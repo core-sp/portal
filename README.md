@@ -1,3 +1,3 @@
 # CORE-SP
 
-Código do Portal CORE-RJ
+Código do Portal CORE-SP
