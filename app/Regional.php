@@ -8,4 +8,5 @@ class Regional extends Model
 {
     protected $table = 'regionais';
     protected $primaryKey = 'idregional';
+    public $timestamps = false;
 }
