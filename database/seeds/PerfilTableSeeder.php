@@ -14,7 +14,12 @@ class PerfilTableSeeder extends Seeder
     {
         $perfil = new Perfil();
         $perfil->nome = "Admin";
-        $perfil->descricao = "Usuário administrador";
+        $perfil->descricao = "Possui controle total do sistema";
+        $perfil->save();
+
+        $perfil = new Perfil();
+        $perfil->nome = "Editor";
+        $perfil->descricao = "Pode gerenciar qualquer tipo de conteúdo no site";
         $perfil->save();
     }
 }
