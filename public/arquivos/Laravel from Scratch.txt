@@ -1,0 +1,14 @@
+- Instalar (composer create-project --prefer-dist laravel/laravel NomeDoProjeto
+
+- Criar banco
+
+- Configurar .env
+
+- app/Providers/AppServiceProviders.php
+	- use Illuminate\Support\Facades\Schema;
+	- public function boot()
+	  {
+	    Schema::defaultStringLength(191);
+	  }
+
+- run php artisan migrate
