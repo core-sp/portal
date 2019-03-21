@@ -78,6 +78,7 @@ Route::prefix('admin')->group(function() {
    */
   Route::prefix('licitacoes')->group(function(){
     Route::get('/', 'LicitacaoController@index')->name('licitacoes.lista');
+    Route::get('/busca', 'LicitacaoController@busca');
     Route::get('/criar', 'LicitacaoController@create');
     Route::post('/criar', 'LicitacaoController@store');
     Route::get('/editar/{id}', 'LicitacaoController@edit');

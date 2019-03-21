@@ -18,7 +18,7 @@ class CreatePaginasTable extends Migration
             $table->string('slug');
             $table->string('titulo');
             $table->text('conteudo');
-            $table->bigInteger('idcategoria')->unsigned();
+            $table->bigInteger('idcategoria')->unsigned()->nullable();
             $table->foreign('idcategoria')->references('idcategoria')->on('pagina_categorias');
             $table->bigInteger('idusuario')->unsigned();
             $table->foreign('idusuario')->references('idusuario')->on('users');
