@@ -53,6 +53,7 @@ Route::prefix('admin')->group(function() {
    */
   Route::prefix('regionais')->group(function() {
     Route::get('/', 'RegionalController@index');
+    Route::get('/busca', 'RegionalController@busca');
     Route::get('/mostra/{id}', 'RegionalController@show');
   });
 
