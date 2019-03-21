@@ -19,7 +19,7 @@ class CreateCursoInscritosTable extends Migration
             $table->string('nome');
             $table->string('telefone');
             $table->string('email');
-            $table->bigInteger('idcurso')->unsigned();
+            $table->bigInteger('idcurso')->unsigned()->nullable();
             $table->foreign('idcurso')->references('idcurso')->on('cursos');
             $table->timestamps();
         });

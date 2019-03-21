@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 use App\Licitacao;
 
 class LicitacaoController extends Controller
@@ -172,5 +173,20 @@ class LicitacaoController extends Controller
         $licitacao = Licitacao::onlyTrashed()->find($id);
         $licitacao->restore();
         return redirect()->route('licitacoes.lista');
+    }
+
+    public function busca()
+    {
+        $busca = Input::get('q');
+        $licitacoes = Licitacao::where('modalidade','LIKE','%'.$busca.'%')
+            ->orWhere('nrlicitacao','LIKE','%'.$busca.'%')
+            ->orWhere('nrprocesso','LIKE','%'.$busca.'%')
+            ->orWhere('situacao','LIKE','%'.$busca.'%')
+            ->orWhere('objeto','LIKE','%'.$busca.'%')
+            ->paginate(10);
+        if (count($licitacoes) > 0) 
+            return view('admin.licitacoes.home', compact('licitacoes', 'busca'));
+        else
+            return view('admin.licitacoes.home')->withMessage('Nenhum curso encontrado');
     }
 }
