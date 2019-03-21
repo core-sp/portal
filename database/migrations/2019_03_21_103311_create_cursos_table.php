@@ -22,6 +22,7 @@ class CreateCursosTable extends Migration
             $table->string('endereco');
             $table->integer('nrvagas');
             $table->text('descricao');
+            $table->text('observacao')->nullable();
             $table->bigInteger('idregional')->unsigned();
             $table->foreign('idregional')->references('idregional')->on('regionais');
             $table->bigInteger('idusuario')->unsigned();

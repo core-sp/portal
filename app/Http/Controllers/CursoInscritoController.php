@@ -56,13 +56,28 @@ class CursoInscritoController extends Controller
         return redirect()->route('cursos.lista');
     }
 
+    public static function permiteInscricao($idcurso)
+    {
+        $contaInscritos = CursoInscrito::where('idcurso', $idcurso)->count();
+        $curso = Curso::find($idcurso);
+        $vagas = $curso->nrvagas;
+        if ($contaInscritos < $vagas) 
+            return true;
+        else
+            return false;        
+    }
+
     public function inscricaoView($idcurso)
     {
-        $curso = Curso::find($idcurso);
-        if ($curso) 
-            return view('site.curso-inscricao', compact('curso'));
-        else
+        if ($this->permiteInscricao($idcurso)) {
+            $curso = Curso::find($idcurso);
+            if ($curso) 
+                return view('site.curso-inscricao', compact('curso'));
+            else
+                abort(404);
+        } else {
             abort(404);
+        }
     }
 
     public function inscricao(Request $request)
