@@ -1,7 +1,3 @@
-# Project Title
+# CORE-SP
 
 Código do Portal CORE-SP
-
-## Getting Started
-
-Código fechado
