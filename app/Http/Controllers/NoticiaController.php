@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 use App\Noticia;
 use App\Regional;
 use Illuminate\Support\Str;
@@ -158,5 +159,17 @@ class NoticiaController extends Controller
         $noticia = Noticia::onlyTrashed()->find($id);
         $noticia->restore();
         return redirect('/admin/noticias');
+    }
+
+    public function busca()
+    {
+        $busca = Input::get('q');
+        $noticias = Noticia::where('titulo','LIKE','%'.$busca.'%')
+            ->orWhere('conteudo','LIKE','%'.$busca.'%')
+            ->paginate(10);
+        if (count($noticias) > 0) 
+            return view('admin.noticias.home', compact('noticias', 'busca'));
+        else
+            return view('admin.noticias.home')->withMessage('Nenhuma notícia encontrada');
     }
 }

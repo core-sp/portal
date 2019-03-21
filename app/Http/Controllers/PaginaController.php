@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 use App\Pagina;
 use App\User;
 use App\PaginaCategoria;
@@ -175,6 +176,19 @@ class PaginaController extends Controller
         $pagina = Pagina::onlyTrashed()->find($id);
         $pagina->restore();
         return redirect('/admin/paginas');
+    }
+
+    public function busca(Request $request)
+    {
+        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $busca = Input::get('q');
+        $paginas = Pagina::where('titulo','LIKE','%'.$busca.'%')
+            ->orWhere('conteudo','LIKE','%'.$busca.'%')
+            ->paginate(10);
+        if (count($paginas) > 0) 
+            return view('admin.paginas.home', compact('paginas', 'busca'));
+        else
+            return view('admin.paginas.home')->withMessage('Nenhuma página encontrada');
     }
 
 }

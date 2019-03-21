@@ -24,11 +24,31 @@ use \App\Http\Controllers\Helper;
       <div class="col-sm-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">
+            <h3 class="card-title d-inline">
               Lista de notícias do CORE-SP
             </h3>
+            @if(isset($busca))
+            <a href="/admin/noticias" class="badge badge-primary d-inline ml-2">Mostrar todas</a>
+            @endif
+            <div class="card-tools">
+              <form class="input-group input-group-sm"
+                method="GET"
+                role="form"
+                action ="/admin/noticias/busca">
+                <input type="text"
+                  name="q"
+                  class="form-control float-right"
+                  placeholder="Pesquisar" />
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-default">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
           <div class="card-body">
+            @if(isset($noticias))
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -69,9 +89,15 @@ use \App\Http\Controllers\Helper;
                 @endforeach
               </tbody>
             </table>
+            @else
+            Nenhuma notícia encontrada
+            <a href="/admin/noticias" class="badge badge-primary d-inline ml-2">Mostrar todas</a>
+            @endif
           </div>
           <div class="card-footer">
+            @if(isset($noticias))
             {{ $noticias->links() }}
+            @endif
           </div>
         </div>
       </div>

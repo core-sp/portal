@@ -27,10 +27,12 @@ class RegionalController extends Controller
     	return view('admin.regionais.mostra', compact('regional', 'noticias'));
     }
 
-    public function busca(Request $request)
+    public function busca()
     {
         $busca = Input::get('q');
-        $regionais = Regional::where('regional','LIKE','%'.$busca.'%')->paginate(10);
+        $regionais = Regional::where('regional','LIKE','%'.$busca.'%')
+            ->orWhere('email','LIKE','%'.$busca.'%')
+            ->paginate(10);
         if (count($regionais) > 0) 
             return view('admin.regionais.home', compact('regionais', 'busca'));
         else
