@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 use App\Curso;
 use App\Regional;
 use App\CursoInscrito;
@@ -188,5 +189,18 @@ class CursoController extends Controller
             ->paginate(10);
         $curso = Curso::find($id);
         return view('admin.cursos.inscritos', compact('inscritos', 'curso'));
+    }
+
+    public function busca()
+    {
+        $busca = Input::get('q');
+        $cursos = Curso::where('tipo','LIKE','%'.$busca.'%')
+            ->orWhere('tema','LIKE','%'.$busca.'%')
+            ->orWhere('descricao','LIKE','%'.$busca.'%')
+            ->paginate(10);
+        if (count($cursos) > 0) 
+            return view('admin.cursos.home', compact('cursos', 'busca'));
+        else
+            return view('admin.cursos.home')->withMessage('Nenhum curso encontrado');
     }
 }

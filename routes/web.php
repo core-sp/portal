@@ -31,6 +31,7 @@ Route::prefix('admin')->group(function() {
    */
   Route::prefix('paginas')->group(function() {
     Route::get('/', 'PaginaController@index')->name('paginas.lista');
+    Route::get('/busca', 'PaginaController@busca');
     Route::get('/criar', 'PaginaController@create');
     Route::post('/criar', 'PaginaController@store');
     Route::get('/editar/{id}', 'PaginaController@edit');
@@ -62,6 +63,7 @@ Route::prefix('admin')->group(function() {
    */
   Route::prefix('noticias')->group(function(){
     Route::get('/', 'NoticiaController@index');
+    Route::get('/busca', 'NoticiaController@busca');
     Route::get('/criar', 'NoticiaController@create');
     Route::post('/criar', 'NoticiaController@store');
     Route::get('/editar/{id}', 'NoticiaController@edit');
@@ -118,6 +120,7 @@ Route::prefix('admin')->group(function() {
    */
   Route::prefix('cursos')->group(function(){
     Route::get('/', 'CursoController@index')->name('cursos.lista');
+    Route::get('/busca', 'CursoController@busca');
     Route::get('/criar', 'CursoController@create');
     Route::post('/criar', 'CursoController@store');
     Route::get('/editar/{id}', 'CursoController@edit');
