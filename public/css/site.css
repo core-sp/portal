@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900');
+
+/*
+ * REGRAS GERAIS
+ */
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
+.preto {
+	color: #141414;
+}
+
+.branco {
+	color: #FFFFFF;
+}
+
+.contraste {
+	background-color: #141414 !important;
+	color: #FFF !important;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+a, a:hover {
+	color: inherit;
+}
+
+.nomargin {
+	margin: 0px;
+}
+
+.nopadding {
+	padding: 0px;
+}
+
+h1 {
+	font-weight: 700;
+	font-size: 3rem;
+}
+
+p, .menu-principal ul li {
+	font-size: 1rem;
+}
+
+/*
+ * REGRAS DO CABEÇALHO
+ */
+#btn-atendimento {
+	background: rgba(151,180,72,1);
+	background: -moz-linear-gradient(left, rgba(151,180,72,1) 0%, rgba(57,100,58,1) 100%);
+	background: -webkit-gradient(left top, right top, color-stop(0%, rgba(151,180,72,1)), color-stop(100%, rgba(57,100,58,1)));
+	background: -webkit-linear-gradient(left, rgba(151,180,72,1) 0%, rgba(57,100,58,1) 100%);
+	background: -o-linear-gradient(left, rgba(151,180,72,1) 0%, rgba(57,100,58,1) 100%);
+	background: -ms-linear-gradient(left, rgba(151,180,72,1) 0%, rgba(57,100,58,1) 100%);
+	background: linear-gradient(to right, rgba(151,180,72,1) 0%, rgba(57,100,58,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#97b448', endColorstr='#39643a', GradientType=1 );
+	color: #FFF;
+	letter-spacing: 0.15rem;
+}
+
+.menu-principal ul li {
+	display: inline-block;
+	padding: 0.65rem 1.35rem;
+	margin-left: 0.45rem;
+	margin-right: 0.45rem;
+	border-top: 0.2rem solid #808080;
+	font-weight: 500;
+	text-align: center;
+}
+
+.menu-principal ul li:hover {
+	border-top-color: rgb(21, 170, 226);
+	color: rgb(21,170,226);
+	cursor: pointer;
+}
+
+.has-child {
+	position: relative;
+}
+
+.dropdown-menu {
+	background-color: #e8eaeb;
+	border-radius: 0px;
+	top: 93%;
+}
+
+.dropdown-menu a {
+	padding: 0.25rem 0.75rem;
+	color: #141414;
+}
+
+.dropdown-menu a:hover {
+	color: rgb(21,170,226);
+}
+
+.dropdown:hover>.dropdown-menu {
+	display: block;
+}
+
+/*
+ * REGRAS DA HOME
+ */
+.carousel {
+  height: 30rem;
+}
+
+.carousel-item img {
+	object-fit: cover;
+	object-position: center;
+	height: 100%;
+	width: 100%;
+}
+
+/*
+ * REGRAS DE PÁGINAS
+ */
+.pagina-titulo {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	left: 0;
+	right: 0;
+}

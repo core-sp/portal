@@ -62,6 +62,7 @@ class PaginaController extends Controller
         $pagina = new Pagina();
         $pagina->titulo = $request->input('titulo');
         $pagina->slug = Str::slug($request->input('titulo'), '-');
+        $pagina->img = $request->input('img');
         $pagina->conteudo = $request->input('conteudo');
         $pagina->idcategoria = $request->input('categoria');
         $pagina->idusuario = $request->input('idusuario');
@@ -131,6 +132,7 @@ class PaginaController extends Controller
         $pagina = Pagina::find($id);
         $pagina->titulo = $request->input('titulo');
         $pagina->slug = Str::slug($request->input('titulo'), '-');
+        $pagina->img = $request->input('img');
         $pagina->conteudo = $request->input('conteudo');
         $pagina->idcategoria = $request->input('categoria');
         $pagina->idusuario = $request->input('idusuario');
