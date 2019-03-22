@@ -24,11 +24,31 @@ use \App\Http\Controllers\Helper;
       <div class="col-sm-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">
+            <h3 class="card-title d-inline">
               Lista de concursos do CORE-SP
             </h3>
+            @if(isset($busca))
+            <a href="/admin/concursos" class="badge badge-primary d-inline ml-2">Mostrar todas</a>
+            @endif
+            <div class="card-tools">
+              <form class="input-group input-group-sm"
+                method="GET"
+                role="form"
+                action ="/admin/concursos/busca">
+                <input type="text"
+                  name="q"
+                  class="form-control float-right"
+                  placeholder="Pesquisar" />
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-default">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
           <div class="card-body">
+            @if(isset($concursos))
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -61,9 +81,26 @@ use \App\Http\Controllers\Helper;
                 @endforeach
               </tbody>
             </table>
+            @else
+            Nenhum concurso encontrado
+            <a href="/admin/concursos" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
+            @endif
           </div>
           <div class="card-footer">
-            {{ $concursos->links() }}
+            @if(isset($concursos))
+            <div class="row">
+              <div class="col-sm-5 align-self-center">
+                @if($concursos->count() > 1)
+                Exibindo {{ $concursos->firstItem() }} a {{ $concursos->lastItem() }} concursos de {{ $concursos->total() }} resultados.
+                @endif
+              </div>
+              <div class="col-sm-7">
+                <div class="float-right">
+                  {{ $concursos->links() }}
+                </div>
+              </div>
+            </div>
+            @endif
           </div>
         </div>
       </div>

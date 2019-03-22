@@ -96,7 +96,18 @@ use \App\Http\Controllers\Helper;
           </div>
           <div class="card-footer">
             @if(isset($noticias))
-            {{ $noticias->links() }}
+            <div class="row">
+              <div class="col-sm-5 align-self-center">
+                @if($noticias->count() > 1)
+                Exibindo {{ $noticias->firstItem() }} a {{ $noticias->lastItem() }} notícias de {{ $noticias->total() }} resultados.
+                @endif
+              </div>
+              <div class="col-sm-7">
+                <div class="float-right">
+                  {{ $noticias->links() }}
+                </div>
+              </div>
+            </div>
             @endif
           </div>
         </div>

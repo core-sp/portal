@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Input;
 use App\User;
 use App\Perfil;
 
@@ -141,7 +142,7 @@ class UserController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin']);
-        $usuarios = User::onlyTrashed()->get();
+        $usuarios = User::onlyTrashed()->paginate(10);
         return view('/admin/usuarios/lixeira', compact('usuarios'));
     }
 
@@ -199,5 +200,17 @@ class UserController extends Controller
     public function infos()
     {
         return view('admin.info.home');
+    }
+
+    public function busca()
+    {
+        $busca = Input::get('q');
+        $usuarios = User::where('nome','LIKE','%'.$busca.'%')
+            ->orWhere('email','LIKE','%'.$busca.'%')
+            ->paginate(10);
+        if (count($usuarios) > 0) 
+            return view('admin.usuarios.home', compact('usuarios', 'busca'));
+        else
+            return view('admin.usuarios.home')->withMessage('Nenhum usuário encontrado');
     }
 }

@@ -22,7 +22,6 @@
             <h3 class="card-title">
               Lista de categorias de páginas do CORE-SP
             </h3>
-            
           </div>
           <div class="card-body">
             <table class="table table-hover">
@@ -53,7 +52,20 @@
             </table>
           </div>
           <div class="card-footer">
-            {{ $categorias->links() }}
+            @if(isset($categorias))
+            <div class="row">
+              <div class="col-sm-5 align-self-center">
+                @if($categorias->count() > 1)
+                Exibindo {{ $categorias->firstItem() }} a {{ $categorias->lastItem() }} categorias de {{ $categorias->total() }} resultados.
+                @endif
+              </div>
+              <div class="col-sm-7">
+                <div class="float-right">
+                  {{ $categorias->links() }}
+                </div>
+              </div>
+            </div>
+            @endif
           </div>
         </div>
       </div>

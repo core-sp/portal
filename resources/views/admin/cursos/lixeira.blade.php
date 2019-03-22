@@ -58,6 +58,9 @@ use \App\Http\Controllers\Helper;
               </tbody>
             </table>
           </div>
+          <div class="card-footer">
+            {{ $cursos->links() }}
+          </div>
         </div>
       </div>
     </div>

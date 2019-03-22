@@ -157,7 +157,7 @@ class LicitacaoController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        $licitacoes = Licitacao::onlyTrashed()->get();
+        $licitacoes = Licitacao::onlyTrashed()->paginate(10);
         return view('admin.licitacoes.lixeira', compact('licitacoes'));
     }
 
@@ -187,6 +187,6 @@ class LicitacaoController extends Controller
         if (count($licitacoes) > 0) 
             return view('admin.licitacoes.home', compact('licitacoes', 'busca'));
         else
-            return view('admin.licitacoes.home')->withMessage('Nenhum curso encontrado');
+            return view('admin.licitacoes.home')->withMessage('Nenhuma licitação encontrada');
     }
 }

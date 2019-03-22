@@ -93,7 +93,18 @@ use \App\Http\Controllers\Helpers\CursoHelper;
           </div>
           <div class="card-footer">
             @if(isset($cursos))
-            {{ $cursos->links() }}
+            <div class="row">
+              <div class="col-sm-5 align-self-center">
+                @if($cursos->count() > 1)
+                Exibindo {{ $cursos->firstItem() }} a {{ $cursos->lastItem() }} cursos de {{ $cursos->total() }} resultados.
+                @endif
+              </div>
+              <div class="col-sm-7">
+                <div class="float-right">
+                  {{ $cursos->links() }}
+                </div>
+              </div>
+            </div>
             @endif
           </div>
         </div>

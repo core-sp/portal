@@ -93,6 +93,7 @@ Route::prefix('admin')->group(function() {
    */
   Route::prefix('usuarios')->group(function(){
     Route::get('/', 'UserController@index')->name('usuarios.lista');
+    Route::get('/busca', 'UserController@busca');
     Route::get('/criar', 'UserController@create');
     Route::post('/criar', 'UserController@store');
     Route::get('/editar/{id}', 'UserController@edit');
@@ -107,6 +108,7 @@ Route::prefix('admin')->group(function() {
    */
   Route::prefix('concursos')->group(function(){
     Route::get('/', 'ConcursoController@index')->name('concursos.lista');
+    Route::get('/busca', 'ConcursoController@busca');
     Route::get('/criar', 'ConcursoController@create');
     Route::post('/criar', 'ConcursoController@store');
     Route::get('/editar/{id}', 'ConcursoController@edit');

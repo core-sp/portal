@@ -163,7 +163,7 @@ class CursoController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        $cursos = Curso::onlyTrashed()->get();
+        $cursos = Curso::onlyTrashed()->paginate(10);
         return view('admin.cursos.lixeira', compact('cursos'));
     }
 

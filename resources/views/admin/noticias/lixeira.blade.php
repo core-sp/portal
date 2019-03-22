@@ -6,7 +6,8 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-12">
-        <h1>Notícias deletadas</h1>
+        <h1 class="d-inline mr-3 align-middle">Notícias Deletadas</h1>
+        <a href="/admin/noticias" class="btn btn-primary">Lista de Notícias</a>
       </div>
     </div>
   </div>
@@ -46,12 +47,10 @@
               </tbody>
             </table>
           </div>
+          <div class="card-footer">
+            {{ $noticias->links() }}
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-12">
-        <a href="/admin/noticias" class="btn btn-primary">Lista de Notícias</a>
       </div>
     </div>
   </div>
