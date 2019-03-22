@@ -26,7 +26,7 @@ $(document).ready(function() {
       "insertdatetime media nonbreaking save table contextmenu directionality",
       "emoticons template paste textcolor colorpicker textpattern"
     ],
-    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+    toolbar: "insertfile undo redo | fontsizeselect | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
     relative_urls: false,
     file_browser_callback : function(field_name, url, type, win) {
       var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
@@ -51,6 +51,34 @@ $(document).ready(function() {
   };
 
   tinymce.init(editor_config);
+
+  // Função para botão stand-alone do LFM
+  (function( $ ){
+
+    $.fn.filemanager = function(type, options) {
+      type = type || 'file';
+
+      this.on('click', function(e) {
+        var route_prefix = (options && options.prefix) ? options.prefix : '/laravel-filemanager';
+        localStorage.setItem('target_input', $(this).data('input'));
+        localStorage.setItem('target_preview', $(this).data('preview'));
+        window.open(route_prefix + '?type=' + type, 'FileManager', 'width=900,height=600');
+        window.SetUrl = function (url, file_path) {
+            //set the value of the desired input to image url
+            var target_input = $('#' + localStorage.getItem('target_input'));
+            target_input.val(file_path).trigger('change');
+
+            //set or change the preview image src
+            var target_preview = $('#' + localStorage.getItem('target_preview'));
+            target_preview.attr('src', url).trigger('change');
+        };
+        return false;
+      });
+    }
+
+  })(jQuery);
+
+  $('#lfm').filemanager('image');
 
 });
 

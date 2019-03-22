@@ -26,7 +26,7 @@ return [
     // If true, private folders will be created for each signed-in user.
     'allow_multi_user' => true,
     // If true, share folder will be created when allow_multi_user is true.
-    'allow_share_folder' => true,
+    'allow_share_folder' => false,
 
     // Flexible way to customize client folders accessibility
     // If you want to customize client folders, publish tag="lfm_handler"
@@ -48,7 +48,7 @@ return [
     'images_folder_name' => 'imagens',
     'files_folder_name'  => 'arquivos',
 
-    'shared_folder_name' => 'compartilhamentos',
+    'shared_folder_name' => 'geral',
     'thumb_folder_name'  => 'thumbnails',
 
     /*

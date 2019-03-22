@@ -27,15 +27,26 @@
             @csrf
             <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
             <div class="card-body">
+              <div class="form-group">
+                <label for="titulo">Título da página</label>
+                <input type="text" class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}" placeholder="Título" name="titulo" />
+                @if($errors->has('titulo'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('titulo') }}
+                </div>
+                @endif
+              </div>
               <div class="form-row">
                 <div class="col">
-                  <label for="titulo">Título da página</label>
-                  <input type="text" class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}" placeholder="Título" name="titulo" />
-                  @if($errors->has('titulo'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('titulo') }}
+                  <label for="lfm">Imagem principal</label>
+                  <div class="input-group">
+                    <span class="input-group-btn">
+                      <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
+                        <i class="fas fa-picture-o"></i> Inserir imagem
+                      </a>
+                    </span>
+                    <input id="thumbnail" class="form-control" type="text" name="img" />
                   </div>
-                  @endif
                 </div>
                 <div class="col">
                   <label for="categoria">Categoria</label>
