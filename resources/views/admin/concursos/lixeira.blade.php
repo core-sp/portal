@@ -53,6 +53,9 @@ use \App\Http\Controllers\Helper;
               </tbody>
             </table>
           </div>
+          <div class="card-footer">
+            {{ $concursos->links() }}
+          </div>
         </div>
       </div>
     </div>

@@ -74,7 +74,18 @@
           </div>
           <div class="card-footer">
             @if(isset($regionais))
-            {{ $regionais->links() }}
+            <div class="row">
+              <div class="col-sm-5 align-self-center">
+                @if($regionais->count() > 1)
+                Exibindo {{ $regionais->firstItem() }} a {{ $regionais->lastItem() }} regionais de {{ $regionais->total() }} resultados.
+                @endif
+              </div>
+              <div class="col-sm-7">
+                <div class="float-right">
+                  {{ $regionais->links() }}
+                </div>
+              </div>
+            </div>
             @endif
           </div>
         </div>

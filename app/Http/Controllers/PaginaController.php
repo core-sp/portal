@@ -160,7 +160,7 @@ class PaginaController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        $paginas = Pagina::onlyTrashed()->get();
+        $paginas = Pagina::onlyTrashed()->paginate(10);
         return view('/admin/paginas/lixeira', compact('paginas'));
     }
 

@@ -100,7 +100,18 @@ use \App\Http\Controllers\Helper;
           </div>
           <div class="card-footer">
             @if(isset($paginas))
-            {{ $paginas->links() }}
+            <div class="row">
+              <div class="col-sm-5 align-self-center">
+                @if($paginas->count() > 1)
+                Exibindo {{ $paginas->firstItem() }} a {{ $paginas->lastItem() }} páginas de {{ $paginas->total() }} resultados.
+                @endif
+              </div>
+              <div class="col-sm-7">
+                <div class="float-right">
+                  {{ $paginas->links() }}
+                </div>
+              </div>
+            </div>
             @endif
           </div>
         </div>

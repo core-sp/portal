@@ -51,6 +51,9 @@ use \App\Http\Controllers\Helper;
               </tbody>
             </table>
           </div>
+          <div class="card-footer">
+            {{ $paginas->links() }}
+          </div>
         </div>
       </div>
     </div>

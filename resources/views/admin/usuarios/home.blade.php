@@ -20,11 +20,31 @@
       <div class="col-sm-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">
+            <h3 class="card-title d-inline">
               Lista de usuários do CORE-SP
             </h3>
+            @if(isset($busca))
+            <a href="/admin/usuarios" class="badge badge-primary d-inline ml-2">Mostrar todas</a>
+            @endif
+            <div class="card-tools">
+              <form class="input-group input-group-sm"
+                method="GET"
+                role="form"
+                action ="/admin/usuarios/busca">
+                <input type="text"
+                  name="q"
+                  class="form-control float-right"
+                  placeholder="Pesquisar" />
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-default">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
           <div class="card-body">
+            @if(isset($usuarios))
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -54,9 +74,26 @@
                 @endforeach
               </tbody>
             </table>
+            @else
+            Nenhum usuário encontrado
+            <a href="/admin/usuarios" class="badge badge-primary d-inline ml-2">Mostrar todas</a>
+            @endif
           </div>
           <div class="card-footer">
-            {{ $usuarios->links() }}
+            @if(isset($usuarios))
+            <div class="row">
+              <div class="col-sm-5 align-self-center">
+                @if($usuarios->count() > 1)
+                Exibindo {{ $usuarios->firstItem() }} a {{ $usuarios->lastItem() }} usuários de {{ $usuarios->total() }} resultados.
+                @endif
+              </div>
+              <div class="col-sm-7">
+                <div class="float-right">
+                  {{ $usuarios->links() }}
+                </div>
+              </div>
+            </div>
+            @endif
           </div>
         </div>
       </div>

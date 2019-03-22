@@ -84,13 +84,24 @@ use \App\Http\Controllers\Helper;
               </tbody>
             </table>
             @else
-            Nenhuma notícia encontrada
+            Nenhuma licitação encontrada
             <a href="/admin/licitacoes" class="badge badge-primary d-inline ml-2">Mostrar todas</a>
             @endif
           </div>
           <div class="card-footer">
             @if(isset($licitacoes))
-            {{ $licitacoes->links() }}
+            <div class="row">
+              <div class="col-sm-5 align-self-center">
+                @if($licitacoes->count() > 1)
+                Exibindo {{ $licitacoes->firstItem() }} a {{ $licitacoes->lastItem() }} licitações de {{ $licitacoes->total() }} resultados.
+                @endif
+              </div>
+              <div class="col-sm-7">
+                <div class="float-right">
+                  {{ $licitacoes->links() }}
+                </div>
+              </div>
+            </div>
             @endif
           </div>
         </div>

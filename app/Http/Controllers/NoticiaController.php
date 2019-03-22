@@ -143,7 +143,7 @@ class NoticiaController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        $noticias = Noticia::onlyTrashed()->get();
+        $noticias = Noticia::onlyTrashed()->paginate(10);
         return view('/admin/noticias/lixeira', compact('noticias'));
     }
 

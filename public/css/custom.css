@@ -17,3 +17,7 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
+
+.pagination {
+	margin-bottom: 0px;
+}

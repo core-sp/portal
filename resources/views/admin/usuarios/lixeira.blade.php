@@ -53,6 +53,9 @@ use \App\Http\Controllers\Helper;
               </tbody>
             </table>
           </div>
+          <div class="card-footer">
+            {{ $usuarios->links() }}
+          </div>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 use App\Concurso;
 
 class ConcursoController extends Controller
@@ -151,7 +152,7 @@ class ConcursoController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        $concursos = Concurso::onlyTrashed()->get();
+        $concursos = Concurso::onlyTrashed()->paginate(10);
         return view('admin.concursos.lixeira', compact('concursos'));
     }
 
@@ -167,5 +168,19 @@ class ConcursoController extends Controller
         $concurso = Concurso::onlyTrashed()->find($id);
         $concurso->restore();
         return redirect()->route('concursos.lista');
+    }
+
+    public function busca()
+    {
+        $busca = Input::get('q');
+        $concursos = Concurso::where('modalidade','LIKE','%'.$busca.'%')
+            ->orWhere('nrprocesso','LIKE','%'.$busca.'%')
+            ->orWhere('situacao','LIKE','%'.$busca.'%')
+            ->orWhere('objeto','LIKE','%'.$busca.'%')
+            ->paginate(10);
+        if (count($concursos) > 0) 
+            return view('admin.concursos.home', compact('concursos', 'busca'));
+        else
+            return view('admin.concursos.home')->withMessage('Nenhum concurso encontrado');
     }
 }
