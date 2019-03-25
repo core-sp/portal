@@ -60,7 +60,7 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-sm-3 text-right align-self-center">
               <div class="mb-2">
-                <button class="btn-atendimento d-inline">Atendimento: <strong>(11) 3243-5500</strong></button>
+                <button class="btn-atendimento d-inline"><h5 class="light">Atendimento: <strong>(11) 3243-5500</strong></h5></button>
               </div>
               <div>
                 <small class="cinza-escuro">Acompanhe-nos:&nbsp;</small>

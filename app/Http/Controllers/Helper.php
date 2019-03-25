@@ -35,4 +35,11 @@ class Helper extends Controller
         $format = $date->format('H:i\ \d\o \d\i\a d\/m\/Y');
         return $format;
     }
+
+    public static function newsData($data)
+    {
+        $date = new \DateTime($data);
+        $format = $date->format('d\/m\/Y');
+        return $format;
+    }
 }

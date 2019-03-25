@@ -1,8 +1,6 @@
 <?php
 
-Route::get('/', function () {
-    return view('site.home');
-});
+Route::get('/', 'SiteController@index');
 
 Route::get('admin', function() {
   return view('admin.home');
