@@ -19,10 +19,15 @@ use \App\Http\Controllers\Helper;
 
       @section('header')
       <header>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="linha-verde w-100"></div>
+          </div>
+        </div>
         <div class="container">
-          <div class="row mt-3 mb-3">
+          <div class="row mb-3 mt-3">
             <div class="col-sm-3 text-left">
-                <img src="{{ asset('img/core.png') }}" alt="CORE-SP" id="logo-header" />
+                <img src="{{ asset('img/logo-horizontal.png') }}" alt="CORE-SP" id="logo-header" />
             </div>
             <div class="col-sm-6 align-self-center">
               <div class="w-75 m-auto text-center">
@@ -55,33 +60,50 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-sm-3 text-right align-self-center">
               <div class="mb-2">
-                <span>Acompanhe-nos:</span>
+                <button class="btn-atendimento d-inline">Atendimento: <strong>(11) 3243-5500</strong></button>
               </div>
-              <button type="button" class="btn btn-sm btn-light">
-                <i class="fab fa-facebook"></i>
-              </button>
-              <button type="button" class="btn btn-sm btn-light">
-                <i class="fab fa-youtube"></i>
-              </button>
-              <button type="button" class="btn btn-sm btn-light">
-                <i class="fab fa-whatsapp"></i>
-              </button>
+              <div>
+                <small class="cinza-escuro">Acompanhe-nos:&nbsp;</small>
+                <button type="button" class="btn btn-sm btn-light">
+                  <i class="fab fa-youtube"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-light">
+                  <i class="fab fa-whatsapp"></i>
+                </button>
+              </div>
             </div>
           </div>
+        </div>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="linha-cinza"></div>
+          </div>
+        </div>
+        <div class="container">
           <div class="row">
               <nav class="menu-principal m-auto">
                 <ul class="nomargin nopadding">
-                  <li><a href="/">Home</a></li>
-                  <li class="dropdown">
-                    <span class="dropdown-toggle">CORE-SP</span>
-                    <div class="dropdown-menu">
-                      <a href="/legislacao" class="drodown-item">Legislação</a>
+                  <li class="nav-item">
+                    <a href="/" class="nav-link">Home</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a href="/legislacao" class="dropdown-item">Legislação</a>
                     </div>
                   </li>
-                  <li>Transparência</li>
-                  <li>Licitações</li>
-                  <li>Seccionais</li>
-                  <li>E-OUV</li>
+                  <li class="nav-item">
+                    <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="nav-link" target="_blank">Transparência</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#" class="nav-link">Licitações</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#" class="nav-link">Seccionais</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#" class="nav-link">E-OUV</a>
+                  </li>
                 </ul>
               </nav>              
           </div>

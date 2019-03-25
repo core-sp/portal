@@ -35,4 +35,38 @@
   </div>
 </section>
 
+<section id="espaco-representante" class="pt-4 pb-3 cinza-claro-bg">
+  <div class="container">
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="home-title">
+          <blockquote>
+            <h4 class="pr-3">Espaço do Representante</h4>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="box text-center">
+          <i class="fas fa-calculator"></i>
+          <p class="text-uppercase">Simulador de Cálculos</p>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="box text-center">
+          <i class="fas fa-briefcase"></i>
+          <p class="text-uppercase">Balcão de Oportunidades</p>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        
+      </div>
+      <div class="col-sm-3">
+        
+      </div>
+    </div>
+  </div>
+</section>
+
 @endsection
