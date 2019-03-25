@@ -59,6 +59,7 @@ class NoticiaController extends Controller
         $noticia = new Noticia();
         $noticia->titulo = $request->input('titulo');
         $noticia->slug = Str::slug($request->input('titulo'), '-');
+        $noticia->img = $request->input('img');
         $noticia->conteudo = $request->input('conteudo');
         $noticia->idregional = $request->input('regionais');
         $noticia->idusuario = $request->input('idusuario');
@@ -114,6 +115,7 @@ class NoticiaController extends Controller
         $noticia = Noticia::find($id);
         $noticia->titulo = $request->input('titulo');
         $noticia->slug = Str::slug($request->input('titulo'), '-');
+        $noticia->img = $request->input('img');
         $noticia->conteudo = $request->input('conteudo');
         $noticia->idregional = $request->input('regionais');
         $noticia->idusuario = $request->input('idusuario');
