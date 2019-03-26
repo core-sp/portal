@@ -8,7 +8,7 @@ body {
 }
 
 .preto {
-	color: #141414;
+	color: #292929;
 }
 
 .branco {
@@ -44,11 +44,11 @@ body {
 }
 
 .cinza-claro {
-	color: #eeeeee;
+	color: #eaeaea;
 }
 
 .cinza-claro-bg {
-	background-color: #EEEEEE;
+	background-color: #eaeaea;
 }
 
 .cinza-escuro {
@@ -56,7 +56,7 @@ body {
 }
 
 .contraste {
-	background-color: #141414 !important;
+	background-color: #292929 !important;
 	color: #FFF !important;
 }
 
@@ -130,6 +130,10 @@ strong, .bold {
 	font-weight: 700;
 }
 
+.stronger {
+	font-weight: 900;
+}
+
 /*
  * REGRAS DO CABEÇALHO
  */
@@ -161,7 +165,7 @@ strong, .bold {
 .linha-cinza {
 	width: 100%;
 	height: 0.0625rem;
-	background-color: #eeeeee;
+	background-color: #eaeaea;
 }
 
 .nav-item {
@@ -171,6 +175,7 @@ strong, .bold {
 	border-top: 0.3rem solid transparent;
 	text-transform: uppercase;
 	transition: 0.3s;
+	color: #292929;
 }
 
 .nav-item:hover {
@@ -209,8 +214,14 @@ strong, .bold {
 /*
  * REGRAS DA HOME
  */
+
+/* CARROSSEL */
+#carousel {
+	width: 100%;
+}
+
 .carousel {
-  height: 28rem;
+  height: 26rem;
 }
 
 .carousel-item img {
@@ -220,12 +231,13 @@ strong, .bold {
 	width: 100%;
 }
 
+/* TÍTULO DA SEÇÃO */
 .home-title {
 	overflow: hidden;
 }
 
 .home-title blockquote {
-	border-left: 0.3rem solid #484848;
+	border-left: 0.3rem solid #0D632F;
 	padding: 0.1rem 0.6rem;
 	position: relative;
 	z-index: 3;
@@ -235,16 +247,23 @@ strong, .bold {
 	position: absolute;
 	z-index: 5;
 	right: 8px;
-	top: 5px;
+	top: 8px;
 	padding-left: .6rem;
 	padding-right: .3rem;
-	color: #484848;
+	color: #292929;
+	font-size: .95rem;
+}
+
+.home-title h5 i {
+	font-size: 1rem;
+	margin-right: 0.2rem;
+	color: #0D632F;
 }
 
 .home-title blockquote h4 {
 	display: inline-block;
 	font-weight: 700;
-	color: #484848;
+	color: #292929;
 }
 
 .home-title blockquote:after {
@@ -254,7 +273,13 @@ strong, .bold {
 	z-index: 2;
 	height: 1px;
 	top: 55%;
-	background-color: #484848;
+	background-color: #d6d6d6;
+}
+
+/* ESPAÇO DO REPRESENTANTE */
+#espaco-representante {
+	padding-bottom: 8rem;
+	background-color: #eaeaea;
 }
 
 .box {
@@ -275,6 +300,7 @@ strong, .bold {
 	border: 1px solid #FFFFFF;
 	padding: 2.1rem;
 	border-radius: 0.375rem;
+	height: 100%;
 }
 
 .inside-box i {
@@ -298,89 +324,59 @@ strong, .bold {
 .btn-box:hover {
 	color: #FFFFFF;
 	border: 0.2rem solid #FFFFFF;
-	background-color: transparent;
+	background-color: transparente}
+
+/* NOVO CORE */
+#novo-core {
+	margin-top: -5rem;
 }
 
-.nce-text {
-	position: absolute;
-	top: 1.35rem;
-	width: 100%;
-	background-color: #EEEEEE;
-	padding: 0.75rem;
-	border-top-right-radius: 1.25rem;
-	border-bottom-right-radius: 1.25rem;
-	border-top-left-radius: 5rem;
-	border-bottom-left-radius: 5rem;
-	z-index: 2;
+#novo-core h2 {
+	letter-spacing: -0.1rem;
 }
 
-.nce-text-right {
-	position: absolute;
-	top: 1.35rem;
-	width: 100%;
-	background-color: #EEEEEE;
-	padding: 0.75rem;
-	border-top-right-radius: 5rem;
-	border-bottom-right-radius: 5rem;
-	border-top-left-radius: 1.25rem;
-	border-bottom-left-radius: 1.25rem;
+.novo-core-animation {
+	animation-duration: 2s;
 }
 
-.nce-text-border {
-	padding: .75rem .75rem .75rem 8.5rem;
-	border: 1px solid #888888;
-	border-top-right-radius: .5rem;
-	border-bottom-right-radius: .5rem;
-}
-
-.nce-text-border-right {
-	padding: .75rem 8.5rem .75rem .75rem;
-	border: 1px solid #888888;
-	border-top-left-radius: .5rem;
-	border-bottom-left-radius: .5rem;
-}
-
-.novo-core-element .fa-angle-double-right {
-	opacity: 0;
-	transition: .3s;
-}
-
-.novo-core-element:hover {
-	cursor: pointer;
-}
-
-.novo-core-element:hover .fa-angle-double-right {
-	opacity: 1;
-}
-
-.novo-core-element i {
-	font-size: 2.5rem;
-	color: #484848;
-}
-
-.novo-core-element h3 {
-	font-weight: 900;
-	color: #484848;
-}
-
-.novo-core-element figure {
+.novo-core-box {
+	border-radius: 0.5rem;
 	position: relative;
-	z-index: 3;
+	overflow: hidden;
+	background-image: url('/img/bg-novo-core.png');
+	background-size: cover;
+	background-position: center;
+	background-attachment: fixed;
 }
 
 .btn-novo-core {
-	border: .1rem solid #13632F;
-	padding: .5rem 1.5rem;
-	background-color: transparent;
-	border-radius: 3rem;
+	padding: 1rem 3rem;
 	display: inline-block;
-	font-size: .8rem;
+	font-size: 1.25rem;
+	color: #FFFFFF;
+	border: 1px solid #FFFFFF;
+	letter-spacing: -0.05rem;
+	text-transform: uppercase;
+	margin: 0rem 0.5rem;
+	background-color: transparent;
+	transition: .3s;
 }
 
+.btn-novo-core:hover {
+	background-color: #FFFFFF;
+	border: 1px solid transparent;
+	color: #004587;
+}
+
+/* NOTÍCIAS */
 .box-news {
 	height: 15rem;
 	position: relative;
 	overflow: hidden;
+}
+
+.box-news h5 {
+	font-weight: 500;
 }
 
 .bn-img {
