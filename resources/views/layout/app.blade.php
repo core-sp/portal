@@ -11,6 +11,7 @@ use \App\Http\Controllers\Helper;
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>CORE-SP | {{ $title }}</title>
+        <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
         <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
         <link href="{{ asset('/css/site.css') }}" rel="stylesheet">
@@ -27,7 +28,7 @@ use \App\Http\Controllers\Helper;
         <div class="container">
           <div class="row mb-4 mt-4">
             <div class="col-sm-4 text-left">
-                <img src="{{ asset('img/logo-certo.png') }}" alt="CORE-SP" id="logo-header" />
+                <a href="/"><img src="{{ asset('img/logo-certo.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-sm-5 align-self-center">
               <div class="w-75 m-auto text-center">
@@ -62,9 +63,10 @@ use \App\Http\Controllers\Helper;
               <div class="mb-2">
                 <button class="btn-atendimento d-inline"><h5 class="light">Atendimento: <strong>(11) 3243-5500</strong></h5></button>
               </div>
-              <div>
-                <img src="{{ asset('img/001-whatsapp.png') }}" />
-                <img src="{{ asset('img/002-youtube.png') }}" />
+              <div class="sociais">
+                <img src="{{ asset('img/002-whatsapp.png') }}" />
+                <img src="{{ asset('img/001-youtube.png') }}" />
+                <img src="{{ asset('img/icon-transparencia.png') }}" />
               </div>
             </div>
           </div>
@@ -75,32 +77,41 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
         <div class="container">
-          <div class="row">
-              <nav class="menu-principal m-auto">
-                <ul class="nomargin nopadding">
-                  <li class="nav-item">
-                    <a href="/" class="nav-link">Home</a>
-                  </li>
-                  <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a href="/legislacao" class="dropdown-item">Legislação</a>
-                    </div>
-                  </li>
-                  <li class="nav-item">
-                    <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="nav-link" target="_blank">Transparência</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">Licitações</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">Seccionais</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">E-OUV</a>
-                  </li>
-                </ul>
-              </nav>              
+          <div class="row" id="menu-principal">
+            <nav class="menu-principal m-auto">
+              <ul class="nomargin nopadding">
+                <li class="nav-item">
+                  <a href="/" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="/legislacao" class="dropdown-item">Legislação</a>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="nav-link" target="_blank">Transparência</a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link">Licitações</a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link">Seccionais</a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link">E-OUV</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      <header id="fixed-menu" class="pb-2">
+        <div class="container">
+          <img src="{{ asset('img/brasao.png') }}" />
+          <div class="row" id="append-menu">
+            
           </div>
         </div>
       </header>

@@ -51,7 +51,9 @@ use \App\Http\Controllers\Helper;
           <blockquote>
             <h4 class="pr-3">Espaço do Representante</h4>
           </blockquote>
-          <h5 class="float-right cinza-claro-bg"><i class="fas fa-user"></i> Acessar o portal</h5>
+          <h5 class="float-right cinza-claro-bg">
+            <a href="#"><i class="fas fa-user icon-title"></i> Acessar o portal</a>
+          </h5>
         </div>
       </div>
     </div>
@@ -59,16 +61,16 @@ use \App\Http\Controllers\Helper;
       <div class="col-sm-3">
         <div class="box text-center azul-escuro-bg">
           <div class="inside-box">
-            <img src="{{ asset('img/002-money.png') }}" />
+            <img src="{{ asset('img/002-money.png') }}" class="inside-img" />
             <p class="text-uppercase mt-3 branco">Simulador de<br /> Cálculos</p>
-            <a href="#" class="btn-box mt-4">Acessar</a>
+            <a href="#" class="btn-box mt-4">Calcular</a>
           </div>
         </div>
       </div>
       <div class="col-sm-3">
         <div class="box text-center azul-bg">
           <div class="inside-box">
-            <img src="{{ asset('img/001-work.png') }}" />
+            <img src="{{ asset('img/001-work.png') }}" class="inside-img" />
             <p class="text-uppercase mt-3 branco">Balcão de Oportunidades</p>
             <a href="#" class="btn-box mt-4">Acessar</a>
           </div>
@@ -77,18 +79,18 @@ use \App\Http\Controllers\Helper;
       <div class="col-sm-3">
         <div class="box text-center azul-escuro-bg">
           <div class="inside-box">
-            <img src="{{ asset('img/003-bill.png') }}" />
+            <img src="{{ asset('img/003-bill.png') }}" class="inside-img" />
             <p class="text-uppercase mt-3 branco">Emissão de boleto<br>anuidade 2019</p>
-            <a href="#" class="btn-box mt-4">Acessar</a>
+            <a href="#" class="btn-box mt-4">EMITIR</a>
           </div>
         </div>
       </div>
       <div class="col-sm-3">
         <div class="box text-center azul-bg">
           <div class="inside-box">
-            <img src="{{ asset('img/004-note.png') }}" />
+            <img src="{{ asset('img/004-note.png') }}" class="inside-img" />
             <p class="text-uppercase mt-3 branco">Registre-se no portal<br>do representante</p>
-            <a href="#" class="btn-box mt-4">Acessar</a>
+            <a href="#" class="btn-box mt-4">Registrar</a>
           </div>
         </div>
       </div>
@@ -99,13 +101,15 @@ use \App\Http\Controllers\Helper;
 <section id="novo-core" class="mb-5">
   <div class="container">
     <div class="row">
-      <div class="col-12 pb-5 pt-5 pl-2 pr-2 text-center novo-core-box">
-        <div class="wow fadeInLeft novo-core-animation">
-          <h2 class="stronger branco text-uppercase mb-5">um novo core-sp para você!</h2>
-          <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
-          <a href="#" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
-          <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
-          <a href="#" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
+      <div class="col-12">
+        <div class="pb-5 pt-5 pl-2 pr-2 text-center novo-core-box">
+          <div class="wow fadeInLeft novo-core-animation">
+            <h2 class="stronger branco text-uppercase mb-5">um novo core-sp para você!</h2>
+            <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
+            <a href="#" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
+            <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
+            <a href="#" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
+          </div>
         </div>
       </div>
     </div>
@@ -120,7 +124,9 @@ use \App\Http\Controllers\Helper;
           <blockquote>
             <h4 class="pr-3">Notícias</h4>
           </blockquote>
-          <h5 class="float-right branco-bg"><i class="fas fa-plus-circle"></i> Ver mais notícias</h5>
+          <h5 class="float-right branco-bg">
+            <a href="#"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
+          </h5>
         </div>
       </div>
     </div>
@@ -139,5 +145,76 @@ use \App\Http\Controllers\Helper;
     </div>
   </div>
 </section>
+
+<section id="beneficios" class="pt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="beneficios-box row">
+          <div class="col-sm-5">
+            <img src="{{ asset('img/computer.png') }}" id="computer" />
+          </div>
+          <div class="col-sm-7 beneficios-txt">
+            <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
+            <p class="branco">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <div>
+              <a href="#" class="btn-beneficios">saiba mais</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="eouv-calendario" class="pb-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-6">
+        <div class="home-title">
+          <blockquote>
+            <h4 class="pr-3">E-ouv</h4>
+          </blockquote>
+          <h5 class="float-right cinza-claro-bg">
+            <a href="#"><i class="fas fa-question icon-title"></i> Tire suas dúvidas</a>
+          </h5>
+        </div>
+        <div class="row">
+          <div class="col-8">
+            <img src="{{ asset('img/computer.png') }}" />
+          </div>
+          <div class="col-4 text-center eouv-imgs align-self-center">
+            <div class="m-auto pb-3">
+              <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" />
+              <img src="{{ asset('img/icon-eouv-02.png') }}" class="azul-escuro-bg" />
+            </div>
+            <div class="m-auto pb-3">
+              <img src="{{ asset('img/icon-eouv-03.png') }}" class="verde-escuro-bg" />
+              <img src="{{ asset('img/icon-eouv-04.png') }}" class="azul-bg" />
+            </div>
+            <div class="m-auto">
+              <img src="{{ asset('img/icon-eouv-05.png') }}" class="azul-escuro-bg" />
+              <img src="{{ asset('img/icon-eouv-06.png') }}" class="verde-escuro-bg" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="home-title">
+          <blockquote>
+            <h4 class="pr-3">Calendário</h4>
+          </blockquote>
+          <h5 class="float-right cinza-claro-bg">
+            <a href="#"><i class="far fa-calendar-alt icon-title"></i> Consulte a agenda</a>
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div style="height: 500px;">
+  
+</div>
 
 @endsection
