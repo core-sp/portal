@@ -11,6 +11,7 @@ use \App\Http\Controllers\Helper;
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>CORE-SP | Portal</title>
+        <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
         <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
         <link href="{{ asset('/css/custom.css') }}" rel="stylesheet">
@@ -55,7 +56,7 @@ use \App\Http\Controllers\Helper;
           <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="/" class="brand-link">
-              <img src="{{ asset('img/logo-small-core.png') }}" alt="CORE-SP Logo" class="brand-image img-circle elevation-3">
+              <img src="{{ asset('img/brasao.png') }}" alt="CORE-SP Logo" class="brand-image img-circle elevation-3">
               <span class="brand-text font-weight-light"><strong>CORE-</strong>SP</span>
             </a>
 
@@ -78,7 +79,7 @@ use \App\Http\Controllers\Helper;
               </div>
 
               <!-- Sidebar Menu -->
-              <nav class="mt-2">
+              <nav class="mt-2 mb-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                   @if(Auth::user()->hasAnyRole(['admin']))
                   <li class="nav-item has-treeview">
