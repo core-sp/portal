@@ -10,21 +10,25 @@ use \App\Http\Controllers\Helper;
   <div class="container-fluid">
     <div class="row">
       <div id="carousel" class="carousel slide" data-ride="carousel">
+        <!--
         <ol class="carousel-indicators">
           <li data-target="#carousel" data-slide-to="0" class="active"></li>
           <li data-target="#carousel" data-slide-to="1"></li>
           <li data-target="#carousel" data-slide-to="2"></li>
         </ol>
+      -->
         <div class="carousel-inner h-100">
           <div class="carousel-item h-100 active">
-            <img class="d-block w-100" src="{{ asset('img/banner-03.jpg') }}" alt="First slide">
+            <img class="d-block w-100" src="{{ asset('img/banner-v3.png') }}" alt="First slide">
           </div>
+          <!--
           <div class="carousel-item h-100">
             <img class="d-block w-100" src="{{ asset('img/banner-02.jpg') }}" alt="Second slide">
           </div>
           <div class="carousel-item h-100">
             <img class="d-block w-100" src="{{ asset('img/banner-04.jpg') }}" alt="Third slide">
           </div>
+        -->
         </div>
         <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -39,7 +43,7 @@ use \App\Http\Controllers\Helper;
   </div>
 </section>
 
-<section id="espaco-representante" class="pt-5 pb-5 cinza-claro-bg">
+<section id="espaco-representante" class="pt-5">
   <div class="container">
     <div class="row mb-2">
       <div class="col-12">
@@ -56,7 +60,7 @@ use \App\Http\Controllers\Helper;
         <div class="box text-center azul-escuro-bg">
           <div class="inside-box">
             <img src="{{ asset('img/002-money.png') }}" />
-            <p class="text-uppercase mt-3 branco">Simulador de Cálculos</p>
+            <p class="text-uppercase mt-3 branco">Simulador de<br /> Cálculos</p>
             <a href="#" class="btn-box mt-4">Acessar</a>
           </div>
         </div>
@@ -94,66 +98,14 @@ use \App\Http\Controllers\Helper;
 
 <section id="novo-core" class="mb-5">
   <div class="container">
-    <div class="row mt-5 mb-2">
-      <div class="col-12">
-        <div class="home-title">
-          <blockquote>
-            <h4 class="pr-3">Um novo CORE-SP para você</h4>
-          </blockquote>
-        </div>
-      </div>
-    </div>
     <div class="row">
-      <div class="col-6 position-relative">
-        <div class="novo-core-element position-relative">
-          <figure class="nomargin">
-            <img src="{{ asset('img/002-calendar.png') }}" />
-          </figure>
-          <div class="nce-text">
-            <div class="nce-text-border">
-              <h3 class="d-inline align-self-center">AGENDA</h3>
-              <i class="fas fa-angle-double-right float-right"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 position-relative">
-        <div class="novo-core-element position-relative">
-          <figure class="nomargin">
-            <img src="{{ asset('img/001-test.png') }}" />
-          </figure>
-          <div class="nce-text">
-            <div class="nce-text-border">
-              <h3 class="d-inline align-self-center">CONCURSOS</h3>
-              <i class="fas fa-angle-double-right float-right"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 position-relative">
-        <div class="novo-core-element position-relative">
-          <figure class="text-right nomargin">
-            <img src="{{ asset('img/statistics.png') }}" />
-          </figure>
-          <div class="nce-text-right">
-            <div class="nce-text-border-right text-right">
-              <h3 class="d-inline align-self-center">FEIRAS</h3>
-              <i class="fas fa-angle-double-right float-left"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 position-relative">
-        <div class="novo-core-element position-relative">
-          <figure class="text-right nomargin">
-            <img src="{{ asset('img/004-blackboard.png') }}" />
-          </figure>
-          <div class="nce-text-right">
-            <div class="nce-text-border-right text-right">
-              <h3 class="d-inline align-self-center">CURSOS</h3>
-              <i class="fas fa-angle-double-right float-left"></i>
-            </div>
-          </div>
+      <div class="col-12 pb-5 pt-5 pl-2 pr-2 text-center novo-core-box">
+        <div class="wow fadeInLeft novo-core-animation">
+          <h2 class="stronger branco text-uppercase mb-5">um novo core-sp para você!</h2>
+          <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
+          <a href="#" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
+          <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
+          <a href="#" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
         </div>
       </div>
     </div>

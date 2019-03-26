@@ -25,11 +25,11 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
         <div class="container">
-          <div class="row mb-3 mt-3">
-            <div class="col-sm-3 text-left">
-                <img src="{{ asset('img/logo-horizontal.png') }}" alt="CORE-SP" id="logo-header" />
+          <div class="row mb-4 mt-4">
+            <div class="col-sm-4 text-left">
+                <img src="{{ asset('img/logo-certo.png') }}" alt="CORE-SP" id="logo-header" />
             </div>
-            <div class="col-sm-6 align-self-center">
+            <div class="col-sm-5 align-self-center">
               <div class="w-75 m-auto text-center">
                 <div class="acessibilidade mb-2">
                   <button type="button" class="btn btn-sm btn-light" id="btn-contrast">
@@ -63,13 +63,8 @@ use \App\Http\Controllers\Helper;
                 <button class="btn-atendimento d-inline"><h5 class="light">Atendimento: <strong>(11) 3243-5500</strong></h5></button>
               </div>
               <div>
-                <small class="cinza-escuro">Acompanhe-nos:&nbsp;</small>
-                <button type="button" class="btn btn-sm btn-light">
-                  <i class="fab fa-youtube"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-light">
-                  <i class="fab fa-whatsapp"></i>
-                </button>
+                <img src="{{ asset('img/001-whatsapp.png') }}" />
+                <img src="{{ asset('img/002-youtube.png') }}" />
               </div>
             </div>
           </div>
