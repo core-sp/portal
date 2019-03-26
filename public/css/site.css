@@ -346,11 +346,11 @@ strong, .bold {
 .btn-box {
 	background-color: #FFFFFF;
 	padding: 0.3rem 1rem;
-	border: 2px solid #FFFFFF;
+	border: 1px solid #FFFFFF;
 	font-size: 1rem;
 	color: #004587;
 	text-transform: uppercase;
-	font-weight: 700;
+	font-weight: 400;
 	font-size: 1.1rem;
 	display: inline-block;
 	transition: .3s;
@@ -358,7 +358,7 @@ strong, .bold {
 
 .btn-box:hover {
 	color: #FFFFFF;
-	border: 2px solid #FFFFFF;
+	border: 1px solid #FFFFFF;
 	background-color: transparent;
 }
 
