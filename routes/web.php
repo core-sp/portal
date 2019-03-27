@@ -135,6 +135,17 @@ Route::prefix('admin')->group(function() {
     Route::post('/adicionar-inscrito/{id}', 'CursoInscritoController@store');
     Route::put('/cancelar-inscricao/{id}', 'CursoInscritoController@cancelarInscricao');
   });
+
+  /*
+   * Rota para CRUD de Banco de Oportunidade
+   */
+  Route::prefix('bdo')->group(function(){
+    Route::get('/', 'BdoController@index');
+    // Lida com as empresas
+    Route::get('/empresas', 'BdoEmpresaController@index');
+    Route::get('/empresas/busca', 'BdoEmpresaController@busca');
+    Route::get('/empresas/criar', 'BdoEmpresaController@create');
+  });
 });
 
 Route::prefix('/')->group(function() {
