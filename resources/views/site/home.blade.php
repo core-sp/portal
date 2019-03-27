@@ -150,7 +150,7 @@ use \App\Http\Controllers\Helper;
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <div class="beneficios-box row">
+        <div class="beneficios-box row nomargin">
           <div class="col-sm-5">
             <img src="{{ asset('img/computer.png') }}" id="computer" />
           </div>
@@ -170,20 +170,17 @@ use \App\Http\Controllers\Helper;
 <section id="eouv-calendario" class="pb-5">
   <div class="container">
     <div class="row">
-      <div class="col-6">
+      <div class="col-8">
         <div class="home-title">
           <blockquote>
             <h4 class="pr-3">E-ouv</h4>
           </blockquote>
-          <h5 class="float-right cinza-claro-bg">
-            <a href="#"><i class="fas fa-question icon-title"></i> Tire suas dúvidas</a>
-          </h5>
         </div>
         <div class="row">
-          <div class="col-8">
+          <div class="col-7">
             <img src="{{ asset('img/computer.png') }}" />
           </div>
-          <div class="col-4 text-center eouv-imgs align-self-center">
+          <div class="col-5 text-center eouv-imgs align-self-center">
             <div class="m-auto pb-3">
               <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" />
               <img src="{{ asset('img/icon-eouv-02.png') }}" class="azul-escuro-bg" />
@@ -199,22 +196,20 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
       </div>
-      <div class="col-6">
-        <div class="home-title">
-          <blockquote>
-            <h4 class="pr-3">Calendário</h4>
-          </blockquote>
-          <h5 class="float-right cinza-claro-bg">
-            <a href="#"><i class="far fa-calendar-alt icon-title"></i> Consulte a agenda</a>
-          </h5>
+      <div class="col-4">
+        <div id="calendario">
+          <img src="{{ asset('img/calendar.jpg') }}" />
+          <div class="calendario-mascara"></div>
+          <div class="calendario-txt text-center">
+            <div class="calendario-center">
+              <h2 class="branco mb-3">Calendário</h2>
+              <a href="#" class="btn-calendario"><h4 class="normal">Consulte a agenda</h4></a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
-
-<div style="height: 500px;">
-  
-</div>
 
 @endsection
