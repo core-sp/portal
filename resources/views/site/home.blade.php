@@ -49,7 +49,8 @@ use \App\Http\Controllers\Helper;
       <div class="col-12">
         <div class="home-title">
           <blockquote>
-            <h4 class="pr-3">Espaço do Representante</h4>
+            <i></i>
+            <h4 class="pr-3 ml-1">Espaço do Representante</h4>
           </blockquote>
           <h5 class="float-right cinza-claro-bg">
             <a href="#"><i class="fas fa-user icon-title"></i> Acessar o portal</a>
@@ -122,7 +123,8 @@ use \App\Http\Controllers\Helper;
       <div class="col-12">
         <div class="home-title">
           <blockquote>
-            <h4 class="pr-3">Notícias</h4>
+            <i></i>
+            <h4 class="pr-3 ml-1">Notícias</h4>
           </blockquote>
           <h5 class="float-right branco-bg">
             <a href="#"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
@@ -152,11 +154,11 @@ use \App\Http\Controllers\Helper;
       <div class="col-12">
         <div class="beneficios-box row nomargin">
           <div class="col-sm-5">
-            <img src="{{ asset('img/computer.png') }}" id="computer" />
+            <img src="{{ asset('img/benefits-2.png') }}" id="computer" />
           </div>
           <div class="col-sm-7 beneficios-txt">
             <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
-            <p class="branco">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p class="branco light">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
             <div>
               <a href="#" class="btn-beneficios">saiba mais</a>
             </div>
@@ -170,19 +172,20 @@ use \App\Http\Controllers\Helper;
 <section id="eouv-calendario" class="pb-5">
   <div class="container">
     <div class="row">
-      <div class="col-8">
+      <div class="col-6">
         <div class="home-title">
           <blockquote>
-            <h4 class="pr-3">E-ouv</h4>
+            <i></i>
+            <h4 class="pr-3 ml-1">E-ouv</h4>
           </blockquote>
         </div>
         <div class="row">
-          <div class="col-7">
+          <div class="col-8">
             <img src="{{ asset('img/computer.png') }}" />
           </div>
-          <div class="col-5 text-center eouv-imgs align-self-center">
+          <div class="col-4 text-center eouv-imgs align-self-center">
             <div class="m-auto pb-3">
-              <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" />
+              <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" />
               <img src="{{ asset('img/icon-eouv-02.png') }}" class="azul-escuro-bg" />
             </div>
             <div class="m-auto pb-3">
@@ -196,14 +199,23 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
       </div>
-      <div class="col-4">
-        <div id="calendario">
-          <img src="{{ asset('img/calendar.jpg') }}" />
-          <div class="calendario-mascara"></div>
-          <div class="calendario-txt text-center">
-            <div class="calendario-center">
-              <h2 class="branco mb-3">Calendário</h2>
-              <a href="#" class="btn-calendario"><h4 class="normal">Consulte a agenda</h4></a>
+      <div class="col-6">
+        <div class="home-title">
+          <blockquote>
+            <i></i>
+            <h4 class="pr-3 ml-1">Calendário</h4>
+          </blockquote>
+        </div>
+        <div id="calendario" class="row">
+          <div class="col-8">
+            <img src="{{ asset('img/calendario.png') }}" />
+          </div>
+          <div class="col-4 align-self-center text-right">
+            <div class="calendario-txt">
+              <p class="preto">Lorem ipsum doloru sit amet, consectet adipiscing elit. <br />Num bibendum arcu.</p>
+              <a href="#" class="btn-calendario mt-4">
+                <h4 class="normal">confira</h4>
+              </a>
             </div>
           </div>
         </div>

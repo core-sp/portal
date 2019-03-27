@@ -74,6 +74,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Curso', 'idcurso');
     }
 
+    public function bdoempresa()
+    {
+        return $this->hasMany('App\BdoEmpresa', 'idempresa');
+    }
+
     public function autorizarPerfis($perfis)
     {
       if (is_array($perfis)) {

@@ -168,14 +168,14 @@ use \App\Http\Controllers\Helper;
               </div>
               <div class="w-75">
                 <p class="branco">Inscreva-se para receber nossos informativos:</p>
-                <form class="mt-3">
-                  <div class="form-group mb-2">
+                <form class="mt-3" id="newsletter">
+                  <div class="form-group">
                     <input type="text" name="nome" class="form-control" placeholder="Nome" />
                   </div>
-                  <div class="form-group mb-2">
+                  <div class="form-group">
                     <input type="text" name="email" class="form-control" placeholder="E-mail" />
                   </div>
-                  <div class="form-group mb-2">
+                  <div class="form-group">
                     <input type="text" name="celular" class="form-control" placeholder="Celular" />
                   </div>
                   <div class="form-group">
