@@ -17,6 +17,7 @@ class CreateNoticiasTable extends Migration
             $table->bigIncrements('idnoticia');
             $table->string('titulo');
             $table->string('slug');
+            $table->string('img')->nullable(); 
             $table->text('conteudo');
             $table->bigInteger('idregional')->unsigned()->nullable();
             $table->foreign('idregional')->references('idregional')->on('regionais');

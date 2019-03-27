@@ -15,8 +15,9 @@ class CreatePaginasTable extends Migration
     {
         Schema::create('paginas', function (Blueprint $table) {
             $table->bigIncrements('idpagina');
-            $table->string('slug');
             $table->string('titulo');
+            $table->string('slug');
+            $table->string('img')->nullable();
             $table->text('conteudo');
             $table->bigInteger('idcategoria')->unsigned()->nullable();
             $table->foreign('idcategoria')->references('idcategoria')->on('pagina_categorias');

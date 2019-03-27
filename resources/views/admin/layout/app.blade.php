@@ -115,82 +115,101 @@ use \App\Http\Controllers\Helper;
                   </li>
                   @endif
                   @if(Auth::user()->hasAnyRole(['admin', 'editor']))
-                  <li class="nav-header">CONTEÚDO</li>
-                  <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon fas fa-file"></i>
-                      <p>
-                        Páginas
-                        <i class="right fa fa-angle-left"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="/admin/paginas" class="nav-link">
-                          <i class="nav-icon fa fa-angle-right"></i>
-                          <p>Todas as páginas</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="/admin/paginas/criar" class="nav-link">
-                          <i class="nav-icon fa fa-angle-right"></i>
-                          <p>Criar nova página</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="/admin/paginas/categorias" class="nav-link">
-                          <i class="nav-icon fa fa-angle-right"></i>
-                          <p>Categorias</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon far fa-newspaper"></i>
-                      <p>
-                        Notícias
-                        <i class="right fa fa-angle-left"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="/admin/noticias" class="nav-link">
-                          <i class="nav-icon fa fa-angle-right"></i>
-                          <p>Todas as notícias</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="/admin/noticias/criar" class="nav-link">
-                          <i class="nav-icon fa fa-angle-right"></i>
-                          <p>Criar nova notícia</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon fas fa-graduation-cap"></i>
-                      <p>
-                        Cursos
-                        <i class="right fa fa-angle-left"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="/admin/cursos" class="nav-link">
-                          <i class="nav-icon fa fa-angle-right"></i>
-                          <p>Todos os cursos</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="/admin/cursos/criar" class="nav-link">
-                          <i class="nav-icon fa fa-angle-right"></i>
-                          <p>Criar novo curso</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
+                    <li class="nav-header">CONTEÚDO</li>
+                    <li class="nav-item has-treeview">
+                      <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-file-alt"></i>
+                        <p>
+                          Páginas
+                          <i class="right fa fa-angle-left"></i>
+                        </p>
+                      </a>
+                      <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                          <a href="/admin/paginas" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Todas as páginas</p>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/admin/paginas/criar" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Criar nova página</p>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/admin/paginas/categorias" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Categorias</p>
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                      <a href="#" class="nav-link">
+                        <i class="nav-icon far fa-newspaper"></i>
+                        <p>
+                          Notícias
+                          <i class="right fa fa-angle-left"></i>
+                        </p>
+                      </a>
+                      <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                          <a href="/admin/noticias" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Todas as notícias</p>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/admin/noticias/criar" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Criar nova notícia</p>
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                      <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-graduation-cap"></i>
+                        <p>
+                          Cursos
+                          <i class="right fa fa-angle-left"></i>
+                        </p>
+                      </a>
+                      <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                          <a href="/admin/cursos" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Todos os cursos</p>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/admin/cursos/criar" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Criar novo curso</p>
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    @if(Auth::user()->hasAnyRole(['admin']))
+                    <li class="nav-item has-treeview">
+                      <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-briefcase"></i>
+                        <p>
+                          B. de Oportunidades
+                          <i class="right fa fa-angle-left"></i>
+                        </p>
+                      </a>
+                      <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                          <a href="/admin/bdo/empresas" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Empresas</p>
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    @endif
                   @endif
                   @if(Auth::user()->hasAnyRole(['admin', 'juridico']))
                   <li class="nav-header">JURÍDICO</li>
