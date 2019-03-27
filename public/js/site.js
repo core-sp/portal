@@ -1,6 +1,4 @@
-$(document).ready(function(){
-	new WOW().init();
-	
+$(document).ready(function(){	
 	$('#btn-contrast').on('click', function(){
 		$('body').toggleClass('contraste');
 		$('#espaco-representante').toggleClass('contraste');
@@ -9,7 +7,7 @@ $(document).ready(function(){
 
 $(window).scroll(function(){
 	if ($(document).scrollTop() > 300) {
-		$('#fixed-menu').slideDown(200);
+		$('#fixed-menu').slideDown(150);
 	} else {
 		$('#fixed-menu').hide();
 	}
