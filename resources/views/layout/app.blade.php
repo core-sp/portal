@@ -119,6 +119,79 @@ use \App\Http\Controllers\Helper;
 
       @yield('content')
 
+      @section('footer')
+      <footer class="pt-4">
+        <div class="container mb-4">
+          <div class="row">
+            <div class="col-4">
+              <div class="footer-title w-75 mb-3">
+                <h5 class="branco">Localização</h5>
+              </div>
+              <p class="branco mb-1">
+                Rua Brigadeiro Luís Antônio, 613
+                <br />Térreo - CEP: 01317-000
+                <br />São Paulo - SP
+                <br />CNPJ: 60.746.179/0001-52
+              </p>
+              <div class="footer-title w-75 mb-3 mt-4">
+                <h5 class="branco">Contato</h5>
+              </div>
+              <p class="branco mb-1">
+                <strong>E-mail:</strong>
+                <br />atendimento@core-sp.org.br
+              </p>
+              <p class="branco">
+                <strong>Telefone:</strong>
+                <br />(11) 3243-5500
+              </p>
+            </div>
+            <div class="col-4">
+              <div class="footer-title w-75 mb-3">
+                <h5 class="branco">Serviços</h5>
+              </div>
+              <p class="branco"><a href="#">Transparência</a></p>
+              <p class="branco"><a href="#">Links Úteis</a></p>
+              <p class="branco"><a href="#">Licitações</a></p>
+              <p class="branco"><a href="#">Concursos</a></p>
+              <p class="branco"><a href="#">Agenda Core-SP</a></p>
+              <p class="branco"><a href="#">Cursos</a></p>
+              <p class="branco"><a href="#">Feiras</a></p>
+              <p class="branco"><a href="#">Balcão de Oportunidades</a></p>
+              <p class="branco"><a href="#">Simulador de Cálculos</a></p>
+              <p class="branco"><a href="#">Registre-se</a></p>
+              <p class="branco"><a href="#">E-OUV</a></p>
+              <p class="branco"><a href="#">Seccionais</a></p>
+            </div>
+            <div class="col-4">
+              <div class="footer-title w-75 mb-3">
+                <h5 class="branco">Newsletter</h5>
+              </div>
+              <div class="w-75">
+                <p class="branco">Inscreva-se para receber nossos informativos:</p>
+                <form class="mt-3">
+                  <div class="form-group mb-2">
+                    <input type="text" name="nome" class="form-control" placeholder="Nome" />
+                  </div>
+                  <div class="form-group mb-2">
+                    <input type="text" name="email" class="form-control" placeholder="E-mail" />
+                  </div>
+                  <div class="form-group mb-2">
+                    <input type="text" name="celular" class="form-control" placeholder="Celular" />
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-default">Inscrever-se</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="linha-azul w-100"></div>
+        <div class="linha-branca w-100"></div>
+        <div class="linha-azul-escuro w-100"></div>
+      </footer>
+      @show
+
       <script type="text/javascript" src="{{ asset('/js/app.js') }}"></script>
       <script type="text/javascript" src="{{ asset('/js/site.js') }}"></script>
     </body>
