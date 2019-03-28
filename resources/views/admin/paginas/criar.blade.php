@@ -2,8 +2,6 @@
 
 @section('content')
 
-<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -79,5 +77,8 @@
     </div>
   </div>
 </section>
+
+<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/tinymce.js') }}"></script>
 
 @endsection

@@ -9,8 +9,6 @@ $modalidades = ConcursoHelper::modalidades();
 $situacoes = ConcursoHelper::situacoes();
 @endphp
 
-<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -108,12 +106,21 @@ $situacoes = ConcursoHelper::situacoes();
     </div>
     <div class="row mt-2 mb-4">
       <div class="col">
+        @if($concurso->updated_at == $concurso->created_at)
+        <div class="callout callout-info">
+          <strong>Criado por:</strong> {{ $concurso->user->nome }}, às {{ Helper::organizaData($concurso->created_at) }}
+        </div>
+        @else
         <div class="callout callout-info">
           <strong>Ultima alteração:</strong> {{ $concurso->user->nome }}, às {{ Helper::organizaData($concurso->updated_at) }}
         </div>
+        @endif
       </div>
     </div>
   </div>
 </section>
+
+<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/tinymce.js') }}"></script>
 
 @endsection

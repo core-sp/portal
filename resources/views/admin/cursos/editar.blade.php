@@ -8,8 +8,6 @@ use \App\Http\Controllers\Helper;
 $tipos = CursoHelper::tipos();
 @endphp
 
-<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -179,12 +177,21 @@ $tipos = CursoHelper::tipos();
     </div>
     <div class="row mt-2 mb-4">
       <div class="col">
+        @if($curso->updated_at == $curso->created_at)
+        <div class="callout callout-info">
+          <strong>Criado por:</strong> {{ $curso->user->nome }}, às {{ Helper::organizaData($curso->created_at) }}
+        </div>
+        @else
         <div class="callout callout-info">
           <strong>Ultima alteração:</strong> {{ $curso->user->nome }}, às {{ Helper::organizaData($curso->updated_at) }}
         </div>
+        @endif
       </div>
     </div>
   </div>
 </section>
+
+<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/tinymce.js') }}"></script>
 
 @endsection

@@ -8,7 +8,6 @@
       <div class="col-sm-12">
         <h1 class="d-inline mr-3 align-middle">Empresas</h1>
         <a href="/admin/bdo/empresas/criar" class="btn btn-primary mr-1">Nova Empresa</a>
-        <a href="#" class="btn btn-warning">Empresas Deletadas</a>
       </div>
     </div>
   </div>
@@ -21,7 +20,7 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title d-inline">
-              Lista de empresas do Banco de Oportunidades do CORE-SP
+              Lista de empresas do Balcão de Oportunidades do CORE-SP
             </h3>
             @if(isset($busca))
             <a href="/admin/bdo/empresas" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
@@ -61,10 +60,8 @@
                   <td>{{ $empresa->segmento }}</td>
                   <td>{{ $empresa->razaosocial }}</td>
                   <td>
-                    <a href="#" class="btn btn-sm btn-default" target="_blank">Ver</a>
-                    <a href="#" class="btn btn-sm btn-secondary">Inscritos</a>
-                    <a href="#" class="btn btn-sm btn-primary">Editar</a>
-                    <form method="POST" action="#" class="d-inline">
+                    <a href="/admin/bdo/empresas/editar/{{ $empresa->idempresa }}" class="btn btn-sm btn-primary">Editar</a>
+                    <form method="POST" action="/admin/bdo/empresas/apagar/{{ $empresa->idempresa }}" class="d-inline">
                       @csrf
                       {{ method_field('DELETE') }}
                       <input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm('Tem certeza que deseja excluir a empresa?')" />

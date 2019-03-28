@@ -2,7 +2,9 @@
 
 @section('content')
 
-<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+@php
+use \App\Http\Controllers\Helper;
+@endphp
 
 <section class="content-header">
   <div class="container-fluid">
@@ -83,7 +85,23 @@
         </div>
       </div>
     </div>
+    <div class="row mt-2 mb-4">
+      <div class="col">
+        @if($noticia->updated_at == $noticia->created_at)
+        <div class="callout callout-info">
+          <strong>Criado por:</strong> {{ $noticia->user->nome }}, às {{ Helper::organizaData($noticia->created_at) }}
+        </div>
+        @else
+        <div class="callout callout-info">
+          <strong>Ultima alteração:</strong> {{ $noticia->user->nome }}, às {{ Helper::organizaData($noticia->updated_at) }}
+        </div>
+        @endif
+      </div>
+    </div>
   </div>
 </section>
+
+<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/tinymce.js') }}"></script>
 
 @endsection

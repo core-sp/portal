@@ -8,8 +8,6 @@ $modalidades = ConcursoHelper::modalidades();
 $situacoes = ConcursoHelper::situacoes();
 @endphp
 
-<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -96,5 +94,8 @@ $situacoes = ConcursoHelper::situacoes();
     </div>
   </div>
 </section>
+
+<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/tinymce.js') }}"></script>
 
 @endsection
