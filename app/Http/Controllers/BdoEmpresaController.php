@@ -43,7 +43,36 @@ class BdoEmpresaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->user()->autorizarPerfis(['admin']);
+        $regras = [
+            'cnpj' => 'required',
+            'razaosocial' => 'required',
+            'endereco' => 'required',
+            'descricao' => 'required',
+            'email' => 'required',
+            'telefone' => 'required'
+        ];
+        $mensagens = [
+            'required' => 'O :attribute é obrigatório',
+        ];
+        $erros = $request->validate($regras, $mensagens);
+
+        $empresa = New BdoEmpresa();
+        $empresa->segmento = $request->input('segmento');
+        $empresa->cnpj = $request->input('cnpj');
+        $empresa->razaosocial = $request->input('razaosocial');
+        $empresa->descricao = $request->input('descricao');
+        $empresa->capitalsocial = $request->input('capitalsocial');
+        $empresa->endereco = $request->input('endereco');
+        $empresa->site = $request->input('site');
+        $empresa->email = $request->input('email');
+        $empresa->telefone = $request->input('telefone');
+        $empresa->contatonome = $request->input('contatonome');
+        $empresa->contatotelefone = $request->input('contatotelefone');
+        $empresa->contatoemail = $request->input('contatoemail');
+        $empresa->idusuario = $request->input('idusuario');
+        $empresa->save();
+        return redirect()->route('bdoempresas.lista');
     }
 
     /**
@@ -63,9 +92,11 @@ class BdoEmpresaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
-        //
+        $request->user()->autorizarPerfis(['admin']);
+        $empresa = BdoEmpresa::find($id);
+        return view('admin.bdo.empresas.editar', compact('empresa'));
     }
 
     /**
@@ -77,7 +108,36 @@ class BdoEmpresaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->user()->autorizarPerfis(['admin']);
+        $regras = [
+            'cnpj' => 'required',
+            'razaosocial' => 'required',
+            'endereco' => 'required',
+            'descricao' => 'required',
+            'email' => 'required',
+            'telefone' => 'required'
+        ];
+        $mensagens = [
+            'required' => 'O :attribute é obrigatório',
+        ];
+        $erros = $request->validate($regras, $mensagens);
+
+        $empresa = BdoEmpresa::find($id);
+        $empresa->segmento = $request->input('segmento');
+        $empresa->cnpj = $request->input('cnpj');
+        $empresa->razaosocial = $request->input('razaosocial');
+        $empresa->descricao = $request->input('descricao');
+        $empresa->capitalsocial = $request->input('capitalsocial');
+        $empresa->endereco = $request->input('endereco');
+        $empresa->site = $request->input('site');
+        $empresa->email = $request->input('email');
+        $empresa->telefone = $request->input('telefone');
+        $empresa->contatonome = $request->input('contatonome');
+        $empresa->contatotelefone = $request->input('contatotelefone');
+        $empresa->contatoemail = $request->input('contatoemail');
+        $empresa->idusuario = $request->input('idusuario');
+        $empresa->update();
+        return redirect()->route('bdoempresas.lista');
     }
 
     /**
@@ -86,9 +146,12 @@ class BdoEmpresaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $request->user()->autorizarPerfis(['admin']);
+        $empresa = BdoEmpresa::find($id);
+        $empresa->delete();
+        return redirect()->route('bdoempresas.lista');
     }
 
     public function busca()

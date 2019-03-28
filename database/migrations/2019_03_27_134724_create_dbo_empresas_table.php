@@ -19,10 +19,14 @@ class CreateDboEmpresasTable extends Migration
             $table->string('cnpj');
             $table->string('razaosocial');
             $table->string('descricao');
-            $table->string('endereco');
-            $table->string('email');
-            $table->string('telefone');
+            $table->string('capitalsocial');
+            $table->string('endereco')->nullable();
+            $table->string('email')->nullable();
+            $table->string('telefone')->nullable();
             $table->string('site')->nullable();
+            $table->string('contatonome')->nullable();
+            $table->string('contatotelefone')->nullable();
+            $table->string('contatoemail')->nullable();
             $table->bigInteger('idusuario')->unsigned();
             $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();

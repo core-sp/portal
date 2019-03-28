@@ -137,14 +137,18 @@ Route::prefix('admin')->group(function() {
   });
 
   /*
-   * Rota para CRUD de Banco de Oportunidade
+   * Rota para CRUD do Balcão de Oportunidade
    */
   Route::prefix('bdo')->group(function(){
-    Route::get('/', 'BdoController@index');
+    Route::get('/', 'BdoEmpresaController@index')->name('bdoempresas.lista');
     // Lida com as empresas
     Route::get('/empresas', 'BdoEmpresaController@index');
     Route::get('/empresas/busca', 'BdoEmpresaController@busca');
     Route::get('/empresas/criar', 'BdoEmpresaController@create');
+    Route::post('/empresas/criar', 'BdoEmpresaController@store');
+    Route::get('/empresas/editar/{id}', 'BdoEmpresaController@edit');
+    Route::put('/empresas/editar/{id}', 'BdoEmpresaController@update');
+    Route::delete('/empresas/apagar/{id}', 'BdoEmpresaController@destroy');
   });
 });
 

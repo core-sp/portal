@@ -183,7 +183,7 @@ use \App\Http\Controllers\Helper;
           <div class="col-8">
             <img src="{{ asset('img/computer.png') }}" />
           </div>
-          <div class="col-4 text-center eouv-imgs align-self-center">
+          <div class="col-4 eouv-imgs align-self-center pl-3">
             <div class="m-auto pb-3">
               <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" />
               <img src="{{ asset('img/icon-eouv-02.png') }}" class="azul-escuro-bg" />
@@ -210,7 +210,7 @@ use \App\Http\Controllers\Helper;
           <div class="col-8">
             <img src="{{ asset('img/calendario.png') }}" />
           </div>
-          <div class="col-4 align-self-center text-right">
+          <div class="col-4 align-self-center text-right pr-4">
             <div class="calendario-txt">
               <p class="preto">Lorem ipsum doloru sit amet, consectet adipiscing elit. <br />Num bibendum arcu.</p>
               <a href="#" class="btn-calendario mt-4">

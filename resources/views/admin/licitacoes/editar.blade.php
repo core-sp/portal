@@ -9,8 +9,6 @@ $modalidades = LicitacaoHelper::modalidades();
 $situacoes = LicitacaoHelper::situacoes();
 @endphp
 
-<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -119,12 +117,21 @@ $situacoes = LicitacaoHelper::situacoes();
     </div>
     <div class="row mt-2 mb-4">
       <div class="col">
+        @if($licitacao->updated_at == $licitacao->created_at)
+        <div class="callout callout-info">
+          <strong>Criado por:</strong> {{ $licitacao->user->nome }}, às {{ Helper::organizaData($licitacao->created_at) }}
+        </div>
+        @else
         <div class="callout callout-info">
           <strong>Ultima alteração:</strong> {{ $licitacao->user->nome }}, às {{ Helper::organizaData($licitacao->updated_at) }}
         </div>
+        @endif
       </div>
     </div>
   </div>
 </section>
+
+<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/tinymce.js') }}"></script>
 
 @endsection
