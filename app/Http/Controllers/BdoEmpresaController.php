@@ -45,7 +45,7 @@ class BdoEmpresaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin']);
         $regras = [
-            'cnpj' => 'required',
+            'cnpj' => 'required|unique:bdo_empresas',
             'razaosocial' => 'required',
             'endereco' => 'required',
             'descricao' => 'required',
@@ -54,6 +54,7 @@ class BdoEmpresaController extends Controller
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
+            'cnpj.unique' => 'Já existe uma empresa cadastrada com este CNPJ'
         ];
         $erros = $request->validate($regras, $mensagens);
 
