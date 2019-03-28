@@ -16,7 +16,7 @@ class BdoEmpresa extends Model
         return $this->belongsTo('App\User', 'idusuario');
     }
 
-    public function bdooportunidade()
+    public function oportunidade()
     {
     	return $this->hasMany('App\BdoOportunidade', 'idoportunidade');
     }

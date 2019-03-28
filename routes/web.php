@@ -140,9 +140,12 @@ Route::prefix('admin')->group(function() {
    * Rota para CRUD do Balcão de Oportunidade
    */
   Route::prefix('bdo')->group(function(){
-    Route::get('/', 'BdoEmpresaController@index')->name('bdoempresas.lista');
+    Route::get('/', 'BdoOportunidadeController@index')->name('bdooportunidades.lista');
+    Route::get('/busca', 'BdoOportunidadeController@busca');
+    Route::get('/criar', 'BdoOportunidadeController@create');
+    Route::post('criar', 'BdoOportunidadeController@store');
     // Lida com as empresas
-    Route::get('/empresas', 'BdoEmpresaController@index');
+    Route::get('/empresas', 'BdoEmpresaController@index')->name('bdoempresas.lista');
     Route::get('/empresas/busca', 'BdoEmpresaController@busca');
     Route::get('/empresas/criar', 'BdoEmpresaController@create');
     Route::post('/empresas/criar', 'BdoEmpresaController@store');

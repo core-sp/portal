@@ -60,6 +60,7 @@
                   <td>{{ $empresa->segmento }}</td>
                   <td>{{ $empresa->razaosocial }}</td>
                   <td>
+                    <a href="/admin/bdo/criar?empresa={{ $empresa->idempresa }}" class="btn btn-sm btn-secondary">Criar Oportunidade</a>
                     <a href="/admin/bdo/empresas/editar/{{ $empresa->idempresa }}" class="btn btn-sm btn-primary">Editar</a>
                     <form method="POST" action="/admin/bdo/empresas/apagar/{{ $empresa->idempresa }}" class="d-inline">
                       @csrf

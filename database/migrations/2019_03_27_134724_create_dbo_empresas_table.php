@@ -18,7 +18,7 @@ class CreateDboEmpresasTable extends Migration
             $table->string('segmento');
             $table->string('cnpj');
             $table->string('razaosocial');
-            $table->string('descricao');
+            $table->text('descricao');
             $table->string('capitalsocial');
             $table->string('endereco')->nullable();
             $table->string('email')->nullable();

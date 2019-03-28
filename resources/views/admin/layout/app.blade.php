@@ -202,6 +202,12 @@ use \App\Http\Controllers\Helper;
                       </a>
                       <ul class="nav nav-treeview">
                         <li class="nav-item">
+                          <a href="/admin/bdo" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Oportunidades</p>
+                          </a>
+                        </li>
+                        <li class="nav-item">
                           <a href="/admin/bdo/empresas" class="nav-link">
                             <i class="nav-icon fa fa-angle-right"></i>
                             <p>Empresas</p>
