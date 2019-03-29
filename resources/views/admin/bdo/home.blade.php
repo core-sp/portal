@@ -70,7 +70,7 @@
                   <td>{{ $oportunidade->status }}</td>
                   <td>
                     <a href="#" class="btn btn-sm btn-default" target="_blank">Ver</a>
-                    <a href="#" class="btn btn-sm btn-primary">Editar</a>
+                    <a href="/admin/bdo/editar/{{ $oportunidade->idoportunidade }}" class="btn btn-sm btn-primary">Editar</a>
                     <form method="POST" action="#" class="d-inline">
                       @csrf
                       {{ method_field('DELETE') }}
@@ -103,6 +103,11 @@
             @endif
           </div>
         </div>
+      </div>
+    </div>
+    <div class="row mt-2">
+      <div class="col">
+        <em>* Para inserir uma nova oportunidade, acesse o menu de Empresas e vincule a oportunidade à empresa desejada.</em>
       </div>
     </div>
   </div>

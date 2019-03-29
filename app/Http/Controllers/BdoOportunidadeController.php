@@ -62,10 +62,15 @@ class BdoOportunidadeController extends Controller
         $oportunidade = new BdoOportunidade();
         $oportunidade->idempresa = $request->input('empresa');
         $oportunidade->segmento = $request->input('segmento');
-        $oportunidade->status = $request->input('status');
+        $oportunidade->descricao = $request->input('descricao');
         $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
         $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');
-        $oportunidade->descricao = $request->input('descricao');
+        $oportunidade->status = $request->input('status');
+        if ($request->input('status') === "Em andamento") {
+            $oportunidade->datainicio = now();
+        } else {
+            $oportunidade->datainicio = null;
+        }
         $oportunidade->idusuario = $request->input('idusuario');
         $oportunidade->save();
         return redirect()->route('bdooportunidades.lista');
@@ -88,9 +93,11 @@ class BdoOportunidadeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
-        //
+        $request->user()->autorizarPerfis(['admin']);
+        $oportunidade = BdoOportunidade::find($id);
+        return view('admin.bdo.editar', compact('oportunidade'));
     }
 
     /**
@@ -102,7 +109,30 @@ class BdoOportunidadeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $regras = [
+            'vagasdisponiveis' => 'required',
+            'descricao' => 'required',
+        ];
+        $mensagens = [
+            'required' => 'O :attribute é obrigatório',
+        ];
+        $erros = $request->validate($regras, $mensagens);
+
+        $oportunidade = BdoOportunidade::find($id);
+        $oportunidade->idempresa = $request->input('empresa');
+        $oportunidade->segmento = $request->input('segmento');
+        $oportunidade->descricao = $request->input('descricao');
+        $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
+        $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');
+        $oportunidade->status = $request->input('status');
+        if ($oportunidade->datainicio === null && $request->input('status') === "Em andamento") {
+            $oportunidade->datainicio = now();
+        } else {
+            $oportunidade->datainicio = null;
+        }
+        $oportunidade->idusuario = $request->input('idusuario');
+        $oportunidade->update();
+        return redirect()->route('bdooportunidades.lista');
     }
 
     /**

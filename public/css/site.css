@@ -621,6 +621,19 @@ footer p {
 	border-radius: 0px;
 }
 
+#newsletter::placeholder {
+  color: #eaeaea;
+  opacity: 1;
+}
+
+#newsletter:-ms-input-placeholder {
+  color: #eaeaea;
+}
+
+#newsletter::-ms-input-placeholder {
+  color: #eaeaea;
+}
+
 .form-group {
 	margin-bottom: .8rem;
 }
@@ -645,4 +658,26 @@ footer p {
 	transform: translateY(-50%);
 	left: 0;
 	right: 0;
+}
+
+#pagina-conteudo {
+	padding-top: 2.25rem;
+	padding-bottom: 2.25rem;
+}
+
+#pagina-conteudo h1,
+#pagina-conteudo h2,
+#pagina-conteudo h3,
+#pagina-conteudo h4,
+#pagina-conteudo h5,
+#pagina-conteudo h6 {
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+}
+
+#pagina-conteudo p {
+	font-size: 1.1rem;
+	line-height: 1.7;
+	padding-bottom: 1.1rem;
+	font-weight: 300;
 }

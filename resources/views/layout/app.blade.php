@@ -93,7 +93,7 @@ use \App\Http\Controllers\Helper;
                   <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="nav-link" target="_blank">Transparência</a>
                 </li>
                 <li class="nav-item">
-                  <a href="#" class="nav-link">Licitações</a>
+                  <a href="/licitacoes" class="nav-link">Licitações</a>
                 </li>
                 <li class="nav-item">
                   <a href="#" class="nav-link">Seccionais</a>
