@@ -42,6 +42,13 @@ class LicitacaoHelper extends Controller
     	return $format;
     }
 
+    public static function onlyDate($data)
+    {
+        $date = new \DateTime($data);
+        $format = $date->format('d\/m\/Y');
+        return $format;
+    }
+
     public static function organizaData($data)
     {
         $date = new \DateTime($data);

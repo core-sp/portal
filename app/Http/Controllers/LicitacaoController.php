@@ -189,4 +189,35 @@ class LicitacaoController extends Controller
         else
             return view('admin.licitacoes.home')->withMessage('Nenhuma licitação encontrada');
     }
+
+    public function buscaAvancada()
+    {
+        $buscaModalidade = Input::get('modalidade');
+        $buscaSituacao = Input::get('situacao');
+        $buscaNrLicitacao = Input::get('nrlicitacao');
+        $buscaNrProcesso = Input::get('nrprocesso');
+        $buscaDataRealizacao = Input::get('datarealizacao');
+        if (!empty($buscaModalidade) 
+            or !empty($buscaSituacao) 
+            or !empty($buscaNrLicitacao)
+            or !empty($buscaNrProcesso)
+            or !empty($buscaDataRealizacao)
+        ){
+            $busca = true;
+        } else {
+            $busca = false;
+        }
+        $licitacoes = Licitacao::where('modalidade','LIKE','%'.$buscaModalidade.'%')
+            ->where('situacao','LIKE','%'.$buscaSituacao.'%')
+            ->where('nrlicitacao','LIKE',$buscaNrLicitacao)
+            ->where('nrprocesso','LIKE',$buscaNrProcesso)
+            ->where('datarealizacao','LIKE',$buscaDataRealizacao)
+            ->paginate(10);
+        if (count($licitacoes) > 0) {
+            return view('site.licitacoes', compact('licitacoes', 'busca'));
+        } else {
+            $licitacoes = null;
+            return view('site.licitacoes', compact('licitacoes', 'busca'));
+        }
+    }
 }
