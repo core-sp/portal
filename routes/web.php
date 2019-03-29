@@ -143,7 +143,9 @@ Route::prefix('admin')->group(function() {
     Route::get('/', 'BdoOportunidadeController@index')->name('bdooportunidades.lista');
     Route::get('/busca', 'BdoOportunidadeController@busca');
     Route::get('/criar', 'BdoOportunidadeController@create');
-    Route::post('criar', 'BdoOportunidadeController@store');
+    Route::post('/criar', 'BdoOportunidadeController@store');
+    Route::get('/editar/{id}', 'BdoOportunidadeController@edit');
+    Route::put('/editar/{id}', 'BdoOportunidadeController@update');
     // Lida com as empresas
     Route::get('/empresas', 'BdoEmpresaController@index')->name('bdoempresas.lista');
     Route::get('/empresas/busca', 'BdoEmpresaController@busca');
@@ -162,6 +164,7 @@ Route::prefix('/')->group(function() {
   // Rotas de conteúdo abertas
   Route::get('noticia/{slug}', 'NoticiaController@show');
   Route::get('licitacao/{id}', 'LicitacaoController@show');
+  Route::get('licitacoes', 'SiteController@licitacoesView');
   Route::get('concurso/{id}', 'ConcursoController@show');
   Route::get('curso/{id}', 'CursoController@show');
   Route::get('{categoria}/{slug}', 'PaginaController@show');

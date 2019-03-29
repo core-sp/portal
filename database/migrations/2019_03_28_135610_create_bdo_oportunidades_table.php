@@ -22,6 +22,7 @@ class CreateBdoOportunidadesTable extends Migration
             $table->integer('vagasdisponiveis');
             $table->integer('vagaspreenchidas')->nullable();
             $table->string('status')->nullable();
+            $table->date('datainicio')->nullable();
             $table->bigInteger('idusuario')->unsigned();
             $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();
