@@ -2,20 +2,13 @@
 
 @section('content')
 
-@php
-use \App\Http\Controllers\Helpers\LicitacaoHelper;
-use \App\Http\Controllers\Helper;
-$modalidades = LicitacaoHelper::modalidades();
-$situacoes = LicitacaoHelper::situacoes();
-@endphp
-
 <section id="pagina-cabecalho" class="mt-1">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-    <img src="{{ asset('img/licitacoes.png') }}" />
+    <img src="{{ asset('img/balcao-de-oportunidades.png') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Licitações
+          Balcão de Oportunidades
         </h1>
       </div>
     </div>
@@ -26,16 +19,16 @@ $situacoes = LicitacaoHelper::situacoes();
   <div class="container">
     <div class="row">
       <div class="col">
-        <form method="GET" role="form" action="/licitacoes/busca">
+        <form method="GET" role="form" action="/balcao-de-oportunidades/busca">
           <div class="form-row mb-3">
           	<div class="col">
           	  <label for="modalidade">Modalidade</label>
           	  <select name="modalidade" class="form-control" id="modalidade">
           	  	<option value="">Todas</option>
-	         	@foreach($modalidades as $modalidade)
-	         	<option value="{{ $modalidade }}">{{ $modalidade }}</option>
-	          	@endforeach
-	          </select>
+	         	    @foreach($modalidades as $modalidade)
+	         	    <option value="{{ $modalidade }}">{{ $modalidade }}</option>
+	          	  @endforeach
+	            </select>
           	</div>
           	<div class="col">
           	  <label for="nrprocesso">Nº do processo</label>
@@ -51,10 +44,10 @@ $situacoes = LicitacaoHelper::situacoes();
           	  <label for="situacao">Situação</label>
           	  <select name="situacao" class="form-control" id="situacao">
           	  	<option value="">Qualquer</option>
-	         	@foreach($situacoes as $situacao)
-	         	<option value="{{ $situacao }}">{{ $situacao }}</option>
-	          	@endforeach
-	          </select>
+    	         	@foreach($situacoes as $situacao)
+    	         	<option value="{{ $situacao }}">{{ $situacao }}</option>
+	          	  @endforeach
+	            </select>
           	</div>
           	<div class="col">
           	  <label for="datarealizacao">Date de Realização</label>

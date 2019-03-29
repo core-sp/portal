@@ -163,8 +163,13 @@ Route::prefix('/')->group(function() {
   Route::get('admin/logout', 'Auth\LoginController@logout')->name('logout');
   // Rotas de conteúdo abertas
   Route::get('noticia/{slug}', 'NoticiaController@show');
+  // Licitações
   Route::get('licitacao/{id}', 'LicitacaoController@show');
   Route::get('licitacoes', 'SiteController@licitacoesView');
+  Route::get('licitacoes/busca', 'LicitacaoController@buscaAvancada');
+  //Balcão de Oportunidades
+  Route::get('balcao-de-oportunidades', 'BdoSite@index');
+
   Route::get('concurso/{id}', 'ConcursoController@show');
   Route::get('curso/{id}', 'CursoController@show');
   Route::get('{categoria}/{slug}', 'PaginaController@show');
