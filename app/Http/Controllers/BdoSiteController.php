@@ -27,6 +27,7 @@ class BdoSiteController extends Controller
         }
         $oportunidades = BdoOportunidade::where('segmento','LIKE',$buscaSegmento)
             ->where('descricao','LIKE','%'.$buscaPalavraChave.'%')
+            ->orWhere('titulo','LIKE','%'.$buscaPalavraChave.'%')
             ->paginate(10);
         if (count($oportunidades) > 0) {
             return view('site.balcao-de-oportunidades', compact('oportunidades', 'busca'));
