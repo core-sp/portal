@@ -16,9 +16,11 @@ class CreateLicitacoesTable extends Migration
         Schema::create('licitacoes', function (Blueprint $table) {
             $table->bigIncrements('idlicitacao');
             $table->string('modalidade');
+            $table->string('situacao');
+            $table->string('titulo');
+            $table->string('edital')->nullable();
             $table->string('nrlicitacao');
             $table->string('nrprocesso');
-            $table->string('situacao');
             $table->dateTime('datarealizacao');
             $table->text('objeto');
             $table->bigInteger('idusuario')->unsigned();

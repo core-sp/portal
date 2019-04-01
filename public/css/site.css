@@ -118,6 +118,10 @@ p {
 	line-height: 1.4;
 }
 
+.p-menor {
+	font-size: .85rem;
+}
+
 .form-control {
 	font-size: .95rem;
 }
@@ -621,17 +625,17 @@ footer p {
 	border-radius: 0px;
 }
 
-#newsletter::placeholder {
-  color: #eaeaea;
+#newsletter input::placeholder {
+  color: #d6d6d6;
   opacity: 1;
 }
 
-#newsletter:-ms-input-placeholder {
-  color: #eaeaea;
+#newsletter input:-ms-input-placeholder {
+  color: #d6d6d6;
 }
 
-#newsletter::-ms-input-placeholder {
-  color: #eaeaea;
+#newsletter input::-ms-input-placeholder {
+  color: #d6d6d6;
 }
 
 .form-group {
@@ -660,7 +664,8 @@ footer p {
 	right: 0;
 }
 
-#pagina-conteudo {
+#pagina-conteudo,
+#pagina-licitacoes {
 	padding-top: 2.25rem;
 	padding-bottom: 2.25rem;
 }
@@ -680,4 +685,89 @@ footer p {
 	line-height: 1.7;
 	padding-bottom: 1.1rem;
 	font-weight: 300;
+}
+
+/*
+ * PÁGINA DE LICITAÇÕES
+ */
+.pesquisaLicitacao {
+	padding: 1rem 1rem 1.5rem 1rem;
+	background-color: #fbfbfb;
+	border-radius: 5px;
+	border: 1px solid #d6d6d6;
+}
+
+.pesquisaLicitacao label {
+	font-size: 0.85rem;
+	margin-bottom: 0.25rem;
+	margin-left: .25rem;
+}
+
+.pesquisaLicitacao .btn {
+	font-size: 0.85rem;
+	width: 49.2%;
+}
+
+.pesquisaLicitacao-btn {
+	padding-bottom: .2rem;
+}
+
+.licitacao-grid {
+	background-color: #fbfbfb;
+	border: 1px solid #d6d6d6;
+	border-radius: 5px;
+	margin-bottom: 1.5rem;
+}
+
+.licitacao-grid-main {
+	padding: 1rem;
+	border-bottom: 1px solid #d6d6d6;
+}
+
+.licitacao-grid-bottom {
+	background-color: #eaeaea;
+	padding: .4rem 1rem;
+}
+
+.marrom {
+	color: #444444;
+}
+
+.licitacao-grid h5 {
+	font-size: 1rem;
+}
+
+.licitacao-grid p {
+	font-size: .85rem;
+	color: #444444;
+	letter-spacing: .025rem;
+}
+
+.pad-left-zero {
+	padding-left: 0px;
+}
+
+.linha-lg {
+	border-bottom: 1px solid #d6d6d6;
+	margin-top: .75rem;
+	margin-bottom: .75rem;
+	width: 100%;
+}
+
+.bot-lg i {
+	font-size: 1rem;
+	color: #444444;
+	background-color: #FFFFFF;
+	padding: .5rem;
+	border-radius: 2.5px;
+	border: 1px solid #d6d6d6;
+}
+
+.bot-lg h6 {
+	letter-spacing: 0.025rem;
+	color: #444444;
+}
+
+.flex-one {
+	flex: 1;
 }

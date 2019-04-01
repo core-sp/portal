@@ -55,4 +55,11 @@ class LicitacaoHelper extends Controller
         $format = $date->format('H:i\ \d\o \d\i\a d\/m\/Y');
         return $format;
     }
+
+    public static function resumo($string)
+    {
+        if (strlen($string) > 100)
+            $string = substr($string, 0, 240) . '...';
+        return $string;
+    }
 }

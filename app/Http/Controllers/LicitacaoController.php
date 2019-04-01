@@ -10,7 +10,7 @@ class LicitacaoController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['except' => 'show']);
+        $this->middleware('auth', ['except' => 'show', 'buscaAvancada']);
     }
     /**
      * Display a listing of the resource.
@@ -70,18 +70,6 @@ class LicitacaoController extends Controller
         $licitacao->idusuario = $request->input('idusuario');
         $licitacao->save();
         return redirect()->route('licitacoes.lista');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $licitacao = Licitacao::find($id);
-        return view('site.licitacao', compact('licitacao'));
     }
 
     /**
@@ -188,36 +176,5 @@ class LicitacaoController extends Controller
             return view('admin.licitacoes.home', compact('licitacoes', 'busca'));
         else
             return view('admin.licitacoes.home')->withMessage('Nenhuma licitação encontrada');
-    }
-
-    public function buscaAvancada()
-    {
-        $buscaModalidade = Input::get('modalidade');
-        $buscaSituacao = Input::get('situacao');
-        $buscaNrLicitacao = Input::get('nrlicitacao');
-        $buscaNrProcesso = Input::get('nrprocesso');
-        $buscaDataRealizacao = Input::get('datarealizacao');
-        if (!empty($buscaModalidade) 
-            or !empty($buscaSituacao) 
-            or !empty($buscaNrLicitacao)
-            or !empty($buscaNrProcesso)
-            or !empty($buscaDataRealizacao)
-        ){
-            $busca = true;
-        } else {
-            $busca = false;
-        }
-        $licitacoes = Licitacao::where('modalidade','LIKE','%'.$buscaModalidade.'%')
-            ->where('situacao','LIKE','%'.$buscaSituacao.'%')
-            ->where('nrlicitacao','LIKE',$buscaNrLicitacao)
-            ->where('nrprocesso','LIKE',$buscaNrProcesso)
-            ->where('datarealizacao','LIKE',$buscaDataRealizacao)
-            ->paginate(10);
-        if (count($licitacoes) > 0) {
-            return view('site.licitacoes', compact('licitacoes', 'busca'));
-        } else {
-            $licitacoes = null;
-            return view('site.licitacoes', compact('licitacoes', 'busca'));
-        }
     }
 }

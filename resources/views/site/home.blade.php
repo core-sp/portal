@@ -154,7 +154,7 @@ use \App\Http\Controllers\Helper;
       <div class="col-12">
         <div class="beneficios-box row nomargin">
           <div class="col-sm-5">
-            <img src="{{ asset('img/benefits-2.png') }}" id="computer" />
+            <img src="{{ asset('img/benef-v2.png') }}" id="computer" />
           </div>
           <div class="col-sm-7 beneficios-txt">
             <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>

@@ -16,5 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RegionalTableSeeder::class);
         $this->call(PaginaTableSeeder::class);
         $this->call(NoticiaTableSeeder::class);
+        $this->call(CursoTableSeeder::class);
+        $this->call(LicitacaoTableSeeder::class);
     }
 }
