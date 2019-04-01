@@ -52,26 +52,6 @@ $situacoes = LicitacaoHelper::situacoes();
                   @endif
                 </div>
                 <div class="col">
-                  <label for="nrlicitacao">Nº da Licitação</label>
-                  <input type="text" class="form-control {{ $errors->has('nrlicitacao') ? 'is-invalid' : '' }}" placeholder="Número" name="nrlicitacao" value="{{ $licitacao->nrlicitacao }}" />
-                  @if($errors->has('nrlicitacao'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('nrlicitacao') }}
-                  </div>
-                  @endif
-                </div>
-              </div>
-              <div class="form-row mt-2">
-                <div class="col">
-                  <label for="nrprocesso">Nº do Processo</label>
-                  <input type="text" class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}" placeholder="Número" name="nrprocesso" value="{{ $licitacao->nrprocesso }}" />
-                  @if($errors->has('nrprocesso'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('nrprocesso') }}
-                  </div>
-                  @endif
-                </div>
-                <div class="col">
                   <label for="situacao">Situação</label>
                   <select name="situacao" class="form-control">
                     @foreach($situacoes as $situacao)
@@ -90,7 +70,47 @@ $situacoes = LicitacaoHelper::situacoes();
                 </div>
               </div>
               <div class="form-row mt-2">
-                <div class="col-6">
+                <div class="col">
+                  <label for="titulo">Título da Licitação</label>
+                  <input type="text" class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}" placeholder="Título" name="titulo" value="{{ $licitacao->titulo }}" />
+                  @if($errors->has('titulo'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('titulo') }}
+                  </div>
+                  @endif
+                </div>
+                <div class="col">
+                  <label for="edital">Edital</label>
+                  <div class="input-group">
+                    <span class="input-group-btn">
+                      <a id="edital" data-input="file" data-preview="holder" class="btn btn-default">
+                        <i class="fas fa-file-o"></i> Inserir Edital
+                      </a>
+                    </span>
+                    <input id="file" class="form-control" type="text" name="edital" value="{{ $licitacao->edital }}" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-row mt-2">
+                <div class="col">
+                  <label for="nrprocesso">Nº do Processo</label>
+                  <input type="text" class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}" placeholder="Número" name="nrprocesso" value="{{ $licitacao->nrprocesso }}" />
+                  @if($errors->has('nrprocesso'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('nrprocesso') }}
+                  </div>
+                  @endif
+                </div>
+                <div class="col">
+                  <label for="nrlicitacao">Nº da Licitação</label>
+                  <input type="text" class="form-control {{ $errors->has('nrlicitacao') ? 'is-invalid' : '' }}" placeholder="Número" name="nrlicitacao" value="{{ $licitacao->nrlicitacao }}" />
+                  @if($errors->has('nrlicitacao'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('nrlicitacao') }}
+                  </div>
+                  @endif
+                </div>
+                <div class="col">
                   <label for="datarealizacao">Data de Realização</label>
                   <input type="datetime-local" class="form-control" name="datarealizacao" value="{{ LicitacaoHelper::getData($licitacao->datarealizacao) }}">
                 </div>

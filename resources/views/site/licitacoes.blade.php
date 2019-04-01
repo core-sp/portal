@@ -22,20 +22,26 @@ $situacoes = LicitacaoHelper::situacoes();
   </div>
 </section>
 
-<section id="pagina-conteudo">
+<section id="pagina-licitacoes">
   <div class="container">
-    <div class="row">
+    <div class="row pb-4">
       <div class="col">
-        <form method="GET" role="form" action="/licitacoes/busca">
-          <div class="form-row mb-3">
+        <form method="GET" role="form" action="/licitacoes/busca" class="pesquisaLicitacao">
+          <div class="form-row text-center mb-2">
+            <div class="m-auto">
+              <h5 class="text-uppercase">Busca detalhada</h5>
+            </div>
+          </div>
+          <div class="linha-lg"></div>
+          <div class="form-row mb-2">
           	<div class="col">
           	  <label for="modalidade">Modalidade</label>
           	  <select name="modalidade" class="form-control" id="modalidade">
           	  	<option value="">Todas</option>
-	         	@foreach($modalidades as $modalidade)
-	         	<option value="{{ $modalidade }}">{{ $modalidade }}</option>
-	          	@endforeach
-	          </select>
+	         	    @foreach($modalidades as $modalidade)
+	         	    <option value="{{ $modalidade }}">{{ $modalidade }}</option>
+	          	  @endforeach
+	            </select>
           	</div>
           	<div class="col">
           	  <label for="nrprocesso">Nº do processo</label>
@@ -46,65 +52,96 @@ $situacoes = LicitacaoHelper::situacoes();
           	  <input type="text" name="nrlicitacao" class="form-control" placeholder="Nº da licitação" id="nrlicitacao">
           	</div>
           </div>
-          <div class="form-row mb-3">
+          <div class="form-row">
           	<div class="col">
           	  <label for="situacao">Situação</label>
           	  <select name="situacao" class="form-control" id="situacao">
           	  	<option value="">Qualquer</option>
-	         	@foreach($situacoes as $situacao)
-	         	<option value="{{ $situacao }}">{{ $situacao }}</option>
-	          	@endforeach
-	          </select>
+	         	    @foreach($situacoes as $situacao)
+	         	    <option value="{{ $situacao }}">{{ $situacao }}</option>
+	          	  @endforeach
+	            </select>
           	</div>
           	<div class="col">
-          	  <label for="datarealizacao">Date de Realização</label>
+          	  <label for="datarealizacao">Data de Realização</label>
           	  <input type="date" class="form-control" name="datarealizacao">
           	</div>
-          </div>
-          <div class="form-row">
-          	<div class="col">
-          	  <button type="submit" class="btn btn-primary">Pesquisar</button>
-          	</div>
+            <div class="col align-self-end pesquisaLicitacao-btn">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
+              <button type="reset" class="btn btn-default"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</button>
+            </div>
           </div>
         </form>
       </div>
     </div>
-    @if(isset($busca))
+  </div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="linha-cinza"></div>
+    </div>
+  </div>
+  <div class="container">
     <div class="row mt-4">
       <div class="col">
-      	@if(isset($licitacoes))
-      	<table class="table table-hover">
-      	  <thead>
-      	  	<tr>
-      	  	  <th>Modalidade</th>
-      	  	  <th>Situação</th>
-      	  	  <th>Data de Realização</th>
-      	  	  <th>Nº da Licitação</th>
-      	  	  <th>Nº do Processo</th>
-      	  	  <th></th>
-      	  	</tr>
-      	  </thead>
-      	  <tbody>
-      	  	@foreach($licitacoes as $licitacao)
-      	  	<tr>
-      	  	  <td>{{ $licitacao->modalidade }}</td>
-      	  	  <td>{{ $licitacao->situacao }}</td>
-      	  	  <td>{{ LicitacaoHelper::onlyDate($licitacao->datarealizacao) }}</td>
-      	  	  <td>{{ $licitacao->nrlicitacao }}</td>
-      	  	  <td>{{ $licitacao->nrprocesso }}</td>
-      	  	  <td>
-      	  	  	<a href="/licitacao/{{ $licitacao->idlicitacao }}" class="btn btn-sm btn-primary">Info</a>
-      	  	  </td>
-      	  	</tr>
-      	  	@endforeach
-      	  </tbody>
-      	</table>
-      	@else
-      	<p>Nenhuma licitação encontrada!</p>
-      	@endif
+        @if(isset($licitacoes))
+          @foreach($licitacoes as $licitacao)
+          <div class="licitacao-grid">
+            <a href="/licitacao/{{ $licitacao->idlicitacao }}">
+              <div class="licitacao-grid-main">
+                <h5 class="marrom">{{ $licitacao->titulo }}</h5>
+                <div class="linha-lg"></div>
+                {!! LicitacaoHelper::resumo($licitacao->objeto) !!}
+                <div class="mt-3 row bot-lg">
+                  <div class="col-sm-4 d-flex">
+                    <div class="mr-2">
+                      <i class="far fa-file-alt"></i>
+                    </div>
+                    <div class="flex-one align-self-center">
+                      <h6 class="light">
+                        <strong>Número:</strong> {{ $licitacao->nrprocesso }}<br />
+                        <strong>Processo:</strong> {{ $licitacao->nrlicitacao }}
+                      </h6>
+                    </div>
+                  </div>
+                  <div class="col-sm-4 d-flex">
+                    <div class="mr-2">
+                      <i class="far fa-clock"></i>
+                    </div>
+                    <div class="flex-one align-self-center">
+                      <h6 class="light">
+                        <strong>Divulgação:</strong> {{ LicitacaoHelper::onlyDate($licitacao->created_at) }}<br />
+                        <strong>Realizacao:</strong> {{ LicitacaoHelper::onlyDate($licitacao->datarealizacao) }}
+                      </h6>
+                    </div>
+                  </div>
+                  <div class="col-sm-4 d-flex">
+                    <div class="mr-2">
+                      <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="flex-one align-self-center">
+                      <h6 class="light">
+                        <strong>Modalidade:</strong> {{ $licitacao->modalidade }}<br />
+                        <strong>Situação:</strong> {{ $licitacao->situacao }}
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="licitacao-grid-bottom">
+                <div class="col">
+                  <div class="text-right">
+                    <h6 class="light marrom"><strong>Atualizado em:</strong> {{ LicitacaoHelper::onlyDate($licitacao->updated_at) }}</h6>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+          @endforeach
+        @else
+        <p>Nenhuma licitação encontrada!</p>
+        @endif
       </div>
     </div>
-    @endif
   </div>
 </section>
 

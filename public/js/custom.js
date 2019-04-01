@@ -41,5 +41,6 @@ $(document).ready(function() {
   })(jQuery);
 
   $('#lfm').filemanager('image');
+  $('#edital').filemanager('file');
 
 });

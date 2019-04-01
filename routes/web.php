@@ -164,9 +164,9 @@ Route::prefix('/')->group(function() {
   // Rotas de conteúdo abertas
   Route::get('noticia/{slug}', 'NoticiaController@show');
   // Licitações
-  Route::get('licitacao/{id}', 'LicitacaoController@show');
-  Route::get('licitacoes', 'SiteController@licitacoesView');
-  Route::get('licitacoes/busca', 'LicitacaoController@buscaAvancada');
+  Route::get('licitacao/{id}', 'LicitacaoSiteController@show');
+  Route::get('licitacoes', 'LicitacaoSiteController@licitacoesView');
+  Route::get('licitacoes/busca', 'LicitacaoSiteController@buscaLicitacoes');
   //Balcão de Oportunidades
   Route::get('balcao-de-oportunidades', 'BdoSite@index');
 
