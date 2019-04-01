@@ -61,7 +61,9 @@ class BdoOportunidadeController extends Controller
 
         $oportunidade = new BdoOportunidade();
         $oportunidade->idempresa = $request->input('empresa');
+        $oportunidade->titulo = $request->input('titulo');
         $oportunidade->segmento = $request->input('segmento');
+        $opprtunidade->regiaoatuacao = $request->input('regiaoatuacao');
         $oportunidade->descricao = $request->input('descricao');
         $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
         $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');
@@ -74,17 +76,6 @@ class BdoOportunidadeController extends Controller
         $oportunidade->idusuario = $request->input('idusuario');
         $oportunidade->save();
         return redirect()->route('bdooportunidades.lista');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
     }
 
     /**
@@ -120,7 +111,9 @@ class BdoOportunidadeController extends Controller
 
         $oportunidade = BdoOportunidade::find($id);
         $oportunidade->idempresa = $request->input('empresa');
+        $oportunidade->titulo = $request->input('titulo');
         $oportunidade->segmento = $request->input('segmento');
+        $opprtunidade->regiaoatuacao = $request->input('regiaoatuacao');
         $oportunidade->descricao = $request->input('descricao');
         $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
         $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');

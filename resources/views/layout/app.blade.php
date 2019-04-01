@@ -149,9 +149,9 @@ use \App\Http\Controllers\Helper;
               <div class="footer-title w-75 mb-3">
                 <h5 class="branco">Serviços</h5>
               </div>
-              <p class="branco"><a href="#">Transparência</a></p>
+              <p class="branco"><a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">Transparência</a></p>
               <p class="branco"><a href="#">Links Úteis</a></p>
-              <p class="branco"><a href="#">Licitações</a></p>
+              <p class="branco"><a href="/licitacoes">Licitações</a></p>
               <p class="branco"><a href="#">Concursos</a></p>
               <p class="branco"><a href="#">Agenda Core-SP</a></p>
               <p class="branco"><a href="#">Cursos</a></p>

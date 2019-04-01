@@ -69,13 +69,15 @@ use \App\Http\Controllers\Helper;
         </div>
       </div>
       <div class="col-sm-3">
-        <div class="box text-center azul-bg">
-          <div class="inside-box">
-            <img src="{{ asset('img/001-work.png') }}" class="inside-img" />
-            <p class="text-uppercase mt-3 branco">Balcão de Oportunidades</p>
-            <a href="#" class="btn-box mt-4">Acessar</a>
+        <a href="/balcao-de-oportunidades">
+          <div class="box text-center azul-bg">
+            <div class="inside-box">
+              <img src="{{ asset('img/001-work.png') }}" class="inside-img" />
+              <p class="text-uppercase mt-3 branco">Balcão de Oportunidades</p>
+              <div class="btn-box mt-4">Acessar</div>
+            </div>
           </div>
-        </div>
+        </a>
       </div>
       <div class="col-sm-3">
         <div class="box text-center azul-escuro-bg">

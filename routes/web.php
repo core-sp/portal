@@ -168,7 +168,9 @@ Route::prefix('/')->group(function() {
   Route::get('licitacoes', 'LicitacaoSiteController@licitacoesView');
   Route::get('licitacoes/busca', 'LicitacaoSiteController@buscaLicitacoes');
   //Balcão de Oportunidades
-  Route::get('balcao-de-oportunidades', 'BdoSite@index');
+  Route::get('balcao-de-oportunidades', 'BdoSiteController@index');
+  Route::get('balcao-de-oportunidades/busca', 'BdoSiteController@buscaOportunidades');
+  Route::get('oportunidade/{id}', 'BdoSiteController@show');
 
   Route::get('concurso/{id}', 'ConcursoController@show');
   Route::get('curso/{id}', 'CursoController@show');

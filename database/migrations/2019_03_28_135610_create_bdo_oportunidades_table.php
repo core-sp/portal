@@ -17,7 +17,9 @@ class CreateBdoOportunidadesTable extends Migration
             $table->bigIncrements('idoportunidade');
             $table->bigInteger('idempresa')->unsigned();
             $table->foreign('idempresa')->references('idempresa')->on('bdo_empresas');
+            $table->string('titulo');
             $table->string('segmento');
+            $table->string('regiaoatuacao')->nullable();
             $table->text('descricao');
             $table->integer('vagasdisponiveis');
             $table->integer('vagaspreenchidas')->nullable();

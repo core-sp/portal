@@ -32,7 +32,25 @@ class LicitacaoTableSeeder extends Seeder
         $licitacao->situacao = "Aberto";
         $licitacao->titulo = "PREGÃO ELETRÔNICO - Contratação de prestação de serviços";
         $licitacao->datarealizacao = "2019-01-18 14:00:00";
-        $licitacao->objeto = "<p>Contratação de empresa para prestação de serviços de implementação, gerenciamento e administração de Auxílios Refeição, via cartão cartão eletrônico com senha numérica individual e CHIP de segurança para validação das transações e respectivas recargas mensais de crédito para o Conselho Regional dos Representantes Comerciais no Estado de São Paulo - CORE-SP, com sede em São Paulo/SP e demais Unidades Descentralizadas.</p>";
+        $licitacao->objeto = "<p>Contratação de empresa para prestação de serviços de implementação, gerenciamento e administração de Auxílios Refeição, via cartão cartão eletrônico com senha numérica individual e CHIP de segurança para validação das transações e respectivas recargas mensais de crédito para o Conselho Regional dos Representantes Comerciais no Estado de São Paulo - CORE-SP, com sede em São Paulo/SP e demais Unidades Descentralizadas.
+            Processo Administrativo n.º 115/18
+            Encaminhamento das Propostas Comerciais: A partir da divulgação do Edital até a data de abertura da Sessão.
+            Sessão de Abertura: A partir das 10h00m, do dia 16/01/2019.
+            Local Site: http://www.comprasgovernamentais.gov.br/
+            Tipo de Licitação: : ( x ) Maior desconto (menor taxa de administração) (aferido na forma do TR/PB) 
+            Contratação de empresa para prestação de serviços de implementação, gerenciamento e administração de Auxílios Refeição, via cartão cartão eletrônico com senha numérica individual e CHIP de segurança para validação das transações e respectivas recargas mensais de crédito para o Conselho Regional dos Representantes Comerciais no Estado de São Paulo - CORE-SP, com sede em São Paulo/SP e demais Unidades Descentralizadas.
+            Participação (__) EXCLUSIVA PARA ME/EPP – COM PREFERÊNCIA GEOGRÁFICA [1]?
+            (__) SIM (__) NÃO
+
+            (__) PARTICIPAÇÃO MISTA [2] - COM PREFERÊNCIA GEOGRÁFICA[3]?
+            (__) SIM (__) NÃO
+
+            (__) PARTICIPAÇÃO MISTA COM COTA RESERVADA [4] - COM PREFERÊNCIA
+            GEOGRÁFICA[5]? (__) SIM (__) NÃO
+            
+            ( X ) PARTICIPAÇÃO AMPLA
+
+            EDITAL: Poderá ser obtido no site no site http://www.comprasgovernamentais.gov.br/. Informações: Na Sede do CORE-SP, endereço Avenida Brigadeiro Luiz Antônio, 613, Bela Vista, São Paulo/SP, 5º Andar. CEP: 01317-000. São Paulo/SP, pelo telefone: (11) 3243-5527, e-mail: licitações@core-sp.org.br e http://www.comprasgovernamentais.gov.br/.</p>";
         $licitacao->idusuario = 1;
         $licitacao->save();
     }

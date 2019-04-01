@@ -50,4 +50,26 @@ class LicitacaoSiteController extends Controller
             return view('site.licitacoes', compact('licitacoes', 'busca'));
         }
     }
+
+    public static function btnSituacao($situacao)
+    {
+        switch ($situacao) {
+            case 'Aberto':
+                echo "<div class='sit-btn sit-verde'>Aberto</div>";
+            break;
+            
+            default:
+                echo "<div class='sit-btn sit-default'>".$situacao."</div>";
+            break;
+        }
+    }
+
+    public static function resumo($string)
+    {
+        if (strlen($string) > 100)
+            $string = strip_tags($string);
+            $string = html_entity_decode($string);
+            $string = substr($string, 0, 240) . '...';
+        return $string;
+    }
 }

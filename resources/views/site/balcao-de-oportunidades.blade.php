@@ -1,0 +1,99 @@
+@extends('layout.app', ['title' => 'Balcão de Oportunidades'])
+
+@section('content')
+
+@php
+use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
+use \App\Http\Controllers\BdoSiteController;
+$segmentos = BdoOportunidadeControllerHelper::segmentos();
+@endphp
+
+<section id="pagina-cabecalho" class="mt-1">
+  <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
+    <img src="{{ asset('img/bdo.png') }}" />
+    <div class="row position-absolute pagina-titulo">
+      <div class="container text-center">
+        <h1 class="branco text-uppercase">
+          Balcão de Oportunidades
+        </h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pagina-bdo">
+  <div class="container">
+    <div class="row pb-4">
+      <div class="col">
+        <form method="GET" role="form" action="/balcao-de-oportunidades/busca" class="pesquisaLicitacao">
+          <div class="form-row text-center mb-2">
+            <div class="m-auto">
+              <h5 class="text-uppercase stronger marrom">Busca detalhada</h5>
+            </div>
+          </div>
+          <div class="linha-lg"></div>
+          <div class="form-row">
+            <div class="col">
+              <label for="palavrachave">Palavra-chave</label>
+              <input type="text" name="palavrachave" class="form-control" placeholder="Palavra chave" id="palavrachave">
+            </div>
+            <div class="col">
+              <label for="segmento">Segmento</label>
+              <select name="segmento" class="form-control" id="segmento">
+                <option value="">Todos</option>
+                @foreach($segmentos as $segmento)
+                <option value="{{ $segmento }}">{{ $segmento }}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="col align-self-end pesquisaLicitacao-btn">
+              <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
+              <button type="reset" class="btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="linha-cinza"></div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row mt-4">
+      <div class="col">
+        @if(isset($oportunidades))
+          @foreach($oportunidades as $oportunidade)
+          <div class="licitacao-grid">
+            <div class="licitacao-grid-main">
+              <h5 class="marrom mb-1">{{ $oportunidade->titulo }}</h5>
+              <h6 class="light">
+                <i class="far fa-building"></i>&nbsp;&nbsp;{{ $oportunidade->empresa->razaosocial }}&nbsp;&nbsp;&nbsp;&nbsp;
+                <i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;{{ $oportunidade->regiaoatuacao }}&nbsp;&nbsp;&nbsp;&nbsp;
+                <i class="fas fa-suitcase"></i>&nbsp;&nbsp;{{ $oportunidade->vagasdisponiveis }} vagas
+              </h6>
+              <div class="linha-lg"></div>
+              <p class="mb-3">{{ $oportunidade->descricao }}</p>
+              <a href="/oportunidade/{{ $oportunidade->idoportunidade }}" class="btn-mais-info">
+                <i class="fas fa-info-circle"></i>&nbsp;&nbsp;Mais informações
+              </a>
+            </div>
+            <div class="licitacao-grid-bottom">
+              <div class="col">
+                <div class="text-right">
+                  <h6 class="light marrom"><strong>Atualizado em:</strong> {{ BdoOportunidadeControllerHelper::onlyDate($oportunidade->updated_at) }}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+          @endforeach
+        @else
+        <p>Nenhuma oportunidade encontrada!</p>
+        @endif
+      </div>
+    </div>
+  </div>
+</section>
+
+@endsection
