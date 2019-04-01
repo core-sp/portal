@@ -5,6 +5,7 @@
 @php
 use \App\Http\Controllers\Helpers\LicitacaoHelper;
 use \App\Http\Controllers\Helper;
+use \App\Http\Controllers\LicitacaoSiteController;
 $modalidades = LicitacaoHelper::modalidades();
 $situacoes = LicitacaoHelper::situacoes();
 @endphp
@@ -29,7 +30,7 @@ $situacoes = LicitacaoHelper::situacoes();
         <form method="GET" role="form" action="/licitacoes/busca" class="pesquisaLicitacao">
           <div class="form-row text-center mb-2">
             <div class="m-auto">
-              <h5 class="text-uppercase">Busca detalhada</h5>
+              <h5 class="text-uppercase stronger marrom">Busca detalhada</h5>
             </div>
           </div>
           <div class="linha-lg"></div>
@@ -67,8 +68,8 @@ $situacoes = LicitacaoHelper::situacoes();
           	  <input type="date" class="form-control" name="datarealizacao">
           	</div>
             <div class="col align-self-end pesquisaLicitacao-btn">
-              <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
-              <button type="reset" class="btn btn-default"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</button>
+              <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
+              <button type="reset" class="btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</button>
             </div>
           </div>
         </form>
@@ -90,7 +91,7 @@ $situacoes = LicitacaoHelper::situacoes();
               <div class="licitacao-grid-main">
                 <h5 class="marrom">{{ $licitacao->titulo }}</h5>
                 <div class="linha-lg"></div>
-                {!! LicitacaoHelper::resumo($licitacao->objeto) !!}
+                <p>{{ LicitacaoSiteController::resumo($licitacao->objeto) }}</p>
                 <div class="mt-3 row bot-lg">
                   <div class="col-sm-4 d-flex">
                     <div class="mr-2">
@@ -121,7 +122,7 @@ $situacoes = LicitacaoHelper::situacoes();
                     <div class="flex-one align-self-center">
                       <h6 class="light">
                         <strong>Modalidade:</strong> {{ $licitacao->modalidade }}<br />
-                        <strong>Situação:</strong> {{ $licitacao->situacao }}
+                        <strong>Situação:</strong> {{ LicitacaoSiteController::btnSituacao($licitacao->situacao) }}
                       </h6>
                     </div>
                   </div>

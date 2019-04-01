@@ -6,6 +6,7 @@
 use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
 $status = BdoOportunidadeControllerHelper::status();
 $segmentos = BdoOportunidadeControllerHelper::segmentos();
+$regioes = BdoOportunidadeControllerHelper::regioes();
 @endphp
 
 <section class="content-header">
@@ -34,9 +35,15 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
             <div class="card-body">
               <div class="form-row">
                 <div class="col">
+                  <label for="titulo">Título</label>
+                  <input type="text" name="titulo" class="form-control" placeholder="Título">
+                </div>
+                <div class="col">
                   <label for="empresafake">Empresa</label>
                   <input type="text" name="empresafake" class="form-control" placeholder="{{ $empresa->razaosocial }}" readonly />
                 </div>
+              </div>
+              <div class="form-row mt-2">
                 <div class="col">
                   <label for="segmento">Segmento</label>
                   <select name="segmento" class="form-control" id="segmento">
@@ -50,8 +57,20 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                   </div>
                   @endif
                 </div>
-              </div>
-              <div class="form-row mt-2">
+                <div class="col">
+                  <label for="regiaoatuacao">Região de Atuação</label>
+                  <select name="regiaoatuacao" class="form-control">
+                    <option value="">Não Especificada</option>
+                    @foreach($regioes as $regiao)
+                    <option value="{{ $regiao }}">{{ $regiao }}</option>
+                    @endforeach
+                  </select>
+                  @if($errors->has('regiaoatuacao'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('regiaoatuacao') }}
+                  </div>
+                  @endif
+                </div>
               	<div class="col">
                   <label for="status">Status</label>
                   <select name="status" class="form-control">
@@ -65,7 +84,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                   </div>
                   @endif
                 </div>
-                <div class="col">
+                <div class="col w-50">
                   <label for="vagasdisponiveis">Vagas Disponíveis</label>
                   <input type="number" class="form-control {{ $errors->has('vagasdisponiveis') ? 'is-invalid' : '' }}" name="vagasdisponiveis">
                   @if($errors->has('vagasdisponiveis'))

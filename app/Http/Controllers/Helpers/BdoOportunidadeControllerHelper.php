@@ -19,6 +19,24 @@ class BdoOportunidadeControllerHelper extends Controller
         return $status;
     }
 
+    public static function onlyDate($data)
+    {
+        $date = new \DateTime($data);
+        $format = $date->format('d\/m\/Y');
+        return $format;
+    }
+
+    public static function regioes()
+    {
+        $regioes = [
+            'Capital',
+            'Grande São Paulo',
+            'Interior',
+            'Litoral'
+        ];
+        return $regioes;
+    }
+
     public static function segmentos()
     {
         $segmentos = [
