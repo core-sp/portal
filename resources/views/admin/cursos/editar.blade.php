@@ -93,21 +93,6 @@ $tipos = CursoHelper::tipos();
                   </div>
                   @endif
                 </div>
-              </div>
-              <div class="form-group mt-2">
-                <label for="endereco">Endereço</label>
-                <input type="text"
-                  name="endereco"
-                  class="form-control"
-                  value="{{ $curso->endereco }}"
-                  maxlength="191" />
-                @if($errors->has('endereco'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('endereco') }}
-                </div>
-                @endif
-              </div>
-              <div class="form-row mt-2">
                 <div class="col">
                   <label for="nrvagas">Nº de vagas</label>
                   <input type="number"
@@ -138,7 +123,45 @@ $tipos = CursoHelper::tipos();
                   </select>
                 </div>
               </div>
-              <div class="form-group mt-2">
+              <div class="form-row mt-2">
+                <div class="col">
+                  <label for="endereco">Endereço</label>
+                  <input type="text"
+                    name="endereco"
+                    class="form-control"
+                    value="{{ $curso->endereco }}"
+                    maxlength="191" />
+                  @if($errors->has('endereco'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('endereco') }}
+                  </div>
+                  @endif
+                </div>
+                <div class="col">
+                  <label for="lfm">Imagem principal</label>
+                  <div class="input-group">
+                    <span class="input-group-btn">
+                      <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
+                        <i class="fas fa-picture-o"></i> Inserir imagem
+                      </a>
+                    </span>
+                    <input id="thumbnail" class="form-control" type="text" name="img" value="{{ $curso->img }}" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group mt-3">
+                <label for="resumo">Resumo</label>
+                <textarea name="resumo"
+                  class="form-control {{ $errors->has('resumo') ? 'is-invalid' : '' }}"
+                  id="resumo"
+                  rows="3">{!! $curso->resumo !!}</textarea>
+                @if($errors->has('resumo'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('resumo') }}
+                </div>
+                @endif
+              </div>
+              <div class="form-group">
                 <label for="descricao">Descrição</label>
                 <textarea name="descricao" 
                   class="form-control my-editor {{ $errors->has('descricao') ? 'is-invalid' : '' }}"
@@ -149,20 +172,6 @@ $tipos = CursoHelper::tipos();
                 @if($errors->has('descricao'))
                 <div class="invalid-feedback">
                   {{ $errors->first('descricao') }}
-                </div>
-                @endif
-              </div>
-              <div class="form-group mt-2">
-                <label for="observacao">Observação</label>
-                <textarea name="observacao"
-                  class="form-control {{ $errors->has('observacao') ? 'is-invalid' : '' }}"
-                  id="observacao"
-                  rows="3">
-                  {!! $curso->observacao !!}  
-                </textarea>
-                @if($errors->has('observacao'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('observacao') }}
                 </div>
                 @endif
               </div>

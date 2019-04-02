@@ -15,6 +15,11 @@ class Noticia extends Model
     	return $this->belongsTo('App\Regional', 'idregional');
     }
 
+    public function curso()
+    {
+        return $this->belongsTo('App\Curso', 'idcurso');
+    }
+
     public function user()
     {
     	return $this->belongsTo('App\User', 'idusuario');

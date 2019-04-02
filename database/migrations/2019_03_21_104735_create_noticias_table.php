@@ -21,6 +21,8 @@ class CreateNoticiasTable extends Migration
             $table->text('conteudo');
             $table->bigInteger('idregional')->unsigned()->nullable();
             $table->foreign('idregional')->references('idregional')->on('regionais');
+            $table->bigInteger('idcurso')->unsigned()->nullable();
+            $table->foreign('idcurso')->references('idcurso')->on('cursos');
             $table->bigInteger('idusuario')->unsigned();
             $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();

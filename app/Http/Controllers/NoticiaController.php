@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\Noticia;
 use App\Regional;
+use App\Curso;
 use Illuminate\Support\Str;
 
 class NoticiaController extends Controller
@@ -35,7 +36,8 @@ class NoticiaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
-        return view('admin.noticias.criar', compact('regionais'));
+        $cursos = Curso::all();
+        return view('admin.noticias.criar', compact('regionais', 'cursos'));
     }
 
     /**
@@ -62,6 +64,7 @@ class NoticiaController extends Controller
         $noticia->img = $request->input('img');
         $noticia->conteudo = $request->input('conteudo');
         $noticia->idregional = $request->input('regionais');
+        $noticia->idcurso = $request->input('curso');
         $noticia->idusuario = $request->input('idusuario');
         $noticia->save();
         return redirect('/admin/noticias');
@@ -89,8 +92,9 @@ class NoticiaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $noticia = Noticia::find($id);
+        $cursos = Curso::all();
         $regionais = Regional::orderBy('regional', 'ASC')->get();
-        return view('admin.noticias.editar', compact('noticia', 'regionais'));
+        return view('admin.noticias.editar', compact('noticia', 'regionais', 'cursos'));
     }
 
     /**
@@ -118,6 +122,7 @@ class NoticiaController extends Controller
         $noticia->img = $request->input('img');
         $noticia->conteudo = $request->input('conteudo');
         $noticia->idregional = $request->input('regionais');
+        $noticia->idcurso = $request->input('curso');
         $noticia->idusuario = $request->input('idusuario');
         $noticia->update();
         return redirect('/admin/noticias');

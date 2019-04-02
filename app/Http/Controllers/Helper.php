@@ -22,6 +22,20 @@ class Helper extends Controller
     	return $acronym;
     }
 
+    public static function onlyDate($data)
+    {
+        $date = new \DateTime($data);
+        $format = $date->format('d\/m\/Y');
+        return $format;
+    }
+
+    public static function onlyHour($data)
+    {
+        $date = new \DateTime($data);
+        $format = $date->format('H:i');
+        return $format;
+    }
+
     public static function formataData($data)
     {
         $date = new \DateTime($data);

@@ -67,10 +67,11 @@ class CursoController extends Controller
         $curso->datarealizacao = $request->input('datarealizacao');
         $curso->duracao = $request->input('duracao');
         $curso->endereco = $request->input('endereco');
+        $curso->img = $request->input('img');
         $curso->nrvagas = $request->input('nrvagas');
         $curso->idregional = $request->input('idregional');
         $curso->descricao = $request->input('descricao');
-        $curso->observacao = $request->input('observacao');
+        $curso->resumo = $request->input('resumo');
         $curso->idusuario = $request->input('idusuario');
         $curso->save();
         return redirect()->route('cursos.lista');
@@ -132,10 +133,11 @@ class CursoController extends Controller
         $curso->datarealizacao = $request->input('datarealizacao');
         $curso->duracao = $request->input('duracao');
         $curso->endereco = $request->input('endereco');
+        $curso->img = $request->input('img');
         $curso->nrvagas = $request->input('nrvagas');
         $curso->idregional = $request->input('idregional');
         $curso->descricao = $request->input('descricao');
-        $curso->observacao = $request->input('observacao');
+        $curso->resumo = $request->input('resumo');
         $curso->idusuario = $request->input('idusuario');
         $curso->update();
         return redirect()->route('cursos.lista');

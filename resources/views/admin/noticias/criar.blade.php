@@ -25,16 +25,16 @@
             @csrf
             <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
             <div class="card-body">
-              <div class="form-group">
-                <label for="titulo">Título da notícia</label>
-                <input type="text" class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}" placeholder="Título" name="titulo" />
-                @if($errors->has('titulo'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('titulo') }}
-                </div>
-                @endif
-              </div>
               <div class="form-row mb-3">
+                <div class="col">
+                  <label for="titulo">Título da notícia</label>
+                  <input type="text" class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}" placeholder="Título" name="titulo" />
+                  @if($errors->has('titulo'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('titulo') }}
+                  </div>
+                  @endif
+                </div>
                 <div class="col">
                   <label for="lfm">Imagem principal</label>
                   <div class="input-group">
@@ -46,15 +46,6 @@
                     <input id="thumbnail" class="form-control" type="text" name="img" />
                   </div>
                 </div>
-                <div class="col">
-                  <label for="regionais">Regional</label>
-                  <select name="regionais" class="form-control">
-                    <option value="">Todas</option>
-                    @foreach($regionais as $regional)
-                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                    @endforeach
-                  </select>
-                </div>
               </div>
               <div class="form-group">
                 <label for="conteudo">Conteúdo da notícia</label>
@@ -64,6 +55,27 @@
                   {{ $errors->first('conteudo') }}
                 </div>
                 @endif
+              </div>
+              <div class="form-row mb-3">
+                <div class="col">
+                  <label for="regionais">Regional</label>
+                  <select name="regionais" class="form-control">
+                    <option value="">Todas</option>
+                    @foreach($regionais as $regional)
+                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                    @endforeach
+                  </select>
+                  <small class="form-text text-muted">
+                    <em>* Associar notícia à alguma regional</em>
+                  </small>
+                </div>
+                <div class="col">
+                  <label for="curso">Curso</label>
+                  <input type="number" name="curso" class="form-control" placeholder="Código da Turma" />
+                  <small class="form-text text-muted">
+                    <em>* Associar notícia à algum curso</em>
+                  </small>
+                </div>
               </div>
             </div>
             <div class="card-footer float-right">

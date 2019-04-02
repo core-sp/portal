@@ -53,7 +53,7 @@ use \App\Http\Controllers\Helpers\CursoHelper;
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>Código</th>
+                  <th>Turma</th>
                   <th>Tipo / Tema</th>
                   <th>Onde / Quando</th>
                   <th>Vagas</th>

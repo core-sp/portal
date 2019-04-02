@@ -61,7 +61,7 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-sm-3 text-right align-self-center">
               <div class="mb-2">
-                <button class="btn-atendimento d-inline"><h5 class="light">Atendimento: <strong>(11) 3243-5500</strong></h5></button>
+                <button class="btn-atendimento d-inline"><h5 class="light branco">Atendimento: <strong>(11) 3243-5500</strong></h5></button>
               </div>
               <div class="sociais">
                 <img src="{{ asset('img/002-whatsapp.png') }}" />
@@ -154,9 +154,9 @@ use \App\Http\Controllers\Helper;
               <p class="branco"><a href="/licitacoes">Licitações</a></p>
               <p class="branco"><a href="#">Concursos</a></p>
               <p class="branco"><a href="#">Agenda Core-SP</a></p>
-              <p class="branco"><a href="#">Cursos</a></p>
+              <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="#">Feiras</a></p>
-              <p class="branco"><a href="#">Balcão de Oportunidades</a></p>
+              <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
               <p class="branco"><a href="#">Simulador de Cálculos</a></p>
               <p class="branco"><a href="#">Registre-se</a></p>
               <p class="branco"><a href="#">E-OUV</a></p>

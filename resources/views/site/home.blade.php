@@ -111,7 +111,7 @@ use \App\Http\Controllers\Helper;
             <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
             <a href="#" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
             <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
-            <a href="#" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
+            <a href="/cursos" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
           </div>
         </div>
       </div>
@@ -160,7 +160,7 @@ use \App\Http\Controllers\Helper;
           </div>
           <div class="col-sm-7 beneficios-txt">
             <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
-            <p class="branco light">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p class="branco light">Novo Core-SP traz benefícios diferenciados para representantes comerciais</p>
             <div>
               <a href="#" class="btn-beneficios">saiba mais</a>
             </div>
@@ -214,7 +214,7 @@ use \App\Http\Controllers\Helper;
           </div>
           <div class="col-4 align-self-center text-right pr-4">
             <div class="calendario-txt">
-              <p class="preto">Lorem ipsum doloru sit amet, consectet adipiscing elit. <br />Num bibendum arcu.</p>
+              <p class="preto">Confira o calendário completo de<br>atendimento e expediente <br>de sua região.</p>
               <a href="#" class="btn-calendario mt-4">
                 <h4 class="normal">confira</h4>
               </a>
