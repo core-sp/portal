@@ -17,6 +17,7 @@ class CreateCursosTable extends Migration
             $table->bigIncrements('idcurso');
             $table->string('tipo');
             $table->string('tema');
+            $table->string('img')->nullable();
             $table->dateTime('datarealizacao');
             $table->dateTime('datatermino');
             $table->float('duracao');
@@ -24,7 +25,7 @@ class CreateCursosTable extends Migration
             $table->string('endereco');
             $table->integer('nrvagas');
             $table->text('descricao');
-            $table->text('observacao')->nullable();
+            $table->text('resumo');
             $table->bigInteger('idregional')->unsigned();
             $table->foreign('idregional')->references('idregional')->on('regionais');
             $table->bigInteger('idusuario')->unsigned();

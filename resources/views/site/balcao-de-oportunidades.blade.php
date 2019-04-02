@@ -119,7 +119,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                   </div>
                 </div>
               </div>
-              <button class="saiba-mais mt-3"><i class="fas fa-angle-double-down"></i> Saiba Mais</button>
+              <button class="saiba-mais mt-3"><i class="fas fa-angle-double-down"></i>&nbsp;&nbsp;Mais Detalhes</button>
             </div>
             <div class="licitacao-grid-bottom">
               <div class="col nopadding">
@@ -136,7 +136,9 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
       </div>
     </div>
     <div class="row mt-3">
+      @if(isset($oportunidades))
       {{ $oportunidades->links() }}
+      @endif
     </div>
   </div>
 </section>

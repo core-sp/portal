@@ -25,4 +25,9 @@ class Curso extends Model
     {
         return $this->belongsTo('App\User', 'idusuario');
     }
+
+    public function noticia()
+    {
+        return $this->hasMany('App\Noticia', 'idnoticia');
+    }
 }

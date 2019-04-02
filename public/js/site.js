@@ -8,9 +8,9 @@ $(document).ready(function(){
 		var bdoinfo = saibamais.prev('.bdo-info');
 		bdoinfo.slideToggle(function(){
 			if(bdoinfo.is(':visible')) {
-				saibamais.html('<i class="fas fa-angle-double-up"></i> Fechar Vaga');
+				saibamais.html('<i class="fas fa-angle-double-up"></i>&nbsp;&nbsp;Menos Detalhes');
 			} else {
-				saibamais.html('<i class="fas fa-angle-double-down"></i> Saiba Mais');
+				saibamais.html('<i class="fas fa-angle-double-down"></i>&nbsp;&nbsp;Mais Detalhes');
 			}
 		});
 	});

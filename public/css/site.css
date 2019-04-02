@@ -120,7 +120,7 @@ h6 {
 }
 
 p {
-	font-size: 1rem;
+	font-size: .95rem;
 	line-height: 1.4;
 	color: #444444;
 }
@@ -590,7 +590,7 @@ strong, .bold {
 }
 
 .calendario-txt {
-	margin-left: -50px;
+	margin-left: -80px;
 }
 
 .btn-calendario {
@@ -685,7 +685,8 @@ footer p {
 #pagina-conteudo,
 #pagina-licitacoes,
 #pagina-licitacao,
-#pagina-bdo {
+#pagina-bdo,
+#pagina-cursos {
 	padding-top: 2.25rem;
 	padding-bottom: 2.25rem;
 }
@@ -907,27 +908,125 @@ footer p {
 	line-height: 1.5;
 }
 
-.menos-padding {
-	padding: .6rem !important;
-}
-
 .bdo-info {
 	display: none;
+}
+
+.bdo-info h5 {
+	color: #15AAE2;
 }
 
 .bdo-info i {
 	color: #15AAE2;
 	font-size: 2rem;
 	margin-left: .5rem;
-}
-
-.bdo-info h5 {
-	font-weight: 700;
-	color: #15AAE2;
-	letter-spacing: normal;
+	width: 36px;
+	text-align: center;
 }
 
 .bdo-info p {
 	padding-bottom: .15rem;
 	font-weight: 300;
+}
+
+.bdo-info-txt {
+	padding-left: 3.3rem;
+}
+
+/*
+ * PÁGINA CURSOS
+ */
+#pagina-cursos {
+	background-color: #eaeaea;
+}
+
+.curso-grid {
+	height: 12rem;
+	position: relative;
+	overflow: hidden;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.curso-grid h5 {
+	font-weight: 500;
+}
+
+.bn-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	transition: .3s;
+}
+
+.curso-grid:hover .bn-img {
+	transform: scale(1.2);
+	cursor: pointer;
+}
+
+.curso-grid-txt {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	padding: 2rem 1.25rem 0.75rem 1.25rem;
+	background: rgba(0,0,0,0);
+	background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+	background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(0,0,0,0)), color-stop(100%, rgba(0,0,0,1)));
+	background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+	background: -o-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+	background: -ms-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+	background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#000000', GradientType=0 );
+}
+
+.curso-grid-content {
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	background-color: #fff;
+	border-left: 1px solid #d6d6d6;
+	border-right: 1px solid #d6d6d6;
+	border-bottom: 1px solid #d6d6d6;
+	padding: 1rem 1.5rem 1.5rem 1.5rem;
+	flex-grow: 1;
+}
+
+.btn-curso-grid {
+	background-color: #004587;
+	border: 1px solid #004587;
+	color: #FFF;
+	padding: .4rem 1.2rem;
+	border-radius: 0px;
+	display: inline-block;
+	transition: .3s;
+	text-transform: uppercase;
+}
+
+.btn-curso-grid:hover {
+	background-color: transparent;
+	color: #004587;
+}
+
+/*
+ * CURSO INTERNA
+ */
+.conteudo-txt h1,
+.conteudo-txt h2,
+.conteudo-txt h3,
+.conteudo-txt h4,
+.conteudo-txt h5,
+.conteudo-txt h6 {
+	padding-bottom: .5rem;
+	padding-top: .5rem;
+}
+
+.conteudo-txt p {
+	padding-bottom: .5rem;
+	line-height: 1.6;
+}
+
+.curso-img {
+	height: 25rem;
+	border: 1px solid #d6d6d6;
 }
