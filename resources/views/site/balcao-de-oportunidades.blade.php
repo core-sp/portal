@@ -74,13 +74,55 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                 <i class="fas fa-suitcase"></i>&nbsp;&nbsp;{{ $oportunidade->vagasdisponiveis }} vagas
               </h6>
               <div class="linha-lg"></div>
-              <p class="mb-3">{{ $oportunidade->descricao }}</p>
-              <a href="/oportunidade/{{ $oportunidade->idoportunidade }}" class="btn-mais-info">
-                <i class="fas fa-info-circle"></i>&nbsp;&nbsp;Mais informações
-              </a>
+              <p>{{ $oportunidade->descricao }}</p>
+              <div class="bdo-info">
+                <div class="row pt-4">
+                  <div class="col">
+                    <div class="row nomargin">
+                      <div>
+                        <i class="far fa-address-card"></i>
+                      </div>
+                      <div class="ml-3 pt-1">
+                        <h5 class="text-uppercase pb-1">Contato</h5>
+                        <p><strong>Nome:</strong> {{ $oportunidade->empresa->contatonome }}</p>
+                        <p><strong>Email:</strong> {{ $oportunidade->empresa->contatoemail }}</p>
+                        <p><strong>Telefone:</strong> {{ $oportunidade->empresa->contatotelefone }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="row nomargin">
+                      <div>
+                        <i class="far fa-building"></i>
+                      </div>
+                      <div class="ml-3 pt-1">
+                        <h5 class="text-uppercase pb-1">{{ $oportunidade->empresa->razaosocial }}</h5>
+                        <p><strong>Endereço:</strong> {{ $oportunidade->empresa->endereco }}</p>
+                        <p><strong>Email:</strong> {{ $oportunidade->empresa->email }}</p>
+                        <p><strong>Telefone:</strong> {{ $oportunidade->empresa->telefone }}</p>
+                        <p><strong>Website:</strong> {{ $oportunidade->empresa->site }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="row nomargin">
+                      <div>
+                        <i class="fas fa-briefcase"></i>
+                      </div>
+                      <div class="ml-3 pt-1">
+                        <h5 class="text-uppercase pb-1">Oportunidade</h5>
+                        <p><strong>Segmento:</strong> {{ $oportunidade->segmento }}</p>
+                        <p><strong>Inclusão:</strong> {{ BdoOportunidadeControllerHelper::onlyDate($oportunidade->created_at) }}</p>
+                        <p><strong>Status:</strong> {{ $oportunidade->status }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button class="saiba-mais mt-3"><i class="fas fa-angle-double-down"></i> Saiba Mais</button>
             </div>
             <div class="licitacao-grid-bottom">
-              <div class="col">
+              <div class="col nopadding">
                 <div class="text-right">
                   <h6 class="light marrom"><strong>Atualizado em:</strong> {{ BdoOportunidadeControllerHelper::onlyDate($oportunidade->updated_at) }}</h6>
                 </div>
@@ -92,6 +134,9 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
         <p>Nenhuma oportunidade encontrada!</p>
         @endif
       </div>
+    </div>
+    <div class="row mt-3">
+      {{ $oportunidades->links() }}
     </div>
   </div>
 </section>

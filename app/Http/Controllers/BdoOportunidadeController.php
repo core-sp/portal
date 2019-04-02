@@ -113,7 +113,7 @@ class BdoOportunidadeController extends Controller
         $oportunidade->idempresa = $request->input('empresa');
         $oportunidade->titulo = $request->input('titulo');
         $oportunidade->segmento = $request->input('segmento');
-        $opprtunidade->regiaoatuacao = $request->input('regiaoatuacao');
+        $oportunidade->regiaoatuacao = $request->input('regiaoatuacao');
         $oportunidade->descricao = $request->input('descricao');
         $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
         $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');

@@ -170,7 +170,6 @@ Route::prefix('/')->group(function() {
   //Balcão de Oportunidades
   Route::get('balcao-de-oportunidades', 'BdoSiteController@index');
   Route::get('balcao-de-oportunidades/busca', 'BdoSiteController@buscaOportunidades');
-  Route::get('oportunidade/{id}', 'BdoSiteController@show');
 
   Route::get('concurso/{id}', 'ConcursoController@show');
   Route::get('curso/{id}', 'CursoController@show');

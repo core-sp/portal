@@ -5,6 +5,7 @@
  */
 body {
 	font-family: 'Roboto', sans-serif;
+	color: #444444;
 }
 
 .preto {
@@ -843,6 +844,10 @@ footer p {
 	width: 40%;
 }
 
+.trinta {
+	width: 30%;
+}
+
 .vinte {
 	width: 20%;
 }
@@ -880,14 +885,49 @@ footer p {
  */
 .btn-mais-info {
 	background-color: #004587;
-	padding: .5rem 1.5rem;
+	padding: .375rem 1.2rem;
 	display: inline-block;
 	border-radius: 5px;
 	border: none;
 	color: #fbfbfb;
-	font-size: 1rem;
+	font-size: .95rem;
 }
 
 .btn-mais-info:hover {
 	color: #fbfbfb;
+}
+
+.saiba-mais {
+	background-color: #004587;
+	border: 1px solid #004587;
+	padding: .35rem 1.5rem;
+	border-radius: .25rem;
+	font-size: .95rem;
+	color: #fbfbfb;
+	line-height: 1.5;
+}
+
+.menos-padding {
+	padding: .6rem !important;
+}
+
+.bdo-info {
+	display: none;
+}
+
+.bdo-info i {
+	color: #15AAE2;
+	font-size: 2rem;
+	margin-left: .5rem;
+}
+
+.bdo-info h5 {
+	font-weight: 700;
+	color: #15AAE2;
+	letter-spacing: normal;
+}
+
+.bdo-info p {
+	padding-bottom: .15rem;
+	font-weight: 300;
 }
