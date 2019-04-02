@@ -3,6 +3,17 @@ $(document).ready(function(){
 		$('body').toggleClass('contraste');
 		$('#espaco-representante').toggleClass('contraste');
 	});
+	$('.saiba-mais').on('click', function(){
+		var saibamais = $(this);
+		var bdoinfo = saibamais.prev('.bdo-info');
+		bdoinfo.slideToggle(function(){
+			if(bdoinfo.is(':visible')) {
+				saibamais.html('<i class="fas fa-angle-double-up"></i> Fechar Vaga');
+			} else {
+				saibamais.html('<i class="fas fa-angle-double-down"></i> Saiba Mais');
+			}
+		});
+	});
 });
 
 $(window).scroll(function(){
