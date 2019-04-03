@@ -57,8 +57,24 @@ body {
 }
 
 .contraste {
-	background-color: #444444 !important;
+	background-color: #000000 !important;
 	color: #FFF !important;
+	filter: grayscale(100%) !important;
+}
+
+.contraste-color {
+	color: #FFFFFF !important;
+}
+
+.contraste-branco {
+	background-color: #FFFFFF !important;
+	color: #000000 !important;
+}
+
+.contraste-cinza {
+	background: #555555 !important;
+	background-color: #555555 !important;
+	color: #FFFFFF !important;
 }
 
 img {
@@ -178,6 +194,11 @@ strong, .bold {
 .main-cabecalho {
 	margin-top: 0.8rem;
 	margin-bottom: 0.8rem;
+}
+
+#header-principal {
+	top: 0;
+	left: 0;
 }
 
 .btn-atendimento {
@@ -525,6 +546,8 @@ strong, .bold {
 	border-radius: 5px;
 	padding-left: 2rem;
 	padding-right: 2rem;
+	position: relative;
+	z-index: 3;
 }
 
 #computer {
@@ -639,7 +662,6 @@ strong, .bold {
  */
 footer {
 	background-color: #004587;
-	border-top: 0.5rem solid #13632F;
 }
 
 footer p {

@@ -2,6 +2,10 @@
 
 @section('content')
 
+@php
+use App\Http\Controllers\Helper;
+@endphp
+
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">

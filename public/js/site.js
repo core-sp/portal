@@ -1,8 +1,4 @@
 $(document).ready(function(){	
-	$('#btn-contrast').on('click', function(){
-		$('body').toggleClass('contraste');
-		$('#espaco-representante').toggleClass('contraste');
-	});
 	$('.saiba-mais').on('click', function(){
 		var saibamais = $(this);
 		var bdoinfo = saibamais.prev('.bdo-info');
