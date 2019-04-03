@@ -59,6 +59,10 @@ body {
 .contraste {
 	background-color: #000000 !important;
 	color: #FFF !important;
+}
+
+.contraste img,
+.contraste-filter {
 	filter: grayscale(100%) !important;
 }
 
@@ -270,6 +274,7 @@ strong, .bold {
 .dropdown-menu {
 	background-color: #e8eaeb;
 	border-radius: 5px;
+	z-index: 5;
 }
 
 .dropdown-item {
@@ -932,65 +937,6 @@ footer p {
 
 .bdo-info {
 	display: none;
-}
-
-.bdo-info h5 {
-	color: #15AAE2;
-}
-
-.bdo-info i {
-	color: #15AAE2;
-	font-size: 2rem;
-	width: 70px;
-	padding: 1rem;
-	border: 1px solid #d6d6d6;
-	text-align: center;
-	transition: .3s;
-	border-radius: 50%;
-}
-
-.bc:hover i,
-.bl:hover i,
-.br:hover i {
-	transform: rotateY(180deg);
-}
-
-.bdo-info h4 {
-	font-size: 1.2rem;
-	color: #15AAE2;
-	letter-spacing: -.02rem;
-	font-weight: 700;
-	border-bottom: 1px solid #d6d6d6;
-	padding-left: 1rem;
-}
-
-.bdo-info p {
-	padding-bottom: .15rem;
-	font-weight: 300;
-}
-
-.bdo-info-txt {
-	padding-left: 3.3rem;
-}
-
-.br,
-.bc,
-.bl {
-	padding: 1rem 0rem;
-}
-
-.linha-h {
-	height: 17px;
-	border-left: 1px solid #d6d6d6;
-	position: absolute;
-	top: 0;
-	left: 42px;
-}
-
-.br:hover,
-.bc:hover,
-.bl:hover {
-	cursor: pointer;
 }
 
 /*

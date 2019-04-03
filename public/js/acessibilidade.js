@@ -4,7 +4,6 @@ $(document).ready(function(){
 		var list = [
 			'body',
 			'#espaco-representante',
-			'.nav-item',
 			'#fixed-menu',
 			'.home-title blockquote h4',
 			'.branco-bg',
@@ -23,7 +22,8 @@ $(document).ready(function(){
 			'.edital-info .table',
 			'.edital-download',
 			'#pagina-cursos',
-			'.curso-grid-content'
+			'.curso-grid-content',
+			'.nav-item'
 		];
 		$(list).toggleClass('contraste');
 
@@ -57,6 +57,13 @@ $(document).ready(function(){
 			'h1'
 		];
 		$(justColor).toggleClass('contraste-color');
+
+		var bgFilter = [
+			'.novo-core-box',
+			'.beneficios-box',
+			'.nav-link'
+		];
+		$(bgFilter).toggleClass('contraste-filter');
 	});
 
 });

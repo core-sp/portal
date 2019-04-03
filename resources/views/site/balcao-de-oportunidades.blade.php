@@ -76,53 +76,37 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
               <div class="linha-lg"></div>
               <p>{{ $oportunidade->descricao }}</p>
               <div class="bdo-info">
-                <div class="row pt-2 pb-2">
-                  <div class="col pad-rig-zero">
-                    <div class="row nomargin br h-100">
-                      <div class="linha-h"></div>
-                      <div>
-                        <i class="far fa-address-card"></i>
-                      </div>
-                      <div class="pt-1 flex-one">
-                        <h4 class="text-uppercase pl-3 pr-3 pb-1">Contato</h4>
-                        <div class="pl-3 pt-2 pr-3">
-                          <p><strong>Nome:</strong> {{ $oportunidade->empresa->contatonome }}</p>
-                          <p><strong>Email:</strong> {{ $oportunidade->empresa->contatoemail }}</p>
-                          <p><strong>Telefone:</strong> {{ $oportunidade->empresa->contatotelefone }}</p>
-                        </div>
-                      </div>
+                <div class="row mt-3 bot-lg">
+                  <div class="col d-flex">
+                    <div class="mr-2">
+                      <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="flex-one">
+                      <p><strong>Nome:</strong> {{ $oportunidade->empresa->contatonome }}</p>
+                      <p><strong>Email:</strong> {{ $oportunidade->empresa->contatoemail }}</p>
+                      <p><strong>Telefone:</strong> {{ $oportunidade->empresa->contatotelefone }}</p>
                     </div>
                   </div>
-                  <div class="col pad-lef-zero pad-rig-zero">
-                    <div class="row nomargin bc h-100">
-                      <div>
-                        <i class="far fa-building"></i>
-                      </div>
-                      <div class="pt-1 flex-one">
-                        <h4 class="text-uppercase pl-3 pr-3 pb-1">Empresa</h4>
-                        <div class="pl-3 pt-2 pr-3">
-                          <p><strong>Empresa:</strong> {{ $oportunidade->empresa->razaosocial }}</p>
-                          <p><strong>Endereço:</strong> {{ $oportunidade->empresa->endereco }}</p>
-                          <p><strong>Email:</strong> {{ $oportunidade->empresa->email }}</p>
-                          <p><strong>Telefone:</strong> {{ $oportunidade->empresa->telefone }}</p>
-                          <p><strong>Website:</strong> {{ $oportunidade->empresa->site }}</p>
-                        </div>
-                      </div>
+                  <div class="col d-flex">
+                    <div class="mr-2">
+                      <i class="far fa-building"></i>
+                    </div>
+                    <div class="flex-one">
+                      <p><strong>Empresa:</strong> {{ $oportunidade->empresa->razaosocial }}</p>
+                      <p><strong>Endereço:</strong> {{ $oportunidade->empresa->endereco }}</p>
+                      <p><strong>Email:</strong> {{ $oportunidade->empresa->email }}</p>
+                      <p><strong>Telefone:</strong> {{ $oportunidade->empresa->telefone }}</p>
+                      <p><strong>Website:</strong> {{ $oportunidade->empresa->site }}</p>
                     </div>
                   </div>
-                  <div class="col pad-lef-zero">
-                    <div class="row nomargin bl h-100">
-                      <div>
-                        <i class="fas fa-briefcase"></i>
-                      </div>
-                      <div class="pt-1 flex-one">
-                        <h4 class="text-uppercase pl-3 pr-3 pb-1">Oportunidade</h4>
-                        <div class="pl-3 pt-2 pr-3">
-                          <p><strong>Segmento:</strong> {{ $oportunidade->segmento }}</p>
-                          <p><strong>Inclusão:</strong> {{ BdoOportunidadeControllerHelper::onlyDate($oportunidade->created_at) }}</p>
-                          <p><strong>Status:</strong> {{ $oportunidade->status }}</p>
-                        </div>
-                      </div>
+                  <div class="col d-flex">
+                    <div class="mr-2">
+                      <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="flex-one">
+                      <p><strong>Segmento:</strong> {{ $oportunidade->segmento }}</p>
+                      <p><strong>Inclusão:</strong> {{ BdoOportunidadeControllerHelper::onlyDate($oportunidade->created_at) }}</p>
+                      <p><strong>Status:</strong> {{ $oportunidade->status }}</p>
                     </div>
                   </div>
                 </div>
