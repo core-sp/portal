@@ -27,20 +27,20 @@
             <div class="card-body">
               <div class="form-row">
                 <div class="col">
-                  <label for="cpf">CPF</label>
-                  <input type="text" name="cpf" class="form-control {{ $errors->has('cpf') ? 'is-invalid' : '' }}" placeholder="CPF" />
-                  @if($errors->has('cpf'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('cpf') }}
-                  </div>
-                  @endif
-                </div>
-                <div class="col">
                   <label for="nome">Nome</label>
                   <input type="text" name="nome" class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}" placeholder="Nome" />
                   @if($errors->has('nome'))
                   <div class="invalid-feedback">
                     {{ $errors->first('nome') }}
+                  </div>
+                  @endif
+                </div>
+                <div class="col">
+                  <label for="email">Email</label>
+                  <input type="text" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="Email" />
+                  @if($errors->has('email'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('email') }}
                   </div>
                   @endif
                 </div>
@@ -56,11 +56,23 @@
                   @endif
                 </div>
                 <div class="col">
-                  <label for="email">Email</label>
-                  <input type="text" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="Email" />
-                  @if($errors->has('email'))
+                  <label for="cpf">CPF</label>
+                  <input type="text" name="cpf" class="form-control {{ $errors->has('cpf') ? 'is-invalid' : '' }}" placeholder="CPF" />
+                  @if($errors->has('cpf'))
                   <div class="invalid-feedback">
-                    {{ $errors->first('email') }}
+                    {{ $errors->first('cpf') }}
+                  </div>
+                  @endif
+                </div>
+                <div class="col">
+                  <label for="registrocore">Registro no CORE</label>
+                  <input type="text"
+                    name="registrocore"
+                    class="form-control {{ $errors->has('registrocore') ? 'is-invalid' : '' }}"
+                    placeholder="Nº do registro no CORE (opcional)" />
+                    @if($errors->has('registrocore'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('registrocore') }}
                   </div>
                   @endif
                 </div>

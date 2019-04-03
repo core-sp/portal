@@ -10,7 +10,7 @@ use \App\Http\Controllers\Helper;
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-12">
-        <h1 class="d-inline mr-3 align-middle">Cursos Deletados</h1>
+        <h1 class="d-inline mr-3 align-middle">Cursos Cancelados</h1>
         <a href="/admin/cursos" class="btn btn-primary">Lista de Cursos</a>
       </div>
     </div>
@@ -24,7 +24,7 @@ use \App\Http\Controllers\Helper;
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">
-              Lista de cursos deletados do CORE-SP
+              Lista de cursos cancelados do CORE-SP
             </h3>
           </div>
           <div class="card-body">
@@ -35,7 +35,7 @@ use \App\Http\Controllers\Helper;
                   <th>Tipo / Tema</th>
                   <th>Onde / Quando</th>
                   <th>Regional</th>
-                  <th>Deletado em:</th>
+                  <th>Cancelado em:</th>
                   <th>Ações</th>
                 </tr>
               </thead>

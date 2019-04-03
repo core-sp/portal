@@ -106,13 +106,11 @@ use \App\Http\Controllers\Helper;
     <div class="row">
       <div class="col-12">
         <div class="pb-5 pt-5 pl-2 pr-2 text-center novo-core-box">
-          <div class="wow fadeInLeft novo-core-animation">
-            <h2 class="stronger branco text-uppercase mb-5">um novo core-sp para você!</h2>
-            <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
-            <a href="#" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
-            <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
-            <a href="/cursos" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
-          </div>
+          <h2 class="stronger branco text-uppercase mb-5">um novo core-sp para você!</h2>
+          <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
+          <a href="#" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
+          <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
+          <a href="/cursos" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
         </div>
       </div>
     </div>
