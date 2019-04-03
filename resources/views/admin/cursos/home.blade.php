@@ -13,7 +13,7 @@ use \App\Http\Controllers\Helpers\CursoHelper;
       <div class="col-sm-12">
         <h1 class="d-inline mr-3 align-middle">Cursos</h1>
         <a href="/admin/cursos/criar" class="btn btn-primary mr-1">Novo Curso</a>
-        <a href="/admin/cursos/lixeira" class="btn btn-warning">Cursos Deletados</a>
+        <a href="/admin/cursos/lixeira" class="btn btn-warning">Cursos Cancelados</a>
       </div>
     </div>
   </div>
@@ -76,10 +76,10 @@ use \App\Http\Controllers\Helpers\CursoHelper;
                     <a href="/curso/{{ $curso->idcurso }}" class="btn btn-sm btn-default" target="_blank">Ver</a>
                     <a href="/admin/cursos/inscritos/{{ $curso->idcurso }}" class="btn btn-sm btn-secondary">Inscritos</a>
                     <a href="/admin/cursos/editar/{{ $curso->idcurso }}" class="btn btn-sm btn-primary">Editar</a>
-                    <form method="POST" action="/admin/cursos/apagar/{{ $curso->idcurso }}" class="d-inline">
+                    <form method="POST" action="/admin/cursos/cancelar/{{ $curso->idcurso }}" class="d-inline">
                       @csrf
                       {{ method_field('DELETE') }}
-                      <input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm('Tem certeza que deseja excluir o curso?')" />
+                      <input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm('Tem certeza que deseja cancelar o curso?')" />
                     </form>
                   </td>
                 </tr>

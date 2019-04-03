@@ -16,7 +16,7 @@
 </section>
 
 <section id="pagina-conteudo">
-	<div class="container">
+	<div class="container conteudo-txt">
 		{!! $pagina->conteudo !!}
 	</div>
 </section>

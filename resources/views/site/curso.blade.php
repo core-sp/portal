@@ -1,10 +1,12 @@
-@extends('layout.app', ['title' => 'Cursos'])
+@extends('layout.app', ['title' => $curso->tipo.' - '.$curso->tema.' ('.$curso->idcurso.')'])
 
 @section('content')
 
 @php
 use \App\Http\Controllers\Helper;
 use \App\Http\Controllers\CursoInscritoController;
+$datarealizacao = Helper::onlyDate($curso->datarealizacao);
+$datatermino = Helper::onlyDate($curso->datatermino);
 @endphp
 
 <section id="pagina-cabecalho" class="mt-1">
@@ -24,31 +26,44 @@ use \App\Http\Controllers\CursoInscritoController;
   <div class="container">
     <div class="row">
       <div class="col">
-        <h4 class="stronger">{{ $curso->tipo }} - {{ $curso->tema }} ({{ $curso->idcurso }})</h4>
+        <div class="row nomargin">
+          <div class="flex-one pr-3 align-self-center">
+            <h4 class="stronger">{{ $curso->tipo }} - {{ $curso->tema }} ({{ $curso->idcurso }})</h4>
+          </div>
+          <div class="align-self-center">
+            <a href="/cursos" class="btn-voltar">Voltar</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="linha-lg"></div>
     <div class="row mt-4">
       <div class="col-sm-4 edital-info">
-        <table class="table table-bordered">
+        <table class="table table-bordered mb-4">
           <tbody>
             <tr>
               <td class="quarenta"><h6>Status</h6></td>
               <td><h6 class="light">
-                @if(CursoInscritoController::permiteInscricao($curso->idcurso))
-                  Vagas abertas
-                @else
-                  Inscrições esgotadas
-                @endif
+                {{ CursoInscritoController::btnSituacao($curso->idcurso) }}
               </h6></td>
             </tr>
             <tr>
-              <td><h6>Data de Realização</h6></td>
-              <td><h6 class="light">{{ Helper::onlyDate($curso->datarealizacao) }}</h6></td>
+              <td><h6>Início</h6></td>
+              <td><h6 class="light">{{ $datarealizacao }}</h6></td>
+            </tr>
+            <tr>
+              <td><h6>Término</h6></td>
+              <td><h6 class="light">{{ $datatermino }}</h6></td>
             </tr>
             <tr>
               <td><h6>Horário</h6></td>
-              <td><h6 class="light">{{ Helper::onlyHour($curso->datarealizacao) }}</h6></td>
+              <td><h6 class="light">
+                @if($datarealizacao == $datatermino)
+                  Das {{ Helper::onlyHour($curso->datarealizacao) }} às {{ Helper::onlyHour($curso->datatermino) }}
+                @else
+                  A partir das {{ Helper::onlyHour($curso->datarealizacao) }}
+                @endif
+              </h6></td>
             </tr>
             <tr>
               <td><h6>Nº de vagas</h6></td>
@@ -56,13 +71,14 @@ use \App\Http\Controllers\CursoInscritoController;
             </tr>
           </tbody>
         </table>
+        <a href="/curso/inscricao/{{ $curso->idcurso }}" class="btn-curso-interna">Inscrever-se</a>
       </div>
       <div class="col-sm-8">
         <div class="curso-img">
           <img src="{{asset($curso->img)}}" class="bn-img" />
         </div>
         <div class="edital-download mt-3 conteudo-txt">
-          <h5>Descrição</h5>
+          <h4 class="stronger">Descrição</h4>
           <div class="linha-lg"></div>
           {!! $curso->descricao !!}
         </div>

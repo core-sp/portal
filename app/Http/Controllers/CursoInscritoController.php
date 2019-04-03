@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Curso;
 use App\CursoInscrito;
+use App\Http\Controllers\Helper;
 
 class CursoInscritoController extends Controller
 {
@@ -42,6 +43,7 @@ class CursoInscritoController extends Controller
         $inscrito->nome = $request->input('nome');
         $inscrito->telefone = $request->input('telefone');
         $inscrito->email = $request->input('email');
+        $inscrito->registrocore = $request->input('registrocore');
         $inscrito->idcurso = $idcurso;
         $inscrito->save();
         return redirect()->route('cursos.lista');
@@ -86,12 +88,13 @@ class CursoInscritoController extends Controller
         $regras = [
             'cpf' => 'required|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso,
             'nome' => 'required',
-            'telefone' => 'required|numeric',
+            'telefone' => 'required',
             'email' => 'email'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
-            'numeric' => 'O :attribute aceita apenas números'
+            'email' => 'Por favor, digite um endereço de email válido',
+            'cpf.unique' => 'O CPF informado já está cadastrado neste curso'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -100,10 +103,27 @@ class CursoInscritoController extends Controller
         $inscrito->nome = $request->input('nome');
         $inscrito->telefone = $request->input('telefone');
         $inscrito->email = $request->input('email');
+        $inscrito->registrocore = $request->input('registrocore');
         $inscrito->idcurso = $idcurso;
         $inscrito->save();
 
-        $agradece = 'Sua inscrição em '.$inscrito->curso->tipo.' '.$inscrito->curso->tema.' foi efetuada com sucesso.';
-        return view('site.agradecimento', compact('agradece'));
+        $agradece = "Sua inscrição em <strong>".$inscrito->curso->tipo;
+        $agradece .= " - ".$inscrito->curso->tema."</strong>";
+        $agradece .= " (turma ".$inscrito->curso->idcurso.") foi efetuada com sucesso.";
+        $agradece .= "<br><br>";
+        $agradece .= "<strong>Endereço: </strong>".$inscrito->curso->endereco;
+        $agradece .= "<br><strong>Data de Início: </strong>".Helper::onlyDate($inscrito->curso->datarealizacao);
+        $agradece .= "<br><strong>Horário: </strong>".Helper::onlyHour($inscrito->curso->datarealizacao);
+
+        return view('site.agradecimento')->with('agradece', $agradece);
+    }
+
+    public static function btnSituacao($idcurso)
+    {
+        if(CursoInscritoController::permiteInscricao($idcurso)) {
+            echo "<div class='sit-btn sit-verde'>Vagas Abertas</div>";
+        } else {
+            echo "<div class='sit-btn sit-verde'>Vagas Abertas</div>";
+        }
     }
 }

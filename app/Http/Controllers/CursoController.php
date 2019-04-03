@@ -78,18 +78,6 @@ class CursoController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $curso = Curso::find($id);
-        return view('site.curso', compact('curso'));
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id

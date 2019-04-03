@@ -83,6 +83,15 @@ a:hover {
 	padding: 0px;
 }
 
+.pad-left-zero,
+.pad-lef-zero {
+	padding-left: 0px;
+}
+
+.pad-rig-zero {
+	padding-right: 0px;
+}
+
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, p, .p {
 	margin-bottom: 0rem;
 	line-height: 1.4;
@@ -147,6 +156,20 @@ strong, .bold {
 
 .stronger {
 	font-weight: 900;
+}
+
+.btn-voltar {
+	background-color: #13632F;
+	color: #FFFFFF;
+	padding: .1rem .85rem;
+	border: 1px solid #13632F;
+	display: inline-block;
+	font-weight: 300;
+}
+
+.btn-voltar:hover {
+	background-color: transparent;
+	color: #13632F;
 }
 
 /*
@@ -409,10 +432,6 @@ strong, .bold {
 #novo-core h2,
 #e-ouv h2 {
 	letter-spacing: -0.1rem;
-}
-
-.novo-core-animation {
-	animation-duration: 2s;
 }
 
 .novo-core-box {
@@ -686,26 +705,10 @@ footer p {
 #pagina-licitacoes,
 #pagina-licitacao,
 #pagina-bdo,
-#pagina-cursos {
+#pagina-cursos,
+#pagina-agradece {
 	padding-top: 2.25rem;
 	padding-bottom: 2.25rem;
-}
-
-#pagina-conteudo h1,
-#pagina-conteudo h2,
-#pagina-conteudo h3,
-#pagina-conteudo h4,
-#pagina-conteudo h5,
-#pagina-conteudo h6 {
-	padding-top: 1rem;
-	padding-bottom: 1rem;
-}
-
-#pagina-conteudo p {
-	font-size: 1.1rem;
-	line-height: 1.7;
-	padding-bottom: 1.1rem;
-	font-weight: 300;
 }
 
 /*
@@ -718,7 +721,8 @@ footer p {
 	border: 1px solid #d6d6d6;
 }
 
-.pesquisaLicitacao label {
+.pesquisaLicitacao label,
+.inscricaoCurso label {
 	font-size: 0.85rem;
 	margin-bottom: 0.25rem;
 	margin-left: .25rem;
@@ -764,10 +768,6 @@ footer p {
 	font-size: .85rem !important;
 	color: #444444;
 	letter-spacing: .025rem;
-}
-
-.pad-left-zero {
-	padding-left: 0px;
 }
 
 .linha-lg {
@@ -919,9 +919,27 @@ footer p {
 .bdo-info i {
 	color: #15AAE2;
 	font-size: 2rem;
-	margin-left: .5rem;
-	width: 36px;
+	width: 70px;
+	padding: 1rem;
+	border: 1px solid #d6d6d6;
 	text-align: center;
+	transition: .3s;
+	border-radius: 50%;
+}
+
+.bc:hover i,
+.bl:hover i,
+.br:hover i {
+	transform: rotateY(180deg);
+}
+
+.bdo-info h4 {
+	font-size: 1.2rem;
+	color: #15AAE2;
+	letter-spacing: -.02rem;
+	font-weight: 700;
+	border-bottom: 1px solid #d6d6d6;
+	padding-left: 1rem;
 }
 
 .bdo-info p {
@@ -931,6 +949,26 @@ footer p {
 
 .bdo-info-txt {
 	padding-left: 3.3rem;
+}
+
+.br,
+.bc,
+.bl {
+	padding: 1rem 0rem;
+}
+
+.linha-h {
+	height: 17px;
+	border-left: 1px solid #d6d6d6;
+	position: absolute;
+	top: 0;
+	left: 42px;
+}
+
+.br:hover,
+.bc:hover,
+.bl:hover {
+	cursor: pointer;
 }
 
 /*
@@ -992,18 +1030,28 @@ footer p {
 	flex-grow: 1;
 }
 
-.btn-curso-grid {
+.btn-curso-grid,
+.btn-curso-interna {
 	background-color: #004587;
 	border: 1px solid #004587;
 	color: #FFF;
-	padding: .4rem 1.2rem;
 	border-radius: 0px;
 	display: inline-block;
 	transition: .3s;
 	text-transform: uppercase;
 }
 
-.btn-curso-grid:hover {
+.btn-curso-grid {
+	padding: .4rem 1.2rem;
+}
+
+.btn-curso-interna {
+	padding: .5rem 1.6rem;
+	font-size: 1.2rem;
+}
+
+.btn-curso-grid:hover,
+.btn-curso-interna:hover {
 	background-color: transparent;
 	color: #004587;
 }
@@ -1019,11 +1067,13 @@ footer p {
 .conteudo-txt h6 {
 	padding-bottom: .5rem;
 	padding-top: .5rem;
+	line-height: 1;
 }
 
 .conteudo-txt p {
 	padding-bottom: .5rem;
 	line-height: 1.6;
+	font-size: 1.1rem;
 }
 
 .curso-img {

@@ -126,7 +126,7 @@ Route::prefix('admin')->group(function() {
     Route::post('/criar', 'CursoController@store');
     Route::get('/editar/{id}', 'CursoController@edit');
     Route::put('/editar/{id}', 'CursoController@update');
-    Route::delete('/apagar/{id}', 'CursoController@destroy');
+    Route::delete('/cancelar/{id}', 'CursoController@destroy');
     Route::get('/lixeira', 'CursoController@lixeira');
     Route::get('/restore/{id}', 'CursoController@restore');
     // Lida com a parte de inscritos
@@ -172,12 +172,13 @@ Route::prefix('/')->group(function() {
   Route::get('balcao-de-oportunidades/busca', 'BdoSiteController@buscaOportunidades');
   // Cursos
   Route::get('cursos', 'CursoSiteController@cursosView');
+  Route::get('curso/{id}', 'CursoSiteController@cursoView');
+  Route::get('curso/inscricao/{id}', 'CursoInscritoController@inscricaoView');
+  Route::post('curso/inscricao/{id}', 'CursoInscritoController@inscricao');
 
   Route::get('concurso/{id}', 'ConcursoController@show');
-  Route::get('curso/{id}', 'CursoController@show');
   Route::get('{categoria}/{slug}', 'PaginaController@show');
   Route::get('{slug}', 'PaginaController@showSemCategoria');
   // Rota para inscrição em curso
-  Route::get('curso/inscricao/{id}', 'CursoInscritoController@inscricaoView');
-  Route::post('curso/inscricao/{id}', 'CursoInscritoController@inscricao');
+  
 });
