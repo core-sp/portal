@@ -18,8 +18,14 @@ use \App\Http\Controllers\Helper;
     </head>
     <body>
 
+    <!-- ACESSIBILIDADE -->
+    <a href="#header-principal" accesskey="1"></a>
+    <a href="#banner-principal" accesskey="3"></a>
+    <a href="#rodape" accesskey="4"></a>
+    <a id="accesskeyContraste" accesskey="5"></a>
+
       @section('header')
-      <header>
+      <header id="header-principal">
         <div class="container-fluid">
           <div class="row">
             <div class="linha-verde w-100"></div>
@@ -36,21 +42,26 @@ use \App\Http\Controllers\Helper;
                   <button type="button" class="btn btn-sm btn-light" id="btn-contrast">
                     <i class="fas fa-adjust"></i>
                   </button>
-                  <button type="button" class="btn btn-sm btn-light">
-                    <i class="fas fa-map-marker-alt"></i>
-                  </button>
-                  <button type="button" class="btn btn-sm btn-light">
-                    <i class="fas fa-wheelchair"></i>
-                  </button>
+                  <a href="/mapa-do-site">
+                    <button type="button" class="btn btn-sm btn-light">
+                      <i class="fas fa-map-marker-alt"></i>
+                    </button>
+                  </a>
+                  <a href="/acessibilidade">
+                    <button type="button" class="btn btn-sm btn-light">
+                      <i class="fas fa-wheelchair"></i>
+                    </button>
+                  </a>
                 </div>
                 <form class="input-group input-group-sm"
                   method="GET"
                   role="form"
-                  action ="/busca">
+                  action ="/busca" />
                   <input type="text"
                     name="q"
                     class="form-control float-right"
-                    placeholder="Digite o que você procura" />
+                    placeholder="Digite o que você procura"
+                    accesskey="2" />
                   <div class="input-group-append">
                     <button type="submit" class="btn btn-default">
                       <i class="fas fa-search"></i>
@@ -120,7 +131,8 @@ use \App\Http\Controllers\Helper;
       @yield('content')
 
       @section('footer')
-      <footer class="pt-4">
+      <div class="linha-verde"></div>
+      <footer class="pt-4" id="rodape">
         <div class="container mb-4">
           <div class="row">
             <div class="col-4">
@@ -194,5 +206,6 @@ use \App\Http\Controllers\Helper;
 
       <script type="text/javascript" src="{{ asset('/js/app.js') }}"></script>
       <script type="text/javascript" src="{{ asset('/js/site.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('/js/acessibilidade.js') }}"></script>
     </body>
 </html>
