@@ -36,14 +36,17 @@
                   @endif
                 </div>
                 <div class="col">
-                  <label for="lfm">Imagem principal</label>
+                  <label for="lfm-noticia">Imagem principal</label>
                   <div class="input-group">
                     <span class="input-group-btn">
-                      <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
+                      <a id="lfm-noticia"
+                        data-input="noticia-img"
+                        data-preview="holder"
+                        class="btn btn-default" />
                         <i class="fas fa-picture-o"></i> Inserir imagem
                       </a>
                     </span>
-                    <input id="thumbnail" class="form-control" type="text" name="img" />
+                    <input id="noticia-img" class="form-control" type="text" name="img" />
                   </div>
                 </div>
               </div>

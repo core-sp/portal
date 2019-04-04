@@ -45,7 +45,7 @@ use \App\Http\Controllers\Helper;
                   <div class="input-group">
                     <span class="input-group-btn">
                       <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
-                        <i class="fas fa-picture-o"></i> Inserir imagem
+                        <i class="fas fa-picture-o"></i> Inserir/Alterar imagem
                       </a>
                     </span>
                     <input id="thumbnail" class="form-control" type="text" name="img" value="{{ $noticia->img }}" />

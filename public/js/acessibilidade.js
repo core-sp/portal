@@ -14,6 +14,7 @@ $(document).ready(function(){
 			'.btn',
 			'.linha-branca',
 			'.box',
+			'.box-dois',
 			'.pesquisaLicitacao',
             '.pesquisaLicitacao label',
             '.inscricaoCurso label',

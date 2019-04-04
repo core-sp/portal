@@ -35,5 +35,16 @@ class NoticiaTableSeeder extends Seeder
         $noticia->conteudo = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><p>Pellentesque suscipit nulla ac pulvinar vestibulum. Ut pellentesque nunc est, sit amet feugiat mi dictum ullamcorper. Praesent lobortis, dolor sit amet posuere volutpat, justo arcu gravida magna, volutpat mattis dolor mauris in lacus.</p><p>Cras ultricies pellentesque quam in ultricies. Ut semper neque non vehicula lacinia. Proin porttitor nunc ultricies tortor lacinia consequat. In ornare condimentum vestibulum. Mauris id dui quis leo volutpat interdum.</p><p>Fusce viverra elit mauris, in malesuada libero tincidunt eu. Ut sit amet ultricies libero. Duis in justo lacus.</p><p>Aliquam dolor leo, efficitur non justo eget, consequat tincidunt risus. Sed iaculis sagittis sodales. Phasellus sodales, justo sit amet ornare lobortis, sapien leo facilisis dui, a bibendum lacus tellus et velit. Nulla eu ornare ante.</p>";
         $noticia->idusuario = 1;
         $noticia->save();
+
+        $noticia = new Noticia();
+        $noticia->titulo = "Curso - Básico em Marketing: Como Foi";
+        $noticia->slug = "curso-basico-em-marketing-como-foi";
+        $noticia->img = "imagens/curso.jpg";
+        $noticia->conteudo = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><p>Pellentesque suscipit nulla ac pulvinar vestibulum. Ut pellentesque nunc est, sit amet feugiat mi dictum ullamcorper. Praesent lobortis, dolor sit amet posuere volutpat, justo arcu gravida magna, volutpat mattis dolor mauris in lacus.</p><p>Cras ultricies pellentesque quam in ultricies. Ut semper neque non vehicula lacinia. Proin porttitor nunc ultricies tortor lacinia consequat. In ornare condimentum vestibulum. Mauris id dui quis leo volutpat interdum.</p><p>Fusce viverra elit mauris, in malesuada libero tincidunt eu. Ut sit amet ultricies libero. Duis in justo lacus.</p><p>Aliquam dolor leo, efficitur non justo eget, consequat tincidunt risus. Sed iaculis sagittis sodales. Phasellus sodales, justo sit amet ornare lobortis, sapien leo facilisis dui, a bibendum lacus tellus et velit. Nulla eu ornare ante.</p>";
+        $noticia->idusuario = 1;
+        $noticia->idcurso = 1;
+        $noticia->created_at = "2019-04-02 12:00:00";
+        $noticia->save();
+
     }
 }

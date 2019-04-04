@@ -16,8 +16,8 @@ class CursoTableSeeder extends Seeder
         $curso->tipo = "Curso";
         $curso->tema = "Básico em Marketing";
         $curso->img = "/imagens/curso-01.png";
-        $curso->datarealizacao = "2019-05-18 12:00:00";
-        $curso->datatermino = "2019-05-18 14:00:00";
+        $curso->datarealizacao = "2019-04-01 12:00:00";
+        $curso->datatermino = "2019-04-01 14:00:00";
         $curso->duracao = 2;
         $curso->cargahoraria = "Segunda-feira: 12h às 14hrs";
         $curso->endereco = "Rua Vergueiro, 256";
