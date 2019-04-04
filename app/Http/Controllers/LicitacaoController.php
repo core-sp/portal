@@ -10,7 +10,7 @@ class LicitacaoController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['except' => 'show', 'buscaAvancada']);
+        $this->middleware('auth', ['except' => ['show', 'buscaAvancada']]);
     }
     /**
      * Display a listing of the resource.

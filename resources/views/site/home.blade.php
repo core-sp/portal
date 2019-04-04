@@ -60,7 +60,7 @@ use \App\Http\Controllers\Helper;
     </div>
     <div class="row">
       <div class="col-sm-3">
-        <div class="box text-center azul-escuro-bg">
+        <div class="box text-center azul-escuro-bg h-100">
           <div class="inside-box">
             <img src="{{ asset('img/002-money.png') }}" class="inside-img" />
             <p class="text-uppercase mt-3 branco">Simulador de<br /> Cálculos</p>
@@ -70,7 +70,7 @@ use \App\Http\Controllers\Helper;
       </div>
       <div class="col-sm-3">
         <a href="/balcao-de-oportunidades">
-          <div class="box text-center azul-bg">
+          <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/001-work.png') }}" class="inside-img" />
               <p class="text-uppercase mt-3 branco">Balcão de Oportunidades</p>
@@ -80,7 +80,7 @@ use \App\Http\Controllers\Helper;
         </a>
       </div>
       <div class="col-sm-3">
-        <div class="box text-center azul-escuro-bg">
+        <div class="box text-center azul-escuro-bg h-100">
           <div class="inside-box">
             <img src="{{ asset('img/003-bill.png') }}" class="inside-img" />
             <p class="text-uppercase mt-3 branco">Emissão de boleto<br>anuidade 2019</p>
@@ -89,7 +89,7 @@ use \App\Http\Controllers\Helper;
         </div>
       </div>
       <div class="col-sm-3">
-        <div class="box text-center azul-bg">
+        <div class="box text-center azul-bg h-100">
           <div class="inside-box">
             <img src="{{ asset('img/004-note.png') }}" class="inside-img" />
             <p class="text-uppercase mt-3 branco">Registre-se no portal<br>do representante</p>
@@ -127,22 +127,14 @@ use \App\Http\Controllers\Helper;
             <h4 class="pr-3 ml-1">Notícias</h4>
           </blockquote>
           <h5 class="float-right branco-bg">
-            <a href="#"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
+            <a href="/noticias"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
           </h5>
         </div>
       </div>
     </div>
     <div class="row">
       @foreach($noticias as $noticia)
-      <div class="col-sm-4">
-        <div class="box-news">
-          <img src="{{asset($noticia->img)}}" class="bn-img" />
-          <div class="box-news-txt">
-            <h6 class="light cinza-claro">{{ Helper::newsData($noticia->updated_at) }}</h6>
-            <h5 class="branco mt-1">{{ $noticia->titulo }}</h5>
-          </div>
-        </div>
-      </div>
+        @include('site.inc.noticia-grid')
       @endforeach
     </div>
   </div>

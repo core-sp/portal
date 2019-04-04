@@ -37,7 +37,7 @@ $datatermino = Helper::onlyDate($curso->datatermino);
       </div>
     </div>
     <div class="linha-lg"></div>
-    <div class="row mt-4">
+    <div class="row mt-2">
       <div class="col-sm-4 edital-info">
         <table class="table table-bordered mb-4">
           <tbody>
@@ -77,7 +77,7 @@ $datatermino = Helper::onlyDate($curso->datatermino);
         <div class="curso-img">
           <img src="{{asset($curso->img)}}" class="bn-img" />
         </div>
-        <div class="edital-download mt-3 conteudo-txt">
+        <div class="edital-download mt-3 conteudo-txt-mini">
           <h4 class="stronger">Descrição</h4>
           <div class="linha-lg"></div>
           {!! $curso->descricao !!}

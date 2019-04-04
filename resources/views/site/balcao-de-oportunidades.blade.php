@@ -26,12 +26,12 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
     <div class="row pb-4">
       <div class="col">
         <form method="GET" role="form" action="/balcao-de-oportunidades/busca" class="pesquisaLicitacao">
-          <div class="form-row text-center mb-2">
+          <div class="form-row text-center">
             <div class="m-auto">
               <h5 class="text-uppercase stronger marrom">Busca detalhada</h5>
             </div>
           </div>
-          <div class="linha-lg"></div>
+          <div class="linha-lg-mini"></div>
           <div class="form-row">
             <div class="col">
               <label for="palavrachave">Palavra-chave</label>
@@ -73,7 +73,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                 <i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;{{ $oportunidade->regiaoatuacao }}&nbsp;&nbsp;&nbsp;&nbsp;
                 <i class="fas fa-suitcase"></i>&nbsp;&nbsp;{{ $oportunidade->vagasdisponiveis }} vagas
               </h6>
-              <div class="linha-lg"></div>
+              <div class="linha-lg-mini"></div>
               <p>{{ $oportunidade->descricao }}</p>
               <div class="bdo-info">
                 <div class="row mt-3 bot-lg">

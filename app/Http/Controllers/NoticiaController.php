@@ -71,18 +71,6 @@ class NoticiaController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($slug)
-    {
-        $noticia = Noticia::where('slug', $slug)->first();
-        return view('site.noticia', compact('noticia'));
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id

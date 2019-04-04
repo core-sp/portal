@@ -35,7 +35,7 @@ use App\Http\Controllers\LicitacaoSiteController;
       </div>
     </div>
     <div class="linha-lg"></div>
-    <div class="row mt-4">
+    <div class="row mt-2">
       <div class="col-sm-4 edital-info">
         <table class="table table-bordered">
           <tbody>
@@ -74,8 +74,8 @@ use App\Http\Controllers\LicitacaoSiteController;
      	</a>
         <div class="edital-download mt-3">
           <h5>Objeto</h5>
-           <div class="linha-lg"></div>
-           <h6 class="light mt-2">{!! $licitacao->objeto !!}</h6>
+           <div class="linha-lg-mini"></div>
+           <h6 class="light">{!! $licitacao->objeto !!}</h6>
         </div>
       </div>
     </div>
