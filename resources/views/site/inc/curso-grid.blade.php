@@ -21,7 +21,7 @@ use \App\Http\Controllers\CursoSiteController;
         @if(CursoInscritoController::permiteInscricao($curso->idcurso))
           <a href="/curso/inscricao/{{ $curso->idcurso }}" class="btn-curso-grid mt-3">Inscrever-se</a>
         @else
-          Inscrições esgotadas
+          <button class="btn-esgotado mt-3">Esgotado</button>
         @endif
       @else
         <a href="noticia/{{ CursoSiteController::getNoticia($curso->idcurso) }}" class="btn-como-foi mt-3">Veja como foi</a>

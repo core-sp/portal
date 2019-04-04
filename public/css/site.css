@@ -919,6 +919,11 @@ footer p {
 	border-color: #08953d;
 }
 
+.sit-vermelho {
+	background-color: #FF0000;
+	border-color: crimson;
+}
+
 .sit-default {
 	background-color: #a2a0a0;
 	border-color: #565656;
@@ -1101,13 +1106,24 @@ footer p {
 	text-transform: uppercase;
 }
 
+.btn-esgotado {
+	background-color: transparent;
+	border: 1px solid transparent;
+	color: #FF0000;
+	border-radius: 0px;
+	display: inline-block;
+	font-weight: 900;
+	text-transform: uppercase;
+}
+
 .btn-como-foi:hover {
 	background-color: transparent;
 	border-color: #13632F;
 }
 
 .btn-curso-grid,
-.btn-como-foi {
+.btn-como-foi,
+.btn-esgotado {
 	padding: .4rem 1.2rem;
 }
 

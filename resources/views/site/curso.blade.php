@@ -71,7 +71,9 @@ $datatermino = Helper::onlyDate($curso->datatermino);
             </tr>
           </tbody>
         </table>
-        <a href="/curso/inscricao/{{ $curso->idcurso }}" class="btn-curso-interna">Inscrever-se</a>
+        @if(CursoInscritoController::permiteInscricao($curso->idcurso))
+          <a href="/curso/inscricao/{{ $curso->idcurso }}" class="btn-curso-interna">Inscrever-se</a>
+        @endif
       </div>
       <div class="col-sm-8">
         <div class="curso-img">
