@@ -11,7 +11,7 @@ class CursoInscritoController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['except' => 'inscricaoView', 'inscricao']);
+        $this->middleware('auth', ['except' => ['inscricao', 'inscricaoView']]);
     }
 
     public function create(Request $request, $idcurso)

@@ -7,26 +7,20 @@ Route::get('admin', function() {
 });
 
 /*
- * Rota de admin
+ * ROTAS FECHADAS
  */
 Route::prefix('admin')->group(function() {
-  /*
-   * Rotas de Login
-   */
+  // Rotas de login
   Auth::routes();
 
-  /*
-   * Rotas de Configuração
-   */
+  // Rotas de Configuração
   Route::prefix('info')->group(function(){
     Route::get('/', 'UserController@infos')->name('admin.info');
     Route::get('/senha', 'UserController@senha');
     Route::put('/senha', 'UserController@changePassword');
   });
   
-  /*
-   * Rota para CRUD de páginas
-   */
+  // Rotas para CRUD de páginas
   Route::prefix('paginas')->group(function() {
     Route::get('/', 'PaginaController@index')->name('paginas.lista');
     Route::get('/busca', 'PaginaController@busca');
@@ -47,18 +41,14 @@ Route::prefix('admin')->group(function() {
     Route::delete('/categorias/apagar/{id}', 'PaginaCategoriaController@destroy');
   });
 
-  /*
-   * Rota para mostrar regionais
-   */
+  // Rotas de regionais
   Route::prefix('regionais')->group(function() {
     Route::get('/', 'RegionalController@index');
     Route::get('/busca', 'RegionalController@busca');
     Route::get('/mostra/{id}', 'RegionalController@show');
   });
 
-  /*
-   * Rota para CRUD de notícias
-   */
+  // Rotas de notícias
   Route::prefix('noticias')->group(function(){
     Route::get('/', 'NoticiaController@index');
     Route::get('/busca', 'NoticiaController@busca');
@@ -71,9 +61,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/restore/{id}', 'NoticiaController@restore');
   });
 
-  /*
-   * Rota para CRUD de licitações
-   */
+  // Rotas de licitações
   Route::prefix('licitacoes')->group(function(){
     Route::get('/', 'LicitacaoController@index')->name('licitacoes.lista');
     Route::get('/busca', 'LicitacaoController@busca');
@@ -86,9 +74,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/restore/{id}', 'LicitacaoController@restore');
   });
 
-  /*
-   * Rota para CRUD de Usuários
-   */
+  // Rotas para usuários
   Route::prefix('usuarios')->group(function(){
     Route::get('/', 'UserController@index')->name('usuarios.lista');
     Route::get('/busca', 'UserController@busca');
@@ -101,9 +87,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/restore/{id}', 'UserController@restore');
   });
 
-  /*
-   * Rota para CRUD de concursos
-   */
+  // Rotas para concursos
   Route::prefix('concursos')->group(function(){
     Route::get('/', 'ConcursoController@index')->name('concursos.lista');
     Route::get('/busca', 'ConcursoController@busca');
@@ -116,9 +100,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/restore/{id}', 'ConcursoController@restore');
   });
 
-  /*
-   * Rota para CRUD de cursos
-   */
+  // Rotas para cursos
   Route::prefix('cursos')->group(function(){
     Route::get('/', 'CursoController@index')->name('cursos.lista');
     Route::get('/busca', 'CursoController@busca');
@@ -136,9 +118,7 @@ Route::prefix('admin')->group(function() {
     Route::put('/cancelar-inscricao/{id}', 'CursoInscritoController@cancelarInscricao');
   });
 
-  /*
-   * Rota para CRUD do Balcão de Oportunidade
-   */
+  // Rota para Balcão de Oportunidades
   Route::prefix('bdo')->group(function(){
     Route::get('/', 'BdoOportunidadeController@index')->name('bdooportunidades.lista');
     Route::get('/busca', 'BdoOportunidadeController@busca');
@@ -157,19 +137,27 @@ Route::prefix('admin')->group(function() {
   });
 });
 
+/*
+ * ROTAS ABERTAS
+ */
 Route::prefix('/')->group(function() {
   // Rotas de admin abertas
   Route::get('admin', 'AdminController@index')->name('admin');
   Route::get('admin/logout', 'Auth\LoginController@logout')->name('logout');
-  // Rotas de conteúdo abertas
-  Route::get('noticia/{slug}', 'NoticiaController@show');
+
+  // Notícias
+  Route::get('noticias', 'NoticiaSiteController@noticiasView');
+  Route::get('noticia/{slug}', 'NoticiaSiteController@show');
+  
   // Licitações
   Route::get('licitacao/{id}', 'LicitacaoSiteController@show');
   Route::get('licitacoes', 'LicitacaoSiteController@licitacoesView');
   Route::get('licitacoes/busca', 'LicitacaoSiteController@buscaLicitacoes');
+  
   //Balcão de Oportunidades
   Route::get('balcao-de-oportunidades', 'BdoSiteController@index');
   Route::get('balcao-de-oportunidades/busca', 'BdoSiteController@buscaOportunidades');
+  
   // Cursos
   Route::get('cursos', 'CursoSiteController@cursosView');
   Route::get('curso/{id}', 'CursoSiteController@cursoView');

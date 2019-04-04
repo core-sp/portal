@@ -28,12 +28,12 @@ $situacoes = LicitacaoHelper::situacoes();
     <div class="row pb-4">
       <div class="col">
         <form method="GET" role="form" action="/licitacoes/busca" class="pesquisaLicitacao">
-          <div class="form-row text-center mb-2">
+          <div class="form-row text-center">
             <div class="m-auto">
               <h5 class="text-uppercase stronger marrom">Busca detalhada</h5>
             </div>
           </div>
-          <div class="linha-lg"></div>
+          <div class="linha-lg-mini"></div>
           <div class="form-row mb-2">
           	<div class="col">
           	  <label for="modalidade">Modalidade</label>
@@ -90,7 +90,7 @@ $situacoes = LicitacaoHelper::situacoes();
             <a href="/licitacao/{{ $licitacao->idlicitacao }}">
               <div class="licitacao-grid-main">
                 <h5 class="marrom">{{ $licitacao->titulo }}</h5>
-                <div class="linha-lg"></div>
+                <div class="linha-lg-mini"></div>
                 <p>{{ LicitacaoSiteController::resumo($licitacao->objeto) }}</p>
                 <div class="mt-3 row bot-lg">
                   <div class="col-sm-4 d-flex">

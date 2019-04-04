@@ -37,12 +37,12 @@ $datatermino = Helper::onlyDate($curso->datatermino);
       </div>
     </div>
     <div class="linha-lg"></div>
-    <div class="row mt-4 mb-4">
+    <div class="row mb-4">
       <div class="col conteudo-txt">
 		<p>Inscrever-se em <strong>{{ $curso->tipo }} - {{ $curso->tema }},
 			</strong> turma <strong>{{ $curso->idcurso }},</strong>
 			que acontecerá no dia <strong>{{ Helper::onlyDate($curso->datarealizacao) }}</strong>
-			 às <strong>{{ Helper::onlyHour($curso->datarealizacao) }}</strong></p>
+			 às <strong>{{ Helper::onlyHour($curso->datarealizacao) }}.</strong></p>
 		<div class="mt-2">
 		  <form method="POST" role="form" class="inscricaoCurso">
 			@csrf

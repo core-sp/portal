@@ -1,27 +1,27 @@
-@extends('layout.app', ['title' => 'Inscrição'])
+@extends('layout.app', ['title' => 'Notícias'])
 
 @section('content')
 
 <section id="pagina-cabecalho" class="mt-1">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-    <img src="{{ asset('img/cursos.png') }}" />
+    <img src="{{ asset('img/noticias.png') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Obrigado!
+          Notícias
         </h1>
       </div>
     </div>
   </div>
 </section>
 
-<section id="pagina-agradece">
+<section id="pagina-noticias">
   <div class="container">
     <div class="row">
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
-            <h4 class="stronger"><i class="fas fa-check"></i>&nbsp;&nbsp;Sucesso!</h4>
+            <h4 class="stronger">Todas as notícias</h4>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
@@ -30,13 +30,18 @@
       </div>
     </div>
     <div class="linha-lg"></div>
-    <div class="row">
+    <div class="row mt-2">
+      @foreach($noticias as $noticia)
+        @include('site.inc.noticia-grid')
+      @endforeach
+    </div>
+    <div class="row mb-2">
       <div class="col">
-        <div class="pb-5 pt-5 pl-2 pr-2 text-center novo-core-box">
-          @if(isset($agradece))
-            <h5 class="light branco">{!! $agradece !!}</h5>
-          @endif
-        </div>
+        @if(isset($noticias))
+          <div class="mt-4 float-right">
+            {{ $noticias->links() }}
+          </div>
+        @endif
       </div>
     </div>
   </div>
