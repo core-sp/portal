@@ -117,7 +117,7 @@ use \App\Http\Controllers\Helper;
   </div>
 </section>
 
-<section id="home-news" class="pb-5">
+<section id="home-news">
   <div class="container">
     <div class="row mb-2">
       <div class="col-12">

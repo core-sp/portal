@@ -163,6 +163,7 @@ Route::prefix('/')->group(function() {
   Route::get('curso/{id}', 'CursoSiteController@cursoView');
   Route::get('curso/inscricao/{id}', 'CursoInscritoController@inscricaoView');
   Route::post('curso/inscricao/{id}', 'CursoInscritoController@inscricao');
+  Route::get('cursos-anteriores', 'CursoSiteController@cursosAnterioresView');
 
   Route::get('concurso/{id}', 'ConcursoController@show');
   Route::get('{categoria}/{slug}', 'PaginaController@show');
