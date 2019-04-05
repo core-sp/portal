@@ -40,6 +40,8 @@ $(document).ready(function(){
 			'.btn-atendimento',
 			'.btn-buscaavancada',
 			'.btn-voltar',
+			'.btn-calendario',
+			'.btn-como-foi',
 			'.btn-edital',
 			'.saiba-mais',
 			'.btn-curso-grid',

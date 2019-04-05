@@ -19,7 +19,12 @@ class PerfilTableSeeder extends Seeder
 
         $perfil = new Perfil();
         $perfil->nome = "Editor";
-        $perfil->descricao = "Pode gerenciar qualquer tipo de conteúdo no site";
+        $perfil->descricao = "Pode gerenciar o conteúdo do portal";
+        $perfil->save();
+
+        $perfil = new Perfil();
+        $perfil->nome = "Jurídico";
+        $perfil->descricao = "Pode gerenciar processos administrativos do portal";
         $perfil->save();
     }
 }

@@ -3,7 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\BdoOportunidade;
 
-class BdoOportunidadeSeeder extends Seeder
+class BdoOportunidadeTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.

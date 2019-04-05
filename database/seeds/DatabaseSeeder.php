@@ -18,7 +18,9 @@ class DatabaseSeeder extends Seeder
         $this->call(NoticiaTableSeeder::class);
         $this->call(CursoTableSeeder::class);
         $this->call(LicitacaoTableSeeder::class);
-        $this->call(BdoEmpresaSeeder::class);
-        $this->call(BdoOportunidadeSeeder::class);
+        $this->call(BdoEmpresaTableSeeder::class);
+        $this->call(BdoOportunidadeTableSeeder::class);
+        $this->call(CursoInscritoTableSeeder::class);
+        $this->call(ConcursoTableSeeder::class);
     }
 }

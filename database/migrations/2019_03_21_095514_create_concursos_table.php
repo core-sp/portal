@@ -16,10 +16,12 @@ class CreateConcursosTable extends Migration
         Schema::create('concursos', function (Blueprint $table) {
             $table->bigIncrements('idconcurso');
             $table->string('modalidade');
+            $table->string('titulo');
             $table->string('nrprocesso');
             $table->string('situacao');
             $table->dateTime('datarealizacao');
-            $table->text('objeto');
+            $table->text('objeto')->nullable();
+            $table->string('linkexterno')->nullable();
             $table->bigInteger('idusuario')->unsigned();
             $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();

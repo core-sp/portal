@@ -3,6 +3,7 @@
 @section('content')
 
 @php
+use \App\Http\Controllers\Helper;
 use \App\Http\Controllers\Helpers\BdoEmpresaControllerHelper;
 $segmentos = BdoEmpresaControllerHelper::segmentos();
 $capitais = BdoEmpresaControllerHelper::capitalSocial();
@@ -170,6 +171,19 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             </div>
           </form>
         </div>
+      </div>
+    </div>
+    <div class="row mt-2 mb-4">
+      <div class="col">
+        @if($empresa->updated_at == $empresa->created_at)
+        <div class="callout callout-info">
+          <strong>Criado por:</strong> {{ $empresa->user->nome }}, às {{ Helper::organizaData($empresa->created_at) }}
+        </div>
+        @else
+        <div class="callout callout-info">
+          <strong>Ultima alteração:</strong> {{ $empresa->user->nome }}, às {{ Helper::organizaData($empresa->updated_at) }}
+        </div>
+        @endif
       </div>
     </div>
   </div>

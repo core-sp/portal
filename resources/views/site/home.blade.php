@@ -6,9 +6,9 @@
 use \App\Http\Controllers\Helper;
 @endphp
 
-<section id="banner-principal" class="mt-1">
+<section class="mt-1">
   <div class="container-fluid">
-    <div class="row">
+    <div class="row" id="conteudo-principal">
       <div id="carousel" class="carousel slide" data-ride="carousel">
         <!--
         <ol class="carousel-indicators">
@@ -108,7 +108,7 @@ use \App\Http\Controllers\Helper;
         <div class="pb-5 pt-5 pl-2 pr-2 text-center novo-core-box">
           <h2 class="stronger branco text-uppercase mb-5">um novo core-sp para você!</h2>
           <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
-          <a href="#" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
+          <a href="/concursos" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
           <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
           <a href="/cursos" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
         </div>

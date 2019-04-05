@@ -25,14 +25,31 @@
             @csrf
             <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
             <div class="card-body">
-              <div class="form-group">
-                <label for="titulo">Título da página</label>
-                <input type="text" class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}" placeholder="Título" name="titulo" />
-                @if($errors->has('titulo'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('titulo') }}
+              <div class="form-row">
+                <div class="col">
+                  <label for="titulo">Título da página</label>
+                  <input type="text"
+                    class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
+                    placeholder="Título"
+                    name="titulo" />
+                  @if($errors->has('titulo'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('titulo') }}
+                  </div>
+                  @endif
                 </div>
-                @endif
+                <div class="col">
+                  <label for="subtitulo">Subtítulo</label>
+                  <input type="text"
+                    class="form-control {{ $errors->has('subtitulo') ? 'is-invalid' : '' }}"
+                    name="subtitulo"
+                    placeholder="Subtítulo" />
+                  @if($errors->has('subtitulo'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('subtitulo') }}
+                  </div>
+                  @endif
+                </div>
               </div>
               <div class="form-row">
                 <div class="col">

@@ -165,7 +165,11 @@ Route::prefix('/')->group(function() {
   Route::post('curso/inscricao/{id}', 'CursoInscritoController@inscricao');
   Route::get('cursos-anteriores', 'CursoSiteController@cursosAnterioresView');
 
-  Route::get('concurso/{id}', 'ConcursoController@show');
+  // Concursos
+  Route::get('concursos', 'ConcursoSiteController@concursosView');
+  Route::get('concursos/busca', 'ConcursoSiteController@buscaConcursos');
+  Route::get('concurso/{id}', 'ConcursoSiteController@show');
+  
   Route::get('{categoria}/{slug}', 'PaginaController@show');
   Route::get('{slug}', 'PaginaController@showSemCategoria');
   // Rota para inscrição em curso

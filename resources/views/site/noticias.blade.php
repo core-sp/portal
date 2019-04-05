@@ -17,7 +17,7 @@
 
 <section id="pagina-noticias">
   <div class="container">
-    <div class="row">
+    <div class="row" id="conteudo-principal">
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">

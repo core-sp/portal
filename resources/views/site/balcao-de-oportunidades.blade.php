@@ -23,7 +23,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
 
 <section id="pagina-bdo">
   <div class="container">
-    <div class="row pb-4">
+    <div class="row pb-4" id="conteudo-principal">
       <div class="col">
         <form method="GET" role="form" action="/balcao-de-oportunidades/busca" class="pesquisaLicitacao">
           <div class="form-row text-center">

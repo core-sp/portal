@@ -13,14 +13,21 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        $perfil = Perfil::where('nome', 'admin')->first();
+        $admin = Perfil::where('nome', 'admin')->first();
+        $editor = Perfil::where('nome', 'editor')->first();
 
         $usuario = new User();
         $usuario->nome = 'Admin';
-        $usuario->email = 'admin@admin.com.br';
-        $usuario->password = bcrypt('admin102030');
+        $usuario->email = 'desenvolvimento@core-sp.org.br';
+        $usuario->password = bcrypt('Senha102030');
         $usuario->save();
-
-        $usuario->perfil()->attach($perfil);
+        $usuario->perfil()->attach($admin);
+        
+        $usuario = new User();
+        $usuario->nome = 'Márcio';
+        $usuario->email = 'comunicacao@core-sp.org.br';
+        $usuario->password = bcrypt('comunicacao102030');
+        $usuario->save();
+        $usuario->perfil()->attach($editor);
     }
 }

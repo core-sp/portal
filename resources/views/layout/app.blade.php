@@ -20,7 +20,7 @@ use \App\Http\Controllers\Helper;
 
     <!-- ACESSIBILIDADE -->
     <a href="#header-principal" accesskey="1"></a>
-    <a href="#banner-principal" accesskey="3"></a>
+    <a href="#conteudo-principal" accesskey="3"></a>
     <a href="#rodape" accesskey="4"></a>
     <a id="accesskeyContraste" accesskey="5"></a>
 
