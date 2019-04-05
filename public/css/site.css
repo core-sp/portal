@@ -207,7 +207,7 @@ strong, .bold {
 .conteudo-txt h5,
 .conteudo-txt h6 {
 	padding-bottom: .5rem;
-	padding-top: .5rem;
+	padding-top: 1rem;
 	line-height: 1;
 }
 
@@ -224,7 +224,7 @@ strong, .bold {
 .conteudo-txt-mini h5,
 .conteudo-txt-mini h6 {
 	padding-bottom: .4rem;
-	padding-top: .4rem;
+	padding-top: .8rem;
 	line-height: 1;
 }
 
