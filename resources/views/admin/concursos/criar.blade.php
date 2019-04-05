@@ -91,7 +91,7 @@ $situacoes = ConcursoHelper::situacoes();
                 </div>
               </div>
               <div class="form-group mt-2">
-                <label for="linkexterno">Link Oficial</label>
+                <label for="linkexterno">Link Oficial do Concurso</label>
                 <input type="text"
                   class="form-control {{ $errors->has('linkexterno') ? 'is-invalid' : '' }}"
                   name="linkexterno"

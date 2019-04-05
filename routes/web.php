@@ -170,8 +170,12 @@ Route::prefix('/')->group(function() {
   Route::get('concursos/busca', 'ConcursoSiteController@buscaConcursos');
   Route::get('concurso/{id}', 'ConcursoSiteController@show');
   
+  // Busca geral
+  Route::get('/busca', 'SiteController@busca');  
+
+  Route::get('seccionais', 'RegionalSiteController@regionaisView');
+
+  // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{categoria}/{slug}', 'PaginaController@show');
   Route::get('{slug}', 'PaginaController@showSemCategoria');
-  // Rota para inscrição em curso
-  
 });

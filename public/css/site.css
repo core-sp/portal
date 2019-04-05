@@ -804,6 +804,8 @@ footer p {
 #pagina-licitacoes,
 #pagina-licitacao,
 #pagina-concursos,
+#pagina-erro,
+#pagina-busca,
 #pagina-bdo,
 #pagina-cursos,
 #pagina-agradece,
@@ -1146,4 +1148,17 @@ footer p {
 .curso-img {
 	height: 25rem;
 	border: 1px solid #d6d6d6;
+}
+
+/*
+ * PÁGINA DE BUSCA
+ */
+.box-resultado {
+	padding-bottom: 1.5rem;
+	border-bottom: 1px solid #d6d6d6;
+	margin-bottom: 1.5rem;
+}
+
+.box-resultado:last-child {
+	border-bottom: none;
 }
