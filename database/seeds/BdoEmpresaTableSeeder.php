@@ -3,7 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\BdoEmpresa;
 
-class BdoEmpresaSeeder extends Seeder
+class BdoEmpresaTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.

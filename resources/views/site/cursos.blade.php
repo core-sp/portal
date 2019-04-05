@@ -22,7 +22,7 @@ use \App\Http\Controllers\CursoInscritoController;
 
 <section id="pagina-cursos">
   <div class="container">
-    <div class="row pb-3">
+    <div class="row pb-3" id="conteudo-principal">
       <div class="col">
         <div class="home-title">
           <blockquote>

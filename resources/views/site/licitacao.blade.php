@@ -22,7 +22,7 @@ use App\Http\Controllers\LicitacaoSiteController;
 
 <section id="pagina-licitacao">
   <div class="container">
-    <div class="row">
+    <div class="row" id="conteudo-principal">
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
@@ -41,7 +41,7 @@ use App\Http\Controllers\LicitacaoSiteController;
           <tbody>
             <tr>
               <td class="quarenta"><h6>Situação</h6></td>
-              <td><h6 class="light">{{ LicitacaoSiteController::btnSituacao($licitacao->situacao) }}</h6></td>
+              <td><h6 class="light">{{ Helper::btnSituacao($licitacao->situacao) }}</h6></td>
             </tr>
             <tr>
               <td><h6>Modalidade</h6></td>

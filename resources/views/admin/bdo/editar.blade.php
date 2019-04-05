@@ -3,6 +3,7 @@
 @section('content')
 
 @php
+use \App\Http\Controllers\Helper;
 use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
 $status = BdoOportunidadeControllerHelper::status();
 $segmentos = BdoOportunidadeControllerHelper::segmentos();
@@ -122,6 +123,19 @@ $regioes = BdoOportunidadeControllerHelper::regioes();
             </div>
           </form>
         </div>
+      </div>
+    </div>
+    <div class="row mt-2 mb-4">
+      <div class="col">
+        @if($oportunidade->updated_at == $oportunidade->created_at)
+        <div class="callout callout-info">
+          <strong>Criado por:</strong> {{ $oportunidade->user->nome }}, às {{ Helper::organizaData($oportunidade->created_at) }}
+        </div>
+        @else
+        <div class="callout callout-info">
+          <strong>Ultima alteração:</strong> {{ $oportunidade->user->nome }}, às {{ Helper::organizaData($oportunidade->updated_at) }}
+        </div>
+        @endif
       </div>
     </div>
   </div>

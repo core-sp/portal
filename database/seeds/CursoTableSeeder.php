@@ -21,7 +21,7 @@ class CursoTableSeeder extends Seeder
         $curso->duracao = 2;
         $curso->cargahoraria = "Segunda-feira: 12h às 14hrs";
         $curso->endereco = "Rua Vergueiro, 256";
-        $curso->nrvagas = 5;
+        $curso->nrvagas = 2;
         $curso->descricao = "<h4>Objetivo</h4>
         <p>Capacitar o profissional que ingressa ou pretende ingressar na &aacute;rea a aplicar t&eacute;cnicas de marketing por meio da an&aacute;lise do ambiente mercadol&oacute;gico e do desenvolvimento do composto de marketing (produto, canais de disrtibui&ccedil;&atilde;o, pre&ccedil;o e comunica&ccedil;&atilde;o), contribuindo nas decis&otilde;es que envolvam o cicle do vida de produtos e servi&ccedil;os no mercado competitico atual.</p>
         <p><strong>Carga hor&aacute;ria: 16 horas</strong></p>
@@ -42,7 +42,7 @@ class CursoTableSeeder extends Seeder
         $curso->duracao = 4;
         $curso->cargahoraria = "Segunda-feira: 12h às 16hrs";
         $curso->endereco = "Avenida Paulista, 120";
-        $curso->nrvagas = 10;
+        $curso->nrvagas = 2;
         $curso->resumo = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tincidunt et justo non hendrerit. Nulla venenatis vestibulum arcu consectetur adipiscing elit.";
         $curso->descricao = "<h4>Objetivo</h4>
         <p>Capacitar o profissional que ingressa ou pretende ingressar na &aacute;rea a aplicar t&eacute;cnicas de marketing por meio da an&aacute;lise do ambiente mercadol&oacute;gico e do desenvolvimento do composto de marketing (produto, canais de disrtibui&ccedil;&atilde;o, pre&ccedil;o e comunica&ccedil;&atilde;o), contribuindo nas decis&otilde;es que envolvam o cicle do vida de produtos e servi&ccedil;os no mercado competitico atual.</p>

@@ -1,33 +1,32 @@
-@extends('layout.app', ['title' => 'Licitações'])
+@extends('layout.app', ['title' => 'Concursos'])
 
 @section('content')
 
 @php
-use \App\Http\Controllers\Helpers\LicitacaoHelper;
 use \App\Http\Controllers\Helper;
-use \App\Http\Controllers\LicitacaoSiteController;
-$modalidades = LicitacaoHelper::modalidades();
-$situacoes = LicitacaoHelper::situacoes();
+use \App\Http\Controllers\Helpers\ConcursoHelper;
+$modalidades = ConcursoHelper::modalidades();
+$situacoes = ConcursoHelper::situacoes();
 @endphp
 
 <section id="pagina-cabecalho" class="mt-1">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-    <img src="{{ asset('img/licitacoes.png') }}" />
+    <img src="{{ asset('img/concursos.png') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Licitações
+          Concursos
         </h1>
       </div>
     </div>
   </div>
 </section>
 
-<section id="pagina-licitacoes">
+<section id="pagina-concursos">
   <div class="container">
     <div class="row pb-4" id="conteudo-principal">
       <div class="col">
-        <form method="GET" role="form" action="/licitacoes/busca" class="pesquisaLicitacao">
+        <form method="GET" role="form" action="/concursos/busca" class="pesquisaLicitacao">
           <div class="form-row text-center">
             <div class="m-auto">
               <h5 class="text-uppercase stronger marrom">Busca detalhada</h5>
@@ -39,7 +38,7 @@ $situacoes = LicitacaoHelper::situacoes();
           	  <label for="modalidade">Modalidade</label>
           	  <select name="modalidade" class="form-control" id="modalidade">
           	  	<option value="">Todas</option>
-	         	    @foreach($modalidades as $modalidade)
+	         	  @foreach($modalidades as $modalidade)
 	         	    <option value="{{ $modalidade }}">{{ $modalidade }}</option>
 	          	  @endforeach
 	            </select>
@@ -48,17 +47,13 @@ $situacoes = LicitacaoHelper::situacoes();
           	  <label for="nrprocesso">Nº do processo</label>
           	  <input type="text" name="nrprocesso" class="form-control" placeholder="Nº do processo" id="nrprocesso">
           	</div>
-          	<div class="col">
-          	  <label for="nrlicitacao">Nº da Licitação</label>
-          	  <input type="text" name="nrlicitacao" class="form-control" placeholder="Nº da licitação" id="nrlicitacao">
-          	</div>
           </div>
           <div class="form-row">
           	<div class="col">
           	  <label for="situacao">Situação</label>
           	  <select name="situacao" class="form-control" id="situacao">
           	  	<option value="">Qualquer</option>
-	         	    @foreach($situacoes as $situacao)
+	         	  @foreach($situacoes as $situacao)
 	         	    <option value="{{ $situacao }}">{{ $situacao }}</option>
 	          	  @endforeach
 	            </select>
@@ -84,14 +79,14 @@ $situacoes = LicitacaoHelper::situacoes();
   <div class="container">
     <div class="row mt-4">
       <div class="col">
-        @if(isset($licitacoes))
-          @foreach($licitacoes as $licitacao)
+        @if(isset($concursos))
+          @foreach($concursos as $concurso)
           <div class="licitacao-grid">
-            <a href="/licitacao/{{ $licitacao->idlicitacao }}">
+            <a href="/concurso/{{ $concurso->idconcurso }}">
               <div class="licitacao-grid-main">
-                <h5 class="marrom">{{ $licitacao->titulo }}</h5>
+                <h5 class="marrom">{{ $concurso->titulo }}</h5>
                 <div class="linha-lg-mini"></div>
-                <p>{{ Helper::resumo($licitacao->objeto) }}</p>
+                <p>{{ Helper::resumo($concurso->objeto) }}</p>
                 <div class="mt-3 row bot-lg">
                   <div class="col-sm-4 d-flex">
                     <div class="mr-2">
@@ -99,8 +94,7 @@ $situacoes = LicitacaoHelper::situacoes();
                     </div>
                     <div class="flex-one align-self-center">
                       <h6 class="light">
-                        <strong>Número:</strong> {{ $licitacao->nrprocesso }}<br />
-                        <strong>Processo:</strong> {{ $licitacao->nrlicitacao }}
+                        <strong>Processo:</strong> {{ $concurso->nrprocesso }}
                       </h6>
                     </div>
                   </div>
@@ -110,8 +104,8 @@ $situacoes = LicitacaoHelper::situacoes();
                     </div>
                     <div class="flex-one align-self-center">
                       <h6 class="light">
-                        <strong>Divulgação:</strong> {{ LicitacaoHelper::onlyDate($licitacao->created_at) }}<br />
-                        <strong>Realizacao:</strong> {{ LicitacaoHelper::onlyDate($licitacao->datarealizacao) }}
+                        <strong>Divulgação:</strong> {{ Helper::onlyDate($concurso->created_at) }}<br />
+                        <strong>Realizacao:</strong> {{ Helper::onlyDate($concurso->datarealizacao) }}
                       </h6>
                     </div>
                   </div>
@@ -121,8 +115,8 @@ $situacoes = LicitacaoHelper::situacoes();
                     </div>
                     <div class="flex-one align-self-center">
                       <h6 class="light">
-                        <strong>Modalidade:</strong> {{ $licitacao->modalidade }}<br />
-                        <strong>Situação:</strong> {{ Helper::btnSituacao($licitacao->situacao) }}
+                        <strong>Modalidade:</strong> {{ $concurso->modalidade }}<br />
+                        <strong>Situação:</strong> {{ $concurso->situacao }}
                       </h6>
                     </div>
                   </div>
@@ -131,7 +125,7 @@ $situacoes = LicitacaoHelper::situacoes();
               <div class="licitacao-grid-bottom">
                 <div class="col">
                   <div class="text-right">
-                    <h6 class="light marrom"><strong>Atualizado em:</strong> {{ LicitacaoHelper::onlyDate($licitacao->updated_at) }}</h6>
+                    <h6 class="light marrom"><strong>Atualizado em:</strong> {{ Helper::onlyDate($concurso->updated_at) }}</h6>
                   </div>
                 </div>
               </div>
@@ -139,7 +133,7 @@ $situacoes = LicitacaoHelper::situacoes();
           </div>
           @endforeach
         @else
-        <p>Nenhuma licitação encontrada!</p>
+        <p>Nenhum concurso encontrado!</p>
         @endif
       </div>
     </div>

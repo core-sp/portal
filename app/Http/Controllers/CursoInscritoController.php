@@ -76,9 +76,9 @@ class CursoInscritoController extends Controller
             if ($curso) 
                 return view('site.curso-inscricao', compact('curso'));
             else
-                abort(404);
+                abort(403);
         } else {
-            abort(404);
+            abort(403);
         }
     }
 

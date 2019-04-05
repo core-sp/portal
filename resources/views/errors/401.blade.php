@@ -1,3 +1,5 @@
+@auth
+
 @extends('admin.layout.app')
 
 @section('content')
@@ -27,3 +29,11 @@
 </section>
 
 @endsection
+
+@endauth
+
+@guest
+
+Corinthians
+
+@endguest

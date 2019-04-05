@@ -46,6 +46,7 @@ class ConcursoController extends Controller
         $request->user()->autorizarPerfis(['admin', 'juridico']);
         $regras = [
             'modalidade' => 'required',
+            'titulo' => 'required',
             'nrprocesso' => 'required|unique:concursos',
             'situacao' => 'required',
             'datarealizacao' => 'required',
@@ -61,25 +62,15 @@ class ConcursoController extends Controller
 
         $concurso = new Concurso();
         $concurso->modalidade = $request->input('modalidade');
+        $concurso->titulo = $request->input('titulo');
         $concurso->nrprocesso = $request->input('nrprocesso');
         $concurso->situacao = $request->input('situacao');
         $concurso->datarealizacao = $request->input('datarealizacao');
         $concurso->objeto = $request->input('objeto');
+        $concurso->linkexterno = $request->input('linkexterno');
         $concurso->idusuario = $request->input('idusuario');
         $concurso->save();
         return redirect()->route('concursos.lista');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $concurso = Concurso::find($id);
-        return view('site.concurso', compact('concurso'));
     }
 
     /**
@@ -107,6 +98,7 @@ class ConcursoController extends Controller
         $request->user()->autorizarPerfis(['admin', 'juridico']);
         $regras = [
             'modalidade' => 'required',
+            'titulo' => 'required',
             'nrprocesso' => 'required',
             'situacao' => 'required',
             'datarealizacao' => 'required',
@@ -121,10 +113,12 @@ class ConcursoController extends Controller
 
         $concurso = Concurso::find($id);
         $concurso->modalidade = $request->input('modalidade');
+        $concurso->titulo = $request->input('titulo');
         $concurso->nrprocesso = $request->input('nrprocesso');
         $concurso->situacao = $request->input('situacao');
         $concurso->datarealizacao = $request->input('datarealizacao');
         $concurso->objeto = $request->input('objeto');
+        $concurso->linkexterno = $request->input('linkexterno');
         $concurso->idusuario = $request->input('idusuario');
         $concurso->update();
         return redirect()->route('concursos.lista');

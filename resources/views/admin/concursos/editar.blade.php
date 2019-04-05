@@ -35,6 +35,19 @@ $situacoes = ConcursoHelper::situacoes();
             <div class="card-body">
               <div class="form-row">
                 <div class="col">
+                  <label for="titulo">Título</label>
+                  <input type="text"
+                    class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
+                    name="titulo"
+                    placeholder="Título"
+                    value="{{ $concurso->titulo }}" />
+                  @if($errors->has('titulo'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('titulo') }}
+                  </div>
+                  @endif
+                </div>
+                <div class="col">
                   <label for="modalidade">Modalidade</label>
                   <select name="modalidade" class="form-control">
                     @foreach($modalidades as $modalidade)
@@ -51,17 +64,22 @@ $situacoes = ConcursoHelper::situacoes();
                   </div>
                   @endif
                 </div>
+              </div>
+              <div class="form-row mt-2">
                 <div class="col">
                   <label for="nrprocesso">Nº do Processo</label>
-                  <input type="text" class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}" placeholder="Número" name="nrprocesso" value="{{ $concurso->nrprocesso }}" maxlength="19" />
+                  <input type="text"
+                    class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
+                    placeholder="Número"
+                    name="nrprocesso"
+                    maxlength="19"
+                    value="{{ $concurso->nrprocesso }}" />
                   @if($errors->has('nrprocesso'))
                   <div class="invalid-feedback">
                     {{ $errors->first('nrprocesso') }}
                   </div>
                   @endif
                 </div>
-              </div>
-              <div class="form-row mt-2">
                 <div class="col">
                   <label for="situacao">Situação</label>
                   <select name="situacao" class="form-control">
@@ -85,6 +103,20 @@ $situacoes = ConcursoHelper::situacoes();
                 </div>
               </div>
               <div class="form-group mt-2">
+                <label for="linkexterno">Link Oficial</label>
+                <input type="text"
+                  class="form-control {{ $errors->has('linkexterno') ? 'is-invalid' : '' }}"
+                  name="linkexterno"
+                  id="linkexterno"
+                  placeholder="Insira a URL"
+                  value="{{ $concurso->linkexterno }}" />
+                @if($errors->has('linkexterno'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('linkexterno') }}
+                </div>
+                @endif
+              </div>
+              <div class="form-group">
                 <label for="objeto">Objeto da Licitação</label>
                 <textarea name="objeto" class="form-control {{ $errors->has('objeto') ? 'is-invalid' : '' }} my-editor" id="conteudo" rows="10">
                   {!! $concurso->objeto !!}
