@@ -13,6 +13,7 @@ class RegionalController extends Controller
     {
         $this->middleware('auth');
     }
+    
     public function index()
     {
     	$regionais = Regional::orderBy('regional', 'ASC')->paginate(10);

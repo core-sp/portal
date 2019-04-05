@@ -53,7 +53,7 @@ $situacoes = ConcursoHelper::situacoes();
           	  <label for="situacao">Situação</label>
           	  <select name="situacao" class="form-control" id="situacao">
           	  	<option value="">Qualquer</option>
-	         	  @foreach($situacoes as $situacao)
+	         	    @foreach($situacoes as $situacao)
 	         	    <option value="{{ $situacao }}">{{ $situacao }}</option>
 	          	  @endforeach
 	            </select>

@@ -58,10 +58,15 @@ use \App\Http\Controllers\Helper;
                   role="form"
                   action ="/busca" />
                   <input type="text"
-                    name="q"
-                    class="form-control float-right"
+                    name="busca"
+                    class="form-control float-right {{ $errors->has('busca') ? 'is-invalid' : '' }}"
                     placeholder="Digite o que você procura"
                     accesskey="2" />
+                    @if($errors->has('busca'))
+                    <div class="invalid-feedback">
+                      {{ $errors->first('busca') }}
+                    </div>
+                    @endif
                   <div class="input-group-append">
                     <button type="submit" class="btn btn-default">
                       <i class="fas fa-search"></i>
@@ -75,9 +80,15 @@ use \App\Http\Controllers\Helper;
                 <button class="btn-atendimento d-inline"><h5 class="light branco">Atendimento: <strong>(11) 3243-5500</strong></h5></button>
               </div>
               <div class="sociais">
-                <img src="{{ asset('img/002-whatsapp.png') }}" />
-                <img src="{{ asset('img/001-youtube.png') }}" />
-                <img src="{{ asset('img/icon-transparencia.png') }}" />
+                <a href="https://api.whatsapp.com/send?phone=551132435516&text=Olá%20CORE-SP!" target="_blank">
+                  <img src="{{ asset('img/002-whatsapp.png') }}" />
+                </a>
+                <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
+                  <img src="{{ asset('img/001-youtube.png') }}" />
+                </a>
+                <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
+                  <img src="{{ asset('img/icon-transparencia.png') }}" />
+                </a>
               </div>
             </div>
           </div>
@@ -107,7 +118,7 @@ use \App\Http\Controllers\Helper;
                   <a href="/licitacoes" class="nav-link">Licitações</a>
                 </li>
                 <li class="nav-item">
-                  <a href="#" class="nav-link">Seccionais</a>
+                  <a href="/seccionais" class="nav-link">Seccionais</a>
                 </li>
                 <li class="nav-item">
                   <a href="#" class="nav-link">E-OUV</a>
