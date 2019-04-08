@@ -23,8 +23,53 @@ class NoticiaController extends Controller
     public function index(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        $noticias = Noticia::paginate(10);
-        return view('admin.noticias.home', compact('noticias'));
+        $resultados = Noticia::paginate(10);
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Título',
+            'Regional',
+            'Última alteração',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/noticia/'.$resultado->idnoticia.'" class="btn btn-sm btn-default">Ver</a> ';
+            $acoes .= '<a href="/admin/noticias/editar/'.$resultado->idnoticia.'" class="btn btn-sm btn-primary">Editar</a> ';
+            $acoes .= '<form method="POST" action="/admin/noticias/apagar/'.$resultado->idnoticia.'" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="_method" value="delete" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a notícia?\')" />';
+            $acoes .= '</form>';
+            if(isset($resultado->idregional))
+                $regional = $resultado->regional->regional;
+            else
+                $regional = "Todas";
+            $conteudo = [
+                $resultado->idnoticia,
+                $resultado->titulo,
+                $regional,
+                Helper::formataData($resultado->updated_at).'<br><small>Por: '.$resultado->user->nome.'</small>',
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Variáveis extras da página
+        $variaveis = [
+            'singular' => 'noticia',
+            'plural' => 'noticias',
+            'btn_criar' => '<a href="/admin/noticias/criar" class="btn btn-primary mr-1">Nova Notícia</a>',
+            'btn_lixeira' => '<a href="/admin/noticias/lixeira" class="btn btn-warning">Notícias Deletadas</a>'
+        ];
+        $variaveis = (object) $variaveis;
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**
@@ -36,8 +81,13 @@ class NoticiaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
-        $cursos = Curso::all();
-        return view('admin.noticias.criar', compact('regionais', 'cursos'));
+        // Variáveis extras da classe
+        $variaveis = [
+            'singular' => 'noticia',
+            'plural' => 'noticias',
+        ];
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
     /**
@@ -79,10 +129,15 @@ class NoticiaController extends Controller
     public function edit(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        $noticia = Noticia::find($id);
-        $cursos = Curso::all();
+        $resultado = Noticia::find($id);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
-        return view('admin.noticias.editar', compact('noticia', 'regionais', 'cursos'));
+        // Variáveis extras da classe
+        $variaveis = [
+            'singular' => 'noticia',
+            'plural' => 'noticias',
+        ];
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.criar', compact('resultado', 'variaveis', 'regionais'));
     }
 
     /**
@@ -138,8 +193,41 @@ class NoticiaController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        $noticias = Noticia::onlyTrashed()->paginate(10);
-        return view('/admin/noticias/lixeira', compact('noticias'));
+        $resultados = Noticia::onlyTrashed()->paginate(10);
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Título',
+            'Deletada em:',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/noticias/restore/'.$resultado->idnoticia.'" class="btn btn-sm btn-primary">Restaurar</a>';
+            $conteudo = [
+                $resultado->idnoticia,
+                $resultado->titulo,
+                Helper::formataData($resultado->deleted_at),
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Variáveis extras da página
+        $variaveis = [
+            'singular' => 'noticia',
+            'plural' => 'noticias',
+            'titulo' => 'Notícias Deletadas',
+            'btn_lista' => '<a href="/admin/noticias" class="btn btn-primary">Lista de Notícias</a>'
+        ];
+        $variaveis = (object) $variaveis;
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**

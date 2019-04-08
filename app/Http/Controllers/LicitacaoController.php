@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\Licitacao;
+use App\Http\Controllers\Helper;
+use App\Http\Controllers\CrudController;
 
 class LicitacaoController extends Controller
 {
@@ -20,8 +22,53 @@ class LicitacaoController extends Controller
     public function index(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        $licitacoes = Licitacao::paginate(10);
-        return view('admin.licitacoes.home', compact('licitacoes'));
+        $resultados = Licitacao::paginate(10);
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Modalidade',
+            'Nº da Licitação',
+            'Nº do Processo',
+            'Situação',
+            'Data de Realização',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/licitacao/'.$resultado->idlicitacao.'" class="btn btn-sm btn-default">Ver</a> ';
+            $acoes .= '<a href="/admin/licitacoes/editar/'.$resultado->idlicitacao.'" class="btn btn-sm btn-primary">Editar</a> ';
+            $acoes .= '<form method="POST" action="/admin/licitacoes/apagar/'.$resultado->idlicitacao.'" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="_method" value="delete" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a licitação?\')" />';
+            $acoes .= '</form>';
+            $conteudo = [
+                $resultado->idlicitacao,
+                $resultado->modalidade,
+                $resultado->nrlicitacao,
+                $resultado->nrprocesso,
+                $resultado->situacao,
+                Helper::formataData($resultado->datarealizacao),
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Variáveis extras da página
+        $variaveis = [
+            'singular' => 'licitacao',
+            'plural' => 'licitacoes',
+            'btn_criar' => '<a href="/admin/licitacoes/criar" class="btn btn-primary mr-1">Nova Licitação</a>',
+            'btn_lixeira' => '<a href="/admin/licitacoes/lixeira" class="btn btn-warning">Licitações Deletadas</a>'
+        ];
+        $variaveis = (object) $variaveis;
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**
@@ -32,7 +79,13 @@ class LicitacaoController extends Controller
     public function create(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        return view('admin.licitacoes.criar');
+        // Variáveis extras da classe
+        $variaveis = [
+            'singular' => 'licitacao',
+            'plural' => 'licitacoes',
+        ];
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.criar', compact('variaveis'));
     }
 
     /**
@@ -63,6 +116,7 @@ class LicitacaoController extends Controller
         $licitacao = new Licitacao();
         $licitacao->modalidade = $request->input('modalidade');
         $licitacao->nrlicitacao = $request->input('nrlicitacao');
+        $licitacao->titulo = $request->input('titulo');
         $licitacao->nrprocesso = $request->input('nrprocesso');
         $licitacao->situacao = $request->input('situacao');
         $licitacao->datarealizacao = $request->input('datarealizacao');
@@ -81,8 +135,14 @@ class LicitacaoController extends Controller
     public function edit(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        $licitacao = Licitacao::find($id);
-        return view('admin.licitacoes.editar', compact('licitacao'));
+        $resultado = Licitacao::find($id);
+        // Variáveis extras de classe
+        $variaveis = [
+            'singular' => 'licitacao',
+            'plural' => 'licitacoes',
+        ];
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
     /**
@@ -116,6 +176,7 @@ class LicitacaoController extends Controller
         $licitacao->nrlicitacao = $request->input('nrlicitacao');
         $licitacao->nrprocesso = $request->input('nrprocesso');
         $licitacao->situacao = $request->input('situacao');
+        $licitacao->titulo = $request->input('titulo');
         $licitacao->datarealizacao = $request->input('datarealizacao');
         $licitacao->objeto = $request->input('objeto');
         $licitacao->idusuario = $request->input('idusuario');
@@ -145,8 +206,43 @@ class LicitacaoController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        $licitacoes = Licitacao::onlyTrashed()->paginate(10);
-        return view('admin.licitacoes.lixeira', compact('licitacoes'));
+        $resultados = Licitacao::onlyTrashed()->paginate(10);
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Modalidade',
+            'Nº da Licitação',
+            'Deletada em:',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/licitacoes/restore/'.$resultado->idlicitacao.'" class="btn btn-sm btn-primary">Restaurar</a>';
+            $conteudo = [
+                $resultado->idlicitacao,
+                $resultado->modalidade,
+                $resultado->nrlicitacao,
+                Helper::formataData($resultado->deleted_at),
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Variáveis extras da página
+        $variaveis = [
+            'singular' => 'licitacao',
+            'titulo' => 'Licitações Deletadas',
+            'plural' => 'licitações',
+            'btn_lista' => '<a href="/admin/licitacoes" class="btn btn-primary mr-1">Lista de Licitações</a>'
+        ];
+        $variaveis = (object) $variaveis;
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**

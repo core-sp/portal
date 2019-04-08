@@ -16,16 +16,41 @@ class RegionalController extends Controller
     
     public function index()
     {
-    	$regionais = Regional::orderBy('regional', 'ASC')->paginate(10);
-    	return view('admin.regionais.home', compact('regionais'));
-    }
-
-    public function show($id)
-    {
-    	$regional = Regional::find($id);
-    	$noticias = Noticia::paginate(10)
-            ->whereIn('idregional', [$id, null]);
-    	return view('admin.regionais.mostra', compact('regional', 'noticias'));
+    	$resultados = Regional::orderBy('regional', 'ASC')->paginate(10);
+    	// Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Regional',
+            'Telefone',
+            'Email',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/seccional/'.$resultado->idregional.'" class="btn btn-sm btn-default" target="_blank">Ver</a>';
+            $conteudo = [
+                $resultado->idregional,
+                $resultado->regional,
+                $resultado->telefone,
+                $resultado->email,
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Variáveis extras da página
+        $variaveis = [
+            'singular' => 'regional',
+            'plural' => 'regionais'
+        ];
+        $variaveis = (object) $variaveis;
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function busca()

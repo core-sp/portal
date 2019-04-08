@@ -45,7 +45,6 @@ Route::prefix('admin')->group(function() {
   Route::prefix('regionais')->group(function() {
     Route::get('/', 'RegionalController@index');
     Route::get('/busca', 'RegionalController@busca');
-    Route::get('/mostra/{id}', 'RegionalController@show');
   });
 
   // Rotas de notícias
@@ -173,7 +172,9 @@ Route::prefix('/')->group(function() {
   // Busca geral
   Route::get('/busca', 'SiteController@busca');  
 
+  // Seccionais
   Route::get('seccionais', 'RegionalSiteController@regionaisView');
+  Route::get('seccional/{id}', 'RegionalSiteController@show');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{categoria}/{slug}', 'PaginaController@show');

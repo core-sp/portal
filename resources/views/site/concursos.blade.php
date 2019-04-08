@@ -38,7 +38,7 @@ $situacoes = ConcursoHelper::situacoes();
           	  <label for="modalidade">Modalidade</label>
           	  <select name="modalidade" class="form-control" id="modalidade">
           	  	<option value="">Todas</option>
-	         	  @foreach($modalidades as $modalidade)
+	         	    @foreach($modalidades as $modalidade)
 	         	    <option value="{{ $modalidade }}">{{ $modalidade }}</option>
 	          	  @endforeach
 	            </select>
@@ -86,7 +86,7 @@ $situacoes = ConcursoHelper::situacoes();
               <div class="licitacao-grid-main">
                 <h5 class="marrom">{{ $concurso->titulo }}</h5>
                 <div class="linha-lg-mini"></div>
-                <p>{{ Helper::resumo($concurso->objeto) }}</p>
+                <p>{!! Helper::resumo($concurso->objeto) !!}</p>
                 <div class="mt-3 row bot-lg">
                   <div class="col-sm-4 d-flex">
                     <div class="mr-2">
