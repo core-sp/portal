@@ -16,6 +16,8 @@ class CreatePaginaCategoriasTable extends Migration
         Schema::create('pagina_categorias', function (Blueprint $table) {
             $table->bigIncrements('idpaginacategoria');
             $table->string('nome');
+            $table->bigInteger('idusuario')->unsigned();
+            $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();
             $table->softDeletes();
         });

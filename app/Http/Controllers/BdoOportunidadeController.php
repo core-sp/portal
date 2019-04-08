@@ -9,6 +9,17 @@ use App\BdoEmpresa;
 
 class BdoOportunidadeController extends Controller
 {
+    public $variaveis = [
+        'singular' => 'oportunidade',
+        'singulariza' => 'a oportunidade',
+        'plural' => 'oportunidade',
+        'pluraliza' => 'oportunidades',
+        'form' => 'bdooportunidade',
+        'btn_criar' => '<a href="/admin/bdo/criar" class="btn btn-primary mr-1">Nova Oportunidade</a>',
+        'busca' => 'bdo',
+        'slug' => 'bdo'
+    ];
+
     public function __construct()
     {
         $this->middleware('auth', ['except' => 'show']);
@@ -18,11 +29,64 @@ class BdoOportunidadeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function resultados()
+    {
+        $resultados = BdoOportunidade::paginate(10);
+        return $resultados;
+    }
+
+    public function tabelaCompleta($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Empresa',
+            'Segmento',
+            'Vagas',
+            'Status',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/bdo/editar/'.$resultado->idoportunidade.'" class="btn btn-sm btn-primary">Editar</a> ';
+            $acoes .= '<form method="POST" action="/admin/bdo/apagar/'.$resultado->idoportunidade.'" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="_method" value="delete" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a oportunidade?\')" />';
+            $acoes .= '</form>';
+            if(isset($resultado->vagaspreenchidas))
+                $relacaovagas = $resultado->vagaspreenchidas.' / '.$resultado->vagasdisponiveis;
+            else
+                $relacaovagas = 'X / '.$resultado->vagasdisponiveis;
+            $conteudo = [
+                $resultado->idoportunidade,
+                $resultado->empresa->razaosocial,
+                $resultado->segmento,
+                $relacaovagas,
+                $resultado->status,
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Monta e retorna tabela        
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
     public function index(Request $request)
     {
         $request->user()->autorizarPerfis(['admin']);
-        $oportunidades = BdoOportunidade::paginate(10);
-        return view('admin.bdo.home', compact('oportunidades')); 
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**
@@ -35,10 +99,12 @@ class BdoOportunidadeController extends Controller
         $request->user()->autorizarPerfis(['admin']);
         $id = Input::get('empresa');
         $empresa = BdoEmpresa::find($id);
-        if (isset($empresa))
-            return view('admin.bdo.criar', compact('empresa'));
-        else
-            abort(401);        
+        if (isset($empresa)) {
+            $variaveis = (object) $this->variaveis;
+            return view('admin.crud.criar', compact('empresa', 'variaveis'));
+        } else {
+            abort(401);
+        }
     }
 
     /**
@@ -63,7 +129,7 @@ class BdoOportunidadeController extends Controller
         $oportunidade->idempresa = $request->input('empresa');
         $oportunidade->titulo = $request->input('titulo');
         $oportunidade->segmento = $request->input('segmento');
-        $opprtunidade->regiaoatuacao = $request->input('regiaoatuacao');
+        $oportunidade->regiaoatuacao = $request->input('regiaoatuacao');
         $oportunidade->descricao = $request->input('descricao');
         $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
         $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');
@@ -87,8 +153,9 @@ class BdoOportunidadeController extends Controller
     public function edit(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin']);
-        $oportunidade = BdoOportunidade::find($id);
-        return view('admin.bdo.editar', compact('oportunidade'));
+        $resultado = BdoOportunidade::find($id);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
     /**

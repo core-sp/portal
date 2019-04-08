@@ -18,10 +18,14 @@
         <div class="card card-info">
           <div class="card-header">
             <div class="card-title">
-              Preencha as informações para criar um novo {{ $variaveis->singular }}
+              Preencha as informações para criar {{ $variaveis->singulariza }}
             </div>
           </div>
-          @include('admin.crud.forms.'.$variaveis->singular)
+          @if(isset($variaveis->form))
+            @include('admin.forms.'.$variaveis->form)
+          @else
+            @include('admin.forms.'.$variaveis->singular)
+          @endif
         </div>
       </div>
     </div>

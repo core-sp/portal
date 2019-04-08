@@ -10,6 +10,17 @@ use App\Http\Controllers\CrudController;
 
 class ConcursoController extends Controller
 {
+    public $variaveis = [
+        'singular' => 'concurso',
+        'singulariza' => 'o concurso',
+        'plural' => 'concursos',
+        'pluraliza' => 'concursos',
+        'btn_criar' => '<a href="/admin/concursos/criar" class="btn btn-primary mr-1">Novo Concurso</a>',
+        'btn_lixeira' => '<a href="/admin/concursos/lixeira" class="btn btn-warning">Concursos Deletados</a>',
+        'btn_lista' => '<a href="/admin/concursos" class="btn btn-primary">Lista de Concursos</a>',
+        'titulo' => 'Concursos Deletados',
+    ];
+
     public function __construct()
     {
         $this->middleware('auth', ['except' => 'show']);
@@ -19,10 +30,14 @@ class ConcursoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function resultados()
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
         $resultados = Concurso::paginate(10);
+        return $resultados;
+    }
+    
+    public function tabelaCompleta($resultados)
+    {
         // Opções de cabeçalho da tabela
         $headers = [
             'Código',
@@ -57,15 +72,17 @@ class ConcursoController extends Controller
             'table',
             'table-hovered'
         ];
-        // Variáveis extras da página
-        $variaveis = [
-            'singular' => 'concurso',
-            'plural' => 'concursos',
-            'btn_criar' => '<a href="/admin/concursos/criar" class="btn btn-primary mr-1">Novo Concurso</a>',
-            'btn_lixeira' => '<a href="/admin/concursos/lixeira" class="btn btn-warning">Concursos Deletados</a>'
-        ];
-        $variaveis = (object) $variaveis;
+        // Monta e retorna tabela        
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
+    public function index(Request $request)
+    {
+        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
@@ -77,12 +94,7 @@ class ConcursoController extends Controller
     public function create(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        // Variáveis extras da classe
-        $variaveis = [
-            'singular' => 'concurso',
-            'plural' => 'concursos',
-        ];
-        $variaveis = (object) $variaveis;
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
 
@@ -134,12 +146,7 @@ class ConcursoController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
         $resultado = Concurso::find($id);
-        // Variáveis extras de classe
-        $variaveis = [
-            'singular' => 'concurso',
-            'plural' => 'concursos',
-        ];
-        $variaveis = (object) $variaveis;
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
@@ -230,14 +237,7 @@ class ConcursoController extends Controller
             'table',
             'table-hovered'
         ];
-        // Variáveis extras da página
-        $variaveis = [
-            'singular' => 'concurso',
-            'plural' => 'concursos',
-            'titulo' => 'Concursos Deletados',
-            'btn_lista' => '<a href="/admin/concursos" class="btn btn-primary">Lista de Concursos</a>'
-        ];
-        $variaveis = (object) $variaveis;
+        $variaveis = (object) $this->variaveis;
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
@@ -259,14 +259,13 @@ class ConcursoController extends Controller
     public function busca()
     {
         $busca = Input::get('q');
-        $concursos = Concurso::where('modalidade','LIKE','%'.$busca.'%')
+        $variaveis = (object) $this->variaveis;
+        $resultados = Concurso::where('modalidade','LIKE','%'.$busca.'%')
             ->orWhere('nrprocesso','LIKE','%'.$busca.'%')
             ->orWhere('situacao','LIKE','%'.$busca.'%')
             ->orWhere('objeto','LIKE','%'.$busca.'%')
             ->paginate(10);
-        if (count($concursos) > 0) 
-            return view('admin.concursos.home', compact('concursos', 'busca'));
-        else
-            return view('admin.concursos.home')->withMessage('Nenhum concurso encontrado');
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

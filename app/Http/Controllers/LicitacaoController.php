@@ -10,6 +10,18 @@ use App\Http\Controllers\CrudController;
 
 class LicitacaoController extends Controller
 {
+    // Variáveis extras da página
+    public $variaveis = [
+        'singular' => 'licitacao',
+        'singulariza' => 'a licitação',
+        'plural' => 'licitacoes',
+        'pluraliza' => 'licitações',
+        'btn_criar' => '<a href="/admin/licitacoes/criar" class="btn btn-primary mr-1">Nova Licitação</a>',
+        'btn_lixeira' => '<a href="/admin/licitacoes/lixeira" class="btn btn-warning">Licitações Deletadas</a>',
+        'btn_lista' => '<a href="/admin/licitacoes" class="btn btn-primary mr-1">Lista de Licitações</a>',
+        'titulo' => 'Licitações Deletadas',
+    ];
+
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['show', 'buscaAvancada']]);
@@ -19,10 +31,15 @@ class LicitacaoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+
+    public function resultados()
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
         $resultados = Licitacao::paginate(10);
+        return $resultados;
+    }
+
+    public function tabelaCompleta($resultados)
+    {
         // Opções de cabeçalho da tabela
         $headers = [
             'Código',
@@ -59,15 +76,17 @@ class LicitacaoController extends Controller
             'table',
             'table-hovered'
         ];
-        // Variáveis extras da página
-        $variaveis = [
-            'singular' => 'licitacao',
-            'plural' => 'licitacoes',
-            'btn_criar' => '<a href="/admin/licitacoes/criar" class="btn btn-primary mr-1">Nova Licitação</a>',
-            'btn_lixeira' => '<a href="/admin/licitacoes/lixeira" class="btn btn-warning">Licitações Deletadas</a>'
-        ];
-        $variaveis = (object) $variaveis;
+        // Monta e retorna tabela        
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
+    public function index(Request $request)
+    {
+        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
@@ -79,12 +98,7 @@ class LicitacaoController extends Controller
     public function create(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        // Variáveis extras da classe
-        $variaveis = [
-            'singular' => 'licitacao',
-            'plural' => 'licitacoes',
-        ];
-        $variaveis = (object) $variaveis;
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
 
@@ -136,12 +150,7 @@ class LicitacaoController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
         $resultado = Licitacao::find($id);
-        // Variáveis extras de classe
-        $variaveis = [
-            'singular' => 'licitacao',
-            'plural' => 'licitacoes',
-        ];
-        $variaveis = (object) $variaveis;
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
@@ -233,14 +242,7 @@ class LicitacaoController extends Controller
             'table',
             'table-hovered'
         ];
-        // Variáveis extras da página
-        $variaveis = [
-            'singular' => 'licitacao',
-            'titulo' => 'Licitações Deletadas',
-            'plural' => 'licitações',
-            'btn_lista' => '<a href="/admin/licitacoes" class="btn btn-primary mr-1">Lista de Licitações</a>'
-        ];
-        $variaveis = (object) $variaveis;
+        $variaveis = (object) $this->variaveis;
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
@@ -262,15 +264,14 @@ class LicitacaoController extends Controller
     public function busca()
     {
         $busca = Input::get('q');
-        $licitacoes = Licitacao::where('modalidade','LIKE','%'.$busca.'%')
+        $variaveis = (object) $this->variaveis;
+        $resultados = Licitacao::where('modalidade','LIKE','%'.$busca.'%')
             ->orWhere('nrlicitacao','LIKE','%'.$busca.'%')
             ->orWhere('nrprocesso','LIKE','%'.$busca.'%')
             ->orWhere('situacao','LIKE','%'.$busca.'%')
             ->orWhere('objeto','LIKE','%'.$busca.'%')
             ->paginate(10);
-        if (count($licitacoes) > 0) 
-            return view('admin.licitacoes.home', compact('licitacoes', 'busca'));
-        else
-            return view('admin.licitacoes.home')->withMessage('Nenhuma licitação encontrada');
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

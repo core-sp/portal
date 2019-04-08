@@ -8,6 +8,17 @@ use App\BdoEmpresa;
 
 class BdoEmpresaController extends Controller
 {
+    public $variaveis = [
+        'singular' => 'empresa',
+        'singulariza' => 'a empresa',
+        'plural' => 'empresas',
+        'pluraliza' => 'empresas',
+        'form' => 'bdoempresa',
+        'btn_criar' => '<a href="/admin/bdo/empresas/criar" class="btn btn-primary mr-1">Nova Empresa</a>',
+        'busca' => 'bdo/empresas',
+        'slug' => 'bdo/empresas'
+    ];
+
     public function __construct()
     {
         $this->middleware('auth', ['except' => 'show']);
@@ -17,11 +28,57 @@ class BdoEmpresaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function resultados()
+    {
+        $resultados = BdoEmpresa::paginate(10);
+        return $resultados;
+    }
+
+    public function tabelaCompleta($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Segmento',
+            'Razão Social',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/bdo/criar?empresa='.$resultado->idempresa.'" class="btn btn-sm btn-secondary">Nova Oportunidade</a> ';
+            $acoes .= '<a href="/admin/bdo/empresas/editar/'.$resultado->idempresa.'" class="btn btn-sm btn-primary">Editar</a> ';
+            $acoes .= '<form method="POST" action="/admin/bdo/empresas/apagar/'.$resultado->idempresa.'" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="_method" value="delete" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a empresa?\')" />';
+            $acoes .= '</form>';
+            $conteudo = [
+                $resultado->idempresa,
+                $resultado->segmento,
+                $resultado->razaosocial,
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Monta e retorna tabela        
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
     public function index(Request $request)
     {
         $request->user()->autorizarPerfis(['admin']);
-        $empresas = BdoEmpresa::paginate(10);
-        return view('admin.bdo.empresas.home', compact('empresas'));
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**
@@ -32,7 +89,8 @@ class BdoEmpresaController extends Controller
     public function create(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        return view('admin.bdo.empresas.criar');
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.criar', compact('variaveis'));
     }
 
     /**
@@ -77,17 +135,6 @@ class BdoEmpresaController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -96,8 +143,9 @@ class BdoEmpresaController extends Controller
     public function edit(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin']);
-        $empresa = BdoEmpresa::find($id);
-        return view('admin.bdo.empresas.editar', compact('empresa'));
+        $resultado = BdoEmpresa::find($id);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
     /**
@@ -158,13 +206,12 @@ class BdoEmpresaController extends Controller
     public function busca()
     {
         $busca = Input::get('q');
-        $empresas = BdoEmpresa::where('segmento','LIKE','%'.$busca.'%')
+        $variaveis = (object) $this->variaveis;
+        $resultados = BdoEmpresa::where('segmento','LIKE','%'.$busca.'%')
             ->orWhere('razaosocial','LIKE','%'.$busca.'%')
             ->orWhere('cnpj','LIKE','%'.$busca.'%')
             ->paginate(10);
-        if (count($empresas) > 0) 
-            return view('admin.bdo.empresas.home', compact('empresas', 'busca'));
-        else
-            return view('admin.bdo.empresas.home')->withMessage('Nenhuma empresa encontrada');
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

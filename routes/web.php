@@ -33,6 +33,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/restore/{id}', 'PaginaController@restore');
     // Rotas para categorias de páginas
     Route::get('/categorias', 'PaginaCategoriaController@index');
+    Route::get('/categorias/busca', 'PaginaCategoriaController@busca');
     Route::get('/categorias/mostra/{id}', 'PaginaCategoriaController@show');
     Route::get('/categorias/criar', 'PaginaCategoriaController@create');
     Route::post('/categorias/criar', 'PaginaCategoriaController@store');
@@ -177,6 +178,6 @@ Route::prefix('/')->group(function() {
   Route::get('seccional/{id}', 'RegionalSiteController@show');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
-  Route::get('{categoria}/{slug}', 'PaginaController@show');
-  Route::get('{slug}', 'PaginaController@showSemCategoria');
+  Route::get('{categoria}/{slug}', 'PaginaSiteController@show');
+  Route::get('{slug}', 'PaginaSiteController@showSemCategoria');
 });
