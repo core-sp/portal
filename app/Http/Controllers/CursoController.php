@@ -19,6 +19,12 @@ class CursoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function resultados()
+    {
+        $resultados = Curso::paginate(10);
+        return $resultados;
+    }
+
     public function index(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);

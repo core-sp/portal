@@ -16,4 +16,9 @@ class PaginaCategoria extends Model
     {
     	return $this->hasMany('App\Pagina', 'idpagina');
     }
+
+    public function user()
+    {
+    	return $this->belongsTo('App\User', 'idusuario');
+    }
 }

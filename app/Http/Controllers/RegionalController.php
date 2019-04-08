@@ -9,15 +9,28 @@ use App\Noticia;
 
 class RegionalController extends Controller
 {
+    // Variáveis extras da página
+    public $variaveis = [
+        'singular' => 'regional',
+        'singulariza' => 'a regional',
+        'plural' => 'regionais',
+        'pluraliza' => 'regionais'
+    ];
+
     public function __construct()
     {
         $this->middleware('auth');
     }
-    
-    public function index()
+
+    public function resultados()
     {
-    	$resultados = Regional::orderBy('regional', 'ASC')->paginate(10);
-    	// Opções de cabeçalho da tabela
+        $resultados = Regional::orderBy('regional', 'ASC')->paginate(10);
+        return $resultados;
+    }
+
+    public function tabelaCompleta($resultados)
+    {
+        // Opções de cabeçalho da tabela
         $headers = [
             'Código',
             'Regional',
@@ -43,25 +56,26 @@ class RegionalController extends Controller
             'table',
             'table-hovered'
         ];
-        // Variáveis extras da página
-        $variaveis = [
-            'singular' => 'regional',
-            'plural' => 'regionais'
-        ];
-        $variaveis = (object) $variaveis;
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+    
+    public function index()
+    {
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function busca()
     {
         $busca = Input::get('q');
-        $regionais = Regional::where('regional','LIKE','%'.$busca.'%')
+        $variaveis = (object) $this->variaveis;
+        $resultados = Regional::where('regional','LIKE','%'.$busca.'%')
             ->orWhere('email','LIKE','%'.$busca.'%')
             ->paginate(10);
-        if (count($regionais) > 0) 
-            return view('admin.regionais.home', compact('regionais', 'busca'));
-        else
-            return view('admin.regionais.home')->withMessage('Nenhuma regional encontrada');
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

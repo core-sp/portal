@@ -11,6 +11,18 @@ use App\Perfil;
 
 class UserController extends Controller
 {
+    // Variáveis extras da página
+    public $variaveis = [
+        'singular' => 'usuario',
+        'singulariza' => 'o usuário',
+        'plural' => 'usuarios',
+        'pluraliza' => 'usuários',
+        'btn_criar' => '<a href="/admin/usuarios/criar" class="btn btn-primary mr-1">Novo Usuário</a>',
+        'btn_lixeira' => '<a href="/admin/usuarios/lixeira" class="btn btn-warning">Usuários Deletados</a>',
+        'btn_lista' => '<a href="/admin/usuarios" class="btn btn-primary">Lista de Usuários</a>',
+        'titulo' => 'Usuários Deletados'
+    ];
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -20,11 +32,57 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function resultados()
+    {
+        $resultados = User::paginate(10);
+        return $resultados;
+    }
+
+    public function tabelaCompleta($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Nome',
+            'E-mail',
+            'Perfil',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/usuarios/editar/'.$resultado->idusuario.'" class="btn btn-sm btn-primary">Editar</a> ';
+            $acoes .= '<form method="POST" action="/admin/usuarios/apagar/'.$resultado->idusuario.'" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="_method" value="delete" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o usuário?\')" />';
+            $acoes .= '</form>';
+            $conteudo = [
+                $resultado->idusuario,
+                $resultado->nome,
+                $resultado->email,
+                $resultado->perfil[0]->nome,
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+    
     public function index(Request $request)
     {
         $request->user()->autorizarPerfis(['admin']);
-        $usuarios = User::paginate(10);
-        return view('admin.usuarios.home', compact('usuarios'));
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**
@@ -35,7 +93,8 @@ class UserController extends Controller
     public function create()
     {
         $perfis = Perfil::all();
-        return view('admin.usuarios.criar', compact('perfis'));
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.criar', compact('variaveis', 'perfis'));
     }
 
     /**
@@ -69,17 +128,6 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -87,9 +135,10 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $usuario = User::find($id);
+        $resultado = User::find($id);
         $perfis = Perfil::all();
-        return view('admin.usuarios.editar', compact('usuario', 'perfis'));
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.criar', compact('resultado', 'perfis', 'variaveis'));
     }
 
     /**
@@ -142,8 +191,36 @@ class UserController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin']);
-        $usuarios = User::onlyTrashed()->paginate(10);
-        return view('/admin/usuarios/lixeira', compact('usuarios'));
+        $resultados = User::onlyTrashed()->paginate(10);
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Nome',
+            'E-mail',
+            'Deletado em',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/usuarios/restore/'.$resultado->idusuario.'" class="btn btn-sm btn-primary">Restaurar</a>';
+            $conteudo = [
+                $resultado->idusuario,
+                $resultado->nome,
+                $resultado->email,
+                Helper::formataData($resultado->deleted_at),
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        $variaveis = (object) $this->variaveis;
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**
@@ -205,12 +282,11 @@ class UserController extends Controller
     public function busca()
     {
         $busca = Input::get('q');
-        $usuarios = User::where('nome','LIKE','%'.$busca.'%')
+        $variaveis = (object) $this->variaveis;
+        $resultados = User::where('nome','LIKE','%'.$busca.'%')
             ->orWhere('email','LIKE','%'.$busca.'%')
             ->paginate(10);
-        if (count($usuarios) > 0) 
-            return view('admin.usuarios.home', compact('usuarios', 'busca'));
-        else
-            return view('admin.usuarios.home')->withMessage('Nenhum usuário encontrado');
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

@@ -11,6 +11,18 @@ use Illuminate\Support\Str;
 
 class NoticiaController extends Controller
 {
+    // Variáveis extras da página
+    public $variaveis = [
+        'singular' => 'noticia',
+        'singulariza' => 'a notícia',
+        'plural' => 'noticias',
+        'pluraliza' => 'notícias',
+        'btn_criar' => '<a href="/admin/noticias/criar" class="btn btn-primary mr-1">Nova Notícia</a>',
+        'btn_lixeira' => '<a href="/admin/noticias/lixeira" class="btn btn-warning">Notícias Deletadas</a>',
+        'btn_lista' => '<a href="/admin/noticias" class="btn btn-primary">Lista de Notícias</a>',
+        'titulo' => 'Notícias Deletadas'
+    ];
+
     public function __construct()
     {
         $this->middleware('auth', ['except' => 'show']);
@@ -20,10 +32,15 @@ class NoticiaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+
+    public function resultados()
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
         $resultados = Noticia::paginate(10);
+        return $resultados;
+    }
+
+    public function tabelaCompleta($resultados)
+    {
         // Opções de cabeçalho da tabela
         $headers = [
             'Código',
@@ -60,15 +77,16 @@ class NoticiaController extends Controller
             'table',
             'table-hovered'
         ];
-        // Variáveis extras da página
-        $variaveis = [
-            'singular' => 'noticia',
-            'plural' => 'noticias',
-            'btn_criar' => '<a href="/admin/noticias/criar" class="btn btn-primary mr-1">Nova Notícia</a>',
-            'btn_lixeira' => '<a href="/admin/noticias/lixeira" class="btn btn-warning">Notícias Deletadas</a>'
-        ];
-        $variaveis = (object) $variaveis;
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
+    public function index(Request $request)
+    {
+        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
@@ -81,12 +99,7 @@ class NoticiaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
-        // Variáveis extras da classe
-        $variaveis = [
-            'singular' => 'noticia',
-            'plural' => 'noticias',
-        ];
-        $variaveis = (object) $variaveis;
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
@@ -131,13 +144,8 @@ class NoticiaController extends Controller
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $resultado = Noticia::find($id);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
-        // Variáveis extras da classe
-        $variaveis = [
-            'singular' => 'noticia',
-            'plural' => 'noticias',
-        ];
-        $variaveis = (object) $variaveis;
-        return view('admin.crud.criar', compact('resultado', 'variaveis', 'regionais'));
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
     }
 
     /**
@@ -218,14 +226,7 @@ class NoticiaController extends Controller
             'table',
             'table-hovered'
         ];
-        // Variáveis extras da página
-        $variaveis = [
-            'singular' => 'noticia',
-            'plural' => 'noticias',
-            'titulo' => 'Notícias Deletadas',
-            'btn_lista' => '<a href="/admin/noticias" class="btn btn-primary">Lista de Notícias</a>'
-        ];
-        $variaveis = (object) $variaveis;
+        $variaveis = (object) $this->variaveis;
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
@@ -247,12 +248,11 @@ class NoticiaController extends Controller
     public function busca()
     {
         $busca = Input::get('q');
-        $noticias = Noticia::where('titulo','LIKE','%'.$busca.'%')
+        $variaveis = (object) $this->variaveis;
+        $resultados = Noticia::where('titulo','LIKE','%'.$busca.'%')
             ->orWhere('conteudo','LIKE','%'.$busca.'%')
             ->paginate(10);
-        if (count($noticias) > 0) 
-            return view('admin.noticias.home', compact('noticias', 'busca'));
-        else
-            return view('admin.noticias.home')->withMessage('Nenhuma notícia encontrada');
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

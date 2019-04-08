@@ -3,10 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 use App\PaginaCategoria;
 
 class PaginaCategoriaController extends Controller
 {
+    public $variaveis = [
+        'singular' => 'categoria',
+        'singulzariza' => 'a categoria',
+        'plural' => 'categorias',
+        'pluraliza' => 'categorias',
+        'form' => 'paginacategoria',
+        'busca' => 'paginas/categorias',
+        'btn_criar' => '<a href="/admin/paginas/categorias/criar" class="btn btn-primary">Nova Categoria</a>'
+    ];
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -16,11 +27,54 @@ class PaginaCategoriaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function resultados()
+    {
+        $resultados = PaginaCategoria::paginate(10);
+        return $resultados;
+    }
+
+    public function tabelaCompleta($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Nome',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/paginas/categorias/editar/'.$resultado->idpaginacategoria.'" class="btn btn-sm btn-primary">Editar</a> ';
+            $acoes .= '<form method="POST" action="/admin/paginas/categorias/apagar/'.$resultado->idpaginacategoria.'" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="_method" value="delete" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a categoria?\')" />';
+            $acoes .= '</form>';
+            $conteudo = [
+                $resultado->idpaginacategoria,
+                $resultado->nome,
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Monta e retorna tabela        
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
     public function index(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        $categorias = PaginaCategoria::paginate(10);
-        return view('admin.paginas.categorias.home', compact('categorias'));
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**
@@ -31,7 +85,8 @@ class PaginaCategoriaController extends Controller
     public function create(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        return view('admin.paginas.categorias.criar');
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.criar', compact('variaveis'));
     }
 
     /**
@@ -52,22 +107,9 @@ class PaginaCategoriaController extends Controller
         $request->validate($regras, $mensagens);
         $categoria = new PaginaCategoria();
         $categoria->nome = $request->input('nome');
+        $categoria->idusuario = $request->input('idusuario');
         $categoria->save();
         return redirect('/admin/paginas/categorias');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Request $request, $id)
-    {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
-        $paginas = PaginaCategoria::find($id)->pagina;
-        $cat = PaginaCategoria::find($id);
-        return view('admin.paginas.categorias.mostra', compact('cat', 'paginas'));
     }
 
     /**
@@ -79,8 +121,9 @@ class PaginaCategoriaController extends Controller
     public function edit(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        $categoria = PaginaCategoria::find($id);
-        return view('admin.paginas.categorias.editar', compact('categoria'));
+        $resultado = PaginaCategoria::find($id);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
     /**
@@ -102,6 +145,7 @@ class PaginaCategoriaController extends Controller
         $request->validate($regras, $mensagens);
         $categoria = PaginaCategoria::find($id);
         $categoria->nome = $request->input('nome');
+        $categoria->idusuario = $request->input('idusuario');
         $categoria->update();
         return redirect('/admin/paginas/categorias');
     }
@@ -118,5 +162,15 @@ class PaginaCategoriaController extends Controller
         $pagina = PaginaCategoria::find($id);
         $pagina->delete();
         return redirect('/admin/paginas/categorias');
+    }
+
+    public function busca()
+    {
+        $busca = Input::get('q');
+        $variaveis = (object) $this->variaveis;
+        $resultados = PaginaCategoria::where('nome','LIKE','%'.$busca.'%')
+            ->paginate(10);
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }
