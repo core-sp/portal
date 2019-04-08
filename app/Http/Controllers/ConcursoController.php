@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\Concurso;
+use App\Http\Controllers\Helper;
+use App\Http\Controllers\CrudController;
 
 class ConcursoController extends Controller
 {
@@ -20,8 +22,51 @@ class ConcursoController extends Controller
     public function index(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        $concursos = Concurso::paginate(10);
-        return view('admin.concursos.home', compact('concursos'));
+        $resultados = Concurso::paginate(10);
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Modalidade',
+            'Nº do Processo',
+            'Situação',
+            'Data de Realização',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/concurso/'.$resultado->idconcurso.'" class="btn btn-sm btn-default">Ver</a> ';
+            $acoes .= '<a href="/admin/concursos/editar/'.$resultado->idconcurso.'" class="btn btn-sm btn-primary">Editar</a> ';
+            $acoes .= '<form method="POST" action="/admin/concursos/apagar/'.$resultado->idconcurso.'" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="_method" value="delete" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o concurso?\')" />';
+            $acoes .= '</form>';
+            $conteudo = [
+                $resultado->idconcurso,
+                $resultado->modalidade,
+                $resultado->nrprocesso,
+                $resultado->situacao,
+                Helper::formataData($resultado->datarealizacao),
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Variáveis extras da página
+        $variaveis = [
+            'singular' => 'concurso',
+            'plural' => 'concursos',
+            'btn_criar' => '<a href="/admin/concursos/criar" class="btn btn-primary mr-1">Novo Concurso</a>',
+            'btn_lixeira' => '<a href="/admin/concursos/lixeira" class="btn btn-warning">Concursos Deletados</a>'
+        ];
+        $variaveis = (object) $variaveis;
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**
@@ -32,7 +77,13 @@ class ConcursoController extends Controller
     public function create(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        return view('admin.concursos.criar');
+        // Variáveis extras da classe
+        $variaveis = [
+            'singular' => 'concurso',
+            'plural' => 'concursos',
+        ];
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.criar', compact('variaveis'));
     }
 
     /**
@@ -82,8 +133,14 @@ class ConcursoController extends Controller
     public function edit(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        $concurso = Concurso::find($id);
-        return view('admin.concursos.editar', compact('concurso'));
+        $resultado = Concurso::find($id);
+        // Variáveis extras de classe
+        $variaveis = [
+            'singular' => 'concurso',
+            'plural' => 'concursos',
+        ];
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
     /**
@@ -146,8 +203,43 @@ class ConcursoController extends Controller
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
-        $concursos = Concurso::onlyTrashed()->paginate(10);
-        return view('admin.concursos.lixeira', compact('concursos'));
+        $resultados = Concurso::onlyTrashed()->paginate(10);
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Modalidade',
+            'Nº do Processo',
+            'Deletado em',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/concursos/restore/'.$resultado->idconcurso.'" class="btn btn-sm btn-primary">Restaurar</a>';
+            $conteudo = [
+                $resultado->idconcurso,
+                $resultado->modalidade,
+                $resultado->nrprocesso,
+                Helper::formataData($resultado->deleted_at),
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Variáveis extras da página
+        $variaveis = [
+            'singular' => 'concurso',
+            'plural' => 'concursos',
+            'titulo' => 'Concursos Deletados',
+            'btn_lista' => '<a href="/admin/concursos" class="btn btn-primary">Lista de Concursos</a>'
+        ];
+        $variaveis = (object) $variaveis;
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
     /**

@@ -66,6 +66,13 @@ class Helper extends Controller
         return $string;
     }
 
+    public static function getData($data)
+    {
+    	$date = new \DateTime($data);
+    	$format = $date->format('Y-m-d\TH:i:s');
+    	return $format;
+    }
+
     public static function btnSituacao($situacao)
     {
         switch ($situacao) {

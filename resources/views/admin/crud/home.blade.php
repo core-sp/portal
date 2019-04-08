@@ -6,7 +6,13 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-12">
-        <h1>Regionais</h1>
+        <h1 class="d-inline mr-3 align-middle">{{ ucfirst($variaveis->plural) }}</h1>
+        @if(isset($variaveis->btn_criar))
+        {!! $variaveis->btn_criar !!}
+        @endif
+        @if(isset($variaveis->btn_lixeira))
+        {!! $variaveis->btn_lixeira !!}
+        @endif
       </div>
     </div>
   </div>
@@ -19,16 +25,16 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title d-inline">
-              Lista de regionais do CORE-SP
+              Lista de {{ $variaveis->plural }} do CORE-SP
             </h3>
             @if(isset($busca))
-              <a href="/admin/regionais" class="badge badge-primary d-inline ml-2">Mostrar todas</a>
+            <a href="/admin/{{ $variaveis->plural }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
             @endif
             <div class="card-tools">
               <form class="input-group input-group-sm"
                 method="GET"
                 role="form"
-                action ="/admin/regionais/busca">
+                action ="/admin/{{ $variaveis->plural }}/busca">
                 <input type="text"
                   name="q"
                   class="form-control float-right"
@@ -42,47 +48,24 @@
             </div>
           </div>
           <div class="card-body">
-            @if(isset($regionais))
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Regional</th>
-                  <th>Telefone</th>
-                  <th>Email</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach($regionais as $regional)
-                <tr>
-                  <td>{{ $regional->idregional }}</td>
-                  <td>{{ $regional->regional }}</td>
-                  <td>{{ $regional->telefone }}</td>
-                  <td>{{ $regional->email }}</td>
-                  <td>
-                    <a href="/admin/regionais/mostra/{{ $regional->idregional }}" class="btn btn-sm btn-default">Ver</a>
-                  </td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
+            @if($resultados)
+            {!! $tabela !!}
             @else
-            Nenhuma regional encontrada
-            <a href="/admin/regionais" class="badge badge-primary d-inline ml-2">Mostrar todas</a>
+            Nenhum {{ $variaveis->singular }} encontrado
+            <a href="/admin/{{ $variaveis->plural }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
             @endif
           </div>
           <div class="card-footer">
-            @if(isset($regionais))
+            @if($resultados)
             <div class="row">
               <div class="col-sm-5 align-self-center">
-                @if($regionais->count() > 1)
-                Exibindo {{ $regionais->firstItem() }} a {{ $regionais->lastItem() }} regionais de {{ $regionais->total() }} resultados.
-                @endif
+              @if($resultados->count() > 1)
+              Exibindo {{ $resultados->firstItem() }} a {{ $resultados->lastItem() }} resultados de um total de {{ $resultados->total() }}.
+              @endif
               </div>
               <div class="col-sm-7">
                 <div class="float-right">
-                  {{ $regionais->links() }}
+                  {{ $resultados->links() }}
                 </div>
               </div>
             </div>
