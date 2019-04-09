@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use App\User;
 use App\Perfil;
+use App\Regional;
 
 class UserController extends Controller
 {
@@ -49,6 +50,7 @@ class UserController extends Controller
             'Nome',
             'E-mail',
             'Perfil',
+            'Seccional',
             'Ações'
         ];
         // Opções de conteúdo da tabela
@@ -65,6 +67,7 @@ class UserController extends Controller
                 $resultado->nome,
                 $resultado->email,
                 $resultado->perfil[0]->nome,
+                $resultado->regional->regional,
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -96,7 +99,8 @@ class UserController extends Controller
     {
         $perfis = Perfil::all();
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.criar', compact('variaveis', 'perfis'));
+        $regionais = Regional::all();
+        return view('admin.crud.criar', compact('variaveis', 'perfis', 'regionais'));
     }
 
     /**
@@ -123,6 +127,7 @@ class UserController extends Controller
         $usuario = new User();
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
+        $usuario->idregional = $request->input('idregional');
         $usuario->password = Hash::make($request->input('password'));
         $usuario->save();
         $usuario->perfil()->attach([$request->input('perfil')]);
@@ -139,8 +144,9 @@ class UserController extends Controller
     {
         $resultado = User::find($id);
         $perfis = Perfil::all();
+        $regionais = Regional::all();
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.editar', compact('resultado', 'perfis', 'variaveis'));
+        return view('admin.crud.editar', compact('resultado', 'perfis', 'variaveis', 'regionais'));
     }
 
     /**
@@ -165,6 +171,7 @@ class UserController extends Controller
         $usuario = User::find($id);
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
+        $usuario->idregional = $request->input('idregional');
         $usuario->update();
         $usuario->perfil()->sync([$request->input('perfil')]);
         return redirect('/admin/usuarios');

@@ -2,6 +2,10 @@
 
 @section('content')
 
+@php
+use App\Http\Controllers\NewsletterController;
+@endphp
+
 <section class="content-header">
   <div class="container-fluid">
     <div class="row">
@@ -15,15 +19,15 @@
 <section class="content">
   <div class="container-fluid">
   	<div class="row">
-  	  <div class="col-sm-12">
+  	  <div class="col-sm">
   	  	<div class="card">
   	  	  <div class="card-header">
   	  	  	<h3 class="card-title">
-	  	  	  Conectado como:
-            <strong>
-              {{ Auth::user()->perfil[0]->nome }}
-            </strong>
-	  	  	</h3>
+							Conectado como:
+							<strong>
+								{{ Auth::user()->perfil[0]->nome }}
+							</strong>
+	  	  		</h3>
   	  	  </div>
   	  	  <div class="card-body">
   	  	  	Seja bem-vindo ao novo Portal do CORE-SP!
@@ -33,7 +37,67 @@
   	  	  </div>
   	  	</div>
   	  </div>
+			<div class="col">
+				<div class="card">
+				  <div class="card-header">
+					  <div class="card-title">
+							<h3 class="card-title">Informações úteis</h3>
+						</div>
+					</div>
+					<div class="card-body">
+						- Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois em "Alterar Senha"
+					</div>
+				</div>
+			</div>
   	</div>
+		@if(Auth::user()->hasAnyRole(['admin', 'editor']))
+		<div class="row">
+		 	<div class="col">
+			  <div class="card">
+					<div class="card-header">
+						<div class="card-title">
+							<h3 class="card-title">Newsletter</h3>
+						</div>
+					</div>
+					<div class="card-body row">
+						<div class="col">
+							<div class="info-box">
+								<span class="info-box-icon bg-info">
+									<i class="fas fa-users"></i>
+								</span>
+								<div class="info-box-content">
+									<span class="info-box-text">Total de registros</span>
+									<span class="info-box-number">{{ NewsletterController::countNewsletter() }}</span>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<div class="info-box">
+								<span class="info-box-icon bg-info">
+									<i class="fas fa-calendar-alt"></i>
+								</span>
+								<div class="info-box-content">
+									<span class="info-box-text">Registros na última semana</span>
+									<span class="info-box-number">{{ NewsletterController::countNewsletterLastWeek() }}</span>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<div class="info-box">
+								<span class="info-box-icon bg-info">
+									<i class="far fa-file-excel"></i>
+								</span>
+								<div class="info-box-content">
+									<span class="info-box-text">Planilha</span>
+									<span class="info-box-number">Gerar planilha de registrados</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div> 
+			</div>
+		</div>
+		@endif
   </div>	
 </section>
 

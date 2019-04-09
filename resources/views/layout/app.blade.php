@@ -191,15 +191,43 @@ use \App\Http\Controllers\Helper;
               </div>
               <div class="w-75">
                 <p class="branco">Inscreva-se para receber nossos informativos:</p>
-                <form class="mt-3" id="newsletter">
+                <form class="mt-3" id="newsletter" method="POST" action="/newsletter">
+                  @csrf
                   <div class="form-group">
-                    <input type="text" name="nome" class="form-control" placeholder="Nome" />
+                    <input type="text"
+                      name="nome"
+                      class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
+                      placeholder="Nome"
+                      />
+                      @if($errors->has('nome'))
+                      <div class="invalid-feedback">
+                      {{ $errors->first('nome') }}
+                      </div>
+                      @endif
                   </div>
                   <div class="form-group">
-                    <input type="text" name="email" class="form-control" placeholder="E-mail" />
+                    <input type="text"
+                      name="email"
+                      class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                      placeholder="E-mail"
+                      />
+                      @if($errors->has('email'))
+                      <div class="invalid-feedback">
+                      {{ $errors->first('email') }}
+                      </div>
+                      @endif
                   </div>
                   <div class="form-group">
-                    <input type="text" name="celular" class="form-control" placeholder="Celular" />
+                    <input type="text"
+                      name="celular"
+                      class="form-control {{ $errors->has('celular') ? 'is-invalid' : '' }}"
+                      placeholder="Celular"
+                      />
+                      @if($errors->has('celular'))
+                      <div class="invalid-feedback">
+                      {{ $errors->first('celular') }}
+                      </div>
+                      @endif
                   </div>
                   <div class="form-group">
                     <button type="submit" class="btn btn-default">Inscrever-se</button>
