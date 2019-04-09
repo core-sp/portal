@@ -13,6 +13,7 @@ class PaginaCategoriaController extends Controller
         'singulzariza' => 'a categoria',
         'plural' => 'categorias',
         'pluraliza' => 'categorias',
+        'titulo_criar' => 'Criar categoria',
         'form' => 'paginacategoria',
         'busca' => 'paginas/categorias',
         'btn_criar' => '<a href="/admin/paginas/categorias/criar" class="btn btn-primary">Nova Categoria</a>'

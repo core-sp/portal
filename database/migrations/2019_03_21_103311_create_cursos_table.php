@@ -20,8 +20,6 @@ class CreateCursosTable extends Migration
             $table->string('img')->nullable();
             $table->dateTime('datarealizacao');
             $table->dateTime('datatermino');
-            $table->float('duracao');
-            $table->string('cargahoraria');
             $table->string('endereco');
             $table->integer('nrvagas');
             $table->text('descricao');

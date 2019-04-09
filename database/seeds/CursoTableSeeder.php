@@ -18,8 +18,6 @@ class CursoTableSeeder extends Seeder
         $curso->img = "/imagens/curso-01.png";
         $curso->datarealizacao = "2019-04-01 12:00:00";
         $curso->datatermino = "2019-04-01 14:00:00";
-        $curso->duracao = 2;
-        $curso->cargahoraria = "Segunda-feira: 12h às 14hrs";
         $curso->endereco = "Rua Vergueiro, 256";
         $curso->nrvagas = 2;
         $curso->descricao = "<h4>Objetivo</h4>
@@ -39,8 +37,6 @@ class CursoTableSeeder extends Seeder
         $curso->img = "/imagens/curso-02.png";
         $curso->datarealizacao = "2019-05-20 12:00:00";
         $curso->datatermino = "2019-05-20 16:00:00";
-        $curso->duracao = 4;
-        $curso->cargahoraria = "Segunda-feira: 12h às 16hrs";
         $curso->endereco = "Avenida Paulista, 120";
         $curso->nrvagas = 2;
         $curso->resumo = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tincidunt et justo non hendrerit. Nulla venenatis vestibulum arcu consectetur adipiscing elit.";
@@ -60,8 +56,6 @@ class CursoTableSeeder extends Seeder
         $curso->img = "/imagens/curso-03.png";
         $curso->datarealizacao = "2019-05-21 14:00:00";
         $curso->datatermino = "2019-05-21 17:00:00";
-        $curso->duracao = 3;
-        $curso->cargahoraria = "Segunda-feira: 12h às 15hrs";
         $curso->endereco = "Avenida Brigadeiro Luís Antônio, 613";
         $curso->nrvagas = 20;
         $curso->resumo = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ex leo, rutrum eu odio ut, posuere dapibus nunc. Nunc dapibus tellus a elit cursus auctor.";

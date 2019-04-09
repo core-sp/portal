@@ -3,22 +3,75 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use App\Curso;
 use App\CursoInscrito;
 use App\Http\Controllers\Helper;
+use App\Http\Controllers\CrudController;
 
 class CursoInscritoController extends Controller
 {
+    public $variaveis = [
+        'singular' => 'inscrito',
+        'singulariza' => 'o inscrito',
+        'plural' => 'inscritos',
+        'pluraliza' => 'inscritos'
+    ];
+    
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['inscricao', 'inscricaoView']]);
+    }
+
+    public static function tabelaCompleta($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'CPF',
+            'Nome',
+            'Telefone',
+            'Email',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/cursos/inscritos/editar/'.$resultado->idcursoinscrito.'" class="btn btn-sm btn-primary">Editar</a> ';
+            $acoes .= '<form method="POST" action="/admin/cursos/cancelar-inscricao/'.$resultado->idcursoinscrito.'" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="_method" value="delete" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar Inscrição" onclick="return confirm(\'Tem certeza que deseja cancelar a inscrição?\')" />';
+            $acoes .= '</form>';
+            $conteudo = [
+                $resultado->cpf,
+                $resultado->nome,
+                $resultado->telefone,
+                $resultado->email,
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        // Monta e retorna tabela        
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
     }
 
     public function create(Request $request, $idcurso)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $curso = Curso::find($idcurso);
-        return view('admin.cursos.adicionar-inscrito', compact('curso'));
+        $variaveis = [
+            'form' => 'cursoinscrito',
+            'singulariza' => 'o inscrito',
+            'titulo_criar' => 'Adicionar inscrito em '.$curso->tipo.': '.$curso->tema,
+        ];
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.criar', compact('curso', 'variaveis'));
     }
 
     public function store(Request $request)
@@ -46,16 +99,47 @@ class CursoInscritoController extends Controller
         $inscrito->registrocore = $request->input('registrocore');
         $inscrito->idcurso = $idcurso;
         $inscrito->save();
-        return redirect()->route('cursos.lista');
+        return Redirect::route('inscritos.lista', array('id' => $idcurso));
     }
 
-    public function cancelarInscricao(Request $request, $idcursoinscrito)
+    public function edit(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
-        $inscrito = CursoInscrito::find($idcursoinscrito);
-        $inscrito->idcurso = null;
+        $resultado = CursoInscrito::find($id);
+        $variaveis = [
+            'form' => 'cursoinscrito',
+            'singular' => 'inscrito',
+            'singulariza' => 'o inscrito'
+        ];
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $idcurso = $request->input('idcurso');
+        $regras = [
+            'cpf' => 'required',
+            'nome' => 'required',
+            'telefone' => 'required',
+            'email' => 'email'
+        ];
+        $mensagens = [
+            'cpf.unique' => 'Este CPF já está cadastrado para o curso',
+            'required' => 'O :attribute é obrigatório',
+        ];
+        $erros = $request->validate($regras, $mensagens);
+
+        $inscrito = CursoInscrito::find($id);
+        $inscrito->cpf = $request->input('cpf');
+        $inscrito->nome = $request->input('nome');
+        $inscrito->telefone = $request->input('telefone');
+        $inscrito->email = $request->input('email');
+        $inscrito->registrocore = $request->input('registrocore');
+        $inscrito->idcurso = $idcurso;
         $inscrito->update();
-        return redirect()->route('cursos.lista');
+        return Redirect::route('inscritos.lista', array('id' => $idcurso));
     }
 
     public static function permiteInscricao($idcurso)
@@ -126,4 +210,13 @@ class CursoInscritoController extends Controller
             echo "<div class='sit-btn sit-vermelho'>Esgotado</div>";
         }
     }
+
+    public function destroy(Request $request, $id)
+    {
+        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $curso = CursoInscrito::find($id);
+        $curso->delete();
+        return Redirect::route('inscritos.lista', array('id' => $curso->idcurso));
+    }
+
 }

@@ -22,7 +22,10 @@ class CreateCursoInscritosTable extends Migration
             $table->string('registrocore')->nullable();
             $table->bigInteger('idcurso')->unsigned()->nullable();
             $table->foreign('idcurso')->references('idcurso')->on('cursos');
+            $table->bigInteger('idusuario')->unsigned()->nullable();
+            $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
