@@ -79,6 +79,11 @@ class User extends Authenticatable
         return $this->hasMany('App\BdoEmpresa', 'idempresa');
     }
 
+    public function regional()
+    {
+    	return $this->belongsTo('App\Regional', 'idregional');
+    }
+
     public function autorizarPerfis($perfis)
     {
       if (is_array($perfis)) {

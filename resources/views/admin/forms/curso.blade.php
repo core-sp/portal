@@ -36,14 +36,14 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="tema">Tema</label>
                 <input type="text"
-                class="form-control {{ $errors->has('tema') ? 'is-invalid' : '' }}" 
-                placeholder="Tema" 
-                name="tema"
-                maxlength="191"
-                @if(isset($resultado))
-                value="{{ $resultado->tema }}"
-                @endif
-                />
+                    class="form-control {{ $errors->has('tema') ? 'is-invalid' : '' }}" 
+                    placeholder="Tema" 
+                    name="tema"
+                    maxlength="191"
+                    @if(isset($resultado))
+                    value="{{ $resultado->tema }}"
+                    @endif
+                    />
                 @if($errors->has('tema'))
                 <div class="invalid-feedback">
                 {{ $errors->first('tema') }}
@@ -77,13 +77,13 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="nrvagas">Nº de vagas</label>
                 <input type="number"
-                name="nrvagas"
-                class="form-control"
-                max="10000"
-                @if(isset($resultado))
-                value="{{ $resultado->nrvagas }}"
-                @endif
-                />
+                    name="nrvagas"
+                    class="form-control"
+                    max="10000"
+                    @if(isset($resultado))
+                    value="{{ $resultado->nrvagas }}"
+                    @endif
+                    />
                 @if($errors->has('nrvagas'))
                 <div class="invalid-feedback">
                 {{ $errors->first('nrvagas') }}
@@ -93,12 +93,12 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="datarealizacao">Data de Realização</label>
                 <input type="datetime-local" 
-                class="form-control" 
-                name="datarealizacao" 
-                @if(isset($resultado))
-                value="{{ CursoHelper::getData($resultado->datarealizacao) }}"
-                @endif
-                />
+                    class="form-control" 
+                    name="datarealizacao" 
+                    @if(isset($resultado))
+                    value="{{ CursoHelper::getData($resultado->datarealizacao) }}"
+                    @endif
+                    />
                 @if($errors->has('datarealizacao'))
                 <div class="invalid-feedback">
                 {{ $errors->first('datarealizacao') }}
@@ -108,12 +108,13 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="datatermino">Data de Término</label>
                 <input type="datetime-local" 
-                class="form-control" 
-                name="datatermino" 
-                @if(isset($resultado))
-                value="{{ CursoHelper::getData($resultado->datatermino) }}"
-                @endif
-                />
+                    class="form-control" 
+                    name="datatermino"
+                    id="datatermino"
+                    @if(isset($resultado))
+                    value="{{ CursoHelper::getData($resultado->datatermino) }}"
+                    @endif
+                    />
                 @if($errors->has('datatermino'))
                 <div class="invalid-feedback">
                 {{ $errors->first('datatermino') }}
@@ -125,13 +126,13 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="endereco">Endereço</label>
                 <input type="text"
-                name="endereco"
-                class="form-control"
-                maxlength="191"
-                @if(isset($resultado))
-                value="{{ $resultado->endereco }}"
-                @endif
-                />
+                    name="endereco"
+                    class="form-control"
+                    maxlength="191"
+                    @if(isset($resultado))
+                    value="{{ $resultado->endereco }}"
+                    @endif
+                    />
                 @if($errors->has('endereco'))
                 <div class="invalid-feedback">
                 {{ $errors->first('endereco') }}
@@ -200,4 +201,4 @@ $tipos = CursoHelper::tipos();
         @endif    
         </button>
     </div>
-    </form>
+</form>

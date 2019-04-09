@@ -28,7 +28,11 @@
               {{ method_field('PUT') }}
               <div class="form-group">
                 <label for="current-password">Senha atual</label>
-                <input type="password" class="form-control {{ $errors->has('current-password') ? 'is-invalid' : '' }}" id="current-password" name="current-password" placeholder="Password">
+                <input type="password"
+                  class="form-control {{ $errors->has('current-password') ? 'is-invalid' : '' }}"
+                  id="current-password"
+                  name="current-password"
+                  placeholder="Senha atual">
                 @if($errors->has('current-password'))
                 <div class="invalid-feedback">
                   {{ $errors->first('current-password') }}
@@ -37,7 +41,11 @@
               </div>
               <div class="form-group">
                 <label for="password">Nova senha</label>
-                <input type="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" id="password" name="password" placeholder="Password">
+                <input type="password"
+                  class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
+                  id="password"
+                  name="password"
+                  placeholder="Nova senha">
                 @if($errors->has('password'))
                 <div class="invalid-feedback">
                   {{ $errors->first('password') }}
@@ -46,7 +54,11 @@
               </div>
               <div class="form-group">
                 <label for="password_confirmation">Confirme a senha</label>
-                <input type="password" class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}" id="password_confirmation" name="password_confirmation" placeholder="Insira a senha novamente">
+                <input type="password"
+                  class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}"
+                  id="password_confirmation"
+                  name="password_confirmation"
+                  placeholder="Insira a nova senha novamente">
                 @if($errors->has('password_confirmation'))
                 <div class="invalid-feedback">
                   {{ $errors->first('password_confirmation') }}
@@ -54,6 +66,7 @@
                 @endif
               </div>
               <div class="form-group">
+                <a href="/admin/info" type="cancel" class="btn btn-default">Cancelar</a>&nbsp;
                 <button type="submit" class="btn btn-danger">Alterar</button>
               </div>
             </form>

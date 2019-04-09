@@ -179,6 +179,9 @@ Route::prefix('/')->group(function() {
   Route::get('seccionais', 'RegionalSiteController@regionaisView');
   Route::get('seccional/{id}', 'RegionalSiteController@show');
 
+  // Newsletter
+  Route::post('newsletter', 'NewsletterController@store');
+
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{categoria}/{slug}', 'PaginaSiteController@show');
   Route::get('{slug}', 'PaginaSiteController@showSemCategoria');

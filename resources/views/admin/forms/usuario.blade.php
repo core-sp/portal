@@ -37,6 +37,22 @@
             @endforeach
             </select>
         </div>
+        <div class="col">
+            <label for="idregional">Regional</label>
+            <select name="idregional" class="form-control">
+            @foreach($regionais as $regional)
+                @if(isset($resultado))
+                    @if($resultado->regional->idregional == $regional->idregional)
+                    <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                    @else
+                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                    @endif
+                @else
+                <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                @endif
+            @endforeach
+            </select>
+        </div>
         </div>
         <div class="form-group">
             <label for="email">Email</label>

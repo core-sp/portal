@@ -51,14 +51,14 @@ $datatermino = Helper::onlyDate($curso->datatermino);
 			  <div class="col">
 				<label for="nome">Nome *</label>
 				<input type="text"
-					class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}""
+					class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
 					name="nome"
 					placeholder="Nome" />
-				@if($errors->has('nome'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('nome') }}
-                  </div>
-                @endif
+					@if($errors->has('nome'))
+						<div class="invalid-feedback">
+							{{ $errors->first('nome') }}
+						</div>
+					@endif
 			  </div>
 			  <div class="col">
 				<label for="email">Email *</label>
