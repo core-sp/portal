@@ -15,6 +15,7 @@ class ConcursoController extends Controller
         'singulariza' => 'o concurso',
         'plural' => 'concursos',
         'pluraliza' => 'concursos',
+        'titulo_criar' => 'Cadastrar concurso',
         'btn_criar' => '<a href="/admin/concursos/criar" class="btn btn-primary mr-1">Novo Concurso</a>',
         'btn_lixeira' => '<a href="/admin/concursos/lixeira" class="btn btn-warning">Concursos Deletados</a>',
         'btn_lista' => '<a href="/admin/concursos" class="btn btn-primary">Lista de Concursos</a>',

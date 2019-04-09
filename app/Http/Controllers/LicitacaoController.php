@@ -16,6 +16,7 @@ class LicitacaoController extends Controller
         'singulariza' => 'a licitação',
         'plural' => 'licitacoes',
         'pluraliza' => 'licitações',
+        'titulo_criar' => 'Cadastrar licitação',
         'btn_criar' => '<a href="/admin/licitacoes/criar" class="btn btn-primary mr-1">Nova Licitação</a>',
         'btn_lixeira' => '<a href="/admin/licitacoes/lixeira" class="btn btn-warning">Licitações Deletadas</a>',
         'btn_lista' => '<a href="/admin/licitacoes" class="btn btn-primary mr-1">Lista de Licitações</a>',

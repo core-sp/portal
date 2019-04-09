@@ -6,7 +6,12 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-12">
-        <h1 class="d-inline mr-3 align-middle">{{ ucfirst($variaveis->pluraliza) }}</h1>
+        <h1 class="d-inline mr-3 align-middle">
+          {{ ucfirst($variaveis->pluraliza) }}
+          @if(isset($variaveis->continuacao_titulo))
+            {{ $variaveis->continuacao_titulo }}
+          @endif
+        </h1>
         @if(isset($variaveis->btn_criar))
         {!! $variaveis->btn_criar !!}
         @endif

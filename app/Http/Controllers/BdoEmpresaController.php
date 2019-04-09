@@ -13,6 +13,7 @@ class BdoEmpresaController extends Controller
         'singulariza' => 'a empresa',
         'plural' => 'empresas',
         'pluraliza' => 'empresas',
+        'titulo_criar' => 'Cadastrar nova empresa',
         'form' => 'bdoempresa',
         'btn_criar' => '<a href="/admin/bdo/empresas/criar" class="btn btn-primary mr-1">Nova Empresa</a>',
         'busca' => 'bdo/empresas',

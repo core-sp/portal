@@ -17,10 +17,12 @@ class UserController extends Controller
         'singulariza' => 'o usuário',
         'plural' => 'usuarios',
         'pluraliza' => 'usuários',
+        'titulo_criar' => 'Cadastrar usuário',
         'btn_criar' => '<a href="/admin/usuarios/criar" class="btn btn-primary mr-1">Novo Usuário</a>',
         'btn_lixeira' => '<a href="/admin/usuarios/lixeira" class="btn btn-warning">Usuários Deletados</a>',
         'btn_lista' => '<a href="/admin/usuarios" class="btn btn-primary">Lista de Usuários</a>',
-        'titulo' => 'Usuários Deletados'
+        'titulo' => 'Usuários Deletados',
+        'cancela_idusuario' => true
     ];
 
     public function __construct()
@@ -138,7 +140,7 @@ class UserController extends Controller
         $resultado = User::find($id);
         $perfis = Perfil::all();
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.criar', compact('resultado', 'perfis', 'variaveis'));
+        return view('admin.crud.editar', compact('resultado', 'perfis', 'variaveis'));
     }
 
     /**

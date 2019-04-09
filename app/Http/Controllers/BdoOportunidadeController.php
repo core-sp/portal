@@ -14,6 +14,7 @@ class BdoOportunidadeController extends Controller
         'singulariza' => 'a oportunidade',
         'plural' => 'oportunidade',
         'pluraliza' => 'oportunidades',
+        'titulo_criar' => 'Cadastrar nova oportunidade',
         'form' => 'bdooportunidade',
         'btn_criar' => '<a href="/admin/bdo/criar" class="btn btn-primary mr-1">Nova Oportunidade</a>',
         'busca' => 'bdo',

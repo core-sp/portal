@@ -16,6 +16,7 @@ class PaginaController extends Controller
         'singulariza' => 'a página',
         'plural' => 'paginas',
         'pluraliza' => 'páginas',
+        'titulo_criar' => 'Criar página',
         'btn_criar' => '<a href="/admin/paginas/criar" class="btn btn-primary mr-1">Nova Página</a>',
         'btn_lixeira' => '<a href="/admin/paginas/lixeira" class="btn btn-warning">Páginas Deletadas</a>',
         'btn_lista' => '<a href="/admin/paginas" class="btn btn-primary">Lista de Páginas</a>',

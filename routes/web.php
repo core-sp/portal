@@ -112,10 +112,12 @@ Route::prefix('admin')->group(function() {
     Route::get('/lixeira', 'CursoController@lixeira');
     Route::get('/restore/{id}', 'CursoController@restore');
     // Lida com a parte de inscritos
-    Route::get('/inscritos/{id}', 'CursoController@inscritos');
+    Route::get('/inscritos/{id}', 'CursoController@inscritos')->name('inscritos.lista');
+    Route::get('/inscritos/editar/{id}', 'CursoInscritoController@edit');
+    Route::put('/inscritos/editar/{id}', 'CursoInscritoController@update');
     Route::get('/adicionar-inscrito/{id}', 'CursoInscritoController@create');
     Route::post('/adicionar-inscrito/{id}', 'CursoInscritoController@store');
-    Route::put('/cancelar-inscricao/{id}', 'CursoInscritoController@cancelarInscricao');
+    Route::delete('/cancelar-inscricao/{id}', 'CursoInscritoController@destroy');
   });
 
   // Rota para Balcão de Oportunidades

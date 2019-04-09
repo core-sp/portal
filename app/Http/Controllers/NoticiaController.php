@@ -17,6 +17,7 @@ class NoticiaController extends Controller
         'singulariza' => 'a notícia',
         'plural' => 'noticias',
         'pluraliza' => 'notícias',
+        'titulo_criar' => 'Publicar notícia',
         'btn_criar' => '<a href="/admin/noticias/criar" class="btn btn-primary mr-1">Nova Notícia</a>',
         'btn_lixeira' => '<a href="/admin/noticias/lixeira" class="btn btn-warning">Notícias Deletadas</a>',
         'btn_lista' => '<a href="/admin/noticias" class="btn btn-primary">Lista de Notícias</a>',
