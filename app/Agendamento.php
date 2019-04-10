@@ -10,7 +10,7 @@ class Agendamento extends Model
     use SoftDeletes;
 
     protected $primaryKey = 'idagendamento';
-    protected $table = 'agendamento';
+    protected $table = 'agendamentos';
 
     public function regional()
     {

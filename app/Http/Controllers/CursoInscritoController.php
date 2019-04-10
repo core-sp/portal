@@ -181,7 +181,7 @@ class CursoInscritoController extends Controller
             'cpf.unique' => 'O CPF informado já está cadastrado neste curso'
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Inputa dados no Banco de Dados
         $inscrito = new CursoInscrito();
         $inscrito->cpf = $request->input('cpf');
         $inscrito->nome = $request->input('nome');
@@ -189,8 +189,10 @@ class CursoInscritoController extends Controller
         $inscrito->email = $request->input('email');
         $inscrito->registrocore = $request->input('registrocore');
         $inscrito->idcurso = $idcurso;
-        $inscrito->save();
-
+        $save = $inscrito->save();
+        if(!$save)
+            abort(501);
+        // Gera mensagem de agradecimento
         $agradece = "Sua inscrição em <strong>".$inscrito->curso->tipo;
         $agradece .= " - ".$inscrito->curso->tema."</strong>";
         $agradece .= " (turma ".$inscrito->curso->idcurso.") foi efetuada com sucesso.";
@@ -198,7 +200,7 @@ class CursoInscritoController extends Controller
         $agradece .= "<strong>Endereço: </strong>".$inscrito->curso->endereco;
         $agradece .= "<br><strong>Data de Início: </strong>".Helper::onlyDate($inscrito->curso->datarealizacao);
         $agradece .= "<br><strong>Horário: </strong>".Helper::onlyHour($inscrito->curso->datarealizacao);
-
+        // Retorna view de agradecimento
         return view('site.agradecimento')->with('agradece', $agradece);
     }
 

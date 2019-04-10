@@ -96,7 +96,7 @@ $situacoes = LicitacaoHelper::situacoes();
         <div class="col">
             <label for="nrprocesso">Nº do Processo</label>
             <input type="text"
-                class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
+                class="form-control nrprocessoInput {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
                 placeholder="Número"
                 name="nrprocesso"
                 @if(isset($resultado))
@@ -112,7 +112,7 @@ $situacoes = LicitacaoHelper::situacoes();
         <div class="col">
             <label for="nrlicitacao">Nº da Licitação</label>
             <input type="text"
-                class="form-control {{ $errors->has('nrlicitacao') ? 'is-invalid' : '' }}"
+                class="form-control nrlicitacaoInput {{ $errors->has('nrlicitacao') ? 'is-invalid' : '' }}"
                 placeholder="Número"
                 name="nrlicitacao"
                 @if(isset($resultado))

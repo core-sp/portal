@@ -19,7 +19,8 @@ class CreateAgendamentosTable extends Migration
             $table->string('cpf');
             $table->string('email');
             $table->string('celular');
-            $table->dateTime('diahora');
+            $table->date('dia');
+            $table->string('hora');
             $table->string('protocolo');
             $table->string('tiposervico');
             $table->bigInteger('idregional')->unsigned()->nullable();

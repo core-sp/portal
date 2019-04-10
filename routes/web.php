@@ -186,6 +186,8 @@ Route::prefix('/')->group(function() {
 
   // Agendamentos
   Route::get('agendamento', 'AgendamentoController@formView');
+  Route::post('agendamento', 'AgendamentoController@store');
+  Route::post('/checa-horarios', 'AgendamentoController@checaHorarios');
 
   // Newsletter
   Route::post('newsletter', 'NewsletterController@store');
