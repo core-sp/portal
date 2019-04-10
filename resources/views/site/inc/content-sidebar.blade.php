@@ -1,4 +1,4 @@
-<a href="https://api.whatsapp.com/send?phone=551132435516&text=Olá%20CORE-SP!" target="_blank">
+<a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
   <div class="box-dois zap-bg mb-3">
     <div class="inside-box-dois d-flex">
       <div class="align-self-center">

@@ -137,6 +137,11 @@ Route::prefix('admin')->group(function() {
     Route::put('/empresas/editar/{id}', 'BdoEmpresaController@update');
     Route::delete('/empresas/apagar/{id}', 'BdoEmpresaController@destroy');
   });
+
+  // Rota para Agendamentos
+  Route::prefix('agendamentos')->group(function(){
+    Route::get('/', 'AgendamentoController@index')->name('agendamentos.lista');
+  });
 });
 
 /*
@@ -178,6 +183,9 @@ Route::prefix('/')->group(function() {
   // Seccionais
   Route::get('seccionais', 'RegionalSiteController@regionaisView');
   Route::get('seccional/{id}', 'RegionalSiteController@show');
+
+  // Agendamentos
+  Route::get('agendamento', 'AgendamentoController@formView');
 
   // Newsletter
   Route::post('newsletter', 'NewsletterController@store');

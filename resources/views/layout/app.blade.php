@@ -14,6 +14,7 @@ use \App\Http\Controllers\Helper;
         <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
         <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
+        <link href="{{ asset('/css/datepicker.css') }}" rel="stylesheet">
         <link href="{{ asset('/css/site.css') }}" rel="stylesheet">
     </head>
     <body>
@@ -80,7 +81,7 @@ use \App\Http\Controllers\Helper;
                 <button class="btn-atendimento d-inline"><h5 class="light branco">Atendimento: <strong>(11) 3243-5500</strong></h5></button>
               </div>
               <div class="sociais">
-                <a href="https://api.whatsapp.com/send?phone=551132435516&text=Olá%20CORE-SP!" target="_blank">
+                <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
                   <img src="{{ asset('img/002-whatsapp.png') }}" />
                 </a>
                 <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
@@ -244,6 +245,7 @@ use \App\Http\Controllers\Helper;
       @show
 
       <script type="text/javascript" src="{{ asset('/js/app.js') }}"></script>
+      <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
       <script type="text/javascript" src="{{ asset('/js/site.js') }}"></script>
       <script type="text/javascript" src="{{ asset('/js/acessibilidade.js') }}"></script>
     </body>

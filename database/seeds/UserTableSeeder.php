@@ -13,8 +13,9 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        $admin = Perfil::where('nome', 'admin')->first();
-        $editor = Perfil::where('nome', 'editor')->first();
+        $admin = Perfil::where('nome', 'Admin')->first();
+        $editor = Perfil::where('nome', 'Editor')->first();
+        $atendimento = Perfil::where('nome', 'Atendimento')->first();
 
         $usuario = new User();
         $usuario->nome = 'Admin';
@@ -31,5 +32,45 @@ class UserTableSeeder extends Seeder
         $usuario->password = bcrypt('comunicacao102030');
         $usuario->save();
         $usuario->perfil()->attach($editor);
+        
+        $usuario = new User();
+        $usuario->nome = 'Cícero';
+        $usuario->email = 'cicero@core-sp.org.br';
+        $usuario->idregional = 1;
+        $usuario->password = bcrypt('cicero102030');
+        $usuario->save();
+        $usuario->perfil()->attach($atendimento);
+
+        $usuario = new User();
+        $usuario->nome = 'Karol';
+        $usuario->email = 'karol@core-sp.org.br';
+        $usuario->idregional = 1;
+        $usuario->password = bcrypt('karol102030');
+        $usuario->save();
+        $usuario->perfil()->attach($atendimento);
+
+        $usuario = new User();
+        $usuario->nome = 'Emanuele';
+        $usuario->email = 'emanuele@core-sp.org.br';
+        $usuario->idregional = 1;
+        $usuario->password = bcrypt('emanuele102030');
+        $usuario->save();
+        $usuario->perfil()->attach($atendimento);
+
+        $usuario = new User();
+        $usuario->nome = 'Fraeli';
+        $usuario->email = 'fraeli@core-sp.org.br';
+        $usuario->idregional = 1;
+        $usuario->password = bcrypt('fraeli102030');
+        $usuario->save();
+        $usuario->perfil()->attach($atendimento);
+
+        $usuario = new User();
+        $usuario->nome = 'Wendel';
+        $usuario->email = 'wendel@core-sp.org.br';
+        $usuario->idregional = 4;
+        $usuario->password = bcrypt('wendel102030');
+        $usuario->save();
+        $usuario->perfil()->attach($atendimento);
     }
 }

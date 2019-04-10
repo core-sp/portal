@@ -12,7 +12,8 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
-        "unisharp/laravel-filemanager": "~1.8"
+        "unisharp/laravel-filemanager": "~1.8",
+        "nesbot/carbon": "^2.16.3"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
