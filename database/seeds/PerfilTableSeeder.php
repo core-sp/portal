@@ -26,5 +26,15 @@ class PerfilTableSeeder extends Seeder
         $perfil->nome = "Jurídico";
         $perfil->descricao = "Pode gerenciar processos administrativos do portal";
         $perfil->save();
+
+        $perfil = new Perfil();
+        $perfil->nome = "Atendimento";
+        $perfil->descricao = "Pode realizar atendimentos";
+        $perfil->save();
+
+        $perfil = new Perfil();
+        $perfil->nome = "Gestão de Atendimento";
+        $perfil->descricao = "Realiza toda a gestão do atendimento, sede e seccionais";
+        $perfil->save();
     }
 }

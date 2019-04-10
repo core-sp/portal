@@ -33,6 +33,6 @@
 </section>
 
 <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-<script type="text/javascript" src="{{ asset('js/tinymce.js') }}"></script> 
+<script type="text/javascript" src="{{ asset('js/tinymce.js') }}"></script>
 
 @endsection
