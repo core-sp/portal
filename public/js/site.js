@@ -37,9 +37,29 @@ segunda.innerHTML = primeira.innerHTML;
 			nextText: 'Próximo',
 			prevText: 'Anterior',
 			maxDate: '+1m',
-			minDate: 0,
-			beforeShowDay: $.datepicker.noWeekends,
-			defaultDate: +1
+			minDate: +1,
+			beforeShowDay: $.datepicker.noWeekends
 		});
+		// Ajax após change no datepicker
+		$('#datepicker').change(function(){
+			$.ajax({
+				method: "POST",
+				data: {
+					"_token": $('#token').val(),
+					"idregional": $('#idregional').val(),
+					"dia": $('#datepicker').val()
+				},
+				dataType: 'HTML',
+				url: "/checa-horarios",
+				success: function(response) {
+					$('#horarios').html(response);
+					//console.log(response);
+				}
+			});
+		});
+		// Máscaras
+		$('#datepicker').mask("99/99/9999");
+		$('.cpfInput').mask('999.999.999-99');
+		$('.celularInput').mask('(99) 99999-9999');
 	});
 })(jQuery);

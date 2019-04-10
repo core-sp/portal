@@ -4,7 +4,6 @@
 
 @php
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
-$horas = AgendamentoControllerHelper::horas();
 $servicos = AgendamentoControllerHelper::servicos();
 $pessoas = AgendamentoControllerHelper::pessoas();
 @endphp
@@ -42,7 +41,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
 		<p>Agende seu atendimento presencial no CORE-SP, com até um mês de antecedência.</p>
         <div class="mt-2">
           <form method="POST" class="inscricaoCurso">
-            @csrf
+            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <h5>Informações de contato</h5>
             <div class="form-row mt-2">
               <div class="col">
@@ -60,7 +59,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
               <div class="col">
                 <label for="cpf">CPF</label>
                 <input type="text"
-                  class="form-control {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
+                  class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
                   name="cpf"
                   placeholder="CPF"
                   />
@@ -88,7 +87,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
               <div class="col">
                 <label for="celular">Celular</label>
                 <input type="text"
-                  class="form-control {{ $errors->has('celular') ? 'is-invalid' : '' }}"
+                  class="form-control celularInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
                   name="celular"
                   placeholder="Celular"
                   />
@@ -101,6 +100,19 @@ $pessoas = AgendamentoControllerHelper::pessoas();
             </div>
             <h5 class="mt-2">Informações de agendamento</h5>
             <div class="form-row mt-2">
+              <div class="col">
+                <label for="idregional">Regional</label>
+                <select name="idregional" id="idregional" class="form-control">
+                  @foreach($regionais as $regional)
+                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                  @endforeach 
+                </select>
+                @if($errors->has('regional'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('regional') }}
+                </div>
+                @endif
+              </div>
               <div class="col">
                 <label for="dia">Dia</label>
                 <input type="text" 
@@ -117,27 +129,12 @@ $pessoas = AgendamentoControllerHelper::pessoas();
               </div>
               <div class="col">
                 <label for="hora">Horários disponíveis</label>
-                <select name="hora" id="hora" class="form-control">
-                  @foreach($horas as $hora)
-                    <option value="{{ $hora }}">{{ $hora }}</option>
-                  @endforeach 
+                <select name="hora" id="horarios" class="form-control">
+                  <option value="" disabled selected>Selecione o dia do atendimento</option>
                 </select>
                 @if($errors->has('hora'))
                 <div class="invalid-feedback">
                   {{ $errors->first('hora') }}
-                </div>
-                @endif
-              </div>
-              <div class="col">
-                <label for="idregional">Regional</label>
-                <select name="idregional" class="form-control">
-                  @foreach($regionais as $regional)
-                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                  @endforeach 
-                </select>
-                @if($errors->has('regional'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('regional') }}
                 </div>
                 @endif
               </div>
@@ -169,6 +166,10 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 </div>
                 @endif
               </div>
+            </div>
+            <div class="float-right mt-4">
+              <a href="/" class="btn btn-default">Cancelar</a>
+              <button type="submit" class="btn btn-primary">Agendar</button>
             </div>
           </form>
         </div>
