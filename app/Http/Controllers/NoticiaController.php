@@ -194,7 +194,9 @@ class NoticiaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $noticia = Noticia::find($id);
-        $noticia->delete();
+        $delete = $noticia->delete();
+        if(!$delete)
+            abort(500);
         return redirect('/admin/noticias');
     }
 

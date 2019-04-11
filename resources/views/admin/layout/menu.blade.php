@@ -32,6 +32,7 @@
             </li>
         </ul>
         </li>
+        @endif
         <li class="nav-item">
         <a href="/admin/regionais" class="nav-link">
             <i class="nav-icon fas fa-globe-americas"></i>
@@ -40,7 +41,6 @@
             </p>
         </a>
         </li>
-        @endif
         <!-- Conteúdo -->
         @if(Auth::user()->hasAnyRole(['admin', 'editor']))
         <li class="nav-header">CONTEÚDO</li>

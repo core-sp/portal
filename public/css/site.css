@@ -1162,3 +1162,21 @@ footer p {
 .box-resultado:last-child {
 	border-bottom: none;
 }
+
+/*
+ * PÁGINA DE AGENDAMENTO
+ */
+#datepicker:hover {
+	cursor: pointer;
+}
+
+#loadImage {
+	position: absolute;
+	bottom: 2px;
+	left: 0.75rem;
+	display: none;
+}
+
+#loadImage img {
+	width: 32px;
+}

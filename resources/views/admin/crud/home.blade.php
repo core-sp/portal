@@ -71,6 +71,8 @@
                 @else
                 <a href="/admin/{{ $variaveis->plural }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
                 @endif
+              @else
+              Nenhum {{ $variaveis->singular }} encontrado
               @endif
             @endif
           </div>
@@ -78,13 +80,17 @@
             @if($resultados)
             <div class="row">
               <div class="col-sm-5 align-self-center">
-              @if($resultados->count() > 1)
-              Exibindo {{ $resultados->firstItem() }} a {{ $resultados->lastItem() }} {{ $variaveis->plural }} de {{ $resultados->total() }} resultados.
+              @if($resultados instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                @if($resultados->count() > 1)
+                  Exibindo {{ $resultados->firstItem() }} a {{ $resultados->lastItem() }} {{ $variaveis->plural }} de {{ $resultados->total() }} resultados.
+                @endif
               @endif
               </div>
               <div class="col-sm-7">
                 <div class="float-right">
-                  {{ $resultados->links() }}
+                  @if($resultados instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                    {{ $resultados->links() }}
+                  @endif
                 </div>
               </div>
             </div>

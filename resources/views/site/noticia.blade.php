@@ -8,7 +8,7 @@
 
 <section id="pagina-cabecalho" class="mt-1">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-    <img src="{{ asset('img/noticias.png') }}" />
+    <img src="{{ asset('img/news-interna.png') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">

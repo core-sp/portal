@@ -197,7 +197,9 @@ class PaginaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $pagina = Pagina::find($id);
-        $pagina->delete();
+        $delete = $pagina->delete();
+        if(!$delete)
+            abort(500);
         return redirect('/admin/paginas');
     }
 

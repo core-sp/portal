@@ -170,6 +170,7 @@ class BdoOportunidadeController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->user()->autorizarPerfis(['admin']);
         $regras = [
             'vagasdisponiveis' => 'required',
             'descricao' => 'required',
@@ -206,9 +207,14 @@ class BdoOportunidadeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $request->user()->autorizarPerfis(['admin']);
+        $resultado = BdoOportunidade::find($id);
+        $delete = $resultado->delete();
+        if(!$delete)
+            abort(500);
+        return redirect()->route('bdooportunidades.lista');
     }
 
     public function busca()

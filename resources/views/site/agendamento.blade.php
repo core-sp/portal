@@ -115,13 +115,16 @@ $pessoas = AgendamentoControllerHelper::pessoas();
               </div>
               <div class="col">
                 <label for="dia">Dia</label>
-                <input type="text" 
-                  class="form-control"
-                  id="datepicker"
-                  name="dia"
-                  placeholder="dd/mm/aaaaa"
-                  autocomplete="off"
-                  />
+                <div class="input-group">
+                  <input type="text" 
+                    class="form-control"
+                    id="datepicker"
+                    name="dia"
+                    placeholder="dd/mm/aaaaa"
+                    autocomplete="off"
+                    readonly
+                    />
+                </div>
                 @if($errors->has('dia'))
                 <div class="invalid-feedback">
                   {{ $errors->first('dia') }}
@@ -129,6 +132,11 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 @endif
               </div>
               <div class="col">
+                <div id="loadImage">
+                  <div class="loadeando">
+                    <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
+                  </div>
+                </div>
                 <label for="hora">Horários disponíveis</label>
                 <select name="hora" id="horarios" class="form-control">
                   <option value="" disabled selected>Selecione o dia do atendimento</option>

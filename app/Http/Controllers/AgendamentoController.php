@@ -6,157 +6,117 @@ use Illuminate\Http\Request;
 use App\Agendamento;
 use App\Regional;
 use Carbon\Carbon;
+use App\Http\Controllers\Helper;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 
 class AgendamentoController extends Controller
 {
-    public function index()
+    public $variaveis = [
+        'singular' => 'agendamento',
+        'singulariza' => 'o agendamento',
+        'plural' => 'agendamentos',
+        'pluraliza' => 'agendamentos'
+    ];
+
+    public function __construct()
     {
-        AgendamentoControllerHelper::countAtendentes(2);
+        $this->middleware('auth');
     }
 
-    public function formView()
+    public function resultados($idregional = null)
     {
-        $regionais = Regional::all();
-        return view('site.agendamento', compact('regionais'));
-    }
-
-    public function store(Request $request)
-    {
-        $regras = [
-            'nome' => 'required',
-            'cpf' => 'required',
-            'email' => 'required',
-            'dia' => 'required',
-            'hora' => 'required'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-        ];
-        $erros = $request->validate($regras, $mensagens);
-        // Organiza dados de dia e hora
-        $regional = $request->input('idregional');
-        $dia_inalterado = $request->input('dia');
-        $dia = str_replace('/', '-', $request->input('dia'));
-        $dia = date('Y-m-d', strtotime($dia));
-        $hora = $request->input('hora');
-        if(!$this->permiteAgendamento($dia, $hora, $regional))
-            abort(403);
-        // Monta a string de tipo de serviço
-        $tiposervico = $request->input('servico').' para '.$request->input('pessoa');
-        // Gera a HASH (protocolo) aleatória
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
-        do {
-            $random = substr(str_shuffle($characters), 0, 8);
-            $checaProtocolo = Agendamento::where('protocolo',$random)->get();
-        } while(!$checaProtocolo->isEmpty());  
-        //Inputa os dados
-        $agendamento = new Agendamento();
-        $agendamento->nome = $request->input('nome');
-        $agendamento->cpf = $request->input('cpf');
-        $agendamento->email = $request->input('email');
-        $agendamento->celular = $request->input('celular');
-        $agendamento->dia = $dia;
-        $agendamento->hora = $hora;
-        $agendamento->protocolo = 'AGE'.$random;
-        $agendamento->tiposervico = $tiposervico;
-        $agendamento->idregional = $regional;
-        $save = $agendamento->save();
-        if(!$save)
-            abort(500);
-        // Gera mensagem de agradecimento
-        $agradece = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
-        $agradece .= "<br>";
-        $agradece .= "Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência.";
-        $agradece .= "<br><br><strong>Detalhes do agendamento</strong><br>";
-        $agradece .= "Dia: ".$dia_inalterado."<br>";
-        $agradece .= "Horário: ".$agendamento->hora."<br>";
-        $agradece .= "Cidade: ".$agendamento->regional->regional."<br>";
-        $agradece .= "Endereço: ".$agendamento->regional->endereco.", ".$agendamento->regional->numero;
-        $agradece .= " - ".$agendamento->regional->complemento."<br>";
-        $agradece .= "Serviço: ".$tiposervico.'<br>';
-        $agradece .= "Protocolo: AGE".$random;
-
-        // Retorna view de agradecimento
-        return view('site.agradecimento')->with('agradece', $agradece);
-    }
-
-    public function permiteAgendamento($dia, $hora, $idregional)
-    {
-        // Conta o número de atendentes da seccional
-        $contagem = AgendamentoControllerHelper::countAtendentes($idregional);
-        $checaAgendamento = Agendamento::where('dia',$dia)
-            ->where('hora',$hora)
-            ->where('idregional',$idregional)
-            ->count();
-        if($contagem == 1) {
-            if($checaAgendamento < 1)
-                return true;
-            else
-                return false;
-        } elseif($contagem > 1) {
-            if($checaAgendamento < ($contagem - 1))
-                return true;
-            else
-                return false;
-        }
-    }
-
-    public function checaHorariosDisponiveis($dia, $idregional)
-    {
-        $agendamentos = Agendamento::where('dia',$dia)
-            ->where('idregional',$idregional)
+        $date = new \DateTime('+1 day');
+        $diaAtual = $date->format('Y-m-d');
+        $resultados = Agendamento::where('idregional',$idregional)
+            ->where('dia','=',$diaAtual)
+            ->orderBy('dia','ASC')
+            ->orderBy('hora','ASC')
             ->get();
-        $horarios = [];
-        $contagem = AgendamentoControllerHelper::countAtendentes($idregional);
-        if($contagem == 1) {
-            foreach($agendamentos as $agendamento) {
-                array_push($horarios,$agendamento->hora);
-            }
-            return $horarios;
-        } elseif($contagem > 1) {
-            foreach($agendamentos as $agendamento) {
-                array_push($horarios,$agendamento->hora);
-            }
-            return $horarios;
+        return $resultados;
+    }
+
+    public function status($status, $id)
+    {
+        switch ($status) {
+            case 'Cancelado':
+                return "<strong>Cancelado</strong>";
+            break;
+
+            case 'Compareceu':
+                return "<strong><i class='fas fa-check'></i></strong>";
+            break;
+
+            default:
+                $acoes = '<form method="POST" id="statusAgendamento" class="form-inline">';
+                $acoes .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="PUT" id="method" />';
+                $acoes .= '<input type="hidden" name="idagendamento" value="'.$id.'" />';
+                $acoes .= '<input type="hidden" name="status" id="status" value="Compareceu" />';
+                $acoes .= '<input type="submit" value="Compareceu" class="btn btn-sm ml-1 btn-primary" />';
+                $acoes .= '</form>';
+                return $acoes;
+            break;
         }
     }
 
-    public function checaHorarios(Request $request)
+    public function tabelaCompleta($resultados)
     {
-        $horarios = AgendamentoControllerHelper::horas();
-        $idregional = $_POST['idregional'];
-        $dia = $_POST['dia'];
-        $dia = str_replace('/', '-', $_POST['dia']);
-        $dia = date('Y-m-d', strtotime($dia));
-        // Checa pela contagem
-        $contagem = AgendamentoControllerHelper::countAtendentes($idregional);
-        if($contagem == 1) {
-            $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
-            $horariosPossiveis = array_diff($horarios, $horariosJaMarcados);
-            foreach($horariosPossiveis as $h) {
-                echo "<option value='".$h."'>".$h."</option>";
-            }
-            return $horariosPossiveis;
-        } elseif($contagem > 1) {
-            $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
-            $valores = array_count_values($horariosJaMarcados);
-            $atendimentos = $contagem - 1;
-            $horariosJaCheios = [];
-            foreach($valores as $chave => $numero) {
-                if($numero >= $atendimentos)
-                    array_push($horariosJaCheios, $chave);
-            }
-            $horariosPossiveis = array_diff($horarios, $horariosJaCheios);
-            foreach($horariosPossiveis as $h) {
-                echo "<option value='".$h."'>".$h."</option>";
-            }
-            return $horariosPossiveis;
-        } else {
-            foreach($horarios as $h) {
-                echo "<option value='".$h."'>".$h."</option>";
-            }
-            return $horarios;
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Protocolo',
+            'Nome/CPF',
+            'Horário',
+            'Serviço',
+            'Status'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            // Ações possíveis com cada resultado
+            $acoes = $this->status($resultado->status, $resultado->idagendamento);
+            // Mostra dados na tabela
+            $conteudo = [
+                $resultado->protocolo,
+                $resultado->nome.'<br>'.$resultado->cpf,
+                $resultado->hora,
+                $resultado->tiposervico,
+                $acoes
+            ];
+            array_push($contents, $conteudo);
         }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hovered'
+        ];
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+    
+    public function index(Request $request)
+    {
+        $request->user()->autorizarPerfis(['Admin', 'Atendimento']);
+        $regional = $request->user()->idregional;
+        $resultados = $this->resultados($regional);
+        $tabela = $this->tabelaCompleta($resultados);
+        // Pega dia atual e cospe no título
+        $date = new \DateTime('+1 day');
+        $diaAtual = $date->format('d\/m\/Y');
+        $this->variaveis['continuacao_titulo'] = 'em '.$request->user()->regional->regional.' - '.$diaAtual;
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $idusuario = $request->user()->idusuario;
+        $idagendamento = $_POST['idagendamento'];
+        $status = $_POST['status'];
+        $agendamento = Agendamento::find($idagendamento);
+        $agendamento->status = $status;
+        $agendamento->idusuario = $idusuario;
+        $update = $agendamento->update();
+        if(!$update)
+            abort(500);
     }
 }

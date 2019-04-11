@@ -204,7 +204,9 @@ class BdoEmpresaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin']);
         $empresa = BdoEmpresa::find($id);
-        $empresa->delete();
+        $delete = $empresa->delete();
+        if(!$delete)
+            abort(500);
         return redirect()->route('bdoempresas.lista');
     }
 

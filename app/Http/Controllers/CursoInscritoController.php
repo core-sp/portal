@@ -221,7 +221,9 @@ class CursoInscritoController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $curso = CursoInscrito::find($id);
-        $curso->delete();
+        $delete = $curso->delete();
+        if(!$delete)
+            abort(500);
         return Redirect::route('inscritos.lista', array('id' => $curso->idcurso));
     }
 

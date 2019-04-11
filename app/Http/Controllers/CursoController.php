@@ -212,7 +212,9 @@ class CursoController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $curso = Curso::find($id);
-        $curso->delete();
+        $delete = $curso->delete();
+        if(!$delete)
+            abort(500);
         return redirect()->route('cursos.lista');
     }
 
