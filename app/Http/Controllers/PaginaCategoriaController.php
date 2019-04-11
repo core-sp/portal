@@ -31,7 +31,7 @@ class PaginaCategoriaController extends Controller
 
     public function resultados()
     {
-        $resultados = PaginaCategoria::paginate(10);
+        $resultados = PaginaCategoria::orderBy('idpaginacategoria','DESC')->paginate(10);
         return $resultados;
     }
 
@@ -109,7 +109,9 @@ class PaginaCategoriaController extends Controller
         $categoria = new PaginaCategoria();
         $categoria->nome = $request->input('nome');
         $categoria->idusuario = $request->input('idusuario');
-        $categoria->save();
+        $save = $categoria->save();
+        if(!$save)
+            abort(500);
         return redirect('/admin/paginas/categorias');
     }
 
@@ -147,7 +149,9 @@ class PaginaCategoriaController extends Controller
         $categoria = PaginaCategoria::find($id);
         $categoria->nome = $request->input('nome');
         $categoria->idusuario = $request->input('idusuario');
-        $categoria->update();
+        $update = $categoria->update();
+        if(!$update)
+            abort(500);
         return redirect('/admin/paginas/categorias');
     }
 

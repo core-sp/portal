@@ -38,7 +38,7 @@ class CursoController extends Controller
 
     public function resultados()
     {
-        $resultados = Curso::paginate(10);
+        $resultados = Curso::orderBy('idcurso','DESC')->paginate(10);
         return $resultados;
     }
 
@@ -140,7 +140,9 @@ class CursoController extends Controller
         $curso->descricao = $request->input('descricao');
         $curso->resumo = $request->input('resumo');
         $curso->idusuario = $request->input('idusuario');
-        $curso->save();
+        $save = $curso->save();
+        if(!$save)
+            abort(500);
         return redirect()->route('cursos.lista');
     }
 
@@ -194,7 +196,9 @@ class CursoController extends Controller
         $curso->descricao = $request->input('descricao');
         $curso->resumo = $request->input('resumo');
         $curso->idusuario = $request->input('idusuario');
-        $curso->update();
+        $update = $curso->update();
+        if(!$update)
+            abort(500);
         return redirect()->route('cursos.lista');
     }
 

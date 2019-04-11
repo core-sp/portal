@@ -23,10 +23,12 @@ class NewsletterController extends Controller
         $newsletter->nome = $request->input('nome');
         $newsletter->email = $request->input('email');
         $newsletter->celular = $request->input('celular');
-        $newsletter->save();
-
+        $save = $newsletter->save();
+        if(!$save)
+            abort(500);
+        // Mensagem de agradecimento
         $agradece = "Muito obrigado por inscrever-se em nossa newsletter";
-
+        // Retorna view de agradecimento
         return view('site.agradecimento')->with('agradece', $agradece);
     }
 

@@ -33,7 +33,7 @@ class ConcursoController extends Controller
      */
     public function resultados()
     {
-        $resultados = Concurso::paginate(10);
+        $resultados = Concurso::orderBy('idconcurso','DESC')->paginate(10);
         return $resultados;
     }
     
@@ -133,7 +133,9 @@ class ConcursoController extends Controller
         $concurso->objeto = $request->input('objeto');
         $concurso->linkexterno = $request->input('linkexterno');
         $concurso->idusuario = $request->input('idusuario');
-        $concurso->save();
+        $save = $concurso->save();
+        if(!$save)
+            abort(500);
         return redirect()->route('concursos.lista');
     }
 
@@ -185,7 +187,9 @@ class ConcursoController extends Controller
         $concurso->objeto = $request->input('objeto');
         $concurso->linkexterno = $request->input('linkexterno');
         $concurso->idusuario = $request->input('idusuario');
-        $concurso->update();
+        $update = $concurso->update();
+        if(!$update)
+            abort(500);
         return redirect()->route('concursos.lista');
     }
 

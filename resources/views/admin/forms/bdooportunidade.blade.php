@@ -132,11 +132,7 @@ $regioes = BdoOportunidadeControllerHelper::regioes();
             <textarea name="descricao"
             class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }}"
             id="descricao"
-            rows="10">
-            @if(isset($resultado))
-                {{ $resultado->descricao }}
-            @endif 
-            </textarea>
+            rows="10">@if(isset($resultado)) {{ $resultado->descricao }} @endif</textarea>
             @if($errors->has('descricao'))
             <div class="invalid-feedback">
                 {{ $errors->first('descricao') }}

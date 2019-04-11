@@ -101,11 +101,7 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
                 name="descricao"
                 id="descricao"
                 rows="5"
-                placeholder="Descrição da empresa">
-                @if(isset($resultado))
-                    {{ $resultado->descricao }}
-                @endif
-            </textarea>
+                placeholder="Descrição da empresa">@if(isset($resultado)) {{ $resultado->descricao }} @endif</textarea>
         </div>
         <h5 class="mt-4 mb-2">Informações da empresa</h5>
         <div class="form-row">

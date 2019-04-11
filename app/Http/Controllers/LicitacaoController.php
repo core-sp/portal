@@ -35,7 +35,7 @@ class LicitacaoController extends Controller
 
     public function resultados()
     {
-        $resultados = Licitacao::paginate(10);
+        $resultados = Licitacao::orderBy('idlicitacao','DESC')->paginate(10);
         return $resultados;
     }
 
@@ -137,7 +137,9 @@ class LicitacaoController extends Controller
         $licitacao->datarealizacao = $request->input('datarealizacao');
         $licitacao->objeto = $request->input('objeto');
         $licitacao->idusuario = $request->input('idusuario');
-        $licitacao->save();
+        $save = $licitacao->save();
+        if(!$save)
+            abort(500);
         return redirect()->route('licitacoes.lista');
     }
 
@@ -190,7 +192,9 @@ class LicitacaoController extends Controller
         $licitacao->datarealizacao = $request->input('datarealizacao');
         $licitacao->objeto = $request->input('objeto');
         $licitacao->idusuario = $request->input('idusuario');
-        $licitacao->update();
+        $update = $licitacao->update();
+        if(!$update)
+            abort(500);
         return redirect()->route('licitacoes.lista');
     }
 

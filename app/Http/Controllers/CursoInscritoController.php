@@ -98,7 +98,9 @@ class CursoInscritoController extends Controller
         $inscrito->email = $request->input('email');
         $inscrito->registrocore = $request->input('registrocore');
         $inscrito->idcurso = $idcurso;
-        $inscrito->save();
+        $save = $inscrito->save();
+        if(!$save)
+            abort(500);
         return Redirect::route('inscritos.lista', array('id' => $idcurso));
     }
 
@@ -138,7 +140,9 @@ class CursoInscritoController extends Controller
         $inscrito->email = $request->input('email');
         $inscrito->registrocore = $request->input('registrocore');
         $inscrito->idcurso = $idcurso;
-        $inscrito->update();
+        $update = $inscrito->update();
+        if(!$update)
+            abort(500);
         return Redirect::route('inscritos.lista', array('id' => $idcurso));
     }
 
@@ -191,7 +195,7 @@ class CursoInscritoController extends Controller
         $inscrito->idcurso = $idcurso;
         $save = $inscrito->save();
         if(!$save)
-            abort(501);
+            abort(500);
         // Gera mensagem de agradecimento
         $agradece = "Sua inscrição em <strong>".$inscrito->curso->tipo;
         $agradece .= " - ".$inscrito->curso->tema."</strong>";

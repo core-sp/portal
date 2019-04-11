@@ -32,7 +32,7 @@ class BdoEmpresaController extends Controller
 
     public function resultados()
     {
-        $resultados = BdoEmpresa::paginate(10);
+        $resultados = BdoEmpresa::orderBy('idempresa', 'DESC')->paginate(10);
         return $resultados;
     }
 
@@ -131,7 +131,9 @@ class BdoEmpresaController extends Controller
         $empresa->contatotelefone = $request->input('contatotelefone');
         $empresa->contatoemail = $request->input('contatoemail');
         $empresa->idusuario = $request->input('idusuario');
-        $empresa->save();
+        $save = $empresa->save();
+        if(!$save)
+            abort(500);
         return redirect()->route('bdoempresas.lista');
     }
 
@@ -186,7 +188,9 @@ class BdoEmpresaController extends Controller
         $empresa->contatotelefone = $request->input('contatotelefone');
         $empresa->contatoemail = $request->input('contatoemail');
         $empresa->idusuario = $request->input('idusuario');
-        $empresa->update();
+        $update = $empresa->update();
+        if(!$update)
+            abort(500);
         return redirect()->route('bdoempresas.lista');
     }
 
