@@ -40,6 +40,15 @@ segunda.innerHTML = primeira.innerHTML;
 			minDate: +1,
 			beforeShowDay: $.datepicker.noWeekends
 		});
+		// Zera o valor do dia, ao selecionar a regional
+		$('#idregional').change(function(){
+			$('#datepicker').val('');
+			$('#horarios')
+				.find('option')
+				.remove()
+				.end()
+				.append('<option value="" disabled selected>Selecione o dia do atendimento</option>');
+		});
 		// Ajax após change no datepicker
 		$('#datepicker').change(function(){
 			$.ajax({
@@ -53,7 +62,6 @@ segunda.innerHTML = primeira.innerHTML;
 				url: "/checa-horarios",
 				success: function(response) {
 					$('#horarios').html(response);
-					//console.log(response);
 				}
 			});
 		});

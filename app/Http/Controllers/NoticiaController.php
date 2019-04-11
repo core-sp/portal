@@ -36,7 +36,7 @@ class NoticiaController extends Controller
 
     public function resultados()
     {
-        $resultados = Noticia::paginate(10);
+        $resultados = Noticia::orderBy('idnoticia','DESC')->paginate(10);
         return $resultados;
     }
 
@@ -130,7 +130,9 @@ class NoticiaController extends Controller
         $noticia->idregional = $request->input('regionais');
         $noticia->idcurso = $request->input('curso');
         $noticia->idusuario = $request->input('idusuario');
-        $noticia->save();
+        $save = $noticia->save();
+        if(!$save)
+            abort(500);
         return redirect('/admin/noticias');
     }
 
@@ -176,7 +178,9 @@ class NoticiaController extends Controller
         $noticia->idregional = $request->input('regionais');
         $noticia->idcurso = $request->input('curso');
         $noticia->idusuario = $request->input('idusuario');
-        $noticia->update();
+        $update = $noticia->update();
+        if(!$update)
+            abort(500);
         return redirect('/admin/noticias');
     }
 

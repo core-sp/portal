@@ -36,7 +36,7 @@ class PaginaController extends Controller
 
     public function resultados()
     {
-        $resultados = Pagina::paginate(10);
+        $resultados = Pagina::orderBy('idpagina','DESC')->paginate(10);
         return $resultados;
     }
 
@@ -134,7 +134,9 @@ class PaginaController extends Controller
         $pagina->conteudo = $request->input('conteudo');
         $pagina->idcategoria = $request->input('categoria');
         $pagina->idusuario = $request->input('idusuario');
-        $pagina->save();
+        $save = $pagina->save();
+        if(!$save)
+            abort(500);
         return redirect('/admin/paginas');
     }    
 
@@ -179,7 +181,9 @@ class PaginaController extends Controller
         $pagina->conteudo = $request->input('conteudo');
         $pagina->idcategoria = $request->input('categoria');
         $pagina->idusuario = $request->input('idusuario');
-        $pagina->update();
+        $update = $pagina->update();
+        if(!$update)
+            abort(500);
         return redirect('/admin/paginas');
     }
 

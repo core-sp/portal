@@ -38,7 +38,7 @@ class UserController extends Controller
 
     public function resultados()
     {
-        $resultados = User::paginate(10);
+        $resultados = User::orderBy('idusuario','DESC')->paginate(10);
         return $resultados;
     }
 
@@ -129,7 +129,9 @@ class UserController extends Controller
         $usuario->email = $request->input('email');
         $usuario->idregional = $request->input('idregional');
         $usuario->password = Hash::make($request->input('password'));
-        $usuario->save();
+        $save = $usuario->save();
+        if(!$save)
+            abort(500);
         $usuario->perfil()->attach([$request->input('perfil')]);
         return redirect('/admin/usuarios');
     }
@@ -172,7 +174,9 @@ class UserController extends Controller
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
         $usuario->idregional = $request->input('idregional');
-        $usuario->update();
+        $update = $usuario->update();
+        if(!$update)
+            abort(500);
         $usuario->perfil()->sync([$request->input('perfil')]);
         return redirect('/admin/usuarios');
     }

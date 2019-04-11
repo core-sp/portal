@@ -36,6 +36,7 @@ class AgendamentoController extends Controller
         $erros = $request->validate($regras, $mensagens);
         // Organiza dados de dia e hora
         $regional = $request->input('idregional');
+        $dia_inalterado = $request->input('dia');
         $dia = str_replace('/', '-', $request->input('dia'));
         $dia = date('Y-m-d', strtotime($dia));
         $hora = $request->input('hora');
@@ -44,12 +45,11 @@ class AgendamentoController extends Controller
         // Monta a string de tipo de serviço
         $tiposervico = $request->input('servico').' para '.$request->input('pessoa');
         // Gera a HASH (protocolo) aleatória
-        $characters = 'aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVxXzZ0123456789';
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
         do {
             $random = substr(str_shuffle($characters), 0, 8);
             $checaProtocolo = Agendamento::where('protocolo',$random)->get();
-        } while(!$checaProtocolo->isEmpty());
-        
+        } while(!$checaProtocolo->isEmpty());  
         //Inputa os dados
         $agendamento = new Agendamento();
         $agendamento->nome = $request->input('nome');
@@ -58,14 +58,25 @@ class AgendamentoController extends Controller
         $agendamento->celular = $request->input('celular');
         $agendamento->dia = $dia;
         $agendamento->hora = $hora;
-        $agendamento->protocolo = $random;
+        $agendamento->protocolo = 'AGE'.$random;
         $agendamento->tiposervico = $tiposervico;
         $agendamento->idregional = $regional;
         $save = $agendamento->save();
         if(!$save)
-            abort(501);
+            abort(500);
         // Gera mensagem de agradecimento
-        $agradece = "Seu atendimento foi agendado com sucesso";
+        $agradece = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
+        $agradece .= "<br>";
+        $agradece .= "Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência.";
+        $agradece .= "<br><br><strong>Detalhes do agendamento</strong><br>";
+        $agradece .= "Dia: ".$dia_inalterado."<br>";
+        $agradece .= "Horário: ".$agendamento->hora."<br>";
+        $agradece .= "Cidade: ".$agendamento->regional->regional."<br>";
+        $agradece .= "Endereço: ".$agendamento->regional->endereco.", ".$agendamento->regional->numero;
+        $agradece .= " - ".$agendamento->regional->complemento."<br>";
+        $agradece .= "Serviço: ".$tiposervico.'<br>';
+        $agradece .= "Protocolo: AGE".$random;
+
         // Retorna view de agradecimento
         return view('site.agradecimento')->with('agradece', $agradece);
     }
@@ -97,10 +108,18 @@ class AgendamentoController extends Controller
             ->where('idregional',$idregional)
             ->get();
         $horarios = [];
-        foreach($agendamentos as $agendamento) {
-            array_push($horarios,$agendamento->hora);
+        $contagem = AgendamentoControllerHelper::countAtendentes($idregional);
+        if($contagem == 1) {
+            foreach($agendamentos as $agendamento) {
+                array_push($horarios,$agendamento->hora);
+            }
+            return $horarios;
+        } elseif($contagem > 1) {
+            foreach($agendamentos as $agendamento) {
+                array_push($horarios,$agendamento->hora);
+            }
+            return $horarios;
         }
-        return $horarios;
     }
 
     public function checaHorarios(Request $request)
@@ -110,14 +129,34 @@ class AgendamentoController extends Controller
         $dia = $_POST['dia'];
         $dia = str_replace('/', '-', $_POST['dia']);
         $dia = date('Y-m-d', strtotime($dia));
-        $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
+        // Checa pela contagem
         $contagem = AgendamentoControllerHelper::countAtendentes($idregional);
         if($contagem == 1) {
+            $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
             $horariosPossiveis = array_diff($horarios, $horariosJaMarcados);
             foreach($horariosPossiveis as $h) {
                 echo "<option value='".$h."'>".$h."</option>";
             }
             return $horariosPossiveis;
+        } elseif($contagem > 1) {
+            $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
+            $valores = array_count_values($horariosJaMarcados);
+            $atendimentos = $contagem - 1;
+            $horariosJaCheios = [];
+            foreach($valores as $chave => $numero) {
+                if($numero >= $atendimentos)
+                    array_push($horariosJaCheios, $chave);
+            }
+            $horariosPossiveis = array_diff($horarios, $horariosJaCheios);
+            foreach($horariosPossiveis as $h) {
+                echo "<option value='".$h."'>".$h."</option>";
+            }
+            return $horariosPossiveis;
+        } else {
+            foreach($horarios as $h) {
+                echo "<option value='".$h."'>".$h."</option>";
+            }
+            return $horarios;
         }
     }
 }

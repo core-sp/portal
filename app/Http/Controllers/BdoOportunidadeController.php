@@ -33,7 +33,7 @@ class BdoOportunidadeController extends Controller
 
     public function resultados()
     {
-        $resultados = BdoOportunidade::paginate(10);
+        $resultados = BdoOportunidade::orderBy('idoportunidade', 'DESC')->paginate(10);
         return $resultados;
     }
 
@@ -141,7 +141,9 @@ class BdoOportunidadeController extends Controller
             $oportunidade->datainicio = null;
         }
         $oportunidade->idusuario = $request->input('idusuario');
-        $oportunidade->save();
+        $save = $oportunidade->save();
+        if(!$save)
+            abort(500);
         return redirect()->route('bdooportunidades.lista');
     }
 
@@ -192,7 +194,9 @@ class BdoOportunidadeController extends Controller
             $oportunidade->datainicio = null;
         }
         $oportunidade->idusuario = $request->input('idusuario');
-        $oportunidade->update();
+        $update = $oportunidade->update();
+        if(!$update)
+            abort(500);
         return redirect()->route('bdooportunidades.lista');
     }
 

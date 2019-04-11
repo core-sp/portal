@@ -120,6 +120,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   id="datepicker"
                   name="dia"
                   placeholder="dd/mm/aaaaa"
+                  autocomplete="off"
                   />
                 @if($errors->has('dia'))
                 <div class="invalid-feedback">

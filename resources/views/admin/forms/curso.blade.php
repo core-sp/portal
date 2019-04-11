@@ -129,6 +129,7 @@ $tipos = CursoHelper::tipos();
                     name="endereco"
                     class="form-control"
                     maxlength="191"
+                    placeholder="Endereço"
                     @if(isset($resultado))
                     value="{{ $resultado->endereco }}"
                     @endif
@@ -163,11 +164,8 @@ $tipos = CursoHelper::tipos();
             <textarea name="resumo"
                 class="form-control {{ $errors->has('resumo') ? 'is-invalid' : '' }}"
                 id="resumo"
-                rows="3">
-                @if(isset($resultado))
-                {!! $resultado->resumo !!}
-                @endif
-            </textarea>
+                placeholder="Resumo do curso"
+                rows="3">@if(isset($resultado)) {!! $resultado->resumo !!} @endif</textarea>
             @if($errors->has('resumo'))
             <div class="invalid-feedback">
                 {{ $errors->first('resumo') }}
