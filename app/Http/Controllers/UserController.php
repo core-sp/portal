@@ -191,7 +191,9 @@ class UserController extends Controller
     {
         $request->user()->autorizarPerfis(['admin']);
         $usuario = User::find($id);
-        $usuario->delete();
+        $delete = $usuario->delete();
+        if(!$delete)
+            abort(500);
         return redirect()->route('usuarios.lista');
 
     }

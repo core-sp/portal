@@ -60,10 +60,41 @@ segunda.innerHTML = primeira.innerHTML;
 				},
 				dataType: 'HTML',
 				url: "/checa-horarios",
+				beforeSend: function(){
+					$('#loadImage').show();
+				},
+				complete: function(){
+					$('#loadImage').hide();
+				},
 				success: function(response) {
 					$('#horarios').html(response);
 				}
 			});
+		});
+		$('#datepicker').blur(function(){
+			if(!$(this).val()){
+				$(this).css('background-color','#FFFFFF');
+			}
+		});
+		// Muda Status agendamento
+		$('#statusAgendamento').on('submit', function(e){
+			e.preventDefault();
+			$.ajax({
+				method: "PUT",
+				url: "/admin/agendamentos/status",
+				data: {
+					"_token": $('#tokenStatusAgendamento').val(),
+					"idagendamento": $('#idagendamento').val(),
+					"status": $('#status').val()
+				},
+				dataType: "html",
+				success: function() {
+					$('.table').load('table');
+				},
+				error: function (jXHR, textStatus, errorThrown) {
+					alert(errorThrown);
+				}
+			})
 		});
 		// Máscaras
 		$('#datepicker').mask("99/99/9999");

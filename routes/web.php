@@ -135,6 +135,7 @@ Route::prefix('admin')->group(function() {
     Route::post('/criar', 'BdoOportunidadeController@store');
     Route::get('/editar/{id}', 'BdoOportunidadeController@edit');
     Route::put('/editar/{id}', 'BdoOportunidadeController@update');
+    Route::delete('/apagar/{id}', 'BdoOportunidadeController@destroy');
     // Lida com as empresas
     Route::get('/empresas', 'BdoEmpresaController@index')->name('bdoempresas.lista');
     Route::get('/empresas/busca', 'BdoEmpresaController@busca');
@@ -148,6 +149,7 @@ Route::prefix('admin')->group(function() {
   // Rota para Agendamentos
   Route::prefix('agendamentos')->group(function(){
     Route::get('/', 'AgendamentoController@index')->name('agendamentos.lista');
+    Route::put('/status', 'AgendamentoController@updateStatus');
   });
 });
 
@@ -192,9 +194,9 @@ Route::prefix('/')->group(function() {
   Route::get('seccional/{id}', 'RegionalSiteController@show');
 
   // Agendamentos
-  Route::get('agendamento', 'AgendamentoController@formView');
-  Route::post('agendamento', 'AgendamentoController@store');
-  Route::post('/checa-horarios', 'AgendamentoController@checaHorarios');
+  Route::get('agendamento', 'AgendamentoSiteController@formView');
+  Route::post('agendamento', 'AgendamentoSiteController@store');
+  Route::post('/checa-horarios', 'AgendamentoSiteController@checaHorarios');
 
   // Newsletter
   Route::post('newsletter', 'NewsletterController@store');

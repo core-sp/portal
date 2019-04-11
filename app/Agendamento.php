@@ -16,4 +16,9 @@ class Agendamento extends Model
     {
     	return $this->belongsTo('App\Regional', 'idregional');
     }
+
+    public function user()
+    {
+    	return $this->belongsTo('App\User', 'idusuario');
+    }
 }

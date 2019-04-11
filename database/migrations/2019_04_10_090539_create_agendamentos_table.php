@@ -25,6 +25,9 @@ class CreateAgendamentosTable extends Migration
             $table->string('tiposervico');
             $table->bigInteger('idregional')->unsigned()->nullable();
             $table->foreign('idregional')->references('idregional')->on('regionais');
+            $table->bigInteger('idusuario')->unsigned()->nullable();
+            $table->foreign('idusuario')->references('idusuario')->on('users');
+            $table->string('status')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

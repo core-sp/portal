@@ -165,7 +165,9 @@ class PaginaCategoriaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $pagina = PaginaCategoria::find($id);
-        $pagina->delete();
+        $delete = $pagina->delete();
+        if(!$delete)
+            abort(500);
         return redirect('/admin/paginas/categorias');
     }
 

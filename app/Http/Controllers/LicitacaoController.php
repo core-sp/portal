@@ -208,7 +208,9 @@ class LicitacaoController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
         $licitacao = Licitacao::find($id);
-        $licitacao->delete();
+        $delete = $licitacao->delete();
+        if(!$delete)
+            abort(500);
         return redirect()->route('licitacoes.lista');
     }
 

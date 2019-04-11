@@ -203,7 +203,9 @@ class ConcursoController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'juridico']);
         $concurso = Concurso::find($id);
-        $concurso->delete();
+        $delete = $concurso->delete();
+        if(!$delete)
+            abort(500);
         return redirect()->route('concursos.lista');
     }
 
