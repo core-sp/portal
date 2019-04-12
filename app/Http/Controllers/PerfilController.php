@@ -66,7 +66,7 @@ class PerfilController extends Controller
         // Classes da tabela
         $classes = [
             'table',
-            'table-hovered'
+            'table-hover'
         ];
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
         return $tabela;

@@ -5,7 +5,7 @@
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
-      <div class="col-sm-12">
+      <div class="col">
         <h1 class="d-inline mr-3 align-middle">
           {{ ucfirst($variaveis->pluraliza) }}
           @if(isset($variaveis->continuacao_titulo))
@@ -61,6 +61,14 @@
             </div>
           </div>
           <div class="card-body">
+            @if(isset($variaveis->filtro))
+            <div class="row mb-3">
+              <div class="col filtroRow">
+                <p class="d-inline">Filtrar por:&nbsp;&nbsp;</p>
+                {!! $variaveis->filtro !!}
+              </div>
+            </div>
+            @endif
             @if($resultados->count() > 0)
             {!! $tabela !!}
             @else

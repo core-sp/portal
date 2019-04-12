@@ -1,15 +1,5 @@
 $(document).ready(function(){	
-	$('.saiba-mais').on('click', function(){
-		var saibamais = $(this);
-		var bdoinfo = saibamais.prev('.bdo-info');
-		bdoinfo.slideToggle(function(){
-			if(bdoinfo.is(':visible')) {
-				saibamais.html('<i class="fas fa-angle-double-up"></i>&nbsp;&nbsp;Menos Detalhes');
-			} else {
-				saibamais.html('<i class="fas fa-angle-double-down"></i>&nbsp;&nbsp;Mais Detalhes');
-			}
-		});
-	});
+	
 });
 
 $(window).scroll(function(){
@@ -27,6 +17,19 @@ segunda.innerHTML = primeira.innerHTML;
 
 (function($){
 	$(function(){
+		// Botão Saiba Mais do Banco de Oportunidades
+		$('.saiba-mais').on('click', function(){
+			var saibamais = $(this);
+			var bdoinfo = saibamais.prev('.bdo-info');
+			bdoinfo.slideToggle(function(){
+				if(bdoinfo.is(':visible')) {
+					saibamais.html('<i class="fas fa-angle-double-up"></i>&nbsp;&nbsp;Menos Detalhes');
+				} else {
+					saibamais.html('<i class="fas fa-angle-double-down"></i>&nbsp;&nbsp;Mais Detalhes');
+				}
+			});
+		});
+		// Datepicker Agendamentos
 		$('#datepicker').datepicker({
 			dateFormat: 'dd/mm/yy',
 			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
@@ -76,25 +79,27 @@ segunda.innerHTML = primeira.innerHTML;
 				$(this).css('background-color','#FFFFFF');
 			}
 		});
-		// Muda Status agendamento
-		$('#statusAgendamento').on('submit', function(e){
+		// Muda Status agendamento no ADMIN
+		$('#btnSubmit').on('click', function(e){
 			e.preventDefault();
+			e.stopImmediatePropagation();
 			$.ajax({
-				method: "PUT",
-				url: "/admin/agendamentos/status",
+				url: $(this).attr('action'),
+				method: "POST",
 				data: {
+					"_method": $('#method').val(),
 					"_token": $('#tokenStatusAgendamento').val(),
 					"idagendamento": $('#idagendamento').val(),
 					"status": $('#status').val()
 				},
 				dataType: "html",
-				success: function() {
-					$('.table').load('table');
+				success: function(response) {
+					console.log(response);
 				},
 				error: function (jXHR, textStatus, errorThrown) {
 					alert(errorThrown);
 				}
-			})
+			});
 		});
 		// Máscaras
 		$('#datepicker').mask("99/99/9999");
