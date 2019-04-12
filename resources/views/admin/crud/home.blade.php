@@ -66,6 +66,7 @@
               <div class="col filtroRow">
                 <p class="d-inline">Filtrar por:&nbsp;&nbsp;</p>
                 {!! $variaveis->filtro !!}
+                <small class="ml-2"><a href="/admin/{{ $variaveis->plural }}" class="text-danger pointer"><i class="fas fa-times"></i>&nbsp;&nbsp;Remover filtro</a></small>
               </div>
             </div>
             @endif

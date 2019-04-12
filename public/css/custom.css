@@ -21,3 +21,11 @@
 .pagination {
 	margin-bottom: 0px;
 }
+
+.checkIcone {
+	font-size: .8rem;
+}
+
+.pointer:hover {
+  cursor: pointer;
+}

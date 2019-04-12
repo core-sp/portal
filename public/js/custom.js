@@ -32,6 +32,22 @@
       return false;
     });
   }
+  // Filtro Agendamento
+  $('#filtroAgendamento').on('submit', function(){
+    var url = "/admin/agendamentos";
+    var regional = $('#filtroAgendamentoRegional').val();
+    var status = $('#filtroAgendamentoStatus').val();
+    $.ajax({
+      method: "GET",
+      success: function() {
+        if(status === null) {
+          window.location.href = '?filtro=sim&regional='+regional;
+        } else {
+          window.location.href = '?filtro=sim&regional='+regional+'&status='+status;
+        }
+      }
+    });
+  });
   // Btns
   $('#lfm').filemanager('image');
   $('#edital').filemanager('file');
@@ -40,19 +56,4 @@
   $('.nrprocessoInput').mask('999/9999');
   $('.cnpjInput').mask('99.999.999/9999-99');
   $('.telefoneInput').mask('(00) 0000-00009');
-  // Filtro de Agendamentos
-  $('#filtroAgendamento').change(function(){
-    var urlInicio = window.location.pathname + "?filtro=";
-    var filtro = $(this).val();
-    $.ajax({
-      method: "GET",
-      success: function() {
-        if(filtro) {
-          window.location.href = urlInicio+filtro;
-        } else {
-          window.location.href = window.location.pathname;
-        }
-      }
-    });
-  });
 })(jQuery);
