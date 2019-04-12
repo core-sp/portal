@@ -71,7 +71,7 @@ class ConcursoController extends Controller
         // Classes da tabela
         $classes = [
             'table',
-            'table-hovered'
+            'table-hover'
         ];
         // Monta e retorna tabela        
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
@@ -242,7 +242,7 @@ class ConcursoController extends Controller
         // Classes da tabela
         $classes = [
             'table',
-            'table-hovered'
+            'table-hover'
         ];
         $variaveis = (object) $this->variaveis;
         $tabela = CrudController::montaTabela($headers, $contents, $classes);

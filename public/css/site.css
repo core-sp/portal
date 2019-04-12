@@ -1172,8 +1172,8 @@ footer p {
 
 #loadImage {
 	position: absolute;
-	bottom: 2px;
-	left: 0.75rem;
+	bottom: 4px;
+	left: 11px;
 	display: none;
 }
 

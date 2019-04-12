@@ -75,7 +75,7 @@ class UserController extends Controller
         // Classes da tabela
         $classes = [
             'table',
-            'table-hovered'
+            'table-hover'
         ];
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
         return $tabela;
@@ -231,7 +231,7 @@ class UserController extends Controller
         // Classes da tabela
         $classes = [
             'table',
-            'table-hovered'
+            'table-hover'
         ];
         $variaveis = (object) $this->variaveis;
         $tabela = CrudController::montaTabela($headers, $contents, $classes);

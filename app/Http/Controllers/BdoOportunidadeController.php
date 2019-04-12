@@ -74,7 +74,7 @@ class BdoOportunidadeController extends Controller
         // Classes da tabela
         $classes = [
             'table',
-            'table-hovered'
+            'table-hover'
         ];
         // Monta e retorna tabela        
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
