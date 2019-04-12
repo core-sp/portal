@@ -37,8 +37,10 @@ $pessoas = AgendamentoControllerHelper::pessoas();
     </div>
     <div class="linha-lg"></div>
     <div class="row mb-4">
-      <div class="col conteudo-txt">
-		<p>Agende seu atendimento presencial no CORE-SP, com até um mês de antecedência.</p>
+      <div class="col">
+      <div class="conteudo-txt">
+      <p>Agende seu atendimento presencial no CORE-SP, com até um mês de antecedência.</p>  
+      </div>
         <div class="mt-2">
           <form method="POST" class="inscricaoCurso">
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
@@ -98,7 +100,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
 				  @endif
               </div>
             </div>
-            <h5 class="mt-2">Informações de agendamento</h5>
+            <h5 class="mt-4">Informações de agendamento</h5>
             <div class="form-row mt-2">
               <div class="col">
                 <label for="idregional">Regional</label>

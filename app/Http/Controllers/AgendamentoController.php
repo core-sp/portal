@@ -35,30 +35,56 @@ class AgendamentoController extends Controller
         return $resultados;
     }
 
-    public function resultadosFiltro($filtro, $idregional = null)
+    public function resultadosFiltro($idregional, $status = 'Todos')
     {
         $date = new \DateTime();
-        $dataAtual = $date->format('Y-m-d');
-        if($filtro == 'NaoCompareceu') {
-            $filtro = null;
+        $diaAtual = $date->format('Y-m-d');
+        $resultados = Agendamento::query();
+        switch ($status) {
+            case ($status === 'Todos'):
+                $resultados->where('idregional',$idregional)
+                    ->where('dia','=',$diaAtual)
+                    ->orderBy('dia','ASC')
+                    ->orderBy('hora','ASC')
+                    ->get();
+            break;
+            case($status == 'NaoCompareceu'):
+                $resultados->whereNull('status')
+                    ->where('idregional',$idregional)
+                    ->where('dia','=',$diaAtual)
+                    ->orderBy('dia','ASC')
+                    ->orderBy('hora','ASC')
+                    ->get();
+            break;
+            case($status == 'Compareceu'):
+                $resultados->where([
+                    'idregional' => $idregional,
+                    'dia' => $diaAtual,
+                    'status' => 'Compareceu'
+                    ])->orderBy('dia','ASC')
+                    ->orderBy('hora','ASC')
+                    ->get();
+            break;
         }
-        $resultados = Agendamento::where('idregional',$idregional)
-            ->where('dia','=',$dataAtual)
-            ->where('status',$filtro)
-            ->orderBy('dia','ASC')
-            ->orderBy('hora','ASC')
-            ->get();
         return $resultados;
     }
 
     public function filtros()
     {
-        $select = '<select class="d-inline w-auto custom-select form-control" id="filtroAgendamento">';
-        $select .= '<option disabled selected>Selecionar filtro</option>';
+        $regionais = Regional::all();
+        $select = '<form id="filtroAgendamento" class="d-inline">';
+        $select .= '<select class="d-inline w-auto custom-select custom-select-sm mr-2" id="filtroAgendamentoRegional">';
+        $select .= '<option disabled selected>Seccional</option>';
+        foreach($regionais as $regional) 
+            $select .= '<option value="'.$regional->idregional.'">'.$regional->regional.'</option>';
+        $select .= '</select>';
+        $select .= '<select class="d-inline w-auto custom-select custom-select-sm" id="filtroAgendamentoStatus">';
+        $select .= '<option disabled selected>Status</option>';
         $select .= '<option value="Compareceu">Compareceram</option>';
         $select .= '<option value="NaoCompareceu">Não Compareceram</option>';
-        $select .= '<option value="">Nenhum</option>';
         $select .= '</select>';
+        $select .= '<input type="submit" class="btn btn-sm btn-primary ml-2" value="Filtrar" />';
+        $select .= '</form>';
         return $select;
     }
 
@@ -70,7 +96,7 @@ class AgendamentoController extends Controller
             break;
 
             case 'Compareceu':
-                return "<p><i class='fas fa-check'></i> Compareceu</p>";
+                return "<p><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;Compareceu</p>";
             break;
 
             default:
@@ -125,8 +151,12 @@ class AgendamentoController extends Controller
         $request->user()->autorizarPerfis(['Admin', 'Atendimento']);
         $regional = $request->user()->idregional;
         if($request->has('filtro')) {
-            $filtro = $_GET['filtro'];
-            $resultados = $this->resultadosFiltro($filtro, $regional);
+            $regional = $_GET['regional'];
+            if(isset($_GET['status'])) {
+                $status = $_GET['status'];
+                $resultados = $this->resultadosFiltro($regional, $status);
+            }
+            $resultados = $this->resultadosFiltro($regional);
         } else {
             $resultados = $this->resultados($regional);
         }

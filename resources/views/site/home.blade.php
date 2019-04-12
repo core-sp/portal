@@ -65,34 +65,34 @@ use \App\Http\Controllers\Helper;
         </div>
       </div>
       <div class="col-sm-3">
-        <a href="/balcao-de-oportunidades">
+        <a href="/balcao-de-oportunidades" class="d-block">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/001-work.png') }}" class="inside-img" />
               <p class="text-uppercase mt-3 branco">Balcão de Oportunidades</p>
-              <div class="btn-box mt-4">Acessar</div>
+              <button class="btn-box mt-4">Acessar</button>
             </div>
           </div>
         </a>
       </div>
       <div class="col-sm-3">
-        <a href="http://boleto.core-sp.org.br" target="_blank">
+        <a href="http://boleto.core-sp.org.br" class="d-block" target="_blank">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" />
               <p class="text-uppercase mt-3 branco">Emissão de boleto<br>anuidade 2019</p>
-              <a href="#" class="btn-box mt-4">EMITIR</a>
+              <button href="#" class="btn-box mt-4">EMITIR</button>
             </div>
           </div>
         </a>
       </div>
       <div class="col-sm-3">
-        <a href="/agendamento">
+        <a href="/agendamento" class="d-block">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/appointment.png') }}" class="inside-img" />
               <p class="text-uppercase mt-3 branco">Agende seu<br>atendimento</p>
-              <a href="/agendamento" class="btn-box mt-4">Agendar</a>
+              <button class="btn-box mt-4">Agendar</button>
             </div>
           </div>
         </a>

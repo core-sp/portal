@@ -1180,3 +1180,16 @@ footer p {
 #loadImage img {
 	width: 32px;
 }
+
+.form-box {
+	padding: 1rem;
+	border: 1px solid #d6d6d6;
+	border-radius: 5px;
+}
+
+.inscricaoCurso h5 {
+	border-bottom: 1px solid #d6d6d6;
+	padding-bottom: 4px;
+	margin-bottom: 12px;
+	margin-top: 12px;
+}
