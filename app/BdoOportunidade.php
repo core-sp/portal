@@ -20,4 +20,9 @@ class BdoOportunidade extends Model
     {
     	return $this->belongsTo('App\BdoEmpresa', 'idempresa');
     }
+
+    public function regional()
+    {
+    	return $this->belongsTo('App\Regional', 'idregional');
+    }
 }
