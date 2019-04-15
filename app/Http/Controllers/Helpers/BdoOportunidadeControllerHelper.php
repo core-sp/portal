@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Helpers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Regional;
 
 class BdoOportunidadeControllerHelper extends Controller
 {
@@ -177,7 +178,16 @@ class BdoOportunidadeControllerHelper extends Controller
 
     public static function listRegioes($string)
     {
-        $string = str_replace(',',' / ',$string);
-        return $string;
+        $string = explode(',',$string);
+        $array = [];
+        foreach($string as $s)
+            array_push($array, $s);
+        $regionais = Regional::findMany($array);
+        $regArray = [];
+        foreach($regionais as $r)
+            array_push($regArray, $r->regional);
+        $corrigido = implode(',',$regArray);
+        $mostra = str_replace(',',' / ',$corrigido);
+        return $mostra;
     }
 }

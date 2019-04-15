@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\BdoOportunidade;
 use App\BdoEmpresa;
+use App\Regional;
 
 class BdoOportunidadeController extends Controller
 {
@@ -100,9 +101,10 @@ class BdoOportunidadeController extends Controller
         $request->user()->autorizarPerfis(['admin']);
         $id = Input::get('empresa');
         $empresa = BdoEmpresa::find($id);
+        $regioes = Regional::all();
         if (isset($empresa)) {
             $variaveis = (object) $this->variaveis;
-            return view('admin.crud.criar', compact('empresa', 'variaveis'));
+            return view('admin.crud.criar', compact('empresa', 'regioes', 'variaveis'));
         } else {
             abort(401);
         }
@@ -159,8 +161,10 @@ class BdoOportunidadeController extends Controller
         $request->user()->autorizarPerfis(['admin']);
         $resultado = BdoOportunidade::find($id);
         $variaveis = (object) $this->variaveis;
+        $regioes = Regional::all();
         $regioesEdit = explode(',', $resultado->regiaoatuacao);
-        return view('admin.crud.editar', compact('resultado', 'variaveis', 'regioesEdit'));
+        $regioesEdit = Regional::findMany(array_values($regioesEdit));
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'regioes', 'regioesEdit'));
     }
 
     /**
@@ -182,11 +186,12 @@ class BdoOportunidadeController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
+        $regioes = implode(',',$request->input('regiaoatuacao'));
         $oportunidade = BdoOportunidade::find($id);
         $oportunidade->idempresa = $request->input('empresa');
         $oportunidade->titulo = $request->input('titulo');
         $oportunidade->segmento = $request->input('segmento');
-        $oportunidade->regiaoatuacao = $request->input('regiaoatuacao');
+        $oportunidade->regiaoatuacao = $regioes;
         $oportunidade->descricao = $request->input('descricao');
         $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
         $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');

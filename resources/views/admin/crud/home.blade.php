@@ -69,11 +69,13 @@
                 </div>
                 {!! $variaveis->filtro !!}
                 @if(isset($temFiltro))
-                <small class="ml-2">
-                  <a href="/admin/{{ $variaveis->plural }}" class="text-danger pointer">
-                    <i class="fas fa-times"></i>&nbsp;&nbsp;Remover filtro
-                  </a>
-                </small>
+                <div class="col-sm-auto align-self-center">
+                  <small>
+                    <a href="/admin/{{ $variaveis->plural }}" class="text-danger pointer">
+                      <i class="fas fa-times"></i>&nbsp;&nbsp;Remover filtro
+                    </a>
+                  </small>
+                </div>
                 @endif
               </div>
               @endif

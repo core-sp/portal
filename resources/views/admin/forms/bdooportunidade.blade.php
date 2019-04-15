@@ -3,7 +3,6 @@ use \App\Http\Controllers\Helper;
 use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
 $status = BdoOportunidadeControllerHelper::status();
 $segmentos = BdoOportunidadeControllerHelper::segmentos();
-$regioes = BdoOportunidadeControllerHelper::regioes();
 @endphp
 
 <form role="form" method="POST">
@@ -75,6 +74,7 @@ $regioes = BdoOportunidadeControllerHelper::regioes();
                         <input type="number"
                             class="form-control {{ $errors->has('vagasdisponiveis') ? 'is-invalid' : '' }}"
                             name="vagasdisponiveis"
+                            placeholder="00"
                             @if(isset($resultado))
                             value="{{ $resultado->vagasdisponiveis }}"
                             @endif
@@ -111,13 +111,16 @@ $regioes = BdoOportunidadeControllerHelper::regioes();
             <div class="col">
                 <label for="regiaoatuacao">Região de Atuação</label>
                 <select name="regiaoatuacao[]" id="regiaoAtuacaoOportunidade" class="form-control" size="5" multiple>
-                <option value="">Não Especificada</option>
                 @foreach($regioes as $regiao)
-                    @if(in_array($regiao, $regioesEdit))
-                    <option value="{{ $regiao }}" selected>{{ $regiao }}</option>
+                    @if(isset($resultado))
+                        @if($regioesEdit->contains('idregional',$regiao->idregional))
+                        <option value="{{ $regiao->idregional }}" selected>{{ $regiao->regional }}</option>
+                        @else
+                        <option value="{{ $regiao->idregional }}">{{ $regiao->regional }}</option>
+                        @endif
                     @else
-                    <option value="{{ $regiao }}">{{ $regiao }}</option>
-                    @endif               
+                    <option value="{{ $regiao->idregional }}">{{ $regiao->regional }}</option>
+                    @endif
                 @endforeach
                 </select>
                 @if($errors->has('regiaoatuacao'))
