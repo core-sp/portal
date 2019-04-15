@@ -174,4 +174,10 @@ class BdoOportunidadeControllerHelper extends Controller
         sort($segmentos);
         return $segmentos;
     }
+
+    public static function listRegioes($string)
+    {
+        $string = str_replace(',',' / ',$string);
+        return $string;
+    }
 }

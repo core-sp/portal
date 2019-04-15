@@ -62,13 +62,21 @@
           </div>
           <div class="card-body">
             @if(isset($variaveis->filtro))
-            <div class="row mb-3">
-              <div class="col filtroRow">
-                <p class="d-inline">Filtrar por:&nbsp;&nbsp;</p>
+              @if(Auth::user()->hasAnyRole($variaveis->mostraFiltros))
+              <div class="row mb-3">
+                <div class="col-sm-auto align-self-center">
+                  <p class="d-inline">Filtrar por:&nbsp;&nbsp;</p>
+                </div>
                 {!! $variaveis->filtro !!}
-                <small class="ml-2"><a href="/admin/{{ $variaveis->plural }}" class="text-danger pointer"><i class="fas fa-times"></i>&nbsp;&nbsp;Remover filtro</a></small>
+                @if(isset($temFiltro))
+                <small class="ml-2">
+                  <a href="/admin/{{ $variaveis->plural }}" class="text-danger pointer">
+                    <i class="fas fa-times"></i>&nbsp;&nbsp;Remover filtro
+                  </a>
+                </small>
+                @endif
               </div>
-            </div>
+              @endif
             @endif
             @if($resultados->count() > 0)
             {!! $tabela !!}

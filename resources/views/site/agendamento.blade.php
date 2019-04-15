@@ -167,8 +167,8 @@ $pessoas = AgendamentoControllerHelper::pessoas();
               <div class="col">
                 <label for="pessoa">Para:</label>
                 <select name="pessoa" class="form-control">
-                  @foreach($pessoas as $pessoa)
-                    <option value="{{ $pessoa }}">{{ $pessoa }}</option>
+                  @foreach($pessoas as $pessoa => $diminutivo)
+                    <option value="{{ $diminutivo }}">{{ $pessoa }}</option>
                   @endforeach 
                 </select>
                 @if($errors->has('pessoa'))

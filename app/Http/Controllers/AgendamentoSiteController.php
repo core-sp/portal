@@ -120,7 +120,7 @@ class AgendamentoSiteController extends Controller
         // Gera a HASH (protocolo) aleatória
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
         do {
-            $random = substr(str_shuffle($characters), 0, 8);
+            $random = substr(str_shuffle($characters), 0, 6);
             $random = 'AGE'.$random;
             $checaProtocolo = Agendamento::where('protocolo',$random)->get();
         } while(!$checaProtocolo->isEmpty());  

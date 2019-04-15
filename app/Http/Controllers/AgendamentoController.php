@@ -7,6 +7,7 @@ use App\Agendamento;
 use App\Regional;
 use Carbon\Carbon;
 use App\Http\Controllers\Helper;
+use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 
 class AgendamentoController extends Controller
@@ -31,54 +32,93 @@ class AgendamentoController extends Controller
             ->where('dia','=',$diaAtual)
             ->orderBy('dia','ASC')
             ->orderBy('hora','ASC')
-            ->get();
+            ->paginate(10);
         return $resultados;
     }
 
-    public function resultadosFiltro($idregional, $status = 'Todos')
+    public function checaFiltros($request)
+    {
+        $request->user()->autorizarPerfis(['Admin', 'Gestão de Atendimento']);
+        if(Input::has(['regional','status'])) {
+            $resultados = $this->resultadosFiltro(Input::get('regional'), Input::get('status'));
+        } elseif (Input::has('regional')) {
+            $resultados = $this->resultados(Input::get('regional'));
+        } elseif(Input::has('status')) {
+            $resultados = $this->resultadosFiltro($regional, Input::get('status'));
+        }
+        return $resultados;
+    }
+
+    public function resultadosFiltro($idregional, $status)
     {
         $date = new \DateTime();
         $diaAtual = $date->format('Y-m-d');
-        $resultados = Agendamento::query();
         switch ($status) {
-            case ($status === 'Todos'):
-                $resultados->where('idregional',$idregional)
-                    ->where('dia','=',$diaAtual)
-                    ->orderBy('dia','ASC')
-                    ->orderBy('hora','ASC')
-                    ->get();
+            case 'Compareceu':
+                $status = 'Compareceu';
             break;
-            case($status == 'NaoCompareceu'):
-                $resultados->whereNull('status')
-                    ->where('idregional',$idregional)
-                    ->where('dia','=',$diaAtual)
-                    ->orderBy('dia','ASC')
-                    ->orderBy('hora','ASC')
-                    ->get();
-            break;
-            case($status == 'Compareceu'):
-                $resultados->where([
-                    'idregional' => $idregional,
-                    'dia' => $diaAtual,
-                    'status' => 'Compareceu'
-                    ])->orderBy('dia','ASC')
-                    ->orderBy('hora','ASC')
-                    ->get();
+            default:
+                $status = null;
             break;
         }
+        if($status === null) {
+            $resultados = Agendamento::where('idregional',$idregional)
+                ->where('dia','=',$diaAtual)
+                ->whereNull('status')
+                ->orderBy('dia','ASC')
+                ->orderBy('hora','ASC')
+                ->get();
+        } else {
+            $resultados = Agendamento::where('idregional',$idregional)
+                ->where('dia','=',$diaAtual)
+                ->where('status','LIKE',$status)
+                ->orderBy('dia','ASC')
+                ->orderBy('hora','ASC')
+                ->get();
+        }
         return $resultados;
+    }
+
+    public function index(Request $request)
+    {
+        $request->user()->autorizarPerfis(['Admin', 'Atendimento', 'Gestão de Atendimento']);
+        $regional = $request->user()->idregional;
+        // Checa se tem filtro
+        if(Input::get('filtro') == 'sim') {
+            $temFiltro = true;
+            $resultados = $this->checaFiltros($request);
+        } else {
+            $temFiltro = null;
+            $resultados = $this->resultados($regional);
+        }
+        // Monta tabela com resultados
+        $tabela = $this->tabelaCompleta($resultados);
+        // Pega dia atual e cospe no título
+        $date = new \DateTime();
+        $diaAtual = $date->format('d\/m\/Y');
+        $this->variaveis['continuacao_titulo'] = 'em '.$request->user()->regional->regional.' - '.$diaAtual;
+        // Variáveis globais
+        $variaveis = $this->variaveis;
+        $variaveis['filtro'] = $this->filtros();
+        $variaveis['mostraFiltros'] = [
+            'Admin',
+            'Gestão de Atendimento'
+        ];
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
 
     public function filtros()
     {
         $regionais = Regional::all();
-        $select = '<form id="filtroAgendamento" class="d-inline">';
-        $select .= '<select class="d-inline w-auto custom-select custom-select-sm mr-2" id="filtroAgendamentoRegional">';
-        $select .= '<option disabled selected>Seccional</option>';
+        $select = '<form method="GET" action="/admin/agendamentos/filtro" class="d-inline">';
+        $select .= '<input type="hidden" name="filtro" value="sim" />';
+        $select .= '<select class="d-inline w-auto custom-select custom-select-sm mr-2" name="regional">';
+        $select .= '<option disabled selected>Seccional *</option>';
         foreach($regionais as $regional) 
             $select .= '<option value="'.$regional->idregional.'">'.$regional->regional.'</option>';
         $select .= '</select>';
-        $select .= '<select class="d-inline w-auto custom-select custom-select-sm" id="filtroAgendamentoStatus">';
+        $select .= '<select class="d-inline w-auto custom-select custom-select-sm" name="status">';
         $select .= '<option disabled selected>Status</option>';
         $select .= '<option value="Compareceu">Compareceram</option>';
         $select .= '<option value="NaoCompareceu">Não Compareceram</option>';
@@ -145,31 +185,6 @@ class AgendamentoController extends Controller
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
         return $tabela;
     }
-    
-    public function index(Request $request)
-    {
-        $request->user()->autorizarPerfis(['Admin', 'Atendimento']);
-        $regional = $request->user()->idregional;
-        if($request->has('filtro')) {
-            $regional = $_GET['regional'];
-            if(isset($_GET['status'])) {
-                $status = $_GET['status'];
-                $resultados = $this->resultadosFiltro($regional, $status);
-            }
-            $resultados = $this->resultadosFiltro($regional);
-        } else {
-            $resultados = $this->resultados($regional);
-        }
-        $tabela = $this->tabelaCompleta($resultados);
-        // Pega dia atual e cospe no título
-        $date = new \DateTime();
-        $diaAtual = $date->format('d\/m\/Y');
-        $this->variaveis['continuacao_titulo'] = 'em '.$request->user()->regional->regional.' - '.$diaAtual;
-        $variaveis = $this->variaveis;
-        $variaveis['filtro'] = $this->filtros();
-        $variaveis = (object) $variaveis;
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
-    }
 
     public function updateStatus(Request $request)
     {
@@ -183,5 +198,18 @@ class AgendamentoController extends Controller
         if(!$update)
             abort(500);
         return redirect()->route('agendamentos.lista');
+    }
+
+    public function busca()
+    {
+        $busca = Input::get('q');
+        $variaveis = (object) $this->variaveis;
+        $resultados = Agendamento::where('nome','LIKE','%'.$busca.'%')
+            ->orWhere('cpf','LIKE','%'.$busca.'%')
+            ->orWhere('email','LIKE','%'.$busca.'%')
+            ->orWhere('protocolo','LIKE','%'.$busca.'%')
+            ->paginate(10);
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

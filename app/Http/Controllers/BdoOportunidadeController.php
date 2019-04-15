@@ -126,11 +126,12 @@ class BdoOportunidadeController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
+        $regioes = implode(',',$request->input('regiaoatuacao'));
         $oportunidade = new BdoOportunidade();
         $oportunidade->idempresa = $request->input('empresa');
         $oportunidade->titulo = $request->input('titulo');
         $oportunidade->segmento = $request->input('segmento');
-        $oportunidade->regiaoatuacao = $request->input('regiaoatuacao');
+        $oportunidade->regiaoatuacao = $regioes;
         $oportunidade->descricao = $request->input('descricao');
         $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
         $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');
@@ -158,7 +159,8 @@ class BdoOportunidadeController extends Controller
         $request->user()->autorizarPerfis(['admin']);
         $resultado = BdoOportunidade::find($id);
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+        $regioesEdit = explode(',', $resultado->regiaoatuacao);
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'regioesEdit'));
     }
 
     /**

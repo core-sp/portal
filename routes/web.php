@@ -149,6 +149,7 @@ Route::prefix('admin')->group(function() {
   // Rota para Agendamentos
   Route::prefix('agendamentos')->group(function(){
     Route::get('/', 'AgendamentoController@index')->name('agendamentos.lista');
+    Route::get('/busca', 'AgendamentoController@busca');
     Route::put('/status', 'AgendamentoController@updateStatus');
     Route::get('/filtro', 'AgendamentoController@index');
   });

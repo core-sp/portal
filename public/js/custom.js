@@ -32,22 +32,8 @@
       return false;
     });
   }
-  // Filtro Agendamento
-  $('#filtroAgendamento').on('submit', function(){
-    var url = "/admin/agendamentos";
-    var regional = $('#filtroAgendamentoRegional').val();
-    var status = $('#filtroAgendamentoStatus').val();
-    $.ajax({
-      method: "GET",
-      success: function() {
-        if(status === null) {
-          window.location.href = '?filtro=sim&regional='+regional;
-        } else {
-          window.location.href = '?filtro=sim&regional='+regional+'&status='+status;
-        }
-      }
-    });
-  });
+  // Select múltiplo em oportunidades
+  $('#regiaoAtuacaoOportunidade').selectpicker();
   // Btns
   $('#lfm').filemanager('image');
   $('#edital').filemanager('file');
