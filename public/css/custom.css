@@ -29,3 +29,11 @@
 .pointer:hover {
   cursor: pointer;
 }
+
+.nopadding {
+  padding: 0px;
+}
+
+.nomargin {
+  margin: 0px;
+}

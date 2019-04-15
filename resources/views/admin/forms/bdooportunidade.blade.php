@@ -47,85 +47,85 @@ $regioes = BdoOportunidadeControllerHelper::regioes();
         </div>
         </div>
         <div class="form-row mt-2">
-        <div class="col">
-            <label for="segmento">Segmento</label>
-            <select name="segmento" class="form-control" id="segmento">
-            @foreach($segmentos as $segmento)
-                @if(isset($resultado))
-                    @if($resultado->segmento == $segmento)
-                    <option class="{{ $segmento }}" selected>{{ $segmento }}</option>
-                    @else
-                    <option value="{{ $segmento }}">{{ $segmento }}</option>
+            <div class="col">
+                <div class="row nomargin">
+                    <label for="segmento">Segmento</label>
+                    <select name="segmento" class="form-control" id="segmento">
+                    @foreach($segmentos as $segmento)
+                        @if(isset($resultado))
+                            @if($resultado->segmento == $segmento)
+                            <option class="{{ $segmento }}" selected>{{ $segmento }}</option>
+                            @else
+                            <option value="{{ $segmento }}">{{ $segmento }}</option>
+                            @endif
+                        @else
+                        <option value="{{ $segmento }}">{{ $segmento }}</option>
+                        @endif
+                    @endforeach
+                    </select>
+                    @if($errors->has('segmento'))
+                    <div class="invalid-feedback">
+                    {{ $errors->first('segmento') }}
+                    </div>
                     @endif
-                @else
-                <option value="{{ $segmento }}">{{ $segmento }}</option>
-                @endif
-            @endforeach
-            </select>
-            @if($errors->has('segmento'))
-            <div class="invalid-feedback">
-            {{ $errors->first('segmento') }}
+                </div>
+                <div class="row mt-2">
+                    <div class="col">
+                        <label for="vagasdisponiveis">Vagas Disponíveis</label>
+                        <input type="number"
+                            class="form-control {{ $errors->has('vagasdisponiveis') ? 'is-invalid' : '' }}"
+                            name="vagasdisponiveis"
+                            @if(isset($resultado))
+                            value="{{ $resultado->vagasdisponiveis }}"
+                            @endif
+                            />
+                        @if($errors->has('vagasdisponiveis'))
+                        <div class="invalid-feedback">
+                        {{ $errors->first('vagasdisponiveis') }}
+                        </div>
+                        @endif
+                    </div>
+                    <div class="col">
+                        <label for="status">Status</label>
+                        <select name="status" class="form-control">
+                        @foreach($status as $s)
+                            @if(isset($resultado))
+                                @if($resultado->status == $s)
+                                <option value="{{ $s }}" selected>{{ $s }}</option>
+                                @else
+                                <option value="{{ $s }}">{{ $s }}</option>
+                                @endif
+                            @else
+                            <option value="{{ $s }}">{{ $s }}</option>
+                            @endif
+                        @endforeach
+                        </select>
+                        @if($errors->has('status'))
+                        <div class="invalid-feedback">
+                        {{ $errors->first('status') }}
+                        </div>
+                        @endif
+                    </div>
+                </div>
             </div>
-            @endif
-        </div>
-        <div class="col">
-            <label for="regiaoatuacao">Região de Atuação</label>
-            <select name="regiaoatuacao" class="form-control">
-            <option value="">Não Especificada</option>
-            @foreach($regioes as $regiao)
-                @if(isset($resultado))
-                    @if($regiao == $resultado->regiaoatuacao)
+            <div class="col">
+                <label for="regiaoatuacao">Região de Atuação</label>
+                <select name="regiaoatuacao[]" id="regiaoAtuacaoOportunidade" class="form-control" size="5" multiple>
+                <option value="">Não Especificada</option>
+                @foreach($regioes as $regiao)
+                    @if(in_array($regiao, $regioesEdit))
                     <option value="{{ $regiao }}" selected>{{ $regiao }}</option>
                     @else
                     <option value="{{ $regiao }}">{{ $regiao }}</option>
-                    @endif
-                @else
-                <option value="{{ $regiao }}">{{ $regiao }}</option>
+                    @endif               
+                @endforeach
+                </select>
+                @if($errors->has('regiaoatuacao'))
+                <div class="invalid-feedback">
+                {{ $errors->first('regiaoatuacao') }}
+                </div>
                 @endif
-            @endforeach
-            </select>
-            @if($errors->has('regiaoatuacao'))
-            <div class="invalid-feedback">
-            {{ $errors->first('regiaoatuacao') }}
             </div>
-            @endif
-        </div>
-        <div class="col">
-            <label for="status">Status</label>
-            <select name="status" class="form-control">
-            @foreach($status as $s)
-                @if(isset($resultado))
-                    @if($resultado->status == $s)
-                    <option value="{{ $s }}" selected>{{ $s }}</option>
-                    @else
-                    <option value="{{ $s }}">{{ $s }}</option>
-                    @endif
-                @else
-                <option value="{{ $s }}">{{ $s }}</option>
-                @endif
-            @endforeach
-            </select>
-            @if($errors->has('status'))
-            <div class="invalid-feedback">
-            {{ $errors->first('status') }}
-            </div>
-            @endif
-        </div>
-        <div class="col">
-            <label for="vagasdisponiveis">Vagas Disponíveis</label>
-            <input type="number"
-                class="form-control {{ $errors->has('vagasdisponiveis') ? 'is-invalid' : '' }}"
-                name="vagasdisponiveis"
-                @if(isset($resultado))
-                value="{{ $resultado->vagasdisponiveis }}"
-                @endif
-                />
-            @if($errors->has('vagasdisponiveis'))
-            <div class="invalid-feedback">
-            {{ $errors->first('vagasdisponiveis') }}
-            </div>
-            @endif
-        </div>
         </div>
         <div class="form-group mt-2">
             <label for="descricao">Descrição</label>

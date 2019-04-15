@@ -70,7 +70,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
               <h5 class="marrom mb-1">{{ $oportunidade->titulo }}</h5>
               <h6 class="light">
                 <i class="far fa-building"></i>&nbsp;&nbsp;{{ $oportunidade->empresa->razaosocial }}&nbsp;&nbsp;&nbsp;&nbsp;
-                <i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;{{ $oportunidade->regiaoatuacao }}&nbsp;&nbsp;&nbsp;&nbsp;
+                <i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;{{ BdoOportunidadeControllerHelper::listRegioes($oportunidade->regiaoatuacao) }}&nbsp;&nbsp;&nbsp;&nbsp;
                 <i class="fas fa-suitcase"></i>&nbsp;&nbsp;{{ $oportunidade->vagasdisponiveis }} vagas
               </h6>
               <div class="linha-lg-mini"></div>

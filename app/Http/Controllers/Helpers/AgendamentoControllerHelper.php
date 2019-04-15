@@ -47,9 +47,7 @@ class AgendamentoControllerHelper extends Controller
     public static function servicos()
     {
         $servicos = [
-            'Registro',
-            'Pagamento de Emolumentos',
-            'Baixa'
+            'Refis',
         ];
         return $servicos;
     }
@@ -57,9 +55,9 @@ class AgendamentoControllerHelper extends Controller
     public static function pessoas()
     {
         $pessoas = [
-            'Pessoa Física',
-            'Pessoa Jurídica',
-            'Ambas'
+            'Pessoa Física' => 'PF',
+            'Pessoa Jurídica' => 'PJ',
+            'Ambas' => 'PF e PJ'
         ];
         return $pessoas;
     }
