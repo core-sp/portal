@@ -58,11 +58,11 @@ class AgendamentoSiteController extends Controller
 
     public function checaHorarios(Request $request)
     {
-        $horarios = AgendamentoControllerHelper::horas();
         $idregional = $_POST['idregional'];
         $dia = $_POST['dia'];
         $dia = str_replace('/', '-', $_POST['dia']);
         $dia = date('Y-m-d', strtotime($dia));
+        $horarios = AgendamentoControllerHelper::horas($idregional, $dia);
         // Checa pela contagem
         $contagem = AgendamentoControllerHelper::countAtendentes($idregional);
         if($contagem == 1) {

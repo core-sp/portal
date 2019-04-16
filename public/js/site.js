@@ -1,5 +1,10 @@
 $(document).ready(function(){	
-	
+	// Máscaras
+	$('#datepicker').mask("99/99/9999");
+	$('.cpfInput').mask('999.999.999-99');
+	$('.celularInput').mask('(99) 99999-9999');
+	$('.nrlicitacaoInput').mask('999/9999');
+	$('.nrprocessoInput').mask('999/9999');
 });
 
 $(window).scroll(function(){
@@ -101,9 +106,5 @@ segunda.innerHTML = primeira.innerHTML;
 				}
 			});
 		});
-		// Máscaras
-		$('#datepicker').mask("99/99/9999");
-		$('.cpfInput').mask('999.999.999-99');
-		$('.celularInput').mask('(99) 99999-9999');
 	});
 })(jQuery);

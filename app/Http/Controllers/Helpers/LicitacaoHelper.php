@@ -14,7 +14,8 @@ class LicitacaoHelper extends Controller
             'Concurso',
             'Carta Convite',
             'Leilão',
-            'Pregão Eletrônico',
+            'Pregão Eletrônico SRP',
+            'Pregão Eletrônico Tradicional',
             'Pregão Presencial',
             'Tomada de Preços',
         ];
@@ -25,11 +26,13 @@ class LicitacaoHelper extends Controller
     {
     	$situacoes = [
             'Aberto',
+            'Adjudicado',
             'Anulado',
     		'Cancelado',
             'Concluído',
     		'Deserto',
-    		'Em Andamento',
+            'Em Andamento',
+            'Em fase de recurso',
     		'Homologado'
     	];
     	return $situacoes;

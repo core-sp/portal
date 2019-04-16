@@ -54,7 +54,7 @@ class LicitacaoController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<a href="/licitacao/'.$resultado->idlicitacao.'" class="btn btn-sm btn-default">Ver</a> ';
+            $acoes = '<a href="/licitacao/'.$resultado->idlicitacao.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
             $acoes .= '<a href="/admin/licitacoes/editar/'.$resultado->idlicitacao.'" class="btn btn-sm btn-primary">Editar</a> ';
             $acoes .= '<form method="POST" action="/admin/licitacoes/apagar/'.$resultado->idlicitacao.'" class="d-inline">';
             $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';

@@ -46,11 +46,11 @@ $situacoes = LicitacaoHelper::situacoes();
           	</div>
           	<div class="col">
           	  <label for="nrprocesso">Nº do processo</label>
-          	  <input type="text" name="nrprocesso" class="form-control" placeholder="Nº do processo" id="nrprocesso">
+          	  <input type="text" name="nrprocesso" class="form-control nrprocessoInput" placeholder="Nº do processo" id="nrprocesso">
           	</div>
           	<div class="col">
           	  <label for="nrlicitacao">Nº da Licitação</label>
-          	  <input type="text" name="nrlicitacao" class="form-control" placeholder="Nº da licitação" id="nrlicitacao">
+          	  <input type="text" name="nrlicitacao" class="form-control nrlicitacaoInput" placeholder="Nº da licitação" id="nrlicitacao">
           	</div>
           </div>
           <div class="form-row">

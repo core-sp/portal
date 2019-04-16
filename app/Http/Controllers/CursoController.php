@@ -56,7 +56,7 @@ class CursoController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<a href="/curso/'.$resultado->idcurso.'" class="btn btn-sm btn-default">Ver</a> ';
+            $acoes = '<a href="/curso/'.$resultado->idcurso.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
             $acoes .= '<a href="/admin/cursos/inscritos/'.$resultado->idcurso.'" class="btn btn-sm btn-secondary">Inscritos</a> ';
             $acoes .= '<a href="/admin/cursos/editar/'.$resultado->idcurso.'" class="btn btn-sm btn-primary">Editar</a> ';
             $acoes .= '<form method="POST" action="/admin/cursos/cancelar/'.$resultado->idcurso.'" class="d-inline">';
