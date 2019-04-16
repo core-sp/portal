@@ -127,20 +127,24 @@ class LicitacaoController extends Controller
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Formata DateTime
+        $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
+        // Inputa no BD
         $licitacao = new Licitacao();
         $licitacao->modalidade = $request->input('modalidade');
         $licitacao->nrlicitacao = $request->input('nrlicitacao');
         $licitacao->titulo = $request->input('titulo');
         $licitacao->nrprocesso = $request->input('nrprocesso');
         $licitacao->situacao = $request->input('situacao');
-        $licitacao->datarealizacao = $request->input('datarealizacao');
+        $licitacao->datarealizacao = $datarealizacao;
         $licitacao->objeto = $request->input('objeto');
         $licitacao->idusuario = $request->input('idusuario');
         $save = $licitacao->save();
         if(!$save)
             abort(500);
-        return redirect()->route('licitacoes.lista');
+        return redirect()->route('licitacoes.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Licitação cadastrada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -182,20 +186,24 @@ class LicitacaoController extends Controller
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Formata DateTime
+        $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
+        // Update nos dados do BD        
         $licitacao = Licitacao::find($id);
         $licitacao->modalidade = $request->input('modalidade');
         $licitacao->nrlicitacao = $request->input('nrlicitacao');
         $licitacao->nrprocesso = $request->input('nrprocesso');
         $licitacao->situacao = $request->input('situacao');
         $licitacao->titulo = $request->input('titulo');
-        $licitacao->datarealizacao = $request->input('datarealizacao');
+        $licitacao->datarealizacao = $datarealizacao;
         $licitacao->objeto = $request->input('objeto');
         $licitacao->idusuario = $request->input('idusuario');
         $update = $licitacao->update();
         if(!$update)
             abort(500);
-        return redirect()->route('licitacoes.lista');
+        return redirect()->route('licitacoes.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Licitação editada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -211,7 +219,9 @@ class LicitacaoController extends Controller
         $delete = $licitacao->delete();
         if(!$delete)
             abort(500);
-        return redirect()->route('licitacoes.lista');
+        return redirect()->route('licitacoes.lista')
+            ->with('message', '<i class="icon fa fa-danger"></i>Licitação deletada com sucesso!')
+            ->with('class', 'alert-danger');
     }
 
     /**
@@ -221,7 +231,7 @@ class LicitacaoController extends Controller
      */
     public function lixeira(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        $request->user()->autorizarPerfis(['Admin']);
         $resultados = Licitacao::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -265,7 +275,9 @@ class LicitacaoController extends Controller
         $request->user()->autorizarPerfis(['admin', 'juridico']);
         $licitacao = Licitacao::onlyTrashed()->find($id);
         $licitacao->restore();
-        return redirect()->route('licitacoes.lista');
+        return redirect()->route('licitacoes.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Licitação restaurada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function busca()

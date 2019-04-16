@@ -3,6 +3,17 @@
 @section('content')
 
 <section class="content-header">
+  @if(\Session::has('message'))
+    <div class="container-fluid mb-2">
+      <div class="row">
+        <div class="col">
+          <div class="alert alert-dismissible {{ \Session::get('class') }}">
+            {!! \Session::get('message') !!}
+          </div>
+        </div>
+      </div>
+    </div>
+  @endif
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col">
@@ -15,8 +26,10 @@
         @if(isset($variaveis->btn_criar))
         {!! $variaveis->btn_criar !!}
         @endif
-        @if(isset($variaveis->btn_lixeira))
-        {!! $variaveis->btn_lixeira !!}
+        @if(Auth::user()->hasAnyRole(['Admin']))
+          @if(isset($variaveis->btn_lixeira))
+            {!! $variaveis->btn_lixeira !!}
+          @endif
         @endif
       </div>
     </div>

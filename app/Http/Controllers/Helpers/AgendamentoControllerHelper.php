@@ -43,10 +43,17 @@ class AgendamentoControllerHelper extends Controller
             '17:30',
         ];
         $checaBloqueio = AgendamentoBloqueio::where('idregional',$regional)
-            ->whereDate('diainicio','>=',$dia)
-            ->whereDate('diatermino','<=',$dia)
+            ->whereDate('diainicio','<=',$dia)
+            ->whereDate('diatermino','>=',$dia)
             ->first();
-        echo "<script>console.log('".$checaBloqueio."');</script>";
+        if($checaBloqueio) {
+            $horaInicio = $checaBloqueio->horainicio;
+            $horaTermino = $checaBloqueio->horatermino;
+            $keyHoraInicio = array_search($horaInicio, $horas);
+            $keyHoraTermino = array_search($horaTermino, $horas);
+            for($i = $keyHoraInicio; $i <= $keyHoraTermino; $i++)
+                unset($horas[$i]);
+        }
         return $horas;
     }
 

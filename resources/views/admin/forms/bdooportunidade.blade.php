@@ -110,7 +110,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
             </div>
             <div class="col">
                 <label for="regiaoatuacao">Região de Atuação</label>
-                <select name="regiaoatuacao[]" id="regiaoAtuacaoOportunidade" class="form-control" size="5" multiple>
+                <select name="regiaoatuacao[]" id="regiaoAtuacaoOportunidade" class="form-control" size="4" multiple>
                 @foreach($regioes as $regiao)
                     @if(isset($resultado))
                         @if($regioesEdit->contains('idregional',$regiao->idregional))
@@ -123,6 +123,9 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                     @endif
                 @endforeach
                 </select>
+                <small class="form-text text-muted">
+                  <em>* Segure Ctrl para selecionar mais de uma região</em>
+                </small>
                 @if($errors->has('regiaoatuacao'))
                 <div class="invalid-feedback">
                 {{ $errors->first('regiaoatuacao') }}

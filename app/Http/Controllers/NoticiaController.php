@@ -53,7 +53,7 @@ class NoticiaController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<a href="/noticia/'.$resultado->idnoticia.'" class="btn btn-sm btn-default">Ver</a> ';
+            $acoes = '<a href="/noticia/'.$resultado->slug.'" class="btn btn-sm btn-default">Ver</a> ';
             $acoes .= '<a href="/admin/noticias/editar/'.$resultado->idnoticia.'" class="btn btn-sm btn-primary">Editar</a> ';
             $acoes .= '<form method="POST" action="/admin/noticias/apagar/'.$resultado->idnoticia.'" class="d-inline">';
             $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
@@ -133,7 +133,9 @@ class NoticiaController extends Controller
         $save = $noticia->save();
         if(!$save)
             abort(500);
-        return redirect('/admin/noticias');
+        return redirect('/admin/noticias')
+            ->with('message', '<i class="icon fa fa-check"></i>Notícia criada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -181,7 +183,9 @@ class NoticiaController extends Controller
         $update = $noticia->update();
         if(!$update)
             abort(500);
-        return redirect('/admin/noticias');
+        return redirect('/admin/noticias')
+            ->with('message', '<i class="icon fa fa-check"></i>Notícia editada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -197,7 +201,9 @@ class NoticiaController extends Controller
         $delete = $noticia->delete();
         if(!$delete)
             abort(500);
-        return redirect('/admin/noticias');
+        return redirect('/admin/noticias')
+            ->with('message', '<i class="icon fa fa-ban"></i>Notícia deletada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -207,7 +213,7 @@ class NoticiaController extends Controller
      */
     public function lixeira(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $request->user()->autorizarPerfis(['Admin']);
         $resultados = Noticia::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -249,7 +255,9 @@ class NoticiaController extends Controller
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $noticia = Noticia::onlyTrashed()->find($id);
         $noticia->restore();
-        return redirect('/admin/noticias');
+        return redirect('/admin/noticias')
+            ->with('message', '<i class="icon fa fa-check"></i>Notícia restaurada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function busca()

@@ -45,7 +45,10 @@
                   class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
                   id="password"
                   name="password"
-                  placeholder="Nova senha">
+                  placeholder="Nova senha" />
+                  <small class="form-text text-muted">
+                    <em>* A senha deve conter no mínimo: 6 caracteres, uma letra maiúscula, uma letra minúscula e um número</em><br />
+                  </small>
                 @if($errors->has('password'))
                 <div class="invalid-feedback">
                   {{ $errors->first('password') }}
@@ -65,7 +68,7 @@
                 </div>
                 @endif
               </div>
-              <div class="form-group">
+              <div class="form-group text-right">
                 <a href="/admin/info" type="cancel" class="btn btn-default">Cancelar</a>&nbsp;
                 <button type="submit" class="btn btn-danger">Alterar</button>
               </div>
