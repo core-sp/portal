@@ -123,20 +123,24 @@ class ConcursoController extends Controller
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Formata DateTime
+        $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
+        // Update nos dados do BD
         $concurso = new Concurso();
         $concurso->modalidade = $request->input('modalidade');
         $concurso->titulo = $request->input('titulo');
         $concurso->nrprocesso = $request->input('nrprocesso');
         $concurso->situacao = $request->input('situacao');
-        $concurso->datarealizacao = $request->input('datarealizacao');
+        $concurso->datarealizacao = $datarealizacao;
         $concurso->objeto = $request->input('objeto');
         $concurso->linkexterno = $request->input('linkexterno');
         $concurso->idusuario = $request->input('idusuario');
         $save = $concurso->save();
         if(!$save)
             abort(500);
-        return redirect()->route('concursos.lista');
+        return redirect()->route('concursos.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Concurso cadastrado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -177,20 +181,24 @@ class ConcursoController extends Controller
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Formata DateTime
+        $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
+        // Update nos dados do BD
         $concurso = Concurso::find($id);
         $concurso->modalidade = $request->input('modalidade');
         $concurso->titulo = $request->input('titulo');
         $concurso->nrprocesso = $request->input('nrprocesso');
         $concurso->situacao = $request->input('situacao');
-        $concurso->datarealizacao = $request->input('datarealizacao');
+        $concurso->datarealizacao = $datarealizacao;
         $concurso->objeto = $request->input('objeto');
         $concurso->linkexterno = $request->input('linkexterno');
         $concurso->idusuario = $request->input('idusuario');
         $update = $concurso->update();
         if(!$update)
             abort(500);
-        return redirect()->route('concursos.lista');
+        return redirect()->route('concursos.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Concurso editado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -206,7 +214,9 @@ class ConcursoController extends Controller
         $delete = $concurso->delete();
         if(!$delete)
             abort(500);
-        return redirect()->route('concursos.lista');
+        return redirect()->route('concursos.lista')
+            ->with('message', '<i class="icon fa fa-ban"></i>Concurso deletado com sucesso!')
+            ->with('class', 'alert-danger');
     }
 
     /**
@@ -216,7 +226,7 @@ class ConcursoController extends Controller
      */
     public function lixeira(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        $request->user()->autorizarPerfis(['Admin']);
         $resultados = Concurso::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -260,7 +270,9 @@ class ConcursoController extends Controller
         $request->user()->autorizarPerfis(['admin', 'juridico']);
         $concurso = Concurso::onlyTrashed()->find($id);
         $concurso->restore();
-        return redirect()->route('concursos.lista');
+        return redirect()->route('concursos.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Concurso restaurado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function busca()

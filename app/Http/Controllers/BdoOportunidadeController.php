@@ -17,7 +17,6 @@ class BdoOportunidadeController extends Controller
         'pluraliza' => 'oportunidades',
         'titulo_criar' => 'Cadastrar nova oportunidade',
         'form' => 'bdooportunidade',
-        'btn_criar' => '<a href="/admin/bdo/criar" class="btn btn-primary mr-1">Nova Oportunidade</a>',
         'busca' => 'bdo',
         'slug' => 'bdo'
     ];
@@ -147,7 +146,9 @@ class BdoOportunidadeController extends Controller
         $save = $oportunidade->save();
         if(!$save)
             abort(500);
-        return redirect()->route('bdooportunidades.lista');
+        return redirect()->route('bdooportunidades.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Oportunidade cadastrada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -205,7 +206,9 @@ class BdoOportunidadeController extends Controller
         $update = $oportunidade->update();
         if(!$update)
             abort(500);
-        return redirect()->route('bdooportunidades.lista');
+        return redirect()->route('bdooportunidades.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Oportunidade editada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -221,7 +224,9 @@ class BdoOportunidadeController extends Controller
         $delete = $resultado->delete();
         if(!$delete)
             abort(500);
-        return redirect()->route('bdooportunidades.lista');
+        return redirect()->route('bdooportunidades.lista')
+            ->with('message', '<i class="icon fa fa-ban"></i>Oportunidade deletada com sucesso!')
+            ->with('class', 'alert-danger');
     }
 
     public function busca()

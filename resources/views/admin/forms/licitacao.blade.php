@@ -93,48 +93,65 @@ $situacoes = LicitacaoHelper::situacoes();
         </div>
         </div>
         <div class="form-row mt-2">
-        <div class="col">
-            <label for="nrprocesso">Nº do Processo</label>
-            <input type="text"
-                class="form-control nrprocessoInput {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
-                placeholder="Número"
-                name="nrprocesso"
-                @if(isset($resultado))
-                value="{{ $resultado->nrprocesso }}"
+            <div class="col">
+                <label for="nrprocesso">Nº do Processo</label>
+                <input type="text"
+                    class="form-control nrprocessoInput {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
+                    placeholder="Número"
+                    name="nrprocesso"
+                    @if(isset($resultado))
+                    value="{{ $resultado->nrprocesso }}"
+                    @endif
+                    />
+                @if($errors->has('nrprocesso'))
+                <div class="invalid-feedback">
+                {{ $errors->first('nrprocesso') }}
+                </div>
                 @endif
-                />
-            @if($errors->has('nrprocesso'))
-            <div class="invalid-feedback">
-            {{ $errors->first('nrprocesso') }}
             </div>
-            @endif
-        </div>
-        <div class="col">
-            <label for="nrlicitacao">Nº da Licitação</label>
-            <input type="text"
-                class="form-control nrlicitacaoInput {{ $errors->has('nrlicitacao') ? 'is-invalid' : '' }}"
-                placeholder="Número"
-                name="nrlicitacao"
-                @if(isset($resultado))
-                value="{{ $resultado->nrlicitacao }}"
+            <div class="col">
+                <label for="nrlicitacao">Nº da Licitação</label>
+                <input type="text"
+                    class="form-control nrlicitacaoInput {{ $errors->has('nrlicitacao') ? 'is-invalid' : '' }}"
+                    placeholder="Número"
+                    name="nrlicitacao"
+                    @if(isset($resultado))
+                    value="{{ $resultado->nrlicitacao }}"
+                    @endif
+                    />
+                @if($errors->has('nrlicitacao'))
+                <div class="invalid-feedback">
+                {{ $errors->first('nrlicitacao') }}
+                </div>
                 @endif
-                />
-            @if($errors->has('nrlicitacao'))
-            <div class="invalid-feedback">
-            {{ $errors->first('nrlicitacao') }}
             </div>
-            @endif
-        </div>
-        <div class="col">
-            <label for="datarealizacao">Data de Realização</label>
-            <input type="datetime-local"
-                class="form-control"
-                name="datarealizacao"
-                @if(isset($resultado))
-                value="{{ LicitacaoHelper::getData($resultado->datarealizacao) }}"
+            <div class="col">
+                <label for="datarealizacao">Data de Realização</label>
+                <input type="text"
+                    class="form-control dataInput"
+                    name="datarealizacao"
+                    placeholder="dd/mm/aaaa"
+                    @if(isset($resultado))
+                    value="{{ Helper::OnlyDate($resultado->datarealizacao) }}"
+                    @endif
+                    />
+            </div>
+            <div class="col">
+                <label for="horainicio">Horário de Início</label>
+                <input type="text" 
+                    class="form-control timeInput" 
+                    name="horainicio"
+                    placeholder="00:00"
+                    @if(isset($resultado))
+                    value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
+                    @endif
+                    />
+                @if($errors->has('horainicio'))
+                <div class="invalid-feedback">
+                {{ $errors->first('horainicio') }}
+                </div>
                 @endif
-                />
-        </div>
+            </div>
         </div>
         <div class="form-group mt-2">
         <label for="objeto">Objeto da Licitação</label>

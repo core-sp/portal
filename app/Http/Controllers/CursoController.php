@@ -118,6 +118,7 @@ class CursoController extends Controller
         $regras = [
             'tema' => 'required',
             'datarealizacao' => 'required',
+            'horainicio' => 'required',
             'endereco' => 'required',
             'nrvagas' => 'required|numeric',
             'descricao' => 'required'
@@ -127,12 +128,15 @@ class CursoController extends Controller
             'numeric' => 'O :attribute aceita apenas números'
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Formata DateTime
+        $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
+        $datatermino = Helper::retornaDateTime($request->input('datatermino'), $request->input('horatermino'));
+        // Inputa dados no BD
         $curso = New Curso();
         $curso->tipo = $request->input('tipo');
         $curso->tema = $request->input('tema');
-        $curso->datarealizacao = $request->input('datarealizacao');
-        $curso->datatermino = $request->input('datatermino');
+        $curso->datarealizacao = $datarealizacao;
+        $curso->datatermino = $datatermino;
         $curso->endereco = $request->input('endereco');
         $curso->img = $request->input('img');
         $curso->nrvagas = $request->input('nrvagas');
@@ -143,15 +147,11 @@ class CursoController extends Controller
         $save = $curso->save();
         if(!$save)
             abort(500);
-        return redirect()->route('cursos.lista');
+        return redirect()->route('cursos.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Curso criado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
@@ -183,12 +183,15 @@ class CursoController extends Controller
             'numeric' => 'O :attribute aceita apenas números'
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Formata DateTime
+        $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
+        $datatermino = Helper::retornaDateTime($request->input('datatermino'), $request->input('horatermino'));
+        // Update de dados no BD
         $curso = Curso::find($id);
         $curso->tipo = $request->input('tipo');
         $curso->tema = $request->input('tema');
-        $curso->datarealizacao = $request->input('datarealizacao');
-        $curso->datatermino = $request->input('datatermino');
+        $curso->datarealizacao = $datarealizacao;
+        $curso->datatermino = $datatermino;
         $curso->endereco = $request->input('endereco');
         $curso->img = $request->input('img');
         $curso->nrvagas = $request->input('nrvagas');
@@ -199,7 +202,9 @@ class CursoController extends Controller
         $update = $curso->update();
         if(!$update)
             abort(500);
-        return redirect()->route('cursos.lista');
+        return redirect()->route('cursos.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Curso editado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -215,7 +220,9 @@ class CursoController extends Controller
         $delete = $curso->delete();
         if(!$delete)
             abort(500);
-        return redirect()->route('cursos.lista');
+        return redirect()->route('cursos.lista')
+            ->with('message', '<i class="icon fa fa-ban"></i>Curso cancelado com sucesso!')
+            ->with('class', 'alert-danger');
     }
 
     /**
@@ -225,7 +232,7 @@ class CursoController extends Controller
      */
     public function lixeira(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $request->user()->autorizarPerfis(['Admin']);
         $resultados = Curso::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -272,7 +279,9 @@ class CursoController extends Controller
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $curso = Curso::onlyTrashed()->find($id);
         $curso->restore();
-        return redirect()->route('cursos.lista');
+        return redirect()->route('cursos.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Curso restaurado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function inscritos(Request $request, $id)

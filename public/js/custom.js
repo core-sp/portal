@@ -7,6 +7,8 @@ $(document).ready(function(){
   $('.nrprocessoInput').mask('999/9999');
   $('.cnpjInput').mask('99.999.999/9999-99');
   $('.telefoneInput').mask('(00) 0000-00009');
+  $('.dataInput').mask('00/00/0000');
+  $('.timeInput').mask('00:00');
 });
 
 (function($){

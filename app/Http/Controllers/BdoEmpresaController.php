@@ -134,7 +134,9 @@ class BdoEmpresaController extends Controller
         $save = $empresa->save();
         if(!$save)
             abort(500);
-        return redirect()->route('bdoempresas.lista');
+        return redirect()->route('bdoempresas.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Empresa cadastrada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -191,7 +193,9 @@ class BdoEmpresaController extends Controller
         $update = $empresa->update();
         if(!$update)
             abort(500);
-        return redirect()->route('bdoempresas.lista');
+        return redirect()->route('bdoempresas.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Empresa editada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -202,12 +206,14 @@ class BdoEmpresaController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        $request->user()->autorizarPerfis(['Admin']);
         $empresa = BdoEmpresa::find($id);
         $delete = $empresa->delete();
         if(!$delete)
             abort(500);
-        return redirect()->route('bdoempresas.lista');
+        return redirect()->route('bdoempresas.lista')
+            ->with('message', '<i class="icon fa fa-ban"></i>Empresa deletada com sucesso!')
+            ->with('class', 'alert-danger');
     }
 
     public function busca()

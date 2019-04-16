@@ -133,7 +133,9 @@ class UserController extends Controller
         if(!$save)
             abort(500);
         $usuario->perfil()->attach([$request->input('perfil')]);
-        return redirect('/admin/usuarios');
+        return redirect('/admin/usuarios')
+            ->with('message', '<i class="icon fa fa-check"></i>Usuário cadastrado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -178,7 +180,9 @@ class UserController extends Controller
         if(!$update)
             abort(500);
         $usuario->perfil()->sync([$request->input('perfil')]);
-        return redirect('/admin/usuarios');
+        return redirect('/admin/usuarios')
+            ->with('message', '<i class="icon fa fa-check"></i>Usuário editado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -194,7 +198,9 @@ class UserController extends Controller
         $delete = $usuario->delete();
         if(!$delete)
             abort(500);
-        return redirect()->route('usuarios.lista');
+        return redirect()->route('usuarios.lista')
+            ->with('message', '<i class="icon fa fa-ban"></i>Usuário deletado com sucesso!')
+            ->with('class', 'alert-danger');
 
     }
 
@@ -205,7 +211,7 @@ class UserController extends Controller
      */
     public function lixeira(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        $request->user()->autorizarPerfis(['Admin']);
         $resultados = User::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -249,7 +255,9 @@ class UserController extends Controller
         $request->user()->autorizarPerfis(['admin']);
         $usuario = User::onlyTrashed()->find($id);
         $usuario->restore();
-        return redirect()->route('usuarios.lista');
+        return redirect()->route('usuarios.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Usuário restaurado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -267,12 +275,15 @@ class UserController extends Controller
     {
         $regras = [
             'current-password' => 'required',
-            'password' => 'required|same:password',
+            'password' => 'required|min:6|regex:/^[a-zA-Z0-9]+$/',
             'password_confirmation' => 'required|same:password'
         ];
         $mensagens = [
           'current-password.required' => 'Por favor, insira sua senha atual',
           'password.required' => 'Por favor, insira uma nova senha',
+          'password.min' => 'A senha deve conter no mínimo 6 caracteres',
+          'password.regex' => 'O formato da senha é inválido',
+          'password_confirmation.same' => 'A confirmação de senha deve ser idêntica à senha'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -281,8 +292,12 @@ class UserController extends Controller
             $user_id = Auth::id();
             $obj_user = User::find($user_id);
             $obj_user->password = Hash::make($request->input('password'));
-            $obj_user->save();
-            return redirect()->route('admin.info');
+            $save = $obj_user->save();
+            if(!$save)
+                abort(500);
+            return redirect()->route('admin.info')
+                ->with('message', '<i class="icon fa fa-check"></i>Senha alterada com sucesso!')
+                ->with('class', 'alert-success');
         } else {
             $error = array('current-password' => 'Por favor, insira a senha correta');
             return response()->json(array('error' => $error), 400);

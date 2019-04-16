@@ -73,6 +73,15 @@ class Helper extends Controller
     	return $format;
     }
 
+    public static function retornaDateTime($dia, $hora)
+    {
+        $dia = str_replace('/','-',$dia);
+        $date = $dia.' '.$hora;
+        $date = new \DateTime($date);
+    	$format = $date->format('Y-m-d\TH:i:s');
+    	return $format;
+    }
+
     public static function btnSituacao($situacao)
     {
         switch ($situacao) {

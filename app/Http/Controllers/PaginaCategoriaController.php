@@ -112,7 +112,9 @@ class PaginaCategoriaController extends Controller
         $save = $categoria->save();
         if(!$save)
             abort(500);
-        return redirect('/admin/paginas/categorias');
+        return redirect('/admin/paginas/categorias')
+            ->with('message', '<i class="icon fa fa-check"></i>Categoria de página criada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -152,7 +154,9 @@ class PaginaCategoriaController extends Controller
         $update = $categoria->update();
         if(!$update)
             abort(500);
-        return redirect('/admin/paginas/categorias');
+        return redirect('/admin/paginas/categorias')
+            ->with('message', '<i class="icon fa fa-check"></i>Categoria de página editada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -168,7 +172,9 @@ class PaginaCategoriaController extends Controller
         $delete = $pagina->delete();
         if(!$delete)
             abort(500);
-        return redirect('/admin/paginas/categorias');
+        return redirect('/admin/paginas/categorias')
+            ->with('message', '<i class="icon fa fa-ban"></i>Categoria de página deletada com sucesso!')
+            ->with('class', 'alert-danger');
     }
 
     public function busca()

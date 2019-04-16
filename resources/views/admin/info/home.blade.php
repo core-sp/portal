@@ -3,6 +3,17 @@
 @section('content')
 
 <section class="content-header">
+	@if(\Session::has('message'))
+		<div class="container-fluid mb-2">
+			<div class="row">
+				<div class="col">
+					<div class="alert alert-dismissible {{ \Session::get('class') }}">
+						{!! \Session::get('message') !!}
+					</div>
+				</div>
+			</div>
+		</div>
+	@endif
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm-12">

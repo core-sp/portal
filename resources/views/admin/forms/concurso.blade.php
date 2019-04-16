@@ -13,23 +13,7 @@ $situacoes = ConcursoHelper::situacoes();
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
       <div class="form-row">
-        <div class="col">
-          <label for="titulo">Título</label>
-          <input type="text"
-          class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
-          name="titulo"
-          placeholder="Título"
-          @if(isset($resultado))
-          value="{{ $resultado->titulo }}"
-          @endif
-          />
-          @if($errors->has('titulo'))
-          <div class="invalid-feedback">
-          {{ $errors->first('titulo') }}
-          </div>
-          @endif
-        </div>
-        <div class="col">
+        <div class="col-sm-3">
           <label for="modalidade">Modalidade</label>
           <select name="modalidade" class="form-control">
           @foreach($modalidades as $modalidade)
@@ -47,6 +31,22 @@ $situacoes = ConcursoHelper::situacoes();
           @if($errors->has('modalidade'))
           <div class="invalid-feedback">
           {{ $errors->first('modalidade') }}
+          </div>
+          @endif
+        </div>
+        <div class="col">
+          <label for="titulo">Título</label>
+          <input type="text"
+          class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
+          name="titulo"
+          placeholder="Título"
+          @if(isset($resultado))
+          value="{{ $resultado->titulo }}"
+          @endif
+          />
+          @if($errors->has('titulo'))
+          <div class="invalid-feedback">
+          {{ $errors->first('titulo') }}
           </div>
           @endif
         </div>
@@ -92,13 +92,30 @@ $situacoes = ConcursoHelper::situacoes();
         </div>
         <div class="col">
           <label for="datarealizacao">Data de Realização</label>
-          <input type="datetime-local"
-            class="form-control"
+          <input type="text"
+            class="form-control dataInput"
             name="datarealizacao"
+            placeholder="dd/mm/aaaa"
             @if(isset($resultado))
-            value="{{ Helper::getData($resultado->datarealizacao) }}"
+            value="{{ Helper::onlyDate($resultado->datarealizacao) }}"
             @endif
             />
+        </div>
+        <div class="col">
+          <label for="horainicio">Horário de Início</label>
+          <input type="text" 
+            class="form-control timeInput" 
+            name="horainicio"
+            placeholder="00:00"
+            @if(isset($resultado))
+            value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
+            @endif
+            />
+          @if($errors->has('horainicio'))
+          <div class="invalid-feedback">
+          {{ $errors->first('horainicio') }}
+          </div>
+          @endif
         </div>
       </div>
       <div class="form-group mt-2">

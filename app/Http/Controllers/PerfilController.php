@@ -105,7 +105,9 @@ class PerfilController extends Controller
         $save = $pagina->save();
         if(!$save)
             abort(500);
-        return redirect('/admin/usuarios/perfis');
+        return redirect('/admin/usuarios/perfis')
+            ->with('message', '<i class="icon fa fa-check"></i>Perfil cadastrado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function edit(Request $request, $id)
@@ -133,7 +135,9 @@ class PerfilController extends Controller
         $update = $pagina->update();
         if(!$update)
             abort(500);
-        return redirect('/admin/usuarios/perfis');
+        return redirect('/admin/usuarios/perfis')
+            ->with('message', '<i class="icon fa fa-check"></i>Perfil editado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function destroy(Request $request, $id)
@@ -143,7 +147,9 @@ class PerfilController extends Controller
         $delete = $perfil->delete();
         if(!$delete)
             abort(500);
-        return redirect('/admin/usuarios/perfis');
+        return redirect('/admin/usuarios/perfis')
+            ->with('message', '<i class="icon fa fa-ban"></i>Perfil deletado com sucesso!')
+            ->with('class', 'alert-danger');;
     }
 
 }

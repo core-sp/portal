@@ -137,7 +137,9 @@ class PaginaController extends Controller
         $save = $pagina->save();
         if(!$save)
             abort(500);
-        return redirect('/admin/paginas');
+        return redirect('/admin/paginas')
+            ->with('message', '<i class="icon fa fa-check"></i>Página criada com sucesso!')
+            ->with('class', 'alert-success');
     }    
 
     /**
@@ -184,7 +186,9 @@ class PaginaController extends Controller
         $update = $pagina->update();
         if(!$update)
             abort(500);
-        return redirect('/admin/paginas');
+        return redirect('/admin/paginas')
+            ->with('message', '<i class="icon fa fa-check"></i>Página editada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     /**
@@ -200,7 +204,9 @@ class PaginaController extends Controller
         $delete = $pagina->delete();
         if(!$delete)
             abort(500);
-        return redirect('/admin/paginas');
+        return redirect('/admin/paginas')
+            ->with('message', '<i class="icon fa fa-ban"></i>Página deletada com sucesso!')
+            ->with('class', 'alert-danger');
     }
 
     /**
@@ -210,7 +216,7 @@ class PaginaController extends Controller
      */
     public function lixeira(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $request->user()->autorizarPerfis(['Admin']);
         $resultados = Pagina::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -252,7 +258,9 @@ class PaginaController extends Controller
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $pagina = Pagina::onlyTrashed()->find($id);
         $pagina->restore();
-        return redirect('/admin/paginas');
+        return redirect('/admin/paginas')
+            ->with('message', '<i class="icon fa fa-check"></i>Página restaurada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function busca(Request $request)
