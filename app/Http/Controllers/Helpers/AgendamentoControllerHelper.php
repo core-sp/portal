@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Agendamento;
 use App\User;
+use App\AgendamentoBloqueio;
 
 class AgendamentoControllerHelper extends Controller
 {
@@ -19,7 +20,7 @@ class AgendamentoControllerHelper extends Controller
         return $count;
     }
 
-    public static function horas()
+    public static function horas($regional, $dia)
     {
         $horas = [
             '09:00',
@@ -41,6 +42,11 @@ class AgendamentoControllerHelper extends Controller
             '17:00',
             '17:30',
         ];
+        $checaBloqueio = AgendamentoBloqueio::where('idregional',$regional)
+            ->whereDate('diainicio','>=',$dia)
+            ->whereDate('diatermino','<=',$dia)
+            ->first();
+        echo "<script>console.log('".$checaBloqueio."');</script>";
         return $horas;
     }
 

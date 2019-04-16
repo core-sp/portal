@@ -80,10 +80,18 @@
               </div>
               @endif
             @endif
+            @if(isset($busca))
+              <div class="row mb-3">
+                <div class="col">
+                  Mostrando resultados para a busca: <strong>{{ $busca }}</strong>
+                </div>
+              </div>
+            @endif
             @if($resultados->count() > 0)
             {!! $tabela !!}
             @else
               @if(isset($busca))
+              <hr />
               Nenhum {{ $variaveis->singular }} encontrado
                 @if(isset($variaveis->slug))
                 <a href="/admin/{{ $variaveis->slug }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>

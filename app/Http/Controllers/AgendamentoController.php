@@ -64,6 +64,8 @@ class AgendamentoController extends Controller
             $resultados = $this->resultados($dia, Input::get('regional'));
         } elseif(Input::has('status')) {
             $resultados = $this->resultadosFiltro($dia, $regional, Input::get('status'));
+        } elseif(Input::has('dia')) {
+            $resultados = $this->resultados($dia, $regional);
         }
         // Pega dia atual e cospe no título
         $dia = Helper::onlyDate($dia);

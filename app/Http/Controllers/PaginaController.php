@@ -259,13 +259,12 @@ class PaginaController extends Controller
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
         $busca = Input::get('q');
-        $paginas = Pagina::where('titulo','LIKE','%'.$busca.'%')
+        $variaveis = (object) $this->variaveis;
+        $resultados = Pagina::where('titulo','LIKE','%'.$busca.'%')
             ->orWhere('conteudo','LIKE','%'.$busca.'%')
             ->paginate(10);
-        if (count($paginas) > 0) 
-            return view('admin.paginas.home', compact('paginas', 'busca'));
-        else
-            return view('admin.paginas.home')->withMessage('Nenhuma página encontrada');
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'variaveis', 'tabela', 'busca'));
     }
 
 }
