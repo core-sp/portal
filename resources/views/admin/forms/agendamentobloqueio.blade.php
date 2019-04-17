@@ -42,9 +42,14 @@ $horas = AgendamentoControllerHelper::todasHoras();
                     placeholder="dd/mm/aaaa"
                     name="diainicio"
                     @if(isset($resultado))
-                    value="{{ Helper::OnlyDate($resultado->diainicio) }}"
+                        @if($resultado->diainicio != '2000-01-01')
+                        value="{{ Helper::OnlyDate($resultado->diainicio) }}"
+                        @endif
                     @endif
                     />
+                <small class="form-text text-muted">
+                    <em>* Deixe o campo vazio para aplicar a regra a partir de hoje</em>
+                </small>
                 @if($errors->has('diainicio'))
                 <div class="invalid-feedback">
                 {{ $errors->first('diainicio') }}
@@ -58,9 +63,14 @@ $horas = AgendamentoControllerHelper::todasHoras();
                     placeholder="dd/mm/aaaa"
                     name="diatermino"
                     @if(isset($resultado))
-                    value="{{ Helper::OnlyDate($resultado->diatermino) }}"
+                        @if($resultado->diatermino != '2100-01-01')
+                        value="{{ Helper::OnlyDate($resultado->diatermino) }}"
+                        @endif
                     @endif
                     />
+                <small class="form-text text-muted">
+                    <em>* Deixe o campo vazio para aplicar a regra por tempo indeterminado</em>
+                </small>
                 @if($errors->has('diatermino'))
                 <div class="invalid-feedback">
                 {{ $errors->first('diatermino') }}

@@ -191,7 +191,7 @@ class AgendamentoBloqueioController extends Controller
         if(!$update)
             abort(500);
         return redirect()->route('agendamentobloqueios.lista')
-            ->with('message', '<i class="icon fa fa-check"></i>Bloqueio cadastrado com sucesso!')
+            ->with('message', '<i class="icon fa fa-check"></i>Bloqueio editado com sucesso!')
             ->with('class', 'alert-success');
     }
 
