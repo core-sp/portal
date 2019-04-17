@@ -19,6 +19,7 @@ class CreateNoticiasTable extends Migration
             $table->string('slug');
             $table->string('img')->nullable(); 
             $table->text('conteudo');
+            $table->text('publicada')->nullable();
             $table->bigInteger('idregional')->unsigned()->nullable();
             $table->foreign('idregional')->references('idregional')->on('regionais');
             $table->bigInteger('idcurso')->unsigned()->nullable();

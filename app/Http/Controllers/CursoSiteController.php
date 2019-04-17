@@ -12,14 +12,18 @@ class CursoSiteController extends Controller
     public function cursosView()
     {
         $now = now();
-        $cursos = Curso::where('datarealizacao','>=',$now)->paginate(10);
+        $cursos = Curso::where('datarealizacao','>=',$now)
+            ->where('publicado','Sim')
+            ->paginate(10);
         return view('site.cursos', compact('cursos'));
     }
 
     public function cursosAnterioresView()
     {
         $now = now();
-        $cursos = Curso::where('datarealizacao','<',$now)->paginate(10);
+        $cursos = Curso::where('datarealizacao','<',$now)
+            ->where('publicado','Sim')
+            ->paginate(10);
         return view('site.cursos-anteriores', compact('cursos'));
     }
 

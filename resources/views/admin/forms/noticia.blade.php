@@ -18,7 +18,7 @@
                 />
             @if($errors->has('titulo'))
             <div class="invalid-feedback">
-            {{ $errors->first() }}
+            {{ $errors->first('titulo') }}
             </div>
             @endif
         </div>
@@ -53,7 +53,7 @@
         </textarea>
         @if($errors->has('conteudo'))
         <div class="invalid-feedback">
-            {{ $errors->first() }}
+            {{ $errors->first('conteudo') }}
         </div>
         @endif
         </div>

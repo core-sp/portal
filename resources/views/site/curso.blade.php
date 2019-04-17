@@ -7,6 +7,7 @@ use \App\Http\Controllers\Helper;
 use \App\Http\Controllers\CursoInscritoController;
 $datarealizacao = Helper::onlyDate($curso->datarealizacao);
 $datatermino = Helper::onlyDate($curso->datatermino);
+$now = now();
 @endphp
 
 <section id="pagina-cabecalho" class="mt-1">
@@ -71,8 +72,10 @@ $datatermino = Helper::onlyDate($curso->datatermino);
             </tr>
           </tbody>
         </table>
-        @if(CursoInscritoController::permiteInscricao($curso->idcurso))
-          <a href="/curso/inscricao/{{ $curso->idcurso }}" class="btn-curso-interna">Inscrever-se</a>
+        @if($curso->datarealizacao > $now)
+          @if(CursoInscritoController::permiteInscricao($curso->idcurso))
+            <a href="/curso/inscricao/{{ $curso->idcurso }}" class="btn-curso-interna">Inscrever-se</a>
+          @endif
         @endif
       </div>
       <div class="col-sm-8">

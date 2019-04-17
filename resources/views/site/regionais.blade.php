@@ -38,11 +38,12 @@ use App\Http\Controllers\Helper;
       <div class="col-sm-8">
         @foreach($regionais as $regional)
         <div class="box-resultado">
-          <h5 class="pb-1">{{ $regional->regional }}</h5>
+          <h5 class="pb-1">{{ $regional->prefixo }} - {{ $regional->regional }}</h5>
           <p class="light"><strong>Endereço:</strong> {{ $regional->endereco }}, {{ $regional->numero }} - {{ $regional->complemento }}</p>
-          <p class="light"><strong>Localização: </strong>{{ $regional->bairro }} - {{ $regional->cep }}</p>
           <p class="light"><strong>Telefone:</strong> {{ $regional->telefone }}</p>
           <p class="light"><strong>Email:</strong> {{ $regional->email }}</p>
+          <p class="light mb-2"><strong>Horário de funcionamento: </strong>{{ $regional->funcionamento }}</p>
+          <a href="/seccional/{{ $regional->idregional }}" class="btn-curso-grid">Detalhes</a>
         </div>
         @endforeach
       </div>

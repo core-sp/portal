@@ -46,6 +46,8 @@ Route::prefix('admin')->group(function() {
   Route::prefix('regionais')->group(function() {
     Route::get('/', 'RegionalController@index');
     Route::get('/busca', 'RegionalController@busca');
+    Route::get('/editar/{id}', 'RegionalController@edit');
+    Route::put('/editar/{id}', 'RegionalController@update');
   });
 
   // Rotas de notícias

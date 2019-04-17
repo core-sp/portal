@@ -210,10 +210,16 @@ class CursoInscritoController extends Controller
 
     public static function btnSituacao($idcurso)
     {
-        if(CursoInscritoController::permiteInscricao($idcurso)) {
-            echo "<div class='sit-btn sit-verde'>Vagas Abertas</div>";
+        $now = now();
+        $curso = Curso::find($idcurso);
+        if($curso->datarealizacao < $now) {
+            echo "<div class='sit-btn sit-vermelho'>Já realizado</div>";
         } else {
-            echo "<div class='sit-btn sit-vermelho'>Esgotado</div>";
+            if(CursoInscritoController::permiteInscricao($idcurso)) {
+                echo "<div class='sit-btn sit-verde'>Vagas Abertas</div>";
+            } else {
+                echo "<div class='sit-btn sit-vermelho'>Esgotado</div>";
+            }
         }
     }
 

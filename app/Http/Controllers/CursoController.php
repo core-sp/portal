@@ -30,11 +30,6 @@ class CursoController extends Controller
     {
         $this->middleware('auth', ['except' => 'show']);
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
     public function resultados()
     {
@@ -64,9 +59,13 @@ class CursoController extends Controller
             $acoes .= '<input type="hidden" name="_method" value="delete" />';
             $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')" />';
             $acoes .= '</form>';
+            if($resultado->publicado == 'Sim')
+                $publicado = 'Publicado';
+            else
+                $publicado = 'Rascunho';
             $conteudo = [
                 $resultado->idcurso,
-                $resultado->tipo.'<br>'.$resultado->tema,
+                $resultado->tipo.'<br>'.$resultado->tema.'<br /><small><em>'.$publicado.'</em></small>',
                 $resultado->endereco.'<br />'.Helper::formataData($resultado->datarealizacao),
                 CursoHelper::contagem($resultado->idcurso).' / '.$resultado->nrvagas,
                 $resultado->regional->regional,
@@ -93,11 +92,6 @@ class CursoController extends Controller
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
@@ -106,12 +100,6 @@ class CursoController extends Controller
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
@@ -142,6 +130,7 @@ class CursoController extends Controller
         $curso->nrvagas = $request->input('nrvagas');
         $curso->idregional = $request->input('idregional');
         $curso->descricao = $request->input('descricao');
+        $curso->publicado = $request->input('publicado');
         $curso->resumo = $request->input('resumo');
         $curso->idusuario = $request->input('idusuario');
         $save = $curso->save();
@@ -161,13 +150,6 @@ class CursoController extends Controller
         return view('admin.crud.editar', compact('resultado', 'regionais', 'variaveis'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
@@ -198,6 +180,7 @@ class CursoController extends Controller
         $curso->idregional = $request->input('idregional');
         $curso->descricao = $request->input('descricao');
         $curso->resumo = $request->input('resumo');
+        $curso->publicado = $request->input('publicado');
         $curso->idusuario = $request->input('idusuario');
         $update = $curso->update();
         if(!$update)
@@ -207,12 +190,6 @@ class CursoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
@@ -225,11 +202,6 @@ class CursoController extends Controller
             ->with('class', 'alert-danger');
     }
 
-    /**
-     * Mostra a lixeira de cursos
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['Admin']);
@@ -268,12 +240,6 @@ class CursoController extends Controller
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Restaura licitação deletada
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function restore(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);
