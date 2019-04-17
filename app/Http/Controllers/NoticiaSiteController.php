@@ -10,7 +10,7 @@ class NoticiaSiteController extends Controller
     public function noticiasView()
     {
 
-        $noticias = Noticia::paginate(9);
+        $noticias = Noticia::where('publicada','Sim')->paginate(9);
         return view('site.noticias', compact('noticias'));        
     }
 

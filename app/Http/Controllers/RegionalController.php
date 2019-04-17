@@ -24,7 +24,7 @@ class RegionalController extends Controller
 
     public function resultados()
     {
-        $resultados = Regional::orderBy('regional', 'ASC')->paginate(10);
+        $resultados = Regional::paginate(10);
         return $resultados;
     }
 
@@ -41,10 +41,11 @@ class RegionalController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<a href="/seccional/'.$resultado->idregional.'" class="btn btn-sm btn-default" target="_blank">Ver</a>';
+            $acoes = '<a href="/seccional/'.$resultado->idregional.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
+            $acoes .= '<a href="/admin/regionais/editar/'.$resultado->idregional.'" class="btn btn-sm btn-primary">Editar</a>';
             $conteudo = [
                 $resultado->idregional,
-                $resultado->regional,
+                $resultado->prefixo.' - '.$resultado->regional,
                 $resultado->telefone,
                 $resultado->email,
                 $acoes
@@ -66,6 +67,52 @@ class RegionalController extends Controller
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $request->user()->autorizarPerfis(['Admin', 'Editor']);
+        $resultado = Regional::find($id);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->user()->autorizarPerfis(['Admin', 'Editor']);
+        $regras = [
+            'cidade' => 'required',
+            'email' => 'required',
+            'endereco' => 'required',
+            'numero' => 'required',
+            'cep' => 'required',
+            'telefone' => 'required',
+            'funcionamento' => 'required',
+            'descricao' => 'required'
+        ];
+        $mensagens = [
+            'required' => 'O :attribute é obrigatório'
+        ];
+        $erros = $request->validate($regras, $mensagens);
+        // Inputa dados no BD
+        $regional = Regional::find($id);
+        $regional->regional = $request->input('cidade');
+        $regional->email = $request->input('email');
+        $regional->endereco = $request->input('endereco');
+        $regional->numero = $request->input('numero');
+        $regional->complemento = $request->input('complemento');
+        $regional->cep = $request->input('cep');
+        $regional->telefone = $request->input('telefone');
+        $regional->fax = $request->input('fax');
+        $regional->funcionamento = $request->input('funcionamento');
+        $regional->responsavel = $request->input('responsavel');
+        $regional->descricao = $request->input('descricao');
+        $update = $regional->update();
+        if(!$update)
+            abort(500);
+        return redirect('/admin/regionais')
+            ->with('message', '<i class="icon fa fa-check"></i>Regional editada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function busca()

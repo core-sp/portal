@@ -28,11 +28,6 @@ class NoticiaController extends Controller
     {
         $this->middleware('auth', ['except' => 'show']);
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
     public function resultados()
     {
@@ -48,6 +43,7 @@ class NoticiaController extends Controller
             'Título',
             'Regional',
             'Última alteração',
+            'Publicada',
             'Ações'
         ];
         // Opções de conteúdo da tabela
@@ -69,6 +65,7 @@ class NoticiaController extends Controller
                 $resultado->titulo,
                 $regional,
                 Helper::formataData($resultado->updated_at).'<br><small>Por: '.$resultado->user->nome.'</small>',
+                $resultado->publicada,
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -84,35 +81,24 @@ class NoticiaController extends Controller
 
     public function index(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
         $regras = [
             'titulo' => 'required',
             'conteudo' => 'required'
@@ -121,12 +107,18 @@ class NoticiaController extends Controller
             'required' => 'O :attribute é obrigatório'
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Checa o usuário
+        if($request->user()->hasRole('Gestão de Atendimento'))
+            $publicada = 'Não';
+        else
+            $publicada = 'Sim';
+        // Inputa dados no BD
         $noticia = new Noticia();
         $noticia->titulo = $request->input('titulo');
         $noticia->slug = Str::slug($request->input('titulo'), '-');
         $noticia->img = $request->input('img');
         $noticia->conteudo = $request->input('conteudo');
+        $noticia->publicada = $publicada;
         $noticia->idregional = $request->input('regionais');
         $noticia->idcurso = $request->input('curso');
         $noticia->idusuario = $request->input('idusuario');
@@ -138,31 +130,18 @@ class NoticiaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
         $resultado = Noticia::find($id);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
         $regras = [
             'titulo' => 'required',
             'conteudo' => 'required'
@@ -171,12 +150,18 @@ class NoticiaController extends Controller
             'required' => 'O :attribute é obrigatório'
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Checa o usuário
+        if($request->user()->hasRole('Gestão de Atendimento'))
+            $publicada = 'Não';
+        else
+            $publicada = 'Sim';   
+        // Inputa dados no BD
         $noticia = Noticia::find($id);
         $noticia->titulo = $request->input('titulo');
         $noticia->slug = Str::slug($request->input('titulo'), '-');
         $noticia->img = $request->input('img');
         $noticia->conteudo = $request->input('conteudo');
+        $noticia->publicada = $publicada;
         $noticia->idregional = $request->input('regionais');
         $noticia->idcurso = $request->input('curso');
         $noticia->idusuario = $request->input('idusuario');
@@ -188,15 +173,9 @@ class NoticiaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
         $noticia = Noticia::find($id);
         $delete = $noticia->delete();
         if(!$delete)
@@ -206,11 +185,6 @@ class NoticiaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Mostra a lixeira de notícias
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['Admin']);
@@ -244,12 +218,6 @@ class NoticiaController extends Controller
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Restaura notícia deletada
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function restore(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin', 'editor']);

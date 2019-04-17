@@ -34,12 +34,19 @@
       <div class="col-sm-8 pr-4">
         <div class="conteudo-txt">
           <p class="light"><strong>Endereço:</strong> {{ $resultado->endereco }}, {{ $resultado->numero }} - {{ $resultado->complemento }}</p>
-          <p class="light"><strong>Localização: </strong>{{ $resultado->bairro }} - {{ $resultado->cep }}</p>
+          <p class="light"><strong>Bairro: </strong>{{ $resultado->bairro }}</p>
+          <p class="light"><strong>CEP: </strong>{{ $resultado->cep }}</p>
           <p class="light"><strong>Telefone:</strong> {{ $resultado->telefone }}</p>
           <p class="light"><strong>Email:</strong> {{ $resultado->email }}</p>
+          <p class="light"><strong>Horário de funcionamento: </strong>{{ $resultado->funcionamento }}</p>
+          @if(isset($resultado->responsavel))
+            <p class="light"><strong>Responsável:</strong> {{ $resultado->responsavel }}</p>
+          @endif
           <div class="linha-lg"></div>
           <p><strong>Descrição: </strong></p>
-          <p class="light">{!! $resultado->descricao !!}</p>
+          <div class="descricaoRegional">
+            {!! $resultado->descricao !!}
+          </div>
         </div>
       </div>
       <div class="col-sm-4">

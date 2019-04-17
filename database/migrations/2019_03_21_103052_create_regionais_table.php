@@ -15,15 +15,18 @@ class CreateRegionaisTable extends Migration
     {
         Schema::create('regionais', function (Blueprint $table) {
             $table->bigIncrements('idregional');
+            $table->string('prefixo');
             $table->string('regional');
             $table->string('endereco');
             $table->string('bairro');
             $table->string('numero');
-            $table->string('complemento');
+            $table->string('complemento')->nullable();
             $table->string('cep');
             $table->string('telefone');
-            $table->string('fax');
+            $table->string('fax')->nullable();
             $table->string('email');
+            $table->string('funcionamento')->nullable();
+            $table->string('responsavel')->nullable();
             $table->text('descricao');
         });
     }

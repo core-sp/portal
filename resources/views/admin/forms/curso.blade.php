@@ -194,6 +194,23 @@ $tipos = CursoHelper::tipos();
                     />
                 </div>
             </div>
+            <div class="col-sm-3">
+                <label for="publicado">Publicar agora?</label>
+                <select name="publicado" class="form-control">
+                    @if(isset($resultado))
+                        @if($resultado->publicado == 'Sim')
+                        <option value="Sim" selected>Sim</option>
+                        <option value="Não">Não</option>
+                        @else
+                        <option value="Sim">Sim</option>
+                        <option value="Não" selected>Não</option>
+                        @endif
+                    @else
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                    @endif
+                </select>
+            </div>
         </div>
         <div class="form-group mt-3">
             <label for="resumo">Resumo</label>

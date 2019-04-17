@@ -45,7 +45,8 @@ use App\Http\Controllers\NewsletterController;
 						</div>
 					</div>
 					<div class="card-body">
-						- Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois em "Alterar Senha"
+						<p>- Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois selecione "Alterar Senha";</p>
+						<p class="mb-0">- Para informações, dúvidas ou sugestões relacionadas ao Portal, contate o CTI através do ramal 5538;</p>
 					</div>
 				</div>
 			</div>
@@ -88,7 +89,7 @@ use App\Http\Controllers\NewsletterController;
 									<i class="far fa-file-excel"></i>
 								</span>
 								<div class="info-box-content">
-									<span class="info-box-text">Planilha</span>
+									<span class="info-box-text">Planilha (em breve)</span>
 									<span class="info-box-number">Gerar planilha de registrados</span>
 								</div>
 							</div>

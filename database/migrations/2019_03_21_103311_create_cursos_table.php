@@ -24,6 +24,7 @@ class CreateCursosTable extends Migration
             $table->integer('nrvagas');
             $table->text('descricao');
             $table->text('resumo');
+            $table->string('publicado');
             $table->bigInteger('idregional')->unsigned();
             $table->foreign('idregional')->references('idregional')->on('regionais');
             $table->bigInteger('idusuario')->unsigned();

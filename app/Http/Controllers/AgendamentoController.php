@@ -177,9 +177,9 @@ class AgendamentoController extends Controller
         $select .= '<div class="d-inline-block mr-2 ml-2">';
         if(Input::has('dia')) {
             $dia = Input::get('dia');
-            $select .= '<input type="text" class="form-control dataInput form-control-sm" name="dia" placeholder="dd/mm/aaaa" value="'.$dia.'" />';
+            $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="dia" placeholder="dd/mm/aaaa" value="'.$dia.'" />';
         } else {
-            $select .= '<input type="test" class="form-control dataInput form-control-sm" name="dia" placeholder="dd/mm/aaaa" />';
+            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="dia" placeholder="dd/mm/aaaa" />';
         }
         $select .= '</div>';
         $select .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
