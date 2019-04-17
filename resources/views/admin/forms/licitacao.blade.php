@@ -174,7 +174,7 @@ $situacoes = LicitacaoHelper::situacoes();
         <a href="/admin/licitacoes" class="btn btn-default">Cancelar</a>
         <button type="submit" class="btn btn-primary ml-1">
         @if(isset($resultado))
-            Editar
+            Salvar
         @else
             Publicar
         @endif

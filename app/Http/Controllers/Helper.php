@@ -82,6 +82,18 @@ class Helper extends Controller
     	return $format;
     }
 
+    public static function retornaDate($dia)
+    {
+        if(!empty($dia)) {
+            $dia = str_replace('/','-',$dia);
+            $date = new \DateTime($dia);
+            $format = $date->format('Y-m-d');
+            return $format;
+        } else {
+            $dia = null;
+        }
+    }
+
     public static function btnSituacao($situacao)
     {
         switch ($situacao) {

@@ -152,6 +152,13 @@ Route::prefix('admin')->group(function() {
     Route::get('/busca', 'AgendamentoController@busca');
     Route::put('/status', 'AgendamentoController@updateStatus');
     Route::get('/filtro', 'AgendamentoController@index');
+    // Lida com bloqueios
+    Route::get('/bloqueios', 'AgendamentoBloqueioController@index')->name('agendamentobloqueios.lista');
+    Route::get('/bloqueios/criar', 'AgendamentoBloqueioController@create');
+    Route::post('/bloqueios/criar', 'AgendamentoBloqueioController@store');
+    Route::get('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@edit');
+    Route::put('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@update');
+    Route::delete('/bloqueios/apagar/{id}', 'AgendamentoBloqueioController@destroy');
   });
 });
 

@@ -45,10 +45,4 @@ $(document).ready(function(){
       return false;
     });
   }
-  // Select múltiplo em oportunidades
-  $('#regiaoAtuacaoOportunidade').selectpicker();
 })(jQuery);
-
-$(document).ready(function(){
-  
-});
