@@ -43,7 +43,7 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title d-inline">
-              Lista de {{ $variaveis->pluraliza }} do CORE-SP
+              Lista de {{ $variaveis->plural }} do CORE-SP
             </h3>
             @if(isset($busca))
               @if(isset($variaveis->slug))

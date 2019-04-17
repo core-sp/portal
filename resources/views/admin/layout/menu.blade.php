@@ -154,6 +154,14 @@
                 <p>Agendamentos</p>
             </a>
         </li>
+            @if(Auth::user()->hasAnyRole(['Admin', 'Gestão de Atendimento']))
+            <li class="nav-item">
+                <a href="/admin/agendamentos/bloqueios" class="nav-link">
+                    <i class="nav-icon fas fa-ban"></i>
+                    <p>Bloqueios</p>
+                </a>
+            </li>
+            @endif
         @endif
         <!-- Jurídico -->
         @if(Auth::user()->hasAnyRole(['admin', 'Jurídico']))

@@ -40,6 +40,9 @@ class AgendamentoController extends Controller
         if(Input::has('dia')) {
             if(!empty(Input::get('dia'))) {
                 $dia = Input::get('dia');
+                $replace = str_replace('/','-',$dia);
+                $dia = new \DateTime($replace);
+                $dia = $dia->format('Y-m-d');
             } else {
                 $date = new \DateTime();
                 $dia = $date->format('Y-m-d');
@@ -65,7 +68,8 @@ class AgendamentoController extends Controller
         } elseif(Input::has('status')) {
             $resultados = $this->resultadosFiltro($dia, $regional, Input::get('status'));
         } elseif(Input::has('dia')) {
-            $resultados = $this->resultados($dia, $regional);
+            echo "<script>console.log('".$regional."');</script>";
+            $resultados = $this->resultados($dia, $regional->idregional);
         }
         // Pega dia atual e cospe no título
         $dia = Helper::onlyDate($dia);
@@ -139,7 +143,7 @@ class AgendamentoController extends Controller
     public function filtros()
     {
         $regionais = Regional::all();
-        $select = '<form method="GET" action="/admin/agendamentos/filtro" class="d-inline">';
+        $select = '<form method="GET" action="/admin/agendamentos/filtro" class="mb-0">';
         $select .= '<input type="hidden" name="filtro" value="sim" />';
         $select .= '<select class="d-inline w-auto custom-select custom-select-sm mr-2" name="regional">';
         $select .= '<option disabled selected>Seccional *</option>';
@@ -173,9 +177,9 @@ class AgendamentoController extends Controller
         $select .= '<div class="d-inline-block mr-2 ml-2">';
         if(Input::has('dia')) {
             $dia = Input::get('dia');
-            $select .= '<input type="date" class="form-control form-control-sm" name="dia" value="'.$dia.'" />';
+            $select .= '<input type="text" class="form-control dataInput form-control-sm" name="dia" placeholder="dd/mm/aaaa" value="'.$dia.'" />';
         } else {
-            $select .= '<input type="date" class="form-control form-control-sm" name="dia" />';
+            $select .= '<input type="test" class="form-control dataInput form-control-sm" name="dia" placeholder="dd/mm/aaaa" />';
         }
         $select .= '</div>';
         $select .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';

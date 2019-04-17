@@ -100,7 +100,7 @@
         @endif
         <button type="submit" class="btn btn-primary ml-1">
         @if(isset($resultado))
-            Editar 
+            Salvar
         @else
             Publicar
         @endif    

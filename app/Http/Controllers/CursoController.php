@@ -17,8 +17,8 @@ class CursoController extends Controller
     public $variaveis = [
         'singular' => 'curso',
         'singulariza' => 'o curso',
-        'plural' => 'curso',
-        'pluraliza' => 'curso',
+        'plural' => 'cursos',
+        'pluraliza' => 'cursos',
         'titulo_criar' => 'Cadastrar curso',
         'btn_criar' => '<a href="/admin/cursos/criar" class="btn btn-primary mr-1">Novo Curso</a>',
         'btn_lixeira' => '<a href="/admin/cursos/lixeira" class="btn btn-warning">Cursos Cancelados</a>',
