@@ -1,4 +1,4 @@
-@extends('layout.app', ['title' => $curso->tipo.' - '.$curso->tema.' ('.$curso->idcurso.')'])
+@extends('site.layout.app', ['title' => $curso->tipo.' - '.$curso->tema.' ('.$curso->idcurso.')'])
 
 @section('content')
 
