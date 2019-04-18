@@ -42,7 +42,8 @@ class RegionalController extends Controller
         $contents = [];
         foreach($resultados as $resultado) {
             $acoes = '<a href="/seccional/'.$resultado->idregional.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            $acoes .= '<a href="/admin/regionais/editar/'.$resultado->idregional.'" class="btn btn-sm btn-primary">Editar</a>';
+            if(\Auth::user()->hasAnyRole(['Admin', 'Editor']))
+                $acoes .= '<a href="/admin/regionais/editar/'.$resultado->idregional.'" class="btn btn-sm btn-primary">Editar</a>';
             $conteudo = [
                 $resultado->idregional,
                 $resultado->prefixo.' - '.$resultado->regional,

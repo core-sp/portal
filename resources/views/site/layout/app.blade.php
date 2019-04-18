@@ -174,9 +174,8 @@ use \App\Http\Controllers\Helper;
                 <h5 class="branco">Serviços</h5>
               </div>
               <p class="branco"><a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">Transparência</a></p>
-              <p class="branco"><a href="#">Links Úteis</a></p>
               <p class="branco"><a href="/licitacoes">Licitações</a></p>
-              <p class="branco"><a href="#">Concursos</a></p>
+              <p class="branco"><a href="/concursos">Concursos</a></p>
               <p class="branco"><a href="#">Agenda Core-SP</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="#">Feiras</a></p>
@@ -184,7 +183,7 @@ use \App\Http\Controllers\Helper;
               <p class="branco"><a href="#">Simulador de Cálculos</a></p>
               <p class="branco"><a href="#">Registre-se</a></p>
               <p class="branco"><a href="#">E-OUV</a></p>
-              <p class="branco"><a href="#">Seccionais</a></p>
+              <p class="branco"><a href="/seccionais">Seccionais</a></p>
             </div>
             <div class="col-4">
               <div class="footer-title w-75 mb-3">

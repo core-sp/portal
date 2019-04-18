@@ -30,11 +30,6 @@ class UserController extends Controller
     {
         $this->middleware('auth');
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
     public function resultados()
     {
@@ -90,11 +85,6 @@ class UserController extends Controller
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         $perfis = Perfil::all();
@@ -103,12 +93,6 @@ class UserController extends Controller
         return view('admin.crud.criar', compact('variaveis', 'perfis', 'regionais'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->user()->autorizarPerfis(['admin']);
@@ -138,12 +122,6 @@ class UserController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $resultado = User::find($id);
@@ -153,13 +131,6 @@ class UserController extends Controller
         return view('admin.crud.editar', compact('resultado', 'perfis', 'variaveis', 'regionais'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin']);
@@ -185,12 +156,6 @@ class UserController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin']);
@@ -204,11 +169,6 @@ class UserController extends Controller
 
     }
 
-    /**
-     * Mostra a lixeira de usuários
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function lixeira(Request $request)
     {
         $request->user()->autorizarPerfis(['Admin']);
@@ -244,12 +204,6 @@ class UserController extends Controller
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Restaura usuário deletado
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function restore(Request $request, $id)
     {
         $request->user()->autorizarPerfis(['admin']);
@@ -260,12 +214,6 @@ class UserController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Muda a senha de determinado usuário
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function senha()
     {
         return view('admin.info.senha');

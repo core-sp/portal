@@ -1,4 +1,4 @@
-@extends('layout.app', ['title' => 'Notícias'])
+@extends('site.layout.app', ['title' => 'Notícias'])
 
 @section('content')
 

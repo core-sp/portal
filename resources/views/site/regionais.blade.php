@@ -1,4 +1,4 @@
-@extends('layout.app', ['title' => 'Regionais'])
+@extends('site.layout.app', ['title' => 'Regionais'])
 
 @section('content')
 
