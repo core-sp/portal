@@ -1,12 +1,12 @@
-@extends('site.layout.app', ['title' => $curso->tipo.' - '.$curso->tema.' ('.$curso->idcurso.')'])
+
+
+@extends('site.layout.app', ['title' => 'Cursos'])
 
 @section('content')
 
 @php
 use \App\Http\Controllers\Helper;
 use \App\Http\Controllers\CursoInscritoController;
-$datarealizacao = Helper::onlyDate($curso->datarealizacao);
-$datatermino = Helper::onlyDate($curso->datatermino);
 $now = now();
 @endphp
 
@@ -16,7 +16,11 @@ $now = now();
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
+          @if(isset($curso))
           {{ $curso->tipo }} - {{ $curso->tema }}
+          @else
+          erro
+          @endif
         </h1>
       </div>
     </div>
@@ -25,6 +29,7 @@ $now = now();
 
 <section id="pagina-licitacao">
   <div class="container">
+    @if(isset($curso))
     <div class="row" id="conteudo-principal">
       <div class="col">
         <div class="row nomargin">
@@ -50,16 +55,16 @@ $now = now();
             </tr>
             <tr>
               <td><h6>Início</h6></td>
-              <td><h6 class="light">{{ $datarealizacao }}</h6></td>
+              <td><h6 class="light">{{ Helper::onlyDate($curso->datarealizacao) }}</h6></td>
             </tr>
             <tr>
               <td><h6>Término</h6></td>
-              <td><h6 class="light">{{ $datatermino }}</h6></td>
+              <td><h6 class="light">{{ Helper::onlyDate($curso->datatermino) }}</h6></td>
             </tr>
             <tr>
               <td><h6>Horário</h6></td>
               <td><h6 class="light">
-                @if($datarealizacao == $datatermino)
+                @if(Helper::onlyDate($curso->datarealizacao) == Helper::onlyDate($curso->datatermino))
                   Das {{ Helper::onlyHour($curso->datarealizacao) }} às {{ Helper::onlyHour($curso->datatermino) }}
                 @else
                   A partir das {{ Helper::onlyHour($curso->datarealizacao) }}
@@ -89,6 +94,9 @@ $now = now();
         </div>
       </div>
     </div>
+    @else
+      @include('site.inc.content-error')
+    @endif
   </div>
 </section>
 

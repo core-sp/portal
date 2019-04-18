@@ -12,7 +12,11 @@ use App\Http\Controllers\Helper;
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
+          @if(isset($concurso))
           {{ $concurso->modalidade }} {{ $concurso->nrprocesso }}
+          @else
+            erro
+          @endif
         </h1>
       </div>
     </div>
@@ -21,6 +25,7 @@ use App\Http\Controllers\Helper;
 
 <section id="pagina-concursos">
   <div class="container">
+    @if(isset($concurso))
     <div class="row" id="conteudo-principal">
       <div class="col">
         <div class="row nomargin">
@@ -74,6 +79,9 @@ use App\Http\Controllers\Helper;
         </div>
       </div>
     </div>
+    @else
+      @include('site.inc.content-error')
+    @endif
   </div>
 </section>
 

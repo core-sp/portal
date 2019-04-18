@@ -150,11 +150,13 @@ class CursoInscritoController extends Controller
     {
         $contaInscritos = CursoInscrito::where('idcurso', $idcurso)->count();
         $curso = Curso::find($idcurso);
-        $vagas = $curso->nrvagas;
-        if ($contaInscritos < $vagas) 
-            return true;
-        else
-            return false;        
+        if(isset($curso)) {
+            $vagas = $curso->nrvagas;
+            if ($contaInscritos < $vagas) 
+                return true;
+            else
+                return false;
+        }
     }
 
     public function inscricaoView($idcurso)

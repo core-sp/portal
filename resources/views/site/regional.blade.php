@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => $resultado->regional])
+@extends('site.layout.app', ['title' => 'Regional'])
 
 @section('content')
 
@@ -8,7 +8,11 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
+          @if(isset($resultado))
           {{ $resultado->regional }}
+          @else
+          erro
+          @endif
         </h1>
       </div>
     </div>
@@ -17,6 +21,7 @@
 
 <section id="pagina-noticias">
   <div class="container">
+    @if(isset($resultado))
     <div class="row" id="conteudo-principal">
       <div class="col">
         <div class="row nomargin">
@@ -24,7 +29,7 @@
             <h4 class="stronger">{{ $resultado->regional }}</h4>
           </div>
           <div class="align-self-center">
-            <a href="/" class="btn-voltar">Voltar</a>
+            <a href="/seccionais" class="btn-voltar">Voltar</a>
           </div>
         </div>
       </div>
@@ -53,6 +58,9 @@
         @include('site.inc.content-sidebar')
       </div>
     </div>
+    @else
+      @include('site.inc.content-error')
+    @endif
   </div>
 </section>
 

@@ -91,7 +91,7 @@ $situacoes = LicitacaoHelper::situacoes();
               <div class="licitacao-grid-main">
                 <h5 class="marrom">{{ $licitacao->titulo }}</h5>
                 <div class="linha-lg-mini"></div>
-                <p>{{ Helper::resumo($licitacao->objeto) }}</p>
+                <p>{!! Helper::resumo($licitacao->objeto) !!}</p>
                 <div class="mt-3 row bot-lg">
                   <div class="col-sm-4 d-flex">
                     <div class="mr-2">

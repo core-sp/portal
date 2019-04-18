@@ -67,7 +67,7 @@ class CursoTableSeeder extends Seeder
         <p><strong>Pr&eacute;-requisito:&nbsp;</strong>Escolaridade m&iacute;nima - cursando o ensino m&eacute;dio.</p>
         <p>A participa&ccedil;&atilde;o nas atividades previstas requer que o participante demonstre forte interesse pelas &aacute;reas comerciais das organiza&ccedil;&oacute;es e/ou relacionamento entre seus p&uacute;blico-alvo.</p>
         <p>Al&eacute;m disso, pressup&otilde;e-se que dever&aacute; ter racioc&iacute;nio l&oacute;gico e abstrato, externado pela express&atilde;o oral, escrita pr&oacute;pria, leitura de textos e capacidade para elaborar equa&ccedil;&otilde;es matem&aacute;ticas elementares.</p>";
-        $curso->publicado = 'Não';
+        $curso->publicado = 'Sim';
         $curso->idregional = 8;
         $curso->idusuario = 1;
         $curso->save();

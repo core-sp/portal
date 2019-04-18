@@ -122,7 +122,7 @@ use \App\Http\Controllers\Helper;
                   <a href="/seccionais" class="nav-link">Seccionais</a>
                 </li>
                 <li class="nav-item">
-                  <a href="#" class="nav-link">E-OUV</a>
+                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank" class="nav-link">E-OUV</a>
                 </li>
               </ul>
             </nav>
@@ -176,13 +176,13 @@ use \App\Http\Controllers\Helper;
               <p class="branco"><a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">Transparência</a></p>
               <p class="branco"><a href="/licitacoes">Licitações</a></p>
               <p class="branco"><a href="/concursos">Concursos</a></p>
-              <p class="branco"><a href="#">Agenda Core-SP</a></p>
+              <p class="branco"><a href="/agendamentos">Agendamentos</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="#">Feiras</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
               <p class="branco"><a href="#">Simulador de Cálculos</a></p>
               <p class="branco"><a href="#">Registre-se</a></p>
-              <p class="branco"><a href="#">E-OUV</a></p>
+              <p class="branco"><a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">E-OUV</a></p>
               <p class="branco"><a href="/seccionais">Seccionais</a></p>
             </div>
             <div class="col-4">
@@ -220,7 +220,7 @@ use \App\Http\Controllers\Helper;
                   <div class="form-group">
                     <input type="text"
                       name="celular"
-                      class="form-control {{ $errors->has('celular') ? 'is-invalid' : '' }}"
+                      class="form-control celularInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
                       placeholder="Celular"
                       />
                       @if($errors->has('celular'))
