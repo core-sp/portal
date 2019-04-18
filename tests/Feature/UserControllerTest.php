@@ -12,15 +12,15 @@ class UserControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testIndex()
+    public function testHome()
     {
-        $response = $this->get('/admin/usuarios');
+        $response = $this->call('GET', '/admin/usuarios');
         $response->assertStatus(302);
     }
 
     public function testCreate()
     {
-        $response = $this->get('/admin/usuarios/criar');
+        $response = $this->call('GET', '/admin/usuarios/criar');
         $response->assertStatus(302);
     }
 }

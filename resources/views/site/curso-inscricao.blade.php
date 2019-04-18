@@ -25,6 +25,7 @@ $now = now();
 
 <section id="pagina-licitacao">
   <div class="container">
+		@if(isset($curso))
     <div class="row" id="conteudo-principal">
       <div class="col">
         <div class="row nomargin">
@@ -120,6 +121,9 @@ $now = now();
 				<p>Houve algum problema.</p>
 			</div>
     </div>
+		@else
+			@include('site.inc.content-error')
+		@endif
   </div>
 </section>
 

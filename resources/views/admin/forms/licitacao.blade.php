@@ -13,7 +13,7 @@ $situacoes = LicitacaoHelper::situacoes();
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
         <div class="form-row">
-        <div class="col">
+        <div class="col-sm-6">
             <label for="modalidade">Modalidade</label>
             <select name="modalidade" class="form-control">
             @foreach($modalidades as $modalidade)
@@ -34,7 +34,7 @@ $situacoes = LicitacaoHelper::situacoes();
             </div>
             @endif
         </div>
-        <div class="col">
+        <div class="col-sm-3">
             <label for="situacao">Situação</label>
             <select name="situacao" class="form-control">
             @foreach($situacoes as $situacao)
@@ -55,12 +55,28 @@ $situacoes = LicitacaoHelper::situacoes();
             </div>
             @endif
         </div>
+        <div class="col-sm-3">
+            <label for="uasg">UASG</label>
+            <input type="text"
+                class="form-control {{ $errors->has('uasg') ? 'is-invalid' : '' }}"
+                placeholder="926753 (do CORE-SP)"
+                name="uasg"
+                @if(isset($resultado))
+                value="{{ $resultado->uasg }}"
+                @endif
+                />
+            @if($errors->has('uasg'))
+            <div class="invalid-feedback">
+            {{ $errors->first('uasg') }}
+            </div>
+            @endif
+        </div>
         </div>
         <div class="form-row mt-2">
         <div class="col">
             <label for="titulo">Título da Licitação</label>
             <input type="text"
-                class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
+                class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
                 placeholder="Título"
                 name="titulo"
                 @if(isset($resultado))

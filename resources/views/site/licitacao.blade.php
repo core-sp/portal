@@ -13,7 +13,11 @@ use App\Http\Controllers\LicitacaoSiteController;
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          {{ $licitacao->modalidade }} {{ $licitacao->nrlicitacao }}
+          @if(isset($licitacao))
+            {{ $licitacao->modalidade }} {{ $licitacao->nrlicitacao }}
+          @else
+            erro
+          @endif
         </h1>
       </div>
     </div>
@@ -22,6 +26,7 @@ use App\Http\Controllers\LicitacaoSiteController;
 
 <section id="pagina-licitacao">
   <div class="container">
+    @if(isset($licitacao))
     <div class="row" id="conteudo-principal">
       <div class="col">
         <div class="row nomargin">
@@ -42,6 +47,10 @@ use App\Http\Controllers\LicitacaoSiteController;
             <tr>
               <td class="quarenta"><h6>Situação</h6></td>
               <td><h6 class="light">{{ Helper::btnSituacao($licitacao->situacao) }}</h6></td>
+            </tr>
+            <tr>
+              <td><h6>UASG</h6></td>
+              <td><h6 class="light">{{ $licitacao->uasg }}</h6></td>
             </tr>
             <tr>
               <td><h6>Modalidade</h6></td>
@@ -79,6 +88,9 @@ use App\Http\Controllers\LicitacaoSiteController;
         </div>
       </div>
     </div>
+    @else
+      @include('site.inc.content-error')
+    @endif
   </div>
 </section>
 

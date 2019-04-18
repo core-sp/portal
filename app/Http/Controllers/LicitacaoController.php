@@ -132,6 +132,8 @@ class LicitacaoController extends Controller
         // Inputa no BD
         $licitacao = new Licitacao();
         $licitacao->modalidade = $request->input('modalidade');
+        $licitacao->uasg = $request->input('uasg');
+        $licitacao->edital = $request->input('edital');
         $licitacao->nrlicitacao = $request->input('nrlicitacao');
         $licitacao->titulo = $request->input('titulo');
         $licitacao->nrprocesso = $request->input('nrprocesso');
@@ -191,6 +193,8 @@ class LicitacaoController extends Controller
         // Update nos dados do BD        
         $licitacao = Licitacao::find($id);
         $licitacao->modalidade = $request->input('modalidade');
+        $licitacao->uasg = $request->input('uasg');
+        $licitacao->edital = $request->input('edital');
         $licitacao->nrlicitacao = $request->input('nrlicitacao');
         $licitacao->nrprocesso = $request->input('nrprocesso');
         $licitacao->situacao = $request->input('situacao');

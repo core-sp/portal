@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => $noticia->titulo])
+@extends('site.layout.app', ['title' => 'Notícias'])
 
 @section('content')
 
@@ -21,6 +21,7 @@
 
 <section id="pagina-noticias">
   <div class="container">
+    @if(isset($noticia))
     <div class="row" id="conteudo-principal">
       <div class="col">
         <div class="row nomargin">
@@ -67,6 +68,9 @@
         @include('site.inc.noticia-grid')
       @endforeach
     </div>
+    @else
+      @include('site.inc.content-error')
+    @endif
   </div>
 </section>
 

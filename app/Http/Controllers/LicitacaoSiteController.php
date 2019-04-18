@@ -10,7 +10,7 @@ class LicitacaoSiteController extends Controller
 {
 	public function licitacoesView()
     {
-        $licitacoes = Licitacao::paginate(10);
+        $licitacoes = Licitacao::orderBy('created_at','DESC')->paginate(10);
     	return view('site.licitacoes', compact('licitacoes'));
     }
 

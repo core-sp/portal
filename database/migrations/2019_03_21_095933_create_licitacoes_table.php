@@ -17,6 +17,7 @@ class CreateLicitacoesTable extends Migration
             $table->bigIncrements('idlicitacao');
             $table->string('modalidade');
             $table->string('situacao');
+            $table->string('uasg')->nullable();
             $table->string('titulo');
             $table->string('edital')->nullable();
             $table->string('nrlicitacao');
