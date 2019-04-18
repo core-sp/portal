@@ -43,13 +43,12 @@ class NoticiaController extends Controller
             'Título',
             'Regional',
             'Última alteração',
-            'Publicada',
             'Ações'
         ];
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<a href="/noticia/'.$resultado->slug.'" class="btn btn-sm btn-default">Ver</a> ';
+            $acoes = '<a href="/noticia/'.$resultado->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
             $acoes .= '<a href="/admin/noticias/editar/'.$resultado->idnoticia.'" class="btn btn-sm btn-primary">Editar</a> ';
             $acoes .= '<form method="POST" action="/admin/noticias/apagar/'.$resultado->idnoticia.'" class="d-inline">';
             $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
@@ -60,12 +59,15 @@ class NoticiaController extends Controller
                 $regional = $resultado->regional->regional;
             else
                 $regional = "Todas";
+            if($resultado->publicada == 'Sim')
+                $publicada = 'Publicada';
+            else
+                $publicada = 'Rascunho';
             $conteudo = [
                 $resultado->idnoticia,
-                $resultado->titulo,
+                $resultado->titulo.'<br><small><em>'.$publicada.'</em></small>',
                 $regional,
                 Helper::formataData($resultado->updated_at).'<br><small>Por: '.$resultado->user->nome.'</small>',
-                $resultado->publicada,
                 $acoes
             ];
             array_push($contents, $conteudo);
