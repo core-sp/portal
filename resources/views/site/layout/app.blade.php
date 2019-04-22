@@ -34,10 +34,10 @@ use \App\Http\Controllers\Helper;
         </div>
         <div class="container">
           <div class="row mb-4 mt-4">
-            <div class="col-sm-4 text-left">
+            <div class="col-xl-4 col-lg-4 col-md-6 text-left">
                 <a href="/"><img src="{{ asset('img/logo-certo.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
-            <div class="col-sm-5 align-self-center">
+            <div class="col-xl-5 col-lg-4 col-md-6 mudaw align-self-center">
               <div class="w-75 m-auto text-center">
                 <div class="acessibilidade mb-2">
                   <button type="button" class="btn btn-sm btn-light" id="btn-contrast">
@@ -76,8 +76,8 @@ use \App\Http\Controllers\Helper;
                 </form>
               </div>
             </div>
-            <div class="col-sm-3 text-right align-self-center">
-              <div class="mb-2">
+            <div class="col-xl-3 col-lg-4 col-md-12 text-right center-992 align-self-center">
+              <div class="mb-2 inline-992">
                 <button class="btn-atendimento d-inline"><h5 class="light branco">Atendimento: <strong>(11) 3243-5500</strong></h5></button>
               </div>
               <div class="sociais">

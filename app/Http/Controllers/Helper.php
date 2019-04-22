@@ -106,4 +106,10 @@ class Helper extends Controller
             break;
         }
     }
+
+    public static function imgToThumb($string)
+    {
+        $string = str_replace('/imagens','/imagens/thumbnails',$string);
+        return $string;
+    }
 }

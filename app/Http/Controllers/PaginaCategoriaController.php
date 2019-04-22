@@ -10,7 +10,7 @@ class PaginaCategoriaController extends Controller
 {
     public $variaveis = [
         'singular' => 'categoria',
-        'singulzariza' => 'a categoria',
+        'singulariza' => 'a categoria',
         'plural' => 'categorias',
         'pluraliza' => 'categorias',
         'titulo_criar' => 'Criar categoria',

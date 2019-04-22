@@ -40,7 +40,7 @@ use App\Http\Controllers\Helper;
     </div>
     <div class="linha-lg"></div>
     <div class="row mt-2">
-      <div class="col-sm-4 edital-info">
+      <div class="col-xl-4 col-lg-5 edital-info">
         <table class="table table-bordered">
           <tbody>
             <tr>
@@ -62,7 +62,7 @@ use App\Http\Controllers\Helper;
           </tbody>
         </table>
       </div>
-      <div class="col-sm-8">
+      <div class="col-xl-8 col-lg-7">
         <a href="{{ $concurso->linkexterno }}" target="_blank" />
           <div class="edital-download d-flex">
             <div class="flex-one">
@@ -75,7 +75,7 @@ use App\Http\Controllers\Helper;
         <div class="edital-download mt-3">
           <h5>Objeto</h5>
            <div class="linha-lg-mini"></div>
-           <h6 class="light">{!! $concurso->objeto !!}</h6>
+           <p class="light">{!! $concurso->objeto !!}</p>
         </div>
       </div>
     </div>
