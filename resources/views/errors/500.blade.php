@@ -17,7 +17,7 @@
 
 <section id="pagina-erro">
   <div class="containter text-center">
-    <img src="{{ asset('img/404.png') }}" alt="Erro 404" />
+    Erro 500
   </div>
 </section>
 

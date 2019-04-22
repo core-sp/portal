@@ -117,8 +117,9 @@ $now = now();
 						</div>
 					</form>
 				</div>
-				@endif
+				@else
 				<p>Houve algum problema.</p>
+				@endif
 			</div>
     </div>
 		@else

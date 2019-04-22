@@ -43,19 +43,19 @@ use App\Http\Controllers\Helper;
           <div class="box-resultado">
             @if($resultado->tipo == "Notícia")
             <a href="/noticia/{{ $resultado->slug }}"">
-              <h5 class="pb-1">{{ $resultado->tipo }} - {{ $resultado->titulo }}</h5>
+              <h5>{{ $resultado->tipo }} - {{ $resultado->titulo }}</h5>
             </a>
+            <h6 class="cinza">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
             @else
             <a href="/{{ $resultado->slug }}">
-              <h5 class="pb-1">{{ $resultado->tipo }} - {{ $resultado->titulo }}</h5>
+              <h5>{{ $resultado->tipo }} - {{ $resultado->titulo }}</h5>
             </a>
             @endif
-            <h6 class="cinza">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
-            <p>{{ Helper::resumo($resultado->conteudo) }}</p>
+            <p class="mt-2">{{ Helper::resumo($resultado->conteudo) }}</p>
             @if($resultado->tipo == "Notícia")
-            <a href="/noticia/{{ $resultado->slug }}" class="btn-curso-grid mt-2">Confira</a>
+            <a href="/noticia/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
             @else
-            <a href="/{{ $resultado->slug }}" class="btn-curso-grid mt-2">Confira</a>
+            <a href="/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
             @endif
           </div>
           @endforeach

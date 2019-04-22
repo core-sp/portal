@@ -33,6 +33,8 @@ class AgendamentoSiteController extends Controller
                 return true;
             else
                 return false;
+        } elseif($contagem < 1) {
+            return false;
         }
     }
 
@@ -86,6 +88,9 @@ class AgendamentoSiteController extends Controller
                 echo "<option value='".$h."'>".$h."</option>";
             }
             return $horariosPossiveis;
+        } elseif($contagem < 1) {
+            $horarios = AgendamentoControllerHelper::todasHoras();
+            return $horarios;
         } else {
             foreach($horarios as $h) {
                 echo "<option value='".$h."'>".$h."</option>";

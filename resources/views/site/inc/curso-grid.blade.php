@@ -8,7 +8,7 @@ use \App\Http\Controllers\CursoSiteController;
   <div class="h-100 d-flex flex-column">
     <a href="/curso/{{ $curso->idcurso }}">
       <div class="curso-grid">
-        <img src="{{asset($curso->img)}}" class="bn-img" />
+        <img src="{{ asset(Helper::imgToThumb($curso->img)) }}" class="bn-img" />
         <div class="curso-grid-txt">
           <h6 class="light cinza-claro">{{ $curso->regional->regional }} - {{ Helper::onlyDate($curso->datarealizacao) }}</h6>
           <h5 class="branco mt-1">{{ $curso->tipo }} - {{ $curso->tema }}</h5>

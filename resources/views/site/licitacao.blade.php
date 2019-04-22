@@ -41,7 +41,7 @@ use App\Http\Controllers\LicitacaoSiteController;
     </div>
     <div class="linha-lg"></div>
     <div class="row mt-2">
-      <div class="col-sm-4 edital-info">
+      <div class="col-xl-4 col-lg-5 edital-info">
         <table class="table table-bordered">
           <tbody>
             <tr>
@@ -71,7 +71,7 @@ use App\Http\Controllers\LicitacaoSiteController;
           </tbody>
         </table>
       </div>
-      <div class="col-sm-8">
+      <div class="col-xl-8 col-lg-7">
         <a href="{{ $licitacao->edital }}" download />
           <div class="edital-download d-flex">
             <div class="flex-one">
