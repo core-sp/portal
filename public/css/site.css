@@ -525,6 +525,11 @@ strong, .bold {
 	background-size: cover;
 	background-position: center;
 	background-attachment: fixed;
+	padding: 3rem 0.5rem;
+}
+
+.novo-core-box h2 {
+	margin-bottom: 3rem;
 }
 
 .btn-novo-core {
@@ -646,7 +651,7 @@ strong, .bold {
 }
 
 .beneficios-txt p {
-	padding-bottom: 1.5rem;
+	margin-bottom: 1.5rem;
 }
 
 .btn-beneficios {
@@ -1201,6 +1206,10 @@ footer p {
 	font-weight: 300;
 }
 
+.show-992 {
+	display: none;
+}
+
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS
  */
@@ -1342,7 +1351,7 @@ footer p {
 	}
 
 	.beneficios-txt p {
-		padding-bottom: 1rem;
+		margin-bottom: 1rem;
 	}
 
 	#calendario .pr-4 {
@@ -1377,10 +1386,52 @@ footer p {
 	.curso-grid {
 		height: 204px;
 	}
+
+	.novo-core-box {
+		padding: 2.5rem 0.5rem;
+	}
+
+	.novo-core-box h2 {
+		margin-bottom: 2.5rem;
+	}
+	
 }
 
 
 @media screen and (max-width:992px) {
+
+	h1 {
+		font-size: 2.4rem;
+	}
+	
+	h2 {
+		font-size: 1.9rem;
+	}
+	
+	h3 {
+		font-size: 1.5rem;
+	}
+	
+	h4 {
+		font-size: 1.2rem;
+	}
+	
+	h5 {
+		font-size: 1rem;
+	}
+	
+	h6 {
+		font-size: .75rem;
+	}
+	
+	p {
+		font-size: .9rem;
+	}
+	
+	.p-menor {
+		font-size: .8rem;
+	}
+
 	.mudaw {
 		padding-left: 45px;
 	}
@@ -1414,5 +1465,111 @@ footer p {
 
 	.pagina-titulo-img {
 		height: 165px;
+	}
+
+	.show-992 {
+		display: block;
+	}
+
+	.hide-992 {
+		display: none;
+	}
+
+	.pb-15-992 {
+		padding-bottom: 15px;
+	}
+
+	.box:hover {
+		top: -.5rem;
+	}
+
+	.inside-box {
+		padding: 2rem;
+	}
+
+	.btn-atendimento {
+		padding-top: 0.288rem;
+		padding-bottom: 0.288rem;
+	}
+
+	.nav-item {
+		margin: 0rem 0.1rem;
+	}
+
+	.btn-novo-core {
+		padding: 0.75rem 1.75rem;
+		margin: 0rem 0.3rem;
+	}
+
+	.home-3 {
+		display: none;
+	}
+
+	.center-992 {
+		text-align: center;
+	}
+
+	.box-news,
+	.curso-grid {
+		height: 227px;
+	}
+
+	.novo-core-box .mb-5 {
+		margin-bottom: 2rem !important;
+	}
+
+	.beneficios-txt h2 {
+		padding-bottom: 0.2rem;
+	}
+
+	.beneficios-txt {
+		padding: 1.5rem;
+	}
+
+	.novo-core-box {
+		padding: 2rem 0.5rem;
+	}
+
+	.novo-core-box h2,
+	.beneficios-txt p {
+		margin-bottom: 2rem;
+	}
+	
+	#home-news {
+		padding-bottom: 0rem;
+	}
+
+	.calendario-txt p {
+		font-size: 1.1rem;
+	}
+
+	.mt-2-992 {
+		margin-top: 2rem;
+	}
+
+	footer .w-75 {
+		width: 90% !important;
+	}
+
+	.conteudo-txt p {
+		font-size: 1.1rem;
+	}
+
+	.clippers {
+		padding-top: 2rem;
+		display: none;
+	}
+
+	.btn-buscaavancada,
+	.btn-limpar {
+		width: auto;
+	}
+
+	.pesquisaLicitacao-btn {
+		margin-top: 1rem;
+	}
+
+	.edital-info .quarenta {
+		width: 30%;
 	}
 }

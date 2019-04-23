@@ -41,7 +41,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-8 pr-4">
+      <div class="col-lg-8 pr-4">
         <div class="noticia-img">
           <img src="{{asset($noticia->img)}}" />
         </div>
@@ -49,7 +49,7 @@
           {!! $noticia->conteudo !!}
         </div>
       </div>
-      <div class="col-sm-4">
+      <div class="col-lg-4">
         @include('site.inc.content-sidebar')
       </div>
     </div>
@@ -64,7 +64,9 @@
     </div>
     <div class="linha-lg"></div>
     <div class="row mb-3">
+      @php $i = 0; @endphp
       @foreach($tres as $noticia)
+        @php $i++; @endphp
         @include('site.inc.noticia-grid')
       @endforeach
     </div>

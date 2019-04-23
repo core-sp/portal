@@ -55,16 +55,16 @@ use \App\Http\Controllers\Helper;
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-3">
+      <div class="col-lg-3 col-md-6 pb-15-992">
         <div class="box text-center azul-escuro-bg h-100">
           <div class="inside-box">
             <img src="{{ asset('img/002-money.png') }}" class="inside-img" />
-            <p class="text-uppercase mt-3 branco">Simulador de<br /> Cálculos</p>
+            <p class="text-uppercase mt-3 branco">Simulador de<br class="hide-992" /> Cálculos</p>
             <a href="#" class="btn-box mt-4">Calcular</a>
           </div>
         </div>
       </div>
-      <div class="col-sm-3">
+      <div class="col-lg-3 col-md-6 pb-15-992">
         <a href="/balcao-de-oportunidades" class="d-block">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
@@ -75,23 +75,23 @@ use \App\Http\Controllers\Helper;
           </div>
         </a>
       </div>
-      <div class="col-sm-3">
+      <div class="col-lg-3 col-md-6 pb-15-992">
         <a href="http://boleto.core-sp.org.br" class="d-block" target="_blank">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" />
-              <p class="text-uppercase mt-3 branco">Emissão de boleto<br>anuidade 2019</p>
+              <p class="text-uppercase mt-3 branco">Emissão de boleto<br class="hide-992" /> anuidade 2019</p>
               <button href="#" class="btn-box mt-4">EMITIR</button>
             </div>
           </div>
         </a>
       </div>
-      <div class="col-sm-3">
+      <div class="col-lg-3 col-md-6 pb-15-992">
         <a href="/agendamento" class="d-block">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/appointment.png') }}" class="inside-img" />
-              <p class="text-uppercase mt-3 branco">Agende seu<br>atendimento</p>
+              <p class="text-uppercase mt-3 branco">Agende seu<br class="hide-992" /> atendimento</p>
               <button class="btn-box mt-4">Agendar</button>
             </div>
           </div>
@@ -105,8 +105,8 @@ use \App\Http\Controllers\Helper;
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <div class="pb-5 pt-5 pl-2 pr-2 text-center novo-core-box">
-          <h2 class="stronger branco text-uppercase mb-5">um novo core-sp para você!</h2>
+        <div class="text-center novo-core-box">
+          <h2 class="stronger branco text-uppercase">um novo core-sp para você!</h2>
           <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
           <a href="/concursos" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
           <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
@@ -133,7 +133,9 @@ use \App\Http\Controllers\Helper;
       </div>
     </div>
     <div class="row">
+      @php $i = 0; @endphp
       @foreach($noticias as $noticia)
+        @php $i++; @endphp
         @include('site.inc.noticia-grid')
       @endforeach
     </div>
@@ -145,10 +147,10 @@ use \App\Http\Controllers\Helper;
     <div class="row">
       <div class="col-12">
         <div class="beneficios-box row nomargin">
-          <div class="col-sm-5">
+          <div class="col-lg-5 hide-992">
             <img src="{{ asset('img/benef-v2.png') }}" id="computer" />
           </div>
-          <div class="col-sm-7 beneficios-txt">
+          <div class="col-lg-7 beneficios-txt center-992">
             <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
             <p class="branco light">O Core-SP traz benefícios diferenciados para Representantes Comerciais</p>
             <div>
@@ -164,7 +166,7 @@ use \App\Http\Controllers\Helper;
 <section id="eouv-calendario" class="pb-5">
   <div class="container">
     <div class="row">
-      <div class="col-6">
+      <div class="col-lg-6">
         <div class="home-title">
           <blockquote>
             <i></i>
@@ -175,7 +177,7 @@ use \App\Http\Controllers\Helper;
           <div class="col-8">
             <img src="{{ asset('img/computer.png') }}" />
           </div>
-          <div class="col-4 eouv-imgs align-self-center pl-3">
+          <div class="col-4 eouv-imgs align-self-center pl-3 center-992">
             <div class="m-auto pb-3">
               <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" />
               <img src="{{ asset('img/icon-eouv-02.png') }}" class="azul-escuro-bg" />
@@ -191,7 +193,7 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
       </div>
-      <div class="col-6">
+      <div class="col-lg-6 mt-2-992">
         <div class="home-title">
           <blockquote>
             <i></i>

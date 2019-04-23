@@ -66,10 +66,8 @@ class AgendamentoController extends Controller
         } elseif (Input::has('regional')) {
             $resultados = $this->resultados($dia, Input::get('regional'));
         } elseif(Input::has('status')) {
-            echo "<script>console.log('".$dia."');</script>";
-            $resultados = $this->resultadosFiltro($dia, $regional, Input::get('status'));
+            $resultados = $this->resultadosFiltro($dia, $regional->idregional, Input::get('status'));
         } elseif(Input::has('dia')) {
-            echo "<script>console.log('".$regional."');</script>";
             $resultados = $this->resultados($dia, $regional->idregional);
         }
         // Pega dia atual e cospe no título

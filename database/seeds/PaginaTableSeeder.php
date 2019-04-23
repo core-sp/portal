@@ -48,7 +48,7 @@ class PaginaTableSeeder extends Seeder
         $pagina->img = "/imagens/institucional.png";
         $pagina->conteudo = "<p>Teclando-se <strong>Alt + 1:</strong> Posiciona o cursor no topo da página.</p>
             <p>Teclando-se <strong>Alt + 2:</strong> Posiciona o cursor na busca do site.</p>
-            <p>Teclando-se <strong>Alt + 3:</strong> Posiciona o cursor no topo da página.</p>
+            <p>Teclando-se <strong>Alt + 3:</strong> Posiciona o cursor no conteúdo principal da página.</p>
             <p>Teclando-se <strong>Alt + 4:</strong> Posiciona o cursor no rodapé do site.</p>
             <p>Teclando-se <strong>Alt + 5:</strong> Aplica/Remove o contraste da página.</p>";
         $pagina->idusuario = 1;

@@ -4,7 +4,7 @@ use \App\Http\Controllers\CursoInscritoController;
 use \App\Http\Controllers\CursoSiteController;
 @endphp
 
-<div class="col-4">
+<div class="col-lg-4 col-md-6">
   <div class="h-100 d-flex flex-column">
     <a href="/curso/{{ $curso->idcurso }}">
       <div class="curso-grid">

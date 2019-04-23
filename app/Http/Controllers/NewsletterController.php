@@ -11,7 +11,8 @@ class NewsletterController extends Controller
     {
         $regras = [
             'nome' => 'required',
-            'email' => 'required|unique:newsletters'
+            'email' => 'required|unique:newsletters',
+            'celular' => 'required'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
