@@ -30,7 +30,8 @@ class CursoSiteController extends Controller
     public static function getNoticia($id)
     {
         $noticia = Noticia::where('idcurso',$id)->first();
-        return $noticia->slug;
+        if(isset($noticia))
+            return $noticia->slug;
     }
 
     public static function checkCurso($id)

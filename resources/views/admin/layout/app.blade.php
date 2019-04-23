@@ -29,6 +29,12 @@ use \App\Http\Controllers\Helper;
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="/admin" class="nav-link">Home</a>
               </li>
+              <li class="nav-item d-none d-sm-inline-block">
+                <a href="/admin/perfil" class="nav-link">Perfil</a>
+              </li>
+              <li class="nav-item d-none d-sm-inline-block">
+                <a href="/admin/chamados/criar" class="nav-link">Contate o CTI</a>
+              </li>
             </ul>
 
             <ul class="navbar-nav ml-auto">
@@ -57,7 +63,7 @@ use \App\Http\Controllers\Helper;
                   </a>
                 </div>
                 <div class="info">
-                  <a href="/admin/info" class="d-block">
+                  <a href="/admin/perfil" class="d-block">
                     @if(Auth::check())
                     |&nbsp;&nbsp;{{ Auth::user()->nome }}
                     @endif

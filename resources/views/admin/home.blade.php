@@ -7,6 +7,17 @@ use App\Http\Controllers\NewsletterController;
 @endphp
 
 <section class="content-header">
+  @if(\Session::has('message'))
+    <div class="container-fluid mb-2">
+      <div class="row">
+        <div class="col">
+          <div class="alert alert-dismissible {{ \Session::get('class') }}">
+            {!! \Session::get('message') !!}
+          </div>
+        </div>
+      </div>
+    </div>
+  @endif
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm-12">
@@ -46,7 +57,7 @@ use App\Http\Controllers\NewsletterController;
 					</div>
 					<div class="card-body">
 						<p>- Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois selecione "Alterar Senha";</p>
-						<p class="mb-0">- Para informações, dúvidas ou sugestões relacionadas ao Portal, contate o CTI através do ramal 5538;</p>
+						<p class="mb-0">- Para dúvidas, sugestões, reclamações ou solicitações, envie sua mensagem para o CTI através <a href="/admin/chamados/criar">deste link</a>;</p>
 					</div>
 				</div>
 			</div>

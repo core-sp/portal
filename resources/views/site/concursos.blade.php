@@ -45,7 +45,7 @@ $situacoes = ConcursoHelper::situacoes();
           	</div>
           	<div class="col">
           	  <label for="nrprocesso">Nº do processo</label>
-          	  <input type="text" name="nrprocesso" class="form-control" placeholder="Nº do processo" id="nrprocesso">
+          	  <input type="text" name="nrprocesso" class="form-control nrprocessoInput" placeholder="Nº do processo" id="nrprocesso">
           	</div>
           </div>
           <div class="form-row">
@@ -60,7 +60,7 @@ $situacoes = ConcursoHelper::situacoes();
           	</div>
           	<div class="col">
           	  <label for="datarealizacao">Data de Realização</label>
-          	  <input type="date" class="form-control" name="datarealizacao">
+          	  <input type="text" class="form-control dataInput" name="datarealizacao" placeholder="dd/mm/aaaa">
           	</div>
             <div class="col align-self-end pesquisaLicitacao-btn">
               <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>

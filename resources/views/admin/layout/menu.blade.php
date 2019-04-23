@@ -32,6 +32,14 @@
             </li>
         </ul>
         </li>
+        <li class="nav-item">
+        <a href="/admin/chamados" class="nav-link">
+            <i class="nav-icon fas fa-ticket-alt"></i>
+            <p>
+            Chamados
+            </p>
+        </a>
+        </li>
         @endif
         <li class="nav-item">
         <a href="/admin/regionais" class="nav-link">
