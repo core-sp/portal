@@ -197,7 +197,7 @@ use \App\Http\Controllers\Helper;
                     <input type="text"
                       name="nome"
                       class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
-                      placeholder="Nome"
+                      placeholder="Nome *"
                       />
                       @if($errors->has('nome'))
                       <div class="invalid-feedback">
@@ -209,7 +209,7 @@ use \App\Http\Controllers\Helper;
                     <input type="text"
                       name="email"
                       class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                      placeholder="E-mail"
+                      placeholder="E-mail *"
                       />
                       @if($errors->has('email'))
                       <div class="invalid-feedback">
@@ -221,7 +221,7 @@ use \App\Http\Controllers\Helper;
                     <input type="text"
                       name="celular"
                       class="form-control celularInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
-                      placeholder="Celular"
+                      placeholder="Celular *"
                       />
                       @if($errors->has('celular'))
                       <div class="invalid-feedback">
