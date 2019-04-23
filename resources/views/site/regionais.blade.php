@@ -35,7 +35,7 @@ use App\Http\Controllers\Helper;
     </div>
     <div class="linha-lg"></div>
     <div class="row mt-2">
-      <div class="col-sm-8">
+      <div class="col-lg-8">
         @foreach($regionais as $regional)
         <div class="box-resultado">
           <h5 class="pb-1">{{ $regional->prefixo }} - {{ $regional->regional }}</h5>
@@ -47,7 +47,7 @@ use App\Http\Controllers\Helper;
         </div>
         @endforeach
       </div>
-      <div class="col-sm-4">
+      <div class="col-lg-4">
         @include('site.inc.content-sidebar')
       </div>
     </div>

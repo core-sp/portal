@@ -5,6 +5,7 @@ $(document).ready(function(){
 	$('.celularInput').mask('(99) 99999-9999');
 	$('.nrlicitacaoInput').mask('999/9999');
 	$('.nrprocessoInput').mask('999/9999');
+	$('.dataInput').mask('00/00/0000');
 });
 
 $(window).scroll(function(){

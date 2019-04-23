@@ -65,7 +65,7 @@ $situacoes = LicitacaoHelper::situacoes();
           	</div>
           	<div class="col-lg-3 col-md-6">
           	  <label for="datarealizacao">Data de Realização</label>
-          	  <input type="date" class="form-control" name="datarealizacao">
+          	  <input type="text" class="form-control dataInput" placeholder="dd/mm/aaaa" name="datarealizacao">
           	</div>
             <div class="col-lg-4 col-md-12 align-self-end pesquisaLicitacao-btn">
               <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>

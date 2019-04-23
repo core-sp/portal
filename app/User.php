@@ -84,6 +84,11 @@ class User extends Authenticatable
     	return $this->belongsTo('App\Regional', 'idregional');
     }
 
+    public function chamado()
+    {
+        return $this->hasMany('App\Chamado', 'idchamado');
+    }
+
     public function autorizarPerfis($perfis)
     {
       if (is_array($perfis)) {

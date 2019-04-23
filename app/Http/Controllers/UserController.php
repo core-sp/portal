@@ -216,7 +216,7 @@ class UserController extends Controller
 
     public function senha()
     {
-        return view('admin.info.senha');
+        return view('admin.perfil.senha');
     }
 
     public function changePassword(Request $request)
@@ -247,14 +247,15 @@ class UserController extends Controller
                 ->with('message', '<i class="icon fa fa-check"></i>Senha alterada com sucesso!')
                 ->with('class', 'alert-success');
         } else {
-            $error = array('current-password' => 'Por favor, insira a senha correta');
-            return response()->json(array('error' => $error), 400);
+            return redirect()->route('admin.info')
+                ->with('message', '<i class="icon fa fa-ban"></i>A senha atual digitada está incorreta!')
+                ->with('class', 'alert-danger');
         }
     }
 
     public function infos()
     {
-        return view('admin.info.home');
+        return view('admin.perfil.home');
     }
 
     public function busca()

@@ -14,10 +14,22 @@ Route::prefix('admin')->group(function() {
   Auth::routes();
 
   // Rotas de Configuração
-  Route::prefix('info')->group(function(){
+  Route::prefix('perfil')->group(function(){
     Route::get('/', 'UserController@infos')->name('admin.info');
     Route::get('/senha', 'UserController@senha');
     Route::put('/senha', 'UserController@changePassword');
+  });
+
+  // Rotas para chamados
+  Route::prefix('chamados')->group(function(){
+    Route::get('/', 'ChamadoController@index')->name('chamados.lista');
+    Route::get('/busca', 'ChamadoController@busca');
+    Route::get('/criar', 'ChamadoController@create');
+    Route::post('/criar', 'ChamadoController@store');
+    Route::get('/ver/{id}', 'ChamadoController@show');
+    Route::delete('/apagar/{id}', 'ChamadoController@destroy');
+    Route::get('/concluidos', 'ChamadoController@lixeira');
+    Route::get('/restore/{id}', 'ChamadoController@restore');
   });
   
   // Rotas para CRUD de páginas

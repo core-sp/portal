@@ -24,7 +24,9 @@ use \App\Http\Controllers\CursoSiteController;
           <button class="btn-esgotado mt-3">Esgotado</button>
         @endif
       @else
+        @if(!empty(CursoSiteController::getNoticia($curso->idcurso)))
         <a href="noticia/{{ CursoSiteController::getNoticia($curso->idcurso) }}" class="btn-como-foi mt-3">Veja como foi</a>
+        @endif
       @endif
     </div>
   </div>

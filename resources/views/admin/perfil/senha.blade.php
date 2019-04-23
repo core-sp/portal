@@ -69,7 +69,7 @@
                 @endif
               </div>
               <div class="form-group text-right">
-                <a href="/admin/info" type="cancel" class="btn btn-default">Cancelar</a>&nbsp;
+                <a href="/admin/perfil" type="cancel" class="btn btn-default">Cancelar</a>&nbsp;
                 <button type="submit" class="btn btn-danger">Alterar</button>
               </div>
             </form>

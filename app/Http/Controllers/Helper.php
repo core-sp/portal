@@ -109,7 +109,10 @@ class Helper extends Controller
 
     public static function imgToThumb($string)
     {
-        $string = str_replace('/imagens','/imagens/thumbnails',$string);
-        return $string;
+        $str = basename($string);
+        $num = strlen($str);
+        $num = $num <= 0 ? $num : -$num;
+        $add = substr_replace($string,'thumbnails/'.$str,$num);
+        return $add;
     }
 }

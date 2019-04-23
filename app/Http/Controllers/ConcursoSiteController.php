@@ -25,7 +25,10 @@ class ConcursoSiteController extends Controller
         $buscaModalidade = Input::get('modalidade');
         $buscaSituacao = Input::get('situacao');
         $buscaNrProcesso = Input::get('nrprocesso');
-        $buscaDataRealizacao = Input::get('datarealizacao');
+        $dia = Input::get('datarealizacao');
+        $replace = str_replace('/','-',$dia);
+        $dia = new \DateTime($replace);
+        $buscaDataRealizacao = $dia->format('Y-m-d');
         if (!empty($buscaModalidade) 
             or !empty($buscaSituacao)
             or !empty($buscaNrProcesso)
@@ -38,7 +41,7 @@ class ConcursoSiteController extends Controller
         $concursos = Concurso::where('modalidade','LIKE','%'.$buscaModalidade.'%')
             ->where('situacao','LIKE','%'.$buscaSituacao.'%')
             ->where('nrprocesso','LIKE',$buscaNrProcesso)
-            ->where('datarealizacao','LIKE',$buscaDataRealizacao)
+            ->where('datarealizacao','LIKE','%'.$buscaDataRealizacao.'%')
             ->paginate(10);
         if (count($concursos) > 0) {
             return view('site.concursos', compact('concursos', 'busca'));

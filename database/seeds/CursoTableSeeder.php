@@ -15,7 +15,7 @@ class CursoTableSeeder extends Seeder
         $curso = new Curso();
         $curso->tipo = "Curso";
         $curso->tema = "Básico em Marketing";
-        $curso->img = "/imagens/curso-01.png";
+        $curso->img = "/imagens/2019-04/curso-01.png";
         $curso->datarealizacao = "2019-04-01 12:00:00";
         $curso->datatermino = "2019-04-01 14:00:00";
         $curso->endereco = "Rua Vergueiro, 256";
@@ -35,7 +35,7 @@ class CursoTableSeeder extends Seeder
         $curso = new Curso();
         $curso->tipo = "Palestra";
         $curso->tema = "Técnica em Vendas";
-        $curso->img = "/imagens/curso-02.png";
+        $curso->img = "/imagens/2019-04/curso-02.png";
         $curso->datarealizacao = "2019-05-20 12:00:00";
         $curso->datatermino = "2019-05-20 16:00:00";
         $curso->endereco = "Avenida Paulista, 120";
@@ -55,7 +55,7 @@ class CursoTableSeeder extends Seeder
         $curso = new Curso();
         $curso->tipo = "Workshop";
         $curso->tema = "Marketing Digital";
-        $curso->img = "/imagens/curso-03.png";
+        $curso->img = "/imagens/2019-04/curso-03.png";
         $curso->datarealizacao = "2019-05-21 14:00:00";
         $curso->datatermino = "2019-05-21 17:00:00";
         $curso->endereco = "Avenida Brigadeiro Luís Antônio, 613";

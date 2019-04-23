@@ -11,8 +11,8 @@ class PaginaSiteController extends Controller
     public function show($categoria, $slug)
     {
         $pagina = Pagina::where('slug', $slug)->first();
-        $slug = Str::slug($pagina->paginacategoria->nome, '-');
         if(isset($pagina)) {
+            $slug = Str::slug($pagina->paginacategoria->nome, '-');
             if ($categoria == $slug) {
                 return view('site.pagina', compact('pagina', 'categoria'));
             } else {

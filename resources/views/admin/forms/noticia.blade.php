@@ -5,7 +5,7 @@
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}" />
     <div class="card-body">
-        <div class="form-row mb-3">
+        <div class="form-row">
         <div class="col">
             <label for="titulo">Título da notícia</label>
             <input type="text"
