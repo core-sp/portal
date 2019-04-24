@@ -1647,7 +1647,7 @@ footer p {
 		right: 15px;
 		top: 15px;
 		padding: 5px 10px;
-		background-color: #FFFFFF;
+		background-color: #15AAE2;
 		border-radius: 5px;
 	}
 
@@ -1664,7 +1664,7 @@ footer p {
 	}
 
 	#dismiss i {
-		color: #15AAE2;
+		color: #FFF;
 	}
 
 	#sidebarContent .nav-item {
@@ -1676,7 +1676,7 @@ footer p {
 	.sidebar-header {
 		padding: 15px;
 		margin-bottom: 15px;
-		background-color: #004587;
+		background-color: #6d7fcc;
 	}
 
 	#sidebarContent .nav-item {
