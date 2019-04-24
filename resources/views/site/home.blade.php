@@ -55,7 +55,7 @@ use \App\Http\Controllers\Helper;
       </div>
     </div>
     <div class="row">
-      <div class="col-lg-3 col-md-6 pb-15-992">
+      <div class="col-lg-3 col-sm-6 pb-15-992">
         <div class="box text-center azul-escuro-bg h-100">
           <div class="inside-box">
             <img src="{{ asset('img/002-money.png') }}" class="inside-img" />
@@ -64,8 +64,8 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 pb-15-992">
-        <a href="/balcao-de-oportunidades" class="d-block">
+      <div class="col-lg-3 col-sm-6 pb-15-992">
+        <a href="/balcao-de-oportunidades" class="d-block h-100">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/001-work.png') }}" class="inside-img" />
@@ -75,8 +75,8 @@ use \App\Http\Controllers\Helper;
           </div>
         </a>
       </div>
-      <div class="col-lg-3 col-md-6 pb-15-992">
-        <a href="http://boleto.core-sp.org.br" class="d-block" target="_blank">
+      <div class="col-lg-3 col-sm-6 pb-15-992">
+        <a href="http://boleto.core-sp.org.br" class="d-block h-100" target="_blank">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" />
@@ -86,8 +86,8 @@ use \App\Http\Controllers\Helper;
           </div>
         </a>
       </div>
-      <div class="col-lg-3 col-md-6 pb-15-992">
-        <a href="/agendamento" class="d-block">
+      <div class="col-lg-3 col-sm-6 pb-15-992">
+        <a href="/agendamento" class="d-block h-100">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/appointment.png') }}" class="inside-img" />

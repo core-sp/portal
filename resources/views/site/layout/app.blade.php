@@ -33,13 +33,13 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
         <div class="container">
-          <div class="row mb-4 mt-4">
-            <div class="col-xl-4 col-lg-4 col-md-6 text-left">
+          <div class="row header-margin">
+            <div class="col-xl-4 col-lg-4 col-sm-6 offset-sm-3 offset-md-0 text-left">
                 <a href="/"><img src="{{ asset('img/logo-certo.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-xl-5 col-lg-4 col-md-6 mudaw align-self-center">
-              <div class="w-75 m-auto text-center">
-                <div class="acessibilidade mb-2">
+              <div class="w-75 m-auto text-center pt-15-768">
+                <div class="acessibilidade mb-2 center-768">
                   <button type="button" class="btn btn-sm btn-light" id="btn-contrast">
                     <i class="fas fa-adjust"></i>
                   </button>
@@ -110,6 +110,7 @@ use \App\Http\Controllers\Helper;
                   <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a href="/legislacao" class="dropdown-item">Legislação</a>
+                    <a href="/legislacao" class="dropdown-item">Teste</a>
                   </div>
                 </li>
                 <li class="nav-item">
@@ -138,6 +139,25 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
       </header>
+
+      <div id="menuResponsivo">
+        <div class="container">
+          <button type="button" id="sidebarBtn" class="btn btn-info">
+            <i class="fas fa-align-left"></i>&nbsp;
+            <span>Menu</span>
+          </button>
+        </div>
+      </div>
+      <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3 class="branco">Menu</h3>
+        </div>
+        <div id="dismiss">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <div id="sidebarContent"></div>
+      </nav>
+      <div class="overlay"></div>
       @show
 
       @yield('content')
