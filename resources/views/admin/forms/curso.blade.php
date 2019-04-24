@@ -52,10 +52,10 @@ $tipos = CursoHelper::tipos();
             </div>
             <div class="col-2">
                 <label for="nrvagas">Nº de vagas</label>
-                <input type="number"
+                <input type="text"
                     name="nrvagas"
-                    class="form-control"
-                    max="10000"
+                    class="form-control vagasInput"
+                    placeholder="00"
                     @if(isset($resultado))
                     value="{{ $resultado->nrvagas }}"
                     @endif
@@ -112,9 +112,10 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="datarealizacao">Data de Realização</label>
                 <input type="text" 
-                    class="form-control dataInput" 
+                    class="form-control" 
                     name="datarealizacao" 
                     placeholder="dd/mm/aaaa"
+                    id="dataInicio"
                     @if(isset($resultado))
                     value="{{ Helper::onlyDate($resultado->datarealizacao) }}"
                     @endif
@@ -126,27 +127,11 @@ $tipos = CursoHelper::tipos();
                 @endif
             </div>
             <div class="col">
-                <label for="horainicio">Horário de Início</label>
-                <input type="text" 
-                    class="form-control timeInput" 
-                    name="horainicio"
-                    placeholder="00:00"
-                    @if(isset($resultado))
-                    value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
-                    @endif
-                    />
-                @if($errors->has('horainicio'))
-                <div class="invalid-feedback">
-                {{ $errors->first('horainicio') }}
-                </div>
-                @endif
-            </div>
-            <div class="col">
                 <label for="datatermino">Data de Término</label>
                 <input type="text" 
-                    class="form-control dataInput" 
+                    class="form-control" 
                     name="datatermino"
-                    id="datatermino"
+                    id="dataTermino"
                     placeholder="dd/mm/aaaa"
                     @if(isset($resultado))
                     value="{{ Helper::onlyDate($resultado->datatermino) }}"
@@ -159,11 +144,29 @@ $tipos = CursoHelper::tipos();
                 @endif
             </div>
             <div class="col">
+                <label for="horainicio">Horário de Início</label>
+                <input type="text" 
+                    class="form-control" 
+                    name="horainicio"
+                    id="horaInicio"
+                    placeholder="00:00"
+                    @if(isset($resultado))
+                    value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
+                    @endif
+                    />
+                @if($errors->has('horainicio'))
+                <div class="invalid-feedback">
+                {{ $errors->first('horainicio') }}
+                </div>
+                @endif
+            </div>
+            <div class="col">
                 <label for="horatermino">Horário de Término</label>
                 <input type="text" 
-                    class="form-control timeInput" 
+                    class="form-control" 
                     name="horatermino"
                     placeholder="00:00"
+                    id="horaTermino"
                     @if(isset($resultado))
                     value="{{ Helper::onlyHour($resultado->datatermino) }}"
                     @endif

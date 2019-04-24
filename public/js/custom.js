@@ -2,7 +2,7 @@ $(document).ready(function(){
   // Btns
   $('#lfm').filemanager('image');
   $('#edital').filemanager('file');
-  // Máscaras
+  // Máscaras gerais
   $('.nrlicitacaoInput').mask('999/9999');
   $('.nrprocessoInput').mask('999/9999');
   $('.cnpjInput').mask('99.999.999/9999-99');
@@ -10,7 +10,66 @@ $(document).ready(function(){
   $('.fixoInput').mask('(00) 0000-0000');
   $('.cepInput').mask('00000-000');
   $('.dataInput').mask('00/00/0000');
+  // Máscaras para datas
+  $('#dataTermino').mask('00/00/0000', {
+    onComplete: function() {
+      var dataInicio = $('#dataInicio').val();
+      var dataTermino = $('#dataTermino').val();
+      if(dataTermino < dataInicio) {
+        alert('A data de término do curso não pode ser menor que a data de início.');
+        $('#dataTermino').val('');
+      }
+    }
+  });
+  $('#dataInicio').mask('00/00/0000', {
+    onComplete: function() {
+      var dataInicio = $('#dataInicio').val();
+      var dataTermino = $('#dataTermino').val();
+      if(dataInicio > dataTermino) {
+        alert('A data de início do curso não pode ser maior que a data de término.');
+        $('#dataInicio').val('');
+      }
+    }
+  });
+  $('#horaTermino').mask('00:00', {
+    onComplete: function() {
+      var horaInicio = $('#horaInicio').val();
+      var horaTermino = $('#horaTermino').val();
+      if(horaTermino <= horaInicio) {
+        alert('O horário de término do curso não pode ser menor ou igual ao horário de início do curso.');
+        $('#horaTermino').val('');
+      }
+    }
+  });
+  $('#horaInicio').mask('00:00', {
+    onComplete: function() {
+      var horaInicio = $('#horaInicio').val();
+      var horaTermino = $('#horaTermino').val();
+      if(horaInicio > horaTermino) {
+        alert('O horário de início do curso não pode ser maior que o horário de término do curso.');
+        $('#horaInicio').val('');
+      }
+    }
+  });
+  // Máscara para horário bloqueio
+  $('#horaTerminoBloqueio').change(function(){
+    var horaTerminoBloqueio = $(this).val();
+    var horaInicioBloqueio = $('#horaInicioBloqueio').val();
+    if(horaTerminoBloqueio < horaInicioBloqueio) {
+      alert('O horário de término do bloqueio não pode ser menor que o horário de início do bloqueio.');
+      $(this).val($("#horaTerminoBloqueio option:first").val());
+    }
+  });
+  $('#horaInicioBloqueio').change(function(){
+    var horaInicioBloqueio = $(this).val();
+    var horaTerminoBloqueio = $('#horaTerminoBloqueio').val();
+    if(horaInicioBloqueio > horaTerminoBloqueio) {
+      alert('O horário de início do bloqueio não pode ser maior que o horário de término do bloqueio.');
+      $(this).val($("#horaInicioBloqueio option:first").val());
+    }
+  });
   $('.timeInput').mask('00:00');
+  $('.vagasInput').mask('000');
 });
 
 (function($){

@@ -71,8 +71,8 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                 <div class="row mt-2">
                     <div class="col">
                         <label for="vagasdisponiveis">Vagas Disponíveis</label>
-                        <input type="number"
-                            class="form-control {{ $errors->has('vagasdisponiveis') ? 'is-invalid' : '' }}"
+                        <input type="text"
+                            class="form-control vagasInput {{ $errors->has('vagasdisponiveis') ? 'is-invalid' : '' }}"
                             name="vagasdisponiveis"
                             placeholder="00"
                             @if(isset($resultado))

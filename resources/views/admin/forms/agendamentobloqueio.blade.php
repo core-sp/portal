@@ -38,8 +38,9 @@ $horas = AgendamentoControllerHelper::todasHoras();
             <div class="col">
                 <label for="diainicio">Data de início</label>
                 <input type="text"
-                    class="form-control dataInput {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
+                    class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
                     placeholder="dd/mm/aaaa"
+                    id="dataInicio"
                     name="diainicio"
                     @if(isset($resultado))
                         @if($resultado->diainicio != '2000-01-01')
@@ -59,8 +60,9 @@ $horas = AgendamentoControllerHelper::todasHoras();
             <div class="col">
                 <label for="diatermino">Data de término</label>
                 <input type="text"
-                    class="form-control dataInput {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
+                    class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
                     placeholder="dd/mm/aaaa"
+                    id="dataTermino"
                     name="diatermino"
                     @if(isset($resultado))
                         @if($resultado->diatermino != '2100-01-01')
@@ -81,7 +83,8 @@ $horas = AgendamentoControllerHelper::todasHoras();
         <div class="form-row mt-2">
             <div class="col">
                 <label for="horainicio">Hora de início</label>
-                <select name="horainicio" class="form-control">
+                <select name="horainicio" class="form-control" id="horaInicioBloqueio">
+                <option selected disabled>Selecione o horário</option>
                 @foreach($horas as $hora)
                     @if(isset($resultado))
                         @if($resultado->horainicio === $hora)
@@ -102,7 +105,8 @@ $horas = AgendamentoControllerHelper::todasHoras();
             </div>
             <div class="col">
             <label for="horatermino">Hora de término</label>
-                <select name="horatermino" class="form-control">
+                <select name="horatermino" class="form-control" id="horaTerminoBloqueio">
+                <option selected disabled>Selecione o horário</option>
                 @foreach($horas as $hora)
                     @if(isset($resultado))
                         @if($resultado->horatermino === $hora)
