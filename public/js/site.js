@@ -27,7 +27,7 @@ $(document).ready(function(){
 });
 
 $(window).scroll(function(){
-	if($(window).width() > 768) {
+	if($(window).width() > 767) {
 		if ($(document).scrollTop() > 300) {
 			$('#fixed-menu').slideDown(150);
 		} else {

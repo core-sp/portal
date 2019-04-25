@@ -146,15 +146,17 @@ class AgendamentoSiteController extends Controller
         // Gera mensagem de agradecimento
         $agradece = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
         $agradece .= "<br>";
-        $agradece .= "Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência.";
-        $agradece .= "<br><br><strong>Detalhes do agendamento</strong><br>";
+        $agradece .= "Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência e com o número de protocolo em mãos.";
+        $agradece .= "<br><br>";
+        $agradece .= "<strong>Protocolo:</strong> ".$random;
+        $agradece .= "<br><br>";
+        $agradece .= "<strong>Detalhes do agendamento</strong><br>";
         $agradece .= "Dia: ".$dia_inalterado."<br>";
         $agradece .= "Horário: ".$agendamento->hora."<br>";
         $agradece .= "Cidade: ".$agendamento->regional->regional."<br>";
         $agradece .= "Endereço: ".$agendamento->regional->endereco.", ".$agendamento->regional->numero;
         $agradece .= " - ".$agendamento->regional->complemento."<br>";
         $agradece .= "Serviço: ".$tiposervico.'<br>';
-        $agradece .= "Protocolo: ".$random;
 
         // Retorna view de agradecimento
         return view('site.agradecimento')->with('agradece', $agradece);

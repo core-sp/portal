@@ -46,19 +46,19 @@ $pessoas = AgendamentoControllerHelper::pessoas();
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <h5>Informações de contato</h5>
             <div class="form-row mt-2">
-              <div class="col">
+              <div class="col-md-6">
                 <label for="nome">Nome</label>
                 <input type="text"
-				  class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
-				  name="nome"
-				  placeholder="Nome" />
-				  @if($errors->has('nome'))
-				    <div class="invalid-feedback">
-					  {{ $errors->first('nome') }}
-					</div>
-				  @endif
+                  class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
+                  name="nome"
+                  placeholder="Nome" />
+                  @if($errors->has('nome'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('nome') }}
+                  </div>
+                  @endif
               </div>
-              <div class="col">
+              <div class="col-md-6 mt-2-768">
                 <label for="cpf">CPF</label>
                 <input type="text"
                   class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
@@ -66,14 +66,14 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   placeholder="CPF"
                   />
                   @if($errors->has('cpf'))
-				    <div class="invalid-feedback">
-					  {{ $errors->first('cpf') }}
-					</div>
-				  @endif
+                  <div class="invalid-feedback">
+                    {{ $errors->first('cpf') }}
+                  </div>
+                  @endif
               </div>
             </div>
             <div class="form-row mt-2">
-              <div class="col">
+              <div class="col-md-6">
                 <label for="email">E-mail</label>
                 <input type="text"
                   class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
@@ -81,12 +81,12 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   placeholder="E-mail"
                   />
                   @if($errors->has('email'))
-				    <div class="invalid-feedback">
-					  {{ $errors->first('email') }}
-					</div>
-				  @endif
+                  <div class="invalid-feedback">
+                    {{ $errors->first('email') }}
+                  </div>
+                  @endif
               </div>
-              <div class="col">
+              <div class="col-md-6 mt-2-768">
                 <label for="celular">Celular</label>
                 <input type="text"
                   class="form-control celularInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
@@ -94,15 +94,15 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   placeholder="Celular"
                   />
                   @if($errors->has('celular'))
-				    <div class="invalid-feedback">
-					  {{ $errors->first('celular') }}
-					</div>
-				  @endif
+                  <div class="invalid-feedback">
+                    {{ $errors->first('celular') }}
+                  </div>
+                  @endif
               </div>
             </div>
             <h5 class="mt-4">Informações de agendamento</h5>
             <div class="form-row mt-2">
-              <div class="col">
+              <div class="col-md-4">
                 <label for="idregional">Regional</label>
                 <select name="idregional" id="idregional" class="form-control">
                   @foreach($regionais as $regional)
@@ -115,7 +115,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 </div>
                 @endif
               </div>
-              <div class="col">
+              <div class="col-md-4 mt-2-768">
                 <label for="dia">Dia</label>
                 <div class="input-group">
                   <input type="text" 
@@ -133,7 +133,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 </div>
                 @endif
               </div>
-              <div class="col">
+              <div class="col-md-4 mt-2-768">
                 <div id="loadImage">
                   <div class="loadeando">
                     <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
@@ -151,7 +151,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
               </div>
             </div>
             <div class="form-row mt-2">
-              <div class="col">
+              <div class="col-md-6">
                 <label for="servico">Tipo de Serviço</label>
                 <select name="servico" class="form-control">
                   @foreach($servicos as $servico)
@@ -164,7 +164,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 </div>
                 @endif
               </div>
-              <div class="col">
+              <div class="col-md-6 mt-2-768">
                 <label for="pessoa">Para:</label>
                 <select name="pessoa" class="form-control">
                   @foreach($pessoas as $pessoa => $diminutivo)
