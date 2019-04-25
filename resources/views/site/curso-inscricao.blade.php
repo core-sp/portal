@@ -77,7 +77,7 @@ $now = now();
 							<div class="col-md-4">	
 								<label for="cpf">CPF *</label>
 								<input type="text"
-									class="form-control {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
+									class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
 									name="cpf"
 									placeholder="CPF" />
 								@if($errors->has('cpf'))
@@ -89,7 +89,7 @@ $now = now();
 							<div class="col-md-4 mt-2-768">
 								<label for="telefone">Telefone *</label>
 								<input type="text"
-									class="form-control {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
+									class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
 									name="telefone"
 									placeholder="Telefone" />
 								@if($errors->has('telefone'))

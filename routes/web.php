@@ -220,6 +220,9 @@ Route::prefix('/')->group(function() {
   Route::get('agendamento', 'AgendamentoSiteController@formView');
   Route::post('agendamento', 'AgendamentoSiteController@store');
   Route::post('/checa-horarios', 'AgendamentoSiteController@checaHorarios');
+  Route::get('agendamento-consulta', 'AgendamentoSiteController@consultaView');
+  Route::get('agendamento-consulta/busca', 'AgendamentoSiteController@consulta');
+  Route::put('agendamento-consulta/busca', 'AgendamentoSiteController@cancelamento');
 
   // Newsletter
   Route::post('newsletter', 'NewsletterController@store');

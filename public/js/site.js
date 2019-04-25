@@ -6,6 +6,13 @@ $(document).ready(function(){
 	$('.nrlicitacaoInput').mask('999/9999');
 	$('.nrprocessoInput').mask('999/9999');
 	$('.dataInput').mask('00/00/0000');
+	$('.protocoloInput').mask('ZZZZZZ', {
+	  translation: {
+		  'Z': {
+			pattern: /[A-Za-z0-9]/
+		  }
+	  }
+	});
 	// Menu responsivo
 	var first = document.getElementById('menu-principal');
 	var second = document.getElementById('sidebarContent');

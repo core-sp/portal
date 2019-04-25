@@ -47,7 +47,7 @@
       </div>
     </div>
   </a>
-  <a href="#">
+  <a href="http://boleto.core-sp.org.br" target="_blank">
     <div class="box-dois azul-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
