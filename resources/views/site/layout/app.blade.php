@@ -167,7 +167,7 @@ use \App\Http\Controllers\Helper;
       <footer class="pt-4" id="rodape">
         <div class="container mb-4">
           <div class="row">
-            <div class="col-4">
+            <div class="col-md-4">
               <div class="footer-title w-75 mb-3">
                 <h5 class="branco">Localização</h5>
               </div>
@@ -189,7 +189,7 @@ use \App\Http\Controllers\Helper;
                 <br />(11) 3243-5500
               </p>
             </div>
-            <div class="col-4">
+            <div class="col-md-4 hide-768">
               <div class="footer-title w-75 mb-3">
                 <h5 class="branco">Serviços</h5>
               </div>
@@ -205,8 +205,8 @@ use \App\Http\Controllers\Helper;
               <p class="branco"><a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">E-OUV</a></p>
               <p class="branco"><a href="/seccionais">Seccionais</a></p>
             </div>
-            <div class="col-4">
-              <div class="footer-title w-75 mb-3">
+            <div class="col-md-4">
+              <div class="footer-title w-75 mb-3 mt-4-768">
                 <h5 class="branco">Newsletter</h5>
               </div>
               <div class="w-75">

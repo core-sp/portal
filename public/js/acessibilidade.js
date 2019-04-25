@@ -24,7 +24,10 @@ $(document).ready(function(){
 			'.edital-download',
 			'#pagina-cursos',
 			'.curso-grid-content',
-			'.nav-item'
+			'.nav-item',
+			'.sidebar-header',
+			'#sidebar',
+			'.dropdown-item'
 		];
 		$(list).toggleClass('contraste');
 
@@ -46,7 +49,8 @@ $(document).ready(function(){
 			'.saiba-mais',
 			'.btn-curso-grid',
             '.btn-curso-interna',
-            '.btn-novo-core'
+			'.btn-novo-core',
+			'#dismiss'
 		];
 		$(listCinza).toggleClass('contraste-cinza');
 

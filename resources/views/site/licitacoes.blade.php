@@ -44,11 +44,11 @@ $situacoes = LicitacaoHelper::situacoes();
 	          	  @endforeach
 	            </select>
           	</div>
-          	<div class="col-md-3">
+          	<div class="col-md-3 mt-2-768">
           	  <label for="nrprocesso">Nº do processo</label>
           	  <input type="text" name="nrprocesso" class="form-control nrprocessoInput" placeholder="Nº do processo" id="nrprocesso">
           	</div>
-          	<div class="col-md-3">
+          	<div class="col-md-3 mt-2-768">
           	  <label for="nrlicitacao">Nº da Licitação</label>
           	  <input type="text" name="nrlicitacao" class="form-control nrlicitacaoInput" placeholder="Nº da licitação" id="nrlicitacao">
           	</div>
@@ -63,7 +63,7 @@ $situacoes = LicitacaoHelper::situacoes();
 	          	  @endforeach
 	            </select>
           	</div>
-          	<div class="col-lg-3 col-md-6">
+          	<div class="col-lg-3 col-md-6 mt-2-768">
           	  <label for="datarealizacao">Data de Realização</label>
           	  <input type="text" class="form-control dataInput" placeholder="dd/mm/aaaa" name="datarealizacao">
           	</div>
@@ -93,7 +93,7 @@ $situacoes = LicitacaoHelper::situacoes();
                 <div class="linha-lg-mini"></div>
                 <p>{!! Helper::resumo($licitacao->objeto) !!}</p>
                 <div class="mt-3 row bot-lg">
-                  <div class="col-sm-4 d-flex">
+                  <div class="col-sm-4 d-flex mb-2-576">
                     <div class="mr-2">
                       <i class="far fa-file-alt"></i>
                     </div>
@@ -104,7 +104,7 @@ $situacoes = LicitacaoHelper::situacoes();
                       </h6>
                     </div>
                   </div>
-                  <div class="col-sm-4 d-flex">
+                  <div class="col-sm-4 d-flex mb-2-576">
                     <div class="mr-2">
                       <i class="far fa-clock"></i>
                     </div>

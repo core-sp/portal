@@ -34,7 +34,7 @@ $situacoes = ConcursoHelper::situacoes();
           </div>
           <div class="linha-lg-mini"></div>
           <div class="form-row mb-2">
-          	<div class="col">
+          	<div class="col-md-6">
           	  <label for="modalidade">Modalidade</label>
           	  <select name="modalidade" class="form-control" id="modalidade">
           	  	<option value="">Todas</option>
@@ -43,13 +43,13 @@ $situacoes = ConcursoHelper::situacoes();
 	          	  @endforeach
 	            </select>
           	</div>
-          	<div class="col">
+          	<div class="col-md-6 mt-2-768">
           	  <label for="nrprocesso">Nº do processo</label>
           	  <input type="text" name="nrprocesso" class="form-control nrprocessoInput" placeholder="Nº do processo" id="nrprocesso">
           	</div>
           </div>
           <div class="form-row">
-          	<div class="col">
+          	<div class="col-md-4">
           	  <label for="situacao">Situação</label>
           	  <select name="situacao" class="form-control" id="situacao">
           	  	<option value="">Qualquer</option>
@@ -58,11 +58,11 @@ $situacoes = ConcursoHelper::situacoes();
 	          	  @endforeach
 	            </select>
           	</div>
-          	<div class="col">
+          	<div class="col-md-4 mt-2-768">
           	  <label for="datarealizacao">Data de Realização</label>
           	  <input type="text" class="form-control dataInput" name="datarealizacao" placeholder="dd/mm/aaaa">
           	</div>
-            <div class="col align-self-end pesquisaLicitacao-btn">
+            <div class="col-md-4 align-self-end pesquisaLicitacao-btn">
               <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
               <button type="reset" class="btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</button>
             </div>

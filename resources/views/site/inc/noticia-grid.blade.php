@@ -6,7 +6,7 @@
 @else
   @php $classe = ''; @endphp
 @endif
-<div class="col-lg-4 col-md-6 {{ $classe }}">
+<div class="col-lg-4 col-sm-6 {{ $classe }}">
   <a href="/noticia/{{ $noticia->slug }}">
     <div class="box-news">
       <img src="{{ asset(Helper::imgToThumb($noticia->img)) }}" class="bn-img" />

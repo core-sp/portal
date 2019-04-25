@@ -39,7 +39,7 @@ use \App\Http\Controllers\Helper;
   </div>
 </section>
 
-<section id="espaco-representante" class="pt-5">
+<section id="espaco-representante">
   <div class="container">
     <div class="row mb-2">
       <div class="col-12">
@@ -60,7 +60,7 @@ use \App\Http\Controllers\Helper;
           <div class="inside-box">
             <img src="{{ asset('img/002-money.png') }}" class="inside-img" />
             <p class="text-uppercase mt-3 branco">Simulador de<br class="hide-992" /> Cálculos</p>
-            <a href="#" class="btn-box mt-4">Calcular</a>
+            <a href="#" class="btn-box">Calcular</a>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@ use \App\Http\Controllers\Helper;
             <div class="inside-box">
               <img src="{{ asset('img/001-work.png') }}" class="inside-img" />
               <p class="text-uppercase mt-3 branco">Balcão de Oportunidades</p>
-              <button class="btn-box mt-4">Acessar</button>
+              <button class="btn-box">Acessar</button>
             </div>
           </div>
         </a>
@@ -81,7 +81,7 @@ use \App\Http\Controllers\Helper;
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" />
               <p class="text-uppercase mt-3 branco">Emissão de boleto<br class="hide-992" /> anuidade 2019</p>
-              <button href="#" class="btn-box mt-4">EMITIR</button>
+              <button href="#" class="btn-box">EMITIR</button>
             </div>
           </div>
         </a>
@@ -92,7 +92,7 @@ use \App\Http\Controllers\Helper;
             <div class="inside-box">
               <img src="{{ asset('img/appointment.png') }}" class="inside-img" />
               <p class="text-uppercase mt-3 branco">Agende seu<br class="hide-992" /> atendimento</p>
-              <button class="btn-box mt-4">Agendar</button>
+              <button class="btn-box">Agendar</button>
             </div>
           </div>
         </a>
@@ -108,8 +108,11 @@ use \App\Http\Controllers\Helper;
         <div class="text-center novo-core-box">
           <h2 class="stronger branco text-uppercase">um novo core-sp para você!</h2>
           <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
+          <br class="show-576 br-novo-core" />
           <a href="/concursos" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
+          <br class="show-768 br-novo-core" />
           <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
+          <br class="show-576 br-novo-core" />
           <a href="/cursos" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
         </div>
       </div>
@@ -142,7 +145,7 @@ use \App\Http\Controllers\Helper;
   </div>
 </section>
 
-<section id="beneficios" class="pt-5">
+<section id="beneficios">
   <div class="container">
     <div class="row">
       <div class="col-12">
@@ -174,10 +177,10 @@ use \App\Http\Controllers\Helper;
           </blockquote>
         </div>
         <div class="row">
-          <div class="col-8">
+          <div class="col-sm-8">
             <img src="{{ asset('img/computer.png') }}" />
           </div>
-          <div class="col-4 eouv-imgs align-self-center pl-3 center-992">
+          <div class="col-sm-4 hide-576 eouv-imgs align-self-center pl-3 center-992">
             <div class="m-auto pb-3">
               <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" />
               <img src="{{ asset('img/icon-eouv-02.png') }}" class="azul-escuro-bg" />
@@ -201,10 +204,10 @@ use \App\Http\Controllers\Helper;
           </blockquote>
         </div>
         <div id="calendario" class="row">
-          <div class="col-8">
+          <div class="col-sm-8">
             <img src="{{ asset('img/calendario.png') }}" />
           </div>
-          <div class="col-4 align-self-center text-right pr-4">
+          <div class="col-sm-4 hide-576 align-self-center text-right pr-4">
             <div class="calendario-txt">
               <p class="preto">Confira o calendário completo de<br>atendimento e expediente <br>de sua região.</p>
               <a href="#" class="btn-calendario mt-4">

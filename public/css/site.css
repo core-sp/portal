@@ -454,6 +454,7 @@ strong, .bold {
 /* ESPAÇO DO REPRESENTANTE */
 #espaco-representante {
 	padding-bottom: 8rem;
+	padding-top: 3rem;
 	background-color: #eaeaea;
 }
 
@@ -515,6 +516,7 @@ strong, .bold {
 	font-size: 1.1rem;
 	display: inline-block;
 	transition: .3s;
+	margin-top: 1.5rem;
 }
 
 .btn-box:hover {
@@ -526,6 +528,7 @@ strong, .bold {
 /* NOVO CORE */
 #novo-core {
 	margin-top: -5rem;
+	margin-bottom: 3rem;
 }
 
 #novo-core h2,
@@ -541,7 +544,7 @@ strong, .bold {
 	background-size: cover;
 	background-position: center;
 	background-attachment: fixed;
-	padding: 3rem 0.5rem;
+	padding: 3rem;
 }
 
 .novo-core-box h2 {
@@ -634,6 +637,7 @@ strong, .bold {
 /* BENEFÍCIOS */
 #beneficios {
 	margin-bottom: -4rem;
+	padding-top: 3rem;
 }
 
 .beneficios-box {
@@ -1222,7 +1226,9 @@ footer p {
 	font-weight: 300;
 }
 
-.show-992 {
+.show-992,
+.show-768,
+.show-576 {
 	display: none;
 }
 
@@ -1416,6 +1422,10 @@ footer p {
 	.novo-core-box h2 {
 		margin-bottom: 2.5rem;
 	}
+
+	.novo-core-box {
+		padding: 2.5rem;
+	}
 	
 }
 
@@ -1594,10 +1604,22 @@ footer p {
 	.edital-info .quarenta {
 		width: 30%;
 	}
+
+	.conteudo-txt p {
+		font-size: 1rem;
+	}
+
+	.mb-2-576 {
+		margin-bottom: .5rem;
+	}
+
+	.novo-core-box {
+		padding: 2rem;
+	}
 }
 
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 767px) {
 	.mudaw {
 		padding-left: 15px;
 	}
@@ -1746,4 +1768,158 @@ footer p {
 		color: #15AAE2 !important;
 		padding-left: 30px !important;
 	}
+
+	#espaco-representante {
+		padding-top: 2.5rem;
+		padding-bottom: 7rem;
+	}
+
+	#novo-core {
+		margin-bottom: 2.5rem;
+	}
+
+	#beneficios {
+		padding-top: 2.5rem;
+	}
+
+	.show-768 {
+		display: block;
+	}
+
+	.br-novo-core {
+		content: '';
+		height: 15px;;
+	}
+
+	.box-news,
+	.curso-grid {
+		height: 168px;
+	}
+
+	.box-news-txt {
+		padding: 1.5rem .5rem .5rem .5rem;
+	}
+
+	.beneficios-box {
+		padding-right: 0px;
+		padding-left: 0px;
+	}
+
+	.calendario-txt p {
+		font-size: 1rem;
+	}
+
+	footer .w-75 {
+		width: 100% !important;
+	}
+
+	.mt-4-768 {
+		margin-top: 1.5rem;
+	}
+
+	.mt-2-768 {
+		margin-top: .5rem;
+	}
+
+	.novo-core-box {
+		padding: 1.5rem;
+	}
+}
+
+
+@media screen and (max-width: 576px) {
+
+	h1 {
+		font-size: 2rem;
+		line-height: 1.2;
+	}
+	
+	h2 {
+		font-size: 1.8rem;
+	}
+	
+	h3 {
+		font-size: 1.4rem;
+	}
+	
+	h4 {
+		font-size: 1.1rem;
+	}
+	
+	h5 {
+		font-size: .95rem;
+	}
+	
+	h6 {
+		font-size: .7rem;
+	}
+	
+	p {
+		font-size: .85rem;
+	}
+	
+	.p-menor {
+		font-size: .75rem;
+	}
+
+	.carousel {
+		height: 190px;
+	}
+
+	.pagina-titulo-img {
+		height: 145px;
+	}
+
+	.home-title h5 {
+		display: none;
+	}
+
+	.box,
+	.box-news,
+	.curso-grid,
+	.curso-grid-content {
+		width: 75%;
+		margin: 0 auto;
+	}
+
+	.box-news {
+		margin-bottom: 15px;
+	}
+
+	.hide-576 {
+		display: none;
+	}
+
+	.show-576 {
+		display: block;
+	}
+
+	#espaco-representante {
+		padding-top: 2rem;
+	}
+
+	#novo-core {
+		margin-bottom: 2rem;
+	}
+
+	#beneficios {
+		padding-top: 2rem;
+	}
+
+	.btn-box {
+		margin-top: 1.2rem;
+	}
+
+	.curso-grid-content {
+		padding: .75rem 1rem 1rem 1rem;
+	}
+
+	.mb-15-576 {
+		margin-bottom: 15px;
+	}
+
+	.btn-novo-core {
+		width: 200px;
+	}
+
 }

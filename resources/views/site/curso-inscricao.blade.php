@@ -48,7 +48,7 @@ $now = now();
 						@csrf
 						<input type="hidden" name="idcurso" value="{{ $curso->idcurso }}" />
 						<div class="form-row">
-							<div class="col">
+							<div class="col-md-6">
 								<label for="nome">Nome *</label>
 								<input type="text"
 									class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
@@ -60,7 +60,7 @@ $now = now();
 									</div>
 								@endif
 							</div>
-							<div class="col">
+							<div class="col-md-6 mt-2-768">
 								<label for="email">Email *</label>
 								<input type="text"
 									class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}""
@@ -74,7 +74,7 @@ $now = now();
 							</div>
 						</div>
 						<div class="form-row mt-2 mb-4">
-							<div class="col">	
+							<div class="col-md-4">	
 								<label for="cpf">CPF *</label>
 								<input type="text"
 									class="form-control {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
@@ -86,7 +86,7 @@ $now = now();
 									</div>
 								@endif
 							</div>
-							<div class="col">
+							<div class="col-md-4 mt-2-768">
 								<label for="telefone">Telefone *</label>
 								<input type="text"
 									class="form-control {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
@@ -98,7 +98,7 @@ $now = now();
 									</div>
 								@endif
 							</div>
-							<div class="col">
+							<div class="col-md-4 mt-2-768">
 								<label for="registrocore">Nº de registro no CORE</label>
 								<input type="text"
 									class="form-control {{ $errors->has('registrocore') ? 'is-invalid' : '' }}"
