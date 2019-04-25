@@ -22,7 +22,7 @@ class AgendamentoTableSeeder extends Seeder
         $agendamento->celular = "(11) 98999-9907";
         $agendamento->dia = $dia;
         $agendamento->hora = "09:30";
-        $agendamento->protocolo = "AGE000000";
+        $agendamento->protocolo = "AGE-000000";
         $agendamento->tiposervico = "Refis para PF";
         $agendamento->idregional = 1;
         $agendamento->idusuario = 1;
@@ -36,7 +36,7 @@ class AgendamentoTableSeeder extends Seeder
         $agendamento->celular = "(11) 97855-9932";
         $agendamento->dia = $dia;
         $agendamento->hora = "10:30";
-        $agendamento->protocolo = "AGE000000";
+        $agendamento->protocolo = "AGE-000000";
         $agendamento->tiposervico = "Refis para PJ";
         $agendamento->idregional = 1;
         $agendamento->save();
@@ -48,7 +48,7 @@ class AgendamentoTableSeeder extends Seeder
         $agendamento->celular = "(11) 96666-9932";
         $agendamento->dia = $dia;
         $agendamento->hora = "10:00";
-        $agendamento->protocolo = "AGE000000";
+        $agendamento->protocolo = "AGE-000000";
         $agendamento->tiposervico = "Refis para PF";
         $agendamento->idregional = 4;
         $agendamento->save();

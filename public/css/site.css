@@ -850,7 +850,8 @@ footer p {
 }
 
 .pesquisaLicitacao label,
-.inscricaoCurso label {
+.inscricaoCurso label,
+.consultaAgendamento label {
 	font-size: 0.85rem;
 	margin-bottom: 0.25rem;
 	margin-left: .25rem;
@@ -1236,6 +1237,15 @@ footer p {
 #menuResponsivo,
 .overlay {
 	display: none;
+}
+
+.input-group-append button,
+.input-group-text {
+    font-size: .95rem;
+}
+
+.protocoloInput {
+	text-transform: uppercase;
 }
 
 /*

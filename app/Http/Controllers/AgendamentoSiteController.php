@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Agendamento;
 use App\Regional;
+use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 
 class AgendamentoSiteController extends Controller
@@ -126,7 +127,7 @@ class AgendamentoSiteController extends Controller
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
         do {
             $random = substr(str_shuffle($characters), 0, 6);
-            $random = 'AGE'.$random;
+            $random = 'AGE-'.$random;
             $checaProtocolo = Agendamento::where('protocolo',$random)->get();
         } while(!$checaProtocolo->isEmpty());  
         //Inputa os dados
@@ -161,4 +162,48 @@ class AgendamentoSiteController extends Controller
         // Retorna view de agradecimento
         return view('site.agradecimento')->with('agradece', $agradece);
     }
+
+    public function consultaView()
+    {
+        return view('site.agendamento-consulta');
+    }
+
+    public function consulta()
+    {
+        $protocolo = Input::get('protocolo');
+        if (!empty($protocolo)){
+            $busca = true;
+        } else {
+            $busca = false;
+        }
+        $now = date('Y-m-d');
+        $protocolo = 'AGE-'.$protocolo;
+        $resultado = Agendamento::where('protocolo','LIKE',$protocolo)
+            ->where('dia','>=',$now)
+            ->first();
+        return view('site.agendamento-consulta', compact('resultado', 'busca'));
+    }
+
+    public function cancelamento(Request $request)
+    {
+        $id = $request->input('idagendamento');
+        $cpf = $request->input('cpf');
+        $agendamento = Agendamento::find($id);
+        if($agendamento->cpf != $cpf){
+            abort(500);
+        } else {
+            $now = date('Y-m-d');
+            $agendamento->status = "Cancelado";
+            if($now < $agendamento->dia) {
+                $update = $agendamento->update();
+                if(!$update)
+                    abort(500);
+                $agradece = "Agendamento cancelado com sucesso!";
+                return view('site.agradecimento')->with('agradece', $agradece);
+            } else {
+                abort(500);
+            }
+        }
+    }
+
 }
