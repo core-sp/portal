@@ -33,18 +33,38 @@
                 @endif
             </div>
         </div>
-        <div class="form-group mt-2">
-            <label for="mensagem">Mensagem</label>
-            <textarea name="mensagem"
-                class="form-control {{ $errors->has('mensagem') ? 'is-invalid' : '' }}"
-                id="mensagem"
-                placeholder="Descreva com detalhes sua solicitação"
-                rows="3"></textarea>
-            @if($errors->has('mensagem'))
-            <div class="invalid-feedback">
-                {{ $errors->first('mensagem') }}
+        <div class="form-row mt-2">
+            <div class="col">
+                <label for="mensagem">Mensagem</label>
+                <textarea name="mensagem"
+                    class="form-control {{ $errors->has('mensagem') ? 'is-invalid' : '' }}"
+                    id="mensagem"
+                    placeholder="Descreva com detalhes sua solicitação"
+                    rows="3"></textarea>
+                @if($errors->has('mensagem'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('mensagem') }}
+                </div>
+                @endif
             </div>
-            @endif
+        </div>
+        <div class="form-row mt-2">
+            <div class="col">
+                <label for="lfm">Print</label>
+                <div class="input-group">
+                <span class="input-group-prepend">
+                    <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
+                    <i class="fas fa-picture-o"></i> Inserir imagem
+                    </a>
+                </span>
+                <input id="thumbnail"
+                    class="form-control"
+                    type="text"
+                    name="img"
+                    placeholder="Se necessário, anexe um print à solicitação"
+                    />
+                </div>
+            </div>
         </div>
     </div>
     <div class="card-footer float-right">

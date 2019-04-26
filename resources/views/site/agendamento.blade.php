@@ -39,7 +39,8 @@ $pessoas = AgendamentoControllerHelper::pessoas();
     <div class="row mb-4">
       <div class="col">
       <div class="conteudo-txt">
-      <p>Agende seu atendimento presencial no CORE-SP, com até um mês de antecedência.</p>  
+      <p>Agende seu atendimento presencial no CORE-SP, com até um mês de antecedência.<br />
+      Ou então, consulte as <a href="/agendamento-consulta" class="text-primary">informações do atendimento já agendado.</a></p> 
       </div>
         <div class="mt-2">
           <form method="POST" class="inscricaoCurso">

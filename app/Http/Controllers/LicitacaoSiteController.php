@@ -27,9 +27,13 @@ class LicitacaoSiteController extends Controller
         $buscaNrLicitacao = Input::get('nrlicitacao');
         $buscaNrProcesso = Input::get('nrprocesso');
         $dia = Input::get('datarealizacao');
-        $replace = str_replace('/','-',$dia);
-        $dia = new \DateTime($replace);
-        $buscaDataRealizacao = $dia->format('Y-m-d');
+        if(isset($dia)) {
+            $replace = str_replace('/','-',$dia);
+            $dia = new \DateTime($replace);
+            $buscaDataRealizacao = $dia->format('Y-m-d');
+        } else {
+            $buscaDataRealizacao = '';
+        }
         if (!empty($buscaModalidade) 
             or !empty($buscaSituacao) 
             or !empty($buscaNrLicitacao)
@@ -46,6 +50,7 @@ class LicitacaoSiteController extends Controller
             ->where('nrprocesso','LIKE',$buscaNrProcesso)
             ->where('datarealizacao','LIKE','%'.$buscaDataRealizacao.'%')
             ->paginate(10);
+        echo "<script>console.log('".$dia."')</script>";
         if (count($licitacoes) > 0) {
             return view('site.licitacoes', compact('licitacoes', 'busca'));
         } else {

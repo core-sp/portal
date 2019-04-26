@@ -1,5 +1,5 @@
 var show_list;
-var sort_type = 'alphabetic';
+var sort_type = 'updated';
 
 $(document).ready(function () {
   bootbox.setDefaults({locale:lang['locale-bootbox']});

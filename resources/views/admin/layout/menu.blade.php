@@ -1,8 +1,12 @@
+@php
+  $role = Auth::user()->perfil()->first()->nome;
+@endphp
+
 <!-- Sidebar Menu -->
 <nav class="mt-2 mb-2">
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Usuários -->
-        @if(Auth::user()->hasAnyRole(['Admin']))
+        @if($role === 'Admin')
         <li class="nav-item has-treeview">
         <a href="#" class="nav-link">
             <i class="nav-icon fa fa-users"></i>
@@ -50,10 +54,10 @@
         </a>
         </li>
         <!-- Conteúdo -->
-        @if(Auth::user()->hasAnyRole(['Admin', 'Editor', 'Gestão de Atendimento']))
+        @if($role === 'Admin' || $role === 'Editor' || $role === 'Gestão de Atendimento')
         <li class="nav-header">CONTEÚDO</li>
         @endif
-        @if(Auth::user()->hasAnyRole(['Admin', 'Editor']))
+        @if($role === 'Admin' || $role === 'Editor')
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
             <i class="nav-icon fas fa-file-alt"></i>
@@ -84,7 +88,7 @@
             </ul>
         </li>
         @endif
-        @if(Auth::user()->hasAnyRole(['Admin', 'Editor', 'Gestão de Atendimento']))
+        @if($role === 'Admin' || $role === 'Editor' || $role === 'Gestão de Atendimento')
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
             <i class="nav-icon far fa-newspaper"></i>
@@ -109,7 +113,7 @@
             </ul>
         </li>
         @endif
-        @if(Auth::user()->hasAnyRole(['Admin', 'Editor']))
+        @if($role === 'Admin' || $role === 'Editor')
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
             <i class="nav-icon fas fa-graduation-cap"></i>
@@ -134,7 +138,7 @@
             </ul>
         </li>
         @endif
-        @if(Auth::user()->hasAnyRole(['admin']))
+        @if($role === 'Admin')
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
             <i class="nav-icon fas fa-briefcase"></i>
@@ -160,10 +164,10 @@
         </li>
         @endif
         <!-- Atendimento -->
-        @if(Auth::user()->hasAnyRole(['Admin', 'Atendimento', 'Gestão de Atendimento']))
+        @if($role === 'Admin' || $role === 'Editor' || $role === 'Gestão de Atendimento')
         <li class="nav-header">ATENDIMENTO</li>
         @endif
-        @if(Auth::user()->hasAnyRole(['Admin', 'Atendimento', 'Gestão de Atendimento']))
+        @if($role === 'Admin' || $role === 'Editor' || $role === 'Gestão de Atendimento')
         <li class="nav-item">
             <a href="/admin/agendamentos" class="nav-link">
                 <i class="nav-icon far fa-clock"></i>
@@ -171,7 +175,7 @@
             </a>
         </li>
         @endif
-        @if(Auth::user()->hasAnyRole(['Admin', 'Gestão de Atendimento']))
+        @if($role === 'Admin' || $role === 'Gestão de Atendimento')
         <li class="nav-item">
             <a href="/admin/agendamentos/bloqueios" class="nav-link">
                 <i class="nav-icon fas fa-ban"></i>
@@ -180,10 +184,10 @@
         </li>
         @endif
         <!-- Jurídico -->
-        @if(Auth::user()->hasAnyRole(['Admin', 'Jurídico']))
+        @if($role === 'Admin' || $role === 'Jurídico')
         <li class="nav-header">JURÍDICO</li>
         @endif
-        @if(Auth::user()->hasAnyRole(['Admin', 'Jurídico']))
+        @if($role === 'Admin' || $role === 'Jurídico')
         <li class="nav-item has-treeview">
         <a href="#" class="nav-link">
             <i class="nav-icon far fa-file-alt"></i>
@@ -208,7 +212,7 @@
         </ul>
         </li>
         @endif
-        @if(Auth::user()->hasAnyRole(['Admin', 'Jurídico']))
+        @if($role === 'Admin' || $role === 'Jurídico')
         <li class="nav-item has-treeview">
         <a href="#" class="nav-link">
             <i class="nav-icon far fa-edit"></i>

@@ -188,20 +188,34 @@ class AgendamentoSiteController extends Controller
     {
         $id = $request->input('idagendamento');
         $cpf = $request->input('cpf');
+        $protocolo = $request->input('protocolo');
+        // Define as regras de validação
+        $regras = [
+            'cpf' => 'required'
+        ];
+        $mensagens = [
+            'required' => 'O :attribute é obrigatório'
+        ];
+        $erros = $request->validate($regras, $mensagens);
+        //Chama o banco
         $agendamento = Agendamento::find($id);
         if($agendamento->cpf != $cpf){
-            abort(500);
+            return redirect('/agendamento-consulta')
+                ->with('message', '<i class="icon fa fa-ban"></i>O CPF informado não corresponde ao protocolo. Por favor, pesquise novamente o agendamento')
+                ->with('class', 'alert-danger');
         } else {
             $now = date('Y-m-d');
-            $agendamento->status = "Cancelado";
             if($now < $agendamento->dia) {
+                $agendamento->status = "Cancelado";
                 $update = $agendamento->update();
                 if(!$update)
                     abort(500);
                 $agradece = "Agendamento cancelado com sucesso!";
                 return view('site.agradecimento')->with('agradece', $agradece);
             } else {
-                abort(500);
+                return redirect('/agendamento-consulta')
+                    ->with('message', '<i class="icon fa fa-ban"></i>Não é possível cancelar o agendamento no dia do atendimento')
+                    ->with('class', 'alert-danger');
             }
         }
     }
