@@ -26,9 +26,13 @@ class ConcursoSiteController extends Controller
         $buscaSituacao = Input::get('situacao');
         $buscaNrProcesso = Input::get('nrprocesso');
         $dia = Input::get('datarealizacao');
-        $replace = str_replace('/','-',$dia);
-        $dia = new \DateTime($replace);
-        $buscaDataRealizacao = $dia->format('Y-m-d');
+        if(isset($dia)) {
+            $replace = str_replace('/','-',$dia);
+            $dia = new \DateTime($replace);
+            $buscaDataRealizacao = $dia->format('Y-m-d');
+        } else {
+            $buscaDataRealizacao = '';
+        }
         if (!empty($buscaModalidade) 
             or !empty($buscaSituacao)
             or !empty($buscaNrProcesso)

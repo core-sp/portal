@@ -34,6 +34,17 @@
       </div>
     </div>
     <div class="linha-lg"></div>
+    @if(Session::has('message'))
+    <div class="container">
+      <div class="row mt-2 mb-2">
+        <div class="col nopadding">
+          <div class="alert {{ Session::get('class') }}">
+            {!! Session::get('message') !!}
+          </div>
+        </div>
+      </div>
+    </div>
+    @endif
     <div class="row mb-4">
       <div class="col">
         <div class="conteudo-txt">
@@ -67,11 +78,6 @@
     </div>
   </div>
   @if(isset($busca))
-  <div class="container-fluid">
-    <div class="row">
-      <div class="linha-cinza"></div>
-    </div>
-  </div>
   <div class="container">
     @if(isset($resultado))
     <div class="row mt-4 mb-2">
@@ -97,26 +103,34 @@
         <form method="POST" class="mt-2">
         @csrf
         {{ method_field('PUT') }}
+        <input type="hidden" value="{{ $resultado->protocolo }}" name="protocolo" />
         <input type="hidden" value="{{ $resultado->idagendamento }}" name="idagendamento" />
         <div class="input-group">
             <input type="text"
-            class="form-control cpfInput {{ $errors->has('protocolo') ? 'is-invalid' : '' }}"  
-            name="cpf"
-            id="cpf"
-            minlength="10"
-            placeholder="000.000.000-00"
-            required
-            />
+              class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"  
+              name="cpf"
+              id="cpf"
+              placeholder="000.000.000-00"
+              />
             <div class="input-group-append">
-            <button type="submit" class="btn btn-danger">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Cancelar</button>
             </div>
+            @if($errors->has('cpf'))
+            <div class="invalid-feedback">
+              {{ $errors->first('cpf') }}
+            </div>
+            @endif
         </div>
         </form>
       </div>
     </div>
     @endif
     @else
-    Nenhum agendamento encontrado!
+    <div class="row mt-4 mb-2">
+      <div class="col">
+      Nenhum agendamento encontrado!
+      </div>
+    </div>
     @endif
   </div>
   @endif

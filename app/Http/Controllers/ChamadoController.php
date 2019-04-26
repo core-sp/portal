@@ -100,6 +100,7 @@ class ChamadoController extends Controller
         $chamado->tipo = $request->input('tipo');
         $chamado->prioridade = $request->input('prioridade');
         $chamado->mensagem = $request->input('mensagem');
+        $chamado->img = $request->input('img');
         $chamado->idusuario = $request->input('idusuario');
         $save = $chamado->save();
         if(!$save)

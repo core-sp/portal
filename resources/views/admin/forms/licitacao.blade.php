@@ -92,7 +92,7 @@ $situacoes = LicitacaoHelper::situacoes();
         <div class="col">
             <label for="edital">Edital</label>
             <div class="input-group">
-            <span class="input-group-btn">
+            <span class="input-group-prepend">
                 <a id="edital" data-input="file" data-preview="holder" class="btn btn-default">
                 <i class="fas fa-file-o"></i> Inserir Edital
                 </a>

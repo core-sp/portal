@@ -18,6 +18,7 @@ class CreateChamadosTable extends Migration
             $table->string('tipo');
             $table->string('prioridade');
             $table->text('mensagem');
+            $table->string('img')->nullable();
             $table->bigInteger('idusuario')->unsigned();
             $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();
