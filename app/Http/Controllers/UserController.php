@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use App\User;
-use App\Perfil;
 use App\Regional;
+use App\Http\Controllers\ControleControllers;
 
 class UserController extends Controller
 {
@@ -61,7 +61,7 @@ class UserController extends Controller
                 $resultado->idusuario,
                 $resultado->nome,
                 $resultado->email,
-                $resultado->perfil[0]->nome,
+                $resultado->perfil,
                 $resultado->regional->regional,
                 $acoes
             ];
@@ -76,9 +76,9 @@ class UserController extends Controller
         return $tabela;
     }
     
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -87,15 +87,15 @@ class UserController extends Controller
 
     public function create()
     {
-        $perfis = Perfil::all();
+        ControleController::autorizacao(['Admin']);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
-        return view('admin.crud.criar', compact('variaveis', 'perfis', 'regionais'));
+        return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $regras = [
             'nome' => 'required',
             'email' => 'email|required',
@@ -111,12 +111,12 @@ class UserController extends Controller
         $usuario = new User();
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
+        $usuario->perfil = $request->input('perfil');
         $usuario->idregional = $request->input('idregional');
         $usuario->password = Hash::make($request->input('password'));
         $save = $usuario->save();
         if(!$save)
             abort(500);
-        $usuario->perfil()->attach([$request->input('perfil')]);
         return redirect('/admin/usuarios')
             ->with('message', '<i class="icon fa fa-check"></i>Usuário cadastrado com sucesso!')
             ->with('class', 'alert-success');
@@ -124,16 +124,16 @@ class UserController extends Controller
 
     public function edit($id)
     {
+        ControleController::autorizacao(['Admin']);
         $resultado = User::find($id);
-        $perfis = Perfil::all();
         $regionais = Regional::all();
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.editar', compact('resultado', 'perfis', 'variaveis', 'regionais'));
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
     }
 
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $regras = [
             'nome' => 'required',
             'email' => 'email|required'
@@ -146,11 +146,11 @@ class UserController extends Controller
         $usuario = User::find($id);
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
+        $usuario->perfil = $request->input('perfil');
         $usuario->idregional = $request->input('idregional');
         $update = $usuario->update();
         if(!$update)
             abort(500);
-        $usuario->perfil()->sync([$request->input('perfil')]);
         return redirect('/admin/usuarios')
             ->with('message', '<i class="icon fa fa-check"></i>Usuário editado com sucesso!')
             ->with('class', 'alert-success');
@@ -158,7 +158,7 @@ class UserController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $usuario = User::find($id);
         $delete = $usuario->delete();
         if(!$delete)
@@ -171,7 +171,7 @@ class UserController extends Controller
 
     public function lixeira(Request $request)
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = User::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -206,7 +206,7 @@ class UserController extends Controller
 
     public function restore(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $usuario = User::onlyTrashed()->find($id);
         $usuario->restore();
         return redirect()->route('usuarios.lista')
@@ -260,6 +260,7 @@ class UserController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao(['Admin']);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = User::where('nome','LIKE','%'.$busca.'%')

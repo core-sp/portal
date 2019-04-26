@@ -46,8 +46,8 @@
                 <label for="telefone">Telefone</label>
                 <input type="text"
                     name="telefone"
-                    class="form-control {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
-                    placeholder="Telefone"
+                    class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
+                    placeholder="(00) 00000-0000"
                     @if(isset($resultado))
                     value="{{ $resultado->telefone }}" 
                     @endif
@@ -62,8 +62,8 @@
                 <label for="cpf">CPF</label>
                 <input type="text"
                     name="cpf"
-                    class="form-control {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
-                    placeholder="CPF"
+                    class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
+                    placeholder="000.000.000-00"
                     @if(isset($resultado))
                     value="{{ $resultado->cpf }}" 
                     @endif

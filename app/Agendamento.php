@@ -11,6 +11,7 @@ class Agendamento extends Model
 
     protected $primaryKey = 'idagendamento';
     protected $table = 'agendamentos';
+    protected $with = ['user', 'regional'];
 
     public function regional()
     {

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use App\Licitacao;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\CrudController;
+use App\Http\Controllers\ControleController;
 
 class LicitacaoController extends Controller
 {
@@ -82,9 +83,9 @@ class LicitacaoController extends Controller
         return $tabela;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -96,9 +97,9 @@ class LicitacaoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create()
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
@@ -111,7 +112,7 @@ class LicitacaoController extends Controller
      */
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $regras = [
             'modalidade' => 'required',
             'nrlicitacao' => 'required',
@@ -155,9 +156,9 @@ class LicitacaoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $resultado = Licitacao::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -172,7 +173,7 @@ class LicitacaoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $regras = [
             'modalidade' => 'required',
             'nrlicitacao' => 'required',
@@ -216,9 +217,9 @@ class LicitacaoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $licitacao = Licitacao::find($id);
         $delete = $licitacao->delete();
         if(!$delete)
@@ -233,9 +234,9 @@ class LicitacaoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function lixeira(Request $request)
+    public function lixeira()
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = Licitacao::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -274,9 +275,9 @@ class LicitacaoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function restore(Request $request, $id)
+    public function restore($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $licitacao = Licitacao::onlyTrashed()->find($id);
         $licitacao->restore();
         return redirect()->route('licitacoes.lista')
@@ -286,6 +287,7 @@ class LicitacaoController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Licitacao::where('modalidade','LIKE','%'.$busca.'%')

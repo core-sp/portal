@@ -1,5 +1,6 @@
 @php
-use \App\Http\Controllers\Helper;
+  use \App\Http\Controllers\Helper;
+  use App\Http\Controllers\ControleController;
 @endphp
 
 <!doctype html>

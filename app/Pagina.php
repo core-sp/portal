@@ -9,6 +9,7 @@ class Pagina extends Model
 {
     use SoftDeletes;
     protected $primaryKey = 'idpagina';
+    protected $with = ['user', 'paginacategoria'];
 
     public function paginacategoria()
     {

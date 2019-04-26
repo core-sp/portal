@@ -8,6 +8,7 @@ use App\Curso;
 use App\CursoInscrito;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\CrudController;
+use App\Http\Controllers\ControleController;
 
 class CursoInscritoController extends Controller
 {
@@ -61,9 +62,9 @@ class CursoInscritoController extends Controller
         return $tabela;
     }
 
-    public function create(Request $request, $idcurso)
+    public function create($idcurso)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $curso = Curso::find($idcurso);
         $variaveis = [
             'form' => 'cursoinscrito',
@@ -76,18 +77,17 @@ class CursoInscritoController extends Controller
 
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $idcurso = $request->input('idcurso');
         $regras = [
             'cpf' => 'required|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso,
             'nome' => 'required',
-            'telefone' => 'required|numeric',
+            'telefone' => 'required',
             'email' => 'email'
         ];
         $mensagens = [
             'cpf.unique' => 'Este CPF já está cadastrado para o curso',
             'required' => 'O :attribute é obrigatório',
-            'numeric' => 'O :attribute aceita apenas números'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -101,12 +101,14 @@ class CursoInscritoController extends Controller
         $save = $inscrito->save();
         if(!$save)
             abort(500);
-        return Redirect::route('inscritos.lista', array('id' => $idcurso));
+        return Redirect::route('inscritos.lista', array('id' => $idcurso))
+            ->with('message', '<i class="icon fa fa-check"></i>Participante inscrito com sucesso!')
+            ->with('class', 'alert-success');
     }
 
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $resultado = CursoInscrito::find($id);
         $variaveis = [
             'form' => 'cursoinscrito',
@@ -119,7 +121,7 @@ class CursoInscritoController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $idcurso = $request->input('idcurso');
         $regras = [
             'cpf' => 'required',
@@ -143,7 +145,9 @@ class CursoInscritoController extends Controller
         $update = $inscrito->update();
         if(!$update)
             abort(500);
-        return Redirect::route('inscritos.lista', array('id' => $idcurso));
+        return Redirect::route('inscritos.lista', array('id' => $idcurso))
+            ->with('message', '<i class="icon fa fa-check"></i>Participante editado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public static function permiteInscricao($idcurso)
@@ -225,14 +229,16 @@ class CursoInscritoController extends Controller
         }
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $curso = CursoInscrito::find($id);
         $delete = $curso->delete();
         if(!$delete)
             abort(500);
-        return Redirect::route('inscritos.lista', array('id' => $curso->idcurso));
+        return Redirect::route('inscritos.lista', array('id' => $curso->idcurso))
+            ->with('message', '<i class="icon fa fa-ban"></i>Inscrição cancelada com sucesso!')
+            ->with('class', 'alert-danger');;
     }
 
 }

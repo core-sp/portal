@@ -10,6 +10,7 @@ class CursoInscrito extends Model
     use SoftDeletes;
     protected $primaryKey = 'idcursoinscrito';
     protected $table = 'curso_inscritos';
+    protected $with = ['curso'];
 
     public function curso()
     {
