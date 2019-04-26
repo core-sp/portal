@@ -13,7 +13,7 @@ class LicitacaoTableSeeder extends Seeder
     public function run()
     {
         $licitacao = new Licitacao();
-        $licitacao->modalidade = "Pregão Eletrônico";
+        $licitacao->modalidade = "Pregão Eletrônico Tradicional";
         $licitacao->uasg = "926753";
         $licitacao->edital = "/arquivos/PREGAO_002_2019.pdf";
         $licitacao->nrlicitacao = "002/2019";
@@ -26,7 +26,7 @@ class LicitacaoTableSeeder extends Seeder
         $licitacao->save();
 
         $licitacao = new Licitacao();
-        $licitacao->modalidade = "Pregão Eletrônico";
+        $licitacao->modalidade = "Pregão Eletrônico Tradicional";
         $licitacao->uasg = "926753";
         $licitacao->edital = "/arquivos/PREGAO_001_2019.pdf";
         $licitacao->nrlicitacao = "001/2019";

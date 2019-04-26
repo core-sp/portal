@@ -1,3 +1,7 @@
+@php
+  $perfis = App\Http\Controllers\Helpers\UserControllerHelper::perfis();
+@endphp
+
 <form role="form" method="POST" autocomplete="false">
     @csrf
     @if(isset($resultado))
@@ -26,13 +30,13 @@
             <select name="perfil" class="form-control">
             @foreach($perfis as $perfil)
                 @if(isset($resultado))
-                    @if($resultado->perfil[0]->idperfil == $perfil->idperfil)
-                    <option value="{{ $perfil->idperfil }}" selected>{{ $perfil->nome }}</option>
+                    @if($resultado->perfil == $perfil)
+                    <option value="{{ $perfil }}" selected>{{ $perfil }}</option>
                     @else
-                    <option value="{{ $perfil->idperfil }}">{{ $perfil->nome }}</option>
+                    <option value="{{ $perfil }}">{{ $perfil }}</option>
                     @endif
                 @else
-                <option value="{{ $perfil->idperfil }}">{{ $perfil->nome }}</option>
+                <option value="{{ $perfil }}">{{ $perfil }}</option>
                 @endif
             @endforeach
             </select>

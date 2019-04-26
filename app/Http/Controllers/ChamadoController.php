@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\Chamado;
 use App\Http\Controllers\Helper;
+use App\Http\Controllers\ControleController;
 
 class ChamadoController extends Controller
 {
@@ -71,7 +72,7 @@ class ChamadoController extends Controller
 
     public function index(Request $request)
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -112,7 +113,7 @@ class ChamadoController extends Controller
 
     public function show(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultado = Chamado::withTrashed()->find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.mostra', compact('variaveis', 'resultado'));
@@ -120,7 +121,7 @@ class ChamadoController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultado = Chamado::find($id);
         $delete = $resultado->delete();
         if(!$delete)
@@ -132,7 +133,7 @@ class ChamadoController extends Controller
 
     public function lixeira(Request $request)
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = Chamado::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -168,7 +169,7 @@ class ChamadoController extends Controller
 
     public function restore(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin']);
         $chamado = Chamado::onlyTrashed()->find($id);
         $chamado->restore();
         return redirect('/admin/chamados')
@@ -178,6 +179,7 @@ class ChamadoController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao(['Admin']);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Chamado::where('tipo','LIKE','%'.$busca.'%')

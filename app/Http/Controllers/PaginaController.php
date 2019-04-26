@@ -8,6 +8,7 @@ use App\Pagina;
 use App\User;
 use App\PaginaCategoria;
 use Illuminate\Support\Str;
+use App\Http\Controllers\ControleController;
 
 class PaginaController extends Controller
 {
@@ -86,9 +87,9 @@ class PaginaController extends Controller
         return $tabela;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -100,9 +101,9 @@ class PaginaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create()
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $categorias = PaginaCategoria::all();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('categorias', 'variaveis'));
@@ -116,7 +117,7 @@ class PaginaController extends Controller
      */
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $regras = [
             'titulo' => 'required',
             'conteudo' => 'required'
@@ -148,9 +149,9 @@ class PaginaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $resultado = Pagina::find($id);
         $categorias = PaginaCategoria::all();
         $variaveis = (object) $this->variaveis;
@@ -166,7 +167,7 @@ class PaginaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $regras = [
             'titulo' => 'required',
             'conteudo' => 'required'
@@ -197,9 +198,9 @@ class PaginaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $pagina = Pagina::find($id);
         $delete = $pagina->delete();
         if(!$delete)
@@ -214,9 +215,9 @@ class PaginaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function lixeira(Request $request)
+    public function lixeira()
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = Pagina::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -253,9 +254,9 @@ class PaginaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function restore(Request $request, $id)
+    public function restore($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin']);
         $pagina = Pagina::onlyTrashed()->find($id);
         $pagina->restore();
         return redirect('/admin/paginas')
@@ -263,9 +264,9 @@ class PaginaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function busca(Request $request)
+    public function busca()
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Pagina::where('titulo','LIKE','%'.$busca.'%')

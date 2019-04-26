@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use App\Http\Controllers\Helper;
 use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
+use App\Http\Controllers\ControleController;
+use Illuminate\Support\Facades\Auth;
 
 class AgendamentoController extends Controller
 {
@@ -34,7 +36,7 @@ class AgendamentoController extends Controller
         return $resultados;
     }
 
-    public function checaFiltros($request)
+    public function checaFiltros()
     {
         // Filtra dia da busca
         if(Input::has('dia')) {
@@ -56,10 +58,10 @@ class AgendamentoController extends Controller
             $regionalId = Regional::find($regional);
             $regionalNome = $regionalId->regional;
         } else {
-            $regional = Regional::find($request->user()->idregional);
+            $regional = Regional::find(Auth::user()->idregional);
             $regionalNome = $regional->regional;
         }
-        $request->user()->autorizarPerfis(['Admin', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Gestão de Atendimento']);
         // Puxa os resultados
         if(Input::has(['regional','status'])) {
             $resultados = $this->resultadosFiltro($dia, Input::get('regional'), Input::get('status'));
@@ -108,21 +110,21 @@ class AgendamentoController extends Controller
         return $resultados;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['Admin', 'Atendimento', 'Gestão de Atendimento']);
-        $regional = $request->user()->idregional;
+        ControleController::autorizacao(['Admin', 'Atendimento', 'Gestão de Atendimento']);
+        $regional = Auth::user()->idregional;
         // Checa se tem filtro
         if(Input::get('filtro') == 'sim') {
             $temFiltro = true;
-            $resultados = $this->checaFiltros($request);
+            $resultados = $this->checaFiltros();
         } else {
             $temFiltro = null;
             $date = new \DateTime();
             $dia = $date->format('Y-m-d');
             $diaFormatado = $date->format('d\/m\/Y');
             $resultados = $this->resultados($dia, $regional);
-            $regionalId = Regional::find($request->user()->idregional);
+            $regionalId = Regional::find(Auth::user()->idregional);
             $regionalNome = $regionalId->regional;
             $this->variaveis['continuacao_titulo'] = 'em '.$regionalNome.' - '.$diaFormatado;
         }
@@ -251,9 +253,9 @@ class AgendamentoController extends Controller
         return $tabela;
     }
 
-    public function updateStatus(Request $request)
+    public function updateStatus()
     {
-        $idusuario = $request->user()->idusuario;
+        $idusuario = Auth::user()->idusuario;
         $idagendamento = $_POST['idagendamento'];
         $status = $_POST['status'];
         $agendamento = Agendamento::find($idagendamento);

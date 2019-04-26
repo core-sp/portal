@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\PaginaCategoria;
+use App\Http\Controllers\ControleController;
 
 class PaginaCategoriaController extends Controller
 {
@@ -69,9 +70,9 @@ class PaginaCategoriaController extends Controller
         return $tabela;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -83,9 +84,9 @@ class PaginaCategoriaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create()
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
@@ -98,7 +99,7 @@ class PaginaCategoriaController extends Controller
      */
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $regras = [
             'nome' => 'required'
         ];
@@ -123,9 +124,9 @@ class PaginaCategoriaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $resultado = PaginaCategoria::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -140,7 +141,7 @@ class PaginaCategoriaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $regras = [
             'nome' => 'required'
         ];
@@ -165,9 +166,9 @@ class PaginaCategoriaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $pagina = PaginaCategoria::find($id);
         $delete = $pagina->delete();
         if(!$delete)
@@ -179,6 +180,7 @@ class PaginaCategoriaController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao(['Admin', 'Editor']);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = PaginaCategoria::where('nome','LIKE','%'.$busca.'%')

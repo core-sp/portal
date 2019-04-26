@@ -16,6 +16,7 @@ class User extends Authenticatable
 
     protected $primaryKey = 'idusuario';
     protected $table = 'users';
+    protected $with = ['regional'];
 
     /**
      * The attributes that are mass assignable.
@@ -43,11 +44,6 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    public function perfil()
-    {
-        return $this->belongsToMany('App\Perfil', 'perfil_usuarios', 'idusuario', 'idperfil');
-    }
 
     public function pagina()
     {
@@ -87,25 +83,5 @@ class User extends Authenticatable
     public function chamado()
     {
         return $this->hasMany('App\Chamado', 'idchamado');
-    }
-
-    public function autorizarPerfis($perfis)
-    {
-      if (is_array($perfis)) {
-        return $this->hasAnyRole($perfis) || 
-          abort(401, 'Ação não autorizada.');
-      }
-      return $this->hasRole($perfis) || 
-        abort(401, 'Ação não autorizada.');
-    }
-
-    public function hasAnyRole($perfis)
-    {
-        return null !== $this->perfil()->whereIn('nome', $perfis)->first();
-    }
-
-    public function hasRole($perfil)
-    {
-        return null !== $this->perfil()->where('nome', $perfil)->first();
     }
 }

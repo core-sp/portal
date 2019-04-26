@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use App\BdoOportunidade;
 use App\BdoEmpresa;
 use App\Regional;
+use App\Http\Controllers\ControleControllers;
 
 class BdoOportunidadeController extends Controller
 {
@@ -81,9 +82,9 @@ class BdoOportunidadeController extends Controller
         return $tabela;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -95,9 +96,9 @@ class BdoOportunidadeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create()
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $id = Input::get('empresa');
         $empresa = BdoEmpresa::find($id);
         $regioes = Regional::all();
@@ -117,7 +118,7 @@ class BdoOportunidadeController extends Controller
      */
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $regras = [
             'vagasdisponiveis' => 'required',
             'descricao' => 'required',
@@ -157,9 +158,9 @@ class BdoOportunidadeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $resultado = BdoOportunidade::find($id);
         $variaveis = (object) $this->variaveis;
         $regioes = Regional::all();
@@ -177,7 +178,7 @@ class BdoOportunidadeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $regras = [
             'vagasdisponiveis' => 'required',
             'descricao' => 'required',
@@ -217,9 +218,9 @@ class BdoOportunidadeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $resultado = BdoOportunidade::find($id);
         $delete = $resultado->delete();
         if(!$delete)
@@ -231,6 +232,7 @@ class BdoOportunidadeController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao(['Admin']);
         $busca = Input::get('q');
         $oportunidades = BdoOportunidade::where('descricao','LIKE','%'.$busca.'%')
             ->paginate(10);

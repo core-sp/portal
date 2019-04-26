@@ -7,7 +7,7 @@
     @if(isset($resultado->img))
     <div class="col-4">
     @else
-    <div class="col"></div>
+    <div class="col">
     @endif
       <dl>
         <dt>Tipo:</dt>

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use App\Concurso;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\CrudController;
+use App\Http\Controllers\ControleController;
 
 class ConcursoController extends Controller
 {
@@ -78,36 +79,25 @@ class ConcursoController extends Controller
         return $tabela;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request)
+    public function create()
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $regras = [
             'modalidade' => 'required',
             'titulo' => 'required',
@@ -143,30 +133,17 @@ class ConcursoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $resultado = Concurso::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $regras = [
             'modalidade' => 'required',
             'titulo' => 'required',
@@ -207,9 +184,9 @@ class ConcursoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $concurso = Concurso::find($id);
         $delete = $concurso->delete();
         if(!$delete)
@@ -224,9 +201,9 @@ class ConcursoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function lixeira(Request $request)
+    public function lixeira()
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = Concurso::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -265,9 +242,9 @@ class ConcursoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function restore(Request $request, $id)
+    public function restore($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'juridico']);
+        ControleController::autorizacao(['Admin']);
         $concurso = Concurso::onlyTrashed()->find($id);
         $concurso->restore();
         return redirect()->route('concursos.lista')
@@ -277,6 +254,7 @@ class ConcursoController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao(['Admin', 'Jurídico']);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Concurso::where('modalidade','LIKE','%'.$busca.'%')

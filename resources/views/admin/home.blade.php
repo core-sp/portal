@@ -3,7 +3,8 @@
 @section('content')
 
 @php
-use App\Http\Controllers\NewsletterController;
+  use App\Http\Controllers\NewsletterController;
+	use App\Http\Controllers\ControleController;
 @endphp
 
 <section class="content-header">
@@ -36,7 +37,7 @@ use App\Http\Controllers\NewsletterController;
   	  	  	<h3 class="card-title">
 							Conectado como:
 							<strong>
-								{{ Auth::user()->perfil[0]->nome }}
+								{{ Auth::user()->perfil }}
 							</strong>
 	  	  		</h3>
   	  	  </div>
@@ -62,7 +63,7 @@ use App\Http\Controllers\NewsletterController;
 				</div>
 			</div>
   	</div>
-		@if(Auth::user()->hasAnyRole(['admin', 'editor']))
+		@if(ControleController::mostra(['Admin', 'Editor']))
 		<div class="row">
 		 	<div class="col">
 			  <div class="card">

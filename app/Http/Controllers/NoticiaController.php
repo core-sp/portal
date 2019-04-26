@@ -8,6 +8,8 @@ use App\Noticia;
 use App\Regional;
 use App\Curso;
 use Illuminate\Support\Str;
+use App\Http\Controllers\ControleController;
+use Illuminate\Support\Facades\Auth;
 
 class NoticiaController extends Controller
 {
@@ -81,18 +83,18 @@ class NoticiaController extends Controller
         return $tabela;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Editor', 'Gestão de Atendimento']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    public function create(Request $request)
+    public function create()
     {
-        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Editor', 'Gestão de Atendimento']);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
@@ -100,7 +102,7 @@ class NoticiaController extends Controller
 
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Editor', 'Gestão de Atendimento']);
         $regras = [
             'titulo' => 'required',
             'conteudo' => 'required'
@@ -110,7 +112,7 @@ class NoticiaController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
         // Checa o usuário
-        if($request->user()->hasRole('Gestão de Atendimento'))
+        if(Auth::user()->perfil === 'Gestão de Atendimento')
             $publicada = 'Não';
         else
             $publicada = 'Sim';
@@ -132,9 +134,9 @@ class NoticiaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Editor', 'Gestão de Atendimento']);
         $resultado = Noticia::find($id);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
         $variaveis = (object) $this->variaveis;
@@ -143,7 +145,7 @@ class NoticiaController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Editor', 'Gestão de Atendimento']);
         $regras = [
             'titulo' => 'required',
             'conteudo' => 'required'
@@ -153,7 +155,7 @@ class NoticiaController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
         // Checa o usuário
-        if($request->user()->hasRole('Gestão de Atendimento'))
+        if(Auth::user()->perfil === 'Gestão de Atendimento')
             $publicada = 'Não';
         else
             $publicada = 'Sim';   
@@ -175,9 +177,9 @@ class NoticiaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->user()->autorizarPerfis(['Admin', 'Editor', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Editor', 'Gestão de Atendimento']);
         $noticia = Noticia::find($id);
         $delete = $noticia->delete();
         if(!$delete)
@@ -187,9 +189,9 @@ class NoticiaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function lixeira(Request $request)
+    public function lixeira()
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = Noticia::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -220,9 +222,9 @@ class NoticiaController extends Controller
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    public function restore(Request $request, $id)
+    public function restore($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin']);
         $noticia = Noticia::onlyTrashed()->find($id);
         $noticia->restore();
         return redirect('/admin/noticias')
@@ -232,6 +234,7 @@ class NoticiaController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao(['Admin', 'Editor', 'Gestão de Atendimento']);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Noticia::where('titulo','LIKE','%'.$busca.'%')

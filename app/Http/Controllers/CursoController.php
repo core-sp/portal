@@ -11,6 +11,7 @@ use App\Http\Controllers\Helper;
 use App\Http\Controllers\Helpers\CursoHelper;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\CursoInscritoController;
+use App\Http\Controllers\ControleController;
 
 class CursoController extends Controller
 {
@@ -83,18 +84,18 @@ class CursoController extends Controller
         return $tabela;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    public function create(Request $request)
+    public function create()
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
@@ -102,7 +103,7 @@ class CursoController extends Controller
 
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $regras = [
             'tema' => 'required',
             'datarealizacao' => 'required',
@@ -141,9 +142,9 @@ class CursoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $resultado = Curso::find($id);
         $regionais = Regional::all();
         $variaveis = (object) $this->variaveis;
@@ -152,7 +153,7 @@ class CursoController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $regras = [
             'tema' => 'required',
             'datarealizacao' => 'required',
@@ -190,9 +191,9 @@ class CursoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $curso = Curso::find($id);
         $delete = $curso->delete();
         if(!$delete)
@@ -202,9 +203,9 @@ class CursoController extends Controller
             ->with('class', 'alert-danger');
     }
 
-    public function lixeira(Request $request)
+    public function lixeira()
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = Curso::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -240,9 +241,9 @@ class CursoController extends Controller
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    public function restore(Request $request, $id)
+    public function restore($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin']);
         $curso = Curso::onlyTrashed()->find($id);
         $curso->restore();
         return redirect()->route('cursos.lista')
@@ -250,9 +251,9 @@ class CursoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function inscritos(Request $request, $id)
+    public function inscritos($id)
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin', 'Editor']);
         $resultados = CursoInscrito::where('idcurso', $id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -273,6 +274,7 @@ class CursoController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao(['Admin', 'Editor']);
         $busca = Input::get('q');
         $cursos = Curso::where('tipo','LIKE','%'.$busca.'%')
             ->orWhere('tema','LIKE','%'.$busca.'%')

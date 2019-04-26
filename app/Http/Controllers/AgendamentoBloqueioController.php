@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\AgendamentoBloqueio;
 use App\Regional;
 use App\Http\Controllers\Helper;
+use App\Http\Controllers\ControleController;
 
 class AgendamentoBloqueioController extends Controller
 {
@@ -79,18 +80,18 @@ class AgendamentoBloqueioController extends Controller
         return $tabela;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['Admin', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Gestão de Atendimento']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    public function create(Request $request)
+    public function create()
     {
-        $request->user()->autorizarPerfis(['Admin', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Gestão de Atendimento']);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
@@ -98,7 +99,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['Admin', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Gestão de Atendimento']);
         $regras = [
             'horainicio' => 'required',
             'horatermino' => 'required',
@@ -141,9 +142,9 @@ class AgendamentoBloqueioController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['Admin', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Gestão de Atendimento']);
         $resultado = AgendamentoBloqueio::find($id);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
@@ -152,7 +153,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['Admin', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Gestão de Atendimento']);
         $regras = [
             'horainicio' => 'required',
             'horatermino' => 'required',
@@ -197,7 +198,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['Admin', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Gestão de Atendimento']);
         $bloqueio = AgendamentoBloqueio::find($id);
         $delete = $bloqueio->delete();
         if(!$delete)

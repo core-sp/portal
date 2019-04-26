@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\BdoEmpresa;
+use App\Http\Controllers\ControleController;
 
 class BdoEmpresaController extends Controller
 {
@@ -73,9 +74,9 @@ class BdoEmpresaController extends Controller
         return $tabela;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -87,9 +88,9 @@ class BdoEmpresaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create()
     {
-        $request->user()->autorizarPerfis(['admin', 'editor']);
+        ControleController::autorizacao(['Admin']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
@@ -102,7 +103,7 @@ class BdoEmpresaController extends Controller
      */
     public function store(Request $request)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $regras = [
             'cnpj' => 'required|unique:bdo_empresas',
             'razaosocial' => 'required',
@@ -145,9 +146,9 @@ class BdoEmpresaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $resultado = BdoEmpresa::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -162,7 +163,7 @@ class BdoEmpresaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->user()->autorizarPerfis(['admin']);
+        ControleController::autorizacao(['Admin']);
         $regras = [
             'cnpj' => 'required',
             'razaosocial' => 'required',
@@ -204,9 +205,9 @@ class BdoEmpresaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->user()->autorizarPerfis(['Admin']);
+        ControleController::autorizacao(['Admin']);
         $empresa = BdoEmpresa::find($id);
         $delete = $empresa->delete();
         if(!$delete)
@@ -218,6 +219,7 @@ class BdoEmpresaController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao(['Admin']);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = BdoEmpresa::where('segmento','LIKE','%'.$busca.'%')

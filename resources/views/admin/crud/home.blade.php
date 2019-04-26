@@ -2,6 +2,10 @@
 
 @section('content')
 
+@php
+  use App\Http\Controllers\ControleController;
+@endphp
+
 <section class="content-header">
   @if(\Session::has('message'))
     <div class="container-fluid mb-2">
@@ -26,7 +30,7 @@
         @if(isset($variaveis->btn_criar))
         {!! $variaveis->btn_criar !!}
         @endif
-        @if(Auth::user()->hasAnyRole(['Admin']))
+        @if(ControleController::mostra(['Admin']))
           @if(isset($variaveis->btn_lixeira))
             {!! $variaveis->btn_lixeira !!}
           @endif
@@ -75,7 +79,7 @@
           </div>
           <div class="card-body">
             @if(isset($variaveis->filtro))
-              @if(Auth::user()->hasAnyRole($variaveis->mostraFiltros))
+              @if(ControleController::mostra($variaveis->mostraFiltros))
               <div class="row mb-3">
                 <div class="col-sm-auto align-self-center">
                   <p class="d-inline">Filtrar por:&nbsp;&nbsp;</p>
