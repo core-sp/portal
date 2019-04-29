@@ -119,8 +119,12 @@ class AgendamentoSiteController extends Controller
         $dia = str_replace('/', '-', $request->input('dia'));
         $dia = date('Y-m-d', strtotime($dia));
         $hora = $request->input('hora');
+        $cpf = $request->input('cpf');
         if(!$this->permiteAgendamento($dia, $hora, $regional))
             abort(500);
+        // Limita em até dois atendimentos por CPF por dia
+        if(!$this->limiteCpf($dia, $cpf))
+            abort(500, 'É permitido apenas 2 agendamentos por CPF por dia!');
         // Monta a string de tipo de serviço
         $tiposervico = $request->input('servico').' para '.$request->input('pessoa');
         // Gera a HASH (protocolo) aleatória
@@ -133,7 +137,7 @@ class AgendamentoSiteController extends Controller
         //Inputa os dados
         $agendamento = new Agendamento();
         $agendamento->nome = $request->input('nome');
-        $agendamento->cpf = $request->input('cpf');
+        $agendamento->cpf = $cpf;
         $agendamento->email = $request->input('email');
         $agendamento->celular = $request->input('celular');
         $agendamento->dia = $dia;
@@ -161,6 +165,17 @@ class AgendamentoSiteController extends Controller
 
         // Retorna view de agradecimento
         return view('site.agradecimento')->with('agradece', $agradece);
+    }
+
+    public function limiteCPF($dia, $cpf)
+    {
+        $count = Agendamento::where('dia',$dia)
+            ->where('cpf',$cpf)
+            ->count();
+        if($count >= 2)
+            return false;
+        else
+            return true;
     }
 
     public function consultaView()
