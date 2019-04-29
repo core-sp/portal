@@ -17,7 +17,11 @@
 
 <section id="pagina-erro">
   <div class="containter text-center">
-    Erro 500
+    @if($exception->getMessage())
+      {{ $exception->getMessage() }}
+    @else
+      Erro 500
+    @endif
   </div>
 </section>
 
