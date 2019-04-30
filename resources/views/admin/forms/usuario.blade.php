@@ -1,7 +1,3 @@
-@php
-  $perfis = App\Http\Controllers\PerfilController::resultados();
-@endphp
-
 <form role="form" method="POST" autocomplete="false">
     @csrf
     @if(isset($resultado))

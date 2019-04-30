@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use App\User;
 use App\Regional;
+use App\Perfil;
 use App\Http\Controllers\ControleController;
+use App\Http\Controllers\Helper;
 
 class UserController extends Controller
 {
@@ -27,6 +29,7 @@ class UserController extends Controller
         'titulo' => 'Usuários Deletados',
         'cancela_idusuario' => true
     ];
+    public $controller = 'UserController';
 
     public function __construct()
     {
@@ -35,7 +38,9 @@ class UserController extends Controller
 
     public function resultados()
     {
-        $resultados = User::orderBy('idusuario','DESC')->paginate(10);
+        $resultados = User::with(['sessao' => function($query) {
+            $query->orderBy('updated_at', 'DESC')->get();
+        }])->paginate(10);
         return $resultados;
     }
 
@@ -44,8 +49,8 @@ class UserController extends Controller
         // Opções de cabeçalho da tabela
         $headers = [
             'Código',
-            'Nome',
-            'E-mail',
+            'Nome / E-mail',
+            'Último acesso',
             'Perfil',
             'Seccional',
             'Ações'
@@ -59,10 +64,17 @@ class UserController extends Controller
             $acoes .= '<input type="hidden" name="_method" value="delete" />';
             $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o usuário?\')" />';
             $acoes .= '</form>';
+            if(isset($resultado->sessao)) {
+                $acesso = Helper::formataData($resultado->sessao->updated_at);
+                $acesso .= '<br />IP: ';
+                $acesso .= $resultado->sessao->ip_address;
+            } else {
+                $acesso = '29/08/1997';
+            }
             $conteudo = [
                 $resultado->idusuario,
-                $resultado->nome,
-                $resultado->email,
+                $resultado->nome.'<br />'.$resultado->email,
+                $acesso,
                 $resultado->perfil->nome,
                 $resultado->regional->regional,
                 $acoes
@@ -80,9 +92,7 @@ class UserController extends Controller
     
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autoriza($this->controller, 'index');
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -91,12 +101,11 @@ class UserController extends Controller
 
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autoriza($this->controller, 'index');
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
-        return view('admin.crud.criar', compact('variaveis', 'regionais'));
+        $perfis = Perfil::all();
+        return view('admin.crud.criar', compact('variaveis', 'regionais', 'perfis'));
     }
 
     public function store(Request $request)
@@ -137,8 +146,9 @@ class UserController extends Controller
         ]);
         $resultado = User::find($id);
         $regionais = Regional::all();
+        $perfis = Perfil::all();
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais', 'perfis'));
     }
 
     public function update(Request $request, $id)
