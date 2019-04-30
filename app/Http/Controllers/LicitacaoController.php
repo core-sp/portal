@@ -85,7 +85,10 @@ class LicitacaoController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao(['Admin', 'Jurídico']);
+        ControleController::autorizacao([
+            'Admin',
+            'Jurídico'
+        ]);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -99,7 +102,10 @@ class LicitacaoController extends Controller
      */
     public function create()
     {
-        ControleController::autorizacao(['Admin', 'Jurídico']);
+        ControleController::autorizacao([
+            'Admin',
+            'Jurídico'
+        ]);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
@@ -112,7 +118,10 @@ class LicitacaoController extends Controller
      */
     public function store(Request $request)
     {
-        ControleController::autorizacao(['Admin', 'Jurídico']);
+        ControleController::autorizacao([
+            'Admin',
+            'Jurídico'
+        ]);
         $regras = [
             'modalidade' => 'required',
             'nrlicitacao' => 'required',
@@ -158,7 +167,10 @@ class LicitacaoController extends Controller
      */
     public function edit($id)
     {
-        ControleController::autorizacao(['Admin', 'Jurídico']);
+        ControleController::autorizacao([
+            'Admin',
+            'Jurídico'
+        ]);
         $resultado = Licitacao::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -173,7 +185,10 @@ class LicitacaoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao(['Admin', 'Jurídico']);
+        ControleController::autorizacao([
+            'Admin',
+            'Jurídico'
+        ]);
         $regras = [
             'modalidade' => 'required',
             'nrlicitacao' => 'required',
@@ -219,7 +234,10 @@ class LicitacaoController extends Controller
      */
     public function destroy($id)
     {
-        ControleController::autorizacao(['Admin', 'Jurídico']);
+        ControleController::autorizacao([
+            'Admin',
+            'Jurídico'
+        ]);
         $licitacao = Licitacao::find($id);
         $delete = $licitacao->delete();
         if(!$delete)
@@ -236,7 +254,9 @@ class LicitacaoController extends Controller
      */
     public function lixeira()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $resultados = Licitacao::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -277,7 +297,9 @@ class LicitacaoController extends Controller
      */
     public function restore($id)
     {
-        ControleController::autorizacao(['Admin', 'Jurídico']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $licitacao = Licitacao::onlyTrashed()->find($id);
         $licitacao->restore();
         return redirect()->route('licitacoes.lista')
@@ -287,7 +309,10 @@ class LicitacaoController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao(['Admin', 'Jurídico']);
+        ControleController::autorizacao([
+            'Admin',
+            'Jurídico'
+        ]);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Licitacao::where('modalidade','LIKE','%'.$busca.'%')

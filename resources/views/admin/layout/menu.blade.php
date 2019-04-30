@@ -27,6 +27,12 @@
                 <p>Novo usuário</p>
             </a>
             </li>
+            <li class="nav-item">
+            <a href="/admin/usuarios/perfis" class="nav-link">
+                <i class="nav-icon fa fa-angle-right"></i>
+                <p>Perfis</p>
+            </a>
+            </li>
         </ul>
         </li>
         <li class="nav-item">
@@ -47,10 +53,10 @@
         </a>
         </li>
         <!-- Conteúdo -->
-        @if(ControleController::mostra(['Admin', 'Editor', 'Gestão de Atendimento']))
+        @if(ControleController::mostra(['Admin', 'Editor', 'Gestão de Atendimento', 'Coordenadoria de Atendimento', 'Procuradoria']))
         <li class="nav-header">CONTEÚDO</li>
         @endif
-        @if(ControleController::mostra(['Admin', 'Editor']))
+        @if(ControleController::mostra(['Admin', 'Editor', 'Procuradoria']))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
             <i class="nav-icon fas fa-file-alt"></i>
@@ -81,7 +87,7 @@
             </ul>
         </li>
         @endif
-        @if(ControleController::mostra(['Admin', 'Editor', 'Gestão de Atendimento']))
+        @if(ControleController::mostra(['Admin', 'Editor', 'Gestão de Atendimento', 'Coordenadoria de Atendimento']))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
             <i class="nav-icon far fa-newspaper"></i>
@@ -131,7 +137,7 @@
             </ul>
         </li>
         @endif
-        @if(ControleController::mostra(['Admin']))
+        @if(ControleController::mostra(['Admin', 'Transparência']))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
             <i class="nav-icon fas fa-briefcase"></i>
@@ -157,7 +163,7 @@
         </li>
         @endif
         <!-- Atendimento -->
-        @if(ControleController::mostra(['Admin', 'Atendimento', 'Gestão de Atendimento']))
+        @if(ControleController::mostra(['Admin', 'Atendimento', 'Gestão de Atendimento', 'Coordenadoria de Atendimento']))
         <li class="nav-header">ATENDIMENTO</li>
         <li class="nav-item">
             <a href="/admin/agendamentos" class="nav-link">
@@ -166,7 +172,7 @@
             </a>
         </li>
         @endif
-        @if(ControleController::mostra(['Admin', 'Gestão de Atendimento']))
+        @if(ControleController::mostra(['Admin', 'Gestão de Atendimento', 'Coordenadoria de Atendimento']))
         <li class="nav-item">
             <a href="/admin/agendamentos/bloqueios" class="nav-link">
                 <i class="nav-icon fas fa-ban"></i>
@@ -175,8 +181,10 @@
         </li>
         @endif
         <!-- Jurídico -->
-        @if(ControleController::mostra(['Admin', 'Jurídico']))
+        @if(ControleController::mostra(['Admin', 'Jurídico', 'Coordenadoria de Atendimento']))
         <li class="nav-header">JURÍDICO</li>
+        @endif
+        @if(ControleController::mostra(['Admin', 'Jurídico']))
         <li class="nav-item has-treeview">
         <a href="#" class="nav-link">
             <i class="nav-icon far fa-file-alt"></i>
@@ -201,7 +209,7 @@
         </ul>
         </li>
         @endif
-        @if(ControleController::mostra(['Admin', 'Jurídico']))
+        @if(ControleController::mostra(['Admin', 'Coordenadoria de Atendimento']))
         <li class="nav-item has-treeview">
         <a href="#" class="nav-link">
             <i class="nav-icon far fa-edit"></i>

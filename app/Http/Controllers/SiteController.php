@@ -12,7 +12,11 @@ class SiteController extends Controller
 {
     public function index()
     {	
-    	$noticias = Noticia::where('publicada','Sim')->limit(3)->get();
+        $noticias = Noticia::where('publicada','Sim')
+            ->whereNull('idregional')
+            ->orderBy('created_at','DESC')
+            ->limit(3)
+            ->get();
     	return view('site.home', compact('noticias'));
     }
 

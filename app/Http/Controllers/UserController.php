@@ -8,15 +8,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use App\User;
 use App\Regional;
-use App\Http\Controllers\ControleControllers;
+use App\Http\Controllers\ControleController;
 
 class UserController extends Controller
 {
     // Variáveis extras da página
     public $variaveis = [
         'singular' => 'usuario',
+        'singularTexto' => 'usuário',
         'singulariza' => 'o usuário',
         'plural' => 'usuarios',
+        'pluralTexto' => 'usuários',
         'pluraliza' => 'usuários',
         'titulo_criar' => 'Cadastrar usuário',
         'btn_criar' => '<a href="/admin/usuarios/criar" class="btn btn-primary mr-1">Novo Usuário</a>',
@@ -61,7 +63,7 @@ class UserController extends Controller
                 $resultado->idusuario,
                 $resultado->nome,
                 $resultado->email,
-                $resultado->perfil,
+                $resultado->perfil->nome,
                 $resultado->regional->regional,
                 $acoes
             ];
@@ -78,7 +80,9 @@ class UserController extends Controller
     
     public function index()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -87,7 +91,9 @@ class UserController extends Controller
 
     public function create()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
@@ -95,7 +101,9 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $regras = [
             'nome' => 'required',
             'email' => 'email|required',
@@ -124,7 +132,9 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $resultado = User::find($id);
         $regionais = Regional::all();
         $variaveis = (object) $this->variaveis;
@@ -133,7 +143,9 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $regras = [
             'nome' => 'required',
             'email' => 'email|required'
@@ -158,7 +170,9 @@ class UserController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $usuario = User::find($id);
         $delete = $usuario->delete();
         if(!$delete)
@@ -171,7 +185,9 @@ class UserController extends Controller
 
     public function lixeira(Request $request)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $resultados = User::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -206,7 +222,9 @@ class UserController extends Controller
 
     public function restore(Request $request, $id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $usuario = User::onlyTrashed()->find($id);
         $usuario->restore();
         return redirect()->route('usuarios.lista')
@@ -260,7 +278,9 @@ class UserController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin'
+        ]);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = User::where('nome','LIKE','%'.$busca.'%')

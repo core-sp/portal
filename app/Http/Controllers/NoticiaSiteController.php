@@ -10,7 +10,7 @@ class NoticiaSiteController extends Controller
     public function noticiasView()
     {
 
-        $noticias = Noticia::where('publicada','Sim')->paginate(9);
+        $noticias = Noticia::orderBy('created_at', 'DESC')->where('publicada','Sim')->paginate(9);
         return view('site.noticias', compact('noticias'));        
     }
 
@@ -19,7 +19,11 @@ class NoticiaSiteController extends Controller
         $noticia = Noticia::where('slug', $slug)->first();
         if(isset($noticia)) {
             $id = $noticia->idnoticia;
-            $tres = Noticia::latest()->take(3)->where('idnoticia','!=',$id)->get();
+            $tres = Noticia::latest()
+                ->take(3)
+                ->orderBy('created_at','DESC')
+                ->where('idnoticia','!=',$id)
+                ->get();
             return view('site.noticia', compact('noticia', 'tres', 'id'));
         } else {
             abort(404);

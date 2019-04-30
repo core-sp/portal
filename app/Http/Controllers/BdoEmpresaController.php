@@ -76,7 +76,10 @@ class BdoEmpresaController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -90,7 +93,10 @@ class BdoEmpresaController extends Controller
      */
     public function create()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
@@ -103,7 +109,10 @@ class BdoEmpresaController extends Controller
      */
     public function store(Request $request)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $regras = [
             'cnpj' => 'required|unique:bdo_empresas',
             'razaosocial' => 'required',
@@ -148,7 +157,10 @@ class BdoEmpresaController extends Controller
      */
     public function edit($id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $resultado = BdoEmpresa::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -163,7 +175,10 @@ class BdoEmpresaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $regras = [
             'cnpj' => 'required',
             'razaosocial' => 'required',
@@ -207,7 +222,10 @@ class BdoEmpresaController extends Controller
      */
     public function destroy($id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $empresa = BdoEmpresa::find($id);
         $delete = $empresa->delete();
         if(!$delete)
@@ -219,7 +237,10 @@ class BdoEmpresaController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = BdoEmpresa::where('segmento','LIKE','%'.$busca.'%')

@@ -18,7 +18,12 @@ class AgendamentoController extends Controller
         'singular' => 'agendamento',
         'singulariza' => 'o agendamento',
         'plural' => 'agendamentos',
-        'pluraliza' => 'agendamentos'
+        'pluraliza' => 'agendamentos',
+        'mostraFiltros' => [
+            'Admin',
+            'Gestão de Atendimento',
+            'Coordenadoria de Atendimento'
+        ],
     ];
 
     public function __construct()
@@ -61,7 +66,7 @@ class AgendamentoController extends Controller
             $regional = Regional::find(Auth::user()->idregional);
             $regionalNome = $regional->regional;
         }
-        ControleController::autorizacao(['Admin', 'Gestão de Atendimento']);
+        ControleController::autorizacao(['Admin', 'Gestão de Atendimento', 'Coordenadoria de Atendimento']);
         // Puxa os resultados
         if(Input::has(['regional','status'])) {
             $resultados = $this->resultadosFiltro($dia, Input::get('regional'), Input::get('status'));
@@ -112,7 +117,12 @@ class AgendamentoController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao(['Admin', 'Atendimento', 'Gestão de Atendimento']);
+        ControleController::autorizacao([
+            'Admin',
+            'Atendimento',
+            'Gestão de Atendimento',
+            'Coordenadoria de Atendimento'
+        ]);
         $regional = Auth::user()->idregional;
         // Checa se tem filtro
         if(Input::get('filtro') == 'sim') {
@@ -133,10 +143,6 @@ class AgendamentoController extends Controller
         // Variáveis globais
         $variaveis = $this->variaveis;
         $variaveis['filtro'] = $this->filtros();
-        $variaveis['mostraFiltros'] = [
-            'Admin',
-            'Gestão de Atendimento'
-        ];
         $variaveis = (object) $variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
@@ -269,6 +275,12 @@ class AgendamentoController extends Controller
 
     public function busca()
     {
+        ControleController::autorizacao([
+            'Admin',
+            'Atendimento',
+            'Gestão de Atendimento',
+            'Coordenadoria de Atendimento'
+        ]);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Agendamento::where('nome','LIKE','%'.$busca.'%')

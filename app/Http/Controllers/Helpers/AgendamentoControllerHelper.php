@@ -37,7 +37,6 @@ class AgendamentoControllerHelper extends Controller
             '16:00',
             '16:30',
             '17:00',
-            '17:30',
         ];
         $checaBloqueio = AgendamentoBloqueio::where('idregional',$regional)
             ->whereDate('diainicio','<=',$dia)
@@ -74,7 +73,6 @@ class AgendamentoControllerHelper extends Controller
             '16:00',
             '16:30',
             '17:00',
-            '17:30',
         ];
         return $horas;
     }
