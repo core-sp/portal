@@ -84,7 +84,10 @@ class BdoOportunidadeController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -98,7 +101,10 @@ class BdoOportunidadeController extends Controller
      */
     public function create()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $id = Input::get('empresa');
         $empresa = BdoEmpresa::find($id);
         $regioes = Regional::all();
@@ -118,7 +124,10 @@ class BdoOportunidadeController extends Controller
      */
     public function store(Request $request)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $regras = [
             'vagasdisponiveis' => 'required',
             'descricao' => 'required',
@@ -160,7 +169,10 @@ class BdoOportunidadeController extends Controller
      */
     public function edit($id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $resultado = BdoOportunidade::find($id);
         $variaveis = (object) $this->variaveis;
         $regioes = Regional::all();
@@ -178,7 +190,10 @@ class BdoOportunidadeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $regras = [
             'vagasdisponiveis' => 'required',
             'descricao' => 'required',
@@ -220,7 +235,10 @@ class BdoOportunidadeController extends Controller
      */
     public function destroy($id)
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $resultado = BdoOportunidade::find($id);
         $delete = $resultado->delete();
         if(!$delete)
@@ -232,7 +250,10 @@ class BdoOportunidadeController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao(['Admin']);
+        ControleController::autorizacao([
+            'Admin',
+            'Transparência'
+        ]);
         $busca = Input::get('q');
         $oportunidades = BdoOportunidade::where('descricao','LIKE','%'.$busca.'%')
             ->paginate(10);

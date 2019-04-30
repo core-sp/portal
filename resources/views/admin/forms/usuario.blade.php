@@ -1,5 +1,5 @@
 @php
-  $perfis = App\Http\Controllers\Helpers\UserControllerHelper::perfis();
+  $perfis = App\Http\Controllers\PerfilController::resultados();
 @endphp
 
 <form role="form" method="POST" autocomplete="false">
@@ -31,12 +31,12 @@
             @foreach($perfis as $perfil)
                 @if(isset($resultado))
                     @if($resultado->perfil == $perfil)
-                    <option value="{{ $perfil }}" selected>{{ $perfil }}</option>
+                    <option value="{{ $perfil->idperfil }}" selected>{{ $perfil->nome }}</option>
                     @else
-                    <option value="{{ $perfil }}">{{ $perfil }}</option>
+                    <option value="{{ $perfil->idperfil }}">{{ $perfil->nome }}</option>
                     @endif
                 @else
-                <option value="{{ $perfil }}">{{ $perfil }}</option>
+                <option value="{{ $perfil->idperfil }}">{{ $perfil->nome }}</option>
                 @endif
             @endforeach
             </select>

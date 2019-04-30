@@ -104,7 +104,7 @@
                 </div>
               </div>
             @endif
-            @if($resultados->count() > 0)
+            @if(count($resultados) > 0)
             {!! $tabela !!}
             @else
               @if(isset($busca))

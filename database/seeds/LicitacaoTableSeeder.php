@@ -16,8 +16,8 @@ class LicitacaoTableSeeder extends Seeder
         $licitacao->modalidade = "Pregão Eletrônico Tradicional";
         $licitacao->uasg = "926753";
         $licitacao->edital = "/arquivos/PREGAO_002_2019.pdf";
-        $licitacao->nrlicitacao = "002/2019";
-        $licitacao->nrprocesso = "27/19";
+        $licitacao->nrlicitacao = "050/2019";
+        $licitacao->nrprocesso = "050/2019";
         $licitacao->situacao = "Aberto";
         $licitacao->titulo = "PREGÃO ELETRÔNICO - Contratação de serviços";
         $licitacao->datarealizacao = "2019-02-12 14:00:00";
@@ -29,8 +29,8 @@ class LicitacaoTableSeeder extends Seeder
         $licitacao->modalidade = "Pregão Eletrônico Tradicional";
         $licitacao->uasg = "926753";
         $licitacao->edital = "/arquivos/PREGAO_001_2019.pdf";
-        $licitacao->nrlicitacao = "001/2019";
-        $licitacao->nrprocesso = "115/18";
+        $licitacao->nrlicitacao = "060/2019";
+        $licitacao->nrprocesso = "060/2019";
         $licitacao->situacao = "Aberto";
         $licitacao->titulo = "PREGÃO ELETRÔNICO - Contratação de prestação de serviços";
         $licitacao->datarealizacao = "2019-01-18 14:00:00";

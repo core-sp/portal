@@ -19,14 +19,6 @@
                     {{ $errors->first('nome') }}
                 </div>
             @endif
-        </div>
-        <div class="form-group">
-            <label for="descricao">Descrição</label>
-            <textarea class="form-control"
-                name="descricao"
-                id="descricao"
-                rows="5"
-                placeholder="Descrição do perfil">@if(isset($resultado)) {{ $resultado->descricao }} @endif</textarea>
         </div>    
     </div>
     <div class="card-footer float-right">

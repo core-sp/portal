@@ -37,7 +37,7 @@
   	  	  	<h3 class="card-title">
 							Conectado como:
 							<strong>
-								{{ Auth::user()->perfil }}
+								{{ session('perfil') }}
 							</strong>
 	  	  		</h3>
   	  	  </div>
@@ -63,7 +63,7 @@
 				</div>
 			</div>
   	</div>
-		@if(ControleController::mostra(['Admin', 'Editor']))
+		@if(ControleController::mostra(['Admin', 'Editor', 'Procuradoria']))
 		<div class="row">
 		 	<div class="col">
 			  <div class="card">

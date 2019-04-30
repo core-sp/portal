@@ -99,6 +99,11 @@ Route::prefix('admin')->group(function() {
     Route::delete('/apagar/{id}', 'UserController@destroy');
     Route::get('/lixeira', 'UserController@lixeira');
     Route::get('/restore/{id}', 'UserController@restore');
+    // Lida com a parte de Perfis
+    Route::get('/perfis', 'PerfilController@index')->name('perfis.lista');
+    Route::get('/perfis/criar', 'PerfilController@create');
+    Route::post('/perfis/criar', 'PerfilController@store');
+    Route::delete('/perfis/apagar/{id}', 'PerfilController@destroy');
   });
 
   // Rotas para concursos

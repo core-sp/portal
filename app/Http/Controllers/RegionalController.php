@@ -44,7 +44,7 @@ class RegionalController extends Controller
         $contents = [];
         foreach($resultados as $resultado) {
             $acoes = '<a href="/seccional/'.$resultado->idregional.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if(ControleController::mostra(['Admin', 'Editor']))
+            if(ControleController::mostra(['Admin', 'Editor', 'Coordenadoria de Atendimento', 'Gestão de Atendimento']))
                 $acoes .= '<a href="/admin/regionais/editar/'.$resultado->idregional.'" class="btn btn-sm btn-primary">Editar</a>';
             $conteudo = [
                 $resultado->idregional,
@@ -74,7 +74,12 @@ class RegionalController extends Controller
 
     public function edit(Request $request, $id)
     {
-        ControleController::autorizacao(['Admin', 'Editor']);
+        ControleController::autorizacao([
+            'Admin',
+            'Coordenadoria de Atendimento',
+            'Editor',
+            'Gestão de Atendimento'
+        ]);
         $resultado = Regional::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -82,7 +87,12 @@ class RegionalController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao(['Admin', 'Editor']);
+        ControleController::autorizacao([
+            'Admin',
+            'Coordenadoria de Atendimento',
+            'Editor',
+            'Gestão de Atendimento'
+        ]);
         $regras = [
             'cidade' => 'required',
             'email' => 'required',

@@ -64,7 +64,10 @@ class CursoInscritoController extends Controller
 
     public function create($idcurso)
     {
-        ControleController::autorizacao(['Admin', 'Editor']);
+        ControleController::autorizacao([
+            'Admin',
+            'Editor'
+        ]);
         $curso = Curso::find($idcurso);
         $variaveis = [
             'form' => 'cursoinscrito',
@@ -77,7 +80,10 @@ class CursoInscritoController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizacao(['Admin', 'Editor']);
+        ControleController::autorizacao([
+            'Admin',
+            'Editor'
+        ]);
         $idcurso = $request->input('idcurso');
         $regras = [
             'cpf' => 'required|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso,
@@ -108,7 +114,10 @@ class CursoInscritoController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizacao(['Admin', 'Editor']);
+        ControleController::autorizacao([
+            'Admin',
+            'Editor'
+        ]);
         $resultado = CursoInscrito::find($id);
         $variaveis = [
             'form' => 'cursoinscrito',
@@ -121,7 +130,10 @@ class CursoInscritoController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao(['Admin', 'Editor']);
+        ControleController::autorizacao([
+            'Admin',
+            'Editor'
+        ]);
         $idcurso = $request->input('idcurso');
         $regras = [
             'cpf' => 'required',
@@ -231,7 +243,10 @@ class CursoInscritoController extends Controller
 
     public function destroy($id)
     {
-        ControleController::autorizacao(['Admin', 'Editor']);
+        ControleController::autorizacao([
+            'Admin',
+            'Editor'
+        ]);
         $curso = CursoInscrito::find($id);
         $delete = $curso->delete();
         if(!$delete)
