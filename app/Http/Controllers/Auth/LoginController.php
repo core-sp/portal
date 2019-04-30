@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Sessao;
 
 class LoginController extends Controller
 {
@@ -49,14 +50,45 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        $this->setUserSession($user);
+        $this->setUserSession();
+        $this->saveSession($request, $user);
     }
 
-    protected function setUserSession($user)
+    protected function setUserSession()
     {
-        $perfil = Auth::user()->perfil()->first();
+        $user = Auth::user();
+        $perfil = $user->perfil()->first()->nome;
+        $idperfil = $user->perfil()->first()->idperfil;
+        $email = $user->email;
+        $nome = $user->nome;
         session([
-            'perfil' => $perfil->nome
+            'perfil' => $perfil,
+            'idperfil' => $idperfil,
+            'email' => $email,
+            'nome' => $nome
         ]);
+    }
+
+    protected function saveSession($request)
+    {
+        $id = Auth::id();
+        $checa = Sessao::where('idusuario',$id)->first();
+        if(!isset($checa)) {
+            $sessao = new Sessao();
+            $sessao->idusuario = $id;
+            $sessao->ip_address = $request->ip();
+            $save = $sessao->save();
+            if(!$save)
+                abort(500);
+        } else {
+            if($checa->ip_address == $request->ip()) {
+                $update = $checa->touch();
+            } else {
+                $checa->ip_address = $request->ip();
+                $update = $checa->update();
+            }
+            if(!$update)
+                abort(500);
+        }
     }
 }

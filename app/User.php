@@ -15,7 +15,7 @@ class User extends Authenticatable
 
     protected $primaryKey = 'idusuario';
     protected $table = 'users';
-    protected $with = ['regional', 'perfil'];
+    protected $with = ['regional', 'perfil', 'sessao'];
 
     protected $fillable = [
         'nome', 'email', 'password',
@@ -72,5 +72,10 @@ class User extends Authenticatable
     public function perfil()
     {
         return $this->belongsTo('App\Perfil', 'idperfil');
+    }
+
+    public function sessao()
+    {
+        return $this->hasOne('App\Sessao', 'idusuario');
     }
 }

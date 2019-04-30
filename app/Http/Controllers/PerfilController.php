@@ -22,9 +22,11 @@ class PerfilController extends Controller
         $this->middleware('auth');
     }
 
-    public static function resultados()
+    public function resultados()
     {
-        $resultados = Perfil::orderBy('idperfil','ASC')->paginate(10);
+        $resultados = Perfil::withCount('user')
+            ->orderBy('created_at','DESC')
+            ->paginate(10);
         return $resultados;
     }
 

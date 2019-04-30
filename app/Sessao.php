@@ -5,15 +5,15 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Perfil extends Model
+class Sessao extends Model
 {
     use SoftDeletes;
 
-    protected $primaryKey = 'idperfil';
-    protected $table = 'perfis';
+    protected $primaryKey = 'idsessao';
+    protected $table = 'sessoes';
 
     public function user()
     {
-        return $this->hasMany('App\User', 'idusuario');
+        return $this->belongsTo('App\User', 'idusuario');
     }
 }

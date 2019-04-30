@@ -29,12 +29,6 @@ class PaginaController extends Controller
         $this->middleware('auth', ['except' => ['show', 'showSemCategoria']]);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
     public function resultados()
     {
         $resultados = Pagina::orderBy('idpagina','DESC')->paginate(10);
@@ -117,12 +111,6 @@ class PaginaController extends Controller
         return view('admin.crud.criar', compact('categorias', 'variaveis'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         ControleController::autorizacao([
@@ -155,12 +143,6 @@ class PaginaController extends Controller
             ->with('class', 'alert-success');
     }    
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         ControleController::autorizacao([
@@ -174,13 +156,6 @@ class PaginaController extends Controller
         return view('admin.crud.editar', compact('resultado', 'categorias', 'variaveis'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         ControleController::autorizacao([
@@ -212,12 +187,6 @@ class PaginaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         ControleController::autorizacao([
@@ -234,11 +203,6 @@ class PaginaController extends Controller
             ->with('class', 'alert-danger');
     }
 
-    /**
-     * Mostra a lixeira de páginas
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function lixeira()
     {
         ControleController::autorizacao([
@@ -274,12 +238,6 @@ class PaginaController extends Controller
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Restaura página deletada
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function restore($id)
     {
         ControleController::autorizacao([
