@@ -103,6 +103,8 @@ Route::prefix('admin')->group(function() {
     Route::get('/perfis', 'PerfilController@index')->name('perfis.lista');
     Route::get('/perfis/criar', 'PerfilController@create');
     Route::post('/perfis/criar', 'PerfilController@store');
+    Route::get('/perfis/editar/{id}', 'PerfilController@edit');
+    Route::put('/perfis/editar/{id}', 'PerfilController@update');
     Route::delete('/perfis/apagar/{id}', 'PerfilController@destroy');
   });
 

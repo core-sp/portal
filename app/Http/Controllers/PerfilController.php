@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Perfil;
 use App\User;
+use App\Permissao;
 
 class PerfilController extends Controller
 {
@@ -90,6 +91,47 @@ class PerfilController extends Controller
         ]);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
+    }
+
+    public function edit($id)
+    {
+        ControleController::autorizacao([
+            'Admin'
+        ]);
+        Perfil::find($id);
+        $permissoesUser = Permissao::where('controller','UserController')->get();
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'permissoesUser'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        ControleController::autorizacao([
+            'Admin'
+        ]);
+        $permissoes = Permissao::all();
+        foreach($permissoes as $permissao) {
+            $idpermissao = $permissao->idpermissao;
+            $cm = $permissao->controller.'_'.$permissao->metodo;
+            if(strpos($permissao->perfis, $id.',') !== false) {
+                if($request->input($cm) !== 'on') {
+                    $permissaoSingle = Permissao::find($idpermissao);
+                    $perfisString = str_replace($id.',', '', $permissaoSingle->perfis);
+                    $permissaoSingle->perfis = $perfisString;
+                    $permissaoSingle->update();
+                }
+            } else {
+                if($request->input($cm) === 'on') {
+                    $permissaoSingle = Permissao::find($idpermissao);
+                    $perfisString = $id.','.$permissaoSingle->perfis;
+                    $permissaoSingle->perfis = $perfisString;
+                    $permissaoSingle->update();
+                }
+            }
+        }
+        return redirect()->route('perfis.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Permissões atualizadas com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function store(Request $request)

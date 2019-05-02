@@ -37,3 +37,12 @@
 .nomargin {
   margin: 0px;
 }
+
+.perfilEdit td,
+.perfilEdit th {
+  text-align: center;
+}
+
+.perfilEdit .form-check-input {
+  margin-left: 0;
+}

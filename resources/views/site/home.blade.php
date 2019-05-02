@@ -13,16 +13,22 @@ use \App\Http\Controllers\Helper;
         <ol class="carousel-indicators">
           <li data-target="#carousel" data-slide-to="0" class="active"></li>
           <li data-target="#carousel" data-slide-to="1"></li>
+          <li data-target="#carousel" data-slide-to="2"></li>
         </ol>
         <div class="carousel-inner h-100">
           <div class="carousel-item h-100 active">
+            <a href="/balcao-de-oportunidades">
+              <img class="d-block w-100" src="{{ asset('img/banner-refis.png') }}" />
+            </a>
+          </div>
+          <div class="carousel-item h-100">
             <a href="/balcao-de-oportunidades">
               <img class="d-block w-100" src="{{ asset('img/bdo-banner.png') }}" />
             </a>
           </div>
           <div class="carousel-item h-100">
             <a href="/cursos">
-              <img class="d-block w-100" src="{{ asset('img/banner-v3.png') }}" />
+              <img class="d-block w-100" src="{{ asset('img/banner-conexoes.png') }}" />
             </a>
           </div>
         </div>

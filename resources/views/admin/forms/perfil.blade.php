@@ -1,34 +1,34 @@
 <form role="form" method="POST">
     @csrf
-    @if(isset($resultado))
-        {{ method_field('PUT') }}
-    @endif
-    <input type="hidden" name="idusuario" value="{{ Auth::id() }}" />
+    {{ method_field('PUT') }}
     <div class="card-body">
-        <div class="form-group">
-            <label for="nome">Nome do Perfil</label>
-            <input type="text"
-                class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
-                placeholder="Nome"
-                name="nome"
-                @if(isset($resultado))
-                value="{{ $resultado->nome }}"
-                @endif />
-            @if($errors->has('nome'))
-                <div class="invalid-feedback">
-                    {{ $errors->first('nome') }}
-                </div>
-            @endif
-        </div>    
+        <table class="table table-bordered perfilEdit">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Visualizar</th>
+                    <th>Criar</th>
+                    <th>Editar</th>
+                    <th>Apagar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Usuários</td>
+                    @foreach($permissoesUser as $p)
+                    @php $name = $p->controller.'_'.$p->metodo; @endphp
+                        @if(strpos($p->perfis, session('idperfil').',') !== false)
+                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
+                        @else
+                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
+                        @endif
+                    @endforeach
+                </tr>
+            </tbody>
+        </table>
     </div>
     <div class="card-footer float-right">
         <a href="/admin/usuarios/perfis" class="btn btn-default">Cancelar</a>
-        <button type="submit" class="btn btn-primary ml-1">
-        @if(isset($resultado))
-            Salvar
-        @else
-            Publicar
-        @endif
-        </button>
+        <button type="submit" class="btn btn-primary ml-1">Salvar</button>
     </div>
 </form>
