@@ -9,6 +9,9 @@ use App\Http\Controllers\ControleController;
 
 class PaginaCategoriaController extends Controller
 {
+    // Nome da classe Pai (em relação à controle)
+    private $parent = 'PaginaController';
+    // Variáveis
     public $variaveis = [
         'singular' => 'categoria',
         'singulariza' => 'a categoria',
@@ -72,11 +75,7 @@ class PaginaCategoriaController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->parent, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -90,11 +89,7 @@ class PaginaCategoriaController extends Controller
      */
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->parent, 'create');
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
@@ -107,11 +102,7 @@ class PaginaCategoriaController extends Controller
      */
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->parent, 'create');
         $regras = [
             'nome' => 'required'
         ];
@@ -138,11 +129,7 @@ class PaginaCategoriaController extends Controller
      */
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->parent, __FUNCTION__);
         $resultado = PaginaCategoria::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -157,11 +144,7 @@ class PaginaCategoriaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->parent, 'edit');
         $regras = [
             'nome' => 'required'
         ];
@@ -188,11 +171,7 @@ class PaginaCategoriaController extends Controller
      */
     public function destroy($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->parent, __FUNCTION__);
         $pagina = PaginaCategoria::find($id);
         $delete = $pagina->delete();
         if(!$delete)
@@ -204,11 +183,7 @@ class PaginaCategoriaController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->parent, 'index');
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = PaginaCategoria::where('nome','LIKE','%'.$busca.'%')

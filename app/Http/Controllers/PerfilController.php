@@ -75,9 +75,7 @@ class PerfilController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -86,29 +84,27 @@ class PerfilController extends Controller
 
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
 
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
-        Perfil::find($id);
-        $permissoesUser = Permissao::where('controller','UserController')->get();
+        ControleController::autorizaStatic(['1']);
+        $perfil = Perfil::find($id);
+        $idperfil = $perfil->idperfil; 
+        $permissoes = Permissao::all();
+        $permissoesGroup = $permissoes->groupBy('controller');
+        $permissoesArray = $permissoesGroup->toArray();
+
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis', 'permissoesUser'));
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'permissoesArray', 'idperfil'));
     }
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $permissoes = Permissao::all();
         foreach($permissoes as $permissao) {
             $idpermissao = $permissao->idpermissao;
@@ -136,9 +132,7 @@ class PerfilController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $regras = [
             'nome' => 'required',
         ];
@@ -159,9 +153,7 @@ class PerfilController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $perfil = Perfil::find($id);
         $delete = $perfil->delete();
         if(!$delete)

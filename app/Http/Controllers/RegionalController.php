@@ -11,6 +11,8 @@ use App\Http\Controllers\ControleController;
 
 class RegionalController extends Controller
 {
+    // Nome da classe
+    private $class = 'RegionalController';
     // Variáveis extras da página
     public $variaveis = [
         'singular' => 'regional',
@@ -74,12 +76,7 @@ class RegionalController extends Controller
 
     public function edit(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento',
-            'Editor',
-            'Gestão de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultado = Regional::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -87,12 +84,7 @@ class RegionalController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento',
-            'Editor',
-            'Gestão de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, 'edit');
         $regras = [
             'cidade' => 'required',
             'email' => 'required',

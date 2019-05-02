@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class NoticiaController extends Controller
 {
+    // Nome da classe
+    private $class = 'NoticiaController';
     // Variáveis extras da página
     public $variaveis = [
         'singular' => 'noticia',
@@ -85,13 +87,7 @@ class NoticiaController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento',
-            'Editor',
-            'Gestão de Atendimento',
-            'Procuradoria'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -100,13 +96,7 @@ class NoticiaController extends Controller
 
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento',
-            'Editor',
-            'Gestão de Atendimento',
-            'Procuradoria'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
@@ -114,19 +104,15 @@ class NoticiaController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento',
-            'Editor',
-            'Gestão de Atendimento',
-            'Procuradoria'
-        ]);
+        ControleController::autoriza($this->class, 'create');
         $regras = [
-            'titulo' => 'required',
-            'conteudo' => 'required'
+            'titulo' => 'required|max:100|min:3',
+            'conteudo' => 'required|min:100'
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório'
+            'required' => 'O :attribute é obrigatório',
+            'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
+            'max' => 'O campo :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Checa o usuário
@@ -157,13 +143,7 @@ class NoticiaController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento',
-            'Editor',
-            'Gestão de Atendimento',
-            'Procuradoria'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultado = Noticia::find($id);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
         $variaveis = (object) $this->variaveis;
@@ -172,19 +152,15 @@ class NoticiaController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento',
-            'Editor',
-            'Gestão de Atendimento',
-            'Procuradoria'
-        ]);
+        ControleController::autoriza($this->class, 'edit');
         $regras = [
-            'titulo' => 'required',
-            'conteudo' => 'required'
+            'titulo' => 'required|max:100|min:3',
+            'conteudo' => 'required|min:100'
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório'
+            'required' => 'O :attribute é obrigatório',
+            'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
+            'max' => 'O campo :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Checa o usuário
@@ -212,13 +188,7 @@ class NoticiaController extends Controller
 
     public function destroy($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento',
-            'Editor',
-            'Gestão de Atendimento',
-            'Procuradoria'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $noticia = Noticia::find($id);
         $delete = $noticia->delete();
         if(!$delete)
@@ -230,9 +200,7 @@ class NoticiaController extends Controller
 
     public function lixeira()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultados = Noticia::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -265,9 +233,7 @@ class NoticiaController extends Controller
 
     public function restore($id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $noticia = Noticia::onlyTrashed()->find($id);
         $noticia->restore();
         return redirect('/admin/noticias')
@@ -277,13 +243,7 @@ class NoticiaController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento',
-            'Editor',
-            'Gestão de Atendimento',
-            'Procuradoria'
-        ]);
+        ControleController::autoriza($this->class, 'index');
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Noticia::where('titulo','LIKE','%'.$busca.'%')

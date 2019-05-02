@@ -9,6 +9,9 @@ use App\Http\Controllers\ControleController;
 
 class BdoEmpresaController extends Controller
 {
+    // Nome da Classe
+    private $class = 'BdoEmpresaController';
+    // Variáveis
     public $variaveis = [
         'singular' => 'empresa',
         'singulariza' => 'a empresa',
@@ -76,10 +79,7 @@ class BdoEmpresaController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Transparência'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -93,10 +93,7 @@ class BdoEmpresaController extends Controller
      */
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Transparência'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
@@ -109,10 +106,7 @@ class BdoEmpresaController extends Controller
      */
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Transparência'
-        ]);
+        ControleController::autoriza($this->class, 'create');
         $regras = [
             'cnpj' => 'required|unique:bdo_empresas',
             'razaosocial' => 'required',
@@ -157,10 +151,7 @@ class BdoEmpresaController extends Controller
      */
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Transparência'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultado = BdoEmpresa::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -175,10 +166,7 @@ class BdoEmpresaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Transparência'
-        ]);
+        ControleController::autoriza($this->class, 'edit');
         $regras = [
             'cnpj' => 'required',
             'razaosocial' => 'required',
@@ -222,10 +210,7 @@ class BdoEmpresaController extends Controller
      */
     public function destroy($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Transparência'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $empresa = BdoEmpresa::find($id);
         $delete = $empresa->delete();
         if(!$delete)
@@ -237,10 +222,7 @@ class BdoEmpresaController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Transparência'
-        ]);
+        ControleController::autoriza($this->class, 'index');
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = BdoEmpresa::where('segmento','LIKE','%'.$busca.'%')

@@ -15,6 +15,9 @@ use App\Http\Controllers\ControleController;
 
 class CursoController extends Controller
 {
+    // Nome da classe
+    private $class = 'CursoController';
+    // Variáveis
     public $variaveis = [
         'singular' => 'curso',
         'singulariza' => 'o curso',
@@ -86,10 +89,7 @@ class CursoController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -98,10 +98,7 @@ class CursoController extends Controller
 
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
@@ -109,10 +106,7 @@ class CursoController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, 'create');
         $regras = [
             'tema' => 'required',
             'datarealizacao' => 'required',
@@ -153,10 +147,7 @@ class CursoController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultado = Curso::find($id);
         $regionais = Regional::all();
         $variaveis = (object) $this->variaveis;
@@ -165,10 +156,7 @@ class CursoController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, 'edit');
         $regras = [
             'tema' => 'required',
             'datarealizacao' => 'required',
@@ -208,10 +196,7 @@ class CursoController extends Controller
 
     public function destroy($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $curso = Curso::find($id);
         $delete = $curso->delete();
         if(!$delete)
@@ -223,9 +208,7 @@ class CursoController extends Controller
 
     public function lixeira()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultados = Curso::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -263,9 +246,7 @@ class CursoController extends Controller
 
     public function restore($id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $curso = Curso::onlyTrashed()->find($id);
         $curso->restore();
         return redirect()->route('cursos.lista')
@@ -275,10 +256,7 @@ class CursoController extends Controller
 
     public function inscritos($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza('CursoInscritoController', 'index');
         $resultados = CursoInscrito::where('idcurso', $id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -299,10 +277,7 @@ class CursoController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza('CursoInscritoController', 'index');
         $busca = Input::get('q');
         $cursos = Curso::where('tipo','LIKE','%'.$busca.'%')
             ->orWhere('tema','LIKE','%'.$busca.'%')

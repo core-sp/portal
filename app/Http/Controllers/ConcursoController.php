@@ -11,6 +11,9 @@ use App\Http\Controllers\ControleController;
 
 class ConcursoController extends Controller
 {
+    // Nome da classe
+    private $class = 'ConcursoController';
+    // Variáveis extras da página
     public $variaveis = [
         'singular' => 'concurso',
         'singulariza' => 'o concurso',
@@ -81,10 +84,7 @@ class ConcursoController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -93,20 +93,14 @@ class ConcursoController extends Controller
 
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
 
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, 'create');
         $regras = [
             'modalidade' => 'required',
             'titulo' => 'required',
@@ -144,10 +138,7 @@ class ConcursoController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultado = Concurso::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -155,10 +146,7 @@ class ConcursoController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, 'edit');
         $regras = [
             'modalidade' => 'required',
             'titulo' => 'required',
@@ -201,10 +189,7 @@ class ConcursoController extends Controller
      */
     public function destroy($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $concurso = Concurso::find($id);
         $delete = $concurso->delete();
         if(!$delete)
@@ -221,9 +206,7 @@ class ConcursoController extends Controller
      */
     public function lixeira()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultados = Concurso::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -264,9 +247,7 @@ class ConcursoController extends Controller
      */
     public function restore($id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $concurso = Concurso::onlyTrashed()->find($id);
         $concurso->restore();
         return redirect()->route('concursos.lista')
@@ -276,10 +257,7 @@ class ConcursoController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, 'index');
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Concurso::where('modalidade','LIKE','%'.$busca.'%')
