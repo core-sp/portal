@@ -135,10 +135,13 @@ class NoticiaController extends Controller
         else
             $publicada = 'Sim';
         // Inputa dados no BD
+        $img = $request->input['img'];
+        if(!isset($img))
+            $img = '/img/noticia-generico.png';
         $noticia = new Noticia();
         $noticia->titulo = $request->input('titulo');
         $noticia->slug = Str::slug($request->input('titulo'), '-');
-        $noticia->img = $request->input('img');
+        $noticia->img = $img;
         $noticia->conteudo = $request->input('conteudo');
         $noticia->publicada = $publicada;
         $noticia->idregional = $request->input('regionais');

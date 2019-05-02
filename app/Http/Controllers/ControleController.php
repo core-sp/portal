@@ -27,6 +27,7 @@ class ControleController extends Controller
             if(!in_array(session('idperfil'), $array)){
                 abort(401);
             }
+            return response(100);
         } else {
             abort(401);
         }

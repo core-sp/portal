@@ -629,6 +629,7 @@ strong, .bold {
 .noticia-img {
 	height: 410px;
 	border-radius: 5px;
+	border: 1px solid #d6d6d6;
 }
 
 .noticia-img img {

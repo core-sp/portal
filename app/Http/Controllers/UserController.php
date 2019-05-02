@@ -38,9 +38,9 @@ class UserController extends Controller
 
     public function resultados()
     {
-        $resultados = User::with(['sessao' => function($query) {
-            $query->orderBy('updated_at', 'DESC')->get();
-        }])->paginate(10);
+        $resultados = User::leftJoin('sessoes', 'sessoes.idusuario', '=', 'users.idusuario')
+            ->orderBy('sessoes.updated_at','DESC')
+            ->paginate(10);
         return $resultados;
     }
 
@@ -92,7 +92,7 @@ class UserController extends Controller
     
     public function index()
     {
-        ControleController::autoriza($this->controller, 'index');
+        ControleController::autoriza($this->controller, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -101,7 +101,7 @@ class UserController extends Controller
 
     public function create()
     {
-        ControleController::autoriza($this->controller, 'index');
+        ControleController::autoriza($this->controller, __FUNCTION__);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
         $perfis = Perfil::all();
@@ -110,9 +110,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autoriza($this->controller, 'create');
         $regras = [
             'nome' => 'required',
             'email' => 'email|required',
@@ -141,9 +139,7 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autoriza($this->controller, __FUNCTION__);
         $resultado = User::find($id);
         $regionais = Regional::all();
         $perfis = Perfil::all();
@@ -153,9 +149,7 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autoriza($this->controller, 'edit');
         $regras = [
             'nome' => 'required',
             'email' => 'email|required'
@@ -180,9 +174,7 @@ class UserController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autoriza($this->controller, __FUNCTION__);
         $usuario = User::find($id);
         $delete = $usuario->delete();
         if(!$delete)
@@ -195,9 +187,7 @@ class UserController extends Controller
 
     public function lixeira(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizacao(['1']);
         $resultados = User::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -232,9 +222,7 @@ class UserController extends Controller
 
     public function restore(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizacao(['1']);
         $usuario = User::onlyTrashed()->find($id);
         $usuario->restore();
         return redirect()->route('usuarios.lista')
@@ -288,9 +276,7 @@ class UserController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autoriza($this->controller, 'index');
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = User::where('nome','LIKE','%'.$busca.'%')

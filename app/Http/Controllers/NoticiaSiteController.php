@@ -9,7 +9,6 @@ class NoticiaSiteController extends Controller
 {
     public function noticiasView()
     {
-
         $noticias = Noticia::orderBy('created_at', 'DESC')->where('publicada','Sim')->paginate(9);
         return view('site.noticias', compact('noticias'));        
     }
@@ -23,6 +22,7 @@ class NoticiaSiteController extends Controller
                 ->take(3)
                 ->orderBy('created_at','DESC')
                 ->where('idnoticia','!=',$id)
+                ->whereNull('idregional')
                 ->get();
             return view('site.noticia', compact('noticia', 'tres', 'id'));
         } else {
