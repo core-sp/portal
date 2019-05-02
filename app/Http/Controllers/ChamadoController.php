@@ -72,9 +72,7 @@ class ChamadoController extends Controller
 
     public function index(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -115,9 +113,7 @@ class ChamadoController extends Controller
 
     public function show(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultado = Chamado::withTrashed()->find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.mostra', compact('variaveis', 'resultado'));
@@ -125,9 +121,7 @@ class ChamadoController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultado = Chamado::find($id);
         $delete = $resultado->delete();
         if(!$delete)
@@ -139,9 +133,7 @@ class ChamadoController extends Controller
 
     public function lixeira(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultados = Chamado::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -177,9 +169,7 @@ class ChamadoController extends Controller
 
     public function restore(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $chamado = Chamado::onlyTrashed()->find($id);
         $chamado->restore();
         return redirect('/admin/chamados')
@@ -189,9 +179,7 @@ class ChamadoController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Chamado::where('tipo','LIKE','%'.$busca.'%')

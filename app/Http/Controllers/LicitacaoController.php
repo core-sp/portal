@@ -11,6 +11,8 @@ use App\Http\Controllers\ControleController;
 
 class LicitacaoController extends Controller
 {
+    // Nome da classe
+    private $class = 'LicitacaoController';
     // Variáveis extras da página
     public $variaveis = [
         'singular' => 'licitacao',
@@ -85,10 +87,7 @@ class LicitacaoController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Jurídico'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -102,10 +101,7 @@ class LicitacaoController extends Controller
      */
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Jurídico'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
@@ -118,10 +114,7 @@ class LicitacaoController extends Controller
      */
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Jurídico'
-        ]);
+        ControleController::autoriza($this->class, 'create');
         $regras = [
             'modalidade' => 'required',
             'nrlicitacao' => 'required',
@@ -167,10 +160,7 @@ class LicitacaoController extends Controller
      */
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Jurídico'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultado = Licitacao::find($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -185,10 +175,7 @@ class LicitacaoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Jurídico'
-        ]);
+        ControleController::autoriza($this->class, 'edit');
         $regras = [
             'modalidade' => 'required',
             'nrlicitacao' => 'required',
@@ -234,10 +221,7 @@ class LicitacaoController extends Controller
      */
     public function destroy($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Jurídico'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $licitacao = Licitacao::find($id);
         $delete = $licitacao->delete();
         if(!$delete)
@@ -254,9 +238,7 @@ class LicitacaoController extends Controller
      */
     public function lixeira()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultados = Licitacao::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -297,9 +279,7 @@ class LicitacaoController extends Controller
      */
     public function restore($id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $licitacao = Licitacao::onlyTrashed()->find($id);
         $licitacao->restore();
         return redirect()->route('licitacoes.lista')
@@ -309,10 +289,7 @@ class LicitacaoController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Jurídico'
-        ]);
+        ControleController::autoriza($this->class, 'index');
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Licitacao::where('modalidade','LIKE','%'.$busca.'%')

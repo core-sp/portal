@@ -10,6 +10,8 @@ use App\Http\Controllers\ControleController;
 
 class AgendamentoBloqueioController extends Controller
 {
+    private $class = 'AgendamentoBloqueioController';
+    // Variáveis extras da página
     public $variaveis = [
         'singular' => 'bloqueio',
         'singulariza' => 'o bloqueio',
@@ -82,11 +84,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Gestão de Atendimento',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -95,11 +93,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Gestão de Atendimento',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
@@ -107,11 +101,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Gestão de Atendimento',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, 'create');
         $regras = [
             'horainicio' => 'required',
             'horatermino' => 'required',
@@ -156,11 +146,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Gestão de Atendimento',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultado = AgendamentoBloqueio::find($id);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
@@ -169,11 +155,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Gestão de Atendimento',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, 'edit');
         $regras = [
             'horainicio' => 'required',
             'horatermino' => 'required',
@@ -218,11 +200,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Gestão de Atendimento',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $bloqueio = AgendamentoBloqueio::find($id);
         $delete = $bloqueio->delete();
         if(!$delete)

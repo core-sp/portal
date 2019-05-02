@@ -12,6 +12,9 @@ use App\Http\Controllers\ControleController;
 
 class PaginaController extends Controller
 {
+    // Nome da classe
+    private $class = 'PaginaController';
+    // Variáveis
     public $variaveis = [
         'singular' => 'pagina',
         'singulariza' => 'a página',
@@ -83,11 +86,7 @@ class PaginaController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -101,11 +100,7 @@ class PaginaController extends Controller
      */
     public function create()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $categorias = PaginaCategoria::all();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('categorias', 'variaveis'));
@@ -113,11 +108,7 @@ class PaginaController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->class, 'create');
         $regras = [
             'titulo' => 'required',
             'conteudo' => 'required'
@@ -145,11 +136,7 @@ class PaginaController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultado = Pagina::find($id);
         $categorias = PaginaCategoria::all();
         $variaveis = (object) $this->variaveis;
@@ -158,11 +145,7 @@ class PaginaController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->class, 'edit');
         $regras = [
             'titulo' => 'required',
             'conteudo' => 'required'
@@ -189,11 +172,7 @@ class PaginaController extends Controller
 
     public function destroy($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $pagina = Pagina::find($id);
         $delete = $pagina->delete();
         if(!$delete)
@@ -205,9 +184,7 @@ class PaginaController extends Controller
 
     public function lixeira()
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $resultados = Pagina::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -240,9 +217,7 @@ class PaginaController extends Controller
 
     public function restore($id)
     {
-        ControleController::autorizacao([
-            'Admin'
-        ]);
+        ControleController::autorizaStatic(['1']);
         $pagina = Pagina::onlyTrashed()->find($id);
         $pagina->restore();
         return redirect('/admin/paginas')
@@ -252,11 +227,7 @@ class PaginaController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor',
-            'Procuradoria'        
-        ]);
+        ControleController::autoriza($this->class, 'index');
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Pagina::where('titulo','LIKE','%'.$busca.'%')

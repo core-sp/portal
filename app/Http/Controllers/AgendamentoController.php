@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Auth;
 
 class AgendamentoController extends Controller
 {
+    // Nome da classe
+    private $class = 'AgendamentoController';
+    // Variáveis extras da página
     public $variaveis = [
         'singular' => 'agendamento',
         'singulariza' => 'o agendamento',
@@ -66,7 +69,7 @@ class AgendamentoController extends Controller
             $regional = Regional::find(Auth::user()->idregional);
             $regionalNome = $regional->regional;
         }
-        ControleController::autorizacao(['Admin', 'Gestão de Atendimento', 'Coordenadoria de Atendimento']);
+        ControleController::autoriza($this->class, 'edit');
         // Puxa os resultados
         if(Input::has(['regional','status'])) {
             $resultados = $this->resultadosFiltro($dia, Input::get('regional'), Input::get('status'));
@@ -117,12 +120,7 @@ class AgendamentoController extends Controller
 
     public function index()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Atendimento',
-            'Gestão de Atendimento',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $regional = Auth::user()->idregional;
         // Checa se tem filtro
         if(Input::get('filtro') == 'sim') {
@@ -275,12 +273,7 @@ class AgendamentoController extends Controller
 
     public function busca()
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Atendimento',
-            'Gestão de Atendimento',
-            'Coordenadoria de Atendimento'
-        ]);
+        ControleController::autoriza($this->class, 'index');
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Agendamento::where('nome','LIKE','%'.$busca.'%')

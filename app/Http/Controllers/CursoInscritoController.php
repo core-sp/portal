@@ -12,6 +12,9 @@ use App\Http\Controllers\ControleController;
 
 class CursoInscritoController extends Controller
 {
+    // Noma da classe pai (em relação à controle)
+    private $class = 'CursoInscritoController';
+    // Variáveis
     public $variaveis = [
         'singular' => 'inscrito',
         'singulariza' => 'o inscrito',
@@ -64,10 +67,7 @@ class CursoInscritoController extends Controller
 
     public function create($idcurso)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $curso = Curso::find($idcurso);
         $variaveis = [
             'form' => 'cursoinscrito',
@@ -80,10 +80,7 @@ class CursoInscritoController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, 'create');
         $idcurso = $request->input('idcurso');
         $regras = [
             'cpf' => 'required|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso,
@@ -114,10 +111,7 @@ class CursoInscritoController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $resultado = CursoInscrito::find($id);
         $variaveis = [
             'form' => 'cursoinscrito',
@@ -130,10 +124,7 @@ class CursoInscritoController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, 'edit');
         $idcurso = $request->input('idcurso');
         $regras = [
             'cpf' => 'required',
@@ -243,10 +234,7 @@ class CursoInscritoController extends Controller
 
     public function destroy($id)
     {
-        ControleController::autorizacao([
-            'Admin',
-            'Editor'
-        ]);
+        ControleController::autoriza($this->class, __FUNCTION__);
         $curso = CursoInscrito::find($id);
         $delete = $curso->delete();
         if(!$delete)
