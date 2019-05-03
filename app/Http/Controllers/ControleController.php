@@ -26,25 +26,14 @@ class ControleController extends Controller
         }
     }
 
-    public static function array() {
-        $permissao = Permissao::all()
-            ->groupBy('controller');
-        $array = $permissao->toArray();
-        return $array;
-    }
-
     public static function mostra($controller, $metodo)
     {
-        $teste = ControleController::array();
-        $arrayCerto = $teste[$controller];
-        foreach($arrayCerto as $a) {
-            if($a['metodo'] == $metodo) {
-                if(strpos($a['perfis'], session('idperfil').','))
-                    return true;
-                else
-                    return false;
-            }
-        }
+        $cm = $controller.'_'.$metodo;
+        $permissoes = session('permissoes');
+        if(in_array($cm, $permissoes))
+            return true;
+        else
+            return false;
     }
 
     public static function autorizaStatic($perfis)

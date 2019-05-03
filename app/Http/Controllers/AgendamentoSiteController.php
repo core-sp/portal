@@ -43,6 +43,7 @@ class AgendamentoSiteController extends Controller
     {
         $agendamentos = Agendamento::where('dia',$dia)
             ->where('idregional',$idregional)
+            ->whereNull('status')
             ->get();
         $horarios = [];
         $contagem = AgendamentoControllerHelper::countAtendentes($idregional);

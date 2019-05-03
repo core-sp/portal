@@ -8,7 +8,7 @@ use App\Http\Controllers\Helper;
 
 <section id="pagina-cabecalho" class="mt-1">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-    <img src="{{ asset('img/concursos.png') }}" />
+    <img src="{{ asset('img/banner-busca.png') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">

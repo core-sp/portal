@@ -1,13 +1,11 @@
 @php
   use App\Http\Controllers\ControleController;
-  $permissoes = App\Http\Controllers\MenuController::menuMostra();
-  $idperfil = (string) session('idperfil');
 @endphp
 <!-- Sidebar Menu -->
 <nav class="mt-2 mb-2">
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Usuários -->
-        @if(strpos($permissoes[0]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('UserController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fa fa-users"></i>
@@ -15,7 +13,7 @@
             </a>
         @endif
         <ul class="nav nav-treeview">
-            @if(strpos($permissoes[0]['perfis'], $idperfil) !== false)
+            @if(ControleController::mostra('UserController', 'index'))
             <li class="nav-item">
                 <a href="/admin/usuarios" class="nav-link">
                     <i class="nav-icon fa fa-angle-right"></i>
@@ -54,14 +52,14 @@
             </a>
         </li>
         <!-- Conteúdo -->
-        @if(strpos($permissoes[2]['perfis'], $idperfil) !== false ||
-            strpos($permissoes[6]['perfis'], $idperfil) !== false ||
-            strpos($permissoes[10]['perfis'], $idperfil) !== false ||
-            strpos($permissoes[18]['perfis'], $idperfil) !== false ||
-            strpos($permissoes[22]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('PaginaController', 'index') ||
+            ControleController::mostra('NoticiaController', 'index') ||
+            ControleController::mostra('CursoController', 'index') ||
+            ControleController::mostra('BdoEmpresaController', 'index') ||
+            ControleController::mostra('BdoOportunidadeController', 'index'))
         <li class="nav-header">CONTEÚDO</li>
         @endif
-        @if(strpos($permissoes[2]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('PaginaController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-file-alt"></i>
@@ -69,7 +67,7 @@
             </a>
         @endif
             <ul class="nav nav-treeview">
-                @if(strpos($permissoes[2]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('PaginaController', 'index'))
                 <li class="nav-item">
                     <a href="/admin/paginas" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -77,7 +75,7 @@
                     </a>
                 </li>
                 @endif
-                @if(strpos($permissoes[3]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('PaginaController', 'create'))
                 <li class="nav-item">
                     <a href="/admin/paginas/criar" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -93,7 +91,7 @@
                 @endif
             </ul>
         </li>
-        @if(strpos($permissoes[6]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('NoticiaController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-newspaper"></i>
@@ -101,7 +99,7 @@
             </a>
         @endif
             <ul class="nav nav-treeview">
-                @if(strpos($permissoes[6]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('NoticiaController', 'index'))
                 <li class="nav-item">
                     <a href="/admin/noticias" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -109,7 +107,7 @@
                     </a>
                 </li>
                 @endif
-                @if(strpos($permissoes[7]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('NoticiaController', 'create'))
                 <li class="nav-item">
                     <a href="/admin/noticias/criar" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -119,7 +117,7 @@
                 @endif
             </ul>
         </li>
-        @if(strpos($permissoes[10]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('CursoController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-graduation-cap"></i>
@@ -127,7 +125,7 @@
             </a>
         @endif
             <ul class="nav nav-treeview">
-                @if(strpos($permissoes[10]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('CursoController', 'index'))
                 <li class="nav-item">
                     <a href="/admin/cursos" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -135,7 +133,7 @@
                     </a>
                 </li>
                 @endif
-                @if(strpos($permissoes[11]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('CursoController', 'create'))
                 <li class="nav-item">
                     <a href="/admin/cursos/criar" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -145,7 +143,8 @@
                 @endif
             </ul>
         </li>
-        @if(strpos($permissoes[18]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('BdoEmpresaController', 'index') ||
+            ControleController::mostra('BdoOportunidadeController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-briefcase"></i>
@@ -153,7 +152,7 @@
             </a>
         @endif
             <ul class="nav nav-treeview">
-                @if(strpos($permissoes[18]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('BdoEmpresaController', 'index'))
                 <li class="nav-item">
                     <a href="/admin/bdo/empresas" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -161,7 +160,7 @@
                     </a>
                 </li>
                 @endif
-                @if(strpos($permissoes[22]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('BdoOportunidadeController', 'index'))
                 <li class="nav-item">
                     <a href="/admin/bdo" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -172,11 +171,11 @@
             </ul>
         </li>
         <!-- Atendimento -->
-        @if(strpos($permissoes[26]['perfis'], $idperfil) !== false ||
-            strpos($permissoes[28]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('AgendamentoController', 'index') ||
+            ControleController::mostra('AgendamentoBloqueioController', 'index'))
         <li class="nav-header">ATENDIMENTO</li>
         @endif
-        @if(strpos($permissoes[26]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('AgendamentoController', 'index'))
         <li class="nav-item">
             <a href="/admin/agendamentos" class="nav-link">
                 <i class="nav-icon far fa-clock"></i>
@@ -184,7 +183,7 @@
             </a>
         </li>
         @endif
-        @if(strpos($permissoes[28]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('AgendamentoBloqueioController', 'index'))
         <li class="nav-item">
             <a href="/admin/agendamentos/bloqueios" class="nav-link">
                 <i class="nav-icon fas fa-ban"></i>
@@ -193,11 +192,11 @@
         </li>
         @endif
         <!-- Jurídico -->
-        @if(strpos($permissoes[32]['perfis'], $idperfil) !== false ||
-            strpos($permissoes[36]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('LicitacaoController', 'index') ||
+            ControleController::mostra('ConcursoController', 'index'))
         <li class="nav-header">JURÍDICO</li>
         @endif
-        @if(strpos($permissoes[32]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('LicitacaoController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-file-alt"></i>
@@ -205,7 +204,7 @@
             </a>
         @endif
             <ul class="nav nav-treeview">
-                @if(strpos($permissoes[32]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('LicitacaoController', 'index'))
                 <li class="nav-item">
                     <a href="/admin/licitacoes" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -213,7 +212,7 @@
                     </a>
                 </li>
                 @endif
-                @if(strpos($permissoes[33]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('LicitacaoController', 'create'))
                 <li class="nav-item">
                     <a href="/admin/licitacoes/criar" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -223,7 +222,7 @@
                 @endif
             </ul>
         </li>
-        @if(strpos($permissoes[36]['perfis'], $idperfil) !== false)
+        @if(ControleController::mostra('ConcursoController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-edit"></i>
@@ -231,7 +230,7 @@
             </a>
         @endif
             <ul class="nav nav-treeview">
-                @if(strpos($permissoes[36]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('ConcursoController', 'index'))
                 <li class="nav-item">
                     <a href="/admin/concursos" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -239,7 +238,7 @@
                     </a>
                 </li>
                 @endif
-                @if(strpos($permissoes[37]['perfis'], $idperfil) !== false)
+                @if(ControleController::mostra('ConcursoController', 'create'))
                 <li class="nav-item">
                     <a href="/admin/concursos/criar" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>

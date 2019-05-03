@@ -12,7 +12,9 @@ class AgendamentoControllerHelper extends Controller
 {
     public static function countAtendentes($idregional)
     {
-        $getAtendentes = User::where('perfil','Atendimento')->get();
+        $getAtendentes = User::whereHas('perfil', function($q) {
+            $q->where('nome','=','Atendimento');
+        })->get();
         $count = $getAtendentes->where('idregional', $idregional)->count();
         return $count;
     }
