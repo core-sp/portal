@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Sessao;
+use App\Permissao;
 
 class LoginController extends Controller
 {
@@ -54,6 +55,23 @@ class LoginController extends Controller
         $this->saveSession($request, $user);
     }
 
+    protected function permissoes()
+    {
+        $user = Auth::user();
+        $idperfil = $user->perfil()->first()->idperfil;
+        $permissao = Permissao::all();
+        $array = $permissao->toArray();
+        $permissoes = [];
+        foreach($array as $a) {
+            if(strpos($a['perfis'], $idperfil.',') !== false) {
+                $cm = $a['controller'].'_'.$a['metodo'];
+                $perfis = $a['perfis'];
+                array_push($permissoes, $cm);
+            }
+        }
+        return $permissoes;
+    }
+
     protected function setUserSession()
     {
         $user = Auth::user();
@@ -65,7 +83,8 @@ class LoginController extends Controller
             'perfil' => $perfil,
             'idperfil' => $idperfil,
             'email' => $email,
-            'nome' => $nome
+            'nome' => $nome,
+            'permissoes' => $this->permissoes()
         ]);
     }
 
