@@ -9,13 +9,6 @@ use App\Permissao;
 
 class ControleController extends Controller
 {
-    public static function autorizacao($perfis)
-    {
-        if(!in_array(session('perfil'), $perfis)){
-            abort(401);
-        }
-    }
-
     public static function autoriza($controller, $metodo)
     {
         $string = Permissao::select('perfis')
@@ -33,6 +26,27 @@ class ControleController extends Controller
         }
     }
 
+    public static function array() {
+        $permissao = Permissao::all()
+            ->groupBy('controller');
+        $array = $permissao->toArray();
+        return $array;
+    }
+
+    public static function mostra($controller, $metodo)
+    {
+        $teste = ControleController::array();
+        $arrayCerto = $teste[$controller];
+        foreach($arrayCerto as $a) {
+            if($a['metodo'] == $metodo) {
+                if(strpos($a['perfis'], session('idperfil').','))
+                    return true;
+                else
+                    return false;
+            }
+        }
+    }
+
     public static function autorizaStatic($perfis)
     {
         if(!in_array(session('idperfil'), $perfis)){
@@ -43,13 +57,6 @@ class ControleController extends Controller
     public static function mostraStatic($perfis)
     {
         if(in_array(session('idperfil'), $perfis)){
-            return true;
-        }
-    }
-
-    public static function mostra($perfis)
-    {
-        if(in_array(session('perfil'), $perfis)){
             return true;
         }
     }

@@ -21,12 +21,7 @@ class AgendamentoController extends Controller
         'singular' => 'agendamento',
         'singulariza' => 'o agendamento',
         'plural' => 'agendamentos',
-        'pluraliza' => 'agendamentos',
-        'mostraFiltros' => [
-            'Admin',
-            'Gestão de Atendimento',
-            'Coordenadoria de Atendimento'
-        ],
+        'pluraliza' => 'agendamentos'
     ];
 
     public function __construct()
@@ -141,6 +136,8 @@ class AgendamentoController extends Controller
         // Variáveis globais
         $variaveis = $this->variaveis;
         $variaveis['filtro'] = $this->filtros();
+        if(ControleController::mostra($this->class, 'edit'))
+            $variaveis['mostraFiltros'] = true;
         $variaveis = (object) $variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }

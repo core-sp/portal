@@ -56,13 +56,17 @@ class CursoController extends Controller
         $contents = [];
         foreach($resultados as $resultado) {
             $acoes = '<a href="/curso/'.$resultado->idcurso.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            $acoes .= '<a href="/admin/cursos/inscritos/'.$resultado->idcurso.'" class="btn btn-sm btn-secondary">Inscritos</a> ';
-            $acoes .= '<a href="/admin/cursos/editar/'.$resultado->idcurso.'" class="btn btn-sm btn-primary">Editar</a> ';
-            $acoes .= '<form method="POST" action="/admin/cursos/cancelar/'.$resultado->idcurso.'" class="d-inline">';
-            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-            $acoes .= '<input type="hidden" name="_method" value="delete" />';
-            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')" />';
-            $acoes .= '</form>';
+            if(ControleController::mostra('CursoInscritoController', 'index'))
+                $acoes .= '<a href="/admin/cursos/inscritos/'.$resultado->idcurso.'" class="btn btn-sm btn-secondary">Inscritos</a> ';
+            if(ControleController::mostra($this->class, 'edit'))
+                $acoes .= '<a href="/admin/cursos/editar/'.$resultado->idcurso.'" class="btn btn-sm btn-primary">Editar</a> ';
+            if(ControleController::mostra($this->class, 'destroy')) {
+                $acoes .= '<form method="POST" action="/admin/cursos/cancelar/'.$resultado->idcurso.'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')" />';
+                $acoes .= '</form>';
+            }
             if($resultado->publicado == 'Sim')
                 $publicado = 'Publicado';
             else
@@ -92,6 +96,8 @@ class CursoController extends Controller
         ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
+        if(!ControleController::mostra($this->class, 'create'))
+            unset($this->variaveis['btn_criar']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
@@ -270,6 +276,8 @@ class CursoController extends Controller
             'btn_criar' => '<a href="/admin/cursos/adicionar-inscrito/'.$curso->idcurso.'" class="btn btn-primary mr-1">Adicionar inscrito</a> ',
             'btn_lixeira' => '<a href="/admin/cursos" class="btn btn-default">Lista de Cursos</a>'
         ];
+        if(!ControleController::mostra('CursoInscritoController', 'create'))
+            unset($variaveis['btn_criar']);
         $tabela = CursoInscritoController::tabelaCompleta($resultados);
         $variaveis = (object) $variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));

@@ -59,12 +59,16 @@ class UserController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<a href="/admin/usuarios/editar/'.$resultado->idusuario.'" class="btn btn-sm btn-primary">Editar</a> ';
-            $acoes .= '<form method="POST" action="/admin/usuarios/apagar/'.$resultado->idusuario.'" class="d-inline">';
-            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-            $acoes .= '<input type="hidden" name="_method" value="delete" />';
-            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o usuário?\')" />';
-            $acoes .= '</form>';
+            if(ControleController::mostraStatic(['1']) === true) {
+                $acoes = '<a href="/admin/usuarios/editar/'.$resultado->idusuario.'" class="btn btn-sm btn-primary">Editar</a> ';
+                $acoes .= '<form method="POST" action="/admin/usuarios/apagar/'.$resultado->idusuario.'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o usuário?\')" />';
+                $acoes .= '</form>';
+            } else {
+                $acoes = '<i class="fas fa-ban text-danger"></i>';
+            }
             if(isset($resultado->sessao)) {
                 $acesso = Helper::formataData($resultado->sessao->updated_at);
                 $acesso .= '<br />IP: ';
@@ -96,13 +100,15 @@ class UserController extends Controller
         ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
+        if(ControleController::mostraStatic(['1']) !== true)
+            unset($this->variaveis['btn_criar']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function create()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        ControleController::autorizaStatic(['1']);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
         $perfis = Perfil::all();
@@ -111,7 +117,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autoriza($this->class, 'create');
+        ControleController::autorizaStatic(['1']);
         $regras = [
             'nome' => 'required',
             'email' => 'email|required',
@@ -140,7 +146,7 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        ControleController::autorizaStatic(['1']);
         $resultado = User::find($id);
         $regionais = Regional::all();
         $perfis = Perfil::all();
@@ -150,7 +156,7 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autoriza($this->class, 'edit');
+        ControleController::autorizaStatic(['1']);
         $regras = [
             'nome' => 'required',
             'email' => 'email|required'
@@ -175,7 +181,7 @@ class UserController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        ControleController::autorizaStatic(['1']);
         $usuario = User::find($id);
         $delete = $usuario->delete();
         if(!$delete)

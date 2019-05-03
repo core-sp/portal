@@ -52,13 +52,19 @@ class BdoEmpresaController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<a href="/admin/bdo/criar?empresa='.$resultado->idempresa.'" class="btn btn-sm btn-secondary">Nova Oportunidade</a> ';
-            $acoes .= '<a href="/admin/bdo/empresas/editar/'.$resultado->idempresa.'" class="btn btn-sm btn-primary">Editar</a> ';
-            $acoes .= '<form method="POST" action="/admin/bdo/empresas/apagar/'.$resultado->idempresa.'" class="d-inline">';
-            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-            $acoes .= '<input type="hidden" name="_method" value="delete" />';
-            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a empresa?\')" />';
-            $acoes .= '</form>';
+            if(ControleController::mostra('BdoOportunidadeController', 'create'))
+                $acoes = '<a href="/admin/bdo/criar?empresa='.$resultado->idempresa.'" class="btn btn-sm btn-secondary">Nova Oportunidade</a> ';
+            else
+                $acoes = '';
+            if(ControleController::mostra($this->class, 'edit'))
+                $acoes .= '<a href="/admin/bdo/empresas/editar/'.$resultado->idempresa.'" class="btn btn-sm btn-primary">Editar</a> ';
+            if(ControleController::mostra($this->class, 'destroy')) {
+                $acoes .= '<form method="POST" action="/admin/bdo/empresas/apagar/'.$resultado->idempresa.'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a empresa?\')" />';
+                $acoes .= '</form>';
+            }
             $conteudo = [
                 $resultado->idempresa,
                 $resultado->segmento,
@@ -82,6 +88,8 @@ class BdoEmpresaController extends Controller
         ControleController::autoriza($this->class, __FUNCTION__);
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
+        if(!ControleController::mostra($this->class, 'create'))
+            unset($this->variaveis['btn_criar']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }

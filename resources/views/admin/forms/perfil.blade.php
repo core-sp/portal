@@ -1,7 +1,10 @@
 <form role="form" method="POST">
     @csrf
-    {{ method_field('PUT') }}
+    @if(isset($permissoesArray))
+        {{ method_field('PUT') }}
+    @endif
     <div class="card-body">
+        @if(isset($permissoesArray))
         <table class="table table-bordered perfilEdit table-striped">
             <thead>
                 <tr>
@@ -165,6 +168,21 @@
                 </tr>
             </tbody>
         </table>
+        @else
+        <div class="form-group">
+            <label for="nome">Nome</label>
+            <input type="text"
+                class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
+                placeholder="Nome"
+                name="nome"
+                />
+            @if($errors->has('nome'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('nome') }}
+                </div>
+            @endif
+        </div>
+        @endif
     </div>
     <div class="card-footer float-right">
         <a href="/admin/usuarios/perfis" class="btn btn-default">Cancelar</a>

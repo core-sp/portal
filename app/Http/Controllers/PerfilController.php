@@ -89,6 +89,27 @@ class PerfilController extends Controller
         return view('admin.crud.criar', compact('variaveis'));
     }
 
+    public function store(Request $request)
+    {
+        ControleController::autorizaStatic(['1']);
+        $regras = [
+            'nome' => 'required',
+        ];
+        $mensagens = [
+            'required' => 'O :attribute é obrigatório',
+        ];
+        $erros = $request->validate($regras, $mensagens);
+
+        $perfil = new Perfil();
+        $perfil->nome = $request->input('nome');
+        $save = $perfil->save();
+        if(!$save)
+            abort(500);
+        return redirect('/admin/usuarios/perfis')
+            ->with('message', '<i class="icon fa fa-check"></i>Perfil cadastrado com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
     public function edit($id)
     {
         ControleController::autorizaStatic(['1']);
@@ -127,27 +148,6 @@ class PerfilController extends Controller
         }
         return redirect()->route('perfis.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Permissões atualizadas com sucesso!')
-            ->with('class', 'alert-success');
-    }
-
-    public function store(Request $request)
-    {
-        ControleController::autorizaStatic(['1']);
-        $regras = [
-            'nome' => 'required',
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-        ];
-        $erros = $request->validate($regras, $mensagens);
-
-        $perfil = new Perfil();
-        $perfil->nome = $request->input('nome');
-        $save = $perfil->save();
-        if(!$save)
-            abort(500);
-        return redirect('/admin/usuarios/perfis')
-            ->with('message', '<i class="icon fa fa-check"></i>Perfil cadastrado com sucesso!')
             ->with('class', 'alert-success');
     }
 
