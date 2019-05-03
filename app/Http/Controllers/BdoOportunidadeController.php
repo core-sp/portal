@@ -55,12 +55,17 @@ class BdoOportunidadeController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<a href="/admin/bdo/editar/'.$resultado->idoportunidade.'" class="btn btn-sm btn-primary">Editar</a> ';
-            $acoes .= '<form method="POST" action="/admin/bdo/apagar/'.$resultado->idoportunidade.'" class="d-inline">';
-            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-            $acoes .= '<input type="hidden" name="_method" value="delete" />';
-            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a oportunidade?\')" />';
-            $acoes .= '</form>';
+            if(ControleController::mostra($this->class, 'edit'))
+                $acoes = '<a href="/admin/bdo/editar/'.$resultado->idoportunidade.'" class="btn btn-sm btn-primary">Editar</a> ';
+            else
+                $acoes = '';
+            if(ControleController::mostra($this->class, 'destroy')) {
+                $acoes .= '<form method="POST" action="/admin/bdo/apagar/'.$resultado->idoportunidade.'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a oportunidade?\')" />';
+                $acoes .= '</form>';
+            }
             if(isset($resultado->vagaspreenchidas))
                 $relacaovagas = $resultado->vagaspreenchidas.' / '.$resultado->vagasdisponiveis;
             else

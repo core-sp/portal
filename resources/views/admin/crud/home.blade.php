@@ -30,7 +30,7 @@
         @if(isset($variaveis->btn_criar))
         {!! $variaveis->btn_criar !!}
         @endif
-        @if(ControleController::mostra(['Admin']))
+        @if(ControleController::mostraStatic(['1']))
           @if(isset($variaveis->btn_lixeira))
             {!! $variaveis->btn_lixeira !!}
           @endif
@@ -79,7 +79,7 @@
           </div>
           <div class="card-body">
             @if(isset($variaveis->filtro))
-              @if(ControleController::mostra($variaveis->mostraFiltros))
+              @if(isset($variaveis->mostraFiltros))
               <div class="row mb-3">
                 <div class="col-sm-auto align-self-center">
                   <p class="d-inline">Filtrar por:&nbsp;&nbsp;</p>
