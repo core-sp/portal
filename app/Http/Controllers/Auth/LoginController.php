@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Sessao;
 use App\Permissao;
+use App\Events\LoginEvent;
 
 class LoginController extends Controller
 {
@@ -77,11 +78,13 @@ class LoginController extends Controller
         $user = Auth::user();
         $perfil = $user->perfil()->first()->nome;
         $idperfil = $user->perfil()->first()->idperfil;
+        $idusuario = $user->idusuario;
         $email = $user->email;
         $nome = $user->nome;
         session([
             'perfil' => $perfil,
             'idperfil' => $idperfil,
+            'idusuario' => $idusuario,
             'email' => $email,
             'nome' => $nome,
             'permissoes' => $this->permissoes()

@@ -10,6 +10,7 @@ use App\Curso;
 use Illuminate\Support\Str;
 use App\Http\Controllers\ControleController;
 use Illuminate\Support\Facades\Auth;
+use App\Events\CriouNoticiaEvent;
 
 class NoticiaController extends Controller
 {
@@ -141,6 +142,7 @@ class NoticiaController extends Controller
         $save = $noticia->save();
         if(!$save)
             abort(500);
+        event(new CriouNoticiaEvent($noticia->id));
         return redirect('/admin/noticias')
             ->with('message', '<i class="icon fa fa-check"></i>Notícia criada com sucesso!')
             ->with('class', 'alert-success');
