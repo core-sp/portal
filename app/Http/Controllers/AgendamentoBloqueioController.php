@@ -7,6 +7,7 @@ use App\AgendamentoBloqueio;
 use App\Regional;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\ControleController;
+use App\Events\CrudEvent;
 
 class AgendamentoBloqueioController extends Controller
 {
@@ -146,6 +147,7 @@ class AgendamentoBloqueioController extends Controller
         $save = $bloqueio->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('bloqueio de agendamento', 'criou', $bloqueio->idagendamentobloqueio));
         return redirect()->route('agendamentobloqueios.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Bloqueio cadastrado com sucesso!')
             ->with('class', 'alert-success');
@@ -200,6 +202,7 @@ class AgendamentoBloqueioController extends Controller
         $update = $bloqueio->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('bloqueio de agendamento', 'editou', $bloqueio->idagendamentobloqueio));
         return redirect()->route('agendamentobloqueios.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Bloqueio editado com sucesso!')
             ->with('class', 'alert-success');
@@ -212,6 +215,7 @@ class AgendamentoBloqueioController extends Controller
         $delete = $bloqueio->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('bloqueio de agendamento', 'cancelou', $bloqueio->idagendamentobloqueio));
         return redirect()->route('agendamentobloqueios.lista')
             ->with('message', '<i class="icon fa fa-danger"></i>Bloqueio cancelado com sucesso!')
             ->with('class', 'alert-danger');

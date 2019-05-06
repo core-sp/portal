@@ -1017,6 +1017,14 @@ footer p {
 	border: 1px solid #d6d6d6;
 }
 
+.edital-download a {
+	color: #FF0000;
+}
+
+.edital-download a:hover {
+	text-decoration: underline;
+}
+
 .btn-edital {
 	background-color: #004587;
 	padding: .4rem .8rem;
@@ -1249,6 +1257,8 @@ footer p {
 .protocoloInput {
 	text-transform: uppercase;
 }
+
+
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS

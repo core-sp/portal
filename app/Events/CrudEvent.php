@@ -10,20 +10,24 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class CriouNoticiaEvent
+class CrudEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $idnoticia;
+    public $model;
+    public $action;
+    public $id;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($idnoticia)
+    public function __construct($model, $action, $id)
     {
-        $this->idnoticia = $idnoticia;
+        $this->model = $model;
+        $this->action = $action;
+        $this->id = $id;
     }
 
     /**

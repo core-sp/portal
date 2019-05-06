@@ -24,8 +24,8 @@ class EventServiceProvider extends ServiceProvider
         'Illuminate\Auth\Events\Logout' => [
             'App\Listeners\LogSuccessfulLogout',
         ],
-        'App\Events\CriouNoticiaEvent' => [
-            'App\Listeners\CriouNoticiaEventListener',
+        'App\Events\CrudEvent' => [
+            'App\Listeners\CrudEventListener',
         ],
     ];
 

@@ -8,6 +8,7 @@ use App\Licitacao;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\ControleController;
+use App\Events\CrudEvent;
 
 class LicitacaoController extends Controller
 {
@@ -122,6 +123,7 @@ class LicitacaoController extends Controller
         ControleController::autoriza($this->class, 'create');
         $regras = [
             'modalidade' => 'required',
+            'titulo' => 'max:191',
             'nrlicitacao' => 'required',
             'nrprocesso' => 'required',
             'situacao' => 'required',
@@ -133,6 +135,7 @@ class LicitacaoController extends Controller
             'nrlicitacao.required' => 'O nº da licitação é obrigatório',
             'nrprocesso.required' => 'O nº do processo é obrigatório',
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
+            'max' => 'O :attribute excedeu o máximo de caracteres permitidos'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Formata DateTime
@@ -152,6 +155,7 @@ class LicitacaoController extends Controller
         $save = $licitacao->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('licitação', 'criou', $licitacao->idlicitacao));
         return redirect()->route('licitacoes.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Licitação cadastrada com sucesso!')
             ->with('class', 'alert-success');
@@ -183,6 +187,7 @@ class LicitacaoController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $regras = [
             'modalidade' => 'required',
+            'titulo' => 'max:191',
             'nrlicitacao' => 'required',
             'nrprocesso' => 'required',
             'situacao' => 'required',
@@ -194,6 +199,7 @@ class LicitacaoController extends Controller
             'nrlicitacao.required' => 'O nº da licitação é obrigatório',
             'nrprocesso.required' => 'O nº do processo é obrigatório',
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
+            'max' => 'O :attribute excedeu o máximo de caracteres permitidos'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Formata DateTime
@@ -213,6 +219,7 @@ class LicitacaoController extends Controller
         $update = $licitacao->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('licitação', 'editou', $licitacao->idlicitacao));
         return redirect()->route('licitacoes.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Licitação editada com sucesso!')
             ->with('class', 'alert-success');
@@ -231,6 +238,7 @@ class LicitacaoController extends Controller
         $delete = $licitacao->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('licitação', 'apagou', $licitacao->idlicitacao));
         return redirect()->route('licitacoes.lista')
             ->with('message', '<i class="icon fa fa-danger"></i>Licitação deletada com sucesso!')
             ->with('class', 'alert-danger');
@@ -286,7 +294,10 @@ class LicitacaoController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $licitacao = Licitacao::onlyTrashed()->find($id);
-        $licitacao->restore();
+        $restore = $licitacao->restore();
+        if(!$restore)
+            abort(500);
+        event(new CrudEvent('licitação', 'restaurou', $licitacao->idlicitacao));
         return redirect()->route('licitacoes.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Licitação restaurada com sucesso!')
             ->with('class', 'alert-success');

@@ -9,6 +9,7 @@ use App\User;
 use App\PaginaCategoria;
 use Illuminate\Support\Str;
 use App\Http\Controllers\ControleController;
+use App\Events\CrudEvent;
 
 class PaginaController extends Controller
 {
@@ -62,7 +63,7 @@ class PaginaController extends Controller
                 $acoes .= '<form method="POST" action="/admin/paginas/apagar/'.$resultado->idpagina.'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a notícia?\')" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a página?\')" />';
                 $acoes .= '</form>';
             }
             if(isset($resultado->paginacategoria->nome))
@@ -134,6 +135,7 @@ class PaginaController extends Controller
         $save = $pagina->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('página', 'criou', $pagina->idpagina));
         return redirect('/admin/paginas')
             ->with('message', '<i class="icon fa fa-check"></i>Página criada com sucesso!')
             ->with('class', 'alert-success');
@@ -170,6 +172,7 @@ class PaginaController extends Controller
         $update = $pagina->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('página', 'editou', $pagina->idpagina));
         return redirect('/admin/paginas')
             ->with('message', '<i class="icon fa fa-check"></i>Página editada com sucesso!')
             ->with('class', 'alert-success');
@@ -182,6 +185,7 @@ class PaginaController extends Controller
         $delete = $pagina->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('página', 'apagou', $pagina->idpagina));
         return redirect('/admin/paginas')
             ->with('message', '<i class="icon fa fa-ban"></i>Página deletada com sucesso!')
             ->with('class', 'alert-danger');
@@ -224,7 +228,10 @@ class PaginaController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $pagina = Pagina::onlyTrashed()->find($id);
-        $pagina->restore();
+        $restore = $pagina->restore();
+        if(!$restore)
+            abort(500);
+        event(new CrudEvent('página', 'restaurou', $pagina->idpagina));
         return redirect('/admin/paginas')
             ->with('message', '<i class="icon fa fa-check"></i>Página restaurada com sucesso!')
             ->with('class', 'alert-success');

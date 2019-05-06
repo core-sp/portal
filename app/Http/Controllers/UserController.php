@@ -11,6 +11,7 @@ use App\Regional;
 use App\Perfil;
 use App\Http\Controllers\ControleController;
 use App\Http\Controllers\Helper;
+use App\Events\CrudEvent;
 
 class UserController extends Controller
 {
@@ -133,12 +134,13 @@ class UserController extends Controller
         $usuario = new User();
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
-        $usuario->perfil = $request->input('perfil');
+        $usuario->idperfil = $request->input('perfil');
         $usuario->idregional = $request->input('idregional');
         $usuario->password = Hash::make($request->input('password'));
         $save = $usuario->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('usuário', 'criou', $usuario->idusuario));
         return redirect('/admin/usuarios')
             ->with('message', '<i class="icon fa fa-check"></i>Usuário cadastrado com sucesso!')
             ->with('class', 'alert-success');
@@ -169,11 +171,12 @@ class UserController extends Controller
         $usuario = User::find($id);
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
-        $usuario->perfil = $request->input('perfil');
+        $usuario->idperfil = $request->input('perfil');
         $usuario->idregional = $request->input('idregional');
         $update = $usuario->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('usuário', 'editou', $usuario->idusuario));
         return redirect('/admin/usuarios')
             ->with('message', '<i class="icon fa fa-check"></i>Usuário editado com sucesso!')
             ->with('class', 'alert-success');
@@ -186,6 +189,7 @@ class UserController extends Controller
         $delete = $usuario->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('usuário', 'apagou', $usuario->idusuario));
         return redirect()->route('usuarios.lista')
             ->with('message', '<i class="icon fa fa-ban"></i>Usuário deletado com sucesso!')
             ->with('class', 'alert-danger');
@@ -231,7 +235,10 @@ class UserController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $usuario = User::onlyTrashed()->find($id);
-        $usuario->restore();
+        $restore = $usuario->restore();
+        if(!$restore)
+            abort(500);
+        event(new CrudEvent('usuário', 'restaurou', $usuario->idusuario));
         return redirect()->route('usuarios.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Usuário restaurado com sucesso!')
             ->with('class', 'alert-success');
@@ -266,6 +273,7 @@ class UserController extends Controller
             $save = $obj_user->save();
             if(!$save)
                 abort(500);
+            event(new CrudEvent('perfil', 'alterou senha', $obj_user->idusuario));
             return redirect()->route('admin.info')
                 ->with('message', '<i class="icon fa fa-check"></i>Senha alterada com sucesso!')
                 ->with('class', 'alert-success');

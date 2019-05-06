@@ -9,6 +9,7 @@ use App\CursoInscrito;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\ControleController;
+use App\Events\CrudEvent;
 
 class CursoInscritoController extends Controller
 {
@@ -109,6 +110,7 @@ class CursoInscritoController extends Controller
         $save = $inscrito->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('inscrito em curso', 'adicionou', $idcurso));
         return Redirect::route('inscritos.lista', array('id' => $idcurso))
             ->with('message', '<i class="icon fa fa-check"></i>Participante inscrito com sucesso!')
             ->with('class', 'alert-success');
@@ -153,6 +155,7 @@ class CursoInscritoController extends Controller
         $update = $inscrito->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('inscrito em curso', 'editou', $inscrito->idcurso));
         return Redirect::route('inscritos.lista', array('id' => $idcurso))
             ->with('message', '<i class="icon fa fa-check"></i>Participante editado com sucesso!')
             ->with('class', 'alert-success');
@@ -244,6 +247,7 @@ class CursoInscritoController extends Controller
         $delete = $curso->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('inscrito em curso', 'cancelou inscrição', $curso->idcurso));
         return Redirect::route('inscritos.lista', array('id' => $curso->idcurso))
             ->with('message', '<i class="icon fa fa-ban"></i>Inscrição cancelada com sucesso!')
             ->with('class', 'alert-danger');;

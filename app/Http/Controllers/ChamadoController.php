@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use App\Chamado;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\ControleController;
+use App\Events\CrudEvent;
 
 class ChamadoController extends Controller
 {
@@ -106,6 +107,7 @@ class ChamadoController extends Controller
         $save = $chamado->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('chamado', 'criou', $chamado->idchamado));
         return redirect('/admin/perfil')
             ->with('message', '<i class="icon fa fa-check"></i>Chamado registrado com sucesso!')
             ->with('class', 'alert-success');
@@ -126,6 +128,7 @@ class ChamadoController extends Controller
         $delete = $resultado->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('chamado', 'deu baixa', $resultado->idchamado));
         return redirect('/admin/chamados')
             ->with('message', '<i class="icon fa fa-check"></i>Chamado concluído com sucesso!')
             ->with('class', 'alert-success');
@@ -171,7 +174,10 @@ class ChamadoController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $chamado = Chamado::onlyTrashed()->find($id);
-        $chamado->restore();
+        $restore = $chamado->restore();
+        if(!$restore)
+            abort(500);
+        event(new CrudEvent('chamado', 'reabriu', $chamado->idchamado));
         return redirect('/admin/chamados')
             ->with('message', '<i class="icon fa fa-check"></i>Chamado reaberto!')
             ->with('class', 'alert-success');
