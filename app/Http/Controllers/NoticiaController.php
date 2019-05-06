@@ -10,7 +10,7 @@ use App\Curso;
 use Illuminate\Support\Str;
 use App\Http\Controllers\ControleController;
 use Illuminate\Support\Facades\Auth;
-use App\Events\CriouNoticiaEvent;
+use App\Events\CrudEvent;
 
 class NoticiaController extends Controller
 {
@@ -142,7 +142,7 @@ class NoticiaController extends Controller
         $save = $noticia->save();
         if(!$save)
             abort(500);
-        event(new CriouNoticiaEvent($noticia->id));
+        event(new CrudEvent('notícia', 'criou', $noticia->idnoticia));
         return redirect('/admin/noticias')
             ->with('message', '<i class="icon fa fa-check"></i>Notícia criada com sucesso!')
             ->with('class', 'alert-success');
@@ -188,6 +188,7 @@ class NoticiaController extends Controller
         $update = $noticia->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('notícia', 'editou', $noticia->idnoticia));
         return redirect('/admin/noticias')
             ->with('message', '<i class="icon fa fa-check"></i>Notícia editada com sucesso!')
             ->with('class', 'alert-success');
@@ -200,6 +201,7 @@ class NoticiaController extends Controller
         $delete = $noticia->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('notícia', 'apagou', $noticia->idnoticia));
         return redirect('/admin/noticias')
             ->with('message', '<i class="icon fa fa-ban"></i>Notícia deletada com sucesso!')
             ->with('class', 'alert-success');
@@ -242,7 +244,10 @@ class NoticiaController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $noticia = Noticia::onlyTrashed()->find($id);
-        $noticia->restore();
+        $restore = $noticia->restore();
+        if(!$restore)
+            abort(500);
+        event(new CrudEvent('notícia', 'restaurou', $noticia->idnoticia));
         return redirect('/admin/noticias')
             ->with('message', '<i class="icon fa fa-check"></i>Notícia restaurada com sucesso!')
             ->with('class', 'alert-success');

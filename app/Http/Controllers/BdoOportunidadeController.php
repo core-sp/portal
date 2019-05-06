@@ -8,6 +8,7 @@ use App\BdoOportunidade;
 use App\BdoEmpresa;
 use App\Regional;
 use App\Http\Controllers\ControleControllers;
+use App\Events\CrudEvent;
 
 class BdoOportunidadeController extends Controller
 {
@@ -70,9 +71,13 @@ class BdoOportunidadeController extends Controller
                 $relacaovagas = $resultado->vagaspreenchidas.' / '.$resultado->vagasdisponiveis;
             else
                 $relacaovagas = 'X / '.$resultado->vagasdisponiveis;
+            if(isset($resultado->empresa->razaosocial))
+                $razaosocial = $resultado->empresa->razaosocial;
+            else
+                $razaosocial = '';
             $conteudo = [
                 $resultado->idoportunidade,
-                $resultado->empresa->razaosocial,
+                $razaosocial,
                 $resultado->segmento,
                 $relacaovagas,
                 $resultado->status,
@@ -155,6 +160,7 @@ class BdoOportunidadeController extends Controller
         $save = $oportunidade->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('oportunidade (Balcão de Oportunidades)', 'criou', $oportunidade->idoportunidade));
         return redirect()->route('bdooportunidades.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Oportunidade cadastrada com sucesso!')
             ->with('class', 'alert-success');
@@ -215,6 +221,7 @@ class BdoOportunidadeController extends Controller
         $update = $oportunidade->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('oportunidade (Balcão de Oportunidades)', 'editou', $oportunidade->idoportunidade));
         return redirect()->route('bdooportunidades.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Oportunidade editada com sucesso!')
             ->with('class', 'alert-success');
@@ -233,6 +240,7 @@ class BdoOportunidadeController extends Controller
         $delete = $resultado->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('oportunidade (Balcão de Oportunidades)', 'apagou', $resultado->idoportunidade));
         return redirect()->route('bdooportunidades.lista')
             ->with('message', '<i class="icon fa fa-ban"></i>Oportunidade deletada com sucesso!')
             ->with('class', 'alert-danger');

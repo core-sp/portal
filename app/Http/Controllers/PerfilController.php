@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Perfil;
 use App\User;
 use App\Permissao;
+use App\Events\CrudEvent;
 
 class PerfilController extends Controller
 {
@@ -105,6 +106,7 @@ class PerfilController extends Controller
         $save = $perfil->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('perfil de usuário', 'criou', $perfil->idperfil));
         return redirect('/admin/usuarios/perfis')
             ->with('message', '<i class="icon fa fa-check"></i>Perfil cadastrado com sucesso!')
             ->with('class', 'alert-success');
@@ -158,6 +160,7 @@ class PerfilController extends Controller
         $delete = $perfil->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('perfil de usuário', 'apagou', $perfil->idperfil));
         return redirect()->route('perfis.lista')
             ->with('message', '<i class="icon fa fa-ban"></i>Perfil deletado com sucesso!')
             ->with('class', 'alert-danger');

@@ -2,12 +2,12 @@
 
 namespace App\Listeners;
 
-use Illuminate\Auth\Events\Logout;
+use App\Events\CrudEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
 
-class LogSuccessfulLogout
+class CrudEventListener
 {
     /**
      * Create the event listener.
@@ -22,11 +22,13 @@ class LogSuccessfulLogout
     /**
      * Handle the event.
      *
-     * @param  Logout  $event
+     * @param  CrudEvent  $event
      * @return void
      */
-    public function handle(Logout $event)
+    public function handle(CrudEvent $event)
     {
-        info($event->user->nome.' (usuário '.$event->user->idusuario.') desconectou-se do painel de administrador.');
+        $nome = Auth::user()->nome;
+        $id = Auth::id();
+        info($nome.' (usuário '.$id.') '.$event->action.' *'.$event->model.'* (id: '.$event->id.')');
     }
 }

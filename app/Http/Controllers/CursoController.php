@@ -12,6 +12,7 @@ use App\Http\Controllers\Helpers\CursoHelper;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\CursoInscritoController;
 use App\Http\Controllers\ControleController;
+use App\Events\CrudEvent;
 
 class CursoController extends Controller
 {
@@ -146,6 +147,7 @@ class CursoController extends Controller
         $save = $curso->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('curso', 'criou', $curso->idcurso));
         return redirect()->route('cursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Curso criado com sucesso!')
             ->with('class', 'alert-success');
@@ -195,6 +197,7 @@ class CursoController extends Controller
         $update = $curso->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('curso', 'editou', $curso->idcurso));
         return redirect()->route('cursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Curso editado com sucesso!')
             ->with('class', 'alert-success');
@@ -207,6 +210,7 @@ class CursoController extends Controller
         $delete = $curso->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('curso', 'cancelou', $curso->idcurso));
         return redirect()->route('cursos.lista')
             ->with('message', '<i class="icon fa fa-ban"></i>Curso cancelado com sucesso!')
             ->with('class', 'alert-danger');
@@ -254,7 +258,10 @@ class CursoController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $curso = Curso::onlyTrashed()->find($id);
-        $curso->restore();
+        $restore = $curso->restore();
+        if(!$restore)
+            abort(500);
+        event(new CrudEvent('curso', 'reabriu', $curso->idcurso));
         return redirect()->route('cursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Curso restaurado com sucesso!')
             ->with('class', 'alert-success');

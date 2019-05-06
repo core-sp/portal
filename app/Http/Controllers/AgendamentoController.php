@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 use App\Http\Controllers\ControleController;
 use Illuminate\Support\Facades\Auth;
+use App\Events\CrudEvent;
 
 class AgendamentoController extends Controller
 {
@@ -237,7 +238,7 @@ class AgendamentoController extends Controller
             $acoes = $this->status($resultado->status, $resultado->idagendamento, $nomeusuario);
             // Mostra dados na tabela
             $conteudo = [
-                $resultado->protocolo,
+                $resultado->protocolo.'<br><small>Código: '.$resultado->idagendamento.'</small>',
                 $resultado->nome.'<br>'.$resultado->cpf,
                 $resultado->hora,
                 $resultado->tiposervico,
@@ -265,6 +266,7 @@ class AgendamentoController extends Controller
         $update = $agendamento->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('agendamento', 'confirmou presença', $agendamento->idagendamento));
         return redirect()->route('agendamentos.lista');
     }
 

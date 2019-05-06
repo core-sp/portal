@@ -8,6 +8,7 @@ use App\Concurso;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\ControleController;
+use App\Events\CrudEvent;
 
 class ConcursoController extends Controller
 {
@@ -136,6 +137,7 @@ class ConcursoController extends Controller
         $save = $concurso->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('concurso', 'criou', $concurso->idconcurso));
         return redirect()->route('concursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Concurso cadastrado com sucesso!')
             ->with('class', 'alert-success');
@@ -181,6 +183,7 @@ class ConcursoController extends Controller
         $update = $concurso->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('concurso', 'editou', $concurso->idconcurso));
         return redirect()->route('concursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Concurso editado com sucesso!')
             ->with('class', 'alert-success');
@@ -199,6 +202,7 @@ class ConcursoController extends Controller
         $delete = $concurso->delete();
         if(!$delete)
             abort(500);
+        event(new CrudEvent('concurso', 'apagou', $concurso->idconcurso));
         return redirect()->route('concursos.lista')
             ->with('message', '<i class="icon fa fa-ban"></i>Concurso deletado com sucesso!')
             ->with('class', 'alert-danger');
@@ -254,7 +258,10 @@ class ConcursoController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $concurso = Concurso::onlyTrashed()->find($id);
-        $concurso->restore();
+        $restore = $concurso->restore();
+        if(!$restore)
+            abort(500);
+        event(new CrudEvent('concurso', 'restaurou', $concurso->idconcurso));
         return redirect()->route('concursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Concurso restaurado com sucesso!')
             ->with('class', 'alert-success');

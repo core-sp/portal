@@ -36,6 +36,14 @@ class UserTableSeeder extends Seeder
         $usuario->idperfil = 1;
         $usuario->password = bcrypt('ricardo102030');
         $usuario->save();
+
+        $usuario = new User();
+        $usuario->nome = 'José dos Santos Junior';
+        $usuario->email = 'suporte@core-sp.org.br';
+        $usuario->idregional = 1;
+        $usuario->idperfil = 9;
+        $usuario->password = bcrypt('jose102030');
+        $usuario->save();
         
         $usuario = new User();
         $usuario->nome = 'Márcio C. Gonçalez';

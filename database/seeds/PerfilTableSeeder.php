@@ -43,5 +43,9 @@ class PerfilTableSeeder extends Seeder
         $perfil = new Perfil();
         $perfil->nome = 'Atendimento';
         $perfil->save();
+
+        $perfil = new Perfil();
+        $perfil->nome = 'Suporte de TI';
+        $perfil->save();
     }
 }

@@ -5,7 +5,6 @@ namespace App\Listeners;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Auth;
 
 class LogSuccessfulLogin
 {
@@ -27,8 +26,6 @@ class LogSuccessfulLogin
      */
     public function handle(Login $event)
     {
-        $idusuario = Auth::user()->idusuario;
-        $nomeusuario = Auth::user()->nome;
-        info($nomeusuario.' (usuário: '.$idusuario.') conectou-se ao painel de administrador.');
+        info($event->user->nome.' (usuário '.$event->user->idusuario.') conectou-se ao painel de administrador.');
     }
 }

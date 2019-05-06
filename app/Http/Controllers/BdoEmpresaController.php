@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\BdoEmpresa;
+use App\BdoOportunidade;
 use App\Http\Controllers\ControleController;
+use App\Events\CrudEvent;
 
 class BdoEmpresaController extends Controller
 {
@@ -146,6 +148,7 @@ class BdoEmpresaController extends Controller
         $save = $empresa->save();
         if(!$save)
             abort(500);
+        event(new CrudEvent('empresa (Balcão de Oportunidades)', 'criou', $empresa->idempresa));
         return redirect()->route('bdoempresas.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Empresa cadastrada com sucesso!')
             ->with('class', 'alert-success');
@@ -205,6 +208,7 @@ class BdoEmpresaController extends Controller
         $update = $empresa->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('empresa (Balcão de Oportunidades)', 'editou', $empresa->idempresa));
         return redirect()->route('bdoempresas.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Empresa editada com sucesso!')
             ->with('class', 'alert-success');
@@ -220,12 +224,20 @@ class BdoEmpresaController extends Controller
     {
         ControleController::autoriza($this->class, __FUNCTION__);
         $empresa = BdoEmpresa::find($id);
-        $delete = $empresa->delete();
-        if(!$delete)
-            abort(500);
-        return redirect()->route('bdoempresas.lista')
-            ->with('message', '<i class="icon fa fa-ban"></i>Empresa deletada com sucesso!')
-            ->with('class', 'alert-danger');
+        $count = BdoOportunidade::where('idempresa',$id)->count();
+        if($count >= 1) {
+            return redirect()->route('bdoempresas.lista')
+                ->with('message', '<i class="icon fa fa-ban"></i>Não é possível deletar empresas com oportunidades abertas!')
+                ->with('class', 'alert-danger');
+        } else {
+            $delete = $empresa->delete();
+            if(!$delete)
+                abort(500);
+            event(new CrudEvent('empresa (Balcão de Oportunidades)', 'apagou', $empresa->idempresa));
+            return redirect()->route('bdoempresas.lista')
+                ->with('message', '<i class="icon fa fa-ban"></i>Empresa deletada com sucesso!')
+                ->with('class', 'alert-danger');
+        }
     }
 
     public function busca()
