@@ -122,11 +122,11 @@ class LicitacaoController extends Controller
     {
         ControleController::autoriza($this->class, 'create');
         $regras = [
-            'modalidade' => 'required',
+            'modalidade' => 'required|max:191',
             'titulo' => 'max:191',
-            'nrlicitacao' => 'required',
-            'nrprocesso' => 'required',
-            'situacao' => 'required',
+            'nrlicitacao' => 'required|max:191',
+            'nrprocesso' => 'required|max:191',
+            'situacao' => 'required|max:191',
             'objeto' => 'required',
             'datarealizacao' => 'required',
         ];
@@ -135,7 +135,7 @@ class LicitacaoController extends Controller
             'nrlicitacao.required' => 'O nº da licitação é obrigatório',
             'nrprocesso.required' => 'O nº do processo é obrigatório',
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
-            'max' => 'O :attribute excedeu o máximo de caracteres permitidos'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Formata DateTime
@@ -186,11 +186,11 @@ class LicitacaoController extends Controller
     {
         ControleController::autoriza($this->class, 'edit');
         $regras = [
-            'modalidade' => 'required',
+            'modalidade' => 'required|max:191',
             'titulo' => 'max:191',
-            'nrlicitacao' => 'required',
-            'nrprocesso' => 'required',
-            'situacao' => 'required',
+            'nrlicitacao' => 'required|max:191',
+            'nrprocesso' => 'required|max:191',
+            'situacao' => 'required|max:191',
             'objeto' => 'required',
             'datarealizacao' => 'required',
         ];
@@ -199,7 +199,7 @@ class LicitacaoController extends Controller
             'nrlicitacao.required' => 'O nº da licitação é obrigatório',
             'nrprocesso.required' => 'O nº do processo é obrigatório',
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
-            'max' => 'O :attribute excedeu o máximo de caracteres permitidos'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Formata DateTime

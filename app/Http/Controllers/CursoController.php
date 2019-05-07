@@ -115,16 +115,19 @@ class CursoController extends Controller
     {
         ControleController::autoriza($this->class, 'create');
         $regras = [
-            'tema' => 'required',
+            'tipo' => 'max:191',
+            'tema' => 'required|max:191',
+            'img' => 'max:191',
             'datarealizacao' => 'required',
             'horainicio' => 'required',
-            'endereco' => 'required',
+            'endereco' => 'required|max:191',
             'nrvagas' => 'required|numeric',
             'descricao' => 'required'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
-            'numeric' => 'O :attribute aceita apenas números'
+            'numeric' => 'O :attribute aceita apenas números',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Formata DateTime
@@ -166,15 +169,19 @@ class CursoController extends Controller
     {
         ControleController::autoriza($this->class, 'edit');
         $regras = [
-            'tema' => 'required',
+            'tipo' => 'max:191',
+            'tema' => 'required|max:191',
+            'img' => 'max:191',
             'datarealizacao' => 'required',
-            'endereco' => 'required',
+            'horainicio' => 'required',
+            'endereco' => 'required|max:191',
             'nrvagas' => 'required|numeric',
             'descricao' => 'required'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
-            'numeric' => 'O :attribute aceita apenas números'
+            'numeric' => 'O :attribute aceita apenas números',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Formata DateTime
@@ -274,6 +281,8 @@ class CursoController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
         $curso = Curso::find($id);
+        if(!$curso)
+            abort(500);
         $variaveis = [
             'pluraliza' => 'inscritos',
             'plural' => 'inscritos',

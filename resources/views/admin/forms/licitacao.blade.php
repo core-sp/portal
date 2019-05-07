@@ -59,7 +59,7 @@ $situacoes = LicitacaoHelper::situacoes();
             <label for="uasg">UASG</label>
             <input type="text"
                 class="form-control {{ $errors->has('uasg') ? 'is-invalid' : '' }}"
-                placeholder="926753 (do CORE-SP)"
+                placeholder="000000"
                 name="uasg"
                 @if(isset($resultado))
                 value="{{ $resultado->uasg }}"

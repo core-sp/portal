@@ -105,10 +105,11 @@ class PaginaCategoriaController extends Controller
     {
         ControleController::autoriza($this->parent, 'create');
         $regras = [
-            'nome' => 'required'
+            'nome' => 'required|max:191'
         ];
         $mensagens = [
-            'required' => 'O campo :attribute é obrigatório'
+            'required' => 'O campo :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $request->validate($regras, $mensagens);
         $categoria = new PaginaCategoria();
@@ -148,10 +149,11 @@ class PaginaCategoriaController extends Controller
     {
         ControleController::autoriza($this->parent, 'edit');
         $regras = [
-            'nome' => 'required'
+            'nome' => 'required|max:191'
         ];
         $mensagens = [
-            'required' => 'O campo :attribute é obrigatório'
+            'required' => 'O campo :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $request->validate($regras, $mensagens);
         $categoria = PaginaCategoria::find($id);

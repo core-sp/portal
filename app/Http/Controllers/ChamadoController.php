@@ -91,10 +91,12 @@ class ChamadoController extends Controller
         $regras = [
             'tipo' => 'required',
             'prioridade' => 'required',
-            'mensagem' => 'required'
+            'mensagem' => 'required',
+            'img' => 'max:191'
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório'
+            'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Inputa dados no BD

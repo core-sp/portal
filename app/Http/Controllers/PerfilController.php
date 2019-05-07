@@ -94,10 +94,11 @@ class PerfilController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $regras = [
-            'nome' => 'required',
+            'nome' => 'required|max:191',
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 

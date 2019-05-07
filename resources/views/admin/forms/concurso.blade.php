@@ -37,7 +37,7 @@ $situacoes = ConcursoHelper::situacoes();
         <div class="col">
           <label for="titulo">Título</label>
           <input type="text"
-          class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
+          class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
           name="titulo"
           placeholder="Título"
           @if(isset($resultado))

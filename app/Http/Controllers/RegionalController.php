@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Regional;
 use App\Noticia;
 use App\Http\Controllers\ControleController;
+use App\Events\CrudEvent;
 
 class RegionalController extends Controller
 {
@@ -86,17 +87,21 @@ class RegionalController extends Controller
     {
         ControleController::autoriza($this->class, 'edit');
         $regras = [
-            'cidade' => 'required',
-            'email' => 'required',
-            'endereco' => 'required',
-            'numero' => 'required',
-            'cep' => 'required',
-            'telefone' => 'required',
-            'funcionamento' => 'required',
-            'descricao' => 'required'
+            'cidade' => 'required|max:191',
+            'email' => 'required|max:191',
+            'endereco' => 'required|max:191',
+            'numero' => 'required|max:191',
+            'cep' => 'required|max:191',
+            'telefone' => 'required|max:191',
+            'funcionamento' => 'required|max:191',
+            'descricao' => 'required|max:191',
+            'complemento' => 'max:191',
+            'fax' => 'max:191',
+            'responsavel' => 'max:191'
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório'
+            'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Inputa dados no BD
@@ -115,6 +120,7 @@ class RegionalController extends Controller
         $update = $regional->update();
         if(!$update)
             abort(500);
+        event(new CrudEvent('regional', 'editou', $regional->idregional));
         return redirect('/admin/regionais')
             ->with('message', '<i class="icon fa fa-check"></i>Regional editada com sucesso!')
             ->with('class', 'alert-success');

@@ -75,6 +75,8 @@ class CursoInscritoController extends Controller
     {
         ControleController::autoriza($this->class, __FUNCTION__);
         $curso = Curso::find($idcurso);
+        if(!$curso)
+            abort(500);
         $variaveis = [
             'form' => 'cursoinscrito',
             'singulariza' => 'o inscrito',
@@ -89,14 +91,16 @@ class CursoInscritoController extends Controller
         ControleController::autoriza($this->class, 'create');
         $idcurso = $request->input('idcurso');
         $regras = [
-            'cpf' => 'required|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso,
-            'nome' => 'required',
-            'telefone' => 'required',
-            'email' => 'email'
+            'cpf' => 'required|max:191|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL',
+            'nome' => 'required|max:191',
+            'telefone' => 'required|max:191',
+            'email' => 'email|max:191',
+            'registrocore' => 'max:191'
         ];
         $mensagens = [
             'cpf.unique' => 'Este CPF já está cadastrado para o curso',
             'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -134,14 +138,16 @@ class CursoInscritoController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $idcurso = $request->input('idcurso');
         $regras = [
-            'cpf' => 'required',
-            'nome' => 'required',
-            'telefone' => 'required',
-            'email' => 'email'
+            'cpf' => 'required|max:191|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL',
+            'nome' => 'required|max:191',
+            'telefone' => 'required|max:191',
+            'email' => 'email|max:191',
+            'registrocore' => 'max:191'
         ];
         $mensagens = [
             'cpf.unique' => 'Este CPF já está cadastrado para o curso',
             'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -191,15 +197,17 @@ class CursoInscritoController extends Controller
     {
         $idcurso = $request->input('idcurso');
         $regras = [
-            'cpf' => 'required|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso,
-            'nome' => 'required',
-            'telefone' => 'required',
-            'email' => 'email'
+            'cpf' => 'required|max:191|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL',
+            'nome' => 'required|max:191',
+            'telefone' => 'required|max:191',
+            'email' => 'email|max:191',
+            'registrocore' => 'max:191'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'email' => 'Por favor, digite um endereço de email válido',
-            'cpf.unique' => 'O CPF informado já está cadastrado neste curso'
+            'cpf.unique' => 'O CPF informado já está cadastrado neste curso',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Inputa dados no Banco de Dados

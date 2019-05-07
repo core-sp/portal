@@ -116,11 +116,14 @@ class PaginaController extends Controller
     {
         ControleController::autoriza($this->class, 'create');
         $regras = [
-            'titulo' => 'required',
+            'titulo' => 'required|max:191',
+            'subtitulo' => 'max:191',
+            'img' => 'max:191',
             'conteudo' => 'required'
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório'
+            'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -154,11 +157,14 @@ class PaginaController extends Controller
     {
         ControleController::autoriza($this->class, 'edit');
         $regras = [
-            'titulo' => 'required',
+            'titulo' => 'required|max:191',
+            'subtitulo' => 'max:191',
+            'img' => 'max:191',
             'conteudo' => 'required'
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório'
+            'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         $pagina = Pagina::find($id);

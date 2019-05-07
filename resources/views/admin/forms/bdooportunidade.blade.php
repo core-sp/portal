@@ -20,7 +20,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
             <label for="titulo">Título</label>
             <input type="text"
                 name="titulo"
-                class="form-control"
+                class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
                 placeholder="Título"
                 @if(isset($resultado))
                 value="{{ $resultado->titulo }}"

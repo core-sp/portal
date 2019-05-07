@@ -112,13 +112,14 @@ class NoticiaController extends Controller
     {
         ControleController::autoriza($this->class, 'create');
         $regras = [
-            'titulo' => 'required|max:100|min:3',
+            'titulo' => 'required|max:191|min:3',
+            'img' => 'max:191',
             'conteudo' => 'required|min:100'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
-            'max' => 'O campo :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Checa o usuário
@@ -161,13 +162,14 @@ class NoticiaController extends Controller
     {
         ControleController::autoriza($this->class, 'edit');
         $regras = [
-            'titulo' => 'required|max:100|min:3',
+            'titulo' => 'required|max:191|min:3',
+            'img' => 'max:191',
             'conteudo' => 'required|min:100'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
-            'max' => 'O campo :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Checa o usuário

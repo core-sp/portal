@@ -133,11 +133,15 @@ class BdoOportunidadeController extends Controller
     {
         ControleController::autoriza($this->class, 'create');
         $regras = [
+            'titulo' => 'required|max:191',
+            'segmento' => 'max:191',
             'vagasdisponiveis' => 'required',
             'descricao' => 'required',
+            'status' => 'max:191'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -194,11 +198,15 @@ class BdoOportunidadeController extends Controller
     {
         ControleController::autoriza($this->class, 'edit');
         $regras = [
+            'titulo' => 'required|max:191',
+            'segmento' => 'max:191',
             'vagasdisponiveis' => 'required',
             'descricao' => 'required',
+            'status' => 'max:191'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -250,11 +258,10 @@ class BdoOportunidadeController extends Controller
     {
         ControleController::autoriza($this->class, 'index');
         $busca = Input::get('q');
-        $oportunidades = BdoOportunidade::where('descricao','LIKE','%'.$busca.'%')
+        $variaveis = (object) $this->variaveis;
+        $resultados = BdoOportunidade::where('descricao','LIKE','%'.$busca.'%')
             ->paginate(10);
-        if (count($oportunidades) > 0) 
-            return view('admin.bdo.home', compact('oportunidades', 'busca'));
-        else
-            return view('admin.bdo.home')->withMessage('Nenhum curso encontrado');
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }
