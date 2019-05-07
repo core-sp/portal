@@ -118,16 +118,23 @@ class BdoEmpresaController extends Controller
     {
         ControleController::autoriza($this->class, 'create');
         $regras = [
-            'cnpj' => 'required|unique:bdo_empresas',
-            'razaosocial' => 'required',
-            'endereco' => 'required',
+            'segmento' => 'max:191',
+            'cnpj' => 'required|max:191|unique:bdo_empresas',
+            'razaosocial' => 'required|max:191',
+            'capitalsocial' => 'max:191',
+            'endereco' => 'required|max:191',
             'descricao' => 'required',
-            'email' => 'required',
-            'telefone' => 'required'
+            'email' => 'required|max:191',
+            'telefone' => 'required|max:191',
+            'site' => 'max:191',
+            'contatonome' => 'max:191',
+            'contatotelefone' => 'max:191',
+            'contatoemail' => 'max:191',
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
-            'cnpj.unique' => 'Já existe uma empresa cadastrada com este CNPJ'
+            'cnpj.unique' => 'Já existe uma empresa cadastrada com este CNPJ',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -179,15 +186,23 @@ class BdoEmpresaController extends Controller
     {
         ControleController::autoriza($this->class, 'edit');
         $regras = [
-            'cnpj' => 'required',
-            'razaosocial' => 'required',
-            'endereco' => 'required',
+            'segmento' => 'max:191',
+            'cnpj' => 'required|max:191|unique:bdo_empresas',
+            'razaosocial' => 'required|max:191',
+            'capitalsocial' => 'max:191',
+            'endereco' => 'required|max:191',
             'descricao' => 'required',
-            'email' => 'required',
-            'telefone' => 'required'
+            'email' => 'required|max:191',
+            'telefone' => 'required|max:191',
+            'site' => 'max:191',
+            'contatonome' => 'max:191',
+            'contatotelefone' => 'max:191',
+            'contatoemail' => 'max:191',
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
+            'cnpj.unique' => 'Já existe uma empresa cadastrada com este CNPJ',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 

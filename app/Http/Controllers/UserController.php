@@ -120,14 +120,15 @@ class UserController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $regras = [
-            'nome' => 'required',
+            'nome' => 'required|max:191',
             'email' => 'email|required',
-            'password' => 'required|confirmed|min:6'
+            'password' => 'required|confirmed|min:6|max:24'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'password.min' => 'A senha precisa ter no mínimo 6 caracteres.',
             'password.confirmed' => 'As senhas precisam ser idênticas entre si.',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -160,11 +161,12 @@ class UserController extends Controller
     {
         ControleController::autorizaStatic(['1']);
         $regras = [
-            'nome' => 'required',
+            'nome' => 'required|max:191',
             'email' => 'email|required'
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório'
+            'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
 

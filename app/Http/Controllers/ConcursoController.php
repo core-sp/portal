@@ -108,18 +108,20 @@ class ConcursoController extends Controller
     {
         ControleController::autoriza($this->class, 'create');
         $regras = [
-            'modalidade' => 'required',
-            'titulo' => 'required',
-            'nrprocesso' => 'required|unique:concursos',
-            'situacao' => 'required',
+            'modalidade' => 'required|max:191',
+            'titulo' => 'required|max:191',
+            'nrprocesso' => 'required|max:191|unique:concursos',
+            'situacao' => 'required|max:191',
             'datarealizacao' => 'required',
             'objeto' => 'required',
+            'linkexterno' => 'max:191'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'nrprocesso.required' => 'O nº do processo é obrigatório',
             'nrprocesso.unique' => 'Já existe um concurso com este nº de processo',
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Formata DateTime
@@ -155,17 +157,19 @@ class ConcursoController extends Controller
     {
         ControleController::autoriza($this->class, 'edit');
         $regras = [
-            'modalidade' => 'required',
-            'titulo' => 'required',
-            'nrprocesso' => 'required',
-            'situacao' => 'required',
+            'modalidade' => 'required|max:191',
+            'titulo' => 'required|max:191',
+            'nrprocesso' => 'required|max:191',
+            'situacao' => 'required|max:191',
             'datarealizacao' => 'required',
             'objeto' => 'required',
+            'linkexterno' => 'max:191'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'nrprocesso.required' => 'O nº do processo é obrigatório',
             'datarealizacao.required' => 'Informe a data de realização da Licitação',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Formata DateTime

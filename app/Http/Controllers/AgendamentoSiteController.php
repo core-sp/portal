@@ -7,6 +7,8 @@ use App\Agendamento;
 use App\Regional;
 use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AgendamentoMailGuest;
 
 class AgendamentoSiteController extends Controller
 {
@@ -104,14 +106,16 @@ class AgendamentoSiteController extends Controller
     public function store(Request $request)
     {
         $regras = [
-            'nome' => 'required',
-            'cpf' => 'required',
-            'email' => 'required',
+            'nome' => 'required|max:191',
+            'cpf' => 'required|max:191',
+            'email' => 'required|max:191',
+            'celular' => 'max:191',
             'dia' => 'required',
-            'hora' => 'required'
+            'hora' => 'required|max:191',
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Organiza dados de dia e hora
@@ -134,12 +138,13 @@ class AgendamentoSiteController extends Controller
             $random = substr(str_shuffle($characters), 0, 6);
             $random = 'AGE-'.$random;
             $checaProtocolo = Agendamento::where('protocolo',$random)->get();
-        } while(!$checaProtocolo->isEmpty());  
+        } while(!$checaProtocolo->isEmpty()); 
+        $emailUser = $request->input('email'); 
         //Inputa os dados
         $agendamento = new Agendamento();
         $agendamento->nome = $request->input('nome');
         $agendamento->cpf = $cpf;
-        $agendamento->email = $request->input('email');
+        $agendamento->email = $emailUser;
         $agendamento->celular = $request->input('celular');
         $agendamento->dia = $dia;
         $agendamento->hora = $hora;
@@ -163,6 +168,7 @@ class AgendamentoSiteController extends Controller
         $agradece .= "Endereço: ".$agendamento->regional->endereco.", ".$agendamento->regional->numero;
         $agradece .= " - ".$agendamento->regional->complemento."<br>";
         $agradece .= "Serviço: ".$tiposervico.'<br>';
+        Mail::to($emailUser)->send(new AgendamentoMailGuest($agradece));
 
         // Retorna view de agradecimento
         return view('site.agradecimento')->with('agradece', $agradece);
@@ -207,10 +213,11 @@ class AgendamentoSiteController extends Controller
         $protocolo = $request->input('protocolo');
         // Define as regras de validação
         $regras = [
-            'cpf' => 'required'
+            'cpf' => 'required|max:191'
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório'
+            'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
         //Chama o banco

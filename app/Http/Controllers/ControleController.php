@@ -30,10 +30,12 @@ class ControleController extends Controller
     {
         $cm = $controller.'_'.$metodo;
         $permissoes = session('permissoes');
-        if(in_array($cm, $permissoes))
-            return true;
-        else
-            return false;
+        if($permissoes) {
+            if(in_array($cm, $permissoes))
+                return true;
+            else
+                return false;
+        }
     }
 
     public static function autorizaStatic($perfis)
