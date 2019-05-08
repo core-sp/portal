@@ -34,12 +34,15 @@ use \App\Http\Controllers\Helper;
         </div>
         <div class="container">
           <div class="row header-margin">
-            <div class="col-xl-4 col-lg-4 col-sm-6 offset-sm-3 offset-md-0 text-left">
+            <div class="col-lg-4 col-md-6 text-left center-768">
                 <a href="/"><img src="{{ asset('img/logo-certo.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
-            <div class="col-xl-5 col-lg-4 col-md-6 mudaw align-self-center">
-              <div class="w-75 m-auto text-center pt-15-768">
-                <div class="acessibilidade mb-2 center-768">
+            <div class="col-lg-4 col-md-6 center-768 aai">
+              <img src="{{ asset('img/aai-v7.png') }}" alt="Portal da Transparência">
+            </div>
+            <div class="col-lg-4 align-self-end mt-15-992">
+              <div class="mexe-tamanho m-auto text-center">
+                <div class="acessibilidade mb-2 center-992 text-right">
                   <button type="button" class="btn btn-sm btn-light" id="btn-contrast">
                     <i class="fas fa-adjust"></i>
                   </button>
@@ -74,22 +77,6 @@ use \App\Http\Controllers\Helper;
                     </button>
                   </div>
                 </form>
-              </div>
-            </div>
-            <div class="col-xl-3 col-lg-4 col-md-12 text-right center-992 align-self-center">
-              <div class="mb-2 inline-992">
-                <button class="btn-atendimento d-inline"><h5 class="light branco">Atendimento: <strong>(11) 3243-5500</strong></h5></button>
-              </div>
-              <div class="sociais">
-                <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
-                  <img src="{{ asset('img/002-whatsapp.png') }}" />
-                </a>
-                <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
-                  <img src="{{ asset('img/001-youtube.png') }}" />
-                </a>
-                <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-                  <img src="{{ asset('img/icon-transparencia.png') }}" />
-                </a>
               </div>
             </div>
           </div>

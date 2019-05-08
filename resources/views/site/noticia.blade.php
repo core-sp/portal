@@ -43,7 +43,11 @@
     <div class="row">
       <div class="col-lg-8 pr-4">
         <div class="noticia-img">
+          @if(isset($noticia->img))
           <img src="{{asset($noticia->img)}}" />
+          @else
+          <img src="{{asset('img/news-generica-2.png')}}" />
+          @endif
         </div>
         <div class="mt-4 conteudo-txt">
           {!! $noticia->conteudo !!}
