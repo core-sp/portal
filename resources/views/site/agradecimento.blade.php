@@ -39,6 +39,11 @@
         </div>
       </div>
     </div>
+    @if(isset($adendo))
+    <div class="row mt-3">
+      <h4 class="light">{!! $adendo !!}</h4>
+    </div>
+    @endif
   </div>
 </section>
 

@@ -100,6 +100,14 @@ class Helper extends Controller
             case 'Aberto':
                 echo "<div class='sit-btn sit-verde'>Aberto</div>";
             break;
+
+            case 'Homologado':
+                echo "<div class='sit-btn sit-verde'>Homologado</div>";
+            break;
+
+            case 'Cancelado':
+                echo "<div class='sit-btn sit-vermelho'>Cancelado</div>";
+            break;
             
             default:
                 echo "<div class='sit-btn sit-default'>".$situacao."</div>";

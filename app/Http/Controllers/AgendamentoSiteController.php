@@ -139,10 +139,11 @@ class AgendamentoSiteController extends Controller
             $random = 'AGE-'.$random;
             $checaProtocolo = Agendamento::where('protocolo',$random)->get();
         } while(!$checaProtocolo->isEmpty()); 
-        $emailUser = $request->input('email'); 
+        $emailUser = $request->input('email');
+        $nomeUser = $request->input('nome');
         //Inputa os dados
         $agendamento = new Agendamento();
-        $agendamento->nome = $request->input('nome');
+        $agendamento->nome = $nomeUser;
         $agendamento->cpf = $cpf;
         $agendamento->email = $emailUser;
         $agendamento->celular = $request->input('celular');
@@ -162,16 +163,22 @@ class AgendamentoSiteController extends Controller
         $agradece .= "<strong>Protocolo:</strong> ".$random;
         $agradece .= "<br><br>";
         $agradece .= "<strong>Detalhes do agendamento</strong><br>";
+        $agradece .= "Nome: ".$nomeUser."<br>";
+        $agradece .= "CPF: ".$cpf."<br>";
         $agradece .= "Dia: ".$dia_inalterado."<br>";
         $agradece .= "Horário: ".$agendamento->hora."<br>";
         $agradece .= "Cidade: ".$agendamento->regional->regional."<br>";
         $agradece .= "Endereço: ".$agendamento->regional->endereco.", ".$agendamento->regional->numero;
         $agradece .= " - ".$agendamento->regional->complemento."<br>";
         $agradece .= "Serviço: ".$tiposervico.'<br>';
+        $adendo = '<i>* As informações foram enviadas ao email cadastrado no formulário</i>';
         Mail::to($emailUser)->send(new AgendamentoMailGuest($agradece));
 
         // Retorna view de agradecimento
-        return view('site.agradecimento')->with('agradece', $agradece);
+        return view('site.agradecimento')->with([
+            'agradece' => $agradece,
+            'adendo' => $adendo
+        ]);
     }
 
     public function limiteCPF($dia, $cpf)
