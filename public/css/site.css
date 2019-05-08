@@ -303,7 +303,7 @@ strong, .bold {
 	text-align: center;
 	border-top: 0.25rem solid transparent;
 	text-transform: uppercase;
-	transition: 0.3s;
+	transition: border 0.3s;
 	color: #444444;
 }
 
@@ -366,6 +366,15 @@ strong, .bold {
 	float: left;
 	margin-top: 4px;
 	height: 32px;
+}
+
+.aai {
+	text-align: center;
+	align-self: flex-end;
+}
+
+.aai img {
+	border-radius: 5px;
 }
 
 /*
@@ -579,11 +588,25 @@ strong, .bold {
 	color: #15AAE2;
 }
 
-/* NOTÍCIAS */
-#home-news {
-	padding-bottom: 2.75rem;
+/* FALE COM O CORE */
+#fale {
+	padding-top: 2rem;
+	padding-bottom: 3rem;
 }
 
+.faleRow {
+	margin-top: 1.5rem;
+}
+
+.faleRow img {
+	width: 64px;
+}
+
+.fale-txt {
+	padding-left: .75rem;
+}
+
+/* NOTÍCIAS */
 .box-news {
 	height: 16rem;
 	position: relative;
@@ -629,7 +652,6 @@ strong, .bold {
 .noticia-img {
 	height: 410px;
 	border-radius: 5px;
-	border: 1px solid #d6d6d6;
 }
 
 .noticia-img img {
@@ -1357,10 +1379,6 @@ footer p {
 	.p-menor {
 		font-size: .85rem;
 	}
-	
-	.mudaw .w-75 {
-		width: 90% !important;
-	}
 
 	.nav-item {
 		margin: 0rem 0.2rem;
@@ -1486,18 +1504,6 @@ footer p {
 		font-size: .8rem;
 	}
 
-	.mudaw {
-		padding-left: 45px;
-	}
-
-	.mudaw .text-center {
-		text-align: right !important;
-	}
-
-	.mudaw .w-75 {
-		width: 100% !important;
-	}
-
 	.inline-992,
 	.sociais {
 		display: inline-block;
@@ -1546,6 +1552,19 @@ footer p {
 		padding-bottom: 0.288rem;
 	}
 
+	.aai {
+		text-align: right;
+		align-self: center;
+	}
+
+	.mt-15-992 {
+		margin-top: 15px;
+	}
+
+	.mexe-tamanho {
+		width: 75%;
+	}
+
 	.nav-item {
 		margin: 0rem 0.1rem;
 	}
@@ -1588,8 +1607,12 @@ footer p {
 	.beneficios-txt p {
 		margin-bottom: 2rem;
 	}
+
+	.faleSingle {
+		padding-bottom: 15px; 
+	}
 	
-	#home-news {
+	#fale {
 		padding-bottom: 0rem;
 	}
 
@@ -1638,14 +1661,14 @@ footer p {
 	.novo-core-box {
 		padding: 2rem;
 	}
+
+	.aai {
+		padding-top: 15px;
+	}
 }
 
 
 @media screen and (max-width: 767px) {
-	.mudaw {
-		padding-left: 15px;
-	}
-
 	.hide-768 {
 		display: none;
 	}
@@ -1655,7 +1678,7 @@ footer p {
 	}
 
 	.center-768 {
-		text-align: center;
+		text-align: center !important;
 	}
 
 	.header-margin {
@@ -1753,6 +1776,14 @@ footer p {
 		left: 0;
 		position: fixed;
 		background: rgba(0, 0, 0, 0.7);
+	}
+
+	.aai {
+		text-align: center;
+	}
+
+	#logo-header {
+		width: 80%;
 	}
 
 	#menu-principal {
@@ -1882,6 +1913,14 @@ footer p {
 	
 	.p-menor {
 		font-size: .75rem;
+	}
+
+	.center-576 {
+		text-align: center !important;
+	}
+
+	#logo-header {
+		width: 80%;
 	}
 
 	.carousel {

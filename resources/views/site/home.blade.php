@@ -151,6 +151,69 @@ use \App\Http\Controllers\Helper;
   </div>
 </section>
 
+<section id="fale">
+  <div class="container">
+    <div class="row mb-2">
+      <div class="col-12">
+        <div class="home-title">
+          <blockquote>
+            <i></i>
+            <h4 class="pr-3 ml-1">Fale com o CORE-SP</h4>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+    <div class="row faleRow">
+      <div class="col-lg-3 col-sm-6 faleSingle">
+        <a href="/agendamento-consulta">
+          <div class="row nomargin">
+            <div class="align-self-center">
+              <img src="{{ asset('img/001-phone-book.png') }}" alt="">
+            </div>
+            <div class="flex-one fale-txt align-self-center">
+              <h5 class="azul-escuro normal">Consulte seu<br class="hide-768" /> agendamento</h5>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-lg-3 col-sm-6 faleSingle">
+        <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
+          <div class="row nomargin">
+            <div class="align-self-center">
+              <img src="{{ asset('img/whatsapp.png') }}" alt="">
+            </div>
+            <div class="flex-one fale-txt align-self-center">
+              <h5 class="azul-escuro normal">Entre em contato<br class="hide-768" /> pelo WhatsApp</h5>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-lg-3 col-sm-6 faleSingle">
+        <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
+          <div class="row nomargin">
+            <div class="align-self-center">
+              <img src="{{ asset('img/003-youtube.png') }}" alt="">
+            </div>
+            <div class="flex-one fale-txt align-self-center">
+              <h5 class="azul-escuro normal">Institucional 2019<br class="hide-768" /> e informativos</h5>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-lg-3 col-sm-6 faleSingle">
+        <div class="row nomargin">
+          <div class="align-self-center">
+            <img src="{{ asset('img/004-headset.png') }}" alt="">
+          </div>
+          <div class="flex-one fale-txt align-self-center">
+            <h5 class="azul-escuro normal">Atendimento<br class="hide-768" /> (11) 3243-5500</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="beneficios">
   <div class="container">
     <div class="row">
