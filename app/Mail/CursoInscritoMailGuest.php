@@ -7,7 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class AgendamentoMailGuest extends Mailable
+class CursoInscritoMailGuest extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -20,7 +20,7 @@ class AgendamentoMailGuest extends Mailable
 
     public function build()
     {
-        return $this->subject('Agendamento pelo site')
+        return $this->subject('Inscrição no curso pelo site')
             ->view('emails.default');
     }
 }

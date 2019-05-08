@@ -38,7 +38,9 @@ use \App\Http\Controllers\Helper;
                 <a href="/"><img src="{{ asset('img/logo-certo.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
-              <img src="{{ asset('img/aai-v7.png') }}" alt="Portal da Transparência">
+              <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
+                <img src="{{ asset('img/aai-v7.png') }}" alt="Portal da Transparência">
+              </a>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
               <div class="mexe-tamanho m-auto text-center">

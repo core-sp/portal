@@ -10,6 +10,8 @@ use App\Http\Controllers\Helper;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CursoInscritoMailGuest;
 
 class CursoInscritoController extends Controller
 {
@@ -210,12 +212,13 @@ class CursoInscritoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
+        $emailUser = $request->input('email');
         // Inputa dados no Banco de Dados
         $inscrito = new CursoInscrito();
         $inscrito->cpf = $request->input('cpf');
         $inscrito->nome = $request->input('nome');
         $inscrito->telefone = $request->input('telefone');
-        $inscrito->email = $request->input('email');
+        $inscrito->email = $emailUser;
         $inscrito->registrocore = $request->input('registrocore');
         $inscrito->idcurso = $idcurso;
         $save = $inscrito->save();
@@ -226,11 +229,25 @@ class CursoInscritoController extends Controller
         $agradece .= " - ".$inscrito->curso->tema."</strong>";
         $agradece .= " (turma ".$inscrito->curso->idcurso.") foi efetuada com sucesso.";
         $agradece .= "<br><br>";
-        $agradece .= "<strong>Endereço: </strong>".$inscrito->curso->endereco;
-        $agradece .= "<br><strong>Data de Início: </strong>".Helper::onlyDate($inscrito->curso->datarealizacao);
-        $agradece .= "<br><strong>Horário: </strong>".Helper::onlyHour($inscrito->curso->datarealizacao);
+        $agradece .= "<strong>Detalhes da inscrição</strong><br>";
+        $agradece .= "Nome: ".$inscrito->nome."<br>";
+        $agradece .= "CPF: ".$inscrito->cpf."<br>";
+        $agradece .= "Telefone: ".$inscrito->telefone;
+        $agradece .= "<br><br>";
+        $agradece .= "<strong>Detalhes do curso</strong><br>";
+        $agradece .= "Nome: ".$inscrito->curso->tipo." - ".$inscrito->curso->tema."<br>";
+        $agradece .= "Nº da turma: ".$inscrito->curso->idcurso."<br>";
+        $agradece .= "Endereço: ".$inscrito->curso->endereco."<br>";
+        $agradece .= "Data de Início: ".Helper::onlyDate($inscrito->curso->datarealizacao)."<br>";
+        $agradece .= "Horário: ".Helper::onlyHour($inscrito->curso->datarealizacao)."h<br>";
+        $adendo = '<i>* As informações foram enviadas ao email cadastrado no formulário</i>';
+        Mail::to($emailUser)->send(new CursoInscritoMailGuest($agradece));
+
         // Retorna view de agradecimento
-        return view('site.agradecimento')->with('agradece', $agradece);
+        return view('site.agradecimento')->with([
+            'agradece' => $agradece,
+            'adendo' => $adendo
+        ]);
     }
 
     public static function btnSituacao($idcurso)

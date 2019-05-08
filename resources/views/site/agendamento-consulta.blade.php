@@ -84,6 +84,7 @@
       <div class="col mt-2">
         <strong>Agendamento encontrado!</strong><br /><br/>
         <strong>Protocolo:</strong> {{ $resultado->protocolo }}<br />
+        <strong>Nome:</strong> {{ $resultado->nome }}<br />
         <strong>Dia:</strong> {{ Helper::onlyDate($resultado->dia) }}<br />
         <strong>Horário:</strong> {{ $resultado->hora }}<br />
         <strong>Cidade:</strong> {{ $resultado->regional->regional }}<br />
