@@ -217,6 +217,16 @@ strong, .bold {
 	font-size: 1.1rem;
 }
 
+.conteudo-txt a,
+.conteudo-txt-mini a {
+	color: #ff0000;
+}
+
+.conteudo-txt a:hover,
+.conteudo-txt-mini a:hover {
+	text-decoration: underline;
+}
+
 .conteudo-txt-mini h1,
 .conteudo-txt-mini h2,
 .conteudo-txt-mini h3,
@@ -489,7 +499,8 @@ strong, .bold {
 }
 
 .box:hover .inside-img,
-.box-dois:hover .inside-img {
+.box-dois:hover .inside-img,
+.faleSingle:hover .inside-img {
 	transform: rotateY(360deg);
 }
 
@@ -591,7 +602,7 @@ strong, .bold {
 /* FALE COM O CORE */
 #fale {
 	padding-top: 2rem;
-	padding-bottom: 3rem;
+	padding-bottom: 3.25rem;
 }
 
 .faleRow {
@@ -600,6 +611,11 @@ strong, .bold {
 
 .faleRow img {
 	width: 64px;
+	color: #444444;
+}
+
+.faleSingle:hover a h5 {
+	color: #15AAE2;
 }
 
 .fale-txt {

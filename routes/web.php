@@ -228,6 +228,6 @@ Route::prefix('/')->group(function() {
   Route::post('newsletter', 'NewsletterController@store');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
-  Route::get('{categoria}/{slug}', 'PaginaSiteController@show');
-  Route::get('{slug}', 'PaginaSiteController@showSemCategoria');
+  Route::get('{slug}', 'PaginaSiteController@show');
+  Route::get('{categoria}/{slug}', 'PaginaSiteController@showCategoria');
 });

@@ -64,9 +64,9 @@ use \App\Http\Controllers\Helper;
       <div class="col-lg-3 col-sm-6 pb-15-992">
         <div class="box text-center azul-escuro-bg h-100">
           <div class="inside-box">
-            <img src="{{ asset('img/002-money.png') }}" class="inside-img" />
-            <p class="text-uppercase mt-3 branco">Simulador de<br class="hide-992" /> Cálculos</p>
-            <a href="#" class="btn-box">Calcular</a>
+            <img src="{{ asset('img/open-book.png') }}" class="inside-img" />
+            <p class="text-uppercase mt-3 branco">Cartilha do<br class="hide-992" /> Representante</p>
+            <a href="#" class="btn-box">Visualizar</a>
           </div>
         </div>
       </div>
@@ -168,7 +168,7 @@ use \App\Http\Controllers\Helper;
         <a href="/agendamento-consulta">
           <div class="row nomargin">
             <div class="align-self-center">
-              <img src="{{ asset('img/001-phone-book.png') }}" alt="">
+              <img src="{{ asset('img/002-phone-book-.png') }}" class="inside-img" alt="">
             </div>
             <div class="flex-one fale-txt align-self-center">
               <h5 class="azul-escuro normal">Consulte seu<br class="hide-768" /> agendamento</h5>
@@ -180,7 +180,7 @@ use \App\Http\Controllers\Helper;
         <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
           <div class="row nomargin">
             <div class="align-self-center">
-              <img src="{{ asset('img/whatsapp.png') }}" alt="">
+              <img src="{{ asset('img/001-whatsapp-.png') }}" class="inside-img" alt="">
             </div>
             <div class="flex-one fale-txt align-self-center">
               <h5 class="azul-escuro normal">Entre em contato<br class="hide-768" /> pelo WhatsApp</h5>
@@ -192,7 +192,7 @@ use \App\Http\Controllers\Helper;
         <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
           <div class="row nomargin">
             <div class="align-self-center">
-              <img src="{{ asset('img/003-youtube.png') }}" alt="">
+              <img src="{{ asset('img/003-youtube-.png') }}" class="inside-img" alt="">
             </div>
             <div class="flex-one fale-txt align-self-center">
               <h5 class="azul-escuro normal">Institucional 2019<br class="hide-768" /> e informativos</h5>
@@ -203,7 +203,7 @@ use \App\Http\Controllers\Helper;
       <div class="col-lg-3 col-sm-6 faleSingle">
         <div class="row nomargin">
           <div class="align-self-center">
-            <img src="{{ asset('img/004-headset.png') }}" alt="">
+            <img src="{{ asset('img/004-headset-.png') }}" class="inside-img" alt="">
           </div>
           <div class="flex-one fale-txt align-self-center">
             <h5 class="azul-escuro normal">Atendimento<br class="hide-768" /> (11) 3243-5500</h5>

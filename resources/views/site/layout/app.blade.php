@@ -110,9 +110,9 @@ use \App\Http\Controllers\Helper;
                 <li class="nav-item dropdown">
                   <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Serviços</a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a href="/agendamento-consulta" class="dropdown-item">Consulte o agendamento</a>
-                    <a href="/downloads" class="dropdown-item">Downloads</a>
-                    <a href="/perguntas-frequentes" class="dropdown-item">Perguntas Frequentes</a>
+                    <a href="/servicos/agendamento" class="dropdown-item">Agendamento</a>
+                    <a href="/servicos/balcao-de-oportunidades" class="dropdown-item">Balcão de Oportunidades</a>
+                    <a href="/cursos" class="dropdown-item">Cursos</a>
                   </div>
                 </li>
                 <li class="nav-item">
