@@ -20,8 +20,8 @@ class CreatePaginasTable extends Migration
             $table->string('slug');
             $table->string('img')->nullable();
             $table->text('conteudo');
-            $table->bigInteger('idcategoria')->unsigned()->nullable();
-            $table->foreign('idcategoria')->references('idcategoria')->on('pagina_categorias');
+            $table->bigInteger('idpaginacategoria')->unsigned()->nullable();
+            $table->foreign('idpaginacategoria')->references('idpaginacategoria')->on('pagina_categorias');
             $table->bigInteger('idusuario')->unsigned();
             $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();
