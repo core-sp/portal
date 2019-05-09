@@ -8,31 +8,22 @@ use App\Pagina;
 
 class PaginaSiteController extends Controller
 {
-    public function show($categoria, $slug)
+    public function show($slug)
     {
         $pagina = Pagina::where('slug', $slug)->first();
         if(isset($pagina)) {
-            $slug = Str::slug($pagina->paginacategoria->nome, '-');
-            if ($categoria == $slug) {
-                return view('site.pagina', compact('pagina', 'categoria'));
-            } else {
-                abort(404);
-            }
+            return view('site.pagina', compact('pagina'));
         } else {
             abort(404);
-        }
-        
+        }   
     }
 
-    public function showSemCategoria($slug)
+    public function showCategoria($categoria, $slug)
     {
-        $pagina = Pagina::where('slug', $slug)->first();
+        $one = $categoria.'/'.$slug;
+        $pagina = Pagina::where('slug', $one)->first();
         if(isset($pagina)) {
-            if (!isset($pagina->paginacategoria->nome)) {
-                return view('site.pagina', compact('pagina'));
-            } else {
-                abort(404);
-            }
+            return view('site.pagina', compact('pagina'));
         } else {
             abort(404);
         }

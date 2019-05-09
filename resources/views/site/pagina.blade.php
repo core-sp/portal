@@ -6,6 +6,8 @@
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     @if(isset($pagina->img))
     <img src="{{asset($pagina->img)}}" />
+    @else
+    <img src="{{asset('img/institucional.png')}}" alt="CORE-SP">
     @endif
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">

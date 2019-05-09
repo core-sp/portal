@@ -52,11 +52,7 @@ class PaginaController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            if(isset($resultado->paginacategoria->nome))
-                $acao_um = '<a href="/'.Helper::toSlug($resultado->paginacategoria->nome).'/'.$resultado->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a>';
-            else
-                $acao_um = '<a href="/'.$resultado->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a>';
-            $acoes = $acao_um.' ';
+            $acoes = '<a href="/'.$resultado->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
             if(ControleController::mostra($this->class, 'edit'))
                 $acoes .= '<a href="/admin/paginas/editar/'.$resultado->idpagina.'" class="btn btn-sm btn-primary">Editar</a> ';
             if(ControleController::mostra($this->class, 'destroy')) {
@@ -127,10 +123,19 @@ class PaginaController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
+        if(null !== $request->input('categoria')) {
+            $cn = PaginaCategoria::find($request->input('categoria'))->nome;
+            $cnToSlug = Str::slug($cn, '-');
+            $titulo = Str::slug($request->input('titulo'), '-');
+            $slug = $cnToSlug.'/'.$titulo;
+        } else {
+            $slug = Str::slug($request->input('titulo'), '-');
+        }
+
         $pagina = new Pagina();
         $pagina->titulo = $request->input('titulo');
         $pagina->subtitulo = $request->input('subtitulo');
-        $pagina->slug = Str::slug($request->input('titulo'), '-');
+        $pagina->slug = $slug;
         $pagina->img = $request->input('img');
         $pagina->conteudo = $request->input('conteudo');
         $pagina->idcategoria = $request->input('categoria');
@@ -167,10 +172,20 @@ class PaginaController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
+
+        if(null !== $request->input('categoria')) {
+            $cn = PaginaCategoria::find($request->input('categoria'))->nome;
+            $cnToSlug = Str::slug($cn, '-');
+            $titulo = Str::slug($request->input('titulo'), '-');
+            $slug = $cnToSlug.'/'.$titulo;
+        } else {
+            $slug = Str::slug($request->input('titulo'), '-');
+        }
+
         $pagina = Pagina::find($id);
         $pagina->titulo = $request->input('titulo');
         $pagina->subtitulo = $request->input('subtitulo');
-        $pagina->slug = Str::slug($request->input('titulo'), '-');
+        $pagina->slug = $slug;
         $pagina->img = $request->input('img');
         $pagina->conteudo = $request->input('conteudo');
         $pagina->idcategoria = $request->input('categoria');
