@@ -13,7 +13,7 @@ class BdoOportunidadeTableSeeder extends Seeder
     public function run()
     {
         $oportunidade = new BdoOportunidade();
-        $oportunidade->idempresa = 2;
+        $oportunidade->idempresa = 1;
         $oportunidade->titulo = "REPRESENTANTE COMERCIAL";
         $oportunidade->segmento = "Automobilística";
         $oportunidade->regiaoatuacao = "5,10,11";
