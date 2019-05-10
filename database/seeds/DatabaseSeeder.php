@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RegionalTableSeeder::class);
         $this->call(PerfilTableSeeder::class);
         $this->call(UserTableSeeder::class);
+        $this->call(PaginaCategoriaTableSeeder::class);
         $this->call(PaginaTableSeeder::class);
         $this->call(CursoTableSeeder::class);
         $this->call(NoticiaTableSeeder::class);
@@ -24,5 +25,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ConcursoTableSeeder::class);
         $this->call(AgendamentoTableSeeder::class);
         $this->call(PermissaoTableSeeder::class);
+        $this->call(SessoesTableSeeder::class);
     }
 }

@@ -13,15 +13,21 @@ class BdoOportunidadeTableSeeder extends Seeder
     public function run()
     {
         $oportunidade = new BdoOportunidade();
-        $oportunidade->idempresa = 1;
-        $oportunidade->titulo = "Procura-se Representante Comercial do ramo mobiliário";
-        $oportunidade->segmento = "Mobiliário";
-        $oportunidade->regiaoatuacao = "2,4,6";
-        $oportunidade->descricao = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae felis in ipsum euismod posuere. Nulla ultricies tortor sem, vel luctus libero vehicula eu. Etiam ut placerat sem. Vestibulum sit amet dui quis ligula rutrum semper ac eget felis. Donec ut aliquet massa, sed congue metus. Quisque ac ornare purus, ac mollis neque. Nam elementum massa vel nisi mollis efficitur.";
+        $oportunidade->idempresa = 2;
+        $oportunidade->titulo = "REPRESENTANTE COMERCIAL";
+        $oportunidade->segmento = "Automobilística";
+        $oportunidade->regiaoatuacao = "5,10,11";
+        $oportunidade->descricao = " Representante Comercial
+
+        * Experiência em vendas ( automotivo, industrial ou moto peças);
+        * 2º grau completo;
+        * Veículo próprio.
+        
+        Interessados enviar currículo para: rhvendas@unifort.com.br ";
         $oportunidade->vagasdisponiveis = 5;
         $oportunidade->status = "Em andamento";
-        $oportunidade->datainicio = "2019-04-01";
-        $oportunidade->idusuario = 1;
+        $oportunidade->datainicio = "2019-05-06";
+        $oportunidade->idusuario = 31;
         $oportunidade->save();
     }
 }

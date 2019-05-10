@@ -13,42 +13,22 @@ class NoticiaTableSeeder extends Seeder
     public function run()
     {
         $noticia = new Noticia();
-        $noticia->titulo = "Conexão Seccionais: Veja como foi o primeiro encontro";
-        $noticia->slug = "conexao-seccionais-veja-como-foi-o-primeiro-encontro";
-        $noticia->img = "/imagens/2019-04/news-01.jpg";
-        $noticia->conteudo = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><p>Pellentesque suscipit nulla ac pulvinar vestibulum. Ut pellentesque nunc est, sit amet feugiat mi dictum ullamcorper. Praesent lobortis, dolor sit amet posuere volutpat, justo arcu gravida magna, volutpat mattis dolor mauris in lacus.</p><p>Cras ultricies pellentesque quam in ultricies. Ut semper neque non vehicula lacinia. Proin porttitor nunc ultricies tortor lacinia consequat. In ornare condimentum vestibulum. Mauris id dui quis leo volutpat interdum.</p><p>Fusce viverra elit mauris, in malesuada libero tincidunt eu. Ut sit amet ultricies libero. Duis in justo lacus.</p><p>Aliquam dolor leo, efficitur non justo eget, consequat tincidunt risus. Sed iaculis sagittis sodales. Phasellus sodales, justo sit amet ornare lobortis, sapien leo facilisis dui, a bibendum lacus tellus et velit. Nulla eu ornare ante.</p>";
+        $noticia->titulo = "NO TRÂNSITO, O SENTIDO É A VIDA! CORE-SP APOIA ESSA IDEIA!";
+        $noticia->slug = "no-transito-o-sentido-e-a-vida-core-sp-apoia-essa-ideia";
+        $noticia->img = "/imagens/2019-05/maio-amarelo-horizontal-baixa-264-800x560m1.jpg";
+        $noticia->conteudo = "<p style='text-align: justify;'>NO TRÂNSITO, O SENTIDO É A VIDA foi o tema escolhido para a sexta edição do Movimento Maio Amarelo, que propõe o envolvimento direto da sociedade nas ações e uma reflexão sobre uma nova forma de encarar a mobilidade. Trata-se de um estímulo a todos os condutores, seja de caminhões, ônibus, vans, automóveis, motocicletas ou bicicletas, e aos pedestres e passageiros, a optarem por um trânsito mais seguro.
+        O objetivo do movimento é uma ação coordenada entre o Poder Público e a sociedade civil. A intenção é colocar em pauta o tema segurança viária e mobilizar toda a sociedade, envolvendo os mais diversos segmentos: órgãos de governos, empresas, entidades de classe, associações, federações e sociedade civil organizada para, fugindo das falácias cotidianas e costumeiras, efetivamente discutir o tema, engajar-se em ações e propagar o conhecimento, abordando toda a amplitude que a questão do trânsito exige, nas mais diferentes esferas.
+        <strong>O QUE É?</strong>    
+        É um movimento internacional de conscientização para redução de acidentes de trânsito. O trânsito deve ser seguro para todos em qualquer situação.
+        <strong>OBJETIVO</strong>
+        Colocar em pauta, para a sociedade, o tema trânsito. Estimular a participação da população, empresas, governos e entidades.
+        <strong>POR QUE MAIO?</strong>
+        Em 11 de maio de 2011, a ONU decretou a Década de Ação para Segurança no Trânsito. Com isso, o mês de maio se tornou referência mundial para balanço das ações que o mundo inteiro realiza.
+        <strong>POR QUE AMARELO?</strong>
+        O amarelo simboliza atenção e também a sinalização e advertência no trânsito. 
+        Mais informações: www.maioamarelo.com</p>";
         $noticia->publicada = "Sim";
-        $noticia->idusuario = 1;
+        $noticia->idusuario = 5;
         $noticia->save();
-
-        $noticia = new Noticia();
-        $noticia->titulo = "Conexão Seccionais: Veja as datas dos próximos encontros";
-        $noticia->slug = "conexao-seccionais-veja-as-datas-dos-proximos-encontros";
-        $noticia->img = "/imagens/2019-04/news-02.jpg";
-        $noticia->conteudo = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><p>Pellentesque suscipit nulla ac pulvinar vestibulum. Ut pellentesque nunc est, sit amet feugiat mi dictum ullamcorper. Praesent lobortis, dolor sit amet posuere volutpat, justo arcu gravida magna, volutpat mattis dolor mauris in lacus.</p><p>Cras ultricies pellentesque quam in ultricies. Ut semper neque non vehicula lacinia. Proin porttitor nunc ultricies tortor lacinia consequat. In ornare condimentum vestibulum. Mauris id dui quis leo volutpat interdum.</p><p>Fusce viverra elit mauris, in malesuada libero tincidunt eu. Ut sit amet ultricies libero. Duis in justo lacus.</p><p>Aliquam dolor leo, efficitur non justo eget, consequat tincidunt risus. Sed iaculis sagittis sodales. Phasellus sodales, justo sit amet ornare lobortis, sapien leo facilisis dui, a bibendum lacus tellus et velit. Nulla eu ornare ante.</p>";
-        $noticia->publicada = "Sim";
-        $noticia->idusuario = 1;
-        $noticia->save();
-
-        $noticia = new Noticia();
-        $noticia->titulo = "Conexão Seccionais chega em Presidente Prudente";
-        $noticia->slug = "conexao-seccionais-chega-em-presidente-prudente";
-        $noticia->img = "/imagens/2019-04/news-03.jpg";
-        $noticia->conteudo = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><p>Pellentesque suscipit nulla ac pulvinar vestibulum. Ut pellentesque nunc est, sit amet feugiat mi dictum ullamcorper. Praesent lobortis, dolor sit amet posuere volutpat, justo arcu gravida magna, volutpat mattis dolor mauris in lacus.</p><p>Cras ultricies pellentesque quam in ultricies. Ut semper neque non vehicula lacinia. Proin porttitor nunc ultricies tortor lacinia consequat. In ornare condimentum vestibulum. Mauris id dui quis leo volutpat interdum.</p><p>Fusce viverra elit mauris, in malesuada libero tincidunt eu. Ut sit amet ultricies libero. Duis in justo lacus.</p><p>Aliquam dolor leo, efficitur non justo eget, consequat tincidunt risus. Sed iaculis sagittis sodales. Phasellus sodales, justo sit amet ornare lobortis, sapien leo facilisis dui, a bibendum lacus tellus et velit. Nulla eu ornare ante.</p>";
-        $noticia->idusuario = 1;
-        $noticia->publicada = "Sim";
-        $noticia->save();
-
-        $noticia = new Noticia();
-        $noticia->titulo = "Curso - Básico em Marketing: Como Foi";
-        $noticia->slug = "curso-basico-em-marketing-como-foi";
-        $noticia->img = "/imagens/2019-04/curso-01.jpg";
-        $noticia->conteudo = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><p>Pellentesque suscipit nulla ac pulvinar vestibulum. Ut pellentesque nunc est, sit amet feugiat mi dictum ullamcorper. Praesent lobortis, dolor sit amet posuere volutpat, justo arcu gravida magna, volutpat mattis dolor mauris in lacus.</p><p>Cras ultricies pellentesque quam in ultricies. Ut semper neque non vehicula lacinia. Proin porttitor nunc ultricies tortor lacinia consequat. In ornare condimentum vestibulum. Mauris id dui quis leo volutpat interdum.</p><p>Fusce viverra elit mauris, in malesuada libero tincidunt eu. Ut sit amet ultricies libero. Duis in justo lacus.</p><p>Aliquam dolor leo, efficitur non justo eget, consequat tincidunt risus. Sed iaculis sagittis sodales. Phasellus sodales, justo sit amet ornare lobortis, sapien leo facilisis dui, a bibendum lacus tellus et velit. Nulla eu ornare ante.</p>";
-        $noticia->publicada = "Não";
-        $noticia->idusuario = 1;
-        $noticia->idcurso = 1;
-        $noticia->created_at = "2019-04-02 12:00:00";
-        $noticia->save();
-
     }
 }
