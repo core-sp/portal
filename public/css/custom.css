@@ -46,3 +46,7 @@
 .perfilEdit .form-check-input {
   margin-left: 0;
 }
+
+.nowrap {
+  white-space: nowrap;
+}

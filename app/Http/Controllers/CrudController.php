@@ -27,7 +27,10 @@ class CrudController extends Controller
         foreach($contents as $content) {
             $table .= "<tr>";
             foreach($content as $single) {
-                $table .= "<td>";
+                if($single === end($content))
+                    $table .= "<td class='nowrap'>";
+                else
+                    $table .= "<td>";
                 $table .= $single;
                 $table .= "</td>";
             }
