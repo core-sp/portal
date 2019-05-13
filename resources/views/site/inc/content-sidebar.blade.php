@@ -11,7 +11,7 @@
       </div>
     </div>
   </a>
-  <a href="https://youtube.com" target="_blank">
+  <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
     <div class="box-dois vermelho-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
