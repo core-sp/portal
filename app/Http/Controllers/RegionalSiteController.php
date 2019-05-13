@@ -19,9 +19,9 @@ class RegionalSiteController extends Controller
 
     public function show($id)
     {
-    	$resultado = Regional::find($id);
-    	$noticias = Noticia::paginate(10)
-            ->whereIn('idregional', [$id, null]);
-    	return view('site.regional', compact('resultado', 'noticias'));
+        $resultado = Cache::remember('regionalSite', 240, function($id) {
+            return Regional::find($id);
+        });
+    	return view('site.regional', compact('resultado'));
     }
 }
