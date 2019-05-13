@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Agendamento;
 use App\Regional;
+use App\User;
 use Carbon\Carbon;
 use App\Http\Controllers\Helper;
 use Illuminate\Support\Facades\Input;
@@ -198,20 +199,24 @@ class AgendamentoController extends Controller
             break;
 
             case 'Compareceu':
-                $string = "<p class='mb-0'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;Compareceu</p>";
+                $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;Compareceu&nbsp;&nbsp;</p>";
+                if(ControleController::mostra($this->class, 'edit'))
+                    $string .= "<a href='/admin/agendamentos/editar/".$id."' class='btn btn-sm btn-default'>Editar</a>";
                 if(isset($usuario))
-                    $string .= "<p class='mb-0'>Atendido por: <strong>".$usuario."</strong></p>";
+                    $string .= "<small class='d-block'>Atendido por: <strong>".$usuario."</strong></small>";
                 return $string;
             break;
 
             default:
-                $acoes = '<form method="POST" id="statusAgendamento" action="/admin/agendamentos/status" class="form-inline">';
+                $acoes = '<form method="POST" id="statusAgendamento" action="/admin/agendamentos/status" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="PUT" id="method" />';
                 $acoes .= '<input type="hidden" name="idagendamento" value="'.$id.'" />';
                 $acoes .= '<input type="hidden" name="status" id="status" value="Compareceu" />';
                 $acoes .= '<input type="submit" value="Confirmar presença" id="btnSubmit" class="btn btn-sm ml-1 btn-primary" />';
                 $acoes .= '</form>';
+                if(ControleController::mostra($this->class, 'edit'))
+                    $acoes .= " <a href='/admin/agendamentos/editar/".$id."' class='btn btn-sm btn-default'>Editar</a>";
                 return $acoes;
             break;
         }
@@ -282,5 +287,55 @@ class AgendamentoController extends Controller
             ->paginate(10);
         $tabela = $this->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function edit($id)
+    {
+        ControleController::autoriza($this->class, __FUNCTION__);
+        $resultado = Agendamento::find($id);
+        $atendentes = User::select('idusuario','nome')
+            ->where('idregional',$resultado->idregional)
+            ->whereHas('perfil', function($q) {
+                $q->where('nome','=','Atendimento');
+            })->get();
+        $regionais = Regional::select('idregional','regional')->get();
+        $variaveis = $this->variaveis;
+        $variaveis['cancela_idusuario'] = true;
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'atendentes', 'regionais'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        ControleController::autoriza($this->class, 'edit');
+        $regras = [
+            'nome' => 'required|max:191',
+            'cpf' => 'required|max:191',
+            'celular' => 'required|max:191',
+            'regional' => 'max:191',
+            'atendente' => 'max:191',
+            'status' => 'max:191',
+        ];
+        $mensagens = [
+            'required' => 'O :attribute é obrigatório',
+            'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+        ];
+        $erros = $request->validate($regras, $mensagens);
+
+        $agendamento = Agendamento::find($id);
+        $agendamento->nome = $request->input('nome');
+        $agendamento->cpf = $request->input('cpf');
+        $agendamento->celular = $request->input('celular');
+        $agendamento->idregional = $request->input('regional');
+        $agendamento->idusuario = $request->input('atendente');
+        $agendamento->status = $request->input('status');
+        $update = $agendamento->update();
+        if(!$update)
+            abort(500);
+        event(new CrudEvent('agendamento', 'editou', $agendamento->idagendamento));
+        return redirect('/admin/agendamentos')
+            ->with('message', '<i class="icon fa fa-check"></i>Agendamento editado com sucesso!')
+            ->with('class', 'alert-success');
     }
 }
