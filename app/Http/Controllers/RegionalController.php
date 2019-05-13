@@ -31,7 +31,7 @@ class RegionalController extends Controller
     {
         $resultados = Cache::remember('regionais', 240, function(){
             return $resultados = Regional::paginate(10);
-        })
+        });
     }
 
     public function tabelaCompleta($resultados)

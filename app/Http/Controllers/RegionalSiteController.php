@@ -10,7 +10,9 @@ class RegionalSiteController extends Controller
 {
     public function regionaisView()
     {
-        $regionais = Regional::all();
+        $regionais = Cache::remember('regionaisSite', 240, function(){
+            return $regionais = Regional::all();
+        });
         return view('site.regionais', compact('regionais'));
     }
 
