@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use App\Regional;
 use App\Noticia;
 use App\Http\Controllers\ControleController;
@@ -30,9 +29,8 @@ class RegionalController extends Controller
 
     public function resultados()
     {
-        $resultados = Cache::remember('regionais', 240, function(){
-            return $resultados = Regional::paginate(10);
-        });
+        $resultados = Regional::paginate(10);
+        return $resultados;
     }
 
     public function tabelaCompleta($resultados)
