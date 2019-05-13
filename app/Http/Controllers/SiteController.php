@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Cache;
 use App\Noticia;
 use App\Pagina;
 use App\Licitacao;
@@ -11,12 +12,14 @@ use App\Licitacao;
 class SiteController extends Controller
 {
     public function index()
-    {	
-        $noticias = Noticia::where('publicada','Sim')
-            ->whereNull('idregional')
-            ->orderBy('created_at','DESC')
-            ->limit(3)
-            ->get();
+    {
+        $noticias = Cache::remember('noticiasHome', 60, function(){
+            return Noticia::where('publicada','Sim')
+                ->whereNull('idregional')
+                ->orderBy('created_at','DESC')
+                ->limit(3)
+                ->get();
+        });
     	return view('site.home', compact('noticias'));
     }
 
