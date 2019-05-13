@@ -12,8 +12,8 @@ class CursoSiteController extends Controller
 {
     public function cursosView()
     {
-        $now = now();
         $cursos = Cache::remember('cursosSite', 240, function(){
+            $now = now();
             return Curso::select('idcurso','img','idregional','tipo','tema','datarealizacao','resumo')
                 ->where('datarealizacao','>=',$now)
                 ->where('publicado','Sim')
