@@ -171,7 +171,7 @@ use \App\Http\Controllers\Helper;
               <img src="{{ asset('img/002-phone-book-.png') }}" class="inside-img" alt="">
             </div>
             <div class="flex-one fale-txt align-self-center">
-              <h5 class="azul-escuro normal">Consulte seu<br class="hide-768" /> agendamento</h5>
+              <h5 class="normal">Consulte seu<br class="hide-768" /> agendamento</h5>
             </div>
           </div>
         </a>
@@ -183,7 +183,7 @@ use \App\Http\Controllers\Helper;
               <img src="{{ asset('img/001-whatsapp-.png') }}" class="inside-img" alt="">
             </div>
             <div class="flex-one fale-txt align-self-center">
-              <h5 class="azul-escuro normal">Entre em contato<br class="hide-768" /> pelo WhatsApp</h5>
+              <h5 class="normal">Entre em contato<br class="hide-768" /> pelo WhatsApp</h5>
             </div>
           </div>
         </a>
@@ -195,7 +195,7 @@ use \App\Http\Controllers\Helper;
               <img src="{{ asset('img/003-youtube-.png') }}" class="inside-img" alt="">
             </div>
             <div class="flex-one fale-txt align-self-center">
-              <h5 class="azul-escuro normal">Institucional 2019<br class="hide-768" /> e informativos</h5>
+              <h5 class="normal">Institucional 2019<br class="hide-768" /> e informativos</h5>
             </div>
           </div>
         </a>
@@ -206,7 +206,7 @@ use \App\Http\Controllers\Helper;
             <img src="{{ asset('img/004-headset-.png') }}" class="inside-img" alt="">
           </div>
           <div class="flex-one fale-txt align-self-center">
-            <h5 class="azul-escuro normal">Atendimento<br class="hide-768" /> (11) 3243-5500</h5>
+            <h5 class="normal">Atendimento<br class="hide-768" /> (11) 3243-5500</h5>
           </div>
         </div>
       </div>
