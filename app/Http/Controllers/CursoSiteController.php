@@ -12,10 +12,12 @@ class CursoSiteController extends Controller
     public function cursosView()
     {
         $now = now();
-        $cursos = Curso::select('idcurso','img','idregional','tipo','tema','datarealizacao','resumo')
-            ->where('datarealizacao','>=',$now)
-            ->where('publicado','Sim')
-            ->paginate(10);
+        $cursos = Cache::remember('cursosSite', 240, function(){
+            return Curso::select('idcurso','img','idregional','tipo','tema','datarealizacao','resumo')
+                ->where('datarealizacao','>=',$now)
+                ->where('publicado','Sim')
+                ->paginate(10);
+        });
         return view('site.cursos', compact('cursos'));
     }
 
