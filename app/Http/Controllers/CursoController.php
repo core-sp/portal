@@ -159,7 +159,7 @@ class CursoController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = Curso::find($id);
+        $resultado = Curso::with('regional','user')->find($id);
         $regionais = Regional::all();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'regionais', 'variaveis'));

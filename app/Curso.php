@@ -10,7 +10,6 @@ class Curso extends Model
     use SoftDeletes;
 	protected $primaryKey = 'idcurso';
     protected $table = 'cursos';
-    protected $with = ['regional', 'user'];
 
     public function regional()
     {

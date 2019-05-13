@@ -112,6 +112,7 @@ class CursoInscritoController extends Controller
         $inscrito->telefone = $request->input('telefone');
         $inscrito->email = $request->input('email');
         $inscrito->registrocore = $request->input('registrocore');
+        $inscrito->idusuario = $request->input('idusuario');
         $inscrito->idcurso = $idcurso;
         $save = $inscrito->save();
         if(!$save)
@@ -159,6 +160,7 @@ class CursoInscritoController extends Controller
         $inscrito->telefone = $request->input('telefone');
         $inscrito->email = $request->input('email');
         $inscrito->registrocore = $request->input('registrocore');
+        $inscrito->idusuario = $request->input('idusuario');
         $inscrito->idcurso = $idcurso;
         $update = $inscrito->update();
         if(!$update)

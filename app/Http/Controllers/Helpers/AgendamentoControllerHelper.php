@@ -116,7 +116,7 @@ class AgendamentoControllerHelper extends Controller
             else
                 echo "<p class='mb-0'><i>* Agendamento realizado no dia ".Helper::onlyDate($dia).", às ".$hora."</i></p>";
         } else {
-            echo "<p class='mb-0'><i>* Agendamento confirmado para o dia ".Helper::onlyDate($dia).", às ".$hora.". Para cancela-lo, <a href='/agendamento-consulta/busca?protocolo=".str_replace('AGE-','',$protocolo)."'>clique aqui.</a></i></p>";
+            echo "<p class='mb-0'><i>* Agendamento confirmado para o dia ".Helper::onlyDate($dia).", às ".$hora.". Para cancela-lo, <a href='/agendamento-consulta/busca?protocolo=".str_replace('AGE-','',$protocolo)."' target='_blank'>clique aqui.</a></i></p>";
         }
     }
 }
