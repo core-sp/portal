@@ -25,7 +25,6 @@ class AgendamentoTableSeeder extends Seeder
         $agendamento->protocolo = "AGE-000000";
         $agendamento->tiposervico = "Refis para PF";
         $agendamento->idregional = 1;
-        $agendamento->idusuario = 1;
         $agendamento->status = "Compareceu";
         $agendamento->save();
 
