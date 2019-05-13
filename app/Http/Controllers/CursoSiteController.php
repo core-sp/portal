@@ -40,7 +40,8 @@ class CursoSiteController extends Controller
 
     public static function checkCurso($id)
     {
-        $curso = Curso::select('datarealizacao')->find($id);
+        $curso = Curso::select('datarealizacao')
+            ->find($id);
         $now = now();
         if($curso->datarealizacao > $now)
             return true;

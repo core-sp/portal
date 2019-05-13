@@ -6,6 +6,7 @@
     @else
     <input type="hidden" name="idcurso" value="{{ $curso->idcurso }}" />
     @endif
+    <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
         <div class="form-row">
             <div class="col">
