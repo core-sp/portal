@@ -52,7 +52,7 @@ $now = now();
               </h6></td>
             </tr>
             <tr>
-              <td><h6>Aonde</h6></td>
+              <td><h6>Onde</h6></td>
               <td><h6 class="light">{{ $curso->regional->regional }}</h6></td>
             </tr>
             <tr>
