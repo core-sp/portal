@@ -172,7 +172,7 @@ class AgendamentoSiteController extends Controller
         $agradece .= " - ".$agendamento->regional->complemento."<br>";
         $agradece .= "Serviço: ".$tiposervico.'<br>';
         $adendo = '<i>* As informações foram enviadas ao email cadastrado no formulário</i>';
-        Mail::to($emailUser)->send(new AgendamentoMailGuest($agradece));
+        Mail::to($emailUser)->queue(new AgendamentoMailGuest($agradece));
 
         // Retorna view de agradecimento
         return view('site.agradecimento')->with([

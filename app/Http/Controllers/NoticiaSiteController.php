@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use App\Noticia;
 
 class NoticiaSiteController extends Controller
 {
     public function noticiasView()
     {
-        $noticias = Noticia::orderBy('created_at', 'DESC')->where('publicada','Sim')->paginate(9);
+        $noticias = Cache::remember('noticiasGridSite', 60, function(){
+            return Noticia::orderBy('created_at', 'DESC')->where('publicada','Sim')->paginate(9);
+        });
         return view('site.noticias', compact('noticias'));        
     }
 
