@@ -172,10 +172,9 @@ class CursoInscritoController extends Controller
     public static function permiteInscricao($idcurso)
     {
         $contaInscritos = CursoInscrito::where('idcurso', $idcurso)->count();
-        $curso = Curso::find($idcurso);
+        $curso = Curso::select('nrvagas')->find($idcurso);
         if(isset($curso)) {
-            $vagas = $curso->nrvagas;
-            if ($contaInscritos < $vagas) 
+            if ($contaInscritos < $curso->nrvagas) 
                 return true;
             else
                 return false;
@@ -253,7 +252,7 @@ class CursoInscritoController extends Controller
     public static function btnSituacao($idcurso)
     {
         $now = now();
-        $curso = Curso::find($idcurso);
+        $curso = Curso::select('datarealizacao')->find($idcurso);
         if($curso->datarealizacao < $now) {
             echo "<div class='sit-btn sit-vermelho'>Já realizado</div>";
         } else {

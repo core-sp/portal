@@ -1,5 +1,3 @@
-
-
 @extends('site.layout.app', ['title' => 'Cursos'])
 
 @section('content')
@@ -52,6 +50,10 @@ $now = now();
               <td><h6 class="light">
                 {{ CursoInscritoController::btnSituacao($curso->idcurso) }}
               </h6></td>
+            </tr>
+            <tr>
+              <td><h6>Aonde</h6></td>
+              <td><h6 class="light">{{ $curso->regional->regional }}</h6></td>
             </tr>
             <tr>
               <td><h6>Início</h6></td>
