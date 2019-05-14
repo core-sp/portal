@@ -258,8 +258,8 @@ strong, .bold {
 }
 
 .header-margin {
-	margin-top: 1.5rem;
-	margin-bottom: 1.5rem;
+	margin-top: 1.2rem;
+	margin-bottom: 1.2rem;
 }
 
 .btn-atendimento {
@@ -384,6 +384,7 @@ strong, .bold {
 }
 
 .aai img {
+	height: 45px;
 	border-radius: 5px;
 }
 
@@ -1698,8 +1699,8 @@ footer p {
 	}
 
 	.header-margin {
-		margin-top: 1rem;
-		margin-bottom: 1rem;
+		margin-top: .9rem;
+		margin-bottom: .9rem;
 	}
 
 	#sidebar {
@@ -1940,7 +1941,11 @@ footer p {
 	}
 
 	.carousel {
-		height: 190px;
+		height: 500px;
+	}
+
+	.carousel-item img {
+		object-position: top;
 	}
 
 	.pagina-titulo-img {
@@ -1964,11 +1969,11 @@ footer p {
 	}
 
 	.hide-576 {
-		display: none;
+		display: none !important;
 	}
 
 	.show-576 {
-		display: block;
+		display: block !important;
 	}
 
 	#espaco-representante {

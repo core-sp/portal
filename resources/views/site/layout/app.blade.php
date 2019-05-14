@@ -35,11 +35,11 @@ use \App\Http\Controllers\Helper;
         <div class="container">
           <div class="row header-margin">
             <div class="col-lg-4 col-md-6 text-left center-768">
-                <a href="/"><img src="{{ asset('img/logo-certo.png') }}" alt="CORE-SP" id="logo-header" /></a>
+                <a href="/"><img src="{{ asset('img/logo-e.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-                <img src="{{ asset('img/aai-v9.png') }}" alt="Portal da Transparência">
+                <img src="{{ asset('img/aai-v11.png') }}" alt="Portal da Transparência">
               </a>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
