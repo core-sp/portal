@@ -138,7 +138,7 @@ class PaginaController extends Controller
         $pagina->slug = $slug;
         $pagina->img = $request->input('img');
         $pagina->conteudo = $request->input('conteudo');
-        $pagina->idcategoria = $request->input('categoria');
+        $pagina->idpaginacategoria = $request->input('categoria');
         $pagina->idusuario = $request->input('idusuario');
         $save = $pagina->save();
         if(!$save)
@@ -188,7 +188,7 @@ class PaginaController extends Controller
         $pagina->slug = $slug;
         $pagina->img = $request->input('img');
         $pagina->conteudo = $request->input('conteudo');
-        $pagina->idcategoria = $request->input('categoria');
+        $pagina->idpaginacategoria = $request->input('categoria');
         $pagina->idusuario = $request->input('idusuario');
         $update = $pagina->update();
         if(!$update)
