@@ -39,7 +39,7 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-                <img src="{{ asset('img/aai-v7.png') }}" alt="Portal da Transparência">
+                <img src="{{ asset('img/aai-v9.png') }}" alt="Portal da Transparência">
               </a>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">

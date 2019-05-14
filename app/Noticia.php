@@ -9,8 +9,7 @@ class Noticia extends Model
 {
     use SoftDeletes;
     protected $primaryKey = 'idnoticia';
-    protected $with = ['user', 'regional', 'curso'];
-
+    
     public function regional()
     {
     	return $this->belongsTo('App\Regional', 'idregional');
