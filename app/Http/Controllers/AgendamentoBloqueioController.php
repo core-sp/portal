@@ -19,6 +19,7 @@ class AgendamentoBloqueioController extends Controller
         'plural' => 'bloqueios de agendamento',
         'pluraliza' => 'bloqueios',
         'form' => 'agendamentobloqueio',
+        'cancelar' => 'agendamentos/bloqueios',
         'titulo_criar' => 'Cadastrar novo bloqueio',
         'btn_criar' => '<a href="/admin/agendamentos/bloqueios/criar" class="btn btn-primary mr-1">Novo Bloqueio</a>',
     ];

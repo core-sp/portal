@@ -11,7 +11,10 @@ class NoticiaSiteController extends Controller
     public function noticiasView()
     {
         $noticias = Cache::remember('noticiasGridSite', 60, function(){
-            return Noticia::orderBy('created_at', 'DESC')->where('publicada','Sim')->paginate(9);
+            return Noticia::select('img','titulo','subtitulo','created_at','conteudo')
+                ->orderBy('created_at', 'DESC')
+                ->where('publicada','Sim')
+                ->paginate(9);
         });
         return view('site.noticias', compact('noticias'));        
     }
