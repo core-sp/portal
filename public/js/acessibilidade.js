@@ -71,6 +71,15 @@ $(document).ready(function(){
 			'.nav-link'
 		];
 		$(bgFilter).toggleClass('contraste-filter');
+
+		var str = 'logo-e';
+		var str2 = 'logo-b';
+		var logo = $('#logo-header').attr('src').toString();
+		if(logo.includes(str)) {
+			$('#logo-header').attr('src',$('#logo-header').attr('src').replace(str,str2));
+		} else {
+			$('#logo-header').attr('src',$('#logo-header').attr('src').replace(str2,str));
+		}
 	});
 
 });

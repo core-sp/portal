@@ -17,18 +17,20 @@ use \App\Http\Controllers\Helper;
         </ol>
         <div class="carousel-inner h-100">
           <div class="carousel-item h-100 active">
-            <a href="/balcao-de-oportunidades">
-              <img class="d-block w-100" src="{{ asset('img/banner-refis.png') }}" />
+            <a href="/agendamento">
+              <img class="w-100 hide-576" src="{{ asset('img/banner-refis.png') }}" />
+              <img class="w-100 show-576" src="{{ asset('img/banner-refis-m.png') }}" />
             </a>
           </div>
           <div class="carousel-item h-100">
             <a href="/balcao-de-oportunidades">
-              <img class="d-block w-100" src="{{ asset('img/bdo-banner.png') }}" />
+              <img class="w-100" src="{{ asset('img/bdo-banner.png') }}" />
             </a>
           </div>
           <div class="carousel-item h-100">
             <a href="/cursos">
-              <img class="d-block w-100" src="{{ asset('img/banner-conexoes.png') }}" />
+              <img class="w-100 hide-576" src="{{ asset('img/banner-conexoes.png') }}" />
+              <img class="w-100 show-576" src="{{ asset('img/banner-conexoes-m.png') }}" />
             </a>
           </div>
         </div>

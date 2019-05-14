@@ -242,7 +242,8 @@ class CursoInscritoController extends Controller
         $agradece .= "Data de Início: ".Helper::onlyDate($inscrito->curso->datarealizacao)."<br>";
         $agradece .= "Horário: ".Helper::onlyHour($inscrito->curso->datarealizacao)."h<br>";
         $adendo = '<i>* As informações foram enviadas ao email cadastrado no formulário</i>';
-        Mail::to($emailUser)->queue(new CursoInscritoMailGuest($agradece));
+        $quando = now()->addMinutes(2);
+        Mail::to($emailUser)->later($quando, new CursoInscritoMailGuest($agradece));
 
         // Retorna view de agradecimento
         return view('site.agradecimento')->with([
