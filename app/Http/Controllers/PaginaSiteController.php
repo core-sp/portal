@@ -10,7 +10,8 @@ class PaginaSiteController extends Controller
 {
     public function show($slug)
     {
-        $pagina = Pagina::where('slug', $slug)->first();
+        $pagina = Pagina::select('titulo','img','subtitulo','conteudo')
+            ->where('slug', $slug)->first();
         if(isset($pagina)) {
             return view('site.pagina', compact('pagina'));
         } else {
@@ -21,7 +22,8 @@ class PaginaSiteController extends Controller
     public function showCategoria($categoria, $slug)
     {
         $one = $categoria.'/'.$slug;
-        $pagina = Pagina::where('slug', $one)->first();
+        $pagina = Pagina::select('titulo','img','subtitulo','conteudo')
+            ->where('slug', $one)->first();
         if(isset($pagina)) {
             return view('site.pagina', compact('pagina'));
         } else {

@@ -93,18 +93,20 @@
             </div>
         </div>
     </div>
-    <div class="card-footer float-right">
-        @if(isset($resultado))
-        <a href="/admin/cursos/inscritos/{{ $resultado->idcurso }}" class="btn btn-default">Cancelar</a>
-        @else
-        <a href="/admin/cursos/inscritos/{{ $curso->idcurso }}" class="btn btn-default">Cancelar</a>
-        @endif
-        <button type="submit" class="btn btn-primary ml-1">
-        @if(isset($resultado))
-            Salvar
-        @else
-            Publicar
-        @endif    
-        </button>
+    <div class="card-footer">
+        <div class="float-right">
+            @if(isset($resultado))
+            <a href="/admin/cursos/inscritos/{{ $resultado->idcurso }}" class="btn btn-default">Cancelar</a>
+            @else
+            <a href="/admin/cursos/inscritos/{{ $curso->idcurso }}" class="btn btn-default">Cancelar</a>
+            @endif
+            <button type="submit" class="btn btn-primary ml-1">
+            @if(isset($resultado))
+                Salvar
+            @else
+                Publicar
+            @endif    
+            </button>
+        </div>
     </div>
 </form>

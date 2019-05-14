@@ -67,8 +67,10 @@
             </div>
         </div>
     </div>
-    <div class="card-footer float-right">
-        <a href="/admin" class="btn btn-default">Cancelar</a>
-        <button type="submit" class="btn btn-primary ml-1">Registrar</button>
+    <div class="card-footer">
+        <div class="float-right">
+            <a href="/admin" class="btn btn-default">Cancelar</a>
+            <button type="submit" class="btn btn-primary ml-1">Registrar</button>
+        </div>
     </div>
 </form>

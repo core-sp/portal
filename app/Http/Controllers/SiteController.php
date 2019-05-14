@@ -36,11 +36,13 @@ class SiteController extends Controller
         $erros = $request->validate($regras, $mensagens);
 
         $resultados = collect();
-        $paginas = Pagina::where('titulo','LIKE','%'.$busca.'%')
+        $paginas = Pagina::select('titulo','slug','created_at','conteudo')
+            ->where('titulo','LIKE','%'.$busca.'%')
             ->orWhere('conteudo','LIKE','%'.$busca.'%')
             ->limit(10)
             ->get();
-        $noticias = Noticia::where('titulo','LIKE','%'.$busca.'%')
+        $noticias = Noticia::select('titulo','slug','created_at','conteudo')
+            ->where('titulo','LIKE','%'.$busca.'%')
             ->orWhere('conteudo','LIKE','%'.$busca.'%')
             ->limit(10)
             ->get();

@@ -146,14 +146,16 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
             @endif
         </div>
     </div>
-    <div class="card-footer float-right">
-        <a href="/admin/bdo" class="btn btn-default">Cancelar</a>
-        <button type="submit" class="btn btn-primary ml-1">
-        @if(isset($resultado))
-            Salvar
-        @else
-            Publicar
-        @endif
-        </button>
+    <div class="card-footer">
+        <div class="float-right">
+            <a href="/admin/bdo" class="btn btn-default">Cancelar</a>
+            <button type="submit" class="btn btn-primary ml-1">
+            @if(isset($resultado))
+                Salvar
+            @else
+                Publicar
+            @endif
+            </button>
+        </div>
     </div>
 </form>

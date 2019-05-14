@@ -115,8 +115,10 @@
             </div>
         </div>
     </div>
-    <div class="card-footer float-right">
-        <a href="/admin/agendamentos" class="btn btn-default">Cancelar</a>
-        <button type="submit" class="btn btn-primary ml-1">Salvar</button>
+    <div class="card-footer">
+        <div class="float-right">
+            <a href="/admin/agendamentos" class="btn btn-default">Cancelar</a>
+            <button type="submit" class="btn btn-primary ml-1">Salvar</button>
+        </div>
     </div>
 </form>
