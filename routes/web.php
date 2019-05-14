@@ -229,6 +229,9 @@ Route::prefix('/')->group(function() {
   // Newsletter
   Route::post('newsletter', 'NewsletterController@store');
 
+  // Feiras
+  Route::get('feiras', 'SiteController@feiras');
+
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaSiteController@show');
   Route::get('{categoria}/{slug}', 'PaginaSiteController@showCategoria');

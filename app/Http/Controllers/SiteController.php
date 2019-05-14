@@ -56,4 +56,14 @@ class SiteController extends Controller
         }
         return view('site.busca', compact('busca', 'resultados'));
     }
+
+    public function feiras()
+    {
+        $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
+            ->orderBy('created_at', 'DESC')
+            ->where('publicada','Sim')
+            ->where('categoria','Feiras')
+            ->paginate(9);
+        return view('site.feiras', compact('noticias'));
+    }
 }

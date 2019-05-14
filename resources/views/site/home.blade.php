@@ -64,13 +64,15 @@ use \App\Http\Controllers\Helper;
     </div>
     <div class="row">
       <div class="col-lg-3 col-sm-6 pb-15-992">
-        <div class="box text-center azul-escuro-bg h-100">
-          <div class="inside-box">
-            <img src="{{ asset('img/open-book.png') }}" class="inside-img" />
-            <p class="text-uppercase mt-3 branco">Cartilha do<br class="hide-992" /> Representante</p>
-            <a href="#" class="btn-box">Visualizar</a>
+        <a href="/cartilha-do-representante" class="d-block h-100" target="_blank">
+          <div class="box text-center azul-escuro-bg h-100">
+            <div class="inside-box">
+              <img src="{{ asset('img/open-book.png') }}" class="inside-img" />
+              <p class="text-uppercase mt-3 branco">Cartilha do<br class="hide-992" /> Representante</p>
+              <button class="btn-box">Visualizar</button>
+            </div>
           </div>
-        </div>
+        </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15-992">
         <a href="/balcao-de-oportunidades" class="d-block h-100">
@@ -119,7 +121,7 @@ use \App\Http\Controllers\Helper;
           <br class="show-576 br-novo-core" />
           <a href="/concursos" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
           <br class="show-768 br-novo-core" />
-          <a href="#" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
+          <a href="/feiras" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
           <br class="show-576 br-novo-core" />
           <a href="/cursos" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
         </div>

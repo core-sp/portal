@@ -1,3 +1,7 @@
+@php
+    $categorias = App\Http\Controllers\Helpers\NoticiaControllerHelper::categorias();
+@endphp
+
 <form role="form" method="POST">
     @csrf
     @if(isset($resultado))
@@ -90,6 +94,26 @@
                 />
             <small class="form-text text-muted">
             <em>* Associar notícia à algum curso</em>
+            </small>
+        </div>
+        <div class="col">
+            <label for="categoria">Categoria</label>
+            <select name="categoria" class="form-control">
+            <option value="">Nenhuma</option>
+            @foreach($categorias as $cat)
+                @if(isset($resultado))
+                    @if($resultado->categoria == $cat)
+                    <option value="{{ $cat }}" selected>{{ $cat }}</option>
+                    @else
+                    <option value="{{ $cat }}">{{ $cat }}</option>
+                    @endif
+                @else
+                <option value="{{ $cat }}">{{ $cat }}</option>
+                @endif
+            @endforeach
+            </select>
+            <small class="form-text text-muted">
+            <em>* Associar notícia à algum categoria específica</em>
             </small>
         </div>
         </div>

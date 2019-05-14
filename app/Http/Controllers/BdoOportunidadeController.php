@@ -67,6 +67,8 @@ class BdoOportunidadeController extends Controller
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a oportunidade?\')" />';
                 $acoes .= '</form>';
             }
+            if(empty($acoes))
+                $acoes = '<i class="fas fa-lock text-muted"></i>';
             if(isset($resultado->vagaspreenchidas))
                 $relacaovagas = $resultado->vagaspreenchidas.' / '.$resultado->vagasdisponiveis;
             else

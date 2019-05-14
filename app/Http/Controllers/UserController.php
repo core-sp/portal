@@ -68,7 +68,7 @@ class UserController extends Controller
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o usuário?\')" />';
                 $acoes .= '</form>';
             } else {
-                $acoes = '<i class="fas fa-ban text-danger"></i>';
+                $acoes = '<i class="fas fa-lock text-muted"></i>';
             }
             if(isset($resultado->sessao)) {
                 $acesso = Helper::formataData($resultado->sessao->updated_at);
