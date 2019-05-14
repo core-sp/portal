@@ -131,5 +131,13 @@ class PaginaTableSeeder extends Seeder
         <p>Para conferir as &uacute;ltimas oportunidades, <a href="/balcao-de-oportunidades">clique aqui.</a></p>';
         $pagina->idusuario = 1;
         $pagina->save();
+
+        $pagina = new Pagina();
+        $pagina->titulo = "Cartilha do Representante";
+        $pagina->subtitulo = "Lorem ipsum dolor sit amet.";
+        $pagina->slug = "cartilha-do-representante";
+        $pagina->conteudo = '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ut lacus nisi. Morbi at condimentum lectus. Quisque ac lorem ac mauris accumsan convallis ac non magna. Nullam lobortis consequat libero, ac condimentum nisl faucibus quis. Curabitur non nibh lacus. Phasellus ac vehicula diam, at fringilla nunc. Vestibulum mattis est at sapien bibendum tincidunt. Phasellus at dignissim enim. Nunc eget diam sed enim maximus tincidunt quis id ante. Praesent et ultrices risus. Sed interdum, velit pretium feugiat malesuada, elit odio mattis erat, quis tristique felis urna vitae nisl. Duis a ipsum pharetra mauris scelerisque fringilla non at lorem.</p>';
+        $pagina->idusuario = 1;
+        $pagina->save();
     }
 }

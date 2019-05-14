@@ -67,6 +67,8 @@ class BdoEmpresaController extends Controller
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a empresa?\')" />';
                 $acoes .= '</form>';
             }
+            if(empty($acoes))
+                $acoes = '<i class="fas fa-lock text-muted"></i>';
             $conteudo = [
                 $resultado->idempresa,
                 $resultado->segmento,

@@ -127,6 +127,10 @@ class NoticiaController extends Controller
             $publicada = 'Não';
         else
             $publicada = 'Sim';
+        if(empty($request->input('categoria')))
+            $categoria = null;
+        else
+            $categoria = $request->input('categoria');
         // Inputa dados no BD
         $noticia = new Noticia();
         $noticia->titulo = $request->input('titulo');
@@ -134,6 +138,7 @@ class NoticiaController extends Controller
         $noticia->img = $request->input('img');
         $noticia->conteudo = $request->input('conteudo');
         $noticia->publicada = $publicada;
+        $noticia->categoria = $categoria;
         $noticia->idregional = $request->input('regionais');
         $noticia->idcurso = $request->input('curso');
         $noticia->idusuario = $request->input('idusuario');
@@ -173,7 +178,11 @@ class NoticiaController extends Controller
         if(Auth::user()->perfil === 'Estagiário')
             $publicada = 'Não';
         else
-            $publicada = 'Sim';   
+            $publicada = 'Sim';
+        if(empty($request->input('categoria')))
+            $categoria = null;
+        else
+            $categoria = $request->input('categoria');
         // Inputa dados no BD
         $noticia = Noticia::find($id);
         $noticia->titulo = $request->input('titulo');
@@ -181,6 +190,7 @@ class NoticiaController extends Controller
         $noticia->img = $request->input('img');
         $noticia->conteudo = $request->input('conteudo');
         $noticia->publicada = $publicada;
+        $noticia->categoria = $categoria;
         $noticia->idregional = $request->input('regionais');
         $noticia->idcurso = $request->input('curso');
         $noticia->idusuario = $request->input('idusuario');

@@ -383,8 +383,17 @@ strong, .bold {
 	align-self: flex-end;
 }
 
+.it {
+	justify-content: center;
+}
+
+.aai h6 {
+	line-height: 1.1;
+	font-size: .9rem;
+}
+
 .aai img {
-	height: 45px;
+	height: 42px;
 	border-radius: 5px;
 }
 

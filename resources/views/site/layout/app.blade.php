@@ -38,9 +38,18 @@ use \App\Http\Controllers\Helper;
                 <a href="/"><img src="{{ asset('img/logo-e.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
-              <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-                <img src="{{ asset('img/aai-v11.png') }}" alt="Portal da Transparência">
-              </a>
+              <div class="d-flex it">
+                <div class="align-right it-icon">
+                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
+                    <img src="{{ asset('img/icon_transparencia.png') }}" alt="Portal da Transparência">
+                  </a>
+                </div>
+                <div class="text-left align-self-center it-txt">
+                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
+                    <h6 class="lh-1 pl-2">Acesso à<br />informação</h6>
+                  </a>
+                </div>
+              </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
               <div class="mexe-tamanho m-auto text-center">
@@ -194,10 +203,8 @@ use \App\Http\Controllers\Helper;
               <p class="branco"><a href="/concursos">Concursos</a></p>
               <p class="branco"><a href="/agendamentos">Agendamentos</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
-              <p class="branco"><a href="#">Feiras</a></p>
+              <p class="branco"><a href="/feiras">Feiras</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
-              <p class="branco"><a href="#">Simulador de Cálculos</a></p>
-              <p class="branco"><a href="#">Registre-se</a></p>
               <p class="branco"><a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">E-OUV</a></p>
               <p class="branco"><a href="/seccionais">Seccionais</a></p>
             </div>
