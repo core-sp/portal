@@ -47,14 +47,14 @@
       </div>
     </div>
   </a>
-  <a href="http://boleto.core-sp.org.br" target="_blank">
+  <a href="/agendamento" target="_blank">
     <div class="box-dois azul-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
-          <img src="{{ asset('img/003-bill.png') }}" class="inside-img">
+          <img src="{{ asset('img/appointment.png') }}" class="inside-img">
         </div>
         <div class="flex-one align-self-center pl-4">
-          <h5 class="text-uppercase normal branco">Emissão de Boleto Anuidade 2019</h5>
+          <h5 class="text-uppercase normal branco">Agende seu atendimento</h5>
         </div>
       </div>
     </div>
