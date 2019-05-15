@@ -26,7 +26,8 @@ class PerfilController extends Controller
 
     public function resultados()
     {
-        $resultados = Perfil::withCount('user')
+        $resultados = Perfil::select('idperfil','nome')
+            ->withCount('user')
             ->orderBy('created_at','DESC')
             ->paginate(10);
         return $resultados;
