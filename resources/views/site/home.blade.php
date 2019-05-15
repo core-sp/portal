@@ -24,7 +24,8 @@ use \App\Http\Controllers\Helper;
           </div>
           <div class="carousel-item h-100">
             <a href="/balcao-de-oportunidades">
-              <img class="w-100" src="{{ asset('img/bdo-banner.png') }}" />
+              <img class="w-100 hide-576" src="{{ asset('img/banner-bdo.png') }}" />
+              <img class="w-100 show-576" src="{{ asset('img/banner-bdo-m.png') }}" />
             </a>
           </div>
           <div class="carousel-item h-100">
