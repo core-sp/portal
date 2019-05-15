@@ -255,16 +255,28 @@ use \App\Http\Controllers\Helper;
           </div>
           <div class="col-sm-4 hide-576 eouv-imgs align-self-center pl-3 center-992">
             <div class="m-auto pb-3">
-              <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" />
-              <img src="{{ asset('img/icon-eouv-02.png') }}" class="azul-escuro-bg" />
+              <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
+                <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" />
+              </a>
+              <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
+                <img src="{{ asset('img/icon-eouv-02.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Ouvidoria" />
+              </a>
             </div>
             <div class="m-auto pb-3">
-              <img src="{{ asset('img/icon-eouv-03.png') }}" class="verde-escuro-bg" />
-              <img src="{{ asset('img/icon-eouv-04.png') }}" class="azul-bg" />
+              <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
+                <img src="{{ asset('img/icon-eouv-03.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Elogios" />
+              </a>
+              <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
+                <img src="{{ asset('img/icon-eouv-04.png') }}" class="azul-bg" data-toogle="tooltip" title="Sugestões" />
+              </a>
             </div>
             <div class="m-auto">
-              <img src="{{ asset('img/icon-eouv-05.png') }}" class="azul-escuro-bg" />
-              <img src="{{ asset('img/icon-eouv-06.png') }}" class="verde-escuro-bg" />
+              <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
+                <img src="{{ asset('img/icon-eouv-05.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Reclamações" />
+              </a>
+              <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
+                <img src="{{ asset('img/icon-eouv-06.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Dúvidas" />
+              </a>
             </div>
           </div>
         </div>

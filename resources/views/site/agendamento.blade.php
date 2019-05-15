@@ -48,7 +48,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
             <h5>Informações de contato</h5>
             <div class="form-row mt-2">
               <div class="col-md-6">
-                <label for="nome">Nome</label>
+                <label for="nome">Nome *</label>
                 <input type="text"
                   class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                   name="nome"
@@ -60,7 +60,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   @endif
               </div>
               <div class="col-md-6 mt-2-768">
-                <label for="cpf">CPF</label>
+                <label for="cpf">CPF *</label>
                 <input type="text"
                   class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
                   name="cpf"
@@ -75,7 +75,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
             </div>
             <div class="form-row mt-2">
               <div class="col-md-6">
-                <label for="email">E-mail</label>
+                <label for="email">E-mail *</label>
                 <input type="text"
                   class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                   name="email"
@@ -88,7 +88,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   @endif
               </div>
               <div class="col-md-6 mt-2-768">
-                <label for="celular">Celular</label>
+                <label for="celular">Celular *</label>
                 <input type="text"
                   class="form-control celularInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
                   name="celular"
@@ -104,7 +104,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
             <h5 class="mt-4">Informações de agendamento</h5>
             <div class="form-row mt-2">
               <div class="col-md-4">
-                <label for="idregional">Regional</label>
+                <label for="idregional">Regional *</label>
                 <select name="idregional" id="idregional" class="form-control">
                   @foreach($regionais as $regional)
                     <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
@@ -117,7 +117,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 @endif
               </div>
               <div class="col-md-4 mt-2-768">
-                <label for="dia">Dia</label>
+                <label for="dia">Dia *</label>
                 <div class="input-group">
                   <input type="text" 
                     class="form-control"
@@ -140,7 +140,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                     <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
                   </div>
                 </div>
-                <label for="hora">Horários disponíveis</label>
+                <label for="hora">Horários disponíveis *</label>
                 <select name="hora" id="horarios" class="form-control">
                   <option value="" disabled selected>Selecione o dia do atendimento</option>
                 </select>
@@ -153,7 +153,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
             </div>
             <div class="form-row mt-2">
               <div class="col-md-6">
-                <label for="servico">Tipo de Serviço</label>
+                <label for="servico">Tipo de Serviço *</label>
                 <select name="servico" class="form-control">
                   @foreach($servicos as $servico)
                     <option value="{{ $servico }}">{{ $servico }}</option>

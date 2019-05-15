@@ -1,7 +1,0 @@
-Ctrl + D = Seleciona a próxima seleção igual à seleção atual
-
-Ctrl + W = Fecha uma única Tab
-
-Ctrl + 0 = Foca no sidebar do projeto
-
-Ctrl + Pg Up / Ctrl + Pg Down = Alterna entre as Tabs
