@@ -64,7 +64,7 @@ use \App\Http\Controllers\Helper;
     </div>
     <div class="row">
       <div class="col-lg-3 col-sm-6 pb-15-992">
-        <a href="/cartilha-do-representante" class="d-block h-100" target="_blank">
+        <a href="/cartilha-do-representante" class="d-block h-100">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/open-book.png') }}" class="inside-img" />
