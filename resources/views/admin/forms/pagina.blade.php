@@ -63,7 +63,7 @@
             <option value="">Sem Categoria</option>
             @foreach($categorias as $categoria)
                 @if(isset($resultado))
-                    @if ($categoria->idpaginacategoria == $resultado->idcategoria)
+                    @if ($categoria->idpaginacategoria == $resultado->idpaginacategoria)
                     <option value="{{ $categoria->idpaginacategoria }}" selected>{{ $categoria->nome }}</option>
                     @else
                     <option value="{{ $categoria->idpaginacategoria }}" >{{ $categoria->nome }}</option>
