@@ -16,10 +16,6 @@ use \App\Http\Controllers\Helper;
         <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
         <link href="{{ asset('/css/datepicker.css') }}" rel="stylesheet">
         <link href="{{ asset('/css/site.css') }}" rel="stylesheet">
-      
-        <!-- Start of core-sp Zendesk Widget script -->
-        <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=bde53457-be61-41cc-93d2-d1d7a0d4a6fa"> </script>
-        <!-- End of core-sp Zendesk Widget script -->
     </head>
     <body>
 
