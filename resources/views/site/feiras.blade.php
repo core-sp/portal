@@ -21,7 +21,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
-            <h4 class="stronger">Notícias sobre feiras</h4>
+            <h4 class="stronger">Feiras com participação do CORE-SP</h4>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>

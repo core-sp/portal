@@ -97,7 +97,7 @@
                 <option value="">Nulo</option>
                 @foreach($status as $s)
                     @if(isset($resultado))
-                        @if($resultado->staus == $s)
+                        @if($resultado->status == $s)
                         <option value="{{ $s }}" selected>{{ $s }}</option>
                         @else
                         <option value="{{ $s }}">{{ $s }}</option>
