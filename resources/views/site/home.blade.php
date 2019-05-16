@@ -231,7 +231,7 @@ use \App\Http\Controllers\Helper;
             <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
             <p class="branco light">O Core-SP traz benefícios diferenciados para Representantes Comerciais</p>
             <div>
-              <a href="#" class="btn-beneficios">saiba mais</a>
+              <a href="/programa-de-beneficios" class="btn-beneficios">saiba mais</a>
             </div>
           </div>
         </div>
