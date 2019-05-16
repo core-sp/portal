@@ -1,4 +1,4 @@
-$(document).ready(function(){	
+$(document).ready(function(){
 	// Máscaras
 	$('#datepicker').mask("99/99/9999");
 	$('.cpfInput').mask('999.999.999-99');
