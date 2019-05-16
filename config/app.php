@@ -166,7 +166,6 @@ return [
         /*
          * Package Service Providers...
          */
-        App\Providers\HorizonServiceProvider::class,
 
 
         /*
