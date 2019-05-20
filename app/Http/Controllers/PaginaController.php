@@ -131,7 +131,14 @@ class PaginaController extends Controller
         } else {
             $slug = Str::slug($request->input('titulo'), '-');
         }
-
+        $countTitulo = Pagina::select('slug')
+            ->where('slug',$slug)
+            ->count();
+        if($countTitulo >= 1) {
+            return redirect('/admin/paginas')
+                ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar a página. Já existe uma página com esse nome.')
+                ->with('class', 'alert-danger');
+        }
         $pagina = new Pagina();
         $pagina->titulo = $request->input('titulo');
         $pagina->subtitulo = $request->input('subtitulo');
