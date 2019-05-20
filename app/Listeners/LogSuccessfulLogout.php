@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Logout;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LogSuccessfulLogout
 {
@@ -27,6 +28,6 @@ class LogSuccessfulLogout
      */
     public function handle(Logout $event)
     {
-        info($event->user->nome.' (usuário '.$event->user->idusuario.') desconectou-se do painel de administrador.');
+        Log::channel('usuarios')->info($event->user->nome.' (usuário '.$event->user->idusuario.') desconectou-se do painel de administrador.');
     }
 }
