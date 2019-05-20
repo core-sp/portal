@@ -6,6 +6,7 @@ use App\Events\CrudEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CrudEventListener
 {
@@ -29,6 +30,6 @@ class CrudEventListener
     {
         $nome = Auth::user()->nome;
         $id = Auth::id();
-        info($nome.' (usuário '.$id.') '.$event->action.' *'.$event->model.'* (id: '.$event->id.')');
+        Log::channel('usuarios')->info($nome.' (usuário '.$id.') '.$event->action.' *'.$event->model.'* (id: '.$event->id.')');
     }
 }
