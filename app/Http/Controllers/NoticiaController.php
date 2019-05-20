@@ -131,10 +131,20 @@ class NoticiaController extends Controller
             $categoria = null;
         else
             $categoria = $request->input('categoria');
+        // Conta se título de notícia já existe
+        $slug = Str::slug($request->input('titulo'), '-');
+        $countTitulo = Noticia::select('slug')
+            ->where('slug',$slug)
+            ->count();
+        if($countTitulo >= 1) {
+            return redirect('/admin/noticias')
+                ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar, pois já existe uma notícia com esse nome.')
+                ->with('class', 'alert-danger');
+        }
         // Inputa dados no BD
         $noticia = new Noticia();
         $noticia->titulo = $request->input('titulo');
-        $noticia->slug = Str::slug($request->input('titulo'), '-');
+        $noticia->slug = $slug;
         $noticia->img = $request->input('img');
         $noticia->conteudo = $request->input('conteudo');
         $noticia->publicada = $publicada;
