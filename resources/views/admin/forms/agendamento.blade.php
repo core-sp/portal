@@ -28,7 +28,25 @@
                 </div>
                 @endif
             </div>
-            <div class="col-sm-3">
+            <div class="col">
+                <label for="email">Email</label>
+                <input type="text"
+                    class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                    placeholder="Email"
+                    name="email"
+                    @if(isset($resultado))
+                    value="{{ $resultado->email }}"
+                    @endif
+                    />
+                @if($errors->has('email'))
+                <div class="invalid-feedback">
+                {{ $errors->first('email') }}
+                </div>
+                @endif
+            </div>
+        </div>
+        <div class="form-row mt-2">
+            <div class="col">
                 <label for="CPF">CPF</label>
                 <input type="text"
                     class="form-control {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
@@ -44,7 +62,7 @@
                 </div>
                 @endif
             </div>
-            <div class="col-sm-3">
+            <div class="col">
                 <label for="celular">Celular</label>
                 <input type="text"
                     class="form-control {{ $errors->has('celular') ? 'is-invalid' : '' }}"
