@@ -9,6 +9,10 @@ use App\Http\Controllers\ControleController;
 
 class HorizonServiceProvider extends HorizonApplicationServiceProvider
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Bootstrap any application services.
      *
@@ -16,7 +20,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     public function boot()
     {
-        $this->middleware('auth');
+        //
     }
 
     /**
