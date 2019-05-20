@@ -58,7 +58,7 @@ use \App\Http\Controllers\Helper;
             <h4 class="pr-3 ml-1">Espaço do Representante</h4>
           </blockquote>
           <h5 class="float-right cinza-claro-bg">
-            <a href="#"><i class="fas fa-user icon-title"></i> Acessar o portal</a>
+            <a href="/portal"><i class="fas fa-user icon-title"></i> Acessar o portal</a>
           </h5>
         </div>
       </div>
@@ -118,7 +118,7 @@ use \App\Http\Controllers\Helper;
       <div class="col-12">
         <div class="text-center novo-core-box">
           <h2 class="stronger branco text-uppercase">um novo core-sp para você!</h2>
-          <a href="#" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
+          <a href="/agenda" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
           <br class="show-576 br-novo-core" />
           <a href="/concursos" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
           <br class="show-768 br-novo-core" />
