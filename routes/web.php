@@ -168,6 +168,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/filtro', 'AgendamentoController@index');
     Route::get('/editar/{id}', 'AgendamentoController@edit');
     Route::put('/editar/{id}', 'AgendamentoController@update');
+    Route::post('/reenviar-email/{id}', 'AgendamentoController@reenviarEmail');
     // Lida com bloqueios
     Route::get('/bloqueios', 'AgendamentoBloqueioController@index')->name('agendamentobloqueios.lista');
     Route::get('/bloqueios/criar', 'AgendamentoBloqueioController@create');

@@ -3,6 +3,10 @@
     $status = App\Http\Controllers\Helpers\AgendamentoControllerHelper::status();
     use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 @endphp
+<div class="container pt-3 pl-3">
+{{ AgendamentoControllerHelper::txtAgendamento($resultado->dia, $resultado->hora, $resultado->status, $resultado->protocolo, $resultado->idagendamento) }}
+</div>
+<hr class="mb-0">
 <form role="form" method="POST">
     @csrf
     {{ method_field('PUT') }}
@@ -107,11 +111,6 @@
                     @endif
                 @endforeach
                 </select>
-            </div>
-        </div>
-        <div class="form-row mt-3 text-right">
-            <div class="col">
-                {{ AgendamentoControllerHelper::txtAgendamento($resultado->dia, $resultado->hora, $resultado->status, $resultado->protocolo) }}
             </div>
         </div>
     </div>

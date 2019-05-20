@@ -107,7 +107,7 @@ class AgendamentoControllerHelper extends Controller
         return $status;
     }
 
-    public static function txtAgendamento($dia, $hora, $status, $protocolo)
+    public static function txtAgendamento($dia, $hora, $status, $protocolo, $id)
     {
         $now = date('Y-m-d');
         if($now > $dia) {
@@ -116,7 +116,13 @@ class AgendamentoControllerHelper extends Controller
             else
                 echo "<p class='mb-0'><i>* Agendamento realizado no dia ".Helper::onlyDate($dia).", às ".$hora."</i></p>";
         } else {
-            echo "<p class='mb-0'><i>* Agendamento confirmado para o dia ".Helper::onlyDate($dia).", às ".$hora.". Para cancela-lo, <a href='/agendamento-consulta/busca?protocolo=".str_replace('AGE-','',$protocolo)."' target='_blank'>clique aqui.</a></i></p>";
+            // Botão de reenviar email
+            $botao = '<form method="POST" action="/admin/agendamentos/reenviar-email/'.$id.'" class="d-inline">';
+            $botao .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $botao .= '<input type="submit" class="btn btn-sm btn-default" value="Reenviar email de confirmação"></input>';
+            $botao .= '</form>';
+            $cancelar = " <a href='/agendamento-consulta/busca?protocolo=".str_replace('AGE-','',$protocolo)."' class='btn btn-sm btn-danger' target='_blank'>Cancelar agendamento</a>";
+            echo $botao.$cancelar;
         }
     }
 }
