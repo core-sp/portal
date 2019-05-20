@@ -312,6 +312,7 @@ class AgendamentoController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $regras = [
             'nome' => 'required|max:191',
+            'email' => 'required|max:191',
             'cpf' => 'required|max:191',
             'celular' => 'required|max:191',
             'regional' => 'max:191',
@@ -327,6 +328,7 @@ class AgendamentoController extends Controller
 
         $agendamento = Agendamento::find($id);
         $agendamento->nome = $request->input('nome');
+        $agendamento->email = $request->input('email');
         $agendamento->cpf = $request->input('cpf');
         $agendamento->celular = $request->input('celular');
         $agendamento->idregional = $request->input('regional');
