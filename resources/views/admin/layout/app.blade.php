@@ -36,6 +36,11 @@
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="/admin/chamados/criar" class="nav-link">Contate o CTI</a>
               </li>
+              @if(ControleController::mostraStatic(['1']))
+              <li class="nav-item d-none d-sm-inline-block">
+                <a href="/horizon" class="nav-link" target="_blank">Horizon</a>
+              </li>
+              @endif
             </ul>
 
             <ul class="navbar-nav ml-auto">

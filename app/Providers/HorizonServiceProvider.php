@@ -9,10 +9,6 @@ use App\Http\Controllers\ControleController;
 
 class HorizonServiceProvider extends HorizonApplicationServiceProvider
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
     /**
      * Bootstrap any application services.
      *
@@ -20,7 +16,13 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     public function boot()
     {
-        //
+        Horizon::auth(function($request) {
+            if(!in_array(session('idperfil'), ['1'])){
+                abort(403);
+            } else {
+                return true;
+            }
+        });
     }
 
     /**

@@ -149,7 +149,7 @@ return [
             ],
         ],
 
-        'development' => [
+        'testing' => [
             'supervisor-1' => [
                 'connection' => 'redis',
                 'queue' => ['default'],
