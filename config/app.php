@@ -41,6 +41,8 @@ return [
 
     'debug' => env('APP_DEBUG', false),
 
+    'log_max_files' => 0,
+
     /*
     |--------------------------------------------------------------------------
     | Application URL

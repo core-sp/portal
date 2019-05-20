@@ -48,7 +48,7 @@ return [
 
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
+            'path' => storage_path('logs/erros/laravel.log'),
             'level' => 'debug',
             'days' => 14,
         ],
@@ -88,6 +88,17 @@ return [
         'errorlog' => [
             'driver' => 'errorlog',
             'level' => 'debug',
+        ],
+
+        'usuarios' => [
+            'driver' => 'stack',
+            'channels' => ['diario'],
+        ],
+
+        'diario' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/usuarios/'.date('Y/m').'/laravel.log'),
+            'days' => 0,
         ],
     ],
 
