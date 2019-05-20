@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 use App\Http\Controllers\ControleController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AgendamentoMailGuest;
 use App\Events\CrudEvent;
 
 class AgendamentoController extends Controller
@@ -336,6 +338,32 @@ class AgendamentoController extends Controller
         event(new CrudEvent('agendamento', 'editou', $agendamento->idagendamento));
         return redirect('/admin/agendamentos')
             ->with('message', '<i class="icon fa fa-check"></i>Agendamento editado com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function reenviarEmail($id)
+    {
+        $resultado = Agendamento::find($id);
+        // Mensagem do email
+        $agradece = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
+        $agradece .= "<br>";
+        $agradece .= "Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência e com o número de protocolo em mãos.";
+        $agradece .= "<br><br>";
+        $agradece .= "<strong>Protocolo:</strong> ".$resultado->protocolo;
+        $agradece .= "<br><br>";
+        $agradece .= "<strong>Detalhes do agendamento</strong><br>";
+        $agradece .= "Nome: ".$resultado->nome."<br>";
+        $agradece .= "CPF: ".$resultado->cpf."<br>";
+        $agradece .= "Dia: ".Helper::onlyDate($resultado->dia)."<br>";
+        $agradece .= "Horário: ".$resultado->hora."<br>";
+        $agradece .= "Cidade: ".$resultado->regional->regional."<br>";
+        $agradece .= "Endereço: ".$resultado->regional->endereco.", ".$resultado->regional->numero;
+        $agradece .= " - ".$resultado->regional->complemento."<br>";
+        $agradece .= "Serviço: ".$resultado->tiposervico.'<br>';
+        // Manda o email
+        Mail::to($resultado->email)->send(new AgendamentoMailGuest($agradece));
+        return redirect('/admin/agendamentos')
+            ->with('message', '<i class="icon fa fa-check"></i>Email enviado com sucesso!')
             ->with('class', 'alert-success');
     }
 }
