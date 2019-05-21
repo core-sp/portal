@@ -20,7 +20,9 @@ class SiteController extends Controller
                 ->limit(3)
                 ->get();
         });
-    	return view('site.home', compact('noticias'));
+        return response()
+            ->view('site.home', compact('noticias'))
+            ->header('Cache-Control','public,max-age=900');
     }
 
     public function busca(Request $request)
@@ -35,26 +37,30 @@ class SiteController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $resultados = collect();
-        $paginas = Pagina::select('titulo','slug','created_at','conteudo')
-            ->where('titulo','LIKE','%'.$busca.'%')
-            ->orWhere('conteudo','LIKE','%'.$busca.'%')
-            ->limit(10)
-            ->get();
-        $noticias = Noticia::select('titulo','slug','created_at','conteudo')
-            ->where('titulo','LIKE','%'.$busca.'%')
-            ->orWhere('conteudo','LIKE','%'.$busca.'%')
-            ->limit(10)
-            ->get();
-        foreach($paginas as $pagina) {
-            $pagina->tipo = "Página";
-            $resultados->push($pagina);
+        if(isset($busca)) {
+            $resultados = collect();
+            $paginas = Pagina::select('titulo','slug','created_at','conteudo')
+                ->where('titulo','LIKE','%'.$busca.'%')
+                ->orWhere('conteudo','LIKE','%'.$busca.'%')
+                ->limit(10)
+                ->get();
+            $noticias = Noticia::select('titulo','slug','created_at','conteudo')
+                ->where('titulo','LIKE','%'.$busca.'%')
+                ->orWhere('conteudo','LIKE','%'.$busca.'%')
+                ->limit(10)
+                ->get();
+            foreach($paginas as $pagina) {
+                $pagina->tipo = "Página";
+                $resultados->push($pagina);
+            }
+            foreach($noticias as $noticia) {
+                $noticia->tipo = "Notícia";
+                $resultados->push($noticia);
+            }
+            return view('site.busca', compact('busca', 'resultados'));
+        } else {
+            return redirect()->route('site.home');
         }
-        foreach($noticias as $noticia) {
-            $noticia->tipo = "Notícia";
-            $resultados->push($noticia);
-        }
-        return view('site.busca', compact('busca', 'resultados'));
     }
 
     public function feiras()

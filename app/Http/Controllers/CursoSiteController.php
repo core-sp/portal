@@ -19,7 +19,9 @@ class CursoSiteController extends Controller
                 ->where('publicado','Sim')
                 ->paginate(10);
         });
-        return view('site.cursos', compact('cursos'));
+        return response()
+            ->view('site.cursos', compact('cursos'))
+            ->header('Cache-Control','public,max-age=900');
     }
 
     public function cursosAnterioresView()
@@ -28,7 +30,9 @@ class CursoSiteController extends Controller
         $cursos = Curso::where('datarealizacao','<',$now)
             ->where('publicado','Sim')
             ->paginate(10);
-        return view('site.cursos-anteriores', compact('cursos'));
+        return response()
+            ->view('site.cursos-anteriores', compact('cursos'))
+            ->header('Cache-Control','public,max-age=900');
     }
 
     public static function getNoticia($id)
@@ -52,6 +56,8 @@ class CursoSiteController extends Controller
     public function cursoView($id)
     {
         $curso = Curso::find($id);
-        return view('site.curso', compact('curso'));
+        return response()
+            ->view('site.curso', compact('curso'))
+            ->header('Cache-Control','public,max-age=9000');
     }
 }

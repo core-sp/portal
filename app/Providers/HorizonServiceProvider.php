@@ -16,7 +16,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     public function boot()
     {
-        Horizon::auth(function($request) {
+        Horizon::auth(function() {
             if(!in_array(session('idperfil'), ['1'])){
                 abort(403);
             } else {
@@ -34,11 +34,6 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     protected function gate()
     {
-        Gate::define('viewHorizon', function ($user) {
-            return in_array($user->email, [
-                'desenvolvimento@core-sp.org.br',
-                'edson@core-sp.org.br'
-            ]);
-        });
+        //
     }
 }

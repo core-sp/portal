@@ -22,6 +22,14 @@ class UserTableSeeder extends Seeder
         $usuario->save();
 
         $usuario = new User();
+        $usuario->nome = 'Administrador';
+        $usuario->email = 'admin@admin';
+        $usuario->idregional = 1;
+        $usuario->idperfil = 1;
+        $usuario->password = bcrypt('Admin102030!@#');
+        $usuario->save();
+
+        $usuario = new User();
         $usuario->nome = 'Edson Yassudi Miyashiro';
         $usuario->email = 'edson@core-sp.org.br';
         $usuario->idregional = 1;

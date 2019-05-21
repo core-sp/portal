@@ -14,12 +14,16 @@ class RegionalSiteController extends Controller
         $regionais = Cache::remember('regionaisSite', 240, function(){
             return $regionais = Regional::all();
         });
-        return view('site.regionais', compact('regionais'));
+        return response()
+            ->view('site.regionais', compact('regionais'))
+            ->header('Cache-Control','public,max-age=900');
     }
 
     public function show($id)
     {
         $resultado = Regional::find($id);
-    	return view('site.regional', compact('resultado'));
+        return response()
+            ->view('site.regional', compact('resultado'))
+            ->header('Cache-Control','public,max-age=900');
     }
 }
