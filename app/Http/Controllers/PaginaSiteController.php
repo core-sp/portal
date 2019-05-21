@@ -13,7 +13,9 @@ class PaginaSiteController extends Controller
         $pagina = Pagina::select('titulo','img','subtitulo','conteudo')
             ->where('slug', $slug)->first();
         if(isset($pagina)) {
-            return view('site.pagina', compact('pagina'));
+            return response()
+                ->view('site.pagina', compact('pagina'))
+                ->header('Cache-Control','public,max-age=36000');
         } else {
             abort(404);
         }   
@@ -25,7 +27,9 @@ class PaginaSiteController extends Controller
         $pagina = Pagina::select('titulo','img','subtitulo','conteudo')
             ->where('slug', $one)->first();
         if(isset($pagina)) {
-            return view('site.pagina', compact('pagina'));
+            return response()
+                ->view('site.pagina', compact('pagina'))
+                ->header('Cache-Control','public,max-age=36000');
         } else {
             abort(404);
         }

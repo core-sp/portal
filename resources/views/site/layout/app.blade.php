@@ -13,9 +13,9 @@ use \App\Http\Controllers\Helper;
         <title>CORE-SP | {{ $title }}</title>
         <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
-        <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
-        <link href="{{ asset('/css/datepicker.css') }}" rel="stylesheet">
-        <link href="{{ asset('/css/site.css') }}" rel="stylesheet">
+        <link type="text/css" href="{{ asset('/css/app.css') }}" rel="stylesheet">
+        <link type="text/css" href="{{ asset('/css/datepicker.css') }}" rel="stylesheet">
+        <link type="text/css" href="{{ asset('/css/site.css') }}" rel="stylesheet">
     </head>
     <body>
 

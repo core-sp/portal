@@ -30,7 +30,9 @@ class NoticiaSiteController extends Controller
                 ->where('idnoticia','!=',$id)
                 ->whereNull('idregional')
                 ->get();
-            return view('site.noticia', compact('noticia', 'tres', 'id'));
+            return response()
+                ->view('site.noticia', compact('noticia', 'tres', 'id'))
+                ->header('Cache-Control','public,max-age=900');
         } else {
             abort(404);
         }

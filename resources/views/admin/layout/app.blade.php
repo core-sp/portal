@@ -14,8 +14,8 @@
         <title>CORE-SP | Portal</title>
         <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
-        <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
-        <link href="{{ asset('/css/custom.css') }}" rel="stylesheet">
+        <link type="text/css" href="{{ asset('/css/app.css') }}" rel="stylesheet">
+        <link type="text/css" href="{{ asset('/css/custom.css') }}" rel="stylesheet">
     </head>
     <body class="hold-transition sidebar-mini">
 
@@ -35,6 +35,9 @@
               </li>
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="/admin/chamados/criar" class="nav-link">Contate o CTI</a>
+              </li>              
+              <li class="nav-item d-none d-sm-inline-block">
+                <a href="/admin/docs" class="nav-link" target="_blank">Documentação</a>
               </li>
               @if(ControleController::mostraStatic(['1']))
               <li class="nav-item d-none d-sm-inline-block">
