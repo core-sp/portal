@@ -11,6 +11,7 @@
 - [Cursos](#cursos)
 - [Balcão de Oportunidades](#balcao-de-oportunidades)
 - [Agendamentos](#agendamentos)
+- [Licitações / Concursos](#licitacoes-concursos)
 
 <a name="visao-geral"></a>
 ## Visão Geral
@@ -60,13 +61,26 @@ Além de criar, editar e deletar cursos, a plataforma oferece todo o suporte par
 
 <p class="pb-3">Para se trabalhar com o Balcão de Oportunidades, é necessário cadastrar tanto as empresas quanto as oportunidades em momentos separados.</p>
 <p class="pb-3">As oportunidades são inteiramente dependentes das empresas, e só podem ser criadas se vinculadas à alguma empresa.</p>
-<p>Por padrão, uma oportunidade dura 90 dias, e exige alterações manuais para mudança de status.</p>
+<blockquote class="alert is-warning">
+    <p>A mudança de status de uma oportunidade, se necessário, deve ser feita manualmente.</p>
+</blockquote>
 
 <a name="agendamentos"></a>
 ## Agendamentos / Bloqueios
+
 <p class="pb-3">Todo o gerenciamento de agendamentos / bloqueios é realizado dentro do painel de administrador do Portal CORE-SP. Regras de utilização:</p>
 <ul>
     <li style="line-height:2;">O número de atendimentos por horário para cada seccional é sempre relativo à quantidade de usuários com o perfil "Atendimento" daquela seccional - 1. e.g: Caso existam 4 atendentes em uma determinada seccional será possível agendar 3 atendimentos por horário (4 - 1 = 3). <i>Quando houver apenas um atendente, este número será fixado em 1.</i></li>
     <li style="line-height:2;">O atendimento será vinculado ao atendente que pressionar o botão "Confirmar presença" na tela de atendimentos no painel de Administrador.</li>
     <li style="line-height:2;">Os bloqueios poderão ser realizados à qualquer momento, e deverão especificar as datas exatas de início e términos. Para aplicar bloqueios indefinidamente, basta deixar os campos de data em branco.</li>
+    <li style="line-height:2;">As horas selecionadas no bloqueio sempre são aplicadas à regra. e.g: Bloqueio das 12:00 às 13:00 irá bloquear os horários 12:00, 12:30 e 13:00.</li>
 </ul>
+
+<a name="licitacoes-concursos"></a>
+## Licitações / Concursos
+
+Além de visualizar a lista de licitações / concursos já publicadas(os), é possível criar, editar e deletar licitações / concursos.
+
+<blockquote class="alert is-warning">
+    <p>A mudança de status de um objeto, se necessária, deve ser feita manualmente.</p>
+</blockquote>

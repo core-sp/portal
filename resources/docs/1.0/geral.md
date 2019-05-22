@@ -10,6 +10,7 @@
 - Linguagem de programação: <strong>PHP</strong> >= 7.2.14
 - Banco de dados: <strong>MySQL</strong> >= 5.7.24
 - Servidor web: <strong>Apache</strong> >= 2.4.39
+- Armazenamento de dados na memória: <strong>Redis</strong> >= 3.0.6
 - Framework de back-end: <strong>Laravel</strong> >= 5.8
 - Gerenciador de pacotes de back-end: <strong>Composer</strong> >= 1.8.5
 - Framework de front-end: <strong>Node.js</strong> >= 10.15.3
