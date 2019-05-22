@@ -2,9 +2,12 @@
 
 ---
 
-- [Documentação](#documentacao)
+- [Tecnologias](/{{route}}/{{version}}/geral/#tecnologias)
+- [Aplicação](/{{route}}/{{version}}/aplicacao)
+- [Monitoramento](/{{route}}/{{version}}/monitoramento)
+- [Logs](/{{route}}/{{version}}/logs)
 
-<a name="documentacao"></a>
+<a name="/admin/docs/documentacao"></a>
 ## Documentação
 
-Documentação do Portal CORE-SP.
+Documentação da versão 1.0 do Portal CORE-SP.

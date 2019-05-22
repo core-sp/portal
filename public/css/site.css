@@ -389,12 +389,32 @@ strong, .bold {
 
 .aai h6 {
 	line-height: 1.1;
-	font-size: .9rem;
+	font-size: .85rem;
 }
 
 .aai img {
-	height: 42px;
+	height: 38px;
 	border-radius: 5px;
+}
+
+.btn-acessibilidade {
+	min-height: 29px;
+	padding-left: .35rem;
+	padding-right: .35rem;
+}
+
+.btn-acessibilidade h6 {
+	font-weight: 900;
+	line-height: 1;
+	font-size: .9rem;
+}
+
+.btn-access {
+	line-height: 1.4;
+}
+
+.btn-access i {
+	font-size: .8rem;
 }
 
 /*

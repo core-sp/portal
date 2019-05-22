@@ -54,16 +54,22 @@ use \App\Http\Controllers\Helper;
             <div class="col-lg-4 align-self-end mt-15-992">
               <div class="mexe-tamanho m-auto text-center">
                 <div class="acessibilidade mb-2 center-992 text-right">
-                  <button type="button" class="btn btn-sm btn-light" id="btn-contrast">
+                  <button type="button" class="btn btn-sm btn-light btn-acessibilidade" id="increase-font">
+                    <h6>A+</h6>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-light btn-acessibilidade" id="decrease-font">
+                    <h6>A-</h6>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-light btn-access" id="btn-contrast">
                     <i class="fas fa-adjust"></i>
                   </button>
                   <a href="/mapa-do-site">
-                    <button type="button" class="btn btn-sm btn-light">
+                    <button type="button" class="btn btn-sm btn-light btn-access">
                       <i class="fas fa-map-marker-alt"></i>
                     </button>
                   </a>
                   <a href="/acessibilidade">
-                    <button type="button" class="btn btn-sm btn-light">
+                    <button type="button" class="btn btn-sm btn-light btn-access">
                       <i class="fas fa-wheelchair"></i>
                     </button>
                   </a>
@@ -108,6 +114,7 @@ use \App\Http\Controllers\Helper;
                   <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a href="/legislacao" class="dropdown-item">Legislação</a>
+                    <a href="/conselho" class="dropdown-item">Conselho</a>
                   </div>
                 </li>
                 <li class="nav-item">
