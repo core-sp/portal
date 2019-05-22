@@ -252,7 +252,9 @@ use \App\Http\Controllers\Helper;
         </div>
         <div class="row">
           <div class="col-sm-8">
-            <img src="{{ asset('img/computer.png') }}" />
+            <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
+              <img src="{{ asset('img/computer.png') }}" />
+            </a>
           </div>
           <div class="col-sm-4 hide-576 eouv-imgs align-self-center pl-3 center-992">
             <div class="m-auto pb-3">
@@ -291,12 +293,14 @@ use \App\Http\Controllers\Helper;
         </div>
         <div id="calendario" class="row">
           <div class="col-sm-8">
-            <img src="{{ asset('img/calendario.png') }}" />
+            <a href="/calendario">
+              <img src="{{ asset('img/calendario.png') }}" />
+            </a>
           </div>
           <div class="col-sm-4 hide-576 align-self-center text-right pr-4">
             <div class="calendario-txt">
               <p class="preto">Confira o calendário completo de<br>atendimento e expediente <br>de sua região.</p>
-              <a href="#" class="btn-calendario mt-4">
+              <a href="/calendario" class="btn-calendario mt-4">
                 <h4 class="normal">confira</h4>
               </a>
             </div>
