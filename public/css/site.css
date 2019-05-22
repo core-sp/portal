@@ -94,6 +94,10 @@ img {
 	height: auto;
 }
 
+img.lazy {
+	display: block;
+}
+
 a {
 	color: inherit;
 	text-decoration: none;

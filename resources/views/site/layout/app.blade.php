@@ -275,6 +275,7 @@ use \App\Http\Controllers\Helper;
 
       <script type="text/javascript" src="{{ asset('/js/app.js') }}"></script>
       <script type="text/javascript" src="{{ asset('/js/jquery-ui.min.js') }}"></script>
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js"></script>
       <script type="text/javascript" src="{{ asset('/js/jquery.mask.js') }}"></script>
       <script type="text/javascript" src="{{ asset('/js/site.js') }}"></script>
       <script type="text/javascript" src="{{ asset('/js/acessibilidade.js') }}"></script>

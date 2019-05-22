@@ -225,7 +225,7 @@ use \App\Http\Controllers\Helper;
       <div class="col-12">
         <div class="beneficios-box row nomargin">
           <div class="col-lg-5 hide-992">
-            <img src="{{ asset('img/benef-v2.png') }}" id="computer" />
+            <img class="lazy" data-src="{{ asset('img/benef-v2.png') }}" id="computer" />
           </div>
           <div class="col-lg-7 beneficios-txt center-992">
             <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
@@ -253,7 +253,7 @@ use \App\Http\Controllers\Helper;
         <div class="row">
           <div class="col-sm-8">
             <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-              <img src="{{ asset('img/computer.png') }}" />
+              <img class="lazy" data-src="{{ asset('img/computer.png') }}" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 eouv-imgs align-self-center pl-3 center-992">
@@ -294,7 +294,7 @@ use \App\Http\Controllers\Helper;
         <div id="calendario" class="row">
           <div class="col-sm-8">
             <a href="/calendario">
-              <img src="{{ asset('img/calendario.png') }}" />
+              <img class="lazy" data-src="{{ asset('img/calendario.png') }}" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 align-self-center text-right pr-4">

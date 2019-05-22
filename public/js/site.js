@@ -30,7 +30,7 @@ $(document).ready(function(){
 	});
 	$('.dropdown').on('hide.bs.dropdown', function() {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(200);
-	  });
+	});
 });
 
 $(window).scroll(function(){
@@ -136,3 +136,8 @@ segunda.innerHTML = primeira.innerHTML;
 		});
 	});
 })(jQuery);
+
+// Lazy-load
+$(function() {
+	$('.lazy').Lazy();
+});
