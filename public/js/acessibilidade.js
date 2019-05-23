@@ -89,6 +89,12 @@ $(document).ready(function(){
 		if(newFontP <= maxP) {
 			$('p, .home-title h5, .conteudo-txt p').css('font-size', newFontP);
 		}
+		// Change H5
+		newFontH5 = parseInt($('h5').css('font-size')) + 1;
+		maxH5 = 22;
+		if(newFontH5 <= maxH5) {
+			$('h5').css('font-size', newFontH5);
+		}
 		// Change H4
 		newFontH4 = parseInt($('h4').css('font-size')) + 1;
 		maxH4 = 26;
@@ -109,6 +115,12 @@ $(document).ready(function(){
 		minP = 12;
 		if(newMinFontP > minP) {
 			$('p, .home-title h5, .conteudo-txt p').css('font-size', newMinFontP);
+		}
+		// Change H5
+		newMinFontH5 = parseInt($('h5').css('font-size')) - 1;
+		minH5 = 14;
+		if(newMinFontH5 > minH5) {
+			$('h5').css('font-size', newMinFontH5);
 		}
 		// Change H4
 		newMinFontH4 = parseInt($('h4').css('font-size')) - 1;
