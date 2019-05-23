@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
+use App\Rules\Cpf;
 
 class AgendamentoSiteController extends Controller
 {
@@ -107,7 +108,7 @@ class AgendamentoSiteController extends Controller
     {
         $regras = [
             'nome' => 'required|max:191',
-            'cpf' => 'required|max:191',
+            'cpf' => ['required', 'max:191', new Cpf],
             'email' => 'required|max:191',
             'celular' => 'max:191',
             'dia' => 'required',

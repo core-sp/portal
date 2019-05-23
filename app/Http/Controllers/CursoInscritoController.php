@@ -12,6 +12,7 @@ use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CursoInscritoMailGuest;
+use App\Rules\Cpf;
 
 class CursoInscritoController extends Controller
 {
@@ -93,7 +94,7 @@ class CursoInscritoController extends Controller
         ControleController::autoriza($this->class, 'create');
         $idcurso = $request->input('idcurso');
         $regras = [
-            'cpf' => 'required|max:191|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL',
+            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191',
             'email' => 'email|max:191',
@@ -141,7 +142,7 @@ class CursoInscritoController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $idcurso = $request->input('idcurso');
         $regras = [
-            'cpf' => 'required|max:191|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL',
+            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191',
             'email' => 'email|max:191',
@@ -200,7 +201,7 @@ class CursoInscritoController extends Controller
     {
         $idcurso = $request->input('idcurso');
         $regras = [
-            'cpf' => 'required|max:191|unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL',
+            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191',
             'email' => 'email|max:191',

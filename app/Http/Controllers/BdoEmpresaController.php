@@ -8,6 +8,7 @@ use App\BdoEmpresa;
 use App\BdoOportunidade;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use App\Rules\Cnpj;
 
 class BdoEmpresaController extends Controller
 {
@@ -121,7 +122,7 @@ class BdoEmpresaController extends Controller
         ControleController::autoriza($this->class, 'create');
         $regras = [
             'segmento' => 'max:191',
-            'cnpj' => 'required|max:191|unique:bdo_empresas',
+            'cnpj' => ['required', 'max:191', 'unique:bdo_empresas', new Cnpj],
             'razaosocial' => 'required|max:191',
             'capitalsocial' => 'max:191',
             'endereco' => 'required|max:191',
@@ -189,7 +190,7 @@ class BdoEmpresaController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $regras = [
             'segmento' => 'max:191',
-            'cnpj' => 'required|max:191|unique:bdo_empresas',
+            'cnpj' => ['required', 'max:191', 'unique:bdo_empresas', new Cnpj],
             'razaosocial' => 'required|max:191',
             'capitalsocial' => 'max:191',
             'endereco' => 'required|max:191',
