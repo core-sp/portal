@@ -1,6 +1,6 @@
 # CORE-SP
 
-Código do Portal CORE-SP
+Código aberto do Portal CORE-SP.
 
 ## Desenvolvimento
 
