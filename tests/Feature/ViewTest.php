@@ -16,14 +16,12 @@ class ViewTest extends TestCase
 {
     public function testViewAgendamento()
     {
-        $response = $this->get('/agendamento');
-        $response->assertStatus(200);
+        $this->get('/agendamento')->assertStatus(200);
     }
 
     public function testViewBdo()
     {
-        $response = $this->get('/balcao-de-oportunidades');
-        $response->assertStatus(200);
+        $this->get('/balcao-de-oportunidades')->assertStatus(200);
     }
 
     public function testViewBusca()
@@ -39,94 +37,80 @@ class ViewTest extends TestCase
     public function testViewConcurso()
     {
         $concurso = Concurso::first();
-        $response = $this->get('/concurso/'.$concurso->idconcurso);
-        $response->assertStatus(200);
+        $this->get('/concurso/'.$concurso->idconcurso)->assertStatus(200);
     }
 
     public function testViewConcursos()
     {
-        $response = $this->get('/concursos');
-        $response->assertStatus(200);
+        $this->get('/concursos')->assertStatus(200);
     }
 
     public function testViewCursoInscricao()
     {
         $curso = Curso::first();
-        $response = $this->get('/curso/inscricao/'.$curso->idcurso);
-        $response->assertStatus(200);
+        $this->get('/curso/inscricao/'.$curso->idcurso)->assertStatus(200);
     }
 
     public function testViewCurso()
     {
         $curso = Curso::first();
-        $response = $this->get('/curso/'.$curso->idcurso);
-        $response->assertStatus(200);
+        $this->get('/curso/'.$curso->idcurso)->assertStatus(200);
     }
 
     public function testViewCursosAnteriores()
     {
-        $response = $this->get('/cursos-anteriores');
-        $response->assertStatus(200);
+        $this->get('/cursos-anteriores')->assertStatus(200);
     }
 
     public function testViewCursos()
     {
-        $response = $this->get('/cursos');
-        $response->assertStatus(200);
+        $this->get('/cursos')->assertStatus(200);
     }
 
     public function testViewHome()
     {
-        $response = $this->get('/');
-        $response->assertStatus(200);
+        $this->get('/')->assertStatus(200);
     }
 
     public function testViewLicitacao()
     {
         $licitacao = Licitacao::first();
-        $response = $this->get('/licitacao/'.$licitacao->idlicitacao);
-        $response->assertStatus(200);
+        $this->get('/licitacao/'.$licitacao->idlicitacao)->assertStatus(200);
     }
 
     public function testViewLicitacoes()
     {
-        $response = $this->get('/licitacoes');
-        $response->assertStatus(200);
+        $this->get('/licitacoes')->assertStatus(200);
     }
 
     public function testViewNoticia()
     {
         $noticia = Noticia::first();
-        $response = $this->get('/noticia/'.$noticia->slug);
-        $response->assertStatus(200);
+        $this->get('/noticia/'.$noticia->slug)->assertStatus(200);
     }
 
     public function testViewNoticias()
     {
-        $response = $this->get('/noticias');
-        $response->assertStatus(200);
+        $this->get('/noticias')->assertStatus(200);
     }
 
     public function testViewPagina()
     {
         $pagina = Pagina::first();
         if(!isset($pagina->idcategoria))
-            $response = $this->get('/'.$pagina->slug);
+            $this->get('/'.$pagina->slug)->assertStatus(200);
         else
-            $response = $this->get('/'.$pagina->paginacategoria->nome.'/'.$pagina->slug);
-        $response->assertStatus(200);
+            $this->get('/'.$pagina->paginacategoria->nome.'/'.$pagina->slug)->assertStatus(200);
     }
 
     public function testViewRegionais()
     {
-        $response = $this->get('/seccionais');
-        $response->assertStatus(200);
+        $this->get('/seccionais')->assertStatus(200);
     }
 
     public function testViewRegional()
     {
         $regional = Regional::first();
-        $response = $this->get('/seccional/'.$regional->idregional);
-        $response->assertStatus(200);
+        $this->get('/seccional/'.$regional->idregional)->assertStatus(200);
     }
 }
