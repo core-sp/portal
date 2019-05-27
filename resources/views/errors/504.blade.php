@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => '500'])
+@extends('site.layout.app', ['title' => '504'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Erro 500
+          Erro 504
         </h1>
       </div>
     </div>
@@ -20,7 +20,7 @@
     @if($exception->getMessage())
       {{ $exception->getMessage() }}
     @else
-      Oops, houve algum problema!
+      Oops, algo demorou mais do que o esperado!
     @endif
   </div>
 </section>

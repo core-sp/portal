@@ -1,1 +1,1 @@
-<img src="http://127.0.0.1:8000/img/brasao.png" alt="CORE-SP">
+<img src="{{asset('img/brasao.png')}}" alt="CORE-SP">

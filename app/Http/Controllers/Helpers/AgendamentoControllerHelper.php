@@ -17,6 +17,8 @@ class AgendamentoControllerHelper extends Controller
             ->whereHas('perfil', function($q) {
                 $q->where('nome','=','Atendimento');
             })->count();
+        if($count === 0)
+            $count = 1;
         return $count;
     }
 

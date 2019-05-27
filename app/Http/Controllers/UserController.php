@@ -41,6 +41,7 @@ class UserController extends Controller
     public function resultados()
     {
         $resultados = User::leftJoin('sessoes', 'sessoes.idusuario', '=', 'users.idusuario')
+            ->select('users.idusuario','nome','email','idregional','idperfil')
             ->orderBy('sessoes.updated_at','DESC')
             ->paginate(10);
         return $resultados;
