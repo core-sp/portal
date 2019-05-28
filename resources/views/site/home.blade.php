@@ -17,6 +17,12 @@ use \App\Http\Controllers\Helper;
         </ol>
         <div class="carousel-inner h-100">
           <div class="carousel-item h-100 active">
+            <a href="/portal">
+              <img class="w-100 hide-576" src="{{ asset('img/banner-novo-portal.jpg') }}" />
+              <img class="w-100 show-576" src="{{ asset('img/banner-novo-portal-.jpg') }}" />
+            </a>
+          </div>
+          <div class="carousel-item h-100">
             <a href="/agendamento">
               <img class="w-100 hide-576" src="{{ asset('img/banner-refis.png') }}" />
               <img class="w-100 show-576" src="{{ asset('img/banner-refis-m.png') }}" />
@@ -26,12 +32,6 @@ use \App\Http\Controllers\Helper;
             <a href="/balcao-de-oportunidades">
               <img class="w-100 hide-576" src="{{ asset('img/banner-bdo.png') }}" />
               <img class="w-100 show-576" src="{{ asset('img/banner-bdo-m.png') }}" />
-            </a>
-          </div>
-          <div class="carousel-item h-100">
-            <a href="/cursos">
-              <img class="w-100 hide-576" src="{{ asset('img/banner-conexoes.png') }}" />
-              <img class="w-100 show-576" src="{{ asset('img/banner-conexoes-m.png') }}" />
             </a>
           </div>
         </div>
