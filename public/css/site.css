@@ -216,7 +216,7 @@ strong, .bold {
 }
 
 .conteudo-txt p {
-	padding-bottom: .5rem;
+	padding-bottom: 1rem;
 	line-height: 1.6;
 	font-size: 1.1rem;
 }
@@ -1398,7 +1398,7 @@ footer p {
 
 	.conteudo-txt p {
 		font-size: 1.05rem;
-		padding-bottom: .45rem;
+		padding-bottom: .95rem;
 	}
 
 }
@@ -1505,7 +1505,7 @@ footer p {
 
 	.conteudo-txt p {
 		font-size: 1rem;
-		padding-bottom: .4rem;
+		padding-bottom: .9rem;
 	}
 
 	.curso-grid {
