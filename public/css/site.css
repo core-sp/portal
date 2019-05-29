@@ -248,6 +248,13 @@ strong, .bold {
 	font-size: 1rem;
 }
 
+.conteudo-txt iframe {
+	max-width: 100%;
+	height: 409px;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
 /*
  * REGRAS DO CABEÇALHO
  */
@@ -1516,6 +1523,10 @@ footer p {
 	.novo-core-box {
 		padding: 2.5rem;
 	}
+
+	.conteudo-txt iframe {
+		height: 342px;
+	}
 	
 }
 
@@ -1714,6 +1725,10 @@ footer p {
 
 	.aai {
 		padding-top: 15px;
+	}
+
+	.conteudo-txt iframe {
+		height: 387px;
 	}
 }
 
@@ -1926,6 +1941,10 @@ footer p {
 
 	.novo-core-box {
 		padding: 1.5rem;
+	}
+
+	.conteudo-txt iframe {
+		height: 286px;
 	}
 }
 
