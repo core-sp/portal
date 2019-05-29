@@ -35,11 +35,11 @@
               </li>
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="/admin/chamados/criar" class="nav-link">Contate o CTI</a>
-              </li>              
+              </li>
+              @if(ControleController::mostraStatic(['1']))              
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="/admin/docs" class="nav-link" target="_blank">Documentação</a>
               </li>
-              @if(ControleController::mostraStatic(['1']))
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="/horizon" class="nav-link" target="_blank">Horizon</a>
               </li>
