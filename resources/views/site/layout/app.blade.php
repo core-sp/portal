@@ -114,6 +114,7 @@ use \App\Http\Controllers\Helper;
                   <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a href="/legislacao" class="dropdown-item">Legislação</a>
+                    <a href="/institucional" class="dropdown-item">Institucional</a>
                     <a href="/conselho" class="dropdown-item">Conselho</a>
                   </div>
                 </li>

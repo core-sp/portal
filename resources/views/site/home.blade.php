@@ -23,7 +23,7 @@ use \App\Http\Controllers\Helper;
             </a>
           </div>
           <div class="carousel-item h-100">
-            <a href="/agendamento">
+            <a href="/refis-2019">
               <img class="w-100 hide-576" src="{{ asset('img/banner-refis.png') }}" />
               <img class="w-100 show-576" src="{{ asset('img/banner-refis-m.png') }}" />
             </a>
