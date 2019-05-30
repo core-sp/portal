@@ -27,7 +27,7 @@
                 </larecipe-button>
             @endif
 
-            <larecipe-button tag="a" href="hhttps://github.com/arbex10/core-sp" target="__blank" type="black" class="mx-2 px-4">
+            <larecipe-button tag="a" href="https://github.com/core-sp/portal" target="__blank" type="black" class="mx-2 px-4">
                 <i class="fab fa-github"></i>
             </larecipe-button>
 
