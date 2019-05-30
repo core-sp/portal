@@ -35,13 +35,13 @@ use \App\Http\Controllers\Helper;
         <div class="container">
           <div class="row header-margin">
             <div class="col-lg-4 col-md-6 text-left center-768">
-                <a href="/"><img src="{{ asset('img/logo-e.png') }}" alt="CORE-SP" id="logo-header" /></a>
+                <a href="/"><img src="{{ asset('img/logo-core.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
               <div class="d-flex it">
                 <div class="align-right it-icon">
                   <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-                    <img src="{{ asset('img/icon_transparencia.png') }}" alt="Portal da Transparência">
+                    <img src="{{ asset('img/aai-v13.png') }}" alt="Portal da Transparência">
                   </a>
                 </div>
                 <div class="text-left align-self-center it-txt">
@@ -113,9 +113,9 @@ use \App\Http\Controllers\Helper;
                 <li class="nav-item dropdown">
                   <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a href="/legislacao" class="dropdown-item">Legislação</a>
                     <a href="/institucional" class="dropdown-item">Institucional</a>
                     <a href="/conselho" class="dropdown-item">Conselho</a>
+                    <a href="/legislacao" class="dropdown-item">Legislação</a>
                   </div>
                 </li>
                 <li class="nav-item">
@@ -127,8 +127,8 @@ use \App\Http\Controllers\Helper;
                 <li class="nav-item dropdown">
                   <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Serviços</a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a href="/servicos/agendamento" class="dropdown-item">Agendamento</a>
-                    <a href="/servicos/balcao-de-oportunidades" class="dropdown-item">Balcão de Oportunidades</a>
+                    <a href="/agendamento" class="dropdown-item">Agendamento</a>
+                    <a href="/balcao-de-oportunidades" class="dropdown-item">Balcão de Oportunidades</a>
                     <a href="/cursos" class="dropdown-item">Cursos</a>
                   </div>
                 </li>
