@@ -94,7 +94,7 @@ class RegionalController extends Controller
             'cep' => 'required|max:191',
             'telefone' => 'required|max:191',
             'funcionamento' => 'required|max:191',
-            'descricao' => 'required|max:191',
+            'descricao' => 'required',
             'complemento' => 'max:191',
             'fax' => 'max:191',
             'responsavel' => 'max:191'
