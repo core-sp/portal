@@ -72,8 +72,8 @@ $(document).ready(function(){
 		];
 		$(bgFilter).toggleClass('contraste-filter');
 
-		var str = 'logo-e';
-		var str2 = 'logo-b';
+		var str = 'logo-core';
+		var str2 = 'logo-brancore';
 		var logo = $('#logo-header').attr('src').toString();
 		if(logo.includes(str)) {
 			$('#logo-header').attr('src',$('#logo-header').attr('src').replace(str,str2));

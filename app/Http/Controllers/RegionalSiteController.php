@@ -16,7 +16,7 @@ class RegionalSiteController extends Controller
         });
         return response()
             ->view('site.regionais', compact('regionais'))
-            ->header('Cache-Control','public,max-age=900');
+            ->header('Cache-Control','no-cache');
     }
 
     public function show($id)
@@ -24,6 +24,6 @@ class RegionalSiteController extends Controller
         $resultado = Regional::find($id);
         return response()
             ->view('site.regional', compact('resultado'))
-            ->header('Cache-Control','public,max-age=900');
+            ->header('Cache-Control','no-cache');
     }
 }

@@ -15,7 +15,7 @@ class PaginaSiteController extends Controller
         if(isset($pagina)) {
             return response()
                 ->view('site.pagina', compact('pagina'))
-                ->header('Cache-Control','public,max-age=36000');
+                ->header('Cache-Control','no-cache');
         } else {
             abort(404);
         }   
@@ -29,7 +29,7 @@ class PaginaSiteController extends Controller
         if(isset($pagina)) {
             return response()
                 ->view('site.pagina', compact('pagina'))
-                ->header('Cache-Control','public,max-age=36000');
+                ->header('Cache-Control','no-cache');
         } else {
             abort(404);
         }

@@ -13,7 +13,7 @@ class ConcursoSiteController extends Controller
         $concurso = Concurso::find($id);
         return response()
             ->view('site.concurso', compact('concurso'))
-            ->header('Cache-Control','public,max-age=900');
+            ->header('Cache-Control','no-cache');
     }
 
     public function concursosView()
@@ -21,7 +21,7 @@ class ConcursoSiteController extends Controller
         $concursos = Concurso::paginate(9);
         return response()
             ->view('site.concursos', compact('concursos'))
-            ->header('Cache-Control','public,max-age=900');
+            ->header('Cache-Control','no-cache');
     }
 
     public function buscaConcursos()

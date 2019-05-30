@@ -13,7 +13,7 @@ class LicitacaoSiteController extends Controller
         $licitacoes = Licitacao::orderBy('created_at','DESC')->paginate(10);
         return response()
             ->view('site.licitacoes', compact('licitacoes'))
-            ->header('Cache-Control','public,max-age=900');
+            ->header('Cache-Control','no-cache');
     }
 
     public function show($id)
@@ -21,7 +21,7 @@ class LicitacaoSiteController extends Controller
         $licitacao = Licitacao::find($id);
         return response()
             ->view('site.licitacao', compact('licitacao'))
-            ->header('Cache-Control','public,max-age=900');
+            ->header('Cache-Control','no-cache');
     }
 
     public function buscaLicitacoes()

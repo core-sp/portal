@@ -32,7 +32,7 @@ class NoticiaSiteController extends Controller
                 ->get();
             return response()
                 ->view('site.noticia', compact('noticia', 'tres', 'id'))
-                ->header('Cache-Control','public,max-age=900');
+                ->header('Cache-Control','no-cache');
         } else {
             abort(404);
         }

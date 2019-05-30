@@ -31,7 +31,7 @@ use \App\Http\Controllers\Helper;
           <div class="carousel-item h-100">
             <a href="/balcao-de-oportunidades">
               <img class="w-100 hide-576" src="{{ asset('img/banner-bdo.png') }}" />
-              <img class="w-100 show-576" src="{{ asset('img/banner-bdo-m.png') }}" />
+              <img class="w-100 show-576" src="{{ asset('img/banner-bdo-mobile.png') }}" />
             </a>
           </div>
         </div>
@@ -259,26 +259,26 @@ use \App\Http\Controllers\Helper;
           <div class="col-sm-4 hide-576 eouv-imgs align-self-center pl-3 center-992">
             <div class="m-auto pb-3">
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/icon-eouv-01.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" />
+                <img src="{{ asset('img/ie-1.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" />
               </a>
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/icon-eouv-02.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Ouvidoria" />
+                <img src="{{ asset('img/ie-2.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Ouvidoria" />
               </a>
             </div>
             <div class="m-auto pb-3">
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/icon-eouv-03.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Elogios" />
+                <img src="{{ asset('img/ie-3.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Elogios" />
               </a>
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/icon-eouv-04.png') }}" class="azul-bg" data-toogle="tooltip" title="Sugestões" />
+                <img src="{{ asset('img/ie-4.png') }}" class="azul-bg" data-toogle="tooltip" title="Sugestões" />
               </a>
             </div>
             <div class="m-auto">
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/icon-eouv-05.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Reclamações" />
+                <img src="{{ asset('img/ie-5.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Reclamações" />
               </a>
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/icon-eouv-06.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Dúvidas" />
+                <img src="{{ asset('img/ie-6.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Dúvidas" />
               </a>
             </div>
           </div>
@@ -293,14 +293,14 @@ use \App\Http\Controllers\Helper;
         </div>
         <div id="calendario" class="row">
           <div class="col-sm-8">
-            <a href="/calendario">
+            <a href="/calendario-2019">
               <img class="lazy" data-src="{{ asset('img/calendario.png') }}" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 align-self-center text-right pr-4">
             <div class="calendario-txt">
               <p class="preto">Confira o calendário completo de<br>atendimento e expediente <br>de sua região.</p>
-              <a href="/calendario" class="btn-calendario mt-4">
+              <a href="/calendario-2019" class="btn-calendario mt-4">
                 <h4 class="normal">confira</h4>
               </a>
             </div>

@@ -21,7 +21,7 @@ class CursoSiteController extends Controller
         });
         return response()
             ->view('site.cursos', compact('cursos'))
-            ->header('Cache-Control','public,max-age=900');
+            ->header('Cache-Control','no-cache');
     }
 
     public function cursosAnterioresView()
@@ -32,7 +32,7 @@ class CursoSiteController extends Controller
             ->paginate(10);
         return response()
             ->view('site.cursos-anteriores', compact('cursos'))
-            ->header('Cache-Control','public,max-age=900');
+            ->header('Cache-Control','no-cache');
     }
 
     public static function getNoticia($id)
@@ -58,6 +58,6 @@ class CursoSiteController extends Controller
         $curso = Curso::find($id);
         return response()
             ->view('site.curso', compact('curso'))
-            ->header('Cache-Control','public,max-age=9000');
+            ->header('Cache-Control','no-cache');
     }
 }
