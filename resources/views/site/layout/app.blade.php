@@ -209,7 +209,7 @@ use \App\Http\Controllers\Helper;
               <p class="branco"><a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">Transparência</a></p>
               <p class="branco"><a href="/licitacoes">Licitações</a></p>
               <p class="branco"><a href="/concursos">Concursos</a></p>
-              <p class="branco"><a href="/agendamentos">Agendamentos</a></p>
+              <p class="branco"><a href="/agendamento">Agendamento</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="/feiras">Feiras</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
