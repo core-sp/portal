@@ -1,6 +1,6 @@
 # CORE-SP
 
-Código da versão inicial 1.0 do Portal CORE-SP. Repositório oficial foi migrado para o perfil da organização.
+Código oficial do Portal CORE-SP.
 
 ## Desenvolvimento
 
