@@ -16,6 +16,8 @@ class SiteController extends Controller
         $noticias = Cache::remember('noticiasHome', 60, function(){
             return Noticia::where('publicada','Sim')
                 ->whereNull('idregional')
+                ->whereNull('categoria')
+                ->whereNull('idcurso')
                 ->orderBy('created_at','DESC')
                 ->limit(3)
                 ->get();
