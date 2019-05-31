@@ -47,7 +47,7 @@
       </div>
     </div>
   </a>
-  <a href="/agendamento" target="_blank">
+  <a href="/agendamento">
     <div class="box-dois azul-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
