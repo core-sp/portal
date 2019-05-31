@@ -42,7 +42,7 @@ $now = now();
     </div>
     <div class="linha-lg"></div>
     <div class="row mt-2">
-      <div class="col-xl-4 col-lg-5 edital-info">
+      <div class="col-lg-4 edital-info">
         <table class="table table-bordered mb-4">
           <tbody>
             <tr>
@@ -87,7 +87,7 @@ $now = now();
           @endif
         @endif
       </div>
-      <div class="col-xl-8 col-lg-7 mt-2-992">
+      <div class="col-lg-8 mt-2-992">
         <div class="curso-img">
           <img src="{{asset($curso->img)}}" class="bn-img" />
         </div>
