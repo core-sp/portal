@@ -185,7 +185,7 @@ use \App\Http\Controllers\Helper;
                 <h5 class="branco">Localização</h5>
               </div>
               <p class="branco mb-1">
-                Rua Brigadeiro Luís Antônio, 613
+                Av. Brigadeiro Luís Antônio, 613
                 <br />Térreo - CEP: 01317-000
                 <br />São Paulo - SP
                 <br />CNPJ: 60.746.179/0001-52
@@ -199,7 +199,7 @@ use \App\Http\Controllers\Helper;
               </p>
               <p class="branco">
                 <strong>Telefone:</strong>
-                <br />(11) 3243-5500
+                <br />(11) 3243-5500 / 5519
               </p>
             </div>
             <div class="col-md-4 hide-768">
