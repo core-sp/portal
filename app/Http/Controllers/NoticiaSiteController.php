@@ -13,7 +13,7 @@ class NoticiaSiteController extends Controller
         $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
             ->orderBy('created_at', 'DESC')
             ->where('publicada','Sim')
-            ->paginate(3);
+            ->paginate(9);
         return view('site.noticias', compact('noticias'));        
     }
 
