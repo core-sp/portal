@@ -18,7 +18,7 @@ class ConcursoSiteController extends Controller
 
     public function concursosView()
     {
-        $concursos = Concurso::paginate(9);
+        $concursos = Concurso::paginate(10);
         return response()
             ->view('site.concursos', compact('concursos'))
             ->header('Cache-Control','no-cache');

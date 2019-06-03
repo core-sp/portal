@@ -137,6 +137,15 @@ $situacoes = ConcursoHelper::situacoes();
         @endif
       </div>
     </div>
+    @if(isset($concursos))
+    <div class="row">
+      <div class="col">
+        <div class="float-right">
+          {{ $concursos->links() }}
+        </div>
+      </div>
+    </div>
+    @endif
   </div>
 </section>
 

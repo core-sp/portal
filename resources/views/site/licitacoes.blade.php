@@ -143,6 +143,15 @@ $situacoes = LicitacaoHelper::situacoes();
         @endif
       </div>
     </div>
+    @if(isset($licitacoes))
+    <div class="row">
+      <div class="col">
+        <div class="float-right">
+          {{ $licitacoes->links() }}
+        </div>
+      </div>
+    </div>
+    @endif
   </div>
 </section>
 

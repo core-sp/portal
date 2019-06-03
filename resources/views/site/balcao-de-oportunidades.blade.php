@@ -127,11 +127,15 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
         @endif
       </div>
     </div>
-    <div class="row mt-3">
-      @if(isset($oportunidades))
-      {{ $oportunidades->links() }}
-      @endif
+    @if(isset($oportunidades))
+    <div class="row">
+      <div class="col">
+        <div class="float-right">
+          {{ $oportunidades->links() }}
+        </div>
+      </div>
     </div>
+    @endif
   </div>
 </section>
 
