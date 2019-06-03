@@ -97,7 +97,7 @@ return [
 
         'diario' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/usuarios/'.date('Y/m').'/laravel.log'),
+            'path' => storage_path('logs/usuarios/'.date("Y\/m").'/laravel.log'),
             'days' => 0,
         ],
     ],
