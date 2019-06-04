@@ -10,8 +10,9 @@ class NoticiaControllerHelper extends Controller
     public static function categorias()
     {
         $array = [
-            'Feiras',
-            'Benefícios'
+            'Benefícios',
+            'Cotidiano',
+            'Feiras'
         ];
         return $array;
     }
