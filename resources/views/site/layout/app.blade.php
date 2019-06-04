@@ -16,6 +16,16 @@ use \App\Http\Controllers\Helper;
         <link type="text/css" href="{{ asset('/css/app.css') }}" rel="stylesheet">
         <link type="text/css" href="{{ asset('/css/datepicker.css') }}" rel="stylesheet">
         <link type="text/css" href="{{ asset('/css/site.css') }}" rel="stylesheet">
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141375220-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-141375220-1');
+        </script>
     </head>
     <body>
 
