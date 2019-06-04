@@ -14,9 +14,16 @@ use \App\Http\Controllers\Helper;
           <li data-target="#carousel" data-slide-to="0" class="active"></li>
           <li data-target="#carousel" data-slide-to="1"></li>
           <li data-target="#carousel" data-slide-to="2"></li>
+          <li data-target="#carousel" data-slide-to="3"></li>
         </ol>
         <div class="carousel-inner h-100">
           <div class="carousel-item h-100 active">
+            <a href="/noticia/sistema-conferecores-em-atuacao-em-brasilia">
+              <img class="w-100 hide-576" src="{{ asset('img/banner-brasilia.jpg') }}" />
+              <img class="w-100 show-576" src="{{ asset('img/banner-brasilia-m.jpg') }}" />
+            </a>
+          </div>
+          <div class="carousel-item h-100">
             <a href="/portal">
               <img class="w-100 hide-576" src="{{ asset('img/banner-novo-portal.jpg') }}" />
               <img class="w-100 show-576" src="{{ asset('img/banner-novo-portal-.jpg') }}" />
