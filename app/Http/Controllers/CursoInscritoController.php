@@ -13,6 +13,7 @@ use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CursoInscritoMailGuest;
 use App\Rules\Cpf;
+use Illuminate\Support\Facades\Input;
 
 class CursoInscritoController extends Controller
 {
@@ -23,7 +24,8 @@ class CursoInscritoController extends Controller
         'singular' => 'inscrito',
         'singulariza' => 'o inscrito',
         'plural' => 'inscritos',
-        'pluraliza' => 'inscritos'
+        'pluraliza' => 'inscritos',
+        'busca' => 'cursos/inscritos'
     ];
     
     public function __construct()
@@ -278,6 +280,23 @@ class CursoInscritoController extends Controller
         return Redirect::route('inscritos.lista', array('id' => $curso->idcurso))
             ->with('message', '<i class="icon fa fa-ban"></i>Inscrição cancelada com sucesso!')
             ->with('class', 'alert-danger');;
+    }
+
+    public function busca($id)
+    {
+        ControleController::autoriza('CursoInscritoController', 'index');
+        $busca = Input::get('q');
+        $resultados = CursoInscrito::where('idcurso',$id)
+            ->where(function($query) use($busca){
+                $query->where('cpf','LIKE','%'.$busca.'%')
+                ->orWhere('nome','LIKE','%'.$busca.'%')
+                ->orWhere('email','LIKE','%'.$busca.'%');
+            })->paginate(10);
+        $this->variaveis['busca'] = 'cursos/inscritos/'.$id;
+        $this->variaveis['slug'] = 'cursos/inscritos/'.$id;
+        $variaveis = (object) $this->variaveis;
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 
 }

@@ -290,7 +290,8 @@ class CursoController extends Controller
             'singulariza' => 'o inscrito',
             'continuacao_titulo' => 'em '.$curso->tipo.': '.$curso->tema,
             'btn_criar' => '<a href="/admin/cursos/adicionar-inscrito/'.$curso->idcurso.'" class="btn btn-primary mr-1">Adicionar inscrito</a> ',
-            'btn_lixeira' => '<a href="/admin/cursos" class="btn btn-default">Lista de Cursos</a>'
+            'btn_lixeira' => '<a href="/admin/cursos" class="btn btn-default">Lista de Cursos</a>',
+            'busca' => 'cursos/inscritos/'.$id
         ];
         if(!ControleController::mostra('CursoInscritoController', 'create'))
             unset($variaveis['btn_criar']);
@@ -301,15 +302,14 @@ class CursoController extends Controller
 
     public function busca()
     {
-        ControleController::autoriza('CursoInscritoController', 'index');
+        ControleController::autoriza($this->class, 'index');
         $busca = Input::get('q');
-        $cursos = Curso::where('tipo','LIKE','%'.$busca.'%')
+        $resultados = Curso::where('tipo','LIKE','%'.$busca.'%')
             ->orWhere('tema','LIKE','%'.$busca.'%')
             ->orWhere('descricao','LIKE','%'.$busca.'%')
             ->paginate(10);
-        if (count($cursos) > 0) 
-            return view('admin.cursos.home', compact('cursos', 'busca'));
-        else
-            return view('admin.cursos.home')->withMessage('Nenhum curso encontrado');
+        $variaveis = (object) $this->variaveis;
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }
