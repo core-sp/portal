@@ -8,6 +8,7 @@ use App\Regional;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Input;
 
 class AgendamentoBloqueioController extends Controller
 {
@@ -22,6 +23,7 @@ class AgendamentoBloqueioController extends Controller
         'cancelar' => 'agendamentos/bloqueios',
         'titulo_criar' => 'Cadastrar novo bloqueio',
         'btn_criar' => '<a href="/admin/agendamentos/bloqueios/criar" class="btn btn-primary mr-1">Novo Bloqueio</a>',
+        'busca' => 'agendamentos/bloqueios',
     ];
 
     public function __construct()
@@ -220,5 +222,18 @@ class AgendamentoBloqueioController extends Controller
         return redirect()->route('agendamentobloqueios.lista')
             ->with('message', '<i class="icon fa fa-danger"></i>Bloqueio cancelado com sucesso!')
             ->with('class', 'alert-danger');
+    }
+
+    public function busca()
+    {
+        ControleController::autoriza($this->class, 'index');
+        $this->variaveis['slug'] = 'agendamentos/bloqueios';
+        $variaveis = (object) $this->variaveis;
+        $busca = Input::get('q');
+        $resultados = AgendamentoBloqueio::whereHas('regional', function($q) use($busca){
+            $q->where('regional','LIKE','%'.$busca.'%');
+        })->get();
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

@@ -134,6 +134,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/restore/{id}', 'CursoController@restore');
     // Lida com a parte de inscritos
     Route::get('/inscritos/{id}', 'CursoController@inscritos')->name('inscritos.lista');
+    Route::get('/inscritos/{id}/busca', 'CursoInscritoController@busca');
     Route::get('/inscritos/editar/{id}', 'CursoInscritoController@edit');
     Route::put('/inscritos/editar/{id}', 'CursoInscritoController@update');
     Route::get('/adicionar-inscrito/{id}', 'CursoInscritoController@create');
@@ -171,6 +172,7 @@ Route::prefix('admin')->group(function() {
     Route::post('/reenviar-email/{id}', 'AgendamentoController@reenviarEmail');
     // Lida com bloqueios
     Route::get('/bloqueios', 'AgendamentoBloqueioController@index')->name('agendamentobloqueios.lista');
+    Route::get('/bloqueios/busca', 'AgendamentoBloqueioController@busca');
     Route::get('/bloqueios/criar', 'AgendamentoBloqueioController@create');
     Route::post('/bloqueios/criar', 'AgendamentoBloqueioController@store');
     Route::get('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@edit');
