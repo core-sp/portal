@@ -286,12 +286,16 @@ class CursoInscritoController extends Controller
     {
         ControleController::autoriza('CursoInscritoController', 'index');
         $busca = Input::get('q');
+        $curso = Curso::find($id);
         $resultados = CursoInscrito::where('idcurso',$id)
             ->where(function($query) use($busca){
                 $query->where('cpf','LIKE','%'.$busca.'%')
                 ->orWhere('nome','LIKE','%'.$busca.'%')
                 ->orWhere('email','LIKE','%'.$busca.'%');
             })->paginate(10);
+        $this->variaveis['continuacao_titulo'] = 'em '.$curso->tipo.': '.$curso->tema;
+        $this->variaveis['btn_criar'] = '<a href="/admin/cursos/adicionar-inscrito/'.$curso->idcurso.'" class="btn btn-primary mr-1">Adicionar inscrito</a> ';
+        $this->variaveis['btn_lixeira'] = '<a href="/admin/cursos" class="btn btn-default">Lista de Cursos</a>';
         $this->variaveis['busca'] = 'cursos/inscritos/'.$id;
         $this->variaveis['slug'] = 'cursos/inscritos/'.$id;
         $variaveis = (object) $this->variaveis;
