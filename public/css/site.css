@@ -232,6 +232,22 @@ strong, .bold {
 	text-decoration: underline;
 }
 
+figcaption {
+	padding: .5rem .25rem;
+	color: #999999;
+	font-size: .8rem;
+}
+
+figure.align-right {
+	float: right;
+	padding-left: 1rem;
+}
+
+figure.align-left {
+	float: left;
+	padding-right: 1rem;
+}
+
 .conteudo-txt-mini h1,
 .conteudo-txt-mini h2,
 .conteudo-txt-mini h3,
@@ -1507,6 +1523,10 @@ footer p {
 		padding-bottom: .9rem;
 	}
 
+	figcaption {
+		font-size: .75rem;
+	}
+
 	.curso-grid {
 		height: 204px;
 	}
@@ -1944,6 +1964,10 @@ footer p {
 
 	.conteudo-txt iframe {
 		height: 286px;
+	}
+
+	figcaption {
+		font-size: .7rem;
 	}
 }
 
