@@ -663,7 +663,7 @@ figure.align-left {
 }
 
 .newsCotidiano {
-	padding: .25rem 0rem;
+	padding: .25rem 3.25rem .25rem 0rem;
 }
 
 .faleRow img {
@@ -1985,6 +1985,10 @@ footer p {
 
 	#fale {
 		padding-top: 1.75rem;
+	}
+
+	.newsCotidiano {
+		padding: .25rem 0rem;
 	}
 }
 
