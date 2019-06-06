@@ -33,7 +33,8 @@ class AgendamentoBloqueioController extends Controller
 
     public function resultados()
     {
-        $resultados = AgendamentoBloqueio::orderBy('idagendamentobloqueio')
+        $resultados = AgendamentoBloqueio::orderBy('idagendamentobloqueio','DESC')
+            ->where('diatermino','>=',date('Y-m-d'))
             ->paginate(10);
         return $resultados;
     }
