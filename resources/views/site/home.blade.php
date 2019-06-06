@@ -94,7 +94,7 @@ use \App\Http\Controllers\Helper;
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15-992">
-        <a href="/resolucoes-anuidade-taxas-e-emolumentos" class="d-block h-100" target="_blank">
+        <a href="/resolucoes-anuidade-taxas-e-emolumentos" class="d-block h-100">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" />

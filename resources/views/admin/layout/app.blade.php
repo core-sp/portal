@@ -57,7 +57,7 @@
           <!-- Main Sidebar Container -->
           <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
-            <a href="/" class="brand-link">
+            <a href="/admin" class="brand-link">
               <img src="{{ asset('img/brasao.png') }}" alt="CORE-SP Logo" class="brand-image img-circle elevation-3">
               <span class="brand-text font-weight-light"><strong>CORE-</strong>SP</span>
             </a>
@@ -95,7 +95,7 @@
 
           <footer class="main-footer">
             <div class="float-right d-none d-sm-block">
-              <b>Versão</b> 1.0.2
+              <b>Versão</b> 1.0.4
             </div>
             <strong>Portal CORE-SP &copy; 2019.</strong> Todos direitos reservados.
           </footer>
