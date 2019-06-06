@@ -658,17 +658,22 @@ figure.align-left {
 
 /* FALE COM O CORE */
 #fale {
-	padding-top: 2rem;
-	padding-bottom: 3.25rem;
+	padding-top: 2.5rem;
+	padding-bottom: 1rem;
 }
 
-.faleRow {
-	margin-top: 1.5rem;
+.newsCotidiano {
+	padding: .25rem 0rem;
 }
 
 .faleRow img {
 	width: 64px;
 	color: #444444;
+}
+
+.faleSingle {
+	padding-top: 1rem;
+	padding-bottom: 1rem; 
 }
 
 .faleSingle:hover a h5 {
@@ -1546,6 +1551,10 @@ footer p {
 	.conteudo-txt iframe {
 		height: 342px;
 	}
+
+	#fale {
+		padding-top: 2rem;
+	}
 	
 }
 
@@ -1761,6 +1770,10 @@ footer p {
 		padding-top: 15px;
 	}
 
+	.pb-30-768 {
+		padding-bottom: 30px;
+	}
+
 	.center-768 {
 		text-align: center !important;
 	}
@@ -1968,6 +1981,10 @@ footer p {
 
 	figcaption {
 		font-size: .7rem;
+	}
+
+	#fale {
+		padding-top: 1.75rem;
 	}
 }
 

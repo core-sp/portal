@@ -94,12 +94,12 @@ use \App\Http\Controllers\Helper;
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15-992">
-        <a href="http://boleto.core-sp.org.br" class="d-block h-100" target="_blank">
+        <a href="/resolucoes-anuidade-taxas-e-emolumentos" class="d-block h-100" target="_blank">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" />
-              <p class="text-uppercase mt-3 branco">Emissão de boleto<br class="hide-992" /> anuidade 2019</p>
-              <button href="#" class="btn-box">EMITIR</button>
+              <p class="text-uppercase mt-3 branco">Anuidade 2019<br class="hide-992" /> taxas e emolumentos</p>
+              <button href="#" class="btn-box">ACESSAR</button>
             </div>
           </div>
         </a>
@@ -165,60 +165,71 @@ use \App\Http\Controllers\Helper;
 
 <section id="fale">
   <div class="container">
-    <div class="row mb-2">
-      <div class="col-12">
+    <div class="row faleRow">
+      <div class="col-md-6 pb-30-768">
+        <div class="home-title">
+          <blockquote>
+            <i></i>
+            <h4 class="pr-3 ml-1">Cotidiano</h4>
+          </blockquote>
+        </div>
+        @foreach($cotidianos as $resultado)
+          @include('site.inc.noticia-min-grid')
+        @endforeach
+      </div>
+      <div class="col-md-6">
         <div class="home-title">
           <blockquote>
             <i></i>
             <h4 class="pr-3 ml-1">Fale com o CORE-SP</h4>
           </blockquote>
         </div>
-      </div>
-    </div>
-    <div class="row faleRow">
-      <div class="col-lg-3 col-sm-6 faleSingle">
-        <a href="/agendamento-consulta">
-          <div class="row nomargin">
-            <div class="align-self-center">
-              <img src="{{ asset('img/002-phone-book-.png') }}" class="inside-img" alt="">
-            </div>
-            <div class="flex-one fale-txt align-self-center">
-              <h5 class="normal">Consulte seu<br class="hide-768" /> agendamento</h5>
-            </div>
+        <div class="row">
+          <div class="col-lg-6 faleSingle">
+            <a href="/agendamento-consulta">
+              <div class="row nomargin">
+                <div class="align-self-center">
+                  <img src="{{ asset('img/002-phone-book-.png') }}" class="inside-img" alt="">
+                </div>
+                <div class="flex-one fale-txt align-self-center">
+                  <h5 class="normal">Consulte seu<br class="hide-992" /> agendamento</h5>
+                </div>
+              </div>
+            </a>
           </div>
-        </a>
-      </div>
-      <div class="col-lg-3 col-sm-6 faleSingle">
-        <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
-          <div class="row nomargin">
-            <div class="align-self-center">
-              <img src="{{ asset('img/001-whatsapp-.png') }}" class="inside-img" alt="">
-            </div>
-            <div class="flex-one fale-txt align-self-center">
-              <h5 class="normal">Entre em contato<br class="hide-768" /> pelo WhatsApp</h5>
-            </div>
+          <div class="col-lg-6 faleSingle">
+            <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
+              <div class="row nomargin">
+                <div class="align-self-center">
+                  <img src="{{ asset('img/001-whatsapp-.png') }}" class="inside-img" alt="">
+                </div>
+                <div class="flex-one fale-txt align-self-center">
+                  <h5 class="normal">Entre em contato<br class="hide-992" /> pelo WhatsApp</h5>
+                </div>
+              </div>
+            </a>
           </div>
-        </a>
-      </div>
-      <div class="col-lg-3 col-sm-6 faleSingle">
-        <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
-          <div class="row nomargin">
-            <div class="align-self-center">
-              <img src="{{ asset('img/003-youtube-.png') }}" class="inside-img" alt="">
-            </div>
-            <div class="flex-one fale-txt align-self-center">
-              <h5 class="normal">Institucional 2019<br class="hide-768" /> e informativos</h5>
-            </div>
+          <div class="col-lg-6 faleSingle">
+            <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
+              <div class="row nomargin">
+                <div class="align-self-center">
+                  <img src="{{ asset('img/003-youtube-.png') }}" class="inside-img" alt="">
+                </div>
+                <div class="flex-one fale-txt align-self-center">
+                  <h5 class="normal">Institucional 2019<br class="hide-992" /> e informativos</h5>
+                </div>
+              </div>
+            </a>
           </div>
-        </a>
-      </div>
-      <div class="col-lg-3 col-sm-6 faleSingle">
-        <div class="row nomargin">
-          <div class="align-self-center">
-            <img src="{{ asset('img/004-headset-.png') }}" class="inside-img" alt="">
-          </div>
-          <div class="flex-one fale-txt align-self-center">
-            <h5 class="normal">Atendimento<br class="hide-768" /> (11) 3243-5500</h5>
+          <div class="col-lg-6 faleSingle">
+            <div class="row nomargin">
+              <div class="align-self-center">
+                <img src="{{ asset('img/004-headset-.png') }}" class="inside-img" alt="">
+              </div>
+              <div class="flex-one fale-txt align-self-center">
+                <h5 class="normal">Atendimento<br class="hide-992" /> (11) 3243-5500</h5>
+              </div>
+            </div>
           </div>
         </div>
       </div>

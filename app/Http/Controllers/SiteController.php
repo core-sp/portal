@@ -20,8 +20,12 @@ class SiteController extends Controller
             ->orderBy('created_at','DESC')
             ->limit(3)
             ->get();
+        $cotidianos = Noticia::where('publicada','Sim')
+            ->where('categoria','Cotidiano')
+            ->limit(3)
+            ->get();
         return response()
-            ->view('site.home', compact('noticias'))
+            ->view('site.home', compact('noticias','cotidianos'))
             ->header('Cache-Control','no-cache');
     }
 
