@@ -55,19 +55,12 @@ class AgendamentoControllerHelper extends Controller
                 $keyHoraTermino = array_search($horaTermino, $horas);
                 if(!$keyHoraTermino) {
                     $ultimoHoras = end($horas);
-                    if($horaTermino > $ultimoHoras) {
-                        $keyHoraTermino = key($horas);
-                    } else {
-                        $horas = [];
-                    }
+                    $keyHoraTermino = key($horas);
+                    
                 }
                 if(!$keyHoraInicio) {
                     $primeiroHoras = reset($horas);
-                    if($horaInicio < $primeiroHoras) {
-                        $keyHoraInicio = 0;
-                    } else {
-                        $horas = [];
-                    }
+                    $keyHoraInicio = 0;
                 }
                 for($i = $keyHoraInicio; $i <= $keyHoraTermino; $i++)
                     unset($horas[$i]);
