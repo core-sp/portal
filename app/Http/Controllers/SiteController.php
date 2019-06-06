@@ -13,18 +13,16 @@ class SiteController extends Controller
 {
     public function index()
     {
-        $noticias = Cache::remember('noticiasHome', 60, function(){
-            return Noticia::where('publicada','Sim')
-                ->whereNull('idregional')
-                ->whereNull('categoria')
-                ->whereNull('idcurso')
-                ->orderBy('created_at','DESC')
-                ->limit(3)
-                ->get();
-        });
+        $noticias = Noticia::where('publicada','Sim')
+            ->whereNull('idregional')
+            ->whereNull('categoria')
+            ->whereNull('idcurso')
+            ->orderBy('created_at','DESC')
+            ->limit(3)
+            ->get();
         return response()
             ->view('site.home', compact('noticias'))
-            ->header('Cache-Control','public,max-age=900');
+            ->header('Cache-Control','no-cache');
     }
 
     public function busca(Request $request)
