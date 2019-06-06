@@ -43,19 +43,37 @@ class AgendamentoControllerHelper extends Controller
             '16:30',
             '17:00',
         ];
-        $checaBloqueio = AgendamentoBloqueio::where('idregional',$regional)
+        $bloqueios = AgendamentoBloqueio::where('idregional',$regional)
             ->whereDate('diainicio','<=',$dia)
             ->whereDate('diatermino','>=',$dia)
-            ->first();
-        if($checaBloqueio) {
-            $horaInicio = $checaBloqueio->horainicio;
-            $horaTermino = $checaBloqueio->horatermino;
-            $keyHoraInicio = array_search($horaInicio, $horas);
-            $keyHoraTermino = array_search($horaTermino, $horas);
-            for($i = $keyHoraInicio; $i <= $keyHoraTermino; $i++)
-                unset($horas[$i]);
+            ->get();
+        if($bloqueios) {
+            foreach($bloqueios as $bloqueio) {
+                $horaInicio = $bloqueio->horainicio;
+                $horaTermino = $bloqueio->horatermino;
+                $keyHoraInicio = array_search($horaInicio, $horas);
+                $keyHoraTermino = array_search($horaTermino, $horas);
+                if(!$keyHoraTermino) {
+                    $ultimoHoras = end($horas);
+                    if($horaTermino > $ultimoHoras) {
+                        $keyHoraTermino = key($horas);
+                    } else {
+                        $horas = [];
+                    }
+                }
+                if(!$keyHoraInicio) {
+                    $primeiroHoras = reset($horas);
+                    if($horaInicio < $primeiroHoras) {
+                        $keyHoraInicio = 0;
+                    } else {
+                        $horas = [];
+                    }
+                }
+                for($i = $keyHoraInicio; $i <= $keyHoraTermino; $i++)
+                    unset($horas[$i]);
+            }
+            return $horas;
         }
-        return $horas;
     }
 
     public static function todasHoras()
