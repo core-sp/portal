@@ -48,6 +48,31 @@ var segunda = document.getElementById('append-menu');
 
 segunda.innerHTML = primeira.innerHTML;
 
+// Feriados para desablitar calendário
+natDays = [
+	[6, 20, 'br'],
+	[6, 21, 'br']
+];
+// Função para adicionar feriados
+function nationalDays(date) {
+    for (i = 0; i < natDays.length; i++) {
+      if (date.getMonth() == natDays[i][0] - 1
+          && date.getDate() == natDays[i][1]) {
+        return [false, natDays[i][2] + '_day'];
+      }
+	}	
+	return [true, ''];
+}
+// Função para feriados e fim-de-semana
+function noWeekendsOrHolidays(date) {
+    var noWeekend = $.datepicker.noWeekends(date);
+    if (noWeekend[0]) {
+        return nationalDays(date);
+    } else {
+        return noWeekend;
+    }
+}
+
 (function($){
 	$(function(){
 		// Botão Saiba Mais do Banco de Oportunidades
@@ -74,7 +99,7 @@ segunda.innerHTML = primeira.innerHTML;
 			prevText: 'Anterior',
 			maxDate: '+1m',
 			minDate: +1,
-			beforeShowDay: $.datepicker.noWeekends
+			beforeShowDay: noWeekendsOrHolidays
 		});
 		// Zera o valor do dia, ao selecionar a regional
 		$('#idregional').change(function(){
