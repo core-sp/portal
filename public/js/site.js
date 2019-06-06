@@ -51,7 +51,18 @@ segunda.innerHTML = primeira.innerHTML;
 // Feriados para desablitar calendário
 natDays = [
 	[6, 20, 'br'],
-	[6, 21, 'br']
+	[6, 21, 'br'],
+	[7, 8, 'br'],
+	[7, 9, 'br'],
+	[11, 15, 'br'],
+	[11, 20, 'br'],
+	[12, 23, 'br'],
+	[12, 24, 'br'],
+	[12, 25, 'br'],
+	[12, 26, 'br'],
+	[12, 27, 'br'],
+	[12, 30, 'br'],
+	[12, 31, 'br'],
 ];
 // Função para adicionar feriados
 function nationalDays(date) {
@@ -128,7 +139,15 @@ function noWeekendsOrHolidays(date) {
 					$('#loadImage').hide();
 				},
 				success: function(response) {
-					$('#horarios').html(response);
+					if (response !== "[]") {
+						$('#horarios').html(response);
+					} else {
+						$('#horarios')
+							.find('option')
+							.remove()
+							.end()
+							.append('<option value="" disabled selected>Nenhum horário disponível</option>');
+					}
 				}
 			});
 		});
