@@ -190,7 +190,7 @@ class BdoEmpresaController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $regras = [
             'segmento' => 'max:191',
-            'cnpj' => ['required', 'max:191', 'unique:bdo_empresas', new Cnpj],
+            'cnpj' => ['required', 'max:191', new Cnpj],
             'razaosocial' => 'required|max:191',
             'capitalsocial' => 'max:191',
             'endereco' => 'required|max:191',
