@@ -35,11 +35,18 @@ class AgendamentoController extends Controller
 
     public function resultados($dia, $idregional = null)
     {
-        $resultados = Agendamento::where('dia','=',$dia)
-            ->where('idregional',$idregional)
-            ->orderBy('dia','ASC')
-            ->orderBy('hora','ASC')
-            ->paginate(10);
+        if($idregional !== '999') {
+            $resultados = Agendamento::where('dia','=',$dia)
+                ->where('idregional',$idregional)
+                ->orderBy('dia','ASC')
+                ->orderBy('hora','ASC')
+                ->paginate(10);
+        } else {
+            $resultados = Agendamento::where('dia','=',$dia)
+                ->orderBy('dia','ASC')
+                ->orderBy('hora','ASC')
+                ->paginate(10);
+        }
         return $resultados;
     }
 
@@ -61,9 +68,11 @@ class AgendamentoController extends Controller
             $dia = $date->format('Y-m-d');
         }
         if(Input::has('regional')) {
-            $regional = Input::get('regional');
-            $regionalId = Regional::find($regional);
-            $regionalNome = $regionalId->regional;
+            if(Input::get('regional') !== '999') {
+                $regional = Input::get('regional');
+                $regionalId = Regional::find($regional);
+                $regionalNome = $regionalId->regional;
+            }
         } else {
             $regional = Regional::find(Auth::user()->idregional);
             $regionalNome = $regional->regional;
@@ -81,7 +90,10 @@ class AgendamentoController extends Controller
         }
         // Pega dia atual e cospe no título
         $dia = Helper::onlyDate($dia);
-        $this->variaveis['continuacao_titulo'] = 'em '.$regionalNome.' - '.$dia;
+        if(Input::get('regional') !== '999')
+            $this->variaveis['continuacao_titulo'] = 'em '.$regionalNome.' - '.$dia;
+        else
+            $this->variaveis['continuacao_titulo'] = 'em Todas - '.$dia;
         return $resultados;
     }
 
@@ -91,28 +103,47 @@ class AgendamentoController extends Controller
             $date = new \DateTime();
             $dia = $date->format('Y-m-d');
         }
-        switch ($status) {
-            case 'Compareceu':
-                $status = 'Compareceu';
-            break;
-            default:
-                $status = null;
-            break;
-        }
-        if($status === null) {
-            $resultados = Agendamento::where('idregional',$idregional)
-                ->where('dia','=',$dia)
-                ->whereNull('status')
-                ->orderBy('dia','ASC')
-                ->orderBy('hora','ASC')
-                ->get();
+        if($idregional === '999') {
+            if($status === 'null') {
+                $resultados = Agendamento::where('dia','=',$dia)
+                    ->whereNull('status')
+                    ->orderBy('dia','ASC')
+                    ->orderBy('hora','ASC')
+                    ->get();
+            } elseif($status === 'Qualquer') {
+                $resultados = Agendamento::where('dia','=',$dia)
+                    ->orderBy('dia','ASC')
+                    ->orderBy('hora','ASC')
+                    ->get();
+            } else {
+                $resultados = Agendamento::where('dia','=',$dia)
+                    ->where('status','LIKE',$status)
+                    ->orderBy('dia','ASC')
+                    ->orderBy('hora','ASC')
+                    ->get();
+            }
         } else {
-            $resultados = Agendamento::where('idregional',$idregional)
-                ->where('dia','=',$dia)
-                ->where('status','LIKE',$status)
-                ->orderBy('dia','ASC')
-                ->orderBy('hora','ASC')
-                ->get();
+            if($status === 'null') {
+                $resultados = Agendamento::where('idregional',$idregional)
+                    ->where('dia','=',$dia)
+                    ->whereNull('status')
+                    ->orderBy('dia','ASC')
+                    ->orderBy('hora','ASC')
+                    ->get();
+            } elseif ($status === 'Qualquer') {
+                $resultados = Agendamento::where('idregional',$idregional)
+                    ->where('dia','=',$dia)
+                    ->orderBy('dia','ASC')
+                    ->orderBy('hora','ASC')
+                    ->get();
+            } else {
+                $resultados = Agendamento::where('idregional',$idregional)
+                    ->where('dia','=',$dia)
+                    ->where('status','LIKE',$status)
+                    ->orderBy('dia','ASC')
+                    ->orderBy('hora','ASC')
+                    ->get();
+            }
         }
         return $resultados;
     }
@@ -153,6 +184,11 @@ class AgendamentoController extends Controller
         $select .= '<input type="hidden" name="filtro" value="sim" />';
         $select .= '<select class="d-inline w-auto custom-select custom-select-sm mr-2" name="regional">';
         $select .= '<option disabled selected>Seccional *</option>';
+        if(Input::get('regional') === '999') {
+            $select .= '<option value="999" selected>Todas</option>';
+        } else {
+            $select .= '<option value="999">Todas</option>';
+        }
         foreach($regionais as $regional) {
             if(Input::has('regional')) {
                 if($regional->idregional == Input::get('regional')) {
@@ -169,13 +205,20 @@ class AgendamentoController extends Controller
         $select .= '<option disabled selected>Status</option>';
         if(Input::has('status')) {
             if(Input::get('status') == "Compareceu") {
+                $select .= '<option value="Qualquer">Qualquer</option>';
                 $select .= '<option value="Compareceu" selected>Compareceram</option>';
                 $select .= '<option value="null">Não Compareceram</option>';
-            } else {
+            } elseif (Input::get('status') == 'null') {
+                $select .= '<option value="Qualquer">Qualquer</option>';
                 $select .= '<option value="Compareceu">Compareceram</option>';
                 $select .= '<option value="null" selected>Não Compareceram</option>';
+            } else {
+                $select .= '<option value="Qualquer" selected>Qualquer</option>';
+                $select .= '<option value="Compareceu">Compareceram</option>';
+                $select .= '<option value="null">Não Compareceram</option>';
             }
         } else {
+            $select .= '<option value="Qualquer">Qualquer</option>';
             $select .= '<option value="Compareceu">Compareceram</option>';
             $select .= '<option value="null">Não Compareceram</option>';
         }
@@ -248,7 +291,7 @@ class AgendamentoController extends Controller
                 $resultado->protocolo.'<br><small>Código: '.$resultado->idagendamento.'</small>',
                 $resultado->nome.'<br>'.$resultado->cpf,
                 $resultado->hora,
-                $resultado->tiposervico,
+                $resultado->tiposervico.'<br><small>('.$resultado->regional->regional.')',
                 $acoes
             ];
             array_push($contents, $conteudo);
