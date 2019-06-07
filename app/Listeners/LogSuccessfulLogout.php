@@ -28,6 +28,6 @@ class LogSuccessfulLogout
      */
     public function handle(Logout $event)
     {
-        Log::channel('usuarios')->info($event->user->nome.' (usuário '.$event->user->idusuario.') desconectou-se do painel de administrador.');
+        Log::channel('interno')->info($event->user->nome.' (usuário '.$event->user->idusuario.') desconectou-se do painel de administrador.');
     }
 }

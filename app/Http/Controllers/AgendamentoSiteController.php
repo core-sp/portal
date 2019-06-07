@@ -7,9 +7,11 @@ use App\Agendamento;
 use App\Regional;
 use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
+use App\Http\Controllers\Helper;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
 use App\Rules\Cpf;
+use App\Events\AgendamentoEvent;
 
 class AgendamentoSiteController extends Controller
 {
@@ -156,6 +158,11 @@ class AgendamentoSiteController extends Controller
         $save = $agendamento->save();
         if(!$save)
             abort(500);
+        // Gera evento de agendamento
+        $string = $nomeUser." (CPF: ".$cpf.")";
+        $string .= " *agendou* atendimento em *".$agendamento->regional->regional;
+        $string .= "* no dia ".$dia_inalterado;
+        event(new AgendamentoEvent($string));
         // Gera mensagem de agradecimento
         $agradece = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
         $agradece .= "<br>";
@@ -241,6 +248,12 @@ class AgendamentoSiteController extends Controller
                 $update = $agendamento->update();
                 if(!$update)
                     abort(500);
+                // Gera evento de agendamento
+                $string = $agendamento->nome." (CPF: ".$agendamento->cpf.")";
+                $string .= " *cancelou* atendimento em *".$agendamento->regional->regional;
+                $string .= "* no dia ".Helper::onlyDate($agendamento->dia);
+                event(new AgendamentoEvent($string));
+                // Gera mensagem de agradecimento
                 $agradece = "Agendamento cancelado com sucesso!";
                 return view('site.agradecimento')->with('agradece', $agradece);
             } else {

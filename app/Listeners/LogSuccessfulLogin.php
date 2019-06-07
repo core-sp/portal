@@ -27,6 +27,6 @@ class LogSuccessfulLogin
      */
     public function handle(Login $event)
     {
-        Log::channel('usuarios')->info($event->user->nome.' (usuário '.$event->user->idusuario.') conectou-se ao painel de administrador.');
+        Log::channel('interno')->info($event->user->nome.' (usuário '.$event->user->idusuario.') conectou-se ao painel de administrador.');
     }
 }
