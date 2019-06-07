@@ -27,7 +27,7 @@ $situacoes = LicitacaoHelper::situacoes();
   <div class="container">
     <div class="row pb-4" id="conteudo-principal">
       <div class="col">
-        <form method="GET" role="form" action="/licitacoes/busca" class="pesquisaLicitacao">
+        <form method="GET" role="form" action="/licitacoes/busca" enctype="multipart/form-data" class="pesquisaLicitacao">
           <div class="form-row text-center">
             <div class="m-auto">
               <h5 class="text-uppercase stronger marrom">Busca detalhada</h5>
@@ -35,7 +35,14 @@ $situacoes = LicitacaoHelper::situacoes();
           </div>
           <div class="linha-lg-mini"></div>
           <div class="form-row mb-2">
-          	<div class="col-md-6">
+            <div class="col-md-4">
+              <label for="palavra-chave">Palavra-chave</label>
+              <input type="text"
+                name="palavra-chave"
+                class="form-control"
+                placeholder="Insira uma palavra-chave" />
+            </div>
+          	<div class="col-md-4">
           	  <label for="modalidade">Modalidade</label>
           	  <select name="modalidade" class="form-control" id="modalidade">
           	  	<option value="">Todas</option>
@@ -44,17 +51,17 @@ $situacoes = LicitacaoHelper::situacoes();
 	          	  @endforeach
 	            </select>
           	</div>
-          	<div class="col-md-3 mt-2-768">
+          	<div class="col-md-2 col-sm-6 mt-2-768">
           	  <label for="nrprocesso">Nº do processo</label>
           	  <input type="text" name="nrprocesso" class="form-control nrprocessoInput" placeholder="Nº do processo" id="nrprocesso">
           	</div>
-          	<div class="col-md-3 mt-2-768">
+          	<div class="col-md-2 col-sm-6 mt-2-768">
           	  <label for="nrlicitacao">Nº da Licitação</label>
           	  <input type="text" name="nrlicitacao" class="form-control nrlicitacaoInput" placeholder="Nº da licitação" id="nrlicitacao">
           	</div>
           </div>
           <div class="form-row">
-          	<div class="col-lg-5 col-md-6">
+          	<div class="col-lg-4 col-md-6">
           	  <label for="situacao">Situação</label>
           	  <select name="situacao" class="form-control" id="situacao">
           	  	<option value="">Qualquer</option>
@@ -63,7 +70,7 @@ $situacoes = LicitacaoHelper::situacoes();
 	          	  @endforeach
 	            </select>
           	</div>
-          	<div class="col-lg-3 col-md-6 mt-2-768">
+          	<div class="col-lg-4 col-md-6 mt-2-768">
           	  <label for="datarealizacao">Data de Realização</label>
           	  <input type="text" class="form-control dataInput" placeholder="dd/mm/aaaa" name="datarealizacao">
           	</div>

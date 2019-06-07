@@ -26,6 +26,8 @@ class LicitacaoSiteController extends Controller
 
     public function buscaLicitacoes()
     {
+        $buscaPalavraChave = html_entity_decode(Input::get('palavra-chave'));
+        $buscaPalavraChave = htmlentities($buscaPalavraChave);
         $buscaModalidade = Input::get('modalidade');
         $buscaSituacao = Input::get('situacao');
         $buscaNrLicitacao = Input::get('nrlicitacao');
@@ -38,7 +40,8 @@ class LicitacaoSiteController extends Controller
         } else {
             $buscaDataRealizacao = '';
         }
-        if (!empty($buscaModalidade) 
+        if (!empty($buscaPalavraChave)
+            or !empty($buscaModalidade) 
             or !empty($buscaSituacao) 
             or !empty($buscaNrLicitacao)
             or !empty($buscaNrProcesso)
@@ -48,13 +51,13 @@ class LicitacaoSiteController extends Controller
         } else {
             $busca = false;
         }
-        $licitacoes = Licitacao::where('modalidade','LIKE','%'.$buscaModalidade.'%')
+        $licitacoes = Licitacao::where('objeto','LIKE','%'.$buscaPalavraChave.'%')
+            ->where('modalidade','LIKE','%'.$buscaModalidade.'%')
             ->where('situacao','LIKE','%'.$buscaSituacao.'%')
             ->where('nrlicitacao','LIKE',$buscaNrLicitacao)
             ->where('nrprocesso','LIKE',$buscaNrProcesso)
             ->where('datarealizacao','LIKE','%'.$buscaDataRealizacao.'%')
             ->paginate(10);
-        echo "<script>console.log('".$dia."')</script>";
         if (count($licitacoes) > 0) {
             return view('site.licitacoes', compact('licitacoes', 'busca'));
         } else {
