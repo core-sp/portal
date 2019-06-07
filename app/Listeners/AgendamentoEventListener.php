@@ -2,13 +2,12 @@
 
 namespace App\Listeners;
 
-use App\Events\CrudEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Auth;
+use App\Events\AgendamentoEvent;
 use Illuminate\Support\Facades\Log;
 
-class CrudEventListener
+class AgendamentoEventListener
 {
     /**
      * Create the event listener.
@@ -23,13 +22,11 @@ class CrudEventListener
     /**
      * Handle the event.
      *
-     * @param  CrudEvent  $event
+     * @param  object  $event
      * @return void
      */
-    public function handle(CrudEvent $event)
+    public function handle(AgendamentoEvent $event)
     {
-        $nome = Auth::user()->nome;
-        $id = Auth::id();
-        Log::channel('interno')->info($nome.' (usuário '.$id.') '.$event->action.' *'.$event->model.'* (id: '.$event->id.')');
+        Log::channel('externo')->info($event->string);
     }
 }

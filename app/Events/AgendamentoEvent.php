@@ -10,19 +10,15 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class CrudEvent
+class AgendamentoEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $model;
-    public $action;
-    public $id;
+    public $string;
 
-    public function __construct($model, $action, $id)
+    public function __construct($string)
     {
-        $this->model = $model;
-        $this->action = $action;
-        $this->id = $id;
+        $this->string = $string;
     }
 
     public function broadcastOn()

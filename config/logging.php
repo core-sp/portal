@@ -90,14 +90,25 @@ return [
             'level' => 'debug',
         ],
 
-        'usuarios' => [
+        'interno' => [
             'driver' => 'stack',
-            'channels' => ['diario'],
+            'channels' => ['diarioInterno'],
         ],
 
-        'diario' => [
+        'diarioInterno' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/usuarios/'.date("Y\/m").'/laravel.log'),
+            'path' => storage_path('logs/interno/'.date("Y\/m").'/laravel.log'),
+            'days' => 0,
+        ],
+
+        'externo' => [
+            'driver' => 'stack',
+            'channels' => ['diarioExterno'],
+        ],
+
+        'diarioExterno' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/externo/'.date("Y\/m").'/laravel.log'),
             'days' => 0,
         ],
     ],

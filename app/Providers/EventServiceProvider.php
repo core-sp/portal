@@ -27,6 +27,12 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\CrudEvent' => [
             'App\Listeners\CrudEventListener',
         ],
+        'App\Events\AgendamentoEvent' => [
+            'App\Listeners\AgendamentoEventListener',
+        ],
+        'App\Events\CursoInscritoEvent' => [
+            'App\Listeners\CursoInscritoEventListener',
+        ],
     ];
 
     /**
