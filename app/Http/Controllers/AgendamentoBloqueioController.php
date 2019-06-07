@@ -73,6 +73,8 @@ class AgendamentoBloqueioController extends Controller
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o bloqueio?\')" />';
                 $acoes .= '</form>';
             }
+            if(empty($acoes))
+                $acoes = '<i class="fas fa-lock text-muted"></i>';
             $conteudo = [
                 $resultado->idagendamentobloqueio,
                 $resultado->regional->regional,

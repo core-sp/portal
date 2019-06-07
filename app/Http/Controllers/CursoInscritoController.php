@@ -58,6 +58,8 @@ class CursoInscritoController extends Controller
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar Inscrição" onclick="return confirm(\'Tem certeza que deseja cancelar a inscrição?\')" />';
                 $acoes .= '</form>';
             }
+            if(empty($acoes))
+                $acoes = '<i class="fas fa-lock text-muted"></i>';
             $conteudo = [
                 $resultado->cpf,
                 $resultado->nome,
