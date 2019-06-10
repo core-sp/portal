@@ -91,13 +91,17 @@
 									<td>{{ $chamado->prioridade }}</td>
 									<td>
 									@if(isset($chamado->deleted_at))
-										Concluído
+										<strong>Concluído</strong>
 									@else
-										Registrado
+										<strong>Registrado</strong>
 									@endif
 									</td>
 									<td>
+										@if(isset($chamado->deleted_at))
+										<i class="fas fa-lock text-muted"></i>
+										@else
 										<a href="/admin/chamados/editar/{{ $chamado->idchamado }}" class="btn btn-sm btn-primary">Editar</a>
+										@endif
 									</td>
 								</tr>
 								@endforeach

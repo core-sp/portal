@@ -15,7 +15,7 @@
       <img class="lazy bn-img" data-src="{{ asset('img/news-generica-thumb.png') }}" />
       @endif
       <div class="box-news-txt">
-        <h6 class="light cinza-claro">{{ Helper::newsData($noticia->updated_at) }}</h6>
+        <h6 class="light cinza-claro">{{ Helper::onlyDate($noticia->created_at) }}</h6>
         <h5 class="branco mt-1">{{ $noticia->titulo }}</h5>
       </div>
     </div>

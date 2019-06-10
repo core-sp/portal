@@ -149,6 +149,12 @@
                 </select>
             </div>
         </div>
+        <div class="form-row mt-4">
+            <i>* Atendimento agendado pelo usuário no dia {{ Helper::onlyDate($resultado->created_at) }}.</i>
+        </div>
+        <div class="form-row mb-2">
+            <i>** Para alteração de horário, é necessário cancelar o agendamento e cadastrar um novo horário pelo site.</i>
+        </div>
     </div>
     <div class="card-footer">
         <div class="float-right">
