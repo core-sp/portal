@@ -368,12 +368,16 @@ class AgendamentoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
-
+        // Valida dia de atendimento
+        $dia = str_replace('/', '-', $request->input('dia'));
+        $dia = date('Y-m-d', strtotime($dia));
+        // Guarda dados no banco
         $agendamento = Agendamento::find($id);
         $agendamento->nome = $request->input('nome');
         $agendamento->email = $request->input('email');
         $agendamento->cpf = $request->input('cpf');
         $agendamento->celular = $request->input('celular');
+        $agendamento->dia = $dia;
         $agendamento->idregional = $request->input('regional');
         $agendamento->idusuario = $request->input('atendente');
         $agendamento->status = $request->input('status');
