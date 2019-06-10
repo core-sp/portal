@@ -123,7 +123,7 @@ class ChamadoController extends Controller
             $variaveis = (object) $this->variaveis;
             return view('admin.crud.editar', compact('resultado', 'variaveis'));
         } else {
-            abort(403);
+            abort(401);
         }
     }
 
@@ -152,7 +152,7 @@ class ChamadoController extends Controller
             abort(500);
         event(new CrudEvent('chamado', 'editou', $chamado->idchamado));
         return redirect('/admin')
-            ->with('message', '<i class="icon fa fa-check"></i>Chamado registrado com sucesso!')
+            ->with('message', '<i class="icon fa fa-check"></i>Chamado editado com sucesso!')
             ->with('class', 'alert-success');
     }
 
