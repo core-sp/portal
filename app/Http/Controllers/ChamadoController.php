@@ -119,11 +119,15 @@ class ChamadoController extends Controller
     public function edit(Request $request, $id)
     {
         $resultado = Chamado::find($id);
-        if(Auth::id() === $resultado->idusuario) {
-            $variaveis = (object) $this->variaveis;
-            return view('admin.crud.editar', compact('resultado', 'variaveis'));
-        } else {
+        if(!isset($resultado)) {
             abort(401);
+        } else {
+            if(Auth::id() === $resultado->idusuario) {
+                $variaveis = (object) $this->variaveis;
+                return view('admin.crud.editar', compact('resultado', 'variaveis'));
+            } else {
+                abort(401);
+            }
         }
     }
 
@@ -180,7 +184,7 @@ class ChamadoController extends Controller
     public function lixeira(Request $request)
     {
         ControleController::autorizaStatic(['1']);
-        $resultados = Chamado::onlyTrashed()->paginate(10);
+        $resultados = Chamado::onlyTrashed()->orderBy('idchamado','DESC')->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
             'Código',
