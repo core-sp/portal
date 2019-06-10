@@ -13,4 +13,27 @@ class ChamadoControllerHelper extends Controller
         $resultados = Chamado::where('idusuario',$idusuario)->withTrashed()->orderBy('created_at','DESC')->paginate(5);
         return $resultados;
     }
+
+    public static function tipos()
+    {
+        $tipos = [
+            'Dúvida',
+            'Reportar Bug',
+            'Sugestão',
+            'Solicitar Funcionalidade'
+        ];
+        return $tipos;  
+    }
+
+    public static function prioridades()
+    {
+        $prioridades = [
+            'Muito Baixa',
+            'Baixa',
+            'Normal',
+            'Alta',
+            'Muito Alta'
+        ];
+        return $prioridades;
+    }
 }

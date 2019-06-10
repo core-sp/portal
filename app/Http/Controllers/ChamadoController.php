@@ -8,6 +8,7 @@ use App\Chamado;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Auth;
 
 class ChamadoController extends Controller
 {
@@ -110,7 +111,47 @@ class ChamadoController extends Controller
         if(!$save)
             abort(500);
         event(new CrudEvent('chamado', 'criou', $chamado->idchamado));
-        return redirect('/admin/perfil')
+        return redirect('/admin')
+            ->with('message', '<i class="icon fa fa-check"></i>Chamado registrado com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $resultado = Chamado::find($id);
+        if(Auth::id() === $resultado->idusuario) {
+            $variaveis = (object) $this->variaveis;
+            return view('admin.crud.editar', compact('resultado', 'variaveis'));
+        } else {
+            abort(403);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $regras = [
+            'tipo' => 'required',
+            'prioridade' => 'required',
+            'mensagem' => 'required',
+            'img' => 'max:191'
+        ];
+        $mensagens = [
+            'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+        ];
+        $erros = $request->validate($regras, $mensagens);
+        // Inputa dados no BD
+        $chamado = Chamado::find($id);
+        $chamado->tipo = $request->input('tipo');
+        $chamado->prioridade = $request->input('prioridade');
+        $chamado->mensagem = $request->input('mensagem');
+        $chamado->img = $request->input('img');
+        $chamado->idusuario = $request->input('idusuario');
+        $update = $chamado->update();
+        if(!$update)
+            abort(500);
+        event(new CrudEvent('chamado', 'editou', $chamado->idchamado));
+        return redirect('/admin')
             ->with('message', '<i class="icon fa fa-check"></i>Chamado registrado com sucesso!')
             ->with('class', 'alert-success');
     }

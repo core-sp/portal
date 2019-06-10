@@ -66,6 +66,15 @@ class Helper extends Controller
         return $string;
     }
 
+    public static function resumoTamanho($string, $tamanho)
+    {
+        if (strlen($string) > 100)
+            $string = strip_tags($string);
+            $string = html_entity_decode($string);
+            $string = substr($string, 0, $tamanho) . '...';
+        return $string;
+    }
+
     public static function getData($data)
     {
     	$date = new \DateTime($data);
