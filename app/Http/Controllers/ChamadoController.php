@@ -40,7 +40,7 @@ class ChamadoController extends Controller
         // Opções de cabeçalho da tabela
         $headers = [
             'Código',
-            'Tipo',
+            'Tipo / Mensagem',
             'Prioridade',
             'Usuário',
             'Ações'
@@ -56,7 +56,7 @@ class ChamadoController extends Controller
             $acoes .= '</form>';
             $conteudo = [
                 $resultado->idchamado,
-                $resultado->tipo,
+                $resultado->tipo.'<br><small>'.Helper::resumoTamanho($resultado->mensagem, 75).'</small>',
                 $resultado->prioridade,
                 $resultado->user->nome,
                 $acoes
