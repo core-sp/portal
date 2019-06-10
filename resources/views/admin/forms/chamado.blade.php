@@ -1,15 +1,30 @@
+@php
+    $tipos = App\Http\Controllers\Helpers\ChamadoControllerHelper::tipos();
+    $prioridades = App\Http\Controllers\Helpers\ChamadoControllerHelper::prioridades();
+@endphp
+
 <form role="form" method="POST">
     @csrf
+    @if(isset($resultado))
+        {{ method_field('PUT') }}
+    @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}" />
     <div class="card-body">
         <div class="form-row">
             <div class="col">
                 <label for="tipo">Tipo</label>
                 <select name="tipo" class="form-control">
-                    <option value="Dúvida">Dúvida</option>
-                    <option value="Reporte de bugs">Reportar bug</option>
-                    <option value="Sugestão">Sugestão</option>
-                    <option value="Solicitação de funcionalidade">Solicitar funcionalidade</option>
+                    @foreach($tipos as $tipo)
+                        @if(isset($resultado))
+                            @if($tipo === $resultado->tipo)
+                                <option value="{{ $tipo }}" selected>{{ $tipo }}</option>
+                            @else
+                                <option value="{{ $tipo }}">{{ $tipo }}</option>
+                            @endif
+                        @else
+                        <option value="{{ $tipo }}">{{ $tipo }}</option>
+                        @endif
+                    @endforeach
                 </select>
                 @if($errors->has('tipo'))
                     <div class="invalid-feedback">
@@ -20,11 +35,17 @@
             <div class="col">
                 <label for="prioridade">Prioridade</label>
                 <select name="prioridade" class="form-control">
-                    <option value="Muito baixa">Muito baixa</option>
-                    <option value="Baixa">Baixa</option>
-                    <option value="Normal">Normal</option>
-                    <option value="Alta">Alta</option>
-                    <option value="Muito alta">Muito alta</option>
+                    @foreach($prioridades as $prioridade)
+                        @if(isset($resultado))
+                            @if($prioridade === $resultado->prioridade)
+                                <option value="{{ $prioridade }}" selected>{{ $prioridade }}</option>
+                            @else
+                                <option value="{{ $prioridade }}">{{ $prioridade }}</option>
+                            @endif
+                        @else
+                            <option value="{{ $prioridade }}">{{ $prioridade }}</option>
+                        @endif
+                    @endforeach
                 </select>
                 @if($errors->has('prioridade'))
                     <div class="invalid-feedback">
@@ -40,7 +61,7 @@
                     class="form-control {{ $errors->has('mensagem') ? 'is-invalid' : '' }}"
                     id="mensagem"
                     placeholder="Descreva com detalhes sua solicitação"
-                    rows="3"></textarea>
+                    rows="3">@if(isset($resultado)){{ $resultado->mensagem }}@endif</textarea>
                 @if($errors->has('mensagem'))
                 <div class="invalid-feedback">
                     {{ $errors->first('mensagem') }}
@@ -61,6 +82,9 @@
                     class="form-control"
                     type="text"
                     name="img"
+                    @if(isset($resultado->img))
+                    value="{{ $resultado->img }}"
+                    @endif
                     placeholder="Se necessário, anexe um print à solicitação"
                     />
                 </div>
@@ -70,7 +94,13 @@
     <div class="card-footer">
         <div class="float-right">
             <a href="/admin" class="btn btn-default">Cancelar</a>
-            <button type="submit" class="btn btn-primary ml-1">Registrar</button>
+            <button type="submit" class="btn btn-primary ml-1">
+                @if(isset($resultado))
+                    Salvar
+                @else
+                    Registrar
+                @endif
+            </button>
         </div>
     </div>
 </form>

@@ -126,6 +126,11 @@ class AgendamentoSiteController extends Controller
         $dia_inalterado = $request->input('dia');
         $dia = str_replace('/', '-', $request->input('dia'));
         $dia = date('Y-m-d', strtotime($dia));
+        $diaAtual = date('Y-m-d');
+        if(!preg_match('/^[0-9-]+$/', $dia))
+            abort(500);
+        if($dia <= $diaAtual) 
+            abort(500);
         $hora = $request->input('hora');
         $cpf = $request->input('cpf');
         if(!$this->permiteAgendamento($dia, $hora, $regional))
