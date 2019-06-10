@@ -109,7 +109,7 @@ use \App\Http\Controllers\Helper;
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/appointment.png') }}" class="inside-img" />
-              <p class="text-uppercase mt-3 branco">Agende seu<br class="hide-992" /> atendimento</p>
+              <p class="text-uppercase mt-3 branco">Agendamento<br class="hide-992" /> para refis</p>
               <button class="btn-box">Agendar</button>
             </div>
           </div>
