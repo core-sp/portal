@@ -24,6 +24,12 @@ use \App\Http\Controllers\Helper;
             </a>
           </div>
           <div class="carousel-item h-100">
+            <a href="/registro-inicial">
+              <img class="w-100 hide-576" src="{{ asset('img/registro-inicial.jpg') }}" />
+              <img class="w-100 show-576" src="{{ asset('img/registro-inicial-m.jpg') }}" />
+            </a>
+          </div>
+          <div class="carousel-item h-100">
             <a href="/portal">
               <img class="w-100 hide-576" src="{{ asset('img/banner-novo-portal.jpg') }}" />
               <img class="w-100 show-576" src="{{ asset('img/banner-novo-portal-.jpg') }}" />
@@ -33,12 +39,6 @@ use \App\Http\Controllers\Helper;
             <a href="/refis-2019">
               <img class="w-100 hide-576" src="{{ asset('img/banner-refis.png') }}" />
               <img class="w-100 show-576" src="{{ asset('img/banner-refis-m.png') }}" />
-            </a>
-          </div>
-          <div class="carousel-item h-100">
-            <a href="/registro-inicial">
-              <img class="w-100 hide-576" src="{{ asset('img/registro-inicial.jpg') }}" />
-              <img class="w-100 show-576" src="{{ asset('img/registro-inicial-m.jpg') }}" />
             </a>
           </div>
         </div>
