@@ -15,6 +15,7 @@ use App\Mail\CursoInscritoMailGuest;
 use App\Rules\Cpf;
 use Illuminate\Support\Facades\Input;
 use App\Events\CursoInscritoEvent;
+use Response;
 
 class CursoInscritoController extends Controller
 {
@@ -309,6 +310,32 @@ class CursoInscritoController extends Controller
         $variaveis = (object) $this->variaveis;
         $tabela = $this->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function download($id)
+    {
+        ControleController::autoriza($this->class, 'index');
+        $headers = [
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=inscritos-'.$id.'.csv',
+            'Expires' => '0',
+            'Pragma' => 'public',
+        ];
+        $resultado = CursoInscrito::select('cpf','nome','telefone','email','registrocore','created_at')
+            ->where('idcurso', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        $lista = $resultado->toArray();
+        array_unshift($lista, array_keys($lista[0]));
+        $callback = function() use($lista) {
+            $fh = fopen('php://output','w');
+            foreach($lista as $linha) {
+                fputcsv($fh,$linha);
+            }
+            fclose($fh);
+        };
+        return Response::stream($callback, 200, $headers);
     }
 
 }

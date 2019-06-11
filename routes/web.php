@@ -142,6 +142,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/adicionar-inscrito/{id}', 'CursoInscritoController@create');
     Route::post('/adicionar-inscrito/{id}', 'CursoInscritoController@store');
     Route::delete('/cancelar-inscricao/{id}', 'CursoInscritoController@destroy');
+    Route::get('/inscritos/download/{id}', 'CursoInscritoController@download');
   });
 
   // Rota para Balcão de Oportunidades
@@ -180,6 +181,11 @@ Route::prefix('admin')->group(function() {
     Route::get('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@edit');
     Route::put('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@update');
     Route::delete('/bloqueios/apagar/{id}', 'AgendamentoBloqueioController@destroy');
+  });
+
+  // Rota para Newsletter
+  Route::prefix('newsletter')->group(function(){
+    Route::get('/download', 'NewsletterController@download');
   });
 });
 

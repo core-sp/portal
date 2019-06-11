@@ -36,9 +36,9 @@ use \App\Http\Controllers\Helper;
             </a>
           </div>
           <div class="carousel-item h-100">
-            <a href="/balcao-de-oportunidades">
-              <img class="w-100 hide-576" src="{{ asset('img/banner-bdo.png') }}" />
-              <img class="w-100 show-576" src="{{ asset('img/banner-bdo-mobile.png') }}" />
+            <a href="/registro-inicial">
+              <img class="w-100 hide-576" src="{{ asset('img/registro-inicial.jpg') }}" />
+              <img class="w-100 show-576" src="{{ asset('img/registro-inicial-m.jpg') }}" />
             </a>
           </div>
         </div>

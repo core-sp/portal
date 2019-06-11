@@ -104,6 +104,9 @@
                 </div>
               </div>
             @endif
+            @if(isset($variaveis->addonsHome))
+              {!! $variaveis->addonsHome !!}
+            @endif
             @if(count($resultados) > 0)
             {!! $tabela !!}
             @else
