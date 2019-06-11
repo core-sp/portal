@@ -184,7 +184,7 @@ class AgendamentoSiteController extends Controller
         $agradece .= "Endereço: ".$agendamento->regional->endereco.", ".$agendamento->regional->numero;
         $agradece .= " - ".$agendamento->regional->complemento."<br>";
         $agradece .= "Serviço: ".$tiposervico.'<br>';
-        $adendo = '<i>* As informações foram enviadas ao email cadastrado no formulário</i>';
+        $adendo = '<i>* As informações serão enviadas ao email cadastrado no formulário</i>';
         // Texto suplementar ao email de Agendamento
         $sup = AgendamentoControllerHelper::textoSuplementarMail();
         $body = $agradece.$sup;
