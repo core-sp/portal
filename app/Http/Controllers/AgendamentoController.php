@@ -91,9 +91,9 @@ class AgendamentoController extends Controller
         // Pega dia atual e cospe no título
         $dia = Helper::onlyDate($dia);
         if(Input::get('regional') !== '999')
-            $this->variaveis['continuacao_titulo'] = 'em '.$regionalNome.' - '.$dia;
+            $this->variaveis['continuacao_titulo'] = 'em <strong>'.$regionalNome.' - '.$dia.'</strong>';
         else
-            $this->variaveis['continuacao_titulo'] = 'em Todas - '.$dia;
+            $this->variaveis['continuacao_titulo'] = 'em <strong>Todas - '.$dia.'</strong>';
         return $resultados;
     }
 
@@ -164,7 +164,7 @@ class AgendamentoController extends Controller
             $resultados = $this->resultados($dia, $regional);
             $regionalId = Regional::find(Auth::user()->idregional);
             $regionalNome = $regionalId->regional;
-            $this->variaveis['continuacao_titulo'] = 'em '.$regionalNome.' - '.$diaFormatado;
+            $this->variaveis['continuacao_titulo'] = 'em <strong>'.$regionalNome.' - '.$diaFormatado.'</strong>';
         }
         // Monta tabela com resultados
         $tabela = $this->tabelaCompleta($resultados);

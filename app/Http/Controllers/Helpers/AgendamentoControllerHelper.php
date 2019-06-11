@@ -124,10 +124,13 @@ class AgendamentoControllerHelper extends Controller
     {
         $now = date('Y-m-d');
         if($now > $dia) {
-            if($status === 'Cancelado' || $status === null) 
-                echo "<p class='mb-0'><i>* Agendamento cancelado</i></p>";
-            else
-                echo "<p class='mb-0'><i>* Agendamento realizado no dia ".Helper::onlyDate($dia).", às ".$hora."</i></p>";
+            if($status === 'Cancelado') {
+                echo "<p class='mb-0'><strong>Status:</strong> Atendimento cancelado</p>";
+            } elseif($status === null) {
+                echo "<p class='mb-0'><strong>Status:</strong> Não compareceu</p>";
+            } else {
+                echo "<p class='mb-0'><strong>Status:</strong> Atendimento realizado no dia ".Helper::onlyDate($dia).", às ".$hora."</p>";
+            }
         } else {
             // Botão de reenviar email
             $botao = '<form method="POST" action="/admin/agendamentos/reenviar-email/'.$id.'" class="d-inline">';
@@ -137,5 +140,34 @@ class AgendamentoControllerHelper extends Controller
             $cancelar = " <a href='/agendamento-consulta/busca?protocolo=".str_replace('AGE-','',$protocolo)."' class='btn btn-sm btn-danger' target='_blank'>Cancelar agendamento</a>";
             echo $botao.$cancelar;
         }
+    }
+
+    public static function textoSuplementarMail()
+    {
+        $sup = '<hr>';
+        $sup .= '<h3><strong>DOCUMENTAÇÃO PARA REALIZAR ACORDO / PARCELAMENTO DE DÉBITOS:</strong></h3>';
+        $sup .= '<p><strong>Pessoa Jurídica / Cópias Simples:</strong></p>';
+        $sup .= '<ol>';
+        $sup .= '<li>Contrato Social atualizado devidamente registrado no órgão competente;</li>';
+        $sup .= '<li>Atualização Cadastral Pessoa Jurídica devidamente preenchida e assinada pelo administrador;</li>';
+        $sup .= '<li>Cédula de Identidade (não pode ser superior a 10 anos a data de emissão) e CPF e ou CNH (Carteira Nacional de Habilitação) válida e ou RNE para estrangeiros do administrador;</li>';
+        $sup .= '<li>Comprovante de Residência atual de no mínimo até 03 meses do administrador;</li>';
+        $sup .= '</ol>';
+        $sup .= '<p>Observação: Se o acordo / parcelamento for solicitado através de terceiros será necessário apresentar procuração específica, dando amplos poderes para representar a Empresa perante o CORE-SP e cópia Cédula de Identidade (não pode ser superior a 10 anos a data de emissão) do procurador.</p>';
+        $sup .= '<p><strong>Pessoa Física Responsável Técnico / Cópias Simples:</strong></p>';
+        $sup .= '<ol>';
+        $sup .= '<li>Cédula de Identidade (não pode ser superior a 10 anos a data de emissão) e CPF e ou CNH (Carteira Nacional de Habilitação) válida e ou RNE para estrangeiros do administrador;</li>';
+        $sup .= '<li>Comprovante de Residência atual de no mínimo até 03 meses do Representante Comercial;</li>';
+        $sup .= '</ol>';
+        $sup .= '<p>Observação: Se o acordo / parcelamento for solicitado através de terceiros será necessário apresentar procuração específica, dando amplos poderes para representar o Represente Comercial perante o CORE-SP e cópia Cédula de Identidade (não pode ser superior a 10 anos a data de emissão) do procurador.</p>';
+        $sup .= '<p><strong>Pessoa Física Autônomo / Cópias Simples:</strong></p>';
+        $sup .= '<ol>';
+        $sup .= '<li>Cédula de Identidade (não pode ser superior a 10 anos a data de emissão) e CPF e ou CNH (Carteira Nacional de Habilitação) válida e ou RNE para estrangeiros do Representante Comercial;</li>';
+        $sup .= '<li>Comprovante de Residência atual de no mínimo até 03 meses do Representante Comercial;</li>';
+        $sup .= '<li>Atualização Cadastral Pessoa Física devidamente preenchida e assinada pelo Representante Comercial;</li>';
+        $sup .= '</ol>';
+        $sup .= '<p>Observação: Se o acordo / parcelamento for solicitado através de terceiros será necessário apresentar procuração específica, dando amplos poderes para representar o Represente Comercial perante o CORE-SP e cópia Cédula de Identidade (não pode ser superior a 10 anos a data de emissão) do procurador.</p>';
+        $sup .= '<p><strong>Os acordos / parcelamentos são realizados presencialmente na SEDE ou em nossos Escritórios Seccionais, mediante assinatura do Termo de Confissão de Dívida.</strong></p>';
+        return $sup;
     }
 }
