@@ -70,7 +70,6 @@ use \App\Http\Controllers\Helper;
         </div>
       </div>
     </div>
-    {{ url('/') }}
     <div class="row">
       <div class="col-lg-3 col-sm-6 pb-15-992">
         <a href="/cartilha-do-representante" class="d-block h-100">
