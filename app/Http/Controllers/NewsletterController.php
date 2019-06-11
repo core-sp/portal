@@ -24,8 +24,6 @@ class NewsletterController extends Controller
 
         // Remove máscara
         $celular = preg_replace("/[^0-9]/", "", $request->input('celular'));
-        dd($celular);
-        exit;
 
         $newsletter = new Newsletter();
         $newsletter->nome = $request->input('nome');
