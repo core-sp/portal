@@ -50,3 +50,8 @@
 .nowrap {
   white-space: nowrap;
 }
+
+.nodecoration {
+  color: inherit;
+  text-decoration: none;
+}

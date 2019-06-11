@@ -291,7 +291,8 @@ class CursoController extends Controller
             'continuacao_titulo' => 'em <strong>'.$curso->tipo.': '.$curso->tema.'</strong>',
             'btn_criar' => '<a href="/admin/cursos/adicionar-inscrito/'.$curso->idcurso.'" class="btn btn-primary mr-1">Adicionar inscrito</a> ',
             'btn_lixeira' => '<a href="/admin/cursos" class="btn btn-default">Lista de Cursos</a>',
-            'busca' => 'cursos/inscritos/'.$id
+            'busca' => 'cursos/inscritos/'.$id,
+            'addonsHome' => '<a href="/admin/cursos/inscritos/download/'.$id.'" class="btn btn-primary mb-2">Baixar CSV</a>'
         ];
         if(!ControleController::mostra('CursoInscritoController', 'create'))
             unset($variaveis['btn_criar']);
