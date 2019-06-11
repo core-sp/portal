@@ -24,7 +24,7 @@
         <h1 class="d-inline mr-3 align-middle">
           {{ ucfirst($variaveis->pluraliza) }}
           @if(isset($variaveis->continuacao_titulo))
-            {{ $variaveis->continuacao_titulo }}
+            {!! $variaveis->continuacao_titulo !!}
           @endif
         </h1>
         @if(isset($variaveis->btn_criar))

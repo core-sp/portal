@@ -288,7 +288,7 @@ class CursoController extends Controller
             'plural' => 'inscritos',
             'singular' => 'inscrito',
             'singulariza' => 'o inscrito',
-            'continuacao_titulo' => 'em '.$curso->tipo.': '.$curso->tema,
+            'continuacao_titulo' => 'em <strong>'.$curso->tipo.': '.$curso->tema.'</strong>',
             'btn_criar' => '<a href="/admin/cursos/adicionar-inscrito/'.$curso->idcurso.'" class="btn btn-primary mr-1">Adicionar inscrito</a> ',
             'btn_lixeira' => '<a href="/admin/cursos" class="btn btn-default">Lista de Cursos</a>',
             'busca' => 'cursos/inscritos/'.$id
