@@ -9,7 +9,7 @@
         </div>
         <hr>
         <div>
-            <p>Mensagem enviada pelo site oficial do CORE-SP:<a href="{{ route('site.home') }}">{{ route('site.home') }}</a></p>
+            <p>Mensagem enviada pelo <a href="{{ route('site.home') }}">site oficial</a> do CORE-SP.</p>
         </div>
     </body>
 </html>
