@@ -81,22 +81,6 @@
         </div>
         <div class="form-row mt-2">
             <div class="col">
-                <label for="dia">Dia</label>
-                <input type="text"
-                    class="form-control {{ $errors->has('dia') ? 'is-invalid' : '' }}"
-                    placeholder="00/00/0000"
-                    name="dia"
-                    @if(isset($resultado))
-                        value="{{ Helper::onlyDate($resultado->dia) }}"
-                    @endif
-                    />
-                @if($errors->has('dia'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('dia') }}
-                    </div>
-                @endif
-            </div>
-            <div class="col">
                 <label for="regional">Regional</label>
                 <select name="regional" class="form-control">
                 @foreach($regionais as $regional)
@@ -112,8 +96,6 @@
                 @endforeach
                 </select>
             </div>
-        </div>
-        <div class="form-row mt-2">
             <div class="col">
                 <label for="atendente">Atendimento realizado por:</label>
                 <select name="atendente" class="form-control">

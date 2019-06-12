@@ -140,6 +140,7 @@ use \App\Http\Controllers\Helper;
                     <a href="/agendamento" class="dropdown-item">Agendamento</a>
                     <a href="/balcao-de-oportunidades" class="dropdown-item">Balcão de Oportunidades</a>
                     <a href="/cursos" class="dropdown-item">Cursos</a>
+                    <a href="/downloads" class="dropdown-item">Downloads</a>
                     <a href="/registro-inicial" class="dropdown-item">Registro Inicial</a>
                   </div>
                 </li>

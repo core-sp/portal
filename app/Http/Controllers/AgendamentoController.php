@@ -203,24 +203,22 @@ class AgendamentoController extends Controller
         $select .= '</select>';
         $select .= '<select class="d-inline w-auto custom-select custom-select-sm" name="status">';
         $select .= '<option disabled selected>Status</option>';
-        if(Input::has('status')) {
-            if(Input::get('status') == "Compareceu") {
-                $select .= '<option value="Qualquer">Qualquer</option>';
-                $select .= '<option value="Compareceu" selected>Compareceram</option>';
-                $select .= '<option value="null">Não Compareceram</option>';
-            } elseif (Input::get('status') == 'null') {
-                $select .= '<option value="Qualquer">Qualquer</option>';
-                $select .= '<option value="Compareceu">Compareceram</option>';
-                $select .= '<option value="null" selected>Não Compareceram</option>';
-            } else {
-                $select .= '<option value="Qualquer" selected>Qualquer</option>';
-                $select .= '<option value="Compareceu">Compareceram</option>';
-                $select .= '<option value="null">Não Compareceram</option>';
-            }
-        } else {
+        if(Input::get('status') === 'Qualquer')
+            $select .= '<option value="Qualquer" selected>Qualquer</option>';
+        else
             $select .= '<option value="Qualquer">Qualquer</option>';
-            $select .= '<option value="Compareceu">Compareceram</option>';
-            $select .= '<option value="null">Não Compareceram</option>';
+        // Pega os status
+        $status = AgendamentoControllerHelper::status();
+        foreach($status as $s) {
+            if(Input::has('status')) {
+                if(Input::get('status') === $s) {
+                    $select .= '<option value="'.$s.'" selected>'.$s.'</option>';
+                } else {
+                    $select .= '<option value="'.$s.'">'.$s.'</option>';
+                }
+            } else {
+                $select .= '<option value="'.$s.'">'.$s.'</option>';
+            }
         }
         $select .= '</select>';
         $select .= '<div class="d-inline-block mr-2 ml-2">';
@@ -252,13 +250,17 @@ class AgendamentoController extends Controller
                 return $string;
             break;
 
+            case 'Não Compareceu':
+                return "<strong>Não Compareceu</strong>";
+            break;
+
             default:
                 $acoes = '<form method="POST" id="statusAgendamento" action="/admin/agendamentos/status" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="PUT" id="method" />';
                 $acoes .= '<input type="hidden" name="idagendamento" value="'.$id.'" />';
-                $acoes .= '<input type="hidden" name="status" id="status" value="Compareceu" />';
-                $acoes .= '<input type="submit" value="Confirmar presença" id="btnSubmit" class="btn btn-sm ml-1 btn-primary" />';
+                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="Compareceu">Confirmar</button>';
+                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="Não Compareceu">Não Compareceu</button>';
                 $acoes .= '</form>';
                 if(ControleController::mostra($this->class, 'edit'))
                     $acoes .= " <a href='/admin/agendamentos/editar/".$id."' class='btn btn-sm btn-default'>Editar</a>";
@@ -368,19 +370,19 @@ class AgendamentoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
-        // Valida dia de atendimento
-        $dia = str_replace('/', '-', $request->input('dia'));
-        $dia = date('Y-m-d', strtotime($dia));
         // Guarda dados no banco
+        if(empty($request->input('atendente')))
+            $status = $request->input('status');
+        else
+            $status = 'Compareceu';
         $agendamento = Agendamento::find($id);
         $agendamento->nome = $request->input('nome');
         $agendamento->email = $request->input('email');
         $agendamento->cpf = $request->input('cpf');
         $agendamento->celular = $request->input('celular');
-        $agendamento->dia = $dia;
         $agendamento->idregional = $request->input('regional');
         $agendamento->idusuario = $request->input('atendente');
-        $agendamento->status = $request->input('status');
+        $agendamento->status = $status;
         $update = $agendamento->update();
         if(!$update)
             abort(500);

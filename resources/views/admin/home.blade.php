@@ -6,6 +6,7 @@
 	use App\Http\Controllers\NewsletterController;
 	use App\Http\Controllers\ControleController;
 	use App\Http\Controllers\Helper;
+	$alertas = App\Http\Controllers\AdminController::alertas();
 	$chamados = App\Http\Controllers\Helpers\ChamadoControllerHelper::getByUser(Auth::user()->idusuario);
 @endphp
 
@@ -19,6 +20,23 @@
           </div>
         </div>
       </div>
+    </div>
+  @endif
+  @if(!empty($alertas))
+  	<div class="container-fluid mb-2">
+	  @if(isset($alertas['agendamentoCount']))
+      <div class="row">
+        <div class="col">
+          <div class="alert alert-warning">
+		  	@if($alertas['agendamentoCount'] === 1)
+			  <i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Existe <strong>1</strong> atendimento pendente de validação! (AGENDAMENTO)
+			@else
+				<i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Existem <strong>{{ $alertas['agendamentoCount'] }}</strong> atendimentos pendentes de validação! (AGENDAMENTO)
+			@endif
+          </div>
+        </div>
+      </div>
+	  @endif
     </div>
   @endif
   <div class="container-fluid">
@@ -46,7 +64,7 @@
   	  	  </div>
   	  	</div>
   	  </div>
-	  @if(ControleController::mostraStatic(['1','3','2']))
+	  @if(ControleController::mostra('Newsletter','index'))
 		  <div class="col-6">
 		  	<div class="card card-info">
 			  <div class="card-header">
