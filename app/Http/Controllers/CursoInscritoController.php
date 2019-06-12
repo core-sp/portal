@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CursoInscritoMailGuest;
 use App\Rules\Cpf;
 use Illuminate\Support\Facades\Input;
-use App\Events\CursoInscritoEvent;
+use App\Events\ExternoEvent;
 use Response;
 
 class CursoInscritoController extends Controller
@@ -236,7 +236,7 @@ class CursoInscritoController extends Controller
         $string = $inscrito->nome." (CPF: ".$inscrito->cpf.")";
         $string .= " *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
         $string .= "*, turma *".$inscrito->curso->idcurso."*";
-        event(new CursoInscritoEvent($string));
+        event(new ExternoEvent($string));
         // Gera mensagem de agradecimento
         $agradece = "Sua inscrição em <strong>".$inscrito->curso->tipo;
         $agradece .= " - ".$inscrito->curso->tema."</strong>";
