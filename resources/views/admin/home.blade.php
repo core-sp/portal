@@ -64,7 +64,7 @@
   	  	  </div>
   	  	</div>
   	  </div>
-	  @if(ControleController::mostra('Newsletter','index'))
+	  @if(ControleController::mostra('NewsletterController','index'))
 		  <div class="col-6">
 		  	<div class="card card-info">
 			  <div class="card-header">

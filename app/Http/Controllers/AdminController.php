@@ -40,6 +40,9 @@ class AdminController extends Controller
                 ->count();
             $alertas['agendamentoCount'] = $count;
         }
+        if($count < 1) {
+            $alertas = [];
+        }
         return $alertas;
     }
 }
