@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Agendamento;
 
 class AdminController extends Controller
 {
@@ -14,5 +15,31 @@ class AdminController extends Controller
     public function index()
     {
     	return view('admin.home');
+    }
+
+    public static function alertas()
+    {
+        $alertas = [];
+        // Alerta de atendimentos nulos
+        $hoje = date('Y-m-d');
+        if(session('idusuario') === 9) {
+            $count = Agendamento::where('dia','<',$hoje)
+                ->where('status','=',null)
+                ->where('idregional','=',1)
+                ->count();
+            $alertas['agendamentoCount'] = $count;
+        } elseif(session('idusuario') === 10) {
+            $count = Agendamento::where('dia','<',$hoje)
+                ->where('status','=',null)
+                ->where('idregional','!=',1)
+                ->count();
+            $alertas['agendamentoCount'] = $count;
+        } else {
+            $count = Agendamento::where('dia','<',$hoje)
+                ->where('status','=',null)
+                ->count();
+            $alertas['agendamentoCount'] = $count;
+        }
+        return $alertas;
     }
 }

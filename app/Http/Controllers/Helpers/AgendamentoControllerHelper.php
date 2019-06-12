@@ -114,6 +114,7 @@ class AgendamentoControllerHelper extends Controller
     public static function status()
     {
         $status = [
+            'Não Compareceu',
             'Compareceu',
             'Cancelado'
         ];

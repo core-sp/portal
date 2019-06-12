@@ -123,7 +123,7 @@ return [
         'image/gif',
         'image/svg+xml',
         'application/pdf',
-        'text/plain',
+        'text/plain'
     ],
 
     /*

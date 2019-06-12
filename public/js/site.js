@@ -32,7 +32,7 @@ $(document).ready(function(){
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(200);
 	});
 });
-
+// Mostra menu superior ao rolar a tela
 $(window).scroll(function(){
 	if($(window).width() > 767) {
 		if ($(document).scrollTop() > 300) {
@@ -42,12 +42,10 @@ $(window).scroll(function(){
 		}
 	}
 });
-
+// Replica o conteúdo do menu no menu superior
 var primeira = document.getElementById('menu-principal');
 var segunda = document.getElementById('append-menu');
-
 segunda.innerHTML = primeira.innerHTML;
-
 // Feriados para desablitar calendário
 natDays = [
 	[6, 20, 'br'],

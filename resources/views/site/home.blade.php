@@ -24,7 +24,7 @@ use \App\Http\Controllers\Helper;
             </a>
           </div>
           <div class="carousel-item h-100">
-            <a href="/registro-inicial">
+            <a href="/#">
               <img class="w-100 hide-576" src="{{ asset('img/registro-inicial.jpg') }}" />
               <img class="w-100 show-576" src="{{ asset('img/registro-inicial-m.jpg') }}" />
             </a>
