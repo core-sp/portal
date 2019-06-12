@@ -214,19 +214,21 @@ use \App\Http\Controllers\Helper;
                 <br />(11) 3243-5500 / 5519
               </p>
             </div>
-            <div class="col-md-4 hide-768">
-              <div class="footer-title w-75 mb-3">
+            <div class="col-md-4">
+              <div class="footer-title w-75 mb-3 mt-4-768">
+                <h5 class="branco">Parceiros</h5>
+              </div>
+              <a href="http://www.confere.org.br/" target="_blank">
+                <img src="{{ asset('img/confere.png') }}" alt="CONFERE">
+              </a>
+              <div class="footer-title w-75 mb-3 mt-4">
                 <h5 class="branco">Serviços</h5>
               </div>
-              <p class="branco"><a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">Transparência</a></p>
-              <p class="branco"><a href="/licitacoes">Licitações</a></p>
-              <p class="branco"><a href="/concursos">Concursos</a></p>
               <p class="branco"><a href="/agendamento">Agendamento</a></p>
-              <p class="branco"><a href="/cursos">Cursos</a></p>
-              <p class="branco"><a href="/feiras">Feiras</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
-              <p class="branco"><a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">E-OUV</a></p>
-              <p class="branco"><a href="/seccionais">Seccionais</a></p>
+              <p class="branco"><a href="/cursos">Cursos</a></p>
+              <p class="branco"><a href="/downloads">Downloads</a></p>
+              <p class="branco"><a href="/registro-inicial">Registro Inicial</a></p>
             </div>
             <div class="col-md-4">
               <div class="footer-title w-75 mb-3 mt-4-768">

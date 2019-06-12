@@ -318,7 +318,11 @@ class AgendamentoController extends Controller
         $update = $agendamento->update();
         if(!$update)
             abort(500);
-        event(new CrudEvent('agendamento', 'confirmou presença', $agendamento->idagendamento));
+        if($status === 'Compareceu') {
+            event(new CrudEvent('agendamento', 'confirmou presença', $agendamento->idagendamento));
+        } else {
+            event(new CrudEvent('agendamento', 'confirmou falta', $agendamento->idagendamento));
+        }
         return redirect()->route('agendamentos.lista');
     }
 

@@ -11,7 +11,7 @@ use App\Http\Controllers\Helper;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
 use App\Rules\Cpf;
-use App\Events\AgendamentoEvent;
+use App\Events\ExternoEvent;
 
 class AgendamentoSiteController extends Controller
 {
@@ -167,7 +167,7 @@ class AgendamentoSiteController extends Controller
         $string = $nomeUser." (CPF: ".$cpf.")";
         $string .= " *agendou* atendimento em *".$agendamento->regional->regional;
         $string .= "* no dia ".$dia_inalterado;
-        event(new AgendamentoEvent($string));
+        event(new ExternoEvent($string));
         // Gera mensagem de agradecimento
         $agradece = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
         $agradece .= "<br>";
@@ -260,7 +260,7 @@ class AgendamentoSiteController extends Controller
                 $string = $agendamento->nome." (CPF: ".$agendamento->cpf.")";
                 $string .= " *cancelou* atendimento em *".$agendamento->regional->regional;
                 $string .= "* no dia ".Helper::onlyDate($agendamento->dia);
-                event(new AgendamentoEvent($string));
+                event(new ExternoEvent($string));
                 // Gera mensagem de agradecimento
                 $agradece = "Agendamento cancelado com sucesso!";
                 return view('site.agradecimento')->with('agradece', $agradece);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ControleController;
 use App\Newsletter;
+use App\Events\ExternoEvent;
 use Response;
 
 class NewsletterController extends Controller
@@ -32,7 +33,11 @@ class NewsletterController extends Controller
         $save = $newsletter->save();
         if(!$save)
             abort(500);
-        // Mensagem de agradecimento
+        // Gera evento de inscrição no Curso
+        $string = "*".$newsletter->nome."* (".$newsletter->email.")";
+        $string .= " *registrou-se* na newsletter";
+        event(new ExternoEvent($string));
+        // Gera mensagem de agradecimento
         $agradece = "Muito obrigado por inscrever-se em nossa newsletter";
         // Retorna view de agradecimento
         return view('site.agradecimento')->with('agradece', $agradece);

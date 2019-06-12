@@ -1990,6 +1990,15 @@ footer p {
 	.newsCotidiano {
 		padding: .25rem 0rem;
 	}
+
+	.noticia-img {
+		height: auto;
+	}
+
+	.noticia-img img {
+		object-fit: unset;
+		height: auto;
+	}
 }
 
 

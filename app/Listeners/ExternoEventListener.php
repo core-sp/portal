@@ -4,10 +4,10 @@ namespace App\Listeners;
 
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use App\Events\AgendamentoEvent;
+use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Log;
 
-class AgendamentoEventListener
+class ExternoEventListener
 {
     /**
      * Create the event listener.
@@ -25,7 +25,7 @@ class AgendamentoEventListener
      * @param  object  $event
      * @return void
      */
-    public function handle(AgendamentoEvent $event)
+    public function handle(ExternoEvent $event)
     {
         Log::channel('externo')->info($event->string);
     }
