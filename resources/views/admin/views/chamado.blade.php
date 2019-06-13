@@ -6,10 +6,12 @@
   @if(isset($resultado->resposta))
   <div class="row">
     <div class="col">
-      <img class="direct-chat-img" src="{{ asset('img/ti.png') }}" alt="CTI">
-      <div class="direct-chat-text">
-        <h5 class="mb-1">Resposta do CTI</h5>
-        <p class="mb-0">{!! $resultado->resposta !!}</p>
+      <div class="direct-chat-msg">
+        <img class="direct-chat-img" src="{{ asset('img/ti.png') }}" alt="CTI">
+        <div class="direct-chat-text">
+          <h5 class="mb-1">Resposta do CTI</h5>
+          <p class="mb-0">{!! $resultado->resposta !!}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -17,31 +19,40 @@
   @endif
   <div class="row">
     <div class="col">
-      <img class="direct-chat-img" src="{{ asset('img/user.png') }}" alt="USER">
-      <div class="direct-chat-text">
-        <h5 class="mb-1">{{ $resultado->tipo }}</h5>
-        <p class="mb-0"><i>({{ Helper::formataData($resultado->created_at) }}):</i> {{ $resultado->mensagem }}</p>
-      </div>
-      @if(isset($resultado->img))
-        <p><strong>Print:</strong></p>
-        <img src="{{ asset($resultado->img) }}" class="w-100" />
+      @if($resultado->tipo === 'Reportar Bug')
+      <div class="direct-chat-danger">
+      @elseif($resultado->tipo === 'Dúvida')
+      <div class="direct-chat-warning">
+      @elseif($resultado->tipo === 'Solicitar Funcionalidade')
+      <div class="direct-chat-primary">
+      @else
+      <div class="direct-chat-msg">
       @endif
+      <div class="direct-chat-msg right">
+        <img class="direct-chat-img" src="{{ asset('img/user.png') }}" alt="USER">
+          <div class="direct-chat-text">
+          <h5 class="mb-1">{{ $resultado->tipo }}</h5>
+          <p class="mb-0"><i>({{ Helper::formataData($resultado->created_at) }}):</i> {{ $resultado->mensagem }}</p>
+          @if(isset($resultado->img))
+          <hr>
+          <p><i>(Anexo)</i></p>
+          <img src="{{ asset($resultado->img) }}" class="mb-2" />
+          @endif
+        </div>
+      </div>
+      </div>
+      @if(!isset($resultado->deleted_at))
       <hr>
       <form method="POST" action="/admin/chamados/apagar/{{ $resultado->idchamado }}" class="d-inline">
         @csrf
         <input type="hidden" name="_method" value="delete" />
         <input type="submit" class="btn btn-sm btn-success" value="Dar baixa" onclick="return confirm('Tem certeza que deseja dar baixa no chamado?')" />
       </form>
-      </dl>
+      @else
+      <hr>
+      <p class="mb-0"><i>* Chamado concluído em {{ Helper::formataData($resultado->deleted_at) }}</i></p>
+      @endif
     </div>
-    @if(isset($resultado->img))
-    <div class="col-8">
-      <dl>
-        <dt>Print:</dt>
-        <img src="{{ asset($resultado->img) }}" class="w-100" />
-      </dl>
-    </div>
-    @endif
   </div>
   @if(session('idperfil') === 1 && !isset($resultado->resposta) && !isset($resultado->deleted_at))
   <hr>
