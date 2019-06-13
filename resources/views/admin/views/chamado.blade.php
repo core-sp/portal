@@ -3,6 +3,17 @@
 @endphp
 
 <div class="card-body">
+  @if(isset($resultado->resposta))
+  <div class="row">
+    <div class="col">
+      <dl class="mb-0">
+        <dt>Resposta do CTI:</dt>
+        <dd class="mb-0">{{ $resultado->resposta }}</dd>
+      </dl>
+    </div>
+  </div>
+  <hr>
+  @endif
   <div class="row">
     @if(isset($resultado->img))
     <div class="col-4">
@@ -23,7 +34,16 @@
         @if($resultado->deleted_at)
         <dt>Data de conclusão:</dt>
         <dd>{{ Helper::formataData($resultado->deleted_at) }}</dd>
-        <dd><a href="/admin/chamados/restore/{{ $resultado->idchamado }}">Reabrir</a></dd>
+          @if(session('idperfil') === 1)
+          <dd><a href="/admin/chamados/restore/{{ $resultado->idchamado }}">Reabrir</a></dd>
+          @endif
+        @else
+        <hr>
+        <form method="POST" action="/admin/chamados/apagar/{{ $resultado->idchamado }}" class="d-inline">
+          <input type="hidden" name="_token" value="'.csrf_token().'" />
+          <input type="hidden" name="_method" value="delete" />
+          <input type="submit" class="btn btn-sm btn-success" value="Dar baixa" onclick="return confirm(\'Tem certeza que deseja dar baixa no chamado?\')" />
+        </form>
         @endif
       </dl>
     </div>
@@ -36,4 +56,28 @@
     </div>
     @endif
   </div>
+  @if(session('idperfil') === 1 && !isset($resultado->resposta) && !isset($resultado->deleted_at))
+  <hr>
+  <form role="form" method="POST" action="/admin/chamados/resposta/{{ $resultado->idchamado }}">
+    @csrf
+    @if(isset($resultado))
+        {{ method_field('PUT') }}
+    @endif
+    <div class="form-row">
+      <div class="col">
+        <label for="resposta">Resposta</label>
+        <textarea name="resposta"
+          class="form-control {{ $errors->has('resposta') ? 'is-invalid' : '' }}"
+          placeholder="Escreva uma resposta para o chamado"
+          rows="3"></textarea>
+      </div>
+    </div>
+    <div class="form-row mt-2">
+      <div class="col">
+        <button type="submit" class="btn btn-primary">Responder</button>
+        <a href="/admin/chamados" class="btn btn-default ml-1">Cancelar</a>
+      </div>
+    </div>
+  </form>
+  @endif
 </div>

@@ -54,10 +54,14 @@ class ChamadoController extends Controller
             $acoes .= '<input type="hidden" name="_method" value="delete" />';
             $acoes .= '<input type="submit" class="btn btn-sm btn-success" value="Dar baixa" onclick="return confirm(\'Tem certeza que deseja dar baixa no chamado?\')" />';
             $acoes .= '</form>';
+            if(isset($resultado->resposta))
+                $prioridade = $resultado->prioridade."<br><small>(Respondido)</small>";
+            else
+                $prioridade = $resultado->prioridade;
             $conteudo = [
                 $resultado->idchamado,
                 $resultado->tipo.'<br><small>'.Helper::resumoTamanho($resultado->mensagem, 75).'</small>',
-                $resultado->prioridade,
+                $prioridade,
                 $resultado->user->nome,
                 $acoes
             ];
@@ -123,7 +127,10 @@ class ChamadoController extends Controller
             abort(401);
         } else {
             if(Auth::id() === $resultado->idusuario) {
-                $variaveis = (object) $this->variaveis;
+                $variaveis = $this->variaveis;
+                if(!ControleController::mostraStatic(['1']))
+                    $variaveis['btn_lista'] = '';
+                $variaveis = (object) $variaveis;
                 return view('admin.crud.editar', compact('resultado', 'variaveis'));
             } else {
                 abort(401);
@@ -162,10 +169,20 @@ class ChamadoController extends Controller
 
     public function show(Request $request, $id)
     {
-        ControleController::autorizaStatic(['1']);
         $resultado = Chamado::withTrashed()->find($id);
-        $variaveis = (object) $this->variaveis;
-        return view('admin.crud.mostra', compact('variaveis', 'resultado'));
+        if(!isset($resultado)) {
+            abort(401);
+        } else {
+            if(Auth::id() === $resultado->idusuario || session('idperfil') === 1) {
+                $variaveis = $this->variaveis;
+                if(!ControleController::mostraStatic(['1']))
+                    $variaveis['btn_lista'] = '';
+                $variaveis = (object) $variaveis;
+                return view('admin.crud.mostra', compact('resultado', 'variaveis'));
+            } else {
+                abort(401);
+            }
+        }
     }
 
     public function destroy(Request $request, $id)
@@ -241,5 +258,18 @@ class ChamadoController extends Controller
             ->paginate(10);
         $tabela = $this->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function resposta(Request $request, $id)
+    {
+        $chamado = Chamado::withTrashed()->find($id);
+        $chamado->resposta = $request->input('resposta');
+        $update = $chamado->update();
+        if(!$update)
+            abort(500);
+        event(new CrudEvent('chamado', 'respondeu', $chamado->idchamado));
+        return redirect('/admin/chamados/ver/'.$id)
+            ->with('message', '<i class="icon fa fa-check"></i>Resposta emitida com sucesso!')
+            ->with('class', 'alert-success');
     }
 }

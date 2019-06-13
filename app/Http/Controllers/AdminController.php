@@ -20,6 +20,7 @@ class AdminController extends Controller
     public static function alertas()
     {
         $alertas = [];
+        $count = 0;
         // Alerta de atendimentos nulos
         $hoje = date('Y-m-d');
         if(session('idusuario') === 9) {
@@ -34,7 +35,7 @@ class AdminController extends Controller
                 ->where('idregional','!=',1)
                 ->count();
             $alertas['agendamentoCount'] = $count;
-        } else {
+        } elseif(session('idusuario') === 8) {
             $count = Agendamento::where('dia','<',$hoje)
                 ->where('status','=',null)
                 ->count();
