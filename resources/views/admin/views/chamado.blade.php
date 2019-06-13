@@ -6,45 +6,32 @@
   @if(isset($resultado->resposta))
   <div class="row">
     <div class="col">
-      <dl class="mb-0">
-        <dt>Resposta do CTI:</dt>
-        <dd class="mb-0">{{ $resultado->resposta }}</dd>
-      </dl>
+      <img class="direct-chat-img" src="{{ asset('img/ti.png') }}" alt="CTI">
+      <div class="direct-chat-text">
+        <h5 class="mb-1">Resposta do CTI</h5>
+        <p class="mb-0">{!! $resultado->resposta !!}</p>
+      </div>
     </div>
   </div>
   <hr>
   @endif
   <div class="row">
-    @if(isset($resultado->img))
-    <div class="col-4">
-    @else
     <div class="col">
-    @endif
-      <dl>
-        <dt>Tipo:</dt>
-        <dd>{{ $resultado->tipo }}</dd>
-        <dt>Prioridade:</dt>
-        <dd>{{ $resultado->prioridade }}</dd>
-        <dt>Mensagem:</dt>
-        <dd>{{ $resultado->mensagem }}</dd>
-        <dt>Por:</dt>
-        <dd>{{ $resultado->user->nome }}</dd>
-        <dt>Data de emissão:</dt>
-        <dd>{{ Helper::formataData($resultado->created_at) }}</dd>
-        @if($resultado->deleted_at)
-        <dt>Data de conclusão:</dt>
-        <dd>{{ Helper::formataData($resultado->deleted_at) }}</dd>
-          @if(session('idperfil') === 1)
-          <dd><a href="/admin/chamados/restore/{{ $resultado->idchamado }}">Reabrir</a></dd>
-          @endif
-        @else
-        <hr>
-        <form method="POST" action="/admin/chamados/apagar/{{ $resultado->idchamado }}" class="d-inline">
-          @csrf
-          <input type="hidden" name="_method" value="delete" />
-          <input type="submit" class="btn btn-sm btn-success" value="Dar baixa" onclick="return confirm('Tem certeza que deseja dar baixa no chamado?')" />
-        </form>
-        @endif
+      <img class="direct-chat-img" src="{{ asset('img/user.png') }}" alt="USER">
+      <div class="direct-chat-text">
+        <h5 class="mb-1">{{ $resultado->tipo }}</h5>
+        <p class="mb-0"><i>({{ Helper::formataData($resultado->created_at) }}):</i> {{ $resultado->mensagem }}</p>
+      </div>
+      @if(isset($resultado->img))
+        <p><strong>Print:</strong></p>
+        <img src="{{ asset($resultado->img) }}" class="w-100" />
+      @endif
+      <hr>
+      <form method="POST" action="/admin/chamados/apagar/{{ $resultado->idchamado }}" class="d-inline">
+        @csrf
+        <input type="hidden" name="_method" value="delete" />
+        <input type="submit" class="btn btn-sm btn-success" value="Dar baixa" onclick="return confirm('Tem certeza que deseja dar baixa no chamado?')" />
+      </form>
       </dl>
     </div>
     @if(isset($resultado->img))

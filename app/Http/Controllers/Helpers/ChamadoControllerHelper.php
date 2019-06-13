@@ -10,7 +10,7 @@ class ChamadoControllerHelper extends Controller
 {
     public static function getByUser($idusuario)
     {
-        $resultados = Chamado::where('idusuario',$idusuario)->withTrashed()->orderBy('created_at','DESC')->paginate(5);
+        $resultados = Chamado::where('idusuario',$idusuario)->withTrashed()->orderBy('created_at','DESC')->paginate(10);
         return $resultados;
     }
 

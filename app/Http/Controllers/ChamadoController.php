@@ -262,8 +262,9 @@ class ChamadoController extends Controller
 
     public function resposta(Request $request, $id)
     {
+        $data = date('d\/m\/Y, \à\s H:i');
         $chamado = Chamado::withTrashed()->find($id);
-        $chamado->resposta = $request->input('resposta');
+        $chamado->resposta = "<i>(".$data."):</i> ".$request->input('resposta');
         $update = $chamado->update();
         if(!$update)
             abort(500);
