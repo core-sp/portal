@@ -28,6 +28,7 @@ Route::prefix('admin')->group(function() {
     Route::post('/criar', 'ChamadoController@store');
     Route::get('/editar/{id}', 'ChamadoController@edit');
     Route::put('/editar/{id}', 'ChamadoController@update');
+    Route::put('/resposta/{id}', 'ChamadoController@resposta');
     Route::get('/ver/{id}', 'ChamadoController@show');
     Route::delete('/apagar/{id}', 'ChamadoController@destroy');
     Route::get('/concluidos', 'ChamadoController@lixeira');
