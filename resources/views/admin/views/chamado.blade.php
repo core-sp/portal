@@ -40,9 +40,9 @@
         @else
         <hr>
         <form method="POST" action="/admin/chamados/apagar/{{ $resultado->idchamado }}" class="d-inline">
-          <input type="hidden" name="_token" value="'.csrf_token().'" />
+          @csrf
           <input type="hidden" name="_method" value="delete" />
-          <input type="submit" class="btn btn-sm btn-success" value="Dar baixa" onclick="return confirm(\'Tem certeza que deseja dar baixa no chamado?\')" />
+          <input type="submit" class="btn btn-sm btn-success" value="Dar baixa" onclick="return confirm('Tem certeza que deseja dar baixa no chamado?')" />
         </form>
         @endif
       </dl>
