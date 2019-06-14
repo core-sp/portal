@@ -22,6 +22,7 @@ class SiteController extends Controller
             ->get();
         $cotidianos = Noticia::where('publicada','Sim')
             ->where('categoria','Cotidiano')
+            ->orderBy('created_at','DESC')
             ->limit(3)
             ->get();
         return response()
