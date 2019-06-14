@@ -4,6 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Mail\InternoAgendamentoMail;
+use Illuminate\Support\Facades\Mail;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,8 +26,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->call(function() {
+            $body = 'Teste';
+            $regional = 'São Paulo';
+            $dia = '24/06/2019';
+            Mail::to('desenvolvimento@core-sp.org.br')
+                ->send(new InternoAgendamentoMail($body, $regional, $dia));
+        })->dailyAt('10:55');
     }
 
     /**

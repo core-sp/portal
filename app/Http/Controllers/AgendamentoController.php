@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
 use App\Events\CrudEvent;
+use Redirect;
 
 class AgendamentoController extends Controller
 {
@@ -323,7 +324,7 @@ class AgendamentoController extends Controller
         } else {
             event(new CrudEvent('agendamento', 'confirmou falta', $agendamento->idagendamento));
         }
-        return redirect()->route('agendamentos.lista');
+        return Redirect::back();
     }
 
     public function busca()
