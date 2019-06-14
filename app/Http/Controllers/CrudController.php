@@ -15,7 +15,7 @@ class CrudController extends Controller
             $table = "<table>";
         }
         $table .= "<thead>";
-        
+        $table .= "<tr>";
         foreach($headers as $header) {
             $table .= "<th>";
             $table .= $header;
