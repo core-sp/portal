@@ -23,19 +23,19 @@ class AdminController extends Controller
         $count = 0;
         // Alerta de atendimentos nulos
         $hoje = date('Y-m-d');
-        if(session('idusuario') === 9) {
+        if(session('idperfil') === 12) {
             $count = Agendamento::where('dia','<',$hoje)
                 ->where('status','=',null)
                 ->where('idregional','=',1)
                 ->count();
             $alertas['agendamentoCount'] = $count;
-        } elseif(session('idusuario') === 10) {
+        } elseif(session('idperfil') === 13) {
             $count = Agendamento::where('dia','<',$hoje)
                 ->where('status','=',null)
                 ->where('idregional','!=',1)
                 ->count();
             $alertas['agendamentoCount'] = $count;
-        } elseif(session('idusuario') === 8) {
+        } elseif(session('idperfil') === 6 || session('idperfil') === 1) {
             $count = Agendamento::where('dia','<',$hoje)
                 ->where('status','=',null)
                 ->count();
