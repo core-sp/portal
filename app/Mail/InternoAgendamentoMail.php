@@ -24,7 +24,7 @@ class InternoAgendamentoMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Agendamentos em '.$this->regional.' (dia: '.$this->dia.')')
+        return $this->subject('Agendamentos '.$this->regional.' (dia: '.$this->dia.')')
             ->view('emails.interno');
     }
 }

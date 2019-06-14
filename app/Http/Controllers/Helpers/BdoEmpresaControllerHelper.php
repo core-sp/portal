@@ -93,7 +93,7 @@ class BdoEmpresaControllerHelper extends Controller
             'Meio Ambiente (análise/coleta)',
             'Metais',
             'Metalurgia/Mecânica',
-            'Mobiliário',
+            'Mobiliário/Móveis',
             'Moto Peças',
             'Motos',
             'Nutrição Animal',

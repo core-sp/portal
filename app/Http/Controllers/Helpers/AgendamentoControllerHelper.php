@@ -171,4 +171,28 @@ class AgendamentoControllerHelper extends Controller
         $sup .= '<p><strong>Os acordos / parcelamentos são realizados presencialmente na SEDE ou em nossos Escritórios Seccionais, mediante assinatura do Termo de Confissão de Dívida.</strong></p>';
         return $sup;
     }
+
+    public static function tabelaEmailTop()
+    {
+        $body = '<table border="1" cellspacing="0" cellpadding="6">';
+        $body .= '<thead>';
+        $body .= '<tr>';
+        $body .= '<th>Regional</th>';
+        $body .= '<th>Horário</th>';
+        $body .= '<th>Protocolo</th>';
+        $body .= '<th>Nome</th>';
+        $body .= '<th>CPF</th>';
+        $body .= '<th>Serviço</th>';
+        $body .= '</tr>';
+        $body .= '</thead>';
+        $body .= '<tbody>';
+        return $body;
+    }
+
+    public static function tabelaEmailBot()
+    {
+        $body = '</tbody>';
+        $body .= '</table>';
+        return $body;
+    }
 }
