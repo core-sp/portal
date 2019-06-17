@@ -145,6 +145,7 @@ class BdoEmpresaController extends Controller
         $empresa->segmento = $request->input('segmento');
         $empresa->cnpj = $request->input('cnpj');
         $empresa->razaosocial = $request->input('razaosocial');
+        $empresa->fantasia = $request->input('fantasia');
         $empresa->descricao = $request->input('descricao');
         $empresa->capitalsocial = $request->input('capitalsocial');
         $empresa->endereco = $request->input('endereco');
@@ -213,6 +214,7 @@ class BdoEmpresaController extends Controller
         $empresa->segmento = $request->input('segmento');
         $empresa->cnpj = $request->input('cnpj');
         $empresa->razaosocial = $request->input('razaosocial');
+        $empresa->fantasia = $request->input('fantasia');
         $empresa->descricao = $request->input('descricao');
         $empresa->capitalsocial = $request->input('capitalsocial');
         $empresa->endereco = $request->input('endereco');

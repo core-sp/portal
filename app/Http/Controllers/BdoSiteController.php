@@ -10,7 +10,7 @@ class BdoSiteController extends Controller
 {
     public function index()
     {
-    	$oportunidades = BdoOportunidade::paginate(10);
+    	$oportunidades = BdoOportunidade::orderBy('created_at','DESC')->paginate(10);
         return view('site.balcao-de-oportunidades', compact('oportunidades'));
     }
 

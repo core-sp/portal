@@ -34,117 +34,95 @@ class AgendamentoController extends Controller
         $this->middleware('auth');
     }
 
-    public function resultados($dia, $idregional = null)
+    public function resultados($idregional = null)
     {
+        $date = new \DateTime();
+        $dia = $date->format('Y-m-d');
         if($idregional !== '999') {
             $resultados = Agendamento::where('dia','=',$dia)
                 ->where('idregional',$idregional)
                 ->orderBy('dia','ASC')
                 ->orderBy('hora','ASC')
-                ->paginate(10);
+                ->paginate(25);
         } else {
             $resultados = Agendamento::where('dia','=',$dia)
                 ->orderBy('dia','ASC')
                 ->orderBy('hora','ASC')
-                ->paginate(10);
+                ->paginate(25);
         }
         return $resultados;
     }
 
     public function checaFiltros()
     {
-        // Filtra dia da busca
-        if(Input::has('dia')) {
-            if(!empty(Input::get('dia'))) {
-                $dia = Input::get('dia');
-                $replace = str_replace('/','-',$dia);
-                $dia = new \DateTime($replace);
-                $dia = $dia->format('Y-m-d');
+        ControleController::autoriza($this->class, 'index');
+        if(Input::has('mindia')) {
+            if(!empty(Input::get('mindia'))) {
+                $mindia = Input::get('mindia');
+                $replace = str_replace('/','-',$mindia);
+                $mindia = new \DateTime($replace);
+                $mindia = $mindia->format('Y-m-d');
             } else {
                 $date = new \DateTime();
-                $dia = $date->format('Y-m-d');
+                $mindia = $date->format('Y-m-d');
             }
         } else {
             $date = new \DateTime();
-            $dia = $date->format('Y-m-d');
+            $mindia = $date->format('Y-m-d');
+        }
+        if(Input::has('maxdia')) {
+            if(!empty(Input::get('maxdia'))) {
+                $maxdia = Input::get('maxdia');
+                $replace = str_replace('/','-',$maxdia);
+                $maxdia = new \DateTime($replace);
+                $maxdia = $maxdia->format('Y-m-d');
+            } else {
+                $date = new \DateTime();
+                $maxdia = $date->format('Y-m-d');
+            }
+        } else {
+            $date = new \DateTime();
+            $maxdia = $date->format('Y-m-d');
         }
         if(Input::has('regional')) {
             if(Input::get('regional') !== '999') {
                 $regional = Input::get('regional');
-                $regionalId = Regional::find($regional);
-                $regionalNome = $regionalId->regional;
+            } else {
+                $regional = '';
             }
         } else {
-            $regional = Regional::find(Auth::user()->idregional);
-            $regionalNome = $regional->regional;
+            $regional = Regional::select('idregional')->find(Auth::user()->idregional);
+            $regional = $regional->idregional;
         }
-        ControleController::autoriza($this->class, 'edit');
+        if(Input::has('status')) {
+            if(!empty(Input::get('status'))) {
+                $status = Input::get('status');
+                if($status === 'Qualquer') {
+                    $status = null;
+                }
+            } else {
+                $status = '';
+            }
+        } else {
+            $status = '';
+        }
         // Puxa os resultados
-        if(Input::has(['regional','status'])) {
-            $resultados = $this->resultadosFiltro($dia, Input::get('regional'), Input::get('status'));
-        } elseif (Input::has('regional')) {
-            $resultados = $this->resultados($dia, Input::get('regional'));
-        } elseif(Input::has('status')) {
-            $resultados = $this->resultadosFiltro($dia, $regional->idregional, Input::get('status'));
-        } elseif(Input::has('dia')) {
-            $resultados = $this->resultados($dia, $regional->idregional);
-        }
-        // Pega dia atual e cospe no título
-        $dia = Helper::onlyDate($dia);
-        if(Input::get('regional') !== '999')
-            $this->variaveis['continuacao_titulo'] = 'em <strong>'.$regionalNome.' - '.$dia.'</strong>';
-        else
-            $this->variaveis['continuacao_titulo'] = 'em <strong>Todas - '.$dia.'</strong>';
-        return $resultados;
-    }
-
-    public function resultadosFiltro($dia = null, $idregional = null, $status = null)
-    {
-        if(!isset($dia)) {
-            $date = new \DateTime();
-            $dia = $date->format('Y-m-d');
-        }
-        if($idregional === '999') {
-            if($status === 'null') {
-                $resultados = Agendamento::where('dia','=',$dia)
-                    ->whereNull('status')
-                    ->orderBy('dia','ASC')
-                    ->orderBy('hora','ASC')
-                    ->get();
-            } elseif($status === 'Qualquer') {
-                $resultados = Agendamento::where('dia','=',$dia)
-                    ->orderBy('dia','ASC')
-                    ->orderBy('hora','ASC')
-                    ->get();
-            } else {
-                $resultados = Agendamento::where('dia','=',$dia)
-                    ->where('status','LIKE',$status)
-                    ->orderBy('dia','ASC')
-                    ->orderBy('hora','ASC')
-                    ->get();
-            }
+        if(isset($status)) {
+            $resultados = Agendamento::where('idregional','LIKE','%'.$regional.'%')
+                ->where('status','LIKE','%'.$status.'%')
+                ->whereBetween('dia',[$mindia,$maxdia])
+                ->orderBy('dia','DESC')
+                ->limit(50)
+                ->get();
         } else {
-            if($status === 'null') {
-                $resultados = Agendamento::where('idregional',$idregional)
-                    ->where('dia','=',$dia)
-                    ->whereNull('status')
-                    ->orderBy('dia','ASC')
-                    ->orderBy('hora','ASC')
-                    ->get();
-            } elseif ($status === 'Qualquer') {
-                $resultados = Agendamento::where('idregional',$idregional)
-                    ->where('dia','=',$dia)
-                    ->orderBy('dia','ASC')
-                    ->orderBy('hora','ASC')
-                    ->get();
-            } else {
-                $resultados = Agendamento::where('idregional',$idregional)
-                    ->where('dia','=',$dia)
-                    ->where('status','LIKE',$status)
-                    ->orderBy('dia','ASC')
-                    ->orderBy('hora','ASC')
-                    ->get();
-            }
+            $resultados = Agendamento::where('idregional','LIKE','%'.$regional.'%')
+                ->where(function($q){
+                    $q->where('status','LIKE','%%')
+                        ->orWhereNull('status');
+                })->whereBetween('dia',[$mindia,$maxdia])
+                ->orderBy('dia','DESC')
+                ->limit(50)
+                ->get();
         }
         return $resultados;
     }
@@ -154,15 +132,13 @@ class AgendamentoController extends Controller
         ControleController::autoriza($this->class, __FUNCTION__);
         $regional = Auth::user()->idregional;
         // Checa se tem filtro
-        if(Input::get('filtro') == 'sim') {
+        if(Input::get('filtro') === 'sim') {
             $temFiltro = true;
             $resultados = $this->checaFiltros();
         } else {
             $temFiltro = null;
-            $date = new \DateTime();
-            $dia = $date->format('Y-m-d');
-            $diaFormatado = $date->format('d\/m\/Y');
-            $resultados = $this->resultados($dia, $regional);
+            $diaFormatado = date('d\/m\/Y');
+            $resultados = $this->resultados($regional);
             $regionalId = Regional::find(Auth::user()->idregional);
             $regionalNome = $regionalId->regional;
             $this->variaveis['continuacao_titulo'] = 'em <strong>'.$regionalNome.' - '.$diaFormatado.'</strong>';
@@ -172,8 +148,7 @@ class AgendamentoController extends Controller
         // Variáveis globais
         $variaveis = $this->variaveis;
         $variaveis['filtro'] = $this->filtros();
-        if(ControleController::mostra($this->class, 'edit'))
-            $variaveis['mostraFiltros'] = true;
+        $variaveis['mostraFiltros'] = true;
         $variaveis = (object) $variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
@@ -181,29 +156,35 @@ class AgendamentoController extends Controller
     public function filtros()
     {
         $regionais = Regional::all();
-        $select = '<form method="GET" action="/admin/agendamentos/filtro" class="mb-0">';
+        $select = '<form method="GET" action="/admin/agendamentos/filtro" id="filtroAgendamento" class="mb-0">';
+        $select .= '<div class="form-row filtroAge">';
         $select .= '<input type="hidden" name="filtro" value="sim" />';
-        $select .= '<select class="d-inline w-auto custom-select custom-select-sm mr-2" name="regional">';
-        $select .= '<option disabled selected>Seccional *</option>';
-        if(Input::get('regional') === '999') {
-            $select .= '<option value="999" selected>Todas</option>';
-        } else {
-            $select .= '<option value="999">Todas</option>';
-        }
-        foreach($regionais as $regional) {
-            if(Input::has('regional')) {
-                if($regional->idregional == Input::get('regional')) {
-                    $select .= '<option value="'.$regional->idregional.'" selected>'.$regional->regional.'</option>';
+        if(ControleController::mostra($this->class, 'edit') && session('idperfil') !== 12) {
+            $select .= '<div class="form-group mb-0 col">';
+            $select .= '<label>Seccional</label>';
+            $select .= '<select class="custom-select custom-select-sm mr-2" id="regional" name="regional">';
+            if(Input::get('regional') === '999') {
+                $select .= '<option value="999" selected>Todas</option>';
+            } else {
+                $select .= '<option value="999">Todas</option>';
+            }
+            foreach($regionais as $regional) {
+                if(Input::has('regional')) {
+                    if($regional->idregional == Input::get('regional')) {
+                        $select .= '<option value="'.$regional->idregional.'" selected>'.$regional->regional.'</option>';
+                    } else {
+                        $select .= '<option value="'.$regional->idregional.'">'.$regional->regional.'</option>';
+                    }
                 } else {
                     $select .= '<option value="'.$regional->idregional.'">'.$regional->regional.'</option>';
                 }
-            } else {
-                $select .= '<option value="'.$regional->idregional.'">'.$regional->regional.'</option>';
             }
+            $select .= '</select>';
+            $select .= '</div>';
         }
-        $select .= '</select>';
-        $select .= '<select class="d-inline w-auto custom-select custom-select-sm" name="status">';
-        $select .= '<option disabled selected>Status</option>';
+        $select .= '<div class="form-group mb-0 col">';
+        $select .= '<label>Status</label>';
+        $select .= '<select class="custom-select custom-select-sm" name="status">';
         if(Input::get('status') === 'Qualquer')
             $select .= '<option value="Qualquer" selected>Qualquer</option>';
         else
@@ -222,24 +203,45 @@ class AgendamentoController extends Controller
             }
         }
         $select .= '</select>';
-        $select .= '<div class="d-inline-block mr-2 ml-2">';
-        if(Input::has('dia')) {
-            $dia = Input::get('dia');
-            $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="dia" placeholder="dd/mm/aaaa" value="'.$dia.'" />';
+        $select .= '</div>';
+        $select .= '<div class="form-group mb-0 col">';
+        $select .= '<label>De</label>';
+        if(Input::has('mindia')) {
+            $mindia = Input::get('mindia');
+            $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="'.$mindia.'" />';
         } else {
-            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="dia" placeholder="dd/mm/aaaa" />';
+            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" />';
         }
         $select .= '</div>';
+        $select .= '<div class="form-group mb-0 col">';
+        $select .= '<label>Até</label>';
+        if(Input::has('maxdia')) {
+            $maxdia = Input::get('maxdia');
+            $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="'.$maxdia.'" />';
+        } else {
+            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" />';
+        }
+        $select .= '</div>';
+        $select .= '<div class="form-group mb-0 col-auto align-self-end">';
         $select .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
+        $select .= '</div>';
+        $select .= '</div>';
         $select .= '</form>';
         return $select;
     }
 
     public function status($status, $id, $usuario = null)
     {
+        if(Input::has('regional') && session('idperfil') === 8) {
+            if(Input::get('regional') !== Auth::user()->idregional)
+                abort(401);
+        }
         switch ($status) {
             case 'Cancelado':
-                return "<strong>Cancelado</strong>";
+                $btn = "<strong>Cancelado</strong>";
+                if(ControleController::mostra($this->class, 'edit'))
+                    $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/".$id."' class='btn btn-sm btn-default'>Editar</a>";
+                return $btn;
             break;
 
             case 'Compareceu':
@@ -252,7 +254,10 @@ class AgendamentoController extends Controller
             break;
 
             case 'Não Compareceu':
-                return "<strong>Não Compareceu</strong>";
+                $btn = "<strong>Não Compareceu</strong>";
+                if(ControleController::mostra($this->class, 'edit'))
+                    $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/".$id."' class='btn btn-sm btn-default'>Editar</a>";
+                return $btn;
             break;
 
             default:
@@ -293,7 +298,7 @@ class AgendamentoController extends Controller
             $conteudo = [
                 $resultado->protocolo.'<br><small>Código: '.$resultado->idagendamento.'</small>',
                 $resultado->nome.'<br>'.$resultado->cpf,
-                $resultado->hora,
+                $resultado->hora.'<br><small>'.Helper::onlyDate($resultado->dia).'</small>',
                 $resultado->tiposervico.'<br><small>('.$resultado->regional->regional.')',
                 $acoes
             ];
@@ -302,7 +307,8 @@ class AgendamentoController extends Controller
         // Classes da tabela
         $classes = [
             'table',
-            'table-hover'
+            'table-bordered',
+            'table-striped'
         ];
         $tabela = CrudController::montaTabela($headers, $contents, $classes);
         return $tabela;
@@ -336,7 +342,7 @@ class AgendamentoController extends Controller
             ->orWhere('cpf','LIKE','%'.$busca.'%')
             ->orWhere('email','LIKE','%'.$busca.'%')
             ->orWhere('protocolo','LIKE','%'.$busca.'%')
-            ->paginate(10);
+            ->paginate(25);
         $tabela = $this->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }

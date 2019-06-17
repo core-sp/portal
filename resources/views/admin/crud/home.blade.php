@@ -80,13 +80,13 @@
           <div class="card-body">
             @if(isset($variaveis->filtro))
               @if(isset($variaveis->mostraFiltros))
-              <div class="row mb-3">
-                <div class="col-sm-auto align-self-center">
-                  <p class="d-inline">Filtrar por:&nbsp;&nbsp;</p>
+              <div class="row mb-4">
+                <div class="col-sm-auto align-self-end">
+                  <p class="d-inline"><small>Filtro:</small></p>
                 </div>
                 {!! $variaveis->filtro !!}
                 @if(isset($temFiltro))
-                <div class="col-sm-auto align-self-center">
+                <div class="col-sm-auto align-self-end">
                   <small>
                     <a href="/admin/{{ $variaveis->plural }}" class="text-danger pointer">
                       <i class="fas fa-times"></i>&nbsp;&nbsp;Remover filtro
@@ -112,14 +112,14 @@
             @else
               @if(isset($busca))
               <hr />
-              Nenhum {{ $variaveis->singular }} encontrado
+              <strong>Nenhum {{ $variaveis->singular }} encontrado</strong>
                 @if(isset($variaveis->slug))
                 <a href="/admin/{{ $variaveis->slug }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
                 @else
                 <a href="/admin/{{ $variaveis->plural }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
                 @endif
               @else
-              Nenhum {{ $variaveis->singular }} encontrado
+              <strong>Nenhum {{ $variaveis->singular }} encontrado</strong>
               @endif
             @endif
           </div>

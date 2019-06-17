@@ -127,7 +127,6 @@ class BdoOportunidadeControllerHelper extends Controller
             'Mobiliário/Móveis',
             'Moto Peças',
             'Motos',
-            'Móveis',
             'Nutrição Animal',
             'Odontológicos',
             'Óticos',

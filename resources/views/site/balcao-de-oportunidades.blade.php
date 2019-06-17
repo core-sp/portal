@@ -69,9 +69,22 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
             <div class="licitacao-grid-main">
               <h5 class="marrom mb-1">{{ $oportunidade->titulo }}</h5>
               <h6 class="light">
-                <i class="far fa-building"></i>&nbsp;&nbsp;{{ $oportunidade->empresa->razaosocial }}&nbsp;&nbsp;&nbsp;&nbsp;
-                <i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;{{ BdoOportunidadeControllerHelper::listRegioes($oportunidade->regiaoatuacao) }}&nbsp;&nbsp;&nbsp;&nbsp;
-                <i class="fas fa-suitcase"></i>&nbsp;&nbsp;{{ $oportunidade->vagasdisponiveis }} vagas
+                <i class="far fa-building"></i>&nbsp;
+                @if(isset($oportunidade->empresa->fantasia))
+                {{ $oportunidade->empresa->fantasia }}
+                @else
+                {{ $oportunidade->empresa->razaosocial }}
+                @endif  
+                &nbsp;&nbsp;&nbsp;
+                <i class="fas fa-map-marker-alt"></i>&nbsp;
+                {{ BdoOportunidadeControllerHelper::listRegioes($oportunidade->regiaoatuacao) }}
+                &nbsp;&nbsp;&nbsp;
+                <i class="fas fa-suitcase"></i>&nbsp;
+                @if($oportunidade->vagasdisponiveis > 1)
+                {{ $oportunidade->vagasdisponiveis }} vagas
+                @else
+                {{ $oportunidade->vagasdisponiveis }} vaga
+                @endif
               </h6>
               <div class="linha-lg-mini"></div>
               <p>{{ $oportunidade->descricao }}</p>
