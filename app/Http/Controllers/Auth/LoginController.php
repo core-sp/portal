@@ -47,10 +47,8 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        if(session('idusuario')) {
-            $this->performLogout($request);
-            Session::flush();
-        }
+        $this->performLogout($request);
+        Session::flush();
         return redirect()->route('admin');
     }
 
