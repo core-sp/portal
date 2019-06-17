@@ -88,7 +88,7 @@ class AgendamentoController extends Controller
             if(Input::get('regional') !== '999') {
                 $regional = Input::get('regional');
             } else {
-                $regional = '%%';
+                $regional = '';
             }
         } else {
             $regional = Regional::select('idregional')->find(Auth::user()->idregional);
@@ -108,25 +108,49 @@ class AgendamentoController extends Controller
         }
         // Puxa os resultados
         if(isset($status)) {
-            $resultados = Agendamento::where('idregional','LIKE','%'.$regional.'%')
-                ->where('status','LIKE','%'.$status.'%')
-                ->whereBetween('dia',[$mindia,$maxdia])
-                ->orderBy('idregional','ASC')
-                ->orderBy('dia','DESC')
-                ->orderBy('hora','ASC')
-                ->limit(50)
-                ->get();
+            if(empty($regional)) {
+                $resultados = Agendamento::where('idregional','LIKE','%%')
+                    ->where('status','LIKE','%'.$status.'%')
+                    ->whereBetween('dia',[$mindia,$maxdia])
+                    ->orderBy('idregional','ASC')
+                    ->orderBy('dia','DESC')
+                    ->orderBy('hora','ASC')
+                    ->limit(50)
+                    ->get();
+            } else {
+                $resultados = Agendamento::where('idregional','LIKE',$regional)
+                    ->where('status','LIKE','%'.$status.'%')
+                    ->whereBetween('dia',[$mindia,$maxdia])
+                    ->orderBy('idregional','ASC')
+                    ->orderBy('dia','DESC')
+                    ->orderBy('hora','ASC')
+                    ->limit(50)
+                    ->get();
+            }    
         } else {
-            $resultados = Agendamento::where('idregional','LIKE','%'.$regional.'%')
-                ->where(function($q){
-                    $q->where('status','LIKE','%%')
-                        ->orWhereNull('status');
-                })->whereBetween('dia',[$mindia,$maxdia])
-                ->orderBy('idregional','ASC')
-                ->orderBy('dia','DESC')
-                ->orderBy('hora','ASC')
-                ->limit(50)
-                ->get();
+            if(empty($regional)) {
+                $resultados = Agendamento::where('idregional','LIKE','%%')
+                    ->where(function($q){
+                        $q->where('status','LIKE','%%')
+                            ->orWhereNull('status');
+                    })->whereBetween('dia',[$mindia,$maxdia])
+                    ->orderBy('idregional','ASC')
+                    ->orderBy('dia','DESC')
+                    ->orderBy('hora','ASC')
+                    ->limit(50)
+                    ->get();
+            } else {
+                $resultados = Agendamento::where('idregional','LIKE',$regional)
+                    ->where(function($q){
+                        $q->where('status','LIKE','%%')
+                            ->orWhereNull('status');
+                    })->whereBetween('dia',[$mindia,$maxdia])
+                    ->orderBy('idregional','ASC')
+                    ->orderBy('dia','DESC')
+                    ->orderBy('hora','ASC')
+                    ->limit(50)
+                    ->get();
+            }
         }
         return $resultados;
     }
