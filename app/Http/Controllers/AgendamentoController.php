@@ -282,7 +282,7 @@ class AgendamentoController extends Controller
         $headers = [
             'Protocolo',
             'Nome/CPF',
-            'Horário',
+            'Horário/Dia',
             'Serviço',
             'Status'
         ];
@@ -299,7 +299,7 @@ class AgendamentoController extends Controller
             $conteudo = [
                 $resultado->protocolo.'<br><small>Código: '.$resultado->idagendamento.'</small>',
                 $resultado->nome.'<br>'.$resultado->cpf,
-                $resultado->hora.'<br><small>'.Helper::onlyDate($resultado->dia).'</small>',
+                $resultado->hora.'<br><small><strong>'.Helper::onlyDate($resultado->dia).'</strong></small>',
                 $resultado->tiposervico.'<br><small>('.$resultado->regional->regional.')',
                 $acoes
             ];
