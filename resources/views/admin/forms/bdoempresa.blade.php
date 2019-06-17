@@ -16,6 +16,42 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
     <div class="card-body">
         <div class="form-row">
         <div class="col">
+            <label for="razaosocial">Razão Social</label>
+            <input type="text"
+            class="form-control {{ $errors->has('razaosocial') ? 'is-invalid' : '' }}"
+            name="razaosocial"
+            id="razaosocial"
+            placeholder="Razão Social"
+            @if(isset($resultado))
+            value="{{ $resultado->razaosocial }}"
+            @endif
+            />
+            @if($errors->has('razaosocial'))
+            <div class="invalid-feedback">
+            {{ $errors->first('razaosocial') }}
+            </div>
+            @endif
+        </div>
+        <div class="col">
+            <label for="fantasia">Nome Fantasia</label>
+            <input type="text"
+            class="form-control {{ $errors->has('fantasia') ? 'is-invalid' : '' }}"
+            name="fantasia"
+            id="fantasia"
+            placeholder="Nome Fantasia"
+            @if(isset($resultado))
+            value="{{ $resultado->fantasia }}"
+            @endif
+            />
+            @if($errors->has('fantasia'))
+            <div class="invalid-feedback">
+            {{ $errors->first('fantasia') }}
+            </div>
+            @endif
+        </div>
+        </div>
+        <div class="form-row mt-2">
+        <div class="col">
             <label for="segmento">Segmento</label>
             <select name="segmento" class="form-control" id="segmento">
             @foreach($segmentos as $segmento)
@@ -51,25 +87,6 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             @if($errors->has('cnpj'))
             <div class="invalid-feedback">
             {{ $errors->first('cnpj') }}
-            </div>
-            @endif
-        </div>
-        </div>
-        <div class="form-row mt-2">
-        <div class="col">
-            <label for="razaosocial">Razão Social</label>
-            <input type="text"
-            class="form-control {{ $errors->has('razaosocial') ? 'is-invalid' : '' }}"
-            name="razaosocial"
-            id="razaosocial"
-            placeholder="Razão Social"
-            @if(isset($resultado))
-            value="{{ $resultado->razaosocial }}"
-            @endif
-            />
-            @if($errors->has('razaosocial'))
-            <div class="invalid-feedback">
-            {{ $errors->first('razaosocial') }}
             </div>
             @endif
         </div>

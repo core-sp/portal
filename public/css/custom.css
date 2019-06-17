@@ -59,3 +59,9 @@
 img {
   max-width: 100%;
 }
+
+.filtroAge label {
+  font-size: .8rem;
+  margin-bottom: 0;
+  line-height: 1;
+}

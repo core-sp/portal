@@ -88,6 +88,20 @@ $(document).ready(function(){
   });
   $('.timeInput').mask('00:00');
   $('.vagasInput').mask('000');
+  // Regra de data no filtro de agendamento
+  $('#filtroAgendamento').submit(function(e){
+    var maxDataFiltro = $('#maxdiaFiltro').val().split('/');
+    var maxdiaFiltro = new Date(maxDataFiltro[2], maxDataFiltro[1] - 1, maxDataFiltro[0]);
+    var minDataFiltro = $('#mindiaFiltro').val().split('/');
+    var mindiaFiltro = new Date(minDataFiltro[2], minDataFiltro[1] - 1, minDataFiltro[0]);
+    if(mindiaFiltro) {
+      if(maxdiaFiltro < mindiaFiltro) {
+        alert('O dia limite de filtro não pode ser menor que o dia inicial.');
+        $(this).val($("#maxdiaFiltro").val());
+        e.preventDefault();
+      }
+    }
+  });
 });
 
 (function($){

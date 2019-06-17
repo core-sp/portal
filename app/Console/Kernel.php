@@ -70,75 +70,81 @@ class Kernel extends ConsoleKernel
                         ->where('dia','=',$hoje)
                         ->orderBy('idregional','ASC')
                         ->get();
-                    $body = '<h3><i>(Mensagem Programada)</i></h3>';
-                    $body .= '<p>Confira abaixo a lista de agendamentos solicitados pelo Portal CORE-SP hoje, <strong>'.Helper::onlyDate($hoje).':</strong></p>';
-                    $body .= AgendamentoControllerHelper::tabelaEmailTop();
-                    foreach($agendamentos as $age) {
-                        $body .= '<tr>';
-                        $body .= '<td>'.$age->regional->regional.'</td>';
-                        $body .= '<td>'.$age->hora.'</td>';
-                        $body .= '<td>'.$age->protocolo.'</td>';
-                        $body .= '<td>'.$age->nome.'</td>';
-                        $body .= '<td>'.$age->cpf.'</td>';
-                        $body .= '<td>'.$age->tiposervico.'</td>';
-                        $body .= '</tr>';
+                    if($agendamentos->isNotEmpty()) {
+                        $body = '<h3><i>(Mensagem Programada)</i></h3>';
+                        $body .= '<p>Confira abaixo a lista de agendamentos solicitados pelo Portal CORE-SP hoje, <strong>'.Helper::onlyDate($hoje).':</strong></p>';
+                        $body .= AgendamentoControllerHelper::tabelaEmailTop();
+                        foreach($agendamentos as $age) {
+                            $body .= '<tr>';
+                            $body .= '<td>'.$age->regional->regional.'</td>';
+                            $body .= '<td>'.$age->hora.'</td>';
+                            $body .= '<td>'.$age->protocolo.'</td>';
+                            $body .= '<td>'.$age->nome.'</td>';
+                            $body .= '<td>'.$age->cpf.'</td>';
+                            $body .= '<td>'.$age->tiposervico.'</td>';
+                            $body .= '</tr>';
+                        }
+                        $body .= AgendamentoControllerHelper::tabelaEmailBot();
+                        $body .= '<p>';
+                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
+                        $body .= '</p>';
+                        $regional = 'nas Seccionais';
+                        Mail::to($user->email)
+                            ->send(new InternoAgendamentoMail($body, $regional, $diaFormatado));
                     }
-                    $body .= AgendamentoControllerHelper::tabelaEmailBot();
-                    $body .= '<p>';
-                    $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
-                    $body .= '</p>';
-                    $regional = 'nas Seccionais';
-                    Mail::to($user->email)
-                        ->send(new InternoAgendamentoMail($body, $regional, $diaFormatado));
                 } elseif($user->idperfil === 12) {
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('idregional','=',1)
                         ->where('dia','=',$hoje)
                         ->get();
-                    $body = '<h3><i>(Mensagem Programada)</i></h3>';
-                    $body .= '<p>Confira abaixo a lista de agendamentos solicitados pelo Portal CORE-SP hoje, <strong>'.Helper::onlyDate($hoje).':</strong></p>';
-                    $body .= AgendamentoControllerHelper::tabelaEmailTop();
-                    foreach($agendamentos as $age) {
-                        $body .= '<tr>';
-                        $body .= '<td>'.$age->regional->regional.'</td>';
-                        $body .= '<td>'.$age->hora.'</td>';
-                        $body .= '<td>'.$age->protocolo.'</td>';
-                        $body .= '<td>'.$age->nome.'</td>';
-                        $body .= '<td>'.$age->cpf.'</td>';
-                        $body .= '<td>'.$age->tiposervico.'</td>';
-                        $body .= '</tr>';
+                    if($agendamentos->isNotEmpty()) {
+                        $body = '<h3><i>(Mensagem Programada)</i></h3>';
+                        $body .= '<p>Confira abaixo a lista de agendamentos solicitados pelo Portal CORE-SP hoje, <strong>'.Helper::onlyDate($hoje).':</strong></p>';
+                        $body .= AgendamentoControllerHelper::tabelaEmailTop();
+                        foreach($agendamentos as $age) {
+                            $body .= '<tr>';
+                            $body .= '<td>'.$age->regional->regional.'</td>';
+                            $body .= '<td>'.$age->hora.'</td>';
+                            $body .= '<td>'.$age->protocolo.'</td>';
+                            $body .= '<td>'.$age->nome.'</td>';
+                            $body .= '<td>'.$age->cpf.'</td>';
+                            $body .= '<td>'.$age->tiposervico.'</td>';
+                            $body .= '</tr>';
+                        }
+                        $body .= AgendamentoControllerHelper::tabelaEmailBot();
+                        $body .= '<p>';
+                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
+                        $body .= '</p>';
+                        Mail::to($user->email)
+                            ->send(new InternoAgendamentoMail($body, 'em '.$user->regional->regional, $diaFormatado));
                     }
-                    $body .= AgendamentoControllerHelper::tabelaEmailBot();
-                    $body .= '<p>';
-                    $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
-                    $body .= '</p>';
-                    Mail::to($user->email)
-                        ->send(new InternoAgendamentoMail($body, 'em '.$user->regional->regional, $diaFormatado));
                 } elseif($user->idperfil === 6 || $user->idperfil === 1) {
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('dia','=',$hoje)
                         ->orderBy('idregional','ASC')
                         ->get();
-                    $body = '<h3><i>(Mensagem Programada)</i></h3>';
-                    $body .= '<p>Confira abaixo a lista de agendamentos solicitados pelo Portal CORE-SP hoje, <strong>'.Helper::onlyDate($hoje).':</strong></p>';
-                    $body .= AgendamentoControllerHelper::tabelaEmailTop();
-                    foreach($agendamentos as $age) {
-                        $body .= '<tr>';
-                        $body .= '<td>'.$age->regional->regional.'</td>';
-                        $body .= '<td>'.$age->hora.'</td>';
-                        $body .= '<td>'.$age->protocolo.'</td>';
-                        $body .= '<td>'.$age->nome.'</td>';
-                        $body .= '<td>'.$age->cpf.'</td>';
-                        $body .= '<td>'.$age->tiposervico.'</td>';
-                        $body .= '</tr>';
+                    if($agendamentos->isNotEmpty()) {
+                        $body = '<h3><i>(Mensagem Programada)</i></h3>';
+                        $body .= '<p>Confira abaixo a lista de agendamentos solicitados pelo Portal CORE-SP hoje, <strong>'.Helper::onlyDate($hoje).':</strong></p>';
+                        $body .= AgendamentoControllerHelper::tabelaEmailTop();
+                        foreach($agendamentos as $age) {
+                            $body .= '<tr>';
+                            $body .= '<td>'.$age->regional->regional.'</td>';
+                            $body .= '<td>'.$age->hora.'</td>';
+                            $body .= '<td>'.$age->protocolo.'</td>';
+                            $body .= '<td>'.$age->nome.'</td>';
+                            $body .= '<td>'.$age->cpf.'</td>';
+                            $body .= '<td>'.$age->tiposervico.'</td>';
+                            $body .= '</tr>';
+                        }
+                        $body .= AgendamentoControllerHelper::tabelaEmailBot();
+                        $body .= '<p>';
+                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
+                        $body .= '</p>';
+                        $regional = 'em São Paulo e Seccionais';
+                        Mail::to($user->email)
+                            ->send(new InternoAgendamentoMail($body, $regional, $diaFormatado));
                     }
-                    $body .= AgendamentoControllerHelper::tabelaEmailBot();
-                    $body .= '<p>';
-                    $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
-                    $body .= '</p>';
-                    $regional = 'em São Paulo e Seccionais';
-                    Mail::to($user->email)
-                        ->send(new InternoAgendamentoMail($body, $regional, $diaFormatado));
                 }
             }
         })->dailyAt('4:00');
