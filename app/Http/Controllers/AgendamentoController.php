@@ -111,7 +111,9 @@ class AgendamentoController extends Controller
             $resultados = Agendamento::where('idregional','LIKE','%'.$regional.'%')
                 ->where('status','LIKE','%'.$status.'%')
                 ->whereBetween('dia',[$mindia,$maxdia])
+                ->orderBy('idregional','ASC')
                 ->orderBy('dia','DESC')
+                ->orderBy('hora','ASC')
                 ->limit(50)
                 ->get();
         } else {
@@ -120,7 +122,9 @@ class AgendamentoController extends Controller
                     $q->where('status','LIKE','%%')
                         ->orWhereNull('status');
                 })->whereBetween('dia',[$mindia,$maxdia])
+                ->orderBy('idregional','ASC')
                 ->orderBy('dia','DESC')
+                ->orderBy('hora','ASC')
                 ->limit(50)
                 ->get();
         }
