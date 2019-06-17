@@ -71,6 +71,10 @@ class UserController extends Controller
             } else {
                 $acoes = '<i class="fas fa-lock text-muted"></i>';
             }
+            if(isset($resultado->perfil->nome))
+                $perfil = $resultado->perfil->nome;
+            else
+                $perfil = 'Nenhum perfil associado';
             if(isset($resultado->sessao)) {
                 $acesso = Helper::formataData($resultado->sessao->updated_at);
                 $acesso .= '<br />IP: ';
@@ -82,7 +86,7 @@ class UserController extends Controller
                 $resultado->idusuario,
                 $resultado->nome.'<br />'.$resultado->email,
                 $acesso,
-                $resultado->perfil->nome,
+                $perfil,
                 $resultado->regional->regional,
                 $acoes
             ];
