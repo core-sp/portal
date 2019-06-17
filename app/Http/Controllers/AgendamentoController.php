@@ -135,6 +135,7 @@ class AgendamentoController extends Controller
         if(Input::get('filtro') === 'sim') {
             $temFiltro = true;
             $resultados = $this->checaFiltros();
+            $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
         } else {
             $temFiltro = null;
             $diaFormatado = date('d\/m\/Y');
