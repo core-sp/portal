@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Sessao;
 use App\Permissao;
 use App\Events\LoginEvent;
+use Session;
 
 class LoginController extends Controller
 {
@@ -46,8 +47,10 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        if(session('idusuario'))
+        if(session('idusuario')) {
             $this->performLogout($request);
+            Session::flush();
+        }
         return redirect()->route('admin');
     }
 

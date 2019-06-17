@@ -88,7 +88,7 @@ class AgendamentoController extends Controller
             if(Input::get('regional') !== '999') {
                 $regional = Input::get('regional');
             } else {
-                $regional = '';
+                $regional = '%%';
             }
         } else {
             $regional = Regional::select('idregional')->find(Auth::user()->idregional);
