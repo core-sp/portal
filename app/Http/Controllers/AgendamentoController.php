@@ -110,7 +110,7 @@ class AgendamentoController extends Controller
         if(isset($status)) {
             if(empty($regional)) {
                 $resultados = Agendamento::where('idregional','LIKE','%%')
-                    ->where('status','LIKE','%'.$status.'%')
+                    ->where('status','LIKE',$status)
                     ->whereBetween('dia',[$mindia,$maxdia])
                     ->orderBy('idregional','ASC')
                     ->orderBy('dia','DESC')
@@ -119,7 +119,7 @@ class AgendamentoController extends Controller
                     ->get();
             } else {
                 $resultados = Agendamento::where('idregional','LIKE',$regional)
-                    ->where('status','LIKE','%'.$status.'%')
+                    ->where('status','LIKE',$status)
                     ->whereBetween('dia',[$mindia,$maxdia])
                     ->orderBy('idregional','ASC')
                     ->orderBy('dia','DESC')
