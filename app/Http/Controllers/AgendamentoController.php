@@ -162,6 +162,22 @@ class AgendamentoController extends Controller
         // Checa se tem filtro
         if(Input::get('filtro') === 'sim') {
             $temFiltro = true;
+            if(!empty(Input::get('mindia'))) {
+                $mindiaArray = explode('/',Input::get('mindia'));
+                $checaMindia = checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
+                if($checaMindia === false) {
+                    return Redirect::back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
+                        ->with('class', 'alert-danger');
+                }
+            } 
+            if(!empty(Input::get('maxdia'))) {
+                $maxdiaArray = explode('/',Input::get('maxdia'));
+                $checaMaxdia = checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
+                if($checaMaxdia === false) {
+                    return Redirect::back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
+                        ->with('class', 'alert-danger');
+                }
+            }
             $resultados = $this->checaFiltros();
             $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
         } else {
