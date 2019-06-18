@@ -22,8 +22,13 @@ class RegionalSiteController extends Controller
     public function show($id)
     {
         $resultado = Regional::find($id);
+        $noticias = Noticia::select('slug','img','created_at','titulo','idregional')
+            ->where('idregional','=',$id)
+            ->orderBy('created_at','DESC')
+            ->limit(3)
+            ->get();
         return response()
-            ->view('site.regional', compact('resultado'))
+            ->view('site.regional', compact('resultado','noticias'))
             ->header('Cache-Control','no-cache');
     }
 }
