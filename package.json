@@ -27,6 +27,7 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.9.0",
-        "font-awesome": "^4.7.0"
+        "font-awesome": "^4.7.0",
+        "opencollective-postinstall": "^2.0.2"
     }
 }
