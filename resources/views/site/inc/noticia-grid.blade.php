@@ -1,12 +1,7 @@
 @php
   use App\Http\Controllers\Helper;
 @endphp
-@if(isset($i))
-  @php $classe = 'home-'.$i; @endphp
-@else
-  @php $classe = ''; @endphp
-@endif
-<div class="col-lg-4 col-sm-6 {{ $classe }}">
+<div class="col-lg-4 col-sm-6">
   <a href="/noticia/{{ $noticia->slug }}">
     <div class="box-news">
       @if(isset($noticia->img))

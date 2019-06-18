@@ -36,7 +36,7 @@
     </div>
     <div class="linha-lg"></div>
     <div class="row mt-2">
-      <div class="col-sm-8 pr-4">
+      <div class="col-lg-8 pr-4">
         <div class="conteudo-txt">
           <p class="light"><strong>Endereço:</strong> {{ $resultado->endereco }}, {{ $resultado->numero }} - {{ $resultado->complemento }}</p>
           <p class="light"><strong>Bairro: </strong>{{ $resultado->bairro }}</p>
@@ -54,9 +54,26 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-4">
+      <div class="col-lg-4">
         @include('site.inc.content-sidebar')
       </div>
+    </div>
+    <div class="row mt-5">
+      <div class="col">
+        <div class="row nomargin">
+          <div class="flex-one pr-4 align-self-center">
+            <h4 class="stronger">Notícias de {{ $resultado->regional }}</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="linha-lg"></div>
+    <div class="row mb-3">
+      @php $i = 0; @endphp
+      @foreach($noticias as $noticia)
+        @php $i++; @endphp
+        @include('site.inc.noticia-grid')
+      @endforeach
     </div>
     @else
       @include('site.inc.content-error')
