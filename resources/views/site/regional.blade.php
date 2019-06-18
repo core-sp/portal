@@ -58,6 +58,7 @@
         @include('site.inc.content-sidebar')
       </div>
     </div>
+    @if($noticias->isNotEmpty())
     <div class="row mt-5">
       <div class="col">
         <div class="row nomargin">
@@ -75,6 +76,7 @@
         @include('site.inc.noticia-grid')
       @endforeach
     </div>
+    @endif
     @else
       @include('site.inc.content-error')
     @endif
