@@ -76,7 +76,9 @@ class UserController extends Controller
             else
                 $perfil = 'Nenhum perfil associado';
             if(isset($resultado->sessao)) {
+                $acesso = '<span style="white-space:nowrap;">';
                 $acesso = Helper::formataData($resultado->sessao->updated_at);
+                $acesso = '</span>';
                 $acesso .= '<br />IP: ';
                 $acesso .= $resultado->sessao->ip_address;
             } else {
