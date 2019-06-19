@@ -34,14 +34,23 @@
 	  	  	</h3>
   	  	  </div>
   	  	  <div class="card-body">
-  	  	  	@if(Auth::check())
-  	  	  	<div class="mb-2">
-  	  	  	  <strong>Nome:</strong> {{ Auth::user()->nome }}
-  	  	  	</div>
-  	  	  	<div class="mb-3">
-  	  	  	  <strong>Email:</strong> {{ Auth::user()->email }}
-  	  	  	</div>
-  	  	  	<a href="/admin/perfil/senha" class="btn btn-danger">Alterar senha</a>
+			@if(Auth::check())
+			@if(isset(Auth::user()->nome))	  
+			<p class="mb-1"><strong>Nome Completo:</strong> {{ Auth::user()->nome }}</p>
+			@endif
+			@if(isset(Auth::user()->username))	
+			<p class="mb-1"><strong>Nome de Usuário:</strong> {{ Auth::user()->username }}</p>
+			@endif
+			@if(isset(Auth::user()->email))	
+			<p class="mb-1"><strong>Email:</strong> {{ Auth::user()->email }}</p>
+			@endif
+			@if(isset(Auth::user()->perfil->nome))	
+			<p class="mb-1"><strong>Perfil:</strong> {{ Auth::user()->perfil->nome }}</p>
+			@endif
+			@if(isset(Auth::user()->regional->regional))	
+			<p class="mb-1"><strong>Seccional:</strong> {{ Auth::user()->regional->regional }}</p>
+			@endif
+  	  	  	<a href="/admin/perfil/senha" class="btn btn-danger mt-3">Alterar senha</a>
   	  	  	@endif
   	  	  </div>
   	  	  <div class="card-footer">
