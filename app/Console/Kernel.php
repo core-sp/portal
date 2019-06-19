@@ -61,8 +61,12 @@ class Kernel extends ConsoleKernel
                         $body .= '<p>';
                         $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
                         $body .= '</p>';
-                        Mail::to($user->email)
-                            ->send(new InternoAgendamentoMail($body, 'em '.$user->regional->regional, $diaFormatado));
+                        try {
+                            Mail::to($user->email)
+                                ->send(new InternoAgendamentoMail($body, 'em '.$user->regional->regional, $diaFormatado));
+                        } catch (\Exception $e) {
+                            \Log::error($e->getMessage());
+                        }
                     }
                 } elseif($user->idperfil === 13) {
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
@@ -89,8 +93,12 @@ class Kernel extends ConsoleKernel
                         $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
                         $body .= '</p>';
                         $regional = 'nas Seccionais';
-                        Mail::to($user->email)
-                            ->send(new InternoAgendamentoMail($body, $regional, $diaFormatado));
+                        try {
+                            Mail::to($user->email)
+                                ->send(new InternoAgendamentoMail($body, $regional, $diaFormatado));
+                        } catch (\Exception $e) {
+                            \Log::error($e->getMessage());
+                        }
                     }
                 } elseif($user->idperfil === 12) {
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
@@ -115,8 +123,12 @@ class Kernel extends ConsoleKernel
                         $body .= '<p>';
                         $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
                         $body .= '</p>';
-                        Mail::to($user->email)
-                            ->send(new InternoAgendamentoMail($body, 'em '.$user->regional->regional, $diaFormatado));
+                        try {
+                            Mail::to($user->email)
+                                ->send(new InternoAgendamentoMail($body, 'em '.$user->regional->regional, $diaFormatado));
+                        } catch (\Exception $e) {
+                            \Log::error($e->getMessage());
+                        }
                     }
                 } elseif($user->idperfil === 6 || $user->idperfil === 1) {
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
@@ -142,8 +154,12 @@ class Kernel extends ConsoleKernel
                         $body .= 'Por favor, acesse o <a href="https://core-sp.org.br" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
                         $body .= '</p>';
                         $regional = 'em São Paulo e Seccionais';
-                        Mail::to($user->email)
-                            ->send(new InternoAgendamentoMail($body, $regional, $diaFormatado));
+                        try {
+                            Mail::to($user->email)
+                                ->send(new InternoAgendamentoMail($body, $regional, $diaFormatado));
+                        } catch (\Exception $e) {
+                            \Log::error($e->getMessage());
+                        }
                     }
                 }
             }

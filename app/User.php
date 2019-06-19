@@ -19,7 +19,7 @@ class User extends Authenticatable
     protected $with = ['regional', 'perfil', 'sessao'];
 
     protected $fillable = [
-        'nome', 'email', 'password',
+        'nome', 'email', 'username', 'password',
     ];
 
     protected $hidden = [

@@ -127,19 +127,22 @@ class UserController extends Controller
         $regras = [
             'nome' => 'required|max:191',
             'email' => 'email|required',
-            'password' => 'required|confirmed|min:6|max:24'
+            'password' => 'required|confirmed|min:6|max:24',
+            'username' => 'unique:users'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'password.min' => 'A senha precisa ter no mínimo 6 caracteres.',
             'password.confirmed' => 'As senhas precisam ser idênticas entre si.',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'unique' => ':attribute indisponível',
         ];
         $erros = $request->validate($regras, $mensagens);
 
         $usuario = new User();
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
+        $usuario->username = $request->input('username');
         $usuario->idperfil = $request->input('perfil');
         $usuario->idregional = $request->input('idregional');
         $usuario->password = Hash::make($request->input('password'));
@@ -167,17 +170,20 @@ class UserController extends Controller
         ControleController::autorizaStatic(['1']);
         $regras = [
             'nome' => 'required|max:191',
-            'email' => 'email|required'
+            'email' => 'email|required',
+            'username' => 'unique:users'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'unique' => ':attribute indisponível',
         ];
         $erros = $request->validate($regras, $mensagens);
 
         $usuario = User::find($id);
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
+        $usuario->username = $request->input('username');
         $usuario->idperfil = $request->input('perfil');
         $usuario->idregional = $request->input('idregional');
         $update = $usuario->update();

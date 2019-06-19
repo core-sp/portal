@@ -6,7 +6,7 @@
     <div class="card-body">
         <div class="form-row mb-2">
         <div class="col">
-            <label for="nome">Nome do Usuário</label>
+            <label for="nome">Nome Completo</label>
             <input type="text"
                 class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                 placeholder="Nome"
@@ -18,6 +18,22 @@
             @if($errors->has('nome'))
             <div class="invalid-feedback">
             {{ $errors->first('nome') }}
+            </div>
+            @endif
+        </div>
+        <div class="col">
+            <label for="nome">Nome de usuário</label>
+            <input type="text"
+                class="form-control {{ $errors->has('username') ? 'is-invalid' : '' }}"
+                placeholder="Nome"
+                name="username"
+                @if(isset($resultado))
+                value="{{ $resultado->username }}"
+                @endif
+                />
+            @if($errors->has('username'))
+            <div class="invalid-feedback">
+            {{ $errors->first('username') }}
             </div>
             @endif
         </div>
@@ -37,6 +53,24 @@
             @endforeach
             </select>
         </div>
+        </div>
+        <div class="form-row mt-2">
+        <div class="col">
+        <label for="email">Email</label>
+            <input type="text"
+            class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+            placeholder="Email"
+            name="email"
+            @if(isset($resultado))
+            value="{{ $resultado->email }}"
+            @endif
+            />
+            @if($errors->has('email'))
+            <div class="invalid-feedback">
+            {{ $errors->first('email') }}
+            </div>
+            @endif
+        </div>
         <div class="col">
             <label for="idregional">Regional</label>
             <select name="idregional" class="form-control">
@@ -54,24 +88,8 @@
             </select>
         </div>
         </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="text"
-            class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-            placeholder="Email"
-            name="email"
-            @if(isset($resultado))
-            value="{{ $resultado->email }}"
-            @endif
-            />
-            @if($errors->has('email'))
-            <div class="invalid-feedback">
-            {{ $errors->first('email') }}
-            </div>
-            @endif
-        </div>
         @if(!isset($resultado))
-        <div class="form-row">
+        <div class="form-row mt-2">
             <div class="col">
                 <label for="password">Senha</label>
                 <input id="password" type="password" class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" autocomplete="new-password" />

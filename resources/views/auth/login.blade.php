@@ -22,20 +22,22 @@
       <form action="{{ route('login') }}" method="POST">
         @csrf
         <div class="input-group mb-3">
-          <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" placeholder="Email" required autofocus>
-          <div class="input-group-append">
-              <span class="fa fa-envelope input-group-text"></span>
+          <input id="login" type="text"
+            class="form-control{{ $errors->has('username') || $errors->has('email') ? ' is-invalid' : '' }}"
+            name="login" value="{{ old('username') ?: old('email') }}" placeholder="Email ou Nome de usuário" required autofocus>
+          <div class="input-group-append login-icon">
+              <span class="fas fa-user input-group-text" style="line-height:1.5;"></span>
           </div>
-          @if ($errors->has('email'))
-          <span class="invalid-feedback" role="alert">
-            <strong>{{ $errors->first('email') }}</strong>
-          </span>
+          @if ($errors->has('username') || $errors->has('email'))
+            <span class="invalid-feedback">
+              <strong>{{ $errors->first('username') ?: $errors->first('email') }}</strong>
+            </span>
           @endif
         </div>
         <div class="input-group mb-3">         
           <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" placeholder="Senha" required>
-           <div class="input-group-append">
-              <span class="fa fa-lock input-group-text"></span>
+           <div class="input-group-append login-icon">
+              <span class="fa fa-lock input-group-text" style="line-height:1.5;"></span>
           </div>
           @if ($errors->has('password'))
           <span class="invalid-feedback" role="alert">
