@@ -86,7 +86,7 @@ class UserController extends Controller
             }
             $conteudo = [
                 $resultado->idusuario,
-                $resultado->nome.'<br />'.$resultado->email,
+                $resultado->nome.'<br /><span style="white-space:nowrap;">'.$resultado->email.'</span>',
                 $acesso,
                 $perfil,
                 $resultado->regional->regional,
