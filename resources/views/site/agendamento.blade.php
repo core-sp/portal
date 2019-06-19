@@ -52,6 +52,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 <input type="text"
                   class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                   name="nome"
+                  value="{{ old('nome') }}"
                   placeholder="Nome" />
                   @if($errors->has('nome'))
                   <div class="invalid-feedback">
@@ -65,6 +66,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
                   name="cpf"
                   placeholder="CPF"
+                  value="{{ old('cpf') }}"
                   />
                   @if($errors->has('cpf'))
                   <div class="invalid-feedback">
@@ -79,6 +81,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 <input type="text"
                   class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                   name="email"
+                  value="{{ old('email') }}"
                   placeholder="E-mail"
                   />
                   @if($errors->has('email'))
@@ -92,6 +95,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 <input type="text"
                   class="form-control celularInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
                   name="celular"
+                  value="{{ old('celular') }}"
                   placeholder="Celular"
                   />
                   @if($errors->has('celular'))
@@ -107,7 +111,11 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 <label for="idregional">Regional *</label>
                 <select name="idregional" id="idregional" class="form-control">
                   @foreach($regionais as $regional)
+                    @if($regional->idregional == old('idregional'))
+                    <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                    @else
                     <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                    @endif
                   @endforeach 
                 </select>
                 @if($errors->has('regional'))
@@ -120,19 +128,19 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 <label for="dia">Dia *</label>
                 <div class="input-group">
                   <input type="text" 
-                    class="form-control"
+                    class="form-control {{ $errors->has('dia') ? 'is-invalid' : '' }}"
                     id="datepicker"
                     name="dia"
                     placeholder="dd/mm/aaaaa"
                     autocomplete="off"
                     readonly
                     />
+                  @if($errors->has('dia'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('dia') }}
+                  </div>
+                  @endif
                 </div>
-                @if($errors->has('dia'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('dia') }}
-                </div>
-                @endif
               </div>
               <div class="col-md-4 mt-2-768">
                 <div id="loadImage">
@@ -141,7 +149,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   </div>
                 </div>
                 <label for="hora">Horários disponíveis *</label>
-                <select name="hora" id="horarios" class="form-control">
+                <select name="hora" id="horarios" class="form-control {{ $errors->has('hora') ? 'is-invalid' : '' }}">
                   <option value="" disabled selected>Selecione o dia do atendimento</option>
                 </select>
                 @if($errors->has('hora'))
@@ -156,7 +164,11 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 <label for="servico">Tipo de Serviço *</label>
                 <select name="servico" class="form-control">
                   @foreach($servicos as $servico)
+                    @if($servico == old('servico'))
+                    <option value="{{ $servico }}" selected>{{ $servico }}</option>
+                    @else
                     <option value="{{ $servico }}">{{ $servico }}</option>
+                    @endif
                   @endforeach 
                 </select>
                 @if($errors->has('servico'))
@@ -169,7 +181,11 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                 <label for="pessoa">Para:</label>
                 <select name="pessoa" class="form-control">
                   @foreach($pessoas as $pessoa => $diminutivo)
+                    @if(old('pessoa') == $diminutivo)
+                    <option value="{{ $diminutivo }}" selected>{{ $pessoa }}</option>
+                    @else
                     <option value="{{ $diminutivo }}">{{ $pessoa }}</option>
+                    @endif
                   @endforeach 
                 </select>
                 @if($errors->has('pessoa'))

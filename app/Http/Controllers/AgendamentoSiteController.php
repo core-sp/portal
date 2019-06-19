@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
 use App\Rules\Cpf;
 use App\Events\ExternoEvent;
+use Illuminate\Support\Facades\Validator;
+use Redirect;
 
 class AgendamentoSiteController extends Controller
 {
@@ -111,16 +113,22 @@ class AgendamentoSiteController extends Controller
         $regras = [
             'nome' => 'required|max:191',
             'cpf' => ['required', 'max:191', new Cpf],
-            'email' => 'required|max:191',
+            'email' => 'required|email|max:191',
             'celular' => 'max:191',
             'dia' => 'required',
             'hora' => 'required|max:191',
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
+            'dia.required' => 'Informe o dia do atendimento',
+            'hora.required' => 'Informe o horário do atendimento',
+            'email' => 'Email inválido',
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
-        $erros = $request->validate($regras, $mensagens);
+        $validation = Validator::make($request->all(), $regras, $mensagens);
+        if($validation->fails()) {
+            return Redirect::back()->withErrors($validation)->withInput($request->all());
+        }
         // Organiza dados de dia e hora
         $regional = $request->input('idregional');
         $dia_inalterado = $request->input('dia');

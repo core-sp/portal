@@ -7,28 +7,35 @@ use App\Http\Controllers\ControleController;
 use App\Newsletter;
 use App\Events\ExternoEvent;
 use Response;
+use Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class NewsletterController extends Controller
 {
     public function store(Request $request)
     {
         $regras = [
-            'nome' => 'required',
-            'email' => 'required|unique:newsletters',
-            'celular' => 'required'
+            'nomeNl' => 'required',
+            'emailNl' => 'required|unique:newsletters,email',
+            'celularNl' => 'required'
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'email.unique' => 'Este email já está cadastrado em nosso sistema'
+            'nomeNl.required' => 'O nome é obrigatório',
+            'emailNl.required' => 'O email é obrigatório',
+            'celularNl.required' => 'O celular é obrigatório',
+            'emailNl.unique' => 'Este email já está cadastrado em nosso sistema'
         ];
-        $erros = $request->validate($regras, $mensagens);
+        $validation = Validator::make($request->all(), $regras, $mensagens);
+        if($validation->fails()) {
+            return redirect(url()->previous().'#rodape')->withErrors($validation)->withInput($request->all());
+        }
 
         // Remove máscara
-        $celular = preg_replace("/[^0-9]/", "", $request->input('celular'));
+        $celular = preg_replace("/[^0-9]/", "", $request->input('celularNl'));
 
         $newsletter = new Newsletter();
-        $newsletter->nome = $request->input('nome');
-        $newsletter->email = $request->input('email');
+        $newsletter->nome = $request->input('nomeNl');
+        $newsletter->email = $request->input('emailNl');
         $newsletter->celular = $celular;
         $save = $newsletter->save();
         if(!$save)
