@@ -53,6 +53,7 @@ $now = now();
 								<input type="text"
 									class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
 									name="nome"
+									value="{{ old('nome') }}"
 									placeholder="Nome" />
 								@if($errors->has('nome'))
 									<div class="invalid-feedback">
@@ -65,6 +66,7 @@ $now = now();
 								<input type="text"
 									class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}""
 									name="email"
+									value="{{ old('email') }}"
 									placeholder="Email" />
 								@if($errors->has('email'))
 									<div class="invalid-feedback">
@@ -79,6 +81,7 @@ $now = now();
 								<input type="text"
 									class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
 									name="cpf"
+									value="{{ old('cpf') }}"
 									placeholder="CPF" />
 								@if($errors->has('cpf'))
 									<div class="invalid-feedback">
@@ -91,6 +94,7 @@ $now = now();
 								<input type="text"
 									class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
 									name="telefone"
+									value="{{ old('telefone') }}"
 									placeholder="Telefone" />
 								@if($errors->has('telefone'))
 									<div class="invalid-feedback">
@@ -103,6 +107,7 @@ $now = now();
 								<input type="text"
 									class="form-control {{ $errors->has('registrocore') ? 'is-invalid' : '' }}"
 									name="registrocore"
+									value="{{ old('registrocore') }}"
 									placeholder="Registro no CORE (opcional)" />
 								@if($errors->has('registrocore'))
 									<div class="invalid-feedback">

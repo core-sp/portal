@@ -240,37 +240,40 @@ use \App\Http\Controllers\Helper;
                   @csrf
                   <div class="form-group">
                     <input type="text"
-                      name="nome"
-                      class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
+                      name="nomeNl"
+                      class="form-control {{ $errors->has('nomeNl') ? 'is-invalid' : '' }}"
+                      value="{{ old('nomeNl') }}"
                       placeholder="Nome *"
                       />
-                      @if($errors->has('nome'))
+                      @if($errors->has('nomeNl'))
                       <div class="invalid-feedback">
-                      {{ $errors->first('nome') }}
+                      {{ $errors->first('nomeNl') }}
                       </div>
                       @endif
                   </div>
                   <div class="form-group">
                     <input type="text"
-                      name="email"
-                      class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                      name="emailNl"
+                      class="form-control {{ $errors->has('emailNl') ? 'is-invalid' : '' }}"
+                      value="{{ old('emailNl') }}"
                       placeholder="E-mail *"
                       />
-                      @if($errors->has('email'))
+                      @if($errors->has('emailNl'))
                       <div class="invalid-feedback">
-                      {{ $errors->first('email') }}
+                      {{ $errors->first('emailNl') }}
                       </div>
                       @endif
                   </div>
                   <div class="form-group">
                     <input type="text"
-                      name="celular"
-                      class="form-control celularInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
+                      name="celularNl"
+                      class="form-control celularInput {{ $errors->has('celularNl') ? 'is-invalid' : '' }}"
+                      value="{{ old('celularNl') }}"
                       placeholder="Celular *"
                       />
-                      @if($errors->has('celular'))
+                      @if($errors->has('celularNl'))
                       <div class="invalid-feedback">
-                      {{ $errors->first('celular') }}
+                      {{ $errors->first('celularNl') }}
                       </div>
                       @endif
                   </div>

@@ -16,6 +16,7 @@ use App\Rules\Cpf;
 use Illuminate\Support\Facades\Input;
 use App\Events\ExternoEvent;
 use Response;
+use Illuminate\Support\Facades\Validator;
 
 class CursoInscritoController extends Controller
 {
@@ -215,11 +216,14 @@ class CursoInscritoController extends Controller
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
-            'email' => 'Por favor, digite um endereço de email válido',
+            'email' => 'Email inválido',
             'cpf.unique' => 'O CPF informado já está cadastrado neste curso',
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
-        $erros = $request->validate($regras, $mensagens);
+        $validation = Validator::make($request->all(), $regras, $mensagens);
+        if($validation->fails()) {
+            return Redirect::back()->withErrors($validation)->withInput($request->all());
+        }
         $emailUser = $request->input('email');
         // Inputa dados no Banco de Dados
         $inscrito = new CursoInscrito();
