@@ -15,6 +15,7 @@ use \App\Http\Controllers\Helper;
           <li data-target="#carousel" data-slide-to="1"></li>
           <li data-target="#carousel" data-slide-to="2"></li>
           <li data-target="#carousel" data-slide-to="3"></li>
+          <li data-target="#carousel" data-slide-to="4"></li>
         </ol>
         <div class="carousel-inner h-100">
           <div class="carousel-item h-100 active">
@@ -27,6 +28,12 @@ use \App\Http\Controllers\Helper;
             <a href="/#">
               <img class="w-100 hide-576" src="{{ asset('img/registro-inicial.jpg') }}" />
               <img class="w-100 show-576" src="{{ asset('img/registro-inicial-m.jpg') }}" />
+            </a>
+          </div>
+          <div class="carousel-item h-100">
+            <a href="/#">
+              <img class="w-100 hide-576" src="{{ asset('img/banner-carteirinha.jpg') }}" />
+              <img class="w-100 show-576" src="{{ asset('img/banner-carteirinha-m.jpg') }}" />
             </a>
           </div>
           <div class="carousel-item h-100">
