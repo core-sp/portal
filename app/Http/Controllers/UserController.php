@@ -170,10 +170,11 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         ControleController::autorizaStatic(['1']);
+        $usuario = User::find($id);
         $regras = [
             'nome' => 'required|max:191',
             'email' => 'email|required',
-            'username' => 'unique:users'
+            'username' => 'unique:users,username,'.$usuario->idusuario.',idusuario'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
@@ -182,7 +183,6 @@ class UserController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $usuario = User::find($id);
         $usuario->nome = $request->input('nome');
         $usuario->email = $request->input('email');
         $usuario->username = $request->input('username');
