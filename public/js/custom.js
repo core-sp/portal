@@ -12,6 +12,7 @@ $(document).ready(function(){
   $('.cepInput').mask('00000-000');
   $('.dataInput').mask('00/00/0000');
   $('.cpfInput').mask('000.000.000-00');
+  $('#ageporhorario').mask('0');
   // Máscaras para datas
   $('#dataTermino').mask('00/00/0000', {
     onComplete: function() {

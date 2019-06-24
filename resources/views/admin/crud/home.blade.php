@@ -136,7 +136,7 @@
               <div class="col-sm-7">
                 <div class="float-right">
                   @if($resultados instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                    {{ $resultados->links() }}
+                    {{ $resultados->appends(request()->input())->links() }}
                   @endif
                 </div>
               </div>

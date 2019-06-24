@@ -26,7 +26,7 @@ class AgendamentoSiteController extends Controller
     public function permiteAgendamento($dia, $hora, $idregional)
     {
         // Conta o número de atendentes da seccional
-        $contagem = AgendamentoControllerHelper::countAtendentes($idregional);
+        $contagem = Regional::select('ageporhorario')->where('idregional',1)->first()->ageporhorario;
         $checaAgendamento = Agendamento::where('dia',$dia)
             ->where('hora',$hora)
             ->where('idregional',$idregional)
@@ -37,7 +37,7 @@ class AgendamentoSiteController extends Controller
             else
                 return false;
         } elseif($contagem > 1) {
-            if($checaAgendamento < ($contagem - 1))
+            if($checaAgendamento < $contagem)
                 return true;
             else
                 return false;
@@ -53,7 +53,7 @@ class AgendamentoSiteController extends Controller
             ->whereNull('status')
             ->get();
         $horarios = [];
-        $contagem = AgendamentoControllerHelper::countAtendentes($idregional);
+        $contagem = Regional::select('ageporhorario')->where('idregional',1)->first()->ageporhorario;
         if($contagem == 1) {
             foreach($agendamentos as $agendamento) {
                 array_push($horarios,$agendamento->hora);
@@ -75,7 +75,7 @@ class AgendamentoSiteController extends Controller
         $dia = date('Y-m-d', strtotime($dia));
         $horarios = AgendamentoControllerHelper::horas($idregional, $dia);
         // Checa pela contagem
-        $contagem = AgendamentoControllerHelper::countAtendentes($idregional);
+        $contagem = Regional::select('ageporhorario')->where('idregional',1)->first()->ageporhorario;
         if($contagem == 1) {
             $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
             $horariosPossiveis = array_diff($horarios, $horariosJaMarcados);
@@ -86,10 +86,9 @@ class AgendamentoSiteController extends Controller
         } elseif($contagem > 1) {
             $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
             $valores = array_count_values($horariosJaMarcados);
-            $atendimentos = $contagem - 1;
             $horariosJaCheios = [];
             foreach($valores as $chave => $numero) {
-                if($numero >= $atendimentos)
+                if($numero >= $contagem)
                     array_push($horariosJaCheios, $chave);
             }
             $horariosPossiveis = array_diff($horarios, $horariosJaCheios);
