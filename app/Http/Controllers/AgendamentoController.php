@@ -116,7 +116,7 @@ class AgendamentoController extends Controller
                     ->orderBy('dia','DESC')
                     ->orderBy('hora','ASC')
                     ->limit(50)
-                    ->get();
+                    ->paginate(25);
             } else {
                 $resultados = Agendamento::where('idregional','LIKE',$regional)
                     ->where('status','LIKE',$status)
@@ -125,7 +125,7 @@ class AgendamentoController extends Controller
                     ->orderBy('dia','DESC')
                     ->orderBy('hora','ASC')
                     ->limit(50)
-                    ->get();
+                    ->paginate(25);
             }    
         } else {
             if(empty($regional)) {
@@ -138,7 +138,7 @@ class AgendamentoController extends Controller
                     ->orderBy('dia','DESC')
                     ->orderBy('hora','ASC')
                     ->limit(50)
-                    ->get();
+                    ->paginate(25);
             } else {
                 $resultados = Agendamento::where('idregional','LIKE',$regional)
                     ->where(function($q){
@@ -149,7 +149,7 @@ class AgendamentoController extends Controller
                     ->orderBy('dia','DESC')
                     ->orderBy('hora','ASC')
                     ->limit(50)
-                    ->get();
+                    ->paginate(25);
             }
         }
         return $resultados;
@@ -250,12 +250,13 @@ class AgendamentoController extends Controller
         $select .= '</select>';
         $select .= '</div>';
         $select .= '<div class="form-group mb-0 col">';
+        $hoje = date('d\/m\/Y');
         $select .= '<label>De</label>';
         if(Input::has('mindia')) {
             $mindia = Input::get('mindia');
             $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="'.$mindia.'" />';
         } else {
-            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" />';
+            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="'.$hoje.'" />';
         }
         $select .= '</div>';
         $select .= '<div class="form-group mb-0 col">';
@@ -264,7 +265,7 @@ class AgendamentoController extends Controller
             $maxdia = Input::get('maxdia');
             $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="'.$maxdia.'" />';
         } else {
-            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" />';
+            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="'.$hoje.'" />';
         }
         $select .= '</div>';
         $select .= '<div class="form-group mb-0 col-auto align-self-end">';

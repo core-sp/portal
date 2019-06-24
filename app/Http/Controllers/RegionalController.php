@@ -94,6 +94,7 @@ class RegionalController extends Controller
             'cep' => 'required|max:191',
             'telefone' => 'required|max:191',
             'funcionamento' => 'required|max:191',
+            'ageporhorario' => 'required|regex:/^[1-9]+$/',
             'descricao' => 'required',
             'complemento' => 'max:191',
             'fax' => 'max:191',
@@ -101,7 +102,8 @@ class RegionalController extends Controller
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'ageporhorario.regex' => 'O valor deve ser maior que 0'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Inputa dados no BD
@@ -115,6 +117,7 @@ class RegionalController extends Controller
         $regional->telefone = $request->input('telefone');
         $regional->fax = $request->input('fax');
         $regional->funcionamento = $request->input('funcionamento');
+        $regional->ageporhorario = $request->input('ageporhorario');
         $regional->responsavel = $request->input('responsavel');
         $regional->descricao = $request->input('descricao');
         $update = $regional->update();

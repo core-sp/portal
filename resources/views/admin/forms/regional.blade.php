@@ -172,6 +172,23 @@
                 </div>
                 @endif
             </div>
+            <div class="col">
+                <label for="ageporhorario">Agendamentos p/ horário</label>
+                <input type="text"
+                    class="form-control {{ $errors->has('ageporhorario') ? 'is-invalid' : '' }}"
+                    placeholder="Nº de agendamentos permitidos por horário"
+                    name="ageporhorario"
+                    id="ageporhorario"
+                    @if(isset($resultado))
+                    value="{{ $resultado->ageporhorario }}"
+                    @endif
+                    />
+                @if($errors->has('ageporhorario'))
+                <div class="invalid-feedback">
+                {{ $errors->first('ageporhorario') }}
+                </div>
+                @endif
+            </div>
         </div>
         <div class="form-group mt-2">
             <label for="descricao">Descrição da regional</label>
