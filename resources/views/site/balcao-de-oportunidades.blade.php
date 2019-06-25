@@ -74,7 +74,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                 {{ $oportunidade->empresa->fantasia }}
                 @else
                 {{ $oportunidade->empresa->razaosocial }}
-                @endif  
+                @endif
                 &nbsp;&nbsp;&nbsp;
                 <i class="fas fa-map-marker-alt"></i>&nbsp;
                 {{ BdoOportunidadeControllerHelper::listRegioes($oportunidade->regiaoatuacao) }}
@@ -144,7 +144,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
     <div class="row">
       <div class="col">
         <div class="float-right">
-          {{ $oportunidades->links() }}
+          {{ $oportunidades->appends(request()->input())->links() }}
         </div>
       </div>
     </div>

@@ -11,43 +11,33 @@ use \App\Http\Controllers\Helper;
     <div class="row" id="conteudo-principal">
       <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="6000">
         <ol class="carousel-indicators">
-          <li data-target="#carousel" data-slide-to="0" class="active"></li>
-          <li data-target="#carousel" data-slide-to="1"></li>
-          <li data-target="#carousel" data-slide-to="2"></li>
-          <li data-target="#carousel" data-slide-to="3"></li>
-          <li data-target="#carousel" data-slide-to="4"></li>
+          @php $i = -1; @endphp
+          @foreach($imagens as $img)
+          @php $i++; @endphp
+          @if(!empty($img->url))
+            @if($i === 0)
+              <li data-target="#carousel" data-slide-to="{{ $i }}" class="active"></li>
+            @else
+              <li data-target="#carousel" data-slide-to="{{ $i }}"></li>
+            @endif
+          @endif
+          @endforeach
         </ol>
         <div class="carousel-inner h-100">
-          <div class="carousel-item h-100 active">
-            <a href="/noticia/sistema-conferecores-em-atuacao-em-brasilia">
-              <img class="w-100 hide-576" src="{{ asset('img/banner-brasilia.jpg') }}" />
-              <img class="w-100 show-576" src="{{ asset('img/banner-brasilia-m.jpg') }}" />
-            </a>
-          </div>
-          <div class="carousel-item h-100">
-            <a href="/#">
-              <img class="w-100 hide-576" src="{{ asset('img/registro-inicial.jpg') }}" />
-              <img class="w-100 show-576" src="{{ asset('img/registro-inicial-m.jpg') }}" />
-            </a>
-          </div>
-          <div class="carousel-item h-100">
-            <a href="/#">
-              <img class="w-100 hide-576" src="{{ asset('img/banner-carteirinha.jpg') }}" />
-              <img class="w-100 show-576" src="{{ asset('img/banner-carteirinha-m.jpg') }}" />
-            </a>
-          </div>
-          <div class="carousel-item h-100">
-            <a href="/portal">
-              <img class="w-100 hide-576" src="{{ asset('img/banner-novo-portal.jpg') }}" />
-              <img class="w-100 show-576" src="{{ asset('img/banner-novo-portal-.jpg') }}" />
-            </a>
-          </div>
-          <div class="carousel-item h-100">
-            <a href="/refis-2019">
-              <img class="w-100 hide-576" src="{{ asset('img/banner-refis.png') }}" />
-              <img class="w-100 show-576" src="{{ asset('img/banner-refis-m.png') }}" />
-            </a>
-          </div>
+          @foreach($imagens as $img)
+          @if(!empty($img->url))
+            @if($img->ordem === 1)
+            <div class="carousel-item h-100 active">
+            @else
+            <div class="carousel-item h-100">
+            @endif
+              <a href="{{ $img->link }}" target="{{ $img->target }}">
+                <img class="w-100 hide-576" src="{{ asset($img->url) }}" />
+                <img class="w-100 show-576" src="{{ asset($img->url_mobile) }}" />
+              </a>
+            </div>
+          @endif
+          @endforeach
         </div>
         <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>

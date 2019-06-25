@@ -216,7 +216,7 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-md-4">
               <div class="footer-title w-75 mb-3 mt-4-768">
-                <h5 class="branco">Parceiros</h5>
+                <h5 class="branco">Links úteis</h5>
               </div>
               <a href="http://www.confere.org.br/" target="_blank">
                 <img src="{{ asset('img/confere.png') }}" alt="CONFERE">

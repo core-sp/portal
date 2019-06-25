@@ -154,7 +154,7 @@ $situacoes = LicitacaoHelper::situacoes();
     <div class="row">
       <div class="col">
         <div class="float-right">
-          {{ $licitacoes->links() }}
+          {{ $licitacoes->appends(request()->input())->links() }}
         </div>
       </div>
     </div>

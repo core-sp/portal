@@ -188,6 +188,12 @@ Route::prefix('admin')->group(function() {
   Route::prefix('newsletter')->group(function(){
     Route::get('/download', 'NewsletterController@download');
   });
+
+  // Rota para Home Imagens
+  Route::prefix('imagens')->group(function(){
+    Route::get('/bannerprincipal', 'HomeImagemController@editBannerPrincipal');
+    Route::put('/bannerprincipal', 'HomeImagemController@updateBannerPrincipal');
+  });
 });
 
 /*

@@ -38,7 +38,7 @@
             @endif
         </div>
         </div>
-        <div class="form-row">
+        <div class="form-row mt-2">
         <div class="col">
             <label for="lfm">Imagem principal</label>
             <div class="input-group">
@@ -93,7 +93,7 @@
         @endif
         </div>
     </div>
-    <div class="card-footer float-right">
+    <div class="card-footer">
         <div class="float-right">
             <a href="/admin/paginas" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">
