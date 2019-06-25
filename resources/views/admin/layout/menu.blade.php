@@ -170,6 +170,23 @@
                 @endif
             </ul>
         </li>
+        <!-- Imagens na Home -->
+        @if(ControleController::mostra('HomeImagemController', 'edit'))
+        <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+                <i class="nav-icon far fa-image"></i>
+                <p>Imagens<i class="right fa fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="/admin/imagens/bannerprincipal" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Banner principal</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        @endif
         <!-- Atendimento -->
         @if(ControleController::mostra('AgendamentoController', 'index') ||
             ControleController::mostra('AgendamentoBloqueioController', 'index'))

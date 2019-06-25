@@ -37,7 +37,6 @@ class Kernel extends ConsoleKernel
                 ->orWhere('idperfil','=',12)
                 ->orWhere('idperfil','=',8)
                 ->orWhere('idperfil','=',6)
-                ->orWhere('idperfil','=',11)
                 ->get();
             $hoje = date('Y-m-d');
             $diaFormatado = Helper::onlyDate($hoje);

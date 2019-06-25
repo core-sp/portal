@@ -92,6 +92,20 @@
                     <td><input type="checkbox" class="form-check-input" disabled /></td>
                 </tr>
                 <tr>
+                    <td>Imagens (Home)</td>
+                    <td><input type="checkbox" class="form-check-input" disabled /></td>
+                    <td><input type="checkbox" class="form-check-input" disabled /></td>
+                    @foreach($permissoesArray['HomeImagemController'] as $p)
+                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
+                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
+                        @else
+                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
+                        @endif
+                    @endforeach
+                    <td><input type="checkbox" class="form-check-input" disabled /></td>
+                </tr>
+                <tr>
                     <td>Cursos<br />(Inscritos)</td>
                     @foreach($permissoesArray['CursoInscritoController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp

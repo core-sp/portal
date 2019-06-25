@@ -178,16 +178,21 @@ class BdoOportunidadeControllerHelper extends Controller
 
     public static function listRegioes($string)
     {
-        $string = explode(',',$string);
-        $array = [];
-        foreach($string as $s)
-            array_push($array, $s);
-        $regionais = Regional::findMany($array);
-        $regArray = [];
-        foreach($regionais as $r)
-            array_push($regArray, $r->regional);
-        $corrigido = implode(',',$regArray);
-        $mostra = str_replace(',',' / ',$corrigido);
-        return $mostra;
+        if($string !== '1,2,3,4,5,6,7,8,9,10,11,12,13') {
+            $string = explode(',',$string);
+            $array = [];
+            foreach($string as $s)
+                array_push($array, $s);
+            $regionais = Regional::findMany($array);
+            $regArray = [];
+            foreach($regionais as $r)
+                array_push($regArray, $r->regional);
+            $corrigido = implode(',',$regArray);
+            $mostra = str_replace(',',' / ',$corrigido);
+            return $mostra;
+        } else {
+            $mostra = "Em todo o estado de São Paulo";
+            return $mostra;
+        }
     }
 }

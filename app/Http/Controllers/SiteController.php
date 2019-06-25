@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Noticia;
 use App\Pagina;
 use App\Licitacao;
+use App\HomeImagem;
 
 class SiteController extends Controller
 {
@@ -25,8 +26,11 @@ class SiteController extends Controller
             ->orderBy('created_at','DESC')
             ->limit(3)
             ->get();
+        $imagens = HomeImagem::select('ordem','url','url_mobile','link','target')
+            ->orderBy('ordem','ASC')
+            ->get();
         return response()
-            ->view('site.home', compact('noticias','cotidianos'))
+            ->view('site.home', compact('noticias','cotidianos','imagens'))
             ->header('Cache-Control','no-cache');
     }
 

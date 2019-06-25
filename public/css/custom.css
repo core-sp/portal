@@ -65,3 +65,13 @@ img {
   margin-bottom: 0;
   line-height: 1;
 }
+
+.homeimagens label {
+  font-size: 0.85rem;
+  margin-bottom: .15rem;
+  margin-left: .25rem;
+}
+
+.homeimagens:hover {
+  cursor: move;
+}

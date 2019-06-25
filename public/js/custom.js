@@ -1,6 +1,16 @@
 $(document).ready(function(){
   // Btns
   $('#lfm').filemanager('image');
+  $('#lfm-1').filemanager('image');
+  $('#lfm-2').filemanager('image');
+  $('#lfm-3').filemanager('image');
+  $('#lfm-4').filemanager('image');
+  $('#lfm-5').filemanager('image');
+  $('#lfm-m-1').filemanager('image');
+  $('#lfm-m-2').filemanager('image');
+  $('#lfm-m-3').filemanager('image');
+  $('#lfm-m-4').filemanager('image');
+  $('#lfm-m-5').filemanager('image');
   $('#edital').filemanager('file');
   // Máscaras gerais
   $('.nrlicitacaoInput').mask('999/9999');
@@ -89,6 +99,9 @@ $(document).ready(function(){
   });
   $('.timeInput').mask('00:00');
   $('.vagasInput').mask('000');
+  // Draggable
+  $("#sortable").sortable();
+  $( "#sortable" ).disableSelection();
   // Regra de data no filtro de agendamento
   $('#filtroAgendamento').submit(function(e){
     var maxDataFiltro = $('#maxdiaFiltro').val().split('/');
