@@ -126,20 +126,25 @@ class AgendamentoControllerHelper extends Controller
         $now = date('Y-m-d');
         if($now > $dia) {
             if($status === 'Cancelado') {
-                echo "<p class='mb-0'><strong>Status:</strong> Atendimento cancelado</p>";
+                echo "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i>&nbsp;&nbsp;Atendimento cancelado</strong></p>";
+            } elseif($status === 'Não Compareceu') {
+                echo "<p class='mb-0 text-warning'><strong><i class='fas fa-user-alt-slash'></i>&nbsp;&nbsp;Não compareceu</strong></p>";
             } elseif($status === null) {
-                echo "<p class='mb-0'><strong>Status:</strong> Não compareceu</p>";
+                echo "<p class='mb-0 text-danger'><strong><i class='fas fa-exclamation-triangle'></i>&nbsp;&nbsp;Validação pendente</strong></p>";
             } else {
-                echo "<p class='mb-0'><strong>Status:</strong> Atendimento realizado no dia ".Helper::onlyDate($dia).", às ".$hora."</p>";
+                echo "<p class='mb-0 text-success'><strong><i class='fas fa-check-circle'></i>&nbsp;&nbsp;Atendimento realizado com sucesso no dia ".Helper::onlyDate($dia).", às ".$hora."</strong></p>";
             }
         } else {
-            // Botão de reenviar email
-            $botao = '<form method="POST" action="/admin/agendamentos/reenviar-email/'.$id.'" class="d-inline">';
-            $botao .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-            $botao .= '<input type="submit" class="btn btn-sm btn-default" value="Reenviar email de confirmação"></input>';
-            $botao .= '</form>';
-            $cancelar = " <a href='/agendamento-consulta/busca?protocolo=".str_replace('AGE-','',$protocolo)."' class='btn btn-sm btn-danger' target='_blank'>Cancelar agendamento</a>";
-            echo $botao.$cancelar;
+            if($status === 'Cancelado') {
+                echo "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i> Atendimento cancelado</strong></p>";
+            } else {
+                // Botão de reenviar email
+                $botao = '<form method="POST" action="/admin/agendamentos/reenviar-email/'.$id.'" class="d-inline">';
+                $botao .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $botao .= '<input type="submit" class="btn btn-sm btn-default" value="Reenviar email de confirmação"></input>';
+                $botao .= '</form>';
+                echo $botao;
+            }
         }
     }
 

@@ -34,36 +34,46 @@ class HomeImagemController extends Controller
         $array = $request->all();
         unset($array['_token'], $array['_method']);
         $chunk = array_chunk($array, 4);
-        $update1 = HomeImagem::where('ordem',1)->update([
-            'url' => $chunk[0][0],
-            'url_mobile' => $chunk[0][1],
-            'link' => $chunk[0][2],
-            'target' => $chunk[0][3]
-        ]);
-        $update2 = HomeImagem::where('ordem',2)->update([
-            'url' => $chunk[1][0],
-            'url_mobile' => $chunk[1][1],
-            'link' => $chunk[1][2],
-            'target' => $chunk[1][3]
-        ]);
-        $update3 = HomeImagem::where('ordem',3)->update([
-            'url' => $chunk[2][0],
-            'url_mobile' => $chunk[2][1],
-            'link' => $chunk[2][2],
-            'target' => $chunk[2][3]
-        ]);
-        $update4 = HomeImagem::where('ordem',4)->update([
-            'url' => $chunk[3][0],
-            'url_mobile' => $chunk[3][1],
-            'link' => $chunk[3][2],
-            'target' => $chunk[3][3]
-        ]);
-        $update5 = HomeImagem::where('ordem','5')->update([
-            'url' => $chunk[4][0],
-            'url_mobile' => $chunk[4][1],
-            'link' => $chunk[4][2],
-            'target' => $chunk[4][3]
-        ]);
+        $update1 = HomeImagem::where('ordem',1)
+            ->where('funcao','bannerprincipal')
+            ->update([
+                'url' => $chunk[0][0],
+                'url_mobile' => $chunk[0][1],
+                'link' => $chunk[0][2],
+                'target' => $chunk[0][3]
+            ]);
+        $update2 = HomeImagem::where('ordem',2)
+            ->where('funcao','bannerprincipal')
+            ->update([
+                'url' => $chunk[1][0],
+                'url_mobile' => $chunk[1][1],
+                'link' => $chunk[1][2],
+                'target' => $chunk[1][3]
+            ]);
+        $update3 = HomeImagem::where('ordem',3)
+            ->where('funcao','bannerprincipal')
+            ->update([
+                'url' => $chunk[2][0],
+                'url_mobile' => $chunk[2][1],
+                'link' => $chunk[2][2],
+                'target' => $chunk[2][3]
+            ]);
+        $update4 = HomeImagem::where('ordem',4)
+            ->where('funcao','bannerprincipal')
+            ->update([
+                'url' => $chunk[3][0],
+                'url_mobile' => $chunk[3][1],
+                'link' => $chunk[3][2],
+                'target' => $chunk[3][3]
+            ]);
+        $update5 = HomeImagem::where('ordem','5')
+            ->where('funcao','bannerprincipal')
+            ->update([
+                'url' => $chunk[4][0],
+                'url_mobile' => $chunk[4][1],
+                'link' => $chunk[4][2],
+                'target' => $chunk[4][3]
+            ]);
         if(!$update1 || !$update2 || !$update3 || !$update4 || !$update5)
             abort(500);
         event(new CrudEvent('banner principal', 'editou', 1));
