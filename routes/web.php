@@ -171,6 +171,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/busca', 'AgendamentoController@busca');
     Route::put('/status', 'AgendamentoController@updateStatus');
     Route::get('/filtro', 'AgendamentoController@index');
+    Route::get('/pendentes', 'AgendamentoController@pendentes');
     Route::get('/editar/{id}', 'AgendamentoController@edit');
     Route::put('/editar/{id}', 'AgendamentoController@update');
     Route::post('/reenviar-email/{id}', 'AgendamentoController@reenviarEmail');

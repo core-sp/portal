@@ -124,7 +124,7 @@ class AgendamentoControllerHelper extends Controller
     public static function txtAgendamento($dia, $hora, $status, $protocolo, $id)
     {
         $now = date('Y-m-d');
-        if($now > $dia) {
+        if($now >= $dia) {
             if($status === 'Cancelado') {
                 echo "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i>&nbsp;&nbsp;Atendimento cancelado</strong></p>";
             } elseif($status === 'Não Compareceu') {
