@@ -376,7 +376,9 @@ class AgendamentoController extends Controller
         } else {
             event(new CrudEvent('agendamento', 'confirmou falta', $agendamento->idagendamento));
         }
-        return Redirect::back();
+        return Redirect::back()
+            ->with('message', '<i class="icon fa fa-check"></i>Status editado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function busca()
@@ -473,5 +475,41 @@ class AgendamentoController extends Controller
         return redirect('/admin/agendamentos')
             ->with('message', '<i class="icon fa fa-check"></i>Email enviado com sucesso!')
             ->with('class', 'alert-success');
+    }
+
+    public function pendentes()
+    {
+        ControleController::autoriza($this->class, 'edit');
+        $now = date('Y-m-d');
+        if(session('idperfil') === 6 || session('idperfil') === 1) {
+            $resultados = Agendamento::where('dia','<',$now)
+                ->whereNull('status')
+                ->orderBy('dia','DESC')
+                ->paginate(10);
+        } elseif(session('idperfil') === 12 ) {
+            $resultados = Agendamento::where('dia','<',$now)
+                ->where('idregional',1)
+                ->whereNull('status')
+                ->orderBy('dia','DESC')
+                ->paginate(10);
+        } elseif(session('idperfil') === 13) {
+            $resultados = Agendamento::where('dia','<',$now)
+                ->where('idregional','!=',1)
+                ->whereNull('status')
+                ->orderBy('dia','DESC')
+                ->paginate(10);
+        } else {
+            abort(401);
+        }
+        if($resultados->isEmpty()) {
+            $resultados = [];
+        }
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = $this->variaveis;
+        $variaveis['continuacao_titulo'] = 'pendentes de validação';
+        $variaveis['plural'] = 'agendamentos pendentes';
+        $variaveis['btn_criar'] = '<a class="btn btn-primary" href="/admin/agendamentos">Lista de Agendamentos</a>';
+        $variaveis = (object) $variaveis;
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 }

@@ -23,7 +23,7 @@
                     value="{{ $resultado->nome }}"
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                    disabled
+                    readonly
                     @endif
                     />
                 @if($errors->has('nome'))
@@ -42,7 +42,7 @@
                     value="{{ $resultado->email }}"
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                    disabled
+                    readonly
                     @endif
                     />
                 @if($errors->has('email'))
@@ -63,7 +63,7 @@
                     value="{{ $resultado->cpf }}"
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                    disabled
+                    readonly
                     @endif
                     />
                 @if($errors->has('cpf'))
@@ -82,7 +82,7 @@
                     value="{{ $resultado->celular }}"
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                    disabled
+                    readonly
                     @endif
                     />
                 @if($errors->has('celular'))
@@ -97,7 +97,7 @@
                 <label for="regional">Regional</label>
                 <select name="regional"
                     class="form-control"
-                    disabled
+                    readonly
                     />
                 @foreach($regionais as $regional)
                     @if(isset($resultado))
@@ -117,7 +117,7 @@
                 <select name="atendente"
                     class="form-control"
                     @if($now < $resultado->dia)
-                    disabled
+                    readonly
                     @endif
                     />
                 <option value="">Ninguém</option>
@@ -155,7 +155,7 @@
         <div class="form-row mt-4">
             <i>* Atendimento agendado pelo usuário no dia {{ Helper::onlyDate($resultado->created_at) }}.</i>
         </div>
-        @if($now < $resultado->dia)
+        @if($now < $resultado->dia || $resultado->status !== 'Cancelado')
         <div class="form-row mb-2">
             <i>** Para alteração de horário, é necessário cancelar o agendamento e cadastrar um novo horário pelo site.</i>
         </div>

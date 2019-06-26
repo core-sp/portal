@@ -75,3 +75,11 @@ img {
 .homeimagens:hover {
   cursor: move;
 }
+
+.link-alert-span {
+  color: #ffc107;
+}
+
+.link-alert:hover .link-alert-span {
+  color: #ffffff;
+}
