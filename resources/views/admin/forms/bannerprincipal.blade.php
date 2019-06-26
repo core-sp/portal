@@ -2,7 +2,9 @@
     @csrf
     {{ method_field('PUT') }}
     <div class="card-body">
-    <p class="mb-4"><i>* Insira as imagens e arraste as caixas para definir a ordem de exibição</i></p>
+    <p class="mb-4"><i>* Insira as imagens e arraste as caixas para definir a ordem de exibição<br>
+    ** Para remover uma imagem, basta deixar seus campos vazios
+    </i></p>
         <ul id="sortable" class="mb-0 pl-0">
             @php $i = 0; @endphp
             @foreach($resultado as $img)

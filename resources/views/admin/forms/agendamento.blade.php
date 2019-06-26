@@ -2,6 +2,7 @@
     use App\Http\Controllers\Helper;
     $status = App\Http\Controllers\Helpers\AgendamentoControllerHelper::status();
     use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
+    $now = date('Y-m-d');
 @endphp
 <div class="container pt-3 pl-3">
 {{ AgendamentoControllerHelper::txtAgendamento($resultado->dia, $resultado->hora, $resultado->status, $resultado->protocolo, $resultado->idagendamento) }}
@@ -21,6 +22,9 @@
                     @if(isset($resultado))
                     value="{{ $resultado->nome }}"
                     @endif
+                    @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
+                    disabled
+                    @endif
                     />
                 @if($errors->has('nome'))
                 <div class="invalid-feedback">
@@ -36,6 +40,9 @@
                     name="email"
                     @if(isset($resultado))
                     value="{{ $resultado->email }}"
+                    @endif
+                    @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
+                    disabled
                     @endif
                     />
                 @if($errors->has('email'))
@@ -55,6 +62,9 @@
                     @if(isset($resultado))
                     value="{{ $resultado->cpf }}"
                     @endif
+                    @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
+                    disabled
+                    @endif
                     />
                 @if($errors->has('cpf'))
                 <div class="invalid-feedback">
@@ -71,6 +81,9 @@
                     @if(isset($resultado))
                     value="{{ $resultado->celular }}"
                     @endif
+                    @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
+                    disabled
+                    @endif
                     />
                 @if($errors->has('celular'))
                 <div class="invalid-feedback">
@@ -82,7 +95,10 @@
         <div class="form-row mt-2">
             <div class="col">
                 <label for="regional">Regional</label>
-                <select name="regional" class="form-control">
+                <select name="regional"
+                    class="form-control"
+                    disabled
+                    />
                 @foreach($regionais as $regional)
                     @if(isset($resultado))
                         @if($resultado->idregional == $regional->idregional)
@@ -98,7 +114,12 @@
             </div>
             <div class="col">
                 <label for="atendente">Atendimento realizado por:</label>
-                <select name="atendente" class="form-control">
+                <select name="atendente"
+                    class="form-control"
+                    @if($now < $resultado->dia)
+                    disabled
+                    @endif
+                    />
                 <option value="">Ninguém</option>
                 @foreach($atendentes as $atendente)
                     @if(isset($resultado))
@@ -134,9 +155,11 @@
         <div class="form-row mt-4">
             <i>* Atendimento agendado pelo usuário no dia {{ Helper::onlyDate($resultado->created_at) }}.</i>
         </div>
+        @if($now < $resultado->dia)
         <div class="form-row mb-2">
             <i>** Para alteração de horário, é necessário cancelar o agendamento e cadastrar um novo horário pelo site.</i>
         </div>
+        @endif
     </div>
     <div class="card-footer">
         <div class="float-right">
