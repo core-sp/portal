@@ -124,7 +124,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                 @endforeach
                 </select>
                 <small class="form-text text-muted">
-                  <em>* Segure Ctrl para selecionar mais de uma região</em>
+                  <em>* Segure Ctrl para selecionar mais de uma região ou Shift para selecionar um grupo de regiões</em>
                 </small>
                 @if($errors->has('regiaoatuacao'))
                 <div class="invalid-feedback">
