@@ -19,7 +19,7 @@ class BdoSiteController extends Controller
     	$buscaPalavraChave = Input::get('palavra-chave');
         $buscaSegmento = Input::get('segmento');
         $buscaRegional = ','.Input::get('regional').',';
-        if(empty(Input::get('regional')))
+        if(Input::get('regional') === 'todas')
             $buscaRegional = '';
         if (!empty($buscaPalavraChave) 
             or !empty($buscaSegmento) 
