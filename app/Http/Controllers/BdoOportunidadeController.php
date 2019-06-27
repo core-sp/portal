@@ -152,7 +152,7 @@ class BdoOportunidadeController extends Controller
         $oportunidade->idempresa = $request->input('empresa');
         $oportunidade->titulo = $request->input('titulo');
         $oportunidade->segmento = $request->input('segmento');
-        $oportunidade->regiaoatuacao = $regioes;
+        $oportunidade->regiaoatuacao = ','.$regioes.',';
         $oportunidade->descricao = $request->input('descricao');
         $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
         $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');
@@ -217,7 +217,7 @@ class BdoOportunidadeController extends Controller
         $oportunidade->idempresa = $request->input('empresa');
         $oportunidade->titulo = $request->input('titulo');
         $oportunidade->segmento = $request->input('segmento');
-        $oportunidade->regiaoatuacao = $regioes;
+        $oportunidade->regiaoatuacao = ','.$regioes.',';
         $oportunidade->descricao = $request->input('descricao');
         $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
         $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');
@@ -227,7 +227,7 @@ class BdoOportunidadeController extends Controller
         } else {
             $oportunidade->datainicio = null;
         }
-        $oportunidade->idusuario = $request->input('idusuario');
+        // $oportunidade->idusuario = $request->input('idusuario');
         $update = $oportunidade->update();
         if(!$update)
             abort(500);

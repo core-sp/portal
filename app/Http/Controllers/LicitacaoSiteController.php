@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\Licitacao;
+use Redirect;
 
 class LicitacaoSiteController extends Controller
 {
@@ -34,6 +35,11 @@ class LicitacaoSiteController extends Controller
         $buscaNrProcesso = Input::get('nrprocesso');
         $dia = Input::get('datarealizacao');
         if(isset($dia)) {
+            $diaArray = explode('/',$dia);
+            $checaDia = checkdate($diaArray[1], $diaArray[0], $diaArray[2]);
+            if($checaDia === false) {
+                echo "<script>alert('Data inválida'); window.location.href='/licitacoes'</script>";
+            }
             $replace = str_replace('/','-',$dia);
             $dia = new \DateTime($replace);
             $buscaDataRealizacao = $dia->format('Y-m-d');

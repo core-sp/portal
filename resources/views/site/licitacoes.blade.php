@@ -6,6 +6,7 @@
 use \App\Http\Controllers\Helpers\LicitacaoHelper;
 use \App\Http\Controllers\Helper;
 use \App\Http\Controllers\LicitacaoSiteController;
+use Illuminate\Support\Facades\Input;
 $modalidades = LicitacaoHelper::modalidades();
 $situacoes = LicitacaoHelper::situacoes();
 @endphp
@@ -39,40 +40,75 @@ $situacoes = LicitacaoHelper::situacoes();
               <label for="palavra-chave">Palavra-chave</label>
               <input type="text"
                 name="palavra-chave"
-                class="form-control"
-                placeholder="Insira uma palavra-chave" />
+                class="form-control {{ !empty(Input::get('palavra-chave')) ? 'bg-focus border-info' : '' }}"
+                placeholder="Insira uma palavra-chave"
+                @if(!empty(Input::get('palavra-chave')))
+                value="{{ Input::get('palavra-chave') }}"
+                @endif
+                />
             </div>
           	<div class="col-md-4">
           	  <label for="modalidade">Modalidade</label>
-          	  <select name="modalidade" class="form-control" id="modalidade">
+          	  <select name="modalidade" class="form-control {{ !empty(Input::get('modalidade')) && in_array(Input::get('modalidade'), $modalidades) ? 'bg-focus border-info' : '' }}" id="modalidade">
           	  	<option value="">Todas</option>
 	         	    @foreach($modalidades as $modalidade)
-	         	    <option value="{{ $modalidade }}">{{ $modalidade }}</option>
+                  @if($modalidade === Input::get('modalidade'))
+                  <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
+                  @else
+	         	      <option value="{{ $modalidade }}">{{ $modalidade }}</option>
+                  @endif
 	          	  @endforeach
 	            </select>
           	</div>
           	<div class="col-md-2 col-sm-6 mt-2-768">
           	  <label for="nrprocesso">Nº do processo</label>
-          	  <input type="text" name="nrprocesso" class="form-control nrprocessoInput" placeholder="Nº do processo" id="nrprocesso">
+          	  <input type="text"
+                name="nrprocesso"
+                class="form-control nrprocessoInput {{ !empty(Input::get('nrprocesso')) ? 'bg-focus border-info' : '' }}"
+                placeholder="Nº do processo"
+                id="nrprocesso"
+                @if(!empty(Input::get('nrprocesso')))
+                value="{{ Input::get('nrprocesso') }}"
+                @endif
+                />
           	</div>
           	<div class="col-md-2 col-sm-6 mt-2-768">
           	  <label for="nrlicitacao">Nº da Licitação</label>
-          	  <input type="text" name="nrlicitacao" class="form-control nrlicitacaoInput" placeholder="Nº da licitação" id="nrlicitacao">
+          	  <input type="text"
+                name="nrlicitacao"
+                class="form-control nrlicitacaoInput {{ !empty(Input::get('nrlicitacao')) ? 'bg-focus border-info' : '' }}"
+                placeholder="Nº da licitação"
+                id="nrlicitacao"
+                @if(!empty(Input::get('nrlicitacao')))
+                value="{{ Input::get('nrlicitacao') }}"
+                @endif
+                />
           	</div>
           </div>
           <div class="form-row">
           	<div class="col-lg-4 col-md-6">
           	  <label for="situacao">Situação</label>
-          	  <select name="situacao" class="form-control" id="situacao">
+          	  <select name="situacao" class="form-control {{ !empty(Input::get('situacao')) && in_array(Input::get('situacao'), $situacoes) ? 'bg-focus border-info' : '' }}" id="situacao">
           	  	<option value="">Qualquer</option>
 	         	    @foreach($situacoes as $situacao)
-	         	    <option value="{{ $situacao }}">{{ $situacao }}</option>
+                  @if($situacao === Input::get('situacao'))
+                  <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
+                  @else
+   	         	    <option value="{{ $situacao }}">{{ $situacao }}</option>
+                  @endif
 	          	  @endforeach
 	            </select>
           	</div>
           	<div class="col-lg-4 col-md-6 mt-2-768">
           	  <label for="datarealizacao">Data de Realização</label>
-          	  <input type="text" class="form-control dataInput" placeholder="dd/mm/aaaa" name="datarealizacao">
+          	  <input type="text"
+                class="form-control dataInput {{ !empty(Input::get('datarealizacao')) ? 'bg-focus border-info' : '' }}"
+                placeholder="dd/mm/aaaa"
+                name="datarealizacao"
+                @if(!empty(Input::get('datarealizacao')))
+                value="{{ Input::get('datarealizacao') }}"
+                @endif
+                />
           	</div>
             <div class="col-lg-4 col-md-12 align-self-end pesquisaLicitacao-btn">
               <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>

@@ -31,6 +31,11 @@ class ConcursoSiteController extends Controller
         $buscaNrProcesso = Input::get('nrprocesso');
         $dia = Input::get('datarealizacao');
         if(isset($dia)) {
+            $diaArray = explode('/',$dia);
+            $checaDia = checkdate($diaArray[1], $diaArray[0], $diaArray[2]);
+            if($checaDia === false) {
+                echo "<script>alert('Data inválida'); window.location.href='/concursos'</script>";
+            }
             $replace = str_replace('/','-',$dia);
             $dia = new \DateTime($replace);
             $buscaDataRealizacao = $dia->format('Y-m-d');
