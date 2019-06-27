@@ -65,10 +65,14 @@ $regionais = BdoSiteControllerHelper::regionais();
           <div class="form-row mt-2">
             <div class="col">
               <label for="regional">Área de atuação</label>
-              <select name="regional" class="form-control">
+              <select name="regional" class="form-control {{ Input::has('regional') && (Input::get('regional') >= 1 && Input::get('regional') <= 13) ? 'bg-focus border-info' : '' }}">
                 <option value="">Qualquer</option>
                 @foreach($regionais as $regional)
-                <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                  @if($regional->idregional == Input::get('regional'))
+                  <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                  @else
+                  <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                  @endif
                 @endforeach
               </select>
             </div>
