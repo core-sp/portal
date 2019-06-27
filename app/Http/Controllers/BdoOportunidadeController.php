@@ -227,8 +227,7 @@ class BdoOportunidadeController extends Controller
         } else {
             $oportunidade->datainicio = null;
         }
-        // $oportunidade->idusuario = $request->input('idusuario');
-        $oportunidade->timestamps = false;
+        $oportunidade->idusuario = $request->input('idusuario');
         $update = $oportunidade->update();
         if(!$update)
             abort(500);
