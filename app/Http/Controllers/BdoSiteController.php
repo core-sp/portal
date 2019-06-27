@@ -10,14 +10,17 @@ class BdoSiteController extends Controller
 {
     public function index()
     {
-    	$oportunidades = BdoOportunidade::orderBy('created_at','DESC')->paginate(10);
+        $oportunidades = BdoOportunidade::orderBy('created_at','DESC')->paginate(10);
         return view('site.balcao-de-oportunidades', compact('oportunidades'));
     }
 
     public function buscaOportunidades()
     {
-    	$buscaPalavraChave = Input::get('palavrachave');
+    	$buscaPalavraChave = Input::get('palavra-chave');
         $buscaSegmento = Input::get('segmento');
+        $buscaRegional = ','.Input::get('regional').',';
+        if(empty(Input::get('regional')))
+            $buscaRegional = '';
         if (!empty($buscaPalavraChave) 
             or !empty($buscaSegmento) 
         ){
@@ -26,10 +29,12 @@ class BdoSiteController extends Controller
             $busca = false;
         }
         $oportunidades = BdoOportunidade::where('segmento','LIKE',$buscaSegmento)
+            ->where('regiaoatuacao','LIKE','%'.$buscaRegional.'%')
             ->where(function($query) use ($buscaPalavraChave){
                 $query->where('descricao','LIKE','%'.$buscaPalavraChave.'%')
                     ->orWhere('titulo','LIKE','%'.$buscaPalavraChave.'%');
-            })->paginate(10);
+            })->orderBy('created_at','DESC')
+            ->paginate(10);
         if (count($oportunidades) > 0) {
             return view('site.balcao-de-oportunidades', compact('oportunidades', 'busca'));
         } else {

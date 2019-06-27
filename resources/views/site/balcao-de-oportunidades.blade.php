@@ -4,8 +4,11 @@
 
 @php
 use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
+use \App\Http\Controllers\Helpers\BdoSiteControllerHelper;
 use \App\Http\Controllers\BdoSiteController;
+use Illuminate\Support\Facades\Input;
 $segmentos = BdoOportunidadeControllerHelper::segmentos();
+$regionais = BdoSiteControllerHelper::regionais();
 @endphp
 
 <section id="pagina-cabecalho" class="mt-1">
@@ -34,15 +37,38 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
           <div class="linha-lg-mini"></div>
           <div class="form-row">
             <div class="col">
-              <label for="palavrachave">Palavra-chave</label>
-              <input type="text" name="palavrachave" class="form-control" placeholder="Palavra chave" id="palavrachave">
+              <label for="palavra-chave">Palavra-chave</label>
+              <input type="text"
+                name="palavra-chave"
+                class="form-control {{ !empty(Input::get('palavra-chave')) ? 'bg-focus border-info' : '' }}"
+                placeholder="Palavra chave"
+                id="palavrachave"
+                @if(!empty(Input::get('palavra-chave')))
+                value="{{ Input::get('palavra-chave') }}"
+                @endif
+                />
             </div>
             <div class="col">
               <label for="segmento">Segmento</label>
-              <select name="segmento" class="form-control" id="segmento">
+              <select name="segmento" class="form-control {{ !empty(Input::get('segmento')) && in_array(Input::get('segmento'), $segmentos) ? 'bg-focus border-info' : '' }}" id="segmento">
                 <option value="">Todos</option>
                 @foreach($segmentos as $segmento)
-                <option value="{{ $segmento }}">{{ $segmento }}</option>
+                  @if($segmento === Input::get('segmento'))
+                  <option value="{{ $segmento }}" selected>{{ $segmento }}</option>
+                  @else
+                  <option value="{{ $segmento }}">{{ $segmento }}</option>
+                  @endif
+                @endforeach
+              </select>
+            </div>
+          </div>
+          <div class="form-row mt-2">
+            <div class="col">
+              <label for="regional">Área de atuação</label>
+              <select name="regional" class="form-control">
+                <option value="">Qualquer</option>
+                @foreach($regionais as $regional)
+                <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
                 @endforeach
               </select>
             </div>
@@ -50,6 +76,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
               <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
               <button type="reset" class="btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</button>
             </div>
+          </div>
           </div>
         </form>
       </div>

@@ -72,6 +72,7 @@ class Kernel extends ConsoleKernel
                         ->where('idregional','!=',1)
                         ->where('dia','=',$hoje)
                         ->orderBy('idregional','ASC')
+                        ->orderBy('hora','ASC')
                         ->get();
                     if($agendamentos->isNotEmpty()) {
                         $body = '<h3><i>(Mensagem Programada)</i></h3>';
@@ -103,6 +104,7 @@ class Kernel extends ConsoleKernel
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('idregional','=',1)
                         ->where('dia','=',$hoje)
+                        ->orderBy('hora','ASC')
                         ->get();
                     if($agendamentos->isNotEmpty()) {
                         $body = '<h3><i>(Mensagem Programada)</i></h3>';
@@ -133,6 +135,7 @@ class Kernel extends ConsoleKernel
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('dia','=',$hoje)
                         ->orderBy('idregional','ASC')
+                        ->orderBy('hora','ASC')
                         ->get();
                     if($agendamentos->isNotEmpty()) {
                         $body = '<h3><i>(Mensagem Programada)</i></h3>';
