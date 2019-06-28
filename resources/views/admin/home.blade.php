@@ -47,7 +47,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm-12">
-      	<h1>Home</h1>
+      	<h1>Painel de Administrador</h1>
       </div>
     </div>
 	<div class="row mt-3">
@@ -108,7 +108,7 @@
   	  	  	<h3 class="card-title">Conectado como: <strong>{{ session('perfil') }}</strong></h3>
   	  	  </div>
   	  	  <div class="card-body">
-			<p>Perfil de administrador do Portal do CORE-SP!</p>
+			<p>Este é o painel de administrador do Portal do CORE-SP!</p>
 			<a href="/" class="btn btn-success">VISITAR SITE</a>
 			@if(1 === 2)
 			<h3>Newsletter</h3>
