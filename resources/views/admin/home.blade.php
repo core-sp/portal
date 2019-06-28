@@ -109,7 +109,8 @@
   	  	  </div>
   	  	  <div class="card-body">
 			<p>Este é o painel de administrador do Portal do CORE-SP!</p>
-			<a href="/" class="btn btn-success">VISITAR SITE</a>
+			<a href="/" class="btn btn-success" target="_blank">VISITAR SITE</a>
+			<a href="/admin/logout" class="btn btn-default ml-1">DESCONECTAR</a>
 			@if(1 === 2)
 			<h3>Newsletter</h3>
 			<div class="row mt-2">  
