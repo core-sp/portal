@@ -6,11 +6,14 @@
 	use App\Http\Controllers\NewsletterController;
 	use App\Http\Controllers\ControleController;
 	use App\Http\Controllers\Helper;
+	$totalAgendamentos = App\Http\Controllers\Helpers\AgendamentoControllerHelper::countAgendamentos();
+	$totalInscritos = App\Http\Controllers\Helpers\CursoHelper::totalInscritos();
 	$alertas = App\Http\Controllers\AdminController::alertas();
 	$chamados = App\Http\Controllers\Helpers\ChamadoControllerHelper::getByUser(Auth::user()->idusuario);
+	$count = App\Http\Controllers\AdminController::countAtendimentos();
 @endphp
 
-<section class="content-header">
+<section class="content-header pb-1">
   @if(\Session::has('message'))
     <div class="container-fluid mb-2">
       <div class="row">
@@ -47,63 +50,107 @@
       	<h1>Home</h1>
       </div>
     </div>
+	<div class="row mt-3">
+	  <div class="col">
+		<div class="info-box">
+		  <span class="info-box-icon bg-success">
+		  	<i class="fas fa-globe"></i>
+		  </span>
+		  <div class="info-box-content">
+			<span class="info-box-text">Visitas no último mês</span>
+			<span class="info-box-number">40.229</span>
+		  </div>
+		</div>
+	  </div>
+	  <div class="col">
+		<div class="info-box">
+		  <span class="info-box-icon bg-danger">
+		  	<i class="fas fa-user-clock"></i>
+		  </span>
+		  <div class="info-box-content">
+			<span class="info-box-text">Agendamentos</span>
+			<span class="info-box-number">{{ $totalAgendamentos }}</span>
+		  </div>
+		</div>
+	  </div>
+	  <div class="col">
+		<div class="info-box">
+		  <span class="info-box-icon bg-warning">
+		  	<i class="fas fa-chalkboard-teacher text-white"></i>
+		  </span>
+		  <div class="info-box-content">
+			<span class="info-box-text">Inscritos em cursos</span>
+			<span class="info-box-number">{{ $totalInscritos }}</span>
+		  </div>
+		</div>
+	  </div>
+	  <div class="col">
+		<div class="info-box">
+		  <span class="info-box-icon bg-info">
+			<i class="fas fa-newspaper"></i>
+		  </span>
+		  <div class="info-box-content">
+			<span class="info-box-text">Inscritos na Newsletter</span>
+			<span class="info-box-number">{{ NewsletterController::countNewsletter() }}</span>
+		  </div>
+		</div>
+	  </div>
+	</div>
   </div>
 </section>
 
 <section class="content">
   <div class="container-fluid">
   	<div class="row">
-  	  <div class="col-sm">
+  	  <div class="col">
   	  	<div class="card card-info">
   	  	  <div class="card-header">
   	  	  	<h3 class="card-title">Conectado como: <strong>{{ session('perfil') }}</strong></h3>
   	  	  </div>
   	  	  <div class="card-body">
-  	  	  	Seja bem-vindo ao novo Portal do CORE-SP!
-  	  	  </div>
-  	  	  <div class="card-footer">
-  	  	  	CORE-SP
-  	  	  </div>
-  	  	</div>
-  	  </div>
-	  @if(ControleController::mostra('NewsletterController','index'))
-		  <div class="col-6">
-		  	<div class="card card-info">
-			  <div class="card-header">
-			  	<h3 class="card-title">Newsletter</h3>
-			  </div>
-			  <div class="card-body">
-			    <div class="row">
-				  <div class="col">
-					<div class="info-box">
-					  <span class="info-box-icon bg-info">
-						<i class="fas fa-users"></i>
-					  </span>
-					  <div class="info-box-content">
-						<span class="info-box-text">Total de registros</span>
-						<span class="info-box-number">{{ NewsletterController::countNewsletter() }}</span>
-					  </div>
+			<p>Perfil de administrador do Portal do CORE-SP!</p>
+			<a href="/" class="btn btn-success">VISITAR SITE</a>
+			@if(1 === 2)
+			<h3>Newsletter</h3>
+			<div class="row mt-2">  
+			  <div class="col pr-0">
+			  	<a href="/admin/newsletter/download" class="nodecoration">
+				  <div class="info-box">
+					<span class="info-box-icon bg-info">
+					  <i class="far fa-file-excel"></i>
+					</span>
+					<div class="info-box-content">
+					  <span class="info-box-text">Planilha</span>
+					  <span class="info-box-number">Baixar CSV</span>
 					</div>
 				  </div>
-				  <div class="col">
-				  	<a href="/admin/newsletter/download" class="nodecoration">
-					  <div class="info-box">
-						<span class="info-box-icon bg-info">
-							<i class="far fa-file-excel"></i>
-						</span>
-						<div class="info-box-content">
-							<span class="info-box-text">Planilha</span>
-							<span class="info-box-number">Baixar CSV</span>
-						</div>
-						</div>
-					</a>
-				  </div>
-				</div>
+				</a>
+			  </div>
+			</div>
+			@endif
+  	  	  </div>
+		  <div class="card-footer">
+		  	CORE-SP
+		  </div>
+  	  	</div>
+  	  </div>
+	  @if(session('idperfil') === 6 || session('idperfil') === 1 || session('idperfil') === 12)
+	  <div class="col">
+		<div class="card card-info">
+		  <div class="card-header">
+		  	<h3 class="card-title">Atendimentos realizados</h3>
+		  </div>
+		  <div class="card-body">
+		  	<div class="row">
+			  <div class="col">
+				{!! $count !!}
 			  </div>
 			</div>
 		  </div>
+		</div>
+	  </div>
 	  @else
-      <div class="col">
+	  <div class="col">
 		<div class="card card-info">
 			<div class="card-header">
 				<div class="card-title">

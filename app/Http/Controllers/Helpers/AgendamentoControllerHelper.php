@@ -200,4 +200,9 @@ class AgendamentoControllerHelper extends Controller
         $body .= '</table>';
         return $body;
     }
+
+    public static function countAgendamentos()
+    {
+        return Agendamento::all()->count();
+    }
 }

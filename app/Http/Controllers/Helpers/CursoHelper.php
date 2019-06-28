@@ -31,4 +31,9 @@ class CursoHelper extends Controller
         $contagem = CursoInscrito::where('idcurso', $idcurso)->count();
         return $contagem;
     }
+
+    public static function totalInscritos()
+    {
+        return CursoInscrito::all()->count();
+    }
 }

@@ -16,7 +16,6 @@ class User extends Authenticatable
 
     protected $primaryKey = 'idusuario';
     protected $table = 'users';
-    protected $with = ['regional', 'perfil', 'sessao'];
 
     protected $fillable = [
         'nome', 'email', 'username', 'password',
