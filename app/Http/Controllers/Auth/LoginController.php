@@ -105,12 +105,14 @@ class LoginController extends Controller
         $perfil = $user->perfil()->first()->nome;
         $idperfil = $user->perfil()->first()->idperfil;
         $idusuario = $user->idusuario;
+        $idregional = $user->idregional;
         $email = $user->email;
         $nome = $user->nome;
         session([
             'perfil' => $perfil,
             'idperfil' => $idperfil,
             'idusuario' => $idusuario,
+            'idregional' => $idregional,
             'email' => $email,
             'nome' => $nome,
             'permissoes' => $this->permissoes()

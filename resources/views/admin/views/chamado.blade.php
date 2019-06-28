@@ -7,7 +7,7 @@
   <div class="row">
     <div class="col">
       <div class="direct-chat-msg">
-        <img class="direct-chat-img" src="{{ asset('img/ti.png') }}" alt="CTI">
+        <img class="direct-chat-img border border-dark" src="{{ asset('img/ti.png') }}" alt="CTI">
         <div class="direct-chat-text">
           <h5 class="mb-1">Resposta do CTI</h5>
           <p class="mb-0">{!! $resultado->resposta !!}</p>
@@ -29,7 +29,7 @@
       <div class="direct-chat-msg">
       @endif
       <div class="direct-chat-msg right">
-        <img class="direct-chat-img" src="{{ asset('img/user.png') }}" alt="USER">
+        <img class="direct-chat-img border border-dark" src="{{ asset('img/user.png') }}" alt="USER">
           <div class="direct-chat-text">
           <h5 class="mb-1">{{ $resultado->tipo }}</h5>
           <p class="mb-0"><i>({{ Helper::formataData($resultado->created_at) }}):</i> {{ $resultado->mensagem }}</p>
