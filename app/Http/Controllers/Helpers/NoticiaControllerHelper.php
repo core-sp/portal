@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Helpers;
 
 use Illuminate\Http\Request;
+use App\Noticia;
 use App\Http\Controllers\Controller;
 
 class NoticiaControllerHelper extends Controller
@@ -15,5 +16,10 @@ class NoticiaControllerHelper extends Controller
             'Feiras'
         ];
         return $array;
+    }
+
+    public static function totalNoticias()
+    {
+        return Noticia::all()->count();
     }
 }

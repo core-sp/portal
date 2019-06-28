@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Helpers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Regional;
+use App\BdoOportunidade;
 
 class BdoOportunidadeControllerHelper extends Controller
 {
