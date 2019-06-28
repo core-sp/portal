@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Agendamento;
 
 class AdminController extends Controller
@@ -38,6 +39,12 @@ class AdminController extends Controller
         } elseif(session('idperfil') === 6 || session('idperfil') === 1) {
             $count = Agendamento::where('dia','<',$hoje)
                 ->where('status','=',null)
+                ->count();
+            $alertas['agendamentoCount'] = $count;
+        } elseif(session('idperfil') === 8) {
+            $count = Agendamento::where('dia','<',$hoje)
+                ->where('status','=',null)
+                ->where('idregional','=',Auth::user()->idregional)
                 ->count();
             $alertas['agendamentoCount'] = $count;
         }

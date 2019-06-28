@@ -479,7 +479,7 @@ class AgendamentoController extends Controller
 
     public function pendentes()
     {
-        ControleController::autoriza($this->class, 'edit');
+        ControleController::autoriza($this->class, 'index');
         $now = date('Y-m-d');
         if(session('idperfil') === 6 || session('idperfil') === 1) {
             $resultados = Agendamento::where('dia','<',$now)
@@ -495,6 +495,12 @@ class AgendamentoController extends Controller
         } elseif(session('idperfil') === 13) {
             $resultados = Agendamento::where('dia','<',$now)
                 ->where('idregional','!=',1)
+                ->whereNull('status')
+                ->orderBy('dia','DESC')
+                ->paginate(10);
+        } elseif(session('idperfil') === 8) {
+            $resultados = Agendamento::where('dia','<',$now)
+                ->where('idregional','=',Auth::user()->idregional)
                 ->whereNull('status')
                 ->orderBy('dia','DESC')
                 ->paginate(10);
