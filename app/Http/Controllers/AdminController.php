@@ -72,7 +72,7 @@ class AdminController extends Controller
         $users = User::select('idusuario','nome')
                      ->where('idregional',1)
                      ->where('idperfil',8)
-                     ->orderBy('nome','DESC')
+                     ->orderBy('nome','ASC')
                      ->get()
                      ->toArray();
         $tabela = '<table class="table table-bordered table-striped">';
