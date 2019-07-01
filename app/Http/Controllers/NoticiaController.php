@@ -138,7 +138,7 @@ class NoticiaController extends Controller
             ->count();
         if($countTitulo >= 1) {
             return redirect('/admin/noticias')
-                ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar, pois já existe uma notícia com esse nome.')
+                ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar a notícia, pois já existe uma notícia com o título utilizado.')
                 ->with('class', 'alert-danger');
         }
         // Inputa dados no BD
@@ -193,6 +193,17 @@ class NoticiaController extends Controller
             $categoria = null;
         else
             $categoria = $request->input('categoria');
+        // Checa se slug já existe
+        $slug = Str::slug($request->input('titulo'), '-');
+        $countTitulo = Noticia::select('slug')
+            ->where('slug',$slug)
+            ->where('idnoticia','!=',$id)
+            ->count();
+        if($countTitulo >= 1) {
+            return redirect('/admin/noticias')
+                ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível editar a notícia, pois já existe uma notícia com o título utilizado.')
+                ->with('class', 'alert-danger');
+        }
         // Inputa dados no BD
         $noticia = Noticia::find($id);
         $noticia->titulo = $request->input('titulo');
