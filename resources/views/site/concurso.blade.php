@@ -66,16 +66,16 @@ use App\Http\Controllers\Helper;
         <a href="{{ $concurso->linkexterno }}" target="_blank" />
           <div class="edital-download d-flex">
             <div class="flex-one">
-              <h5>Link Oficial do Concurso</h5>
-              <h6 class="light">Clique aqui para acompanhar todos os detalhes do concurso</h6>
+              <h5 class="pb-0">Link Oficial do Concurso</h5>
+              <h6 class="light pb-0">Clique aqui para acompanhar todos os detalhes do concurso</h6>
             </div>
             <button class="btn-edital"><i class="fas fa-download"></i>&nbsp;&nbsp;Acessar</button>
           </div>
      	  </a>
         <div class="edital-download mt-3">
-          <h5>Objeto</h5>
-           <div class="linha-lg-mini"></div>
-           <p class="light">{!! $concurso->objeto !!}</p>
+          <h4 class="azul pb-0">Objeto</h4>
+          <div class="linha-lg-mini mb-3"></div>
+          {!! $concurso->objeto !!}
         </div>
       </div>
     </div>
