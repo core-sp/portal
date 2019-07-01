@@ -161,7 +161,9 @@ h6 {
 	color: #444444;
 }
 
-p {
+p,
+.edital-download p,
+.edital-download ul li {
 	font-size: 1rem;
 	line-height: 1.4;
 	color: #444444;
@@ -1117,6 +1119,25 @@ footer p {
 	border: 1px solid #d6d6d6;
 }
 
+.edital-download p {
+	padding-bottom: 1rem;
+	font-weight: 300;
+}
+
+.edital-download h1,
+.edital-download h2,
+.edital-download h3,
+.edital-download h4,
+.edital-download h5,
+.edital-download h6 {
+	padding-bottom: 1rem;
+}
+
+.edital-download ul li {
+	font-weight: 300;
+}
+
+
 .edital-download a {
 	color: #FF0000;
 }
@@ -1391,7 +1412,9 @@ footer p {
 		font-size: .8rem;
 	}
 	
-	p {
+	p,
+	.edital-download p,
+	.edital-download ul li {
 		font-size: .95rem;
 	}
 	
@@ -1588,7 +1611,9 @@ footer p {
 		font-size: .75rem;
 	}
 	
-	p {
+	p,
+	.edital-download p,
+	.edital-download ul li {
 		font-size: .9rem;
 	}
 	
@@ -2032,7 +2057,9 @@ footer p {
 		font-size: .7rem;
 	}
 	
-	p {
+	p,
+	.edital-download p,
+	.edital-download ul li {
 		font-size: .85rem;
 	}
 	
