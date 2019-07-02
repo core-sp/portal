@@ -113,7 +113,7 @@ class AgendamentoSiteController extends Controller
             'nome' => 'required|max:191',
             'cpf' => ['required', 'max:191', new Cpf],
             'email' => 'required|email|max:191',
-            'celular' => 'max:191',
+            'celular' => 'max:191|min:14',
             'dia' => 'required',
             'hora' => 'required|max:191',
         ];
@@ -122,7 +122,8 @@ class AgendamentoSiteController extends Controller
             'dia.required' => 'Informe o dia do atendimento',
             'hora.required' => 'Informe o horário do atendimento',
             'email' => 'Email inválido',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'celular.min' => 'Número inválido'
         ];
         $validation = Validator::make($request->all(), $regras, $mensagens);
         if($validation->fails()) {

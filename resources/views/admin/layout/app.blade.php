@@ -48,7 +48,8 @@
 
             <ul class="navbar-nav ml-auto">
               @if(Auth::user())
-              <a href="/admin/logout" class="btn btn-sm btn-default">Logout</a>
+              <a href="/" class="btn btn-sm btn-success" target="_blank">Site</a>
+              <a href="/admin/logout" class="btn btn-sm btn-default ml-1">Logout</a>
               @endif
             </ul>
           </nav>
@@ -95,7 +96,7 @@
 
           <footer class="main-footer">
             <div class="float-right d-none d-sm-block">
-              <b>Versão</b> 1.2.3
+              <b>Versão</b> 1.2.5
             </div>
             <strong>Portal CORE-SP &copy; 2019.</strong> Todos direitos reservados.
           </footer>

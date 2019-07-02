@@ -23,23 +23,7 @@
     </div>
   @endif
   @if(!empty($alertas))
-  	<div class="container-fluid mb-2">
-	  @if(isset($alertas['agendamentoCount']))
-      <div class="row">
-        <div class="col">
-		  <a href="/admin/agendamentos/pendentes">
-			<div class="alert alert-warning link-alert">
-			  @if($alertas['agendamentoCount'] === 1)
-				<i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Existe <strong>1</strong> atendimento pendente de validação!&nbsp;&nbsp;<span class="link-alert-span">(Validar)</span>
-			  @else
-				<i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Existem <strong>{{ $alertas['agendamentoCount'] }}</strong> atendimentos pendentes de validação!&nbsp;&nbsp;<span class="link-alert-span">(Validar)</span>
-			  @endif
-			</div>
-		  </a>
-        </div>
-      </div>
-	  @endif
-    </div>
+  	@include('admin.inc.alertashome')
   @endif
   <div class="container-fluid">
     <div class="row">
@@ -48,7 +32,7 @@
       </div>
     </div>
 	<div class="row mt-3">
-		@include('admin.inc.clipshome')
+	  @include('admin.inc.clipshome')
 	</div>
   </div>
 </section>
@@ -65,24 +49,6 @@
 			<p>Este é o painel de administrador do Portal do CORE-SP!</p>
 			<a href="/" class="btn btn-success" target="_blank">VISITAR SITE</a>
 			<a href="/admin/logout" class="btn btn-default ml-1">DESCONECTAR</a>
-			@if(1 === 2)
-			<h3>Newsletter</h3>
-			<div class="row mt-2">  
-			  <div class="col pr-0">
-			  	<a href="/admin/newsletter/download" class="nodecoration">
-				  <div class="info-box">
-					<span class="info-box-icon bg-info">
-					  <i class="far fa-file-excel"></i>
-					</span>
-					<div class="info-box-content">
-					  <span class="info-box-text">Planilha</span>
-					  <span class="info-box-number">Baixar CSV</span>
-					</div>
-				  </div>
-				</a>
-			  </div>
-			</div>
-			@endif
   	  	  </div>
 		  <div class="card-footer">
 		  	CORE-SP
