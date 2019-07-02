@@ -72,9 +72,15 @@ class AdminController extends Controller
         $users = User::select('idusuario','nome')
                      ->where('idregional',1)
                      ->where('idperfil',8)
-                     ->orderBy('nome','ASC')
-                     ->get()
-                     ->toArray();
+                     ->get();
+        foreach($users as $user) {
+            if(isset($countPerUser[$user["idusuario"]]))
+                $user->contagem = $countPerUser[$user["idusuario"]];
+            else
+                $user->contagem = 0;
+        }
+        $ordenados = $users->sortByDesc('contagem')
+              ->toArray();
         $tabela = '<table class="table table-bordered table-striped">';
         $tabela .= '<thead>';
         $tabela .= '<tr>';
@@ -83,7 +89,7 @@ class AdminController extends Controller
         $tabela .= '</tr>';
         $tabela .= '</thead>';
         $tabela .= '<tbody>';
-        foreach($users as $user) {
+        foreach($ordenados as $user) {
             $tabela .= '<tr>';
             $tabela .= '<td>'.$user["nome"].'</td>';
             if(isset($countPerUser[$user["idusuario"]]))

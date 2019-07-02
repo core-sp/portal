@@ -38,13 +38,19 @@
   </div>
 </div>
 <div class="col">
+  @if(session('idperfil') === 1 || session('idperfil') === 3)
+  <a href="/admin/newsletter/download" class="inherit">
+  @endif
   <div class="info-box">
     <span class="info-box-icon bg-info">
       <i class="fas fa-newspaper"></i>
     </span>
     <div class="info-box-content">
-      <span class="info-box-text">Inscrições na Newsletter</span>
-      <span class="info-box-number">{{ NewsletterController::countNewsletter() }}</span>
+      <span class="info-box-text inherit">Inscrições na Newsletter</span>
+      <span class="info-box-number inherit d-inline">{{ NewsletterController::countNewsletter() }}</span>&nbsp;<span class="linkDownload d-inline">(Baixar CSV)</span>
     </div>
   </div>
+  @if(session('idperfil') === 1 || session('idperfil') === 3)
+  </a>
+  @endif
 </div>

@@ -83,3 +83,15 @@ img {
 .link-alert:hover .link-alert-span {
   color: #ffffff;
 }
+
+.inherit {
+  color: inherit;
+}
+
+.info-box .linkDownload {
+  color: #FFFFFF;
+}
+
+.info-box:hover .linkDownload {
+  color: #ffc107;
+}
