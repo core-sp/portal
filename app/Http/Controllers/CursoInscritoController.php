@@ -280,7 +280,7 @@ class CursoInscritoController extends Controller
             if(CursoInscritoController::permiteInscricao($idcurso)) {
                 echo "<div class='sit-btn sit-verde'>Vagas Abertas</div>";
             } else {
-                echo "<div class='sit-btn sit-vermelho'>Esgotado</div>";
+                echo "<div class='sit-btn sit-vermelho'>Vagas esgotadas</div>";
             }
         }
     }
