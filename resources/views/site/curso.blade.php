@@ -79,7 +79,7 @@ $now = now();
             </tr>
           </tbody>
         </table>
-        @if($curso->datarealizacao > $now)
+        @if($curso->datatermino >= $now)
           @if(CursoInscritoController::permiteInscricao($curso->idcurso))
             <div class="center-992">
               <a href="/curso/inscricao/{{ $curso->idcurso }}" class="btn-curso-interna">Inscrever-se</a>
