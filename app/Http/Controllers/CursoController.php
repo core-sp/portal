@@ -281,6 +281,7 @@ class CursoController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
         $curso = Curso::find($id);
+        $now = date('Y-m-d H:i:s');
         if(!$curso)
             abort(500);
         $variaveis = [
@@ -289,14 +290,15 @@ class CursoController extends Controller
             'singular' => 'inscrito',
             'singulariza' => 'o inscrito',
             'continuacao_titulo' => 'em <strong>'.$curso->tipo.': '.$curso->tema.'</strong>',
-            'btn_criar' => '<a href="/admin/cursos/adicionar-inscrito/'.$curso->idcurso.'" class="btn btn-primary mr-1">Adicionar inscrito</a> ',
             'btn_lixeira' => '<a href="/admin/cursos" class="btn btn-default">Lista de Cursos</a>',
             'busca' => 'cursos/inscritos/'.$id,
             'addonsHome' => '<a href="/admin/cursos/inscritos/download/'.$id.'" class="btn btn-primary mb-2">Baixar CSV</a>'
         ];
+        if($curso->datatermino >= $now) 
+            $variaveis['btn_criar'] = '<a href="/admin/cursos/adicionar-inscrito/'.$curso->idcurso.'" class="btn btn-primary mr-1">Adicionar inscrito</a> ';
         if(!ControleController::mostra('CursoInscritoController', 'create'))
             unset($variaveis['btn_criar']);
-        $tabela = CursoInscritoController::tabelaCompleta($resultados);
+        $tabela = CursoInscritoController::tabelaCompleta($resultados, $curso->idcurso);
         $variaveis = (object) $variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }

@@ -12,9 +12,9 @@ class CursoSiteController extends Controller
 {
     public function cursosView()
     {
-        $now = now();
-        $cursos = Curso::select('idcurso','img','idregional','tipo','tema','datarealizacao','resumo')
-                       ->where('datarealizacao','>=',$now)
+        $now = date('Y-m-d H:i:s');
+        $cursos = Curso::select('idcurso','img','idregional','tipo','tema','resumo')
+                       ->where('datatermino','>=',$now)
                        ->where('publicado','Sim')
                        ->paginate(10);
         return response()
@@ -24,8 +24,8 @@ class CursoSiteController extends Controller
 
     public function cursosAnterioresView()
     {
-        $now = now();
-        $cursos = Curso::where('datarealizacao','<',$now)
+        $now = date('Y-m-d H:i:s');
+        $cursos = Curso::where('datatermino','<',$now)
             ->where('publicado','Sim')
             ->paginate(10);
         return response()
@@ -42,10 +42,10 @@ class CursoSiteController extends Controller
 
     public static function checkCurso($id)
     {
-        $curso = Curso::select('datarealizacao')
+        $curso = Curso::select('datatermino')
             ->find($id);
-        $now = now();
-        if($curso->datarealizacao > $now)
+        $now = date('Y-m-d H:i:s');
+        if($curso->datatermino >= $now)
             return true;
         else
             return false;

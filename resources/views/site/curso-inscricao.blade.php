@@ -41,7 +41,7 @@ $now = now();
     <div class="linha-lg"></div>
 			<div class="row mb-4">
 				<div class="col conteudo-txt">
-				@if($curso->datarealizacao > $now && $curso->publicado == 'Sim')
+				@if($curso->datatermino >= $now && $curso->publicado == 'Sim')
 					<p>Inscrever-se em <strong>{{ $curso->tipo }} - {{ $curso->tema }}, </strong> turma <strong>{{ $curso->idcurso }},</strong> que acontecerá no dia <strong>{{ Helper::onlyDate($curso->datarealizacao) }}</strong>	às <strong>{{ Helper::onlyHour($curso->datarealizacao) }}.</strong></p>
 					<div class="mt-2">
 						<form method="POST" role="form" class="inscricaoCurso">
