@@ -115,7 +115,7 @@ class BdoOportunidadeController extends Controller
     {
         ControleController::autoriza($this->class, __FUNCTION__);
         $id = Input::get('empresa');
-        $empresa = BdoEmpresa::find($id);
+        $empresa = BdoEmpresa::findOrFail($id);
         $regioes = Regional::all();
         if (isset($empresa)) {
             $variaveis = (object) $this->variaveis;
@@ -181,7 +181,7 @@ class BdoOportunidadeController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = BdoOportunidade::find($id);
+        $resultado = BdoOportunidade::findOrFail($id);
         $variaveis = (object) $this->variaveis;
         $regioes = Regional::all();
         $regioesEdit = explode(',', $resultado->regiaoatuacao);
@@ -213,7 +213,7 @@ class BdoOportunidadeController extends Controller
         $erros = $request->validate($regras, $mensagens);
 
         $regioes = implode(',',$request->input('regiaoatuacao'));
-        $oportunidade = BdoOportunidade::find($id);
+        $oportunidade = BdoOportunidade::findOrFail($id);
         $oportunidade->idempresa = $request->input('empresa');
         $oportunidade->titulo = $request->input('titulo');
         $oportunidade->segmento = $request->input('segmento');
@@ -246,7 +246,7 @@ class BdoOportunidadeController extends Controller
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = BdoOportunidade::find($id);
+        $resultado = BdoOportunidade::findOrFail($id);
         $delete = $resultado->delete();
         if(!$delete)
             abort(500);

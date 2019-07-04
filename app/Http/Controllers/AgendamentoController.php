@@ -365,7 +365,7 @@ class AgendamentoController extends Controller
         $idusuario = Auth::user()->idusuario;
         $idagendamento = $_POST['idagendamento'];
         $status = $_POST['status'];
-        $agendamento = Agendamento::find($idagendamento);
+        $agendamento = Agendamento::findOrFail($idagendamento);
         $agendamento->status = $status;
         $agendamento->idusuario = $idusuario;
         $update = $agendamento->update();
@@ -398,7 +398,7 @@ class AgendamentoController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = Agendamento::find($id);
+        $resultado = Agendamento::findOrFail($id);
         $atendentes = User::select('idusuario','nome')
             ->where('idregional',$resultado->idregional)
             ->whereHas('perfil', function($q) {
@@ -434,7 +434,7 @@ class AgendamentoController extends Controller
             $status = $request->input('status');
         else
             $status = 'Compareceu';
-        $agendamento = Agendamento::find($id);
+        $agendamento = Agendamento::findOrFail($id);
         $agendamento->nome = $request->input('nome');
         $agendamento->email = $request->input('email');
         $agendamento->cpf = $request->input('cpf');
@@ -453,7 +453,7 @@ class AgendamentoController extends Controller
 
     public function reenviarEmail($id)
     {
-        $resultado = Agendamento::find($id);
+        $resultado = Agendamento::findOrFail($id);
         // Mensagem do email
         $agradece = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
         $agradece .= "<br>";

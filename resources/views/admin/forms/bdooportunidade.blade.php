@@ -8,7 +8,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
 <form role="form" method="POST">
     @csrf
     @if(isset($resultado))
-        {{ method_field('PUT') }}
+        @method('PUT')
         <input type="hidden" name="empresa" value="{{ $resultado->empresa->idempresa }}">
     @else    
         <input type="hidden" name="empresa" value="{{ $empresa->idempresa }}">

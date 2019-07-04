@@ -122,7 +122,7 @@ class ChamadoController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $resultado = Chamado::find($id);
+        $resultado = Chamado::findOrFail($id);
         if(!isset($resultado)) {
             abort(401);
         } else {
@@ -152,7 +152,7 @@ class ChamadoController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
         // Inputa dados no BD
-        $chamado = Chamado::find($id);
+        $chamado = Chamado::findOrFail($id);
         $chamado->tipo = $request->input('tipo');
         $chamado->prioridade = $request->input('prioridade');
         $chamado->mensagem = $request->input('mensagem');
@@ -169,7 +169,7 @@ class ChamadoController extends Controller
 
     public function show(Request $request, $id)
     {
-        $resultado = Chamado::withTrashed()->find($id);
+        $resultado = Chamado::withTrashed()->findOrFail($id);
         if(!isset($resultado)) {
             abort(401);
         } else {
@@ -188,7 +188,7 @@ class ChamadoController extends Controller
     public function destroy(Request $request, $id)
     {
         ControleController::autorizaStatic(['1']);
-        $resultado = Chamado::find($id);
+        $resultado = Chamado::findOrFail($id);
         $delete = $resultado->delete();
         if(!$delete)
             abort(500);
@@ -237,7 +237,7 @@ class ChamadoController extends Controller
     public function restore(Request $request, $id)
     {
         ControleController::autorizaStatic(['1']);
-        $chamado = Chamado::onlyTrashed()->find($id);
+        $chamado = Chamado::onlyTrashed()->findOrFail($id);
         $restore = $chamado->restore();
         if(!$restore)
             abort(500);
@@ -263,7 +263,7 @@ class ChamadoController extends Controller
     public function resposta(Request $request, $id)
     {
         $data = date('d\/m\/Y, \à\s H:i');
-        $chamado = Chamado::withTrashed()->find($id);
+        $chamado = Chamado::withTrashed()->findOrFail($id);
         $chamado->resposta = "<i>(".$data."):</i> ".$request->input('resposta');
         $update = $chamado->update();
         if(!$update)

@@ -174,7 +174,7 @@ class BdoEmpresaController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = BdoEmpresa::find($id);
+        $resultado = BdoEmpresa::findOrFail($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
@@ -210,7 +210,7 @@ class BdoEmpresaController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $empresa = BdoEmpresa::find($id);
+        $empresa = BdoEmpresa::findOrFail($id);
         $empresa->segmento = $request->input('segmento');
         $empresa->cnpj = $request->input('cnpj');
         $empresa->razaosocial = $request->input('razaosocial');
@@ -243,7 +243,7 @@ class BdoEmpresaController extends Controller
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $empresa = BdoEmpresa::find($id);
+        $empresa = BdoEmpresa::findOrFail($id);
         $count = BdoOportunidade::where('idempresa',$id)->count();
         if($count >= 1) {
             return redirect()->route('bdoempresas.lista')

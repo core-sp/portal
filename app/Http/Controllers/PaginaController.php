@@ -124,7 +124,7 @@ class PaginaController extends Controller
         $erros = $request->validate($regras, $mensagens);
 
         if(null !== $request->input('categoria')) {
-            $cn = PaginaCategoria::find($request->input('categoria'))->nome;
+            $cn = PaginaCategoria::findOrFail($request->input('categoria'))->nome;
             $cnToSlug = Str::slug($cn, '-');
             $titulo = Str::slug($request->input('titulo'), '-');
             $slug = $cnToSlug.'/'.$titulo;
@@ -159,7 +159,7 @@ class PaginaController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = Pagina::find($id);
+        $resultado = Pagina::findOrFail($id);
         $categorias = PaginaCategoria::all();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'categorias', 'variaveis'));
@@ -181,7 +181,7 @@ class PaginaController extends Controller
         $erros = $request->validate($regras, $mensagens);
 
         if(null !== $request->input('categoria')) {
-            $cn = PaginaCategoria::find($request->input('categoria'))->nome;
+            $cn = PaginaCategoria::findOrFail($request->input('categoria'))->nome;
             $cnToSlug = Str::slug($cn, '-');
             $titulo = Str::slug($request->input('titulo'), '-');
             $slug = $cnToSlug.'/'.$titulo;
@@ -189,7 +189,7 @@ class PaginaController extends Controller
             $slug = Str::slug($request->input('titulo'), '-');
         }
 
-        $pagina = Pagina::find($id);
+        $pagina = Pagina::findOrFail($id);
         $pagina->titulo = $request->input('titulo');
         $pagina->subtitulo = $request->input('subtitulo');
         $pagina->slug = $slug;
@@ -209,7 +209,7 @@ class PaginaController extends Controller
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $pagina = Pagina::find($id);
+        $pagina = Pagina::findOrFail($id);
         $delete = $pagina->delete();
         if(!$delete)
             abort(500);
@@ -255,7 +255,7 @@ class PaginaController extends Controller
     public function restore($id)
     {
         ControleController::autorizaStatic(['1']);
-        $pagina = Pagina::onlyTrashed()->find($id);
+        $pagina = Pagina::onlyTrashed()->findOrFail($id);
         $restore = $pagina->restore();
         if(!$restore)
             abort(500);

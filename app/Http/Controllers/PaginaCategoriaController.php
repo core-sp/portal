@@ -133,7 +133,7 @@ class PaginaCategoriaController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->parent, __FUNCTION__);
-        $resultado = PaginaCategoria::find($id);
+        $resultado = PaginaCategoria::findOrFail($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
@@ -156,7 +156,7 @@ class PaginaCategoriaController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $request->validate($regras, $mensagens);
-        $categoria = PaginaCategoria::find($id);
+        $categoria = PaginaCategoria::findOrFail($id);
         $categoria->nome = $request->input('nome');
         $categoria->idusuario = $request->input('idusuario');
         $update = $categoria->update();
@@ -177,7 +177,7 @@ class PaginaCategoriaController extends Controller
     public function destroy($id)
     {
         ControleController::autoriza($this->parent, __FUNCTION__);
-        $pagina = PaginaCategoria::find($id);
+        $pagina = PaginaCategoria::findOrFail($id);
         $delete = $pagina->delete();
         if(!$delete)
             abort(500);

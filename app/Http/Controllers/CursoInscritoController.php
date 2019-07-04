@@ -50,7 +50,7 @@ class CursoInscritoController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         $now = date('Y-m-d H:i:s');
-        $curso = Curso::select('datatermino')->find($idcurso);
+        $curso = Curso::select('datatermino')->findOrFail($idcurso);
         foreach($resultados as $resultado) {
             $acoes = '';
             if($curso->datatermino >= $now) {
@@ -63,16 +63,14 @@ class CursoInscritoController extends Controller
                 }
             } else {
                 if($resultado->presenca === null) {
-                    $acoes .= '<form method="POST" action="/admin/cursos/inscritos/confirmar-presenca" class="d-inline">';
+                    $acoes .= '<form method="POST" action="/admin/cursos/inscritos/confirmar-presenca/'.$resultado->idcursoinscrito.'" class="d-inline">';
                     $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                     $acoes .= '<input type="hidden" name="_method" value="put" />';
-                    $acoes .= '<input type="hidden" name="idcursoinscrito" value="'.$resultado->idcursoinscrito.'" />';
                     $acoes .= '<input type="submit" class="btn btn-sm btn-success" value="Confirmar presença" />';
                     $acoes .= '</form> ';
-                    $acoes .= '<form method="POST" action="/admin/cursos/inscritos/confirmar-falta" class="d-inline">';
+                    $acoes .= '<form method="POST" action="/admin/cursos/inscritos/confirmar-falta/'.$resultado->idcursoinscrito.'" class="d-inline">';
                     $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                     $acoes .= '<input type="hidden" name="_method" value="put" />';
-                    $acoes .= '<input type="hidden" name="idcursoinscrito" value="'.$resultado->idcursoinscrito.'" />';
                     $acoes .= '<input type="submit" class="btn btn-sm btn-warning" value="Dar falta" />';
                     $acoes .= '</form>';
                 } elseif ($resultado->presenca === 'Sim') {
@@ -110,7 +108,7 @@ class CursoInscritoController extends Controller
     {
         ControleController::autoriza($this->class, __FUNCTION__);
         $now = date('Y-m-d H:i:s');
-        $curso = Curso::find($idcurso);
+        $curso = Curso::findOrFail($idcurso);
         if(!$curso)
             abort(500);
         if($curso->datatermino <= $now)
@@ -163,7 +161,7 @@ class CursoInscritoController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = CursoInscrito::find($id);
+        $resultado = CursoInscrito::findOrFail($id);
         $variaveis = [
             'form' => 'cursoinscrito',
             'singular' => 'inscrito',
@@ -192,7 +190,7 @@ class CursoInscritoController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $inscrito = CursoInscrito::find($id);
+        $inscrito = CursoInscrito::findOrFail($id);
         $inscrito->cpf = $request->input('cpf');
         $inscrito->nome = $request->input('nome');
         $inscrito->telefone = $request->input('telefone');
@@ -212,7 +210,7 @@ class CursoInscritoController extends Controller
     public static function permiteInscricao($idcurso)
     {
         $contaInscritos = CursoInscrito::where('idcurso', $idcurso)->count();
-        $curso = Curso::select('nrvagas')->find($idcurso);
+        $curso = Curso::select('nrvagas')->findOrFail($idcurso);
         if(isset($curso)) {
             if ($contaInscritos < $curso->nrvagas) 
                 return true;
@@ -224,7 +222,7 @@ class CursoInscritoController extends Controller
     public function inscricaoView($idcurso)
     {
         if ($this->permiteInscricao($idcurso)) {
-            $curso = Curso::find($idcurso);
+            $curso = Curso::findOrFail($idcurso);
             if ($curso) 
                 return view('site.curso-inscricao', compact('curso'));
             else
@@ -301,7 +299,7 @@ class CursoInscritoController extends Controller
     public static function btnSituacao($idcurso)
     {
         $now = date('Y-m-d H:i:s');
-        $curso = Curso::select('datatermino')->find($idcurso);
+        $curso = Curso::select('datatermino')->findOrFail($idcurso);
         if($curso->datatermino <= $now) {
             echo "<div class='sit-btn sit-vermelho'>Já realizado</div>";
         } else {
@@ -316,7 +314,7 @@ class CursoInscritoController extends Controller
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $curso = CursoInscrito::find($id);
+        $curso = CursoInscrito::findOrFail($id);
         $now = date('Y-m-d H:i:s');
         if($curso->datatermino >= $now)
             abort(401);
@@ -333,7 +331,7 @@ class CursoInscritoController extends Controller
     {
         ControleController::autoriza('CursoInscritoController', 'index');
         $busca = Input::get('q');
-        $curso = Curso::find($id);
+        $curso = Curso::findOrFail($id);
         $now = date('Y-m-d H:i:s');
         $resultados = CursoInscrito::where('idcurso',$id)
             ->where(function($query) use($busca){
@@ -378,33 +376,31 @@ class CursoInscritoController extends Controller
         return Response::stream($callback, 200, $headers);
     }
 
-    public function confirmarPresenca(Request $request)
+    public function confirmarPresenca(Request $request, $id)
     {
         ControleController::autoriza($this->class, 'edit');
         $idusuario = Auth::user()->idusuario;
-        $inscrito = CursoInscrito::find($request->idcursoinscrito);
+        $inscrito = CursoInscrito::findOrFail($id);
         $inscrito->presenca = 'Sim';
-        $inscrito->idusuario = $idusuario;
         $update = $inscrito->update();
         if(!$update)
             abort(500);
-            event(new CrudEvent('inscrito em curso', 'confirmou presença do participante '.$request->idcursoinscrito, $inscrito->idcurso));
+            event(new CrudEvent('no curso', 'confirmou presença do participante '.$id, $inscrito->idcurso));
         return Redirect::back()
             ->with('message', '<i class="icon fa fa-check"></i>Presença confirmada!')
             ->with('class', 'alert-success');
     }
 
-    public function confirmarFalta(Request $request)
+    public function confirmarFalta(Request $request, $id)
     {
         ControleController::autoriza($this->class, 'edit');
         $idusuario = Auth::user()->idusuario;
-        $inscrito = CursoInscrito::find($request->idcursoinscrito);
+        $inscrito = CursoInscrito::findOrFail($id);
         $inscrito->presenca = 'Não';
-        $inscrito->idusuario = $idusuario;
         $update = $inscrito->update();
         if(!$update)
             abort(500);
-        event(new CrudEvent('inscrito em curso', 'confirmou falta do participante '.$request->idcursoinscrito, $inscrito->idcurso));
+        event(new CrudEvent('no curso', 'confirmou falta do participante '.$id, $inscrito->idcurso));
         return Redirect::back()
             ->with('message', '<i class="icon fa fa-ban"></i>Falta confirmada!')
             ->with('class', 'alert-warning');

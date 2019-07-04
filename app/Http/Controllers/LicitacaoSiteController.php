@@ -19,7 +19,7 @@ class LicitacaoSiteController extends Controller
 
     public function show($id)
     {
-        $licitacao = Licitacao::find($id);
+        $licitacao = Licitacao::findOrFail($id);
         return response()
             ->view('site.licitacao', compact('licitacao'))
             ->header('Cache-Control','no-cache');

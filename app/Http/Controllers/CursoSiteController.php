@@ -43,7 +43,7 @@ class CursoSiteController extends Controller
     public static function checkCurso($id)
     {
         $curso = Curso::select('datatermino')
-            ->find($id);
+            ->findOrFail($id);
         $now = date('Y-m-d H:i:s');
         if($curso->datatermino >= $now)
             return true;
@@ -53,7 +53,7 @@ class CursoSiteController extends Controller
 
     public function cursoView($id)
     {
-        $curso = Curso::find($id);
+        $curso = Curso::findOrFail($id);
         return response()
             ->view('site.curso', compact('curso'))
             ->header('Cache-Control','no-cache');

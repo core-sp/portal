@@ -13,7 +13,7 @@ class Pagina extends Model
 
     public function paginacategoria()
     {
-    	return $this->belongsTo('App\PaginaCategoria', 'idcategoria');
+    	return $this->belongsTo('App\PaginaCategoria', 'idpaginacategoria');
     }
 
     public function user()

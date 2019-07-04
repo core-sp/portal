@@ -10,7 +10,7 @@ class ConcursoSiteController extends Controller
 {
     public function show($id)
     {
-        $concurso = Concurso::find($id);
+        $concurso = Concurso::findOrFail($id);
         return response()
             ->view('site.concurso', compact('concurso'))
             ->header('Cache-Control','no-cache');
