@@ -7,7 +7,7 @@ $tipos = CursoHelper::tipos();
 <form role="form" method="POST">
     @csrf
     @if(isset($resultado))
-        {{ method_field('PUT') }}
+        @method('PUT')
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">

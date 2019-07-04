@@ -252,7 +252,7 @@ class AgendamentoSiteController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
         //Chama o banco
-        $agendamento = Agendamento::find($id);
+        $agendamento = Agendamento::findOrFail($id);
         if($agendamento->cpf != $cpf){
             return redirect('/agendamento-consulta')
                 ->with('message', '<i class="icon fa fa-ban"></i>O CPF informado não corresponde ao protocolo. Por favor, pesquise novamente o agendamento')

@@ -10,7 +10,7 @@
 <hr class="mb-0">
 <form role="form" method="POST">
     @csrf
-    {{ method_field('PUT') }}
+    @method('PUT')
     <div class="card-body">
         <div class="form-row">
             <div class="col">

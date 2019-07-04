@@ -1,6 +1,6 @@
 <form role="form" method="POST" autocomplete="false">
     @csrf
-    {{ method_field('PUT') }}
+    @method('PUT')
     <div class="card-body">
     <p class="mb-4"><i>* Insira as imagens e arraste as caixas para definir a ordem de exibição<br>
     ** Para remover uma imagem, basta deixar seus campos vazios

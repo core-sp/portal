@@ -160,7 +160,7 @@ class UserController extends Controller
     public function edit($id)
     {
         ControleController::autorizaStatic(['1']);
-        $resultado = User::find($id);
+        $resultado = User::findOrFail($id);
         $regionais = Regional::all();
         $perfis = Perfil::all();
         $variaveis = (object) $this->variaveis;
@@ -170,7 +170,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         ControleController::autorizaStatic(['1']);
-        $usuario = User::find($id);
+        $usuario = User::findOrFail($id);
         $regras = [
             'nome' => 'required|max:191',
             'email' => 'email|required',
@@ -200,7 +200,7 @@ class UserController extends Controller
     public function destroy(Request $request, $id)
     {
         ControleController::autorizaStatic(['1']);
-        $usuario = User::find($id);
+        $usuario = User::findOrFail($id);
         $delete = $usuario->delete();
         if(!$delete)
             abort(500);
@@ -249,7 +249,7 @@ class UserController extends Controller
     public function restore(Request $request, $id)
     {
         ControleController::autorizaStatic(['1']);
-        $usuario = User::onlyTrashed()->find($id);
+        $usuario = User::onlyTrashed()->findOrFail($id);
         $restore = $usuario->restore();
         if(!$restore)
             abort(500);
@@ -283,7 +283,7 @@ class UserController extends Controller
         $current_password = Auth::User()->password;
         if (Hash::check($request->input('current-password'), $current_password)) {
             $user_id = Auth::id();
-            $obj_user = User::find($user_id);
+            $obj_user = User::findOrFail($user_id);
             $obj_user->password = Hash::make($request->input('password'));
             $save = $obj_user->save();
             if(!$save)

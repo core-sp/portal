@@ -162,7 +162,7 @@ class AgendamentoBloqueioController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = AgendamentoBloqueio::find($id);
+        $resultado = AgendamentoBloqueio::findOrFail($id);
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
@@ -198,7 +198,7 @@ class AgendamentoBloqueioController extends Controller
             $diatermino = Helper::retornaDate($request->input('diatermino'));
         }
         // Inputa no BD
-        $bloqueio = AgendamentoBloqueio::find($id);
+        $bloqueio = AgendamentoBloqueio::findOrFail($id);
         $bloqueio->diainicio = $diainicio;
         $bloqueio->diatermino = $diatermino;
         $bloqueio->horainicio = $request->input('horainicio');
@@ -217,7 +217,7 @@ class AgendamentoBloqueioController extends Controller
     public function destroy(Request $request, $id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $bloqueio = AgendamentoBloqueio::find($id);
+        $bloqueio = AgendamentoBloqueio::findOrFail($id);
         $delete = $bloqueio->delete();
         if(!$delete)
             abort(500);

@@ -170,7 +170,7 @@ class LicitacaoController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = Licitacao::find($id);
+        $resultado = Licitacao::findOrFail($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
@@ -205,7 +205,7 @@ class LicitacaoController extends Controller
         // Formata DateTime
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
         // Update nos dados do BD        
-        $licitacao = Licitacao::find($id);
+        $licitacao = Licitacao::findOrFail($id);
         $licitacao->modalidade = $request->input('modalidade');
         $licitacao->uasg = $request->input('uasg');
         $licitacao->edital = $request->input('edital');
@@ -234,7 +234,7 @@ class LicitacaoController extends Controller
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $licitacao = Licitacao::find($id);
+        $licitacao = Licitacao::findOrFail($id);
         $delete = $licitacao->delete();
         if(!$delete)
             abort(500);
@@ -293,7 +293,7 @@ class LicitacaoController extends Controller
     public function restore($id)
     {
         ControleController::autorizaStatic(['1']);
-        $licitacao = Licitacao::onlyTrashed()->find($id);
+        $licitacao = Licitacao::onlyTrashed()->findOrFail($id);
         $restore = $licitacao->restore();
         if(!$restore)
             abort(500);

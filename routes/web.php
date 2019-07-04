@@ -140,8 +140,8 @@ Route::prefix('admin')->group(function() {
     Route::get('/inscritos/{id}/busca', 'CursoInscritoController@busca');
     Route::get('/inscritos/editar/{id}', 'CursoInscritoController@edit');
     Route::put('/inscritos/editar/{id}', 'CursoInscritoController@update');
-    Route::put('/inscritos/confirmar-presenca', 'CursoInscritoController@confirmarPresenca');
-    Route::put('/inscritos/confirmar-falta', 'CursoInscritoController@confirmarFalta');
+    Route::put('/inscritos/confirmar-presenca/{id}', 'CursoInscritoController@confirmarPresenca');
+    Route::put('/inscritos/confirmar-falta/{id}', 'CursoInscritoController@confirmarFalta');
     Route::get('/adicionar-inscrito/{id}', 'CursoInscritoController@create');
     Route::post('/adicionar-inscrito/{id}', 'CursoInscritoController@store');
     Route::delete('/cancelar-inscricao/{id}', 'CursoInscritoController@destroy');

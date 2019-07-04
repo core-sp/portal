@@ -44,7 +44,9 @@ class Kernel extends ConsoleKernel
                 if($user->idperfil === 8) {
                     $count = Agendamento::where('idregional','=',$user->idregional)
                         ->where('dia','=',$hoje)
-                        ->count();
+                        ->where(function($q){
+                            $q->where('status','!=','Cancelado')->orWhereNull('status');
+                        })->count();
                     if($count >= 1) {
                         $body = '<h3><i>(Mensagem Programada)</i></h3>';
                         $body .= '<p>';
@@ -71,7 +73,9 @@ class Kernel extends ConsoleKernel
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('idregional','!=',1)
                         ->where('dia','=',$hoje)
-                        ->orderBy('idregional','ASC')
+                        ->where(function($q){
+                            $q->where('status','!=','Cancelado')->orWhereNull('status');
+                        })->orderBy('idregional','ASC')
                         ->orderBy('hora','ASC')
                         ->get();
                     if($agendamentos->isNotEmpty()) {
@@ -104,7 +108,9 @@ class Kernel extends ConsoleKernel
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('idregional','=',1)
                         ->where('dia','=',$hoje)
-                        ->orderBy('hora','ASC')
+                        ->where(function($q){
+                            $q->where('status','!=','Cancelado')->orWhereNull('status');
+                        })->orderBy('hora','ASC')
                         ->get();
                     if($agendamentos->isNotEmpty()) {
                         $body = '<h3><i>(Mensagem Programada)</i></h3>';
@@ -134,7 +140,9 @@ class Kernel extends ConsoleKernel
                 } elseif($user->idperfil === 6 || $user->idperfil === 1) {
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('dia','=',$hoje)
-                        ->orderBy('idregional','ASC')
+                        ->where(function($q){
+                            $q->where('status','!=','Cancelado')->orWhereNull('status');
+                        })->orderBy('idregional','ASC')
                         ->orderBy('hora','ASC')
                         ->get();
                     if($agendamentos->isNotEmpty()) {

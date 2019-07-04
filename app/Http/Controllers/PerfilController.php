@@ -117,7 +117,7 @@ class PerfilController extends Controller
     public function edit($id)
     {
         ControleController::autorizaStatic(['1']);
-        $perfil = Perfil::find($id);
+        $perfil = Perfil::findOrFail($id);
         $idperfil = $perfil->idperfil; 
         $permissoes = Permissao::all();
         $permissoesGroup = $permissoes->groupBy('controller');
@@ -158,7 +158,7 @@ class PerfilController extends Controller
     public function destroy(Request $request, $id)
     {
         ControleController::autorizaStatic(['1']);
-        $perfil = Perfil::find($id);
+        $perfil = Perfil::findOrFail($id);
         $delete = $perfil->delete();
         if(!$delete)
             abort(500);

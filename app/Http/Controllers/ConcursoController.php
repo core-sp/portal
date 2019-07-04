@@ -148,7 +148,7 @@ class ConcursoController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = Concurso::find($id);
+        $resultado = Concurso::findOrFail($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
@@ -175,7 +175,7 @@ class ConcursoController extends Controller
         // Formata DateTime
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
         // Update nos dados do BD
-        $concurso = Concurso::find($id);
+        $concurso = Concurso::findOrFail($id);
         $concurso->modalidade = $request->input('modalidade');
         $concurso->titulo = $request->input('titulo');
         $concurso->nrprocesso = $request->input('nrprocesso');
@@ -202,7 +202,7 @@ class ConcursoController extends Controller
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $concurso = Concurso::find($id);
+        $concurso = Concurso::findOrFail($id);
         $delete = $concurso->delete();
         if(!$delete)
             abort(500);
@@ -261,7 +261,7 @@ class ConcursoController extends Controller
     public function restore($id)
     {
         ControleController::autorizaStatic(['1']);
-        $concurso = Concurso::onlyTrashed()->find($id);
+        $concurso = Concurso::onlyTrashed()->findOrFail($id);
         $restore = $concurso->restore();
         if(!$restore)
             abort(500);

@@ -1,10 +1,10 @@
 <form role="form" method="POST">
     @csrf
     @if(isset($resultado))
-    {{ method_field('PUT') }}
-    <input type="hidden" name="idcurso" value="{{ $resultado->idcurso }}" />
+        @method('PUT')
+        <input type="hidden" name="idcurso" value="{{ $resultado->idcurso }}" />
     @else
-    <input type="hidden" name="idcurso" value="{{ $curso->idcurso }}" />
+        <input type="hidden" name="idcurso" value="{{ $curso->idcurso }}" />
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">

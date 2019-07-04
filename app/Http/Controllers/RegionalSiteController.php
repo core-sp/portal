@@ -21,7 +21,7 @@ class RegionalSiteController extends Controller
 
     public function show($id)
     {
-        $resultado = Regional::find($id);
+        $resultado = Regional::findOrFail($id);
         $noticias = Noticia::select('slug','img','created_at','titulo','idregional')
             ->where('idregional','=',$id)
             ->orderBy('created_at','DESC')

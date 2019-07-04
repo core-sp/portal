@@ -159,7 +159,7 @@ class CursoController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = Curso::with('regional','user')->find($id);
+        $resultado = Curso::with('regional','user')->findOrFail($id);
         $regionais = Regional::all();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'regionais', 'variaveis'));
@@ -188,7 +188,7 @@ class CursoController extends Controller
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
         $datatermino = Helper::retornaDateTime($request->input('datatermino'), $request->input('horatermino'));
         // Update de dados no BD
-        $curso = Curso::find($id);
+        $curso = Curso::findOrFail($id);
         $curso->tipo = $request->input('tipo');
         $curso->tema = $request->input('tema');
         $curso->datarealizacao = $datarealizacao;
@@ -213,7 +213,7 @@ class CursoController extends Controller
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $curso = Curso::find($id);
+        $curso = Curso::findOrFail($id);
         $delete = $curso->delete();
         if(!$delete)
             abort(500);
@@ -264,7 +264,7 @@ class CursoController extends Controller
     public function restore($id)
     {
         ControleController::autorizaStatic(['1']);
-        $curso = Curso::onlyTrashed()->find($id);
+        $curso = Curso::onlyTrashed()->findOrFail($id);
         $restore = $curso->restore();
         if(!$restore)
             abort(500);
@@ -280,7 +280,7 @@ class CursoController extends Controller
         $resultados = CursoInscrito::where('idcurso', $id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-        $curso = Curso::find($id);
+        $curso = Curso::findOrFail($id);
         $now = date('Y-m-d H:i:s');
         if(!$curso)
             abort(500);

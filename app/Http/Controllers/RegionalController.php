@@ -78,7 +78,7 @@ class RegionalController extends Controller
     public function edit(Request $request, $id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = Regional::find($id);
+        $resultado = Regional::findOrFail($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
@@ -107,7 +107,7 @@ class RegionalController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
         // Inputa dados no BD
-        $regional = Regional::find($id);
+        $regional = Regional::findOrFail($id);
         $regional->regional = $request->input('cidade');
         $regional->email = $request->input('email');
         $regional->endereco = $request->input('endereco');

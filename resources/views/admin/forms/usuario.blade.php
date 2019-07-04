@@ -1,7 +1,7 @@
 <form role="form" method="POST" autocomplete="false">
     @csrf
     @if(isset($resultado))
-    {{ method_field('PUT') }}
+        @method('PUT')
     @endif
     <div class="card-body">
         <div class="form-row mb-2">

@@ -164,7 +164,7 @@ class NoticiaController extends Controller
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = Noticia::find($id);
+        $resultado = Noticia::findOrFail($id);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
@@ -205,7 +205,7 @@ class NoticiaController extends Controller
                 ->with('class', 'alert-danger');
         }
         // Inputa dados no BD
-        $noticia = Noticia::find($id);
+        $noticia = Noticia::findOrFail($id);
         $noticia->titulo = $request->input('titulo');
         $noticia->slug = Str::slug($request->input('titulo'), '-');
         $noticia->img = $request->input('img');
@@ -227,7 +227,7 @@ class NoticiaController extends Controller
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $noticia = Noticia::find($id);
+        $noticia = Noticia::findOrFail($id);
         $delete = $noticia->delete();
         if(!$delete)
             abort(500);
@@ -273,7 +273,7 @@ class NoticiaController extends Controller
     public function restore($id)
     {
         ControleController::autorizaStatic(['1']);
-        $noticia = Noticia::onlyTrashed()->find($id);
+        $noticia = Noticia::onlyTrashed()->findOrFail($id);
         $restore = $noticia->restore();
         if(!$restore)
             abort(500);

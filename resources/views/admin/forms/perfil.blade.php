@@ -1,7 +1,7 @@
 <form role="form" method="POST">
     @csrf
     @if(isset($permissoesArray))
-        {{ method_field('PUT') }}
+        @method('PUT')
     @endif
     <div class="card-body">
         @if(isset($permissoesArray))
