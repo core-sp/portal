@@ -143,17 +143,17 @@ class AgendamentoBloqueioController extends Controller
             $diatermino = Helper::retornaDate($request->input('diatermino'));
         }
         // Inputa no BD
-        $bloqueio = new AgendamentoBloqueio();
-        $bloqueio->diainicio = $diainicio;
-        $bloqueio->diatermino = $diatermino;
-        $bloqueio->horainicio = $request->input('horainicio');
-        $bloqueio->horatermino = $request->input('horatermino');
-        $bloqueio->idregional = $request->input('idregional');
-        $bloqueio->idusuario = $request->input('idusuario');
-        $save = $bloqueio->save();
+        $save = AgendamentoBloqueio::create([
+            'diainicio' => $diainicio,
+            'diatermino' => $diatermino,
+            'horainicio' => request('horainicio'),
+            'horatermino' => request('horatermino'),
+            'idregional' => request('idregional'),
+            'idusuario' => request('idusuario')
+        ]);
         if(!$save)
             abort(500);
-        event(new CrudEvent('bloqueio de agendamento', 'criou', $bloqueio->idagendamentobloqueio));
+        event(new CrudEvent('bloqueio de agendamento', 'criou', $save->idagendamentobloqueio));
         return redirect()->route('agendamentobloqueios.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Bloqueio cadastrado com sucesso!')
             ->with('class', 'alert-success');
@@ -198,17 +198,17 @@ class AgendamentoBloqueioController extends Controller
             $diatermino = Helper::retornaDate($request->input('diatermino'));
         }
         // Inputa no BD
-        $bloqueio = AgendamentoBloqueio::findOrFail($id);
-        $bloqueio->diainicio = $diainicio;
-        $bloqueio->diatermino = $diatermino;
-        $bloqueio->horainicio = $request->input('horainicio');
-        $bloqueio->horatermino = $request->input('horatermino');
-        $bloqueio->idregional = $request->input('idregional');
-        $bloqueio->idusuario = $request->input('idusuario');
-        $update = $bloqueio->update();
+        $update = AgendamentoBloqueio::findOrFail($id)->update([
+            'diainicio' => $diainicio,
+            'diatermino' => $diatermino,
+            'horainicio' => request('horainicio'),
+            'horatermino' => request('horatermino'),
+            'idregional' => request('idregional'),
+            'idusuario' => request('idusuario')
+        ]);
         if(!$update)
             abort(500);
-        event(new CrudEvent('bloqueio de agendamento', 'editou', $bloqueio->idagendamentobloqueio));
+        event(new CrudEvent('bloqueio de agendamento', 'editou', $id));
         return redirect()->route('agendamentobloqueios.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Bloqueio editado com sucesso!')
             ->with('class', 'alert-success');

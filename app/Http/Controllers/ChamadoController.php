@@ -104,17 +104,10 @@ class ChamadoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
-        // Inputa dados no BD
-        $chamado = new Chamado();
-        $chamado->tipo = $request->input('tipo');
-        $chamado->prioridade = $request->input('prioridade');
-        $chamado->mensagem = $request->input('mensagem');
-        $chamado->img = $request->input('img');
-        $chamado->idusuario = $request->input('idusuario');
-        $save = $chamado->save();
+        $save = Chamado::create(request(['tipo', 'prioridade', 'mensagem', 'img', 'idusuario']));
         if(!$save)
             abort(500);
-        event(new CrudEvent('chamado', 'criou', $chamado->idchamado));
+        event(new CrudEvent('chamado', 'criou', $save->idchamado));
         return redirect('/admin')
             ->with('message', '<i class="icon fa fa-check"></i>Chamado registrado com sucesso!')
             ->with('class', 'alert-success');
@@ -151,17 +144,10 @@ class ChamadoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
-        // Inputa dados no BD
-        $chamado = Chamado::findOrFail($id);
-        $chamado->tipo = $request->input('tipo');
-        $chamado->prioridade = $request->input('prioridade');
-        $chamado->mensagem = $request->input('mensagem');
-        $chamado->img = $request->input('img');
-        $chamado->idusuario = $request->input('idusuario');
-        $update = $chamado->update();
+        $update = Chamado::findOrFail($id)->update(request(['tipo', 'prioridade', 'mensagem', 'img', 'idusuario']));
         if(!$update)
             abort(500);
-        event(new CrudEvent('chamado', 'editou', $chamado->idchamado));
+        event(new CrudEvent('chamado', 'editou', $id));
         return redirect('/admin')
             ->with('message', '<i class="icon fa fa-check"></i>Chamado editado com sucesso!')
             ->with('class', 'alert-success');

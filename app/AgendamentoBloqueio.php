@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class AgendamentoBloqueio extends Model
 {
     use SoftDeletes;
+
     protected $primaryKey = 'idagendamentobloqueio';
     protected $table = 'agendamento_bloqueios';
+    protected $fillable = ['diainicio', 'diatermino', 'horainicio', 'horatermino', 'idregional', 'idusuario'];
 
     public function regional()
     {

@@ -434,18 +434,18 @@ class AgendamentoController extends Controller
             $status = $request->input('status');
         else
             $status = 'Compareceu';
-        $agendamento = Agendamento::findOrFail($id);
-        $agendamento->nome = $request->input('nome');
-        $agendamento->email = $request->input('email');
-        $agendamento->cpf = $request->input('cpf');
-        $agendamento->celular = $request->input('celular');
-        $agendamento->idregional = $request->input('regional');
-        $agendamento->idusuario = $request->input('atendente');
-        $agendamento->status = $status;
-        $update = $agendamento->update();
+        $update = Agendamento::findOrFail($id)->update([
+            'nome' => request('nome'),
+            'email' => request('email'),
+            'cpf' => request('cpf'),
+            'celular' => request('celular'),
+            'idregional' => request('idregional'),
+            'idusuario' => request('idusuario'),
+            'status' => $status
+        ]);
         if(!$update)
             abort(500);
-        event(new CrudEvent('agendamento', 'editou', $agendamento->idagendamento));
+        event(new CrudEvent('agendamento', 'editou', $id));
         return redirect('/admin/agendamentos')
             ->with('message', '<i class="icon fa fa-check"></i>Agendamento editado com sucesso!')
             ->with('class', 'alert-success');

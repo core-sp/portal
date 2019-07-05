@@ -94,8 +94,8 @@
         </div>
         <div class="form-row mt-2">
             <div class="col">
-                <label for="regional">Regional</label>
-                <select name="regional"
+                <label for="idregional">Regional</label>
+                <select name="idregional"
                     class="form-control"
                     readonly
                     />
@@ -114,7 +114,7 @@
             </div>
             <div class="col">
                 <label for="atendente">Atendimento realizado por:</label>
-                <select name="atendente"
+                <select name="idusuario"
                     class="form-control"
                     @if($now < $resultado->dia)
                     readonly

@@ -48,24 +48,45 @@ class AgendamentoControllerHelper extends Controller
             ->whereDate('diatermino','>=',$dia)
             ->get();
         if($bloqueios) {
+            $i = 0;
+            $blocHoras = [];
             foreach($bloqueios as $bloqueio) {
+                $i++;
+                // Pega a hora de início de término do bloqueio em questão, assim como sua chave no array horas
                 $horaInicio = $bloqueio->horainicio;
                 $horaTermino = $bloqueio->horatermino;
                 $keyHoraInicio = array_search($horaInicio, $horas);
                 $keyHoraTermino = array_search($horaTermino, $horas);
-                if(!$keyHoraTermino) {
+                // Dá slice no array e compara com as horas disponíveis
+                $length = ($keyHoraTermino - $keyHoraInicio) + 1;
+                $novaHoras = array_slice($horas, $keyHoraInicio, $length);
+                // Pega a diferença do slice para o array completo, iterage por cada valor e insere no array geral
+                $diferenca = array_intersect($horas, $novaHoras);
+                foreach($diferenca as $value) {
+                    if(!in_array($value, $blocHoras)) {
+                        array_push($blocHoras, $value);
+                    }
+                }
+                /*
+                if(!$keyHoraInicio && !$keyHoraTermino) {
+                    continue;
+                } elseif(!$keyHoraTermino) {
                     $ultimoHoras = end($horas);
                     $keyHoraTermino = key($horas);
-                    
-                }
-                if(!$keyHoraInicio) {
-                    $primeiroHoras = reset($horas);
-                    $keyHoraInicio = 0;
+                } elseif(!$keyHoraInicio) {
+                    if($horaInicio > end($horas)) {
+                        continue;
+                    } else {
+                        $primeiroHoras = reset($horas);
+                        $keyHoraInicio = 0;
+                    }
                 }
                 for($i = $keyHoraInicio; $i <= $keyHoraTermino; $i++)
                     unset($horas[$i]);
+                */
             }
-            return $horas;
+            $horasComBloqueio = array_diff($horas, $blocHoras);
+            return $horasComBloqueio;
         }
     }
 
