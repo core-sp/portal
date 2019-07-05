@@ -103,12 +103,11 @@ class PerfilController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $perfil = new Perfil();
-        $perfil->nome = $request->input('nome');
-        $save = $perfil->save();
+        $save = Perfil::create(request(['nome']));
+        
         if(!$save)
             abort(500);
-        event(new CrudEvent('perfil de usuário', 'criou', $perfil->idperfil));
+        event(new CrudEvent('perfil de usuário', 'criou', $save->idperfil));
         return redirect('/admin/usuarios/perfis')
             ->with('message', '<i class="icon fa fa-check"></i>Perfil cadastrado com sucesso!')
             ->with('class', 'alert-success');

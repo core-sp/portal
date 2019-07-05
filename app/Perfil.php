@@ -11,6 +11,7 @@ class Perfil extends Model
 
     protected $primaryKey = 'idperfil';
     protected $table = 'perfis';
+    protected $fillable = ['nome'];
 
     public function user()
     {

@@ -125,9 +125,8 @@ class CursoInscritoController extends Controller
     public function store(Request $request)
     {
         ControleController::autoriza($this->class, 'create');
-        $idcurso = $request->input('idcurso');
         $regras = [
-            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
+            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.request('idcurso').',deleted_at,NULL', new Cpf],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191|min:14',
             'email' => 'email|max:191',
@@ -141,19 +140,13 @@ class CursoInscritoController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $inscrito = new CursoInscrito();
-        $inscrito->cpf = $request->input('cpf');
-        $inscrito->nome = $request->input('nome');
-        $inscrito->telefone = $request->input('telefone');
-        $inscrito->email = $request->input('email');
-        $inscrito->registrocore = $request->input('registrocore');
-        $inscrito->idusuario = $request->input('idusuario');
-        $inscrito->idcurso = $idcurso;
-        $save = $inscrito->save();
+        $save = CursoInscrito::create(request(['cpf', 'nome', 'telefone',
+        'email', 'registrocore', 'idcurso', 'idusuario']));
+
         if(!$save)
             abort(500);
-        event(new CrudEvent('inscrito em curso', 'adicionou', $idcurso));
-        return Redirect::route('inscritos.lista', array('id' => $idcurso))
+        event(new CrudEvent('inscrito em curso', 'adicionou', request('idcurso')));
+        return Redirect::route('inscritos.lista', array('id' => request('idcurso')))
             ->with('message', '<i class="icon fa fa-check"></i>Participante inscrito com sucesso!')
             ->with('class', 'alert-success');
     }

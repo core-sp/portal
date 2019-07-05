@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class BdoEmpresa extends Model
 {
     use SoftDeletes;
+
 	protected $primaryKey = 'idempresa';
     protected $table = 'bdo_empresas';
+    protected $fillable = ['segmento', 'cnpj', 'razaosocial', 'fantasia', 'descricao', 'capitalsocial',
+    'endereco', 'site', 'email', 'telefone', 'contatonome', 'contatotelefone', 'contatoemail', 'idusuario'];
 
     public function user()
     {

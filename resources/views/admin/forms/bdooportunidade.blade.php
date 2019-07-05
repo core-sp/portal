@@ -9,9 +9,9 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
     @csrf
     @if(isset($resultado))
         @method('PUT')
-        <input type="hidden" name="empresa" value="{{ $resultado->empresa->idempresa }}">
+        <input type="hidden" name="idempresa" value="{{ $resultado->empresa->idempresa }}">
     @else    
-        <input type="hidden" name="empresa" value="{{ $empresa->idempresa }}">
+        <input type="hidden" name="idempresa" value="{{ $empresa->idempresa }}">
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">

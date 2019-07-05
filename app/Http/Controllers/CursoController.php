@@ -130,27 +130,28 @@ class CursoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
-        // Formata DateTime
+        
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
         $datatermino = Helper::retornaDateTime($request->input('datatermino'), $request->input('horatermino'));
-        // Inputa dados no BD
-        $curso = New Curso();
-        $curso->tipo = $request->input('tipo');
-        $curso->tema = $request->input('tema');
-        $curso->datarealizacao = $datarealizacao;
-        $curso->datatermino = $datatermino;
-        $curso->endereco = $request->input('endereco');
-        $curso->img = $request->input('img');
-        $curso->nrvagas = $request->input('nrvagas');
-        $curso->idregional = $request->input('idregional');
-        $curso->descricao = $request->input('descricao');
-        $curso->publicado = $request->input('publicado');
-        $curso->resumo = $request->input('resumo');
-        $curso->idusuario = $request->input('idusuario');
-        $save = $curso->save();
+        
+        $save = Curso::create([
+            'tipo' => request('tipo'),
+            'tema' => request('tema'),
+            'datarealizacao' => $datarealizacao,
+            'datatermino' => $datatermino,
+            'endereco' => request('endereco'),
+            'img' => request('img'),
+            'nrvagas' => request('nrvagas'),
+            'idregional' => request('idregional'),
+            'descricao' => request('descricao'),
+            'publicado' => request('publicado'),
+            'resumo' => request('resumo'),
+            'idusuario' => request('idusuario')
+        ]);
+
         if(!$save)
             abort(500);
-        event(new CrudEvent('curso', 'criou', $curso->idcurso));
+        event(new CrudEvent('curso', 'criou', $save->idcurso));
         return redirect()->route('cursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Curso criado com sucesso!')
             ->with('class', 'alert-success');
@@ -188,23 +189,24 @@ class CursoController extends Controller
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
         $datatermino = Helper::retornaDateTime($request->input('datatermino'), $request->input('horatermino'));
         // Update de dados no BD
-        $curso = Curso::findOrFail($id);
-        $curso->tipo = $request->input('tipo');
-        $curso->tema = $request->input('tema');
-        $curso->datarealizacao = $datarealizacao;
-        $curso->datatermino = $datatermino;
-        $curso->endereco = $request->input('endereco');
-        $curso->img = $request->input('img');
-        $curso->nrvagas = $request->input('nrvagas');
-        $curso->idregional = $request->input('idregional');
-        $curso->descricao = $request->input('descricao');
-        $curso->resumo = $request->input('resumo');
-        $curso->publicado = $request->input('publicado');
-        $curso->idusuario = $request->input('idusuario');
-        $update = $curso->update();
+        $update = Curso::findOrFail($id)->update([
+            'tipo' => request('tipo'),
+            'tema' => request('tema'),
+            'datarealizacao' => $datarealizacao,
+            'datatermino' => $datatermino,
+            'endereco' => request('endereco'),
+            'img' => request('img'),
+            'nrvagas' => request('nrvagas'),
+            'idregional' => request('idregional'),
+            'descricao' => request('descricao'),
+            'publicado' => request('publicado'),
+            'resumo' => request('resumo'),
+            'idusuario' => request('idusuario')
+        ]);
+
         if(!$update)
             abort(500);
-        event(new CrudEvent('curso', 'editou', $curso->idcurso));
+        event(new CrudEvent('curso', 'editou', $id));
         return redirect()->route('cursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Curso editado com sucesso!')
             ->with('class', 'alert-success');

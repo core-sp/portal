@@ -38,8 +38,8 @@
             @endif
         </div>
         <div class="col">
-            <label for="perfil">Perfil</label>
-            <select name="perfil" class="form-control">
+            <label for="idperfil">Perfil</label>
+            <select name="idperfil" class="form-control">
             @foreach($perfis as $perfil)
                 @if(isset($resultado))
                     @if($resultado->perfil == $perfil)

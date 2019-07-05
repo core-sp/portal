@@ -63,8 +63,8 @@
         </div>
         <div class="form-row">
         <div class="col">
-            <label for="regionais">Regional</label>
-            <select name="regionais" class="form-control">
+            <label for="idregional">Regional</label>
+            <select name="idregional" class="form-control">
             <option value="">Todas</option>
             @foreach($regionais as $regional)
                 @if(isset($resultado))
@@ -83,9 +83,9 @@
             </small>
         </div>
         <div class="col">
-            <label for="curso">Curso</label>
+            <label for="idcurso">Curso</label>
             <input type="number"
-                name="curso"
+                name="idcurso"
                 class="form-control"
                 placeholder="Código da Turma"
                 @if(isset($resultado))

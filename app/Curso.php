@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Curso extends Model
 {
     use SoftDeletes;
-	protected $primaryKey = 'idcurso';
+
+    protected $primaryKey = 'idcurso';
     protected $table = 'cursos';
+    protected $fillable = ['tipo', 'tema', 'img', 'datarealizacao', 'datatermino',
+    'endereco', 'nrvagas', 'descricao', 'resumo', 'publicado', 'idregional', 'idusuario'];
 
     public function regional()
     {

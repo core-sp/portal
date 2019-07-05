@@ -11,6 +11,7 @@ class PaginaCategoria extends Model
 
     protected $primaryKey = 'idpaginacategoria';
     protected $table = 'pagina_categorias';
+    protected $fillable = ['nome', 'idusuario'];
 
     public function pagina()
     {

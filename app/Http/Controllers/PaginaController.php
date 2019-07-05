@@ -123,8 +123,8 @@ class PaginaController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        if(null !== $request->input('categoria')) {
-            $cn = PaginaCategoria::findOrFail($request->input('categoria'))->nome;
+        if(null !== $request->input('idpaginacategoria')) {
+            $cn = PaginaCategoria::findOrFail($request->input('idpaginacategoria'))->nome;
             $cnToSlug = Str::slug($cn, '-');
             $titulo = Str::slug($request->input('titulo'), '-');
             $slug = $cnToSlug.'/'.$titulo;
@@ -139,18 +139,20 @@ class PaginaController extends Controller
                 ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar a página. Já existe uma página com esse nome.')
                 ->with('class', 'alert-danger');
         }
-        $pagina = new Pagina();
-        $pagina->titulo = $request->input('titulo');
-        $pagina->subtitulo = $request->input('subtitulo');
-        $pagina->slug = $slug;
-        $pagina->img = $request->input('img');
-        $pagina->conteudo = $request->input('conteudo');
-        $pagina->idpaginacategoria = $request->input('categoria');
-        $pagina->idusuario = $request->input('idusuario');
-        $save = $pagina->save();
+
+        $save = Pagina::create([
+            'titulo' => request('titulo'),
+            'subtitulo' => request('subtitulo'),
+            'slug' => $slug,
+            'img' => request('img'),
+            'conteudo' => request('conteudo'),
+            'idpaginacategoria' => request('idpaginacategoria'),
+            'idusuario' => request('idusuario')
+        ]);
+        
         if(!$save)
             abort(500);
-        event(new CrudEvent('página', 'criou', $pagina->idpagina));
+        event(new CrudEvent('página', 'criou', $save->idpagina));
         return redirect('/admin/paginas')
             ->with('message', '<i class="icon fa fa-check"></i>Página criada com sucesso!')
             ->with('class', 'alert-success');
@@ -180,8 +182,8 @@ class PaginaController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        if(null !== $request->input('categoria')) {
-            $cn = PaginaCategoria::findOrFail($request->input('categoria'))->nome;
+        if(null !== $request->input('idpaginacategoria')) {
+            $cn = PaginaCategoria::findOrFail($request->input('idpaginacategoria'))->nome;
             $cnToSlug = Str::slug($cn, '-');
             $titulo = Str::slug($request->input('titulo'), '-');
             $slug = $cnToSlug.'/'.$titulo;
@@ -189,18 +191,19 @@ class PaginaController extends Controller
             $slug = Str::slug($request->input('titulo'), '-');
         }
 
-        $pagina = Pagina::findOrFail($id);
-        $pagina->titulo = $request->input('titulo');
-        $pagina->subtitulo = $request->input('subtitulo');
-        $pagina->slug = $slug;
-        $pagina->img = $request->input('img');
-        $pagina->conteudo = $request->input('conteudo');
-        $pagina->idpaginacategoria = $request->input('categoria');
-        $pagina->idusuario = $request->input('idusuario');
-        $update = $pagina->update();
+        $update = Pagina::findOrFail($id)->update([
+            'titulo' => request('titulo'),
+            'subtitulo' => request('subtitulo'),
+            'slug' => $slug,
+            'img' => request('img'),
+            'conteudo' => request('conteudo'),
+            'idpaginacategoria' => request('idpaginacategoria'),
+            'idusuario' => request('idusuario')
+        ]);
+
         if(!$update)
             abort(500);
-        event(new CrudEvent('página', 'editou', $pagina->idpagina));
+        event(new CrudEvent('página', 'editou', $id));
         return redirect('/admin/paginas')
             ->with('message', '<i class="icon fa fa-check"></i>Página editada com sucesso!')
             ->with('class', 'alert-success');

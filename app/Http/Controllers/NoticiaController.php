@@ -142,20 +142,21 @@ class NoticiaController extends Controller
                 ->with('class', 'alert-danger');
         }
         // Inputa dados no BD
-        $noticia = new Noticia();
-        $noticia->titulo = $request->input('titulo');
-        $noticia->slug = $slug;
-        $noticia->img = $request->input('img');
-        $noticia->conteudo = $request->input('conteudo');
-        $noticia->publicada = $publicada;
-        $noticia->categoria = $categoria;
-        $noticia->idregional = $request->input('regionais');
-        $noticia->idcurso = $request->input('curso');
-        $noticia->idusuario = $request->input('idusuario');
-        $save = $noticia->save();
+        $save = Noticia::create([
+            'titulo' => request('titulo'),
+            'slug' => $slug,
+            'img' => request('img'),
+            'conteudo' => request('conteudo'),
+            'publicada' => $publicada,
+            'categoria' => $categoria,
+            'idregional' => request('idregional'),
+            'idcurso' => request('idcurso'),
+            'idusuario' => request('idusuario')
+        ]);
+
         if(!$save)
             abort(500);
-        event(new CrudEvent('notícia', 'criou', $noticia->idnoticia));
+        event(new CrudEvent('notícia', 'criou', $save->idnoticia));
         return redirect('/admin/noticias')
             ->with('message', '<i class="icon fa fa-check"></i>Notícia criada com sucesso!')
             ->with('class', 'alert-success');
@@ -205,20 +206,21 @@ class NoticiaController extends Controller
                 ->with('class', 'alert-danger');
         }
         // Inputa dados no BD
-        $noticia = Noticia::findOrFail($id);
-        $noticia->titulo = $request->input('titulo');
-        $noticia->slug = Str::slug($request->input('titulo'), '-');
-        $noticia->img = $request->input('img');
-        $noticia->conteudo = $request->input('conteudo');
-        $noticia->publicada = $publicada;
-        $noticia->categoria = $categoria;
-        $noticia->idregional = $request->input('regionais');
-        $noticia->idcurso = $request->input('curso');
-        $noticia->idusuario = $request->input('idusuario');
-        $update = $noticia->update();
+        $update = Noticia::findOrFail($id)->update([
+            'titulo' => request('titulo'),
+            'slug' => $slug,
+            'img' => request('img'),
+            'conteudo' => request('conteudo'),
+            'publicada' => $publicada,
+            'categoria' => $categoria,
+            'idregional' => request('idregional'),
+            'idcurso' => request('idcurso'),
+            'idusuario' => request('idusuario')
+        ]);
+
         if(!$update)
             abort(500);
-        event(new CrudEvent('notícia', 'editou', $noticia->idnoticia));
+        event(new CrudEvent('notícia', 'editou', $id));
         return redirect('/admin/noticias')
             ->with('message', '<i class="icon fa fa-check"></i>Notícia editada com sucesso!')
             ->with('class', 'alert-success');
