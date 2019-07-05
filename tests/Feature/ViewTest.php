@@ -51,7 +51,9 @@ class ViewTest extends TestCase
         $curso = Curso::select('idcurso')->first();
         if(CursoInscritoController::permiteInscricao($curso->idcurso))
             $this->get('/curso/inscricao/'.$curso->idcurso)->assertStatus(200);
-    }
+        else
+            $this->get('/curso/inscricao/'.$curso->idcurso)->assertStatus(500);
+    }   
 
     public function testViewCurso()
     {
