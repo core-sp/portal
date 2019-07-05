@@ -112,13 +112,12 @@ class PaginaCategoriaController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $request->validate($regras, $mensagens);
-        $categoria = new PaginaCategoria();
-        $categoria->nome = $request->input('nome');
-        $categoria->idusuario = $request->input('idusuario');
-        $save = $categoria->save();
+
+        $save = PaginaCategoria::create(request(['nome', 'idusuario']));
+
         if(!$save)
             abort(500);
-        event(new CrudEvent('categoria de página', 'criou', $categoria->idpaginacategoria));
+        event(new CrudEvent('categoria de página', 'criou', $save->idpaginacategoria));
         return redirect('/admin/paginas/categorias')
             ->with('message', '<i class="icon fa fa-check"></i>Categoria de página criada com sucesso!')
             ->with('class', 'alert-success');
@@ -156,13 +155,12 @@ class PaginaCategoriaController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $request->validate($regras, $mensagens);
-        $categoria = PaginaCategoria::findOrFail($id);
-        $categoria->nome = $request->input('nome');
-        $categoria->idusuario = $request->input('idusuario');
-        $update = $categoria->update();
+
+        $update = PaginaCategoria::findOrFail($id)->update(request(['nome', 'idusuario']));
+    
         if(!$update)
             abort(500);
-        event(new CrudEvent('categoria de página', 'editou', $categoria->idpaginacategoria));
+        event(new CrudEvent('categoria de página', 'editou', $id));
         return redirect('/admin/paginas/categorias')
             ->with('message', '<i class="icon fa fa-check"></i>Categoria de página editada com sucesso!')
             ->with('class', 'alert-success');

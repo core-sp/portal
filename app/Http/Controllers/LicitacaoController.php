@@ -138,24 +138,25 @@ class LicitacaoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
-        // Formata DateTime
+        
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
-        // Inputa no BD
-        $licitacao = new Licitacao();
-        $licitacao->modalidade = $request->input('modalidade');
-        $licitacao->uasg = $request->input('uasg');
-        $licitacao->edital = $request->input('edital');
-        $licitacao->nrlicitacao = $request->input('nrlicitacao');
-        $licitacao->titulo = $request->input('titulo');
-        $licitacao->nrprocesso = $request->input('nrprocesso');
-        $licitacao->situacao = $request->input('situacao');
-        $licitacao->datarealizacao = $datarealizacao;
-        $licitacao->objeto = $request->input('objeto');
-        $licitacao->idusuario = $request->input('idusuario');
-        $save = $licitacao->save();
+        
+        $save = Licitacao::create([
+            'modalidade' => request('modalidade'),
+            'uasg' => request('uasg'),
+            'edital' => request('edital'),
+            'titulo' => request('titulo'),
+            'nrlicitacao' => request('nrlicitacao'),
+            'nrprocesso' => request('nrprocesso'),
+            'situacao' => request('situacao'),
+            'datarealizacao' => $datarealizacao,
+            'objeto' => request('objeto'),
+            'idusuario' => request('idusuario')
+        ]);
+
         if(!$save)
             abort(500);
-        event(new CrudEvent('licitação', 'criou', $licitacao->idlicitacao));
+        event(new CrudEvent('licitação', 'criou', $save->idlicitacao));
         return redirect()->route('licitacoes.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Licitação cadastrada com sucesso!')
             ->with('class', 'alert-success');
@@ -202,24 +203,25 @@ class LicitacaoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
-        // Formata DateTime
+        
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
-        // Update nos dados do BD        
-        $licitacao = Licitacao::findOrFail($id);
-        $licitacao->modalidade = $request->input('modalidade');
-        $licitacao->uasg = $request->input('uasg');
-        $licitacao->edital = $request->input('edital');
-        $licitacao->nrlicitacao = $request->input('nrlicitacao');
-        $licitacao->nrprocesso = $request->input('nrprocesso');
-        $licitacao->situacao = $request->input('situacao');
-        $licitacao->titulo = $request->input('titulo');
-        $licitacao->datarealizacao = $datarealizacao;
-        $licitacao->objeto = $request->input('objeto');
-        $licitacao->idusuario = $request->input('idusuario');
-        $update = $licitacao->update();
+        
+        $update = Licitacao::findOrFail($id)->update([
+            'modalidade' => request('modalidade'),
+            'uasg' => request('uasg'),
+            'edital' => request('edital'),
+            'titulo' => request('titulo'),
+            'nrlicitacao' => request('nrlicitacao'),
+            'nrprocesso' => request('nrprocesso'),
+            'situacao' => request('situacao'),
+            'datarealizacao' => $datarealizacao,
+            'objeto' => request('objeto'),
+            'idusuario' => request('idusuario')
+        ]);
+
         if(!$update)
             abort(500);
-        event(new CrudEvent('licitação', 'editou', $licitacao->idlicitacao));
+        event(new CrudEvent('licitação', 'editou', $id));
         return redirect()->route('licitacoes.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Licitação editada com sucesso!')
             ->with('class', 'alert-success');

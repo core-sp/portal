@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Pagina extends Model
 {
     use SoftDeletes;
+    
     protected $primaryKey = 'idpagina';
-    protected $with = ['user', 'paginacategoria'];
+    protected $fillable = ['titulo', 'subtitulo', 'slug', 'img',
+    'conteudo', 'idpaginacategoria', 'idusuario'];
 
     public function paginacategoria()
     {

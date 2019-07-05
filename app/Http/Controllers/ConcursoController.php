@@ -124,22 +124,23 @@ class ConcursoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
-        // Formata DateTime
-        $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
-        // Update nos dados do BD
-        $concurso = new Concurso();
-        $concurso->modalidade = $request->input('modalidade');
-        $concurso->titulo = $request->input('titulo');
-        $concurso->nrprocesso = $request->input('nrprocesso');
-        $concurso->situacao = $request->input('situacao');
-        $concurso->datarealizacao = $datarealizacao;
-        $concurso->objeto = $request->input('objeto');
-        $concurso->linkexterno = $request->input('linkexterno');
-        $concurso->idusuario = $request->input('idusuario');
-        $save = $concurso->save();
+
+        $datarealizacao = Helper::retornaDateTime(request('datarealizacao'), request('horainicio'));
+
+        $save = Concurso::create([
+            'modalidade' => request('modalidade'),
+            'titulo' => request('titulo'),
+            'nrprocesso' => request('nrprocesso'),
+            'situacao' => request('situacao'),
+            'datarealizacao' => $datarealizacao,
+            'objeto' => request('objeto'),
+            'linkexterno' => request('linkexterno'),
+            'idusuario' => request('idusuario')
+        ]);
+
         if(!$save)
             abort(500);
-        event(new CrudEvent('concurso', 'criou', $concurso->idconcurso));
+        event(new CrudEvent('concurso', 'criou', $save->idconcurso));
         return redirect()->route('concursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Concurso cadastrado com sucesso!')
             ->with('class', 'alert-success');
@@ -172,22 +173,23 @@ class ConcursoController extends Controller
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
         $erros = $request->validate($regras, $mensagens);
-        // Formata DateTime
+        
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
-        // Update nos dados do BD
-        $concurso = Concurso::findOrFail($id);
-        $concurso->modalidade = $request->input('modalidade');
-        $concurso->titulo = $request->input('titulo');
-        $concurso->nrprocesso = $request->input('nrprocesso');
-        $concurso->situacao = $request->input('situacao');
-        $concurso->datarealizacao = $datarealizacao;
-        $concurso->objeto = $request->input('objeto');
-        $concurso->linkexterno = $request->input('linkexterno');
-        $concurso->idusuario = $request->input('idusuario');
-        $update = $concurso->update();
+
+        $update = Concurso::findOrFail($id)->update([
+            'modalidade' => request('modalidade'),
+            'titulo' => request('titulo'),
+            'nrprocesso' => request('nrprocesso'),
+            'situacao' => request('situacao'),
+            'datarealizacao' => $datarealizacao,
+            'objeto' => request('objeto'),
+            'linkexterno' => request('linkexterno'),
+            'idusuario' => request('idusuario')
+        ]);
+        
         if(!$update)
             abort(500);
-        event(new CrudEvent('concurso', 'editou', $concurso->idconcurso));
+        event(new CrudEvent('concurso', 'editou', $id));
         return redirect()->route('concursos.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Concurso editado com sucesso!')
             ->with('class', 'alert-success');

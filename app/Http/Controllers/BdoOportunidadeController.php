@@ -147,26 +147,30 @@ class BdoOportunidadeController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $regioes = implode(',',$request->input('regiaoatuacao'));
-        $oportunidade = new BdoOportunidade();
-        $oportunidade->idempresa = $request->input('empresa');
-        $oportunidade->titulo = $request->input('titulo');
-        $oportunidade->segmento = $request->input('segmento');
-        $oportunidade->regiaoatuacao = ','.$regioes.',';
-        $oportunidade->descricao = $request->input('descricao');
-        $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
-        $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');
-        $oportunidade->status = $request->input('status');
-        if ($request->input('status') === "Em andamento") {
-            $oportunidade->datainicio = now();
+        $regioes = ','.implode(',',request('regiaoatuacao')).',';
+        if (request('status') === "Em andamento") {
+            $datainicio = now();
         } else {
-            $oportunidade->datainicio = null;
+            $datainicio = null;
         }
-        $oportunidade->idusuario = $request->input('idusuario');
-        $save = $oportunidade->save();
+
+        $save = BdoOportunidade::create([
+            'idempresa' => request('idempresa'),
+            'titulo' => request('titulo'),
+            'segmento' => request('segmento'),
+            'regiaoatuacao' => $regioes,
+            'descricao' => request('descricao'),
+            'vagasdisponiveis' => request('vagasdisponiveis'),
+            'vagaspreenchidas' => request('vagaspreenchidas'),
+            'status' => request('status'),
+            'datainicio' => $datainicio,
+            'idusuario' => request('idusuario')
+
+        ]);
+
         if(!$save)
             abort(500);
-        event(new CrudEvent('oportunidade (Balcão de Oportunidades)', 'criou', $oportunidade->idoportunidade));
+        event(new CrudEvent('oportunidade (Balcão de Oportunidades)', 'criou', $save->idoportunidade));
         return redirect()->route('bdooportunidades.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Oportunidade cadastrada com sucesso!')
             ->with('class', 'alert-success');
@@ -212,26 +216,29 @@ class BdoOportunidadeController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $regioes = implode(',',$request->input('regiaoatuacao'));
-        $oportunidade = BdoOportunidade::findOrFail($id);
-        $oportunidade->idempresa = $request->input('empresa');
-        $oportunidade->titulo = $request->input('titulo');
-        $oportunidade->segmento = $request->input('segmento');
-        $oportunidade->regiaoatuacao = ','.$regioes.',';
-        $oportunidade->descricao = $request->input('descricao');
-        $oportunidade->vagasdisponiveis = $request->input('vagasdisponiveis');
-        $oportunidade->vagaspreenchidas = $request->input('vagaspreenchidas');
-        $oportunidade->status = $request->input('status');
-        if ($oportunidade->datainicio === null && $request->input('status') === "Em andamento") {
-            $oportunidade->datainicio = now();
+        $regioes = ','.implode(',',request('regiaoatuacao')).',';
+        if (request('datainicio') === null && request('status') === "Em andamento") {
+            $datainicio = now();
         } else {
-            $oportunidade->datainicio = null;
+            $datainicio = null;
         }
-        $oportunidade->idusuario = $request->input('idusuario');
-        $update = $oportunidade->update();
+
+        $update = BdoOportunidade::findOrFail($id)->update([
+            'idempresa' => request('idempresa'),
+            'titulo' => request('titulo'),
+            'segmento' => request('segmento'),
+            'regiaoatuacao' => $regioes,
+            'descricao' => request('descricao'),
+            'vagasdisponiveis' => request('vagasdisponiveis'),
+            'vagaspreenchidas' => request('vagaspreenchidas'),
+            'status' => request('status'),
+            'datainicio' => $datainicio,
+            'idusuario' => request('idusuario')
+        ]);
+
         if(!$update)
             abort(500);
-        event(new CrudEvent('oportunidade (Balcão de Oportunidades)', 'editou', $oportunidade->idoportunidade));
+        event(new CrudEvent('oportunidade (Balcão de Oportunidades)', 'editou', $id));
         return redirect()->route('bdooportunidades.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Oportunidade editada com sucesso!')
             ->with('class', 'alert-success');

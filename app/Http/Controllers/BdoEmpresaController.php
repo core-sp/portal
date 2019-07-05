@@ -141,25 +141,12 @@ class BdoEmpresaController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $empresa = New BdoEmpresa();
-        $empresa->segmento = $request->input('segmento');
-        $empresa->cnpj = $request->input('cnpj');
-        $empresa->razaosocial = $request->input('razaosocial');
-        $empresa->fantasia = $request->input('fantasia');
-        $empresa->descricao = $request->input('descricao');
-        $empresa->capitalsocial = $request->input('capitalsocial');
-        $empresa->endereco = $request->input('endereco');
-        $empresa->site = $request->input('site');
-        $empresa->email = $request->input('email');
-        $empresa->telefone = $request->input('telefone');
-        $empresa->contatonome = $request->input('contatonome');
-        $empresa->contatotelefone = $request->input('contatotelefone');
-        $empresa->contatoemail = $request->input('contatoemail');
-        $empresa->idusuario = $request->input('idusuario');
-        $save = $empresa->save();
+        $save = BdoEmpresa::create(request(['segmento', 'cnpj', 'razaosocial', 'fantasia', 'descricao', 'capitalsocial',
+        'endereco', 'site', 'email', 'telefone', 'contatonome', 'contatotelefone', 'contatoemail', 'idusuario']));
+
         if(!$save)
             abort(500);
-        event(new CrudEvent('empresa (Balcão de Oportunidades)', 'criou', $empresa->idempresa));
+        event(new CrudEvent('empresa (Balcão de Oportunidades)', 'criou', $save->idempresa));
         return redirect()->route('bdoempresas.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Empresa cadastrada com sucesso!')
             ->with('class', 'alert-success');
@@ -210,25 +197,12 @@ class BdoEmpresaController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $empresa = BdoEmpresa::findOrFail($id);
-        $empresa->segmento = $request->input('segmento');
-        $empresa->cnpj = $request->input('cnpj');
-        $empresa->razaosocial = $request->input('razaosocial');
-        $empresa->fantasia = $request->input('fantasia');
-        $empresa->descricao = $request->input('descricao');
-        $empresa->capitalsocial = $request->input('capitalsocial');
-        $empresa->endereco = $request->input('endereco');
-        $empresa->site = $request->input('site');
-        $empresa->email = $request->input('email');
-        $empresa->telefone = $request->input('telefone');
-        $empresa->contatonome = $request->input('contatonome');
-        $empresa->contatotelefone = $request->input('contatotelefone');
-        $empresa->contatoemail = $request->input('contatoemail');
-        $empresa->idusuario = $request->input('idusuario');
-        $update = $empresa->update();
+        $update = BdoEmpresa::findOrFail($id)->update(request(['segmento', 'cnpj', 'razaosocial', 'fantasia', 'descricao', 'capitalsocial',
+        'endereco', 'site', 'email', 'telefone', 'contatonome', 'contatotelefone', 'contatoemail', 'idusuario']));
+        
         if(!$update)
             abort(500);
-        event(new CrudEvent('empresa (Balcão de Oportunidades)', 'editou', $empresa->idempresa));
+        event(new CrudEvent('empresa (Balcão de Oportunidades)', 'editou', $id));
         return redirect()->route('bdoempresas.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Empresa editada com sucesso!')
             ->with('class', 'alert-success');

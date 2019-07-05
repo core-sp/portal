@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Noticia extends Model
 {
     use SoftDeletes;
+
     protected $primaryKey = 'idnoticia';
+    protected $fillable = ['titulo', 'slug', 'img', 'conteudo', 'categoria',
+    'publicada', 'idregional', 'idcurso', 'idusuario'];
     
     public function regional()
     {

@@ -141,17 +141,18 @@ class UserController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $usuario = new User();
-        $usuario->nome = $request->input('nome');
-        $usuario->email = $request->input('email');
-        $usuario->username = $request->input('username');
-        $usuario->idperfil = $request->input('perfil');
-        $usuario->idregional = $request->input('idregional');
-        $usuario->password = Hash::make($request->input('password'));
-        $save = $usuario->save();
+        $save = User::create([
+            'nome' => request('nome'),
+            'email' => request('email'),
+            'username' => request('username'),
+            'idperfil' => request('idperfil'),
+            'idregional' => request('idregional'),
+            'password' => Hash::make(request('password'))
+        ]);
+
         if(!$save)
             abort(500);
-        event(new CrudEvent('usuário', 'criou', $usuario->idusuario));
+        event(new CrudEvent('usuário', 'criou', $save->idusuario));
         return redirect('/admin/usuarios')
             ->with('message', '<i class="icon fa fa-check"></i>Usuário cadastrado com sucesso!')
             ->with('class', 'alert-success');
@@ -173,7 +174,7 @@ class UserController extends Controller
         $usuario = User::findOrFail($id);
         $regras = [
             'nome' => 'required|max:191',
-            'email' => 'email|required',
+            'email' => 'email|unique:users,email,'.$usuario->email.',email|required',
             'username' => 'unique:users,username,'.$usuario->idusuario.',idusuario'
         ];
         $mensagens = [
@@ -183,15 +184,13 @@ class UserController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $usuario->nome = $request->input('nome');
-        $usuario->email = $request->input('email');
-        $usuario->username = $request->input('username');
-        $usuario->idperfil = $request->input('perfil');
-        $usuario->idregional = $request->input('idregional');
-        $update = $usuario->update();
+        $update = $usuario->update(request([
+            'nome', 'email', 'username', 'idperfil', 'idregional'
+        ]));
+
         if(!$update)
             abort(500);
-        event(new CrudEvent('usuário', 'editou', $usuario->idusuario));
+        event(new CrudEvent('usuário', 'editou', $id));
         return redirect('/admin/usuarios')
             ->with('message', '<i class="icon fa fa-check"></i>Usuário editado com sucesso!')
             ->with('class', 'alert-success');

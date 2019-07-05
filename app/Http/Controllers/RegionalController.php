@@ -107,23 +107,15 @@ class RegionalController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
         // Inputa dados no BD
-        $regional = Regional::findOrFail($id);
-        $regional->regional = $request->input('cidade');
-        $regional->email = $request->input('email');
-        $regional->endereco = $request->input('endereco');
-        $regional->numero = $request->input('numero');
-        $regional->complemento = $request->input('complemento');
-        $regional->cep = $request->input('cep');
-        $regional->telefone = $request->input('telefone');
-        $regional->fax = $request->input('fax');
-        $regional->funcionamento = $request->input('funcionamento');
-        $regional->ageporhorario = $request->input('ageporhorario');
-        $regional->responsavel = $request->input('responsavel');
-        $regional->descricao = $request->input('descricao');
-        $update = $regional->update();
+        $update = Regional::findOrFail($id)->update(request([
+            'cidade', 'email', 'endereco', 'numero', 'complemento',
+            'cep', 'telefone', 'fax', 'funcionamento', 'ageporhorario',
+            'responsavel', 'descricao'
+        ]));
+        
         if(!$update)
             abort(500);
-        event(new CrudEvent('regional', 'editou', $regional->idregional));
+        event(new CrudEvent('regional', 'editou', $id));
         return redirect('/admin/regionais')
             ->with('message', '<i class="icon fa fa-check"></i>Regional editada com sucesso!')
             ->with('class', 'alert-success');

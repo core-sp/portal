@@ -19,20 +19,16 @@ class NoticiaSiteController extends Controller
 
     public function show($slug)
     {
-        $noticia = Noticia::where('slug', $slug)->first();
-        if(isset($noticia)) {
-            $id = $noticia->idnoticia;
-            $tres = Noticia::latest()
-                ->take(3)
-                ->orderBy('created_at','DESC')
-                ->where('idnoticia','!=',$id)
-                ->whereNull('idregional')
-                ->get();
-            return response()
-                ->view('site.noticia', compact('noticia', 'tres', 'id'))
-                ->header('Cache-Control','no-cache');
-        } else {
-            abort(404);
-        }
+        $noticia = Noticia::where('slug', $slug)->firstOrFail();
+        $id = $noticia->idnoticia;
+        $tres = Noticia::latest()
+            ->take(3)
+            ->orderBy('created_at','DESC')
+            ->where('idnoticia','!=',$id)
+            ->whereNull('idregional')
+            ->get();
+        return response()
+            ->view('site.noticia', compact('noticia', 'tres', 'id'))
+            ->header('Cache-Control','no-cache');
     }
 }

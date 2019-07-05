@@ -58,8 +58,8 @@
             </div>
         </div>
         <div class="col">
-            <label for="categoria">Categoria</label>
-            <select name="categoria" class="form-control">
+            <label for="idpaginacategoria">Categoria</label>
+            <select name="idpaginacategoria" class="form-control">
             <option value="">Sem Categoria</option>
             @foreach($categorias as $categoria)
                 @if(isset($resultado))

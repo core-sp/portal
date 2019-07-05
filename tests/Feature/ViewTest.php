@@ -9,6 +9,7 @@ use App\Licitacao;
 use App\Noticia;
 use App\Pagina;
 use App\Regional;
+use App\Http\Controllers\CursoInscritoController;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -47,8 +48,9 @@ class ViewTest extends TestCase
 
     public function testViewCursoInscricao()
     {
-        $curso = Curso::first();
-        $this->get('/curso/inscricao/'.$curso->idcurso)->assertStatus(200);
+        $curso = Curso::select('idcurso')->first();
+        if(CursoInscritoController::permiteInscricao($curso->idcurso))
+            $this->get('/curso/inscricao/'.$curso->idcurso)->assertStatus(200);
     }
 
     public function testViewCurso()

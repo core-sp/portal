@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Concurso extends Model
 {
     use SoftDeletes;
+
 	protected $primaryKey = 'idconcurso';
     protected $table = 'concursos';
+    protected $fillable = ['modalidade', 'titulo', 'nrprocesso', 'situacao',
+    'datarealizacao', 'objeto', 'linkexterno', 'idusuario'];
 
     public function user()
     {
