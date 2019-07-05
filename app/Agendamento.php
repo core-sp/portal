@@ -11,6 +11,7 @@ class Agendamento extends Model
 
     protected $primaryKey = 'idagendamento';
     protected $table = 'agendamentos';
+    protected $fillable = ['nome', 'cpf', 'email', 'celular', 'dia', 'hora', 'protocolo', 'tiposervico', 'idregional', 'idusuario', 'status'];
     protected $with = ['user', 'regional'];
 
     public function regional()
