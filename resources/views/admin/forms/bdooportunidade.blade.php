@@ -22,8 +22,12 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                 name="titulo"
                 class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
                 placeholder="Título"
-                @if(isset($resultado))
-                value="{{ $resultado->titulo }}"
+                @if(!empty(old('titulo')))
+                    value="{{ old('titulo') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->titulo }}"
+                    @endif
                 @endif
                 />
             @if($errors->has('titulo'))
@@ -51,14 +55,22 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                     <label for="segmento">Segmento</label>
                     <select name="segmento" class="form-control" id="segmento">
                     @foreach($segmentos as $segmento)
-                        @if(isset($resultado))
-                            @if($resultado->segmento == $segmento)
-                            <option class="{{ $segmento }}" selected>{{ $segmento }}</option>
+                        @if(!empty(old('segmento')))
+                            @if(old('segmento') === $segmento)
+                                <option class="{{ $segmento }}" selected>{{ $segmento }}</option>
                             @else
-                            <option value="{{ $segmento }}">{{ $segmento }}</option>
+                                <option class="{{ $segmento }}">{{ $segmento }}</option>
                             @endif
                         @else
-                        <option value="{{ $segmento }}">{{ $segmento }}</option>
+                            @if(isset($resultado))
+                                @if($resultado->segmento == $segmento)
+                                    <option class="{{ $segmento }}" selected>{{ $segmento }}</option>
+                                @else
+                                    <option value="{{ $segmento }}">{{ $segmento }}</option>
+                                @endif
+                            @else
+                                <option value="{{ $segmento }}">{{ $segmento }}</option>
+                            @endif
                         @endif
                     @endforeach
                     </select>
@@ -75,8 +87,12 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                             class="form-control vagasInput {{ $errors->has('vagasdisponiveis') ? 'is-invalid' : '' }}"
                             name="vagasdisponiveis"
                             placeholder="00"
-                            @if(isset($resultado))
-                            value="{{ $resultado->vagasdisponiveis }}"
+                            @if(!empty(old('vagasdisponiveis')))
+                                value="{{ old('vagasdisponiveis') }}"
+                            @else
+                                @if(isset($resultado))
+                                    value="{{ $resultado->vagasdisponiveis }}"
+                                @endif
                             @endif
                             />
                         @if($errors->has('vagasdisponiveis'))
@@ -89,14 +105,22 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                         <label for="status">Status</label>
                         <select name="status" class="form-control">
                         @foreach($status as $s)
-                            @if(isset($resultado))
-                                @if($resultado->status == $s)
-                                <option value="{{ $s }}" selected>{{ $s }}</option>
+                            @if(!empty(old('status')))
+                                @if(old('status') === $s)
+                                    <option value="{{ $s }}" selected>{{ $s }}</option>
+                                @else
+                                    <option value="{{ $s }}">{{ $s }}</option>
+                                @endif
+                            @else
+                                @if(isset($resultado))
+                                    @if($resultado->status == $s)
+                                    <option value="{{ $s }}" selected>{{ $s }}</option>
+                                    @else
+                                    <option value="{{ $s }}">{{ $s }}</option>
+                                    @endif
                                 @else
                                 <option value="{{ $s }}">{{ $s }}</option>
                                 @endif
-                            @else
-                            <option value="{{ $s }}">{{ $s }}</option>
                             @endif
                         @endforeach
                         </select>
@@ -124,7 +148,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                 @endforeach
                 </select>
                 <small class="form-text text-muted">
-                  <em>* Segure Ctrl para selecionar mais de uma região ou Shift para selecionar um grupo de regiões</em>
+                    <em>* Segure Ctrl para selecionar mais de uma região ou Shift para selecionar um grupo de regiões</em>
                 </small>
                 @if($errors->has('regiaoatuacao'))
                 <div class="invalid-feedback">
@@ -138,7 +162,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
             <textarea name="descricao"
             class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }}"
             id="descricao"
-            rows="10">@if(isset($resultado)) {{ $resultado->descricao }} @endif</textarea>
+            rows="10">@if(!empty(old('descricao'))){{ old('descricao') }}@else @if(isset($resultado)){{ $resultado->descricao }}@endif @endif</textarea>
             @if($errors->has('descricao'))
             <div class="invalid-feedback">
                 {{ $errors->first('descricao') }}

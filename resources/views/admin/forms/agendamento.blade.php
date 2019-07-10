@@ -4,10 +4,12 @@
     use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
     $now = date('Y-m-d');
 @endphp
-<div class="container pt-3 pl-3">
-{{ AgendamentoControllerHelper::txtAgendamento($resultado->dia, $resultado->hora, $resultado->status, $resultado->protocolo, $resultado->idagendamento) }}
+<div class="card-body pt-3 pl-3">
+    <div class="col">
+        {{ AgendamentoControllerHelper::txtAgendamento($resultado->dia, $resultado->hora, $resultado->status, $resultado->protocolo, $resultado->idagendamento) }}
+    </div>
 </div>
-<hr class="mb-0">
+<hr class="mb-0 mt-0">
 <form role="form" method="POST">
     @csrf
     @method('PUT')
@@ -19,8 +21,12 @@
                     class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                     placeholder="Nome"
                     name="nome"
-                    @if(isset($resultado))
-                    value="{{ $resultado->nome }}"
+                    @if(!empty(old('nome')))
+                    value="{{ old('nome') }}"
+                    @else
+                        @if(isset($resultado))
+                        value="{{ $resultado->nome }}"
+                        @endif
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
                     readonly
@@ -38,8 +44,12 @@
                     class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                     placeholder="Email"
                     name="email"
-                    @if(isset($resultado))
-                    value="{{ $resultado->email }}"
+                    @if(!empty(old('email')))
+                        value="{{ old('email') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->email }}"
+                        @endif
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
                     readonly
@@ -56,11 +66,15 @@
             <div class="col">
                 <label for="CPF">CPF</label>
                 <input type="text"
-                    class="form-control {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
+                    class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
                     placeholder="CPF"
                     name="cpf"
-                    @if(isset($resultado))
-                    value="{{ $resultado->cpf }}"
+                    @if(!empty(old('cpf')))
+                    value="{{ old('cpf') }}"
+                    @else
+                        @if(isset($resultado))
+                        value="{{ $resultado->cpf }}"
+                        @endif
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
                     readonly
@@ -78,8 +92,12 @@
                     class="form-control {{ $errors->has('celular') ? 'is-invalid' : '' }}"
                     placeholder="Celular"
                     name="celular"
-                    @if(isset($resultado))
-                    value="{{ $resultado->celular }}"
+                    @if(!empty(old('celular')))
+                    value="{{ old('celular') }}"
+                    @else
+                        @if(isset($resultado))
+                        value="{{ $resultado->celular }}"
+                        @endif
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
                     readonly
@@ -97,7 +115,7 @@
                 <label for="idregional">Regional</label>
                 <select name="idregional"
                     class="form-control"
-                    readonly
+                    disabled
                     />
                 @foreach($regionais as $regional)
                     @if(isset($resultado))
@@ -117,19 +135,27 @@
                 <select name="idusuario"
                     class="form-control"
                     @if($now < $resultado->dia)
-                    readonly
+                    disabled
                     @endif
                     />
                 <option value="">Ninguém</option>
                 @foreach($atendentes as $atendente)
-                    @if(isset($resultado))
-                        @if($resultado->idusuario == $atendente->idusuario)
-                        <option value="{{ $atendente->idusuario }}" selected>{{ $atendente->nome }}</option>
+                    @if(!empty(old('idusuario')))
+                        @if(old('idusuario') == $atendente->idusuario)
+                            <option value="{{ $atendente->idusuario }}" selected>{{ $atendente->nome }}</option>
+                        @else
+                            <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
+                        @endif
+                    @else
+                        @if(isset($resultado))
+                            @if($resultado->idusuario == $atendente->idusuario)
+                            <option value="{{ $atendente->idusuario }}" selected>{{ $atendente->nome }}</option>
+                            @else
+                            <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
+                            @endif
                         @else
                         <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
                         @endif
-                    @else
-                    <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
                     @endif
                 @endforeach
                 </select>
@@ -139,14 +165,22 @@
                 <select name="status" class="form-control">
                 <option value="">Nulo</option>
                 @foreach($status as $s)
-                    @if(isset($resultado))
-                        @if($resultado->status == $s)
-                        <option value="{{ $s }}" selected>{{ $s }}</option>
+                    @if(!empty(old('status')))
+                        @if(old('status') === $s)
+                            <option value="{{ $s }}" selected>{{ $s }}</option>
+                        @else
+                            <option value="{{ $s }}">{{ $s }}</option>
+                        @endif
+                    @else
+                        @if(isset($resultado))
+                            @if($resultado->status == $s)
+                            <option value="{{ $s }}" selected>{{ $s }}</option>
+                            @else
+                            <option value="{{ $s }}">{{ $s }}</option>
+                            @endif
                         @else
                         <option value="{{ $s }}">{{ $s }}</option>
                         @endif
-                    @else
-                    <option value="{{ $s }}">{{ $s }}</option>
                     @endif
                 @endforeach
                 </select>

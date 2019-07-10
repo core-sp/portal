@@ -96,12 +96,13 @@ class ChamadoController extends Controller
         $regras = [
             'tipo' => 'required',
             'prioridade' => 'required',
-            'mensagem' => 'required',
+            'mensagem' => 'required|min:3',
             'img' => 'max:191'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'min' => 'Escreva no mínimo 3 caracteres'
         ];
         $erros = $request->validate($regras, $mensagens);
         $save = Chamado::create(request(['tipo', 'prioridade', 'mensagem', 'img', 'idusuario']));
@@ -136,12 +137,13 @@ class ChamadoController extends Controller
         $regras = [
             'tipo' => 'required',
             'prioridade' => 'required',
-            'mensagem' => 'required',
+            'mensagem' => 'required|min:3',
             'img' => 'max:191'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'min' => 'Escreva no mínimo 3 caracteres'
         ];
         $erros = $request->validate($regras, $mensagens);
         $update = Chamado::findOrFail($id)->update(request(['tipo', 'prioridade', 'mensagem', 'img', 'idusuario']));

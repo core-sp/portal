@@ -6,20 +6,24 @@
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
         <div class="form-group">
-        <label for="nome">Nome da Categoria</label>
-        <input type="text"
-            class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
-            placeholder="Título"
-            name="nome"
-            @if(isset($resultado))
-            value="{{ $resultado->nome }}"
+            <label for="nome">Nome da Categoria</label>
+            <input type="text"
+                class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
+                placeholder="Título"
+                name="nome"
+                @if(!empty(old('nome')))
+                    value="{{ old('nome') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->nome }}"
+                    @endif
+                @endif
+                />
+            @if($errors->has('nome'))
+            <div class="invalid-feedback">
+                {{ $errors->first('nome') }}
+            </div>
             @endif
-            />
-        @if($errors->has('nome'))
-        <div class="invalid-feedback">
-            {{ $errors->first('nome') }}
-        </div>
-        @endif
         </div>
     </div>
     <div class="card-footer">

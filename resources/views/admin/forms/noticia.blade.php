@@ -16,8 +16,12 @@
                 class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
                 placeholder="Título"
                 name="titulo"
-                @if(isset($resultado))
-                value="{{ $resultado->titulo }}"
+                @if(!empty(old('titulo')))
+                    value="{{ old('titulo') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->titulo }}"
+                    @endif
                 @endif
                 />
             @if($errors->has('titulo'))
@@ -35,31 +39,36 @@
                 </a>
             </span>
             <input id="thumbnail"
-                class="form-control"
+                class="form-control {{ $errors->has('img') ? 'is-invalid' : '' }}"
                 type="text"
                 name="img"
-                @if(isset($resultado))
-                value="{{ $resultado->img }}"
+                @if(!empty(old('img')))
+                    value="{{ old('img') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->img }}"
+                    @endif
                 @endif
                 />
+            @if($errors->has('img'))
+            <div class="invalid-feedback">
+            {{ $errors->first('img') }}
+            </div>
+            @endif
             </div>
         </div>
         </div>
         <div class="form-group mt-2">
-        <label for="conteudo">Conteúdo da página</label>
-        <textarea name="conteudo"
-            class="form-control {{ $errors->has('conteudo') ? 'is-invalid' : '' }} my-editor"
-            id="conteudo"
-            rows="10">
-            @if(isset($resultado))
-                {!! $resultado->conteudo !!}
+            <label for="conteudo">Conteúdo da página</label>
+            <textarea name="conteudo"
+                class="form-control {{ $errors->has('conteudo') ? 'is-invalid' : '' }} my-editor"
+                id="conteudo"
+                rows="10">@if(!empty(old('conteudo'))){{ old('conteudo') }}@else @if(isset($resultado)){!! $resultado->conteudo !!}@endif @endif</textarea>
+            @if($errors->has('conteudo'))
+            <div class="invalid-feedback">
+                {{ $errors->first('conteudo') }}
+            </div>
             @endif
-        </textarea>
-        @if($errors->has('conteudo'))
-        <div class="invalid-feedback">
-            {{ $errors->first('conteudo') }}
-        </div>
-        @endif
         </div>
         <div class="form-row">
         <div class="col">
@@ -67,14 +76,22 @@
             <select name="idregional" class="form-control">
             <option value="">Todas</option>
             @foreach($regionais as $regional)
-                @if(isset($resultado))
-                    @if($resultado->idregional == $regional->idregional)
-                    <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                @if(!empty(old('idregional')))
+                    @if(old('idregional') == $regional->idregional)
+                        <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
                     @else
-                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                        <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
                     @endif
                 @else
-                <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                    @if(isset($resultado))
+                        @if($resultado->idregional == $regional->idregional)
+                            <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                        @else
+                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                        @endif
+                    @else
+                        <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                    @endif
                 @endif
             @endforeach
             </select>
@@ -88,8 +105,12 @@
                 name="idcurso"
                 class="form-control"
                 placeholder="Código da Turma"
-                @if(isset($resultado))
-                value="{{ $resultado->idcurso }}"
+                @if(!empty(old('idcurso')))
+                    value="{{ old('idcurso') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->idcurso }}"
+                    @endif
                 @endif
                 />
             <small class="form-text text-muted">
@@ -101,14 +122,22 @@
             <select name="categoria" class="form-control">
             <option value="">Nenhuma</option>
             @foreach($categorias as $cat)
-                @if(isset($resultado))
-                    @if($resultado->categoria == $cat)
-                    <option value="{{ $cat }}" selected>{{ $cat }}</option>
+                @if(!empty(old('categoria')))
+                    @if(old('categoria') === $cat)
+                        <option value="{{ $cat }}" selected>{{ $cat }}</option>
                     @else
-                    <option value="{{ $cat }}">{{ $cat }}</option>
+                        <option value="{{ $cat }}">{{ $cat }}</option>
                     @endif
                 @else
-                <option value="{{ $cat }}">{{ $cat }}</option>
+                    @if(isset($resultado))
+                        @if($resultado->categoria == $cat)
+                            <option value="{{ $cat }}" selected>{{ $cat }}</option>
+                        @else
+                            <option value="{{ $cat }}">{{ $cat }}</option>
+                        @endif
+                    @else
+                        <option value="{{ $cat }}">{{ $cat }}</option>
+                    @endif
                 @endif
             @endforeach
             </select>

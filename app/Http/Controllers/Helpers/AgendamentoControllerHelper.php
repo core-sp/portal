@@ -67,23 +67,6 @@ class AgendamentoControllerHelper extends Controller
                         array_push($blocHoras, $value);
                     }
                 }
-                /*
-                if(!$keyHoraInicio && !$keyHoraTermino) {
-                    continue;
-                } elseif(!$keyHoraTermino) {
-                    $ultimoHoras = end($horas);
-                    $keyHoraTermino = key($horas);
-                } elseif(!$keyHoraInicio) {
-                    if($horaInicio > end($horas)) {
-                        continue;
-                    } else {
-                        $primeiroHoras = reset($horas);
-                        $keyHoraInicio = 0;
-                    }
-                }
-                for($i = $keyHoraInicio; $i <= $keyHoraTermino; $i++)
-                    unset($horas[$i]);
-                */
             }
             $horasComBloqueio = array_diff($horas, $blocHoras);
             return $horasComBloqueio;

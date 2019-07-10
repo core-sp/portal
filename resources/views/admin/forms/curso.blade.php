@@ -16,14 +16,22 @@ $tipos = CursoHelper::tipos();
                 <label for="tipo">Tipo</label>
                 <select name="tipo" class="form-control">
                 @foreach($tipos as $tipo)
-                    @if(isset($resultado))
-                        @if($tipo == $resultado->tipo)
-                        <option value="{{ $tipo }}" selected>{{ $tipo }}</option>
+                    @if(!empty(old('tipo')))
+                        @if(old('tipo') === $tipo)
+                            <option value="{{ $tipo }}" selected>{{ $tipo }}</option>
+                        @else
+                            <option value="{{ $tipo }}"">{{ $tipo }}</option>
+                        @endif
+                    @else
+                        @if(isset($resultado))
+                            @if($tipo == $resultado->tipo)
+                            <option value="{{ $tipo }}" selected>{{ $tipo }}</option>
+                            @else
+                            <option value="{{ $tipo }}">{{ $tipo }}</option>
+                            @endif
                         @else
                         <option value="{{ $tipo }}">{{ $tipo }}</option>
                         @endif
-                    @else
-                    <option value="{{ $tipo }}">{{ $tipo }}</option>
                     @endif
                 @endforeach
                 </select>
@@ -40,8 +48,12 @@ $tipos = CursoHelper::tipos();
                     placeholder="Tema" 
                     name="tema"
                     maxlength="191"
-                    @if(isset($resultado))
-                    value="{{ $resultado->tema }}"
+                    @if(!empty(old('tema')))
+                        value="{{ old('tema') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->tema }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('tema'))
@@ -54,10 +66,14 @@ $tipos = CursoHelper::tipos();
                 <label for="nrvagas">Nº de vagas</label>
                 <input type="text"
                     name="nrvagas"
-                    class="form-control vagasInput"
+                    class="form-control vagasInput {{ $errors->has('nrvagas') ? 'is-invalid' : '' }}"
                     placeholder="00"
-                    @if(isset($resultado))
-                    value="{{ $resultado->nrvagas }}"
+                    @if(!empty(old('nrvagas')))
+                        value="{{ old('nrvagas') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->nrvagas }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('nrvagas'))
@@ -72,20 +88,22 @@ $tipos = CursoHelper::tipos();
                 <label for="idregional">Regional</label>
                 <select name="idregional" class="form-control" id="idregional">
                 @foreach($regionais as $regional)
-                    @if(isset($resultado))
-                        @if($regional->idregional == $resultado->idregional)
-                        <option value="{{ $regional->idregional }}" selected>
-                        {{ $regional->regional }}
-                        </option>
+                    @if(!empty(old('idregional')))
+                        @if(old('idregional') == $regional->idregional)
+                            <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
                         @else
-                        <option value="{{ $regional->idregional }}">
-                        {{ $regional->regional }}
-                        </option>
+                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
                         @endif
                     @else
-                    <option value="{{ $regional->idregional }}">
-                    {{ $regional->regional }}
-                    </option>
+                        @if(isset($resultado))
+                            @if($regional->idregional == $resultado->idregional)
+                                <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                            @else
+                                <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                            @endif
+                        @else
+                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                        @endif
                     @endif
                 @endforeach
                 </select>
@@ -94,11 +112,15 @@ $tipos = CursoHelper::tipos();
                 <label for="endereco">Endereço</label>
                 <input type="text"
                     name="endereco"
-                    class="form-control"
+                    class="form-control {{ $errors->has('endereco') ? 'is-invalid' : '' }}"
                     maxlength="191"
                     placeholder="Endereço"
-                    @if(isset($resultado))
-                    value="{{ $resultado->endereco }}"
+                    @if(!empty(old('endereco')))
+                        value="{{ old('endereco') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->endereco }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('endereco'))
@@ -112,12 +134,16 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="datarealizacao">Data de Realização</label>
                 <input type="text" 
-                    class="form-control" 
+                    class="form-control {{ $errors->has('datarealizacao') ? 'is-invalid' : '' }}" 
                     name="datarealizacao" 
                     placeholder="dd/mm/aaaa"
                     id="dataInicio"
-                    @if(isset($resultado))
-                    value="{{ Helper::onlyDate($resultado->datarealizacao) }}"
+                    @if(!empty(old('datarealizacao')))
+                        value="{{ old('datarealizacao') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ Helper::onlyDate($resultado->datarealizacao) }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('datarealizacao'))
@@ -129,12 +155,16 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="datatermino">Data de Término</label>
                 <input type="text" 
-                    class="form-control" 
+                    class="form-control {{ $errors->has('datatermino') ? 'is-invalid' : '' }}" 
                     name="datatermino"
                     id="dataTermino"
                     placeholder="dd/mm/aaaa"
-                    @if(isset($resultado))
-                    value="{{ Helper::onlyDate($resultado->datatermino) }}"
+                    @if(!empty(old('datatermino')))
+                        value="{{ old('datatermino') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ Helper::onlyDate($resultado->datatermino) }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('datatermino'))
@@ -146,12 +176,16 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="horainicio">Horário de Início</label>
                 <input type="text" 
-                    class="form-control" 
+                    class="form-control {{ $errors->has('horainicio') ? 'is-invalid' : '' }}" 
                     name="horainicio"
                     id="horaInicio"
                     placeholder="00:00"
-                    @if(isset($resultado))
-                    value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
+                    @if(!empty(old('horainicio')))
+                        value="{{ old('horainicio') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('horainicio'))
@@ -164,11 +198,15 @@ $tipos = CursoHelper::tipos();
                 <label for="horatermino">Horário de Término</label>
                 <input type="text" 
                     class="form-control" 
-                    name="horatermino"
+                    name="horatermino {{ $errors->has('horatermino') ? 'is-invalid' : '' }}"
                     placeholder="00:00"
                     id="horaTermino"
-                    @if(isset($resultado))
-                    value="{{ Helper::onlyHour($resultado->datatermino) }}"
+                    @if(!empty(old('horatermino')))
+                        value="{{ old('horatermino') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ Helper::onlyHour($resultado->datatermino) }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('horatermino'))
@@ -188,13 +226,22 @@ $tipos = CursoHelper::tipos();
                     </a>
                 </span>
                 <input id="thumbnail"
-                    class="form-control"
+                    class="form-control {{ $errors->has('img') ? 'is-invalid' : '' }}"
                     type="text"
                     name="img"
-                    @if(isset($resultado))
-                    value="{{ $resultado->img }}"
+                    @if(!empty(old('img')))
+                        value="{{ old('img') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->img }}"
+                        @endif
                     @endif
                     />
+                @if($errors->has('img'))
+                <div class="invalid-feedback">
+                {{ $errors->first('img') }}
+                </div>
+                @endif
                 </div>
             </div>
             <div class="col-sm-3">
@@ -221,7 +268,7 @@ $tipos = CursoHelper::tipos();
                 class="form-control {{ $errors->has('resumo') ? 'is-invalid' : '' }}"
                 id="resumo"
                 placeholder="Resumo do curso"
-                rows="3">@if(isset($resultado)) {!! $resultado->resumo !!} @endif</textarea>
+                rows="3">@if(!empty(old('resumo'))){{ old('resumo') }}@else @if(isset($resultado)) {!! $resultado->resumo !!}@endif @endif</textarea>
             @if($errors->has('resumo'))
             <div class="invalid-feedback">
                 {{ $errors->first('resumo') }}
@@ -233,11 +280,7 @@ $tipos = CursoHelper::tipos();
             <textarea name="descricao" 
                 class="form-control my-editor {{ $errors->has('descricao') ? 'is-invalid' : '' }}"
                 id="descricao"
-                rows="10">
-                @if(isset($resultado))
-                {!! $resultado->descricao !!}    
-                @endif
-            </textarea>
+                rows="10">@if(!empty(old('descricao'))){{ old('descricao') }}@else @if(isset($resultado)){!! $resultado->descricao !!}@endif @endif</textarea>
             @if($errors->has('descricao'))
             <div class="invalid-feedback">
                 {{ $errors->first('descricao') }}

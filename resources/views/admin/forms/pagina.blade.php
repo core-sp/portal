@@ -6,91 +6,108 @@
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}" />
     <div class="card-body">
         <div class="form-row">
-        <div class="col">
-            <label for="titulo">Título da página</label>
-            <input type="text"
-            class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
-            placeholder="Título"
-            name="titulo"
-            @if(isset($resultado))
-            value="{{ $resultado->titulo }}"
-            @endif />
-            @if($errors->has('titulo'))
-            <div class="invalid-feedback">
-            {{ $errors->first('titulo') }}
+            <div class="col">
+                <label for="titulo">Título da página</label>
+                <input type="text"
+                    class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
+                    placeholder="Título"
+                    name="titulo"
+                    @if(!empty(old('titulo')))
+                        value="{{ old('titulo') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->titulo }}"
+                        @endif
+                    @endif
+                    />
+                @if($errors->has('titulo'))
+                <div class="invalid-feedback">
+                {{ $errors->first('titulo') }}
+                </div>
+                @endif
             </div>
-            @endif
-        </div>
-        <div class="col">
-            <label for="subtitulo">Subtítulo</label>
-            <input type="text"
-            class="form-control {{ $errors->has('subtitulo') ? 'is-invalid' : '' }}"
-            name="subtitulo"
-            placeholder="Subtítulo"
-            @if(isset($resultado))
-            value="{{ $resultado->subtitulo }}"
-            @endif
-            />
-            @if($errors->has('subtitulo'))
-            <div class="invalid-feedback">
-            {{ $errors->first('subtitulo') }}
+            <div class="col">
+                <label for="subtitulo">Subtítulo</label>
+                <input type="text"
+                    class="form-control {{ $errors->has('subtitulo') ? 'is-invalid' : '' }}"
+                    name="subtitulo"
+                    placeholder="Subtítulo"
+                    @if(!empty(old('subtitulo')))
+                        value="{{ old('subtitulo') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->subtitulo }}"
+                        @endif
+                    @endif
+                    />
+                @if($errors->has('subtitulo'))
+                <div class="invalid-feedback">
+                {{ $errors->first('subtitulo') }}
+                </div>
+                @endif
             </div>
-            @endif
-        </div>
         </div>
         <div class="form-row mt-2">
-        <div class="col">
-            <label for="lfm">Imagem principal</label>
-            <div class="input-group">
-            <span class="input-group-prepend">
-                <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
-                <i class="fas fa-picture-o"></i> Alterar/Inserir imagem
-                </a>
-            </span>
-            <input id="thumbnail"
-                class="form-control"
-                type="text"
-                name="img"
-                @if(isset($resultado))
-                value="{{ $resultado->img }}"
-                @endif
-                />
+            <div class="col">
+                <label for="lfm">Imagem principal</label>
+                <div class="input-group">
+                    <span class="input-group-prepend">
+                        <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
+                            <i class="fas fa-picture-o"></i> Alterar/Inserir imagem
+                        </a>
+                    </span>
+                    <input id="thumbnail"
+                        class="form-control"
+                        type="text"
+                        name="img"
+                        @if(@!empty(old('img')))
+                            value="{{ old('img') }}"
+                        @else
+                            @if(isset($resultado))
+                                value="{{ $resultado->img }}"
+                            @endif
+                        @endif
+                        />
+                </div>
+            </div>
+            <div class="col">
+                <label for="idpaginacategoria">Categoria</label>
+                <select name="idpaginacategoria" class="form-control">
+                    <option value="">Sem Categoria</option>
+                    @foreach($categorias as $categoria)
+                        @if(!empty(old('idpaginacategoria')))
+                            @if(old('idpaginacategoria') == $categoria->idpaginacategoria)
+                                <option value="{{ $categoria->idpaginacategoria }}" selected>{{ $categoria->nome }}</option>
+                            @else
+                                <option value="{{ $categoria->idpaginacategoria }}">{{ $categoria->nome }}</option>
+                            @endif
+                        @else
+                            @if(isset($resultado))
+                                @if ($categoria->idpaginacategoria == $resultado->idpaginacategoria)
+                                <option value="{{ $categoria->idpaginacategoria }}" selected>{{ $categoria->nome }}</option>
+                                @else
+                                <option value="{{ $categoria->idpaginacategoria }}" >{{ $categoria->nome }}</option>
+                                @endif
+                            @else
+                            <option value="{{ $categoria->idpaginacategoria }}" >{{ $categoria->nome }}</option>
+                            @endif
+                        @endif
+                    @endforeach
+                </select>
+                <a href="/admin/paginas/categorias/criar" class="float-right"><small>Criar nova categoria</small></a>
             </div>
         </div>
-        <div class="col">
-            <label for="idpaginacategoria">Categoria</label>
-            <select name="idpaginacategoria" class="form-control">
-            <option value="">Sem Categoria</option>
-            @foreach($categorias as $categoria)
-                @if(isset($resultado))
-                    @if ($categoria->idpaginacategoria == $resultado->idpaginacategoria)
-                    <option value="{{ $categoria->idpaginacategoria }}" selected>{{ $categoria->nome }}</option>
-                    @else
-                    <option value="{{ $categoria->idpaginacategoria }}" >{{ $categoria->nome }}</option>
-                    @endif
-                @else
-                <option value="{{ $categoria->idpaginacategoria }}" >{{ $categoria->nome }}</option>
-                @endif
-            @endforeach
-            </select>
-            <a href="/admin/paginas/categorias/criar" class="float-right"><small>Criar nova categoria</small></a>
-        </div>
-        </div>
         <div class="form-group">
-        <label for="conteudopage">Conteúdo da página</label>
-        <textarea name="conteudo"
-            class="form-control my-editor {{ $errors->has('conteudo') ? 'is-invalid' : '' }}"
-            id="conteudopage"
-            rows="10">
-        @if(isset($resultado))
-            {!! $resultado->conteudo !!}
-        @endif
-        </textarea>
-        @if($errors->has('conteudo'))
-        <div class="invalid-feedback">
-            {{ $errors->first('conteudo') }}
-        </div>
-        @endif
+            <label for="conteudopage">Conteúdo da página</label>
+            <textarea name="conteudo"
+                class="form-control my-editor {{ $errors->has('conteudo') ? 'is-invalid' : '' }}"
+                id="conteudopage"
+                rows="10">@if(!empty(old('conteudo'))){{ old('conteudo') }}@else @if(isset($resultado)){!! $resultado->conteudo !!}@endif @endif</textarea>
+            @if($errors->has('conteudo'))
+            <div class="invalid-feedback">
+                {{ $errors->first('conteudo') }}
+            </div>
+            @endif
         </div>
     </div>
     <div class="card-footer">
