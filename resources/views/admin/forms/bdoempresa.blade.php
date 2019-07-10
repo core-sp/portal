@@ -22,8 +22,12 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             name="razaosocial"
             id="razaosocial"
             placeholder="Razão Social"
-            @if(isset($resultado))
-            value="{{ $resultado->razaosocial }}"
+            @if(!empty(old('razaosocial')))
+                value="{{ old('razaosocial') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->razaosocial }}"
+                @endif
             @endif
             />
             @if($errors->has('razaosocial'))
@@ -39,8 +43,12 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             name="fantasia"
             id="fantasia"
             placeholder="Nome Fantasia"
-            @if(isset($resultado))
-            value="{{ $resultado->fantasia }}"
+            @if(!empty(old('fantasia')))
+                value="{{ old('fantasia') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->fantasia }}"
+                @endif
             @endif
             />
             @if($errors->has('fantasia'))
@@ -55,14 +63,22 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             <label for="segmento">Segmento</label>
             <select name="segmento" class="form-control" id="segmento">
             @foreach($segmentos as $segmento)
-                @if(isset($resultado))
-                    @if($segmento == $resultado->segmento)
-                    <option value="{{ $segmento }}" selected>{{ $segmento }}</option>
+                @if(!empty(old('segmento')))
+                    @if(old('segmento') === $segmento)
+                        <option value="{{ $segmento }}" selected>{{ $segmento }}</option>
                     @else
-                    <option value="{{ $segmento }}">{{ $segmento }}</option>
+                        <option value="{{ $segmento }}">{{ $segmento }}</option>
                     @endif
                 @else
-                <option value="{{ $segmento }}">{{ $segmento }}</option>
+                    @if(isset($resultado))
+                        @if($segmento == $resultado->segmento)
+                            <option value="{{ $segmento }}" selected>{{ $segmento }}</option>
+                        @else
+                            <option value="{{ $segmento }}">{{ $segmento }}</option>
+                        @endif
+                    @else
+                        <option value="{{ $segmento }}">{{ $segmento }}</option>
+                    @endif
                 @endif
             @endforeach
             </select>
@@ -80,8 +96,12 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
                 name="cnpj"
                 id="cnpj"
                 maxlength="191"
-                @if(isset($resultado))
-                value="{{ $resultado->cnpj }}"
+                @if(!empty(old('cnpj')))
+                    value="{{ old('cnpj') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->cnpj }}"
+                    @endif
                 @endif
                 />
             @if($errors->has('cnpj'))
@@ -94,14 +114,22 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             <label for="capitalsocial">Capital Social</label>
             <select name="capitalsocial" class="form-control" id="capitalsocial" />
             @foreach($capitais as $capital)
-                @if(isset($resultado))
-                    @if($capital == $resultado->capitalsocial)
-                    <option value="{{ $capital }}" selected="">{{ $capital }}</option>
+                @if(!empty(old('capitalsocial')))
+                    @if(old('capitalsocial') === $capital)
+                        <option value="{{ $capital }}" selected>{{ $capital }}</option>
                     @else
-                    <option value="{{ $capital }}">{{ $capital }}</option>
+                        <option value="{{ $capital }}">{{ $capital }}</option>
                     @endif
                 @else
-                <option value="{{ $capital }}">{{ $capital }}</option>
+                    @if(isset($resultado))
+                        @if($capital == $resultado->capitalsocial)
+                            <option value="{{ $capital }}" selected="">{{ $capital }}</option>
+                        @else
+                            <option value="{{ $capital }}">{{ $capital }}</option>
+                        @endif
+                    @else
+                        <option value="{{ $capital }}">{{ $capital }}</option>
+                    @endif
                 @endif
             @endforeach
             </select>
@@ -118,7 +146,7 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
                 name="descricao"
                 id="descricao"
                 rows="5"
-                placeholder="Descrição da empresa">@if(isset($resultado)) {{ $resultado->descricao }} @endif</textarea>
+                placeholder="Descrição da empresa">@if(!empty(old('descricao'))){{ old('descricao') }}@else @if(isset($resultado)){{ $resultado->descricao }}@endif @endif</textarea>
         </div>
         <h5 class="mt-4 mb-2">Informações da empresa</h5>
         <div class="form-row">
@@ -129,8 +157,12 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             name="endereco"
             id="endereco"
             placeholder="Endereço"
-            @if(isset($resultado))
-            value="{{ $resultado->endereco }}"
+            @if(!empty(old('endereco')))
+                value="{{ old('endereco') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->endereco }}"
+                @endif
             @endif
             />
             @if($errors->has('endereco'))
@@ -146,8 +178,12 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             name="site"
             id="site"
             placeholder="Site"
-            @if(isset($resultado))
-            value="{{ $resultado->site }}"
+            @if(!empty(old('site')))
+                value="{{ old('site') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->site }}"
+                @endif
             @endif
             />
             @if($errors->has('site'))
@@ -165,8 +201,12 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             name="email"
             id="email"
             placeholder="Email da empresa"
-            @if(isset($resultado))
-            value="{{ $resultado->email }}"
+            @if(!empty(old('email')))
+                value="{{ old('email') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->email }}"
+                @endif
             @endif
             />
             @if($errors->has('email'))
@@ -182,8 +222,12 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
             name="telefone"
             id="telefone"
             placeholder="Telefone da empresa"
-            @if(isset($resultado))
-            value="{{ $resultado->telefone }}"
+            @if(!empty(old('telefone')))
+                value="{{ old('telefone') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->telefone }}"
+                @endif
             @endif
             />
             @if($errors->has('telefone'))
@@ -198,12 +242,16 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
         <div class="col">
             <label for="contatonome">Nome</label>
             <input type="text"
-            class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+            class="form-control {{ $errors->has('contatonome') ? 'is-invalid' : '' }}"
             name="contatonome"
             id="contatonome"
             placeholder="Nome"
-            @if(isset($resultado))
-            value="{{ $resultado->contatonome }}"
+            @if(!empty(old('contatonome')))
+                value="{{ old('contatonome') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->contatonome }}"
+                @endif
             @endif
             />
             @if($errors->has('contatonome'))
@@ -215,12 +263,16 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
         <div class="col">
             <label for="contatotelefone">Telefone</label>
             <input type="text"
-            class="form-control telefoneInput {{ $errors->has('email') ? 'is-invalid' : '' }}"
+            class="form-control telefoneInput {{ $errors->has('contatotelefone') ? 'is-invalid' : '' }}"
             name="contatotelefone"
             id="contatotelefone"
             placeholder="Telefone do contato"
-            @if(isset($resultado))
-            value="{{ $resultado->contatotelefone }}"
+            @if(!empty(old('contatotelefone')))
+                value="{{ old('contatotelefone') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->contatotelefone }}"
+                @endif
             @endif
             />
             @if($errors->has('contatotelefone'))
@@ -233,12 +285,16 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
         <div class="form-group mt-2">
             <label for="contatoemail">Email</label>
             <input type="text"
-            class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+            class="form-control {{ $errors->has('contatoemail') ? 'is-invalid' : '' }}"
             name="contatoemail"
             id="contatoemail"
             placeholder="Email do contato"
-            @if(isset($resultado))
-            value="{{ $resultado->contatoemail }}"
+            @if(!empty(old('contatoemail')))
+                value="{{ old('contatoemail') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->contatoemail }}"
+                @endif
             @endif
             />
             @if($errors->has('contatoemail'))

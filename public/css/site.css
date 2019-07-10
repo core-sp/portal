@@ -224,6 +224,16 @@ strong, .bold {
 	font-size: 1.1rem;
 }
 
+.conteudo-txt ul,
+.conteudo-txt ol {
+	padding-bottom: 1rem;
+}
+
+.conteudo-txt li {
+	line-height: 1.6;
+	font-size: 1.1rem;
+}
+
 .conteudo-txt a,
 .conteudo-txt-mini a {
 	color: #ff0000;
@@ -1447,6 +1457,15 @@ footer p {
 		padding-bottom: .95rem;
 	}
 
+	.conteudo-txt ul,
+	.conteudo-txt ol {
+		padding-bottom: .95rem;
+	}
+	
+	.conteudo-txt li {
+		font-size: 1.05rem;
+	}
+
 }
 
 @media screen and (max-width: 1200px) {
@@ -1552,6 +1571,15 @@ footer p {
 	.conteudo-txt p {
 		font-size: 1rem;
 		padding-bottom: .9rem;
+	}
+
+	.conteudo-txt ul,
+	.conteudo-txt ol {
+		padding-bottom: .9rem;
+	}
+
+	.conteudo-txt li {
+		font-size: 1rem;
 	}
 
 	figcaption {
@@ -1749,6 +1777,10 @@ footer p {
 		font-size: 1.1rem;
 	}
 
+	.conteudo-txt li {
+		font-size: 1.1rem;
+	}
+
 	.clippers {
 		padding-top: 2rem;
 		display: none;
@@ -1768,6 +1800,10 @@ footer p {
 	}
 
 	.conteudo-txt p {
+		font-size: 1rem;
+	}
+
+	.conteudo-txt li {
 		font-size: 1rem;
 	}
 

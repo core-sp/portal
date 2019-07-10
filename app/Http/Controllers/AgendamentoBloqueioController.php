@@ -121,7 +121,8 @@ class AgendamentoBloqueioController extends Controller
             'horatermino' => 'required',
         ];
         $mensagens = [
-            'required' => 'O :attribute é obrigatório',
+            'horainicio.required' => 'Seleciona uma hora de iníco para o bloqueio',
+            'horatermino.required' => 'Seleciona uma hora de término para o bloqueio',
         ];
         $erros = $request->validate($regras, $mensagens);
         // Formata DateTime

@@ -12,8 +12,12 @@
                     class="form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }}"
                     placeholder="Cidade"
                     name="cidade"
-                    @if(isset($resultado))
-                    value="{{ $resultado->regional }}"
+                    @if(!empty(old('cidade')))
+                        value="{{ old('cidade') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->regional }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('cidade'))
@@ -28,8 +32,12 @@
                     class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                     placeholder="Email"
                     name="email"
-                    @if(isset($resultado))
-                    value="{{ $resultado->email }}"
+                    @if(!empty(old('email')))
+                        value="{{ old('email') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->email }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('email'))
@@ -46,8 +54,12 @@
                     class="form-control {{ $errors->has('endereco') ? 'is-invalid' : '' }}"
                     placeholder="Endereço"
                     name="endereco"
-                    @if(isset($resultado))
-                    value="{{ $resultado->endereco }}"
+                    @if(!empty(old('endereco')))
+                        value="{{ old('endereco') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->endereco }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('endereco'))
@@ -62,8 +74,12 @@
                     class="form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
                     placeholder="Número"
                     name="numero"
-                    @if(isset($resultado))
-                    value="{{ $resultado->numero }}"
+                    @if(!empty(old('numero')))
+                        value="{{ old('numero') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->numero }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('numero'))
@@ -78,8 +94,12 @@
                     class="form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
                     placeholder="Complemento"
                     name="complemento"
-                    @if(isset($resultado))
-                    value="{{ $resultado->complemento }}"
+                    @if(!empty(old('complemento')))
+                        value="{{ old('complemento') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->complemento }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('complemento'))
@@ -96,8 +116,12 @@
                     class="form-control cepInput {{ $errors->has('cep') ? 'is-invalid' : '' }}"
                     placeholder="CEP"
                     name="cep"
-                    @if(isset($resultado))
-                    value="{{ $resultado->cep }}"
+                    @if(!empty(old('cep')))
+                        value="{{ old('cep') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->cep }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('cep'))
@@ -112,8 +136,12 @@
                     class="form-control fixoInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                     placeholder="Telefone"
                     name="telefone"
-                    @if(isset($resultado))
-                    value="{{ $resultado->telefone }}"
+                    @if(!empty(old('telefone')))
+                        value="{{ old('telefone') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->telefone }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('telefone'))
@@ -128,8 +156,12 @@
                     class="form-control fixoInput {{ $errors->has('fax') ? 'is-invalid' : '' }}"
                     placeholder="Fax"
                     name="fax"
-                    @if(isset($resultado))
-                    value="{{ $resultado->fax }}"
+                    @if(!empty(old('fax')))
+                        value="{{ old('fax') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->fax }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('fax'))
@@ -146,8 +178,12 @@
                     class="form-control {{ $errors->has('funcionamento') ? 'is-invalid' : '' }}"
                     placeholder="Descrição do horário de funcionamento"
                     name="funcionamento"
-                    @if(isset($resultado))
-                    value="{{ $resultado->funcionamento }}"
+                    @if(!empty(old('funcionamento')))
+                        value="{{ old('funcionamento') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->funcionamento }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('funcionamento'))
@@ -162,8 +198,12 @@
                     class="form-control {{ $errors->has('responsavel') ? 'is-invalid' : '' }}"
                     placeholder="Responsável"
                     name="responsavel"
-                    @if(isset($resultado))
-                    value="{{ $resultado->responsavel }}"
+                    @if(!empty(old('responsavel')))
+                        value="{{ old('responsavel') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->responsavel }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('responsavel'))
@@ -179,8 +219,12 @@
                     placeholder="Nº de agendamentos permitidos por horário"
                     name="ageporhorario"
                     id="ageporhorario"
-                    @if(isset($resultado))
-                    value="{{ $resultado->ageporhorario }}"
+                    @if(!empty(old('ageporhorario')))
+                        value="{{ old('ageporhorario') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->ageporhorario }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('ageporhorario'))
@@ -195,11 +239,7 @@
             <textarea name="descricao"
                 class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }} my-editor"
                 id="descricao"
-                rows="10">
-                @if(isset($resultado))
-                    {!! $resultado->descricao !!}
-                @endif
-            </textarea>
+                rows="10">@if(!empty(old('descricao'))){{ old('descricao') }}@else @if(isset($resultado)){!! $resultado->descricao !!}@endif @endif</textarea>
             @if($errors->has('descricao'))
             <div class="invalid-feedback">
                 {{ $errors->first('descricao') }}

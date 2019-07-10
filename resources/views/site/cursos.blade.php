@@ -38,9 +38,15 @@ use \App\Http\Controllers\CursoInscritoController;
   </div>
   <div class="container">
     <div class="row mb-3">
-      @foreach($cursos as $curso)
-        @include('site.inc.curso-grid')
-      @endforeach
+      @if($cursos->isNotEmpty())
+        @foreach($cursos as $curso)
+          @include('site.inc.curso-grid')
+        @endforeach
+      @else
+        <div class="col mt-3">
+          <p><i class="fas fa-calendar-times"></i>&nbsp;&nbsp;<i>Nenhum curso agendado nos próximos meses</i></p>
+        </div>
+      @endif
     </div>
     <div class="text-right">
       @if(isset($cursos))

@@ -15,16 +15,24 @@ $situacoes = LicitacaoHelper::situacoes();
         <div class="form-row">
         <div class="col-sm-6">
             <label for="modalidade">Modalidade</label>
-            <select name="modalidade" class="form-control">
+            <select name="modalidade" class="form-control {{ $errors->has('modalidade') ? 'is-invalid' : '' }}">
             @foreach($modalidades as $modalidade)
-                @if(isset($resultado))
-                    @if($resultado->modalidade === $modalidade)
-                    <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
+                @if(!empty(old('modalidade')))
+                    @if(old('modalidade') === $modalidade)
+                        <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
                     @else
-                    <option value="{{ $modalidade }}">{{ $modalidade }}</option>
+                        <option value="{{ $modalidade }}">{{ $modalidade }}</option>
                     @endif
                 @else
-                <option value="{{ $modalidade }}">{{ $modalidade }}</option>
+                    @if(isset($resultado))
+                        @if($resultado->modalidade === $modalidade)
+                            <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
+                        @else
+                            <option value="{{ $modalidade }}">{{ $modalidade }}</option>
+                        @endif
+                    @else
+                        <option value="{{ $modalidade }}">{{ $modalidade }}</option>
+                    @endif
                 @endif
             @endforeach
             </select>
@@ -36,16 +44,24 @@ $situacoes = LicitacaoHelper::situacoes();
         </div>
         <div class="col-sm-3">
             <label for="situacao">Situação</label>
-            <select name="situacao" class="form-control">
+            <select name="situacao" class="form-control {{ $errors->has('situacao') ? 'is-invalid' : '' }}">
             @foreach($situacoes as $situacao)
-                @if(isset($resultado))
-                    @if($situacao == $resultado->situacao)
-                    <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
+                @if(!empty(old('situacao')))
+                    @if(old('situacao') === $situacao)
+                            <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
                     @else
-                    <option value="{{ $situacao }}">{{ $situacao }}</option>
+                        <option value="{{ $situacao }}">{{ $situacao }}</option>
                     @endif
                 @else
-                <option value="{{ $situacao }}">{{ $situacao }}</option>
+                    @if(isset($resultado))
+                        @if($situacao == $resultado->situacao)
+                           <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
+                        @else
+                            <option value="{{ $situacao }}">{{ $situacao }}</option>
+                        @endif
+                    @else
+                        <option value="{{ $situacao }}">{{ $situacao }}</option>
+                    @endif
                 @endif
             @endforeach
             </select>
@@ -54,15 +70,19 @@ $situacoes = LicitacaoHelper::situacoes();
             {{ $errors->first('situacao') }}
             </div>
             @endif
-        </div>
+            </div>
         <div class="col-sm-3">
             <label for="uasg">UASG</label>
             <input type="text"
                 class="form-control {{ $errors->has('uasg') ? 'is-invalid' : '' }}"
                 placeholder="000000"
                 name="uasg"
-                @if(isset($resultado))
-                value="{{ $resultado->uasg }}"
+                @if(!empty(old('uasg')))
+                    value="{{ old('uasg') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->uasg }}"
+                    @endif
                 @endif
                 />
             @if($errors->has('uasg'))
@@ -79,8 +99,12 @@ $situacoes = LicitacaoHelper::situacoes();
                 class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
                 placeholder="Título"
                 name="titulo"
-                @if(isset($resultado))
-                value="{{ $resultado->titulo }}"
+                @if(!empty(old('titulo')))
+                    value="{{ old('titulo') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->titulo }}"
+                    @endif
                 @endif
                 />
             @if($errors->has('titulo'))
@@ -101,8 +125,12 @@ $situacoes = LicitacaoHelper::situacoes();
                 class="form-control"
                 type="text"
                 name="edital"
-                @if(isset($resultado))
-                value="{{ $resultado->edital }}"
+                @if(!empty(old('edital')))
+                    value="{{ old('edital') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->edital }}"
+                    @endif
                 @endif
                 />
             </div>
@@ -115,8 +143,12 @@ $situacoes = LicitacaoHelper::situacoes();
                     class="form-control nrprocessoInput {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
                     placeholder="Número"
                     name="nrprocesso"
-                    @if(isset($resultado))
-                    value="{{ $resultado->nrprocesso }}"
+                    @if(!empty(old('nrprocesso')))
+                        value="{{ old('nrprocesso') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->nrprocesso }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('nrprocesso'))
@@ -131,8 +163,12 @@ $situacoes = LicitacaoHelper::situacoes();
                     class="form-control nrlicitacaoInput {{ $errors->has('nrlicitacao') ? 'is-invalid' : '' }}"
                     placeholder="Número"
                     name="nrlicitacao"
-                    @if(isset($resultado))
-                    value="{{ $resultado->nrlicitacao }}"
+                    @if(!empty(old('nrlicitacao')))
+                        value="{{ old('nrlicitacao') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->nrlicitacao }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('nrlicitacao'))
@@ -144,22 +180,35 @@ $situacoes = LicitacaoHelper::situacoes();
             <div class="col">
                 <label for="datarealizacao">Data de Realização</label>
                 <input type="text"
-                    class="form-control dataInput"
+                    class="form-control dataInput {{ $errors->has('datarealizacao') ? 'is-invalid' : '' }}"
                     name="datarealizacao"
                     placeholder="dd/mm/aaaa"
-                    @if(isset($resultado))
-                    value="{{ Helper::OnlyDate($resultado->datarealizacao) }}"
+                    @if(!empty(old('datarealizacao')))
+                        value="{{ old('datarealizacao') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ Helper::OnlyDate($resultado->datarealizacao) }}"
+                        @endif
                     @endif
                     />
+                @if($errors->has('datarealizacao'))
+                <div class="invalid-feedback">
+                {{ $errors->first('datarealizacao') }}
+                </div>
+                @endif
             </div>
             <div class="col">
                 <label for="horainicio">Horário de Início</label>
                 <input type="text" 
-                    class="form-control timeInput" 
+                    class="form-control timeInput {{ $errors->has('horainicio') ? 'is-invalid' : '' }}"
                     name="horainicio"
                     placeholder="00:00"
-                    @if(isset($resultado))
-                    value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
+                    @if(!empty(old('horainicio')))
+                        value="{{ old('horainicio') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('horainicio'))
@@ -174,11 +223,7 @@ $situacoes = LicitacaoHelper::situacoes();
         <textarea name="objeto"
             class="form-control {{ $errors->has('objeto') ? 'is-invalid' : '' }} my-editor"
             id="conteudo"
-            rows="10">
-            @if(isset($resultado))
-                {!! $resultado->objeto !!}
-            @endif
-        </textarea>
+            rows="10">@if(!empty(old('objeto'))){{ old('objeto') }}@else @if(isset($resultado)){!! $resultado->objeto !!}@endif @endif</textarea>
         @if($errors->has('objeto'))
         <div class="invalid-feedback">
             {{ $errors->first('objeto') }}

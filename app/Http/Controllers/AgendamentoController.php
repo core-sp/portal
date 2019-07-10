@@ -416,7 +416,7 @@ class AgendamentoController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $regras = [
             'nome' => 'required|max:191',
-            'email' => 'required|max:191',
+            'email' => 'required|email|max:191',
             'cpf' => 'required|max:191',
             'celular' => 'required|max:191',
             'regional' => 'max:191',
@@ -426,7 +426,8 @@ class AgendamentoController extends Controller
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'email' => 'Email inválido'
         ];
         $erros = $request->validate($regras, $mensagens);
         // Guarda dados no banco

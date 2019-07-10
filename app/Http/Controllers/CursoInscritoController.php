@@ -129,14 +129,15 @@ class CursoInscritoController extends Controller
             'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.request('idcurso').',deleted_at,NULL', new Cpf],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191|min:14',
-            'email' => 'email|max:191',
+            'email' => 'required|email|max:191',
             'registrocore' => 'max:191'
         ];
         $mensagens = [
             'cpf.unique' => 'Este CPF já está cadastrado para o curso',
             'required' => 'O :attribute é obrigatório',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'telefone.min' => 'Telefone inválido'
+            'telefone.min' => 'Telefone inválido',
+            'email' => 'Digite um email válido'
         ];
         $erros = $request->validate($regras, $mensagens);
 
@@ -172,14 +173,15 @@ class CursoInscritoController extends Controller
             'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191',
-            'email' => 'email|max:191|min:14',
+            'email' => 'required|email|max:191|min:14',
             'registrocore' => 'max:191'
         ];
         $mensagens = [
             'cpf.unique' => 'Este CPF já está cadastrado para o curso',
             'required' => 'O :attribute é obrigatório',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'telefone.min' => 'Telefone inválido'
+            'telefone.min' => 'Telefone inválido',
+            'email' => 'Digite um email válido'
         ];
         $erros = $request->validate($regras, $mensagens);
 

@@ -11,8 +11,12 @@
                 class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                 placeholder="Nome"
                 name="nome"
-                @if(isset($resultado))
-                value="{{ $resultado->nome }}"
+                @if(!empty(old('nome')))
+                    value="{{ old('nome') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->nome }}"
+                    @endif
                 @endif
                 />
             @if($errors->has('nome'))
@@ -27,8 +31,12 @@
                 class="form-control {{ $errors->has('username') ? 'is-invalid' : '' }}"
                 placeholder="Nome"
                 name="username"
-                @if(isset($resultado))
-                value="{{ $resultado->username }}"
+                @if(!empty(old('username')))
+                    value="{{ old('username') }}"
+                @else
+                    @if(isset($resultado))
+                        value="{{ $resultado->username }}"
+                    @endif
                 @endif
                 />
             @if($errors->has('username'))
@@ -41,14 +49,22 @@
             <label for="idperfil">Perfil</label>
             <select name="idperfil" class="form-control">
             @foreach($perfis as $perfil)
-                @if(isset($resultado))
-                    @if($resultado->perfil == $perfil)
-                    <option value="{{ $perfil->idperfil }}" selected>{{ $perfil->nome }}</option>
+                @if(!empty(old('idperfil')))
+                    @if(old('idperfil') == $perfil->idperfil)
+                        <option value="{{ $perfil->idperfil }}" selected>{{ $perfil->nome }}</option>
                     @else
-                    <option value="{{ $perfil->idperfil }}">{{ $perfil->nome }}</option>
+                        <option value="{{ $perfil->idperfil }}">{{ $perfil->nome }}</option>
                     @endif
                 @else
-                <option value="{{ $perfil->idperfil }}">{{ $perfil->nome }}</option>
+                    @if(isset($resultado))
+                        @if($resultado->perfil == $perfil)
+                            <option value="{{ $perfil->idperfil }}" selected>{{ $perfil->nome }}</option>
+                        @else
+                            <option value="{{ $perfil->idperfil }}">{{ $perfil->nome }}</option>
+                        @endif
+                    @else
+                        <option value="{{ $perfil->idperfil }}">{{ $perfil->nome }}</option>
+                    @endif
                 @endif
             @endforeach
             </select>
@@ -61,8 +77,12 @@
             class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
             placeholder="Email"
             name="email"
-            @if(isset($resultado))
-            value="{{ $resultado->email }}"
+            @if(!empty(old('email')))
+                value="{{ old('email') }}"
+            @else
+                @if(isset($resultado))
+                    value="{{ $resultado->email }}"
+                @endif
             @endif
             />
             @if($errors->has('email'))
@@ -75,14 +95,22 @@
             <label for="idregional">Regional</label>
             <select name="idregional" class="form-control">
             @foreach($regionais as $regional)
-                @if(isset($resultado))
-                    @if($resultado->regional->idregional == $regional->idregional)
-                    <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                @if(!empty(old('idregional')))
+                    @if(old('idregional') == $regional->idregional)
+                        <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
                     @else
-                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                        <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
                     @endif
                 @else
-                <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                    @if(isset($resultado))
+                        @if($resultado->regional->idregional == $regional->idregional)
+                            <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                        @else
+                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                        @endif
+                    @else
+                        <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                    @endif
                 @endif
             @endforeach
             </select>
@@ -92,20 +120,29 @@
         <div class="form-row mt-2">
             <div class="col">
                 <label for="password">Senha</label>
-                <input id="password" type="password" class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" autocomplete="new-password" />
-                @if ($errors->has('password'))
-                <span class="invalid-feedback" role="alert">
-                <strong>{{ $errors->first('password') }}</strong>
-                </span>
+                <input id="password"
+                    type="password"
+                    class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}"
+                    name="password"
+                    autocomplete="new-password"
+                    />
+                @if($errors->has('password'))
+                <div class="invalid-feedback">
+                {{ $errors->first('password') }}
+                </div>
                 @endif
             </div>
             <div class="col">
                 <label for="password-confirm">Confirme a senha</label>
-                <input id="password-confirm" type="password" class="form-control {{ $errors->has('password-confirm') ? ' is-invalid' : '' }}" name="password_confirmation" />
-                @if ($errors->has('password-confirm'))
-                <span class="invalid-feedback" role="alert">
-                <strong>{{ $errors->first('password-confirm') }}</strong>
-                </span>
+                <input id="password-confirm"
+                    type="password"
+                    class="form-control {{ $errors->has('password-confirm') ? ' is-invalid' : '' }}"
+                    name="password_confirmation"
+                    />
+                @if($errors->has('password-confirm'))
+                <div class="invalid-feedback">
+                {{ $errors->first('password-confirm') }}
+                </div>
                 @endif
             </div>
         </div>

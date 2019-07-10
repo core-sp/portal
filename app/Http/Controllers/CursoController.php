@@ -119,6 +119,7 @@ class CursoController extends Controller
             'tema' => 'required|max:191',
             'img' => 'max:191',
             'datarealizacao' => 'required',
+            'datatermino' => 'required',
             'horainicio' => 'required',
             'endereco' => 'required|max:191',
             'nrvagas' => 'required|numeric',
@@ -126,6 +127,8 @@ class CursoController extends Controller
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
+            'datarealizacao.required' => 'Insira a data de realização do curso',
+            'datatermino.required' => 'Insira a data de término do curso',
             'numeric' => 'O :attribute aceita apenas números',
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
@@ -174,6 +177,7 @@ class CursoController extends Controller
             'tema' => 'required|max:191',
             'img' => 'max:191',
             'datarealizacao' => 'required',
+            'datatermino' => 'required',
             'horainicio' => 'required',
             'endereco' => 'required|max:191',
             'nrvagas' => 'required|numeric',
@@ -181,6 +185,8 @@ class CursoController extends Controller
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
+            'datarealizacao.required' => 'Insira a data de realização do curso',
+            'datatermino.required' => 'Insira a data de término do curso',
             'numeric' => 'O :attribute aceita apenas números',
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];

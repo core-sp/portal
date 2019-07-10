@@ -16,14 +16,22 @@ $horas = AgendamentoControllerHelper::todasHoras();
                 <label for="idregional">Regional</label>
                 <select name="idregional" class="form-control">
                 @foreach($regionais as $regional)
-                    @if(isset($resultado))
-                        @if($resultado->idregional === $regional->idregional)
-                        <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                    @if(!empty(old('idregional')))
+                        @if(old('idregional') == $regional->idregional)
+                            <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                        @else
+                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                        @endif
+                    @else
+                        @if(isset($resultado))
+                            @if($resultado->idregional === $regional->idregional)
+                            <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
+                            @else
+                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                            @endif
                         @else
                         <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
                         @endif
-                    @else
-                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
                     @endif
                 @endforeach
                 </select>
@@ -42,9 +50,13 @@ $horas = AgendamentoControllerHelper::todasHoras();
                     placeholder="dd/mm/aaaa"
                     id="dataInicio"
                     name="diainicio"
-                    @if(isset($resultado))
-                        @if($resultado->diainicio != '2000-01-01')
-                        value="{{ Helper::OnlyDate($resultado->diainicio) }}"
+                    @if(!empty(old('diainicio')))
+                        value="{{ old('diainicio') }}"
+                    @else
+                        @if(isset($resultado))
+                            @if($resultado->diainicio != '2000-01-01')
+                                value="{{ Helper::OnlyDate($resultado->diainicio) }}"
+                            @endif
                         @endif
                     @endif
                     />
@@ -64,9 +76,13 @@ $horas = AgendamentoControllerHelper::todasHoras();
                     placeholder="dd/mm/aaaa"
                     id="dataTermino"
                     name="diatermino"
-                    @if(isset($resultado))
-                        @if($resultado->diatermino != '2100-01-01')
-                        value="{{ Helper::OnlyDate($resultado->diatermino) }}"
+                    @if(!empty(old('diatermino')))
+                        value="{{ old('diatermino') }}"
+                    @else
+                        @if(isset($resultado))
+                            @if($resultado->diatermino != '2100-01-01')
+                                value="{{ Helper::OnlyDate($resultado->diatermino) }}"
+                            @endif
                         @endif
                     @endif
                     />
@@ -83,17 +99,25 @@ $horas = AgendamentoControllerHelper::todasHoras();
         <div class="form-row mt-2">
             <div class="col">
                 <label for="horainicio">Hora de início</label>
-                <select name="horainicio" class="form-control" id="horaInicioBloqueio">
+                <select name="horainicio" class="form-control {{ $errors->has('horainicio') ? 'is-invalid' : '' }}" id="horaInicioBloqueio">
                 <option selected disabled>Selecione o horário</option>
                 @foreach($horas as $hora)
-                    @if(isset($resultado))
-                        @if($resultado->horainicio === $hora)
-                        <option value="{{ $hora }}" selected>{{ $hora }}</option>
+                    @if(!empty(old('horainicio')))
+                        @if(old('horainicio') == $hora)
+                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
+                        @else
+                            <option value="{{ $hora }}">{{ $hora }}</option>
+                        @endif
+                    @else
+                        @if(isset($resultado))
+                            @if($resultado->horainicio === $hora)
+                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
+                            @else
+                            <option value="{{ $hora }}">{{ $hora }}</option>
+                            @endif
                         @else
                         <option value="{{ $hora }}">{{ $hora }}</option>
                         @endif
-                    @else
-                    <option value="{{ $hora }}">{{ $hora }}</option>
                     @endif
                 @endforeach
                 </select>
@@ -105,17 +129,25 @@ $horas = AgendamentoControllerHelper::todasHoras();
             </div>
             <div class="col">
             <label for="horatermino">Hora de término</label>
-                <select name="horatermino" class="form-control" id="horaTerminoBloqueio">
+                <select name="horatermino" class="form-control {{ $errors->has('horatermino') ? 'is-invalid' : '' }}" id="horaTerminoBloqueio">
                 <option selected disabled>Selecione o horário</option>
                 @foreach($horas as $hora)
-                    @if(isset($resultado))
-                        @if($resultado->horatermino === $hora)
-                        <option value="{{ $hora }}" selected>{{ $hora }}</option>
+                    @if(!empty(old('horatermino')))
+                        @if(old('horatermino') == $hora)
+                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
+                        @else
+                            <option value="{{ $hora }}">{{ $hora }}</option>
+                        @endif
+                    @else
+                        @if(isset($resultado))
+                            @if($resultado->horatermino === $hora)
+                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
+                            @else
+                            <option value="{{ $hora }}">{{ $hora }}</option>
+                            @endif
                         @else
                         <option value="{{ $hora }}">{{ $hora }}</option>
                         @endif
-                    @else
-                    <option value="{{ $hora }}">{{ $hora }}</option>
                     @endif
                 @endforeach
                 </select>

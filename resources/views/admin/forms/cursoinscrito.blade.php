@@ -15,8 +15,12 @@
                     name="nome"
                     class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                     placeholder="Nome"
-                    @if(isset($resultado))
-                    value="{{ $resultado->nome }}"
+                    @if(!empty(old('nome')))
+                        value="{{ old('nome') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->nome }}"
+                        @endif
                     @endif
                     />
                 @if($errors->has('nome'))
@@ -31,8 +35,12 @@
                     name="email"
                     class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                     placeholder="Email"
-                    @if(isset($resultado))
-                    value="{{ $resultado->email }}" 
+                    @if(!empty(old('email')))
+                        value="{{ old('email') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->email }}" 
+                        @endif
                     @endif
                     />
                 @if($errors->has('email'))
@@ -49,8 +57,12 @@
                     name="telefone"
                     class="form-control celularInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                     placeholder="(00) 00000-0000"
-                    @if(isset($resultado))
-                    value="{{ $resultado->telefone }}" 
+                    @if(!empty(old('telefone')))
+                        value="{{ old('telefone') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->telefone }}" 
+                        @endif
                     @endif
                     />
                 @if($errors->has('telefone'))
@@ -65,8 +77,12 @@
                     name="cpf"
                     class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
                     placeholder="000.000.000-00"
-                    @if(isset($resultado))
-                    value="{{ $resultado->cpf }}" 
+                    @if(!empty(old('cpf')))
+                        value="{{ old('cpf') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->cpf }}" 
+                        @endif
                     @endif
                     />
                 @if($errors->has('cpf'))
@@ -81,8 +97,12 @@
                     name="registrocore"
                     class="form-control {{ $errors->has('registrocore') ? 'is-invalid' : '' }}"
                     placeholder="Nº do registro no CORE (opcional)"
-                    @if(isset($resultado))
-                    value="{{ $resultado->registrocore }}" 
+                    @if(!empty(old('registrocore')))
+                        value="{{ old('registrocore') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->registrocore }}" 
+                        @endif
                     @endif
                     />
                 @if($errors->has('registrocore'))

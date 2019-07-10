@@ -123,7 +123,7 @@ class LicitacaoController extends Controller
         ControleController::autoriza($this->class, 'create');
         $regras = [
             'modalidade' => 'required|max:191',
-            'titulo' => 'max:191',
+            'titulo' => 'required|max:191',
             'nrlicitacao' => 'required|max:191',
             'nrprocesso' => 'required|max:191',
             'situacao' => 'required|max:191',
@@ -188,7 +188,7 @@ class LicitacaoController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $regras = [
             'modalidade' => 'required|max:191',
-            'titulo' => 'max:191',
+            'titulo' => 'required|max:191',
             'nrlicitacao' => 'required|max:191',
             'nrprocesso' => 'required|max:191',
             'situacao' => 'required|max:191',
