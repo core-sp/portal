@@ -89,6 +89,24 @@ class NoticiaController extends Controller
         return $tabela;
     }
 
+    protected function regras()
+    {
+        return [
+            'titulo' => 'required|max:191|min:3',
+            'img' => 'max:191',
+            'conteudo' => 'required|min:100'
+        ];
+    }
+
+    protected function mensagens()
+    {
+        return [
+            'required' => 'O :attribute é obrigatório',
+            'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+        ];
+    }
+
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -111,17 +129,7 @@ class NoticiaController extends Controller
     public function store(Request $request)
     {
         ControleController::autoriza($this->class, 'create');
-        $regras = [
-            'titulo' => 'required|max:191|min:3',
-            'img' => 'max:191',
-            'conteudo' => 'required|min:100'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
         // Checa o usuário
         if(Auth::user()->perfil === 'Estagiário')
             $publicada = 'Não';
@@ -174,17 +182,7 @@ class NoticiaController extends Controller
     public function update(Request $request, $id)
     {
         ControleController::autoriza($this->class, 'edit');
-        $regras = [
-            'titulo' => 'required|max:191|min:3',
-            'img' => 'max:191',
-            'conteudo' => 'required|min:100'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
         // Checa o usuário
         if(Auth::user()->perfil === 'Estagiário')
             $publicada = 'Não';

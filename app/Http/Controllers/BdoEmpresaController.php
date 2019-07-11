@@ -31,11 +31,6 @@ class BdoEmpresaController extends Controller
     {
         $this->middleware('auth', ['except' => 'show']);
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
     public function resultados()
     {
@@ -88,96 +83,9 @@ class BdoEmpresaController extends Controller
         return $tabela;
     }
 
-    public function index()
+    protected function regras()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $resultados = $this->resultados();
-        $tabela = $this->tabelaCompleta($resultados);
-        if(!ControleController::mostra($this->class, 'create'))
-            unset($this->variaveis['btn_criar']);
-        $variaveis = (object) $this->variaveis;
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $variaveis = (object) $this->variaveis;
-        return view('admin.crud.criar', compact('variaveis'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        ControleController::autoriza($this->class, 'create');
-        $regras = [
-            'segmento' => 'max:191',
-            'cnpj' => ['required', 'max:191', 'unique:bdo_empresas', new Cnpj],
-            'razaosocial' => 'required|max:191',
-            'capitalsocial' => 'max:191',
-            'endereco' => 'required|max:191',
-            'descricao' => 'required',
-            'email' => 'required|email|max:191',
-            'telefone' => 'required|max:191',
-            'site' => 'max:191',
-            'contatonome' => 'max:191',
-            'contatotelefone' => 'max:191',
-            'contatoemail' => 'email|max:191',
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'cnpj.unique' => 'Já existe uma empresa cadastrada com este CNPJ',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'email' => 'Email inválido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
-
-        $save = BdoEmpresa::create(request(['segmento', 'cnpj', 'razaosocial', 'fantasia', 'descricao', 'capitalsocial',
-        'endereco', 'site', 'email', 'telefone', 'contatonome', 'contatotelefone', 'contatoemail', 'idusuario']));
-
-        if(!$save)
-            abort(500);
-        event(new CrudEvent('empresa (Balcão de Oportunidades)', 'criou', $save->idempresa));
-        return redirect()->route('bdoempresas.lista')
-            ->with('message', '<i class="icon fa fa-check"></i>Empresa cadastrada com sucesso!')
-            ->with('class', 'alert-success');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = BdoEmpresa::findOrFail($id);
-        $variaveis = (object) $this->variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        ControleController::autoriza($this->class, 'edit');
-        $regras = [
+        return [
             'segmento' => 'max:191',
             'cnpj' => ['required', 'max:191', new Cnpj],
             'razaosocial' => 'required|max:191',
@@ -191,13 +99,66 @@ class BdoEmpresaController extends Controller
             'contatotelefone' => 'max:191',
             'contatoemail' => 'email|max:191',
         ];
-        $mensagens = [
+    }
+
+    protected function mensagens()
+    {
+        return [
             'required' => 'O :attribute é obrigatório',
             'cnpj.unique' => 'Já existe uma empresa cadastrada com este CNPJ',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
             'email' => 'Email inválido'
         ];
-        $erros = $request->validate($regras, $mensagens);
+    }
+
+    public function index()
+    {
+        ControleController::autoriza($this->class, __FUNCTION__);
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        if(!ControleController::mostra($this->class, 'create'))
+            unset($this->variaveis['btn_criar']);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+    }
+
+    public function create()
+    {
+        ControleController::autoriza($this->class, __FUNCTION__);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.criar', compact('variaveis'));
+    }
+
+    public function store(Request $request)
+    {
+        ControleController::autoriza($this->class, 'create');
+        $regras = $this->regras();
+        array_push($regras['cnpj'], 'unique:bdo_empresas');
+        $erros = $request->validate($regras, $this->mensagens());
+
+        $save = BdoEmpresa::create(request(['segmento', 'cnpj', 'razaosocial', 'fantasia', 'descricao', 'capitalsocial',
+        'endereco', 'site', 'email', 'telefone', 'contatonome', 'contatotelefone', 'contatoemail', 'idusuario']));
+
+        if(!$save)
+            abort(500);
+        event(new CrudEvent('empresa (Balcão de Oportunidades)', 'criou', $save->idempresa));
+        return redirect()->route('bdoempresas.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Empresa cadastrada com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function edit($id)
+    {
+        ControleController::autoriza($this->class, __FUNCTION__);
+        $resultado = BdoEmpresa::findOrFail($id);
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        ControleController::autoriza($this->class, 'edit');
+        $erros = $request->validate($this->regras(), $this->mensagens());
 
         $update = BdoEmpresa::findOrFail($id)->update(request(['segmento', 'cnpj', 'razaosocial', 'fantasia', 'descricao', 'capitalsocial',
         'endereco', 'site', 'email', 'telefone', 'contatonome', 'contatotelefone', 'contatoemail', 'idusuario']));
@@ -210,12 +171,6 @@ class BdoEmpresaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);

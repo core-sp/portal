@@ -83,11 +83,6 @@ class PaginaCategoriaController extends Controller
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         ControleController::autoriza($this->parent, 'create');
@@ -95,19 +90,14 @@ class PaginaCategoriaController extends Controller
         return view('admin.crud.criar', compact('variaveis'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         ControleController::autoriza($this->parent, 'create');
         $regras = [
-            'nome' => 'required|max:191'
+            'nome' => 'required|max:191|unique:pagina_categorias'
         ];
         $mensagens = [
+            'unique' => 'Já existe uma categoria com este nome',
             'required' => 'O campo :attribute é obrigatório',
             'max' => 'O :attribute excedeu o limite de caracteres permitido'
         ];
@@ -123,12 +113,6 @@ class PaginaCategoriaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         ControleController::autoriza($this->parent, __FUNCTION__);
@@ -137,13 +121,6 @@ class PaginaCategoriaController extends Controller
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         ControleController::autoriza($this->parent, 'edit');
@@ -166,12 +143,6 @@ class PaginaCategoriaController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         ControleController::autoriza($this->parent, __FUNCTION__);
