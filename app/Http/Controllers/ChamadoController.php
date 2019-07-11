@@ -76,6 +76,26 @@ class ChamadoController extends Controller
         return $tabela;
     }
 
+    protected function regras()
+    {
+        return [
+            'tipo' => 'required',
+            'prioridade' => 'required',
+            'mensagem' => 'required|min:3',
+            'img' => 'max:191'
+        ];
+    }
+
+    protected function mensagens()
+    {
+        return [
+            'required' => 'O :attribute é obrigatório',
+            'mensagem.required' => 'A mensagem é obrigatória',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido',
+            'min' => 'Escreva no mínimo 3 caracteres'
+        ];
+    }
+
     public function index(Request $request)
     {
         ControleController::autorizaStatic(['1']);
@@ -93,18 +113,7 @@ class ChamadoController extends Controller
 
     public function store(Request $request)
     {
-        $regras = [
-            'tipo' => 'required',
-            'prioridade' => 'required',
-            'mensagem' => 'required|min:3',
-            'img' => 'max:191'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'min' => 'Escreva no mínimo 3 caracteres'
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
         $save = Chamado::create(request(['tipo', 'prioridade', 'mensagem', 'img', 'idusuario']));
         if(!$save)
             abort(500);

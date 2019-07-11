@@ -92,6 +92,33 @@ class CursoController extends Controller
         return $tabela;
     }
 
+    protected function regras()
+    {
+        return [
+            'tipo' => 'max:191',
+            'tema' => 'required|max:191',
+            'img' => 'max:191',
+            'datarealizacao' => 'required',
+            'datatermino' => 'required',
+            'horainicio' => 'required',
+            'endereco' => 'required|max:191',
+            'nrvagas' => 'required|numeric',
+            'descricao' => 'required'
+        ];
+    }
+
+    protected function mensagens()
+    {
+        return [
+            'required' => 'O :attribute é obrigatório',
+            'datarealizacao.required' => 'Informe a data de realização do curso',
+            'datatermino.required' => 'Informe a data de término do curso',
+            'horainicio.required' => 'Informe a hora de início do curso',
+            'numeric' => 'O :attribute aceita apenas números',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+        ];
+    }
+
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -114,25 +141,7 @@ class CursoController extends Controller
     public function store(Request $request)
     {
         ControleController::autoriza($this->class, 'create');
-        $regras = [
-            'tipo' => 'max:191',
-            'tema' => 'required|max:191',
-            'img' => 'max:191',
-            'datarealizacao' => 'required',
-            'datatermino' => 'required',
-            'horainicio' => 'required',
-            'endereco' => 'required|max:191',
-            'nrvagas' => 'required|numeric',
-            'descricao' => 'required'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'datarealizacao.required' => 'Insira a data de realização do curso',
-            'datatermino.required' => 'Insira a data de término do curso',
-            'numeric' => 'O :attribute aceita apenas números',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
         
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
         $datatermino = Helper::retornaDateTime($request->input('datatermino'), $request->input('horatermino'));
@@ -172,25 +181,7 @@ class CursoController extends Controller
     public function update(Request $request, $id)
     {
         ControleController::autoriza($this->class, 'edit');
-        $regras = [
-            'tipo' => 'max:191',
-            'tema' => 'required|max:191',
-            'img' => 'max:191',
-            'datarealizacao' => 'required',
-            'datatermino' => 'required',
-            'horainicio' => 'required',
-            'endereco' => 'required|max:191',
-            'nrvagas' => 'required|numeric',
-            'descricao' => 'required'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'datarealizacao.required' => 'Insira a data de realização do curso',
-            'datatermino.required' => 'Insira a data de término do curso',
-            'numeric' => 'O :attribute aceita apenas números',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
         // Formata DateTime
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
         $datatermino = Helper::retornaDateTime($request->input('datatermino'), $request->input('horatermino'));

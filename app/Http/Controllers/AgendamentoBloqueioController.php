@@ -94,6 +94,24 @@ class AgendamentoBloqueioController extends Controller
         return $tabela;
     }
 
+    protected function regras()
+    {
+        return [
+            'idregional' => 'required',
+            'horainicio' => 'required',
+            'horatermino' => 'required',
+        ];
+    }
+
+    protected function mensagens()
+    {
+        return [
+            'idregional.required' => 'Selecione uma regional',
+            'horainicio.required' => 'Seleciona uma hora de início para o bloqueio',
+            'horatermino.required' => 'Seleciona uma hora de término para o bloqueio',
+        ];
+    }
+
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -116,15 +134,7 @@ class AgendamentoBloqueioController extends Controller
     public function store(Request $request)
     {
         ControleController::autoriza($this->class, 'create');
-        $regras = [
-            'horainicio' => 'required',
-            'horatermino' => 'required',
-        ];
-        $mensagens = [
-            'horainicio.required' => 'Seleciona uma hora de iníco para o bloqueio',
-            'horatermino.required' => 'Seleciona uma hora de término para o bloqueio',
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
         // Formata DateTime
         if(empty($request->input('diainicio')) && empty($request->input('diatermino'))) {
             $diainicio = '2000-01-01';
@@ -172,14 +182,7 @@ class AgendamentoBloqueioController extends Controller
     public function update(Request $request, $id)
     {
         ControleController::autoriza($this->class, 'edit');
-        $regras = [
-            'horainicio' => 'required',
-            'horatermino' => 'required',
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
         // Formata DateTime
         if(empty($request->input('diainicio')) && empty($request->input('diatermino'))) {
             $diainicio = '2000-01-01';

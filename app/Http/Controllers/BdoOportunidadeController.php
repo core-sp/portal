@@ -30,11 +30,6 @@ class BdoOportunidadeController extends Controller
     {
         $this->middleware('auth', ['except' => 'show']);
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
     public function resultados()
     {
@@ -97,6 +92,26 @@ class BdoOportunidadeController extends Controller
         return $tabela;
     }
 
+    protected function regras()
+    {
+        return [
+            'titulo' => 'required|max:191',
+            'segmento' => 'max:191',
+            'vagasdisponiveis' => 'required',
+            'descricao' => 'required',
+            'status' => 'max:191'
+        ];
+    }
+
+    protected function mensagens()
+    {
+        return [
+            'required' => 'O :attribute é obrigatório',
+            'vagasdisponiveis.required' => 'Informe o número de vagas disponíveis',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+        ];
+    }
+
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -106,11 +121,6 @@ class BdoOportunidadeController extends Controller
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -125,28 +135,10 @@ class BdoOportunidadeController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         ControleController::autoriza($this->class, 'create');
-        $regras = [
-            'titulo' => 'required|max:191',
-            'segmento' => 'max:191',
-            'vagasdisponiveis' => 'required',
-            'descricao' => 'required',
-            'status' => 'max:191'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
-
+        $erros = $request->validate($this->regras(), $this->mensagens());
         $regioes = ','.implode(',',request('regiaoatuacao')).',';
         if (request('status') === "Em andamento") {
             $datainicio = now();
@@ -176,12 +168,6 @@ class BdoOportunidadeController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -193,29 +179,10 @@ class BdoOportunidadeController extends Controller
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regioes', 'regioesEdit'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         ControleController::autoriza($this->class, 'edit');
-        $regras = [
-            'titulo' => 'required|max:191',
-            'segmento' => 'max:191',
-            'vagasdisponiveis' => 'required',
-            'descricao' => 'required',
-            'status' => 'max:191'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
-
+        $erros = $request->validate($this->regras(), $this->mensagens());
         $regioes = ','.implode(',',request('regiaoatuacao')).',';
         if (request('datainicio') === null && request('status') === "Em andamento") {
             $datainicio = now();
@@ -244,12 +211,6 @@ class BdoOportunidadeController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);

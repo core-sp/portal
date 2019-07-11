@@ -86,6 +86,30 @@ class ConcursoController extends Controller
         return $tabela;
     }
 
+    protected function regras()
+    {
+        return [
+            'modalidade' => 'required|max:191',
+            'titulo' => 'required|max:191',
+            'nrprocesso' => 'required|max:191',
+            'situacao' => 'required|max:191',
+            'datarealizacao' => 'required',
+            'objeto' => 'required',
+            'linkexterno' => 'max:191'
+        ];
+    }
+
+    protected function mensagens()
+    {
+        return [
+            'required' => 'O :attribute é obrigatório',
+            'nrprocesso.required' => 'O nº do processo é obrigatório',
+            'nrprocesso.unique' => 'Já existe um concurso com este nº de processo',
+            'datarealizacao.required' => 'Informe a data de realização da Licitação',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+        ];
+    }
+
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -107,24 +131,9 @@ class ConcursoController extends Controller
     public function store(Request $request)
     {
         ControleController::autoriza($this->class, 'create');
-        $regras = [
-            'modalidade' => 'required|max:191',
-            'titulo' => 'required|max:191',
-            'nrprocesso' => 'required|max:191|unique:concursos',
-            'situacao' => 'required|max:191',
-            'datarealizacao' => 'required',
-            'objeto' => 'required',
-            'linkexterno' => 'max:191'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'nrprocesso.required' => 'O nº do processo é obrigatório',
-            'nrprocesso.unique' => 'Já existe um concurso com este nº de processo',
-            'datarealizacao.required' => 'Informe a data de realização da Licitação',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
-
+        $regras = $this->regras();
+        $regras['nrprocesso'] .= '|unique:concursos';
+        $erros = $request->validate($regras, $this->mensagens());
         $datarealizacao = Helper::retornaDateTime(request('datarealizacao'), request('horainicio'));
 
         $save = Concurso::create([
@@ -157,23 +166,7 @@ class ConcursoController extends Controller
     public function update(Request $request, $id)
     {
         ControleController::autoriza($this->class, 'edit');
-        $regras = [
-            'modalidade' => 'required|max:191',
-            'titulo' => 'required|max:191',
-            'nrprocesso' => 'required|max:191',
-            'situacao' => 'required|max:191',
-            'datarealizacao' => 'required',
-            'objeto' => 'required',
-            'linkexterno' => 'max:191'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'nrprocesso.required' => 'O nº do processo é obrigatório',
-            'datarealizacao.required' => 'Informe a data de realização da Licitação',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
-        
+        $erros = $request->validate($this->regras(), $this->mensagens());
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
 
         $update = Concurso::findOrFail($id)->update([

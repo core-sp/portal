@@ -84,6 +84,24 @@ class PaginaController extends Controller
         return $tabela;
     }
 
+    protected function regras()
+    {
+        return [
+            'titulo' => 'required|max:191',
+            'subtitulo' => 'max:191',
+            'img' => 'max:191',
+            'conteudo' => 'required'
+        ];
+    }
+
+    protected function mensagens()
+    {
+        return [
+            'required' => 'O :attribute é obrigatório',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+        ];
+    }
+
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -95,11 +113,6 @@ class PaginaController extends Controller
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -111,17 +124,7 @@ class PaginaController extends Controller
     public function store(Request $request)
     {
         ControleController::autoriza($this->class, 'create');
-        $regras = [
-            'titulo' => 'required|max:191',
-            'subtitulo' => 'max:191',
-            'img' => 'max:191',
-            'conteudo' => 'required'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
 
         if(null !== $request->input('idpaginacategoria')) {
             $cn = PaginaCategoria::findOrFail($request->input('idpaginacategoria'))->nome;
@@ -170,18 +173,8 @@ class PaginaController extends Controller
     public function update(Request $request, $id)
     {
         ControleController::autoriza($this->class, 'edit');
-        $regras = [
-            'titulo' => 'required|max:191',
-            'subtitulo' => 'max:191',
-            'img' => 'max:191',
-            'conteudo' => 'required'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
-
+        $erros = $request->validate($this->regras(), $this->mensagens());
+        
         if(null !== $request->input('idpaginacategoria')) {
             $cn = PaginaCategoria::findOrFail($request->input('idpaginacategoria'))->nome;
             $cnToSlug = Str::slug($cn, '-');

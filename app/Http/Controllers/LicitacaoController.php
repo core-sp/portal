@@ -89,6 +89,30 @@ class LicitacaoController extends Controller
         return $tabela;
     }
 
+    protected function regras()
+    {
+        return [
+            'modalidade' => 'required|max:191',
+            'titulo' => 'required|max:191',
+            'nrlicitacao' => 'required|max:191',
+            'nrprocesso' => 'required|max:191',
+            'situacao' => 'required|max:191',
+            'objeto' => 'required',
+            'datarealizacao' => 'required',
+        ];
+    }
+
+    protected function mensagens()
+    {
+        return [
+            'required' => 'O :attribute é obrigatório',
+            'nrlicitacao.required' => 'O nº da licitação é obrigatório',
+            'nrprocesso.required' => 'O nº do processo é obrigatório',
+            'datarealizacao.required' => 'Informe a data de realização da Licitação',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+        ];
+    }
+
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -100,11 +124,6 @@ class LicitacaoController extends Controller
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -112,32 +131,10 @@ class LicitacaoController extends Controller
         return view('admin.crud.criar', compact('variaveis'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         ControleController::autoriza($this->class, 'create');
-        $regras = [
-            'modalidade' => 'required|max:191',
-            'titulo' => 'required|max:191',
-            'nrlicitacao' => 'required|max:191',
-            'nrprocesso' => 'required|max:191',
-            'situacao' => 'required|max:191',
-            'objeto' => 'required',
-            'datarealizacao' => 'required',
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'nrlicitacao.required' => 'O nº da licitação é obrigatório',
-            'nrprocesso.required' => 'O nº do processo é obrigatório',
-            'datarealizacao.required' => 'Informe a data de realização da Licitação',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
         
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
         
@@ -162,12 +159,6 @@ class LicitacaoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -176,33 +167,10 @@ class LicitacaoController extends Controller
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         ControleController::autoriza($this->class, 'edit');
-        $regras = [
-            'modalidade' => 'required|max:191',
-            'titulo' => 'required|max:191',
-            'nrlicitacao' => 'required|max:191',
-            'nrprocesso' => 'required|max:191',
-            'situacao' => 'required|max:191',
-            'objeto' => 'required',
-            'datarealizacao' => 'required',
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'nrlicitacao.required' => 'O nº da licitação é obrigatório',
-            'nrprocesso.required' => 'O nº do processo é obrigatório',
-            'datarealizacao.required' => 'Informe a data de realização da Licitação',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
+        $erros = $request->validate($this->regras(), $this->mensagens());
         
         $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
         
@@ -227,12 +195,6 @@ class LicitacaoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
@@ -246,11 +208,6 @@ class LicitacaoController extends Controller
             ->with('class', 'alert-danger');
     }
 
-    /**
-     * Mostra a lixeira de licitações
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function lixeira()
     {
         ControleController::autorizaStatic(['1']);
@@ -286,12 +243,6 @@ class LicitacaoController extends Controller
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    /**
-     * Restaura licitação deletada
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function restore($id)
     {
         ControleController::autorizaStatic(['1']);
