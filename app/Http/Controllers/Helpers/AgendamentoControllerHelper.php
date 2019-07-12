@@ -125,6 +125,16 @@ class AgendamentoControllerHelper extends Controller
         return $status;
     }
 
+    public static function servicosCompletos()
+    {
+        return [
+            'Refis para PF',
+            'Refis para PJ',
+            'Refis para PF e PJ',
+            'Outro'
+        ];
+    }
+
     public static function txtAgendamento($dia, $hora, $status, $protocolo, $id)
     {
         $now = date('Y-m-d');

@@ -3,6 +3,7 @@
     $status = App\Http\Controllers\Helpers\AgendamentoControllerHelper::status();
     use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
     $now = date('Y-m-d');
+    $servicos = App\Http\Controllers\Helpers\AgendamentoControllerHelper::servicosCompletos();
 @endphp
 <div class="card-body pt-3 pl-3">
     <div class="col">
@@ -112,10 +113,61 @@
         </div>
         <div class="form-row mt-2">
             <div class="col">
+                <label for="tiposervico">Tipo de serviço</label>
+                <select name="tiposervico" class="form-control">
+                @foreach($servicos as $servico)
+                    @if(!empty(old('tiposervico')))
+                        @if(old('tiposervico') === $servico)
+                            <option value="{{ $servico }}" selected>{{ $servico }}</option>
+                        @else
+                            <option value="{{ $servico }}">{{ $servico }}</option>
+                        @endif
+                    @else
+                        @if(isset($resultado))
+                            @if($resultado->tiposervico === $servico)
+                                <option value="{{ $servico }}" selected>{{ $servico }}</option>
+                            @else
+                                <option value="{{ $servico }}">{{ $servico }}</option>
+                            @endif
+                        @else
+                            <option value="{{ $servico }}">{{ $servico }}</option>
+                        @endif
+                    @endif
+                @endforeach
+                </select>
+            </div>
+            <div class="col">
+                <label for="status">Status</label>
+                <select name="status" class="form-control">
+                <option value="">Nulo</option>
+                @foreach($status as $s)
+                    @if(!empty(old('status')))
+                        @if(old('status') === $s)
+                            <option value="{{ $s }}" selected>{{ $s }}</option>
+                        @else
+                            <option value="{{ $s }}">{{ $s }}</option>
+                        @endif
+                    @else
+                        @if(isset($resultado))
+                            @if($resultado->status == $s)
+                            <option value="{{ $s }}" selected>{{ $s }}</option>
+                            @else
+                            <option value="{{ $s }}">{{ $s }}</option>
+                            @endif
+                        @else
+                        <option value="{{ $s }}">{{ $s }}</option>
+                        @endif
+                    @endif
+                @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="form-row mt-2">
+            <div class="col">
                 <label for="idregional">Regional</label>
                 <select name="idregional"
                     class="form-control"
-                    disabled
+                    readonly
                     />
                 @foreach($regionais as $regional)
                     @if(isset($resultado))
@@ -155,31 +207,6 @@
                             @endif
                         @else
                         <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
-                        @endif
-                    @endif
-                @endforeach
-                </select>
-            </div>
-            <div class="col">
-                <label for="status">Status</label>
-                <select name="status" class="form-control">
-                <option value="">Nulo</option>
-                @foreach($status as $s)
-                    @if(!empty(old('status')))
-                        @if(old('status') === $s)
-                            <option value="{{ $s }}" selected>{{ $s }}</option>
-                        @else
-                            <option value="{{ $s }}">{{ $s }}</option>
-                        @endif
-                    @else
-                        @if(isset($resultado))
-                            @if($resultado->status == $s)
-                            <option value="{{ $s }}" selected>{{ $s }}</option>
-                            @else
-                            <option value="{{ $s }}">{{ $s }}</option>
-                            @endif
-                        @else
-                        <option value="{{ $s }}">{{ $s }}</option>
                         @endif
                     @endif
                 @endforeach
