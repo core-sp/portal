@@ -419,6 +419,7 @@ class AgendamentoController extends Controller
             'email' => 'required|email|max:191',
             'cpf' => 'required|max:191',
             'celular' => 'required|max:191',
+            'tiposervico' => 'required|max:191',
             'regional' => 'max:191',
             'atendente' => 'max:191',
             'status' => 'max:191',
@@ -440,6 +441,7 @@ class AgendamentoController extends Controller
             'email' => request('email'),
             'cpf' => request('cpf'),
             'celular' => request('celular'),
+            'tiposervico' => request('tiposervico'),
             'idregional' => request('idregional'),
             'idusuario' => request('idusuario'),
             'status' => $status
