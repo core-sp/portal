@@ -185,32 +185,37 @@
             <div class="col">
                 <label for="atendente">Atendimento realizado por:</label>
                 <select name="idusuario"
-                    class="form-control"
+                    class="form-control {{ $errors->has('idusuario') ? 'is-invalid' : '' }}"
                     @if($now < $resultado->dia)
                     disabled
                     @endif
                     />
-                <option value="">Ninguém</option>
-                @foreach($atendentes as $atendente)
-                    @if(!empty(old('idusuario')))
-                        @if(old('idusuario') == $atendente->idusuario)
-                            <option value="{{ $atendente->idusuario }}" selected>{{ $atendente->nome }}</option>
+                    <option value="">Ninguém</option>
+                    @foreach($atendentes as $atendente)
+                        @if(!empty(old('idusuario')))
+                            @if(old('idusuario') == $atendente->idusuario)
+                                <option value="{{ $atendente->idusuario }}" selected>{{ $atendente->nome }}</option>
+                            @else
+                                <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
+                            @endif
                         @else
-                            <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
-                        @endif
-                    @else
-                        @if(isset($resultado))
-                            @if($resultado->idusuario == $atendente->idusuario)
-                            <option value="{{ $atendente->idusuario }}" selected>{{ $atendente->nome }}</option>
+                            @if(isset($resultado))
+                                @if($resultado->idusuario == $atendente->idusuario)
+                                <option value="{{ $atendente->idusuario }}" selected>{{ $atendente->nome }}</option>
+                                @else
+                                <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
+                                @endif
                             @else
                             <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
                             @endif
-                        @else
-                        <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
                         @endif
-                    @endif
-                @endforeach
+                    @endforeach
                 </select>
+                @if($errors->has('idusuario'))
+                <div class="invalid-feedback">
+                {{ $errors->first('idusuario') }}
+                </div>
+                @endif
             </div>
         </div>
         <div class="form-row mt-4">

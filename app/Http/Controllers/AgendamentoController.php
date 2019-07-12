@@ -421,12 +421,13 @@ class AgendamentoController extends Controller
             'celular' => 'required|max:191',
             'tiposervico' => 'required|max:191',
             'regional' => 'max:191',
-            'atendente' => 'max:191',
+            'idusuario' => 'max:191|required_if:status,==,Compareceu',
             'status' => 'max:191',
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
+            'required_if' => 'Informe o atendente que realizou o atendimento',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
             'email' => 'Email inválido'
         ];
