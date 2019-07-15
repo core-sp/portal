@@ -156,7 +156,7 @@ class AgendamentoSiteController extends Controller
             $checaProtocolo = Agendamento::where('protocolo',$random)->get();
         } while(!$checaProtocolo->isEmpty()); 
         $emailUser = $request->input('email');
-        $nomeUser = $request->input('nome');
+        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
         //Inputa os dados
         $agendamento = new Agendamento();
         $agendamento->nome = $nomeUser;
