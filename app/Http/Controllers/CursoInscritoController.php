@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Input;
 use App\Events\ExternoEvent;
 use Response;
 use Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
 class CursoInscritoController extends Controller
@@ -126,7 +127,9 @@ class CursoInscritoController extends Controller
     {
         ControleController::autoriza($this->class, 'create');
         $regras = [
-            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.request('idcurso').',deleted_at,NULL', new Cpf],
+            'cpf' => ['required', 'max:191', new Cpf, Rule::unique('curso_inscritos')->where(function ($q) use ($request) {
+                return $q->where('idcurso', $request->input('idcurso'));
+            })],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191|min:14',
             'email' => 'required|email|max:191',
@@ -141,8 +144,17 @@ class CursoInscritoController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $save = CursoInscrito::create(request(['cpf', 'nome', 'telefone',
-        'email', 'registrocore', 'idcurso', 'idusuario']));
+        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
+
+        $save = CursoInscrito::create([
+            'cpf' => request('cpf'),
+            'nome' => $nomeUser,
+            'telefone' => request('telefone'),
+            'email' => request('email'),
+            'registrocore' => request('registrocore'),
+            'idcurso' => request('idcurso'),
+            'idusuario' => request('idusuario')
+        ]);
 
         if(!$save)
             abort(500);
@@ -170,7 +182,9 @@ class CursoInscritoController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $idcurso = $request->input('idcurso');
         $regras = [
-            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
+            'cpf' => ['required', 'max:191', new Cpf, Rule::unique('curso_inscritos')->where(function ($q) use ($idcurso, $id) {
+                return $q->where('idcurso', $idcurso)->where('idcursoinscrito','!=',$id);
+            })],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191',
             'email' => 'required|email|max:191|min:14',
@@ -184,10 +198,11 @@ class CursoInscritoController extends Controller
             'email' => 'Digite um email válido'
         ];
         $erros = $request->validate($regras, $mensagens);
+        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
 
         $inscrito = CursoInscrito::findOrFail($id);
         $inscrito->cpf = $request->input('cpf');
-        $inscrito->nome = $request->input('nome');
+        $inscrito->nome = $nomeUser;
         $inscrito->telefone = $request->input('telefone');
         $inscrito->email = $request->input('email');
         $inscrito->registrocore = $request->input('registrocore');
@@ -249,10 +264,11 @@ class CursoInscritoController extends Controller
             return Redirect::back()->withErrors($validation)->withInput($request->all());
         }
         $emailUser = $request->input('email');
+        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
         // Inputa dados no Banco de Dados
         $inscrito = new CursoInscrito();
         $inscrito->cpf = $request->input('cpf');
-        $inscrito->nome = $request->input('nome');
+        $inscrito->nome = $nomeUser;
         $inscrito->telefone = $request->input('telefone');
         $inscrito->email = $emailUser;
         $inscrito->registrocore = $request->input('registrocore');

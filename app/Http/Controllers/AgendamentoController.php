@@ -437,8 +437,9 @@ class AgendamentoController extends Controller
             $status = $request->input('status');
         else
             $status = 'Compareceu';
+        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
         $update = Agendamento::findOrFail($id)->update([
-            'nome' => request('nome'),
+            'nome' => $nomeUser,
             'email' => request('email'),
             'cpf' => request('cpf'),
             'celular' => request('celular'),
