@@ -16,9 +16,9 @@
 </section>
 
 <section id="pagina-erro">
-  <div class="containter text-center">
+  <div class="container text-center">
     @if($exception->getMessage())
-      {{ $exception->getMessage() }}
+      <h4 class="font-normal">{{ $exception->getMessage() }}</h4>
     @else
       Oops, houve algum problema!
     @endif

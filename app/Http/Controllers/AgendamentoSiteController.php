@@ -107,6 +107,15 @@ class AgendamentoSiteController extends Controller
         }
     }
 
+    protected function bloqueioPorFalta($cpf)
+    {
+        $count = Agendamento::where('cpf',$cpf)
+            ->where('status', 'Não Compareceu')
+            ->count();
+        if($count >= 3)
+            return true;
+    }
+
     public function store(Request $request)
     {
         $regras = [
@@ -146,6 +155,9 @@ class AgendamentoSiteController extends Controller
         // Limita em até dois atendimentos por CPF por dia
         if(!$this->limiteCpf($dia, $cpf))
             abort(500, 'É permitido apenas 2 agendamentos por CPF por dia!');
+        // Cria bloqueio caso o usuário tenha faltado 3 vezes
+        if($this->bloqueioPorFalta($cpf))
+            abort(405, 'Agendamento bloqueado por excesso de falta. Favor entrar em contato com o Core-SP para regularizar o agendamento.');
         // Monta a string de tipo de serviço
         $tiposervico = $request->input('servico').' para '.$request->input('pessoa');
         // Gera a HASH (protocolo) aleatória
