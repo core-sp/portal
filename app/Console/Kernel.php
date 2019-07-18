@@ -60,7 +60,7 @@ class Kernel extends ConsoleKernel
                         $body .= '----------';
                         $body .= '</p>';
                         $body .= '<p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
+                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
                         $body .= '</p>';
                         try {
                             Mail::to($user->email)
@@ -94,7 +94,7 @@ class Kernel extends ConsoleKernel
                         }
                         $body .= AgendamentoControllerHelper::tabelaEmailBot();
                         $body .= '<p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
+                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
                         $body .= '</p>';
                         $regional = 'nas Seccionais';
                         try {
@@ -128,7 +128,7 @@ class Kernel extends ConsoleKernel
                         }
                         $body .= AgendamentoControllerHelper::tabelaEmailBot();
                         $body .= '<p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
+                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
                         $body .= '</p>';
                         try {
                             Mail::to($user->email)
@@ -161,7 +161,7 @@ class Kernel extends ConsoleKernel
                         }
                         $body .= AgendamentoControllerHelper::tabelaEmailBot();
                         $body .= '<p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para maiores informações.';
+                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
                         $body .= '</p>';
                         $regional = 'em São Paulo e Seccionais';
                         try {

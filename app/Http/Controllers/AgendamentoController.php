@@ -387,6 +387,7 @@ class AgendamentoController extends Controller
         $busca = Input::get('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Agendamento::where('nome','LIKE','%'.$busca.'%')
+            ->orWhere('idagendamento','LIKE', $busca)
             ->orWhere('cpf','LIKE','%'.$busca.'%')
             ->orWhere('email','LIKE','%'.$busca.'%')
             ->orWhere('protocolo','LIKE','%'.$busca.'%')
