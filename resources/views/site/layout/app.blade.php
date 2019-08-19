@@ -198,7 +198,7 @@ use \App\Http\Controllers\Helper;
               </div>
               <p class="branco mb-1">
                 Av. Brigadeiro Luís Antônio, 613
-                <br />Térreo - CEP: 01317-000
+                <br />5º andar - CEP: 01317-000
                 <br />São Paulo - SP
                 <br />CNPJ: 60.746.179/0001-52
               </p>
