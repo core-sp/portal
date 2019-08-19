@@ -30,9 +30,10 @@
       @endif
       <div class="direct-chat-msg right">
         <img class="direct-chat-img border border-dark" src="{{ asset('img/user.png') }}" alt="USER">
-          <div class="direct-chat-text">
-          <h5 class="mb-1">{{ $resultado->tipo }}</h5>
-          <p class="mb-0"><i>({{ Helper::formataData($resultado->created_at) }}):</i> {{ $resultado->mensagem }}</p>
+        <div class="direct-chat-text">
+          <h5 class="mb-0">{{ $resultado->tipo }}</h5>
+          <small>(Criado por: {{ $resultado->user->nome }} - {{ Helper::formataData($resultado->created_at) }})</small>
+          <p class="mt-2 mb-2"><i>Mensagem:</i> {{ $resultado->mensagem }}</p>
           @if(isset($resultado->img))
           <hr>
           <p><i>(Anexo)</i></p>
