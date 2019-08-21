@@ -3,7 +3,7 @@
 @section('content')
 
 @php
-use \App\Http\Controllers\Helper;
+  use \App\Http\Controllers\Helper;
 @endphp
 
 <section class="mt-1">
@@ -68,46 +68,70 @@ use \App\Http\Controllers\Helper;
       </div>
     </div>
     <div class="row">
-      <div class="col-lg-3 col-sm-6 pb-15-992">
+      <div class="col-lg-3 offset-lg-1-5 col-sm-6 pb-15">
         <a href="/cartilha-do-representante" class="d-block h-100">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
-              <img src="{{ asset('img/open-book.png') }}" class="inside-img" />
+              <img src="{{ asset('img/open-book.png') }}" class="inside-img" alt="Cartilha do Representante | Core-SP" />
               <p class="text-uppercase mt-3 branco">Cartilha do<br class="hide-992" /> Representante</p>
               <button class="btn-box">Visualizar</button>
             </div>
           </div>
         </a>
       </div>
-      <div class="col-lg-3 col-sm-6 pb-15-992">
+      <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/balcao-de-oportunidades" class="d-block h-100">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
-              <img src="{{ asset('img/001-work.png') }}" class="inside-img" />
+              <img src="{{ asset('img/001-work.png') }}" class="inside-img" alt="Balcão de Oportunidades | Core-SP" />
               <p class="text-uppercase mt-3 branco">Balcão de Oportunidades</p>
               <button class="btn-box">Acessar</button>
             </div>
           </div>
         </a>
       </div>
-      <div class="col-lg-3 col-sm-6 pb-15-992">
+      <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/resolucoes-anuidade-taxas-e-emolumentos" class="d-block h-100">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
-              <img src="{{ asset('img/003-bill.png') }}" class="inside-img" />
+              <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
               <p class="text-uppercase mt-3 branco">Anuidade 2019<br class="hide-992" /> taxas e emolumentos</p>
               <button href="#" class="btn-box">ACESSAR</button>
             </div>
           </div>
         </a>
       </div>
-      <div class="col-lg-3 col-sm-6 pb-15-992">
+
+      <div class="col-lg-3 offset-lg-1-5 col-sm-6 pb-15">
         <a href="/agendamento" class="d-block h-100">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
-              <img src="{{ asset('img/appointment.png') }}" class="inside-img" />
+              <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
               <p class="text-uppercase mt-3 branco">Agendamento<br class="hide-992" /> para refis</p>
               <button class="btn-box">Agendar</button>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-lg-3 col-sm-6 text-right pb-15">
+        <a href="/simulador" class="d-block h-100">
+          <div class="box text-center azul-escuro-bg h-100">
+            <div class="inside-box">
+              <img src="{{ asset('img/001-paper.png') }}" alt="Simulador | Core-SP">
+              <p class="text-uppercase mt-3 branco">Simulador de<br class="hide-992" /> cálculos</p>
+              <button class="btn-box">Acessar</button>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="#" class="d-block h-100">
+          <div class="box text-center azul-bg h-100">
+            <div class="inside-box">
+              <img src="{{ asset('img/002-list.png') }}" alt="Consulta de Ativos | Core-SP">
+              <p class="text-uppercase mt-3 branco">Consulta<br class="hide-992" /> de ativos</p>
+              <h5 class="mt-4 text-white">EM BREVE</h5>
+              {{-- <button class="btn-box">Acessar</button> --}}
             </div>
           </div>
         </a>
@@ -186,7 +210,7 @@ use \App\Http\Controllers\Helper;
             <a href="/agendamento-consulta">
               <div class="row nomargin">
                 <div class="align-self-center">
-                  <img src="{{ asset('img/002-phone-book-.png') }}" class="inside-img" alt="">
+                  <img src="{{ asset('img/002-phone-book-.png') }}" class="inside-img" alt="Consulta de Agendamento | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
                   <h5 class="normal">Consulte seu<br class="hide-992" /> agendamento</h5>
@@ -198,7 +222,7 @@ use \App\Http\Controllers\Helper;
             <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
               <div class="row nomargin">
                 <div class="align-self-center">
-                  <img src="{{ asset('img/001-whatsapp-.png') }}" class="inside-img" alt="">
+                  <img src="{{ asset('img/001-whatsapp-.png') }}" class="inside-img" alt="WhatsApp | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
                   <h5 class="normal">Entre em contato<br class="hide-992" /> pelo WhatsApp</h5>
@@ -210,7 +234,7 @@ use \App\Http\Controllers\Helper;
             <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
               <div class="row nomargin">
                 <div class="align-self-center">
-                  <img src="{{ asset('img/003-youtube-.png') }}" class="inside-img" alt="">
+                  <img src="{{ asset('img/003-youtube-.png') }}" class="inside-img" alt="YouTube | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
                   <h5 class="normal">Institucional 2019<br class="hide-992" /> e informativos</h5>
@@ -221,7 +245,7 @@ use \App\Http\Controllers\Helper;
           <div class="col-lg-6 faleSingle">
             <div class="row nomargin">
               <div class="align-self-center">
-                <img src="{{ asset('img/004-headset-.png') }}" class="inside-img" alt="">
+                <img src="{{ asset('img/004-headset-.png') }}" class="inside-img" alt="Atendimento | Core-SP">
               </div>
               <div class="flex-one fale-txt align-self-center">
                 <h5 class="normal">Atendimento<br class="hide-992" /> (11) 3243-5500</h5>
@@ -240,7 +264,7 @@ use \App\Http\Controllers\Helper;
       <div class="col-12">
         <div class="beneficios-box row nomargin">
           <div class="col-lg-5 hide-992">
-            <img class="lazy" data-src="{{ asset('img/benef-v2.png') }}" id="computer" />
+            <img class="lazy" data-src="{{ asset('img/benef-v2.png') }}" id="computer" alt="Programa de Benefícios | Core-SP" />
           </div>
           <div class="col-lg-7 beneficios-txt center-992">
             <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
@@ -268,32 +292,32 @@ use \App\Http\Controllers\Helper;
         <div class="row">
           <div class="col-sm-8">
             <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-              <img class="lazy" data-src="{{ asset('img/computer.png') }}" />
+              <img class="lazy" data-src="{{ asset('img/computer.png') }}" alt="E-OUV | Core-SP" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 eouv-imgs align-self-center pl-3 center-992">
             <div class="m-auto pb-3">
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/ie-1.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" />
+                <img src="{{ asset('img/ie-1.png') }}" class="azul-bg" data-toggle="tooltip" title="Fale Conosco" alt="Fale Conosco | Core-SP" />
               </a>
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/ie-2.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Ouvidoria" />
+                <img src="{{ asset('img/ie-2.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Ouvidoria" alt="Ouvidoria | Core-SP" />
               </a>
             </div>
             <div class="m-auto pb-3">
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/ie-3.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Elogios" />
+                <img src="{{ asset('img/ie-3.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Elogios" alt="Elogios | Core-SP" />
               </a>
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/ie-4.png') }}" class="azul-bg" data-toogle="tooltip" title="Sugestões" />
+                <img src="{{ asset('img/ie-4.png') }}" class="azul-bg" data-toogle="tooltip" title="Sugestões" alt="Sugestões | Core-SP" />
               </a>
             </div>
             <div class="m-auto">
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/ie-5.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Reclamações" />
+                <img src="{{ asset('img/ie-5.png') }}" class="azul-escuro-bg" data-toogle="tooltip" title="Reclamações" alt="Reclamações | Core-SP" />
               </a>
               <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank">
-                <img src="{{ asset('img/ie-6.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Dúvidas" />
+                <img src="{{ asset('img/ie-6.png') }}" class="verde-escuro-bg" data-toogle="tooltip" title="Dúvidas" alt="Dúvidas | Core-SP" />
               </a>
             </div>
           </div>
@@ -309,7 +333,7 @@ use \App\Http\Controllers\Helper;
         <div id="calendario" class="row">
           <div class="col-sm-8">
             <a href="/calendario-2019">
-              <img class="lazy" data-src="{{ asset('img/calendario.png') }}" />
+              <img class="lazy" data-src="{{ asset('img/calendario.png') }}" alt="Calendário | Core-SP" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 align-self-center text-right pr-4">

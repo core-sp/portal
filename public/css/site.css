@@ -288,6 +288,12 @@ figure.align-left {
 	margin-bottom: 1rem;
 }
 
+@media (min-width: 992px) {
+	.offset-lg-1-5 {
+		margin-left: 12.4999995%;
+	}
+}
+
 
 /*
  * REGRAS DO CABEÇALHO
@@ -584,7 +590,7 @@ figure.align-left {
 
 .inside-box {
 	border: 1px solid #FFFFFF;
-	padding: 2.1rem;
+	padding: 1.5rem;
 	border-radius: 5px;
 	height: 100%;
 }
@@ -611,7 +617,7 @@ figure.align-left {
 	font-size: 1.1rem;
 	display: inline-block;
 	transition: .3s;
-	margin-top: 1.5rem;
+	margin-top: 1.1rem;
 }
 
 .btn-box:hover {
@@ -970,11 +976,30 @@ footer p {
 
 .pesquisaLicitacao label,
 .inscricaoCurso label,
-.consultaAgendamento label {
+.consultaAgendamento label,
+.simulador label {
 	font-size: 0.85rem;
 	margin-bottom: 0.25rem;
 	margin-left: .25rem;
 	color: #444444;
+}
+
+.blank-row {
+	border-top: 2px solid #dee2e6;
+	border-bottom: 2px solid #dee2e6;
+	height: 0px;
+}
+
+#simuladorAddons {
+	display: none;
+}
+
+.border-3 {
+	border-bottom-width: 4px !important;
+}
+
+.blank-row td {
+	padding: 0px;
 }
 
 .pesquisaLicitacao .btn {
@@ -1337,7 +1362,8 @@ footer p {
 /*
  * PÁGINA DE AGENDAMENTO
  */
-#datepicker:hover {
+#datepicker:hover,
+#dataInicio:hover {
 	cursor: pointer;
 }
 
@@ -1397,6 +1423,10 @@ footer p {
 	background-color: #E8F0FE;
 }
 
+.pb-15 {
+	padding-bottom: 15px;
+}
+
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS
@@ -1450,7 +1480,7 @@ footer p {
 	}
 
 	.inside-box {
-		padding: 1.9rem;
+		padding: 1.35rem;
 	}
 
 	.box-news {
@@ -1532,7 +1562,7 @@ footer p {
 	}
 
 	.inside-box {
-		padding: 1.5rem;
+		padding: 1.2rem;
 	}
 
 	.beneficios-box {
@@ -1694,7 +1724,7 @@ footer p {
 	}
 
 	.inside-box {
-		padding: 2rem;
+		padding: 1.45rem;
 	}
 
 	.btn-atendimento {
@@ -2161,7 +2191,7 @@ footer p {
 	}
 
 	.btn-box {
-		margin-top: 1.2rem;
+		margin-top: 1rem;
 	}
 
 	.curso-grid-content {
