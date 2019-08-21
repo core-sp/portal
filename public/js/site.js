@@ -6,6 +6,7 @@ $(document).ready(function(){
 	$('.nrlicitacaoInput').mask('999/9999');
 	$('.nrprocessoInput').mask('999/9999');
 	$('.dataInput').mask('00/00/0000');
+	$('.capitalSocial').mask('#.##0,00', {reverse: true});
 	$('.protocoloInput').mask('ZZZZZZ', {
 	  translation: {
 		  'Z': {
@@ -176,6 +177,40 @@ function noWeekendsOrHolidays(date) {
 				}
 			});
 		});
+	});
+})(jQuery);
+
+// Simulador
+(function($){
+	$('#tipoPessoa').on('change', function(){
+		if ($('#tipoPessoa').val() == 1) {
+			$('#simuladorAddons').show();
+			$('#simuladorAddons').css('display','flex');
+		} else {
+			$('#simuladorAddons').hide();
+			$('#filial').prop('disabled', 'disabled').val('');
+		}
+	});
+	// Calendário Simulador
+	$('#dataInicio').datepicker({
+		dateFormat: 'dd/mm/yy',
+		dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+		dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+		dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+		monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+		monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+		nextText: 'Próximo',
+		prevText: 'Anterior',
+		maxDate: '0',
+		minDate: '-48m',
+	});
+	// Filial
+	$("#filialCheck").change(function() {
+		if(this.checked) {
+			$('#filial').prop('disabled', false);
+		} else {
+			$('#filial').prop('disabled', 'disabled').val('');
+		}
 	});
 })(jQuery);
 

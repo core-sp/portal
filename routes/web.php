@@ -253,6 +253,10 @@ Route::prefix('/')->group(function() {
   // Feiras
   Route::get('feiras', 'SiteController@feiras');
 
+  // Simulador
+  Route::get('simulador', 'SimuladorController@view');
+  Route::post('simulador', 'SimuladorController@extrato');
+
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaSiteController@show');
   Route::get('{categoria}/{slug}', 'PaginaSiteController@showCategoria');

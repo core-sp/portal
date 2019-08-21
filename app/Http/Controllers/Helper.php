@@ -132,4 +132,43 @@ class Helper extends Controller
         $add = substr_replace($string,'thumbnails/'.$str,$num);
         return $add;
     }
+
+    public static function listaCores()
+    {
+        return [
+            1 => 'Core-AL',
+            2 => 'Core-AM',
+            3 => 'Core-BA',
+            4 => 'Core-CE',
+            5 => 'Core-DF',
+            6 => 'Core-ES',
+            7 => 'Core-GO',
+            8 => 'Core-MA',
+            9 => 'Core-MG',
+            10 => 'Core-MS',
+            11 => 'Core-MT',
+            12 => 'Core-PA',
+            13 => 'Core-PB',
+            14 => 'Core-PE',
+            15 => 'Core-PI',
+            16 => 'Core-PR',
+            17 => 'Core-RJ',
+            18 => 'Core-RN',
+            19 => 'Core-RO',
+            20 => 'Core-RS',
+            21 => 'Core-SC',
+            22 => 'Core-SE',
+            23 => 'Core-TO',
+            24 => 'Core-SP'
+        ];
+    }
+
+    public static function tipoPessoa()
+    {
+        return [
+            2 => 'Física',
+            5 => 'Física RT',
+            1 => 'Jurídica'
+        ];
+    }
 }
