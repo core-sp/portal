@@ -14,9 +14,7 @@ class FirebirdConnection
         try {
             $this->connection = new PDO('firebird:dbname='.$this->config()->host.':'.$this->config()->dbname.';charset=UTF8',
                                         $this->config()->username,
-                                        $this->config()->password,
-                                        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-            die(json_encode(['outcome' => true]));
+                                        $this->config()->password);
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
