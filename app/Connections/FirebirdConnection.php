@@ -3,6 +3,7 @@
 namespace App\Connections;
 
 use PDO;
+use PDOException;
 
 class FirebirdConnection
 {
@@ -10,7 +11,13 @@ class FirebirdConnection
 
     public function __construct()
     {
-        $this->connection = new PDO('firebird:dbname='.$this->config()->host.':'.$this->config()->dbname.';charset=UTF8', $this->config()->username, $this->config()->password);
+        try {
+            $this->connection = new PDO('firebird:dbname='.$this->config()->host.':'.$this->config()->dbname.';charset=UTF8', $this->config()->username, $this->config()->password);
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+
+        return $this->connection;
     }
 
     protected function config()
