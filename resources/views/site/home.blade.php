@@ -118,7 +118,7 @@
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/001-paper.png') }}" alt="Simulador | Core-SP">
-              <p class="text-uppercase mt-3 branco">Simulador de<br class="hide-992" /> cálculos</p>
+              <p class="text-uppercase mt-3 branco">Simulador de<br class="hide-992" /> valores</p>
               <button class="btn-box">Acessar</button>
             </div>
           </div>
