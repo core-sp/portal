@@ -45,12 +45,12 @@
                 <label for="tipoPessoa">Tipo de Pessoa</label>
                 <select name="tipoPessoa" id="tipoPessoa" class="form-control">
                   @foreach(SimuladorControllerHelper::tipoPessoa() as $key => $tipo)
-                    <option value="{{ $key }}" {{ Input::get('tipoPessoa') == $key ? 'selected' : '' }}>{{ $tipo }}</option>
+                    <option value="{{ $key }}" {{ Input::get('tipoPessoa') == $key || old('tipoPessoa') == $key ? 'selected' : '' }}>{{ $tipo }}</option>
                   @endforeach
                 </select>
               </div>
               <div class="col">
-                <label for="dataInicio">Data de início das atividades</label>
+                <label for="dataInicio">Data de início das atividades *</label>
                 <input
                   type="text"
                   name="dataInicio"
@@ -60,6 +60,7 @@
                   placeholder="dd/mm/aaaa"
                   autocomplete="off"
                   readonly
+                  required
                 />
                 @if($errors->has('dataInicio'))
                   <div class="invalid-feedback">
@@ -68,7 +69,7 @@
                 @endif
               </div>
             </div>
-            <div class="form-row mt-2" id="simuladorAddons" style="{{ Input::get('tipoPessoa') == 1 ? 'display: flex;' : '' }}">
+            <div class="form-row mt-2" id="simuladorAddons" style="{{ Input::get('tipoPessoa') === '1' || old('tipoPessoa') === '1' ? 'display: flex;' : '' }}">
               <div class="col-6">
                 <label for="capitalSocial">Capital Social</label>
                 <div class="input-group">
