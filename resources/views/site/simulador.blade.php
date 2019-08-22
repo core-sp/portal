@@ -13,7 +13,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Simulador de Cálculos para Registro inicial
+          Simulador de Valores para Registro inicial
         </h1>
       </div>
     </div>
