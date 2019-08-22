@@ -134,7 +134,7 @@
         @if(isset($total) || isset($extrato) || isset($taxas))
         <div class="row nomargin mt-4">
           <h4 class="mb-1">Pessoa {{ SimuladorControllerHelper::tipoPessoa()[Input::get('tipoPessoa')] }} {{ Input::get('filial') && Input::get('filial') !== '50' ? ' (' . SimuladorControllerHelper::listaCores()[Input::get('filial')] . ')' : '' }}</h4>
-          <table class="table table-sm table-hover mb-0">
+          <table class="table table-sm table-hover mb-0 tableSimulador">
             <thead>
               <tr>
                 <th class="border-3">Descrição</th>
@@ -164,7 +164,7 @@
           </table>
           @if(isset($rt))
             <h4 class="mb-1">Pessoa Física RT</h4>
-            <table class="table table-sm table-hover mb-0">
+            <table class="table table-sm table-hover mb-0 tableSimulador">
               <thead>
                 <th class="border-3">Descrição</th>
                 <th class="border-3">Valor</th>
