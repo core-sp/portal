@@ -216,6 +216,10 @@ function getDate() {
 		maxDate: '0',
 		minDate: '-48m',
 	}
+	// Mostra loading button
+	$('#submitSimulador').on('click', function(){
+		$('#loadingSimulador').css('display', 'inline-block');
+	});
 	// Calendário Simulador
 	$('#dataInicio').datepicker(options);
 	// Datepicker options
