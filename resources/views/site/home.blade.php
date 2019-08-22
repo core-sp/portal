@@ -128,8 +128,8 @@
         <a href="#" class="d-block h-100">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
-              <img src="{{ asset('img/002-list.png') }}" alt="Consulta de Ativos | Core-SP">
-              <p class="text-uppercase mt-3 branco">Consulta<br class="hide-992" /> de ativos</p>
+              <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
+              <p class="text-uppercase mt-3 branco">Consulta<br class="hide-992" /> de situação</p>
               <h5 class="mt-4 text-white">EM BREVE</h5>
               {{-- <button class="btn-box">Acessar</button> --}}
             </div>

@@ -180,19 +180,31 @@ function noWeekendsOrHolidays(date) {
 	});
 })(jQuery);
 
+// Get now date
+function getDate() {
+	var today = new Date();
+
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; 
+	var yyyy = today.getFullYear();
+
+	if(dd<10) 
+	{
+		dd='0'+dd;
+	} 
+
+	if(mm<10) 
+	{
+		mm='0'+mm;
+	} 
+
+	return dd+'/'+mm+'/'+yyyy;
+}
+
 // Simulador
 (function($){
-	$('#tipoPessoa').on('change', function(){
-		if ($('#tipoPessoa').val() == 1) {
-			$('#simuladorAddons').show();
-			$('#simuladorAddons').css('display','flex');
-		} else {
-			$('#simuladorAddons').hide();
-			$('#filial').prop('disabled', 'disabled').val('');
-		}
-	});
-	// Calendário Simulador
-	$('#dataInicio').datepicker({
+	// Opções Datepicker
+	var options = {
 		dateFormat: 'dd/mm/yy',
 		dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
 		dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
@@ -203,6 +215,24 @@ function noWeekendsOrHolidays(date) {
 		prevText: 'Anterior',
 		maxDate: '0',
 		minDate: '-48m',
+	}
+	// Calendário Simulador
+	$('#dataInicio').datepicker(options);
+	// Datepicker options
+	if($('#tipoPessoa').val() != '1') {
+		$('#dataInicio').datepicker("destroy");
+	}
+	// Mudanças on change tipo de Pessoa
+	$('#tipoPessoa').on('change', function(){
+		if ($('#tipoPessoa').val() == 1) {
+			$('#simuladorAddons').show();
+			$('#simuladorAddons').css('display','flex');
+			$('#dataInicio').val('').datepicker(options);
+		} else {
+			$('#simuladorAddons').hide();
+			$('#filial').prop('disabled', 'disabled').val('');
+			$('#dataInicio').val(getDate()).datepicker("destroy");
+		}
 	});
 	// Filial
 	$("#filialCheck").change(function() {

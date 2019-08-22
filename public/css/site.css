@@ -1427,6 +1427,25 @@ footer p {
 	padding-bottom: 15px;
 }
 
+.textoSimulador h4 {
+	line-height: 1.3;
+}
+
+.textoSimulador p {
+	margin-bottom: 15px;
+	font-weight: 300;
+}
+
+.textoSimulador ol {
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+.textoSimulador ol li {
+	margin-bottom: 5px;
+	font-weight: 300;
+}
+
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS
