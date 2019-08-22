@@ -56,7 +56,13 @@
                   name="dataInicio"
                   id="dataInicio" 
                   class="form-control dataInput {{ $errors->has('dataInicio') ? 'is-invalid' : '' }}"
-                  value="{{ Input::get('dataInicio') ? Input::get('dataInicio') : date('d\/m\/Y') }}"
+                  @if(Input::get('dataInicio'))
+                    value="{{ Input::get('dataInicio') }}"
+                  @elseif($errors->has('dataInicio'))
+                    value=""
+                  @else
+                    value="{{ date('d\/m\/Y') }}"
+                  @endif
                   placeholder="dd/mm/aaaa"
                   autocomplete="off"
                   readonly
@@ -81,8 +87,7 @@
                     id="capitalSocial"
                     name="capitalSocial"
                     class="form-control capitalSocial"
-                    placeholder="1,00"
-                    value="{{ Input::get('capitalSocial') }}"
+                    value="{{ Input::get('capitalSocial') ? Input::get('capitalSocial') : '1,00' }}"
                     maxlength="15"
                   />
                 </div>
