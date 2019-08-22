@@ -4,7 +4,7 @@
 
 @php
     use Illuminate\Support\Facades\Input;
-    use \App\Http\Controllers\Helper;
+    use \App\Http\Controllers\Helpers\SimuladorControllerHelper;
 @endphp
 
 <section id="pagina-cabecalho" class="mt-1">
@@ -13,7 +13,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Simulador de Cálculos
+          Simulador de Cálculos para Registro inicial
         </h1>
       </div>
     </div>
@@ -26,7 +26,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h4 class="stronger">Representante já pode consultar, com mais facilidade, sua situação junto ao Conselho!</h4>
+            <h4 class="stronger">Representante já pode consultar, com mais facilidade, valores para registro inicial!</h4>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
@@ -38,18 +38,13 @@
     <div class="row mt-2" id="conteudo-principal">
       <div class="col-lg-8">
         <div class="row nomargin">
-          <p class="mb-2">O simulador de cálculos, novo serviço oferecido pelo Core-SP, é uma solução informatizada que permite a consulta sobre regularização dos registros e identificação de possíveis pendências financeiras junto ao Conselho.</p>
-          <p class="mb-2">Um recurso simples, ágil e moderno que visa contribuir para uma melhor administração do tempo de representantes comerciais e de seus contadores.</p>
-          <p class="mb-2">Importante ressaltar que as informações recebidas no simulador de cálculos são para simples conferência, devendo o profissional comparecer na sede ou seccionais, para eventual regularização, naquela data.</p>
-        </div>
-        <div class="row nomargin mt-3">
           <form method="post" class="w-100 simulador">
             @csrf
             <div class="form-row">
               <div class="col">
                 <label for="tipoPessoa">Tipo de Pessoa</label>
                 <select name="tipoPessoa" id="tipoPessoa" class="form-control">
-                  @foreach(Helper::tipoPessoa() as $key => $tipo)
+                  @foreach(SimuladorControllerHelper::tipoPessoa() as $key => $tipo)
                     <option value="{{ $key }}" {{ Input::get('tipoPessoa') == $key ? 'selected' : '' }}>{{ $tipo }}</option>
                   @endforeach
                 </select>
@@ -61,7 +56,7 @@
                   name="dataInicio"
                   id="dataInicio" 
                   class="form-control dataInput {{ $errors->has('dataInicio') ? 'is-invalid' : '' }}"
-                  value="{{ Input::get('dataInicio') }}"
+                  value="{{ Input::get('dataInicio') ? Input::get('dataInicio') : date('d\/m\/Y') }}"
                   placeholder="dd/mm/aaaa"
                   autocomplete="off"
                   readonly
@@ -104,7 +99,7 @@
                 </div>
                 <select name="filial" id="filial" class="form-control" {{ Input::get('filialCheck') == 'on' ? '' : 'disabled' }}>
                   <option value="50" {{ Input::get('filial') == 50 ? 'selected' : '' }}></option>
-                  @foreach(Helper::listaCores() as $key => $filial)
+                  @foreach(SimuladorControllerHelper::listaCores() as $key => $filial)
                     <option value="{{ $key }}" {{ Input::get('filial') == $key ? 'selected' : '' }}>{{ $filial }}</option>
                   @endforeach
                 </select>
@@ -131,8 +126,8 @@
         </div>
         @if(isset($total) || isset($extrato) || isset($taxas))
         <div class="row nomargin mt-4">
-          <h4 class="mb-1">Pessoa {{ Helper::tipoPessoa()[Input::get('tipoPessoa')] }} {{ Input::get('filial') && Input::get('filial') !== '50' ? ' (' . Helper::listaCores()[Input::get('filial')] . ')' : '' }}</h4>
-          <table class="table table-sm table-hover">
+          <h4 class="mb-1">Pessoa {{ SimuladorControllerHelper::tipoPessoa()[Input::get('tipoPessoa')] }} {{ Input::get('filial') && Input::get('filial') !== '50' ? ' (' . SimuladorControllerHelper::listaCores()[Input::get('filial')] . ')' : '' }}</h4>
+          <table class="table table-sm table-hover mb-0">
             <thead>
               <tr>
                 <th class="border-3">Descrição</th>
@@ -162,7 +157,7 @@
           </table>
           @if(isset($rt))
             <h4 class="mb-1">Pessoa Física RT</h4>
-            <table class="table table-sm table-hover">
+            <table class="table table-sm table-hover mb-0">
               <thead>
                 <th class="border-3">Descrição</th>
                 <th class="border-3">Valor</th>
@@ -191,6 +186,31 @@
             <h4 class="mt-2"><span class="light">Total geral:</span> R$ {{ $totalGeral  }}</h4>
           @endif
         </div>
+        @endif
+        @if(request('tipoPessoa') === '2')
+          <hr>
+          <div class="textoSimulador">
+            {!! SimuladorControllerHelper::textoPessoaFisica() !!}
+          </div>
+        @elseif(request('tipoPessoa') === '5')
+          <hr>
+          <div class="textoSimulador">
+            {!! SimuladorControllerHelper::textoPessoaFisicaRt() !!}
+          </div>
+        @elseif(request('tipoPessoa') === '1' && request('empresaIndividual') !== 'on')
+          <hr>
+          <div class="textoSimulador">
+            {!! SimuladorControllerHelper::textoPessoaJuridica() !!}
+          </div>
+        @elseif(request('tipoPessoa') === '1' && request('empresaIndividual') === 'on')
+          <hr>
+          <div class="textoSimulador">
+            {!! SimuladorControllerHelper::textoPessoaJuridicaEmpresaIndividual() !!}
+          </div>
+        @endif
+        @if(request('tipoPessoa') !== null)
+          <hr>
+          <p class="light">Simulação emitida em: <strong>{{ date('d\/m\/Y') }}</strong></p>
         @endif
       </div>
       <div class="col-lg-4">
