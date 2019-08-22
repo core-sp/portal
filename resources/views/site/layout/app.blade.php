@@ -17,7 +17,7 @@ use \App\Http\Controllers\Helper;
         <link type="text/css" href="{{ asset('/css/datepicker.css') }}" rel="stylesheet">
         <link type="text/css" href="{{ asset('/css/site.css') }}" rel="stylesheet">
 
-        @if(request()->getHttpHost() === 'core-sp.org.br')
+        @if(strstr(request()->getHttpHost(), 'core-sp.org.br'))
           <!-- Global site tag (gtag.js) - Google Analytics -->
           <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141375220-1"></script>
           <script>
