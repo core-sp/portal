@@ -27,7 +27,9 @@ $(document).ready(function(){
 			'.nav-item',
 			'.sidebar-header',
 			'#sidebar',
-			'.dropdown-item'
+			'.dropdown-item',
+			'.tableSimulador',
+			'label'
 		];
 		$(list).toggleClass('contraste');
 
@@ -87,7 +89,7 @@ $(document).ready(function(){
 		newFontP = parseInt($('p').css('font-size')) + 1;
 		maxP = 20;
 		if(newFontP <= maxP) {
-			$('p, .home-title h5, .conteudo-txt p, .conteudo-txt ul li').css('font-size', newFontP);
+			$('p, .home-title h5, .conteudo-txt p, .conteudo-txt ul li, .tableSimulador td, ol li').css('font-size', newFontP);
 		}
 		// Change P Mini
 		newFontPMini = parseInt($('p').css('font-size')) + 1;
@@ -120,7 +122,7 @@ $(document).ready(function(){
 		newMinFontP = parseInt($('p').css('font-size')) - 1;
 		minP = 12;
 		if(newMinFontP > minP) {
-			$('p, .home-title h5, .conteudo-txt p, .conteudo-txt ul li').css('font-size', newMinFontP);
+			$('p, .home-title h5, .conteudo-txt p, .conteudo-txt ul li, .tableSimulador td, ol li').css('font-size', newMinFontP);
 		}
 		// Change P Mini
 		newMinFontPMini = parseInt($('p').css('font-size')) - 1;
