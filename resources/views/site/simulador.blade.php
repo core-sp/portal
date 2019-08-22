@@ -193,6 +193,10 @@
             <h4 class="mt-2"><span class="light">Total geral:</span> R$ {{ $totalGeral  }}</h4>
           @endif
         </div>
+        <hr>
+        <div class="row nomargin">
+          <small><i>* Os valores calculados são de acordo com as informações preenchidas</i></small>
+        </div>
         @endif
         @if(request('tipoPessoa') === '2')
           <hr>
