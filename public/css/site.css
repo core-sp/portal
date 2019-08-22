@@ -1446,6 +1446,14 @@ footer p {
 	font-weight: 300;
 }
 
+#loadingSimulador {
+	display: none;
+}
+
+#loadingSimulador img {
+	height: 32px;
+}
+
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS

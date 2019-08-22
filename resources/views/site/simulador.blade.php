@@ -119,7 +119,8 @@
             </div>
             <div class="form-row mt-2">
               <div class="col">
-                <input type="submit" value="Simular {{ Input::has('dataInicio') ? ' novamente' : '' }}" class="btn btn-primary">
+                <input type="submit" value="Simular {{ Input::has('dataInicio') ? ' novamente' : '' }}" class="btn btn-primary" id="submitSimulador">
+                <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading"></div>
               </div>
             </div>
           </form>
