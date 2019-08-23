@@ -227,7 +227,7 @@ function getDate() {
 		$('#dataInicio').datepicker("destroy");
 	}
 	// Mudanças on change tipo de Pessoa
-	$('#tipoPessoa').on('change', function(){
+	$(document).on('change', '#tipoPessoa', function(){
 		if ($('#tipoPessoa').val() == 1) {
 			$('#simuladorAddons').show();
 			$('#simuladorAddons').css('display','flex');
@@ -239,7 +239,7 @@ function getDate() {
 		}
 	});
 	// Filial
-	$("#filialCheck").change(function() {
+	$(document).on('change', "#filialCheck", function() {
 		if(this.checked) {
 			$('#filial').prop('disabled', false);
 		} else {
