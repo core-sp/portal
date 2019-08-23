@@ -948,6 +948,8 @@ footer p {
 	transform: translateY(-50%);
 	left: 0;
 	right: 0;
+	padding-left: 15px;
+	padding-right: 15px;
 }
 
 #pagina-conteudo,
@@ -1454,6 +1456,10 @@ footer p {
 	height: 32px;
 }
 
+.nowrap {
+	white-space: nowrap;
+}
+
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS
@@ -1556,7 +1562,9 @@ footer p {
 		font-size: .8rem;
 	}
 	
-	p {
+	p, 
+	.tableSimulador td,
+	.textoSimulador ol li {
 		font-size: .95rem;
 	}
 	
@@ -1703,7 +1711,9 @@ footer p {
 	
 	p,
 	.edital-download p,
-	.edital-download ul li {
+	.edital-download ul li,
+	.tableSimulador td,
+	.textoSimulador ol li {
 		font-size: .9rem;
 	}
 	
@@ -2157,7 +2167,9 @@ footer p {
 	
 	p,
 	.edital-download p,
-	.edital-download ul li {
+	.edital-download ul li,
+	.tableSimulador td,
+	.textoSimulador ol li {
 		font-size: .85rem;
 	}
 	

@@ -41,7 +41,7 @@
           <form method="post" class="w-100 simulador">
             @csrf
             <div class="form-row">
-              <div class="col">
+              <div class="col-sm mb-2-576">
                 <label for="tipoPessoa">Tipo de Pessoa</label>
                 <select name="tipoPessoa" id="tipoPessoa" class="form-control">
                   @foreach(SimuladorControllerHelper::tipoPessoa() as $key => $tipo)
@@ -49,7 +49,7 @@
                   @endforeach
                 </select>
               </div>
-              <div class="col">
+              <div class="col-sm">
                 <label for="dataInicio">Data de início das atividades *</label>
                 <input
                   type="text"
@@ -76,7 +76,7 @@
               </div>
             </div>
             <div class="form-row mt-2" id="simuladorAddons" style="{{ Input::get('tipoPessoa') === '1' || old('tipoPessoa') === '1' ? 'display: flex;' : '' }}">
-              <div class="col-6">
+              <div class="col-sm-6 mb-2-576">
                 <label for="capitalSocial">Capital Social</label>
                 <div class="input-group">
                   <div class="input-group-prepend">
@@ -92,7 +92,7 @@
                   />
                 </div>
               </div>
-              <div class="col-6">
+              <div class="col-sm-6 mb-2-576">
                 <div class="form-check">
                   <input
                     type="checkbox"
@@ -145,20 +145,20 @@
               @foreach($extrato as $cobranca)
                 <tr>
                   <td>{{ $cobranca['DESCRICAO'] }}</td>
-                  <td>{{ 'R$ ' . str_replace('.', ',', $cobranca['VALOR_TOTAL']) }}</td>
+                  <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['VALOR_TOTAL']) }}</span></td>
                 </tr>
               @endforeach
               <tr class="blank-row"><td colspan="2"></td></tr>
               @foreach($taxas as $cobranca)
                 <tr>
                   <td>{{ utf8_encode($cobranca['TAX_DESCRICAO']) }}</td>
-                  <td>{{ 'R$ ' . str_replace('.', ',', $cobranca['TAX_VALOR']) }}</td>
+                  <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['TAX_VALOR']) }}</span></td>
                 </tr>
               @endforeach
               <tr class="blank-row"><td colspan="2"></td></tr>
               <tr>
                 <td class="text-right pt-2"><strong>Total:</strong></td>
-                <td class="pt-2">R$ {{ $total }}</td>
+                <td class="pt-2"><span class="nowrap">R$ {{ $total }}</span></td>
               </tr>
             </tbody>
           </table>
@@ -173,20 +173,20 @@
                 @foreach($rt as $cobranca)
                   <tr>
                     <td>{{ $cobranca['DESCRICAO'] }}</td>
-                    <td>{{ 'R$ ' . str_replace('.', ',', $cobranca['VALOR_TOTAL']) }}</td>
+                    <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['VALOR_TOTAL']) }}</span></td>
                   </tr>
                 @endforeach
                 <tr class="blank-row"><td colspan="2"></td></tr>
                 @foreach($rtTaxas as $cobranca)
                   <tr>
                     <td>{{ utf8_encode($cobranca['TAX_DESCRICAO']) }}</td>
-                    <td>{{ 'R$ ' . str_replace('.', ',', $cobranca['TAX_VALOR']) }}</td>
+                    <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['TAX_VALOR']) }}</span></td>
                   </tr>
                 @endforeach
                 <tr class="blank-row"><td colspan="2"></td></tr>
                 <tr>
                   <td class="text-right pt-2"><strong>Total:</strong></td>
-                  <td class="pt-2">R$ {{ str_replace('.', ',', $rtTotal) }}</td>
+                  <td class="pt-2"><span class="nowrap">R$ {{ str_replace('.', ',', $rtTotal) }}</span></td>
                 </tr>
               </tbody>
             </table>
