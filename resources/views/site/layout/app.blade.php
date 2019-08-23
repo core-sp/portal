@@ -144,6 +144,7 @@ use \App\Http\Controllers\Helper;
                     <a href="/cursos" class="dropdown-item">Cursos</a>
                     <a href="/downloads" class="dropdown-item">Downloads</a>
                     <a href="/registro-inicial" class="dropdown-item">Registro Inicial</a>
+                    <a href="/simulador" class="dropdown-item">Simulador de Valores</a>
                   </div>
                 </li>
                 <li class="nav-item">
