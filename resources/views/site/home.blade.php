@@ -84,7 +84,7 @@
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/001-work.png') }}" class="inside-img" alt="Balcão de Oportunidades | Core-SP" />
-              <p class="text-uppercase mt-3 branco">Balcão de Oportunidades</p>
+              <p class="text-uppercase mt-3 branco">Balcão de<br class="hide-992" /> Oportunidades</p>
               <button class="btn-box">Acessar</button>
             </div>
           </div>
