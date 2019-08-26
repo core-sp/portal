@@ -197,8 +197,8 @@ $tipos = CursoHelper::tipos();
             <div class="col">
                 <label for="horatermino">Horário de Término</label>
                 <input type="text" 
-                    class="form-control" 
-                    name="horatermino {{ $errors->has('horatermino') ? 'is-invalid' : '' }}"
+                    class="form-control {{ $errors->has('horatermino') ? 'is-invalid' : '' }}"
+                    name="horatermino"
                     placeholder="00:00"
                     id="horaTermino"
                     @if(!empty(old('horatermino')))
