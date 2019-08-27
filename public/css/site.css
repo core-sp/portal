@@ -222,6 +222,7 @@ strong, .bold {
 	padding-bottom: 1rem;
 	line-height: 1.6;
 	font-size: 1.1rem;
+	font-weight: 300;
 }
 
 .conteudo-txt ul,
@@ -979,7 +980,8 @@ footer p {
 .pesquisaLicitacao label,
 .inscricaoCurso label,
 .consultaAgendamento label,
-.simulador label {
+.simulador label,
+.consulta label {
 	font-size: 0.85rem;
 	margin-bottom: 0.25rem;
 	margin-left: .25rem;
@@ -1460,6 +1462,31 @@ footer p {
 	white-space: nowrap;
 }
 
+.consulta-box .badge {
+	padding: 0.3em 0.5em;
+	font-size: 100%;
+}
+
+.consulta-box strong,
+h5 {
+	font-weight: 500;
+}
+
+.consulta-box p {
+	font-weight: 300;
+}
+
+.alert-warning {
+    color: #856404 !important;
+    background-color: #fff3cd !important;
+    border-color: #ffeeba !important;
+}
+
+.alert-warning p {
+	font-weight: 300;
+	font-size: .8rem;
+}
+
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS
@@ -1560,6 +1587,10 @@ footer p {
 	
 	h6 {
 		font-size: .8rem;
+	}
+
+	.alert-warning p {
+		font-size: .75rem;
 	}
 	
 	p, 
@@ -1719,6 +1750,10 @@ footer p {
 	
 	.p-menor {
 		font-size: .8rem;
+	}
+
+	.alert-warning p {
+		font-size: .7rem;
 	}
 
 	.inline-992,
