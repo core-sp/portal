@@ -141,6 +141,7 @@ use \App\Http\Controllers\Helper;
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a href="/agendamento" class="dropdown-item">Agendamento</a>
                     <a href="/balcao-de-oportunidades" class="dropdown-item">Balcão de Oportunidades</a>
+                    <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
                     <a href="/cursos" class="dropdown-item">Cursos</a>
                     <a href="/downloads" class="dropdown-item">Downloads</a>
                     <a href="/registro-inicial" class="dropdown-item">Registro Inicial</a>
@@ -229,9 +230,11 @@ use \App\Http\Controllers\Helper;
               </div>
               <p class="branco"><a href="/agendamento">Agendamento</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
+              <p class="branco"><a href="/consulta-de-situacao">Consulta de Situação</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="/downloads">Downloads</a></p>
               <p class="branco"><a href="/registro-inicial">Registro Inicial</a></p>
+              <p class="branco"><a href="/simulador">Simulador de Valores</a></p>
             </div>
             <div class="col-md-4">
               <div class="footer-title w-75 mb-3 mt-4-768">

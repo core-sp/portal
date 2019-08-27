@@ -125,13 +125,12 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="#" class="d-block h-100">
+        <a href="/consulta-de-situacao" class="d-block h-100">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
               <p class="text-uppercase mt-3 branco">Consulta<br class="hide-992" /> de situação</p>
-              <h5 class="mt-4 text-white">EM BREVE</h5>
-              {{-- <button class="btn-box">Acessar</button> --}}
+              <button class="btn-box">Acessar</button>
             </div>
           </div>
         </a>

@@ -74,6 +74,10 @@ $now = now();
               </h6></td>
             </tr>
             <tr>
+              <td><h6>Endereço</h6></td>
+              <td><h6 class="light">{{ $curso->endereco }}</h6></td>
+            </tr>
+            <tr>
               <td><h6>Nº de vagas</h6></td>
               <td><h6 class="light">{{ $curso->nrvagas }}</h6></td>
             </tr>

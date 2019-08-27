@@ -257,6 +257,10 @@ Route::prefix('/')->group(function() {
   Route::get('simulador', 'SimuladorController@view');
   Route::post('simulador', 'SimuladorController@extrato');
 
+  // Consulta de Situação
+  Route::get('consulta-de-situacao', 'ConsultaSituacaoController@consultaView');
+  Route::post('consulta-de-situacao', 'ConsultaSituacaoController@consulta');
+
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaSiteController@show');
   Route::get('{categoria}/{slug}', 'PaginaSiteController@showCategoria');
