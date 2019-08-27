@@ -37,7 +37,8 @@ $(document).ready(function(){
 			'.linha-verde',
 			'.linha-azul',
 			'.linha-azul-escuro',
-			'.bdo-info i'
+			'.bdo-info i',
+			'.consulta-linha hr'
 		];
 		$(listBranco).toggleClass('contraste-branco');
 
@@ -52,7 +53,8 @@ $(document).ready(function(){
 			'.btn-curso-grid',
             '.btn-curso-interna',
 			'.btn-novo-core',
-			'#dismiss'
+			'#dismiss',
+			'.consulta-alert'
 		];
 		$(listCinza).toggleClass('contraste-cinza');
 
@@ -97,6 +99,12 @@ $(document).ready(function(){
 		if(newFontPMini <= maxPMini) {
 			$('.conteudo-txt-mini p').css('font-size', newFontPMini);
 		}
+		// Change H6
+		newFontH6 = parseInt($('h6').css('font-size')) + 1;
+		maxH6 = 21;
+		if(newFontH6 <= maxH6) {
+			$('h6').css('font-size', newFontH6);
+		}
 		// Change H5
 		newFontH5 = parseInt($('h5').css('font-size')) + 1;
 		maxH5 = 22;
@@ -129,6 +137,12 @@ $(document).ready(function(){
 		minPMini = 11;
 		if(newMinFontPMini <= minPMini) {
 			$('.conteudo-txt-mini p').css('font-size', newMinFontPMini);
+		}
+		// Change H6
+		newMinFontH6 = parseInt($('h6').css('font-size')) - 1;
+		minH6 = 12;
+		if(newMinFontH6 > minH6) {
+			$('h6').css('font-size', newMinFontH6);
 		}
 		// Change H5
 		newMinFontH5 = parseInt($('h5').css('font-size')) - 1;

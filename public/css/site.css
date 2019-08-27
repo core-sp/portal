@@ -64,6 +64,12 @@ body {
 	color: #888888;
 }
 
+.alert-warning {
+    color: #856404 !important;
+    background-color: #fff3cd !important;
+    border-color: #ffeeba !important;
+}
+
 .contraste {
 	background-color: #000000 !important;
 	color: #FFF !important;
@@ -1474,12 +1480,6 @@ h5 {
 
 .consulta-box p {
 	font-weight: 300;
-}
-
-.alert-warning {
-    color: #856404 !important;
-    background-color: #fff3cd !important;
-    border-color: #ffeeba !important;
 }
 
 .alert-warning p {
