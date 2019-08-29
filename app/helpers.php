@@ -18,8 +18,16 @@ function badgeConsulta($situacao)
 }
 
 function formataData($data)
-    {
-        $date = new \DateTime($data);
-        $format = $date->format('d\/m\/Y, \à\s H:i');
-        return $format;
-    }
+{
+    $date = new \DateTime($data);
+    $format = $date->format('d\/m\/Y, \à\s H:i');
+    return $format;
+}
+
+function formataImageUrl($urlBruta)
+{
+    $lastSlash = strrpos($urlBruta, '/') + 1;
+    $imageName = substr($urlBruta, $lastSlash);
+    $urlName = substr($urlBruta, 0, $lastSlash);
+    return $urlName . rawurlencode($imageName);
+}

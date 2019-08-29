@@ -5,12 +5,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{{ $pagina->titulo }}">
   <meta property="og:description" content="{!! strip_tags(substr($pagina->conteudo, 0, 100)) !!}">
-  <meta property="og:image" content="{{ isset($pagina->img) ? url('/') . $pagina->img : asset('img/news-generica-2.png') }}">
-  <meta property="og:image:secure_url" content="{{ isset($pagina->img) ? url('/') . $pagina->img : asset('img/news-generica-2.png') }}">
+  <meta property="og:image" content="{{ isset($pagina->img) ? formataImageUrl(url('/') . $pagina->img) : asset('img/news-generica-2.png') }}">
+  <meta property="og:image:secure_url" content="{{ isset($pagina->img) ? formataImageUrl(url('/') . $pagina->img) : asset('img/news-generica-2.png') }}">
 
   <meta name="twitter:title" content="{{ $pagina->titulo }}">
   <meta name="twitter:description" content="{!! strip_tags(substr($pagina->conteudo, 0, 100)) !!}">
-  <meta name="twitter:image" content="{{ isset($pagina->img) ? url('/') . $pagina->img : asset('img/news-generica-2.png') }}">
+  <meta name="twitter:image" content="{{ isset($pagina->img) ? formataImageUrl(url('/') . $pagina->img) : asset('img/news-generica-2.png') }}">
 @endsection
 
 @section('content')
