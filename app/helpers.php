@@ -16,3 +16,10 @@ function badgeConsulta($situacao)
         break;
     }
 }
+
+function formataData($data)
+    {
+        $date = new \DateTime($data);
+        $format = $date->format('d\/m\/Y, \à\s H:i');
+        return $format;
+    }

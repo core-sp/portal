@@ -17,6 +17,8 @@ use \App\Http\Controllers\Helper;
         <link type="text/css" href="{{ asset('/css/datepicker.css') }}" rel="stylesheet">
         <link type="text/css" href="{{ asset('/css/site.css?'.time()) }}" rel="stylesheet">
 
+        @yield('meta')
+
         @if(strstr(request()->getHttpHost(), 'core-sp.org.br'))
           <!-- Global site tag (gtag.js) - Google Analytics -->
           <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141375220-1"></script>
@@ -152,7 +154,7 @@ use \App\Http\Controllers\Helper;
                   <a href="/seccionais" class="nav-link">Seccionais</a>
                 </li>
                 <li class="nav-item">
-                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank" class="nav-link">E-OUV</a>
+                  <a href="/blog" class="nav-link">Blog</a>
                 </li>
               </ul>
             </nav>

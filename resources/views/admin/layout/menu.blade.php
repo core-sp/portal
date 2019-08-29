@@ -56,7 +56,8 @@
             ControleController::mostra('NoticiaController', 'index') ||
             ControleController::mostra('CursoController', 'index') ||
             ControleController::mostra('BdoEmpresaController', 'index') ||
-            ControleController::mostra('BdoOportunidadeController', 'index'))
+            ControleController::mostra('BdoOportunidadeController', 'index') ||
+            ControleController::mostra('PostsController', 'index'))
         <li class="nav-header">CONTEÚDO</li>
         @endif
         @if(ControleController::mostra('PaginaController', 'index'))
@@ -117,13 +118,37 @@
                 @endif
             </ul>
         </li>
+        @if(ControleController::mostra('PostsController', 'index'))
+        <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-rss"></i>
+                <p>Blog<i class="right fa fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+                @if(ControleController::mostra('PostsController', 'index'))
+                <li class="nav-item">
+                    <a href="/admin/posts" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Todos os posts</p>
+                    </a>
+                </li>
+                @endif
+                @if(ControleController::mostra('PostsController', 'edit'))
+                <li class="nav-item">
+                    <a href="/admin/posts/create" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Criar novo post</p>
+                    </a>
+                </li>
+                @endif
+            </ul>
+        @endif
         @if(ControleController::mostra('CursoController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-graduation-cap"></i>
                 <p>Cursos<i class="right fa fa-angle-left"></i></p>
             </a>
-        @endif
             <ul class="nav nav-treeview">
                 @if(ControleController::mostra('CursoController', 'index'))
                 <li class="nav-item">
@@ -143,6 +168,7 @@
                 @endif
             </ul>
         </li>
+        @endif
         @if(ControleController::mostra('BdoEmpresaController', 'index') ||
             ControleController::mostra('BdoOportunidadeController', 'index'))
         <li class="nav-item has-treeview">

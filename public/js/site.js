@@ -39,7 +39,27 @@ $(document).ready(function(){
 	$('.dropdown').on('hide.bs.dropdown', function() {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(200);
 	});
+	// Facebook Sharer
+	$('.fb-share, .linkedin-share').click(function(e) {
+        e.preventDefault();
+        window.open($(this).attr('href'), 'fbShareWindow', 'height=450, width=550, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
+        return false;
+    });
+	// Twitter Sharer
+	$('.twitter-share').click(function(e) {
+        e.preventDefault();
+        window.open($(this).attr('href'), 'fbShareWindow', 'height=273, width=450, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
+        return false;
+    });
 });
+// Variaveis
+var margin = 15;
+var prenderTopInicial = $('#prender').offset().top - margin;
+var limiteBotInicial = $('.limite-sociais').offset().top + $('.limite-sociais').outerHeight(true);
+if($(window).resize()) {
+	var prenderTopInicial = $('#prender').offset().top - margin;
+	var limiteBotInicial = $('.limite-sociais').offset().top + $('.limite-sociais').outerHeight(true);
+}
 // Mostra menu superior ao rolar a tela
 $(window).scroll(function(){
 	if($(window).width() > 767) {
@@ -49,7 +69,19 @@ $(window).scroll(function(){
 			$('#fixed-menu').hide();
 		}
 	}
+	var windowTop  = $(document).scrollTop() + $('#fixed-menu').height() + margin;
+	if(windowTop >= prenderTopInicial) {
+		$('#prender').addClass('prender').css('top', $('#fixed-menu').height() + margin);
+	} else {
+		$('#prender').removeClass('prender');
+	}
+	if(windowTop >= limiteBotInicial - ($('#prender').height() + margin)) {
+		$('#prender').addClass('prenderBot');
+	} else {
+		$('#prender').removeClass('prenderBot');
+	}
 });
+
 // Replica o conteúdo do menu no menu superior
 var primeira = document.getElementById('menu-principal');
 var segunda = document.getElementById('append-menu');
@@ -221,7 +253,7 @@ function getDate() {
 		nextText: 'Próximo',
 		prevText: 'Anterior',
 		maxDate: '0',
-		minDate: '-48m',
+		minDate: '-256m',
 	}
 	// Mostra loading button
 	$('#submitSimulador').on('click', function(){

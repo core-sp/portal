@@ -197,6 +197,9 @@ Route::prefix('admin')->group(function() {
     Route::get('/bannerprincipal', 'HomeImagemController@editBannerPrincipal');
     Route::put('/bannerprincipal', 'HomeImagemController@updateBannerPrincipal');
   });
+
+  // Rotas para Blog Posts
+  Route::resource('/posts', 'PostsController')->except(['show']);
 });
 
 /*
@@ -260,6 +263,10 @@ Route::prefix('/')->group(function() {
   // Consulta de Situação
   Route::get('consulta-de-situacao', 'ConsultaSituacaoController@consultaView');
   Route::post('consulta-de-situacao', 'ConsultaSituacaoController@consulta');
+
+  // Blog
+  Route::get('blog', 'PostsController@blogPage');
+  Route::get('blog/{slug}', 'PostsController@show');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaSiteController@show');

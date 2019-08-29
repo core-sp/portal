@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900');
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Crimson+Text');
 
 /*
  * REGRAS GERAIS
@@ -239,6 +239,7 @@ strong, .bold {
 .conteudo-txt li {
 	line-height: 1.6;
 	font-size: 1.1rem;
+	font-weight: 300;
 }
 
 .conteudo-txt a,
@@ -1051,6 +1052,7 @@ footer p {
 	font-size: .85rem !important;
 	color: #444444;
 	letter-spacing: .025rem;
+	font-weight: 300;
 }
 
 .linha-lg {
@@ -1487,6 +1489,59 @@ h5 {
 	font-size: .8rem;
 }
 
+/** BLOG **/
+.post-title {
+	font-weight: 500;
+	font-family: 'Crimson Text', serif;
+	line-height: 1;
+}
+
+.post-subtitle {
+	font-weight: 500;
+	font-family: 'Crimson Text', serif;
+	color: rgba(0, 0, 0, 0.54);
+	line-height: 1.3;
+}
+
+.sociais-post {
+	overflow: hidden;
+}
+
+#prender img {
+	margin-bottom: 7.5px;
+	display: block;
+}
+
+#prender img:hover {
+	cursor: pointer;
+	opacity: .8;
+}
+
+#prender {
+	margin-top: 15px;
+	margin-left: 15px;
+}
+
+.prender {
+	position: fixed;
+}
+
+.prenderBot {
+	position: absolute;
+	bottom: 0;
+	top: unset !important;
+}
+
+.bot-post h5 {
+	padding-bottom: .75rem;
+}
+
+.bot-post p {
+	font-size: .9rem;
+	font-weight: 300;
+	padding-bottom: .5rem;
+}
+
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS
@@ -1748,7 +1803,8 @@ h5 {
 		font-size: .9rem;
 	}
 	
-	.p-menor {
+	.p-menor,
+	.bot-post p {
 		font-size: .8rem;
 	}
 
@@ -2208,7 +2264,8 @@ h5 {
 		font-size: .85rem;
 	}
 	
-	.p-menor {
+	.p-menor,
+	.bot-post p {
 		font-size: .75rem;
 	}
 
