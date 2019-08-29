@@ -16,7 +16,7 @@ class User extends Authenticatable
 
     protected $primaryKey = 'idusuario';
     protected $table = 'users';
-    protected $fillable = ['nome', 'email', 'username', 'idregional', 'idperfil', 'password'];
+    protected $guarded = [];
 
     protected $hidden = [
         'password', 'remember_token',
@@ -29,6 +29,16 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPassword($token));
+    }
+
+    public function isAdmin()
+    {
+        return $this->perfil->nome === 'Admin';
+    }
+
+    public function isEditor()
+    {
+        return $this->perfil->nome === 'Editor';
     }
 
     public function pagina()
