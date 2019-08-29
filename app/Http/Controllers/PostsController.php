@@ -68,7 +68,7 @@ class PostsController extends Controller
 
     public function index()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->authorize('create', new Post());
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
