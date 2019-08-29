@@ -52,35 +52,38 @@ $(document).ready(function(){
         return false;
     });
 });
-// Variaveis
-var margin = 15;
-var prenderTopInicial = $('#prender').offset().top - margin;
-var limiteBotInicial = $('.limite-sociais').offset().top + $('.limite-sociais').outerHeight(true);
-if($(window).resize()) {
+// Scroll das redes sociais em posts do blog
+if(window.location.href.indexOf("/blog/") > -1) {
+	// Variaveis
+	var margin = 15;
 	var prenderTopInicial = $('#prender').offset().top - margin;
 	var limiteBotInicial = $('.limite-sociais').offset().top + $('.limite-sociais').outerHeight(true);
-}
-// Mostra menu superior ao rolar a tela
-$(window).scroll(function(){
-	if($(window).width() > 767) {
-		if ($(document).scrollTop() > 300) {
-			$('#fixed-menu').slideDown(150);
-		} else {
-			$('#fixed-menu').hide();
+	if($(window).resize()) {
+		var prenderTopInicial = $('#prender').offset().top - margin;
+		var limiteBotInicial = $('.limite-sociais').offset().top + $('.limite-sociais').outerHeight(true);
+	}
+	// Mostra menu superior ao rolar a tela
+	$(window).scroll(function(){
+		if($(window).width() > 767) {
+			if ($(document).scrollTop() > 300) {
+				$('#fixed-menu').slideDown(150);
+			} else {
+				$('#fixed-menu').hide();
+			}
 		}
-	}
-	var windowTop  = $(document).scrollTop() + $('#fixed-menu').height() + margin;
-	if(windowTop >= prenderTopInicial) {
-		$('#prender').addClass('prender').css('top', $('#fixed-menu').height() + margin);
-	} else {
-		$('#prender').removeClass('prender');
-	}
-	if(windowTop >= limiteBotInicial - ($('#prender').height() + margin)) {
-		$('#prender').addClass('prenderBot');
-	} else {
-		$('#prender').removeClass('prenderBot');
-	}
-});
+		var windowTop  = $(document).scrollTop() + $('#fixed-menu').height() + margin;
+		if(windowTop >= prenderTopInicial) {
+			$('#prender').addClass('prender').css('top', $('#fixed-menu').height() + margin);
+		} else {
+			$('#prender').removeClass('prender');
+		}
+		if(windowTop >= limiteBotInicial - ($('#prender').height() + margin)) {
+			$('#prender').addClass('prenderBot');
+		} else {
+			$('#prender').removeClass('prenderBot');
+		}
+	});
+}
 
 // Replica o conteúdo do menu no menu superior
 var primeira = document.getElementById('menu-principal');
