@@ -226,7 +226,7 @@ strong, .bold {
 .conteudo-txt h4,
 .conteudo-txt h5,
 .conteudo-txt h6 {
-	padding-bottom: .5rem;
+	padding-bottom: 1rem;
 	padding-top: 1rem;
 	line-height: 1;
 }
