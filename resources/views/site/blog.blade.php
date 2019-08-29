@@ -31,9 +31,11 @@
     </div>
     <div class="linha-lg"></div>
     <div class="row mt-2">
-      @foreach($posts as $post)
+      @forelse ($posts as $post)
         @include('site.inc.post-grid')
-      @endforeach
+      @empty
+        <p>Nenhum post encontrado!</p>
+      @endforelse
     </div>
     <div class="row mb-2">
       <div class="col">
