@@ -50,7 +50,7 @@
         </div>
         <div class="col-md-8">
           <div class="d-block mb-4">
-            <h1 class="post-title mb-1">{{ $post->titulo }}</h1>
+            <h1 class="post-title mb-2">{{ $post->titulo }}</h1>
             <h4 class="post-subtitle mb-3">{{ $post->subtitulo }}</h4>
             <p><small class="light">Por: {{ $post->user->nome }} | {{ formataData($post->created_at) }}</small></p>
           </div>
