@@ -5,8 +5,8 @@
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{{ $post->titulo }}">
   <meta property="og:description" content="{!! strip_tags(substr($post->conteudo, 0, 100)) !!}">
-  <meta property="og:image" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}">
-  <meta property="og:image:secure_url" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}">
+  <meta property="og:image" content="{{ isset($post->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}">
+  <meta property="og:image:secure_url" content="{{ isset($post->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}">
 
   <meta name="twitter:title" content="{{ $post->titulo }}">
   <meta name="twitter:description" content="{!! strip_tags(substr($post->conteudo, 0, 100)) !!}">
