@@ -152,7 +152,9 @@ h3 {
 	color: #444444;
 }
 
-h4 {
+h4,
+#conteudo-principal h1,
+.home-title h1 {
 	font-size: 1.4rem;
 	color: #444444;
 }
@@ -173,6 +175,11 @@ p,
 	font-size: 1rem;
 	line-height: 1.4;
 	color: #444444;
+}
+
+.h3-box {
+	font-size: 1rem;
+	line-height: 1.4;
 }
 
 .p-menor {
@@ -543,7 +550,7 @@ figure.align-left {
 	transition: .3s;
 }
 
-.home-title blockquote h4 {
+.home-title blockquote h1 {
 	display: inline-block;
 	font-weight: 700;
 	color: #444444;
@@ -1560,7 +1567,9 @@ h5 {
 		font-size: 1.75rem;
 	}
 	
-	h4 {
+	h4,
+	#conteudo-principal h1,
+	.home-title h1 {
 		font-size: 1.325rem;
 	}
 	
@@ -1574,7 +1583,8 @@ h5 {
 	
 	p,
 	.edital-download p,
-	.edital-download ul li {
+	.edital-download ul li,
+	.h3-box {
 		font-size: .95rem;
 	}
 	
@@ -1632,7 +1642,9 @@ h5 {
 		font-size: 1.7rem;
 	}
 	
-	h4 {
+	h4,
+	#conteudo-principal h1,
+	.home-title h1 {
 		font-size: 1.3rem;
 	}
 	
@@ -1783,7 +1795,9 @@ h5 {
 		font-size: 1.5rem;
 	}
 	
-	h4 {
+	h4,
+	#conteudo-principal h1,
+	.home-title h1 {
 		font-size: 1.2rem;
 	}
 	
@@ -1799,7 +1813,8 @@ h5 {
 	.edital-download p,
 	.edital-download ul li,
 	.tableSimulador td,
-	.textoSimulador ol li {
+	.textoSimulador ol li,
+	.h3-box {
 		font-size: .9rem;
 	}
 	
@@ -2244,7 +2259,9 @@ h5 {
 		font-size: 1.4rem;
 	}
 	
-	h4 {
+	h4,
+	#conteudo-principal h1,
+	.home-title h1 {
 		font-size: 1.1rem;
 	}
 	
@@ -2260,7 +2277,8 @@ h5 {
 	.edital-download p,
 	.edital-download ul li,
 	.tableSimulador td,
-	.textoSimulador ol li {
+	.textoSimulador ol li,
+	.h3-box {
 		font-size: .85rem;
 	}
 	

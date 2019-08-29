@@ -41,21 +41,26 @@ use App\Http\Controllers\Helper;
         @else
           @foreach($resultados as $resultado)
           <div class="box-resultado">
-            @if($resultado->tipo == "Notícia")
+            @if($resultado->tipo === "Notícia")
             <a href="/noticia/{{ $resultado->slug }}"">
-              <h5>{{ $resultado->tipo }} - {{ $resultado->titulo }}</h5>
+              <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
             <h6 class="cinza">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
-            @else
-            <a href="/{{ $resultado->slug }}">
-              <h5>{{ $resultado->tipo }} - {{ $resultado->titulo }}</h5>
-            </a>
-            @endif
             <p class="mt-2">{{ Helper::resumo($resultado->conteudo) }}</p>
-            @if($resultado->tipo == "Notícia")
             <a href="/noticia/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
-            @else
+            @elseif($resultado->tipo == 'Página')
+            <a href="/{{ $resultado->slug }}">
+              <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
+            </a>
+            <p class="mt-2">{{ Helper::resumo($resultado->conteudo) }}</p>
             <a href="/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+            @else
+            <a href="/blog/{{ $resultado->slug }}"">
+              <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
+            </a>
+            <h6 class="cinza">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
+            <p class="mt-2">{{ Helper::resumo($resultado->conteudo) }}</p>
+            <a href="/blog/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
             @endif
           </div>
           @endforeach

@@ -1,5 +1,17 @@
 @extends('site.layout.app', ['title' => 'Notícias'])
 
+@section('meta')
+  <meta property="og:url" content="{{ url('/') . '/noticia/' . $noticia->slug }}">
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="{{ $noticia->titulo }}">
+  <meta property="og:description" content="{!! strip_tags(substr($noticia->conteudo, 0, 100)) !!}">
+  <meta property="og:image" content="{{ url('/') . $noticia->img }}">
+
+  <meta name="twitter:title" content="{{ $noticia->titulo }}">
+  <meta name="twitter:description" content="{!! strip_tags(substr($noticia->conteudo, 0, 100)) !!}">
+  <meta name="twitter:image" content="{{ url('/') . $noticia->img }}">
+@endsection
+
 @section('content')
 
 @php
@@ -26,7 +38,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h4 class="stronger">{{ $noticia->titulo }}</h4>
+            <h1 class="stronger">{{ $noticia->titulo }}</h1>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
