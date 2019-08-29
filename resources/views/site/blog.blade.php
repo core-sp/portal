@@ -4,7 +4,7 @@
 
 <section id="pagina-cabecalho" class="mt-1">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-    <img src="{{ asset('img/news-interna.png') }}" />
+    <img src="{{ asset('img/noticias.png') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
@@ -21,7 +21,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
-            <h4 class="stronger">Todas os posts</h4>
+            <h4 class="stronger">Todos os posts</h4>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
@@ -34,7 +34,9 @@
       @forelse ($posts as $post)
         @include('site.inc.post-grid')
       @empty
-        <p>Nenhum post encontrado!</p>
+        <div class="col">
+          <p><strong>Nenhum post encontrado!</strong></p>
+        </div>
       @endforelse
     </div>
     <div class="row mb-2">

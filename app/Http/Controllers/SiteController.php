@@ -9,6 +9,7 @@ use App\Noticia;
 use App\Pagina;
 use App\Licitacao;
 use App\HomeImagem;
+use App\Post;
 
 class SiteController extends Controller
 {
@@ -58,6 +59,11 @@ class SiteController extends Controller
                 ->orWhere('conteudo','LIKE','%'.$busca.'%')
                 ->limit(10)
                 ->get();
+            $posts = Post::select('titulo', 'slug', 'created_at', 'conteudo')
+                ->where('titulo','LIKE','%'.$busca.'%')
+                ->orWhere('conteudo','LIKE','%'.$busca.'%')
+                ->limit(10)
+                ->get();
             foreach($paginas as $pagina) {
                 $pagina->tipo = "Página";
                 $resultados->push($pagina);
@@ -65,6 +71,10 @@ class SiteController extends Controller
             foreach($noticias as $noticia) {
                 $noticia->tipo = "Notícia";
                 $resultados->push($noticia);
+            }
+            foreach($posts as $post) {
+                $post->tipo = "Artigo";
+                $resultados->push($post);
             }
             return view('site.busca', compact('busca', 'resultados'));
         } else {

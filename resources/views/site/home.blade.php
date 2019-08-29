@@ -32,8 +32,8 @@
             <div class="carousel-item h-100">
             @endif
               <a href="{{ $img->link }}" target="{{ $img->target }}">
-                <img class="w-100 hide-576" src="{{ asset($img->url) }}" />
-                <img class="w-100 show-576" src="{{ asset($img->url_mobile) }}" />
+                <img class="w-100 hide-576" src="{{ asset($img->url) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
+                <img class="w-100 show-576" src="{{ asset($img->url_mobile) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
               </a>
             </div>
           @endif
@@ -59,7 +59,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h4 class="pr-3 ml-1">Espaço do Representante</h4>
+            <h1 class="pr-3 ml-1">Espaço do Representante</h1>
           </blockquote>
           <h5 class="float-right cinza-claro-bg">
             <a href="/portal"><i class="fas fa-user icon-title"></i> Acessar o portal</a>
@@ -73,7 +73,7 @@
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/open-book.png') }}" class="inside-img" alt="Cartilha do Representante | Core-SP" />
-              <p class="text-uppercase mt-3 branco">Cartilha do<br class="hide-992" /> Representante</p>
+              <h3 class="text-uppercase mt-3 branco normal h3-box">Cartilha do<br class="hide-992" /> Representante</h3>
               <button class="btn-box">Visualizar</button>
             </div>
           </div>
@@ -84,7 +84,7 @@
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/001-work.png') }}" class="inside-img" alt="Balcão de Oportunidades | Core-SP" />
-              <p class="text-uppercase mt-3 branco">Balcão de<br class="hide-992" /> Oportunidades</p>
+              <h3 class="text-uppercase mt-3 branco normal h3-box">Balcão de<br class="hide-992" /> Oportunidades</h3>
               <button class="btn-box">Acessar</button>
             </div>
           </div>
@@ -95,7 +95,7 @@
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
-              <p class="text-uppercase mt-3 branco">Anuidade 2019<br class="hide-992" /> taxas e emolumentos</p>
+              <h3 class="text-uppercase mt-3 branco normal h3-box">Anuidade 2019<br class="hide-992" /> taxas e emolumentos</h3>
               <button href="#" class="btn-box">ACESSAR</button>
             </div>
           </div>
@@ -107,7 +107,7 @@
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
-              <p class="text-uppercase mt-3 branco">Agendamento<br class="hide-992" /> para refis</p>
+              <h3 class="text-uppercase mt-3 branco normal h3-box">Agendamento<br class="hide-992" /> para refis</h3>
               <button class="btn-box">Agendar</button>
             </div>
           </div>
@@ -118,7 +118,7 @@
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/001-paper.png') }}" alt="Simulador | Core-SP">
-              <p class="text-uppercase mt-3 branco">Simulador de<br class="hide-992" /> valores</p>
+              <h3 class="text-uppercase mt-3 branco normal h3-box">Simulador de<br class="hide-992" /> valores</h3>
               <button class="btn-box">Acessar</button>
             </div>
           </div>
@@ -129,7 +129,7 @@
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
-              <p class="text-uppercase mt-3 branco">Consulta<br class="hide-992" /> de situação</p>
+              <h3 class="text-uppercase mt-3 branco normal h3-box">Consulta<br class="hide-992" /> de situação</h3>
               <button class="btn-box">Acessar</button>
             </div>
           </div>
@@ -165,7 +165,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h4 class="pr-3 ml-1">Notícias</h4>
+            <h1 class="pr-3 ml-1">Notícias</h1>
           </blockquote>
           <h5 class="float-right branco-bg">
             <a href="/noticias"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
@@ -190,7 +190,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h4 class="pr-3 ml-1">Cotidiano</h4>
+            <h1 class="pr-3 ml-1">Cotidiano</h1>
           </blockquote>
         </div>
         @foreach($cotidianos as $resultado)
@@ -201,7 +201,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h4 class="pr-3 ml-1">Fale com o CORE-SP</h4>
+            <h1 class="pr-3 ml-1">Fale com o CORE-SP</h1>
           </blockquote>
         </div>
         <div class="row">
@@ -285,7 +285,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h4 class="pr-3 ml-1">E-ouv</h4>
+            <h1 class="pr-3 ml-1">E-ouv</h1>
           </blockquote>
         </div>
         <div class="row">
@@ -326,7 +326,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h4 class="pr-3 ml-1">Calendário</h4>
+            <h1 class="pr-3 ml-1">Calendário</h1>
           </blockquote>
         </div>
         <div id="calendario" class="row">

@@ -36,7 +36,7 @@
             <a class="fb-share" href="https://www.facebook.com/dialog/share?app_id=788710944865049&display=popup&href={{ url('/') . '/blog/' . $post->slug }}" target="_blank">
               <img src="{{ asset('img/facebook-share.png') }}" alt="Core-SP | Facebook Share">
             </a>
-            <a class="twitter-share" href="https://twitter.com/intent/tweet?url={{ url('/') . '/blog/' . $post->slug }}&text={{ $post->titulo }}&hashtags=RepresentanteComercial,Core-SP">
+            <a class="twitter-share" href="https://twitter.com/intent/tweet?url={{ url('/') . '/blog/' . $post->slug }}&text={{ $post->titulo }}&hashtags=RepresentanteComercial,Core-SP,Vendas">
               <img src="{{ asset('img/twitter-share.png') }}" alt="Core-SP | Twitter Share">
             </a>
             <a href="https://wa.me/?text={{ url('/') . '/blog/' . $post->slug }}">

@@ -106,6 +106,10 @@ class PostsController extends Controller
         $array['slug'] = str_slug(request('titulo'));
 
         $post->create($array);
+
+        return redirect('/admin/posts')
+            ->with('message', '<i class="icon fa fa-check"></i>Post criado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function show($slug)
