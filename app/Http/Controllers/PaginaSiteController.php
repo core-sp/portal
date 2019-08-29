@@ -10,7 +10,7 @@ class PaginaSiteController extends Controller
 {
     public function show($slug)
     {
-        $pagina = Pagina::select('titulo','img','subtitulo','conteudo')
+        $pagina = Pagina::select('titulo','slug','img','subtitulo','conteudo')
             ->where('slug', $slug)->first();
         if(isset($pagina)) {
             return response()

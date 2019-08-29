@@ -5,11 +5,11 @@
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{{ $noticia->titulo }}">
   <meta property="og:description" content="{!! strip_tags(substr($noticia->conteudo, 0, 100)) !!}">
-  <meta property="og:image" content="{{ url('/') . $noticia->img }}">
+  <meta property="og:image" content="{{ isset($noticia->img) ? url('/') . $noticia->img : asset('img/news-generica-2.png') }}">
 
   <meta name="twitter:title" content="{{ $noticia->titulo }}">
   <meta name="twitter:description" content="{!! strip_tags(substr($noticia->conteudo, 0, 100)) !!}">
-  <meta name="twitter:image" content="{{ url('/') . $noticia->img }}">
+  <meta name="twitter:image" content="{{ isset($noticia->img) ? url('/') . $noticia->img : asset('img/news-generica-2.png') }}">
 @endsection
 
 @section('content')
@@ -58,7 +58,7 @@
           @if(isset($noticia->img))
           <img src="{{asset($noticia->img)}}" />
           @else
-          <img src="{{asset('img/news-generica-2.png')}}" />
+          <img src="{{ asset('img/news-generica-2.png') }}" />
           @endif
         </div>
         <div class="mt-4 conteudo-txt">
