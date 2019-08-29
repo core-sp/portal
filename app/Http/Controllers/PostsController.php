@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CrudEvent;
 use App\Post;
 use Illuminate\Http\Request;
 
@@ -39,7 +40,7 @@ class PostsController extends Controller
         $contents = [];
         foreach($resultados as $resultado) {
             $acoes = '<a href="/blog/'.$resultado->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if(ControleController::mostra('PostsController', 'edit')) {
+            if(auth()->user()->isAdmin() || auth()->user()->isEditor()) {
                 $acoes .= '<a href="/admin/posts/'.$resultado->id.'/edit" class="btn btn-sm btn-primary">Editar</a> ';
                 $acoes .= '<form method="POST" action="/admin/posts/'.$resultado->id.'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
@@ -75,16 +76,17 @@ class PostsController extends Controller
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    protected function validateRequest()
+    protected function validateRequest($id = null)
     {
         return request()->validate([
             'idusuario' => 'required|integer',
-            'titulo' => 'required|unique:posts,titulo',
+            'titulo' => 'required|unique:posts,titulo,'.$id,
             'subtitulo' => 'required',
             'img' => 'required',
             'conteudo' => 'required'
         ], [
-            'required' => 'Este campo é obrigatório'
+            'required' => 'Este campo é obrigatório',
+            'unique' => 'Já existe uma matéria com este mesmo nome'
         ]);
     }
 
@@ -105,7 +107,9 @@ class PostsController extends Controller
 
         $array['slug'] = str_slug(request('titulo'));
 
-        $post->create($array);
+        $save = $post->create($array);
+
+        event(new CrudEvent('post', 'criou', $save->id));
 
         return redirect('/admin/posts')
             ->with('message', '<i class="icon fa fa-check"></i>Post criado com sucesso!')
@@ -142,13 +146,15 @@ class PostsController extends Controller
     {
         $this->authorize('create', $post);
 
-        $array = $this->validateRequest();
+        $array = $this->validateRequest($post->id);
 
         if(!empty(request('titulo'))) {
             $array['slug'] = str_slug(request('titulo'));
         }
 
         $post->update($array);
+
+        event(new CrudEvent('post', 'editou', $post->id));
 
         return redirect('/admin/posts')
             ->with('message', '<i class="icon fa fa-check"></i>Post editado com sucesso!')
@@ -160,6 +166,8 @@ class PostsController extends Controller
         $this->authorize('create', $post);
 
         $post->delete();
+
+        event(new CrudEvent('post', 'apagou', $post->id));
 
         return redirect('/admin/posts')
             ->with('message', '<i class="icon fa fa-check"></i>Post deletado com sucesso!')
