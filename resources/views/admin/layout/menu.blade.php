@@ -118,14 +118,14 @@
                 @endif
             </ul>
         </li>
-        @if(ControleController::mostra('PostsController', 'index'))
+        @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-rss"></i>
                 <p>Blog<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(ControleController::mostra('PostsController', 'index'))
+                @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
                 <li class="nav-item">
                     <a href="/admin/posts" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -133,7 +133,7 @@
                     </a>
                 </li>
                 @endif
-                @if(ControleController::mostra('PostsController', 'edit'))
+                @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
                 <li class="nav-item">
                     <a href="/admin/posts/create" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
