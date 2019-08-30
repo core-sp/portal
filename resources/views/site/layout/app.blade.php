@@ -56,7 +56,7 @@ use \App\Http\Controllers\Helper;
               <div class="d-flex it">
                 <div class="align-right it-icon">
                   <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-                    <img src="{{ asset('img/aai-v13.png') }}" alt="Portal da Transparência">
+                    <img src="{{ asset('img/aai-v13.png') }}" alt="Core-SP | Portal da Transparência">
                   </a>
                 </div>
                 <div class="text-left align-self-center it-txt">
@@ -165,7 +165,7 @@ use \App\Http\Controllers\Helper;
 
       <header id="fixed-menu" class="pb-2">
         <div class="container">
-          <img src="{{ asset('img/brasao.png') }}" />
+          <img src="{{ asset('img/brasao.png') }}" alt="Core-SP" />
           <div class="row" id="append-menu">
             
           </div>
