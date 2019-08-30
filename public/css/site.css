@@ -155,7 +155,8 @@ h3 {
 h4,
 #conteudo-principal h1,
 #conteudo-principal h2,
-.home-title h1 {
+.home-title h1,
+.home-title h2 {
 	font-size: 1.4rem;
 	color: #444444;
 }
@@ -1576,7 +1577,8 @@ h5 {
 	h4,
 	#conteudo-principal h1,
 	#conteudo-principal h2,
-	.home-title h1 {
+	.home-title h1,
+	.home-title h2 {
 		font-size: 1.325rem;
 	}
 	
@@ -1653,7 +1655,8 @@ h5 {
 	h4,
 	#conteudo-principal h1,
 	#conteudo-principal h2,
-	.home-title h1 {
+	.home-title h1,
+	.home-title h2 {
 		font-size: 1.3rem;
 	}
 	
@@ -1808,7 +1811,8 @@ h5 {
 	h4,
 	#conteudo-principal h1,
 	#conteudo-principal h2,
-	.home-title h1 {
+	.home-title h1,
+	.home-title h2 {
 		font-size: 1.2rem;
 	}
 	
@@ -2274,7 +2278,8 @@ h5 {
 	h4,
 	#conteudo-principal h1,
 	#conteudo-principal h2,
-	.home-title h1 {
+	.home-title h1,
+	.home-title h2 {
 		font-size: 1.1rem;
 	}
 	

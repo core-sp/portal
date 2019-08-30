@@ -59,7 +59,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h1 class="pr-3 ml-1">Espaço do Representante</h1>
+            <h2 class="pr-3 ml-1">Espaço do Representante</h2>
           </blockquote>
           <h5 class="float-right cinza-claro-bg">
             <a href="/portal"><i class="fas fa-user icon-title"></i> Acessar o portal</a>
@@ -165,7 +165,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h1 class="pr-3 ml-1">Notícias</h1>
+            <h2 class="pr-3 ml-1">Notícias</h2>
           </blockquote>
           <h5 class="float-right branco-bg">
             <a href="/noticias"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
@@ -190,7 +190,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h1 class="pr-3 ml-1">Cotidiano</h1>
+            <h2 class="pr-3 ml-1">Cotidiano</h2>
           </blockquote>
         </div>
         @foreach($cotidianos as $resultado)
@@ -201,7 +201,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h1 class="pr-3 ml-1">Fale com o CORE-SP</h1>
+            <h2 class="pr-3 ml-1">Fale com o CORE-SP</h2>
           </blockquote>
         </div>
         <div class="row">
@@ -285,7 +285,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h1 class="pr-3 ml-1">E-ouv</h1>
+            <h2 class="pr-3 ml-1">E-ouv</h2>
           </blockquote>
         </div>
         <div class="row">
@@ -326,7 +326,7 @@
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h1 class="pr-3 ml-1">Calendário</h1>
+            <h2 class="pr-3 ml-1">Calendário</h2>
           </blockquote>
         </div>
         <div id="calendario" class="row">
