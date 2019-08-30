@@ -25,7 +25,7 @@ use App\Http\Controllers\Helper;
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h4 class="stronger">Lista de Seccionais</h4>
+            <h2 class="stronger">Lista de Seccionais</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
@@ -38,7 +38,7 @@ use App\Http\Controllers\Helper;
       <div class="col-lg-8">
         @foreach($regionais as $regional)
         <div class="box-resultado">
-          <h5 class="pb-1">{{ $regional->prefixo }} - {{ $regional->regional }}</h5>
+          <h2 class="pb-1">{{ $regional->prefixo }} - {{ $regional->regional }}</h2>
           <p class="light"><strong>Endereço:</strong> {{ $regional->endereco }}, {{ $regional->numero }} - {{ $regional->complemento }}</p>
           <p class="light"><strong>Telefone:</strong> {{ $regional->telefone }}</p>
           <p class="light"><strong>Email:</strong> {{ $regional->email }}</p>

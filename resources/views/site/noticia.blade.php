@@ -4,12 +4,12 @@
   <meta property="og:url" content="{{ url('/') . '/noticia/' . $noticia->slug }}">
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{{ $noticia->titulo }}">
-  <meta property="og:description" content="{!! strip_tags(substr($noticia->conteudo, 0, 100)) !!}">
+  <meta property="og:description" content="{!! retornaDescription($noticia->conteudo) !!}">
   <meta property="og:image" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $noticia->img) : asset('img/news-generica-2.png') }}">
   <meta property="og:image:secure_url" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $noticia->img) : asset('img/news-generica-2.png') }}">
 
   <meta name="twitter:title" content="{{ $noticia->titulo }}">
-  <meta name="twitter:description" content="{!! strip_tags(substr($noticia->conteudo, 0, 100)) !!}">
+  <meta name="twitter:description" content="{!! retornaDescription($noticia->conteudo) !!}">
   <meta name="twitter:image" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $noticia->img) : asset('img/news-generica-2.png') }}">
 @endsection
 
@@ -39,7 +39,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h1 class="stronger">{{ $noticia->titulo }}</h1>
+            <h2 class="stronger">{{ $noticia->titulo }}</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>

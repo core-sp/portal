@@ -26,7 +26,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h4 class="stronger">{{ $resultado->regional }}</h4>
+            <h2 class="stronger">{{ $resultado->regional }}</h2>
           </div>
           <div class="align-self-center">
             <a href="/seccionais" class="btn-voltar">Voltar</a>
