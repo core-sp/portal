@@ -263,6 +263,8 @@ class CursoInscritoController extends Controller
         if($validation->fails()) {
             return Redirect::back()->withErrors($validation)->withInput($request->all());
         }
+        if(!$this->permiteInscricao($idcurso))
+            abort(500, 'As inscrições para este curso estão esgotadas!');
         $emailUser = $request->input('email');
         $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
         // Inputa dados no Banco de Dados
