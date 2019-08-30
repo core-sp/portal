@@ -125,7 +125,13 @@
             </div>
             <div class="form-row mt-2">
               <div class="col">
-                <input type="submit" value="Simular {{ Input::has('dataInicio') ? ' novamente' : '' }}" class="btn btn-primary" id="submitSimulador">
+                <input
+                  type="submit"
+                  value="Simular {{ Input::has('dataInicio') ? ' novamente' : '' }}"
+                  class="btn btn-primary"
+                  id="submitSimulador"
+                  onclick="ga('send', {hitType: 'event', eventCategory: 'Button', eventAction: 'click', eventLabel: 'Simulador' });"
+                />
                 <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading"></div>
               </div>
             </div>
