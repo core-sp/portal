@@ -27,7 +27,7 @@ use \App\Http\Controllers\CursoInscritoController;
         <div class="home-title">
           <blockquote>
             <i></i>
-            <h4 class="pr-3 ml-1">Próximos cursos</h4>
+            <h2 class="pr-3 ml-1">Próximos cursos</h2>
           </blockquote>
           <h5 class="float-right cinza-claro-bg">
             <a href="/cursos-anteriores"><i class="fas fa-history icon-title"></i> Cursos anteriores</a>

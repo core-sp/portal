@@ -4,12 +4,12 @@
   <meta property="og:url" content="{{ url('/') . '/' . $pagina->slug }}">
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{{ $pagina->titulo }}">
-  <meta property="og:description" content="{!! strip_tags(substr($pagina->conteudo, 0, 100)) !!}">
+  <meta property="og:description" content="{!! retornaDescription($pagina->conteudo) !!}">
   <meta property="og:image" content="{{ isset($pagina->img) ? formataImageUrl(url('/') . $pagina->img) : asset('img/news-generica-2.png') }}">
   <meta property="og:image:secure_url" content="{{ isset($pagina->img) ? formataImageUrl(url('/') . $pagina->img) : asset('img/news-generica-2.png') }}">
 
   <meta name="twitter:title" content="{{ $pagina->titulo }}">
-  <meta name="twitter:description" content="{!! strip_tags(substr($pagina->conteudo, 0, 100)) !!}">
+  <meta name="twitter:description" content="{!! retornaDescription($pagina->conteudo) !!}">
   <meta name="twitter:image" content="{{ isset($pagina->img) ? formataImageUrl(url('/') . $pagina->img) : asset('img/news-generica-2.png') }}">
 @endsection
 
@@ -38,7 +38,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h4 class="stronger">{{ $pagina->subtitulo }}</h4>
+            <h2 class="stronger">{{ $pagina->subtitulo }}</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>

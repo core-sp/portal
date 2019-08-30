@@ -31,3 +31,8 @@ function formataImageUrl($urlBruta)
     $urlName = substr($urlBruta, 0, $lastSlash);
     return $urlName . rawurlencode($imageName);
 }
+
+function retornaDescription($string)
+{
+    return substr(html_entity_decode(strip_tags($string)), 0, 150) . '...';
+}

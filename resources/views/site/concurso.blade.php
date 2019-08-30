@@ -30,7 +30,7 @@ use App\Http\Controllers\Helper;
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
-            <h4 class="stronger">{{ $concurso->titulo }}</h4>
+            <h2 class="stronger">{{ $concurso->titulo }}</h2>
           </div>
           <div class="align-self-center">
             <a href="/concursos" class="btn-voltar">Voltar</a>

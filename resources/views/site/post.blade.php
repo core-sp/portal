@@ -4,12 +4,12 @@
   <meta property="og:url" content="{{ url('/') . '/blog/' . $post->slug }}">
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{{ $post->titulo }}">
-  <meta property="og:description" content="{!! strip_tags(substr($post->conteudo, 0, 100)) !!}">
+  <meta property="og:description" content="{!! retornaDescription($post->conteudo) !!}">
   <meta property="og:image" content="{{ isset($post->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}">
   <meta property="og:image:secure_url" content="{{ isset($post->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}">
 
   <meta name="twitter:title" content="{{ $post->titulo }}">
-  <meta name="twitter:description" content="{!! strip_tags(substr($post->conteudo, 0, 100)) !!}">
+  <meta name="twitter:description" content="{!! retornaDescription($post->conteudo) !!}">
   <meta name="twitter:image" content="{{ formataImageUrl(url('/') . $post->img) }}">
 @endsection
 
@@ -40,7 +40,7 @@
             <a class="twitter-share" href="https://twitter.com/intent/tweet?url={{ url('/') . '/blog/' . $post->slug }}&text={{ $post->titulo }}&hashtags=RepresentanteComercial,Core-SP,Vendas">
               <img src="{{ asset('img/twitter-share.png') }}" alt="Core-SP | Twitter Share">
             </a>
-            <a href="https://wa.me/?text={{ url('/') . '/blog/' . $post->slug }}">
+            <a href="https://wa.me/?text={{ url('/') . '/blog/' . $post->slug }}" target="_blank">
               <img src="{{ asset('img/whatsapp-share.png') }}" alt="Core-SP | Whatsapp Share">
             </a>
             <a class="linkedin-share" href="https://www.linkedin.com/shareArticle?mini=true&url={{ url('/') . '/blog/' . $post->slug }}&title={{ $post->titulo }}&summary={!! strip_tags(substr($post->conteudo, 0, 100)) !!}&source=Core-SP">

@@ -25,7 +25,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
-            <h4 class="stronger">Consulte os dados de seu agendamento no CORE-SP</h4>
+            <h2 class="stronger">Consulte os dados de seu agendamento no CORE-SP</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>

@@ -25,7 +25,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h4 class="stronger">Representante já pode consultar, com mais facilidade, sua situação junto ao Conselho!</h4>
+            <h2 class="stronger">Representante já pode consultar, com mais facilidade, sua situação junto ao Conselho!</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>

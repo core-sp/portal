@@ -31,7 +31,7 @@ use App\Http\Controllers\LicitacaoSiteController;
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
-            <h4 class="stronger">{{ $licitacao->titulo }}</h4>
+            <h2 class="stronger">{{ $licitacao->titulo }}</h2>
           </div>
           <div class="align-self-center">
             <a href="/licitacoes" class="btn-voltar">Voltar</a>

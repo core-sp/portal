@@ -154,6 +154,7 @@ h3 {
 
 h4,
 #conteudo-principal h1,
+#conteudo-principal h2,
 .home-title h1 {
 	font-size: 1.4rem;
 	color: #444444;
@@ -162,6 +163,10 @@ h4,
 h5 {
 	font-size: 1.15rem;
 	color: #444444;
+}
+
+.box-resultado h2 {
+	font-size: 1.15rem;
 }
 
 h6 {
@@ -550,7 +555,8 @@ figure.align-left {
 	transition: .3s;
 }
 
-.home-title blockquote h1 {
+.home-title blockquote h1,
+.home-title blockquote h2 {
 	display: inline-block;
 	font-weight: 700;
 	color: #444444;
@@ -1569,11 +1575,13 @@ h5 {
 	
 	h4,
 	#conteudo-principal h1,
+	#conteudo-principal h2,
 	.home-title h1 {
 		font-size: 1.325rem;
 	}
 	
-	h5 {
+	h5,
+	.box-resultado h2 {
 		font-size: 1.1rem;
 	}
 	
@@ -1644,11 +1652,13 @@ h5 {
 	
 	h4,
 	#conteudo-principal h1,
+	#conteudo-principal h2,
 	.home-title h1 {
 		font-size: 1.3rem;
 	}
 	
-	h5 {
+	h5,
+	.box-resultado h2 {
 		font-size: 1.1rem;
 	}
 	
@@ -1797,11 +1807,13 @@ h5 {
 	
 	h4,
 	#conteudo-principal h1,
+	#conteudo-principal h2,
 	.home-title h1 {
 		font-size: 1.2rem;
 	}
 	
-	h5 {
+	h5,
+	.box-resultado h2 {
 		font-size: 1rem;
 	}
 	
@@ -2261,11 +2273,13 @@ h5 {
 	
 	h4,
 	#conteudo-principal h1,
+	#conteudo-principal h2,
 	.home-title h1 {
 		font-size: 1.1rem;
 	}
 	
-	h5 {
+	h5,
+	.box-resultado h2 {
 		font-size: .95rem;
 	}
 	

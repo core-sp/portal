@@ -25,7 +25,7 @@ use App\Http\Controllers\Helper;
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h4 class="stronger">Busca por: {{ $busca }}</h4>
+            <h2 class="stronger">Busca por: {{ $busca }}</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
