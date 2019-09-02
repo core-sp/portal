@@ -359,7 +359,7 @@ class CursoInscritoController extends Controller
         $this->variaveis['busca'] = 'cursos/inscritos/'.$id;
         $this->variaveis['slug'] = 'cursos/inscritos/'.$id;
         $variaveis = (object) $this->variaveis;
-        $tabela = $this->tabelaCompleta($resultados);
+        $tabela = $this->tabelaCompleta($resultados, $id);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 

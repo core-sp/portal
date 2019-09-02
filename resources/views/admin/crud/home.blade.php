@@ -50,21 +50,14 @@
               Lista de {{ $variaveis->plural }} do CORE-SP
             </h3>
             @if(isset($busca))
-              @if(isset($variaveis->slug))
-              <a href="/admin/{{ $variaveis->slug }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
-              @else
-              <a href="/admin/{{ $variaveis->plural }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
-              @endif
+              <a href="/admin/{{ isset($variaveis->slug) ? $variaveis->slug : $variaveis->plural }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
             @endif
             <div class="card-tools">
               <form class="input-group input-group-sm"
                 method="GET"
                 role="form"
-                @if(isset($variaveis->busca))
-                action ="/admin/{{ $variaveis->busca }}/busca">
-                @else
-                action ="/admin/{{ $variaveis->plural }}/busca">
-                @endif
+                action ="/admin/{{ isset($variaveis->busca) ? $variaveis->busca : $variaveis->plural }}/busca"
+              >
                 <input type="text"
                   name="q"
                   class="form-control float-right"
@@ -113,11 +106,7 @@
               @if(isset($busca))
               <hr />
               <strong>Nenhum {{ $variaveis->singular }} encontrado</strong>
-                @if(isset($variaveis->slug))
-                <a href="/admin/{{ $variaveis->slug }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
-                @else
-                <a href="/admin/{{ $variaveis->plural }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
-                @endif
+              <a href="/admin/{{ isset($variaveis->slug) ? $variaveis->slug : $variaveis->plural }}" class="badge badge-primary d-inline ml-2">Mostrar todos</a>
               @else
               <strong>Nenhum {{ $variaveis->singular }} encontrado</strong>
               @endif
