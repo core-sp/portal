@@ -12,6 +12,7 @@ class ConsultaSituacaoController extends Controller
 
     protected function connect()
     {
+        // Conexão e criação do objeto de conexão na variável $connection
         $this->connection = new FirebirdConnection();
     }
 
@@ -22,6 +23,7 @@ class ConsultaSituacaoController extends Controller
 
     protected function validateRequest()
     {
+        // Validação dos campos do formulário
         return request()->validate([
             'cpfCnpj' => ['required', new CpfCnpj],
         ], [
@@ -31,6 +33,7 @@ class ConsultaSituacaoController extends Controller
 
     protected function validateAndConnect()
     {
+        // Validação e conexão
         $this->validateRequest();
 
         $this->connect();
@@ -40,6 +43,7 @@ class ConsultaSituacaoController extends Controller
     {
         $this->validateAndConnect();
 
+        // Regex para CPF
         $cpf = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
 
         $run = $this->connection->prepare("select SITUACAO, REGISTRONUM, ASS_ID, NOME, EMAILS from PROCSTATUSREGISTRO('" . $cpf . "')");
