@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\CrudEvent;
 use App\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 
 class PostsController extends Controller
 {
@@ -172,5 +173,22 @@ class PostsController extends Controller
         return redirect('/admin/posts')
             ->with('message', '<i class="icon fa fa-check"></i>Post deletado com sucesso!')
             ->with('class', 'alert-success');
+    }
+
+    public function busca()
+    {
+        $this->authorize('create', new Post());
+
+        $busca = Input::get('q');
+
+        $variaveis = (object) $this->variaveis;
+
+        $resultados = Post::where('titulo','LIKE','%'.$busca.'%')
+            ->orWhere('conteudo','LIKE','%'.$busca.'%')
+            ->paginate(10);
+
+        $tabela = $this->tabelaCompleta($resultados);
+
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

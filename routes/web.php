@@ -200,6 +200,7 @@ Route::prefix('admin')->group(function() {
 
   // Rotas para Blog Posts
   Route::resource('/posts', 'PostsController')->except(['show']);
+  Route::get('/posts/busca', 'PostsController@busca');
 });
 
 /*

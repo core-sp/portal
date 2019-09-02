@@ -213,4 +213,16 @@ class BlogTest extends TestCase
 
         $this->assertSoftDeleted('posts', ['id' => $post->id]);
     }
+
+    /** @test */
+    function the_search_must_show_a_blog_post()
+    {
+        $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $this
+            ->get('/admin/posts/busca', ['q' => $post->titulo])
+            ->assertSeeText($post->subtitulo);
+    }
 }
