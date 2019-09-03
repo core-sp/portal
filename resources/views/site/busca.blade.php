@@ -25,7 +25,7 @@ use App\Http\Controllers\Helper;
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h2 class="stronger">Busca por: {{ $busca }}</h2>
+            <h2 class="stronger">Busca por: {{ html_entity_decode($busca) }}</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
@@ -45,22 +45,28 @@ use App\Http\Controllers\Helper;
             <a href="/noticia/{{ $resultado->slug }}"">
               <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
-            <h6 class="cinza">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
-            <p class="mt-2">{{ Helper::resumo($resultado->conteudo) }}</p>
-            <a href="/noticia/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+            <h6 class="cinza mb-2">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
+            {!! Helper::resumo($resultado->conteudo) !!}
+            <div>
+              <a href="/noticia/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+            </div>
             @elseif($resultado->tipo == 'Página')
             <a href="/{{ $resultado->slug }}">
-              <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
+              <h5 class="normal mb-2"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
-            <p class="mt-2">{{ Helper::resumo($resultado->conteudo) }}</p>
-            <a href="/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+            {!! Helper::resumo($resultado->conteudo) !!}
+            <div>
+              <a href="/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+            </div>
             @else
             <a href="/blog/{{ $resultado->slug }}"">
               <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
-            <h6 class="cinza">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
-            <p class="mt-2">{{ Helper::resumo($resultado->conteudo) }}</p>
-            <a href="/blog/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+            <h6 class="cinza mb-2">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
+            {!! Helper::resumo($resultado->conteudo) !!}
+            <div>
+              <a href="/blog/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+            </div>
             @endif
           </div>
           @endforeach

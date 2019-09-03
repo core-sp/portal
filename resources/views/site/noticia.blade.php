@@ -1,16 +1,18 @@
 @extends('site.layout.app', ['title' => 'Notícias'])
 
 @section('meta')
-  <meta property="og:url" content="{{ url('/') . '/noticia/' . $noticia->slug }}">
-  <meta property="og:type" content="article" />
-  <meta property="og:title" content="{{ $noticia->titulo }}">
-  <meta property="og:description" content="{!! retornaDescription($noticia->conteudo) !!}">
-  <meta property="og:image" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $noticia->img) : asset('img/news-generica-2.png') }}">
-  <meta property="og:image:secure_url" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $noticia->img) : asset('img/news-generica-2.png') }}">
+<meta name="description" content="{!! retornaDescription($noticia->conteudo) !!}" />
 
-  <meta name="twitter:title" content="{{ $noticia->titulo }}">
-  <meta name="twitter:description" content="{!! retornaDescription($noticia->conteudo) !!}">
-  <meta name="twitter:image" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $noticia->img) : asset('img/news-generica-2.png') }}">
+  <meta property="og:url" content="{{ url('/') . '/noticia/' . $noticia->slug }}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="{{ $noticia->titulo }}" />
+  <meta property="og:description" content="{!! retornaDescription($noticia->conteudo) !!}" />
+  <meta property="og:image" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $noticia->img) : asset('img/news-generica-2.png') }}" />
+  <meta property="og:image:secure_url" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $noticia->img) : asset('img/news-generica-2.png') }}" />
+
+  <meta name="twitter:title" content="{{ $noticia->titulo }}" />
+  <meta name="twitter:description" content="{!! retornaDescription($noticia->conteudo) !!}" />
+  <meta name="twitter:image" content="{{ isset($noticia->img) ? formataImageUrl(url('/') . $noticia->img) : asset('img/news-generica-2.png') }}" />
 @endsection
 
 @section('content')
