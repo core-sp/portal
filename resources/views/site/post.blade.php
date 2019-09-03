@@ -1,16 +1,18 @@
 @extends('site.layout.app', ['title' => $post->titulo])
 
 @section('meta')
-  <meta property="og:url" content="{{ url('/') . '/blog/' . $post->slug }}">
-  <meta property="og:type" content="article" />
-  <meta property="og:title" content="{{ $post->titulo }}">
-  <meta property="og:description" content="{!! retornaDescription($post->conteudo) !!}">
-  <meta property="og:image" content="{{ isset($post->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}">
-  <meta property="og:image:secure_url" content="{{ isset($post->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}">
+  <meta name="description" content="{!! retornaDescription($post->conteudo) !!}" />
 
-  <meta name="twitter:title" content="{{ $post->titulo }}">
-  <meta name="twitter:description" content="{!! retornaDescription($post->conteudo) !!}">
-  <meta name="twitter:image" content="{{ formataImageUrl(url('/') . $post->img) }}">
+  <meta property="og:url" content="{{ url('/') . '/blog/' . $post->slug }}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="{{ $post->titulo }}" />
+  <meta property="og:description" content="{!! retornaDescription($post->conteudo) !!}" />
+  <meta property="og:image" content="{{ isset($post->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}" />
+  <meta property="og:image:secure_url" content="{{ isset($post->img) ? formataImageUrl(url('/') . $post->img) : asset('img/news-generica-2.png') }}" />
+
+  <meta name="twitter:title" content="{{ $post->titulo }}" />
+  <meta name="twitter:description" content="{!! retornaDescription($post->conteudo) !!}" />
+  <meta name="twitter:image" content="{{ formataImageUrl(url('/') . $post->img) }}" />
 @endsection
 
 @section('content')

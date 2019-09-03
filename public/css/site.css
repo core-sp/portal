@@ -1385,6 +1385,10 @@ footer p {
 	border-bottom: none;
 }
 
+.box-resultado p {
+	display: inline-block;
+}
+
 /*
  * PÁGINA DE AGENDAMENTO
  */

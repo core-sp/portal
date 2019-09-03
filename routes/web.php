@@ -237,7 +237,7 @@ Route::prefix('/')->group(function() {
   Route::get('concurso/{id}', 'ConcursoSiteController@show');
   
   // Busca geral
-  Route::get('/busca', 'SiteController@busca');  
+  Route::get('/busca', 'SiteController@busca');
 
   // Seccionais
   Route::get('seccionais', 'RegionalSiteController@regionaisView');
