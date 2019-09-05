@@ -1484,6 +1484,10 @@ footer p {
 	height: 32px;
 }
 
+.notReadOnly {
+	background-color: #FFFFFF !important;
+}
+
 .nowrap {
 	white-space: nowrap;
 }

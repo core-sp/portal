@@ -125,65 +125,39 @@
             </div>
             <div class="form-row mt-2">
               <div class="col">
-                <input
+                <button
                   type="submit"
-                  value="Simular {{ Input::has('dataInicio') ? ' novamente' : '' }}"
                   class="btn btn-primary"
                   id="submitSimulador"
-                  onclick="ga('send', {hitType: 'event', eventCategory: 'Button', eventAction: 'click', eventLabel: 'Simulador' });"
-                />
+                  onclick="ga('send', 'event', 'button', 'click-simulador', 'Simulador');"
+                >
+                  Simular {{ Input::has('dataInicio') ? ' novamente' : '' }}
+                </button>
                 <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading"></div>
               </div>
             </div>
           </form>
         </div>
+        <div id="simuladorTxt">
         @if(isset($total) || isset($extrato) || isset($taxas))
-        <div class="row nomargin mt-4">
-          <h4 class="mb-1">Pessoa {{ SimuladorControllerHelper::tipoPessoa()[Input::get('tipoPessoa')] }} {{ Input::get('filial') && Input::get('filial') !== '50' ? ' (' . SimuladorControllerHelper::listaCores()[Input::get('filial')] . ')' : '' }}</h4>
-          <table class="table table-sm table-hover mb-0 tableSimulador">
-            <thead>
-              <tr>
-                <th class="border-3">Descrição</th>
-                <th class="border-3">Valor</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($extrato as $cobranca)
-                <tr>
-                  <td>{{ $cobranca['DESCRICAO'] }}</td>
-                  <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['VALOR_TOTAL']) }}</span></td>
-                </tr>
-              @endforeach
-              <tr class="blank-row"><td colspan="2"></td></tr>
-              @foreach($taxas as $cobranca)
-                <tr>
-                  <td>{{ utf8_encode($cobranca['TAX_DESCRICAO']) }}</td>
-                  <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['TAX_VALOR']) }}</span></td>
-                </tr>
-              @endforeach
-              <tr class="blank-row"><td colspan="2"></td></tr>
-              <tr>
-                <td class="text-right pt-2"><strong>Total:</strong></td>
-                <td class="pt-2"><span class="nowrap">R$ {{ $total }}</span></td>
-              </tr>
-            </tbody>
-          </table>
-          @if(isset($rt))
-            <h4 class="mb-1">Pessoa Física RT</h4>
+          <div class="row nomargin mt-4">
+            <h4 class="mb-1">Pessoa {{ SimuladorControllerHelper::tipoPessoa()[Input::get('tipoPessoa')] }} {{ Input::get('filial') && Input::get('filial') !== '50' ? ' (' . SimuladorControllerHelper::listaCores()[Input::get('filial')] . ')' : '' }}</h4>
             <table class="table table-sm table-hover mb-0 tableSimulador">
               <thead>
-                <th class="border-3">Descrição</th>
-                <th class="border-3">Valor</th>
+                <tr>
+                  <th class="border-3">Descrição</th>
+                  <th class="border-3">Valor</th>
+                </tr>
               </thead>
               <tbody>
-                @foreach($rt as $cobranca)
+                @foreach($extrato as $cobranca)
                   <tr>
                     <td>{{ $cobranca['DESCRICAO'] }}</td>
                     <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['VALOR_TOTAL']) }}</span></td>
                   </tr>
                 @endforeach
                 <tr class="blank-row"><td colspan="2"></td></tr>
-                @foreach($rtTaxas as $cobranca)
+                @foreach($taxas as $cobranca)
                   <tr>
                     <td>{{ utf8_encode($cobranca['TAX_DESCRICAO']) }}</td>
                     <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['TAX_VALOR']) }}</span></td>
@@ -192,43 +166,72 @@
                 <tr class="blank-row"><td colspan="2"></td></tr>
                 <tr>
                   <td class="text-right pt-2"><strong>Total:</strong></td>
-                  <td class="pt-2"><span class="nowrap">R$ {{ str_replace('.', ',', $rtTotal) }}</span></td>
+                  <td class="pt-2"><span class="nowrap">R$ {{ $total }}</span></td>
                 </tr>
               </tbody>
             </table>
-            <h4 class="mt-2"><span class="light">Total geral:</span> R$ {{ $totalGeral  }}</h4>
+            @if(isset($rt))
+              <h4 class="mb-1">Pessoa Física RT</h4>
+              <table class="table table-sm table-hover mb-0 tableSimulador">
+                <thead>
+                  <th class="border-3">Descrição</th>
+                  <th class="border-3">Valor</th>
+                </thead>
+                <tbody>
+                  @foreach($rt as $cobranca)
+                    <tr>
+                      <td>{{ $cobranca['DESCRICAO'] }}</td>
+                      <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['VALOR_TOTAL']) }}</span></td>
+                    </tr>
+                  @endforeach
+                  <tr class="blank-row"><td colspan="2"></td></tr>
+                  @foreach($rtTaxas as $cobranca)
+                    <tr>
+                      <td>{{ utf8_encode($cobranca['TAX_DESCRICAO']) }}</td>
+                      <td><span class="nowrap">{{ 'R$ ' . str_replace('.', ',', $cobranca['TAX_VALOR']) }}</span></td>
+                    </tr>
+                  @endforeach
+                  <tr class="blank-row"><td colspan="2"></td></tr>
+                  <tr>
+                    <td class="text-right pt-2"><strong>Total:</strong></td>
+                    <td class="pt-2"><span class="nowrap">R$ {{ str_replace('.', ',', $rtTotal) }}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h4 class="mt-2"><span class="light">Total geral:</span> R$ {{ $totalGeral  }}</h4>
+            @endif
+          </div>
+          <hr>
+          <div class="row nomargin">
+            <small><i>* Os valores calculados são de acordo com as informações preenchidas</i></small>
+          </div>
+          @endif
+          @if(request('tipoPessoa') === '2')
+            <hr>
+            <div class="textoSimulador">
+              {!! SimuladorControllerHelper::textoPessoaFisica() !!}
+            </div>
+          @elseif(request('tipoPessoa') === '5')
+            <hr>
+            <div class="textoSimulador">
+              {!! SimuladorControllerHelper::textoPessoaFisicaRt() !!}
+            </div>
+          @elseif(request('tipoPessoa') === '1' && request('empresaIndividual') !== 'on')
+            <hr>
+            <div class="textoSimulador">
+              {!! SimuladorControllerHelper::textoPessoaJuridica() !!}
+            </div>
+          @elseif(request('tipoPessoa') === '1' && request('empresaIndividual') === 'on')
+            <hr>
+            <div class="textoSimulador">
+              {!! SimuladorControllerHelper::textoPessoaJuridicaEmpresaIndividual() !!}
+            </div>
+          @endif
+          @if(request('tipoPessoa') !== null)
+            <hr>
+            <p class="light">Simulação emitida em: <strong>{{ date('d\/m\/Y') }}</strong></p>
           @endif
         </div>
-        <hr>
-        <div class="row nomargin">
-          <small><i>* Os valores calculados são de acordo com as informações preenchidas</i></small>
-        </div>
-        @endif
-        @if(request('tipoPessoa') === '2')
-          <hr>
-          <div class="textoSimulador">
-            {!! SimuladorControllerHelper::textoPessoaFisica() !!}
-          </div>
-        @elseif(request('tipoPessoa') === '5')
-          <hr>
-          <div class="textoSimulador">
-            {!! SimuladorControllerHelper::textoPessoaFisicaRt() !!}
-          </div>
-        @elseif(request('tipoPessoa') === '1' && request('empresaIndividual') !== 'on')
-          <hr>
-          <div class="textoSimulador">
-            {!! SimuladorControllerHelper::textoPessoaJuridica() !!}
-          </div>
-        @elseif(request('tipoPessoa') === '1' && request('empresaIndividual') === 'on')
-          <hr>
-          <div class="textoSimulador">
-            {!! SimuladorControllerHelper::textoPessoaJuridicaEmpresaIndividual() !!}
-          </div>
-        @endif
-        @if(request('tipoPessoa') !== null)
-          <hr>
-          <p class="light">Simulação emitida em: <strong>{{ date('d\/m\/Y') }}</strong></p>
-        @endif
       </div>
       <div class="col-lg-4">
         @include('site.inc.content-sidebar')

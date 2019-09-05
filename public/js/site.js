@@ -273,17 +273,20 @@ function getDate() {
 	// Datepicker options
 	if($('#tipoPessoa').val() != '1') {
 		$('#dataInicio').datepicker("destroy");
+	} else {
+		$('#dataInicio').addClass('notReadOnly');
 	}
 	// Mudanças on change tipo de Pessoa
 	$(document).on('change', '#tipoPessoa', function(){
+		$('#simuladorTxt').hide();
 		if ($('#tipoPessoa').val() == 1) {
 			$('#simuladorAddons').show();
 			$('#simuladorAddons').css('display','flex');
-			$('#dataInicio').val('').datepicker(options);
+			$('#dataInicio').val('').datepicker(options).addClass('notReadOnly');
 		} else {
 			$('#simuladorAddons').hide();
 			$('#filial').prop('disabled', 'disabled').val('');
-			$('#dataInicio').val(getDate()).datepicker("destroy");
+			$('#dataInicio').val(getDate()).datepicker("destroy").removeClass('notReadOnly');
 		}
 	});
 	// Filial
