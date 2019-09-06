@@ -1,5 +1,9 @@
 @extends('site.layout.app', ['title' => 'Consulta de Situação'])
 
+@section('description')
+  <meta name="description" content="A Consulta de Situação do Core-SP é uma solução informatizada que permite verificar a situação do Representante Comercial junto ao Conselho." />
+@endsection
+
 @section('content')
 
 @php

@@ -1,5 +1,9 @@
 @extends('site.layout.app', ['title' => 'Regionais'])
 
+@section('description')
+  <meta name="description" content="O Core-SP possui escritórios seccionais espalhados por regiões estratégicas em todo o estado de São Paulo. Encontre o escritório mais próximo de você.">
+@endsection
+
 @section('content')
 
 @php

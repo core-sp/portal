@@ -1,5 +1,9 @@
 @extends('site.layout.app', ['title' => 'Simulador'])
 
+@section('description')
+  <meta name="description" content="Com informações detalhadas, o Simulador de Valores permite ao Representante Comercial calcular com precisão o valor de seu Registro Inicial." />
+@endsection
+
 @section('content')
 
 @php

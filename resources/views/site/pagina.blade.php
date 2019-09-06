@@ -1,5 +1,9 @@
 @extends('site.layout.app', ['title' => $pagina->titulo])
 
+@section('description')
+  <meta name="description" content="{!! retornaDescription($pagina->conteudo) !!}">
+@endsection
+
 @section('meta')
   <meta property="og:url" content="{{ url('/') . '/' . $pagina->slug }}">
   <meta property="og:type" content="article" />
