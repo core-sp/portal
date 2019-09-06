@@ -129,7 +129,7 @@
                   type="submit"
                   class="btn btn-primary"
                   id="submitSimulador"
-                  onclick="ga('send', 'event', 'button', 'click-simulador', 'Simulador');"
+                  onclick="ga('send', 'event', 'button', 'click', 'simulador');"
                 >
                   Simular {{ Input::has('dataInicio') ? ' novamente' : '' }}
                 </button>
