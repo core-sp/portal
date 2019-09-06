@@ -129,9 +129,9 @@
                   type="submit"
                   class="btn btn-primary"
                   id="submitSimulador"
-                  onClick="gtag('event', 'button', {
-                    'event_category': 'click',
-                    'event_label': 'simulador'
+                  onClick="gtag('event', 'calcular', {
+                    'event_category': 'simulador',
+                    'event_label': 'Simulador de Valores'
                   });"
                 >
                   Simular {{ Input::has('dataInicio') ? ' novamente' : '' }}
