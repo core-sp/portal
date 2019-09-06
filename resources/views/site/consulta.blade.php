@@ -59,7 +59,16 @@
               @endif
             </div>
             <div class="ml-2 align-self-end">
-              <button type="submit" class="btn btn-primary">Consultar {{ Input::get('cpfCnpj') ? 'novamente' : '' }}</button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                onClick="gtag('event', 'consultar', {
+                  'event_category': 'situação',
+                  'event_label': 'Consulta de Situação'
+                });"
+              >
+                Consultar {{ Input::get('cpfCnpj') ? 'novamente' : '' }}
+              </button>
             </div>
           </form>
         </div>
