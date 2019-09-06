@@ -1,5 +1,9 @@
 @extends('site.layout.app', ['title' => 'Cursos'])
 
+@section('description')
+  <meta name="description" content="{!! retornaDescription($curso->descricao) !!}" />
+@endsection
+
 @section('content')
 
 @php

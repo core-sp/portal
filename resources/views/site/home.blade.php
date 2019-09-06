@@ -1,5 +1,9 @@
 @extends('site.layout.app', ['title' => 'Home'])
 
+@section('description')
+  <meta name="description" content="O Core-SP é responsável pela consulta, orientação, disciplina e fiscalização do exercício da profissão de Representação Comercial no estado de São Paulo.">
+@endsection
+
 @section('content')
 
 @php

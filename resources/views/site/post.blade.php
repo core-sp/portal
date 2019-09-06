@@ -1,8 +1,10 @@
 @extends('site.layout.app', ['title' => $post->titulo])
 
-@section('meta')
+@section('description')
   <meta name="description" content="{!! retornaDescription($post->conteudo) !!}" />
+@endsection
 
+@section('meta')
   <meta property="og:url" content="{{ url('/') . '/blog/' . $post->slug }}" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{{ $post->titulo }}" />
