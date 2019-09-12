@@ -58,22 +58,18 @@ use \App\Http\Controllers\Helper;
                 <a href="/"><img src="{{ asset('img/logo-core.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
-              <div class="d-flex it">
-                <div class="align-right it-icon">
-                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-                    <img src="{{ asset('img/aai-v13.png') }}" alt="Core-SP | Portal da Transparência">
-                  </a>
-                </div>
-                <div class="text-left align-self-center it-txt">
-                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-                    <h6 class="lh-1 pl-2">Acesso à<br />informação</h6>
-                  </a>
-                </div>
+              <div class="d-block setembro">
+                <h2 class="pacifico">#SetembroAmarelo</h2>
+                <p class="light"><small><i>"Campanha brasileira de prevenção ao suicídio"</i></small></p>
               </div>
+              
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
               <div class="mexe-tamanho m-auto text-center">
                 <div class="acessibilidade mb-2 center-992 text-right">
+                  <button type="button" class="btn btn-sm btn-light btn-accessibilidade" id="btn-aat">
+                    <img src="{{ asset('img/aai-v13.png') }}" alt="Core-SP | Portal da Transparência"> <span class="hide-only-1200">Acesso à informação</span>
+                  </button>
                   <button type="button" class="btn btn-sm btn-light btn-acessibilidade" id="increase-font">
                     <h6>A+</h6>
                   </button>
@@ -123,47 +119,49 @@ use \App\Http\Controllers\Helper;
             <div class="linha-cinza"></div>
           </div>
         </div>
-        <div class="container">
-          <div class="row" id="menu-principal">
-            <nav class="menu-principal m-auto">
-              <ul class="nomargin nopadding">
-                <li class="nav-item">
-                  <a href="/" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
-                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a href="/institucional" class="dropdown-item">Institucional</a>
-                    <a href="/conselho" class="dropdown-item">Conselho</a>
-                    <a href="/legislacao" class="dropdown-item">Legislação</a>
-                  </div>
-                </li>
-                <li class="nav-item">
-                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="nav-link" target="_blank">Transparência</a>
-                </li>
-                <li class="nav-item">
-                  <a href="/licitacoes" class="nav-link">Licitações</a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Serviços</a>
-                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a href="/agendamento" class="dropdown-item">Agendamento</a>
-                    <a href="/balcao-de-oportunidades" class="dropdown-item">Balcão de Oportunidades</a>
-                    <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
-                    <a href="/cursos" class="dropdown-item">Cursos</a>
-                    <a href="/downloads" class="dropdown-item">Downloads</a>
-                    <a href="/registro-inicial" class="dropdown-item">Registro Inicial</a>
-                    <a href="/simulador" class="dropdown-item">Simulador de Valores</a>
-                  </div>
-                </li>
-                <li class="nav-item">
-                  <a href="/seccionais" class="nav-link">Seccionais</a>
-                </li>
-                <li class="nav-item">
-                  <a href="/blog" class="nav-link">Blog</a>
-                </li>
-              </ul>
-            </nav>
+        <div class="container-fluid menu-inteiro">
+          <div class="container">
+            <div class="row" id="menu-principal">
+              <nav class="menu-principal m-auto">
+                <ul class="nomargin nopadding">
+                  <li class="nav-item">
+                    <a href="/" class="nav-link">Home</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a href="/institucional" class="dropdown-item">Institucional</a>
+                      <a href="/conselho" class="dropdown-item">Conselho</a>
+                      <a href="/legislacao" class="dropdown-item">Legislação</a>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="nav-link" target="_blank">Transparência</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/licitacoes" class="nav-link">Licitações</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Serviços</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a href="/agendamento" class="dropdown-item">Agendamento</a>
+                      <a href="/balcao-de-oportunidades" class="dropdown-item">Balcão de Oportunidades</a>
+                      <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
+                      <a href="/cursos" class="dropdown-item">Cursos</a>
+                      <a href="/downloads" class="dropdown-item">Downloads</a>
+                      <a href="/registro-inicial" class="dropdown-item">Registro Inicial</a>
+                      <a href="/simulador" class="dropdown-item">Simulador de Valores</a>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/seccionais" class="nav-link">Seccionais</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/blog" class="nav-link">Blog</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </div>
         </div>
       </header>

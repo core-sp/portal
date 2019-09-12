@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Crimson+Text');
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Crimson+Text|Satisfy');
 
 /*
  * REGRAS GERAIS
@@ -327,6 +327,7 @@ figure.align-left {
 #header-principal {
 	top: 0;
 	left: 0;
+	background-color: #FFE001;
 }
 
 .header-margin {
@@ -452,7 +453,7 @@ figure.align-left {
 
 .aai {
 	text-align: center;
-	align-self: flex-end;
+	align-self: center;
 }
 
 .it {
@@ -1564,6 +1565,41 @@ h5 {
 	padding-bottom: .5rem;
 }
 
+.pacifico {
+	font-family: 'Satisfy', cursive;
+}
+
+.menu-inteiro {
+	background-color: #FFFFFF;
+}
+
+.setembro h2 {
+	line-height: 1;
+}
+
+.setembro p {
+	margin-top: -2px;
+	line-height: 1;
+	letter-spacing: -0.25px;
+}
+
+#btn-aat {
+	padding-top: 3.5px;
+	padding-bottom: 3.5px;
+}
+
+#btn-aat img {
+	width: 19px;
+	margin-right: 2px;
+}
+
+#btn-aat {
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: -0.5px;
+	line-height: 19px;
+}
+
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS
@@ -1798,7 +1834,14 @@ h5 {
 	#fale {
 		padding-top: 2rem;
 	}
-	
+
+	.hide-only-1200 {
+		display: none;
+	}
+
+	#btn-aat img {
+		margin-right: 0px;
+	}
 }
 
 
@@ -2023,6 +2066,14 @@ h5 {
 
 	.conteudo-txt iframe {
 		height: 387px;
+	}
+
+	.hide-only-1200 {
+		display: inline-block;
+	}
+
+	#btn-aat img {
+		margin-right: 2px;
 	}
 }
 
