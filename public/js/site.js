@@ -56,7 +56,17 @@ $(document).ready(function(){
         e.preventDefault();
         window.open($(this).attr('href'), 'fbShareWindow', 'height=700, width=450, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
         return false;
-    });
+	});
+	
+	$(window).scroll(function(){
+		if($(window).width() > 767) {
+			if ($(document).scrollTop() > 300) {
+				$('#fixed-menu').slideDown(150);
+			} else {
+				$('#fixed-menu').hide();
+			}
+		}
+	});
 });
 // Scroll das redes sociais em posts do blog
 if(window.location.href.indexOf("/blog/") > -1) {
@@ -70,13 +80,6 @@ if(window.location.href.indexOf("/blog/") > -1) {
 	}
 	// Mostra menu superior ao rolar a tela
 	$(window).scroll(function(){
-		if($(window).width() > 767) {
-			if ($(document).scrollTop() > 300) {
-				$('#fixed-menu').slideDown(150);
-			} else {
-				$('#fixed-menu').hide();
-			}
-		}
 		var windowTop  = $(document).scrollTop() + $('#fixed-menu').height() + margin;
 		if(windowTop >= prenderTopInicial) {
 			$('#prender').addClass('prender').css('top', $('#fixed-menu').height() + margin);

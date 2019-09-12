@@ -29,7 +29,9 @@ $(document).ready(function(){
 			'#sidebar',
 			'.dropdown-item',
 			'.tableSimulador',
-			'label'
+			'label',
+			'.menu-inteiro',
+			'#header-principal'
 		];
 		$(list).toggleClass('contraste');
 
