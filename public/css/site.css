@@ -2433,4 +2433,9 @@ h5 {
 		width: 200px;
 	}
 
+	#btn-aat {
+		display: block;
+		margin: 0 auto;
+		margin-bottom: 5px;
+	}
 }
