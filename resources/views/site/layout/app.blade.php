@@ -67,9 +67,11 @@ use \App\Http\Controllers\Helper;
             <div class="col-lg-4 align-self-end mt-15-992">
               <div class="mexe-tamanho m-auto text-center">
                 <div class="acessibilidade center-992 text-right">
-                  <button type="button" class="btn btn-sm btn-light btn-accessibilidade" id="btn-aat">
-                    <img src="{{ asset('img/aai-v13.png') }}" alt="Core-SP | Portal da Transparência"> <span class="hide-only-1200">Acesso à informação</span>
-                  </button>
+                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
+                    <button type="button" class="btn btn-sm btn-light btn-accessibilidade" id="btn-aat">
+                      <img src="{{ asset('img/aai-v13.png') }}" alt="Core-SP | Portal da Transparência"> <span class="hide-only-1200">Acesso à informação</span>
+                    </button>
+                  </a>
                   <button type="button" class="btn btn-sm btn-light btn-acessibilidade" id="increase-font">
                     <h6>A+</h6>
                   </button>
