@@ -60,7 +60,7 @@ use \App\Http\Controllers\Helper;
             <div class="col-lg-4 col-md-6 center-768 aai">
               <div class="d-block setembro">
                 <h2 class="pacifico">#SetembroAmarelo</h2>
-                <p class="light"><small><i>"Campanha brasileira de prevenção ao suicídio"</i></small></p>
+                <p class="light"><small>Campanha brasileira de prevenção ao suicídio</small></p>
               </div>
               
             </div>
