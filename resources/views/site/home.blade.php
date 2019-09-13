@@ -210,16 +210,14 @@
         </div>
         <div class="row">
           <div class="col-lg-6 faleSingle">
-            <a href="/agendamento-consulta">
-              <div class="row nomargin">
-                <div class="align-self-center">
-                  <img src="{{ asset('img/002-phone-book-.png') }}" class="inside-img" alt="Consulta de Agendamento | Core-SP">
-                </div>
-                <div class="flex-one fale-txt align-self-center">
-                  <h5 class="normal">Consulte seu<br class="hide-992" /> agendamento</h5>
-                </div>
+            <div class="row nomargin">
+              <div class="align-self-center">
+                <img src="{{ asset('img/004-headset-.png') }}" class="inside-img" alt="Atendimento | Core-SP">
               </div>
-            </a>
+              <div class="flex-one fale-txt align-self-center">
+                <h5 class="normal">Atendimento<br class="hide-992" /> (11) 3243-5500</h5>
+              </div>
+            </div>
           </div>
           <div class="col-lg-6 faleSingle">
             <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
@@ -233,27 +231,37 @@
               </div>
             </a>
           </div>
+        </div>
+        <div class="home-title mt-4">
+          <blockquote>
+            <i></i>
+            <h2 class="pr-3 ml-1">CORE-SP nas Mídias Sociais</h2>
+          </blockquote>
+        </div>
+        <div class="row">
           <div class="col-lg-6 faleSingle">
             <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
               <div class="row nomargin">
                 <div class="align-self-center">
-                  <img src="{{ asset('img/003-youtube-.png') }}" class="inside-img" alt="YouTube | Core-SP">
+                  <img src="{{ asset('img/youtube-icon.png') }}" class="inside-img" alt="YouTube | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
-                  <h5 class="normal">Institucional 2019<br class="hide-992" /> e informativos</h5>
+                  <h5 class="normal">Nosso canal<br class="hide-992" /> no YouTube</h5>
                 </div>
               </div>
             </a>
           </div>
           <div class="col-lg-6 faleSingle">
-            <div class="row nomargin">
-              <div class="align-self-center">
-                <img src="{{ asset('img/004-headset-.png') }}" class="inside-img" alt="Atendimento | Core-SP">
+            <a href="https://www.instagram.com/coresaopaulo/?hl=pt-br" target="_blank">
+              <div class="row nomargin">
+                <div class="align-self-center">
+                  <img src="{{ asset('img/instagram-icon.png') }}" class="inside-img" alt="Instagram | Core-SP">
+                </div>
+                <div class="flex-one fale-txt align-self-center">
+                  <h5 class="normal">Siga-nos<br class="hide-992" /> no Instagram</h5>
+                </div>
               </div>
-              <div class="flex-one fale-txt align-self-center">
-                <h5 class="normal">Atendimento<br class="hide-992" /> (11) 3243-5500</h5>
-              </div>
-            </div>
+            </a>
           </div>
         </div>
       </div>
