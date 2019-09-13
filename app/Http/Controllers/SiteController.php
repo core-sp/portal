@@ -25,7 +25,7 @@ class SiteController extends Controller
         $cotidianos = Noticia::where('publicada','Sim')
             ->where('categoria','Cotidiano')
             ->orderBy('created_at','DESC')
-            ->limit(3)
+            ->limit(4)
             ->get();
         $imagens = HomeImagem::select('ordem','url','url_mobile','link','target')
             ->orderBy('ordem','ASC')
