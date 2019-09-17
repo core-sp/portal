@@ -114,6 +114,7 @@ class BdoEmpresaControllerHelper extends Controller
             'Produtos Agrícolas',
             'Produtos Frigoríficos',
             'Produtos Laboratoriais',
+            'Produtos Sustentáveis',
             'Publicidade e Propaganda',
             'Químico',
             'Químico/Farmacêutica',
