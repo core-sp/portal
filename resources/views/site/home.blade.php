@@ -292,6 +292,24 @@
 
 <section id="eouv-calendario" class="pb-5">
   <div class="container">
+    <div class="row mb-2">
+      <div class="col">
+        <div class="home-title">
+          <blockquote>
+            <i></i>
+            <h2 class="pr-3 ml-1">Blog</h2>
+          </blockquote>
+        </div>
+        <div></div>
+      </div>
+    </div>
+    <div class="row" id="home-blog">
+      @php $i = 0; $post = new \App\Post(); @endphp
+      @foreach($post->latestPosts() as $post)
+        @php $i++; @endphp
+        @include('site.inc.post-grid')
+      @endforeach
+    </div>
     <div class="row">
       <div class="col-lg-6">
         <div class="home-title">
