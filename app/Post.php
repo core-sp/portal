@@ -20,4 +20,9 @@ class Post extends Model
     {
         return '/blog/' . $this->slug;
     }
+
+    public function latestPosts()
+    {
+        return $this->orderBy('created_at', 'DESC')->limit(3)->get();
+    }
 }

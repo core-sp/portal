@@ -74,6 +74,7 @@ if(window.location.href.indexOf("/blog/") > -1) {
 	var margin = 15;
 	var prenderTopInicial = $('#prender').offset().top - margin;
 	var limiteBotInicial = $('.limite-sociais').offset().top + $('.limite-sociais').outerHeight(true);
+	console.log($('.limite-sociais').offset().top);
 	if($(window).resize()) {
 		var prenderTopInicial = $('#prender').offset().top - margin;
 		var limiteBotInicial = $('.limite-sociais').offset().top + $('.limite-sociais').outerHeight(true);
@@ -81,12 +82,13 @@ if(window.location.href.indexOf("/blog/") > -1) {
 	// Mostra menu superior ao rolar a tela
 	$(window).scroll(function(){
 		var windowTop  = $(document).scrollTop() + $('#fixed-menu').height() + margin;
+		this.console.log(windowTop);
 		if(windowTop >= prenderTopInicial) {
 			$('#prender').addClass('prender').css('top', $('#fixed-menu').height() + margin);
 		} else {
 			$('#prender').removeClass('prender');
 		}
-		if(windowTop >= limiteBotInicial - ($('#prender').height() + margin)) {
+		if(windowTop >= limiteBotInicial) {
 			$('#prender').addClass('prenderBot');
 		} else {
 			$('#prender').removeClass('prenderBot');
