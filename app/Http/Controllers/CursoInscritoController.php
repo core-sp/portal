@@ -371,7 +371,7 @@ class CursoInscritoController extends Controller
             'Expires' => '0',
             'Pragma' => 'public',
         ];
-        $resultado = CursoInscrito::select('cpf','nome','telefone','email','registrocore','created_at')
+        $resultado = CursoInscrito::select('email','cpf','nome','telefone','registrocore','created_at')
             ->where('idcurso', $id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -380,7 +380,7 @@ class CursoInscritoController extends Controller
         $callback = function() use($lista) {
             $fh = fopen('php://output','w');
             foreach($lista as $linha) {
-                fputcsv($fh,$linha);
+                fputcsv($fh,$linha,';');
             }
             fclose($fh);
         };

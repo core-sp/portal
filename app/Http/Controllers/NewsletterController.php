@@ -81,7 +81,7 @@ class NewsletterController extends Controller
         $callback = function() use($lista) {
             $fh = fopen('php://output','w');
             foreach($lista as $linha) {
-                fputcsv($fh,$linha);
+                fputcsv($fh,$linha,';');
             }
             fclose($fh);
         };
