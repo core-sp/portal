@@ -180,9 +180,7 @@ class CursoInscritoController extends Controller
         ControleController::autoriza($this->class, 'edit');
         $idcurso = $request->input('idcurso');
         $regras = [
-            'cpf' => ['required', 'max:191', new Cpf, Rule::unique('curso_inscritos')->where(function ($q) use ($idcurso, $id) {
-                return $q->where('idcurso', $idcurso)->where('idcursoinscrito','!=',$id);
-            })],
+            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,'.$id.',idcursoinscrito,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191',
             'email' => 'required|email|max:191|min:14',
@@ -379,6 +377,7 @@ class CursoInscritoController extends Controller
         array_unshift($lista, array_keys($lista[0]));
         $callback = function() use($lista) {
             $fh = fopen('php://output','w');
+            fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
             foreach($lista as $linha) {
                 fputcsv($fh,$linha,';');
             }

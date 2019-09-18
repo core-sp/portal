@@ -80,6 +80,7 @@ class NewsletterController extends Controller
         array_unshift($lista, array_keys($lista[0]));
         $callback = function() use($lista) {
             $fh = fopen('php://output','w');
+            fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
             foreach($lista as $linha) {
                 fputcsv($fh,$linha,';');
             }
