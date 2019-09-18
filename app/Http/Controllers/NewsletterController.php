@@ -75,7 +75,7 @@ class NewsletterController extends Controller
             'Expires' => '0',
             'Pragma' => 'public',
         ];
-        $lista = Newsletter::select('nome','email','celular','created_at')->get();
+        $lista = Newsletter::select('email','nome','celular','created_at')->get();
         $lista = $lista->toArray();
         array_unshift($lista, array_keys($lista[0]));
         $callback = function() use($lista) {
