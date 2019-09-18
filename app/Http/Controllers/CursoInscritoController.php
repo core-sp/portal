@@ -127,9 +127,7 @@ class CursoInscritoController extends Controller
     {
         ControleController::autoriza($this->class, 'create');
         $regras = [
-            'cpf' => ['required', 'max:191', new Cpf, Rule::unique('curso_inscritos')->where(function ($q) use ($request) {
-                return $q->where('idcurso', $request->input('idcurso'));
-            })],
+            'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$request->input('idcurso').',deleted_at,NULL', new Cpf],
             'nome' => 'required|max:191',
             'telefone' => 'required|max:191|min:14',
             'email' => 'required|email|max:191',
