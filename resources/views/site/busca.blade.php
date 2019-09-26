@@ -25,7 +25,10 @@ use App\Http\Controllers\Helper;
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <h2 class="stronger">Busca por: {{ html_entity_decode($busca) }}</h2>
+            <p class="light">Busca por: <strong>{{ html_entity_decode($busca) }}</strong>
+            @if($resultados->count())
+            <small><i>- {{ $resultados->count() === 1 ? $resultados->count() . ' resultado' : $resultados->count() . ' resultados' }}</i></small></p>
+            @endif
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
@@ -37,7 +40,7 @@ use App\Http\Controllers\Helper;
     <div class="row mt-2">
       <div class="col-sm-8">
         @if($resultados->isEmpty())
-          Sua busca não retornou nenhum resultado!
+          Sua busca não retornou <strong>nenhum resultado!</strong>
         @else
           @foreach($resultados as $resultado)
           <div class="box-resultado">
