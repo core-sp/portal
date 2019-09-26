@@ -27,6 +27,26 @@
                 @endif
             </div>
             <div class="col">
+                <label for="bairro">Bairro</label>
+                <input type="text"
+                    class="form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
+                    placeholder="Bairro"
+                    name="bairro"
+                    @if(!empty(old('bairro')))
+                        value="{{ old('bairro') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->bairro }}"
+                        @endif
+                    @endif
+                    />
+                @if($errors->has('bairro'))
+                <div class="invalid-feedback">
+                {{ $errors->first('bairro') }}
+                </div>
+                @endif
+            </div>
+            <div class="col">
                 <label for="email">Email</label>
                 <input type="text"
                     class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"

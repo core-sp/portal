@@ -90,6 +90,7 @@ class RegionalController extends Controller
             'cidade' => 'required|max:191',
             'email' => 'required|max:191',
             'endereco' => 'required|max:191',
+            'bairro' => 'required|max:191',
             'numero' => 'required|max:191',
             'cep' => 'required|max:191',
             'telefone' => 'required|max:191',
@@ -108,7 +109,7 @@ class RegionalController extends Controller
         $erros = $request->validate($regras, $mensagens);
         // Inputa dados no BD
         $update = Regional::findOrFail($id)->update(request([
-            'cidade', 'email', 'endereco', 'numero', 'complemento',
+            'cidade', 'email', 'endereco', 'bairro', 'numero', 'complemento',
             'cep', 'telefone', 'fax', 'funcionamento', 'ageporhorario',
             'responsavel', 'descricao'
         ]));
