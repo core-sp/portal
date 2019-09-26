@@ -70,23 +70,18 @@ $(document).ready(function(){
 });
 // Scroll das redes sociais em posts do blog
 if(window.location.href.indexOf("/blog/") > -1) {
-	// Variaveis
-	var margin = 15;
-	var prenderTopInicial = $('#prender').offset().top - margin;
-	var limiteBotInicial = $('.limite-sociais').offset().top + $('.limite-sociais').outerHeight(true);
-	if($(window).resize()) {
-		var prenderTopInicial = $('#prender').offset().top - margin;
-		var limiteBotInicial = $('.limite-sociais').offset().top + $('.limite-sociais').outerHeight(true);
-	}
-	// Mostra menu superior ao rolar a tela
-	$(window).scroll(function(){
-		var windowTop  = $(document).scrollTop() + $('#fixed-menu').height() + margin;
-		if(windowTop >= prenderTopInicial) {
+	var prenderTop = $('#prender').offset().top;
+	$(window).scroll(function() {
+		var margin = 15;
+		var topson = $(document).scrollTop() + $('#fixed-menu').height() + margin;
+		var topsonPrender = $(document).scrollTop() + $('#fixed-menu').height() + margin + $('#prender').height();
+		var botson = $('.sociais-post').offset().top + $('.sociais-post').height();
+		if(topson >= prenderTop) {
 			$('#prender').addClass('prender').css('top', $('#fixed-menu').height() + margin);
 		} else {
 			$('#prender').removeClass('prender');
 		}
-		if(windowTop >= limiteBotInicial - ($('#prender').height() + margin)) {
+		if(topsonPrender >= botson) {
 			$('#prender').addClass('prenderBot');
 		} else {
 			$('#prender').removeClass('prenderBot');
