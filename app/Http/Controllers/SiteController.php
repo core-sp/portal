@@ -57,11 +57,13 @@ class SiteController extends Controller
             $noticias = Noticia::select('titulo','slug','created_at','conteudo')
                 ->where('titulo','LIKE','%'.$busca.'%')
                 ->orWhere('conteudo','LIKE','%'.$busca.'%')
+                ->orderBy('created_at', 'DESC')
                 ->limit(10)
                 ->get();
             $posts = Post::select('titulo', 'slug', 'created_at', 'conteudo')
                 ->where('titulo','LIKE','%'.$busca.'%')
                 ->orWhere('conteudo','LIKE','%'.$busca.'%')
+                ->orderBy('created_at', 'DESC')
                 ->limit(10)
                 ->get();
             foreach($paginas as $pagina) {
