@@ -18,13 +18,16 @@ $regionais = BdoSiteControllerHelper::regionais();
 <section id="pagina-cabecalho" class="mt-1">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/bdo.png') }}" />
-    <div class="row position-absolute pagina-titulo">
+    <div class="row position-absolute pagina-titulo" id="bdo-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
           Balcão de Oportunidades
         </h1>
       </div>
     </div>
+    <h6 class="branco normal">
+      Quer anunciar vagas? Entre em contato para mais esclarecimentos através do <strong class="nowrap">informacoes@core-sp.org.br</strong>
+    </h6>
   </div>
 </section>
 
@@ -184,15 +187,7 @@ $regionais = BdoSiteControllerHelper::regionais();
       </div>
     </div>
     @endif
-  </div>
-  <div class="container-fluid">
-    <div class="row mt-2 mb-2">
-      <div class="linha-cinza"></div>
-    </div>
-  </div>
-  <div class="container">
-    <p><small><i>* Quer anunciar vagas em nosso balcão de Balcão de Oportunidades? Entre em contato para maiores esclarecimentos através do <strong>informacoes@core-sp.org.br</strong></i></small></p>
-  </div>
+  </div>  
 </section>
 
 @endsection
