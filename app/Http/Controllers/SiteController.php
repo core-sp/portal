@@ -49,8 +49,9 @@ class SiteController extends Controller
 
         if(isset($busca)) {
             $resultados = collect();
-            $paginas = Pagina::select('titulo','slug','created_at','conteudo')
+            $paginas = Pagina::select('titulo','subtitulo','slug','created_at','conteudo')
                 ->where('titulo','LIKE','%'.$busca.'%')
+                ->orWhere('subtitulo','LIKE','%'.$busca.'%')
                 ->orWhere('conteudo','LIKE','%'.$busca.'%')
                 ->limit(10)
                 ->get();
@@ -60,8 +61,9 @@ class SiteController extends Controller
                 ->orderBy('created_at', 'DESC')
                 ->limit(10)
                 ->get();
-            $posts = Post::select('titulo', 'slug', 'created_at', 'conteudo')
+            $posts = Post::select('titulo', 'subtitulo', 'slug', 'created_at', 'conteudo')
                 ->where('titulo','LIKE','%'.$busca.'%')
+                ->orWhere('subtitulo','LIKE','%'.$busca.'%')
                 ->orWhere('conteudo','LIKE','%'.$busca.'%')
                 ->orderBy('created_at', 'DESC')
                 ->limit(10)
