@@ -327,7 +327,7 @@ figure.align-left {
 #header-principal {
 	top: 0;
 	left: 0;
-	background-color: #D42170;
+	background-color: #CF458F;
 }
 
 .header-margin {
@@ -976,6 +976,17 @@ footer p {
 	padding-left: 15px;
 	padding-right: 15px;
 	margin: 0;
+}
+
+.pagina-titulo-img h6 {
+	position: absolute;
+	bottom: 10px;
+	left: 0; 
+	right: 0; 
+	margin-left: auto; 
+	margin-right: auto;
+	padding-left: 15px;
+	padding-right: 15px;
 }
 
 #pagina-conteudo,
@@ -1855,6 +1866,10 @@ h5 {
 	#btn-aat img {
 		margin-right: 0px;
 	}
+
+	.pagina-titulo-img h6 {
+		bottom: 7.5px;
+	}
 }
 
 
@@ -2450,5 +2465,17 @@ h5 {
 		display: block;
 		margin: 0 auto;
 		margin-bottom: 5px;
+	}
+
+	.pagina-titulo-img h6 {
+		bottom: 5px;
+	}
+
+	#bdo-titulo {
+		top: 40%;
+	}
+
+	#bdo-titulo h1 {
+		line-height: 1;
 	}
 }
