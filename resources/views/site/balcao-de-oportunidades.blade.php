@@ -185,6 +185,9 @@ $regionais = BdoSiteControllerHelper::regionais();
     </div>
     @endif
   </div>
+  <div class="container">
+    <p><small><i>* Quer anunciar vagas em nosso balcão de Balcão de Oportunidades? Entre em contato para maiores esclarecimentos através do <strong>informacoes@core-sp.org.br</strong></i></small></p>
+  </div>
 </section>
 
 @endsection
