@@ -478,7 +478,7 @@ figure.align-left {
 .btn-acessibilidade h6 {
 	font-weight: 900;
 	line-height: 1;
-	font-size: .9rem;
+	font-size: .9rem !important;
 }
 
 .btn-access {

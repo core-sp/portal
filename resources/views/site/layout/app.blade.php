@@ -55,7 +55,7 @@ use \App\Http\Controllers\Helper;
         <div class="container">
           <div class="row header-margin">
             <div class="col-lg-4 col-md-6 text-left center-768">
-                <a href="/"><img src="{{ asset('img/logo-core.png') }}" alt="CORE-SP" id="logo-header" /></a>
+                <a href="/"><img src="{{ asset('img/logo-branco.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
               <div class="d-block setembro">
