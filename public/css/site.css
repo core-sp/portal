@@ -327,7 +327,7 @@ figure.align-left {
 #header-principal {
 	top: 0;
 	left: 0;
-	background-color: #F2ABC1;
+	background-color: #D42170;
 }
 
 .header-margin {
@@ -1578,12 +1578,14 @@ h5 {
 
 .setembro h2 {
 	line-height: 1;
+	color: #FFFFFF;
 }
 
 .setembro p {
 	margin-top: -2px;
 	line-height: 1;
 	letter-spacing: -0.1px;
+	color: #FFFFFF;
 }
 
 #btn-aat {
