@@ -59,10 +59,9 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
               <div class="d-block setembro">
-                <h2 class="pacifico">#SetembroAmarelo</h2>
-                <p class="light"><small>Campanha brasileira de prevenção ao suicídio</small></p>
+                <h2 class="pacifico">#OutubroRosa</h2>
+                <p class="light"><small>Luta contra o câncer de mama</small></p>
               </div>
-              
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
               <div class="mexe-tamanho m-auto text-center">
