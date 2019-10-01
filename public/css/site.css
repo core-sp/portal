@@ -303,7 +303,7 @@ figure.align-left {
 }
 
 .conteudo-txt iframe {
-	max-width: 100%;
+	width: 100%;
 	height: 409px;
 	margin-top: 1rem;
 	margin-bottom: 1rem;
@@ -521,6 +521,8 @@ figure.align-left {
 	position: relative;
 	z-index: 3;
 	margin: 0;
+	background: none;
+	border-left: none;
 }
 
 .home-title blockquote i {
@@ -973,6 +975,7 @@ footer p {
 	right: 0;
 	padding-left: 15px;
 	padding-right: 15px;
+	margin: 0;
 }
 
 #pagina-conteudo,
@@ -1386,9 +1389,9 @@ footer p {
 	border-bottom: none;
 }
 
-.box-resultado p {
+/* .box-resultado p {
 	display: inline-block;
-}
+} */
 
 /*
  * PÁGINA DE AGENDAMENTO
