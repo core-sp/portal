@@ -166,8 +166,36 @@
                         </div>
                     </div>
                     <h4 class="mt-3">Informações da Oportunidade</h4>
-                    <div class="form-row">
+                    <div class="form-group">
+                        <label for="titulo">Título da Oportunidade</label>
+                        <input
+                            type="text"
+                            name="titulo"
+                            class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
+                            placeholder="Título"
+                            value="{{ old('titulo') }}"
+                        >
+                        @if($errors->has('titulo'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('titulo') }}
+                            </div>
+                        @endif
+                    </div>
+                    <div class="form-row mt-2">
                         <div class="col-sm mb-2-576">
+                            <label for="segmentoOportunidade">Segmento da Oportunidade</label>
+                            <select name="segmentoOportunidade" class="form-control">
+                                @foreach (segmentos() as $segmento)
+                                    <option value="{{ $segmento }}" {{ $segmento == old('segmentoOportunidade') ? 'selected' : '' }}>{{ $segmento }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('segmentoOportunidade'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('segmentoOportunidade') }}
+                                </div>
+                            @endif
+                        </div>
+                        <div class="col-sm-4 mb-2-576">
                             <label for="nrVagas">Quantidade de vagas</label>
                             <input
                                 type="text"
@@ -179,19 +207,6 @@
                             @if($errors->has('nrVagas'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('nrVagas') }}
-                                </div>
-                            @endif
-                        </div>
-                        <div class="col-sm mb-2-576">
-                            <label for="segmentoOportunidade">Segmento da Oportunidade</label>
-                            <select name="segmentoOportunidade" class="form-control">
-                                @foreach (segmentos() as $segmento)
-                                    <option value="{{ $segmento }}" {{ $segmento == old('segmentoOportunidade') ? 'selected' : '' }}>{{ $segmento }}</option>
-                                @endforeach
-                            </select>
-                            @if($errors->has('segmentoOportunidade'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('segmentoOportunidade') }}
                                 </div>
                             @endif
                         </div>
@@ -221,7 +236,7 @@
                             name="descricaoOportunidade"
                             rows="5"
                             class="form-control {{ $errors->has('descricaoOportunidade') ? 'is-invalid' : '' }}"
-                            placeholder="Descreva brevemente a oportunidade"
+                            placeholder="Exemplo:&#10;*Possuir carro;&#10;*Possuir Empresa;&#10;*Preferencialmente ter experiência no segmento do produto / serviço;&#10;*Conhecer a região que irá atuar;&#10;*Preferencialmente possuir carteira ativa de clientes;"
                         >{{ old('descricaoOportunidade') }}</textarea>
                         @if($errors->has('descricaoOportunidade'))
                             <div class="invalid-feedback">
