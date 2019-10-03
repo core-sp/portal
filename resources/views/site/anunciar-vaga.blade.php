@@ -37,34 +37,35 @@
                 <h4>Informações da Empresa</h4>
                 <form method="POST" class="w-100 simulador">
                     @csrf
+                    <input type="hidden" name="descricao" value="Empresa cadastrada pelo site.">
                     <div class="form-row">
                         <div class="col-sm mb-2-576">
-                            <label for="razaoSocial">Razão Social</label>
+                            <label for="razaosocial">Razão Social</label>
                             <input
                                 type="text"
-                                class="form-control {{ $errors->has('razaoSocial') ? 'is-invalid' : '' }}"
-                                name="razaoSocial"
+                                class="form-control {{ $errors->has('razaosocial') ? 'is-invalid' : '' }}"
+                                name="razaosocial"
                                 placeholder="Razão Social"
-                                value="{{ old('razaoSocial') }}"
+                                value="{{ old('razaosocial') }}"
                             >
-                            @if($errors->has('razaoSocial'))
+                            @if($errors->has('razaosocial'))
                                 <div class="invalid-feedback">
-                                    {{ $errors->first('razaoSocial') }}
+                                    {{ $errors->first('razaosocial') }}
                                 </div>
                             @endif
                         </div>
                         <div class="col-sm mb-2-576">
-                            <label for="nomeFantasia">Nome Fantasia</label>
+                            <label for="fantasia">Nome Fantasia</label>
                             <input
                                 type="text"
-                                class="form-control {{ $errors->has('nomeFantasia') ? 'is-invalid' : '' }}"
-                                name="nomeFantasia"
+                                class="form-control {{ $errors->has('fantasia') ? 'is-invalid' : '' }}"
+                                name="fantasia"
                                 placeholder="Nome Fantasia"
-                                value="{{ old('nomeFantasia') }}"
+                                value="{{ old('fantasia') }}"
                             >
-                            @if($errors->has('nomeFantasia'))
+                            @if($errors->has('fantasia'))
                                 <div class="invalid-feedback">
-                                    {{ $errors->first('nomeFantasia') }}
+                                    {{ $errors->first('fantasia') }}
                                 </div>
                             @endif
                         </div>
@@ -86,21 +87,6 @@
                                 </div>
                             @endif
                         </div>
-                        <div class="col-sm mb-2-576">
-                            <label for="capital">Capital Social</label>
-                            <select name="capital" class="form-control">
-                                @foreach (capitais() as $capital)
-                                    <option value="{{ $capital }}" {{ $capital == old('capital') ? 'selected' : '' }}>{{ $capital }}</option>
-                                @endforeach
-                            </select>
-                            @if($errors->has('capital'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('capital') }}
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="form-row mt-2">
                         <div class="col-sm mb-2-576">
                             <label for="segmento">Segmento</label>
                             <select name="segmento" class="form-control">
@@ -149,7 +135,7 @@
                     </div>
                     <div class="form-row mt-2">
                         <div class="col-sm mb-2-576">
-                            <label for="site">Site</label>
+                            <label for="site">Site / Rede Social</label>
                             <input
                                 type="text"
                                 name="site"
@@ -186,13 +172,13 @@
                             <input
                                 type="text"
                                 name="nrVagas"
-                                class="form-control numeroInput {{ $errors->has('nrvagas') ? 'is-invalid' : '' }}"
+                                class="form-control numeroInput {{ $errors->has('nrVagas') ? 'is-invalid' : '' }}"
                                 placeholder="00"
                                 value="{{ old('nrVagas') }}"
                             >
                             @if($errors->has('nrVagas'))
                                 <div class="invalid-feedback">
-                                    {{ $errors->first('razaoSocial') }}
+                                    {{ $errors->first('nrVagas') }}
                                 </div>
                             @endif
                         </div>
@@ -216,8 +202,8 @@
                     <div class="form-group mt-2">
                         <label for="regiaoAtuacao">Região de Atuação</label>
                         <select name="regiaoAtuacao[]" class="form-control {{ $errors->has('regiaoAtuacao') ? 'is-invalid' : '' }}" multiple>
-                            @foreach (regioes() as $regiao)
-                                <option value="{{ $regiao }}" {{ in_array($regiao, $oldRA) ? 'selected' : '' }}>{{ $regiao }}</option>
+                            @foreach (regioes() as $key => $regiao)
+                                <option value="{{ $key }}" {{ in_array($regiao, $oldRA) ? 'selected' : '' }}>{{ $regiao }}</option>
                             @endforeach
                         </select>
                         @if($errors->has('regiaoAtuacao'))
@@ -225,66 +211,69 @@
                                 {{ $errors->first('regiaoAtuacao') }}
                             </div>
                         @endif
+                        <small class="form-text text-muted">
+                            <em>* Segure Ctrl para selecionar mais de uma região ou Shift para selecionar um grupo de regiões.</em>
+                        </small>
                     </div>
                     <div class="form-group mt-2">
-                        <label for="descricao">Descrição da Oportunidade</label>
+                        <label for="descricaoOportunidade">Descrição da Oportunidade</label>
                         <textarea
-                            name="descricao"
+                            name="descricaoOportunidade"
                             rows="5"
-                            class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }}"
+                            class="form-control {{ $errors->has('descricaoOportunidade') ? 'is-invalid' : '' }}"
                             placeholder="Descreva brevemente a oportunidade"
-                        >{{ old('descricao') }}</textarea>
-                        @if($errors->has('descricao'))
+                        >{{ old('descricaoOportunidade') }}</textarea>
+                        @if($errors->has('descricaoOportunidade'))
                             <div class="invalid-feedback">
-                                {{ $errors->first('descricao') }}
+                                {{ $errors->first('descricaoOportunidade') }}
                             </div>
                         @endif
                     </div>
                     <h5 class="pb-2 pt-2 cinza-escuro">Informações do Contato</h5>
                     <div class="form-row">
                         <div class="col-sm mb-2-576">
-                            <label for="contatoNome">Nome</label>
+                            <label for="contatonome">Nome</label>
                             <input
                                 type="text"
-                                name="contatoNome"
-                                class="form-control {{ $errors->has('contatoNome') ? 'is-invalid' : '' }}"
+                                name="contatonome"
+                                class="form-control {{ $errors->has('contatonome') ? 'is-invalid' : '' }}"
                                 placeholder="Nome"
-                                value="{{ old('contatoNome') }}"
+                                value="{{ old('contatonome') }}"
                             >
-                            @if($errors->has('contatoNome'))
+                            @if($errors->has('contatonome'))
                                 <div class="invalid-feedback">
-                                    {{ $errors->first('contatoNome') }}
+                                    {{ $errors->first('contatonome') }}
                                 </div>
                             @endif
                         </div>
                         <div class="col-sm mb-2-576">
-                            <label for="contatoTelefone">Telefone</label>
+                            <label for="contatotelefone">Telefone</label>
                             <input
                                 type="text"
-                                name="contatoTelefone"
-                                class="form-control telefoneInput {{ $errors->has('contatoTelefone') ? 'is-invalid' : '' }}"
+                                name="contatotelefone"
+                                class="form-control telefoneInput {{ $errors->has('contatotelefone') ? 'is-invalid' : '' }}"
                                 placeholder="Telefone"
-                                value="{{ old('contatoTelefone') }}"
+                                value="{{ old('contatotelefone') }}"
                             >
-                            @if($errors->has('contatoTelefone'))
+                            @if($errors->has('contatotelefone'))
                                 <div class="invalid-feedback">
-                                    {{ $errors->first('contatoTelefone') }}
+                                    {{ $errors->first('contatotelefone') }}
                                 </div>
                             @endif
                         </div>
                     </div>
                     <div class="form-group mt-2">
-                        <label for="contatoEmail">Email</label>
+                        <label for="contatoemail">Email</label>
                         <input
                             type="text"
-                            name="contatoEmail"
-                            class="form-control {{ $errors->has('contatoEmail') ? 'is-invalid' : '' }}"
+                            name="contatoemail"
+                            class="form-control {{ $errors->has('contatoemail') ? 'is-invalid' : '' }}"
                             placeholder="Email"
-                            value="{{ old('contatoEmail') }}"
+                            value="{{ old('contatoemail') }}"
                         >
-                        @if($errors->has('contatoEmail'))
+                        @if($errors->has('contatoemail'))
                             <div class="invalid-feedback">
-                                {{ $errors->first('contatoEmail') }}
+                                {{ $errors->first('contatoemail') }}
                             </div>
                         @endif
                     </div>

@@ -77,7 +77,7 @@ class BdoOportunidadeController extends Controller
                 $razaosocial,
                 $resultado->segmento,
                 $relacaovagas,
-                $resultado->status,
+                $resultado->status !== 'Sob Análise' ? $resultado->status : '<strong class="text-danger">'.$resultado->status.'</strong>',
                 $acoes
             ];
             array_push($contents, $conteudo);
