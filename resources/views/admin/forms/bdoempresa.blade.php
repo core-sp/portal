@@ -2,7 +2,6 @@
 use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
 use \App\Http\Controllers\Helpers\BdoEmpresaControllerHelper;
 $status = BdoOportunidadeControllerHelper::status();
-$segmentos = BdoOportunidadeControllerHelper::segmentos();
 $regioes = BdoOportunidadeControllerHelper::regioes();
 $capitais = BdoEmpresaControllerHelper::capitalSocial();
 @endphp
@@ -62,7 +61,7 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
         <div class="col">
             <label for="segmento">Segmento</label>
             <select name="segmento" class="form-control" id="segmento">
-            @foreach($segmentos as $segmento)
+            @foreach(segmentos() as $segmento)
                 @if(!empty(old('segmento')))
                     @if(old('segmento') === $segmento)
                         <option value="{{ $segmento }}" selected>{{ $segmento }}</option>
