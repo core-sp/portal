@@ -158,7 +158,7 @@ class BdoSiteController extends Controller
     {
         $this->validaAnuncio();
 
-        event(new ExternoEvent($this->stringEvento(request('razaoSocial'), request('email'))));
+        event(new ExternoEvent($this->stringEvento(request('razaosocial'), request('email'))));
 
         $this->saveBdoEmpresa();
 
