@@ -55,10 +55,10 @@
 	    <div class="col-lg-8 conteudo-txt pr-4">
 	      {!! $pagina->conteudo !!}
 	    </div>
-	  <div class="col-lg-4">
-	  	@include('site.inc.content-sidebar')
+      <div class="col-lg-4">
+        @include('site.inc.content-sidebar')
+      </div>
 	  </div>
-	</div>
   </div>
 </section>
 

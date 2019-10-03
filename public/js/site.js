@@ -6,13 +6,27 @@ $(document).ready(function(){
 	$('.nrlicitacaoInput').mask('999/9999');
 	$('.nrprocessoInput').mask('999/9999');
 	$('.dataInput').mask('00/00/0000');
+	$('.cnpjInput').mask('99.999.999/9999-99');
 	$('.capitalSocial').mask('#.##0,00', {reverse: true});
+	$('.numeroInput').mask('99');
 	$('.protocoloInput').mask('ZZZZZZ', {
 	  translation: {
 		  'Z': {
 			pattern: /[A-Za-z0-9]/
 		  }
 	  }
+	});
+	$('.telefoneInput').mask('(00) 0000-00009').focusout(function (event) {  
+		var target, phone, element;
+		target = (event.currentTarget) ? event.currentTarget : event.srcElement;
+		phone = target.value.replace(/\D/g, '');
+		element = $(target);
+		element.unmask();
+		if(phone.length > 10) {
+			element.mask("(99) 99999-9999");  
+		} else {  
+			element.mask("(99) 9999-99999");  
+		}  
 	});
 	var options = {
 		onKeyPress: function (cpf, ev, el, op) {
@@ -68,6 +82,15 @@ $(document).ready(function(){
 		}
 	});
 });
+
+// Lightbox
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+	if($(window).width() > 767) {
+		event.preventDefault();
+		$(this).ekkoLightbox();
+	}
+});
+
 // Scroll das redes sociais em posts do blog
 if(window.location.href.indexOf("/blog/") > -1) {
 	var prenderTop = $('#prender').offset().top;

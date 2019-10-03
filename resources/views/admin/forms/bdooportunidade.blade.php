@@ -2,7 +2,6 @@
 use \App\Http\Controllers\Helper;
 use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
 $status = BdoOportunidadeControllerHelper::status();
-$segmentos = BdoOportunidadeControllerHelper::segmentos();
 @endphp
 
 <form role="form" method="POST">
@@ -54,7 +53,7 @@ $segmentos = BdoOportunidadeControllerHelper::segmentos();
                 <div class="row nomargin">
                     <label for="segmento">Segmento</label>
                     <select name="segmento" class="form-control" id="segmento">
-                    @foreach($segmentos as $segmento)
+                    @foreach(segmentos() as $segmento)
                         @if(!empty(old('segmento')))
                             @if(old('segmento') === $segmento)
                                 <option class="{{ $segmento }}" selected>{{ $segmento }}</option>

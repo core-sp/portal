@@ -212,6 +212,10 @@ strong, .bold {
 	font-weight: 900;
 }
 
+.nohover:hover {
+	color: inherit;
+}
+
 .btn-voltar {
 	background-color: #13632F;
 	color: #FFFFFF;
