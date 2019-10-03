@@ -192,18 +192,18 @@ function capitais()
 function regioes()
 {
     return [
-        'São Paulo',
-        'Campinas',
-        'Bauru',
-        'Ribeirão Preto',
-        'São José dos Campos',
-        'São José do Rio Preto',
-        'Presidente Prudente',
-        'Araraquara',
-        'Sorocaba',
-        'Santos',
-        'Araçatuba',
-        'Rio Claro',
-        'Marília'
+        1 => 'São Paulo',
+        2 => 'Campinas',
+        3 => 'Bauru',
+        4 => 'Ribeirão Preto',
+        5 => 'São José dos Campos',
+        6 => 'São José do Rio Preto',
+        7 => 'Presidente Prudente',
+        8 => 'Araraquara',
+        9 => 'Sorocaba',
+        10 => 'Santos',
+        11 => 'Araçatuba',
+        12 => 'Rio Claro',
+        13 => 'Marília'
     ];
 }

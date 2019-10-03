@@ -16,7 +16,8 @@
         "laravel/tinker": "^1.0",
         "nesbot/carbon": "^2.16.3",
         "predis/predis": "^1.1",
-        "unisharp/laravel-filemanager": "~1.8"
+        "unisharp/laravel-filemanager": "~1.8",
+        "doctrine/dbal": "v2.9.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",

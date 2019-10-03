@@ -77,29 +77,32 @@
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/open-book.png') }}" class="inside-img" alt="Cartilha do Representante | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco normal h3-box">Cartilha do<br class="hide-992" /> Representante</h3>
+              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Cartilha do<br class="hide-992" /> Representante</h3>
               <button class="btn-box">Visualizar</button>
             </div>
           </div>
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/balcao-de-oportunidades" class="d-block h-100">
-          <div class="box text-center azul-bg h-100">
-            <div class="inside-box">
-              <img src="{{ asset('img/001-work.png') }}" class="inside-img" alt="Balcão de Oportunidades | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco normal h3-box">Balcão de<br class="hide-992" /> Oportunidades</h3>
+        <div class="box text-center azul-bg h-100">
+          <div class="inside-box">
+            <img src="{{ asset('img/001-work.png') }}" class="inside-img" alt="Balcão de Oportunidades | Core-SP" />
+            <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Balcão de<br class="hide-992" /> Oportunidades</h3>
+            <a href="/balcao-de-oportunidades" class="d-inline h-100">
               <button class="btn-box">Acessar</button>
-            </div>
+            </a>
+            <a href="/anunciar-vaga" class="d-inline h-100">
+              <button class="btn-box btn-box-little">Anunciar</button>
+            </a>
           </div>
-        </a>
+        </div>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/resolucoes-anuidade-taxas-e-emolumentos" class="d-block h-100">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco normal h3-box">Anuidade 2019<br class="hide-992" /> taxas e emolumentos</h3>
+              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Anuidade 2019<br class="hide-992" /> taxas e emolumentos</h3>
               <button href="#" class="btn-box">ACESSAR</button>
             </div>
           </div>
@@ -111,7 +114,7 @@
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco normal h3-box">Agendamento<br class="hide-992" /> para refis</h3>
+              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Agendamento<br class="hide-992" /> para refis</h3>
               <button class="btn-box">Agendar</button>
             </div>
           </div>
@@ -122,22 +125,25 @@
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/001-paper.png') }}" alt="Simulador | Core-SP">
-              <h3 class="text-uppercase mt-3 branco normal h3-box">Simulador de<br class="hide-992" /> valores</h3>
+              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Simulador de<br class="hide-992" /> valores</h3>
               <button class="btn-box">Acessar</button>
             </div>
           </div>
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/consulta-de-situacao" class="d-block h-100">
-          <div class="box text-center azul-bg h-100">
-            <div class="inside-box">
-              <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
-              <h3 class="text-uppercase mt-3 branco normal h3-box">Consulta<br class="hide-992" /> de situação</h3>
+        <div class="box text-center azul-bg h-100">
+          <div class="inside-box">
+            <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
+            <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Consulta<br class="hide-992" /> de situação</h3>
+            <a href="/consulta-de-situacao" class="d-block h-100">
               <button class="btn-box">Acessar</button>
-            </div>
+            </a>
+            <a href="/agendamento-consulta" class="d-block h-100">
+              <button class="btn-box btn-box-little">Consultar</button>
+            </a>
           </div>
-        </a>
+        </div>
       </div>
     </div>
   </div>

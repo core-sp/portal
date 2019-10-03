@@ -36,7 +36,7 @@ $status = BdoOportunidadeControllerHelper::status();
             @endif
         </div>
         <div class="col">
-            <label for="empresafake">Empresa</label>
+            <label for="empresafake">Empresa&nbsp;&nbsp;<a href="/admin/bdo/empresas/editar/{{ $resultado->empresa->idempresa }}" target="_blank"><small>Editar empresa</small></a></label>
             <input type="text"
                 name="empresafake"
                 class="form-control"

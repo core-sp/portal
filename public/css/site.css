@@ -622,6 +622,10 @@ figure.align-left {
 	padding: 1.5rem;
 	border-radius: 5px;
 	height: 100%;
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+	justify-content: center;
 }
 
 .inside-box-dois {
@@ -646,7 +650,15 @@ figure.align-left {
 	font-size: 1.1rem;
 	display: inline-block;
 	transition: .3s;
-	margin-top: 1.1rem;
+}
+
+.rolando {
+	flex: 1 1 auto;
+	align-self: center;
+}
+
+.btn-box-little {
+	margin-top: .5rem;
 }
 
 .btn-box:hover {
