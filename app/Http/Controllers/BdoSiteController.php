@@ -69,6 +69,7 @@ class BdoSiteController extends Controller
             'telefone' => 'required|max:191',
             'site' => 'required|max:191',
             'email' => 'required|email|max:191',
+            'titulo' => 'required|max:191',
             'nrVagas' => 'required|max:3|not_in:0',
             'regiaoAtuacao' => 'required|array|min:1|max:15',
             'descricao' => 'required|max:500',
@@ -140,7 +141,7 @@ class BdoSiteController extends Controller
     {
         $save = BdoOportunidade::create([
             'idempresa' => $idempresa,
-            'titulo' => 'Oportunidade cadastrada pelo site',
+            'titulo' => request('titulo'),
             'segmento' => request('segmentoOportunidade'),
             'regiaoatuacao' => ',' . implode(',', request('regiaoAtuacao')),
             'descricao' => request('descricaoOportunidade'),
