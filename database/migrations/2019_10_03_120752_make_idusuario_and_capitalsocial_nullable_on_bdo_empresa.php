@@ -9,7 +9,7 @@ class MakeIdusuarioAndCapitalsocialNullableOnBdoEmpresa extends Migration
     public function up()
     {
         Schema::table('bdo_empresas', function($table) {
-            $table->bigInteger('idusuario')->nullable()->change();
+            $table->bigInteger('idusuario')->unsigned()->nullable()->change();
             $table->string('capitalsocial')->nullable()->change();
         });
     }
@@ -17,7 +17,7 @@ class MakeIdusuarioAndCapitalsocialNullableOnBdoEmpresa extends Migration
     public function down()
     {
         Schema::table('bdo_empresas', function($table) {
-            $table->bigInteger('idusuario')->nullable(false)->change();
+            $table->bigInteger('idusuario')->unsigned()->nullable(false)->change();
             $table->string('capitalsocial')->nullable(false)->change();
         });
     }
