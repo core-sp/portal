@@ -110,15 +110,18 @@
       </div>
 
       <div class="col-lg-3 offset-lg-1-5 col-sm-6 pb-15">
-        <a href="/agendamento" class="d-block h-100">
-          <div class="box text-center azul-bg h-100">
-            <div class="inside-box">
-              <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Agendamento<br class="hide-992" /> para refis</h3>
+        <div class="box text-center azul-bg h-100">
+          <div class="inside-box">
+            <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
+            <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Agendamento<br class="hide-992" /> para refis</h3>
+            <a href="/agendamento" class="d-block h-100">
               <button class="btn-box">Agendar</button>
-            </div>
+            </a>
+            <a href="/agendamento-consulta" class="d-block h-100">
+              <button class="btn-box btn-box-little">Consultar</button>
+            </a>
           </div>
-        </a>
+        </div>
       </div>
       <div class="col-lg-3 col-sm-6 text-right pb-15">
         <a href="/simulador" class="d-block h-100">
@@ -132,18 +135,15 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <div class="box text-center azul-bg h-100">
-          <div class="inside-box">
-            <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
-            <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Consulta<br class="hide-992" /> de situação</h3>
-            <a href="/consulta-de-situacao" class="d-block h-100">
+        <a href="/consulta-de-situacao" class="d-block h-100">
+          <div class="box text-center azul-bg h-100">
+            <div class="inside-box">
+              <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
+              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Consulta<br class="hide-992" /> de situação</h3>
               <button class="btn-box">Acessar</button>
-            </a>
-            <a href="/agendamento-consulta" class="d-block h-100">
-              <button class="btn-box btn-box-little">Consultar</button>
-            </a>
+            </div>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </div>
