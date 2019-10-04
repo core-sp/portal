@@ -18,7 +18,6 @@ class SiteController extends Controller
         $noticias = Noticia::where('publicada','Sim')
             ->whereNull('idregional')
             ->whereNull('categoria')
-            ->whereNull('idcurso')
             ->orderBy('created_at','DESC')
             ->limit(3)
             ->get();

@@ -197,7 +197,7 @@ use \App\Http\Controllers\Helper;
       </nav>
       <div class="overlay"></div>
       @show
-
+      
       @yield('content')
 
       @section('footer')

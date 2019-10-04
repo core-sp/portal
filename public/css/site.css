@@ -641,13 +641,11 @@ figure.align-left {
 
 .btn-box {
 	background-color: #FFFFFF;
-	padding: 0.3rem 1rem;
+	padding: 0.25rem .8rem;
 	border: 1px solid #FFFFFF;
 	font-size: 1rem;
-	color: #004587;
 	text-transform: uppercase;
 	font-weight: 400;
-	font-size: 1.1rem;
 	display: inline-block;
 	transition: .3s;
 }
@@ -1640,6 +1638,15 @@ h5 {
 	padding-bottom: 2.5rem;
 }
 
+.ui-tooltip {
+	-webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
+	box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);
+	background: #FFFFFF;
+	border: 1px solid #15AAE2 !important;
+	font-size: 12px;
+	line-height: 1.4;
+}
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS

@@ -77,8 +77,8 @@
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/open-book.png') }}" class="inside-img" alt="Cartilha do Representante | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Cartilha do<br class="hide-992" /> Representante</h3>
-              <button class="btn-box">Visualizar</button>
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cartilha do<br class="hide-992" /> Representante</h3>
+              <button class="btn-box azul-escuro">Visualizar</button>
             </div>
           </div>
         </a>
@@ -87,12 +87,12 @@
         <div class="box text-center azul-bg h-100">
           <div class="inside-box">
             <img src="{{ asset('img/001-work.png') }}" class="inside-img" alt="Balcão de Oportunidades | Core-SP" />
-            <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Balcão de<br class="hide-992" /> Oportunidades</h3>
+            <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Balcão de<br class="hide-992" /> Oportunidades</h3>
             <a href="/balcao-de-oportunidades" class="d-inline h-100">
-              <button class="btn-box">Acessar</button>
+              <button class="btn-box azul">Acessar</button>
             </a>
             <a href="/anunciar-vaga" class="d-inline h-100">
-              <button class="btn-box btn-box-little">Anunciar</button>
+              <button class="btn-box btn-box-little azul">Anunciar</button>
             </a>
           </div>
         </div>
@@ -102,8 +102,8 @@
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Anuidade 2019<br class="hide-992" /> taxas e emolumentos</h3>
-              <button href="#" class="btn-box">ACESSAR</button>
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2019<br class="hide-992" /> taxas e emolumentos</h3>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
             </div>
           </div>
         </a>
@@ -113,12 +113,12 @@
         <div class="box text-center azul-bg h-100">
           <div class="inside-box">
             <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
-            <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Agendamento<br class="hide-992" /> para refis</h3>
+            <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Agendamento<br class="hide-992" /> para refis</h3>
             <a href="/agendamento" class="d-block h-100">
-              <button class="btn-box">Agendar</button>
+              <button class="btn-box azul">Agendar</button>
             </a>
             <a href="/agendamento-consulta" class="d-block h-100">
-              <button class="btn-box btn-box-little">Consultar</button>
+              <button class="btn-box btn-box-little azul">Consultar</button>
             </a>
           </div>
         </div>
@@ -128,8 +128,8 @@
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/001-paper.png') }}" alt="Simulador | Core-SP">
-              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Simulador de<br class="hide-992" /> valores</h3>
-              <button class="btn-box">Acessar</button>
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Simulador de<br class="hide-992" /> valores</h3>
+              <button class="btn-box azul-escuro">Acessar</button>
             </div>
           </div>
         </a>
@@ -139,8 +139,8 @@
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
-              <h3 class="text-uppercase mt-3 branco normal h3-box mb-3">Consulta<br class="hide-992" /> de situação</h3>
-              <button class="btn-box">Acessar</button>
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> de situação</h3>
+              <button class="btn-box azul">Acessar</button>
             </div>
           </div>
         </a>
