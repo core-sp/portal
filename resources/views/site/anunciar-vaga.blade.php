@@ -31,7 +31,7 @@
         <div class="linha-lg"></div>
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt pr-4">
-                <p>Preencha o formulário abaixo para solicitar a inclusão de sua vaga(s) no <strong>Balcão de Oportunidades</strong> do <strong>Core-SP.</strong></p>
+                <p>Preencha o formulário abaixo para solicitar a inclusão de sua(s) vaga(s) no <strong>Balcão de Oportunidades</strong> do <strong>Core-SP.</strong></p>
                 <p>A(s) vaga(s) será(ão) disponibilizada(s) em até 03 (três) dias úteis, após a verificação dos dados informados.</p>
                 <p>Para mais esclarecimentos, entre em contato conosco através do email <strong>informacoes@core-sp.org.br</strong>.</p>
                 <h4>Informações da Empresa</h4>
