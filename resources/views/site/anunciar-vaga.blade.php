@@ -20,7 +20,7 @@
             <div class="col">
                 <div class="row nomargin">
                     <div class="flex-one pr-4 align-self-center">
-                        <h2 class="stronger">Solicite a inclusão de sua vaga no Balcão de Oportunidades do Core-SP</h2>
+                        <h2 class="stronger">Solicite a inclusão de sua(s) vaga(s) no Balcão de Oportunidades do Core-SP</h2>
                     </div>
                     <div class="align-self-center">
                         <a href="/" class="btn-voltar">Voltar</a>
