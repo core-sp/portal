@@ -91,9 +91,9 @@
             <a href="/balcao-de-oportunidades" class="d-inline h-100">
               <button class="btn-box azul">Acessar</button>
             </a>
-            <a href="/anunciar-vaga" class="d-inline h-100">
+            {{-- <a href="/anunciar-vaga" class="d-inline h-100">
               <button class="btn-box btn-box-little azul">Anunciar</button>
-            </a>
+            </a> --}}
           </div>
         </div>
       </div>
