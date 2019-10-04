@@ -72,7 +72,7 @@ class BdoSiteController extends Controller
             'titulo' => 'required|max:191',
             'nrVagas' => 'required|max:3|not_in:0',
             'regiaoAtuacao' => 'required|array|min:1|max:15',
-            'descricao' => 'required|max:500',
+            'descricaoOportunidade' => 'required|max:500',
             'contatonome' => 'required|max:191',
             'contatotelefone' => 'required|max:191',
             'contatoemail' => 'required|email|max:191'
@@ -83,11 +83,11 @@ class BdoSiteController extends Controller
             'nrVagas.required' => 'Por favor, informe a quantidade de vagas da oportunidade',
             'nrVagas.not_in' => 'Valor inválido',
             'regiaoAtuacao.required' => 'Por favor, selecione ao menos uma região de atuação',
-            'descricao.required' => 'Por favor, insira a descrição da oportunidade',
+            'descricaoOportunidade.required' => 'Por favor, insira a descrição da oportunidade',
             'contatonome.required' => 'Por favor, informe o nome do contato',
             'contatotelefone.required' => 'Por favor, informe o telefone do contato',
             'contatoemail.required' => 'Por favor, informe o email do contato',
-            'required' => 'Por favor, informe :attribute',
+            'required' => 'Por favor, informe o :attribute',
             'email' => 'Email inválido',
             'max' => 'Excedido número máximo de caracteres'
         ]);
@@ -122,7 +122,9 @@ class BdoSiteController extends Controller
         $agradece .= '<br><br>';
         $agradece .= 'Muito obrigado pelo interesse em fazer parte do <strong>Balcão de Oportunidades</strong> do <strong>Core-SP!</strong>';
         $agradece .= '<br><br>';
-        $agradece .= 'Responderemos à sua requisição o mais rapidamente possível através do email: <strong>' . request('email') . '.</strong>';
+        $agradece .= 'A(s) vaga(s) será(ão) disponibilizada(s) em até 03 (três) dias úteis, após a verificação dos dados informados.';
+        $agradece .= '<br><br>';
+        $agradece .= 'Caso necessite mais esclarecimentos, entre em contato conosco através do email informacoes@core-sp.org.br.';
         return $agradece;
     }
 

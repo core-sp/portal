@@ -14,7 +14,7 @@ class NoticiaSiteController extends Controller
             ->orderBy('created_at', 'DESC')
             ->where('publicada','Sim')
             ->paginate(9);
-        return view('site.noticias', compact('noticias'));        
+        return view('site.noticias', compact('noticias'));
     }
 
     public function show($slug)

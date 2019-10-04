@@ -31,9 +31,9 @@
         <div class="linha-lg"></div>
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt pr-4">
-                <p>Preencha o formulário abaixo para solicitar a inclusão de sua vaga no <strong>Balcão de Oportunidades</strong> do <strong>Core-SP.</strong></p>
-                <p>Você será notificado sobre a inclusão da vaga através do email informado no formulário, uma vez que as informações forem verificadas e incluídas em nosso sistema.</p>
-                <p>Para mais esclarecimentos, entre em contato conosco através do informacoes@core-sp.org.br</p>
+                <p>Preencha o formulário abaixo para solicitar a inclusão de sua vaga(s) no <strong>Balcão de Oportunidades</strong> do <strong>Core-SP.</strong></p>
+                <p>A(s) vaga(s) será(ão) disponibilizada(s) em até 03 (três) dias úteis, após a verificação dos dados informados.</p>
+                <p>Para mais esclarecimentos, entre em contato conosco através do email <strong>informacoes@core-sp.org.br</strong>.</p>
                 <h4>Informações da Empresa</h4>
                 <form method="POST" class="w-100 simulador">
                     @csrf
@@ -231,12 +231,12 @@
                         </small>
                     </div>
                     <div class="form-group mt-2">
-                        <label for="descricaoOportunidade">Descrição da Oportunidade</label>
+                        <label for="descricaoOportunidade">Descrição da Oportunidade</label> <i class="fas fa-question-circle d-inline azul" id="interrogation"></i>
                         <textarea
                             name="descricaoOportunidade"
                             rows="5"
                             class="form-control {{ $errors->has('descricaoOportunidade') ? 'is-invalid' : '' }}"
-                            placeholder="Exemplo:&#10;*Possuir carro;&#10;*Possuir Empresa;&#10;*Preferencialmente ter experiência no segmento do produto / serviço;&#10;*Conhecer a região que irá atuar;&#10;*Preferencialmente possuir carteira ativa de clientes;"
+                            placeholder="Descreva brevemente a oportunidade."
                         >{{ old('descricaoOportunidade') }}</textarea>
                         @if($errors->has('descricaoOportunidade'))
                             <div class="invalid-feedback">

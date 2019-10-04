@@ -81,6 +81,19 @@ $(document).ready(function(){
 			}
 		}
 	});
+	
+	$('#interrogation').on({
+		"mouseover": function() {
+			$(this).tooltip({
+				items: "#interrogation",
+				content: "<h6 class='mb-2'><strong>Exemplo:</strong></h6>* Possuir carro;<br>* Possuir Empresa;<br>* Preferencialmente ter experiência no segmento do produto / serviço;<br>* Conhecer a região que irá atuar;<br>* Preferencialmente possuir carteira ativa de clientes;"
+			});
+			$(this).tooltip("open");
+		},
+		"mouseout": function() {
+			$(this).tooltip("disable");   
+		}
+	});
 });
 
 // Lightbox
