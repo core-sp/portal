@@ -2501,4 +2501,12 @@ h5 {
 	#bdo-titulo h1 {
 		line-height: 1;
 	}
+
+	.bdo-info .row {
+		display: block !important;
+	}
+
+	.bdo-info .col {
+		margin-top: 10px;
+	}
 }

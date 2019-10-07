@@ -36,15 +36,11 @@ $status = BdoOportunidadeControllerHelper::status();
             @endif
         </div>
         <div class="col">
-            <label for="empresafake">Empresa&nbsp;&nbsp;<a href="/admin/bdo/empresas/editar/{{ $resultado->empresa->idempresa }}" target="_blank"><small>Editar empresa</small></a></label>
+            <label for="empresafake">Empresa&nbsp;&nbsp;<a href="/admin/bdo/empresas/editar/{{ isset($resultado->empresa->idempresa) ? $resultado->empresa->idempresa : $empresa->idempresa }}" target="_blank"><small>Editar empresa</small></a></label>
             <input type="text"
                 name="empresafake"
                 class="form-control"
-                @if(isset($resultado))
-                placeholder="{{ $resultado->empresa->razaosocial }}"
-                @else
-                placeholder="{{ $empresa->razaosocial }}"
-                @endif
+                placeholder="{{ isset($resultado->empresa->razaosocial) ? $resultado->empresa->razaosocial : $empresa->razaosocial }}"
                 readonly />
         </div>
         </div>
