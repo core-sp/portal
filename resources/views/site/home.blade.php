@@ -218,7 +218,7 @@
           <div class="col-lg-6 faleSingle">
             <div class="row nomargin">
               <div class="align-self-center">
-                <img src="{{ asset('img/004-headset-.png') }}" class="inside-img" alt="Atendimento | Core-SP">
+                <img src="{{ asset('img/the-phone-icon.png') }}" class="inside-img" alt="Atendimento | Core-SP">
               </div>
               <div class="flex-one fale-txt align-self-center">
                 <h5 class="normal">Atendimento<br class="hide-992" /> (11) 3243-5500</h5>
@@ -226,13 +226,13 @@
             </div>
           </div>
           <div class="col-lg-6 faleSingle">
-            <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
+            <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
               <div class="row nomargin">
                 <div class="align-self-center">
-                  <img src="{{ asset('img/001-whatsapp-.png') }}" class="inside-img" alt="WhatsApp | Core-SP">
+                  <img src="{{ asset('img/icon_transparencia.png') }}" alt="Transparência | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
-                  <h5 class="normal">Entre em contato<br class="hide-992" /> pelo WhatsApp</h5>
+                  <h5 class="normal">Acesso à<br class="hide-992" /> informação</h5>
                 </div>
               </div>
             </a>
@@ -246,10 +246,22 @@
         </div>
         <div class="row">
           <div class="col-lg-6 faleSingle">
+            <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
+              <div class="row nomargin">
+                <div class="align-self-center">
+                  <img src="{{ asset('img/the-whatsapp-icon.png') }}" class="inside-img" alt="WhatsApp | Core-SP">
+                </div>
+                <div class="flex-one fale-txt align-self-center">
+                  <h5 class="normal">Entre em contato<br class="hide-992" /> pelo WhatsApp</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-lg-6 faleSingle">
             <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
               <div class="row nomargin">
                 <div class="align-self-center">
-                  <img src="{{ asset('img/youtube-icon.png') }}" class="inside-img" alt="YouTube | Core-SP">
+                  <img src="{{ asset('img/the-youtube-icon.png') }}" class="inside-img" alt="YouTube | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
                   <h5 class="normal">Nosso canal<br class="hide-992" /> no YouTube</h5>
@@ -261,10 +273,23 @@
             <a href="https://www.instagram.com/coresaopaulo/?hl=pt-br" target="_blank">
               <div class="row nomargin">
                 <div class="align-self-center">
-                  <img src="{{ asset('img/instagram-icon.png') }}" class="inside-img" alt="Instagram | Core-SP">
+                  <img src="{{ asset('img/the-instagram-icon.png') }}" class="inside-img" alt="Instagram | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
-                  <h5 class="normal">Siga-nos<br class="hide-992" /> no Instagram</h5>
+                  <h5 class="normal">Siga-nos no<br class="hide-992" /> Instagram</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-lg-6 faleSingle">
+            <a href="#">
+              <div class="row nomargin">
+                <div class="align-self-center">
+                  <img src="{{ asset('img/the-linkedin-logo.png') }}" class="inside-img" alt="Instagram | Core-SP">
+                </div>
+                <div class="flex-one fale-txt align-self-center">
+                  <h5 class="normal">Siga-nos no<br class="hide-992" /> LinkedIn</h5>
+                  <h6><i>(Em breve)</i></h6>
                 </div>
               </div>
             </a>

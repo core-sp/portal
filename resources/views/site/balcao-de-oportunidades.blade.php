@@ -26,7 +26,7 @@ $regionais = BdoSiteControllerHelper::regionais();
       </div>
     </div>
     <h6 class="branco normal">
-      Quer anunciar vagas? Entre em contato para mais esclarecimentos através do <strong class="nowrap">informacoes@core-sp.org.br</strong>
+      <a href="/anunciar-vaga" style="color:inherit;">Quer anunciar vagas? Clique aqui, preencha os dados e solicite a inclusão</a>
     </h6>
   </div>
 </section>
