@@ -1,5 +1,5 @@
 <div class="clippers">
-  <a href="#">
+  <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
     <div class="box-dois mb-3">
       <div class="inside-box-dois inside-box-transparencia d-flex">
         <div class="align-self-center faleRow">
