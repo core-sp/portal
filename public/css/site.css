@@ -60,8 +60,28 @@ body {
 	background-color: #eaeaea;
 }
 
+.verde-transparencia {
+	color: #00682D;
+}
+
+.transparencia-footer {
+	width: 24px;
+}
+
+.lh-32 {
+	line-height: 24px;
+}
+
+.ml-75 {
+	margin-left: .75rem;
+}
+
 .cinza-escuro {
 	color: #888888;
+}
+
+.cinza-escuro-bg {
+	background-color: #888888;
 }
 
 .alert-warning {
@@ -415,6 +435,25 @@ figure.align-left {
 	min-width: 200px;
 }
 
+.sub-dropdown {
+	position: relative;
+	cursor: pointer;
+}
+
+.sub-dropdown-menu {
+	display: none;
+	position: absolute;
+	top: -1px;
+	left: 100%;
+	background-color: #eef1f4;
+    border-radius: 0px;
+    z-index: 5;
+    box-shadow: none;
+    padding: 0px;
+	min-width: 200px;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
 .dropdown-item {
 	padding: .3rem .5rem !important;
 	font-size: 0.9rem !important;
@@ -427,6 +466,19 @@ figure.align-left {
 .dropdown-item:hover {
 	background-color: #eef1f4;
 	padding-left: .75rem !important;
+}
+
+.branco-azul {
+	background-color: #FFF;
+	color: #15AAE2 !important;
+}
+
+.menu-hoverable {
+	background-color: #eef1f4;
+}
+
+.bb-0 {
+	border-bottom: none;
 }
 
 .nav-link {
@@ -601,6 +653,14 @@ figure.align-left {
 	border-radius: 5px;
 	position: relative;
 	cursor: pointer;
+}
+
+.box-transparencia {
+	padding: 0.5rem;
+}
+
+.inside-box-transparencia {
+	border-color: #00682D !important;
 }
 
 .box:hover {
@@ -1459,6 +1519,7 @@ footer p {
 
 .show-992,
 .show-768,
+.show-inline-768,
 .show-576 {
 	display: none;
 }
@@ -1618,16 +1679,11 @@ h5 {
 	padding-bottom: 3.5px;
 }
 
-#btn-aat img {
-	width: 19px;
-	margin-right: 2px;
-}
-
 #btn-aat {
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 700;
 	letter-spacing: -0.5px;
-	line-height: 19px;
+	line-height: 20px;
 }
 
 .acessibilidade {
@@ -2079,7 +2135,8 @@ h5 {
 
 	.clippers {
 		padding-top: 2rem;
-		display: none;
+		max-width: 365px;
+		margin: 0 auto;
 	}
 
 	.btn-buscaavancada,
@@ -2189,6 +2246,37 @@ h5 {
 		background-color: #15AAE2 !important;
 		margin-bottom: 7.5px;
 		box-shadow: none !important;
+	}
+
+	.sub-dropdown {
+		color: #FFFFFF;
+	}
+
+	.sub-dropdown-menu {
+		position: relative;
+		top: unset;
+		left: unset;
+		background-color: transparent;
+		border: none;
+		min-width: unset;
+	}
+
+	.sub-dropdown .dropdown-item {
+		color: #FFFFFF;
+	}
+
+	.sub-dropdown-menu .dropdown-item {
+		padding-left: 35px !important;
+		padding-top: 5px !important;
+		padding-bottom: 5px !important;
+	}
+
+	.sub-dropdown-menu .dropdown-item:hover {
+		padding-left: 40px !important;
+	}
+
+	.menu-hoverable {
+		background-color: transparent !important;
 	}
 
 	#dismiss:hover {
@@ -2302,6 +2390,10 @@ h5 {
 
 	.show-768 {
 		display: block;
+	}
+
+	.show-inline-768 {
+		display: inline-block;
 	}
 
 	.br-novo-core {

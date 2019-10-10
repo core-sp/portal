@@ -52,6 +52,23 @@ $(document).ready(function(){
 	});
 	$('.dropdown').on('hide.bs.dropdown', function() {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(200);
+		$('.sub-dropdown').removeClass('menu-hoverable');
+		$('.sub-dropdown-menu').hide();
+		if($(window).width() < 768) {
+			$('.dropdown-item').removeClass('branco-azul');
+		}
+	});
+	// Segundo nível do menu
+	$('.sub-dropdown').on('click', function(e){
+		e.stopPropagation();
+		$(this).toggleClass('menu-hoverable');
+		$('.sub-dropdown').not($(this)).removeClass('menu-hoverable');
+		$(this).children('.sub-dropdown-menu').toggle('slide', { direction: "left" }, 200);
+		$('.sub-dropdown-menu').not($(this).children('.sub-dropdown-menu')).hide();
+		if($(window).width() < 768) {
+			$(this).children('.dropdown-item').toggleClass('branco-azul');
+			$('.dropdown-item').not($(this).children('.dropdown-item')).removeClass('branco-azul');
+		}
 	});
 	// Facebook Sharer
 	$('.fb-share').click(function(e) {
@@ -81,12 +98,25 @@ $(document).ready(function(){
 			}
 		}
 	});
-	
-	$('#interrogation').on({
+	// Interrogação (Descricão da Oportunidade)
+	$('#descricao-da-oportunidade').on({
 		"mouseover": function() {
 			$(this).tooltip({
-				items: "#interrogation",
+				items: "#descricao-da-oportunidade",
 				content: "<h6 class='mb-2'><strong>Exemplo:</strong></h6>* Possuir carro;<br>* Possuir Empresa;<br>* Preferencialmente ter experiência no segmento do produto / serviço;<br>* Conhecer a região que irá atuar;<br>* Preferencialmente possuir carteira ativa de clientes;"
+			});
+			$(this).tooltip("open");
+		},
+		"mouseout": function() {
+			$(this).tooltip("disable");   
+		}
+	});
+	// Interrogação (Endereço da empresa)
+	$('#endereco-da-empresa').on({
+		"mouseover": function() {
+			$(this).tooltip({
+				items: "#endereco-da-empresa",
+				content: "<h6 class='mb-2'><strong>Exemplo:</strong></h6>Av. Brigadeiro Luís Antônio, 613 - 5º andar - Centro - São Paulo - SP"
 			});
 			$(this).tooltip("open");
 		},

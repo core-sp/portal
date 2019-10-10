@@ -88,8 +88,26 @@
                             @endif
                         </div>
                         <div class="col-sm mb-2-576">
+                            <label for="telefone">Telefone</label>
+                            <input
+                                type="text"
+                                name="telefone"
+                                class="form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
+                                placeholder="Telefone"
+                                value="{{ old('telefone') }}"
+                            >
+                            @if($errors->has('telefone'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('telefone') }}
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="form-row mt-2">
+                        <div class="col-sm mb-2-576">
                             <label for="segmento">Segmento</label>
-                            <select name="segmento" class="form-control">
+                            <select name="segmento" class="form-control {{ $errors->has('segmento') ? 'is-invalid' : '' }}">
+                                <option disabled {{ old('segmento') ? '' : 'selected' }}>Selecione o segmento...</option>
                                 @foreach (segmentos() as $segmento)
                                     <option value="{{ $segmento }}" {{ $segmento == old('segmento') ? 'selected' : '' }}>{{ $segmento }}</option>
                                 @endforeach
@@ -103,32 +121,17 @@
                     </div>
                     <div class="form-row mt-2">
                         <div class="col-sm mb-2-576">
-                            <label for="endereco">Endereço</label>
+                            <label for="endereco">Endereço</label>  <i class="fas fa-question-circle d-inline azul" id="endereco-da-empresa"></i>
                             <input
                                 type="text"
                                 name="endereco"
                                 class="form-control {{ $errors->has('endereco') ? 'is-invalid' : '' }}"
-                                placeholder="Endereço"
+                                placeholder="Rua, Avenida, Praça, Rodovia - nº - Complemento - Bairro - Cidade - Estado"
                                 value="{{ old('endereco') }}"
                             >
                             @if($errors->has('endereco'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('endereco') }}
-                                </div>
-                            @endif
-                        </div>
-                        <div class="col-sm mb-2-576">
-                            <label for="telefone">Telefone</label>
-                            <input
-                                type="text"
-                                name="telefone"
-                                class="form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
-                                placeholder="Telefone"
-                                value="{{ old('telefone') }}"
-                            >
-                            @if($errors->has('telefone'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('telefone') }}
                                 </div>
                             @endif
                         </div>
@@ -184,7 +187,8 @@
                     <div class="form-row mt-2">
                         <div class="col-sm mb-2-576">
                             <label for="segmentoOportunidade">Segmento da Oportunidade</label>
-                            <select name="segmentoOportunidade" class="form-control">
+                            <select name="segmentoOportunidade" class="form-control {{ $errors->has('segmentoOportunidade') ? 'is-invalid' : '' }}">
+                                <option disabled {{ old('segmentoOportunidade') ? '' : 'selected' }}>Selecione o segmento...</option>
                                 @foreach (segmentos() as $segmento)
                                     <option value="{{ $segmento }}" {{ $segmento == old('segmentoOportunidade') ? 'selected' : '' }}>{{ $segmento }}</option>
                                 @endforeach
@@ -231,12 +235,12 @@
                         </small>
                     </div>
                     <div class="form-group mt-2">
-                        <label for="descricaoOportunidade">Descrição da Oportunidade</label> <i class="fas fa-question-circle d-inline azul" id="interrogation"></i>
+                        <label for="descricaoOportunidade">Descrição da Oportunidade</label> <i class="fas fa-question-circle d-inline azul" id="descricao-da-oportunidade"></i>
                         <textarea
                             name="descricaoOportunidade"
                             rows="5"
                             class="form-control {{ $errors->has('descricaoOportunidade') ? 'is-invalid' : '' }}"
-                            placeholder="Descreva brevemente a oportunidade."
+                            placeholder="Descreva brevemente a oportunidade"
                         >{{ old('descricaoOportunidade') }}</textarea>
                         @if($errors->has('descricaoOportunidade'))
                             <div class="invalid-feedback">

@@ -67,11 +67,6 @@ use \App\Http\Controllers\Helper;
             <div class="col-lg-4 align-self-end mt-15-992">
               <div class="mexe-tamanho m-auto text-center">
                 <div class="acessibilidade center-992 text-right">
-                  <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-                    <button type="button" class="btn btn-sm btn-light btn-accessibilidade" id="btn-aat">
-                      <img src="{{ asset('img/aai-v13.png') }}" alt="Core-SP | Portal da Transparência"> <span class="hide-only-1200">Acesso à informação</span>
-                    </button>
-                  </a>
                   <button type="button" class="btn btn-sm btn-light btn-acessibilidade" id="increase-font">
                     <h6>A+</h6>
                   </button>
@@ -146,13 +141,29 @@ use \App\Http\Controllers\Helper;
                   <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Serviços</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a href="/agendamento" class="dropdown-item">Agendamento</a>
-                      <a href="/balcao-de-oportunidades" class="dropdown-item">Balcão de Oportunidades</a>
+                      <div class="sub-dropdown">
+                        <div class="dropdown-item">
+                          Agendamento <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
+                        </div>
+                        <div class="sub-dropdown-menu">
+                          <a href="/agendamento" class="dropdown-item">Agendar</a>
+                          <a href="/agendamento-consulta" class="dropdown-item bb-0">Consultar</a>
+                        </div>
+                      </div>
+                      <div class="sub-dropdown">
+                        <div class="dropdown-item">
+                          Balcão de Oportunidades <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
+                        </div>
+                        <div class="sub-dropdown-menu">
+                          <a href="/balcao-de-oportunidades" class="dropdown-item">Acessar</a>
+                          <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
+                        </div>
+                      </div>
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
                       <a href="/registro-inicial" class="dropdown-item">Registro Inicial</a>
-                      <a href="/simulador" class="dropdown-item">Simulador de Valores</a>
+                      <a href="/simulador" class="dropdown-item bb-0">Simulador de Valores</a>
                     </div>
                   </li>
                   <li class="nav-item">
@@ -249,6 +260,14 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-md-4">
               <div class="footer-title w-75 mb-3 mt-4-768">
+                <h5 class="branco">Transparência</h5>
+              </div>
+              <div class="w-75">
+                <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
+                  <img src="{{ asset('img/icon_transparencia.png') }}" alt="Transparência | Core-SP" class="d-inline transparencia-footer">&nbsp;&nbsp;<p class="d-inline branco lh-32">Acesso à informação</p>
+                </a>
+              </div>
+              <div class="footer-title w-75 mb-3 mt-4">
                 <h5 class="branco">Newsletter</h5>
               </div>
               <div class="w-75">
