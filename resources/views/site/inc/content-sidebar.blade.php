@@ -1,6 +1,6 @@
 <div class="clippers">
   <a href="http://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" target="_blank">
-    <div class="box-dois mb-3">
+    <div class="box-dois almost-white-bg mb-3">
       <div class="inside-box-dois inside-box-transparencia d-flex">
         <div class="align-self-center faleRow">
           <img src="{{ asset('img/icon_transparencia.png') }}" alt="Transparência | Core-SP">
