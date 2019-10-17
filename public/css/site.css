@@ -549,6 +549,18 @@ figure.align-left {
 	font-size: .8rem;
 }
 
+.login-header {
+	justify-content: flex-end;
+}
+
+.p-restrita .fas {
+	font-size: 15px;
+}
+
+.p-restrita a {
+	color: inherit;
+}
+
 /*
  * REGRAS DA HOME
  */

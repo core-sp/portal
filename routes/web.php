@@ -271,6 +271,19 @@ Route::prefix('/')->group(function() {
   Route::get('blog', 'PostsController@blogPage');
   Route::get('blog/{slug}', 'PostsController@show');
 
+  // Representantes
+  Route::prefix('representante')->group(function(){
+    Route::get('/home', 'RepresentanteSiteController@index')->name('representante.dashboard');
+    Route::get('/login', 'Auth\RepresentanteLoginController@showLoginForm')->name('representante.login');
+    Route::post('/login', 'Auth\RepresentanteLoginController@login')->name('representante.login.submit');
+    Route::get('/logout', 'Auth\RepresentanteLoginController@logout')->name('representante.logout');
+    // Reset password routes
+    Route::get('/password/reset', 'Auth\RepresentanteForgotPasswordController@showLinkRequestForm')->name('representante.password.request');
+    Route::post('/password/email', 'Auth\RepresentanteForgotPasswordController@sendResetLinkEmail')->name('representante.password.email');
+    Route::get('/password/reset/{token}', 'Auth\RepresentanteResetPasswordController@showResetForm')->name('representante.password.reset');
+    Route::post('/password/reset', 'Auth\RepresentanteResetPasswordController@reset')->name('representante.password.update');
+  });
+
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaSiteController@show');
   Route::get('{categoria}/{slug}', 'PaginaSiteController@showCategoria');

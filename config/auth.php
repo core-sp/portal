@@ -46,6 +46,17 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
+        'representante' => [
+            'driver' => 'session',
+            'provider' => 'representantes',
+        ],
+
+        'representante-api' => [
+            'driver' => 'token',
+            'provider' => 'representantes',
+            'hash' => false,
+        ],
     ],
 
     /*
@@ -71,6 +82,11 @@ return [
             'model' => App\User::class,
         ],
 
+        'representantes' => [
+            'driver' => 'eloquent',
+            'model' => App\Representante::class,
+        ]
+
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
@@ -95,6 +111,12 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_resets',
+            'expire' => 15,
+        ],
+
+        'representantes' => [
+            'provider' => 'representantes',
             'table' => 'password_resets',
             'expire' => 60,
         ],

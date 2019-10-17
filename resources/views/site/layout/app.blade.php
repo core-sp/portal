@@ -66,6 +66,8 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
               <div class="mexe-tamanho m-auto text-center">
+                @component('components.login-header')
+                @endcomponent
                 <div class="acessibilidade center-992 text-right">
                   <button type="button" class="btn btn-sm btn-light btn-acessibilidade" id="increase-font">
                     <h6>A+</h6>
