@@ -17,10 +17,12 @@ class CreateRepresentantesTable extends Migration
             $table->bigIncrements('id');
             $table->string('cpf_cnpj')->unique();
             $table->string('registro_core')->nullable();
+            $table->string('nome')->nullable();
             $table->string('email');
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
