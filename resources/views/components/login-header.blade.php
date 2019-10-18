@@ -21,7 +21,7 @@
                         Área do Representante
                     </a>
                     &nbsp;&nbsp;|&nbsp;&nbsp;
-                    <a href="#">
+                    <a href="{{ route('representante.cadastro') }}">
                         Cadastro
                     </a>
                 </small>
