@@ -164,6 +164,27 @@ $status = BdoOportunidadeControllerHelper::status();
             </div>
             @endif
         </div>
+        <div class="form-group mt-2">
+            <label for="observacao">Observação</label>
+            <textarea name="observacao"
+                class="form-control {{ $errors->has('observacao') ? 'is-invalid' : '' }}"
+                id="observacao"
+                rows="3"
+                placeholder="Caso necessite, insira alguma observação sobre a oportunidade (ela não será publicada)"
+            >@php
+                if(!empty(old('observacao'))) {
+                    echo old('observacao');
+                }
+                if(isset($resultado->observacao)) {
+                    echo $resultado->observacao;
+                }
+            @endphp</textarea>
+            @if($errors->has('observacao'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('observacao') }}
+                </div>
+            @endif
+        </div>
     </div>
     <div class="card-footer">
         <div class="float-right">

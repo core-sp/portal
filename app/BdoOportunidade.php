@@ -11,7 +11,7 @@ class BdoOportunidade extends Model
 
 	protected $primaryKey = 'idoportunidade';
     protected $table = 'bdo_oportunidades';
-    protected $fillable = ['idempresa', 'titulo', 'segmento', 'regiaoatuacao', 'descricao', 'vagasdisponiveis', 'vagaspreenchidas', 'status', 'datainicio', 'idusuario'];
+    protected $fillable = ['idempresa', 'titulo', 'segmento', 'regiaoatuacao', 'descricao', 'vagasdisponiveis', 'vagaspreenchidas', 'status', 'observacao', 'datainicio', 'idusuario'];
 
     public function user()
     {
