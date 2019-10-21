@@ -278,6 +278,7 @@ Route::prefix('/')->group(function() {
     Route::post('/login', 'Auth\RepresentanteLoginController@login')->name('representante.login.submit');
     Route::get('/logout', 'Auth\RepresentanteLoginController@logout')->name('representante.logout');
     Route::get('/cadastro', 'RepresentanteSiteController@cadastroView')->name('representante.cadastro');
+    Route::post('/cadastro', 'RepresentanteSiteController@cadastro')->name('representante.cadastro.submit');
     // Reset password routes
     Route::get('/password/reset', 'Auth\RepresentanteForgotPasswordController@showLinkRequestForm')->name('representante.password.request');
     Route::post('/password/email', 'Auth\RepresentanteForgotPasswordController@sendResetLinkEmail')->name('representante.password.email');

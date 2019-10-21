@@ -8,6 +8,7 @@ $(document).ready(function(){
 	$('.dataInput').mask('00/00/0000');
 	$('.cnpjInput').mask('99.999.999/9999-99');
 	$('.capitalSocial').mask('#.##0,00', {reverse: true});
+	$('#registro_core').mask('0000000/0000', {reverse: true});
 	$('.numeroInput').mask('99');
 	$('.protocoloInput').mask('ZZZZZZ', {
 	  translation: {
