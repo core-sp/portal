@@ -852,6 +852,10 @@ figure.align-left {
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#000000', GradientType=0 );
 }
 
+.box-news-txt h5 {
+	line-height: 1.3;
+}
+
 /* PÁGINA NOTÍCIA */
 .noticia-img {
 	height: 410px;
@@ -1095,7 +1099,8 @@ footer p {
 .inscricaoCurso label,
 .consultaAgendamento label,
 .simulador label,
-.consulta label {
+.consulta label,
+.cadastroRepresentante label {
 	font-size: 0.85rem;
 	margin-bottom: 0.25rem;
 	margin-left: .25rem;
