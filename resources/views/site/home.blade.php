@@ -66,7 +66,7 @@
             <h2 class="pr-3 ml-1">Espaço do Representante</h2>
           </blockquote>
           <h5 class="float-right cinza-claro-bg">
-            <a href="/portal"><i class="fas fa-user icon-title"></i> Acessar o portal</a>
+          <a href="{{ route('representante.login') }}"><i class="fas fa-user icon-title"></i> Área do Representante</a>
           </h5>
         </div>
       </div>

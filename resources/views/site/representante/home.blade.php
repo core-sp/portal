@@ -16,11 +16,13 @@
 </section>
 
 <section id="pagina-noticias">
-    <div class="container">
-        <div class="row">
-            <h1>Logado como Representante Comercial!</h1>
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h1>Logado como Representante Comercial!</h1>
+      </div>
     </div>
+  </div>
 </section>
 
 @endsection

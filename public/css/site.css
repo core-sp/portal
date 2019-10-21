@@ -1107,7 +1107,8 @@ footer p {
 .inscricaoCurso label,
 .consultaAgendamento label,
 .simulador label,
-.consulta label {
+.consulta label,
+.cadastroRepresentante label {
 	font-size: 0.85rem;
 	margin-bottom: 0.25rem;
 	margin-left: .25rem;

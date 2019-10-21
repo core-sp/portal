@@ -42,11 +42,14 @@ class RepresentanteForgotPasswordController extends Controller
     {
         $this->validateEmail($request);
         
-        $response = $this->broker()->sendResetLink(
-            $request->only('cpf_cnpj')
-        );
+        $cpf_cnpj = preg_replace('/[^0-9]+/', '', $request->only('cpf_cnpj'));
+        $arrayCC = [
+            'cpf_cnpj' => $cpf_cnpj
+        ];
+        
+        $response = $this->broker()->sendResetLink($arrayCC);
 
-        $email = $this->getEmail($request->only('cpf_cnpj')['cpf_cnpj']);
+        $email = $this->getEmail($cpf_cnpj);
 
         return $response == Password::RESET_LINK_SENT
                     ? $this->sendResetLinkResponse($request, 'O link de confirmação da senha foi enviado ao email ' . $email)

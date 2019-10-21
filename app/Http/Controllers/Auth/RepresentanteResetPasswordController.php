@@ -47,6 +47,15 @@ class RepresentanteResetPasswordController extends Controller
         ];
     }
 
+    protected function validationErrorMessages()
+    {
+        return [
+            'required' => 'Campo obrigatório',
+            'confirmed' => 'A senha e a confirmação precisam ser idênticas',
+            'password.min' => 'A senha precisa ter no mínimo 6 caracteres'
+        ];
+    }
+
     public function getEmailForPasswordReset()
     {
         return $this->cpf_cnpj;
@@ -54,9 +63,22 @@ class RepresentanteResetPasswordController extends Controller
 
     protected function credentials(Request $request)
     {
-        return $request->only(
-            'cpf_cnpj', 'password', 'password_confirmation', 'token'
-        );
+        return [
+            'cpf_cnpj' => preg_replace('/[^0-9]+/', '', $request->cpf_cnpj),
+            'password' => $request->password,
+            'password_confirmation' => $request->password_confirmation,
+            'token' => $request->token
+        ];
+    }
+
+    protected function sendResetResponse(Request $request, $response)
+    {
+        return redirect()
+            ->route('representante.login')
+            ->with([
+                'message' => 'Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.',
+                'class' => 'alert-success'
+            ]);
     }
 
     public function showResetForm(Request $request, $token = null)

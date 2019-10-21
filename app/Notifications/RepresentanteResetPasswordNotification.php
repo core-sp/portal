@@ -26,9 +26,8 @@ class RepresentanteResetPasswordNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', route('representante.password.reset', $this->token))
-                    ->line('Thank you for using our application!');
+            ->action('Notification Action', route('representante.password.reset', $this->token))
+            ->subject('Alteração de senha');
     }
 
     public function toArray($notifiable)
