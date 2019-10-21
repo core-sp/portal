@@ -12,10 +12,11 @@ class BdoOportunidadeControllerHelper extends Controller
     public static function status()
     {
     	$status = [
-    		'Sob Análise',
-    		'Em andamento',
+            'Sob Análise',
+            'Recusado',
+            'Em andamento',
+            'Concluído',
     		'Expirado',
-    		'Concluído'
     	];
     	sort($status);
         return $status;

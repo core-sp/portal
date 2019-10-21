@@ -37,6 +37,31 @@ class BdoOportunidadeController extends Controller
         return $resultados;
     }
 
+    protected function statusNoAdmin($status)
+    {
+        switch ($status) {
+            case 'Sob Análise':
+                return '<strong><i>Sob Análise</i></strong>';
+            break;
+
+            case 'Recusado':
+                return '<strong class="text-danger">Recusado</strong>';
+            break;
+
+            case 'Concluído':
+                return '<strong class="text-warning">Concluído</strong>';
+            break;
+
+            case 'Em andamento':
+                return '<strong class="text-success">Em andamento</strong>';
+            break;
+            
+            default:
+                return $status;
+            break;
+        }
+    }
+
     public function tabelaCompleta($resultados)
     {
         // Opções de cabeçalho da tabela
@@ -77,7 +102,7 @@ class BdoOportunidadeController extends Controller
                 $razaosocial,
                 $resultado->segmento,
                 $relacaovagas,
-                $resultado->status !== 'Sob Análise' ? $resultado->status : '<strong class="text-danger">'.$resultado->status.'</strong>',
+                $this->statusNoAdmin($resultado->status),
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -99,7 +124,8 @@ class BdoOportunidadeController extends Controller
             'segmento' => 'max:191',
             'vagasdisponiveis' => 'required',
             'descricao' => 'required',
-            'status' => 'max:191'
+            'status' => 'max:191',
+            'observacao' => 'max:500',
         ];
     }
 
@@ -155,9 +181,9 @@ class BdoOportunidadeController extends Controller
             'vagasdisponiveis' => request('vagasdisponiveis'),
             'vagaspreenchidas' => request('vagaspreenchidas'),
             'status' => request('status'),
+            'observacao' => request('observacao'),
             'datainicio' => $datainicio,
             'idusuario' => request('idusuario')
-
         ]);
 
         if(!$save)
@@ -199,6 +225,7 @@ class BdoOportunidadeController extends Controller
             'vagasdisponiveis' => request('vagasdisponiveis'),
             'vagaspreenchidas' => request('vagaspreenchidas'),
             'status' => request('status'),
+            'observacao' => request('observacao'),
             'datainicio' => $datainicio,
             'idusuario' => request('idusuario')
         ]);
