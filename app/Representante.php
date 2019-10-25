@@ -8,33 +8,60 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticable;
 use Illuminate\Support\Facades\Mail;
+use App\Connections\FirebirdConnection;
+use App\Traits\GerentiProcedures;
 
 class Representante extends Authenticable
 {
-    use Notifiable, SoftDeletes;
+    use Notifiable, SoftDeletes, GerentiProcedures;
 
     protected $guard = 'representante';
 
-    protected $fillable = ['cpf_cnpj', 'registro_core', 'nome', 'email', 'password'];
+    protected $fillable = ['cpf_cnpj', 'registro_core', 'ass_id', 'nome', 'email', 'password'];
 
     protected $hidden = ['password', 'remember_token'];
 
     public function sendPasswordResetNotification($token)
     {
-        $body = 'Você está recebendo este email pois solicitou alteração de senha no Portal Core-SP.';
-        $body .= '<br>';
-        $body .= 'Clique no link abaixo para continuar o procedimento.';
-        $body .= '<br><br>';
-        $body .= '<a href="'. route('representante.password.reset', $token) .'">Alterar senha</a>';
-        $body .= '<br><br>';
-        $body .= 'Caso não tenha solicitado, favor desconsiderar este email.';
-        $body .= '<br><br>';
-        $body .= 'Atenciosamente,';
-        $body .= '<br>';
-        $body .= 'Portal Core-SP';
+        $body = emailResetRepresentante($token);
 
-        // $this->notify(new RepresentanteResetPasswordNotification($token));
-
+        // $this->notify(new RepresentanteResetPasswordNotification($token)); - FALLBACK
         Mail::to($this->email)->send(new RepresentanteResetPasswordMail($token, $body));
+    }
+
+    public function enderecos()
+    {
+        return $this->gerentiEnderecos($this->ass_id);
+    }
+
+    public function contatos()
+    {
+        return $this->gerentiContatos($this->ass_id);
+    }
+
+    public function tipoPessoa()
+    {
+        return strlen($this->cpf_cnpj) === 14 ? 'PF' : 'PJ';
+    }
+
+    public function dadosGerais()
+    {
+        return $this->tipoPessoa() === 'PF' ? $this->gerentiDadosGeraisPF($this->ass_id) : $this->gerentiDadosGeraisPJ($this->ass_id);
+    }
+
+    public function getCpfCnpjAttribute($value)
+    {
+        if(strlen($value) === 11) {
+            return substr($value, 0, 3) . '.' . substr($value, 3, 3) . '.' . substr($value, 6, 3) . '-' . substr($value, 9, 2);
+        } elseif(strlen($value) === 14) {
+            return substr($value, 0, 2) . '.' . substr($value, 2, 3) . '.' . substr($value, 5, 3) . '/' . substr($value, 8, 4) . '-' . substr($value, 12, 2);
+        } else {
+            return 'Indefinido';
+        }
+    }
+
+    public function getRegistroCoreAttribute($value)
+    {
+        return substr_replace($value, '/', -4, 0);
     }
 }

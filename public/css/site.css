@@ -133,6 +133,11 @@ a {
 	text-decoration: none;
 }
 
+.link-nostyle {
+	text-decoration: none !important;
+	color: #FFF !important;
+}
+
 a:hover {
 	color: #15AAE2;
 }
@@ -711,6 +716,17 @@ figure.align-left {
 	height: 100%;
 }
 
+.box-minor-padding {
+	border: 1px solid #FFFFFF;
+	padding: 1rem;
+	border-radius: 5px;
+	height: 100%;
+}
+
+.box-minor-padding img {
+	width: 45px;
+}
+
 .inside-box i {
 	font-size: 5rem;
 }
@@ -1125,6 +1141,10 @@ footer p {
 	height: 0px;
 }
 
+.bt-unset {
+	border-top: unset !important;
+}
+
 #simuladorAddons {
 	display: none;
 }
@@ -1185,6 +1205,12 @@ footer p {
 	margin-bottom: .75rem;
 	width: 100%;
 	display: inline-block;
+}
+
+.linha-lg-mod {
+	border-bottom: 1px solid #d6d6d6;
+	margin-top: .75rem;
+	width: 100%;
 }
 
 .linha-lg-mini {
@@ -1723,6 +1749,53 @@ h5 {
 	border: 1px solid #15AAE2 !important;
 	font-size: 12px;
 	line-height: 1.4;
+}
+
+.menu-representante {
+	background-color: #fbfbfb;
+}
+
+.mr-item,
+.border-one-mr {
+	border: 1px solid #dee2e6;
+}
+
+.mr-item h6 {
+	padding: .75rem;
+}
+
+.mr-item:hover,
+.mr-item:hover .brancar,
+.mr-item-selected {
+	color: #fbfbfb;
+	background-color: #444444;
+}
+
+.mr-item-selected .brancar {
+	color: #fbfbfb;
+}
+
+.representante-content {
+	background-color: #fbfbfb;
+	padding: 1rem;
+	border: 1px solid #dee2e6;
+}
+
+.contato-single {
+	padding: 10px;
+	display: flex;
+	width: 100%;
+	align-self: center;
+}
+
+.contato-single p {
+	line-height: 1.5;
+	align-self: center;
+	flex: 1;
+}
+
+.b-dashed {
+	border-bottom: 1px dotted #444;
 }
 
 /*

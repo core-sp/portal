@@ -4,11 +4,16 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Representante;
 use Illuminate\Support\Facades\Auth;
 use App\Rules\CpfCnpj;
+use App\Traits\GerentiProcedures;
+use Illuminate\Support\Facades\Input;
 
 class RepresentanteLoginController extends Controller
 {
+    use GerentiProcedures;
+
     public function __construct()
     {
         $this->middleware('guest:representante')->except('logout');
@@ -19,6 +24,23 @@ class RepresentanteLoginController extends Controller
         return view('auth.representante-login'); 
     }
 
+    protected function verificaGerentiLogin($cpfCnpj)
+    {
+        $cpfCnpj = preg_replace('/[^0-9]+/', '', $cpfCnpj);
+        $registro = Representante::where('cpf_cnpj', $cpfCnpj)->first();
+
+        if(isset($registro)) {
+            $checkGerenti = $this->checaAtivo($registro->registro_core, $cpfCnpj);
+
+            if($checkGerenti === false) {
+                return redirect()
+                    ->route('representante.cadastro')
+                    ->with('message', 'Desculpe, mas o cadastro informado não está corretamente inscrito no Core-SP. Por favor, verifique se todas as informações foram inseridas corretamente.')
+                    ->withInput(Input::all());
+            }
+        }
+    }
+
     public function login(Request $request)
     {
         $this->validate($request, [
@@ -27,6 +49,8 @@ class RepresentanteLoginController extends Controller
         ], [
             'required' => 'Campo obrigatório'
         ]);
+
+        $this->verificaGerentiLogin($request->cpf_cnpj);
 
         if (Auth::guard('representante')->attempt([
             'cpf_cnpj' => preg_replace('/[^0-9]+/', '', $request->cpf_cnpj),
