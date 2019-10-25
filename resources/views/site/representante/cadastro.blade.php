@@ -4,7 +4,7 @@
 
 <section id="pagina-cabecalho" class="mt-1">
     <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-        <img src="{{ asset('img/news-interna.png') }}" />
+        <img src="{{ asset('img/banner-cadastro-representante.jpg') }}" />
         <div class="row position-absolute pagina-titulo">
             <div class="container text-center">
                 <h1 class="branco text-uppercase">
@@ -36,8 +36,6 @@
                     <p class="alert alert-danger">{{ Session::get('message') }}</p>
                 @endif
                 <p>Preencha as informações abaixo para realizar o cadastro e então acessar a área do Representante Comercial.</p>
-                <p>Nela, você conseguirá atualizar dados cadastrais e emitir boletos de pagamento de anuidade.</p>
-                <h4>Cadastro</h4>
                 <form action="{{ route('representante.cadastro.submit') }}" method="POST" class="cadastroRepresentante">
                     @csrf
                     <div class="form-row">
@@ -73,22 +71,6 @@
                                 </div>
                             @endif
                         </div>
-                    </div>
-                    <div class="form-group mt-2">
-                        <label for="nome">Nome Completo *</label>
-                        <input
-                            type="text"
-                            name="nome"
-                            class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
-                            id="nome"
-                            value="{{ old('nome') }}"
-                            placeholder="Nome"
-                        >
-                        @if($errors->has('nome'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('nome') }}
-                            </div>
-                        @endif
                     </div>
                     <div class="form-group mt-2">
                         <label for="email">Email *</label>

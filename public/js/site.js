@@ -10,6 +10,14 @@ $(document).ready(function(){
 	$('.capitalSocial').mask('#.##0,00', {reverse: true});
 	$('#registro_core').mask('0000000/0000', {reverse: true});
 	$('.numeroInput').mask('99');
+	$('.cep').mask('00000-000');
+	$('.numero').mask('ZZZZZZZZZZ', {
+		translation: {
+			'Z': {
+			  pattern: /[0-9\-]/
+			}
+		}
+	});
 	$('.protocoloInput').mask('ZZZZZZ', {
 	  translation: {
 		  'Z': {
@@ -89,7 +97,62 @@ $(document).ready(function(){
         window.open($(this).attr('href'), 'fbShareWindow', 'height=700, width=450, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
         return false;
 	});
+
+	// CEP Correios
+	function limpa_formulário_cep() {
+		// Limpa valores do formulário de cep.
+		$("#rua").val("");
+		$("#bairro").val("");
+		$("#cidade").val("");
+		$("#uf").val("");
+		$("#ibge").val("");
+	}
 	
+	//Quando o campo cep perde o foco.
+	$("#cep").blur(function() {
+		//Nova variável "cep" somente com dígitos.
+		var cep = $(this).val().replace(/\D/g, '');
+		//Verifica se campo cep possui valor informado.
+		if (cep != "") {
+			//Expressão regular para validar o CEP.
+			var validacep = /^[0-9]{8}$/;
+			//Valida o formato do CEP.
+			if(validacep.test(cep)) {
+				//Preenche os campos com "..." enquanto consulta webservice.
+				$("#rua").val("...");
+				$("#bairro").val("...");
+				$("#cidade").val("...");
+				$("#uf").val("...");
+				$("#ibge").val("...");
+				//Consulta o webservice viacep.com.br/
+				$.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
+					if (!("erro" in dados)) {
+						//Atualiza os campos com os valores da consulta.
+						$("#rua").val(dados.logradouro);
+						$("#bairro").val(dados.bairro);
+						$("#cidade").val(dados.localidade);
+						$("#uf").val(dados.uf);
+						$("#ibge").val(dados.ibge);
+					} //end if.
+					else {
+						//CEP pesquisado não foi encontrado.
+						limpa_formulário_cep();
+						alert("CEP não encontrado.");
+					}
+				});
+			} //end if.
+			else {
+				//cep é inválido.
+				limpa_formulário_cep();
+				alert("Formato de CEP inválido.");
+			}
+		} //end if.
+		else {
+			//cep sem valor, limpa formulário.
+			limpa_formulário_cep();
+		}
+	});
+	// Scroll fixed menu
 	$(window).scroll(function(){
 		if($(window).width() > 767) {
 			if ($(document).scrollTop() > 300) {
@@ -290,6 +353,46 @@ function noWeekendsOrHolidays(date) {
 				}
 			});
 		});
+		// Switch para máscaras de contato Gerenti
+		function switchMascaras(conteudo, id)
+		{
+			switch (id) {
+				case '1':
+				case '4':
+				case '6':
+				case '7':
+				case '8':
+					conteudo.mask('(99) 9999-9999');
+				break;
+				case '2':
+					conteudo.mask('(99) 99999-9999');
+				break;
+				case '3':
+					conteudo.mask("A", {
+						translation: {
+							"A": { pattern: /[\w@\-.+]/, recursive: true }
+						}
+					});
+				break;
+				case '5':
+					conteudo.unmask();
+				break;
+				default:
+					conteudo.mask('9');
+				break;
+			}
+		}
+		// Gerenti Inserir Contato
+		$('#gerentiTipoContato').on('change', function(){
+			var conteudo = $('#gerentiInserirContato');
+			conteudo.prop("disabled", false).val('');
+			switchMascaras(conteudo, $(this).val());
+		});
+		if($('#gerentiTipoContato').is(':disabled')) {
+			conteudo = $('#gerentiInserirContato');
+			var id = $('#gerentiTipoContato option:selected').val();
+			switchMascaras(conteudo, id);
+		}
 	});
 })(jQuery);
 

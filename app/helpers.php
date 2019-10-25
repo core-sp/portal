@@ -207,3 +207,82 @@ function regioes()
         13 => 'Marília'
     ];
 }
+
+function emailResetRepresentante($token)
+{
+    $body = 'Você está recebendo este email pois solicitou alteração de senha no Portal Core-SP.';
+    $body .= '<br>';
+    $body .= 'Clique no link abaixo para continuar o procedimento.';
+    $body .= '<br><br>';
+    $body .= '<a href="'. route('representante.password.reset', $token) .'">Alterar senha</a>';
+    $body .= '<br><br>';
+    $body .= 'Caso não tenha solicitado, favor desconsiderar este email.';
+    $body .= '<br><br>';
+    $body .= 'Atenciosamente,';
+    $body .= '<br>';
+    $body .= 'Portal Core-SP';
+
+    return $body;
+}
+
+function formataEnderecoGerenti($logradouro, $num = '', $comp = '')
+{
+    $end = $logradouro;
+    !empty($num) ? $end .= ', ' . $num : $end .= '';
+    !empty($comp) ? $end .= ' - ' . $comp : $end .= '';
+
+    return $end;
+}
+
+function estados()
+{
+    return [
+        'AC'=>'Acre',
+        'AL'=>'Alagoas',
+        'AP'=>'Amapá',
+        'AM'=>'Amazonas',
+        'BA'=>'Bahia',
+        'CE'=>'Ceará',
+        'DF'=>'Distrito Federal',
+        'ES'=>'Espírito Santo',
+        'GO'=>'Goiás',
+        'MA'=>'Maranhão',
+        'MT'=>'Mato Grosso',
+        'MS'=>'Mato Grosso do Sul',
+        'MG'=>'Minas Gerais',
+        'PA'=>'Pará',
+        'PB'=>'Paraíba',
+        'PR'=>'Paraná',
+        'PE'=>'Pernambuco',
+        'PI'=>'Piauí',
+        'RJ'=>'Rio de Janeiro',
+        'RN'=>'Rio Grande do Norte',
+        'RS'=>'Rio Grande do Sul',
+        'RO'=>'Rondônia',
+        'RR'=>'Roraima',
+        'SC'=>'Santa Catarina',
+        'SP'=>'São Paulo',
+        'SE'=>'Sergipe',
+        'TO'=>'Tocantins'
+    ];
+}
+
+function gerentiTiposContatos()
+{
+    return [
+        '1' => 'Telefone',
+        '2' => 'Celular',
+        '3' => 'E-mail',
+        '4' => 'Fax',
+        '5' => 'Site',
+        '6' => 'Tel. Emergência',
+        '7' => 'Tel. Contato',
+        '8' => 'Tel. Referência'
+    ];
+}
+
+function formataDataGerenti($date)
+{
+    $array = explode('-', $date);
+    return $array[2] . '/' . $array[1] . '/' . $array[0];
+}

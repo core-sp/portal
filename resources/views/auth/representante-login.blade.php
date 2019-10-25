@@ -4,7 +4,7 @@
 
 <section id="pagina-cabecalho" class="mt-1">
     <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-        <img src="{{ asset('img/news-interna.png') }}" />
+        <img src="{{ asset('img/banner-login-representante.jpg') }}" />
         <div class="row position-absolute pagina-titulo">
             <div class="container text-center">
                 <h1 class="branco text-uppercase">
@@ -35,6 +35,7 @@
                 @if(Session::has('message'))
                     <p class="alert {{ Session::get('class') }}">{{ Session::get('message') }}</p>
                 @endif
+                <p>Preencha as informações abaixo para acessar a área do Representante Comercial.</p>
                 <form action="{{ route('representante.login.submit') }}" method="POST" class="cadastroRepresentante">
                     @csrf
                     <div class="form-group">
