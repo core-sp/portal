@@ -12,7 +12,6 @@ class LicitacaoHelper extends Controller
         $modalidades = [
             'Concorrência Pública',
             'Concurso',
-            'Cotação Eletrônica',
             'Carta Convite',
             'Leilão',
             'Pregão Eletrônico SRP',
