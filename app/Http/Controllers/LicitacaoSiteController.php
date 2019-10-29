@@ -63,6 +63,7 @@ class LicitacaoSiteController extends Controller
             ->where('nrlicitacao','LIKE',$buscaNrLicitacao)
             ->where('nrprocesso','LIKE',$buscaNrProcesso)
             ->where('datarealizacao','LIKE','%'.$buscaDataRealizacao.'%')
+            ->orderBy('created_at','DESC')
             ->paginate(10);
         if (count($licitacoes) > 0) {
             return view('site.licitacoes', compact('licitacoes', 'busca'));
