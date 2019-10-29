@@ -17,7 +17,7 @@ $situacoes = LicitacaoHelper::situacoes();
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Licitações
+          Licitações e Compras
         </h1>
       </div>
     </div>
