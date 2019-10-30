@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Anunciar Vaga'])
+@extends('site.layout.app', ['title' => 'Balcão de Oportunidades: Anunciar Vaga'])
 
 @section('content')
 
