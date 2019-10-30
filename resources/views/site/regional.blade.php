@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Regional'])
+@extends('site.layout.app', ['title' => 'Regional: ' . $resultado->regional])
 
 @section('content')
 
