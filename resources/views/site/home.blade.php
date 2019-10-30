@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Home'])
+@extends('site.layout.app', ['title' => 'Conselho Regional dos Representantes Comerciais do Estado de São Paulo'])
 
 @section('description')
   <meta name="description" content="O Core-SP é responsável pela consulta, orientação, disciplina e fiscalização do exercício da profissão de Representação Comercial no estado de São Paulo.">
