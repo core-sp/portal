@@ -130,6 +130,7 @@ use \App\Http\Controllers\Helper;
                       <a href="/institucional" class="dropdown-item">Institucional</a>
                       <a href="/conselho" class="dropdown-item">Conselho</a>
                       <a href="/legislacao" class="dropdown-item">Legislação</a>
+                      <a href="/missao-visao-e-valores" class="dropdown-item bb-0">Missão, Visão e Valores</a>
                     </div>
                   </li>
                   <li class="nav-item">
