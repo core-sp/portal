@@ -20,6 +20,7 @@ class NoticiaSiteController extends Controller
     public function show($slug)
     {
         $noticia = Noticia::where('slug', $slug)->firstOrFail();
+        $titulo = $noticia->titulo;
         $id = $noticia->idnoticia;
         $tres = Noticia::latest()
             ->take(3)
@@ -28,7 +29,7 @@ class NoticiaSiteController extends Controller
             ->whereNull('idregional')
             ->get();
         return response()
-            ->view('site.noticia', compact('noticia', 'tres', 'id'))
+            ->view('site.noticia', compact('noticia', 'titulo', 'tres', 'id'))
             ->header('Cache-Control','no-cache');
     }
 }
