@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Notícias'])
+@extends('site.layout.app', ['title' => $titulo])
 
 @section('description')
   <meta name="description" content="{!! retornaDescription($noticia->conteudo) !!}" />
