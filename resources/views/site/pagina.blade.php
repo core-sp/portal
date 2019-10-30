@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => $pagina->titulo])
+@extends('site.layout.app', ['title' => isset($pagina) ? $pagina->titulo : 'Página'])
 
 @section('description')
   <meta name="description" content="{!! retornaDescription($pagina->conteudo) !!}">
