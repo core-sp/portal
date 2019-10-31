@@ -17,8 +17,8 @@ class SimuladorController extends Controller
     protected function taxas($tipo)
     {
         // Retorno das taxas de acordo com o tipo de pessoa
-        $run = $this->connection->prepare("select TAX_ID, TAX_DESCRICAO, TAX_VALOR from PROCTAXAINICIAIS(".$tipo.")");
-        $run->execute();
+        $run = $this->connection->prepare("select TAX_ID, TAX_DESCRICAO, TAX_VALOR from PROCTAXAINICIAIS(:tipo)");
+        $run->execute(['tipo' => $tipo]);
 
         return $run->fetchAll();
     }
@@ -38,8 +38,13 @@ class SimuladorController extends Controller
     protected function simulador($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 24)
     {
         // Retorno do extrato de acordo com o tipo de pessoa, data de início, capital social e filial
-        $run = $this->connection->prepare("SELECT descricao, valor_total, data_vencimento FROM procextrato ('', ".$tipoPessoa.", '".$dataInicio."', ".$capitalSocial.", cast('NOW' as date), ".$filial.")");
-        $run->execute();
+        $run = $this->connection->prepare("SELECT descricao, valor_total, data_vencimento FROM procextrato ('', :tipopessoa, :datainicio, :capitalsocial, cast('NOW' as date), :filial)");
+        $run->execute([
+            'tipopessoa' => $tipoPessoa,
+            'datainicio' => $dataInicio,
+            'capitalsocial' => $capitalSocial,
+            'filial' => $filial
+        ]);
 
         return $run->fetchAll();
     }
