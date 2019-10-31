@@ -16,7 +16,7 @@ use \App\Http\Controllers\Helper;
           <meta name="description" content="O Core-SP é responsável pela consulta, orientação, disciplina e fiscalização do exercício da profissão de Representação Comercial no estado de São Paulo.">
         @endif
 
-        <title>Core-SP - {{ $title }}</title>
+        <title>Core-SP &#8212; {{ $title }}</title>
         <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
         <link type="text/css" href="{{ asset('/css/app.css') }}" rel="stylesheet">
@@ -60,8 +60,8 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
               <div class="d-block setembro">
-                <h2 class="pacifico"><a href="/noticia/core-sp-na-campanha-outubro-rosa" class="nohover">#OutubroRosa</a></h2>
-                <p class="light"><a href="/noticia/core-sp-na-campanha-outubro-rosa" class="nohover"><small>Luta contra o câncer de mama</small></a></p>
+                <h2 class="pacifico"><a href="/noticia/novembro-azul-a-importancia-de-se-cuidar" class="nohover">#NovembroAzul</a></h2>
+                <p class="light"><a href="/noticia/novembro-azul-a-importancia-de-se-cuidar" class="nohover"><small>Luta contra o câncer de próstata</small></a></p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
@@ -129,8 +129,9 @@ use \App\Http\Controllers\Helper;
                   <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a href="/institucional" class="dropdown-item">Institucional</a>
+                      <a href="/concursos" class="dropdown-item">Concursos</a>
                       <a href="/conselho" class="dropdown-item">Conselho</a>
+                      <a href="/institucional" class="dropdown-item">Institucional</a>
                       <a href="/legislacao" class="dropdown-item">Legislação</a>
                       <a href="/missao-visao-e-valores" class="dropdown-item bb-0">Missão, Visão e Valores</a>
                     </div>

@@ -360,7 +360,7 @@ figure.align-left {
 #header-principal {
 	top: 0;
 	left: 0;
-	background-color: #CF458F;
+	background-color: #004587;
 }
 
 .header-margin {
@@ -2165,7 +2165,7 @@ h5 {
 	}
 
 	.btn-novo-core {
-		padding: 0.75rem 1.75rem;
+		padding: 0.65rem 1.25rem;
 		margin: 0rem 0.3rem;
 	}
 
@@ -2200,7 +2200,7 @@ h5 {
 
 	.novo-core-box h2,
 	.beneficios-txt p {
-		margin-bottom: 2rem;
+		margin-bottom: 1.35rem;
 	}
 
 	.faleSingle {

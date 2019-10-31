@@ -259,6 +259,9 @@ Route::prefix('/')->group(function() {
   // Feiras
   Route::get('feiras', 'SiteController@feiras');
 
+  // Fiscalização
+  Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao');
+
   // Simulador
   Route::get('simulador', 'SimuladorController@view');
   Route::post('simulador', 'SimuladorController@extrato');

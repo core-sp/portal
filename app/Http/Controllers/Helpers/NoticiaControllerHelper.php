@@ -13,7 +13,8 @@ class NoticiaControllerHelper extends Controller
         $array = [
             'Benefícios',
             'Cotidiano',
-            'Feiras'
+            'Feiras',
+            'Fiscalização'
         ];
         return $array;
     }
