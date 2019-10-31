@@ -16,7 +16,7 @@ use \App\Http\Controllers\Helper;
           <meta name="description" content="O Core-SP é responsável pela consulta, orientação, disciplina e fiscalização do exercício da profissão de Representação Comercial no estado de São Paulo.">
         @endif
 
-        <title>Core-SP - {{ $title }}</title>
+        <title>Core-SP &#8212; {{ $title }}</title>
         <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
         <link type="text/css" href="{{ asset('/css/app.css') }}" rel="stylesheet">
