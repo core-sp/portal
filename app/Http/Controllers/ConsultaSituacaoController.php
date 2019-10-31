@@ -46,8 +46,10 @@ class ConsultaSituacaoController extends Controller
         // Regex para CPF
         $cpf = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
 
-        $run = $this->connection->prepare("select SITUACAO, REGISTRONUM, ASS_ID, NOME, EMAILS from PROCSTATUSREGISTRO('" . $cpf . "')");
-        $run->execute();
+        $run = $this->connection->prepare("select SITUACAO, REGISTRONUM, ASS_ID, NOME, EMAILS from PROCSTATUSREGISTRO(:cpf)");
+        $run->execute([
+            'cpf' => $cpf
+        ]);
 
         $resultado = $run->fetchAll();
 

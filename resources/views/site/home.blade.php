@@ -155,11 +155,9 @@
       <div class="col-12">
         <div class="text-center novo-core-box">
           <h2 class="stronger branco text-uppercase">um novo core-sp para você!</h2>
-          <a href="/agenda" class="btn-novo-core"><h4 class="normal">Agenda</h4></a>
+          <a href="/arquivos/2019-07/Informativo%20Core-SP_agosto-compactado.pdf" class="btn-novo-core" download><h4 class="normal">Informativo</h4></a>
           <br class="show-576 br-novo-core" />
-          <a href="/concursos" class="btn-novo-core"><h4 class="normal">Concursos</h4></a>
-          <br class="show-768 br-novo-core" />
-          <a href="/feiras" class="btn-novo-core"><h4 class="normal">Feiras</h4></a>
+          <a href="/acoes-da-fiscalizacao" class="btn-novo-core"><h4 class="normal">Fiscalização</h4></a>
           <br class="show-576 br-novo-core" />
           <a href="/cursos" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
         </div>

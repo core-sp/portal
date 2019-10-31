@@ -94,4 +94,14 @@ class SiteController extends Controller
             ->paginate(9);
         return view('site.feiras', compact('noticias'));
     }
+
+    public function acoesFiscalizacao()
+    {
+        $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
+            ->orderBy('created_at', 'DESC')
+            ->where('publicada','Sim')
+            ->where('categoria','Fiscalização')
+            ->paginate(9);
+        return view('site.acoes-da-fiscalizacao', compact('noticias'));
+    }
 }
