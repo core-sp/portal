@@ -142,7 +142,7 @@ use \App\Http\Controllers\Helper;
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <a href="/acoes-da-fiscalizacao" class="dropdown-item">Ações da fiscalização</a>
                       <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank" class="dropdown-item">Denuncie</a>
-                      <a href="/sobre-a-fiscalizacao" class="dropdown-item">Sobre o departamento</a>
+                      <a href="/sobre-a-fiscalizacao" class="dropdown-item bb-0">Sobre o departamento</a>
                     </div>
                   </li>
                   <li class="nav-item">
