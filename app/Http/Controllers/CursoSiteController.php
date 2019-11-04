@@ -27,6 +27,7 @@ class CursoSiteController extends Controller
         $now = date('Y-m-d H:i:s');
         $cursos = Curso::where('datatermino','<',$now)
             ->where('publicado','Sim')
+            ->orderBy('created_at','DESC')
             ->paginate(10);
         return response()
             ->view('site.cursos-anteriores', compact('cursos'))

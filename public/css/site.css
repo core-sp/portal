@@ -2076,7 +2076,11 @@ h5 {
 	}
 
 	.nav-item {
-		margin: 0rem 0.1rem;
+		margin: 0rem;
+	}
+
+	.nav-item a {
+		padding: 0.35rem 0.44rem;
 	}
 
 	.btn-novo-core {
