@@ -188,6 +188,12 @@ $(document).ready(function(){
 			$(this).tooltip("disable");   
 		}
 	});
+	if($('#cnpj').length != 0) {
+		if($('#cnpj').val().length == 18) {
+			var value = $('#cnpj').val();
+			getInfoEmpresa(value);
+		}
+	}
 });
 
 // Lightbox
@@ -393,8 +399,60 @@ function noWeekendsOrHolidays(date) {
 			var id = $('#gerentiTipoContato option:selected').val();
 			switchMascaras(conteudo, id);
 		}
+		// Auto-preenche empresa Balcão de Oportunidades (anúncio)
+		$('#cnpj').on('keyup', function(){
+			var value = $(this).val();
+			if(value.length == 18) {
+				getInfoEmpresa(value);
+			}
+		});
+		// Após modal
+		$('#avInfo').on('hidden.bs.modal', function () {
+			$('#titulice').focus();
+		});
+		$('#avNull').on('hidden.bs.modal', function () {
+			$('#av01').focus();
+		});
+		// Abre campo para Outro Segmento
+		$('#avSegmentoOp').on('change', function(){
+			if($(this).val() == 'Outro') {
+				$('#outroSegmento').show();
+			} else {
+				$('#outroSegmento').hide();
+			}
+		});
 	});
 })(jQuery);
+
+// Get informação empresa
+function getInfoEmpresa(value)
+{
+	return $.ajax({
+		type: 'GET',
+		url: '/info-empresa/' + encodeURIComponent(value.replace(/[^\d]+/g,'')),
+		beforeSend: function() {
+			$('#avLoading').show();	
+		},
+		success: function(data)
+		{
+			var json = $.parseJSON(data);
+			$('.avHidden').hide();
+			$('#av10').val(json.idempresa);
+			$('#titulice').focus();
+			$('#avLoading').hide();
+			// Mostra o alert
+			$('#avAlert').show().addClass('alert-success').removeClass('alert-info').text('Empresa já cadastrada. Favor seguir com o preenchimento da oportunidade abaixo.');
+		},
+		error: function()
+		{
+			$('.avHidden').css('display', 'flex');
+			$('#av10').val('0');
+			$('#av01').focus();
+			$('#avLoading').hide();
+			$('#avAlert').show().addClass('alert-info').removeClass('alert-success').text('Empresa não cadastrada. Favor informar os dados da empresa abaixo.');
+		}
+	});
+}
 
 // Get now date
 function getDate() {

@@ -49,7 +49,7 @@ $status = BdoOportunidadeControllerHelper::status();
                 <div class="row nomargin">
                     <label for="segmento">Segmento</label>
                     <select name="segmento" class="form-control" id="segmento">
-                    @foreach(segmentos() as $segmento)
+                    @foreach(segmentosWithAddons($resultado->segmento) as $segmento)
                         @if(!empty(old('segmento')))
                             @if(old('segmento') === $segmento)
                                 <option class="{{ $segmento }}" selected>{{ $segmento }}</option>

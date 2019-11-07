@@ -32,13 +32,32 @@
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt pr-4">
                 <p>Preencha o formulário abaixo para solicitar a inclusão de sua(s) vaga(s) no <strong>Balcão de Oportunidades</strong> do <strong>Core-SP.</strong></p>
-                <p>A(s) vaga(s) será(ão) disponibilizada(s) em até 03 (três) dias úteis, após a verificação dos dados informados.</p>
+                <p>A(s) vaga(s) será(ão) disponibilizada(s) em até 03 (três) dias úteis, após a verificação dos dados informados, e permanecerá pelo prazo de até 90 (noventa) dias - após este período o status da(s) vaga(s) passará de "Em andamento" para "Concluído".</p>
                 <p>Para mais esclarecimentos, entre em contato conosco através do email <strong>informacoes@core-sp.org.br</strong>.</p>
                 <h4>Informações da Empresa</h4>
                 <form method="POST" class="w-100 simulador">
                     @csrf
                     <input type="hidden" name="descricao" value="Empresa cadastrada pelo site.">
-                    <div class="form-row">
+                    <input type="hidden" name="idempresa" id="av10" value="{{ old('idempresa') ? old('idempresa') : '0' }}">
+                    <div class="form-group">
+                        <label for="cnpj">CNPJ</label>
+                        <input type="text"
+                            class="form-control cnpjInput {{ $errors->has('cnpj') ? 'is-invalid' : '' }}"
+                            placeholder="CNPJ"
+                            name="cnpj"
+                            id="cnpj"
+                            maxlength="191"
+                            value="{{ old('cnpj') }}"
+                        >
+                        @if($errors->has('cnpj'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('cnpj') }}
+                            </div>
+                        @endif
+                    </div>
+                    <div id="avLoading"><img src="{{ asset('img/ajax-loader.gif') }}" class="pt-0 mb-2" alt="Loading"></div>
+                    <div id="avAlert" class="alert" role="alert"></div>
+                    <div class="form-row mt-2 avHidden">
                         <div class="col-sm mb-2-576">
                             <label for="razaosocial">Razão Social</label>
                             <input
@@ -47,6 +66,7 @@
                                 name="razaosocial"
                                 placeholder="Razão Social"
                                 value="{{ old('razaosocial') }}"
+                                id="av01"
                             >
                             @if($errors->has('razaosocial'))
                                 <div class="invalid-feedback">
@@ -70,23 +90,7 @@
                             @endif
                         </div>
                     </div>
-                    <div class="form-row mt-2">
-                        <div class="col-sm mb-2-576">
-                            <label for="cnpj">CNPJ</label>
-                            <input type="text"
-                                class="form-control cnpjInput {{ $errors->has('cnpj') ? 'is-invalid' : '' }}"
-                                placeholder="CNPJ"
-                                name="cnpj"
-                                id="cnpj"
-                                maxlength="191"
-                                value="{{ old('cnpj') }}"
-                            >
-                            @if($errors->has('cnpj'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('cnpj') }}
-                                </div>
-                            @endif
-                        </div>
+                    <div class="form-row mt-2 avHidden">
                         <div class="col-sm mb-2-576">
                             <label for="telefone">Telefone</label>
                             <input
@@ -102,8 +106,6 @@
                                 </div>
                             @endif
                         </div>
-                    </div>
-                    <div class="form-row mt-2">
                         <div class="col-sm mb-2-576">
                             <label for="segmento">Segmento</label>
                             <select name="segmento" class="form-control {{ $errors->has('segmento') ? 'is-invalid' : '' }}">
@@ -119,7 +121,7 @@
                             @endif
                         </div>
                     </div>
-                    <div class="form-row mt-2">
+                    <div class="form-row mt-2 avHidden">
                         <div class="col-sm mb-2-576">
                             <label for="endereco">Endereço</label>  <i class="fas fa-question-circle d-inline azul" id="endereco-da-empresa"></i>
                             <input
@@ -136,7 +138,7 @@
                             @endif
                         </div>
                     </div>
-                    <div class="form-row mt-2">
+                    <div class="form-row mt-2 avHidden">
                         <div class="col-sm mb-2-576">
                             <label for="site">Site / Rede Social</label>
                             <input
@@ -177,6 +179,7 @@
                             class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
                             placeholder="Título"
                             value="{{ old('titulo') }}"
+                            id="titulice"
                         >
                         @if($errors->has('titulo'))
                             <div class="invalid-feedback">
@@ -187,7 +190,7 @@
                     <div class="form-row mt-2">
                         <div class="col-sm mb-2-576">
                             <label for="segmentoOportunidade">Segmento da Oportunidade</label>
-                            <select name="segmentoOportunidade" class="form-control {{ $errors->has('segmentoOportunidade') ? 'is-invalid' : '' }}">
+                            <select name="segmentoOportunidade" class="form-control {{ $errors->has('segmentoOportunidade') ? 'is-invalid' : '' }}" id="avSegmentoOp">
                                 <option disabled {{ old('segmentoOportunidade') ? '' : 'selected' }}>Selecione o segmento...</option>
                                 @foreach (segmentos() as $segmento)
                                     <option value="{{ $segmento }}" {{ $segmento == old('segmentoOportunidade') ? 'selected' : '' }}>{{ $segmento }}</option>
@@ -213,6 +216,18 @@
                                     {{ $errors->first('nrVagas') }}
                                 </div>
                             @endif
+                        </div>
+                    </div>
+                    <div class="form-row mt-2" id="outroSegmento">
+                        <div class="col-sm-8 mb-2-576">
+                            <label for="outroseg"><i class="fa fa-level-down-alt"></i> Qual o segmento?</label>
+                            <input
+                                type="text"
+                                name="outroseg"
+                                id="outrosegmento"
+                                class="form-control"
+                                placeholder="Informe aqui o segmento da oportunidade..."
+                            >
                         </div>
                     </div>
                     @php

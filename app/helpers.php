@@ -171,8 +171,8 @@ function segmentos()
         'Vestuário',
         'Veterinário',
         'Vidros',
+        'Outro'
     ];
-    sort($segmentos);
     return $segmentos;
 }
 
@@ -285,4 +285,18 @@ function formataDataGerenti($date)
 {
     $array = explode('-', $date);
     return $array[2] . '/' . $array[1] . '/' . $array[0];
+}
+
+function segmentosWithAddons($addOn)
+{
+    if($addOn === null)
+        return segmentos();
+
+    $segmentos = segmentos();
+
+    if(!in_array($addOn, $segmentos)) {
+        array_push($segmentos, $addOn);
+    }
+
+    return $segmentos;
 }
