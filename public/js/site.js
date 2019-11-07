@@ -124,9 +124,11 @@ $(document).ready(function(){
 			$(this).tooltip("disable");   
 		}
 	});
-	if($('#cnpj').val().length == 18) {
-		var value = $('#cnpj').val();
-		getInfoEmpresa(value);
+	if($('#cnpj').length != 0) {
+		if($('#cnpj').val().length == 18) {
+			var value = $('#cnpj').val();
+			getInfoEmpresa(value);
+		}
 	}
 });
 
