@@ -174,7 +174,8 @@ class BdoSiteController extends Controller
 
         $this->saveBdoOportunidade($idempresa);
 
-        Mail::to(['informacoes@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
+        // Mail::to(['informacoes@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
+        Mail::to('desenvolvimento@core-sp.org.br')->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
 
         return view('site.agradecimento')->with([
             'agradece' => $this->agradecimento()
