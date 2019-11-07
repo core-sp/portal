@@ -324,12 +324,16 @@ function getInfoEmpresa(value)
 	return $.ajax({
 		type: 'GET',
 		url: '/info-empresa/' + encodeURIComponent(value.replace(/[^\d]+/g,'')),
+		beforeSend: function() {
+			$('#avLoading').show();	
+		},
 		success: function(data)
 		{
 			var json = $.parseJSON(data);
 			$('.avHidden').hide();
 			$('#av10').val(json.idempresa);
 			$('#titulice').focus();
+			$('#avLoading').hide();
 			// Mostra o alert
 			$('#avAlert').show().addClass('alert-success').removeClass('alert-info').text('Empresa já cadastrada. Favor seguir com o preenchimento da oportunidade abaixo.');
 		},
@@ -338,6 +342,7 @@ function getInfoEmpresa(value)
 			$('.avHidden').css('display', 'flex');
 			$('#av10').val('0');
 			$('#av01').focus();
+			$('#avLoading').hide();
 			$('#avAlert').show().addClass('alert-info').removeClass('alert-success').text('Empresa não cadastrada. Favor informar os dados da empresa abaixo.');
 		}
 	});

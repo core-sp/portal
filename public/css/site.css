@@ -1587,7 +1587,8 @@ footer p {
 	display: none;
 }
 
-#loadingSimulador img {
+#loadingSimulador img,
+#avLoading img {
 	height: 32px;
 }
 
@@ -1741,6 +1742,10 @@ h5 {
 }
 
 #outroSegmento {
+	display: none;
+}
+
+#avLoading {
 	display: none;
 }
 
