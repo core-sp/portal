@@ -29,7 +29,7 @@ class BdoEmpresaController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth', ['except' => 'show']);
+        $this->middleware('auth', ['except' => ['show', 'apiGetEmpresa']]);
     }
 
     public function resultados()
@@ -202,5 +202,15 @@ class BdoEmpresaController extends Controller
             ->paginate(10);
         $tabela = $this->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function apiGetEmpresa($cnpj)
+    {
+        $cnpj = preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj);
+
+        return BdoEmpresa::select('idempresa', 'cnpj', 'razaosocial', 'fantasia', 'telefone', 'segmento', 'endereco', 'site', 'email')
+            ->where('cnpj', '=', $cnpj)
+            ->first()
+            ->toJson();
     }
 }

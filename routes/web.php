@@ -225,6 +225,7 @@ Route::prefix('/')->group(function() {
   Route::get('balcao-de-oportunidades/busca', 'BdoSiteController@buscaOportunidades');
   Route::get('anunciar-vaga', 'BdoSiteController@anunciarVagaView');
   Route::post('anunciar-vaga', 'BdoSiteController@anunciarVaga');
+  Route::get('/info-empresa/{cnpj}', 'BdoEmpresaController@apiGetEmpresa');
   
   // Cursos
   Route::get('cursos', 'CursoSiteController@cursosView');

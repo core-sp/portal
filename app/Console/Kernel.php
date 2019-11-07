@@ -8,8 +8,10 @@ use App\Mail\InternoAgendamentoMail;
 use Illuminate\Support\Facades\Mail;
 use App\User;
 use App\Agendamento;
+use App\BdoOportunidade;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
+use Carbon\Carbon;
 
 class Kernel extends ConsoleKernel
 {
@@ -174,6 +176,14 @@ class Kernel extends ConsoleKernel
                 }
             }
         })->dailyAt('4:00');
+
+        $schedule->call(function(){
+            BdoOportunidade::select('idempresa', 'status', 'datainicio')
+                ->where('datainicio', '<=', Carbon::now()->subDays(90)->toDateString())
+                ->update([
+                    'status' => 'Concluído'
+                ]);
+        })->dailyAt('2:00');
     }
 
     /**
