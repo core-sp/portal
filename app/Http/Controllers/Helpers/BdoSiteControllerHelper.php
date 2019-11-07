@@ -18,15 +18,15 @@ class BdoSiteControllerHelper extends Controller
     {
         switch ($status) {
             case 'Em andamento':
-                echo "<div class='sit-btn bg-success'>".$status."</div>";
+                echo "<span class='badge badge-success'>".$status."</span>";
             break;
 
             case 'Concluído':
-                echo "<div class='sit-btn bg-info'>".$status."</div>";
+                echo "<span class='sit-btn bg-info'>".$status."</span>";
             break;
             
             default:
-                echo "<div class='sit-btn bg-secondary'>".$status."</div>";
+                echo "<span class='sit-btn bg-secondary'>".$status."</span>";
             break;
         }
     }

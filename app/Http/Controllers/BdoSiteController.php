@@ -18,7 +18,7 @@ class BdoSiteController extends Controller
 
     public function index()
     {
-        $oportunidades = BdoOportunidade::orderBy('created_at','DESC')
+        $oportunidades = BdoOportunidade::orderBy('datainicio','DESC')
             ->whereNotIn('status', ['Sob Análise', 'Concluído', 'Recusado'])
             ->paginate(10);
         return view('site.balcao-de-oportunidades', compact('oportunidades'));
@@ -44,7 +44,7 @@ class BdoSiteController extends Controller
             ->where(function($query) use ($buscaPalavraChave){
                 $query->where('descricao','LIKE','%'.$buscaPalavraChave.'%')
                     ->orWhere('titulo','LIKE','%'.$buscaPalavraChave.'%');
-            })->orderBy('created_at','DESC')
+            })->orderBy('datainicio','DESC')
             ->paginate(10);
         if (count($oportunidades) > 0) {
             return view('site.balcao-de-oportunidades', compact('oportunidades', 'busca'));
