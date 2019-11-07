@@ -19,7 +19,7 @@ class BdoSiteController extends Controller
     public function index()
     {
         $oportunidades = BdoOportunidade::orderBy('created_at','DESC')
-            ->whereNotIn('status', ['Sob Análise', 'Recusado'])
+            ->whereNotIn('status', ['Sob Análise', 'Concluído', 'Recusado'])
             ->paginate(10);
         return view('site.balcao-de-oportunidades', compact('oportunidades'));
     }
@@ -40,7 +40,7 @@ class BdoSiteController extends Controller
         }
         $oportunidades = BdoOportunidade::where('segmento','LIKE',$buscaSegmento)
             ->where('regiaoatuacao','LIKE','%'.$buscaRegional.'%')
-            ->whereNotIn('status', ['Sob Análise', 'Recusado'])
+            ->whereNotIn('status', ['Sob Análise', 'Concluído', 'Recusado'])
             ->where(function($query) use ($buscaPalavraChave){
                 $query->where('descricao','LIKE','%'.$buscaPalavraChave.'%')
                     ->orWhere('titulo','LIKE','%'.$buscaPalavraChave.'%');
@@ -174,8 +174,7 @@ class BdoSiteController extends Controller
 
         $this->saveBdoOportunidade($idempresa);
 
-        //Mail::to(['informacoes@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
-        Mail::to('desenvolvimento@core-sp.org.br')->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
+        Mail::to(['informacoes@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
 
         return view('site.agradecimento')->with([
             'agradece' => $this->agradecimento()
