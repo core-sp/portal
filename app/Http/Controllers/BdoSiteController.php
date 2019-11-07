@@ -62,14 +62,15 @@ class BdoSiteController extends Controller
     protected function validaAnuncio()
     {
         request()->validate([
-            'razaosocial' => 'required|max:191',
-            'fantasia' => 'required|max:191',
+            'idempresa' => 'required',
+            'razaosocial' => 'required_if:idempresa,!=,0|max:191',
+            'fantasia' => 'required_if:idempresa,!=,0|max:191',
             'cnpj' => ['required', 'max:191', new Cnpj],
-            'segmento' => 'required',
-            'endereco' => 'required|max:191',
-            'telefone' => 'required|max:191',
-            'site' => 'required|max:191',
-            'email' => 'required|email|max:191',
+            'segmento' => 'required_if:idempresa,!=,0',
+            'endereco' => 'required_if:idempresa,!=,0|max:191',
+            'telefone' => 'required_if:idempresa,!=,0|max:191',
+            'site' => 'required_if:idempresa,!=,0|max:191',
+            'email' => 'required_if:idempresa,!=,0|max:191',
             'titulo' => 'required|max:191',
             'segmentoOportunidade' => 'required',
             'nrVagas' => 'required|max:3|not_in:0',
@@ -79,9 +80,10 @@ class BdoSiteController extends Controller
             'contatotelefone' => 'required|max:191',
             'contatoemail' => 'required|email|max:191'
         ], [
-            'razaosocial.required' => 'Por favor, informe a Razão Social',
-            'fantasia.required' => 'Por favor, informe o Nome Fantasia',
-            'endereco.required' => 'Por favor, informe o endereço',
+            'cnpj.required' => 'Por favor, informe o CNPJ',
+            'razaosocial.required_if' => 'Por favor, informe a Razão Social',
+            'fantasia.required_if' => 'Por favor, informe o Nome Fantasia',
+            'endereco.required_if' => 'Por favor, informe o endereço',
             'nrVagas.required' => 'Por favor, informe a quantidade de vagas da oportunidade',
             'nrVagas.not_in' => 'Valor inválido',
             'regiaoAtuacao.required' => 'Por favor, selecione ao menos uma região de atuação',
@@ -91,6 +93,7 @@ class BdoSiteController extends Controller
             'contatoemail.required' => 'Por favor, informe o email do contato',
             'segmentoOportunidade.required' => 'Por favor, informe o segmento da oportunidade',
             'required' => 'Por favor, informe o :attribute',
+            'required_if' => 'Por favor, informe o :attribute',
             'email' => 'Email inválido',
             'max' => 'Excedido número máximo de caracteres'
         ]);
@@ -108,10 +111,6 @@ class BdoSiteController extends Controller
 
     protected function bodyEmail() {
         $body = 'Nova solicitação de inclusão de oportunidade no Balcão de Oportunidades do Core-SP.';
-        $body .= '<br><br>';
-        $body .= '<strong>Razão Social: </strong>' . request('razaosocial');
-        $body .= '<br><br>';
-        $body .= '<strong>Email de Contato: </strong>' . request('email');
         $body .= '<br><br>';
         $body .= '<strong>Código da Oportunidade:</strong> #' . $this->idoportunidade;
         $body .= '<br><br>';
@@ -144,10 +143,12 @@ class BdoSiteController extends Controller
 
     protected function saveBdoOportunidade($idempresa)
     {
+        request('segmentoOportunidade') === 'Outro' && !empty(request('outroseg')) ? $segmento = request('outroseg') : $segmento = request('segmentoOportunidade');
+
         $save = BdoOportunidade::create([
             'idempresa' => $idempresa,
             'titulo' => request('titulo'),
-            'segmento' => request('segmentoOportunidade'),
+            'segmento' => $segmento,
             'regiaoatuacao' => ',' . implode(',', request('regiaoAtuacao')),
             'descricao' => request('descricaoOportunidade'),
             'vagasdisponiveis' => request('nrVagas'),
@@ -166,11 +167,15 @@ class BdoSiteController extends Controller
 
         event(new ExternoEvent($this->stringEvento(request('razaosocial'), request('email'))));
 
-        $this->saveBdoEmpresa();
+        if(request('idempresa') === "0")
+            $this->saveBdoEmpresa();
 
-        $this->saveBdoOportunidade($this->idempresa);
+        request('idempresa') !== "0" ? $idempresa = request('idempresa') : $idempresa = $this->idempresa;
 
-        Mail::to(['informacoes@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
+        $this->saveBdoOportunidade($idempresa);
+
+        //Mail::to(['informacoes@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
+        Mail::to('desenvolvimento@core-sp.org.br')->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
 
         return view('site.agradecimento')->with([
             'agradece' => $this->agradecimento()
