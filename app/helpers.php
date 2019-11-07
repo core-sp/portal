@@ -171,8 +171,8 @@ function segmentos()
         'Vestuário',
         'Veterinário',
         'Vidros',
+        'Outro'
     ];
-    sort($segmentos);
     return $segmentos;
 }
 
@@ -206,4 +206,18 @@ function regioes()
         12 => 'Rio Claro',
         13 => 'Marília'
     ];
+}
+
+function segmentosWithAddons($addOn)
+{
+    if($addOn === null)
+        return segmentos();
+
+    $segmentos = segmentos();
+
+    if(!in_array($addOn, $segmentos)) {
+        array_push($segmentos, $addOn);
+    }
+
+    return $segmentos;
 }

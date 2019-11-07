@@ -76,6 +76,10 @@ body {
 	line-height: 24px;
 }
 
+.lh-1 {
+	line-height: 1.2 !important;
+}
+
 .ml-75 {
 	margin-left: .75rem;
 }
@@ -1715,6 +1719,29 @@ h5 {
 	border: 1px solid #15AAE2 !important;
 	font-size: 12px;
 	line-height: 1.4;
+}
+
+.avHidden,
+#avInfo {
+	display: none;
+}
+
+#avInfo input[type="text"] {
+	border: none;
+	padding: 0px 0px 0px 5px;
+}
+
+#avInfo label {
+	margin-bottom: 0px;
+	line-height: 24px;
+}
+
+#avAlert {
+	display: none;
+}
+
+#outroSegmento {
+	display: none;
 }
 
 /*
