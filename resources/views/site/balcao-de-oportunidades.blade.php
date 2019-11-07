@@ -156,7 +156,7 @@ $regionais = BdoSiteControllerHelper::regionais();
                     </div>
                     <div class="flex-one">
                       <p><strong>Segmento:</strong> {{ $oportunidade->segmento }}</p>
-                      <p><strong>Inclusão:</strong> {{ BdoOportunidadeControllerHelper::onlyDate($oportunidade->created_at) }}</p>
+                      <p><strong>Inclusão:</strong> {{ BdoOportunidadeControllerHelper::onlyDate($oportunidade->datainicio) }}</p>
                       <p class="d-inline"><strong>Status:</strong> </p>{{ BdoSiteControllerHelper::btnStatus($oportunidade->status) }}
                     </div>
                   </div>
