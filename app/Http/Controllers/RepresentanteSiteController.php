@@ -178,13 +178,19 @@ class RepresentanteSiteController extends Controller
     {
         $this->gerentiDeletarContato(Auth::guard('representante')->user()->ass_id, $request->id, $request->status);
 
-        $request->status === '1' ? $msg = 'Contato ativado com sucesso!' : $msg = 'Contato desativado com sucesso!';
+        if($request->status === '1') {
+            $msg = 'Contato ativado com sucesso!';
+            $class = 'alert-success';
+        } else {
+            $msg = 'Contato desativado com sucesso!';
+            $class = 'alert-info';
+        }
 
         return redirect()
             ->route('representante.contatos.view')
             ->with([
                 'message' => $msg,
-                'class' => 'alert-info'
+                'class' => $class
             ]);
     }
 }
