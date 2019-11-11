@@ -4,7 +4,7 @@
             <small>
                 <a href="{{ route('representante.dashboard') }}">
                     <i class="fas fa-user"></i>&nbsp;
-                    {{ Auth::guard('representante')->user()->nome }}
+                   {{ limitRepresentanteName(Auth::guard('representante')->user()->nome) }}
                 </a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="{{ route('representante.logout') }}">

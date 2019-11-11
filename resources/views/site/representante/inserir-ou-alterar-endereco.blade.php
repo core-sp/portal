@@ -3,7 +3,7 @@
 @section('content-representante')
 
 <div class="representante-content w-100">
-    <div class="conteudo-txt w-100">
+    <div class="conteudo-txt-mini light w-100">
         <h4 class="pt-0 pb-0">{{ isset($infos) ? 'Alterar endereço' : 'Inserir endereço' }}</h4>
         <div class="linha-lg-mini mb-3"></div>
         <p>Preencha as informações abaixo para {{ isset($infos) ? 'alterar o' : 'inserir um novo' }} endereço.</p>
@@ -14,7 +14,7 @@
             @endif
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="cep">Cep *</label>
+                    <label for="cep">CEP *</label>
                     <input
                         type="text"
                         name="cep"

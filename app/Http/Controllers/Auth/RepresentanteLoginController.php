@@ -41,6 +41,16 @@ class RepresentanteLoginController extends Controller
         }
     }
 
+    protected function verificaSeAtivo($cpfCnpj)
+    {
+        $representante = Representante::where('cpf_cnpj', '=', $cpfCnpj)->first();
+
+        if($representante->ativo === 0)
+            return false;
+        else
+            return true;
+    }
+
     public function login(Request $request)
     {
         $this->validate($request, [
@@ -50,21 +60,31 @@ class RepresentanteLoginController extends Controller
             'required' => 'Campo obrigatório'
         ]);
 
+        $cpfCnpj = preg_replace('/[^0-9]+/', '', $request->cpf_cnpj);
+
+        if(!$this->verificaSeAtivo($cpfCnpj))
+            return $this->redirectWithErrors($request->only('cpf_cnpj', 'remember'));
+
         $this->verificaGerentiLogin($request->cpf_cnpj);
 
         if (Auth::guard('representante')->attempt([
-            'cpf_cnpj' => preg_replace('/[^0-9]+/', '', $request->cpf_cnpj),
+            'cpf_cnpj' => $cpfCnpj,
             'password' => $request->password
         ], $request->remember)) {
             return redirect()->intended(route('representante.dashboard'));
         }
 
+        return $this->redirectWithErrors($request->only('cpf_cnpj', 'remember'));
+    }
+
+    protected function redirectWithErrors($withInput)
+    {
         return redirect()
             ->back()
             ->with([
                 'message' => 'Login inválido.',
                 'class' => 'alert-danger'
-            ])->withInput($request->only('cpf_cnpj', 'remember'));
+            ])->withInput($withInput);
     }
 
     public function logout(Request $request)

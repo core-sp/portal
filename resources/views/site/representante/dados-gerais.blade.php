@@ -9,7 +9,7 @@
 @endif
 
 <div class="representante-content w-100">
-    <div class="row nomargin conteudo-txt">
+    <div class="row nomargin conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Dados gerais</h4>
         <div class="linha-lg-mini mb-3"></div>
         <div class="contato-single b-dashed">
@@ -37,7 +37,7 @@
                     <p class="pb-0">Regional: <strong>{{ utf8_encode($dado['REGIONAL']) }}</strong></p>
                 </div>
                 <div class="contato-single">
-                    <p class="pb-0">NIRE: <strong>{{ $dado['NIRE'] }}</strong></p>
+                    <p class="pb-0">NIRE: <strong>{{ empty($dado['NIRE']) ? '-----' : $dado['NIRE'] }}</strong></p>
                 </div>
             @endif
         @endforeach

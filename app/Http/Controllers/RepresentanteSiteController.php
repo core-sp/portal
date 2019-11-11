@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Connections\FirebirdConnection;
+use App\Events\ExternoEvent;
+use App\Mail\CadastroRepresentanteMail;
 use App\Representante;
 use Illuminate\Http\Request;
 use App\Rules\CpfCnpj;
 use Illuminate\Support\Facades\Input;
 use App\Traits\GerentiProcedures;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class RepresentanteSiteController extends Controller
 {
@@ -16,7 +19,7 @@ class RepresentanteSiteController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:representante')->except(['cadastroView', 'cadastro']);
+        $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
     }
 
     public function index()
@@ -29,15 +32,18 @@ class RepresentanteSiteController extends Controller
         return view('site.representante.cadastro');
     }
 
-    protected function rules($request)
+    protected function rules($request, $cpfCnpj)
     {
+        $request->request->set('cpfCnpj', $cpfCnpj);
+
         $this->validate($request, [
-            'cpfCnpj' => ['required', new CpfCnpj],
+            'cpfCnpj' => ['required', new CpfCnpj, 'unique:representantes,cpf_cnpj'],
             'registro_core' => 'required',
             'email' => 'required|email',
             'password' => 'required|confirmed|min:6',
         ], [
             'required' => 'Campo obrigatório',
+            'unique' => 'Este CPF/CNPJ já está cadastrado em nosso sistema',
             'password.min' => 'A senha deve conter no mínimo 6 caracteres',
             'min' => 'Quantidade inválida de caracteres',
             'email' => 'Email inválido',
@@ -45,26 +51,64 @@ class RepresentanteSiteController extends Controller
         ]);
     }
 
-    public function saveRepresentante($ass_id, $nome)
+    public function saveRepresentante($ass_id, $nome, $cpfCnpj)
     {
+        $token = str_random(32);
+
         $save = Representante::create([
-            'cpf_cnpj' => preg_replace('/[^0-9]+/', '', request('cpfCnpj')),
+            'cpf_cnpj' => $cpfCnpj,
             'registro_core' => preg_replace('/[^0-9]+/', '', request('registro_core')),
             'ass_id' => $ass_id,
             'nome' => $nome,
             'email' => request('email'),
-            'password' => bcrypt(request('password'))
+            'password' => bcrypt(request('password')),
+            'verify_token' => $token,
         ]);
 
         if(!$save)
             abort(403);
+
+        $body = '<strong>Cadastro no Portal Core-SP realizado com sucesso!</strong>';
+        $body .= '<br /><br />';
+        $body .= 'Para concluir o processo, basta clicar <a href="'. route('representante.verifica-email', $token) .'">NESTE LINK</a>.';
+
+        Mail::to(request('email'))->queue(new CadastroRepresentanteMail($body));
+    }
+
+    public function verificaEmail($token)
+    {
+        $find = Representante::where('verify_token', '=', $token)->first();
+
+        if($find) {
+            $find->update([
+                'ativo' => 1,
+                'verify_token' => null
+            ]);
+        } else {
+            abort(500);
+        }
+
+        event(new ExternoEvent('Usuário ' . $find->id . ' ('. $find->cpf_cnpj .') verificou o email após o cadastro.'));
+
+        return redirect()
+            ->route('representante.login')
+            ->with([
+                'message' => 'Email verificado com sucesso. Favor continuar com o login abaixo.',
+                'class' => 'alert-success'
+            ]);
     }
 
     public function cadastro(Request $request)
     {
-        $this->rules($request);
+        $cpfCnpjCru = request('cpfCnpj');
+
+        $cpfCnpj = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
+
+        $this->rules($request, $cpfCnpj);
+
+        strlen(request('registro_core')) === 11 ? $registro = '0' . request('registro_core') : $registro = request('registro_core');
         
-        $checkGerenti = $this->checaAtivo(request('registro_core'), request('cpfCnpj'));
+        $checkGerenti = $this->checaAtivo($registro, request('cpfCnpj'), request('email'));
 
         if($checkGerenti === false) {
             return redirect()
@@ -73,14 +117,13 @@ class RepresentanteSiteController extends Controller
                 ->withInput(Input::all());
         }
 
-        $this->saveRepresentante($checkGerenti['ASS_ID'], $checkGerenti['NOME']);
+        $this->saveRepresentante($checkGerenti['ASS_ID'], $checkGerenti['NOME'], $cpfCnpj);
 
-        return redirect()
-            ->route('representante.login')
-            ->with([
-                'message' => 'Cadastro realizado com sucesso. Por favor, realize o login abaixo.',
-                'class' => 'alert-success'
-            ]);
+        event(new ExternoEvent($cpfCnpjCru . ' (' . request('email') . ') cadastrou-se na Área do Representante.'));
+
+        return view('site.agradecimento')->with([
+            'agradece' => 'Cadastro realizado com sucesso. Por favor, <strong>verifique o email informado para confirmar seu cadastro.</strong>'
+        ]);
     }
 
     public function dadosGeraisView()
@@ -88,12 +131,9 @@ class RepresentanteSiteController extends Controller
         return view('site.representante.dados-gerais');
     }
 
-    public function inserirContatoView(Request $request)
+    public function inserirContatoView()
     {
-        $tipo = $request->tipo;
-        $id = $request->id;
-        $conteudo = $request->conteudo;
-        return view('site.representante.inserir-ou-alterar-contato', compact('tipo', 'id', 'conteudo'));
+        return view('site.representante.inserir-ou-alterar-contato');
     }
 
     public function contatosView()
@@ -169,7 +209,7 @@ class RepresentanteSiteController extends Controller
         return redirect()
             ->route('representante.enderecos.view')
             ->with([
-                'message' => 'Endereço cadastrado com sucesso!',
+                'message' => $msg,
                 'class' => 'alert-success'
             ]);
     }
@@ -192,5 +232,10 @@ class RepresentanteSiteController extends Controller
                 'message' => $msg,
                 'class' => $class
             ]);
+    }
+
+    public function listaCobrancas()
+    {
+        return view('site.representante.lista-cobrancas');
     }
 }
