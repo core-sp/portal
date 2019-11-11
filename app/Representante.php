@@ -17,7 +17,7 @@ class Representante extends Authenticable
 
     protected $guard = 'representante';
 
-    protected $fillable = ['cpf_cnpj', 'registro_core', 'ass_id', 'nome', 'email', 'password'];
+    protected $fillable = ['cpf_cnpj', 'registro_core', 'ass_id', 'nome', 'email', 'password', 'verify_token', 'ativo'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -63,5 +63,28 @@ class Representante extends Authenticable
     public function getRegistroCoreAttribute($value)
     {
         return substr_replace($value, '/', -4, 0);
+    }
+
+    public function cobrancas()
+    {
+        $values = $this->gerentiBolestosLista($this->ass_id);
+        
+        $extrato = [];
+        $parcelamento = [];
+
+        foreach($values as $value) {
+            if($value['TPGERBOL_ID'] === 1) {
+                array_push($extrato, $value);
+            } else {
+                array_push($parcelamento, $value);
+            }
+        }
+        
+        $result = [
+            'extrato' => $extrato,
+            'parcelamento' => $parcelamento
+        ];
+
+        return $result;
     }
 }

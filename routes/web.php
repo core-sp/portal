@@ -282,11 +282,13 @@ Route::prefix('/')->group(function() {
     Route::get('/contatos', 'RepresentanteSiteController@contatosView')->name('representante.contatos.view');
     Route::get('/enderecos', 'RepresentanteSiteController@enderecosView')->name('representante.enderecos.view');
     Route::get('/dados-gerais', 'RepresentanteSiteController@dadosGeraisView')->name('representante.dados-gerais');
-    Route::get('/inserir-ou-alterar-contato', 'RepresentanteSiteController@inserirContatoView')->name('representante.inserir-ou-alterar-contato.view');
-    Route::post('/inserir-ou-alterar-contato', 'RepresentanteSiteController@inserirContato')->name('representante.inserir-ou-alterar-contato');
+    Route::get('/inserir-contato', 'RepresentanteSiteController@inserirContatoView')->name('representante.inserir-ou-alterar-contato.view');
+    Route::post('/inserir-contato', 'RepresentanteSiteController@inserirContato')->name('representante.inserir-ou-alterar-contato');
     Route::post('/deletar-contato', 'RepresentanteSiteController@deletarContato')->name('representante.deletar-contato');
     Route::get('/inserir-ou-alterar-endereco', 'RepresentanteSiteController@inserirEnderecoView')->name('representante.inserir-ou-alterar-endereco.view');
     Route::post('/inserir-ou-alterar-endereco', 'RepresentanteSiteController@inserirEndereco')->name('representante.inserir-ou-alterar-endereco');
+    Route::get('/cobrancas-em-aberto', 'RepresentanteSiteController@listaCobrancas')->name('representante.lista-cobrancas');
+    Route::get('/verifica-email/{token}', 'RepresentanteSiteController@verificaEmail')->name('representante.verifica-email');
     // Login e Cadastro
     Route::get('/login', 'Auth\RepresentanteLoginController@showLoginForm')->name('representante.login');
     Route::post('/login', 'Auth\RepresentanteLoginController@login')->name('representante.login.submit');

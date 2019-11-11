@@ -300,3 +300,13 @@ function segmentosWithAddons($addOn)
 
     return $segmentos;
 }
+
+function limitRepresentanteName($str)
+{
+    if (strlen($str) > 30)
+        $sub = substr($str, 0, 27) . '...';
+    else
+        $sub = $str;
+
+    return $sub;
+}

@@ -52,6 +52,11 @@
               <h6 class="brancar"><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;Endereços</h6>
             </a>
           </div>
+          <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.lista-cobrancas' ? 'mr-item-selected' : '' }}">
+            <a href="{{ route('representante.lista-cobrancas') }}">
+              <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Cobranças vigentes</h6>
+            </a>
+          </div>
         </div>
       </div>
       <div class="col-sm-9">
