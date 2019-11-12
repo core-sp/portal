@@ -162,6 +162,7 @@
                                 class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                                 placeholder="Email"
                                 value="{{ old('email') }}"
+                                id="avEmail"
                             >
                             @if($errors->has('email'))
                                 <div class="invalid-feedback">
