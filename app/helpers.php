@@ -310,3 +310,8 @@ function limitRepresentanteName($str)
 
     return $sub;
 }
+
+function formataCepGerenti($cep)
+{
+    return substr_replace($cep, '-', -3, 0);
+}
