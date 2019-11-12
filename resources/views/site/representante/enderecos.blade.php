@@ -10,7 +10,7 @@
 
 <div class="representante-content w-100">
     <div class="row nomargin conteudo-txt-mini light">
-        <h4 class="pt-1 pb-1">Endereços</h4>
+        <h4 class="pt-1 pb-1">Endereços cadastrados</h4>
         <div class="linha-lg-mini mb-3"></div>
         @if (!empty(Auth::guard('representante')->user()->enderecos()))
             <div class="list-group w-100">
@@ -24,12 +24,12 @@
                         @if ($item['END_CORRESP'] === 'T   ')
                             <p class="pb-0"><small><i>(Endereço para correspondência)</i></small></p>
                         @endif
-                        <div class="mt-2 mb-1">
+                        {{-- <div class="mt-2 mb-1">
                             <form method="GET" action="{{ route('representante.inserir-ou-alterar-endereco.view') }}">
                                 <input type="hidden" name="sequencia" value="{{ $item['END_SEQUENCIA'] }}">
                                 <button type="submit" class="btn btn-sm btn-info link-nostyle branco">Atualizar endereço</button>
                             </form>
-                        </div>
+                        </div> --}}
                     </div>
                 @endforeach
             </div>
@@ -40,7 +40,7 @@
 </div>
 
 <div class="d-block mt-3">
-    <a href="{{ route('representante.inserir-ou-alterar-endereco.view') }}" class="btn btn-primary link-nostyle branco">Inserir endereço</a>
+    <a href="{{ route('representante.inserir-endereco.view') }}" class="btn btn-primary link-nostyle branco">Inserir endereço</a>
 </div>
 
 @endsection

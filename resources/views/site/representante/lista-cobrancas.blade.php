@@ -4,7 +4,7 @@
 
 <div class="representante-content w-100">
     <div class="nomargin conteudo-txt-mini light">
-        <h4 class="pt-1 pb-1">Cobranças vigentes</h4>
+        <h4 class="pt-1 pb-1">Situação Financeira</h4>
         <div class="linha-lg-mini mb-3"></div>
         <p>Confira abaixo sua lista de cobranças vigentes, as quais ainda estão <strong>dentro do prazo de vencimento.</strong></p>
         <h5 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;ANUIDADE</h5>
