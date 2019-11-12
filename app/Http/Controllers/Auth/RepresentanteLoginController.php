@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Representante;
@@ -67,10 +68,14 @@ class RepresentanteLoginController extends Controller
 
         $this->verificaGerentiLogin($request->cpf_cnpj);
 
+        
+
         if (Auth::guard('representante')->attempt([
             'cpf_cnpj' => $cpfCnpj,
             'password' => $request->password
         ], $request->remember)) {
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ('. Auth::guard('representante')->user()->registro_core .') logou-se na Área do Representante.'));
+
             return redirect()->intended(route('representante.dashboard'));
         }
 

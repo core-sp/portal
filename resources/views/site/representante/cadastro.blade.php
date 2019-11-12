@@ -35,7 +35,9 @@
                 @if(Session::has('message'))
                     <p class="alert alert-danger">{{ Session::get('message') }}</p>
                 @endif
-                <p>Preencha as informações abaixo para realizar o cadastro e então acessar a área do Representante Comercial.</p>
+                <p>Preencha as informações abaixo para realizar o cadastro e acessar a nova <strong>área do Representante Comercial.</strong></p>
+                <p class="pb-0"><strong>IMPORTANTE:</strong> O email informado deve ser <strong>o mesmo cadastrado junto ao Conselho no momento do registro inicial.</strong></p>
+                <hr>
                 <form action="{{ route('representante.cadastro.submit') }}" method="POST" class="cadastroRepresentante">
                     @csrf
                     <div class="form-row">

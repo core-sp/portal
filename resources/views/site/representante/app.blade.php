@@ -54,7 +54,7 @@
           </div>
           <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.lista-cobrancas' ? 'mr-item-selected' : '' }}">
             <a href="{{ route('representante.lista-cobrancas') }}">
-              <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Cobranças vigentes</h6>
+              <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Situação Financeira</h6>
             </a>
           </div>
         </div>

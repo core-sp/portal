@@ -92,13 +92,7 @@ trait GerentiProcedures
 
     public function gerentiInserirEndereco($ass_id, $request)
     {
-        $request->corresp === 'on' ? $corresp = 'T' : $corresp = 'F';
-
-        if(isset($request->sequencia)) {
-            $sequencia = intval($request->sequencia);
-        } else {
-            $sequencia = $this->gerentiBuscarSequenciaEndereco($ass_id);
-        }
+        $sequencia = $this->gerentiBuscarSequenciaEndereco($ass_id);
 
         $cep = preg_replace( '/[^0-9]/', '', $request->cep);
 
@@ -106,7 +100,7 @@ trait GerentiProcedures
 
         $run = $this->gerentiConnection->prepare("execute procedure SP_ENDERECOS_UI(
             ".$ass_id.", ".$sequencia.", '', :logradouro, :estado, :municipio, :numero, :complemento,
-            :bairro, :cep, '".$corresp."', '', 'F', 210, CAST('NOW' AS DATE), '".$corresp."', 'F'
+            :bairro, :cep, 'T', '', 'F', 210, CAST('NOW' AS DATE), 'T', 'F'
         )");
 
         $run->execute([

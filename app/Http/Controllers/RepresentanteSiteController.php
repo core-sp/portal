@@ -133,7 +133,7 @@ class RepresentanteSiteController extends Controller
 
     public function inserirContatoView()
     {
-        return view('site.representante.inserir-ou-alterar-contato');
+        return view('site.representante.inserir-contato');
     }
 
     public function contatosView()
@@ -176,10 +176,7 @@ class RepresentanteSiteController extends Controller
 
     public function inserirEnderecoView()
     {
-        $sequencia = Input::get('sequencia');
-        isset($sequencia) ? $infos = $this->gerentiEnderecoInfos(Auth::guard('representante')->user()->ass_id, $sequencia) : $infos = null;
-
-        return view('site.representante.inserir-ou-alterar-endereco', compact('infos', 'sequencia'));
+        return view('site.representante.inserir-endereco');
     }
 
     protected function validateEndereco($request)
@@ -204,12 +201,12 @@ class RepresentanteSiteController extends Controller
 
         $this->gerentiInserirEndereco(Auth::guard('representante')->user()->ass_id, $request);
 
-        isset($request->sequencia) ? $msg = 'Endereço atualizado com sucesso!' : $msg = 'Endereço cadastrado com sucesso!';
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ('. Auth::guard('representante')->user()->registro_core .') inseriu um novo endereço de correspondência.'));
 
         return redirect()
             ->route('representante.enderecos.view')
             ->with([
-                'message' => $msg,
+                'message' => 'Endereço cadastrado com sucesso!',
                 'class' => 'alert-success'
             ]);
     }
@@ -221,10 +218,14 @@ class RepresentanteSiteController extends Controller
         if($request->status === '1') {
             $msg = 'Contato ativado com sucesso!';
             $class = 'alert-success';
+            $str = 'ativou';
         } else {
             $msg = 'Contato desativado com sucesso!';
             $class = 'alert-info';
+            $str = 'desativou';
         }
+
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ('. Auth::guard('representante')->user()->registro_core .') '. $str .' o contato '. $request->id .'.'));
 
         return redirect()
             ->route('representante.contatos.view')
