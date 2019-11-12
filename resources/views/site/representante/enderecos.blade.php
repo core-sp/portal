@@ -20,7 +20,7 @@
                         <p class="pb-0">Bairro: <strong>{{ $item['END_BAIRRO'] }}</strong></p>
                         <p class="pb-0">Município: <strong>{{ $item['END_MUNICIPIO'] }}</strong></p>
                         <p class="pb-0">Estado: <strong>{{ $item['END_ESTADO'] }}</strong></p>
-                        <p class="pb-0">CEP: <strong>{{ $item['END_CEP'] }}</strong></p>
+                        <p class="pb-0">CEP: <strong>{{ formataCepGerenti($item['END_CEP']) }}</strong></p>
                         @if ($item['END_CORRESP'] === 'T   ')
                             <p class="pb-0"><small><i>(Endereço para correspondência)</i></small></p>
                         @endif
