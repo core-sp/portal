@@ -440,6 +440,7 @@ function getInfoEmpresa(value)
 			var json = $.parseJSON(data);
 			$('.avHidden').hide();
 			$('#av10').val(json.idempresa);
+			$('#av01, #avEmail').val('');
 			$('#titulice').focus();
 			$('#avLoading').hide();
 			// Mostra o alert
