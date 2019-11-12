@@ -103,7 +103,7 @@ class BdoSiteController extends Controller
 
     protected function stringEvento($nomeEmpresa, $email)
     {
-        return '*' . $nomeEmpresa . '* (' . $email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades';
+        return '*' . $nomeEmpresa . '* (' . $email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades.';
     }
 
     protected function stringRegioes($regioes)
@@ -167,14 +167,25 @@ class BdoSiteController extends Controller
     {
         $this->validaAnuncio();
 
-        event(new ExternoEvent($this->stringEvento(request('razaosocial'), request('email'))));
-
-        if(request('idempresa') === "0")
+        if(request('idempresa') === "0") {
             $this->saveBdoEmpresa();
-
-        request('idempresa') !== "0" ? $idempresa = request('idempresa') : $idempresa = $this->idempresa;
+            $idempresa = $this->idempresa;
+        } else {
+            $idempresa = request('idempresa');
+            $empresa = BdoEmpresa::find($idempresa);
+        }
 
         $this->saveBdoOportunidade($idempresa);
+
+        if(isset($empresa)) {
+            $razaoSocial = $empresa->razaosocial;
+            $empresaEmail = $empresa->email;
+        } else {
+            $razaoSocial = request('razaosocial');
+            $empresaEmail = request('email');
+        }
+
+        event(new ExternoEvent($this->stringEvento($razaoSocial, $empresaEmail)));
 
         Mail::to(['informacoes@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
 
