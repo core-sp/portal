@@ -201,6 +201,12 @@ Route::prefix('admin')->group(function() {
   // Rotas para Blog Posts
   Route::resource('/posts', 'PostsController')->except(['show']);
   Route::get('/posts/busca', 'PostsController@busca');
+
+  // Rotas para Representantes
+  Route::get('/representante-enderecos', 'RepresentanteEnderecoController@index');
+  Route::get('/representante-enderecos/{id}', 'RepresentanteEnderecoController@show')->name('admin.representante-endereco.show');
+  Route::post('/representante-enderecos/inserir', 'RepresentanteEnderecoController@inserirEnderecoGerenti')->name('admin.representante-endereco.post');
+  Route::post('/representante-enderecos/recusar', 'RepresentanteEnderecoController@recusarEndereco')->name('admin.representante-endereco-recusado.post');
 });
 
 /*

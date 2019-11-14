@@ -315,3 +315,54 @@ function formataCepGerenti($cep)
 {
     return substr_replace($cep, '-', -3, 0);
 }
+
+function utf8_converter($array)
+{
+    array_walk_recursive($array, function(&$item, $key){
+        if(!mb_detect_encoding($item, 'utf-8', true)){
+            $item = utf8_encode($item);
+        }
+    });
+ 
+    return $array;
+}
+
+function formataDataGerentiRecursive($array)
+{
+    array_walk_recursive($array, function(&$item, $key){
+        if($key === 'Data de cadastro' || $key === 'Data do Registro Social' || $key === 'Data de homologação') {
+            $item = formataDataGerenti($item);
+        }
+    });
+ 
+    return $array;
+}
+
+function secondLine($situacao, $vencimento = null, $link = null)
+{
+    if($situacao === 'Em aberto' && $vencimento === null) {
+        $str = '<strong class="text-danger">EXPIRADO</strong>';
+    } elseif($situacao === 'Em aberto' && $link !== null) {
+        $str = '<strong class="text-success">EM ABERTO</strong> ⋅ <a href="' . $link . '" class="normal text-info">IMPRIMIR BOLETO</a>'; 
+    } elseif($situacao === 'Pago') {
+        $str = '<strong class="text-success">PAGO</strong>';
+    } elseif($situacao = 'Proc. Adm.') {
+        $str = '<strong class="text-info">PROC. ADM.</strong>';
+    } else {
+        $str = '<strong class="text-info">INDEFINIDO</strong>';
+    }
+
+    return $str;
+}
+
+function toReais($float)
+{
+    return number_format($float, 2, ',', '.');
+}
+
+function statusBold($string)
+{
+    $array = explode(':', $string);
+
+    return $array[0] . ': <strong>' . $array[1] . '</strong>';
+}

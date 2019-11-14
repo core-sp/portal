@@ -31,7 +31,9 @@ class Representante extends Authenticable
 
     public function enderecos()
     {
-        return $this->gerentiEnderecos($this->ass_id);
+        $enderecos = $this->gerentiEnderecos($this->ass_id);
+
+        return utf8_converter($enderecos);
     }
 
     public function contatos()
@@ -46,7 +48,43 @@ class Representante extends Authenticable
 
     public function dadosGerais()
     {
-        return $this->tipoPessoa() === 'PF' ? $this->gerentiDadosGeraisPF($this->ass_id) : $this->gerentiDadosGeraisPJ($this->ass_id);
+        if($this->tipoPessoa() === 'PF') {
+            $dados = $this->gerentiDadosGeraisPF($this->ass_id);
+            return $this->arrangeDgPf($dados);
+        } else {
+            $dados = $this->gerentiDadosGeraisPJ($this->ass_id);
+            return $this->arrangeDgPj($dados);
+        }
+    }
+
+    protected function arrangeDgPf($dados)
+    {
+        $dados = formataDataGerentiRecursive($dados);
+        $rg = ['RG' => $dados['identidade'] . '<span class="light">, expedido em</span> ' . $dados['expedicao'] . '<span class="light">, por</span> ' . $dados['emissor']];
+        unset($dados['expedicao'], $dados['emissor'], $dados['identidade']);
+        $novoDados = $rg + $dados;
+        $toUtf = utf8_converter($novoDados);
+
+        return $toUtf;
+    }
+
+    protected function arrangeDgPj($dados)
+    {
+        $dados = formataDataGerentiRecursive($dados);
+        $dados = utf8_converter($dados);
+
+        if(!empty($dados['Responsável Técnico'])) {
+            $rtArray = explode('-', $dados['Responsável Técnico']);
+            $rt = ['Responsável técnico' => $rtArray[1] . ' (' . $rtArray[0] . ')'];
+
+            unset($dados['Responsável Técnico']);
+
+            $novosDados = $rt + $dados;
+        } else {
+            $novosDados = $dados;
+        }
+
+        return $novosDados;
     }
 
     public function getCpfCnpjAttribute($value)
@@ -68,23 +106,34 @@ class Representante extends Authenticable
     public function cobrancas()
     {
         $values = $this->gerentiBolestosLista($this->ass_id);
+        $values = utf8_converter($values);
         
-        $extrato = [];
-        $parcelamento = [];
+        $anuidades = [];
+        $outros = [];
 
         foreach($values as $value) {
-            if($value['TPGERBOL_ID'] === 1) {
-                array_push($extrato, $value);
+            if (strpos($value['DESCRICAO'], 'Anuidade') !== false) {
+                array_push($anuidades, $value);
             } else {
-                array_push($parcelamento, $value);
+                array_push($outros, $value);
             }
         }
         
         $result = [
-            'extrato' => $extrato,
-            'parcelamento' => $parcelamento
+            'anuidades' => $anuidades,
+            'outros' => $outros
         ];
 
         return $result;
+    }
+
+    public function solicitacoesEnderecos()
+    {
+        return RepresentanteEndereco::where('ass_id', '=', $this->ass_id)->where('status', '!=', 'Enviado')->orderBy('created_at', 'DESC')->get();
+    }
+
+    public function status()
+    {
+        return $this->gerentiStatus($this->ass_id);
     }
 }

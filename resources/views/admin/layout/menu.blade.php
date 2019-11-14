@@ -215,7 +215,8 @@
         @endif
         <!-- Atendimento -->
         @if(ControleController::mostra('AgendamentoController', 'index') ||
-            ControleController::mostra('AgendamentoBloqueioController', 'index'))
+            ControleController::mostra('AgendamentoBloqueioController', 'index') ||
+            ControleController::mostra('RepresentanteEnderecoController', 'index'))
         <li class="nav-header">ATENDIMENTO</li>
         @endif
         @if(ControleController::mostra('AgendamentoController', 'index'))
@@ -233,6 +234,22 @@
                 <p>Bloqueios</p>
             </a>
         </li>
+        @endif
+        @if (ControleController::mostra('RepresentanteEnderecoController', 'index'))
+            <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fa fa-users"></i>
+                    <p>Representantes<i class="right fa fa-angle-left"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="/admin/representante-enderecos" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Endereços</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
         @endif
         <!-- Jurídico -->
         @if(ControleController::mostra('LicitacaoController', 'index') ||

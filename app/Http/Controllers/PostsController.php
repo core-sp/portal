@@ -21,6 +21,11 @@ class PostsController extends Controller
         'btn_criar' => '<a href="/admin/posts/create" class="btn btn-primary mr-1">Novo Post</a>'
     ];
 
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['show', 'blogPage']]);
+    }
+
     public function resultados()
     {
         $resultados = Post::orderBy('id','DESC')->paginate(10);

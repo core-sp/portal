@@ -173,6 +173,29 @@
                     @endforeach
                 </tr>
                 <tr>
+                        <td>Representante - Endereços</td>
+                        @php
+                            $p = $permissoesArray['RepresentanteEnderecoController'][0];
+                            $name = $p['controller'].'_'.$p['metodo'];
+                        @endphp
+                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
+                        @else
+                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
+                        @endif
+                        <td><input type="checkbox" class="form-check-input" disabled /></td>
+                        @php
+                            $p = $permissoesArray['RepresentanteEnderecoController'][1];
+                            $name = $p['controller'].'_'.$p['metodo'];
+                        @endphp
+                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
+                        @else
+                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
+                        @endif
+                        <td><input type="checkbox" class="form-check-input" disabled /></td>
+                </tr>
+                <tr>
                     <td>Licitações</td>
                     @foreach($permissoesArray['LicitacaoController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp

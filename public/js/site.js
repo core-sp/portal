@@ -423,6 +423,10 @@ function noWeekendsOrHolidays(date) {
 				$('#outroSegmento').hide();
 			}
 		});
+		// Menu mobile representante
+		$('#bars-representante').on('click', function(){
+			$('#mobile-menu-representante').slideToggle();
+		});
 	});
 })(jQuery);
 

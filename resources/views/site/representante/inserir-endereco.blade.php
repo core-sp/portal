@@ -7,7 +7,7 @@
         <h4 class="pt-0 pb-0">Inserir endereço</h4>
         <div class="linha-lg-mini mb-3"></div>
         <p>Preencha as informações abaixo para inserir um <strong>novo endereço de correspondência.</strong></p>
-        <form action="{{ route('representante.inserir-endereco') }}" method="POST">
+        <form action="{{ route('representante.inserir-endereco') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
@@ -18,6 +18,7 @@
                         class="form-control cep {{ $errors->has('cep') ? 'is-invalid' : '' }}"
                         id="cep"
                         placeholder="CEP"
+                        value="{{ old('cep') }}"
                     >
                     @if($errors->has('cep'))
                         <div class="invalid-feedback">
@@ -33,6 +34,7 @@
                         class="form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
                         id="bairro"
                         placeholder="Bairro"
+                        value="{{ old('bairro') }}"
                     >
                     @if($errors->has('bairro'))
                         <div class="invalid-feedback">
@@ -49,6 +51,7 @@
                     class="form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }}"
                     id="rua"
                     placeholder="Logradouro"
+                    value="{{ old('logradouro') }}"
                 >
                 @if($errors->has('logradouro'))
                     <div class="invalid-feedback">
@@ -65,6 +68,7 @@
                         class="form-control numero {{ $errors->has('numero') ? 'is-invalid' : '' }}"
                         id="numero"
                         placeholder="Número"
+                        value="{{ old('numero') }}"
                     >
                     @if($errors->has('numero'))
                         <div class="invalid-feedback">
@@ -80,6 +84,7 @@
                         class="form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
                         id="complemento"
                         placeholder="Complemento"
+                        value="{{ old('complemento') }}"
                     >
                     @if($errors->has('complemento'))
                         <div class="invalid-feedback">
@@ -93,7 +98,7 @@
                     <label for="uf">Estado *</label>
                     <select name="estado" id="uf" class="form-control {{ $errors->has('estado') ? 'is-invalid' : '' }}">
                         @foreach (estados() as $key => $estado)
-                            <option value="{{ $key }}">{{ $estado }}</option>
+                            <option value="{{ $key }}" {{ old('estado') === $key ? 'selected' : '' }}>{{ $estado }}</option>
                         @endforeach
                     </select>
                     @if($errors->has('estado'))
@@ -110,6 +115,7 @@
                         id="cidade"
                         class="form-control {{ $errors->has('municipio') ? 'is-invalid' : '' }}"
                         placeholder="Município"
+                        value="{{ old('municipio') }}"
                     >
                     @if($errors->has('municipio'))
                         <div class="invalid-feedback">
@@ -118,11 +124,25 @@
                     @endif
                 </div>
             </div>
+            <div class="form-group">
+                <label for="comprovante-residencia">Comprovante de Residência *</label>
+                <input
+                    type="file"
+                    name="crimage"
+                    class="form-control-file {{ $errors->has('crimage') ? 'is-invalid' : '' }}"
+                    id="comprovante-residencia"
+                >
+                @if($errors->has('crimage'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('crimage') }}
+                    </div>
+                @endif
+            </div>
             {{-- <div class="form-check mb-4">
                 <input type="checkbox" class="form-check-input" id="corresp" name="corresp" {{ $infos[0]['END_CORRESP'] === 'T' ? 'checked' : '' }}>
                 <label class="form-check-label" for="corresp">Endereço para correspondência</label>
             </div> --}}
-            <div class="form-group mt-3">
+            <div class="form-group mt-4">
                 <button type="submit" class="btn btn-primary">Cadastrar</button>
             </div>
         </form>
