@@ -6,6 +6,7 @@ use App\Connections\FirebirdConnection;
 use App\Events\ExternoEvent;
 use App\Mail\CadastroRepresentanteMail;
 use App\Representante;
+use App\RepresentanteEndereco;
 use Illuminate\Http\Request;
 use App\Rules\CpfCnpj;
 use Illuminate\Support\Facades\Input;
@@ -189,24 +190,54 @@ class RepresentanteSiteController extends Controller
             'complemento' => 'max:100',
             'estado' => 'required|max:5',
             'municipio' => 'required|max:30',
+            'crimage' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ], [
             'required' => 'Campo obrigatório',
-            'max' => 'Excedido limite de caracteres'
+            'max' => 'Excedido limite de caracteres',
+            'crimage.required' => 'Favor adicionar um comprovante de residência',
+            'mimes' => 'Tipo de arquivo não suportado',
+            'image' => 'Tipo de arquivo não suportado',
+            'crimage.max' => 'A imagem não pode ultrapassar 2MB'
         ]);
+    }
+
+    public function saveEndereco($image)
+    {
+        $save = RepresentanteEndereco::create([
+            'ass_id' => Auth::guard('representante')->user()->ass_id,
+            'cep' => request('cep'),
+            'bairro' => request('bairro'),
+            'logradouro' => request('logradouro'),
+            'numero' => request('numero'),
+            'complemento' => request('complemento'),
+            'estado' => request('estado'),
+            'municipio' => request('municipio'),
+            'crimage' => $image,
+            'status' => 'Aguardando confirmação'
+        ]);
+
+        if(!$save)
+            abort(403);
     }
 
     public function inserirEndereco(Request $request)
     {
         $this->validateEndereco($request);
 
-        $this->gerentiInserirEndereco(Auth::guard('representante')->user()->ass_id, $request);
+        $imageName = Auth::guard('representante')->user()->id . '-' . time() . '.' . request()->crimage->getClientOriginalExtension();
 
-        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ('. Auth::guard('representante')->user()->registro_core .') inseriu um novo endereço de correspondência.'));
+        request()->crimage->move(public_path('imagens/representantes/enderecos'), $imageName);
+
+        $this->saveEndereco($imageName);
+
+        // $this->gerentiInserirEndereco(Auth::guard('representante')->user()->ass_id, $request);
+
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ('. Auth::guard('representante')->user()->registro_core .') solicitou mudança no endereço de correspondência.'));
 
         return redirect()
             ->route('representante.enderecos.view')
             ->with([
-                'message' => 'Endereço cadastrado com sucesso!',
+                'message' => 'Solicitação enviada com sucesso! Após verificação das informações, o endereço será atualizado.',
                 'class' => 'alert-success'
             ]);
     }

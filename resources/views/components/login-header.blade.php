@@ -1,6 +1,6 @@
 <div class="row nomargin mb-3 login-header">
     @if(Auth::guard('representante')->check())
-        <p class="cinza-claro p-restrita">
+        <p class="cinza-claro p-restrita m-auto-992">
             <small>
                 <a href="{{ route('representante.dashboard') }}">
                     <i class="fas fa-user"></i>&nbsp;
@@ -14,7 +14,7 @@
         </p>
     @else
         <a href="{{ route('representante.login') }}">
-            <p class="cinza-claro p-restrita">
+            <p class="cinza-claro p-restrita m-auto-992">
                 <small>
                     <a href="{{ route('representante.login') }}">
                         <i class="fas fa-lock"></i>&nbsp;

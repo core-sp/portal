@@ -10,24 +10,14 @@ use Illuminate\Support\Facades\Log;
 
 class LogSuccessfulLogout
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
     public function __construct()
     {
         //
     }
 
-    /**
-     * Handle the event.
-     *
-     * @param  Logout  $event
-     * @return void
-     */
     public function handle(Logout $event)
     {
-        Log::channel('interno')->info($event->user->nome.' (usuário '.$event->user->idusuario.') desconectou-se do painel de administrador.');
+        if(!Auth::guard('representante')->check())
+            Log::channel('interno')->info($event->user->nome.' (usuário '.$event->user->idusuario.') desconectou-se do painel de administrador.');
     }
 }

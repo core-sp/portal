@@ -68,7 +68,7 @@ use \App\Http\Controllers\Helper;
               <div class="mexe-tamanho m-auto text-center">
                 @component('components.login-header')
                 @endcomponent
-                <div class="acessibilidade center-992 text-right">
+                <div class="acessibilidade center-992 text-right hide-768">
                   <button type="button" class="btn btn-sm btn-light btn-acessibilidade" id="increase-font">
                     <h6>A+</h6>
                   </button>
@@ -89,10 +89,11 @@ use \App\Http\Controllers\Helper;
                     </button>
                   </a>
                 </div>
-                <form class="input-group input-group-sm"
+                <form class="input-group input-group-sm hide-768"
                   method="GET"
                   role="form"
-                  action ="/busca" />
+                  action ="/busca"
+                />
                   <input type="text"
                     name="busca"
                     class="form-control float-right {{ $errors->has('busca') ? 'is-invalid' : '' }}"

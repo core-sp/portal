@@ -27,39 +27,42 @@
     </div>
     <div class="linha-lg"></div>
     <div class="row">
-      <div class="col-sm-3">
+      <div class="col-xl-3 pb-15-992">
         <div class="menu-representante">
           <div class="p-3 border-one-mr azul-escuro-bg">
             <h6 class="branco"><strong>{{ Auth::guard('representante')->user()->nome }}</strong></h6>
+            <i class="fas fa-bars show-992" id="bars-representante"></i>
           </div>
-          <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.dashboard' ? 'mr-item-selected' : '' }}">
-            <a href="{{ route('representante.dashboard') }}">
-              <h6 class="brancar"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</h6>
-            </a>
-          </div>
-          <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.dados-gerais' ? 'mr-item-selected' : '' }}">
-            <a href="{{ route('representante.dados-gerais') }}">
-              <h6 class="brancar"><i class="fas fa-table"></i>&nbsp;&nbsp;Dados gerais</h6>
-            </a>
-          </div>
-          <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.contatos.view' ? 'mr-item-selected' : '' }}">
-            <a href="{{ route('representante.contatos.view') }}">
-              <h6 class="brancar"><i class="fas fa-phone"></i>&nbsp;&nbsp;Contatos</h6>
-            </a>
-          </div>
-          <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.enderecos.view' ? 'mr-item-selected' : '' }}">
-            <a href="{{ route('representante.enderecos.view') }}">
-              <h6 class="brancar"><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;Endereços</h6>
-            </a>
-          </div>
-          <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.lista-cobrancas' ? 'mr-item-selected' : '' }}">
-            <a href="{{ route('representante.lista-cobrancas') }}">
-              <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Situação Financeira</h6>
-            </a>
+          <div id="mobile-menu-representante" class="hide-992">
+            <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.dashboard' ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.dashboard') }}">
+                <h6 class="brancar"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</h6>
+              </a>
+            </div>
+            <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.dados-gerais' ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.dados-gerais') }}">
+                <h6 class="brancar"><i class="fas fa-table"></i>&nbsp;&nbsp;Dados gerais</h6>
+              </a>
+            </div>
+            <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.contatos.view' ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.contatos.view') }}">
+                <h6 class="brancar"><i class="fas fa-phone"></i>&nbsp;&nbsp;Contatos</h6>
+              </a>
+            </div>
+            <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.enderecos.view' ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.enderecos.view') }}">
+                <h6 class="brancar"><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;End. de Correspondência</h6>
+              </a>
+            </div>
+            <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.lista-cobrancas' ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.lista-cobrancas') }}">
+                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Situação Financeira</h6>
+              </a>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-sm-9">
+      <div class="col-xl-9">
         <div class="row nomargin">
           @yield('content-representante')
         </div>

@@ -35,7 +35,7 @@
             <div class="input-group">
             <span class="input-group-prepend">
                 <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-default">
-                <i class="fas fa-picture-o"></i> Inserir/Alterar imagem
+                    <i class="fas fa-picture-o"></i> Inserir/Alterar imagem
                 </a>
             </span>
             <input id="thumbnail"
@@ -51,9 +51,9 @@
                 @endif
                 />
             @if($errors->has('img'))
-            <div class="invalid-feedback">
-            {{ $errors->first('img') }}
-            </div>
+                <div class="invalid-feedback">
+                    {{ $errors->first('img') }}
+                </div>
             @endif
             </div>
         </div>

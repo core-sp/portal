@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Connections\FirebirdConnection;
 use Illuminate\Support\Facades\Input;
+use PDO;
 
 trait GerentiProcedures
 {
@@ -54,47 +55,59 @@ trait GerentiProcedures
     {
         $this->connect();
 
-        $query = 'select TP_dados.tpd_descricao, dados.dad_valor FROM dados inner join TP_DADOS on dados.tpd_id = TP_DADOS.tpd_id WHERE ASS_ID = :ass_id';
+        $query = 'select DATA_CADASTRO "Data de cadastro", DATA_NASCIMENTO "Data de nascimento",
+            IDENTIDADE "identidade", DATA_EXPEDICAO "expedicao", ORGAO_EMISSOR "emissor", ESTADO_CIVIL "Estado civil", 
+            NATURALIDADE "Naturalidade", NACIONALIDADE "Nacionalidade", NOME_PAI "Nome do pai", NOME_MAE "Nome da mãe", 
+            DATAHOMOLOGACAO "Data de homologação", SEXO "Sexo", TIPOPESSOA "Tipo de pessoa", REGIONAL "Regional", 
+            DT_INICIO "Data de início", REG_SECUNDARIO "Registro secundário", CORE_ORIGEM "Core de origem"
+            from PROCPORTALDADOSGERAISPF(:ass_id)';
 
         $run = $this->gerentiConnection->prepare($query);
         
         $run->execute([
             'ass_id' => $ass_id
         ]);
-        return $run->fetchAll();
+        return $run->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
     public function gerentiDadosGeraisPJ($ass_id)
     {
         $this->connect();
         
-        $query = 'select first 1 ASS_DT_REG_SOCIAL, ASS_DT_ADMISSAO, REGIONAL, NIRE from ASSOCIADOS where ASS_ID = :ass_id';
+        $query = 'select DATACADASTRO "Data de cadastro", DATAREGSOCIAL "Data do Registro Social", 
+            DATAHOMOLOGACAO "Data de homologação", NIRE "Nire", TIPOPESSOA "Tipo de pessoa", 
+            REGIONAL "Regional", DATA_JUNTA "Data do reg. na junta comercial", DT_INICIO "Data de início",
+            REG_SECUNDARIO "Registro secundário", CORE_ORIGEM "Core de origem", INSCR_ESTADUAL "Inscrição estadual", 
+            TIPO_EMPRESA "Tipo de empresa", INSCR_MUNICIPAL "Inscrição municipal", RESPTEC "Responsável Técnico"
+            from PROCPORTALDADOSGERAISPJ(:ass_id)';
 
         $run = $this->gerentiConnection->prepare($query);
         
         $run->execute([
             'ass_id' => $ass_id
         ]);
-        return $run->fetchAll();
+        return $run->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
     public function gerentiEnderecos($ass_id)
     {
         $this->connect();
 
-        $run = $this->gerentiConnection->prepare('select * from SP_ENDERECOS_SEL (:ass_id)');
+        $run = $this->gerentiConnection->prepare('select ENDERECO "Logradouro", END_CONPLEMENTO "Complemento", 
+            END_BAIRRO "Bairro", END_CEP "CEP", END_MUNICIPIO "Cidade", END_ESTADO "UF"
+            from SP_PEGA_ENDER(:ass_id, 1)');
 
         $run->execute([
             'ass_id' => $ass_id
         ]);
-        return $run->fetchAll();
+        return $run->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
-    public function gerentiInserirEndereco($ass_id, $request)
+    public function gerentiInserirEndereco($ass_id, $infos)
     {
         $sequencia = $this->gerentiBuscarSequenciaEndereco($ass_id);
 
-        $cep = preg_replace( '/[^0-9]/', '', $request->cep);
+        $cep = preg_replace( '/[^0-9]/', '', $infos['cep']);
 
         $this->connect();
 
@@ -104,12 +117,12 @@ trait GerentiProcedures
         )");
 
         $run->execute([
-            'logradouro' => $request->logradouro,
-            'estado' => $request->estado,
-            'municipio' => $request->municipio,
-            'numero' => $request->numero,
-            'complemento' => $request->complemento,
-            'bairro' => $request->bairro,
+            'logradouro' => $infos['logradouro'],
+            'estado' => $infos['estado'],
+            'municipio' => $infos['municipio'],
+            'numero' => $infos['numero'],
+            'complemento' => $infos['complemento'],
+            'bairro' => $infos['bairro'],
             'cep' => $cep
         ]);
     }
@@ -182,14 +195,26 @@ trait GerentiProcedures
     {
         $this->connect();
 
-        $run = $this->gerentiConnection->prepare("select ASS_ID, REGISTRO, NOME, BOL_ID, NOSSONUMERO, DATADOCUMENTO, 
-            DATAVENCIMENTO, CONTA_IDBOL, USERIDBOL, TPGERBOL_ID, LOGINUSER, ORIGEMBOL, VALORBOLETO, CONTADESCR, ITENSBOL, 
-            ASS_CPF_CGC, TP_ASSOC, BOL_SEUNUMERO, BOL_NUMERODOCUMENTO, ENDERECO, END_CONPLEMENTO, END_BAIRRO, END_CEP, END_MUNICIPIO, 
-            END_ESTADO, END_CORRESP,  END_CORR_DEVOLV from PROCBOLETOSREGIOSTRADOSEMABERTO (:ass_id, CAST('01.01.1970' AS DATE), CAST('NOW' AS DATE))");
+        $run = $this->gerentiConnection->prepare("select  descricao, vencimento, valor, multa, 
+            juros, correcao, residuo, total, boleto, vencimentoboleto, link, situacao
+            from PROCPORTALSITUACAOFINANCEIRA(:ass_id);
+        ");
 
         $run->execute([
             'ass_id' => $ass_id
         ]);
-        return $run->fetchAll();
+        return $run->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function gerentiStatus($ass_id)
+    {
+        $this->connect();
+
+        $run = $this->gerentiConnection->prepare('select SITUACAO from PROCSITUACAOATUAL(:ass_id)');
+
+        $run->execute([
+            'ass_id' => $ass_id
+        ]);
+        return utf8_encode($run->fetchAll()[0]['SITUACAO']);
     }
 }
