@@ -35,27 +35,27 @@
           </div>
           <div id="mobile-menu-representante" class="hide-992">
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.dashboard' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.dashboard') }}">
+              <a href="{{ route('representante.dashboard') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</h6>
               </a>
             </div>
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.dados-gerais' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.dados-gerais') }}">
+              <a href="{{ route('representante.dados-gerais') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-table"></i>&nbsp;&nbsp;Dados gerais</h6>
               </a>
             </div>
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.contatos.view' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.contatos.view') }}">
+              <a href="{{ route('representante.contatos.view') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-phone"></i>&nbsp;&nbsp;Contatos</h6>
               </a>
             </div>
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.enderecos.view' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.enderecos.view') }}">
+              <a href="{{ route('representante.enderecos.view') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-map-marker-alt"></i>&nbsp;&nbsp;End. de Correspondência</h6>
               </a>
             </div>
             <div class="mr-item bt-unset {{ Route::currentRouteName() === 'representante.lista-cobrancas' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.lista-cobrancas') }}">
+              <a href="{{ route('representante.lista-cobrancas') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Situação Financeira</h6>
               </a>
             </div>
@@ -63,7 +63,12 @@
         </div>
       </div>
       <div class="col-xl-9">
-        <div class="row nomargin">
+        <div id="loading" class="row nomargin">
+          <div class="representante-content w-100">
+            <h2><i class="fas fa-cog fa-spin"></i></h2>
+          </div>
+        </div>
+        <div class="row nomargin" id="rc-main">
           @yield('content-representante')
         </div>
       </div>

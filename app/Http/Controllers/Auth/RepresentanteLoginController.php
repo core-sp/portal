@@ -68,13 +68,11 @@ class RepresentanteLoginController extends Controller
 
         $this->verificaGerentiLogin($request->cpf_cnpj);
 
-        
-
         if (Auth::guard('representante')->attempt([
             'cpf_cnpj' => $cpfCnpj,
             'password' => $request->password
         ], $request->remember)) {
-            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ('. Auth::guard('representante')->user()->registro_core .') conectou-se à Área do Representante.'));
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") conectou-se à Área do Representante.'));
 
             return redirect()->intended(route('representante.dashboard'));
         }
@@ -94,7 +92,7 @@ class RepresentanteLoginController extends Controller
 
     public function logout(Request $request)
     {
-        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ('. Auth::guard('representante')->user()->registro_core .') desconectou-se da Área do Representante.'));
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") desconectou-se da Área do Representante.'));
 
         Auth::guard('representante')->logout();
 

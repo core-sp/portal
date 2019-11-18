@@ -195,10 +195,9 @@ trait GerentiProcedures
     {
         $this->connect();
 
-        $run = $this->gerentiConnection->prepare("select  descricao, vencimento, valor, multa, 
+        $run = $this->gerentiConnection->prepare("select descricao, vencimento, valor, multa, 
             juros, correcao, residuo, total, boleto, vencimentoboleto, link, situacao
-            from PROCPORTALSITUACAOFINANCEIRA(:ass_id);
-        ");
+            from PROCPORTALSITUACAOFINANCEIRA(:ass_id)");
 
         $run->execute([
             'ass_id' => $ass_id

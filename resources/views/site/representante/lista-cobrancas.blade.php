@@ -2,6 +2,10 @@
 
 @section('content-representante')
 
+@php
+    $cobrancas = Auth::guard('representante')->user()->cobrancas();    
+@endphp
+
 <div class="representante-content w-100">
     <div class="nomargin conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Situação Financeira</h4>
@@ -17,8 +21,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (Auth::guard('representante')->user()->cobrancas()['anuidades'] as $cobranca)
-                        @include('site.representante.inc.cobranca')
+                    @foreach ($cobrancas['anuidades'] as $cobranca)
+                        <tr>
+                            <td class="ls-meio-neg">
+                                {{ $cobranca['DESCRICAO'] }} ⋅ {!! secondLine($cobranca['SITUACAO'], $cobranca['VENCIMENTOBOLETO'], $cobranca['LINK'], $cobranca['DESCRICAO']) !!}
+                            </td>
+                            <td class="ls-meio-neg">R$ {{ toReais($cobranca['VALOR']) }}</td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -26,7 +35,7 @@
             <p class="light">Nada a mostrar aqui.</p>
         @endif
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;OUTRAS COBRANÇAS</h5>
-        @if (!empty(Auth::guard('representante')->user()->cobrancas()['outros']))
+        @if (!empty($cobrancas['outros']))
             <table class="table table-bordered bg-white mb-0">
                 <thead>
                     <tr>
@@ -35,8 +44,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (Auth::guard('representante')->user()->cobrancas()['outros'] as $cobranca)
-                        @include('site.representante.inc.cobranca')
+                    @foreach ($cobrancas['outros'] as $cobranca)
+                        <tr>
+                            <td class="ls-meio-neg">
+                                {{ $cobranca['DESCRICAO'] }} ⋅ {!! secondLine($cobranca['SITUACAO'], $cobranca['VENCIMENTOBOLETO'], $cobranca['LINK'], $cobranca['DESCRICAO']) !!}
+                            </td>
+                            <td class="ls-meio-neg">R$ {{ toReais($cobranca['VALOR']) }}</td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>

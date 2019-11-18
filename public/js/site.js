@@ -536,3 +536,16 @@ function getDate() {
 $(function() {
 	$('.lazy').Lazy();
 });
+
+function clickBoleto(descricao)
+{
+	$.get('/representante/evento-boleto', {
+		'descricao': descricao,
+	});
+}
+
+function showLoading()
+{
+	$('#rc-main').hide();
+	$('#loading').show();
+}
