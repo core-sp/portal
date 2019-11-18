@@ -89,7 +89,7 @@ class RepresentanteSiteController extends Controller
             abort(500);
         }
 
-        event(new ExternoEvent('Usuário ' . $find->id . ' ('. $find->cpf_cnpj .') verificou o email após o cadastro.'));
+        event(new ExternoEvent('Usuário ' . $find->id . ' ("'. $find->cpf_cnpj .'") verificou o email após o cadastro.'));
 
         return redirect()
             ->route('representante.login')
@@ -232,7 +232,7 @@ class RepresentanteSiteController extends Controller
 
         // $this->gerentiInserirEndereco(Auth::guard('representante')->user()->ass_id, $request);
 
-        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ('. Auth::guard('representante')->user()->registro_core .') solicitou mudança no endereço de correspondência.'));
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") solicitou mudança no endereço de correspondência.'));
 
         return redirect()
             ->route('representante.enderecos.view')
@@ -256,7 +256,7 @@ class RepresentanteSiteController extends Controller
             $str = 'desativou';
         }
 
-        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ('. Auth::guard('representante')->user()->registro_core .') '. $str .' o contato '. $request->id .'.'));
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") '. $str .' o contato '. $request->id .'.'));
 
         return redirect()
             ->route('representante.contatos.view')
@@ -269,5 +269,11 @@ class RepresentanteSiteController extends Controller
     public function listaCobrancas()
     {
         return view('site.representante.lista-cobrancas');
+    }
+
+    public function eventoBoleto()
+    {
+        $descricao = Input::get('descricao');
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") imprimiu o boleto "' . $descricao . '"'));
     }
 }

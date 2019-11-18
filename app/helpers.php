@@ -338,12 +338,12 @@ function formataDataGerentiRecursive($array)
     return $array;
 }
 
-function secondLine($situacao, $vencimento = null, $link = null)
+function secondLine($situacao, $vencimento = null, $link = null, $descricao = null)
 {
     if($situacao === 'Em aberto' && $vencimento === null) {
         $str = '<strong class="text-danger">EXPIRADO</strong>';
     } elseif($situacao === 'Em aberto' && $link !== null) {
-        $str = '<strong class="text-success">EM ABERTO</strong> ⋅ <a href="' . $link . '" class="normal text-info">IMPRIMIR BOLETO</a>'; 
+        $str = '<strong class="text-warning">EM ABERTO</strong> ⋅ <a href="' . $link . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">IMPRIMIR BOLETO</a>';
     } elseif($situacao === 'Pago') {
         $str = '<strong class="text-success">PAGO</strong>';
     } elseif($situacao = 'Proc. Adm.') {
