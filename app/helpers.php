@@ -366,3 +366,12 @@ function statusBold($string)
 
     return $array[0] . ': <strong>' . $array[1] . '</strong>';
 }
+
+function termoDeUso()
+{
+    return '
+        <p><strong>1. Aceitação dos Termos e Condições de Uso</strong></p>
+        <p>O uso da Área Restrita do Representante Comercial oferecida pela Core-SP está condicionado à aceitação e ao cumprimento dos Termos e Condições de Uso descritos abaixo.</p>
+        <p>Para fazer uso da Área Restrita, é preciso: (i) ler atentamente os termos descritos abaixo; (ii) concordar expressamente com eles, (iii) se cadastrar fornecendo o CPF/CNPJ, número de registro junto ao Core-SP e o e-mail válido cadastrado no ato de registro profissional, para ter acesso à Área Restrita.</p>
+    ';
+}

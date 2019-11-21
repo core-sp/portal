@@ -11,6 +11,7 @@ use App\Agendamento;
 use App\BdoOportunidade;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
+use App\Representante;
 use Carbon\Carbon;
 
 class Kernel extends ConsoleKernel
@@ -184,6 +185,12 @@ class Kernel extends ConsoleKernel
                     'status' => 'Concluído'
                 ]);
         })->dailyAt('2:00');
+
+        $schedule->call(function(){
+            Representante::where('created_at', '<=', Carbon::now()->subDays(2)->toDateString())
+                ->where('ativo', '=', 0)
+                ->delete();
+        })->dailyAt('3:00');
     }
 
     /**

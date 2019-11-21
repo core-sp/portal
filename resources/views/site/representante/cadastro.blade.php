@@ -35,7 +35,9 @@
                 @if(Session::has('message'))
                     <p class="alert alert-danger">{{ Session::get('message') }}</p>
                 @endif
-                <p>Preencha as informações abaixo para realizar o cadastro e acessar a nova <strong>área do Representante Comercial.</strong></p>
+                <p>Seja bem-vindo(a).</p>
+                <p>A Área Restrita do Portal do Core-SP é destinada exclusivamente aos Representantes Comerciais.</p>
+                <p>Preencha as informações abaixo e realize o seu cadastro.</p>
                 <p class="pb-0"><strong>IMPORTANTE:</strong> O email informado deve ser <strong>o mesmo cadastrado junto ao Conselho no momento do registro inicial.</strong></p>
                 <hr>
                 <form action="{{ route('representante.cadastro.submit') }}" method="POST" class="cadastroRepresentante">
@@ -116,6 +118,28 @@
                                 placeholder="Confirme a senha"
                             >
                         </div>
+                    </div>
+                    <div class="form-check mt-3">
+                        <input class="form-check-input position-static {{ $errors->has('checkbox-tdu') ? 'is-invalid' : '' }}"
+                            name="checkbox-tdu"
+                            type="checkbox"
+                            id="checkbox-termo-de-uso"
+                            {{ old('checkbox-tdu') === 'on' ? 'checked' : '' }}
+                        />
+                        <p class="d-inline ml-1 lh-28">
+                            <small class="light lh-28">
+                                Li e concordo com os <a class="azul-obrigatorio" id="link-termo-de-uso" data-toggle="modal" data-target="#modal-termo-de-uso">Termos de Uso</a> da Área Restrita do Representante do Core-SP.
+                            </small>
+                        </p>
+                        @if($errors->has('checkbox-tdu'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('checkbox-tdu') }}
+                            </div>
+                        @endif
+                    </div>
+                    <div class="modal" id="modal-termo-de-uso">
+                        @component('components.termo-de-uso')
+                        @endcomponent
                     </div>
                     <div class="form-group mt-3">
                         <button

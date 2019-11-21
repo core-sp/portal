@@ -11,14 +11,14 @@
       </div>
     </div>
   </a>
-  <a href="/agendamento">
+  <a href="/representante/login">
     <div class="box-dois azul-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
-          <img src="{{ asset('img/appointment.png') }}" class="inside-img">
+          <img src="{{ asset('img/padlock.png') }}" class="inside-img">
         </div>
         <div class="flex-one align-self-center pl-4">
-          <h5 class="text-uppercase normal branco">Agendar atendimento</h5>
+          <h5 class="text-uppercase normal branco">Área restrita do Representante</h5>
         </div>
       </div>
     </div>
