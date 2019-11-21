@@ -46,10 +46,14 @@ class RepresentanteLoginController extends Controller
     {
         $representante = Representante::where('cpf_cnpj', '=', $cpfCnpj)->first();
 
-        if($representante->ativo === 0)
+        if(isset($representante)) {
+            if($representante->ativo === 0)
+                return false;
+            else
+                return true;
+        } else {
             return false;
-        else
-            return true;
+        }
     }
 
     public function login(Request $request)

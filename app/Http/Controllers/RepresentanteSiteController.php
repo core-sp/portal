@@ -58,6 +58,8 @@ class RepresentanteSiteController extends Controller
     {
         $token = str_random(32);
 
+        request('checkbox-tdu') === 'on' ? $aceite = 1 : $aceite = 0;
+
         $save = Representante::create([
             'cpf_cnpj' => $cpfCnpj,
             'registro_core' => preg_replace('/[^0-9]+/', '', request('registro_core')),
@@ -66,6 +68,7 @@ class RepresentanteSiteController extends Controller
             'email' => request('email'),
             'password' => bcrypt(request('password')),
             'verify_token' => $token,
+            'aceite' => $aceite
         ]);
 
         if(!$save)
@@ -113,16 +116,16 @@ class RepresentanteSiteController extends Controller
         
         $checkGerenti = $this->checaAtivo($registro, request('cpfCnpj'), request('email'));
 
-        if($checkGerenti === false) {
+        if (array_key_exists('Error', $checkGerenti)) {
             return redirect()
                 ->route('representante.cadastro')
-                ->with('message', 'Desculpe, mas o cadastro informado não está corretamente inscrito no Core-SP. Por favor, verifique se todas as informações foram inseridas corretamente.')
+                ->with('message', $checkGerenti['Error'])
                 ->withInput(Input::all());
         }
 
         $this->saveRepresentante($checkGerenti['ASS_ID'], $checkGerenti['NOME'], $cpfCnpj);
 
-        event(new ExternoEvent($cpfCnpjCru . ' ("' . request('email') . '") cadastrou-se na Área do Representante.'));
+        event(new ExternoEvent('"' . $cpfCnpjCru . '" ("' . request('email') . '") cadastrou-se na Área do Representante.'));
 
         return view('site.agradecimento')->with([
             'agradece' => 'Cadastro realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>'
@@ -168,6 +171,8 @@ class RepresentanteSiteController extends Controller
         }
 
         isset($request->id) ? $msg = 'Contato editado com sucesso!' : $msg = 'Contato cadastrado com sucesso!';
+
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") inseriu um novo contato: '. gerentiTiposContatos()[$request->tipo] .'.'));
 
         return redirect()
             ->route('representante.contatos.view')

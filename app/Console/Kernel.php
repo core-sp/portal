@@ -187,7 +187,7 @@ class Kernel extends ConsoleKernel
         })->dailyAt('2:00');
 
         $schedule->call(function(){
-            Representante::where('created_at', '<=', Carbon::now()->subDays(2)->toDateString())
+            Representante::where('created_at', '<=', Carbon::now()->subHours(24)->toDateString())
                 ->where('ativo', '=', 0)
                 ->delete();
         })->dailyAt('3:00');

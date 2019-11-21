@@ -41,7 +41,9 @@
                     </div>
                 </div>
             @empty
-                <p>Nenhum contato cadastrado.</p>
+                <div class="contatos-table space-single">
+                    <p class="light pb-0">Nenhum contato cadastrado.</p>
+                </div>
             @endforelse
         </div>
     </div>

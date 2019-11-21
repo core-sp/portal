@@ -33,9 +33,8 @@
             </table>
         @else
             <div class="contatos-table space-single">
-
+                <p class="light pb-0">Nada a mostrar aqui.</p>
             </div>
-            <p class="light">Nada a mostrar aqui.</p>
         @endif
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;OUTRAS COBRANÇAS</h5>
         @if (!empty($cobrancas['outros']))
@@ -58,7 +57,9 @@
                 </tbody>
             </table>
         @else
-            <p class="light">Nada a mostrar aqui.</p>
+            <div class="contatos-table space-single">
+                <p class="light pb-0">Nada a mostrar aqui.</p>
+            </div>
         @endif
     </div>            
 </div>
