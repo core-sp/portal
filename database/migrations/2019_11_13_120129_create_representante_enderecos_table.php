@@ -15,7 +15,7 @@ class CreateRepresentanteEnderecosTable extends Migration
     {
         Schema::create('representante_enderecos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('ass_id')->nullable();
+            $table->unsignedInteger('ass_id');
             $table->string('cep');
             $table->string('bairro');
             $table->string('logradouro');
@@ -26,8 +26,6 @@ class CreateRepresentanteEnderecosTable extends Migration
             $table->string('crimage');
             $table->timestamps();
             $table->softDeletes();
-
-            $table->foreign('ass_id')->references('ass_id')->on('representantes');
         });
     }
 
