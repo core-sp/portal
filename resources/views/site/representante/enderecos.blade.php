@@ -28,7 +28,9 @@
                 @endforeach
             </div>
         @else
-            <p class="light">Você não possui nenhuma solicitação de inclusão de endereço.</p>
+            <div class="contatos-table space-single">
+                <p class="light pb-0">Você não possui nenhuma solicitação de inclusão de endereço.</p>
+            </div>
         @endif
         <div class="d-block mt-2 mb-3">
             <a href="{{ route('representante.inserir-endereco.view') }}" class="btn btn-primary link-nostyle branco">Adicionar novo endereço de correspondência</a>

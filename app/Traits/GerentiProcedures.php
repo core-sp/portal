@@ -31,8 +31,10 @@ trait GerentiProcedures
 
         $verificaEmail = $this->gerentiEmails($resultado[0]['EMAILS']);
 
-        if($resultado[0]['SITUACAO'] !== 'Ativo' || !in_array($email, $verificaEmail))
-            return false;
+        if($resultado[0]['SITUACAO'] !== 'Ativo')
+            return ['Error' => 'O cadastro informado não está corretamente inscrito no Core-SP. Por favor, verifique as informações inseridas.'];
+        elseif(!in_array($email, $verificaEmail))
+            return ['Error' => 'O email informado não corresponde ao cadastro informado. Por favor, insira o email correto.'];
         else
             return $resultado[0];
     }
@@ -170,7 +172,7 @@ trait GerentiProcedures
 
         $id !== 0 ? $nameProc = 'SP_CONTATOXPESS_U' : $nameProc = 'SP_CONTATOXPESS_I';
 
-        $run = $this->gerentiConnection->prepare("execute procedure ".$nameProc."(:ass_id, :id, 0, 210, CAST('NOW' AS DATE), :conteudo, :tipo, '', 1)");
+        $run = $this->gerentiConnection->prepare("execute procedure ".$nameProc."(:ass_id, :id, 0, 210, CAST('NOW' AS DATE), :conteudo, :tipo, 'Inserido pelo usuário no Portal Core-SP', 1)");
         $run->execute([
             'ass_id' => $ass_id,
             'id' => $id,

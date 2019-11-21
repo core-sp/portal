@@ -17,7 +17,7 @@ class Representante extends Authenticable
 
     protected $guard = 'representante';
 
-    protected $fillable = ['cpf_cnpj', 'registro_core', 'ass_id', 'nome', 'email', 'password', 'verify_token', 'ativo'];
+    protected $fillable = ['cpf_cnpj', 'registro_core', 'ass_id', 'nome', 'email', 'password', 'verify_token', 'aceite', 'ativo'];
 
     protected $hidden = ['password', 'remember_token'];
 
