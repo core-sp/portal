@@ -129,7 +129,8 @@ class RepresentanteEnderecoController extends Controller
         $endereco = RepresentanteEndereco::find(request('id'));
 
         $endereco->update([
-            'status' => 'Recusado'
+            'status' => 'Recusado',
+            'observacao' => request('observacao')
         ]);
 
         event(new CrudEvent('endereço representante', 'recusou', $endereco->id));

@@ -163,4 +163,8 @@ $(document).ready(function(){
       return false;
     });
   }
+  // Recusar endereço
+  $('#recusar-trigger').on('click', function(){
+    $('#recusar-form').toggle();
+  });
 })(jQuery);

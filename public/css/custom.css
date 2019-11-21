@@ -95,3 +95,7 @@ img {
 .info-box:hover .linkDownload {
   color: #ffc107;
 }
+
+#recusar-form {
+  display: none;
+}
