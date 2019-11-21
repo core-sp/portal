@@ -9,5 +9,5 @@ class RepresentanteEndereco extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['ass_id', 'cep', 'bairro', 'logradouro', 'numero', 'complemento', 'estado', 'municipio', 'crimage', 'status'];
+    protected $fillable = ['ass_id', 'cep', 'bairro', 'logradouro', 'numero', 'complemento', 'estado', 'municipio', 'crimage', 'status', 'observacao'];
 }

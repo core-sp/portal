@@ -36,13 +36,17 @@
                         Enviar para o Gerenti
                     </button>
                 </form>
-                <form action="{{ route('admin.representante-endereco-recusado.post') }}" method="POST" class="d-inline ml-1">
-                    @csrf
-                    <input type="hidden" name="id" value="{{ $resultado->id }}">
-                    <button type="submit" class="btn btn-danger">
-                        Recusar
-                    </button>
-                </form>
+                <button class="btn btn-info" id="recusar-trigger">Recusar&nbsp;&nbsp;<i class="fas fa-chevron-down"></i></button>
+                <div class="w-100" id="recusar-form">
+                    <form action="{{ route('admin.representante-endereco-recusado.post') }}" method="POST" class="mt-2">
+                        @csrf
+                        <input type="hidden" name="id" value="{{ $resultado->id }}">
+                        <textarea name="observacao" rows="3" placeholder="Insira aqui o motivo pelo qual a solicitação foi recusada..." class="form-control"></textarea>
+                        <button type="submit" class="btn btn-danger mt-2">
+                            Recusar
+                        </button>
+                    </form>
+                </div>
             @endif
         </div>
     </div>

@@ -23,7 +23,7 @@
                         <p class="pb-0 branco">Estado: <strong>{{ $item->estado }}</strong></p>
                         <p class="pb-0 branco">CEP: <strong>{{ $item->cep }}</strong></p>
                         <p class="pb-2 branco"><small><i>(Novo endereço para correspondência)</i></small></p>
-                        <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-danger' : 'text-light' }}">{{ $item->status }}</strong></p>
+                        <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-danger' : 'text-light' }} text-uppercase">{{ $item->status }}</strong><i>{{ isset($item->observacao) ? ' — ' . $item->observacao : '' }}</i></p>
                     </div>
                 @endforeach
             </div>

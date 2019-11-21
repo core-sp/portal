@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Connections\FirebirdConnection;
 use App\Events\ExternoEvent;
 use App\Mail\CadastroRepresentanteMail;
+use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Representante;
 use App\RepresentanteEndereco;
 use Illuminate\Http\Request;
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\Mail;
 class RepresentanteSiteController extends Controller
 {
     use GerentiProcedures;
+
+    protected $idendereco;
 
     public function __construct()
     {
@@ -225,6 +228,8 @@ class RepresentanteSiteController extends Controller
 
         if(!$save)
             abort(403);
+
+        $this->idendereco = $save->id;
     }
 
     public function inserirEndereco(Request $request)
@@ -240,6 +245,14 @@ class RepresentanteSiteController extends Controller
         // $this->gerentiInserirEndereco(Auth::guard('representante')->user()->ass_id, $request);
 
         event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") solicitou mudança no endereço de correspondência.'));
+
+        $body = 'Nova solicitação de alteração de endereço no Portal Core-SP.';
+        $body .= '<br /><br />';
+        $body .= '<strong>Código da solicitação:</strong> #'. $this->idendereco;
+        $body .= '<br /><br />';
+        $body .= 'Para verifica-la, acesse o <a href="' . route('site.home') . '/admin">painel de administração</a> do Portal Core-SP.';
+
+        Mail::to('desenvolvimento@core-sp.org.br')->queue(new SolicitacaoAlteracaoEnderecoMail($body));
 
         return redirect()
             ->route('representante.enderecos.view')
