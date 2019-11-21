@@ -38,17 +38,19 @@ class RepresentanteSiteController extends Controller
         $request->request->set('cpfCnpj', $cpfCnpj);
 
         $this->validate($request, [
-            'cpfCnpj' => ['required', new CpfCnpj, 'unique:representantes,cpf_cnpj'],
+            'cpfCnpj' => ['required', new CpfCnpj, 'unique:representantes,cpf_cnpj,NULL,id,deleted_at,NULL'],
             'registro_core' => 'required',
             'email' => 'required|email',
             'password' => 'required|confirmed|min:6',
+            'checkbox-tdu' => 'accepted'
         ], [
             'required' => 'Campo obrigatório',
             'unique' => 'Este CPF/CNPJ já está cadastrado em nosso sistema',
             'password.min' => 'A senha deve conter no mínimo 6 caracteres',
             'min' => 'Quantidade inválida de caracteres',
             'email' => 'Email inválido',
-            'password.confirmed' => 'A senha e a confirmação devem ser idênticas'
+            'password.confirmed' => 'A senha e a confirmação devem ser idênticas',
+            'accepted' => '- Você deve concordar com os Termos de Uso'
         ]);
     }
 
@@ -120,10 +122,10 @@ class RepresentanteSiteController extends Controller
 
         $this->saveRepresentante($checkGerenti['ASS_ID'], $checkGerenti['NOME'], $cpfCnpj);
 
-        event(new ExternoEvent($cpfCnpjCru . ' (' . request('email') . ') cadastrou-se na Área do Representante.'));
+        event(new ExternoEvent($cpfCnpjCru . ' ("' . request('email') . '") cadastrou-se na Área do Representante.'));
 
         return view('site.agradecimento')->with([
-            'agradece' => 'Cadastro realizado com sucesso. Por favor, <strong>verifique o email informado para confirmar seu cadastro.</strong>'
+            'agradece' => 'Cadastro realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>'
         ]);
     }
 

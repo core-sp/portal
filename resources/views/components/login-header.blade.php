@@ -18,11 +18,11 @@
                 <small>
                     <a href="{{ route('representante.login') }}">
                         <i class="fas fa-lock"></i>&nbsp;
-                        Área do Representante
+                        Área restrita do Representante
                     </a>
                     &nbsp;&nbsp;|&nbsp;&nbsp;
                     <a href="{{ route('representante.cadastro') }}">
-                        Cadastro
+                        Cadastre-se
                     </a>
                 </small>
             </p>

@@ -333,7 +333,9 @@ figure.align-left {
 	padding-top: .8rem;
 }
 
-.conteudo-txt-mini p {
+.conteudo-txt-mini p,
+.conteudo-txt-mini ol li,
+.conteudo-txt-mini ul li {
 	padding-bottom: .4rem;
 	line-height: 1.5;
 	font-size: 1rem;
@@ -1874,6 +1876,19 @@ h5 {
 #loading {
 	display: none;
 }
+
+#link-termo-de-uso {
+	cursor: pointer;
+	color: #15AAE2;
+}
+
+.lh-28 {
+	line-height: 26px !important;
+	vertical-align: bottom !important;
+	padding-bottom: 0px !important;
+}
+
+/* FINAL */
 
 /*
  * CSS PARA DISPOSITIVOS MÓVEIS

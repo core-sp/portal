@@ -35,7 +35,7 @@
                 @if(Session::has('message'))
                     <p class="alert {{ Session::get('class') }}">{{ Session::get('message') }}</p>
                 @endif
-                <p>Preencha as informações abaixo para acessar a área do Representante Comercial.</p>
+                <p>Preencha as informações abaixo para <strong>acessar a área restrita do Representante Comercial.</strong></p>
                 <form action="{{ route('representante.login.submit') }}" method="POST" class="cadastroRepresentante">
                     @csrf
                     <div class="form-group">
