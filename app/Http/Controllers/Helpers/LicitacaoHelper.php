@@ -10,9 +10,10 @@ class LicitacaoHelper extends Controller
     public static function modalidades()
     {
         $modalidades = [
+            'Carta Convite',
             'Concorrência Pública',
             'Concurso',
-            'Carta Convite',
+            'Credenciamento',
             'Leilão',
             'Pregão Eletrônico SRP',
             'Pregão Eletrônico Tradicional',
