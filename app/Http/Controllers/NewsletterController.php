@@ -15,7 +15,7 @@ class NewsletterController extends Controller
     public function store(Request $request)
     {
         $regras = [
-            'nomeNl' => 'required|regex:/^[a-zA-Záéíãõâêô]+$/',
+            'nomeNl' => 'required|max:191|regex:/^[a-zA-Z ÁáÉéÍíÓóÚúÃãÕõÂâÊêÔô]+$/',
             'emailNl' => 'required|email|unique:newsletters,email',
             'celularNl' => 'required'
         ];

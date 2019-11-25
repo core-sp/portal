@@ -243,7 +243,7 @@ class CursoInscritoController extends Controller
         $idcurso = $request->input('idcurso');
         $regras = [
             'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
-            'nome' => 'required|max:191',
+            'nome' => 'required|max:191|regex:/^[a-zA-Z ÁáÉéÍíÓóÚúÃãÕõÂâÊêÔô]+$/',
             'telefone' => 'required|max:191|min:14',
             'email' => 'email|max:191',
             'registrocore' => 'max:191'
@@ -251,6 +251,7 @@ class CursoInscritoController extends Controller
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
             'email' => 'Email inválido',
+            'nome.regex' => 'Nome inválido',
             'cpf.unique' => 'O CPF informado já está cadastrado neste curso',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
             'telefone.min' => 'Telefone inválido'
