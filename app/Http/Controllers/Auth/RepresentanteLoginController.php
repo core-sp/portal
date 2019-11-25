@@ -47,12 +47,19 @@ class RepresentanteLoginController extends Controller
         $representante = Representante::where('cpf_cnpj', '=', $cpfCnpj)->first();
 
         if(isset($representante)) {
-            if($representante->ativo === 0)
-                return false;
-            else
-                return true;
+            if($representante->ativo === 0) {
+                return [
+                    'message' => 'Por favor, acesse o email informado no momento do cadastro para verificar sua conta.',
+                    'class' => 'alert-warning'
+                ];
+            } else {
+                return [];
+            }
         } else {
-            return false;
+            return [
+                'message' => 'Login inválido.',
+                'class' => 'alert-danger'
+            ];
         }
     }
 
@@ -67,8 +74,8 @@ class RepresentanteLoginController extends Controller
 
         $cpfCnpj = preg_replace('/[^0-9]+/', '', $request->cpf_cnpj);
 
-        if(!$this->verificaSeAtivo($cpfCnpj))
-            return $this->redirectWithErrors($request->only('cpf_cnpj', 'remember'));
+        if(!empty($this->verificaSeAtivo($cpfCnpj)))
+            return $this->redirectWithErrors($request->only('cpf_cnpj', 'remember'), $this->verificaSeAtivo($cpfCnpj)['message'], $this->verificaSeAtivo($cpfCnpj)['class']);
 
         $this->verificaGerentiLogin($request->cpf_cnpj);
 
@@ -84,13 +91,13 @@ class RepresentanteLoginController extends Controller
         return $this->redirectWithErrors($request->only('cpf_cnpj', 'remember'));
     }
 
-    protected function redirectWithErrors($withInput)
+    protected function redirectWithErrors($withInput, $message = 'Login inválido.', $class = 'alert-danger')
     {
         return redirect()
             ->back()
             ->with([
-                'message' => 'Login inválido.',
-                'class' => 'alert-danger'
+                'message' => $message,
+                'class' => $class
             ])->withInput($withInput);
     }
 
