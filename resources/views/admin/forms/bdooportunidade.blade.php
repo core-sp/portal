@@ -15,41 +15,44 @@ $status = BdoOportunidadeControllerHelper::status();
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
         <div class="form-row">
-        <div class="col">
-            <label for="titulo">Título</label>
-            <input type="text"
-                name="titulo"
-                class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
-                placeholder="Título"
-                @if(!empty(old('titulo')))
-                    value="{{ old('titulo') }}"
-                @else
-                    @if(isset($resultado))
-                        value="{{ $resultado->titulo }}"
+            <div class="col">
+                <label for="titulo">Título</label>
+                <input type="text"
+                    name="titulo"
+                    class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
+                    placeholder="Título"
+                    @if(!empty(old('titulo')))
+                        value="{{ old('titulo') }}"
+                    @else
+                        @if(isset($resultado))
+                            value="{{ $resultado->titulo }}"
+                        @endif
                     @endif
+                    />
+                @if($errors->has('titulo'))
+                <div class="invalid-feedback">
+                {{ $errors->first('titulo') }}
+                </div>
                 @endif
-                />
-            @if($errors->has('titulo'))
-            <div class="invalid-feedback">
-            {{ $errors->first('titulo') }}
             </div>
-            @endif
+            <div class="col">
+                <label for="empresafake">Empresa&nbsp;&nbsp;<a href="/admin/bdo/empresas/editar/{{ isset($resultado->empresa->idempresa) ? $resultado->empresa->idempresa : $empresa->idempresa }}" target="_blank"><small>Editar empresa</small></a></label>
+                <input type="text"
+                    name="empresafake"
+                    class="form-control"
+                    placeholder="{{ isset($resultado->empresa->razaosocial) ? $resultado->empresa->razaosocial : $empresa->razaosocial }}"
+                    readonly />
+            </div>
         </div>
-        <div class="col">
-            <label for="empresafake">Empresa&nbsp;&nbsp;<a href="/admin/bdo/empresas/editar/{{ isset($resultado->empresa->idempresa) ? $resultado->empresa->idempresa : $empresa->idempresa }}" target="_blank"><small>Editar empresa</small></a></label>
-            <input type="text"
-                name="empresafake"
-                class="form-control"
-                placeholder="{{ isset($resultado->empresa->razaosocial) ? $resultado->empresa->razaosocial : $empresa->razaosocial }}"
-                readonly />
-        </div>
-        </div>
+        @php
+            isset($resultado->segmento) ? $seg = $resultado->segmento : $seg = $empresa->segmento;
+        @endphp
         <div class="form-row mt-2">
             <div class="col">
                 <div class="row nomargin">
                     <label for="segmento">Segmento</label>
                     <select name="segmento" class="form-control" id="segmento">
-                    @foreach(segmentosWithAddons($resultado->segmento) as $segmento)
+                    @foreach(segmentosWithAddons($seg) as $segmento)
                         @if(!empty(old('segmento')))
                             @if(old('segmento') === $segmento)
                                 <option class="{{ $segmento }}" selected>{{ $segmento }}</option>
@@ -57,8 +60,8 @@ $status = BdoOportunidadeControllerHelper::status();
                                 <option class="{{ $segmento }}">{{ $segmento }}</option>
                             @endif
                         @else
-                            @if(isset($resultado))
-                                @if($resultado->segmento == $segmento)
+                            @if(isset($seg))
+                                @if($seg == $segmento)
                                     <option class="{{ $segmento }}" selected>{{ $segmento }}</option>
                                 @else
                                     <option value="{{ $segmento }}">{{ $segmento }}</option>
