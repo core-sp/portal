@@ -15,12 +15,14 @@ class NewsletterController extends Controller
     public function store(Request $request)
     {
         $regras = [
-            'nomeNl' => 'required',
-            'emailNl' => 'required|unique:newsletters,email',
+            'nomeNl' => 'required|regex:/^[a-zA-Záéíãõâêô]+$/',
+            'emailNl' => 'required|email|unique:newsletters,email',
             'celularNl' => 'required'
         ];
         $mensagens = [
             'nomeNl.required' => 'O nome é obrigatório',
+            'nomeNl.regex' => 'Nome inválido',
+            'emailNl.email' => 'Email inválido',
             'emailNl.required' => 'O email é obrigatório',
             'celularNl.required' => 'O celular é obrigatório',
             'emailNl.unique' => 'Este email já está cadastrado em nosso sistema'
