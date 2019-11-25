@@ -54,8 +54,8 @@ class SimuladorControllerHelper extends Controller
             <p>Com a aprovação do novo Código Civil em 11 de janeiro de 2003 (através da Lei Nº 10.406, de 10 de janeiro de 2002), <strong>a maioridade civil passou a ser a partir dos 18 anos no Brasil.</strong></p>
             <p>Apresentar cópia dos documentos abaixo relacionados:</p>
             <ol type="a">
-                <li>Cédula de identidade e CPF;</li>
-                <li>Comprovante de residência;</li>
+                <li>Carteira de Identidade, CNH (data de expedição -10 anos), e ou RNE para estrangeiros;</li>
+                <li>Comprovante de residência recente (máximo 03 meses);</li>
                 <li>2 fotos 3x4 (sem data);</li>
                 <li>Comprovante de quitação com o serviço militar, para os profissionais do sexo masculino que tenham até 45 anos (exceto estrangeiro);</li>
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>
@@ -75,8 +75,8 @@ class SimuladorControllerHelper extends Controller
             <p>Com a aprovação do novo Código Civil em 11 de janeiro de 2003 (através da Lei Nº 10.406, de 10 de janeiro de 2002), <strong>a maioridade civil passou a ser a partir dos 18 anos no Brasil.</strong></p>
             <p>Apresentar cópia dos documentos abaixo relacionados:</p>
             <ol type="a">
-                <li>Cédula de identidade e CPF;</li>
-                <li>Comprovante de residência;</li>
+                <li>Carteira de Identidade, CNH (data de expedição -10 anos), e ou RNE para estrangeiros;</li>
+                <li>Comprovante de residência recente (máximo 03 meses);</li>
                 <li>2 fotos 3x4 (sem data);</li>
                 <li>Comprovante de quitação com o serviço militar, para os profissionais do sexo masculino que tenham até 45 anos (exceto estrangeiro);</li>
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>

@@ -23,7 +23,7 @@
                         <p class="pb-0 branco">Estado: <strong>{{ $item->estado }}</strong></p>
                         <p class="pb-0 branco">CEP: <strong>{{ $item->cep }}</strong></p>
                         <p class="pb-2 branco"><small><i>(Novo endereço para correspondência)</i></small></p>
-                        <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-danger' : 'text-light' }} text-uppercase">{{ $item->status }}</strong><i>{{ isset($item->observacao) ? ' — ' . $item->observacao : '' }}</i></p>
+                        <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-danger' : 'text-warning' }} text-uppercase">{{ $item->status }}</strong><i>{{ isset($item->observacao) ? ' — ' . $item->observacao : '' }}</i></p>
                     </div>
                 @endforeach
             </div>
@@ -39,7 +39,7 @@
         <div class="contatos-table space-single">
             @if(Auth::guard('representante')->user()->enderecos()['CEP'] !== null)
                 @foreach (Auth::guard('representante')->user()->enderecos() as $key => $item)
-                    <p class="pb-0">{{ $key }}: <strong>{{ !empty($item) ? $item : '-----' }}</strong></p>
+                    <p class="pb-0">{{ $key }}: <strong class="text-uppercase">{{ !empty($item) ? $item : '-----' }}</strong></p>
                 @endforeach
             @else
                 <p class="pb-0">Nenhum endereço cadastrado.</p>
