@@ -97,8 +97,8 @@ class SimuladorControllerHelper extends Controller
             <p>As pessoas jurídicas legalmente constituídas para os serviços de Representação Comercial, agência, agenciamento, intermediação de negócios, intermediação por conta de terceiros, distribuição ou atividade equivalente estão obrigadas a se registrarem no Conselho Regional em cuja jurisdição exerçam suas atividades, sendo-lhes exigidos CÓPIA LEGIVEL dos seguintes documentos:</p>
             <ol type="a">
                 <li>Contrato social e alterações contratuais consolidadas devidamente registradas no órgão competente e inscrição no CNPJ;</li>
-                <li>Documento de identidade (RG) e CPF de todos os sócios;</li>
-                <li>Comprovante de residência de todos os sócios;</li>
+                <li>Carteira de Identidade, CNH (data de expedição -10 anos), e ou RNE para estrangeiros de todos os sócios;</li>
+                <li>Comprovante de residência recente (máximo 03 meses) de todos os sócios;</li>
                 <li>Quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009 (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
                 <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma;</li>
                 <li>Alvará de localização e inscrição ISS;</li>
@@ -106,8 +106,8 @@ class SimuladorControllerHelper extends Controller
             <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
             <h4 class="mt-4">RELAÇÃO DE DOCUMENTOS DO RESPONSÁVEL TÉCNICO EXIGIDOS PARA O REGISTRO:</h4>
             <ol type="a">
-                <li>Cédula de identidade e CPF;</li>
-                <li>Comprovante de residência;</li>
+                <li>Carteira de Identidade, CNH (data de expedição -10 anos), e ou RNE para estrangeiros;</li>
+                <li>Comprovante de residência recente (máximo 03 meses);</li>
                 <li>2 fotos 3x4 (sem data);</li>
                 <li>Comprovante de quitação com o serviço militar, para os profissionais do sexo masculino que tenham até 45 anos (exceto estrangeiro);</li>
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>
