@@ -194,7 +194,9 @@ use \App\Http\Controllers\Helper;
 
       <header id="fixed-menu" class="pb-2">
         <div class="container">
-          <img src="{{ asset('img/brasao.png') }}" alt="Core-SP" />
+          <a href="/">
+            <img src="{{ asset('img/brasao.png') }}" alt="Core-SP" />
+          </a>
           <div class="row" id="append-menu">
             
           </div>

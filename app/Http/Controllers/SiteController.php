@@ -46,25 +46,42 @@ class SiteController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
+        $buscaArray = preg_split('/\s+/', $busca, -1);
+
         if(isset($busca)) {
             $resultados = collect();
             $paginas = Pagina::select('titulo','subtitulo','slug','created_at','conteudo')
-                ->where('titulo','LIKE','%'.$busca.'%')
-                ->orWhere('subtitulo','LIKE','%'.$busca.'%')
-                ->orWhere('conteudo','LIKE','%'.$busca.'%')
-                ->limit(10)
+                ->where(function($query) use ($buscaArray) {
+                    foreach($buscaArray as $b) {
+                        $query->where(function($q) use ($b) {
+                            $q->where('titulo','LIKE','%'.$b.'%')
+                                ->orWhere('subtitulo','LIKE','%'.$b.'%')
+                                ->orWhere('conteudo','LIKE','%'.$b.'%');
+                        });
+                    }
+                })->limit(10)
                 ->get();
             $noticias = Noticia::select('titulo','slug','created_at','conteudo')
-                ->where('titulo','LIKE','%'.$busca.'%')
-                ->orWhere('conteudo','LIKE','%'.$busca.'%')
-                ->orderBy('created_at', 'DESC')
+                ->where(function($query) use ($buscaArray) {
+                    foreach($buscaArray as $b) {
+                        $query->where(function($q) use ($b) {
+                            $q->where('titulo','LIKE','%'.$b.'%')
+                                ->orWhere('conteudo','LIKE','%'.$b.'%');
+                        });
+                    }
+                })->orderBy('created_at', 'DESC')
                 ->limit(10)
                 ->get();
             $posts = Post::select('titulo', 'subtitulo', 'slug', 'created_at', 'conteudo')
-                ->where('titulo','LIKE','%'.$busca.'%')
-                ->orWhere('subtitulo','LIKE','%'.$busca.'%')
-                ->orWhere('conteudo','LIKE','%'.$busca.'%')
-                ->orderBy('created_at', 'DESC')
+                ->where(function($query) use ($buscaArray) {
+                    foreach($buscaArray as $b) {
+                        $query->where(function($q) use ($b) {
+                            $q->where('titulo','LIKE','%'.$b.'%')
+                                ->orWhere('subtitulo','LIKE','%'.$b.'%')
+                                ->orWhere('conteudo','LIKE','%'.$b.'%');
+                        });
+                    }
+                })->orderBy('created_at', 'DESC')
                 ->limit(10)
                 ->get();
             foreach($paginas as $pagina) {
