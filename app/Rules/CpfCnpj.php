@@ -13,7 +13,7 @@ class CpfCnpj implements Rule
 
     public function passes($attribute, $value)
     {
-        if(strlen($value) === 14 || strlen($value) === 11) {
+        if(strlen($value) === 11) {
             // Elimina possivel mascara
             $cpf = preg_replace("/[^0-9]/", "", $value);
             $cpf = str_pad($cpf, 11, '0', STR_PAD_LEFT);
