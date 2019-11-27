@@ -54,7 +54,7 @@
     <div class="linha-lg-mini"></div>
     <div class="row">
       <div class="col">
-      <h6 class="light mb-4"><span class="normal">Por: </span>{{ $noticia->user->nome }} | <span class="normal">{{ Helper::onlyDate($noticia->created_at) }}</span> | <span class="normal">{{ Helper::onlyHour($noticia->created_at) }}</span></h6>
+      <h6 class="light mb-4"><span class="normal">Por: </span>{{ $noticia->user->perfil->nome === 'Editor' ? 'Setor de comunicação' : $noticia->user->nome }} | <span class="normal">{{ Helper::onlyDate($noticia->created_at) }}</span> | <span class="normal">{{ Helper::onlyHour($noticia->created_at) }}</span></h6>
       </div>
     </div>
     <div class="row">
