@@ -65,14 +65,16 @@ class RepresentanteLoginController extends Controller
 
     public function login(Request $request)
     {
+        $cpfCnpj = preg_replace('/[^0-9]+/', '', $request->cpf_cnpj);
+
+        $request->request->set('cpf_cnpj', $cpfCnpj);
+
         $this->validate($request, [
             'cpf_cnpj' => ['required', new CpfCnpj],
             'password' => 'required'
         ], [
             'required' => 'Campo obrigatório'
         ]);
-
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', $request->cpf_cnpj);
 
         if(!empty($this->verificaSeAtivo($cpfCnpj)))
             return $this->redirectWithErrors($request->only('cpf_cnpj', 'remember'), $this->verificaSeAtivo($cpfCnpj)['message'], $this->verificaSeAtivo($cpfCnpj)['class']);
