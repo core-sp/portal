@@ -126,7 +126,7 @@ class RepresentanteSiteController extends Controller
                 ->withInput(Input::all());
         }
 
-        $this->saveRepresentante($checkGerenti['ASS_ID'], $checkGerenti['NOME'], $cpfCnpj);
+        $this->saveRepresentante($checkGerenti['ASS_ID'], utf8_encode($checkGerenti['NOME']), $cpfCnpj);
 
         event(new ExternoEvent('"' . $cpfCnpjCru . '" ("' . request('email') . '") cadastrou-se na Área do Representante.'));
 

@@ -75,6 +75,7 @@ class SimuladorControllerHelper extends Controller
             <p>Com a aprovação do novo Código Civil em 11 de janeiro de 2003 (através da Lei Nº 10.406, de 10 de janeiro de 2002), <strong>a maioridade civil passou a ser a partir dos 18 anos no Brasil.</strong></p>
             <p>Apresentar cópia dos documentos abaixo relacionados:</p>
             <ol type="a">
+                <li>Contrato Social de constituição e alterações contratuais consolidadas devidamente registradas no órgão competente;</li>
                 <li>Carteira de Identidade, CNH (data de expedição -10 anos), e ou RNE para estrangeiros;</li>
                 <li>Comprovante de residência recente (máximo 03 meses);</li>
                 <li>2 fotos 3x4 (sem data);</li>
