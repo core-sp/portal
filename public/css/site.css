@@ -366,7 +366,9 @@ figure.align-left {
 #header-principal {
 	top: 0;
 	left: 0;
-	background-color: #004587;
+	background-color: #d11111;
+	background-image: url('/img/snowing.gif');
+	background-repeat: repeat-x;
 }
 
 .header-margin {
