@@ -264,7 +264,7 @@ class RepresentanteSiteController extends Controller
 
     public function deletarContato(Request $request)
     {
-        $this->gerentiDeletarContato(Auth::guard('representante')->user()->ass_id, $request->id, $request->status);
+        $this->gerentiDeletarContato(Auth::guard('representante')->user()->ass_id, $request);
 
         if($request->status === '1') {
             $msg = 'Contato ativado com sucesso!';
