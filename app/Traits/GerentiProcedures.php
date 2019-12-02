@@ -172,7 +172,7 @@ trait GerentiProcedures
 
         $id !== 0 ? $nameProc = 'SP_CONTATOXPESS_U' : $nameProc = 'SP_CONTATOXPESS_I';
 
-        $run = $this->gerentiConnection->prepare("execute procedure ".$nameProc."(:ass_id, :id, 0, 210, CAST('NOW' AS DATE), :conteudo, :tipo, 'Inserido pelo usuário no Portal Core-SP', 1)");
+        $run = $this->gerentiConnection->prepare("execute procedure ".$nameProc."(:ass_id, :id, 0, 210, CAST('NOW' AS DATE), :conteudo, :tipo, '', 1)");
         $run->execute([
             'ass_id' => $ass_id,
             'id' => $id,
@@ -181,15 +181,15 @@ trait GerentiProcedures
         ]);
     }
 
-    public function gerentiDeletarContato($ass_id, $id, $status)
+    public function gerentiDeletarContato($ass_id, $request)
     {
         $this->connect();
 
-        $run = $this->gerentiConnection->prepare("execute procedure SP_CONTATO_STATUS(:ass_id, :id, :status)");
+        $run = $this->gerentiConnection->prepare("execute procedure SP_CONTATO_STATUS(:ass_id, :id, :status, 210)");
         $run->execute([
             'ass_id' => $ass_id,
-            'id' => $id,
-            'status' => $status
+            'id' => $request->id,
+            'status' => $request->status
         ]);
     }
 
