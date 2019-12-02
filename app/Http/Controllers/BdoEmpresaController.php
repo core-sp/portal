@@ -208,9 +208,14 @@ class BdoEmpresaController extends Controller
     {
         $cnpj = preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj);
 
-        return BdoEmpresa::select('idempresa', 'cnpj', 'razaosocial', 'fantasia', 'telefone', 'segmento', 'endereco', 'site', 'email')
+       $empresa = BdoEmpresa::select('idempresa', 'cnpj', 'razaosocial', 'fantasia', 'telefone', 'segmento', 'endereco', 'site', 'email')
             ->where('cnpj', '=', $cnpj)
-            ->first()
-            ->toJson();
+            ->first();
+
+        if(isset($empresa)) {
+            return $empresa->toJson();
+        } else {
+            abort(500);
+        }
     }
 }
