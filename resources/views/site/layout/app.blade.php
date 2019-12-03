@@ -50,7 +50,7 @@ use \App\Http\Controllers\Helper;
       <header id="header-principal">
         <div class="container-fluid">
           <div class="row">
-            <div class="linha-azul-escuro w-100"></div>
+            <div class="linha-verde w-100"></div>
           </div>
         </div>
         <div class="container">
