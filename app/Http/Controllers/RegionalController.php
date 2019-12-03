@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Auth;
 use App\Regional;
-use App\Noticia;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RegionalController extends Controller
 {
@@ -124,7 +122,7 @@ class RegionalController extends Controller
 
     public function busca()
     {
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Regional::where('regional','LIKE','%'.$busca.'%')
             ->orWhere('email','LIKE','%'.$busca.'%')

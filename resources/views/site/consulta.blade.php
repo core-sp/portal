@@ -6,10 +6,6 @@
 
 @section('content')
 
-@php
-    use Illuminate\Support\Facades\Input;
-@endphp
-
 <section id="pagina-cabecalho" class="mt-1">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/banner-consulta.jpg') }}" />
@@ -71,7 +67,7 @@
                   'event_label': 'Consulta de Situação'
                 });"
               >
-                Consultar {{ Input::get('cpfCnpj') ? 'novamente' : '' }}
+                Consultar {{ Request::input('cpfCnpj') ? 'novamente' : '' }}
               </button>
             </div>
           </form>
@@ -79,7 +75,7 @@
         @if(isset($resultado) && count($resultado) === 1)
           <div class="mt-3">
             <div>
-              <p class="light"><i>Resultados para a busca do CPF/CNPJ:</i> <strong>{{ Input::get('cpfCnpj') }}</strong></p>
+              <p class="light"><i>Resultados para a busca do CPF/CNPJ:</i> <strong>{{ Request::input('cpfCnpj') }}</strong></p>
             </div>
             <hr class="mb-4">
             @if(utf8_encode($resultado[0]['SITUACAO']) === 'Não encontrado')
@@ -88,12 +84,12 @@
               <div class="consulta-box">
                 <div class="consulta-avatar d-flex">
                   <div>
-                    <img src="{{ strlen(Input::get('cpfCnpj')) === 14 ? asset('img/icon-rc.png') : asset('img/icon-empresa.png') }}" alt="Avatar Representante Comercial" />
+                    <img src="{{ strlen(Request::input('cpfCnpj')) === 14 ? asset('img/icon-rc.png') : asset('img/icon-empresa.png') }}" alt="Avatar Representante Comercial" />
                   </div>
                   <div class="flex-one align-self-center ml-3">
                     <h5>{{ utf8_encode($resultado[0]['NOME']) }}</h5>
                     <p><strong>Registro:</strong> {{ substr_replace($resultado[0]['REGISTRONUM'], '/', -4, 0) }}</p>
-                    <p><strong>{{ strlen(Input::get('cpfCnpj')) === 14 ? 'CPF:' : 'CNPJ:' }}</strong> {{ Input::get('cpfCnpj') }}</p>
+                    <p><strong>{{ strlen(Request::input('cpfCnpj')) === 14 ? 'CPF:' : 'CNPJ:' }}</strong> {{ Request::input('cpfCnpj') }}</p>
                     <p class="mt-2"><strong>Situação:</strong> {!! badgeConsulta($resultado[0]['SITUACAO']) !!}</p>
                   </div>
                 </div>

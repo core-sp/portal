@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Licitacao;
-use Redirect;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class LicitacaoSiteController extends Controller
 {
@@ -27,13 +25,13 @@ class LicitacaoSiteController extends Controller
 
     public function buscaLicitacoes()
     {
-        $buscaPalavraChave = html_entity_decode(Input::get('palavra-chave'));
+        $buscaPalavraChave = html_entity_decode(IlluminateRequest::input('palavra-chave'));
         $buscaPalavraChave = htmlentities($buscaPalavraChave);
-        $buscaModalidade = Input::get('modalidade');
-        $buscaSituacao = Input::get('situacao');
-        $buscaNrLicitacao = Input::get('nrlicitacao');
-        $buscaNrProcesso = Input::get('nrprocesso');
-        $dia = Input::get('datarealizacao');
+        $buscaModalidade = IlluminateRequest::input('modalidade');
+        $buscaSituacao = IlluminateRequest::input('situacao');
+        $buscaNrLicitacao = IlluminateRequest::input('nrlicitacao');
+        $buscaNrProcesso = IlluminateRequest::input('nrprocesso');
+        $dia = IlluminateRequest::input('datarealizacao');
         if(isset($dia)) {
             $diaArray = explode('/',$dia);
             $checaDia = checkdate($diaArray[1], $diaArray[0], $diaArray[2]);

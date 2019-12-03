@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
 use App\User;
 use App\Regional;
 use App\Perfil;
 use App\Http\Controllers\ControleController;
 use App\Http\Controllers\Helper;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class UserController extends Controller
 {
@@ -306,7 +306,7 @@ class UserController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = User::where('nome','LIKE','%'.$busca.'%')
             ->orWhere('email','LIKE','%'.$busca.'%')

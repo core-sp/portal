@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\PaginaCategoria;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class PaginaCategoriaController extends Controller
 {
@@ -159,7 +159,7 @@ class PaginaCategoriaController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->parent, 'index');
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = PaginaCategoria::where('nome','LIKE','%'.$busca.'%')
             ->paginate(10);

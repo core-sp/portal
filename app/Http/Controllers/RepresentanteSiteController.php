@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Input;
 use App\Traits\GerentiProcedures;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
 {
@@ -123,7 +124,7 @@ class RepresentanteSiteController extends Controller
             return redirect()
                 ->route('representante.cadastro')
                 ->with('message', $checkGerenti['Error'])
-                ->withInput(Input::all());
+                ->withInput(IlluminateRequest::all());
         }
 
         $this->saveRepresentante($checkGerenti['ASS_ID'], utf8_encode($checkGerenti['NOME']), $cpfCnpj);
@@ -293,7 +294,7 @@ class RepresentanteSiteController extends Controller
 
     public function eventoBoleto()
     {
-        $descricao = Input::get('descricao');
+        $descricao = IlluminateRequest::input('descricao');
         event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") imprimiu o boleto "' . $descricao . '"'));
     }
 }

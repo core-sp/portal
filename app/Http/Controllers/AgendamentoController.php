@@ -6,15 +6,14 @@ use Illuminate\Http\Request;
 use App\Agendamento;
 use App\Regional;
 use App\User;
-use Carbon\Carbon;
 use App\Http\Controllers\Helper;
-use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 use App\Http\Controllers\ControleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 use Redirect;
 
 class AgendamentoController extends Controller
@@ -56,9 +55,9 @@ class AgendamentoController extends Controller
     public function checaFiltros()
     {
         ControleController::autoriza($this->class, 'index');
-        if(Input::has('mindia')) {
-            if(!empty(Input::get('mindia'))) {
-                $mindia = Input::get('mindia');
+        if(IlluminateRequest::has('mindia')) {
+            if(!empty(IlluminateRequest::input('mindia'))) {
+                $mindia = IlluminateRequest::input('mindia');
                 $replace = str_replace('/','-',$mindia);
                 $mindia = new \DateTime($replace);
                 $mindia = $mindia->format('Y-m-d');
@@ -70,9 +69,9 @@ class AgendamentoController extends Controller
             $date = new \DateTime();
             $mindia = $date->format('Y-m-d');
         }
-        if(Input::has('maxdia')) {
-            if(!empty(Input::get('maxdia'))) {
-                $maxdia = Input::get('maxdia');
+        if(IlluminateRequest::has('maxdia')) {
+            if(!empty(IlluminateRequest::input('maxdia'))) {
+                $maxdia = IlluminateRequest::input('maxdia');
                 $replace = str_replace('/','-',$maxdia);
                 $maxdia = new \DateTime($replace);
                 $maxdia = $maxdia->format('Y-m-d');
@@ -84,9 +83,9 @@ class AgendamentoController extends Controller
             $date = new \DateTime();
             $maxdia = $date->format('Y-m-d');
         }
-        if(Input::has('regional')) {
-            if(Input::get('regional') !== '999') {
-                $regional = Input::get('regional');
+        if(IlluminateRequest::has('regional')) {
+            if(IlluminateRequest::input('regional') !== '999') {
+                $regional = IlluminateRequest::input('regional');
             } else {
                 $regional = '';
             }
@@ -94,9 +93,9 @@ class AgendamentoController extends Controller
             $regional = Regional::select('idregional')->find(Auth::user()->idregional);
             $regional = $regional->idregional;
         }
-        if(Input::has('status')) {
-            if(!empty(Input::get('status'))) {
-                $status = Input::get('status');
+        if(IlluminateRequest::has('status')) {
+            if(!empty(IlluminateRequest::input('status'))) {
+                $status = IlluminateRequest::input('status');
                 if($status === 'Qualquer') {
                     $status = null;
                 }
@@ -160,18 +159,18 @@ class AgendamentoController extends Controller
         ControleController::autoriza($this->class, __FUNCTION__);
         $regional = Auth::user()->idregional;
         // Checa se tem filtro
-        if(Input::get('filtro') === 'sim') {
+        if(IlluminateRequest::input('filtro') === 'sim') {
             $temFiltro = true;
-            if(!empty(Input::get('mindia'))) {
-                $mindiaArray = explode('/',Input::get('mindia'));
+            if(!empty(IlluminateRequest::input('mindia'))) {
+                $mindiaArray = explode('/',IlluminateRequest::input('mindia'));
                 $checaMindia = checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
                 if($checaMindia === false) {
                     return Redirect::back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
                         ->with('class', 'alert-danger');
                 }
             } 
-            if(!empty(Input::get('maxdia'))) {
-                $maxdiaArray = explode('/',Input::get('maxdia'));
+            if(!empty(IlluminateRequest::input('maxdia'))) {
+                $maxdiaArray = explode('/',IlluminateRequest::input('maxdia'));
                 $checaMaxdia = checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
                 if($checaMaxdia === false) {
                     return Redirect::back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
@@ -208,14 +207,14 @@ class AgendamentoController extends Controller
             $select .= '<div class="form-group mb-0 col">';
             $select .= '<label>Seccional</label>';
             $select .= '<select class="custom-select custom-select-sm mr-2" id="regional" name="regional">';
-            if(Input::get('regional') === '999') {
+            if(IlluminateRequest::input('regional') === '999') {
                 $select .= '<option value="999" selected>Todas</option>';
             } else {
                 $select .= '<option value="999">Todas</option>';
             }
             foreach($regionais as $regional) {
-                if(Input::has('regional')) {
-                    if($regional->idregional == Input::get('regional')) {
+                if(IlluminateRequest::has('regional')) {
+                    if($regional->idregional == IlluminateRequest::input('regional')) {
                         $select .= '<option value="'.$regional->idregional.'" selected>'.$regional->regional.'</option>';
                     } else {
                         $select .= '<option value="'.$regional->idregional.'">'.$regional->regional.'</option>';
@@ -230,15 +229,15 @@ class AgendamentoController extends Controller
         $select .= '<div class="form-group mb-0 col">';
         $select .= '<label>Status</label>';
         $select .= '<select class="custom-select custom-select-sm" name="status">';
-        if(Input::get('status') === 'Qualquer')
+        if(IlluminateRequest::input('status') === 'Qualquer')
             $select .= '<option value="Qualquer" selected>Qualquer</option>';
         else
             $select .= '<option value="Qualquer">Qualquer</option>';
         // Pega os status
         $status = AgendamentoControllerHelper::status();
         foreach($status as $s) {
-            if(Input::has('status')) {
-                if(Input::get('status') === $s) {
+            if(IlluminateRequest::has('status')) {
+                if(IlluminateRequest::input('status') === $s) {
                     $select .= '<option value="'.$s.'" selected>'.$s.'</option>';
                 } else {
                     $select .= '<option value="'.$s.'">'.$s.'</option>';
@@ -252,8 +251,8 @@ class AgendamentoController extends Controller
         $select .= '<div class="form-group mb-0 col">';
         $hoje = date('d\/m\/Y');
         $select .= '<label>De</label>';
-        if(Input::has('mindia')) {
-            $mindia = Input::get('mindia');
+        if(IlluminateRequest::has('mindia')) {
+            $mindia = IlluminateRequest::input('mindia');
             $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="'.$mindia.'" />';
         } else {
             $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="'.$hoje.'" />';
@@ -261,8 +260,8 @@ class AgendamentoController extends Controller
         $select .= '</div>';
         $select .= '<div class="form-group mb-0 col">';
         $select .= '<label>Até</label>';
-        if(Input::has('maxdia')) {
-            $maxdia = Input::get('maxdia');
+        if(IlluminateRequest::has('maxdia')) {
+            $maxdia = IlluminateRequest::input('maxdia');
             $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="'.$maxdia.'" />';
         } else {
             $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="'.$hoje.'" />';
@@ -278,8 +277,8 @@ class AgendamentoController extends Controller
 
     public function status($status, $id, $usuario = null)
     {
-        if(Input::has('regional') && session('idperfil') === 8) {
-            if(Input::get('regional') !== Auth::user()->idregional)
+        if(IlluminateRequest::has('regional') && session('idperfil') === 8) {
+            if(IlluminateRequest::input('regional') !== Auth::user()->idregional)
                 abort(401);
         }
         switch ($status) {
@@ -384,7 +383,7 @@ class AgendamentoController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Agendamento::where('nome','LIKE','%'.$busca.'%')
             ->orWhere('idagendamento','LIKE', $busca)

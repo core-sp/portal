@@ -7,7 +7,6 @@
 @section('content')
 
 @php
-    use Illuminate\Support\Facades\Input;
     use \App\Http\Controllers\Helpers\SimuladorControllerHelper;
 @endphp
 
@@ -49,7 +48,7 @@
                 <label for="tipoPessoa">Tipo de Pessoa</label>
                 <select name="tipoPessoa" id="tipoPessoa" class="form-control">
                   @foreach(SimuladorControllerHelper::tipoPessoa() as $key => $tipo)
-                    <option value="{{ $key }}" {{ Input::get('tipoPessoa') == $key || old('tipoPessoa') == $key ? 'selected' : '' }}>{{ $tipo }}</option>
+                    <option value="{{ $key }}" {{ Request::input('tipoPessoa') == $key || old('tipoPessoa') == $key ? 'selected' : '' }}>{{ $tipo }}</option>
                   @endforeach
                 </select>
               </div>
@@ -60,8 +59,8 @@
                   name="dataInicio"
                   id="dataInicio" 
                   class="form-control dataInput {{ $errors->has('dataInicio') ? 'is-invalid' : '' }}"
-                  @if(Input::get('dataInicio'))
-                    value="{{ Input::get('dataInicio') }}"
+                  @if(Request::input('dataInicio'))
+                    value="{{ Request::input('dataInicio') }}"
                   @elseif($errors->has('dataInicio'))
                     value=""
                   @else
@@ -79,7 +78,7 @@
                 @endif
               </div>
             </div>
-            <div class="form-row mt-2" id="simuladorAddons" style="{{ Input::get('tipoPessoa') === '1' || old('tipoPessoa') === '1' ? 'display: flex;' : '' }}">
+            <div class="form-row mt-2" id="simuladorAddons" style="{{ Request::input('tipoPessoa') === '1' || old('tipoPessoa') === '1' ? 'display: flex;' : '' }}">
               <div class="col-sm-6 mb-2-576">
                 <label for="capitalSocial">Capital Social</label>
                 <div class="input-group">
@@ -91,7 +90,7 @@
                     id="capitalSocial"
                     name="capitalSocial"
                     class="form-control capitalSocial"
-                    value="{{ Input::get('capitalSocial') ? Input::get('capitalSocial') : '1,00' }}"
+                    value="{{ Request::input('capitalSocial') ? Request::input('capitalSocial') : '1,00' }}"
                     maxlength="15"
                   />
                 </div>
@@ -103,14 +102,14 @@
                     name="filialCheck"
                     id="filialCheck"
                     class="form-check-input"
-                    {{ Input::get('filialCheck') == 'on' ? 'checked' : '' }}
+                    {{ Request::input('filialCheck') == 'on' ? 'checked' : '' }}
                   />
                   <label for="form-check-label" for="filialCheck">Filial</label>
                 </div>
-                <select name="filial" id="filial" class="form-control" {{ Input::get('filialCheck') == 'on' ? '' : 'disabled' }}>
-                  <option value="50" {{ Input::get('filial') == 50 ? 'selected' : '' }}></option>
+                <select name="filial" id="filial" class="form-control" {{ Request::input('filialCheck') == 'on' ? '' : 'disabled' }}>
+                  <option value="50" {{ Request::input('filial') == 50 ? 'selected' : '' }}></option>
                   @foreach(SimuladorControllerHelper::listaCores() as $key => $filial)
-                    <option value="{{ $key }}" {{ Input::get('filial') == $key ? 'selected' : '' }}>{{ $filial }}</option>
+                    <option value="{{ $key }}" {{ Request::input('filial') == $key ? 'selected' : '' }}>{{ $filial }}</option>
                   @endforeach
                 </select>
               </div>
@@ -121,7 +120,7 @@
                     name="empresaIndividual"
                     id="empresaIndividual"
                     class="form-check-input"
-                    {{ Input::get('empresaIndividual') == 'on' ? 'checked' : '' }}
+                    {{ Request::input('empresaIndividual') == 'on' ? 'checked' : '' }}
                   />
                   <label for="form-check-label" for="empresaIndividual">Empresa Individual</label>
                 </div>
@@ -138,7 +137,7 @@
                     'event_label': 'Simulador de Valores'
                   });"
                 >
-                  Simular {{ Input::has('dataInicio') ? ' novamente' : '' }}
+                  Simular {{ Request::input('dataInicio') ? ' novamente' : '' }}
                 </button>
                 <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading"></div>
               </div>
@@ -148,7 +147,7 @@
         <div id="simuladorTxt">
         @if(isset($total) || isset($extrato) || isset($taxas))
           <div class="row nomargin mt-4">
-            <h4 class="mb-1">Pessoa {{ SimuladorControllerHelper::tipoPessoa()[Input::get('tipoPessoa')] }} {{ Input::get('filial') && Input::get('filial') !== '50' ? ' (' . SimuladorControllerHelper::listaCores()[Input::get('filial')] . ')' : '' }}</h4>
+            <h4 class="mb-1">Pessoa {{ SimuladorControllerHelper::tipoPessoa()[Request::input('tipoPessoa')] }} {{ Request::input('filial') && Request::input('filial') !== '50' ? ' (' . SimuladorControllerHelper::listaCores()[Request::input('filial')] . ')' : '' }}</h4>
             <table class="table table-sm table-hover mb-0 tableSimulador">
               <thead>
                 <tr>

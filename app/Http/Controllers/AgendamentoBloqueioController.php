@@ -8,7 +8,7 @@ use App\Regional;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoBloqueioController extends Controller
 {
@@ -236,7 +236,7 @@ class AgendamentoBloqueioController extends Controller
         ControleController::autoriza($this->class, 'index');
         $this->variaveis['slug'] = 'agendamentos/bloqueios';
         $variaveis = (object) $this->variaveis;
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $resultados = AgendamentoBloqueio::whereHas('regional', function($q) use($busca){
             $q->where('regional','LIKE','%'.$busca.'%');
         })->get();

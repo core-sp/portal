@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Rules\CpfCnpj;
 use App\Traits\GerentiProcedures;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteLoginController extends Controller
 {
@@ -37,7 +38,7 @@ class RepresentanteLoginController extends Controller
                 return redirect()
                     ->route('representante.cadastro')
                     ->with('message', 'Desculpe, mas o cadastro informado não está corretamente inscrito no Core-SP. Por favor, verifique se todas as informações foram inseridas corretamente.')
-                    ->withInput(Input::all());
+                    ->withInput(IlluminateRequest::all());
             }
         }
     }
