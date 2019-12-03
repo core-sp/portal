@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\BdoOportunidade;
 use App\BdoEmpresa;
 use App\Regional;
 use App\Http\Controllers\ControleControllers;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoOportunidadeController extends Controller
 {
@@ -150,7 +150,7 @@ class BdoOportunidadeController extends Controller
     public function create()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $id = Input::get('empresa');
+        $id = IlluminateRequest::input('empresa');
         $empresa = BdoEmpresa::findOrFail($id);
         $regioes = Regional::all();
         if (isset($empresa)) {
@@ -254,7 +254,7 @@ class BdoOportunidadeController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = BdoOportunidade::where('descricao','LIKE','%'.$busca.'%')
             ->paginate(10);

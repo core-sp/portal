@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Concurso;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class ConcursoSiteController extends Controller
 {
@@ -26,10 +25,10 @@ class ConcursoSiteController extends Controller
 
     public function buscaConcursos()
     {
-        $buscaModalidade = Input::get('modalidade');
-        $buscaSituacao = Input::get('situacao');
-        $buscaNrProcesso = Input::get('nrprocesso');
-        $dia = Input::get('datarealizacao');
+        $buscaModalidade = IlluminateRequest::input('modalidade');
+        $buscaSituacao = IlluminateRequest::input('situacao');
+        $buscaNrProcesso = IlluminateRequest::input('nrprocesso');
+        $dia = IlluminateRequest::input('datarealizacao');
         if(isset($dia)) {
             $diaArray = explode('/',$dia);
             $checaDia = checkdate($diaArray[1], $diaArray[0], $diaArray[2]);

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Input;
 use App\Events\ExternoEvent;
 use Response;
 use Auth;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
@@ -340,7 +341,7 @@ class CursoInscritoController extends Controller
     public function busca($id)
     {
         ControleController::autoriza('CursoInscritoController', 'index');
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $curso = Curso::findOrFail($id);
         $now = date('Y-m-d H:i:s');
         $resultados = CursoInscrito::where('idcurso',$id)

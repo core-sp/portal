@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Concurso;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class ConcursoController extends Controller
 {
@@ -269,7 +269,7 @@ class ConcursoController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Concurso::where('modalidade','LIKE','%'.$busca.'%')
             ->orWhere('nrprocesso','LIKE','%'.$busca.'%')

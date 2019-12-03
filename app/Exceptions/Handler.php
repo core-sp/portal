@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Arr;
 use Log;
 
 class Handler extends ExceptionHandler
@@ -26,7 +27,7 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if($exception instanceof AuthenticationException){
-            $guard = array_get($exception->guards(), 0);
+            $guard = Arr::get($exception->guards(), 0);
             switch($guard){
                 case 'representante':
                     return redirect(route('representante.login'));

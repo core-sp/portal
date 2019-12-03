@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\CrudEvent;
 use App\Post;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class PostsController extends Controller
 {
@@ -184,7 +183,7 @@ class PostsController extends Controller
     {
         $this->authorize('create', new Post());
 
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
 
         $variaveis = (object) $this->variaveis;
 

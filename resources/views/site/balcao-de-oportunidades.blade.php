@@ -10,7 +10,6 @@
 use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
 use \App\Http\Controllers\Helpers\BdoSiteControllerHelper;
 use \App\Http\Controllers\BdoSiteController;
-use Illuminate\Support\Facades\Input;
 $segmentos = BdoOportunidadeControllerHelper::segmentos();
 $regionais = BdoSiteControllerHelper::regionais();
 @endphp
@@ -47,20 +46,20 @@ $regionais = BdoSiteControllerHelper::regionais();
               <label for="palavra-chave">Palavra-chave</label>
               <input type="text"
                 name="palavra-chave"
-                class="form-control {{ !empty(Input::get('palavra-chave')) ? 'bg-focus border-info' : '' }}"
+                class="form-control {{ !empty(Request::input('palavra-chave')) ? 'bg-focus border-info' : '' }}"
                 placeholder="Palavra chave"
                 id="palavrachave"
-                @if(!empty(Input::get('palavra-chave')))
-                value="{{ Input::get('palavra-chave') }}"
+                @if(!empty(Request::input('palavra-chave')))
+                value="{{ Request::input('palavra-chave') }}"
                 @endif
                 />
             </div>
             <div class="col">
               <label for="segmento">Segmento</label>
-              <select name="segmento" class="form-control {{ !empty(Input::get('segmento')) && in_array(Input::get('segmento'), $segmentos) ? 'bg-focus border-info' : '' }}" id="segmento">
+              <select name="segmento" class="form-control {{ !empty(Request::input('segmento')) && in_array(Request::input('segmento'), $segmentos) ? 'bg-focus border-info' : '' }}" id="segmento">
                 <option value="">Todos</option>
                 @foreach($segmentos as $segmento)
-                  @if($segmento === Input::get('segmento'))
+                  @if($segmento === Request::input('segmento'))
                   <option value="{{ $segmento }}" selected>{{ $segmento }}</option>
                   @else
                   <option value="{{ $segmento }}">{{ $segmento }}</option>
@@ -72,10 +71,10 @@ $regionais = BdoSiteControllerHelper::regionais();
           <div class="form-row mt-2">
             <div class="col">
               <label for="regional">Área de atuação</label>
-              <select name="regional" class="form-control {{ !empty(Input::get('regional')) && (Input::get('regional') >= 0 || Input::get('regional') <= 13 || Input::get('regional') === 'todas') ? 'bg-focus border-info' : '' }}">
+              <select name="regional" class="form-control {{ !empty(Request::input('regional')) && (Request::input('regional') >= 0 || Request::input('regional') <= 13 || Request::input('regional') === 'todas') ? 'bg-focus border-info' : '' }}">
                 <option value="todas">Qualquer</option>
                 @foreach($regionais as $regional)
-                  @if($regional->idregional == Input::get('regional'))
+                  @if($regional->idregional == Request::input('regional'))
                   <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
                   @else
                   <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>

@@ -10,6 +10,7 @@ use App\Pagina;
 use App\Licitacao;
 use App\HomeImagem;
 use App\Post;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class SiteController extends Controller
 {
@@ -36,7 +37,7 @@ class SiteController extends Controller
 
     public function busca(Request $request)
     {
-        $busca = htmlentities(Input::get('busca'));
+        $busca = htmlentities(IlluminateRequest::input('busca'));
         $regras = [
             'busca' => 'required|min:3',
         ];

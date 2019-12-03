@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Noticia;
 use App\Regional;
-use App\Curso;
 use Illuminate\Support\Str;
 use App\Http\Controllers\ControleController;
 use Illuminate\Support\Facades\Auth;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class NoticiaController extends Controller
 {
@@ -286,7 +285,7 @@ class NoticiaController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Noticia::where('titulo','LIKE','%'.$busca.'%')
             ->orWhere('conteudo','LIKE','%'.$busca.'%')

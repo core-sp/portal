@@ -13,6 +13,7 @@ use App\Http\Controllers\CrudController;
 use App\Http\Controllers\CursoInscritoController;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class CursoController extends Controller
 {
@@ -305,7 +306,7 @@ class CursoController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $resultados = Curso::where('tipo','LIKE','%'.$busca.'%')
             ->orWhere('tema','LIKE','%'.$busca.'%')
             ->orWhere('descricao','LIKE','%'.$busca.'%')

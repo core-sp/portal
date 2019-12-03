@@ -6,7 +6,6 @@ use App\Events\CrudEvent;
 use App\Representante;
 use App\RepresentanteEndereco;
 use App\Traits\GerentiProcedures;
-use Illuminate\Http\Request;
 use App\Http\Controllers\ControleController;
 
 class RepresentanteEnderecoController extends Controller

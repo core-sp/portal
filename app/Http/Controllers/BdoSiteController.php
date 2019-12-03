@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\BdoOportunidade;
 use App\Rules\Cnpj;
 use App\BdoEmpresa;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AnunciarVagaMail;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoSiteController extends Controller
 {
@@ -27,10 +26,10 @@ class BdoSiteController extends Controller
 
     public function buscaOportunidades()
     {
-    	$buscaPalavraChave = Input::get('palavra-chave');
-        $buscaSegmento = Input::get('segmento');
-        $buscaRegional = ','.Input::get('regional').',';
-        if(Input::get('regional') === 'todas')
+    	$buscaPalavraChave = IlluminateRequest::input('palavra-chave');
+        $buscaSegmento = IlluminateRequest::input('segmento');
+        $buscaRegional = ','. IlluminateRequest::input('regional').',';
+        if(IlluminateRequest::input('regional') === 'todas')
             $buscaRegional = '';
         if (!empty($buscaPalavraChave) 
             or !empty($buscaSegmento) 
@@ -187,7 +186,8 @@ class BdoSiteController extends Controller
 
         event(new ExternoEvent($this->stringEvento($razaoSocial, $empresaEmail)));
 
-        Mail::to(['informacoes@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
+        // Mail::to(['informacoes@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
+        Mail::to('desenvolvimento@core-sp.org.br')->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
 
         return view('site.agradecimento')->with([
             'agradece' => $this->agradecimento()

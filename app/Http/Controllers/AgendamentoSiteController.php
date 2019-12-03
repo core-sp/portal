@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Agendamento;
 use App\Regional;
-use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 use App\Http\Controllers\Helper;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
 use App\Rules\Cpf;
 use App\Events\ExternoEvent;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 use Illuminate\Support\Facades\Validator;
 use Redirect;
 
@@ -235,7 +235,7 @@ class AgendamentoSiteController extends Controller
 
     public function consulta()
     {
-        $protocolo = Input::get('protocolo');
+        $protocolo = IlluminateRequest::input('protocolo');
         if (!empty($protocolo)){
             $busca = true;
         } else {

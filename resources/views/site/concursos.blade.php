@@ -38,11 +38,11 @@ $situacoes = ConcursoHelper::situacoes();
           	<div class="col-md-6">
           	  <label for="modalidade">Modalidade</label>
           	  <select name="modalidade"
-                class="form-control {{ !empty(Input::get('modalidade')) && in_array(Input::get('modalidade'), $modalidades) ? 'bg-focus border-info' : '' }}"
+                class="form-control {{ !empty(Request::input('modalidade')) && in_array(Request::input('modalidade'), $modalidades) ? 'bg-focus border-info' : '' }}"
                 id="modalidade">
           	  	<option value="">Todas</option>
 	         	    @foreach($modalidades as $modalidade)
-                  @if($modalidade === Input::get('modalidade'))
+                  @if($modalidade === Request::input('modalidade'))
                   <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
                   @else
 	         	      <option value="{{ $modalidade }}">{{ $modalidade }}</option>
@@ -52,10 +52,10 @@ $situacoes = ConcursoHelper::situacoes();
           	</div>
           	<div class="col-md-6 mt-2-768">
           	  <label for="situacao">Situação</label>
-          	  <select name="situacao" class="form-control {{ !empty(Input::get('situacao')) && in_array(Input::get('situacao'), $situacoes) ? 'bg-focus border-info' : '' }}" id="situacao">
+          	  <select name="situacao" class="form-control {{ !empty(Request::input('situacao')) && in_array(Request::input('situacao'), $situacoes) ? 'bg-focus border-info' : '' }}" id="situacao">
           	  	<option value="">Qualquer</option>
 	         	    @foreach($situacoes as $situacao)
-                  @if($situacao === Input::get('situacao'))
+                  @if($situacao === Request::input('situacao'))
                   <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
                   @else
    	         	    <option value="{{ $situacao }}">{{ $situacao }}</option>
@@ -69,22 +69,22 @@ $situacoes = ConcursoHelper::situacoes();
           	  <label for="nrprocesso">Nº do processo</label>
           	  <input type="text"
                 name="nrprocesso"
-                class="form-control nrprocessoInput {{ !empty(Input::get('nrprocesso')) ? 'bg-focus border-info' : '' }}"
+                class="form-control nrprocessoInput {{ !empty(Request::input('nrprocesso')) ? 'bg-focus border-info' : '' }}"
                 placeholder="Nº do processo"
                 id="nrprocesso"
-                @if(!empty(Input::get('nrprocesso')))
-                value="{{ Input::get('nrprocesso') }}"
+                @if(!empty(Request::input('nrprocesso')))
+                value="{{ Request::input('nrprocesso') }}"
                 @endif
                 />
           	</div>
           	<div class="col-md-4 mt-2-768">
           	  <label for="datarealizacao">Data de Realização</label>
           	  <input type="text"
-                class="form-control dataInput {{ !empty(Input::get('datarealizacao')) ? 'bg-focus border-info' : '' }}"
+                class="form-control dataInput {{ !empty(Request::input('datarealizacao')) ? 'bg-focus border-info' : '' }}"
                 name="datarealizacao"
                 placeholder="dd/mm/aaaa"
-                @if(!empty(Input::get('datarealizacao')))
-                value="{{ Input::get('datarealizacao') }}"
+                @if(!empty(Request::input('datarealizacao')))
+                value="{{ Request::input('datarealizacao') }}"
                 @endif
                 />
           	</div>

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\BdoEmpresa;
 use App\BdoOportunidade;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
 use App\Rules\Cnpj;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoEmpresaController extends Controller
 {
@@ -194,7 +194,7 @@ class BdoEmpresaController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = BdoEmpresa::where('segmento','LIKE','%'.$busca.'%')
             ->orWhere('razaosocial','LIKE','%'.$busca.'%')

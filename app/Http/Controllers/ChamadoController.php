@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Chamado;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class ChamadoController extends Controller
 {
@@ -247,7 +247,7 @@ class ChamadoController extends Controller
     public function busca()
     {
         ControleController::autorizaStatic(['1']);
-        $busca = Input::get('q');
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Chamado::where('tipo','LIKE','%'.$busca.'%')
             ->orWhere('prioridade','LIKE','%'.$busca.'%')
