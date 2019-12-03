@@ -84,7 +84,7 @@
               <div class="consulta-box">
                 <div class="consulta-avatar d-flex">
                   <div>
-                    <img src="{{ strlen(Request::input('cpfCnpj')) === 14 ? asset('img/icon-rc.png') : asset('img/icon-empresa.png') }}" alt="Avatar Representante Comercial" />
+                    <img src="{{ strlen(Request::input('cpfCnpj')) === 11 ? asset('img/icon-rc.png') : asset('img/icon-empresa.png') }}" alt="Avatar Representante Comercial" />
                   </div>
                   <div class="flex-one align-self-center ml-3">
                     <h5>{{ utf8_encode($resultado[0]['NOME']) }}</h5>
