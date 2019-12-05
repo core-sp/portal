@@ -163,6 +163,7 @@ use \App\Http\Controllers\Helper;
                           <a href="/agendamento-consulta" class="dropdown-item bb-0">Consultar</a>
                         </div>
                       </div>
+                      <a href="/representante/login" class="dropdown-item">Área Restrita</a>
                       <div class="sub-dropdown">
                         <div class="dropdown-item">
                           Balcão de Oportunidades <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
@@ -172,6 +173,7 @@ use \App\Http\Controllers\Helper;
                           <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
                         </div>
                       </div>
+                      <a href="/cancelamento-de-registro" class="dropdown-item">Cancelamento de Registro</a>
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
@@ -265,7 +267,9 @@ use \App\Http\Controllers\Helper;
                 <h5 class="branco">Serviços</h5>
               </div>
               <p class="branco"><a href="/agendamento">Agendamento</a></p>
+              <p class="branco"><a href="/representante/login">Área Restrita</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
+              <p class="branco"><a href="/cancelamento-de-registro">Cancelamento de Registro</a></p>
               <p class="branco"><a href="/consulta-de-situacao">Consulta de Situação</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="/downloads">Downloads</a></p>
