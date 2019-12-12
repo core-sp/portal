@@ -7,8 +7,11 @@
                     <hr>
                 @break
                 @case('Recusado')
-                <p><strong class="text-danger"><i class="fas fa-ban"></i>&nbsp;&nbsp;Recusado em {{ formataData($resultado->updated_at) }}</strong></p>
-                <hr>
+                    <p class="{{ isset($resultado->observacao) ? 'mb-0' : '' }}"><strong class="text-danger"><i class="fas fa-ban"></i>&nbsp;&nbsp;Recusado em {{ formataData($resultado->updated_at) }}</strong></p>
+                    @isset($resultado->observacao)
+                        <p class="light"><small class="light">{!! '—————<br><strong>Motivo:</strong> ' . $resultado->observacao !!}</small></p>
+                    @endisset
+                    <hr>
                 @break                    
             @endswitch
             <h4>Representante:</h4>

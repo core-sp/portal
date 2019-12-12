@@ -10,7 +10,6 @@ use App\Representante;
 use App\RepresentanteEndereco;
 use Illuminate\Http\Request;
 use App\Rules\CpfCnpj;
-use Illuminate\Support\Facades\Input;
 use App\Traits\GerentiProcedures;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
