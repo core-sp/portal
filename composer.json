@@ -12,6 +12,7 @@
         "binarytorch/larecipe": "^2.1",
         "doctrine/dbal": "v2.9.2",
         "fideloper/proxy": "^4.0",
+        "guzzlehttp/guzzle": "^6.5",
         "laravel/framework": "^6.0",
         "laravel/helpers": "^1.1",
         "laravel/horizon": "^3.1",

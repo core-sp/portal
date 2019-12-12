@@ -218,4 +218,20 @@ trait GerentiProcedures
         ]);
         return utf8_encode($run->fetchAll()[0]['SITUACAO']);
     }
+
+    public function gerentiAnuidadeVigente($cpfCnpj)
+    {
+        $this->connect();
+
+        $ano = (int) date('Y');
+
+        $run = $this->gerentiConnection->prepare('select BOL_ID, NOSSONUMERO from PROCPORTALBOLETOANO(:cpfCnpj, :ano)');
+
+        $run->execute([
+            'cpfCnpj' => $cpfCnpj,
+            'ano' => $ano
+        ]);
+
+        dd($run->fetchAll(PDO::FETCH_ASSOC));
+    }
 }

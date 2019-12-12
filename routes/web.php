@@ -281,6 +281,10 @@ Route::prefix('/')->group(function() {
   Route::get('blog', 'PostsController@blogPage');
   Route::get('blog/{slug}', 'PostsController@show');
 
+  // Anuidade ano vigente
+  // Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView');
+  // Route::post('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigente');
+
   // Representantes
   Route::prefix('representante')->group(function(){
     Route::get('/home', 'RepresentanteSiteController@index')->name('representante.dashboard');

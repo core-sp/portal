@@ -1147,6 +1147,13 @@ footer p {
 	color: #444444;
 }
 
+.cadastroRepresentante iframe {
+	margin-bottom: 0px;
+	margin-top: 0px;
+	height: auto;
+	max-height: 76px;
+}
+
 .blank-row {
 	border-top: 2px solid #dee2e6;
 	border-bottom: 2px solid #dee2e6;
