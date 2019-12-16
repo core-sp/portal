@@ -284,7 +284,11 @@ function gerentiTiposContatos()
 function formataDataGerenti($date)
 {
     $array = explode('-', $date);
-    return $array[2] . '/' . $array[1] . '/' . $array[0];
+    if(count($array) === 3) {
+        return $array[2] . '/' . $array[1] . '/' . $array[0];
+    } else {
+        return '----------';
+    }
 }
 
 function segmentosWithAddons($addOn)
