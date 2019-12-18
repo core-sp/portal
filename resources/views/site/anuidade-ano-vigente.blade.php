@@ -71,7 +71,13 @@
                     <hr>
                     <p>Anuidade encontrado. Imprima o boleto clicando no link abaixo:</p>
                     <strong class="text-uppercase">
-                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $nossonumero }}" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">IMPRIMIR BOLETO</a>
+                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $nossonumero[0]['NOSSONUMERO'] }}"
+                            class="normal text-info"
+                            onClick="gtag('event', 'imprimir', {
+                                'event_category': 'boleto',
+                                'event_label': 'Boleto do Ano Vigente'
+                            });"    
+                        >IMPRIMIR BOLETO</a>
                     </strong>
                 @endisset
                 @isset($notFound)
