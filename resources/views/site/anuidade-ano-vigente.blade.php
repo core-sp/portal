@@ -69,7 +69,7 @@
                 </form>
                 @isset($nossonumero)
                     <hr>
-                    <p class="pb-0">Anuidade encontrada. Imprima o boleto clicando no link abaixo:</p>
+                    <p class="pb-0"><strong>Anuidade encontrada!</strong> Imprima o boleto clicando no link abaixo:</p>
                     <h3 class="text-uppercase">
                         <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $nossonumero[0]['NOSSONUMERO'] }}"
                             class="normal text-info"
