@@ -31,8 +31,8 @@
         <div class="linha-lg"></div>
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt pr-4">
-                <p>Informe o CPF abaixo para imprimir o boleto de anuidade do ano vigente.</p>
-                <form method="post" class="cadastroRepresentante">
+                <p>Informe o CPF abaixo para verificar a disponibilidade do boleto de anuidade do ano vigente, e então imprima-o clicando no link.</p>
+                <form method="post" class="cadastroRepresentante" id="anoVigente">
                     @csrf
                     <div class="form-group">
                         <label for="cpfCnpj">CPF ou CNPJ *</label>
@@ -52,20 +52,32 @@
                     </div>
                     <div class="form-group mt-2">
                         @if(env('GOOGLE_RECAPTCHA_KEY'))
-                            <div class="g-recaptcha {{ $errors->has('g-recaptcha-response') ? 'is-invalid' : '' }}" data-sitekey="{{env('GOOGLE_RECAPTCHA_KEY')}}"></div>
+                            <div class="g-recaptcha {{ $errors->has('g-recaptcha-response') ? 'is-invalid' : '' }}" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
                             @if($errors->has('g-recaptcha-response'))
-                                <div class="invalid-feedback">
+                                <div class="invalid-feedback" style="display:block;">
                                     {{ $errors->first('g-recaptcha-response') }}
                                 </div>
                             @endif
                         @endif
                     </div>
                     <div class="form-group mt-3">
-                        <button type="submit" class="btn btn-primary">
-                            Imprimir
+                        <button type="submit" class="btn btn-primary" id="anoVigenteButton">
+                           Verificar {{ isset($nossonumero) || isset($notFound) ? 'novamente' : '' }}
                         </button>
+                        <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading"></div>
                     </div>
                 </form>
+                @isset($nossonumero)
+                    <hr>
+                    <p>Anuidade encontrado. Imprima o boleto clicando no link abaixo:</p>
+                    <strong class="text-uppercase">
+                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $nossonumero }}" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">IMPRIMIR BOLETO</a>
+                    </strong>
+                @endisset
+                @isset($notFound)
+                    <hr>
+                    <strong>Nenhum boleto encontrado para o CPF/CNPJ informado.</strong>
+                @endisset
             </div>
             <div class="col-lg-4">
                 @include('site.inc.content-sidebar')

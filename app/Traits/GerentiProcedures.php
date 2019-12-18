@@ -232,6 +232,6 @@ trait GerentiProcedures
             'ano' => 2020
         ]);
 
-        dd($run->fetchAll(PDO::FETCH_ASSOC));
+        return $run->fetchAll(PDO::FETCH_ASSOC);
     }
 }

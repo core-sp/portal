@@ -282,7 +282,7 @@ Route::prefix('/')->group(function() {
   Route::get('blog/{slug}', 'PostsController@show');
 
   // Anuidade ano vigente
-  Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView');
+  Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView')->name('anuidade-ano-vigente');
   Route::post('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigente');
 
   // Representantes
