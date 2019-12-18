@@ -498,7 +498,7 @@ function getDate() {
 		minDate: '-256m',
 	}
 	// Mostra loading button
-	$('#submitSimulador').on('click', function(){
+	$('#submitSimulador, #anoVigenteButton').on('click', function(){
 		$('#loadingSimulador').css('display', 'inline-block');
 	});
 	// Calendário Simulador

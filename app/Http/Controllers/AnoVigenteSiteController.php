@@ -26,9 +26,17 @@ class AnoVigenteSiteController extends Controller
             'g-recaptcha-response' => 'required|recaptcha'
         ], [
             'cpfCnpj.required' => 'Informe o CPF/CNPJ',
-            'g-recaptcha-response' => 'ReCAPTCHA obrigatório'
+            'g-recaptcha-response' => 'ReCAPTCHA inválido',
+            'g-recaptcha-response.required' => 'ReCAPTCHA obrigatório'
         ]);
 
-        $this->gerentiAnuidadeVigente($cpfCnpj);
+        $nossonumero = $this->gerentiAnuidadeVigente($cpfCnpj);
+
+        if(!empty($nossonumero)) {
+            return view('site.anuidade-ano-vigente', compact('nossonumero'));
+        } else {
+            $notFound = true;
+            return view('site.anuidade-ano-vigente', compact('notFound'));
+        }
     }
 }
