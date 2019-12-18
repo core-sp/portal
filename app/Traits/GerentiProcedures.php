@@ -229,7 +229,7 @@ trait GerentiProcedures
 
         $run->execute([
             'cpfCnpj' => $cpfCnpj,
-            'ano' => $ano
+            'ano' => 2020
         ]);
 
         dd($run->fetchAll(PDO::FETCH_ASSOC));
