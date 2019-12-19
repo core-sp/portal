@@ -31,7 +31,7 @@
         <div class="linha-lg"></div>
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt pr-4">
-                <p>Informe o CPF abaixo para verificar a disponibilidade do boleto de anuidade do ano vigente, e então imprima-o clicando no link.</p>
+                <p>Informe o CPF abaixo para verificar a disponibilidade do boleto de anuidade do ano vigente, e então baixe-o clicando no link.</p>
                 <p>Ou, se preferir, acesse a <a href="/representante/cadastro">Área Restrita do Representante,</a> e confira também outras informações relativas ao seu cadastro junto ao Core-SP, incluindo seu extrato financeiro detalhado.</p>
                 <form method="post" class="cadastroRepresentante" id="anoVigente">
                     @csrf
@@ -70,15 +70,17 @@
                 </form>
                 @if(Session::get('nossonumero'))
                     <hr>
-                    <p class="pb-0"><strong>Anuidade encontrada!</strong> Imprima o boleto clicando no link abaixo:</p>
+                    <p class="pb-0"><strong>Anuidade encontrada!</strong> Baixe o boleto clicando no link abaixo:</p>
                     <h3 class="text-uppercase">
                         <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ Session::get('nossonumero')[0]['NOSSONUMERO'] }}"
                             class="normal text-info"
-                            onClick="gtag('event', 'imprimir', {
+                            onClick="gtag('event', 'download', {
                                 'event_category': 'boleto',
                                 'event_label': 'Boleto do Ano Vigente'
-                            });"    
-                        ><i class="fas fa-file-download"></i>&nbsp;&nbsp;IMPRIMIR BOLETO</a>
+                            });"
+                        >
+                            <button class="btn btn-success btn-lg"><i class="fas fa-download"></i>&nbsp;&nbsp;BAIXAR BOLETO</button>
+                        </a>
                     </h3>
                     <hr>
                     <p><small class="light">Observação: Atente-se às datas informadas no corpo do boleto para pagar a anuidade com desconto.</small></p>
