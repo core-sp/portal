@@ -65,7 +65,7 @@
                         <button type="submit" class="btn btn-primary" id="anoVigenteButton">
                            Verificar {{ isset($nossonumero) || isset($notFound) ? 'novamente' : '' }}
                         </button>
-                        <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading"></div>
+                        <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" class="pt-0" alt="Loading"></div>
                     </div>
                 </form>
                 @isset($nossonumero)
