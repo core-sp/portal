@@ -32,7 +32,7 @@
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt pr-4">
                 <p>Informe o CPF abaixo para verificar a disponibilidade do boleto de anuidade do ano vigente, e então baixe-o clicando no link.</p>
-                <p>Ou, se preferir, acesse a <a href="/representante/cadastro">Área Restrita do Representante,</a> e confira também outras informações relativas ao seu cadastro junto ao Core-SP, incluindo seu extrato financeiro detalhado.</p>
+                <p>Ou, se preferir, acesse a <a href="/representante/login">Área Restrita do Representante,</a> e confira também outras informações relativas ao seu cadastro junto ao Core-SP, incluindo seu extrato financeiro detalhado.</p>
                 <form method="post" class="cadastroRepresentante" id="anoVigente">
                     @csrf
                     <div class="form-group">
