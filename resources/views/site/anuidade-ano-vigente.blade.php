@@ -68,7 +68,7 @@
                         <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" class="pt-0" alt="Loading"></div>
                     </div>
                 </form>
-                @isset($nossonumero)
+                @if(Session::get('nossonumero'))
                     <hr>
                     <p class="pb-0"><strong>Anuidade encontrada!</strong> Imprima o boleto clicando no link abaixo:</p>
                     <h3 class="text-uppercase">
@@ -82,11 +82,11 @@
                     </h3>
                     <hr>
                     <p><small class="light">Observação: Atente-se às datas informadas no corpo do boleto para pagar a anuidade com desconto.</small></p>
-                @endisset
-                @isset($notFound)
+                @endif
+                @if(Session::get('notFound'))
                     <hr>
                     <strong>Nenhum boleto encontrado para o CPF/CNPJ informado.</strong>
-                @endisset
+                @endif
             </div>
             <div class="col-lg-4">
                 @include('site.inc.content-sidebar')
