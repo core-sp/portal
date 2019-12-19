@@ -72,7 +72,7 @@
                     <hr>
                     <p class="pb-0"><strong>Anuidade encontrada!</strong> Imprima o boleto clicando no link abaixo:</p>
                     <h3 class="text-uppercase">
-                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $nossonumero[0]['NOSSONUMERO'] }}"
+                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ Session::get('nossonumero')[0]['NOSSONUMERO'] }}"
                             class="normal text-info"
                             onClick="gtag('event', 'imprimir', {
                                 'event_category': 'boleto',
