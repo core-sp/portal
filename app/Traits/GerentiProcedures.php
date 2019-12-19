@@ -223,13 +223,13 @@ trait GerentiProcedures
     {
         $this->connect();
 
-        $ano = (int) date('Y');
+        $ano = (int) date('Y', strtotime('+15 days'));
 
         $run = $this->gerentiConnection->prepare('select BOL_ID, NOSSONUMERO from PROCPORTALBOLETOANO(:cpfCnpj, :ano)');
 
         $run->execute([
             'cpfCnpj' => $cpfCnpj,
-            'ano' => 2020
+            'ano' => $ano
         ]);
 
         return $run->fetchAll(PDO::FETCH_ASSOC);
