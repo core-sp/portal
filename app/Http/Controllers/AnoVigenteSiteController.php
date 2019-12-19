@@ -33,10 +33,10 @@ class AnoVigenteSiteController extends Controller
         $nossonumero = $this->gerentiAnuidadeVigente($cpfCnpj);
 
         if(!empty($nossonumero)) {
-            return view('site.anuidade-ano-vigente', compact('nossonumero'));
+            return redirect()->back()->with('nossonumero', $nossonumero)->withInput();
         } else {
             $notFound = true;
-            return view('site.anuidade-ano-vigente', compact('notFound'));
+            return redirect()->back()->with('notFound', $notFound)->withInput();
         }
     }
 }
