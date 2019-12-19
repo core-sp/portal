@@ -78,9 +78,10 @@
                                 'event_category': 'boleto',
                                 'event_label': 'Boleto do Ano Vigente'
                             });"    
-                        >IMPRIMIR BOLETO</a>
+                        ><i class="fas fa-file-download"></i> IMPRIMIR BOLETO</a>
                     </h3>
-                    <p>Observação: Atente-se às datas informadas para pagar a anuidade com desconto.</p>
+                    <hr>
+                    <p><small>Observação: Atente-se às datas informadas para pagar a anuidade com desconto.</small></p>
                 @endisset
                 @isset($notFound)
                     <hr>
