@@ -200,13 +200,12 @@ class RepresentanteSiteController extends Controller
             'complemento' => 'max:100',
             'estado' => 'required|max:5',
             'municipio' => 'required|max:30',
-            'crimage' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'crimage' => 'required|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048'
         ], [
             'required' => 'Campo obrigatório',
             'max' => 'Excedido limite de caracteres',
             'crimage.required' => 'Favor adicionar um comprovante de residência',
             'mimes' => 'Tipo de arquivo não suportado',
-            'image' => 'Tipo de arquivo não suportado',
             'crimage.max' => 'A imagem não pode ultrapassar 2MB'
         ]);
     }
