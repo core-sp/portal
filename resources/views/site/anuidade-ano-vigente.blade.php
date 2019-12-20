@@ -63,7 +63,7 @@
                     </div>
                     <div class="form-group mt-3">
                         <button type="submit" class="btn btn-primary" id="anoVigenteButton">
-                           Verificar {{ isset($nossonumero) || isset($notFound) ? 'novamente' : '' }}
+                           Verificar {{ Session::get('nossonumero') || Session::get('notFound') ? 'novamente' : '' }}
                         </button>
                         <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" class="pt-0" alt="Loading"></div>
                     </div>
