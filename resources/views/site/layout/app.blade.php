@@ -60,8 +60,8 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
               <div class="d-block setembro">
-                <h2 class="pacifico"><a href="/blog/planejamento-financeiro-do-representante-comercial" class="nohover">#BoasFestas</a></h2>
-                <p class="light"><a href="/blog/planejamento-financeiro-do-representante-comercial" class="nohover"><small>Feliz natal e próspero ano novo</small></a></p>
+                <h2 class="pacifico"><a href="/noticia/boas-festas" class="nohover">#BoasFestas</a></h2>
+                <p class="light"><a href="/noticia/boas-festas" class="nohover"><small>Feliz natal e próspero ano novo</small></a></p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">

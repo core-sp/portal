@@ -223,7 +223,7 @@ trait GerentiProcedures
     {
         $this->connect();
 
-        $ano = (int) date('Y', strtotime('+15 days'));
+        $ano = (int) date('Y');
 
         $run = $this->gerentiConnection->prepare('select BOL_ID, NOSSONUMERO from PROCPORTALBOLETOANO(:cpfCnpj, :ano)');
 
