@@ -72,14 +72,15 @@
                     <hr>
                     <p class="pb-0"><strong>Anuidade encontrada!</strong> Baixe o boleto clicando no link abaixo:</p>
                     <h3 class="text-uppercase">
-                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ Session::get('nossonumero')[0]['NOSSONUMERO'] }}"
-                            class="normal text-info"
-                            onClick="gtag('event', 'download', {
-                                'event_category': 'boleto',
-                                'event_label': 'Boleto do Ano Vigente'
-                            });"
-                        >
-                            <button class="btn btn-success btn-lg"><i class="fas fa-download"></i>&nbsp;&nbsp;BAIXAR BOLETO</button>
+                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ Session::get('nossonumero')[0]['NOSSONUMERO'] }}" class="normal text-info">
+                            <button class="btn btn-success btn-lg"
+                                onClick="gtag('event', 'download', {
+                                    'event_category': 'boleto',
+                                    'event_label': 'Boleto do Ano Vigente'
+                                });"
+                            >
+                                <i class="fas fa-download"></i>&nbsp;&nbsp;BAIXAR BOLETO
+                            </button>
                         </a>
                     </h3>
                     <hr>
