@@ -293,6 +293,6 @@ class RepresentanteSiteController extends Controller
     public function eventoBoleto()
     {
         $descricao = IlluminateRequest::input('descricao');
-        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") imprimiu o boleto "' . $descricao . '"'));
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") baixou o boleto "' . $descricao . '"'));
     }
 }
