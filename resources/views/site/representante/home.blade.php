@@ -4,6 +4,7 @@
 
 @php
     $nrBoleto = Auth::guard('representante')->user()->boletoAnuidade();
+    $string = 'Anuidade ' . date("Y") . ' (Parcela Única)';
 @endphp
 
 <div class="representante-content">
@@ -18,18 +19,13 @@
         @if (isset($nrBoleto))
             <p class="pb-0">
                 <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $nrBoleto }}">
-                    <button class="btn btn-success btn-lg"
-                        onClick="gtag('event', 'download', {
-                            'event_category': 'boleto',
-                            'event_label': 'Boleto do Ano Vigente'
-                        });"
-                    >
+                    <button class="btn btn-success btn-lg" onClick="clickBoleto({{ $string }})">
                         <i class="fas fa-download"></i>&nbsp;&nbsp;BAIXAR BOLETO
                     </button>
                 </a>
             </p>
         @else
-            <p class="pb-0">Já pago ou indisponível.</p>
+            <p class="pb-0">Já pago ou indisponível. Confira mais detalhes na guia de <a href="/representante/situacao-financeira">Situação Financeira</a>.</p>
         @endif
     </div>
 </div>
