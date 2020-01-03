@@ -342,12 +342,14 @@ function formataDataGerentiRecursive($array)
     return $array;
 }
 
-function secondLine($situacao, $vencimento = null, $link = null, $descricao = null)
+function secondLine($situacao, $vencimento = null, $link = null, $descricao = null, $boleto = null)
 {
     if($situacao === 'Em aberto' && $vencimento === null) {
         $str = '<strong class="text-danger">EXPIRADO</strong>';
     } elseif($situacao === 'Em aberto' && $link !== null) {
         $str = '<strong class="text-warning">EM ABERTO</strong> ⋅ <a href="' . $link . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">IMPRIMIR BOLETO</a>';
+    } elseif($situacao === 'Em aberto' && $boleto !== null) {
+        $str = '<strong class="text-warning">EM ABERTO</strong> ⋅ <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/' . $boleto . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">IMPRIMIR BOLETO</a>';
     } elseif($situacao === 'Pago') {
         $str = '<strong class="text-success">PAGO</strong>';
     } elseif($situacao = 'Proc. Adm.') {

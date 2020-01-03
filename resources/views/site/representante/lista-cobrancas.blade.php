@@ -25,7 +25,7 @@
                     @foreach ($cobrancas['anuidades'] as $cobranca)
                         <tr>
                             <td class="ls-meio-neg">
-                                {{ $cobranca['DESCRICAO'] }} ⋅ {!! secondLine($cobranca['SITUACAO'], $cobranca['VENCIMENTOBOLETO'], $cobranca['LINK'], $cobranca['DESCRICAO']) !!}
+                                {{ $cobranca['DESCRICAO'] }} ⋅ {!! secondLine($cobranca['SITUACAO'], $cobranca['VENCIMENTOBOLETO'], $cobranca['LINK'], $cobranca['DESCRICAO'], $cobranca['BOLETO']) !!}
                             </td>
                             <td class="ls-meio-neg">R$ {{ toReais($cobranca['VALOR']) }}</td>
                         </tr>
