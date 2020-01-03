@@ -60,8 +60,8 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
               <div class="d-block setembro">
-                <h2 class="pacifico"><a href="/noticia/boas-festas" class="nohover">#BoasFestas</a></h2>
-                <p class="light"><a href="/noticia/boas-festas" class="nohover"><small>Feliz natal e próspero ano novo</small></a></p>
+                <h2 class="pacifico"><a href="/institucional" class="nohover">#Core54anos</a></h2>
+                <p class="light"><a href="/institucional" class="nohover"><small>Trabalho, transparência e respeito<br>ao Representante Comercial</small></a></p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
@@ -163,6 +163,7 @@ use \App\Http\Controllers\Helper;
                           <a href="/agendamento-consulta" class="dropdown-item bb-0">Consultar</a>
                         </div>
                       </div>
+                      <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade 2020</a>
                       <a href="/representante/login" class="dropdown-item">Área Restrita</a>
                       <div class="sub-dropdown">
                         <div class="dropdown-item">

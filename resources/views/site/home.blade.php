@@ -138,7 +138,7 @@
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2019<br class="hide-992" /> taxas e emolumentos</h3>
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2020<br class="hide-992" /> taxas e emolumentos</h3>
               <button href="#" class="btn-box azul">ACESSAR</button>
             </div>
           </div>
