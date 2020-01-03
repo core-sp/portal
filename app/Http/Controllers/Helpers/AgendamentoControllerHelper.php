@@ -100,7 +100,10 @@ class AgendamentoControllerHelper extends Controller
     public static function servicos()
     {
         $servicos = [
-            'Refis',
+            'Atualização de Cadastro',
+            'Cancelamento de Registro',
+            'Registro Inicial',
+            'Outros'
         ];
         return $servicos;
     }
@@ -128,10 +131,18 @@ class AgendamentoControllerHelper extends Controller
     public static function servicosCompletos()
     {
         return [
-            'Refis para PF',
-            'Refis para PJ',
-            'Refis para PF e PJ',
-            'Outro'
+            'Atualização de Cadastro para PF',
+            'Atualização de Cadastro para PJ',
+            'Atualização de Cadastro para PF e PJ',
+            'Cancelamento de Registro para PF',
+            'Cancelamento de Registro para PJ',
+            'Cancelamento de Registro para PF e PJ',
+            'Registro Inicial para PF',
+            'Registro Inicial para PJ',
+            'Registro Inicial para PF e PJ',
+            'Outros para PF',
+            'Outros para PJ',
+            'Outros para PF e PJ'
         ];
     }
 

@@ -20,7 +20,7 @@
             <div class="col">
                 <div class="row nomargin">
                     <div class="flex-one pr-4 align-self-center">
-                        <h2 class="stronger">Imprima o boleto de anuidade do ano vigente</h2>
+                        <h2 class="stronger">Baixe o boleto de anuidade do ano vigente</h2>
                     </div>
                     <div class="align-self-center">
                         <a href="/" class="btn-voltar">Voltar</a>

@@ -2750,7 +2750,7 @@ h5 {
 	.box-news,
 	.curso-grid,
 	.curso-grid-content {
-		width: 75%;
+		width: 60%;
 		margin: 0 auto;
 	}
 
@@ -2778,8 +2778,12 @@ h5 {
 		padding-top: 2rem;
 	}
 
+	.inside-box {
+		padding: 1.2rem;
+	}
+
 	.btn-box {
-		margin-top: 1rem;
+		margin-top: .5rem;
 	}
 
 	.curso-grid-content {
