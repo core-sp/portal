@@ -139,6 +139,7 @@ class Representante extends Authenticable
 
     public function boletoAnuidade()
     {
+        dd($this->gerentiAnuidadeVigente($this->cpf_cnpj));
         if(isset($this->gerentiAnuidadeVigente($this->cpf_cnpj)[0]['NOSSONUMERO']))
             return $this->gerentiAnuidadeVigente($this->cpf_cnpj)[0]['NOSSONUMERO'];
         else
