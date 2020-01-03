@@ -136,4 +136,12 @@ class Representante extends Authenticable
     {
         return $this->gerentiStatus($this->ass_id);
     }
+
+    public function boletoAnuidade()
+    {
+        if(isset($this->gerentiAnuidadeVigente($this->cpf_cnpj)[0]['NOSSONUMERO']))
+            return $this->gerentiAnuidadeVigente($this->cpf_cnpj)[0]['NOSSONUMERO'];
+        else
+            return null;
+    }
 }
