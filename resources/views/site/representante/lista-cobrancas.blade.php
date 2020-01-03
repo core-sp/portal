@@ -21,7 +21,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{ dd($cobrancas['anuidades']) }}
                     @foreach ($cobrancas['anuidades'] as $cobranca)
                         <tr>
                             <td class="ls-meio-neg">
