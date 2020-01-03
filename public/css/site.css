@@ -281,6 +281,12 @@ strong, .bold {
 	font-weight: 300;
 }
 
+.conteudo-caption {
+	line-height: 1.1;
+	margin-top: -1rem;
+	margin-bottom: 1rem;
+}
+
 .conteudo-txt ul,
 .conteudo-txt ol {
 	padding-bottom: 1rem;
