@@ -16,7 +16,6 @@
         <p class="pb-0">{!! statusBold(Auth::guard('representante')->user()->status()) !!}</p>
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;ANUIDADE {{ date('Y') }}</h5>
         @if (isset($nrBoleto))
-        
             <p class="pb-0">
                 <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $nrBoleto }}">
                     <button class="btn btn-success btn-lg"
