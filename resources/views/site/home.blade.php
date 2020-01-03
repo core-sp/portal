@@ -72,7 +72,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-lg-3 offset-lg-1-5 col-sm-6 pb-15">
+      <div class="col-lg-3 col-sm-6 pb-15">
         <div class="box text-center azul-escuro-bg h-100">
           <div class="inside-box">
             <img src="{{ asset('img/padlock.png') }}" class="inside-img" alt="Área restrita do Representante | Core-SP" />
@@ -92,7 +92,7 @@
             <div class="inside-box">
               <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> de situação</h3>
-              <button class="btn-box azul">Acessar</button>
+              <button class="btn-box azul">Consultar</button>
             </div>
           </div>
         </a>
@@ -111,35 +111,60 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-3 offset-lg-1-5 col-sm-6 text-right pb-15">
-        <a href="/simulador" class="d-block h-100">
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="/anuidade-ano-vigente" class="d-block h-100">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
-              <img src="{{ asset('img/001-paper.png') }}" alt="Simulador | Core-SP">
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Simulador de<br class="hide-992" /> valores</h3>
+              <img src="{{ asset('img/printer.png') }}" class="inside-img" alt="Anuidade 2020 | Core-SP" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Boleto<br class="hide-992" /> anuidade 2020</h3>
               <button class="btn-box azul">Acessar</button>
             </div>
           </div>
         </a>
       </div>
+      <div class="col-lg-3 col-sm-6 text-right pb-15">
+        <a href="/simulador" class="d-block h-100">
+          <div class="box text-center azul-bg h-100">
+            <div class="inside-box">
+              <img src="{{ asset('img/001-paper.png') }}" alt="Simulador | Core-SP">
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Simulador de<br class="hide-992" /> valores</h3>
+              <button class="btn-box azul">Simular</button>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <div class="box text-center azul-escuro-bg h-100">
+          <div class="inside-box">
+            <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
+            <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Agendamento<br class="hide-992" /> de Atendimento</h3>
+            <a href="/agendamento" class="d-inline h-100">
+              <button class="btn-box azul-escuro">Agendar</button>
+            </a>
+            <a href="/agendamento-consulta" class="d-inline h-100">
+              <button class="btn-box btn-box-little azul-escuro">Consultar</button>
+            </a>
+          </div>
+        </div>
+      </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/cartilha-do-representante" class="d-block h-100">
-          <div class="box text-center azul-escuro-bg h-100">
+          <div class="box text-center azul-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/open-book.png') }}" class="inside-img" alt="Cartilha do Representante | Core-SP" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cartilha do<br class="hide-992" /> Representante</h3>
-              <button class="btn-box azul-escuro">Visualizar</button>
+              <button class="btn-box azul">Visualizar</button>
             </div>
           </div>
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/resolucoes-anuidade-taxas-e-emolumentos" class="d-block h-100">
-          <div class="box text-center azul-bg h-100">
+          <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2020<br class="hide-992" /> taxas e emolumentos</h3>
-              <button href="#" class="btn-box azul">ACESSAR</button>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
             </div>
           </div>
         </a>

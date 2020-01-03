@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
-use Redirect;
 
 class AgendamentoController extends Controller
 {
@@ -165,7 +164,7 @@ class AgendamentoController extends Controller
                 $mindiaArray = explode('/',IlluminateRequest::input('mindia'));
                 $checaMindia = checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
                 if($checaMindia === false) {
-                    return Redirect::back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
+                    return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
                         ->with('class', 'alert-danger');
                 }
             } 
@@ -173,7 +172,7 @@ class AgendamentoController extends Controller
                 $maxdiaArray = explode('/',IlluminateRequest::input('maxdia'));
                 $checaMaxdia = checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
                 if($checaMaxdia === false) {
-                    return Redirect::back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
+                    return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
                         ->with('class', 'alert-danger');
                 }
             }
@@ -375,7 +374,7 @@ class AgendamentoController extends Controller
         } else {
             event(new CrudEvent('agendamento', 'confirmou falta', $agendamento->idagendamento));
         }
-        return Redirect::back()
+        return redirect()->back()
             ->with('message', '<i class="icon fa fa-check"></i>Status editado com sucesso!')
             ->with('class', 'alert-success');
     }
