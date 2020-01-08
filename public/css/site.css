@@ -1901,6 +1901,10 @@ h5 {
 	padding-bottom: 0px !important;
 }
 
+.parceiro-grid img {
+	max-width: 240px;
+}
+
 /* FINAL */
 
 /*
@@ -2828,5 +2832,9 @@ h5 {
 
 	.bdo-info .col {
 		margin-top: 10px;
+	}
+
+	.parceiro-grid img {
+		max-width: 150px;
 	}
 }
