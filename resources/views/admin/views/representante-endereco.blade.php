@@ -12,7 +12,7 @@
                         <p class="light"><small class="light">{!! '—————<br><strong>Motivo:</strong> ' . $resultado->observacao !!}</small></p>
                     @endisset
                     <hr>
-                @break                    
+                @break
             @endswitch
             <h4>Representante:</h4>
             <p class="mb-0">Registro: <strong>{{ $representante->registro_core }}</strong></p>
@@ -26,7 +26,9 @@
             <p class="mb-0">Complemento: <strong>{{ isset($resultado->complemento) ? $resultado->complemento : '---' }}</strong></p>
             <p class="mb-0">Estado: <strong>{{ $resultado->estado }}</strong></p>
             <p>Município: <strong>{{ $resultado->municipio }}</strong></p>
-            <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimage }}" class="btn btn-sm btn-secondary" target="_blank">Visualizar comprovante de residência</a>
+            <h5>Comprovante de residência:</h5>
+            <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimage }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
+            <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimage }}" class="btn btn-sm btn-secondary" target="_blank" download>Baixar</a>
             @if ($resultado->status === 'Aguardando confirmação')
                 <hr>
                 <h4 class="mb-3">Ações</h4>
