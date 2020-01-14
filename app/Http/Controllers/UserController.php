@@ -130,7 +130,7 @@ class UserController extends Controller
             'nome' => 'required|max:191',
             'email' => 'email|required',
             'password' => 'required|confirmed|min:6|max:24',
-            'username' => 'unique:users'
+            'username' => 'unique:users,deleted_at,NULL'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
