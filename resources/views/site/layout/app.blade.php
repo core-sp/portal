@@ -268,6 +268,7 @@ use \App\Http\Controllers\Helper;
                 <h5 class="branco">Serviços</h5>
               </div>
               <p class="branco"><a href="/agendamento">Agendamento</a></p>
+              <p class="branco"><a href="/anuidade-ano-vigente">Anuidade 2020</a></p>
               <p class="branco"><a href="/representante/login">Área Restrita</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
               <p class="branco"><a href="/cancelamento-de-registro">Cancelamento de Registro</a></p>

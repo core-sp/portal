@@ -39,28 +39,30 @@
             @endif
             <p>Digite o CPF ou CNPJ abaixo para reconfigurar sua senha.</p>
             <form action="{{ route('representante.password.email') }}" method="POST">
-                @csrf
-                <div class="form-group has-feedback {{ $errors->has('cpf_cnpj') ? 'has-error' : '' }}">
-                  <input 
-                    type="text"
-                    name="cpf_cnpj"
-                    class="form-control cpfOuCnpj"
-                    value="{{ isset($cpf_cnpj) ? $cpf_cnpj : old('cpf_cnpj') }}"
-                    placeholder="CPF / CNPJ"
-                  >
-                  <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
-                  @if ($errors->has('cpf_cnpj'))
-                      <span class="help-block">
-                        <strong>{{ $errors->first('cpf_cnpj') }}</strong>
-                      </span>
-                  @endif
-                </div>
-                <div class="form-group mt-2">
-                  <button type="submit"
-                    class="btn btn-primary"
-                  >Enviar</button>
-                </div>
-              </form>
+              @csrf
+              <div class="form-group has-feedback {{ $errors->has('cpf_cnpj') ? 'has-error' : '' }}">
+                <input 
+                  type="text"
+                  name="cpf_cnpj"
+                  class="form-control cpfOuCnpj"
+                  value="{{ isset($cpf_cnpj) ? $cpf_cnpj : old('cpf_cnpj') }}"
+                  placeholder="CPF / CNPJ"
+                >
+                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                @if ($errors->has('cpf_cnpj'))
+                    <span class="help-block">
+                      <strong>{{ $errors->first('cpf_cnpj') }}</strong>
+                    </span>
+                @endif
+              </div>
+              <div class="form-group mt-2">
+                <button type="submit"
+                  class="btn btn-primary"
+                >Enviar</button>
+              </div>
+            </form>
+            <hr>
+            <p><i>* Caso não tenha acesso ao email cadastrado inicialmente ou este não seja mais válido, acesse <a href="{{ route('representante.email.reset.view') }}">este link para alterá-lo</a>.</i></p>
           </div>
           <div class="col-lg-4">
               @include('site.inc.content-sidebar')
