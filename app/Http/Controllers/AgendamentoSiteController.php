@@ -291,5 +291,4 @@ class AgendamentoSiteController extends Controller
             }
         }
     }
-
 }
