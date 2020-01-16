@@ -415,7 +415,7 @@
         <div id="calendario" class="row">
           <div class="col-sm-8">
             <a href="/calendario-2019">
-              <img class="lazy" data-src="{{ asset('img/calendario.png') }}" alt="Calendário | Core-SP" />
+              <img class="lazy" data-src="{{ asset('img/arte-calendario.png') }}" alt="Calendário | Core-SP" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 align-self-center text-right pr-4">
