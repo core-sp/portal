@@ -39,6 +39,7 @@ class SimuladorController extends Controller
     {
         // Retorno do extrato de acordo com o tipo de pessoa, data de início, capital social e filial
         $run = $this->connection->prepare("SELECT descricao, valor_total, data_vencimento FROM procextrato ('', :tipopessoa, :datainicio, :capitalsocial, cast('NOW' as date), :filial)");
+
         $run->execute([
             'tipopessoa' => $tipoPessoa,
             'datainicio' => $dataInicio,
@@ -46,7 +47,81 @@ class SimuladorController extends Controller
             'filial' => $filial
         ]);
 
-        return $run->fetchAll();
+        $array = $run->fetchAll();
+
+        if (strpos($array[0]['DESCRICAO'], 'Anuidade') === false) {
+            return $array;
+        } elseif ($this->descontoAnuidade($array[0]['VALOR_TOTAL']) === null) {
+            return $array;
+        }
+
+        $desconto = $this->descontoAnuidade($array[0]['VALOR_TOTAL']);
+
+        array_push($array, $desconto);
+
+        return $array;
+    }
+
+    protected function descontoAnuidade($anuidade)
+    {
+        $mes = date('m');
+
+        $porcentagem = $this->porcentagemDesconto($mes);
+
+        if(isset($porcentagem)) {
+            $desconto = ($anuidade * $porcentagem * -1);
+
+            $desconto = number_format($desconto, 2);
+    
+            return [
+                'DESCRICAO' => $this->descricaoDesconto($mes),
+                'VALOR_TOTAL' => $desconto
+            ];
+        }
+
+        return null;        
+    }
+
+    protected function porcentagemDesconto($mes)
+    {
+        switch ($mes) {
+            case '01':
+                return 0.2;
+            break;
+
+            case '02':
+                return 0.15;
+            break;
+
+            case '03':
+                return 0.1;
+            break;
+            
+            default:
+                return null;
+            break;
+        }
+    }
+
+    protected function descricaoDesconto($mes)
+    {
+        switch ($mes) {
+            case '01':
+                return 'Desconto de anuidade (Janeiro)'; 
+            break;
+            
+            case '02':
+                return 'Desconto de anuidade (Fevereiro)'; 
+            break;
+
+            case '03':
+                return 'Desconto de anuidade (Março)'; 
+            break;
+
+            default:
+                return null;
+            break;
+        }
     }
 
     protected function simuladorTotal($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 24)
