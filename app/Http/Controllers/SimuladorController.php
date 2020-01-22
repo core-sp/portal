@@ -49,15 +49,13 @@ class SimuladorController extends Controller
 
         $array = $run->fetchAll();
 
-        if (strpos($array[0]['DESCRICAO'], 'Anuidade') === false) {
-            return $array;
-        } elseif ($this->descontoAnuidade($array[0]['VALOR_TOTAL']) === null) {
-            return $array;
+        foreach($array as $single) {
+            if (strpos($single['DESCRICAO'], 'Anuidade') !== false) {
+                $desconto = $this->descontoAnuidade($single['VALOR_TOTAL']);
+                if(isset($desconto))
+                    array_push($array, $desconto);
+            }
         }
-
-        $desconto = $this->descontoAnuidade($array[0]['VALOR_TOTAL']);
-
-        array_push($array, $desconto);
 
         return $array;
     }
