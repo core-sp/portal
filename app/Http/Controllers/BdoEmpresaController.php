@@ -208,14 +208,35 @@ class BdoEmpresaController extends Controller
     {
         $cnpj = preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj);
 
-       $empresa = BdoEmpresa::select('idempresa', 'cnpj', 'razaosocial', 'fantasia', 'telefone', 'segmento', 'endereco', 'site', 'email')
+        $empresa = BdoEmpresa::select('idempresa', 'cnpj', 'razaosocial', 'fantasia', 'telefone', 'segmento', 'endereco', 'site', 'email')
             ->where('cnpj', '=', $cnpj)
             ->first();
 
+        $count = $this->temOportunidade($empresa->idempresa);
+
+        if($count > 0) {
+            $message = 'A empresa informada <strong>já possui uma vaga em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do telefone <strong>(11) 3243-5523</strong> e/ou através do e-mail: <strong>samuel.santos@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.';
+            $class = 'alert-warning';
+        } else {
+            $message = 'Empresa já cadastrada. Favor seguir com o preenchimento da oportunidade abaixo.';
+            $class = 'alert-success';
+        }
+
         if(isset($empresa)) {
-            return $empresa->toJson();
+            return [
+                'empresa' => $empresa->toJson(),
+                'message' => $message,
+                'class' => $class
+            ];
         } else {
             abort(500);
         }
+    }
+
+    protected function temOportunidade($id)
+    {
+        return BdoOportunidade::where('idempresa', $id)
+            ->where('status', 'Em andamento')
+            ->count();
     }
 }

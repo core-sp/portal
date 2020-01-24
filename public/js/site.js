@@ -441,14 +441,13 @@ function getInfoEmpresa(value)
 		},
 		success: function(data)
 		{
-			var json = $.parseJSON(data);
 			$('.avHidden').hide();
-			$('#av10').val(json.idempresa);
+			$('#av10').val(data.empresa.idempresa);
 			$('#av01, #avEmail').val('');
 			$('#titulice').focus();
 			$('#avLoading').hide();
 			// Mostra o alert
-			$('#avAlert').show().addClass('alert-success').removeClass('alert-info').text('Empresa já cadastrada. Favor seguir com o preenchimento da oportunidade abaixo.');
+			$('#avAlert').show().removeClass('alert-info alert-warning').addClass(data.class).html(data.message);
 		},
 		error: function()
 		{
@@ -456,7 +455,7 @@ function getInfoEmpresa(value)
 			$('#av10').val('0');
 			$('#av01').focus();
 			$('#avLoading').hide();
-			$('#avAlert').show().addClass('alert-info').removeClass('alert-success').text('Empresa não cadastrada. Favor informar os dados da empresa abaixo.');
+			$('#avAlert').show().removeClass('alert-info alert-success').addClass('alert-info').text('Empresa não cadastrada. Favor informar os dados da empresa abaixo.');
 		}
 	});
 }

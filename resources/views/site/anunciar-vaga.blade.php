@@ -31,6 +31,9 @@
         <div class="linha-lg"></div>
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt pr-4">
+                @if(Session::has('message'))
+                    <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+                @endif
                 <p>Preencha o formulário abaixo para solicitar a inclusão de sua(s) vaga(s) no <strong>Balcão de Oportunidades</strong> do <strong>Core-SP.</strong></p>
                 <p>A(s) vaga(s) será(ão) disponibilizada(s) em até 03 (três) dias úteis, após a verificação dos dados informados, e permanecerá pelo prazo de até 90 (noventa) dias - após este período o status da(s) vaga(s) passará de "Em andamento" para "Concluído".</p>
                 <p>Para mais esclarecimentos, entre em contato conosco através do email <strong>samuel.santos@core-sp.org.br</strong>.</p>
