@@ -454,7 +454,9 @@ function atendimentoJuridico(dia, regional)
 	   dia === '23/06/2020' && regional === '11' ||
 	   dia === '25/06/2020' && regional === '6' ||
 	   dia === '26/06/2020' && regional === '6') {
-		$('#selectServicos').prepend(new Option("Plantão Jurídico", "Plantão Jurídico")).attr('selected','selected');
+		if($("#selectServicos option[value='Plantão Jurídico']").length == 0) {
+			$('#selectServicos').prepend(new Option("Plantão Jurídico", "Plantão Jurídico")).attr('selected','selected');
+		}
 		$("#selectServicos")[0].options[0].selected = true;
 	} else {
 		$('#selectServicos option[value="Plantão Jurídico"]').remove();
