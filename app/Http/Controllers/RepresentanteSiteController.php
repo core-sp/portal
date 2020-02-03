@@ -61,7 +61,7 @@ class RepresentanteSiteController extends Controller
     {
         $token = str_random(32);
 
-        request('checkbox-tdu') === 'on' ? $aceite = 1 : $aceite = 0;
+        request('checkbox-tdu') === 'on' ? $aceite = 1 : $aceite = 0;        
 
         $save = Representante::create([
             'cpf_cnpj' => $cpfCnpj,
@@ -75,6 +75,36 @@ class RepresentanteSiteController extends Controller
         ]);
 
         if(!$save)
+            abort(403);
+
+        $body = '<strong>Cadastro no Portal Core-SP realizado com sucesso!</strong>';
+        $body .= '<br /><br />';
+        $body .= 'Para concluir o processo, basta clicar <a href="'. route('representante.verifica-email', $token) .'">NESTE LINK</a>.';
+
+        Mail::to(request('email'))->queue(new CadastroRepresentanteMail($body));
+    }
+
+    public function updateRepresentante($id, $ass_id, $nome, $cpfCnpj)
+    {
+        $token = str_random(32);
+
+        request('checkbox-tdu') === 'on' ? $aceite = 1 : $aceite = 0;
+
+        $rep = Representante::withTrashed()->find($id);
+        $rep->restore();
+
+        $update = $rep->update([
+            'cpf_cnpj' => $cpfCnpj,
+            'registro_core' => preg_replace('/[^0-9]+/', '', request('registro_core')),
+            'ass_id' => $ass_id,
+            'nome' => $nome,
+            'email' => request('email'),
+            'password' => bcrypt(request('password')),
+            'verify_token' => $token,
+            'aceite' => $aceite
+        ]);
+
+        if(!$update)
             abort(403);
 
         $body = '<strong>Cadastro no Portal Core-SP realizado com sucesso!</strong>';
@@ -116,7 +146,7 @@ class RepresentanteSiteController extends Controller
         $this->rules($request, $cpfCnpj);
 
         strlen(request('registro_core')) === 11 ? $registro = '0' . request('registro_core') : $registro = request('registro_core');
-        
+
         $checkGerenti = $this->checaAtivo($registro, request('cpfCnpj'), request('email'));
 
         if (array_key_exists('Error', $checkGerenti)) {
@@ -126,7 +156,13 @@ class RepresentanteSiteController extends Controller
                 ->withInput(IlluminateRequest::all());
         }
 
-        $this->saveRepresentante($checkGerenti['ASS_ID'], utf8_encode($checkGerenti['NOME']), $cpfCnpj);
+        $checkSoftDeleted = Representante::where('cpf_cnpj', $cpfCnpj)->withTrashed()->first();
+
+        if($checkSoftDeleted) {
+            $this->updateRepresentante($checkSoftDeleted->id, $checkGerenti['ASS_ID'], utf8_encode($checkGerenti['NOME']), $cpfCnpj);
+        } else {
+            $this->saveRepresentante($checkGerenti['ASS_ID'], utf8_encode($checkGerenti['NOME']), $cpfCnpj);
+        }
 
         event(new ExternoEvent('"' . $cpfCnpjCru . '" ("' . request('email') . '") cadastrou-se na Área do Representante.'));
 

@@ -306,6 +306,7 @@ function noWeekendsOrHolidays(date) {
 		});
 		// Ajax após change no datepicker
 		$('#datepicker').change(function(){
+			atendimentoJuridico($(this).val(), $('#idregional').val());
 			$.ajax({
 				method: "POST",
 				data: {
@@ -429,6 +430,36 @@ function noWeekendsOrHolidays(date) {
 		});
 	});
 })(jQuery);
+
+// Atendimento Jurídico
+function atendimentoJuridico(dia, regional)
+{
+	if(dia === '17/02/2020' && regional === '8' ||
+	   dia === '18/02/2020' && regional === '8' ||
+	   dia === '19/02/2020' && regional === '4' ||
+	   dia === '20/02/2020' && regional === '4' ||
+	   dia === '17/03/2020' && regional === '7' ||
+	   dia === '18/03/2020' && regional === '7' ||
+	   dia === '23/03/2020' && regional === '12' ||
+	   dia === '24/03/2020' && regional === '12' ||
+	   dia === '07/04/2020' && regional === '13' ||
+	   dia === '08/04/2020' && regional === '13' ||
+	   dia === '27/04/2020' && regional === '3' ||
+	   dia === '28/04/2020' && regional === '3' ||
+	   dia === '18/05/2020' && regional === '9' ||
+	   dia === '19/05/2020' && regional === '9' ||
+	   dia === '20/05/2020' && regional === '2' ||
+	   dia === '21/05/2020' && regional === '2' ||
+	   dia === '22/06/2020' && regional === '11' ||
+	   dia === '23/06/2020' && regional === '11' ||
+	   dia === '25/06/2020' && regional === '6' ||
+	   dia === '26/06/2020' && regional === '6') {
+		$('#selectServicos').prepend(new Option("Plantão Jurídico", "Plantão Jurídico")).attr('selected','selected');
+		$("#selectServicos")[0].options[0].selected = true;
+	} else {
+		$('#selectServicos option[value="Plantão Jurídico"]').remove();
+	}
+}
 
 // Get informação empresa
 function getInfoEmpresa(value)

@@ -162,7 +162,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
             <div class="form-row mt-2">
               <div class="col-md-6">
                 <label for="servico">Tipo de Serviço *</label>
-                <select name="servico" class="form-control">
+                <select name="servico" class="form-control" id="selectServicos">
                   @foreach($servicos as $servico)
                     @if($servico == old('servico'))
                     <option value="{{ $servico }}" selected>{{ $servico }}</option>

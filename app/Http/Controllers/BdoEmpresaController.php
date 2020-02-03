@@ -212,7 +212,7 @@ class BdoEmpresaController extends Controller
             ->where('cnpj', '=', $cnpj)
             ->first();
 
-        $count = $this->temOportunidade($empresa->idempresa);
+        isset($empresa) ? $count = $this->temOportunidade($empresa->idempresa) : $count = 0;
 
         if($count > 0) {
             $message = 'A empresa informada <strong>já possui uma vaga em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do telefone <strong>(11) 3243-5523</strong> e/ou através do e-mail: <strong>samuel.santos@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.';
