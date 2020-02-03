@@ -11,7 +11,7 @@
     </span>
     <div class="info-box-content">
       <span class="info-box-text">Visitas no último mês</span>
-      <span class="info-box-number">47.683</span>
+      <span class="info-box-number">113.941</span>
     </div>
   </div>
 </div>
