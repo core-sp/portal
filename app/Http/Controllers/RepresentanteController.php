@@ -74,7 +74,7 @@ class RepresentanteController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = preg_replace('/[^0-9]+/', '', FacadesRequest::input('q'));
+        $busca = preg_replace('/[^0-9A-Za-z]+/', '', FacadesRequest::input('q'));
         $variaveis = (object) $this->variaveis;
         $resultados = Representante::where('nome','LIKE','%'.$busca.'%')
             ->orWhere('registro_core','LIKE','%'.$busca.'%')
