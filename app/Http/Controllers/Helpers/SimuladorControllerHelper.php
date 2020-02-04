@@ -81,7 +81,7 @@ class SimuladorControllerHelper extends Controller
                 <li>2 fotos 3x4 (sem data);</li>
                 <li>Comprovante de quitação com o serviço militar, para os profissionais do sexo masculino que tenham até 45 anos (exceto estrangeiro);</li>
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>
-                <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (www.core-sp.org.br/downloads/IndRespTec.pdf)</li>
+                <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (<a href="https://www.core-sp.org.br/arquivos/2019-07/DECLARA%C3%87%C3%83O%20DE%20RT.pdf" class="vermelho" target="_blank">Termo de indicação de Resp. Técnico</a>)</li>
                 <li>Cópia da quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009. (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
             </ol>
             <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
@@ -112,7 +112,7 @@ class SimuladorControllerHelper extends Controller
                 <li>2 fotos 3x4 (sem data);</li>
                 <li>Comprovante de quitação com o serviço militar, para os profissionais do sexo masculino que tenham até 45 anos (exceto estrangeiro);</li>
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>
-                <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (www.core-sp.org.br/downloads/IndRespTec.pdf)</li>
+                <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (<a href="https://www.core-sp.org.br/arquivos/2019-07/DECLARA%C3%87%C3%83O%20DE%20RT.pdf" class="vermelho" target="_blank">Termo de indicação de Resp. Técnico</a>)</li>
                 <li>Cópia da quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009. (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
             </ol>
             <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
