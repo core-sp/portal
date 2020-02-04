@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Representante;
+use Illuminate\Support\Facades\Request as FacadesRequest;
 
 class RepresentanteController extends Controller
 {
@@ -69,5 +69,19 @@ class RepresentanteController extends Controller
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+    }
+
+    public function busca()
+    {
+        ControleController::autoriza($this->class, 'index');
+        $busca = preg_replace('/[^0-9]+/', '', FacadesRequest::input('q'));
+        $variaveis = (object) $this->variaveis;
+        $resultados = Representante::where('nome','LIKE','%'.$busca.'%')
+            ->orWhere('registro_core','LIKE','%'.$busca.'%')
+            ->orWhere('cpf_cnpj','LIKE','%'.$busca.'%')
+            ->orWhere('email','LIKE','%'.$busca.'%')
+            ->paginate(10);
+        $tabela = $this->tabelaCompleta($resultados);
+        return view('admin.crud.home', compact('resultados', 'variaveis', 'tabela', 'busca'));
     }
 }

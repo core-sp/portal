@@ -173,7 +173,7 @@
                     @endforeach
                 </tr>
                 <tr>
-                    <td>Representante - Cadastros</td>
+                    <td>Representante - Cadastrados</td>
                     @php
                         $p = $permissoesArray['RepresentanteController'][0];
                         $name = $p['controller'].'_'.$p['metodo'];
