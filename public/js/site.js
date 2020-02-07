@@ -563,6 +563,11 @@ function getDate() {
 			$('#filial').prop('disabled', 'disabled').val('');
 		}
 	});
+	// Filename comprovante de residência
+	$('#comprovante-residencia, #comprovante-residencia-dois').on('change',function(e){
+		var fileName = e.target.files[0].name;
+		$(this).next('.custom-file-label').html(fileName);
+	})
 })(jQuery);
 
 // Lazy-load
