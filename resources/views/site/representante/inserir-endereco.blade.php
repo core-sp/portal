@@ -93,7 +93,7 @@
                     @endif
                 </div>
             </div>
-            <div class="form-row mb-3 cadastroRepresentante">
+            <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
                     <label for="uf">Estado *</label>
                     <select name="estado" id="uf" class="form-control {{ $errors->has('estado') ? 'is-invalid' : '' }}">
@@ -124,23 +124,38 @@
                     @endif
                 </div>
             </div>
-            <div class="form-group">
-                <label for="comprovante-residencia">Comprovante de Residência *</label>
+            <div class="cadastroRepresentante">
+                <label>Comprovante de residência *</label>
+            </div>
+            <div class="custom-file">
                 <input
                     type="file"
                     name="crimage"
-                    class="form-control-file {{ $errors->has('crimage') ? 'is-invalid' : '' }}"
+                    class="custom-file-input {{ $errors->has('crimage') ? 'is-invalid' : '' }}"
                     id="comprovante-residencia"
+                    role="button"
                 >
+                <label class="custom-file-label" for="comprovante-residencia">Selecionar arquivo...</label>
                 @if($errors->has('crimage'))
                     <div class="invalid-feedback">
                         {{ $errors->first('crimage') }}
                     </div>
                 @endif
             </div>
-            {{-- <div class="form-check mb-4">
-                <input type="checkbox" class="form-check-input" id="corresp" name="corresp" {{ $infos[0]['END_CORRESP'] === 'T' ? 'checked' : '' }}>
-                <label class="form-check-label" for="corresp">Endereço para correspondência</label>
+            {{-- <div class="custom-file mt-2">
+                <input
+                    type="file"
+                    name="crimagedois"
+                    class="custom-file-input {{ $errors->has('crimagedois') ? 'is-invalid' : '' }}"
+                    id="comprovante-residencia-dois"
+                    role="button"
+                >
+                <label class="custom-file-label" for="comprovante-residencia">Selecionar outro arquivo... <i>(opcional)</i></label>
+                @if($errors->has('crimagedois'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('crimagedois') }}
+                    </div>
+                @endif
             </div> --}}
             <div class="form-group mt-4">
                 <button type="submit" class="btn btn-primary">Cadastrar</button>

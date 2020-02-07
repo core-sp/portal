@@ -729,6 +729,11 @@ figure.align-left {
 	justify-content: center;
 }
 
+.inside-box img,
+.inside-box-dois img {
+	min-width: 64px;
+}
+
 .inside-box-dois {
 	border: 1px solid #FFFFFF;
 	padding: 1rem 1.75rem;
@@ -775,6 +780,15 @@ figure.align-left {
 	color: #FFFFFF;
 	border: 1px solid #FFFFFF;
 	background-color: transparent;
+}
+
+.custom-file-input ~ .custom-file-label::after {
+    content: "Pesquisar";
+}
+
+input[type=file],
+input[type=file]::-webkit-file-upload-button {
+    cursor: pointer; 
 }
 
 /* NOVO CORE */
