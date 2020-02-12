@@ -246,7 +246,7 @@ class RepresentanteSiteController extends Controller
         ]);
     }
 
-    public function saveEndereco($image)
+    public function saveEndereco($image, $imageDois = null)
     {
         $save = RepresentanteEndereco::create([
             'ass_id' => Auth::guard('representante')->user()->ass_id,
@@ -258,6 +258,7 @@ class RepresentanteSiteController extends Controller
             'estado' => request('estado'),
             'municipio' => request('municipio'),
             'crimage' => $image,
+            'crimagedois' => $imageDois,
             'status' => 'Aguardando confirmação'
         ]);
 
@@ -275,7 +276,14 @@ class RepresentanteSiteController extends Controller
 
         request()->crimage->move(public_path('imagens/representantes/enderecos'), $imageName);
 
-        $this->saveEndereco($imageName);
+        if(isset(request()->crimagedois)) {
+            $imageDoisName = Auth::guard('representante')->user()->id . '-2-' . time() . '.' . request()->crimagedois->getClientOriginalExtension();
+            request()->crimagedois->move(public_path('imagens/representantes/enderecos'), $imageDoisName);
+        } else {
+            $imageDoisName = null;
+        }
+
+        $this->saveEndereco($imageName, $imageDoisName);
 
         // $this->gerentiInserirEndereco(Auth::guard('representante')->user()->ass_id, $request);
 
@@ -287,7 +295,7 @@ class RepresentanteSiteController extends Controller
         $body .= '<br /><br />';
         $body .= 'Para verifica-la, acesse o <a href="' . route('site.home') . '/admin">painel de administração</a> do Portal Core-SP.';
 
-        Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($body));
+        // Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($body));
 
         return redirect()
             ->route('representante.enderecos.view')

@@ -27,8 +27,23 @@
             <p class="mb-0">Estado: <strong>{{ $resultado->estado }}</strong></p>
             <p>Município: <strong>{{ $resultado->municipio }}</strong></p>
             <h5>Comprovante de residência:</h5>
-            <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimage }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
-            <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimage }}" class="btn btn-sm btn-secondary" target="_blank" download>Baixar</a>
+            <p class="mb-0">
+                @isset($resultado->crimagedois)
+                    <strong>1- </strong>
+                @endisset
+                <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimage }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
+                <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimage }}" class="btn btn-sm btn-secondary" target="_blank" download>Baixar</a>
+            </p>
+                @isset($resultado->crimagedois)
+                    <div class="mt-2">
+                        <p>
+                            <strong>2- </strong>
+                            <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimagedois }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
+                            <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimagedois }}" class="btn btn-sm btn-secondary" target="_blank" download>Baixar</a>
+                        </p>
+                    </div>
+                @endisset
+            </p>
             @if ($resultado->status === 'Aguardando confirmação')
                 <hr>
                 <h4 class="mb-3">Ações</h4>
