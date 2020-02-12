@@ -295,7 +295,7 @@ class RepresentanteSiteController extends Controller
         $body .= '<br /><br />';
         $body .= 'Para verifica-la, acesse o <a href="' . route('site.home') . '/admin">painel de administração</a> do Portal Core-SP.';
 
-        // Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($body));
+        Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($body));
 
         return redirect()
             ->route('representante.enderecos.view')
