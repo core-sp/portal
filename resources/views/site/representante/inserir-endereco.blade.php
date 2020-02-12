@@ -142,7 +142,7 @@
                     </div>
                 @endif
             </div>
-            <div id="showCrimageDois" class="mt-3">
+            <div id="showCrimageDois" class="mt-2">
                 <p><i>* Se necessário, anexe outro arquivo <a id="linkShowCrimageDois" class="pointer vermelho">clicando aqui.</a></i></p>
             </div>
             <div class="custom-file mt-2" id="divCrimageDois">
