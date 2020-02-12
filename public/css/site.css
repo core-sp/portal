@@ -45,7 +45,7 @@ body {
 }
 
 .vermelho {
-	color: #ff0000;
+	color: #ff0000 !important;
 }
 
 .azul-escuro {
@@ -693,6 +693,10 @@ figure.align-left {
 	padding: 0.5rem;
 	border-radius: 5px;
 	position: relative;
+	cursor: pointer;
+}
+
+.pointer:hover {
 	cursor: pointer;
 }
 
@@ -1923,6 +1927,10 @@ h5 {
 
 .parceiro-grid img {
 	max-width: 240px;
+}
+
+#divCrimageDois {
+	display: none;
 }
 
 /* FINAL */

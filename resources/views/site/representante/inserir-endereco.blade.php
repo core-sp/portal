@@ -142,7 +142,10 @@
                     </div>
                 @endif
             </div>
-            {{-- <div class="custom-file mt-2">
+            <div id="showCrimageDois" class="mt-3">
+                <p><i>* Se necessário, anexe outro arquivo <a id="linkShowCrimageDois" class="pointer vermelho">clicando aqui.</a></i></p>
+            </div>
+            <div class="custom-file mt-2" id="divCrimageDois">
                 <input
                     type="file"
                     name="crimagedois"
@@ -156,7 +159,7 @@
                         {{ $errors->first('crimagedois') }}
                     </div>
                 @endif
-            </div> --}}
+            </div>
             <div class="form-group mt-4">
                 <button type="submit" class="btn btn-primary">Cadastrar</button>
             </div>
