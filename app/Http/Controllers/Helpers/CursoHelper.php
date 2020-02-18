@@ -12,8 +12,9 @@ class CursoHelper extends Controller
     public static function tipos()
     {
         $tipos = [
-            'Palestra',
             'Curso',
+            'Evento Comemorativo',
+            'Palestra',
             'Workshop'
         ];
         return $tipos;
