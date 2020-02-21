@@ -206,8 +206,8 @@ class AgendamentoSiteController extends Controller
         $agradece .= "Serviço: ".$tiposervico.'<br>';
         $adendo = '<i>* As informações serão enviadas ao email cadastrado no formulário</i>';
         // Texto suplementar ao email de Agendamento
-        $sup = AgendamentoControllerHelper::textoSuplementarMail();
-        $body = $agradece.$sup;
+        // $sup = AgendamentoControllerHelper::textoSuplementarMail();
+        $body = $agradece;
         Mail::to($emailUser)->queue(new AgendamentoMailGuest($body));
 
         // Retorna view de agradecimento
