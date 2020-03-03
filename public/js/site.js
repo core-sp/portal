@@ -303,6 +303,7 @@ function noWeekendsOrHolidays(date) {
 				.remove()
 				.end()
 				.append('<option value="" disabled selected>Selecione o dia do atendimento</option>');
+			$('#selectServicos option[value="Plantão Jurídico"]').remove();
 		});
 		// Ajax após change no datepicker
 		$('#datepicker').change(function(){
@@ -440,8 +441,8 @@ function atendimentoJuridico(dia, regional)
 	   dia === '20/02/2020' && regional === '4' ||
 	   dia === '17/03/2020' && regional === '7' ||
 	   dia === '18/03/2020' && regional === '7' ||
-	   dia === '23/03/2020' && regional === '12' ||
-	   dia === '24/03/2020' && regional === '12' ||
+	   dia === '17/03/2020' && regional === '12' ||
+	   dia === '18/03/2020' && regional === '12' ||
 	   dia === '07/04/2020' && regional === '13' ||
 	   dia === '08/04/2020' && regional === '13' ||
 	   dia === '27/04/2020' && regional === '3' ||
