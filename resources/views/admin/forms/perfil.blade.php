@@ -20,7 +20,7 @@
                     <td>Usuários</td>
                     @foreach($permissoesArray['UserController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -36,7 +36,7 @@
                     <td><input type="checkbox" class="form-check-input" disabled /></td>
                     @foreach($permissoesArray['RegionalController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -48,7 +48,7 @@
                     <td>Páginas</td>
                     @foreach($permissoesArray['PaginaController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -59,7 +59,7 @@
                     <td>Notícias</td>
                     @foreach($permissoesArray['NoticiaController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -70,7 +70,7 @@
                     <td>Cursos</td>
                     @foreach($permissoesArray['CursoController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -81,7 +81,7 @@
                     <td>Newsletter</td>
                     @foreach($permissoesArray['NewsletterController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -97,7 +97,7 @@
                     <td><input type="checkbox" class="form-check-input" disabled /></td>
                     @foreach($permissoesArray['HomeImagemController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -109,7 +109,7 @@
                     <td>Cursos<br />(Inscritos)</td>
                     @foreach($permissoesArray['CursoInscritoController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -120,7 +120,7 @@
                     <td>B. de Oportunidades<br />(Empresas)</td>
                     @foreach($permissoesArray['BdoEmpresaController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -131,7 +131,7 @@
                     <td>B. de Oportunidades<br />(Oportunidades)</td>
                     @foreach($permissoesArray['BdoOportunidadeController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -144,7 +144,7 @@
                         $p = $permissoesArray['AgendamentoController'][0];
                         $name = $p['controller'].'_'.$p['metodo'];
                     @endphp
-                    @if(strpos($p['perfis'], $idperfil.',') !== false)
+                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                     @else
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -154,7 +154,7 @@
                         $p = $permissoesArray['AgendamentoController'][1];
                         $name = $p['controller'].'_'.$p['metodo'];
                     @endphp
-                    @if(strpos($p['perfis'], $idperfil.',') !== false)
+                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                     @else
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -165,7 +165,7 @@
                     <td>Agendamentos<br />(Bloqueios)</td>
                     @foreach($permissoesArray['AgendamentoBloqueioController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -178,7 +178,7 @@
                         $p = $permissoesArray['RepresentanteController'][0];
                         $name = $p['controller'].'_'.$p['metodo'];
                     @endphp
-                    @if(strpos($p['perfis'], $idperfil.',') !== false)
+                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                     @else
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -193,7 +193,7 @@
                         $p = $permissoesArray['RepresentanteEnderecoController'][0];
                         $name = $p['controller'].'_'.$p['metodo'];
                     @endphp
-                    @if(strpos($p['perfis'], $idperfil.',') !== false)
+                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                     @else
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -203,7 +203,7 @@
                         $p = $permissoesArray['RepresentanteEnderecoController'][1];
                         $name = $p['controller'].'_'.$p['metodo'];
                     @endphp
-                    @if(strpos($p['perfis'], $idperfil.',') !== false)
+                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                     @else
                         <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -214,7 +214,7 @@
                     <td>Licitações</td>
                     @foreach($permissoesArray['LicitacaoController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
@@ -225,7 +225,7 @@
                     <td>Concursos</td>
                     @foreach($permissoesArray['ConcursoController'] as $p)
                     @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], $idperfil.',') !== false)
+                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
                         @else
                             <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
