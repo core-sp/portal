@@ -133,7 +133,7 @@ class PerfilController extends Controller
         foreach($permissoes as $permissao) {
             $idpermissao = $permissao->idpermissao;
             $cm = $permissao->controller.'_'.$permissao->metodo;
-            if(strpos($permissao->perfis, $id.',') !== false) {
+            if(strpos($permissao->perfis, ','.$id.',') !== false || strpos($permissao->perfis, $id.',') === 0) {
                 if($request->input($cm) !== 'on') {
                     $permissaoSingle = Permissao::find($idpermissao);
                     $perfisString = str_replace($id.',', '', $permissaoSingle->perfis);
