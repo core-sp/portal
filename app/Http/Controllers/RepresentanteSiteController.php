@@ -272,6 +272,17 @@ class RepresentanteSiteController extends Controller
     {
         $this->validateEndereco($request);
 
+        // Checa se já tem solicitação de endereço sob análise.
+        $count = RepresentanteEndereco::where('ass_id', Auth::guard('representante')->user()->ass_id)->where('status', 'Aguardando confirmação')->count();
+        if($count >= 1) {
+            return redirect()
+                ->route('representante.enderecos.view')
+                ->with([
+                    'message' => 'Você já possui uma solicitação de alteração de endereço sob análise. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
+                    'class' => 'alert-danger'
+                ]);
+        }
+
         $imageName = Auth::guard('representante')->user()->id . '-' . time() . '.' . request()->crimage->getClientOriginalExtension();
 
         request()->crimage->move(public_path('imagens/representantes/enderecos'), $imageName);
@@ -295,7 +306,7 @@ class RepresentanteSiteController extends Controller
         $body .= '<br /><br />';
         $body .= 'Para verifica-la, acesse o <a href="' . route('site.home') . '/admin">painel de administração</a> do Portal Core-SP.';
 
-        Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($body));
+        // Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($body));
 
         return redirect()
             ->route('representante.enderecos.view')
