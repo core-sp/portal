@@ -165,6 +165,7 @@ use \App\Http\Controllers\Helper;
                       </div>
                       <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade 2020</a>
                       <a href="/representante/login" class="dropdown-item">Área Restrita</a>
+                      <a href="/servicos-atendimento-ao-rc" class="dropdown-item">Atendimento</a>
                       <div class="sub-dropdown">
                         <div class="dropdown-item">
                           Balcão de Oportunidades <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
@@ -174,11 +175,9 @@ use \App\Http\Controllers\Helper;
                           <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
                         </div>
                       </div>
-                      <a href="/cancelamento-de-registro" class="dropdown-item">Cancelamento de Registro</a>
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
-                      <a href="/registro-inicial" class="dropdown-item">Registro Inicial</a>
                       <a href="/simulador" class="dropdown-item bb-0">Simulador de Valores</a>
                     </div>
                   </li>
@@ -270,12 +269,11 @@ use \App\Http\Controllers\Helper;
               <p class="branco"><a href="/agendamento">Agendamento</a></p>
               <p class="branco"><a href="/anuidade-ano-vigente">Anuidade 2020</a></p>
               <p class="branco"><a href="/representante/login">Área Restrita</a></p>
+              <p class="branco"><a href="/servicos-atendimento-ao-rc">Atendimento</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
-              <p class="branco"><a href="/cancelamento-de-registro">Cancelamento de Registro</a></p>
               <p class="branco"><a href="/consulta-de-situacao">Consulta de Situação</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="/downloads">Downloads</a></p>
-              <p class="branco"><a href="/registro-inicial">Registro Inicial</a></p>
               <p class="branco"><a href="/simulador">Simulador de Valores</a></p>
             </div>
             <div class="col-md-4">
