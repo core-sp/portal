@@ -38,10 +38,13 @@ $pessoas = AgendamentoControllerHelper::pessoas();
     <div class="linha-lg"></div>
     <div class="row mb-4">
       <div class="col">
-      <div class="conteudo-txt">
-      <p>Agende seu atendimento presencial no CORE-SP, com até um mês de antecedência.<br />
+        <div class="conteudo-txt">
+          <p><strong>Importante:</strong> O atendimento presencial está suspenso temporariamente, neste período os serviços deverão ser solicitados via email. O prazo para análise e resposta do email depende do tipo de serviço solicitado.</p>
+          <p>Para mais informações, acesse <a href="/servicos-atendimento-ao-rc">este link</a>.</p>
+          <!--
+          <p>Agende seu atendimento presencial no CORE-SP, com até um mês de antecedência.<br />
       Ou então, consulte as <a href="/agendamento-consulta" class="text-primary">informações do atendimento já agendado.</a></p> 
-      </div>
+        </div>
         <div class="mt-2">
           <form method="POST" class="inscricaoCurso">
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
@@ -54,11 +57,11 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   name="nome"
                   value="{{ old('nome') }}"
                   placeholder="Nome" />
-                  @if($errors->has('nome'))
+                @if($errors->has('nome'))
                   <div class="invalid-feedback">
                     {{ $errors->first('nome') }}
                   </div>
-                  @endif
+                @endif
               </div>
               <div class="col-md-6 mt-2-768">
                 <label for="cpf">CPF *</label>
@@ -68,11 +71,11 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   placeholder="CPF"
                   value="{{ old('cpf') }}"
                   />
-                  @if($errors->has('cpf'))
+                @if($errors->has('cpf'))
                   <div class="invalid-feedback">
                     {{ $errors->first('cpf') }}
                   </div>
-                  @endif
+                @endif
               </div>
             </div>
             <div class="form-row mt-2">
@@ -84,11 +87,11 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   value="{{ old('email') }}"
                   placeholder="E-mail"
                   />
-                  @if($errors->has('email'))
+                @if($errors->has('email'))
                   <div class="invalid-feedback">
                     {{ $errors->first('email') }}
                   </div>
-                  @endif
+                @endif
               </div>
               <div class="col-md-6 mt-2-768">
                 <label for="celular">Celular *</label>
@@ -98,11 +101,11 @@ $pessoas = AgendamentoControllerHelper::pessoas();
                   value="{{ old('celular') }}"
                   placeholder="Celular"
                   />
-                  @if($errors->has('celular'))
+                @if($errors->has('celular'))
                   <div class="invalid-feedback">
                     {{ $errors->first('celular') }}
                   </div>
-                  @endif
+                @endif
               </div>
             </div>
             <h5 class="mt-4">Informações de agendamento</h5>
@@ -201,7 +204,8 @@ $pessoas = AgendamentoControllerHelper::pessoas();
             </div>
           </form>
         </div>
-	  </div>
+      </div>
+    -->
     </div>
   </div>
 </section>
