@@ -234,4 +234,24 @@ trait GerentiProcedures
 
         return $run->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function gerentiBusca($registro, $nome, $cpfCnpj)
+    {
+        $this->connect();
+
+        $run = $this->gerentiConnection->prepare("select ass_id, ass_ativo, ass_entidade, ass_tp_assoc,
+            ass_registro, ass_nome, ass_cpf_cgc, ass_dt_admissao, ass_dt_reg_social, ass_tp_pessoa,
+            ass_usu_cadastro, ass_tp_regiao, ass_dt_update, usu_codigo, sys_last_update, tipo,
+            cancelado, excore
+            from procbuscaassociado(:registro, :nome, :cpfCnpj, :email, :telefone)");
+        $run->execute([
+            'registro' => $registro,
+            'nome' => $nome,
+            'cpfCnpj' => $cpfCnpj,
+            'email' => '',
+            'telefone' => ''
+        ]);
+
+        return $run->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

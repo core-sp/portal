@@ -123,7 +123,7 @@ class PerfilController extends Controller
         $permissoesArray = $permissoesGroup->toArray();
 
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis', 'permissoesArray', 'idperfil'));
+        return view('admin.crud.editar', compact('variaveis', 'permissoesArray', 'idperfil'));
     }
 
     public function update(Request $request, $id)

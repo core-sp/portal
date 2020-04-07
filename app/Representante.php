@@ -127,6 +127,30 @@ class Representante extends Authenticable
         return $result;
     }
 
+    public function cobrancasById($ass_id)
+    {
+        $values = $this->gerentiBolestosLista($ass_id);
+        $values = utf8_converter($values);
+        
+        $anuidades = [];
+        $outros = [];
+
+        foreach($values as $value) {
+            if (strpos($value['DESCRICAO'], 'Anuidade') !== false) {
+                array_push($anuidades, $value);
+            } else {
+                array_push($outros, $value);
+            }
+        }
+        
+        $result = [
+            'anuidades' => $anuidades,
+            'outros' => $outros
+        ];
+
+        return $result;
+    }
+
     public function solicitacoesEnderecos()
     {
         return RepresentanteEndereco::where('ass_id', '=', $this->ass_id)->where('status', '!=', 'Enviado')->orderBy('created_at', 'DESC')->get();

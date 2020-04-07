@@ -245,18 +245,26 @@
                 <ul class="nav nav-treeview">
                     @if (ControleController::mostra('RepresentanteController', 'index'))
                     <li class="nav-item">
+                        <a href="/admin/representantes/buscaGerenti" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Busca Gerenti</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="/admin/representantes" class="nav-link">
                             <i class="nav-icon fa fa-angle-right"></i>
                             <p>Cadastrados</p>
                         </a>
                     </li>
                     @endif
+                    @if (ControleController::mostra('RepresentanteEnderecoController', 'index'))
                     <li class="nav-item">
                         <a href="/admin/representante-enderecos" class="nav-link">
                             <i class="nav-icon fa fa-angle-right"></i>
                             <p>Endereços</p>
                         </a>
-                    </li>
+                    </li>    
+                    @endif
                 </ul>
             </li>
         @endif
