@@ -115,7 +115,7 @@ class RepresentanteController extends Controller
             $conteudo = [
                 $resultado['ASS_NOME'] . ' <strong>(' . stringTipoPessoa($resultado['ASS_TP_ASSOC']) . ')</strong>',
                 formataRegistro($resultado['ASS_REGISTRO']),
-                formataCpfCnpj($resultado['ASS_CPF_CGC']),
+                '<span class="nowrap">' . formataCpfCnpj($resultado['ASS_CPF_CGC']) . '</span>',
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -159,8 +159,9 @@ class RepresentanteController extends Controller
         $this->validateRequest();
         $variaveis = (object) $this->variaveis;
         $resultados = $this->gerentiBusca($request->registro, $request->nome, $request->cpf_cnpj);
-        count($resultados) ? $tabela = $this->tabelaGerenti($resultados) : $tabela = 'vazia';
-        return view('admin.crud.criar', compact('variaveis', 'tabela'));
+        $count = count($resultados);
+        $count ? $tabela = $this->tabelaGerenti($resultados) : $tabela = 'vazia';
+        return view('admin.crud.criar', compact('variaveis', 'tabela', 'count'));
     }
 
     public function representanteInfo(Request $request)
