@@ -65,10 +65,13 @@
             </div>
         </div>
         <div class="form-group mt-3 mb-0">
-            <button type="submit" class="btn btn-primary">Buscar</button>
+        <button type="submit" class="btn btn-primary">Buscar {{ isset($tabela) ? 'novamente' : '' }}</button>
         </div>
     </div>
 </form>
+<div class="ml-4">
+    <small class="light"><i>{!! isset($count) ? 'Sua busca retornou <strong>' . $count . '</strong> resultado(s).' : '' !!}</i></small>
+</div>
 @if (isset($tabela))
     @if ($tabela === 'vazia')
         <hr>
