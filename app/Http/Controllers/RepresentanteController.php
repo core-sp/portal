@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Representante;
+use App\Rules\CpfCnpj;
+use Illuminate\Http\Request;
+use App\Traits\GerentiProcedures;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 
 class RepresentanteController extends Controller
 {
+    use GerentiProcedures;
+
     // Nome da classe
     private $class = 'RepresentanteController';
     // Variáveis
@@ -15,6 +20,9 @@ class RepresentanteController extends Controller
         'singulariza' => 'o representante',
         'plural' => 'representantes',
         'pluraliza' => 'representantes',
+        'titulo_criar' => 'Buscar Representante no Gerenti',
+        'muda_criar' => 'Preencha as informações para buscar no Gerenti',
+        'btn_lista' => '<a href="/admin/representantes/buscaGerenti" class="btn btn-primary">Nova Busca</a>'
     ];
 
     public function __construct()
@@ -83,5 +91,88 @@ class RepresentanteController extends Controller
             ->paginate(10);
         $tabela = $this->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'variaveis', 'tabela', 'busca'));
+    }
+
+    public function tabelaGerenti($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Nome',
+            'Registro',
+            'CPF/CNPJ',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) {
+            $acoes = '<form method="POST" action="/admin/representantes/info" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="tipo" value="'.$resultado["ASS_TP_ASSOC"].'" />';
+            $acoes .= '<input type="hidden" name="nome" value="'.$resultado["ASS_NOME"].'" />';
+            $acoes .= '<input type="hidden" name="ass_id" value="'.$resultado["ASS_ID"].'" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-default" value="Detalhes" />';
+            $acoes .= '</form>';
+            $conteudo = [
+                $resultado['ASS_NOME'] . ' <strong>(' . stringTipoPessoa($resultado['ASS_TP_ASSOC']) . ')</strong>',
+                formataRegistro($resultado['ASS_REGISTRO']),
+                formataCpfCnpj($resultado['ASS_CPF_CGC']),
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hover'
+        ];
+        // Monta e retorna tabela        
+        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
+    public function buscaGerentiView()
+    {
+        ControleController::autoriza($this->class, 'index');
+        $variaveis = (object) $this->variaveis;
+        return view('admin.crud.criar', compact('variaveis'));
+    }
+
+    protected function validateRequest()
+    {
+        return request()->validate([
+            'nome' => 'nullable|min:5',
+            'cpf_cnpj' => ['min:11', new CpfCnpj],
+            'registro' => 'nullable|min:5'
+        ], [
+            'nome.min' => 'Preencha no mínimo 5 caracteres',
+            'registro.min' => 'Preencha no mínimo 5 caracteres',
+            'min' => 'Erro no preenchimento!'
+        ]);
+    }
+    
+    public function buscaGerenti(Request $request)
+    {
+        $request->merge([
+            'registro' => preg_replace('/[^0-9]/', '', $request->registro),
+            'cpf_cnpj' => preg_replace('/[^0-9]/', '', $request->cpf_cnpj)
+        ]);
+        $this->validateRequest();
+        $variaveis = (object) $this->variaveis;
+        $resultados = $this->gerentiBusca($request->registro, $request->nome, $request->cpf_cnpj);
+        count($resultados) ? $tabela = $this->tabelaGerenti($resultados) : $tabela = 'vazia';
+        return view('admin.crud.criar', compact('variaveis', 'tabela'));
+    }
+
+    public function representanteInfo(Request $request)
+    {
+        ControleController::autoriza($this->class, 'index');
+        $variaveis = (object) $this->variaveis;
+        $nome = $request->nome;
+        $request->tipo === '2' || $request->tipo === '5' ? $dados_gerais = Representante::arrangeDgPf($this->gerentiDadosGeraisPF($request->ass_id)) : $dados_gerais = Representante::arrangeDgPj($this->gerentiDadosGeraisPJ($request->ass_id));
+        $contatos = $this->gerentiContatos($request->ass_id);
+        $enderecos = utf8_converter($this->gerentiEnderecos($request->ass_id));
+        $rep = new Representante();
+        $cobrancas = $rep->cobrancasById($request->ass_id);
+        return view('admin.crud.mostra', compact('variaveis', 'nome', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas'));
     }
 }

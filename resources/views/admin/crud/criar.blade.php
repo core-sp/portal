@@ -18,7 +18,7 @@
         <div class="card card-info">
           <div class="card-header">
             <div class="card-title">
-              Preencha as informações para criar {{ $variaveis->singulariza }}
+              {{ isset($variaveis->muda_criar) ? $variaveis->muda_criar : 'Preencha as informações para criar ' . $variaveis->singulariza }}
             </div>
           </div>
           @if(isset($variaveis->form))

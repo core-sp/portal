@@ -99,3 +99,35 @@ img {
 #recusar-form {
   display: none;
 }
+
+.rotate-90 {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.setecinco {
+  padding-left: .75rem !important;
+}
+
+.contato-single p {
+	line-height: 1.65;
+}
+
+.space-single {
+  padding: 0.75rem 1.25rem;
+}
+
+.space {
+  padding: 1.25rem 1.25rem .25rem 1.25rem;
+}
+
+.secondary-bg {
+  background-color: #6c757d !important;
+}
+
+.no-border {
+  border-top: none !important;
+}

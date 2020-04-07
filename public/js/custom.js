@@ -33,6 +33,14 @@ $(document).ready(function(){
   $('.cepInput').mask('00000-000');
   $('.dataInput').mask('00/00/0000');
   $('.cpfInput').mask('000.000.000-00');
+  $('#registro_core').mask('0000000/0000', {reverse: true});
+  var options = {
+		onKeyPress: function (cpf, ev, el, op) {
+			var masks = ['000.000.000-000', '00.000.000/0000-00'];
+			$('.cpfOuCnpj').mask((cpf.length > 14) ? masks[1] : masks[0], op);
+		}
+	}
+	$('.cpfOuCnpj').length > 11 ? $('.cpfOuCnpj').mask('00.000.000/0000-00', options) : $('.cpfOuCnpj').mask('000.000.000-00#', options);
   $('#ageporhorario').mask('0');
   // Máscaras para datas
   $('#dataTermino').mask('00/00/0000', {

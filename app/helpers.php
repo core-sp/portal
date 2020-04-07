@@ -383,3 +383,38 @@ function termoDeUso()
         <p>Para fazer uso da Área Restrita, é preciso: (i) ler atentamente os termos descritos abaixo; (ii) concordar expressamente com eles, (iii) se cadastrar fornecendo o CPF/CNPJ, número de registro junto ao Core-SP e o e-mail válido cadastrado no ato de registro profissional, para ter acesso à Área Restrita.</p>
     ';
 }
+
+function stringTipoPessoa($number)
+{
+    switch ($number) {
+        case '1':
+            return 'PJ';
+        break;
+
+        case '2':
+            return 'PF';
+        break;
+
+        case '5':
+            return 'RT';
+        break;
+        
+        default:
+            return 'Indefinida';
+        break;
+    }
+}
+
+function formataRegistro($registro)
+{
+    return substr_replace($registro, '/', -4, 0);
+}
+
+function formataCpfCnpj($value)
+{
+    $cnpj_cpf = preg_replace("/\D/", '', $value);
+    if (strlen($cnpj_cpf) === 11) {
+        return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cnpj_cpf);
+    } 
+    return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
+}

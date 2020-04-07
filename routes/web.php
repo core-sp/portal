@@ -205,6 +205,9 @@ Route::prefix('admin')->group(function() {
   // Rotas para Representantes
   Route::get('/representantes', 'RepresentanteController@index');
   Route::get('/representantes/busca', 'RepresentanteController@busca');
+  Route::get('/representantes/buscaGerenti', 'RepresentanteController@buscaGerentiView');
+  Route::post('/representantes/buscaGerenti', 'RepresentanteController@buscaGerenti');
+  Route::post('/representantes/info', 'RepresentanteController@representanteInfo');
   Route::get('/representante-enderecos', 'RepresentanteEnderecoController@index');
   Route::get('/representante-enderecos/{id}', 'RepresentanteEnderecoController@show')->name('admin.representante-endereco.show');
   Route::post('/representante-enderecos/inserir', 'RepresentanteEnderecoController@inserirEnderecoGerenti')->name('admin.representante-endereco.post');
