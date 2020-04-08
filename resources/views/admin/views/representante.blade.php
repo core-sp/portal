@@ -1,10 +1,13 @@
 <div class="space">
     <div class="card card-info card-outline mb-0">
         <div class="card-header secondary-bg">
-            <h3 class="card-title">
-                <i class="fas fa-user"></i>
-                    &nbsp;{{ $nome }}
-            </h3>
+            <div class="d-flex">
+                <h3 class="card-title flex-one">
+                    <i class="fas fa-user"></i>
+                        &nbsp;{{ $nome }}
+                </h3>
+                <h5 class="situacao blink_me mb-0 pl-3"><strong>{{ $situacao }}</strong></h5>
+            </div>
         </div>
         <div class="card-body">
             <div class="row">
