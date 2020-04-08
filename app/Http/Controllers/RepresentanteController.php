@@ -140,13 +140,14 @@ class RepresentanteController extends Controller
     protected function validateRequest()
     {
         return request()->validate([
-            'nome' => 'nullable|min:5',
-            'cpf_cnpj' => ['min:11', new CpfCnpj],
-            'registro' => 'nullable|min:5'
+            'nome' => 'nullable|min:5|required_without_all:cpf_cnpj,registro',
+            'cpf_cnpj' => ['min:11', new CpfCnpj, 'required_without_all:nome,registro'],
+            'registro' => 'nullable|min:5|required_without_all:nome,cpf_cnpj'
         ], [
             'nome.min' => 'Preencha no mínimo 5 caracteres',
             'registro.min' => 'Preencha no mínimo 5 caracteres',
-            'min' => 'Erro no preenchimento!'
+            'min' => 'Erro no preenchimento!',
+            'required_without_all' => 'Preencha pelo menos um campo'
         ]);
     }
     
