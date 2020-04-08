@@ -164,6 +164,13 @@ class RepresentanteController extends Controller
         return view('admin.crud.criar', compact('variaveis', 'tabela', 'count'));
     }
 
+    protected function pegaSituacao($ass_id)
+    {
+        $situacao = $this->gerentiStatus($ass_id);
+        $array = explode(':', $situacao);
+        return trim($array[1]);
+    }
+
     public function representanteInfo(Request $request)
     {
         ControleController::autoriza($this->class, 'index');
@@ -171,9 +178,10 @@ class RepresentanteController extends Controller
         $nome = $request->nome;
         $request->tipo === '2' || $request->tipo === '5' ? $dados_gerais = Representante::arrangeDgPf($this->gerentiDadosGeraisPF($request->ass_id)) : $dados_gerais = Representante::arrangeDgPj($this->gerentiDadosGeraisPJ($request->ass_id));
         $contatos = $this->gerentiContatos($request->ass_id);
+        $situacao = $this->pegaSituacao($request->ass_id);
         $enderecos = utf8_converter($this->gerentiEnderecos($request->ass_id));
         $rep = new Representante();
         $cobrancas = $rep->cobrancasById($request->ass_id);
-        return view('admin.crud.mostra', compact('variaveis', 'nome', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas'));
+        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas'));
     }
 }
