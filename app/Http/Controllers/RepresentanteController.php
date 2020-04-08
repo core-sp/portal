@@ -53,7 +53,7 @@ class RepresentanteController extends Controller
             $resultado->ativo === 0 ? $ativo = 'Não' : $ativo = 'Sim'; 
             $conteudo = [
                 $resultado->id,
-                $resultado->cpf_cnpj,
+                '<span class="nowrap">' . $resultado->cpf_cnpj . '</span>',
                 $resultado->registro_core,
                 $resultado->nome . '<br><small>Cadastro realizado em: ' . formataData($resultado->created_at) . '</small>',
                 $resultado->email,
