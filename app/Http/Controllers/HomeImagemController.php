@@ -74,7 +74,15 @@ class HomeImagemController extends Controller
                 'link' => $chunk[4][2],
                 'target' => $chunk[4][3]
             ]);
-        if(!$update1 || !$update2 || !$update3 || !$update4 || !$update5)
+        $update6 = HomeImagem::where('ordem','6')
+            ->where('funcao','bannerprincipal')
+            ->update([
+                'url' => $chunk[5][0],
+                'url_mobile' => $chunk[5][1],
+                'link' => $chunk[5][2],
+                'target' => $chunk[5][3]
+            ]);
+        if(!$update1 || !$update2 || !$update3 || !$update4 || !$update5 || !$update6)
             abort(500);
         event(new CrudEvent('banner principal', 'editou', 1));
         return redirect('/admin')
