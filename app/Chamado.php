@@ -15,6 +15,6 @@ class Chamado extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\User', 'idusuario');
+        return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
 }

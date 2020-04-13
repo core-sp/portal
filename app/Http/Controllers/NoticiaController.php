@@ -70,11 +70,12 @@ class NoticiaController extends Controller
                 $publicada = 'Publicada';
             else
                 $publicada = 'Rascunho';
+            isset($resultado->user) ? $autor = $resultado->user->nome : $autor = 'Usuário Deletado';
             $conteudo = [
                 $resultado->idnoticia,
                 $resultado->titulo.'<br><small><em>'.$publicada.'</em></small>',
                 $regional,
-                Helper::formataData($resultado->updated_at).'<br><small>Por: '.$resultado->user->nome.'</small>',
+                Helper::formataData($resultado->updated_at).'<br><small>Por: '.$autor.'</small>',
                 $acoes
             ];
             array_push($contents, $conteudo);

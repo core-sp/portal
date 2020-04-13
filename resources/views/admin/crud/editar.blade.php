@@ -39,11 +39,11 @@ use App\Http\Controllers\Helper;
         <div class="col">
           @if($resultado->updated_at == $resultado->created_at)
           <div class="callout callout-info">
-            <strong>Criado por:</strong> {{ $resultado->user->nome }}, às {{ Helper::organizaData($resultado->created_at) }}
+            <strong>Criado por:</strong> {{ isset($resultado->user->nome) ? $resultado->user->nome : 'Usuário Deletado' }}, às {{ Helper::organizaData($resultado->created_at) }}
           </div>
           @else
           <div class="callout callout-info">
-            <strong>Ultima alteração:</strong> {{ $resultado->user->nome }}, às {{ Helper::organizaData($resultado->updated_at) }}
+            <strong>Ultima alteração:</strong> {{ isset($resultado->user->nome) ? $resultado->user->nome : 'Usuário Deletado' }}, às {{ Helper::organizaData($resultado->updated_at) }}
           </div>
           @endif
         </div>

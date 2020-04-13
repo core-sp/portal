@@ -65,11 +65,12 @@ class PaginaController extends Controller
                 $categoria = $resultado->paginacategoria->nome;
             else
                 $categoria = 'Sem Categoria';
+            isset($resultado->user) ? $autor = $resultado->user->nome : $autor = 'Usuário Deletado';
             $conteudo = [
                 $resultado->idpagina,
                 $resultado->titulo,
                 $categoria,
-                Helper::formataData($resultado->updated_at).'<br><small>Por: '.$resultado->user->nome.'</small>',
+                Helper::formataData($resultado->updated_at).'<br><small>Por: '. $autor .'</small>',
                 $acoes
             ];
             array_push($contents, $conteudo);

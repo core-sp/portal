@@ -53,9 +53,10 @@ class PostsController extends Controller
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Deletar" onclick="return confirm(\'Tem certeza que deseja deletar o post?\')" />';
                 $acoes .= '</form>';
             }
+            isset($resultado->user) ? $autor = $resultado->user->nome : $autor = 'Usuário Deletado';
             $conteudo = [
                 $resultado->id,
-                $resultado->user->nome.'<br>'.formataData($resultado->created_at),
+                $autor.'<br>'.formataData($resultado->created_at),
                 $resultado->titulo,
                 $resultado->subtitulo,
                 $acoes
