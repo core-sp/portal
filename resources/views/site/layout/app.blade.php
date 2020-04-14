@@ -60,8 +60,8 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai">
               <div class="d-block setembro">
-                <h2 class="pacifico"><a href="/institucional" class="nohover">#Core54anos</a></h2>
-                <p class="light"><a href="/institucional" class="nohover"><small>Trabalho, transparência e respeito<br>ao Representante Comercial</small></a></p>
+                <h2 class="pacifico"><a href="/institucional" class="nohover">#HeróisAutônomos</a></h2>
+                <p class="light"><a href="/institucional" class="nohover"><small>Aos dedicados Representantes Comerciais<br>deste País, o nosso muito obrigado.</small></a></p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
