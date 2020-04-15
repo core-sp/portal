@@ -196,6 +196,19 @@ $(document).ready(function(){
 			getInfoEmpresa(value);
 		}
 	}
+	// Popup Campanha
+	var campanha = localStorage.getItem('campanha');
+	if (campanha == null) {
+		localStorage.setItem('campanha', 1);
+		$(window).on('load', function(){
+			$('#popup-campanha').modal('show');
+		});
+	}
+	$('#popup-campanha').on('hidden.bs.modal', function(){
+		$('#video-campanha').each(function(){
+			this.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*')
+		});
+	});
 });
 
 // Lightbox
