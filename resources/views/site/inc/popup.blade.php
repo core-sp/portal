@@ -10,8 +10,8 @@
                 </button>
             </div>
             <video id="video-campanha" controls autoplay muted>
-                <source src="{{ asset('img/campanha.webm') }}" type="video/webm">
                 <source src="{{ asset('img/campanha.mp4') }}" type="video/mp4">
+                <source src="{{ asset('img/campanha.webm') }}" type="video/webm">
             </video>
         </div>
     </div>
