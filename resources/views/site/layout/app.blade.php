@@ -40,6 +40,8 @@ use \App\Http\Controllers\Helper;
     </head>
     <body>
 
+    @include('site.inc.popup')
+
     <!-- ACESSIBILIDADE -->
     <a href="#header-principal" accesskey="1"></a>
     <a href="#conteudo-principal" accesskey="3"></a>

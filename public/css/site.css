@@ -1933,6 +1933,28 @@ h5 {
 	display: none;
 }
 
+#popup-campanha .model-content {
+	border-radius: 0;
+}
+
+#popup-campanha .modal-header {
+	border-radius: 0;
+	padding: 15px;
+}
+
+#popup-campanha .modal-title {
+	color: #16688E;
+}
+
+#popup-campanha .modal-body {
+	padding: 0;
+}
+
+#popup-campanha iframe {
+	width: 100%;
+	height: 452px;
+}
+
 /* FINAL */
 
 /*
@@ -2430,6 +2452,10 @@ h5 {
 	.contato-single,
 	.space-single {
 		padding: 0.75rem;
+	}
+
+	#popup-campanha iframe {
+		height: 282px;
 	}
 }
 
