@@ -205,9 +205,10 @@ $(document).ready(function(){
 		});
 	}
 	$('#popup-campanha').on('hidden.bs.modal', function(){
-		$('#video-campanha').each(function(){
-			this.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*')
-		});
+		$('#video-campanha').get(0).pause();
+	});
+	$('#video-campanha').on('ended', function(){
+		$('#popup-campanha').modal('hide');
 	});
 });
 

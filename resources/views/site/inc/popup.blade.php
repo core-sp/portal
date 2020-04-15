@@ -9,12 +9,10 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <iframe src="https://www.youtube.com/embed/8Z5QS3c1pxs?autoplay=1&mute=1&controls=1&modestbranding=1&showinfo=0&enablejsapi=1"
-                frameborder="0"
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-                id="video-campanha"
-            ></iframe>
+            <video id="video-campanha" controls autoplay muted>
+                <source src="{{ asset('img/campanha.webm') }}" type="video/webm">
+                <source src="{{ asset('img/campanha.mp4') }}" type="video/mp4">
+            </video>
         </div>
     </div>
 </div>
