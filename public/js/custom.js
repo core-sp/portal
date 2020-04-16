@@ -7,12 +7,14 @@ $(document).ready(function(){
   $('#lfm-4').filemanager('image');
   $('#lfm-5').filemanager('image');
   $('#lfm-6').filemanager('image');
+  $('#lfm-7').filemanager('image');
   $('#lfm-m-1').filemanager('image');
   $('#lfm-m-2').filemanager('image');
   $('#lfm-m-3').filemanager('image');
   $('#lfm-m-4').filemanager('image');
   $('#lfm-m-5').filemanager('image');
   $('#lfm-m-6').filemanager('image');
+  $('#lfm-m-7').filemanager('image');
   $('#edital').filemanager('file');
   // Máscaras gerais
   $('.nrlicitacaoInput').mask('999/9999');
