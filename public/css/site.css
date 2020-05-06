@@ -1955,6 +1955,19 @@ h5 {
 	height: 452px;
 }
 
+.btn-faixa {
+	color: #FFF;
+	padding: 5px 15px;
+	border: 1px solid #343a40;
+	background-color: transparent;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.as-center {
+	align-self: center;	
+}
+
 /* FINAL */
 
 /*

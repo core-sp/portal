@@ -60,7 +60,7 @@ use \App\Http\Controllers\Helper;
             <div class="col-lg-4 col-md-6 text-left center-768">
                 <a href="/"><img src="{{ asset('img/logo-branco.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
-            <div class="col-lg-4 col-md-6 center-768 aai">
+            <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
                 <h2 class="pacifico"><a href="https://www.confere.org.br/" target="_blank" class="nohover">#HeróisAutônomos</a></h2>
                 <p class="light"><a href="https://www.confere.org.br/" target="_blank" class="nohover"><small>Aos dedicados Representantes Comerciais<br>deste País, o nosso muito obrigado.</small></a></p>
@@ -194,6 +194,23 @@ use \App\Http\Controllers\Helper;
             </div>
           </div>
         </div>
+        <a href="/noticia/o-vencimento-da-anuidade-inicialmente-previsto-em-3004-foi-prorrogado-para-3006-sem-encargos-financeiros" class="hide-768">
+          <div class="container-fluid bg-warning pt-2 pb-2">
+            <div class="row">
+                <div class="container">
+                  <div class="d-flex">
+                    <div class="flex-one as-center">
+                      <h5 class="d-inline pr-3 text-dark"><strong>ANUIDADE 2020</strong></h5>
+                      <p class="d-inline text-dark">Vencimento inicial em 30/04 prorrogado para 30/06, sem encargos financeiros. <span class="nowrap">Solicite novo boleto!</span></p>
+                    </div>
+                    <div class="as-center ml-2">
+                      <p class="text-dark btn-faixa"><strong>SAIBA MAIS</strong></p>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </a>  
       </header>
 
       <header id="fixed-menu" class="pb-2">

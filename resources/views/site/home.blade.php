@@ -10,7 +10,7 @@
   use \App\Http\Controllers\Helper;
 @endphp
 
-<section class="mt-1">
+<section>
   <div class="container-fluid">
     <div class="row" id="conteudo-principal">
       <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="6000">

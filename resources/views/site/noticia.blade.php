@@ -23,7 +23,7 @@
   use App\Http\Controllers\Helper;
 @endphp
 
-<section id="pagina-cabecalho" class="mt-1">
+<section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/noticias.png') }}" />
     <div class="row position-absolute pagina-titulo">
