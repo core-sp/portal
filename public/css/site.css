@@ -253,6 +253,11 @@ strong, .bold {
 	color: inherit;
 }
 
+.nohoverbranco,
+.nohoverbranco:hover {
+	color: #ffc107;
+}
+
 .btn-voltar {
 	background-color: #13632F;
 	color: #FFFFFF;
@@ -376,7 +381,7 @@ figure.align-left {
 #header-principal {
 	top: 0;
 	left: 0;
-	background-color: #16688E;
+	background-color: #004587;
 }
 
 .header-margin {
@@ -1956,7 +1961,7 @@ h5 {
 }
 
 .btn-faixa {
-	color: #FFF;
+	color: #004587;
 	padding: 5px 15px;
 	border: 1px solid #343a40;
 	background-color: transparent;
