@@ -121,7 +121,7 @@ use \App\Http\Controllers\Helper;
             <div class="linha-cinza"></div>
           </div>
         </div>
-        <div class="container-fluid menu-inteiro">
+        <div class="container-fluid menu-inteiro pb-1">
           <div class="container">
             <div class="row" id="menu-principal">
               <nav class="menu-principal m-auto">
