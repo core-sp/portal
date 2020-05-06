@@ -2,7 +2,7 @@
 
 @section('content')
 
-<section id="pagina-cabecalho" class="mt-1">
+<section id="pagina-cabecalho">
     <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
         <img src="{{ asset('img/banner-cadastro-representante.jpg') }}" />
         <div class="row position-absolute pagina-titulo">

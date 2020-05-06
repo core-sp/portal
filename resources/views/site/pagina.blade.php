@@ -19,7 +19,7 @@
 
 @section('content')
 
-<section id="pagina-cabecalho" class="mt-1">
+<section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     @if(isset($pagina->img))
     <img src="{{asset($pagina->img)}}" />

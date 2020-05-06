@@ -10,7 +10,7 @@ $modalidades = LicitacaoHelper::modalidades();
 $situacoes = LicitacaoHelper::situacoes();
 @endphp
 
-<section id="pagina-cabecalho" class="mt-1">
+<section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/licitacoes.png') }}" />
     <div class="row position-absolute pagina-titulo">
