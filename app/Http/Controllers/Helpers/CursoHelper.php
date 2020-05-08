@@ -14,6 +14,7 @@ class CursoHelper extends Controller
         $tipos = [
             'Curso',
             'Evento Comemorativo',
+            'Live',
             'Palestra',
             'Workshop'
         ];
