@@ -8,4 +8,5 @@ class Permissao extends Model
 {
     protected $primaryKey = 'idpermissao';
     protected $table = 'permissoes';
+    protected $fillable = ['controller', 'metodo', 'perfis'];
 }

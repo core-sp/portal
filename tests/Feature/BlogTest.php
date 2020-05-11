@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BlogTest extends TestCase
@@ -13,7 +12,6 @@ class BlogTest extends TestCase
     /** @test */
     function an_admin_can_create_a_blog_post()
     {
-        $this->withoutExceptionHandling();
         $this->signInAsAdmin();
 
         $attributes = factory('App\Post')->raw();
