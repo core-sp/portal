@@ -9,12 +9,15 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\ControleController;
 use Illuminate\Support\Facades\Auth;
 use App\Events\CrudEvent;
+use App\Repositories\NoticiaRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class NoticiaController extends Controller
 {
     // Nome da classe
     private $class = 'NoticiaController';
+    private $noticiaModel;
+    private $noticiaRepository;
     // Variáveis extras da página
     public $variaveis = [
         'singular' => 'noticia',
@@ -28,65 +31,11 @@ class NoticiaController extends Controller
         'titulo' => 'Notícias Deletadas'
     ];
 
-    public function __construct()
+    public function __construct(Noticia $noticia, NoticiaRepository $noticiaRepository)
     {
         $this->middleware('auth', ['except' => 'show']);
-    }
-
-    public function resultados()
-    {
-        $resultados = Noticia::orderBy('idnoticia','DESC')->paginate(10);
-        return $resultados;
-    }
-
-    public function tabelaCompleta($resultados)
-    {
-        // Opções de cabeçalho da tabela
-        $headers = [
-            'Código',
-            'Título',
-            'Regional',
-            'Última alteração',
-            'Ações'
-        ];
-        // Opções de conteúdo da tabela
-        $contents = [];
-        foreach($resultados as $resultado) {
-            $acoes = '<a href="/noticia/'.$resultado->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if(ControleController::mostra($this->class, 'edit'))
-                $acoes .= '<a href="/admin/noticias/editar/'.$resultado->idnoticia.'" class="btn btn-sm btn-primary">Editar</a> ';
-            if(ControleController::mostra($this->class, 'destroy')) {
-                $acoes .= '<form method="POST" action="/admin/noticias/apagar/'.$resultado->idnoticia.'" class="d-inline">';
-                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-                $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a notícia?\')" />';
-                $acoes .= '</form>';
-            }
-            if(isset($resultado->idregional))
-                $regional = $resultado->regional->regional;
-            else
-                $regional = "Todas";
-            if($resultado->publicada == 'Sim')
-                $publicada = 'Publicada';
-            else
-                $publicada = 'Rascunho';
-            isset($resultado->user) ? $autor = $resultado->user->nome : $autor = 'Usuário Deletado';
-            $conteudo = [
-                $resultado->idnoticia,
-                $resultado->titulo.'<br><small><em>'.$publicada.'</em></small>',
-                $regional,
-                Helper::formataData($resultado->updated_at).'<br><small>Por: '.$autor.'</small>',
-                $acoes
-            ];
-            array_push($contents, $conteudo);
-        }
-        // Classes da tabela
-        $classes = [
-            'table',
-            'table-hover'
-        ];
-        $tabela = CrudController::montaTabela($headers, $contents, $classes);
-        return $tabela;
+        $this->noticiaModel = $noticia;
+        $this->noticiaRepository = $noticiaRepository;
     }
 
     protected function regras()
@@ -110,8 +59,8 @@ class NoticiaController extends Controller
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultados = $this->resultados();
-        $tabela = $this->tabelaCompleta($resultados);
+        $resultados = $this->noticiaRepository->getToTable();
+        $tabela = $this->noticiaModel->tabelaCompleta($this->noticiaRepository->getToTable());
         if(!ControleController::mostra($this->class, 'create'))
             unset($this->variaveis['btn_criar']);
         $variaveis = (object) $this->variaveis;
@@ -141,9 +90,7 @@ class NoticiaController extends Controller
             $categoria = $request->input('categoria');
         // Conta se título de notícia já existe
         $slug = Str::slug($request->input('titulo'), '-');
-        $countTitulo = Noticia::select('slug')
-            ->where('slug',$slug)
-            ->count();
+        $countTitulo = $this->noticiaRepository->getExistingSlug($slug);
         if($countTitulo >= 1) {
             return redirect('/admin/noticias')
                 ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar a notícia, pois já existe uma notícia com o título utilizado.')
@@ -194,10 +141,7 @@ class NoticiaController extends Controller
             $categoria = $request->input('categoria');
         // Checa se slug já existe
         $slug = Str::slug($request->input('titulo'), '-');
-        $countTitulo = Noticia::select('slug')
-            ->where('slug',$slug)
-            ->where('idnoticia','!=',$id)
-            ->count();
+        $countTitulo = $this->noticiaRepository->getExistingSlug($slug, $id);
         if($countTitulo >= 1) {
             return redirect('/admin/noticias')
                 ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível editar a notícia, pois já existe uma notícia com o título utilizado.')
@@ -240,40 +184,16 @@ class NoticiaController extends Controller
     public function lixeira()
     {
         ControleController::autorizaStatic(['1']);
-        $resultados = Noticia::onlyTrashed()->paginate(10);
-        // Opções de cabeçalho da tabela
-        $headers = [
-            'Código',
-            'Título',
-            'Deletada em:',
-            'Ações'
-        ];
-        // Opções de conteúdo da tabela
-        $contents = [];
-        foreach($resultados as $resultado) {
-            $acoes = '<a href="/admin/noticias/restore/'.$resultado->idnoticia.'" class="btn btn-sm btn-primary">Restaurar</a>';
-            $conteudo = [
-                $resultado->idnoticia,
-                $resultado->titulo,
-                Helper::formataData($resultado->deleted_at),
-                $acoes
-            ];
-            array_push($contents, $conteudo);
-        }
-        // Classes da tabela
-        $classes = [
-            'table',
-            'table-hover'
-        ];
+        $resultados = $this->noticiaRepository->getTrashed();
         $variaveis = (object) $this->variaveis;
-        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        $tabela = $this->noticiaModel->tabelaTrashed($resultados);;
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function restore($id)
     {
         ControleController::autorizaStatic(['1']);
-        $noticia = Noticia::onlyTrashed()->findOrFail($id);
+        $noticia = $this->noticiaRepository->getTrashedById($id);
         $restore = $noticia->restore();
         if(!$restore)
             abort(500);
@@ -288,10 +208,8 @@ class NoticiaController extends Controller
         ControleController::autoriza($this->class, 'index');
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
-        $resultados = Noticia::where('titulo','LIKE','%'.$busca.'%')
-            ->orWhere('conteudo','LIKE','%'.$busca.'%')
-            ->paginate(10);
-        $tabela = $this->tabelaCompleta($resultados);
+        $resultados = $this->noticiaRepository->getBusca($busca);
+        $tabela = $this->noticiaModel->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

@@ -5,29 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Noticia;
+use App\Repositories\NoticiaRepository;
 
 class NoticiaSiteController extends Controller
 {
     public function noticiasView()
     {
-        $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
-            ->orderBy('created_at', 'DESC')
-            ->where('publicada','Sim')
-            ->paginate(9);
+        $noticias = (new NoticiaRepository())->getSiteGrid();
         return view('site.noticias', compact('noticias'));
     }
 
     public function show($slug)
     {
-        $noticia = Noticia::where('slug', $slug)->firstOrFail();
+        $noticia = (new NoticiaRepository())->getBySlug($slug);
         $titulo = $noticia->titulo;
         $id = $noticia->idnoticia;
-        $tres = Noticia::latest()
-            ->take(3)
-            ->orderBy('created_at','DESC')
-            ->where('idnoticia','!=',$id)
-            ->whereNull('idregional')
-            ->get();
+        $tres = (new NoticiaRepository())->getThreeExcludingOneById($id);
         return response()
             ->view('site.noticia', compact('noticia', 'titulo', 'tres', 'id'))
             ->header('Cache-Control','no-cache');
