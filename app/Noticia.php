@@ -6,12 +6,13 @@ use App\Http\Controllers\ControleController;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\Helper;
 use App\Repositories\NoticiaRepository;
+use App\Traits\Tabela;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Noticia extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, Tabela;
 
     protected $primaryKey = 'idnoticia';
     protected $fillable = ['titulo', 'slug', 'img', 'conteudo', 'categoria',
@@ -32,6 +33,21 @@ class Noticia extends Model
     	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
 
+    public function variaveis()
+    {
+        return [
+            'singular' => 'noticia',
+            'singulariza' => 'a notícia',
+            'plural' => 'noticias',
+            'pluraliza' => 'notícias',
+            'titulo_criar' => 'Publicar notícia',
+            'btn_criar' => '<a href="'.route("noticias.create").'" class="btn btn-primary mr-1">Nova Notícia</a>',
+            'btn_lixeira' => '<a href="/admin/noticias/lixeira" class="btn btn-warning">Notícias Deletadas</a>',
+            'btn_lista' => '<a href="'.route("noticias.index").'" class="btn btn-primary">Lista de Notícias</a>',
+            'titulo' => 'Notícias Deletadas'
+        ];
+    }
+
     protected function tabelaHeaders()
     {
         return ['Código', 'Título', 'Regional', 'Última alteração', 'Ações' ];
@@ -42,9 +58,9 @@ class Noticia extends Model
         return $query->map(function($row){
             $acoes = '<a href="/noticia/'.$row->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
             if(ControleController::mostra('NoticiaController', 'edit'))
-                $acoes .= '<a href="/admin/noticias/editar/'.$row->idnoticia.'" class="btn btn-sm btn-primary">Editar</a> ';
+                $acoes .= '<a href="'.route('noticias.edit', $row->idnoticia).'" class="btn btn-sm btn-primary">Editar</a> ';
             if(ControleController::mostra('NoticiaController', 'destroy')) {
-                $acoes .= '<form method="POST" action="/admin/noticias/apagar/'.$row->idnoticia.'" class="d-inline">';
+                $acoes .= '<form method="POST" action="'.route('noticias.destroy', $row->idnoticia).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a notícia?\')" />';
@@ -71,7 +87,7 @@ class Noticia extends Model
 
     public function tabelaCompleta($query)
     {
-        return CrudController::montaTabela(
+        return $this->montaTabela(
             $this->tabelaHeaders(), 
             $this->tabelaContents($query),
             [ 'table', 'table-hover' ]
@@ -82,7 +98,7 @@ class Noticia extends Model
     {
         $headers = [ 'Código', 'Título', 'Deletada em:', 'Ações' ];
         $contents = $query->map(function($row){
-            $acoes = '<a href="/admin/noticias/restore/'.$row->idnoticia.'" class="btn btn-sm btn-primary">Restaurar</a>';
+            $acoes = '<a href="'.route('noticias.restore', $row->idnoticia).'" class="btn btn-sm btn-primary">Restaurar</a>';
             return [
                 $row->idnoticia,
                 $row->titulo,

@@ -6,6 +6,7 @@ use App\Noticia;
 use App\Permissao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class NoticiaTest extends TestCase
@@ -37,13 +38,13 @@ class NoticiaTest extends TestCase
     }
     
     /** @test */
-    public function route_to_create_noticia_is_working_properly()
+    public function noticia_can_be_created()
     {
         $this->signInAsAdmin();
         $attributes = factory('App\Noticia')->raw();
 
-        $this->get('/admin/noticias/criar')->assertOk();
-        $this->post('/admin/noticias/criar', $attributes);
+        $this->get(route('noticias.index'))->assertOk();
+        $this->post(route('noticias.store'), $attributes);
         $this->assertDatabaseHas('noticias', ['titulo' => $attributes['titulo']]);
     }
 
@@ -54,8 +55,8 @@ class NoticiaTest extends TestCase
         $noticia = factory('App\Noticia')->create();
         $noticiaDois = factory('App\Noticia')->create();
         
-        $this->get('/admin/noticias')->assertSee($noticia->titulo);
-        $this->get('/admin/noticias')->assertSee($noticiaDois->titulo);
+        $this->get(route('noticias.index'))->assertSee($noticia->titulo);
+        $this->get(route('noticias.index'))->assertSee($noticiaDois->titulo);
     }
 
     /** @test */
@@ -77,7 +78,7 @@ class NoticiaTest extends TestCase
         $attributes = factory('App\Noticia')->raw([
             'titulo' => $noticia->titulo
         ]);
-        $this->post('/admin/noticias/criar', $attributes);
+        $this->post(route('noticias.store'), $attributes);
         $this->assertEquals(1, Noticia::count());
     }
 
@@ -88,7 +89,7 @@ class NoticiaTest extends TestCase
 
         $noticia = factory('App\Noticia')->create();
 
-        $this->put('/admin/noticias/editar/' . $noticia->idnoticia, [
+        $this->patch(route('noticias.update', $noticia->idnoticia), [
             'idusuario' => $user->idusuario,
             'titulo' => 'Novo titulo',
             'conteudo' => $noticia->conteudo
@@ -105,11 +106,60 @@ class NoticiaTest extends TestCase
         $noticia = factory('App\Noticia')->create();
         $noticiaDois = factory('App\Noticia')->create();
 
-        $this->put('/admin/noticias/editar/' . $noticia->idnoticia, [
+        $this->patch(route('noticias.update', $noticia->idnoticia), [
             'titulo' => $noticiaDois->titulo
         ]);
         
         $this->assertNotEquals(Noticia::find($noticia->idnoticia)->titulo, $noticiaDois->titulo);
         $this->assertEquals(Noticia::find($noticia->idnoticia)->titulo, $noticia->titulo);
+    }
+
+    /** @test */
+    public function noticia_can_be_deleted()
+    {
+        $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->delete(route('noticias.destroy', $noticia->idnoticia));
+        $this->assertNotNull(Noticia::withTrashed()->find($noticia->idnoticia)->deleted_at);
+    }
+
+    /** @test */
+    public function deleted_noticias_are_shown_in_trash()
+    {
+        $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->delete(route('noticias.destroy', $noticia->idnoticia));
+
+        $this->get(route('noticias.trashed'))->assertOk()->assertSee($noticia->titulo);
+    }
+
+    /** @test */
+    public function deleted_noticias_are_not_shown_on_index()
+    {
+        $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->delete(route('noticias.destroy', $noticia->idnoticia));
+
+        $this->get(route('noticias.index'))->assertOk()->assertDontSee($noticia->titulo);
+    }
+
+    /** @test */
+    public function deleted_noticias_can_be_restored()
+    {
+        $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->delete(route('noticias.destroy', $noticia->idnoticia));
+        $this->get(route('noticias.restore', $noticia->idnoticia));
+
+        $this->assertNull(Noticia::find($noticia->idnoticia)->deleted_at);
+        $this->get(route('noticias.index'))->assertSee($noticia->titulo);
     }
 }

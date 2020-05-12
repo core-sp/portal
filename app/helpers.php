@@ -432,3 +432,20 @@ function onlyHour($data)
     $format = $date->format('H:i');
     return $format;
 }
+
+function organizaData($data)
+{
+    $date = new \DateTime($data);
+    $format = $date->format('H:i\ \d\o \d\i\a d\/m\/Y');
+    return $format;
+}
+
+function noticiaCategorias() 
+{
+    return [
+        'Benefícios',
+        'Cotidiano',
+        'Feiras',
+        'Fiscalização'
+    ];
+}

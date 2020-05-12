@@ -66,17 +66,7 @@ Route::prefix('admin')->group(function() {
   });
 
   // Rotas de notícias
-  Route::prefix('noticias')->group(function(){
-    Route::get('/', 'NoticiaController@index');
-    Route::get('/busca', 'NoticiaController@busca');
-    Route::get('/criar', 'NoticiaController@create');
-    Route::post('/criar', 'NoticiaController@store');
-    Route::get('/editar/{id}', 'NoticiaController@edit');
-    Route::put('/editar/{id}', 'NoticiaController@update');
-    Route::delete('/apagar/{id}', 'NoticiaController@destroy');
-    Route::get('/lixeira', 'NoticiaController@lixeira');
-    Route::get('/restore/{id}', 'NoticiaController@restore');
-  });
+  require('admin/noticias.php');
 
   // Rotas de licitações
   Route::prefix('licitacoes')->group(function(){

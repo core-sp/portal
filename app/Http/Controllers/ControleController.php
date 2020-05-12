@@ -40,14 +40,14 @@ class ControleController extends Controller
 
     public static function autorizaStatic($perfis)
     {
-        if(!in_array(session('idperfil'), $perfis)){
+        if(!in_array(Auth::user()->perfil->idperfil, $perfis)){
             abort(401);
         }
     }
 
     public static function mostraStatic($perfis)
     {
-        if(in_array(session('idperfil'), $perfis)){
+        if(in_array(Auth::user()->perfil->idperfil, $perfis)){
             return true;
         }
     }
