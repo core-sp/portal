@@ -1,11 +1,7 @@
-@php
-    $categorias = App\Http\Controllers\Helpers\NoticiaControllerHelper::categorias();
-@endphp
-
-<form role="form" method="POST">
+<form role="form" action="{{ !isset($resultado) ? route('noticias.store') : route('noticias.update', Request::route('id')) }}" method="POST">
     @csrf
     @if(isset($resultado))
-        @method('PUT')
+        @method('PATCH')
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}" />
     <div class="card-body">
@@ -121,7 +117,7 @@
             <label for="categoria">Categoria</label>
             <select name="categoria" class="form-control">
             <option value="">Nenhuma</option>
-            @foreach($categorias as $cat)
+            @foreach(noticiaCategorias() as $cat)
                 @if(!empty(old('categoria')))
                     @if(old('categoria') === $cat)
                         <option value="{{ $cat }}" selected>{{ $cat }}</option>

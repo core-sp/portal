@@ -18,24 +18,14 @@ class NoticiaController extends Controller
     private $class = 'NoticiaController';
     private $noticiaModel;
     private $noticiaRepository;
-    // Variáveis extras da página
-    public $variaveis = [
-        'singular' => 'noticia',
-        'singulariza' => 'a notícia',
-        'plural' => 'noticias',
-        'pluraliza' => 'notícias',
-        'titulo_criar' => 'Publicar notícia',
-        'btn_criar' => '<a href="/admin/noticias/criar" class="btn btn-primary mr-1">Nova Notícia</a>',
-        'btn_lixeira' => '<a href="/admin/noticias/lixeira" class="btn btn-warning">Notícias Deletadas</a>',
-        'btn_lista' => '<a href="/admin/noticias" class="btn btn-primary">Lista de Notícias</a>',
-        'titulo' => 'Notícias Deletadas'
-    ];
+    private $variaveis;
 
     public function __construct(Noticia $noticia, NoticiaRepository $noticiaRepository)
     {
         $this->middleware('auth', ['except' => 'show']);
         $this->noticiaModel = $noticia;
         $this->noticiaRepository = $noticiaRepository;
+        $this->variaveis = $noticia->variaveis();
     }
 
     protected function regras()
