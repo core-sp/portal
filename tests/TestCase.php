@@ -10,6 +10,9 @@ abstract class TestCase extends BaseTestCase
 
     protected function signIn($user = null)
     {
+        factory('App\Perfil')->create([
+            'nome' => 'Admin'
+        ]);
         $user = $user ?: factory('App\User')->create();
         $this->actingAs($user);
         return $user;
@@ -23,34 +26,6 @@ abstract class TestCase extends BaseTestCase
 
         $user = factory('App\User')->create([
             'idperfil' => $perfilDeAdmin->idperfil
-        ]);
-
-        $this->actingAs($user);
-        return $user;
-    }
-
-    protected function signInAsEditor()
-    {
-        $perfilDeEditor = factory('App\Perfil')->create([
-            'nome' => 'Editor'
-        ]);
-
-        $user = factory('App\User')->create([
-            'idperfil' => $perfilDeEditor->idperfil
-        ]);
-
-        $this->actingAs($user);
-        return $user;
-    }
-
-    protected function signInAsAtendimento()
-    {
-        $perfilDeAtendimento = factory('App\Perfil')->create([
-            'nome' => 'Atendimento'
-        ]);
-
-        $user = factory('App\User')->create([
-            'idperfil' => $perfilDeAtendimento->idperfil
         ]);
 
         $this->actingAs($user);

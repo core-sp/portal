@@ -2,17 +2,16 @@
 
 namespace App;
 
-use App\Http\Controllers\ControleController;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\Helper;
-use App\Repositories\NoticiaRepository;
-use App\Traits\Tabela;
+use App\Traits\ControleAcesso;
+use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Noticia extends Model
 {
-    use SoftDeletes, Tabela;
+    use SoftDeletes, TabelaAdmin, ControleAcesso;
 
     protected $primaryKey = 'idnoticia';
     protected $fillable = ['titulo', 'slug', 'img', 'conteudo', 'categoria',
@@ -57,9 +56,9 @@ class Noticia extends Model
     {
         return $query->map(function($row){
             $acoes = '<a href="/noticia/'.$row->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if(ControleController::mostra('NoticiaController', 'edit'))
+            if($this->mostra('NoticiaController', 'edit'))
                 $acoes .= '<a href="'.route('noticias.edit', $row->idnoticia).'" class="btn btn-sm btn-primary">Editar</a> ';
-            if(ControleController::mostra('NoticiaController', 'destroy')) {
+            if($this->mostra('NoticiaController', 'destroy')) {
                 $acoes .= '<form method="POST" action="'.route('noticias.destroy', $row->idnoticia).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
