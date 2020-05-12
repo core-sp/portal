@@ -49,6 +49,19 @@ class NoticiaTest extends TestCase
     }
 
     /** @test */
+    public function non_authorized_users_cannot_create_noticias()
+    {
+        $this->signIn();
+
+        $this->get(route('noticias.create'))->assertStatus(401);
+
+        $attributes = factory('App\Noticia')->raw();
+
+        $this->post(route('noticias.store'), $attributes)->assertStatus(401);
+        $this->assertDatabaseMissing('noticias', ['titulo' => $attributes['titulo']]);
+    }
+
+    /** @test */
     public function noticias_are_shown_on_the_admin_panel()
     {
         $this->signInAsAdmin();
@@ -57,6 +70,16 @@ class NoticiaTest extends TestCase
         
         $this->get(route('noticias.index'))->assertSee($noticia->titulo);
         $this->get(route('noticias.index'))->assertSee($noticiaDois->titulo);
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_see_noticias_on_admin()
+    {
+        $this->signIn();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.index'))->assertStatus(401)->assertDontSee($noticia->titulo);
     }
 
     /** @test */
@@ -99,6 +122,21 @@ class NoticiaTest extends TestCase
     }
 
     /** @test */
+    public function non_authorized_users_cannot_update_noticias()
+    {
+        $this->signIn();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.edit', $noticia->idnoticia))->assertStatus(401);
+
+        $titulo = 'Novo titulo';
+
+        $this->patch(route('noticias.update', $noticia->idnoticia), ['titulo' => $titulo])->assertStatus(401);
+        $this->assertDatabaseMissing('noticias', ['titulo' => $titulo]);
+    }
+
+    /** @test */
     public function noticia_cannot_be_updated_to_existing_title()
     {
         $this->signInAsAdmin();
@@ -123,6 +161,17 @@ class NoticiaTest extends TestCase
 
         $this->delete(route('noticias.destroy', $noticia->idnoticia));
         $this->assertNotNull(Noticia::withTrashed()->find($noticia->idnoticia)->deleted_at);
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_delete_noticia()
+    {
+        $this->signIn();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->delete(route('noticias.destroy', $noticia->idnoticia))->assertStatus(401);
+        $this->assertNull(Noticia::withTrashed()->find($noticia->idnoticia)->deleted_at);
     }
 
     /** @test */
@@ -161,5 +210,46 @@ class NoticiaTest extends TestCase
 
         $this->assertNull(Noticia::find($noticia->idnoticia)->deleted_at);
         $this->get(route('noticias.index'))->assertSee($noticia->titulo);
+    }
+
+    /** @test */
+    function noticia_can_be_searched()
+    {
+        $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.busca', ['q' => $noticia->titulo]))
+            ->assertSeeText($noticia->titulo);
+    }
+
+    /** @test */
+    function noticia_author_is_shown_on_admin()
+    {
+        $user = $this->signInAsAdmin();
+
+        factory('App\Noticia')->create();
+
+        $this->get(route('noticias.index'))->assertSee($user->nome);
+    }
+
+    /** @test */
+    function link_to_edit_noticia_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.index'))->assertSee(route('noticias.edit', $noticia->idnoticia));
+    }
+
+    /** @test */
+    function link_to_destroy_noticia_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.index'))->assertSee(route('noticias.destroy', $noticia->idnoticia));
     }
 }

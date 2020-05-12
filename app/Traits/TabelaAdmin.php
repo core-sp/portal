@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-trait Tabela {
+trait TabelaAdmin {
     public function montaTabela($headers, $contents, $classes = null)
     {
         if(isset($classes)) {

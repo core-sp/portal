@@ -6,14 +6,16 @@ use Illuminate\Http\Request;
 use App\Noticia;
 use App\Regional;
 use Illuminate\Support\Str;
-use App\Http\Controllers\ControleController;
 use Illuminate\Support\Facades\Auth;
 use App\Events\CrudEvent;
 use App\Repositories\NoticiaRepository;
+use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class NoticiaController extends Controller
 {
+    use ControleAcesso;
+
     // Nome da classe
     private $class = 'NoticiaController';
     private $noticiaModel;
@@ -48,10 +50,10 @@ class NoticiaController extends Controller
 
     public function index()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
         $resultados = $this->noticiaRepository->getToTable();
         $tabela = $this->noticiaModel->tabelaCompleta($this->noticiaRepository->getToTable());
-        if(!ControleController::mostra($this->class, 'create'))
+        if(!$this->mostra($this->class, 'create'))
             unset($this->variaveis['btn_criar']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
@@ -59,7 +61,7 @@ class NoticiaController extends Controller
 
     public function create()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
@@ -67,7 +69,7 @@ class NoticiaController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autoriza($this->class, 'create');
+        $this->autoriza($this->class, 'create');
         $erros = $request->validate($this->regras(), $this->mensagens());
         // Checa o usuário
         if(Auth::user()->perfil === 'Estagiário')
@@ -109,7 +111,7 @@ class NoticiaController extends Controller
 
     public function edit($id)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
         $resultado = Noticia::findOrFail($id);
         $regionais = Regional::orderBy('regional', 'ASC')->get();
         $variaveis = (object) $this->variaveis;
@@ -118,7 +120,7 @@ class NoticiaController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autoriza($this->class, 'edit');
+        $this->autoriza($this->class, 'edit');
         $erros = $request->validate($this->regras(), $this->mensagens());
         // Checa o usuário
         if(Auth::user()->perfil === 'Estagiário')
@@ -160,7 +162,7 @@ class NoticiaController extends Controller
 
     public function destroy($id)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
         $noticia = Noticia::findOrFail($id);
         $delete = $noticia->delete();
         if(!$delete)
@@ -173,7 +175,7 @@ class NoticiaController extends Controller
 
     public function lixeira()
     {
-        ControleController::autorizaStatic(['1']);
+        $this->autorizaStatic(['1']);
         $resultados = $this->noticiaRepository->getTrashed();
         $variaveis = (object) $this->variaveis;
         $tabela = $this->noticiaModel->tabelaTrashed($resultados);;
@@ -182,7 +184,7 @@ class NoticiaController extends Controller
 
     public function restore($id)
     {
-        ControleController::autorizaStatic(['1']);
+        $this->autorizaStatic(['1']);
         $noticia = $this->noticiaRepository->getTrashedById($id);
         $restore = $noticia->restore();
         if(!$restore)
@@ -195,7 +197,7 @@ class NoticiaController extends Controller
 
     public function busca()
     {
-        ControleController::autoriza($this->class, 'index');
+        $this->autoriza($this->class, 'index');
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = $this->noticiaRepository->getBusca($busca);
