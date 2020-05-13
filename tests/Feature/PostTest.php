@@ -9,9 +9,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class PostTest extends TestCase
 {
     use RefreshDatabase;
+
+    /** @test */
+    function a_post_can_be_created()
+    {
+        $post = factory('App\Post')->create();
+
+        $this->assertDatabaseHas('posts', ['titulo' => $post->titulo]);
+    }
     
     /** @test */
-    function post_can_be_created()
+    function post_can_be_created_by_an_user()
     {
         $this->signInAsAdmin();
 
@@ -31,12 +39,31 @@ class PostTest extends TestCase
     {
         $this->signIn();
 
-        $this->get(route('posts.index'))->assertStatus(403);
+        $this->get(route('posts.index'))->assertForbidden();
 
         $attributes = factory('App\Post')->raw();
         
-        $this->post(route('posts.store'), $attributes)->assertStatus(403);
+        $this->post(route('posts.store'), $attributes)->assertForbidden();
         $this->assertDatabaseMissing('posts', ['titulo' => $attributes['titulo']]);
+    }
+
+    /** @test */
+    function a_post_is_shown_correctly_on_site_after_its_creation()
+    {
+        $post = factory('App\Post')->create();
+
+        $this->get('/blog/' . $post->slug)
+            ->assertOk()
+            ->assertSee($post->titulo)
+            ->assertSee($post->conteudo);
+    }
+
+    /** @test */
+    function created_posts_are_shown_correctly()
+    {
+        $post = factory('App\Post')->create();
+
+        $this->get('/blog')->assertOk()->assertSee($post->titulo);
     }
 
     /** @test */
@@ -58,7 +85,7 @@ class PostTest extends TestCase
         $post = factory('App\Post')->create();
 
         $this->get(route('posts.index'))
-            ->assertStatus(403)
+            ->assertForbidden()
             ->assertDontSee($post->titulo);
     }
 
@@ -152,11 +179,11 @@ class PostTest extends TestCase
 
         $post = factory('App\Post')->create();
 
-        $this->get(route('posts.edit', $post->id))->assertStatus(403);
+        $this->get(route('posts.edit', $post->id))->assertForbidden();
 
         $titulo = 'Novo titulo';
 
-        $this->patch(route('posts.update', $post->id), ['titulo' => $titulo])->assertStatus(403);
+        $this->patch(route('posts.update', $post->id), ['titulo' => $titulo])->assertForbidden();
         $this->assertDatabaseMissing('posts', ['titulo' => $titulo]);
     }
 
@@ -180,7 +207,7 @@ class PostTest extends TestCase
 
         $post = factory('App\Post')->create();
 
-        $this->delete(route('posts.destroy', $post->id))->assertStatus(403);
+        $this->delete(route('posts.destroy', $post->id))->assertForbidden();
 
         $this->assertDatabaseHas('posts', ['titulo' => $post->titulo]);
     }

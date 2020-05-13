@@ -1,4 +1,4 @@
-<form role="form" method="POST">
+<form role="form" action="{{ !isset($resultado) ? route('paginas.store') : route('paginas.update', Request::route('id')) }}" method="POST">
     @csrf
     @if(isset($resultado))
         @method('PUT')
@@ -70,34 +70,8 @@
                         />
                 </div>
             </div>
-            <div class="col">
-                <label for="idpaginacategoria">Categoria</label>
-                <select name="idpaginacategoria" class="form-control">
-                    <option value="">Sem Categoria</option>
-                    @foreach($categorias as $categoria)
-                        @if(!empty(old('idpaginacategoria')))
-                            @if(old('idpaginacategoria') == $categoria->idpaginacategoria)
-                                <option value="{{ $categoria->idpaginacategoria }}" selected>{{ $categoria->nome }}</option>
-                            @else
-                                <option value="{{ $categoria->idpaginacategoria }}">{{ $categoria->nome }}</option>
-                            @endif
-                        @else
-                            @if(isset($resultado))
-                                @if ($categoria->idpaginacategoria == $resultado->idpaginacategoria)
-                                <option value="{{ $categoria->idpaginacategoria }}" selected>{{ $categoria->nome }}</option>
-                                @else
-                                <option value="{{ $categoria->idpaginacategoria }}" >{{ $categoria->nome }}</option>
-                                @endif
-                            @else
-                            <option value="{{ $categoria->idpaginacategoria }}" >{{ $categoria->nome }}</option>
-                            @endif
-                        @endif
-                    @endforeach
-                </select>
-                <a href="/admin/paginas/categorias/criar" class="float-right"><small>Criar nova categoria</small></a>
-            </div>
         </div>
-        <div class="form-group">
+        <div class="form-group mt-2">
             <label for="conteudopage">Conteúdo da página</label>
             <textarea name="conteudo"
                 class="form-control my-editor {{ $errors->has('conteudo') ? 'is-invalid' : '' }}"

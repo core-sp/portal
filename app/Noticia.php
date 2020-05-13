@@ -2,8 +2,6 @@
 
 namespace App;
 
-use App\Http\Controllers\CrudController;
-use App\Http\Controllers\Helper;
 use App\Traits\ControleAcesso;
 use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
@@ -78,7 +76,7 @@ class Noticia extends Model
                 $row->idnoticia,
                 $row->titulo.'<br><small><em>'.$publicada.'</em></small>',
                 $regional,
-                Helper::formataData($row->updated_at).'<br><small>Por: '.$autor.'</small>',
+                formataData($row->updated_at).'<br><small>Por: '.$autor.'</small>',
                 $acoes
             ];
         })->toArray();
@@ -101,12 +99,12 @@ class Noticia extends Model
             return [
                 $row->idnoticia,
                 $row->titulo,
-                Helper::formataData($row->deleted_at),
+                formataData($row->deleted_at),
                 $acoes
             ];
         });
 
-        return CrudController::montaTabela(
+        return $this->montaTabela(
             $headers, 
             $contents,
             [ 'table', 'table-hover' ]
