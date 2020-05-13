@@ -18,18 +18,4 @@ class PaginaSiteController extends Controller
             abort(404);
         }   
     }
-
-    public function showCategoria($categoria, $slug)
-    {
-        $one = $categoria.'/'.$slug;
-        $pagina = Pagina::select('titulo','img','subtitulo','conteudo')
-            ->where('slug', $one)->first();
-        if(isset($pagina)) {
-            return response()
-                ->view('site.pagina', compact('pagina'))
-                ->header('Cache-Control','no-cache');
-        } else {
-            abort(404);
-        }
-    }
 }

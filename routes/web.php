@@ -36,26 +36,7 @@ Route::prefix('admin')->group(function() {
   });
   
   // Rotas para CRUD de páginas
-  Route::prefix('paginas')->group(function() {
-    Route::get('/', 'PaginaController@index')->name('paginas.lista');
-    Route::get('/busca', 'PaginaController@busca');
-    Route::get('/criar', 'PaginaController@create');
-    Route::post('/criar', 'PaginaController@store');
-    Route::get('/editar/{id}', 'PaginaController@edit');
-    Route::put('/editar/{id}', 'PaginaController@update');
-    Route::delete('/apagar/{id}', 'PaginaController@destroy');
-    Route::get('/lixeira', 'PaginaController@lixeira');
-    Route::get('/restore/{id}', 'PaginaController@restore');
-    // Rotas para categorias de páginas
-    Route::get('/categorias', 'PaginaCategoriaController@index');
-    Route::get('/categorias/busca', 'PaginaCategoriaController@busca');
-    Route::get('/categorias/mostra/{id}', 'PaginaCategoriaController@show');
-    Route::get('/categorias/criar', 'PaginaCategoriaController@create');
-    Route::post('/categorias/criar', 'PaginaCategoriaController@store');
-    Route::get('/categorias/editar/{id}', 'PaginaCategoriaController@edit');
-    Route::put('/categorias/editar/{id}', 'PaginaCategoriaController@update');
-    Route::delete('/categorias/apagar/{id}', 'PaginaCategoriaController@destroy');
-  });
+  require('admin/paginas.php');
 
   // Rotas de regionais
   Route::prefix('regionais')->group(function() {
@@ -311,6 +292,5 @@ Route::prefix('/')->group(function() {
   });
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
-  Route::get('{slug}', 'PaginaSiteController@show');
-  Route::get('{categoria}/{slug}', 'PaginaSiteController@showCategoria');
+  Route::get('{slug}', 'PaginaSiteController@show')->name('paginas.site');
 });

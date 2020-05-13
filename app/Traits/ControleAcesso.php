@@ -15,11 +15,11 @@ trait ControleAcesso {
         if(isset($string)) {
             $array = explode(',',$string->perfis);
             if(!in_array(Auth::user()->perfil->idperfil, $array)){
-                abort(401);
+                abort(403);
             }
             return response(100);
         } else {
-            abort(401);
+            abort(403);
         }
     }
 
@@ -39,7 +39,7 @@ trait ControleAcesso {
     public function autorizaStatic($perfis)
     {
         if(!in_array(Auth::user()->perfil->idperfil, $perfis)){
-            abort(401);
+            abort(403);
         }
     }
 

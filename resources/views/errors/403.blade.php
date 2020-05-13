@@ -14,7 +14,7 @@
 
 <section class="content">
   <div class="error-page">
-  	<h2 class="headline text-danger">401</h2>
+  	<h2 class="headline text-danger">403</h2>
   	<div class="error-content align-middle">
   	  <h3>
   	  	<i class="fa fa-warning text-danger"></i>

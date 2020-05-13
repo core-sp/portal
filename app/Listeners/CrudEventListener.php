@@ -10,22 +10,11 @@ use Illuminate\Support\Facades\Log;
 
 class CrudEventListener
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
     public function __construct()
     {
         //
     }
 
-    /**
-     * Handle the event.
-     *
-     * @param  CrudEvent  $event
-     * @return void
-     */
     public function handle(CrudEvent $event)
     {
         $nome = Auth::user()->nome;

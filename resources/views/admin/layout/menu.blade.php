@@ -83,12 +83,6 @@
                         <p>Criar nova página</p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="/admin/paginas/categorias" class="nav-link">
-                        <i class="nav-icon fa fa-angle-right"></i>
-                        <p>Categorias</p>
-                    </a>
-                </li>
                 @endif
             </ul>
         </li>
