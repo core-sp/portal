@@ -70,7 +70,7 @@
             <ul class="nav nav-treeview">
                 @if(ControleController::mostra('PaginaController', 'index'))
                 <li class="nav-item">
-                    <a href="/admin/paginas" class="nav-link">
+                    <a href="{{ route('paginas.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todas as páginas</p>
                     </a>
@@ -78,7 +78,7 @@
                 @endif
                 @if(ControleController::mostra('PaginaController', 'create'))
                 <li class="nav-item">
-                    <a href="/admin/paginas/criar" class="nav-link">
+                    <a href="{{ route('paginas.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Criar nova página</p>
                     </a>
@@ -96,7 +96,7 @@
             <ul class="nav nav-treeview">
                 @if(ControleController::mostra('NoticiaController', 'index'))
                 <li class="nav-item">
-                    <a href="/admin/noticias" class="nav-link">
+                    <a href="{{ route('noticias.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todas as notícias</p>
                     </a>
@@ -104,7 +104,7 @@
                 @endif
                 @if(ControleController::mostra('NoticiaController', 'create'))
                 <li class="nav-item">
-                    <a href="/admin/noticias/criar" class="nav-link">
+                    <a href="{{ route('noticias.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Criar nova notícia</p>
                     </a>
@@ -121,7 +121,7 @@
             <ul class="nav nav-treeview">
                 @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
                 <li class="nav-item">
-                    <a href="/admin/posts" class="nav-link">
+                    <a href="{{ route('posts.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os posts</p>
                     </a>
@@ -129,7 +129,7 @@
                 @endif
                 @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
                 <li class="nav-item">
-                    <a href="/admin/posts/create" class="nav-link">
+                    <a href="{{ route('posts.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Criar novo post</p>
                     </a>
