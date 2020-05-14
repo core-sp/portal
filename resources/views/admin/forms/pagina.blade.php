@@ -1,7 +1,7 @@
 <form role="form" action="{{ !isset($resultado) ? route('paginas.store') : route('paginas.update', Request::route('id')) }}" method="POST">
     @csrf
     @if(isset($resultado))
-        @method('PUT')
+        @method('PATCH')
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}" />
     <div class="card-body">
