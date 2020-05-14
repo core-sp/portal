@@ -13,12 +13,9 @@ class NoticiaTest extends TestCase
 {
     use RefreshDatabase;
 
-    private $pathLogInterno;
-
     protected function setUp(): void
     {
         parent::setUp();
-        $this->pathLogInterno= 'logs/interno/'.date('Y').'/'.date('m').'/laravel-'.date('Y-m-d').'.log';
         Permissao::insert([
             [
                 'controller' => 'NoticiaController',
@@ -58,9 +55,10 @@ class NoticiaTest extends TestCase
         $attributes = factory('App\Noticia')->raw();
 
         $this->post(route('noticias.store'), $attributes);
-        $log = tailCustom(storage_path($this->pathLogInterno));
+        $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString($user->nome, $log);
         $this->assertStringContainsString('criou', $log);
+        $this->assertStringContainsString('notícia', $log);
     }
 
     /** @test */
@@ -185,9 +183,10 @@ class NoticiaTest extends TestCase
             'titulo' => 'Novo titulo',
             'conteudo' => $noticia->conteudo
         ]);
-        $log = tailCustom(storage_path($this->pathLogInterno));
+        $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString($user->nome, $log);
         $this->assertStringContainsString('editou', $log);
+        $this->assertStringContainsString('notícia', $log);
     }
 
     /** @test */
@@ -240,9 +239,10 @@ class NoticiaTest extends TestCase
         $noticia = factory('App\Noticia')->create();
 
         $this->delete(route('noticias.destroy', $noticia->idnoticia));
-        $log = tailCustom(storage_path($this->pathLogInterno));
+        $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString($user->nome, $log);
         $this->assertStringContainsString('apagou', $log);
+        $this->assertStringContainsString('notícia', $log);
     }
 
     /** @test */
@@ -303,9 +303,10 @@ class NoticiaTest extends TestCase
 
         $this->delete(route('noticias.destroy', $noticia->idnoticia));
         $this->get(route('noticias.restore', $noticia->idnoticia));
-        $log = tailCustom(storage_path($this->pathLogInterno));
+        $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString($user->nome, $log);
         $this->assertStringContainsString('restaurou', $log);
+        $this->assertStringContainsString('notícia', $log);
     }
 
     /** @test */

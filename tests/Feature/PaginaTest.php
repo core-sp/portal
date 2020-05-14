@@ -45,6 +45,19 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_pagina_is_created()
+    {
+        $user = $this->signInAsAdmin();
+        $attributes = factory('App\Pagina')->raw();
+
+        $this->post(route('paginas.store'), $attributes);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('criou', $log);
+        $this->assertStringContainsString('página', $log);
+    }
+
+    /** @test */
     public function pagina_can_be_created_by_user()
     {
         $this->signInAsAdmin();
@@ -155,6 +168,26 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_pagina_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $pagina = factory('App\Pagina')->create();
+        $titulo = 'Novo titulo';
+
+        $this->patch(route('paginas.update', $pagina->idpagina), [
+            'idusuario' => $user->idusuario,
+            'titulo' => $titulo,
+            'conteudo' => $pagina->conteudo
+        ]);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('editou', $log);
+        $this->assertStringContainsString('página', $log);
+    }
+
+    /** @test */
     public function non_authorized_users_cannot_update_paginas()
     {
         $user = $this->signIn();
@@ -181,6 +214,19 @@ class PaginaTest extends TestCase
 
         $this->delete(route('paginas.destroy', $pagina->idpagina));
         $this->assertSoftDeleted('paginas', ['idpagina' => $pagina->idpagina]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_pagina_is_deleted()
+    {
+        $user = $this->signInAsAdmin();
+        $pagina = factory('App\Pagina')->create();
+
+        $this->delete(route('paginas.destroy', $pagina->idpagina));
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('apagou', $log);
+        $this->assertStringContainsString('página', $log);
     }
 
     /** @test */
@@ -217,6 +263,20 @@ class PaginaTest extends TestCase
         $this->get(route('paginas.restore', $pagina->idpagina));
 
         $this->assertNull(Pagina::find($pagina->idpagina)->deleted_at);
+    }
+
+    /** @test */
+    public function log_is_generated_when_pagina_is_restored()
+    {
+        $user = $this->signInAsAdmin();
+        $pagina = factory('App\Pagina')->create();
+
+        Pagina::find($pagina->idpagina)->delete();
+        $this->get(route('paginas.restore', $pagina->idpagina));
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('restaurou', $log);
+        $this->assertStringContainsString('página', $log);
     }
 
     /** @test */

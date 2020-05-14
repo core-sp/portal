@@ -291,6 +291,10 @@ Route::prefix('/')->group(function() {
     Route::post('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmail')->name('representante.email.reset');
   });
 
+  Route::get('/chat', function(){
+    return view('site.chat');
+  });
+
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaSiteController@show')->name('paginas.site');
 });

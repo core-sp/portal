@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Post::class, function (Faker $faker) {
     return [
-        'idusuario' => factory('App\User'),
+        'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User'),
         'titulo' => $titulo = $faker->sentence,
         'slug' => str_slug($titulo, '-'),
         'subtitulo' => $faker->sentence,
