@@ -156,7 +156,7 @@ class PaginaController extends Controller
         $restore = $this->paginaRepository->getTrashedById($id)->restore();
         if(!$restore)
             abort(500);
-        event(new CrudEvent('página', 'restaurou', $pagina->idpagina));
+        event(new CrudEvent('página', 'restaurou', $id));
         return redirect('/admin/paginas')
             ->with('message', '<i class="icon fa fa-check"></i>Página restaurada com sucesso!')
             ->with('class', 'alert-success');

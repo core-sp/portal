@@ -8,6 +8,11 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
+    protected function pathLogInterno()
+    {
+        return 'logs/interno/'.date('Y').'/'.date('m').'/laravel-'.date('Y-m-d').'.log';
+    }
+
     protected function signIn($user = null)
     {
         factory('App\Perfil')->create([

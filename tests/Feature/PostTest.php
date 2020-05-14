@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Post;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 
 class PostTest extends TestCase
 {
@@ -32,6 +33,19 @@ class PostTest extends TestCase
             'titulo' => $attributes['titulo'],
             'subtitulo' => $attributes['subtitulo']
         ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_post_is_created()
+    {
+        $user = $this->signInAsAdmin();
+        $attributes = factory('App\Post')->raw();
+
+        $this->post(route('posts.store'), $attributes);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('criou', $log);
+        $this->assertStringContainsString('post', $log);
     }
 
     /** @test */
@@ -154,22 +168,36 @@ class PostTest extends TestCase
     /** @test */
     function a_post_title_can_be_updated()
     {
-        $this->signInAsAdmin();
+        $user = $this->signInAsAdmin();
 
         $post = factory('App\Post')->create();
 
         $attributes = $post->getAttributes();
 
-        $attributes['titulo'] = 'Novo título';
+        $attributes['titulo'] = 'Novo titulo';
 
         $this->get(route('posts.edit', $post->id))->assertOk();
 
         $this->patch(route('posts.update', $post->id), $attributes);
+        $this->assertEquals(Post::find($post->id)->titulo, 'Novo titulo');
+    }
 
-        $this->assertDatabaseHas('posts', [
-            'titulo' => 'Novo título',
-            'slug' => 'novo-titulo'
-        ]);
+    /** @test */
+    public function log_is_generated_when_post_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $attributes = $post->getAttributes();
+
+        $attributes['titulo'] = 'Novo titulo';
+
+        $this->patch(route('posts.update', $post->id), $attributes);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('editou', $log);
+        $this->assertStringContainsString('post', $log);
     }
 
     /** @test */
@@ -198,6 +226,20 @@ class PostTest extends TestCase
 
         $this->assertSoftDeleted('posts', ['id' => $post->id]);
         $this->assertNotNull(Post::withTrashed()->find($post->id)->deleted_at);
+    }
+
+    /** @test */
+    public function log_is_generated_when_post_is_deleted()
+    {
+        $user = $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $this->delete(route('posts.destroy', $post->id));
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('apagou', $log);
+        $this->assertStringContainsString('post', $log);
     }
 
     /** @test */
