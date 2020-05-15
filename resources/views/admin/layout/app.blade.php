@@ -36,11 +36,9 @@
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="/admin/chamados/criar" class="nav-link">Contate o CTI</a>
               </li>
-              @if(ControleController::autoriza('RepresentanteController', 'index'))
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="https://app.jivosite.com/" class="nav-link" target="_blank">Chat</a>
               </li>
-              @endif
               @if(ControleController::mostraStatic(['1']))
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="/horizon" class="nav-link" target="_blank">Horizon</a>
