@@ -37,7 +37,9 @@ use \App\Http\Controllers\Helper;
             gtag('config', 'UA-141375220-1');
           </script>
         @endif
-        <script src="//code.jivosite.com/widget/X12I8gg4Qy" async></script>
+        @if(config('app.env') !== 'local')
+          <script src="//code.jivosite.com/widget/X12I8gg4Qy" async></script>
+        @endif
     </head>
     <body>
 

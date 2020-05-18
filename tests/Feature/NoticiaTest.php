@@ -86,6 +86,15 @@ class NoticiaTest extends TestCase
     }
 
     /** @test */
+    public function noticia_user_creator_is_shown_on_the_admin_panel()
+    {
+        $user = $this->signInAsAdmin();
+        $noticia = factory('App\Noticia')->create();
+        
+        $this->get(route('noticias.edit', $noticia->idnoticia))->assertSee($user->nome);
+    }
+
+    /** @test */
     public function non_authorized_users_cannot_see_noticias_on_admin()
     {
         $this->signIn();
@@ -348,5 +357,13 @@ class NoticiaTest extends TestCase
         $noticia = factory('App\Noticia')->create();
 
         $this->get(route('noticias.index'))->assertSee(route('noticias.destroy', $noticia->idnoticia));
+    }
+
+    /** @test */
+    function link_to_create_noticia_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('noticias.index'))->assertSee(route('noticias.create'));
     }
 }

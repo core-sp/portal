@@ -102,7 +102,7 @@ class Noticia extends Model
                 formataData($row->deleted_at),
                 $acoes
             ];
-        });
+        })->toArray();
 
         return $this->montaTabela(
             $headers, 

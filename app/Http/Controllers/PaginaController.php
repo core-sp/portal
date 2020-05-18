@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Pagina;
 use Illuminate\Support\Str;
 use App\Events\CrudEvent;
+use App\Http\Requests\PaginaRequest;
 use App\Repositories\PaginaRepository;
 use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
@@ -28,24 +29,6 @@ class PaginaController extends Controller
         $this->paginaRepository = $paginaRepository;
     }
 
-    protected function regras()
-    {
-        return [
-            'titulo' => 'required|max:191',
-            'subtitulo' => 'max:191',
-            'img' => 'max:191',
-            'conteudo' => 'required'
-        ];
-    }
-
-    protected function mensagens()
-    {
-        return [
-            'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-    }
-
     public function index()
     {
         $this->autoriza($this->class, __FUNCTION__);
@@ -64,10 +47,9 @@ class PaginaController extends Controller
         return view('admin.crud.criar', compact('variaveis'));
     }
 
-    public function store(Request $request)
+    public function store(PaginaRequest $request)
     {
-        $this->autoriza($this->class, 'create');
-        $request->validate($this->regras(), $this->mensagens());
+        $request->validated();
 
         $slug = Str::slug($request->input('titulo'), '-');
 
@@ -104,10 +86,9 @@ class PaginaController extends Controller
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
-    public function update(Request $request, $id)
+    public function update(PaginaRequest $request, $id)
     {
-        $this->autoriza($this->class, 'edit');
-        $erros = $request->validate($this->regras(), $this->mensagens());
+        $request->validated();
         
         $slug = Str::slug($request->input('titulo'), '-');
 

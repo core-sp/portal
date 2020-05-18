@@ -73,6 +73,15 @@ class PostTest extends TestCase
     }
 
     /** @test */
+    public function post_user_creator_is_shown_on_the_admin_panel()
+    {
+        $user = $this->signInAsAdmin();
+        $post = factory('App\Post')->create();
+        
+        $this->get(route('posts.edit', $post->id))->assertSee($user->nome);
+    }
+
+    /** @test */
     function created_posts_are_shown_correctly()
     {
         $post = factory('App\Post')->create();

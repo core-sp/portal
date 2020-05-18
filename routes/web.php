@@ -50,17 +50,7 @@ Route::prefix('admin')->group(function() {
   require('admin/noticias.php');
 
   // Rotas de licitações
-  Route::prefix('licitacoes')->group(function(){
-    Route::get('/', 'LicitacaoController@index')->name('licitacoes.lista');
-    Route::get('/busca', 'LicitacaoController@busca');
-    Route::get('/criar', 'LicitacaoController@create');
-    Route::post('/criar', 'LicitacaoController@store');
-    Route::get('/editar/{id}', 'LicitacaoController@edit');
-    Route::put('/editar/{id}', 'LicitacaoController@update');
-    Route::delete('apagar/{id}', 'LicitacaoController@destroy');
-    Route::get('/lixeira', 'LicitacaoController@lixeira');
-    Route::get('/restore/{id}', 'LicitacaoController@restore');
-  });
+  require('admin/licitacoes.php');
 
   // Rotas para usuários
   Route::prefix('usuarios')->group(function(){
