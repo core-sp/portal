@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Noticia;
 use App\Regional;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use App\Events\CrudEvent;
+use App\Http\Requests\NoticiaRequest;
 use App\Repositories\NoticiaRepository;
 use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
@@ -30,24 +30,6 @@ class NoticiaController extends Controller
         $this->variaveis = $noticia->variaveis();
     }
 
-    protected function regras()
-    {
-        return [
-            'titulo' => 'required|max:191|min:3',
-            'img' => 'max:191',
-            'conteudo' => 'required|min:100'
-        ];
-    }
-
-    protected function mensagens()
-    {
-        return [
-            'required' => 'O :attribute é obrigatório',
-            'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-    }
-
     public function index()
     {
         $this->autoriza($this->class, __FUNCTION__);
@@ -67,10 +49,9 @@ class NoticiaController extends Controller
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
-    public function store(Request $request)
+    public function store(NoticiaRequest $request)
     {
-        $this->autoriza($this->class, 'create');
-        $erros = $request->validate($this->regras(), $this->mensagens());
+        $request->validated();
         // Checa o usuário
         if(Auth::user()->perfil === 'Estagiário')
             $publicada = 'Não';
@@ -118,10 +99,9 @@ class NoticiaController extends Controller
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
     }
 
-    public function update(Request $request, $id)
+    public function update(NoticiaRequest $request, $id)
     {
-        $this->autoriza($this->class, 'edit');
-        $erros = $request->validate($this->regras(), $this->mensagens());
+        $request->validated();
         // Checa o usuário
         if(Auth::user()->perfil === 'Estagiário')
             $publicada = 'Não';
@@ -178,7 +158,7 @@ class NoticiaController extends Controller
         $this->autorizaStatic(['1']);
         $resultados = $this->noticiaRepository->getTrashed();
         $variaveis = (object) $this->variaveis;
-        $tabela = $this->noticiaModel->tabelaTrashed($resultados);;
+        $tabela = $this->noticiaModel->tabelaTrashed($resultados);
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 

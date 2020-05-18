@@ -472,3 +472,63 @@ function tailCustom($filepath, $lines = 1, $adaptive = true) {
     fclose($f);
     return trim($output);
 }
+
+function modalidadesLicitacao()
+{
+    return [
+        'Carta Convite',
+        'Concorrência Pública',
+        'Concurso',
+        'Credenciamento',
+        'Leilão',
+        'Pregão Eletrônico SRP',
+        'Pregão Eletrônico Tradicional',
+        'Pregão Presencial',
+        'Tomada de Preços',
+    ];
+}
+
+function situacoesLicitacao()
+{
+    return [
+        'Aberto',
+        'Adjudicado',
+        'Anulado',
+        'Cancelado',
+        'Concluído',
+        'Deserto',
+        'Em Andamento',
+        'Em fase de recurso',
+        'Homologado'
+    ];
+}
+
+function retornaDateTime($dia, $hora)
+{
+    $dia = str_replace('/','-',$dia);
+    $date = $dia.' '.$hora;
+    $date = new \DateTime($date);
+    $format = $date->format('Y-m-d\TH:i:s');
+    return $format;
+}
+
+function btnSituacao($situacao)
+{
+    switch ($situacao) {
+        case 'Aberto':
+            echo "<div class='sit-btn sit-verde'>Aberto</div>";
+        break;
+
+        case 'Homologado':
+            echo "<div class='sit-btn sit-verde'>Homologado</div>";
+        break;
+
+        case 'Cancelado':
+            echo "<div class='sit-btn sit-vermelho'>Cancelado</div>";
+        break;
+        
+        default:
+            echo "<div class='sit-btn sit-default'>".$situacao."</div>";
+        break;
+    }
+}

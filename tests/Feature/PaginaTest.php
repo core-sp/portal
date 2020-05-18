@@ -137,6 +137,15 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
+    public function pagina_user_creator_is_shown_on_the_admin_panel()
+    {
+        $user = $this->signInAsAdmin();
+        $pagina = factory('App\Pagina')->create();
+        
+        $this->get(route('paginas.edit', $pagina->idpagina))->assertSee($user->nome);
+    }
+
+    /** @test */
     public function created_paginas_are_shown_on_the_website()
     {
         $this->signInAsAdmin();

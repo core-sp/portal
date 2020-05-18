@@ -2,11 +2,6 @@
 
 @section('content')
 
-@php
-use App\Http\Controllers\Helper;
-use App\Http\Controllers\LicitacaoSiteController;
-@endphp
-
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/licitacoes.png') }}" />
@@ -46,7 +41,7 @@ use App\Http\Controllers\LicitacaoSiteController;
           <tbody>
             <tr>
               <td class="quarenta"><h6>Situação</h6></td>
-              <td><h6 class="light">{{ Helper::btnSituacao($licitacao->situacao) }}</h6></td>
+              <td><h6 class="light">{{ btnSituacao($licitacao->situacao) }}</h6></td>
             </tr>
             <tr>
               <td><h6>UASG</h6></td>
@@ -66,7 +61,7 @@ use App\Http\Controllers\LicitacaoSiteController;
             </tr>
             <tr>
               <td><h6>Data de realização</h6></td>
-              <td><h6 class="light">{{ Helper::formataData($licitacao->datarealizacao) }}</h6></td>
+              <td><h6 class="light">{{ formataData($licitacao->datarealizacao) }}</h6></td>
             </tr>
           </tbody>
         </table>
