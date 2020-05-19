@@ -23,7 +23,7 @@ class NoticiaController extends Controller
 
     public function __construct(Noticia $noticia, NoticiaRepository $noticiaRepository)
     {
-        $this->middleware('auth', ['except' => 'show', 'siteGrid']);
+        $this->middleware('auth', ['except' => ['show', 'siteGrid']]);
         $this->noticiaModel = $noticia;
         $this->noticiaRepository = $noticiaRepository;
         $this->variaveis = $noticia->variaveis();
