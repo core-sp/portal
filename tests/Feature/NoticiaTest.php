@@ -147,7 +147,7 @@ class NoticiaTest extends TestCase
         $this->signInAsAdmin();
         $noticia = factory('App\Noticia')->create();
 
-        $this->get('/noticia/' . $noticia->slug)
+        $this->get(route('noticias.show', $noticia->slug))
             ->assertOk()
             ->assertSee($noticia->titulo);
     }
@@ -237,7 +237,7 @@ class NoticiaTest extends TestCase
         $noticia = factory('App\Noticia')->create();
 
         $this->delete(route('noticias.destroy', $noticia->idnoticia));
-        $this->assertNotNull(Noticia::withTrashed()->find($noticia->idnoticia)->deleted_at);
+        $this->assertSoftDeleted('noticias', ['idnoticia' => $noticia->idnoticia]);
     }
 
     /** @test */

@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Licitacao;
-use App\Http\Controllers\CrudController;
 use App\Events\CrudEvent;
 use App\Http\Requests\LicitacaoRequest;
 use App\Repositories\LicitacaoRepository;
@@ -22,7 +20,7 @@ class LicitacaoController extends Controller
 
     public function __construct(Licitacao $licitacao, LicitacaoRepository $licitacaoRepository)
     {
-        $this->middleware('auth', ['except' => ['show', 'buscaAvancada']]);
+        $this->middleware('auth', ['except' => ['show', 'siteGrid', 'siteBusca']]);
         $this->licitacaoModel = $licitacao;
         $this->licitacaoRepository = $licitacaoRepository;
         $this->variaveis = $licitacao->variaveis();
@@ -50,23 +48,10 @@ class LicitacaoController extends Controller
     {
         $request->validated();
         
-        $datarealizacao = retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
-        
-        $save = Licitacao::create([
-            'modalidade' => request('modalidade'),
-            'uasg' => request('uasg'),
-            'edital' => request('edital'),
-            'titulo' => request('titulo'),
-            'nrlicitacao' => request('nrlicitacao'),
-            'nrprocesso' => request('nrprocesso'),
-            'situacao' => request('situacao'),
-            'datarealizacao' => $datarealizacao,
-            'objeto' => request('objeto'),
-            'idusuario' => request('idusuario')
-        ]);
-
+        $save = $this->licitacaoRepository->store($request);
         if(!$save)
             abort(500);
+
         event(new CrudEvent('licitação', 'criou', $save->idlicitacao));
         return redirect()->route('licitacoes.index')
             ->with('message', '<i class="icon fa fa-check"></i>Licitação cadastrada com sucesso!')
@@ -85,37 +70,33 @@ class LicitacaoController extends Controller
     {
         $request->validated();
         
-        $datarealizacao = retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
-        
-        $update = Licitacao::findOrFail($id)->update([
-            'modalidade' => request('modalidade'),
-            'uasg' => request('uasg'),
-            'edital' => request('edital'),
-            'titulo' => request('titulo'),
-            'nrlicitacao' => request('nrlicitacao'),
-            'nrprocesso' => request('nrprocesso'),
-            'situacao' => request('situacao'),
-            'datarealizacao' => $datarealizacao,
-            'objeto' => request('objeto'),
-            'idusuario' => request('idusuario')
-        ]);
-
+        $update = $this->licitacaoRepository->update($id, $request);
         if(!$update)
             abort(500);
+
         event(new CrudEvent('licitação', 'editou', $id));
         return redirect()->route('licitacoes.index')
             ->with('message', '<i class="icon fa fa-check"></i>Licitação editada com sucesso!')
             ->with('class', 'alert-success');
     }
 
+    public function show($id)
+    {
+        $licitacao = $this->licitacaoRepository->findById($id);
+        return response()
+            ->view('site.licitacao', compact('licitacao'))
+            ->header('Cache-Control','no-cache');
+    }
+
     public function destroy($id)
     {
         $this->autoriza($this->class, __FUNCTION__);
-        $licitacao = $this->licitacaoRepository->findById($id);
-        $delete = $licitacao->delete();
+        
+        $delete = $this->licitacaoRepository->findById($id)->delete();
         if(!$delete)
             abort(500);
-        event(new CrudEvent('licitação', 'apagou', $licitacao->idlicitacao));
+        
+        event(new CrudEvent('licitação', 'apagou', $id));
         return redirect()->route('licitacoes.index')
             ->with('message', '<i class="icon fa fa-danger"></i>Licitação deletada com sucesso!')
             ->with('class', 'alert-danger');
@@ -133,11 +114,12 @@ class LicitacaoController extends Controller
     public function restore($id)
     {
         $this->autorizaStatic(['1']);
-        $licitacao = $this->licitacaoRepository->getTrashedById($id);
-        $restore = $licitacao->restore();
+        
+        $restore = $this->licitacaoRepository->getTrashedById($id)->restore();
         if(!$restore)
             abort(500);
-        event(new CrudEvent('licitação', 'restaurou', $licitacao->idlicitacao));
+        
+        event(new CrudEvent('licitação', 'restaurou', $id));
         return redirect()->route('licitacoes.index')
             ->with('message', '<i class="icon fa fa-check"></i>Licitação restaurada com sucesso!')
             ->with('class', 'alert-success');
@@ -151,5 +133,36 @@ class LicitacaoController extends Controller
         $resultados = $this->licitacaoRepository->getBusca($busca);
         $tabela = $this->licitacaoModel->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function siteGrid()
+    {
+        $licitacoes = $this->licitacaoRepository->getSiteGrid();
+        return response()
+            ->view('site.licitacoes', compact('licitacoes'))
+            ->header('Cache-Control','no-cache');
+    }
+
+    public function siteBusca()
+    {
+        // Refatorar
+        $licitacoes = $this->licitacaoRepository->getBuscaSite();
+        if (!empty(IlluminateRequest::input('palavra-chave'))
+            or !empty(IlluminateRequest::input('modalidade')) 
+            or !empty(IlluminateRequest::input('situacao')) 
+            or !empty(IlluminateRequest::input('nrlicitacao'))
+            or !empty(IlluminateRequest::input('nrprocesso'))
+            or !empty(IlluminateRequest::input('datarealizacao'))
+        ){
+            $busca = true;
+        } else {
+            $busca = false;
+        }
+        if (count($licitacoes) > 0) {
+            return view('site.licitacoes', compact('licitacoes', 'busca'));
+        } else {
+            $licitacoes = null;
+            return view('site.licitacoes', compact('licitacoes', 'busca'));
+        }
     }
 }

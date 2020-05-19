@@ -183,13 +183,13 @@ Route::prefix('/')->group(function() {
   Route::get('admin/logout', 'Auth\LoginController@logout')->name('logout');
 
   // Notícias
-  Route::get('noticias', 'NoticiaSiteController@noticiasView');
-  Route::get('noticia/{slug}', 'NoticiaSiteController@show');
+  Route::get('/noticias', 'NoticiaController@siteGrid')->name('noticias.siteGrid');
+  Route::get('/noticias/{slug}', 'NoticiaController@show')->name('noticias.show');
   
   // Licitações
-  Route::get('licitacao/{id}', 'LicitacaoSiteController@show');
-  Route::get('licitacoes', 'LicitacaoSiteController@licitacoesView');
-  Route::get('licitacoes/busca', 'LicitacaoSiteController@buscaLicitacoes');
+  Route::get('/licitacoes/busca', 'LicitacaoController@siteBusca')->name('licitacoes.siteBusca');
+  Route::get('/licitacoes/{id}', 'LicitacaoController@show')->name('licitacoes.show');
+  Route::get('/licitacoes', 'LicitacaoController@siteGrid')->name('licitacoes.siteGrid');
   
   //Balcão de Oportunidades
   Route::get('balcao-de-oportunidades', 'BdoSiteController@index');
@@ -286,5 +286,5 @@ Route::prefix('/')->group(function() {
   });
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
-  Route::get('{slug}', 'PaginaSiteController@show')->name('paginas.site');
+  Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
 });

@@ -10,9 +10,16 @@ class PaginaRepository {
         return Pagina::orderBy('idpagina','DESC')->paginate(10);
     }
 
-    public function countBySlug($slug)
+    public function countBySlug($slug, $id = null)
     {
-        return Pagina::select('slug')->where('slug',$slug)->count();
+        if($id === null) {
+            return Pagina::select('slug')->where('slug',$slug)->count();
+        }
+
+        return Pagina::select('slug')
+            ->where('idpagina', '!=', $id)
+            ->where('slug',$slug)
+            ->count();
     }
 
     public function findById($id)
@@ -35,5 +42,36 @@ class PaginaRepository {
         return Pagina::where('titulo','LIKE','%'.$busca.'%')
             ->orWhere('conteudo','LIKE','%'.$busca.'%')
             ->paginate(10);
+    }
+
+    public function store($request, $slug)
+    {
+        return Pagina::create([
+            'titulo' => $request->titulo,
+            'subtitulo' => $request->subtitulo,
+            'slug' => $slug,
+            'img' => $request->img,
+            'conteudo' => $request->conteudo,
+            'idusuario' => $request->idusuario
+        ]);
+    }
+
+    public function update($id, $request, $slug)
+    {
+        return Pagina::findOrFail($id)->update([
+            'titulo' => $request->titulo,
+            'subtitulo' => $request->subtitulo,
+            'slug' => $slug,
+            'img' => $request->img,
+            'conteudo' => $request->conteudo,
+            'idusuario' => $request->idusuario
+        ]);
+    }
+
+    public function show($slug)
+    {
+        return Pagina::select('titulo','slug','img','subtitulo','conteudo')
+            ->where('slug', $slug)
+            ->first();
     }
 }

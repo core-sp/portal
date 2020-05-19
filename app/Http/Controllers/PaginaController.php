@@ -52,26 +52,17 @@ class PaginaController extends Controller
         $request->validated();
 
         $slug = Str::slug($request->input('titulo'), '-');
-
         $countTitulo = $this->paginaRepository->countBySlug($slug);
-
         if($countTitulo >= 1) {
             return redirect(route('paginas.index'))
                 ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar a página. Já existe uma página com esse nome.')
                 ->with('class', 'alert-danger');
         }
 
-        $save = Pagina::create([
-            'titulo' => request('titulo'),
-            'subtitulo' => request('subtitulo'),
-            'slug' => $slug,
-            'img' => request('img'),
-            'conteudo' => request('conteudo'),
-            'idusuario' => request('idusuario')
-        ]);
-        
+        $save = $this->paginaRepository->store($request, $slug);
         if(!$save)
             abort(500);
+
         event(new CrudEvent('página', 'criou', $save->idpagina));
         return redirect(route('paginas.index'))
             ->with('message', '<i class="icon fa fa-check"></i>Página criada com sucesso!')
@@ -91,33 +82,39 @@ class PaginaController extends Controller
         $request->validated();
         
         $slug = Str::slug($request->input('titulo'), '-');
+        $countTitulo = $this->paginaRepository->countBySlug($slug, $id);
+        if($countTitulo >= 1) {
+            return redirect(route('paginas.index'))
+                ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar a página. Já existe uma página com esse nome.')
+                ->with('class', 'alert-danger');
+        }
 
-        $update = Pagina::findOrFail($id)->update([
-            'titulo' => request('titulo'),
-            'subtitulo' => request('subtitulo'),
-            'slug' => $slug,
-            'img' => request('img'),
-            'conteudo' => request('conteudo'),
-            'idusuario' => request('idusuario')
-        ]);
-
+        $update = $this->paginaRepository->update($id, $request, $slug);
         if(!$update)
             abort(500);
+
         event(new CrudEvent('página', 'editou', $id));
-        return redirect('/admin/paginas')
+        return redirect(route('paginas.index'))
             ->with('message', '<i class="icon fa fa-check"></i>Página editada com sucesso!')
             ->with('class', 'alert-success');
+    }
+
+    public function show($slug)
+    {
+        $pagina = $this->paginaRepository->show($slug);
+        return isset($pagina) ? response()->view('site.pagina', compact('pagina'))->header('Cache-Control','no-cache') : abort(404);
     }
 
     public function destroy($id)
     {
         $this->autoriza($this->class, __FUNCTION__);
-        $pagina = $this->paginaRepository->findById($id);
-        $delete = $pagina->delete();
+        
+        $delete = $this->paginaRepository->findById($id)->delete();
         if(!$delete)
             abort(500);
-        event(new CrudEvent('página', 'apagou', $pagina->idpagina));
-        return redirect('/admin/paginas')
+        
+        event(new CrudEvent('página', 'apagou', $id));
+        return redirect(route('paginas.index'))
             ->with('message', '<i class="icon fa fa-ban"></i>Página deletada com sucesso!')
             ->with('class', 'alert-danger');
     }
@@ -134,11 +131,13 @@ class PaginaController extends Controller
     public function restore($id)
     {
         $this->autorizaStatic(['1']);
+
         $restore = $this->paginaRepository->getTrashedById($id)->restore();
         if(!$restore)
             abort(500);
+        
         event(new CrudEvent('página', 'restaurou', $id));
-        return redirect('/admin/paginas')
+        return redirect(route('paginas.index'))
             ->with('message', '<i class="icon fa fa-check"></i>Página restaurada com sucesso!')
             ->with('class', 'alert-success');
     }

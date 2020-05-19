@@ -532,3 +532,29 @@ function btnSituacao($situacao)
         break;
     }
 }
+
+function noticiaPublicada()
+{
+    if(Auth::user()->perfil === 'Estagiário')
+        return 'Não';
+    else
+        return 'Sim';
+}
+
+function imgToThumb($string)
+{
+    $str = basename($string);
+    $num = strlen($str);
+    $num = $num <= 0 ? $num : -$num;
+    $add = substr_replace($string,'thumbnails/'.$str,$num);
+    return $add;
+}
+
+function resumo($string)
+{
+    if (strlen($string) > 100)
+        $string = strip_tags($string);
+        $string = html_entity_decode($string);
+        $string = substr($string, 0, 240) . '...';
+    return $string;
+}

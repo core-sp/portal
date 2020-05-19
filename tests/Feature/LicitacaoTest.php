@@ -79,7 +79,7 @@ class LicitacaoTest extends TestCase
         $this->signInAsAdmin();
         $licitacao = factory('App\Licitacao')->create();
         
-        $this->get('/licitacoes')
+        $this->get(route('licitacoes.siteGrid'))
             ->assertSee($licitacao->titulo)
             ->assertSee($licitacao->nrlicitacao)
             ->assertSee($licitacao->nrprocesso)
@@ -92,11 +92,21 @@ class LicitacaoTest extends TestCase
         $this->signInAsAdmin();
         $licitacao = factory('App\Licitacao')->create();
         
-        $this->get('/licitacao/' . $licitacao->idlicitacao)
+        $this->get(route('licitacoes.show', $licitacao->idlicitacao))
             ->assertSee($licitacao->titulo)
             ->assertSee($licitacao->nrlicitacao)
             ->assertSee($licitacao->nrprocesso)
             ->assertSee($licitacao->modalidade);
+    }
+
+    /** @test */
+    public function link_to_licitacao_is_shown_on_website()
+    {
+        $this->signInAsAdmin();
+        $licitacao = factory('App\Licitacao')->create();
+        
+        $this->get(route('licitacoes.siteGrid', $licitacao->idlicitacao))
+            ->assertSee(route('licitacoes.show', $licitacao->idlicitacao));
     }
 
     /** @test */
@@ -291,7 +301,7 @@ class LicitacaoTest extends TestCase
         $licitacao = factory('App\Licitacao')->create();
 
         $this->delete(route('licitacoes.destroy', $licitacao->idlicitacao));
-        $this->assertNotNull(Licitacao::withTrashed()->find($licitacao->idlicitacao)->deleted_at);
+        $this->assertSoftDeleted('licitacoes', ['idlicitacao' => $licitacao->idlicitacao]);
     }
 
     /** @test */
@@ -409,5 +419,90 @@ class LicitacaoTest extends TestCase
         $this->signInAsAdmin();
 
         $this->get(route('licitacoes.index'))->assertSee(route('licitacoes.create'));
+    }
+
+    /** @test */
+    function licitacao_can_be_searched_by_modalidade_on_website()
+    {
+        $this->withoutExceptionHandling();
+
+        $licitacao = factory('App\Licitacao')->create();
+
+        $this->get(route('licitacoes.siteBusca', [
+            'modalidade' => $licitacao->modalidade
+        ]))->assertOk()
+            ->assertSee($licitacao->titulo);
+    }
+
+    /** @test */
+    function licitacao_can_be_searched_by_palavrachave_on_website()
+    {
+        $licitacao = factory('App\Licitacao')->create();
+        $array_titulo = explode($licitacao->titulo, ' ');
+        $first_word = $array_titulo[0];
+
+        $this->get(route('licitacoes.siteBusca', [
+            'palavra-chave' => $first_word
+        ]))->assertOk()
+            ->assertSee($licitacao->titulo);
+    }
+
+    /** @test */
+    function licitacao_can_be_searched_by_nrprocesso_on_website()
+    {
+        $licitacao = factory('App\Licitacao')->create();
+
+        $this->get(route('licitacoes.siteBusca', [
+            'nrprocesso' => $licitacao->nrprocesso
+        ]))->assertOk()
+            ->assertSee($licitacao->titulo);
+    }
+
+    /** @test */
+    function licitacao_can_be_searched_by_nrlicitacao_on_website()
+    {
+        $licitacao = factory('App\Licitacao')->create();
+
+        $this->get(route('licitacoes.siteBusca', [
+            'nrlicitacao' => $licitacao->nrlicitacao
+        ]))->assertOk()
+            ->assertSee($licitacao->titulo);
+    }
+
+    /** @test */
+    function licitacao_can_be_searched_by_situacao_on_website()
+    {
+        $this->withoutExceptionHandling();
+        $licitacao = factory('App\Licitacao')->create();
+
+        $this->get(route('licitacoes.siteBusca', [
+            'situacao' => $licitacao->situacao
+        ]))->assertOk()
+            ->assertSee($licitacao->titulo);
+    }
+
+    /** @test */
+    function licitacao_can_be_searched_by_datarealizacao_on_website()
+    {
+        $this->withoutExceptionHandling();
+        $licitacao = factory('App\Licitacao')->create();
+
+        $this->get(route('licitacoes.siteBusca', [
+            'datarealizacao' => onlyDate($licitacao->datarealizacao)
+        ]))->assertOk()
+            ->assertSee($licitacao->titulo);
+    }
+
+    /** @test */
+    function licitacao_can_be_searched_by_more_than_one_param_on_website()
+    {
+        $this->withoutExceptionHandling();
+        $licitacao = factory('App\Licitacao')->create();
+
+        $this->get(route('licitacoes.siteBusca', [
+            'nrprocesso' => $licitacao->nrprocesso,
+            'situacao' => $licitacao->situacao
+        ]))->assertOk()
+            ->assertSee($licitacao->titulo);
     }
 }

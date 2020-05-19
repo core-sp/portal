@@ -2,14 +2,6 @@
 
 @section('content')
 
-@php
-use \App\Http\Controllers\Helpers\LicitacaoHelper;
-use \App\Http\Controllers\Helper;
-use \App\Http\Controllers\LicitacaoSiteController;
-$modalidades = LicitacaoHelper::modalidades();
-$situacoes = LicitacaoHelper::situacoes();
-@endphp
-
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/licitacoes.png') }}" />
@@ -27,7 +19,7 @@ $situacoes = LicitacaoHelper::situacoes();
   <div class="container">
     <div class="row pb-4" id="conteudo-principal">
       <div class="col">
-        <form method="GET" role="form" action="/licitacoes/busca" enctype="multipart/form-data" class="pesquisaLicitacao">
+        <form method="GET" role="form" action="{{ route('licitacoes.siteBusca') }}" enctype="multipart/form-data" class="pesquisaLicitacao">
           <div class="form-row text-center">
             <div class="m-auto">
               <h5 class="text-uppercase stronger marrom">Busca detalhada</h5>
@@ -48,9 +40,9 @@ $situacoes = LicitacaoHelper::situacoes();
             </div>
           	<div class="col-md-4">
           	  <label for="modalidade">Modalidade</label>
-          	  <select name="modalidade" class="form-control {{ !empty(Request::input('modalidade')) && in_array(Request::input('modalidade'), $modalidades) ? 'bg-focus border-info' : '' }}" id="modalidade">
+          	  <select name="modalidade" class="form-control {{ !empty(Request::input('modalidade')) && in_array(Request::input('modalidade'), modalidadesLicitacao()) ? 'bg-focus border-info' : '' }}" id="modalidade">
           	  	<option value="">Todas</option>
-	         	    @foreach($modalidades as $modalidade)
+	         	    @foreach(modalidadesLicitacao() as $modalidade)
                   @if($modalidade === Request::input('modalidade'))
                   <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
                   @else
@@ -87,9 +79,9 @@ $situacoes = LicitacaoHelper::situacoes();
           <div class="form-row">
           	<div class="col-lg-4 col-md-6">
           	  <label for="situacao">Situação</label>
-          	  <select name="situacao" class="form-control {{ !empty(Request::input('situacao')) && in_array(Request::input('situacao'), $situacoes) ? 'bg-focus border-info' : '' }}" id="situacao">
+          	  <select name="situacao" class="form-control {{ !empty(Request::input('situacao')) && in_array(Request::input('situacao'), situacoesLicitacao()) ? 'bg-focus border-info' : '' }}" id="situacao">
           	  	<option value="">Qualquer</option>
-	         	    @foreach($situacoes as $situacao)
+	         	    @foreach(situacoesLicitacao() as $situacao)
                   @if($situacao === Request::input('situacao'))
                   <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
                   @else
@@ -129,11 +121,11 @@ $situacoes = LicitacaoHelper::situacoes();
         @if(isset($licitacoes))
           @foreach($licitacoes as $licitacao)
           <div class="licitacao-grid">
-            <a href="/licitacao/{{ $licitacao->idlicitacao }}">
+            <a href="{{ route('licitacoes.show', $licitacao->idlicitacao) }}">
               <div class="licitacao-grid-main">
                 <h5 class="marrom">{{ $licitacao->titulo }}</h5>
                 <div class="linha-lg-mini"></div>
-                <p>{!! Helper::resumo($licitacao->objeto) !!}</p>
+                <p>{!! resumo($licitacao->objeto) !!}</p>
                 <div class="mt-3 row bot-lg">
                   <div class="col-sm-4 d-flex mb-2-576">
                     <div class="mr-2">
@@ -152,8 +144,8 @@ $situacoes = LicitacaoHelper::situacoes();
                     </div>
                     <div class="flex-one align-self-center">
                       <h6 class="light">
-                        <strong>Divulgação:</strong> {{ LicitacaoHelper::onlyDate($licitacao->created_at) }}<br />
-                        <strong>Realizacao:</strong> {{ LicitacaoHelper::onlyDate($licitacao->datarealizacao) }}
+                        <strong>Divulgação:</strong> {{ onlyDate($licitacao->created_at) }}<br />
+                        <strong>Realizacao:</strong> {{ onlyDate($licitacao->datarealizacao) }}
                       </h6>
                     </div>
                   </div>
@@ -164,7 +156,7 @@ $situacoes = LicitacaoHelper::situacoes();
                     <div class="flex-one align-self-center">
                       <h6 class="light">
                         <strong>Modalidade:</strong> {{ $licitacao->modalidade }}<br />
-                        <strong>Situação:</strong> {{ Helper::btnSituacao($licitacao->situacao) }}
+                        <strong>Situação:</strong> {{ btnSituacao($licitacao->situacao) }}
                       </h6>
                     </div>
                   </div>
@@ -173,7 +165,7 @@ $situacoes = LicitacaoHelper::situacoes();
               <div class="licitacao-grid-bottom">
                 <div class="col">
                   <div class="text-right">
-                    <h6 class="light marrom"><strong>Atualizado em:</strong> {{ LicitacaoHelper::onlyDate($licitacao->updated_at) }}</h6>
+                    <h6 class="light marrom"><strong>Atualizado em:</strong> {{ onlyDate($licitacao->updated_at) }}</h6>
                   </div>
                 </div>
               </div>
