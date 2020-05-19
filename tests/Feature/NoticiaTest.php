@@ -153,6 +153,16 @@ class NoticiaTest extends TestCase
     }
 
     /** @test */
+    public function noticia_site_grid_is_shown_on_the_website()
+    {
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.siteGrid', $noticia->slug))
+            ->assertOk()
+            ->assertSee($noticia->titulo);
+    }
+
+    /** @test */
     public function noticia_with_same_title_cannot_be_created()
     {
         $this->signInAsAdmin();
