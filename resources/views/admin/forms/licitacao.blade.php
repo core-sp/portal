@@ -1,7 +1,7 @@
-<form role="form" method="POST" action="{{ route('licitacoes.store') }}">
+<form role="form" method="POST" action="{{ isset($resultado) ? route('licitacoes.update', $resultado->idlicitacao) : route('licitacoes.store') }}">
     @csrf
     @if(isset($resultado))
-        @method('PUT')
+        @method('PATCH')
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
