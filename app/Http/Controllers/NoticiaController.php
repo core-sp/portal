@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Noticia;
 use App\Regional;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
 use App\Events\CrudEvent;
 use App\Http\Requests\NoticiaRequest;
 use App\Repositories\NoticiaRepository;
@@ -24,7 +23,7 @@ class NoticiaController extends Controller
 
     public function __construct(Noticia $noticia, NoticiaRepository $noticiaRepository)
     {
-        $this->middleware('auth', ['except' => 'show']);
+        $this->middleware('auth', ['except' => 'show', 'siteGrid']);
         $this->noticiaModel = $noticia;
         $this->noticiaRepository = $noticiaRepository;
         $this->variaveis = $noticia->variaveis();
@@ -52,40 +51,22 @@ class NoticiaController extends Controller
     public function store(NoticiaRequest $request)
     {
         $request->validated();
-        // Checa o usuário
-        if(Auth::user()->perfil === 'Estagiário')
-            $publicada = 'Não';
-        else
-            $publicada = 'Sim';
-        if(empty($request->input('categoria')))
-            $categoria = null;
-        else
-            $categoria = $request->input('categoria');
         // Conta se título de notícia já existe
         $slug = Str::slug($request->input('titulo'), '-');
         $countTitulo = $this->noticiaRepository->getExistingSlug($slug);
         if($countTitulo >= 1) {
-            return redirect('/admin/noticias')
+            return redirect(route('noticias.index'))
                 ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar a notícia, pois já existe uma notícia com o título utilizado.')
                 ->with('class', 'alert-danger');
         }
         // Inputa dados no BD
-        $save = Noticia::create([
-            'titulo' => request('titulo'),
-            'slug' => $slug,
-            'img' => request('img'),
-            'conteudo' => request('conteudo'),
-            'publicada' => $publicada,
-            'categoria' => $categoria,
-            'idregional' => request('idregional'),
-            'idcurso' => request('idcurso'),
-            'idusuario' => request('idusuario')
-        ]);
-
+        $save = $this->noticiaRepository->store($request, $slug);
+        // Aborta se algo deu errado
         if(!$save)
             abort(500);
+        // Gera evento no log e redireciona
         event(new CrudEvent('notícia', 'criou', $save->idnoticia));
-        return redirect('/admin/noticias')
+        return redirect(route('noticias.index'))
             ->with('message', '<i class="icon fa fa-check"></i>Notícia criada com sucesso!')
             ->with('class', 'alert-success');
     }
@@ -102,52 +83,44 @@ class NoticiaController extends Controller
     public function update(NoticiaRequest $request, $id)
     {
         $request->validated();
-        // Checa o usuário
-        if(Auth::user()->perfil === 'Estagiário')
-            $publicada = 'Não';
-        else
-            $publicada = 'Sim';
-        if(empty($request->input('categoria')))
-            $categoria = null;
-        else
-            $categoria = $request->input('categoria');
         // Checa se slug já existe
         $slug = Str::slug($request->input('titulo'), '-');
         $countTitulo = $this->noticiaRepository->getExistingSlug($slug, $id);
         if($countTitulo >= 1) {
-            return redirect('/admin/noticias')
+            return redirect(route('noticias.index'))
                 ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível editar a notícia, pois já existe uma notícia com o título utilizado.')
                 ->with('class', 'alert-danger');
         }
         // Inputa dados no BD
-        $update = Noticia::findOrFail($id)->update([
-            'titulo' => request('titulo'),
-            'slug' => $slug,
-            'img' => request('img'),
-            'conteudo' => request('conteudo'),
-            'publicada' => $publicada,
-            'categoria' => $categoria,
-            'idregional' => request('idregional'),
-            'idcurso' => request('idcurso'),
-            'idusuario' => request('idusuario')
-        ]);
-
+        $update = $this->noticiaRepository->update($id, $request, $slug);
+        // Aborta se algo dá errado
         if(!$update)
             abort(500);
+        // Gera evento e redireciona
         event(new CrudEvent('notícia', 'editou', $id));
-        return redirect('/admin/noticias')
+        return redirect(route('noticias.index'))
             ->with('message', '<i class="icon fa fa-check"></i>Notícia editada com sucesso!')
             ->with('class', 'alert-success');
+    }
+
+    public function show($slug)
+    {
+        $noticia = $this->noticiaRepository->getBySlug($slug);
+        $titulo = $noticia->titulo;
+        $id = $noticia->idnoticia;
+        $tres = $this->noticiaRepository->getThreeExcludingOneById($id);
+        return response()
+            ->view('site.noticia', compact('noticia', 'titulo', 'tres', 'id'))
+            ->header('Cache-Control','no-cache');
     }
 
     public function destroy($id)
     {
         $this->autoriza($this->class, __FUNCTION__);
-        $noticia = Noticia::findOrFail($id);
-        $delete = $noticia->delete();
+        $delete = $this->noticiaRepository->destroy($id);
         if(!$delete)
             abort(500);
-        event(new CrudEvent('notícia', 'apagou', $noticia->idnoticia));
+        event(new CrudEvent('notícia', 'apagou', $id));
         return redirect('/admin/noticias')
             ->with('message', '<i class="icon fa fa-ban"></i>Notícia deletada com sucesso!')
             ->with('class', 'alert-success');
@@ -165,11 +138,10 @@ class NoticiaController extends Controller
     public function restore($id)
     {
         $this->autorizaStatic(['1']);
-        $noticia = $this->noticiaRepository->getTrashedById($id);
-        $restore = $noticia->restore();
+        $restore = $this->noticiaRepository->getTrashedById($id)->restore();
         if(!$restore)
             abort(500);
-        event(new CrudEvent('notícia', 'restaurou', $noticia->idnoticia));
+        event(new CrudEvent('notícia', 'restaurou', $id));
         return redirect('/admin/noticias')
             ->with('message', '<i class="icon fa fa-check"></i>Notícia restaurada com sucesso!')
             ->with('class', 'alert-success');
@@ -183,5 +155,11 @@ class NoticiaController extends Controller
         $resultados = $this->noticiaRepository->getBusca($busca);
         $tabela = $this->noticiaModel->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function siteGrid()
+    {
+        $noticias = $this->noticiaRepository->getSiteGrid();
+        return view('site.noticias', compact('noticias'));
     }
 }

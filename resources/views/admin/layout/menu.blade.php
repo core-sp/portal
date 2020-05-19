@@ -277,7 +277,7 @@
             <ul class="nav nav-treeview">
                 @if(ControleController::mostra('LicitacaoController', 'index'))
                 <li class="nav-item">
-                    <a href="/admin/licitacoes" class="nav-link">
+                    <a href="{{ route('licitacoes.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todas as licitações</p>
                     </a>
@@ -285,7 +285,7 @@
                 @endif
                 @if(ControleController::mostra('LicitacaoController', 'create'))
                 <li class="nav-item">
-                    <a href="/admin/licitacoes/criar" class="nav-link">
+                    <a href="{{ route('licitacoes.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Criar nova licitação</p>
                     </a>

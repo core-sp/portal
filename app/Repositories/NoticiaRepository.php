@@ -63,4 +63,43 @@ class NoticiaRepository {
             ->where('idnoticia','!=',$id)
             ->count();
     }
+
+    public function store($request, $slug)
+    {
+        $publicada = noticiaPublicada();
+        empty($request->input('categoria')) ? $categoria = null : $categoria = $request->input('categoria');
+        return Noticia::create([
+            'titulo' => $request->titulo,
+            'slug' => $slug,
+            'img' => $request->img,
+            'conteudo' => $request->conteudo,
+            'publicada' => $publicada,
+            'categoria' => $categoria,
+            'idregional' => $request->idregional,
+            'idcurso' => $request->idcurso,
+            'idusuario' => $request->idusuario
+        ]);
+    }
+
+    public function update($id, $request, $slug)
+    {
+        $publicada = noticiaPublicada();
+        empty($request->input('categoria')) ? $categoria = null : $categoria = $request->input('categoria');
+        return Noticia::findOrFail($id)->update([
+            'titulo' => $request->titulo,
+            'slug' => $slug,
+            'img' => $request->img,
+            'conteudo' => $request->conteudo,
+            'publicada' => $publicada,
+            'categoria' => $categoria,
+            'idregional' => $request->idregional,
+            'idcurso' => $request->idcurso,
+            'idusuario' => $request->idusuario
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        return Noticia::findOrFail($id)->delete();
+    }
 }

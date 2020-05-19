@@ -113,6 +113,22 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
+    public function pagina_cannot_be_updated_to_an_exisiting_title()
+    {
+        $this->signInAsAdmin();
+
+        $pagina = factory('App\Pagina')->create();
+        $paginaDois = factory('App\Pagina')->create();
+
+        $attributes = factory('App\Pagina')->raw([
+            'titulo' => $pagina->titulo
+        ]);
+
+        $this->post(route('paginas.update', $paginaDois->idpagina), $attributes);
+        $this->assertNotEquals(Pagina::find($paginaDois->idpagina)->titulo, $pagina->titulo);
+    }
+
+    /** @test */
     public function non_authorized_users_cannot_create_pagina()
     {
         $this->signIn();

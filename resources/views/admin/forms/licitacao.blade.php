@@ -1,11 +1,4 @@
-@php
-use \App\Http\Controllers\Helpers\LicitacaoHelper;
-use \App\Http\Controllers\Helper;
-$modalidades = LicitacaoHelper::modalidades();
-$situacoes = LicitacaoHelper::situacoes();
-@endphp
-
-<form role="form" method="POST">
+<form role="form" method="POST" action="{{ route('licitacoes.store') }}">
     @csrf
     @if(isset($resultado))
         @method('PUT')
@@ -16,7 +9,7 @@ $situacoes = LicitacaoHelper::situacoes();
         <div class="col-sm-6">
             <label for="modalidade">Modalidade</label>
             <select name="modalidade" class="form-control {{ $errors->has('modalidade') ? 'is-invalid' : '' }}">
-            @foreach($modalidades as $modalidade)
+            @foreach(modalidadesLicitacao() as $modalidade)
                 @if(!empty(old('modalidade')))
                     @if(old('modalidade') === $modalidade)
                         <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
@@ -45,7 +38,7 @@ $situacoes = LicitacaoHelper::situacoes();
         <div class="col-sm-3">
             <label for="situacao">Situação</label>
             <select name="situacao" class="form-control {{ $errors->has('situacao') ? 'is-invalid' : '' }}">
-            @foreach($situacoes as $situacao)
+            @foreach(situacoesLicitacao() as $situacao)
                 @if(!empty(old('situacao')))
                     @if(old('situacao') === $situacao)
                             <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
@@ -187,7 +180,7 @@ $situacoes = LicitacaoHelper::situacoes();
                         value="{{ old('datarealizacao') }}"
                     @else
                         @if(isset($resultado))
-                            value="{{ Helper::OnlyDate($resultado->datarealizacao) }}"
+                            value="{{ onlyDate($resultado->datarealizacao) }}"
                         @endif
                     @endif
                     />
@@ -207,7 +200,7 @@ $situacoes = LicitacaoHelper::situacoes();
                         value="{{ old('horainicio') }}"
                     @else
                         @if(isset($resultado))
-                            value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
+                            value="{{ onlyHour($resultado->datarealizacao) }}"
                         @endif
                     @endif
                     />
