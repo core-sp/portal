@@ -2,10 +2,14 @@
 
 namespace App;
 
+use App\Traits\ControleAcesso;
+use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 
 class Regional extends Model
 {
+    use ControleAcesso, TabelaAdmin;
+
     protected $table = 'regionais';
     protected $primaryKey = 'idregional';
     protected $fillable = ['prefixo', 'regional', 'endereco', 'bairro',
@@ -16,5 +20,45 @@ class Regional extends Model
     public function user()
     {
         return $this->hasMany('App\User', 'idusuario');
+    }
+
+    public function variaveis()
+    {
+        return [
+            'singular' => 'regional',
+            'singulariza' => 'a regional',
+            'plural' => 'regionais',
+            'pluraliza' => 'regionais'
+        ];
+    }
+
+    protected function tabelaHeaders()
+    {
+        return ['Código', 'Regional', 'Telefone', 'Email', 'Ações'];
+    }
+
+    protected function tabelaContents($query)
+    {
+        return $query->map(function($row){
+            $acoes = '<a href="'.route('regionais.show', $row->idregional).'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
+            if($this->mostra('RegionalController', 'edit'))
+                $acoes .= '<a href="'.route('regionais.edit', $row->idregional).'" class="btn btn-sm btn-primary">Editar</a>';
+            return [
+                $row->idregional,
+                $row->prefixo.' - '.$row->regional,
+                $row->telefone,
+                $row->email,
+                $acoes
+            ];
+        })->toArray();
+    }
+
+    public function tabelaCompleta($query)
+    {
+        return $this->montaTabela(
+            $this->tabelaHeaders(), 
+            $this->tabelaContents($query),
+            [ 'table', 'table-hover' ]
+        );
     }
 }

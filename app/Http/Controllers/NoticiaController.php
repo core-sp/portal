@@ -15,7 +15,6 @@ class NoticiaController extends Controller
 {
     use ControleAcesso;
 
-    // Nome da classe
     private $class = 'NoticiaController';
     private $noticiaModel;
     private $noticiaRepository;

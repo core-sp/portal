@@ -274,6 +274,14 @@ class PostTest extends TestCase
     }
 
     /** @test */
+    function link_to_create_post_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('posts.index'))->assertSee(route('posts.create'));
+    }
+
+    /** @test */
     function link_to_edit_post_is_shown_on_admin()
     {
         $this->signInAsAdmin();

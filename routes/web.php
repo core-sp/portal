@@ -35,20 +35,12 @@ Route::prefix('admin')->group(function() {
     Route::get('/restore/{id}', 'ChamadoController@restore');
   });
   
-  // Rotas para CRUD de páginas
+  // Rotas de páginas
   require('admin/paginas.php');
-
   // Rotas de regionais
-  Route::prefix('regionais')->group(function() {
-    Route::get('/', 'RegionalController@index');
-    Route::get('/busca', 'RegionalController@busca');
-    Route::get('/editar/{id}', 'RegionalController@edit');
-    Route::put('/editar/{id}', 'RegionalController@update');
-  });
-
+  require('admin/regionais.php');
   // Rotas de notícias
   require('admin/noticias.php');
-
   // Rotas de licitações
   require('admin/licitacoes.php');
 
@@ -182,9 +174,10 @@ Route::prefix('/')->group(function() {
   Route::get('admin', 'AdminController@index')->name('admin');
   Route::get('admin/logout', 'Auth\LoginController@logout')->name('logout');
 
+  // Regionais
+  require('site/regionais.php');
   // Notícias
-  require('site/noticias.php');
-  
+  require('site/noticias.php');  
   // Licitações
   require('site/licitacoes.php');
   
@@ -209,10 +202,6 @@ Route::prefix('/')->group(function() {
   
   // Busca geral
   Route::get('/busca', 'SiteController@busca');
-
-  // Seccionais
-  Route::get('seccionais', 'RegionalSiteController@regionaisView');
-  Route::get('seccional/{id}', 'RegionalSiteController@show');
 
   // Agendamentos
   Route::get('agendamento', 'AgendamentoSiteController@formView');
