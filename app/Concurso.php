@@ -78,9 +78,9 @@ class Concurso extends Model
     {
         $headers = ['Código', 'Modalidade', 'Nº do Processo', 'Deletado em', 'Ações'];
         
-        $query->map(function($row){
+        $contents = $query->map(function($row){
             $acoes = '<a href="'.route('concursos.restore', $row->idconcurso).'" class="btn btn-sm btn-primary">Restaurar</a>';
-            $conteudo = [
+            return [
                 $row->idconcurso,
                 $row->modalidade,
                 $row->nrprocesso,

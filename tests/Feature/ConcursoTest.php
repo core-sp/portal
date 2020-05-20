@@ -432,4 +432,16 @@ class ConcursoTest extends TestCase
         ]))->assertOk()
             ->assertSee($concurso->nrprocesso);
     }
+
+    /** @test */
+    function concurso_lixeira_is_acessible_by_authorized_users()
+    {
+        $this->signInAsAdmin();
+        $concurso = factory('App\Concurso')->create();
+        $concurso->delete();
+
+        $this->get(route('concursos.lixeira'))
+            ->assertOk()
+            ->assertSee($concurso->nrprocesso);
+    }
 }

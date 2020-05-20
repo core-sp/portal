@@ -110,6 +110,7 @@ class ConcursoController extends Controller
         $this->autorizaStatic(['1']);
         $resultados = $this->concursoRepository->getTrashed();
         $tabela = $this->concursoModel->tabelaTrashed($resultados);
+        $variaveis = (object) $this->variaveis;
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
