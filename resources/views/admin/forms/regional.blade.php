@@ -1,28 +1,28 @@
-<form role="form" method="POST">
+<form role="form" method="POST" action="{{ route('regionais.update', $resultado->idregional) }}">
     @csrf
     @if(isset($resultado))
-        @method('PUT')
+        @method('PATCH')
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}" />
     <div class="card-body">
         <div class="form-row">
             <div class="col">
-                <label for="cidade">Cidade</label>
+                <label for="regional">Regional</label>
                 <input type="text"
-                    class="form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }}"
-                    placeholder="Cidade"
-                    name="cidade"
-                    @if(!empty(old('cidade')))
-                        value="{{ old('cidade') }}"
+                    class="form-control {{ $errors->has('regional') ? 'is-invalid' : '' }}"
+                    placeholder="Regional"
+                    name="regional"
+                    @if(!empty(old('regional')))
+                        value="{{ old('regional') }}"
                     @else
                         @if(isset($resultado))
                             value="{{ $resultado->regional }}"
                         @endif
                     @endif
                     />
-                @if($errors->has('cidade'))
+                @if($errors->has('regional'))
                 <div class="invalid-feedback">
-                {{ $errors->first('cidade') }}
+                {{ $errors->first('regional') }}
                 </div>
                 @endif
             </div>

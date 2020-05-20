@@ -1,14 +1,10 @@
-@extends('site.layout.app', ['title' => 'Regionais'])
+@extends('site.layout.app', ['title' => 'Seccionais'])
 
 @section('description')
   <meta name="description" content="O Core-SP possui escritórios seccionais espalhados por regiões estratégicas em todo o estado de São Paulo. Encontre o escritório mais próximo de você.">
 @endsection
 
 @section('content')
-
-@php
-use App\Http\Controllers\Helper;
-@endphp
 
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
@@ -47,7 +43,7 @@ use App\Http\Controllers\Helper;
           <p class="light"><strong>Telefone:</strong> {{ $regional->telefone }}</p>
           <p class="light"><strong>Email:</strong> {{ $regional->email }}</p>
           <p class="light mb-2"><strong>Horário de funcionamento: </strong>{{ $regional->funcionamento }}</p>
-          <a href="/seccional/{{ $regional->idregional }}" class="btn-curso-grid">Detalhes</a>
+          <a href="{{ route('regionais.show', $regional->idregional) }}" class="btn-curso-grid">Detalhes</a>
         </div>
         @endforeach
       </div>

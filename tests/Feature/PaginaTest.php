@@ -326,6 +326,14 @@ class PaginaTest extends TestCase
     }
 
     /** @test */
+    function link_to_create_pagina_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('paginas.index'))->assertSee(route('paginas.create'));
+    }
+
+    /** @test */
     function link_to_edit_pagina_is_shown_on_admin()
     {
         $this->signInAsAdmin();

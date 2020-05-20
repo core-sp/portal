@@ -6,10 +6,6 @@
 
 @section('content')
 
-@php
-  use \App\Http\Controllers\Helper;
-@endphp
-
 <section>
   <div class="container-fluid">
     <div class="row" id="conteudo-principal">
