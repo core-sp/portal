@@ -11,7 +11,7 @@ $factory->define(Noticia::class, function (Faker $faker) {
         'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User'),
         'titulo' => $titulo = $faker->sentence,
         'slug' => str_slug($titulo, '-'),
-        'conteudo' => $faker->text,
+        'conteudo' => str_random(200),
         'publicada' => 'Sim'
     ];
 });

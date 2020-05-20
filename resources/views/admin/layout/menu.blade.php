@@ -311,7 +311,7 @@
                 @endif
                 @if(ControleController::mostra('ConcursoController', 'create'))
                 <li class="nav-item">
-                    <a href="/admin/concursos/criar" class="nav-link">
+                    <a href="{{ route('concursos.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Criar novo concurso</p>
                     </a>

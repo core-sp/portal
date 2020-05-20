@@ -2,14 +2,6 @@
 
 @section('content')
 
-@php
-use \App\Http\Controllers\Helper;
-use \App\Http\Controllers\Helpers\ConcursoHelper;
-use Illuminate\Support\Facades\Input;
-$modalidades = ConcursoHelper::modalidades();
-$situacoes = ConcursoHelper::situacoes();
-@endphp
-
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/concursos.png') }}" />
@@ -38,10 +30,10 @@ $situacoes = ConcursoHelper::situacoes();
           	<div class="col-md-6">
           	  <label for="modalidade">Modalidade</label>
           	  <select name="modalidade"
-                class="form-control {{ !empty(Request::input('modalidade')) && in_array(Request::input('modalidade'), $modalidades) ? 'bg-focus border-info' : '' }}"
+                class="form-control {{ !empty(Request::input('modalidade')) && in_array(Request::input('modalidade'), concursoModalidades()) ? 'bg-focus border-info' : '' }}"
                 id="modalidade">
           	  	<option value="">Todas</option>
-	         	    @foreach($modalidades as $modalidade)
+	         	    @foreach(concursoModalidades() as $modalidade)
                   @if($modalidade === Request::input('modalidade'))
                   <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
                   @else
@@ -52,9 +44,9 @@ $situacoes = ConcursoHelper::situacoes();
           	</div>
           	<div class="col-md-6 mt-2-768">
           	  <label for="situacao">Situação</label>
-          	  <select name="situacao" class="form-control {{ !empty(Request::input('situacao')) && in_array(Request::input('situacao'), $situacoes) ? 'bg-focus border-info' : '' }}" id="situacao">
+          	  <select name="situacao" class="form-control {{ !empty(Request::input('situacao')) && in_array(Request::input('situacao'), concursoSituacoes()) ? 'bg-focus border-info' : '' }}" id="situacao">
           	  	<option value="">Qualquer</option>
-	         	    @foreach($situacoes as $situacao)
+	         	    @foreach(concursoSituacoes() as $situacao)
                   @if($situacao === Request::input('situacao'))
                   <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
                   @else
@@ -108,11 +100,11 @@ $situacoes = ConcursoHelper::situacoes();
         @if(isset($concursos))
           @foreach($concursos as $concurso)
           <div class="licitacao-grid">
-            <a href="/concurso/{{ $concurso->idconcurso }}">
+            <a href="{{ route('concursos.show', $concurso->idconcurso) }}}">
               <div class="licitacao-grid-main">
                 <h5 class="marrom">{{ $concurso->titulo }}</h5>
                 <div class="linha-lg-mini"></div>
-                <p>{!! Helper::resumo($concurso->objeto) !!}</p>
+                <p>{!! resumo($concurso->objeto) !!}</p>
                 <div class="mt-3 row bot-lg">
                   <div class="col-sm-4 d-flex">
                     <div class="mr-2">
@@ -130,8 +122,8 @@ $situacoes = ConcursoHelper::situacoes();
                     </div>
                     <div class="flex-one align-self-center">
                       <h6 class="light">
-                        <strong>Divulgação:</strong> {{ Helper::onlyDate($concurso->created_at) }}<br />
-                        <strong>Realizacao:</strong> {{ Helper::onlyDate($concurso->datarealizacao) }}
+                        <strong>Divulgação:</strong> {{ onlyDate($concurso->created_at) }}<br />
+                        <strong>Realizacao:</strong> {{ onlyDate($concurso->datarealizacao) }}
                       </h6>
                     </div>
                   </div>
@@ -151,7 +143,7 @@ $situacoes = ConcursoHelper::situacoes();
               <div class="licitacao-grid-bottom">
                 <div class="col">
                   <div class="text-right">
-                    <h6 class="light marrom"><strong>Atualizado em:</strong> {{ Helper::onlyDate($concurso->updated_at) }}</h6>
+                    <h6 class="light marrom"><strong>Atualizado em:</strong> {{ onlyDate($concurso->updated_at) }}</h6>
                   </div>
                 </div>
               </div>

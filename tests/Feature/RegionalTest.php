@@ -72,6 +72,21 @@ class RegionalTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_regional_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $regional = factory('App\Regional')->create();
+        $attributes = factory('App\Regional')->raw();
+
+        $this->patch(route('regionais.update', $regional->idregional), $attributes);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('editou', $log);
+        $this->assertStringContainsString('regional', $log);
+    }
+
+    /** @test */
     public function regional_is_required_to_update_regionais()
     {
         $this->signInAsAdmin();
@@ -169,6 +184,7 @@ class RegionalTest extends TestCase
     /** @test */
     public function regional_is_shown_on_the_website()
     {
+        $this->withoutExceptionHandling();
         $regional = factory('App\Regional')->create();
 
         $this->get(route('regionais.show', $regional->idregional))

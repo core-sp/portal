@@ -1,14 +1,7 @@
-@php
-use App\Http\Controllers\Helpers\ConcursoHelper;
-use App\Http\Controllers\Helper;
-$modalidades = ConcursoHelper::modalidades();
-$situacoes = ConcursoHelper::situacoes();
-@endphp
-
-<form role="form" method="POST" enctype="multipart/form-data">
+<form role="form" method="POST" enctype="multipart/form-data" action="{{ !isset($resultado) ? route('concursos.store') : route('concursos.update', Request::route('id')) }}">
     @csrf
     @if(isset($resultado))
-      @method('PUT')
+      @method('PATCH')
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
@@ -16,7 +9,7 @@ $situacoes = ConcursoHelper::situacoes();
         <div class="col-sm-3">
           <label for="modalidade">Modalidade</label>
           <select name="modalidade" class="form-control">
-          @foreach($modalidades as $modalidade)
+          @foreach(concursoModalidades() as $modalidade)
             @if(!empty(old('modalidade')))
               @if(old('modalidade') === $modalidade)
                 <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
@@ -88,7 +81,7 @@ $situacoes = ConcursoHelper::situacoes();
         <div class="col">
           <label for="situacao">Situação</label>
           <select name="situacao" class="form-control {{ $errors->has('situacao') ? 'is-invalid' : '' }}">
-          @foreach($situacoes as $situacao)
+          @foreach(concursoSituacoes() as $situacao)
             @if(!empty(old('situacao')))
               @if(old('situacao') === $situacao)
                 <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
@@ -124,7 +117,7 @@ $situacoes = ConcursoHelper::situacoes();
               value="{{ old('datarealizacao') }}"
             @else
               @if(isset($resultado))
-                value="{{ Helper::onlyDate($resultado->datarealizacao) }}"
+                value="{{ onlyDate($resultado->datarealizacao) }}"
               @endif
             @endif
             />
@@ -144,7 +137,7 @@ $situacoes = ConcursoHelper::situacoes();
               value="{{ old('horainicio') }}"
             @else
               @if(isset($resultado))
-                value="{{ Helper::onlyHour($resultado->datarealizacao) }}"
+                value="{{ onlyHour($resultado->datarealizacao) }}"
               @endif
             @endif
             />

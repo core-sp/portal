@@ -107,8 +107,6 @@ class NoticiaTest extends TestCase
     /** @test */
     function a_noticia_can_be_created()
     {
-        $this->signInAsAdmin();
-
         $noticia = factory('App\Noticia')->create();
 
         $this->assertDatabaseHas('noticias', ['titulo' => $noticia->titulo]);
@@ -133,11 +131,24 @@ class NoticiaTest extends TestCase
     {
         $this->signInAsAdmin();
 
-        $noticia = factory('App\Post')->create([
+        $attributes = factory('App\Noticia')->raw([
             'titulo' => ''
         ]);
 
-        $this->assertDatabaseMissing('noticias', ['idnoticia' => $noticia->idnoticia]);
+        $this->post(route('noticias.store'), $attributes)->assertSessionHasErrors('titulo');
+        $this->assertEquals(0, Noticia::count());
+    }
+
+    /** @test */
+    function a_noticia_without_conteudo_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Noticia')->raw([
+            'conteudo' => ''
+        ]);
+
+        $this->post(route('noticias.store'), $attributes)->assertSessionHasErrors('conteudo');
         $this->assertEquals(0, Noticia::count());
     }
 
