@@ -43,6 +43,8 @@ Route::prefix('admin')->group(function() {
   require('admin/noticias.php');
   // Rotas de licitações
   require('admin/licitacoes.php');
+  // Rotas de concursos
+  require('admin/concursos.php');
 
   // Rotas para usuários
   Route::prefix('usuarios')->group(function(){
@@ -62,19 +64,6 @@ Route::prefix('admin')->group(function() {
     Route::get('/perfis/editar/{id}', 'PerfilController@edit');
     Route::put('/perfis/editar/{id}', 'PerfilController@update');
     Route::delete('/perfis/apagar/{id}', 'PerfilController@destroy');
-  });
-
-  // Rotas para concursos
-  Route::prefix('concursos')->group(function(){
-    Route::get('/', 'ConcursoController@index')->name('concursos.lista');
-    Route::get('/busca', 'ConcursoController@busca');
-    Route::get('/criar', 'ConcursoController@create');
-    Route::post('/criar', 'ConcursoController@store');
-    Route::get('/editar/{id}', 'ConcursoController@edit');
-    Route::put('/editar/{id}', 'ConcursoController@update');
-    Route::delete('/apagar/{id}', 'ConcursoController@destroy');
-    Route::get('/lixeira', 'ConcursoController@lixeira');
-    Route::get('/restore/{id}', 'ConcursoController@restore');
   });
 
   // Rotas para cursos
@@ -180,6 +169,8 @@ Route::prefix('/')->group(function() {
   require('site/noticias.php');  
   // Licitações
   require('site/licitacoes.php');
+  // Concursos
+  require('site/concursos.php');
   
   //Balcão de Oportunidades
   Route::get('balcao-de-oportunidades', 'BdoSiteController@index');
@@ -193,12 +184,7 @@ Route::prefix('/')->group(function() {
   Route::get('curso/{id}', 'CursoSiteController@cursoView');
   Route::get('curso/inscricao/{id}', 'CursoInscritoController@inscricaoView');
   Route::post('curso/inscricao/{id}', 'CursoInscritoController@inscricao');
-  Route::get('cursos-anteriores', 'CursoSiteController@cursosAnterioresView');
-
-  // Concursos
-  Route::get('concursos', 'ConcursoSiteController@concursosView');
-  Route::get('concursos/busca', 'ConcursoSiteController@buscaConcursos');
-  Route::get('concurso/{id}', 'ConcursoSiteController@show');
+  Route::get('cursos-anteriores', 'CursoSiteController@cursosAnterioresView'); 
   
   // Busca geral
   Route::get('/busca', 'SiteController@busca');
@@ -237,35 +223,7 @@ Route::prefix('/')->group(function() {
   Route::post('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigente');
 
   // Representantes
-  Route::prefix('representante')->group(function(){
-    Route::get('/home', 'RepresentanteSiteController@index')->name('representante.dashboard');
-    Route::get('/dados-gerais', 'RepresentanteSiteController@dadosGeraisView')->name('representante.dados-gerais');
-    Route::get('/contatos', 'RepresentanteSiteController@contatosView')->name('representante.contatos.view');
-    Route::get('/enderecos', 'RepresentanteSiteController@enderecosView')->name('representante.enderecos.view');
-    Route::get('/dados-gerais', 'RepresentanteSiteController@dadosGeraisView')->name('representante.dados-gerais');
-    Route::get('/inserir-contato', 'RepresentanteSiteController@inserirContatoView')->name('representante.inserir-ou-alterar-contato.view');
-    Route::post('/inserir-contato', 'RepresentanteSiteController@inserirContato')->name('representante.inserir-ou-alterar-contato');
-    Route::post('/deletar-contato', 'RepresentanteSiteController@deletarContato')->name('representante.deletar-contato');
-    Route::get('/inserir-endereco', 'RepresentanteSiteController@inserirEnderecoView')->name('representante.inserir-endereco.view');
-    Route::post('/inserir-endereco', 'RepresentanteSiteController@inserirEndereco')->name('representante.inserir-endereco');
-    Route::get('/situacao-financeira', 'RepresentanteSiteController@listaCobrancas')->name('representante.lista-cobrancas');
-    Route::get('/verifica-email/{token}', 'RepresentanteSiteController@verificaEmail')->name('representante.verifica-email');
-    Route::get('/evento-boleto', 'RepresentanteSiteController@eventoBoleto')->name('representante.evento-boleto');
-    // Login e Cadastro
-    Route::get('/login', 'Auth\RepresentanteLoginController@showLoginForm')->name('representante.login');
-    Route::post('/login', 'Auth\RepresentanteLoginController@login')->name('representante.login.submit');
-    Route::get('/logout', 'Auth\RepresentanteLoginController@logout')->name('representante.logout');
-    Route::get('/cadastro', 'RepresentanteSiteController@cadastroView')->name('representante.cadastro');
-    Route::post('/cadastro', 'RepresentanteSiteController@cadastro')->name('representante.cadastro.submit');
-    // Reset password routes
-    Route::get('/password/reset', 'Auth\RepresentanteForgotPasswordController@showLinkRequestForm')->name('representante.password.request');
-    Route::post('/password/email', 'Auth\RepresentanteForgotPasswordController@sendResetLinkEmail')->name('representante.password.email');
-    Route::get('/password/reset/{token}', 'Auth\RepresentanteResetPasswordController@showResetForm')->name('representante.password.reset');
-    Route::post('/password/reset', 'Auth\RepresentanteResetPasswordController@reset')->name('representante.password.update');
-    // Reset email routes
-    Route::get('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmailView')->name('representante.email.reset.view');
-    Route::post('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmail')->name('representante.email.reset');
-  });
+  require('site/representantes.php');
 
   Route::get('/chat', function(){
     return view('site.chat');

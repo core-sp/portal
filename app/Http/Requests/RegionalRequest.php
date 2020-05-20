@@ -17,19 +17,16 @@ class RegionalRequest extends FormRequest
     public function rules()
     {
         return [
-            'regional' => 'required|max:191',
-            'email' => 'required|max:191',
-            'endereco' => 'required|max:191',
-            'bairro' => 'required|max:191',
-            'numero' => 'required|max:191',
-            'cep' => 'required|max:191',
-            'telefone' => 'required|max:191',
-            'funcionamento' => 'required|max:191',
+            'regional' => 'required|',
+            'email' => 'required|',
+            'endereco' => 'required|',
+            'bairro' => 'required|',
+            'numero' => 'required|',
+            'cep' => 'required|',
+            'telefone' => 'required|',
+            'funcionamento' => 'required|',
             'ageporhorario' => 'required|regex:/^[1-9]+$/',
-            'descricao' => 'required',
-            'complemento' => 'max:191',
-            'fax' => 'max:191',
-            'responsavel' => 'max:191'
+            'descricao' => 'required'
         ];
     }
 

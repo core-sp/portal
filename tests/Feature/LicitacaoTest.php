@@ -424,8 +424,6 @@ class LicitacaoTest extends TestCase
     /** @test */
     function licitacao_can_be_searched_by_modalidade_on_website()
     {
-        $this->withoutExceptionHandling();
-
         $licitacao = factory('App\Licitacao')->create();
 
         $this->get(route('licitacoes.siteBusca', [
@@ -472,7 +470,6 @@ class LicitacaoTest extends TestCase
     /** @test */
     function licitacao_can_be_searched_by_situacao_on_website()
     {
-        $this->withoutExceptionHandling();
         $licitacao = factory('App\Licitacao')->create();
 
         $this->get(route('licitacoes.siteBusca', [
@@ -484,7 +481,6 @@ class LicitacaoTest extends TestCase
     /** @test */
     function licitacao_can_be_searched_by_datarealizacao_on_website()
     {
-        $this->withoutExceptionHandling();
         $licitacao = factory('App\Licitacao')->create();
 
         $this->get(route('licitacoes.siteBusca', [
@@ -496,7 +492,6 @@ class LicitacaoTest extends TestCase
     /** @test */
     function licitacao_can_be_searched_by_more_than_one_param_on_website()
     {
-        $this->withoutExceptionHandling();
         $licitacao = factory('App\Licitacao')->create();
 
         $this->get(route('licitacoes.siteBusca', [

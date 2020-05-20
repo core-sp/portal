@@ -558,3 +558,24 @@ function resumo($string)
         $string = substr($string, 0, 240) . '...';
     return $string;
 }
+
+function concursoModalidades()
+{
+    return [
+        'Concurso Público',
+        'Processo Seletivo'
+    ];
+}
+
+function concursoSituacoes()
+{
+    return [
+        'Aberto',
+        'Anulado',
+        'Cancelado',
+        'Concluído',
+        'Deserto',
+        'Em Andamento',
+        'Homologado'
+    ];
+}
