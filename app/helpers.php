@@ -1,5 +1,7 @@
 <?php
 
+use App\Repositories\PermissaoRepository;
+
 function badgeConsulta($situacao)
 {
     switch ($situacao) {
@@ -578,4 +580,33 @@ function concursoSituacoes()
         'Em Andamento',
         'Homologado'
     ];
+}
+
+function permissoesPorPerfil()
+{
+    $all = (new PermissaoRepository())->getAll();
+    
+    $filtered = $all->filter(function($permissao){
+        $perfis = explode(',', $permissao->perfis);
+        return in_array(Auth::user()->perfil->idperfil, $perfis);
+    });
+    
+    return $filtered->map(function($row){
+        return [
+            'controller' => $row->controller,
+            'metodo' => $row->metodo
+        ];
+    })->toArray();
+}
+
+function mostraItem($permissoes, $controller, $metodo)
+{
+    $check = ['controller' => $controller, 'metodo' => $metodo];
+    return in_array($check, $permissoes) || auth()->user()->isAdmin() ? true : false;
+}
+
+function mostraTitulo($permissoes, $controllers)
+{
+    $column = array_column($permissoes, 'controller');
+    return !empty(array_intersect($column, $controllers)) || auth()->user()->isAdmin() ? true : false;
 }

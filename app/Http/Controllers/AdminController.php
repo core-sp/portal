@@ -58,21 +58,21 @@ class AdminController extends Controller
     public static function countAtendimentos()
     {
         $array = Agendamento::select('idusuario')
-                            ->with(['user' => function ($q) {
-                                $q->select('idusuario');
-                            }])->where('status','Compareceu')
-                            ->where('idregional',1)
-                            ->get()
-                            ->toArray();
+            ->with(['user' => function ($q) {
+                $q->select('idusuario');
+            }])->where('status','Compareceu')
+            ->where('idregional',1)
+            ->get()
+            ->toArray();
         $count = [];
         foreach($array as $a) {
             array_push($count, $a['idusuario']);
         }
         $countPerUser = array_count_values($count);
         $users = User::select('idusuario','nome')
-                     ->where('idregional',1)
-                     ->where('idperfil',8)
-                     ->get();
+            ->where('idregional',1)
+            ->where('idperfil',8)
+            ->get();
         foreach($users as $user) {
             if(isset($countPerUser[$user["idusuario"]]))
                 $user->contagem = $countPerUser[$user["idusuario"]];

@@ -29,4 +29,21 @@ class AdminTest extends TestCase
             ->assertSee($user->username)
             ->assertSee($user->email);
     }
+
+    /** @test */
+    public function the_admin_menu_has_correct_links()
+    {
+        $this->signInAsAdmin();
+
+        $this->get('/admin')
+            ->assertSee(route('regionais.index'))
+            ->assertSee(route('paginas.index'))
+            ->assertSee(route('paginas.create'))
+            ->assertSee(route('noticias.index'))
+            ->assertSee(route('noticias.create'))
+            ->assertSee(route('posts.index'))
+            ->assertSee(route('posts.create'))
+            ->assertSee(route('concursos.index'))
+            ->assertSee(route('concursos.create'));
+    }
 }
