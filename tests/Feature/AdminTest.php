@@ -46,4 +46,20 @@ class AdminTest extends TestCase
             ->assertSee(route('concursos.index'))
             ->assertSee(route('concursos.create'));
     }
+
+    /** @test */
+    public function non_authorized_users_cannot_see_links()
+    {
+        $this->signIn();
+
+        $this->get('/admin')
+            ->assertDontSee(route('paginas.index'))
+            ->assertDontSee(route('paginas.create'))
+            ->assertDontSee(route('noticias.index'))
+            ->assertDontSee(route('noticias.create'))
+            ->assertDontSee(route('posts.index'))
+            ->assertDontSee(route('posts.create'))
+            ->assertDontSee(route('concursos.index'))
+            ->assertDontSee(route('concursos.create'));
+    }
 }
