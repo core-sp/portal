@@ -1,8 +1,3 @@
-@php
-  use \App\Http\Controllers\Helper;
-  use App\Http\Controllers\ControleController;
-@endphp
-
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -39,7 +34,7 @@
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="https://app.jivosite.com/" class="nav-link" target="_blank">Chat</a>
               </li>
-              @if(ControleController::mostraStatic(['1']))
+              @if(auth()->user()->isAdmin())
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="/horizon" class="nav-link" target="_blank">Horizon</a>
               </li>

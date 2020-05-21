@@ -2,16 +2,13 @@
 
 namespace App\Traits;
 
+use App\Repositories\PermissaoRepository;
 use Illuminate\Support\Facades\Auth;
-use App\Permissao;
 
 trait ControleAcesso {
     public function autoriza($controller, $metodo)
     {
-        $string = Permissao::select('perfis')
-            ->where('controller',$controller)
-            ->where('metodo',$metodo)
-            ->first();
+        $string = (new PermissaoRepository())->getFirst($controller, $metodo);
         if(isset($string)) {
             $array = explode(',',$string->perfis);
             if(!in_array(Auth::user()->perfil->idperfil, $array)){
@@ -25,10 +22,7 @@ trait ControleAcesso {
 
     public function mostra($controller, $metodo)
     {
-        $string = Permissao::select('perfis')
-            ->where('controller',$controller)
-            ->where('metodo',$metodo)
-            ->first();
+        $string = (new PermissaoRepository())->getFirst($controller, $metodo);
         $perfis = explode(',',$string->perfis);
         if(!in_array(Auth::user()->perfil->idperfil, $perfis)){
             return false;
