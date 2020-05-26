@@ -8,7 +8,7 @@ function badgeConsulta($situacao)
         case 'Ativo':
             return '<span class="badge badge-success">'.$situacao.'</span>';
         break;
-        
+
         case 'Cancelado':
             return '<span class="badge badge-danger">'.$situacao.'</span>';
         break;
@@ -329,7 +329,7 @@ function utf8_converter($array)
             $item = utf8_encode($item);
         }
     });
- 
+
     return $array;
 }
 
@@ -340,7 +340,7 @@ function formataDataGerentiRecursive($array)
             $item = formataDataGerenti($item);
         }
     });
- 
+
     return $array;
 }
 
@@ -400,7 +400,7 @@ function stringTipoPessoa($number)
         case '5':
             return 'RT';
         break;
-        
+
         default:
             return 'Indefinida';
         break;
@@ -417,7 +417,7 @@ function formataCpfCnpj($value)
     $cnpj_cpf = preg_replace("/\D/", '', $value);
     if (strlen($cnpj_cpf) === 11) {
         return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cnpj_cpf);
-    } 
+    }
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
 }
 
@@ -442,7 +442,7 @@ function organizaData($data)
     return $format;
 }
 
-function noticiaCategorias() 
+function noticiaCategorias()
 {
     return [
         'Benefícios',
@@ -528,7 +528,7 @@ function btnSituacao($situacao)
         case 'Cancelado':
             echo "<div class='sit-btn sit-vermelho'>Cancelado</div>";
         break;
-        
+
         default:
             echo "<div class='sit-btn sit-default'>".$situacao."</div>";
         break;
@@ -585,12 +585,12 @@ function concursoSituacoes()
 function permissoesPorPerfil()
 {
     $all = (new PermissaoRepository())->getAll();
-    
+
     $filtered = $all->filter(function($permissao){
         $perfis = explode(',', $permissao->perfis);
         return in_array(Auth::user()->perfil->idperfil, $perfis);
     });
-    
+
     return $filtered->map(function($row){
         return [
             'controller' => $row->controller,
@@ -609,4 +609,15 @@ function mostraTitulo($permissoes, $controllers)
 {
     $column = array_column($permissoes, 'controller');
     return !empty(array_intersect($column, $controllers)) || auth()->user()->isAdmin() ? true : false;
+}
+
+function mostraChatScript()
+{
+    if(config('app.env') !== 'local') {
+        $hour = date('H');
+        $day = date('w');
+        if($hour >= 9 && $hour <= 18 && $day !== '6' && $day !== '0') {
+            return '<script src="//code.jivosite.com/widget/X12I8gg4Qy" async></script>';
+        }
+    }
 }
