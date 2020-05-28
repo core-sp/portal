@@ -3,128 +3,38 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Curso;
 use App\Regional;
 use App\CursoInscrito;
 use App\Http\Controllers\Helper;
-use App\Http\Controllers\Helpers\CursoHelper;
 use App\Http\Controllers\CrudController;
 use App\Http\Controllers\CursoInscritoController;
 use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use App\Http\Requests\CursoRequest;
+use App\Repositories\CursoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class CursoController extends Controller
 {
-    // Nome da classe
     private $class = 'CursoController';
-    // Variáveis
-    public $variaveis = [
-        'singular' => 'curso',
-        'singulariza' => 'o curso',
-        'plural' => 'cursos',
-        'pluraliza' => 'cursos',
-        'titulo_criar' => 'Cadastrar curso',
-        'btn_criar' => '<a href="/admin/cursos/criar" class="btn btn-primary mr-1">Novo Curso</a>',
-        'btn_lixeira' => '<a href="/admin/cursos/lixeira" class="btn btn-warning">Cursos Cancelados</a>',
-        'btn_lista' => '<a href="/admin/cursos" class="btn btn-primary mr-1">Lista de Cursos</a>',
-        'titulo' => 'Cursos cancelados',
-    ];
+    private $cursoModel;
+    private $cursoRepository;
+    private $variaveis;
 
-    public function __construct()
+    public function __construct(Curso $curso, CursoRepository $cursoRepository)
     {
         $this->middleware('auth', ['except' => 'show']);
-    }
-
-    public function resultados()
-    {
-        $resultados = Curso::orderBy('idcurso','DESC')->paginate(10);
-        return $resultados;
-    }
-
-    public function tabelaCompleta($resultados)
-    {
-        // Opções de cabeçalho da tabela
-        $headers = [
-            'Turma',
-            'Tipo / Tema',
-            'Onde / Quando',
-            'Vagas',
-            'Regional',
-            'Ações'
-        ];
-        // Opções de conteúdo da tabela
-        $contents = [];
-        foreach($resultados as $resultado) {
-            $acoes = '<a href="/curso/'.$resultado->idcurso.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if(ControleController::mostra('CursoInscritoController', 'index'))
-                $acoes .= '<a href="/admin/cursos/inscritos/'.$resultado->idcurso.'" class="btn btn-sm btn-secondary">Inscritos</a> ';
-            if(ControleController::mostra($this->class, 'edit'))
-                $acoes .= '<a href="/admin/cursos/editar/'.$resultado->idcurso.'" class="btn btn-sm btn-primary">Editar</a> ';
-            if(ControleController::mostra($this->class, 'destroy')) {
-                $acoes .= '<form method="POST" action="/admin/cursos/cancelar/'.$resultado->idcurso.'" class="d-inline">';
-                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-                $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')" />';
-                $acoes .= '</form>';
-            }
-            if($resultado->publicado == 'Sim')
-                $publicado = 'Publicado';
-            else
-                $publicado = 'Rascunho';
-            $conteudo = [
-                $resultado->idcurso,
-                $resultado->tipo.'<br>'.$resultado->tema.'<br /><small><em>'.$publicado.'</em></small>',
-                $resultado->endereco.'<br />'.Helper::formataData($resultado->datarealizacao),
-                CursoHelper::contagem($resultado->idcurso).' / '.$resultado->nrvagas,
-                $resultado->regional->regional,
-                $acoes
-            ];
-            array_push($contents, $conteudo);
-        }
-        // Classes da tabela
-        $classes = [
-            'table',
-            'table-hover'
-        ];
-        // Monta e retorna tabela        
-        $tabela = CrudController::montaTabela($headers, $contents, $classes);
-        return $tabela;
-    }
-
-    protected function regras()
-    {
-        return [
-            'tipo' => 'max:191',
-            'tema' => 'required|max:191',
-            'img' => 'max:191',
-            'datarealizacao' => 'required',
-            'datatermino' => 'required',
-            'horainicio' => 'required',
-            'endereco' => 'required|max:191',
-            'nrvagas' => 'required|numeric',
-            'descricao' => 'required'
-        ];
-    }
-
-    protected function mensagens()
-    {
-        return [
-            'required' => 'O :attribute é obrigatório',
-            'datarealizacao.required' => 'Informe a data de realização do curso',
-            'datatermino.required' => 'Informe a data de término do curso',
-            'horainicio.required' => 'Informe a hora de início do curso',
-            'numeric' => 'O :attribute aceita apenas números',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
+        $this->cursoModel = $curso;
+        $this->cursoRepository = $cursoRepository;
+        $this->variaveis = $curso->variaveis();
     }
 
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
-        $resultados = $this->resultados();
-        $tabela = $this->tabelaCompleta($resultados);
+        $resultados = $this->cursoRepository->getToTable();
+        $tabela = $this->cursoModel->tabelaCompleta($resultados);
         if(!ControleController::mostra($this->class, 'create'))
             unset($this->variaveis['btn_criar']);
         $variaveis = (object) $this->variaveis;
@@ -139,13 +49,12 @@ class CursoController extends Controller
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
-    public function store(Request $request)
+    public function store(CursoRequest $request)
     {
-        ControleController::autoriza($this->class, 'create');
-        $erros = $request->validate($this->regras(), $this->mensagens());
+        $request->validated();
         
-        $datarealizacao = Helper::retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
-        $datatermino = Helper::retornaDateTime($request->input('datatermino'), $request->input('horatermino'));
+        $datarealizacao = retornaDateTime($request->input('datarealizacao'), $request->input('horainicio'));
+        $datatermino = retornaDateTime($request->input('datatermino'), $request->input('horatermino'));
         
         $save = Curso::create([
             'tipo' => request('tipo'),
@@ -165,7 +74,7 @@ class CursoController extends Controller
         if(!$save)
             abort(500);
         event(new CrudEvent('curso', 'criou', $save->idcurso));
-        return redirect()->route('cursos.lista')
+        return redirect()->route('cursos.index')
             ->with('message', '<i class="icon fa fa-check"></i>Curso criado com sucesso!')
             ->with('class', 'alert-success');
     }

@@ -58,4 +58,56 @@ class CursoTest extends TestCase
 
         $this->assertDatabaseHas('cursos', ['tema' => $curso->tema]);
     }
+
+    /** @test */
+    public function curso_can_be_created_by_an_user()
+    {
+        $this->withoutExceptionHandling();
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw();
+
+        $this->post(route('cursos.store'), $attributes);
+        $this->assertDatabaseHas('cursos', [
+            'tema' => $attributes['tema'],
+            'idusuario' => $user->idusuario
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_curso_is_created()
+    {
+        $user = $this->signInAsAdmin();
+        $attributes = factory('App\Curso')->raw();
+
+        $this->post(route('cursos.store'), $attributes);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('criou', $log);
+        $this->assertStringContainsString('curso', $log);
+    }
+
+    /** @test */
+    public function curso_is_shown_on_admin_panel_after_its_creation()
+    {
+        $this->signInAsAdmin();
+        $curso = factory('App\Curso')->create();
+        
+        $this->get(route('cursos.index'))
+            ->assertSee($curso->idcurso)
+            ->assertSee($curso->tema);
+    }
+
+    /** @test */
+    public function curso_without_tema_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'tema' => ''
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('tema');
+        $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
+    }
 }
