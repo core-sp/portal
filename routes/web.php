@@ -45,6 +45,8 @@ Route::prefix('admin')->group(function() {
   require('admin/licitacoes.php');
   // Rotas de concursos
   require('admin/concursos.php');
+  // Rotas de concursos
+  require('admin/cursos.php');
 
   // Rotas para usuários
   Route::prefix('usuarios')->group(function(){
@@ -66,29 +68,7 @@ Route::prefix('admin')->group(function() {
     Route::delete('/perfis/apagar/{id}', 'PerfilController@destroy');
   });
 
-  // Rotas para cursos
-  Route::prefix('cursos')->group(function(){
-    Route::get('/', 'CursoController@index')->name('cursos.lista');
-    Route::get('/busca', 'CursoController@busca');
-    Route::get('/criar', 'CursoController@create');
-    Route::post('/criar', 'CursoController@store');
-    Route::get('/editar/{id}', 'CursoController@edit');
-    Route::put('/editar/{id}', 'CursoController@update');
-    Route::delete('/cancelar/{id}', 'CursoController@destroy');
-    Route::get('/lixeira', 'CursoController@lixeira');
-    Route::get('/restore/{id}', 'CursoController@restore');
-    // Lida com a parte de inscritos
-    Route::get('/inscritos/{id}', 'CursoController@inscritos')->name('inscritos.lista');
-    Route::get('/inscritos/{id}/busca', 'CursoInscritoController@busca');
-    Route::get('/inscritos/editar/{id}', 'CursoInscritoController@edit');
-    Route::put('/inscritos/editar/{id}', 'CursoInscritoController@update');
-    Route::put('/inscritos/confirmar-presenca/{id}', 'CursoInscritoController@confirmarPresenca');
-    Route::put('/inscritos/confirmar-falta/{id}', 'CursoInscritoController@confirmarFalta');
-    Route::get('/adicionar-inscrito/{id}', 'CursoInscritoController@create');
-    Route::post('/adicionar-inscrito/{id}', 'CursoInscritoController@store');
-    Route::delete('/cancelar-inscricao/{id}', 'CursoInscritoController@destroy');
-    Route::get('/inscritos/download/{id}', 'CursoInscritoController@download');
-  });
+  
 
   // Rota para Balcão de Oportunidades
   Route::prefix('bdo')->group(function(){
@@ -181,7 +161,7 @@ Route::prefix('/')->group(function() {
   
   // Cursos
   Route::get('cursos', 'CursoSiteController@cursosView');
-  Route::get('curso/{id}', 'CursoSiteController@cursoView');
+  Route::get('curso/{id}', 'CursoSiteController@cursoView')->name('cursos.show');
   Route::get('curso/inscricao/{id}', 'CursoInscritoController@inscricaoView');
   Route::post('curso/inscricao/{id}', 'CursoInscritoController@inscricao');
   Route::get('cursos-anteriores', 'CursoSiteController@cursosAnterioresView'); 

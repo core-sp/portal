@@ -141,7 +141,7 @@
             <ul class="nav nav-treeview">
                 @if(mostraItem($permissoes, 'CursoController', 'index'))
                 <li class="nav-item">
-                    <a href="/admin/cursos" class="nav-link">
+                    <a href="{{ route('cursos.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os cursos</p>
                     </a>
@@ -149,7 +149,7 @@
                 @endif
                 @if(mostraItem($permissoes, 'CursoController', 'create'))
                 <li class="nav-item">
-                    <a href="/admin/cursos/criar" class="nav-link">
+                    <a href="{{ route('cursos.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Criar novo curso</p>
                     </a>

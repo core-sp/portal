@@ -2,12 +2,15 @@
 
 namespace App;
 
+use App\Repositories\CursoRepository;
+use App\Traits\ControleAcesso;
+use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Curso extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, TabelaAdmin, ControleAcesso;
 
     protected $primaryKey = 'idcurso';
     protected $table = 'cursos';
@@ -32,5 +35,64 @@ class Curso extends Model
     public function noticia()
     {
         return $this->hasMany('App\Noticia', 'idnoticia');
+    }
+
+    public function variaveis()
+    {
+        return [
+            'singular' => 'curso',
+            'singulariza' => 'o curso',
+            'plural' => 'cursos',
+            'pluraliza' => 'cursos',
+            'titulo_criar' => 'Cadastrar curso',
+            'btn_criar' => '<a href="'.route('cursos.create').'" class="btn btn-primary mr-1">Novo Curso</a>',
+            'btn_lixeira' => '<a href="'.route('cursos.lixeira').'" class="btn btn-warning">Cursos Cancelados</a>',
+            'btn_lista' => '<a href="'.route('cursos.index').'" class="btn btn-primary mr-1">Lista de Cursos</a>',
+            'titulo' => 'Cursos cancelados',
+        ];
+    }
+
+    private function tabelaHeaders()
+    {
+        return ['Turma', 'Tipo / Tema', 'Onde / Quando', 'Vagas', 'Regional', 'Ações'];
+    }
+
+    private function tabelaContents($query)
+    {
+        return $query->map(function($row){
+            $acoes = '<a href="'.route('cursos.show', $row->idcurso).'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
+            if($this->mostra('CursoInscritoController', 'index'))
+                $acoes .= '<a href="'.route('inscritos.index', $row->idcurso).'" class="btn btn-sm btn-secondary">Inscritos</a> ';
+            if($this->mostra('CursoController', 'edit'))
+                $acoes .= '<a href="'.route('cursos.edit', $row->idcurso).'" class="btn btn-sm btn-primary">Editar</a> ';
+            if($this->mostra('CursoController', 'destroy')) {
+                $acoes .= '<form method="POST" action="'.route('cursos.destroy', $row->idcurso).'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o curso?\')" />';
+                $acoes .= '</form>';
+            }
+            if($row->publicado == 'Sim')
+                $publicado = 'Publicado';
+            else
+                $publicado = 'Rascunho';
+            return [
+                $row->idcurso,
+                $row->tipo.'<br>'.$row->tema.'<br /><small><em>'.$publicado.'</em></small>',
+                $row->endereco.'<br />'.formataData($row->datarealizacao),
+                (new CursoRepository())->getCursoContagem($row->idcurso).' / '.$row->nrvagas,
+                $row->regional->regional,
+                $acoes
+            ];
+        })->toArray();
+    }
+
+    public function tabelaCompleta($query)
+    {
+        return $this->montaTabela(
+            $this->tabelaHeaders(), 
+            $this->tabelaContents($query),
+            [ 'table', 'table-hover' ]
+        );
     }
 }

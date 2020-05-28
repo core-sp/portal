@@ -44,7 +44,9 @@ class AdminTest extends TestCase
             ->assertSee(route('posts.index'))
             ->assertSee(route('posts.create'))
             ->assertSee(route('concursos.index'))
-            ->assertSee(route('concursos.create'));
+            ->assertSee(route('concursos.create'))
+            ->assertSee(route('cursos.index'))
+            ->assertSee(route('cursos.create'));
     }
 
     /** @test */
@@ -60,6 +62,8 @@ class AdminTest extends TestCase
             ->assertDontSee(route('posts.index'))
             ->assertDontSee(route('posts.create'))
             ->assertDontSee(route('concursos.index'))
-            ->assertDontSee(route('concursos.create'));
+            ->assertDontSee(route('concursos.create'))
+            ->assertDontSee(route('cursos.index'))
+            ->assertDontSee(route('cursos.create'));
     }
 }
