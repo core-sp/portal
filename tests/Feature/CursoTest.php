@@ -110,4 +110,58 @@ class CursoTest extends TestCase
         $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('tema');
         $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
     }
+
+    /** @test */
+    public function curso_without_datarealizacao_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'datarealizacao' => ''
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('datarealizacao');
+        $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
+    }
+
+    /** @test */
+    public function curso_without_datatermino_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'datatermino' => ''
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('datatermino');
+        $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
+    }
+
+    /** @test */
+    public function curso_endereco_is_required_if_tema_not_live()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'tema' => 'Curso',
+            'endereco' => ''
+        ]);
+
+        $this->post(route('cursos.store'), $attributes)->assertSessionHasErrors('endereco');
+        $this->assertDatabaseMissing('cursos', ['resumo' => $attributes['resumo']]);
+    }
+
+    /** @test */
+    public function curso_endereco_is_not_required_if_tema_is_live()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Curso')->raw([
+            'tema' => 'Live',
+            'endereco' => ''
+        ]);
+
+        $this->post(route('cursos.store'), $attributes);
+        $this->assertDatabaseHas('cursos', ['resumo' => $attributes['resumo']]);
+    }
 }
