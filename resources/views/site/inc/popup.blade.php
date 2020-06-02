@@ -1,5 +1,5 @@
 <div class="modal hide fade" id="popup-campanha">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
@@ -10,8 +10,8 @@
                 </button>
             </div>
             <video id="video-campanha" controls autoplay muted>
-                <source src="{{ asset('img/campanha.mp4') }}" type="video/mp4">
-                <source src="{{ asset('img/campanha.webm') }}" type="video/webm">
+                <source src="{{ asset('img/compressed.mp4') }}" type="video/mp4">
+                <source src="{{ asset('img/compressed.webm') }}" type="video/webm">
             </video>
         </div>
     </div>
