@@ -95,4 +95,26 @@ class Curso extends Model
             [ 'table', 'table-hover' ]
         );
     }
+
+    public function tabelaTrashed($query)
+    {
+        $headers = ['Turma', 'Tipo / Tema', 'Onde / Quando', 'Regional', 'Cancelado em:', 'Ações'];
+        $contents = $query->map(function($row){
+            $acoes = '<a href="'.route('cursos.restore', $row->idcurso).'" class="btn btn-sm btn-primary">Restaurar</a> ';
+            return [
+                $row->idcurso,
+                $row->tipo.'<br>'.$row->tema,
+                $row->endereco.'<br />'.formataData($row->datarealizacao),
+                $row->regional->regional,
+                formataData($row->deleted_at),
+                $acoes
+            ];
+        })->toArray();
+
+        return $this->montaTabela(
+            $headers, 
+            $contents,
+            [ 'table', 'table-hover' ]
+        );
+    }
 }

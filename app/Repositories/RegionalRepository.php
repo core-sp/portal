@@ -16,6 +16,11 @@ class RegionalRepository {
         return Regional::all();
     }
 
+    public function getAsc()
+    {
+        return Regional::orderBy('regional', 'ASC')->get();
+    }
+
     public function getById($id)
     {
         return Regional::findOrFail($id);
