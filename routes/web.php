@@ -151,6 +151,8 @@ Route::prefix('/')->group(function() {
   require('site/licitacoes.php');
   // Concursos
   require('site/concursos.php');
+  // Cursos
+  require('site/cursos.php');
   
   //Balcão de Oportunidades
   Route::get('balcao-de-oportunidades', 'BdoSiteController@index');
@@ -158,13 +160,6 @@ Route::prefix('/')->group(function() {
   Route::get('anunciar-vaga', 'BdoSiteController@anunciarVagaView');
   Route::post('anunciar-vaga', 'BdoSiteController@anunciarVaga');
   Route::get('/info-empresa/{cnpj}', 'BdoEmpresaController@apiGetEmpresa');
-  
-  // Cursos
-  Route::get('cursos', 'CursoSiteController@cursosView');
-  Route::get('curso/{id}', 'CursoSiteController@cursoView')->name('cursos.show');
-  Route::get('curso/inscricao/{id}', 'CursoInscritoController@inscricaoView');
-  Route::post('curso/inscricao/{id}', 'CursoInscritoController@inscricao');
-  Route::get('cursos-anteriores', 'CursoSiteController@cursosAnterioresView'); 
   
   // Busca geral
   Route::get('/busca', 'SiteController@busca');

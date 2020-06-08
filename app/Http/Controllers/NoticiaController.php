@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Noticia;
-use App\Regional;
 use Illuminate\Support\Str;
 use App\Events\CrudEvent;
 use App\Http\Requests\NoticiaRequest;
 use App\Repositories\NoticiaRepository;
+use App\Repositories\RegionalRepository;
 use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
@@ -42,7 +42,7 @@ class NoticiaController extends Controller
     public function create()
     {
         $this->autoriza($this->class, __FUNCTION__);
-        $regionais = Regional::orderBy('regional', 'ASC')->get();
+        $regionais = (new RegionalRepository)->getAsc();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
@@ -74,7 +74,7 @@ class NoticiaController extends Controller
     {
         $this->autoriza($this->class, __FUNCTION__);
         $resultado = Noticia::findOrFail($id);
-        $regionais = Regional::orderBy('regional', 'ASC')->get();
+        $regionais = (new RegionalRepository)->getAsc();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
     }

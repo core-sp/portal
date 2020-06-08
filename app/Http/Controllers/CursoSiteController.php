@@ -7,18 +7,6 @@ use App\Noticia;
 
 class CursoSiteController extends Controller
 {
-    public function cursosView()
-    {
-        $now = date('Y-m-d H:i:s');
-        $cursos = Curso::select('idcurso','img','idregional','tipo','tema','resumo', 'datarealizacao')
-                       ->where('datatermino','>=',$now)
-                       ->where('publicado','Sim')
-                       ->paginate(10);
-        return response()
-            ->view('site.cursos', compact('cursos'))
-            ->header('Cache-Control','no-cache');
-    }
-
     public function cursosAnterioresView()
     {
         $now = date('Y-m-d H:i:s');

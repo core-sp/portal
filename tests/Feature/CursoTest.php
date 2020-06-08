@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Curso;
 use App\Permissao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -163,5 +164,268 @@ class CursoTest extends TestCase
 
         $this->post(route('cursos.store'), $attributes);
         $this->assertDatabaseHas('cursos', ['resumo' => $attributes['resumo']]);
+    }
+
+    /** @test */
+    public function the_name_of_the_user_who_created_curso_is_shown_on_admin_panel()
+    {
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.edit', $curso->idcurso))
+            ->assertOk()
+            ->assertSee($user->nome);
+    }
+
+    /** @test */
+    public function the_cursos_regional_is_shown_on_admin_panel()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.index'))
+            ->assertSee($curso->regional->regional);
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_create_cursos()
+    {
+        $this->signIn();
+
+        $this->get(route('cursos.create'))->assertForbidden();
+
+        $attributes = factory('App\Curso')->raw();
+
+        $this->post(route('cursos.store'), $attributes)->assertForbidden();
+        $this->assertDatabaseMissing('cursos', ['tema' => $attributes['tema']]);
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_see_cursos_on_admin_panel()
+    {
+        $this->signIn();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.index'))
+            ->assertForbidden()
+            ->assertDontSee($curso->tema);
+    }
+
+    /** @test */
+    function multiple_cursos_can_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+        $cursoDois = factory('App\Curso')->create();
+
+        $this->assertDatabaseHas('cursos', ['tema' => $curso->tema]);
+        $this->assertDatabaseHas('cursos', ['tema' => $cursoDois->tema]);
+        $this->assertEquals(2, Curso::count());
+    }
+
+    /** @test */
+    public function curso_can_be_updated()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+        $attributes = factory('App\Curso')->raw();
+
+        $this->patch(route('cursos.update', $curso->idcurso), $attributes);
+
+        $cur = Curso::find($curso->idcurso);
+        $this->assertEquals($cur->tema, $attributes['tema']);
+        $this->assertEquals($cur->descricao, $attributes['descricao']);
+        $this->assertEquals($cur->resumo, $attributes['resumo']);
+        $this->assertDatabaseHas('cursos', [
+            'tema' => $attributes['tema'],
+            'descricao' => $attributes['descricao'],
+            'resumo' => $attributes['resumo']
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_curso_is_updated()
+    {
+        $this->withoutExceptionHandling();
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+        $attributes = factory('App\Curso')->raw();
+
+        $this->patch(route('cursos.update', $curso->idcurso), $attributes);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('editou', $log);
+        $this->assertStringContainsString('curso', $log);
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_update_cursos()
+    {
+        $this->signIn();
+
+        $curso = factory('App\Curso')->create();
+        $attributes = factory('App\Curso')->raw();
+
+        $this->get(route('cursos.edit', $curso->idcurso))->assertForbidden();
+        $this->patch(route('cursos.update', $curso->idcurso), $attributes)->assertForbidden();
+
+        $this->assertDatabaseMissing('cursos', ['tema' => $attributes['tema']]);
+    }
+
+    /** @test */
+    public function curso_can_be_deleted()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->delete(route('cursos.destroy', $curso->idcurso));
+        $this->assertSoftDeleted('cursos', ['idcurso' => $curso->idcurso]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_curso_is_deleted()
+    {
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+        $this->delete(route('cursos.destroy', $curso->idcurso));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('cancelou', $log);
+        $this->assertStringContainsString('curso', $log);
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_delete_curso()
+    {
+        $this->signIn();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->delete(route('cursos.destroy', $curso->idcurso))->assertForbidden();
+        $this->assertNull(Curso::withTrashed()->find($curso->idcurso)->deleted_at);
+    }
+
+    /** @test */
+    public function canceled_cursos_are_shown_in_trash()
+    {
+        $this->withoutExceptionHandling();
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->delete(route('cursos.destroy', $curso->idcurso));
+
+        $this->get(route('cursos.lixeira'))->assertOk()->assertSee($curso->idcurso);
+    }
+
+    /** @test */
+    public function deleted_cursos_are_not_shown_on_index()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->delete(route('cursos.destroy', $curso->idcurso));
+
+        $this->get(route('cursos.index'))->assertOk()->assertDontSee($curso->tema);
+    }
+
+    /** @test */
+    public function deleted_cursos_can_be_restored()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->delete(route('cursos.destroy', $curso->idcurso));
+        $this->get(route('cursos.restore', $curso->idcurso));
+
+        $this->assertNull(Curso::find($curso->idcurso)->deleted_at);
+        $this->get(route('cursos.index'))->assertSee($curso->tema);
+    }
+
+    /** @test */
+    public function log_is_generated_when_curso_is_restored()
+    {
+        $user = $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+        $this->delete(route('cursos.destroy', $curso->idcurso));
+        $this->get(route('cursos.restore', $curso->idcurso));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('reabriu', $log);
+        $this->assertStringContainsString('curso', $log);
+    }
+
+    /** @test */
+    function curso_can_be_searched_on_admin_panel()
+    {
+        $this->withoutExceptionHandling();
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.busca', ['q' => $curso->tema]))
+            ->assertSeeText($curso->tema);
+    }
+
+    /** @test */
+    function link_to_create_curso_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
+
+        $this->get(route('cursos.index'))->assertSee(route('cursos.create'));
+    }
+
+    /** @test */
+    function link_to_edit_curso_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.index'))->assertSee(route('cursos.edit', $curso->idcurso));
+    }
+
+    /** @test */
+    function link_to_destroy_curso_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
+
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.index'))->assertSee(route('cursos.destroy', $curso->idcurso));
+    }
+
+    /** @test */
+    function curso_is_shown_on_website()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.show', $curso->idcurso))
+            ->assertOk()
+            ->assertSee($curso->tema);
+    }
+
+    /** @test */
+    function curso_is_shown_on_curso_lista_on_website()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.index.website'))
+            ->assertOk()
+            ->assertSee($curso->tema);
     }
 }
