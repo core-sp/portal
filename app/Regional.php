@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Repositories\AgendamentoBloqueioRepository;
 use App\Traits\ControleAcesso;
 use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ class Regional extends Model
     protected $primaryKey = 'idregional';
     protected $fillable = ['prefixo', 'regional', 'endereco', 'bairro',
     'numero', 'complemento', 'cep', 'telefone', 'fax', 'email',
-    'funcionamento', 'ageporhorario', 'responsavel', 'descricao'];
+    'funcionamento', 'ageporhorario', 'horariosage', 'responsavel', 'descricao'];
     public $timestamps = false;
 
     public function user()
@@ -60,5 +61,29 @@ class Regional extends Model
             $this->tabelaContents($query),
             [ 'table', 'table-hover' ]
         );
+    }
+
+    public function horariosAge()
+    {
+        if($this->horariosage)
+            return explode(',', $this->horariosage);
+
+        return null;
+    }
+
+    public function horariosDisponiveis($dia)
+    {
+        $horas = $this->horariosAge();
+        $bloqueios = (new AgendamentoBloqueioRepository)->getByRegionalAndDay($this->idregional, $dia);
+        if($bloqueios) {
+            foreach($bloqueios as $bloqueio) {
+                foreach($horas as $key => $hora) {
+                    if($hora >= $bloqueio->horainicio && $hora <= $bloqueio->horatermino) {
+                        unset($horas[$key]);
+                    }
+                }
+            }
+        }
+        return $horas;
     }
 }
