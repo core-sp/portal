@@ -206,21 +206,29 @@
         <li class="nav-header">ATENDIMENTO</li>
         @endif
         @if(mostraItem($permissoes, 'AgendamentoController', 'index'))
-        <li class="nav-item">
-            <a href="/admin/agendamentos" class="nav-link">
+        <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
                 <i class="nav-icon far fa-clock"></i>
-                <p>Agendamentos</p>
+                <p>Agendamentos<i class="right fa fa-angle-left"></i></p>
             </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="/admin/agendamentos" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Todos os agendamentos</p>
+                    </a>
+                </li>
+                @endif
+                @if(mostraItem($permissoes, 'AgendamentoBloqueioController', 'index'))
+                <li class="nav-item">
+                    <a href="/admin/agendamentos/bloqueios" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Bloqueios</p>
+                    </a>
+                </li>
+            @endif
+            </ul>
         </li>
-        @endif
-        @if(mostraItem($permissoes, 'AgendamentoBloqueioController', 'index'))
-        <li class="nav-item">
-            <a href="/admin/agendamentos/bloqueios" class="nav-link">
-                <i class="nav-icon fas fa-ban"></i>
-                <p>Bloqueios</p>
-            </a>
-        </li>
-        @endif
         @if (mostraTitulo($permissoes, ['RepresentanteEnderecoController', 'RepresentanteController']))
             <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">

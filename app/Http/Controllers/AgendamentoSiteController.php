@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
 use App\Rules\Cpf;
 use App\Events\ExternoEvent;
+use App\Repositories\RegionalRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 use Illuminate\Support\Facades\Validator;
 use Redirect;
@@ -54,12 +55,7 @@ class AgendamentoSiteController extends Controller
             ->get();
         $horarios = [];
         $contagem = Regional::select('ageporhorario')->where('idregional',1)->first()->ageporhorario;
-        if($contagem == 1) {
-            foreach($agendamentos as $agendamento) {
-                array_push($horarios,$agendamento->hora);
-            }
-            return $horarios;
-        } elseif($contagem > 1) {
+        if($contagem >= 1) {
             foreach($agendamentos as $agendamento) {
                 array_push($horarios,$agendamento->hora);
             }
@@ -67,13 +63,13 @@ class AgendamentoSiteController extends Controller
         }
     }
 
-    public function checaHorarios(Request $request)
+    public function checaHorarios()
     {
         $idregional = $_POST['idregional'];
         $dia = $_POST['dia'];
         $dia = str_replace('/', '-', $_POST['dia']);
         $dia = date('Y-m-d', strtotime($dia));
-        $horarios = AgendamentoControllerHelper::horas($idregional, $dia);
+        $horarios = (new RegionalRepository)->getHorariosAgendamento($idregional, $dia);
         // Checa pela contagem
         $contagem = Regional::select('ageporhorario')->where('idregional',1)->first()->ageporhorario;
         if($contagem == 1) {
@@ -99,6 +95,7 @@ class AgendamentoSiteController extends Controller
         } elseif($contagem < 1) {
             $horarios = AgendamentoControllerHelper::todasHoras();
             return $horarios;
+            // return null;
         } else {
             foreach($horarios as $h) {
                 echo "<option value='".$h."'>".$h."</option>";
