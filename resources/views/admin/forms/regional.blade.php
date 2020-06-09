@@ -232,7 +232,9 @@
                 </div>
                 @endif
             </div>
-            <div class="col">
+        </div>
+        <div class="form-row mt-2">
+            <div class="col-sm-4">
                 <label for="ageporhorario">Agendamentos p/ horário</label>
                 <input type="text"
                     class="form-control {{ $errors->has('ageporhorario') ? 'is-invalid' : '' }}"
@@ -252,6 +254,21 @@
                 {{ $errors->first('ageporhorario') }}
                 </div>
                 @endif
+            </div>
+            <div class="col">
+                <label for="horariosage">Horários p/ agendamento</label>
+                <select name="horariosage[]" class="form-control" size="4" multiple>
+                    @foreach (todasHoras() as $hora)
+                        @if ($resultado->horariosAge() && in_array($hora, $resultado->horariosAge()))
+                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
+                        @else
+                            <option value="{{ $hora }}">{{ $hora }}</option>
+                        @endif
+                    @endforeach
+                </select>
+                <small class="form-text text-muted">
+                    <em>* Segure Ctrl para selecionar mais de um horário ou Shift para selecionar um grupo de horários</em>
+                </small>
             </div>
         </div>
         <div class="form-group mt-2">

@@ -1,7 +1,6 @@
 @php
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
-$horas = AgendamentoControllerHelper::todasHoras();
 @endphp
 
 <form role="form" method="POST">
@@ -101,7 +100,7 @@ $horas = AgendamentoControllerHelper::todasHoras();
                 <label for="horainicio">Hora de início</label>
                 <select name="horainicio" class="form-control {{ $errors->has('horainicio') ? 'is-invalid' : '' }}" id="horaInicioBloqueio">
                 <option selected disabled>Selecione o horário</option>
-                @foreach($horas as $hora)
+                @foreach(todasHoras() as $hora)
                     @if(!empty(old('horainicio')))
                         @if(old('horainicio') == $hora)
                             <option value="{{ $hora }}" selected>{{ $hora }}</option>
@@ -131,7 +130,7 @@ $horas = AgendamentoControllerHelper::todasHoras();
             <label for="horatermino">Hora de término</label>
                 <select name="horatermino" class="form-control {{ $errors->has('horatermino') ? 'is-invalid' : '' }}" id="horaTerminoBloqueio">
                 <option selected disabled>Selecione o horário</option>
-                @foreach($horas as $hora)
+                @foreach(todasHoras() as $hora)
                     @if(!empty(old('horatermino')))
                         @if(old('horatermino') == $hora)
                             <option value="{{ $hora }}" selected>{{ $hora }}</option>
