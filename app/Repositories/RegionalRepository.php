@@ -44,6 +44,14 @@ class RegionalRepository {
 
     public function update($id, $request)
     {
+        if($request->horariosage) {
+            $request->merge(['horariosage' => implode(',', $request->horariosage)]);
+        }
         return Regional::findOrFail($id)->update($request->all());
+    }
+
+    public function getHorariosAgendamento($id, $dia)
+    {
+        return Regional::find($id)->horariosDisponiveis($dia);
     }
 }

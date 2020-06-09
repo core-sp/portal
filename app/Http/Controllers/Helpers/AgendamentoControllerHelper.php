@@ -8,6 +8,7 @@ use App\Agendamento;
 use App\User;
 use App\Http\Controllers\Helper;
 use App\AgendamentoBloqueio;
+use App\Regional;
 
 class AgendamentoControllerHelper extends Controller
 {
@@ -24,43 +25,21 @@ class AgendamentoControllerHelper extends Controller
 
     public static function horas($regional, $dia)
     {
-        $horas = [
-            '09:00',
-            '10:00',
-            '11:00',
-            '12:00',
-            '13:00',
-            '14:00',
-            '15:00'
-        ];
+        $horas = Regional::find($regional)->horariosAge();
         $bloqueios = AgendamentoBloqueio::where('idregional',$regional)
             ->whereDate('diainicio','<=',$dia)
             ->whereDate('diatermino','>=',$dia)
             ->get();
         if($bloqueios) {
-            $i = 0;
-            $blocHoras = [];
             foreach($bloqueios as $bloqueio) {
-                $i++;
-                // Pega a hora de início de término do bloqueio em questão, assim como sua chave no array horas
-                $horaInicio = $bloqueio->horainicio;
-                $horaTermino = $bloqueio->horatermino;
-                $keyHoraInicio = array_search($horaInicio, $horas);
-                $keyHoraTermino = array_search($horaTermino, $horas);
-                // Dá slice no array e compara com as horas disponíveis
-                $length = ($keyHoraTermino - $keyHoraInicio) + 1;
-                $novaHoras = array_slice($horas, $keyHoraInicio, $length);
-                // Pega a diferença do slice para o array completo, iterage por cada valor e insere no array geral
-                $diferenca = array_intersect($horas, $novaHoras);
-                foreach($diferenca as $value) {
-                    if(!in_array($value, $blocHoras)) {
-                        array_push($blocHoras, $value);
+                foreach($horas as $key => $hora) {
+                    if($hora >= $bloqueio->horainicio && $hora <= $bloqueio->horatermino) {
+                        unset($horas[$key]);
                     }
                 }
             }
-            $horasComBloqueio = array_diff($horas, $blocHoras);
-            return $horasComBloqueio;
         }
+        return $horas;
     }
 
     public static function todasHoras()
