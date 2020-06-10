@@ -30,7 +30,7 @@ use \App\Http\Controllers\CursoInscritoController;
             <h2 class="pr-3 ml-1">Próximos cursos</h2>
           </blockquote>
           <h5 class="float-right cinza-claro-bg">
-            <a href="/cursos-anteriores"><i class="fas fa-history icon-title"></i> Cursos anteriores</a>
+            <a href="{{ route('cursos.previous.website') }}"><i class="fas fa-history icon-title"></i> Cursos anteriores</a>
           </h5>
         </div>
       </div>

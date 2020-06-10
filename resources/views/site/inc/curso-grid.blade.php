@@ -6,7 +6,7 @@ use \App\Http\Controllers\CursoSiteController;
 
 <div class="col-lg-4 col-sm-6 mb-3">
   <div class="h-100 d-flex flex-column">
-    <a href="/curso/{{ $curso->idcurso }}">
+    <a href="{{ route('cursos.show', $curso->idcurso) }}">
       <div class="curso-grid">
         <img src="{{ asset(Helper::imgToThumb($curso->img)) }}" class="bn-img" />
         <div class="curso-grid-txt">

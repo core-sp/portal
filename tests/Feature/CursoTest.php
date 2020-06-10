@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Curso;
 use App\Permissao;
+use DateInterval;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -420,12 +421,64 @@ class CursoTest extends TestCase
     }
 
     /** @test */
-    function curso_is_shown_on_curso_lista_on_website()
+    function next_cursos_are_shown_on_next_curso_lista_on_website()
     {
         $curso = factory('App\Curso')->create();
 
         $this->get(route('cursos.index.website'))
             ->assertOk()
+            ->assertSee(route('cursos.show', $curso->idcurso))
+            ->assertSee($curso->tema);
+    }
+
+    /** @test */
+    function next_cursos_are_not_shown_on_previous_curso_lista_on_website()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.previous.website'))
+            ->assertOk()
+            ->assertDontSee($curso->tema);
+    }
+
+    /** @test */
+    function previous_cursos_are_not_shown_on_next_curso_list_on_website()
+    {
+        $date = new \DateTime();
+        $date->sub(new DateInterval('P30D'));
+        $realizacao = $date->format('Y-m-d\TH:i:s');
+        $new_date = new \DateTime();
+        $new_date->sub(new DateInterval('P31D'));
+        $termino = $new_date->format('Y-m-d\TH:i:s');
+
+        $curso = factory('App\Curso')->create([
+            'datarealizacao' => $realizacao,
+            'datatermino' => $termino
+        ]);
+
+        $this->get(route('cursos.index.website'))
+            ->assertOk()
+            ->assertDontSee($curso->tema);
+    }
+
+    /** @test */
+    function previous_cursos_are_shown_on_previous_curso_list_on_website()
+    {
+        $date = new \DateTime();
+        $date->sub(new DateInterval('P30D'));
+        $realizacao = $date->format('Y-m-d\TH:i:s');
+        $new_date = new \DateTime();
+        $new_date->sub(new DateInterval('P31D'));
+        $termino = $new_date->format('Y-m-d\TH:i:s');
+
+        $curso = factory('App\Curso')->create([
+            'datarealizacao' => $realizacao,
+            'datatermino' => $termino
+        ]);
+
+        $this->get(route('cursos.previous.website'))
+            ->assertOk()
+            ->assertSee(route('cursos.show', $curso->idcurso))
             ->assertSee($curso->tema);
     }
 }
