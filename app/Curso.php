@@ -76,10 +76,11 @@ class Curso extends Model
                 $publicado = 'Publicado';
             else
                 $publicado = 'Rascunho';
+            isset($row->endereco) ? $endereco = $row->endereco : $endereco = 'Evento online';
             return [
                 $row->idcurso,
                 $row->tipo.'<br>'.$row->tema.'<br /><small><em>'.$publicado.'</em></small>',
-                $row->endereco.'<br />'.formataData($row->datarealizacao),
+                $endereco.'<br />'.formataData($row->datarealizacao),
                 (new CursoRepository())->getCursoContagem($row->idcurso).' / '.$row->nrvagas,
                 $row->regional->regional,
                 $acoes
@@ -101,10 +102,11 @@ class Curso extends Model
         $headers = ['Turma', 'Tipo / Tema', 'Onde / Quando', 'Regional', 'Cancelado em:', 'Ações'];
         $contents = $query->map(function($row){
             $acoes = '<a href="'.route('cursos.restore', $row->idcurso).'" class="btn btn-sm btn-primary">Restaurar</a> ';
+            isset($row->endereco) ? $endereco = $row->endereco : $endereco = 'Evento online';
             return [
                 $row->idcurso,
                 $row->tipo.'<br>'.$row->tema,
-                $row->endereco.'<br />'.formataData($row->datarealizacao),
+                $endereco.'<br />'.formataData($row->datarealizacao),
                 $row->regional->regional,
                 formataData($row->deleted_at),
                 $acoes

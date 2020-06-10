@@ -22,7 +22,7 @@ class CursoRequest extends FormRequest
             'img' => 'max:255',
             'datarealizacao' => 'required',
             'datatermino' => 'required',
-            'endereco' => 'required_unless:tema,Live|max:255',
+            'endereco' => 'required_unless:tipo,Live|max:255',
             'nrvagas' => 'required|numeric',
             'descricao' => 'required'
         ];
