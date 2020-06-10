@@ -158,7 +158,7 @@ class CursoInscritoController extends Controller
         if(!$save)
             abort(500);
         event(new CrudEvent('inscrito em curso', 'adicionou', request('idcurso')));
-        return Redirect::route('inscritos.lista', array('id' => request('idcurso')))
+        return Redirect::route('inscritos.index', array('id' => request('idcurso')))
             ->with('message', '<i class="icon fa fa-check"></i>Participante inscrito com sucesso!')
             ->with('class', 'alert-success');
     }
@@ -209,7 +209,7 @@ class CursoInscritoController extends Controller
         if(!$update)
             abort(500);
         event(new CrudEvent('inscrito em curso', 'editou', $inscrito->idcurso));
-        return Redirect::route('inscritos.lista', array('id' => $idcurso))
+        return Redirect::route('inscritos.index', array('id' => $idcurso))
             ->with('message', '<i class="icon fa fa-check"></i>Participante editado com sucesso!')
             ->with('class', 'alert-success');
     }
@@ -333,7 +333,7 @@ class CursoInscritoController extends Controller
         if(!$delete)
             abort(500);
         event(new CrudEvent('inscrito em curso', 'cancelou inscrição', $curso->idcurso));
-        return Redirect::route('inscritos.lista', array('id' => $curso->idcurso))
+        return Redirect::route('inscritos.index', array('id' => $curso->idcurso))
             ->with('message', '<i class="icon fa fa-ban"></i>Inscrição cancelada com sucesso!')
             ->with('class', 'alert-danger');;
     }

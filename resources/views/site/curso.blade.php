@@ -90,7 +90,7 @@ $now = now();
         @if($curso->datatermino >= $now)
           @if(CursoInscritoController::permiteInscricao($curso->idcurso))
             <div class="center-992">
-              <a href="/curso/inscricao/{{ $curso->idcurso }}" class="btn-curso-interna">Inscrever-se</a>
+              <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-interna">Inscrever-se</a>
             </div>
           @endif
         @endif

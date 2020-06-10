@@ -4,10 +4,10 @@ use \App\Http\Controllers\Helper;
 $tipos = CursoHelper::tipos();
 @endphp
 
-<form role="form" method="POST">
+<form role="form" method="POST" action="{{ !isset($resultado) ? route('cursos.store') : route('cursos.update', Request::route('id')) }}">
     @csrf
     @if(isset($resultado))
-        @method('PUT')
+        @method('PATCH')
     @endif
     <input type="hidden" name="idusuario" value="{{ Auth::id() }}">
     <div class="card-body">
