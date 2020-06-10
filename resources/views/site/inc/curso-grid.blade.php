@@ -19,7 +19,7 @@ use \App\Http\Controllers\CursoSiteController;
       <p>{!! $curso->resumo !!}</p>
       @if(CursoSiteController::checkCurso($curso->idcurso))
         @if(CursoInscritoController::permiteInscricao($curso->idcurso))
-          <a href="/curso/inscricao/{{ $curso->idcurso }}" class="btn-curso-grid mt-3">Inscrever-se</a>
+          <a href="{{ route('cursos.inscricao.website', $curso->idcurso) }}" class="btn-curso-grid mt-3">Inscrever-se</a>
         @else
           <button class="btn-esgotado mt-3">Vagas esgotadas</button>
         @endif
