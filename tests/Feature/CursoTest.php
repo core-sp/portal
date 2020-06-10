@@ -140,12 +140,12 @@ class CursoTest extends TestCase
     }
 
     /** @test */
-    public function curso_endereco_is_required_if_tema_not_live()
+    public function curso_endereco_is_required_if_tipo_not_live()
     {
         $this->signInAsAdmin();
 
         $attributes = factory('App\Curso')->raw([
-            'tema' => 'Curso',
+            'tipo' => 'Curso',
             'endereco' => ''
         ]);
 
@@ -154,12 +154,12 @@ class CursoTest extends TestCase
     }
 
     /** @test */
-    public function curso_endereco_is_not_required_if_tema_is_live()
+    public function curso_endereco_is_not_required_if_tipo_is_live()
     {
         $this->signInAsAdmin();
 
         $attributes = factory('App\Curso')->raw([
-            'tema' => 'Live',
+            'tipo' => 'Live',
             'endereco' => ''
         ]);
 
