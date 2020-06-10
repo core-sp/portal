@@ -13,7 +13,7 @@ class CursoSiteController extends Controller
         $cursos = Curso::where('datatermino','<',$now)
             ->where('publicado','Sim')
             ->orderBy('created_at','DESC')
-            ->paginate(10);
+            ->paginate(9);
         return response()
             ->view('site.cursos-anteriores', compact('cursos'))
             ->header('Cache-Control','no-cache');

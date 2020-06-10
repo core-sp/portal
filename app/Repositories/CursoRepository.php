@@ -37,7 +37,7 @@ class CursoRepository {
         return Curso::select('idcurso','img','idregional','tipo','tema','resumo', 'datarealizacao')
             ->where('datatermino','>=',$now)
             ->where('publicado','Sim')
-            ->paginate(10);
+            ->paginate(9);
     }
 
     public function store($request)
