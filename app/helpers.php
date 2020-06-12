@@ -616,7 +616,7 @@ function mostraChatScript()
     if(config('app.env') !== 'local') {
         $hour = date('H');
         $day = date('w');
-        if($hour >= 10 && $hour <= 16 && $day !== '6' && $day !== '0') {
+        if($hour >= 10 && $hour < 16 && $day !== '6' && $day !== '0') {
             return '<script src="//code.jivosite.com/widget/X12I8gg4Qy" async></script>';
         }
     }
