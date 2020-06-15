@@ -347,6 +347,13 @@ function noWeekendsOrHolidays(date) {
 							.end()
 							.append('<option value="" disabled selected>Nenhum horário disponível</option>');
 					}
+				},
+				error: function() {
+					$('#horarios')
+						.find('option')
+						.remove()
+						.end()
+						.append('<option value="" disabled selected>Nenhum horário disponível</option>');
 				}
 			});
 		});
