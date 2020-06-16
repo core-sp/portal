@@ -39,13 +39,12 @@ $pessoas = AgendamentoControllerHelper::pessoas();
     <div class="row mb-4">
       <div class="col">
         <div class="conteudo-txt">
+          <!--
           <p><strong>Importante:</strong> O atendimento presencial está suspenso temporariamente, neste período os serviços deverão ser solicitados via email. O prazo para análise e resposta do email depende do tipo de serviço solicitado.</p>
           <p>Para mais informações, acesse <a href="/servicos-atendimento-ao-rc">este link</a>.</p>
-          <!--
-          <p>Agende seu atendimento presencial no CORE-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="/agendamento-consulta" class="text-primary">informações do atendimento já agendado.</a></p>
           -->
+          <p>Agende seu atendimento presencial no CORE-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="/agendamento-consulta" class="text-primary">informações do atendimento já agendado.</a></p>
         </div>
-        <!--
         <div class="mt-2">
           <form method="POST" class="inscricaoCurso">
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
@@ -205,7 +204,6 @@ $pessoas = AgendamentoControllerHelper::pessoas();
             </div>
           </form>
         </div>
-        -->
       </div>
     </div>
   </div>
