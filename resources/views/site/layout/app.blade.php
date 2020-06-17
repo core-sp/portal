@@ -195,14 +195,14 @@ use \App\Http\Controllers\Helper;
             </div>
           </div>
         </div>
-        <a href="/noticia/o-vencimento-da-anuidade-inicialmente-previsto-em-3004-foi-prorrogado-para-3006-sem-encargos-financeiros" class="hide-768">
+        <a href="/noticias/o-pagamento-do-1o-quadrimestre-da-anuidade-de-2020-foi-mais-uma-vez-prorrogado-podendo-ser-efetuado-ate-31072020-sem-quaisquer-acrescimos" class="hide-768">
           <div class="container-fluid bg-warning pt-2 pb-2">
             <div class="row">
                 <div class="container">
                   <div class="d-flex">
                     <div class="flex-one as-center">
                       <h5 class="d-inline pr-3 text-dark"><strong>ANUIDADE 2020</strong></h5>
-                      <p class="d-inline text-dark">Vencimento inicial em 30/04 prorrogado para 30/06, sem encargos financeiros. <span class="nowrap">Baixe o boleto atualizado!</span></p>
+                      <p class="d-inline text-dark">Vencimento do 1º quadrimestre da anuidade 2020 foi prorrogado para 31/07. <span class="nowrap">Solicite boleto atualizado!</span></p>
                     </div>
                     <div class="as-center ml-2">
                       <p class="text-dark btn-faixa"><strong>SAIBA MAIS</strong></p>
