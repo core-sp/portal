@@ -27,10 +27,14 @@ class AgendamentoSiteController extends Controller
     public function permiteAgendamento($dia, $hora, $idregional)
     {
         // Conta o número de atendentes da seccional
-        $contagem = Regional::select('ageporhorario')->where('idregional',1)->first()->ageporhorario;
+        $contagem = Regional::select('ageporhorario')
+            ->where('idregional',$idregional)
+            ->first()
+            ->ageporhorario;
         $checaAgendamento = Agendamento::where('dia',$dia)
             ->where('hora',$hora)
             ->where('idregional',$idregional)
+            ->whereNull('status')
             ->count();
         if($contagem == 1) {
             if($checaAgendamento < 1)
@@ -54,7 +58,7 @@ class AgendamentoSiteController extends Controller
             ->whereNull('status')
             ->get();
         $horarios = [];
-        $contagem = Regional::select('ageporhorario')->where('idregional',1)->first()->ageporhorario;
+        $contagem = Regional::select('ageporhorario')->where('idregional',$idregional)->first()->ageporhorario;
         if($contagem >= 1) {
             foreach($agendamentos as $agendamento) {
                 array_push($horarios,$agendamento->hora);
@@ -71,7 +75,7 @@ class AgendamentoSiteController extends Controller
         $dia = date('Y-m-d', strtotime($dia));
         $horarios = (new RegionalRepository)->getHorariosAgendamento($idregional, $dia);
         // Checa pela contagem
-        $contagem = Regional::select('ageporhorario')->where('idregional',1)->first()->ageporhorario;
+        $contagem = Regional::select('ageporhorario')->where('idregional',$idregional)->first()->ageporhorario;
         if($contagem == 1) {
             $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
             $horariosPossiveis = array_diff($horarios, $horariosJaMarcados);
@@ -218,6 +222,7 @@ class AgendamentoSiteController extends Controller
     {
         $count = Agendamento::where('dia',$dia)
             ->where('cpf',$cpf)
+            ->whereNull('status')
             ->count();
         if($count >= 2)
             return false;
