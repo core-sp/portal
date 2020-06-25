@@ -249,8 +249,6 @@ segunda.innerHTML = primeira.innerHTML;
 natDays = [
 	[6, 20, 'br'],
 	[6, 21, 'br'],
-	[7, 8, 'br'],
-	[7, 9, 'br'],
 	[11, 15, 'br'],
 	[11, 20, 'br'],
 	[12, 23, 'br'],

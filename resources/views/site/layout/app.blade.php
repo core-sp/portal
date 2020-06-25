@@ -202,7 +202,7 @@ use \App\Http\Controllers\Helper;
                   <div class="d-flex">
                     <div class="flex-one as-center">
                       <h5 class="d-inline pr-3 text-dark"><strong>ANUIDADE 2020</strong></h5>
-                      <p class="d-inline text-dark">Vencimento do 1º quadrimestre da anuidade 2020 foi prorrogado para 31/07. <span class="nowrap">Solicite boleto atualizado!</span></p>
+                      <p class="d-inline text-dark">Vencimento do 1º quadrimestre da anuidade 2020 foi prorrogado para 31/07. <span class="nowrap">Baixe o boleto atualizado!</span></p>
                     </div>
                     <div class="as-center ml-2">
                       <p class="text-dark btn-faixa"><strong>SAIBA MAIS</strong></p>
