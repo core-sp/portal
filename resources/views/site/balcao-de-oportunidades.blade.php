@@ -32,6 +32,11 @@ $regionais = BdoSiteControllerHelper::regionais();
 
 <section id="pagina-bdo">
   <div class="container">
+    <div class="row pb-4">
+      <div class="offset-md-2 col-md-8">
+        <iframe src="https://www.youtube.com/embed/HsdrwN7vvB4?rel=0" class="yt-bdo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
     <div class="row pb-4" id="conteudo-principal">
       <div class="col">
         <form method="GET" role="form" action="/balcao-de-oportunidades/busca" class="pesquisaLicitacao">
