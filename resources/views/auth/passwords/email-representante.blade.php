@@ -2,7 +2,7 @@
 
 @section('content')
 
-<section id="pagina-cabecalho" class="mt-1">
+<section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/banner-reset-senha-representante.jpg') }}" />
     <div class="row position-absolute pagina-titulo">
@@ -32,6 +32,9 @@
         <div class="linha-lg"></div>
         <div class="row mt-2">
           <div class="col-lg-8 conteudo-txt">
+            @if(Session::has('message'))
+              <p class="alert {{ Session::get('class') }}">{{ Session::get('message') }}</p>
+            @endif
             @if (session('status'))
               <div class="alert alert-success" role="alert">
                 {{ session('status') }}

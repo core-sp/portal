@@ -24,7 +24,11 @@ class RepresentanteForgotPasswordController extends Controller
 
     protected function validateEmail(Request $request)
     {
-        $this->validate($request, ['cpf_cnpj' => 'required']);
+        $this->validate(
+            $request,
+            ['cpf_cnpj' => 'required'],
+            ['required' => 'Por favor, informe o campo de CPF/CNPJ.']
+        );
     }
 
     protected function getEmail($cpfCnpj)
@@ -34,7 +38,10 @@ class RepresentanteForgotPasswordController extends Controller
         if(isset($first)) {
             return $first->email;
         } else {
-            return redirect()->back()->with('message', 'CPF ou CNPJ não encontrado');
+            return redirect()
+                ->back()
+                ->with('message', 'CPF ou CNPJ não cadastrado.')
+                ->with('class', 'alert-danger');
         }
     }
 
