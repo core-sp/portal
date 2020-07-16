@@ -257,6 +257,7 @@ class BdoOportunidadeController extends Controller
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = BdoOportunidade::where('descricao','LIKE','%'.$busca.'%')
+            ->orWhere('status','LIKE','%'.$busca.'%')
             ->paginate(10);
         $tabela = $this->tabelaCompleta($resultados);
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
