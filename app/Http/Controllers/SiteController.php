@@ -38,6 +38,7 @@ class SiteController extends Controller
     public function busca(Request $request)
     {
         $busca = htmlentities(IlluminateRequest::input('busca'));
+
         $regras = [
             'busca' => 'required|min:3',
         ];
@@ -51,7 +52,7 @@ class SiteController extends Controller
 
         if(isset($busca)) {
             $resultados = collect();
-            $paginas = Pagina::select('titulo','subtitulo','slug','created_at','conteudo')
+            $paginas = Pagina::selectRaw("'Página' as tipo, titulo, subtitulo, slug, created_at,conteudo")
                 ->where(function($query) use ($buscaArray) {
                     foreach($buscaArray as $b) {
                         $query->where(function($q) use ($b) {
@@ -60,9 +61,8 @@ class SiteController extends Controller
                                 ->orWhere('conteudo','LIKE','%'.$b.'%');
                         });
                     }
-                })->limit(10)
-                ->get();
-            $noticias = Noticia::select('titulo','slug','created_at','conteudo')
+                })->limit(10);
+            $noticias = Noticia::selectRaw("'Notícia' as tipo, titulo, null as subtitulo, slug, created_at, conteudo")
                 ->where(function($query) use ($buscaArray) {
                     foreach($buscaArray as $b) {
                         $query->where(function($q) use ($b) {
@@ -71,9 +71,8 @@ class SiteController extends Controller
                         });
                     }
                 })->orderBy('created_at', 'DESC')
-                ->limit(10)
-                ->get();
-            $posts = Post::select('titulo', 'subtitulo', 'slug', 'created_at', 'conteudo')
+                ->limit(10);
+            $posts = Post::selectRaw("'Artigo' as tipo, titulo, subtitulo, slug, created_at,conteudo")
                 ->where(function($query) use ($buscaArray) {
                     foreach($buscaArray as $b) {
                         $query->where(function($q) use ($b) {
@@ -83,20 +82,10 @@ class SiteController extends Controller
                         });
                     }
                 })->orderBy('created_at', 'DESC')
-                ->limit(10)
-                ->get();
-            foreach($paginas as $pagina) {
-                $pagina->tipo = "Página";
-                $resultados->push($pagina);
-            }
-            foreach($noticias as $noticia) {
-                $noticia->tipo = "Notícia";
-                $resultados->push($noticia);
-            }
-            foreach($posts as $post) {
-                $post->tipo = "Artigo";
-                $resultados->push($post);
-            }
+                ->limit(10);
+
+            $resultados = $paginas->union($noticias)->union($posts)->get();
+
             return view('site.busca', compact('busca', 'resultados'));
         } else {
             return redirect()->route('site.home');
