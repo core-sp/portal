@@ -1,6 +1,7 @@
 // TinyMCE com File Manager
 var public_path = "{{ path('public') }}";  
 var editor_config = {
+entity_encoding : "raw",
 path_absolute : "/",
 selector: "textarea.my-editor",
 language: "pt_BR",
