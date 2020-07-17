@@ -37,7 +37,7 @@ class SiteController extends Controller
 
     public function busca(Request $request)
     {
-        $busca = htmlentities(IlluminateRequest::input('busca'));
+        $busca = IlluminateRequest::input('busca');
 
         $regras = [
             'busca' => 'required|min:3',

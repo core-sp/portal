@@ -25,7 +25,7 @@ use App\Http\Controllers\Helper;
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-4 align-self-center">
-            <p class="light">Busca por: <strong>{{ html_entity_decode($busca) }}</strong>
+            <p class="light">Busca por: <strong>{{ $busca }}</strong>
             @if($resultados->count())
             <small><i>- {{ $resultados->count() === 1 ? $resultados->count() . ' resultado' : $resultados->count() . ' resultados' }}</i></small></p>
             @endif
