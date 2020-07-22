@@ -656,3 +656,8 @@ function todasHoras()
         '17:30',
     ];
 }
+
+function converterParaTextoCru($html)
+{
+    return html_entity_decode(strip_tags($html));
+}
