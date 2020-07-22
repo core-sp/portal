@@ -387,4 +387,21 @@ class NoticiaTest extends TestCase
 
         $this->get(route('noticias.index'))->assertSee(route('noticias.create'));
     }
+
+    /** @test */
+    function conteudoBusca_is_stored_with_no_tags()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Noticia')->raw();
+
+        $attributes['conteudo'] = '<p>unit_test' . $attributes['conteudo'] . '</p>';
+
+        $this->post(route('noticias.store'), $attributes);
+
+        $noticia = Noticia::first();
+
+        $this->assertStringNotContainsString('<p>', $noticia->conteudoBusca);
+
+    }
 }

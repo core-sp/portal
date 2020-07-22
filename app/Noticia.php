@@ -12,7 +12,7 @@ class Noticia extends Model
     use SoftDeletes, TabelaAdmin, ControleAcesso;
 
     protected $primaryKey = 'idnoticia';
-    protected $fillable = ['titulo', 'slug', 'img', 'conteudo', 'categoria',
+    protected $fillable = ['titulo', 'slug', 'img', 'conteudo', 'conteudoBusca', 'categoria',
     'publicada', 'idregional', 'idcurso', 'idusuario'];
     
     public function regional()
