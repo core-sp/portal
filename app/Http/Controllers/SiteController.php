@@ -67,7 +67,7 @@ class SiteController extends Controller
                     foreach($buscaArray as $b) {
                         $query->where(function($q) use ($b) {
                             $q->where('titulo','LIKE','%'.$b.'%')
-                                ->orWhere('conteudo','LIKE','%'.$b.'%');
+                                ->orWhere('conteudoBusca','LIKE','%'.$b.'%');
                         });
                     }
                 })->orderBy('created_at', 'DESC')
