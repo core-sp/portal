@@ -102,16 +102,16 @@ use \App\Http\Controllers\Helper;
                     class="form-control float-right {{ $errors->has('busca') ? 'is-invalid' : '' }}"
                     placeholder="Digite o que você procura"
                     accesskey="2" />
-                    @if($errors->has('busca'))
-                    <div class="invalid-feedback">
-                      {{ $errors->first('busca') }}
-                    </div>
-                    @endif
                   <div class="input-group-append">
                     <button type="submit" class="btn btn-default">
                       <i class="fas fa-search"></i>
                     </button>
                   </div>
+                  @if($errors->has('busca'))
+                    <div class="invalid-feedback text-left">
+                      {{ $errors->first('busca') }}
+                    </div>
+                  @endif
                 </form>
               </div>
             </div>

@@ -52,6 +52,7 @@ class PaginaRepository {
             'slug' => $slug,
             'img' => $request->img,
             'conteudo' => $request->conteudo,
+            'conteudoBusca' => converterParaTextoCru($request->conteudo),
             'idusuario' => $request->idusuario
         ]);
     }
@@ -64,6 +65,7 @@ class PaginaRepository {
             'slug' => $slug,
             'img' => $request->img,
             'conteudo' => $request->conteudo,
+            'conteudoBusca' => converterParaTextoCru($request->conteudo),
             'idusuario' => $request->idusuario
         ]);
     }

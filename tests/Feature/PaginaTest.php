@@ -352,4 +352,21 @@ class PaginaTest extends TestCase
 
         $this->get(route('paginas.index'))->assertSee(route('paginas.destroy', $pagina->idpagina));
     }
+
+    /** @test */
+    function pagina_conteudoBusca_is_stored_with_no_tags()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Pagina')->raw();
+
+        $attributes['conteudo'] = '<p>unit_test' . $attributes['conteudo'] . '</p>';
+
+        $this->post(route('paginas.store'), $attributes);
+
+        $pagina = Pagina::first();
+
+        $this->assertStringNotContainsString('<p>', $pagina->conteudoBusca);
+
+    }
 }

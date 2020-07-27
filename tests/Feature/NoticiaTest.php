@@ -389,7 +389,7 @@ class NoticiaTest extends TestCase
     }
 
     /** @test */
-    function conteudoBusca_is_stored_with_no_tags()
+    function noticia_conteudoBusca_is_stored_with_no_tags()
     {
         $this->signInAsAdmin();
 
