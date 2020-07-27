@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Post;
+use App\Permissao;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,30 @@ use Illuminate\Support\Facades\Auth;
 class PostTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Permissao::insert([
+            [
+                'controller' => 'PostsController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'PostsController',
+                'metodo' => 'create',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'PostsController',
+                'metodo' => 'edit',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'PostsController',
+                'metodo' => 'destroy',
+                'perfis' => '1,'
+            ]
+        ]);
+    }
 
     /** @test */
     function a_post_can_be_created()
@@ -53,11 +78,12 @@ class PostTest extends TestCase
     {
         $this->signIn();
 
-        $this->get(route('posts.index'))->assertForbidden();
-
         $attributes = factory('App\Post')->raw();
-        
+
+        $this->get(route('posts.create'))->assertForbidden();
+
         $this->post(route('posts.store'), $attributes)->assertForbidden();
+
         $this->assertDatabaseMissing('posts', ['titulo' => $attributes['titulo']]);
     }
 
@@ -218,10 +244,11 @@ class PostTest extends TestCase
 
         $this->get(route('posts.edit', $post->id))->assertForbidden();
 
-        $titulo = 'Novo titulo';
+        $post->titulo = 'Novo titulo';
 
-        $this->patch(route('posts.update', $post->id), ['titulo' => $titulo])->assertForbidden();
-        $this->assertDatabaseMissing('posts', ['titulo' => $titulo]);
+        $this->patch(route('posts.update', $post->id), $post->getAttributes())->assertForbidden();
+        
+        $this->assertDatabaseMissing('posts', ['titulo' => $post->titulo]);
     }
 
     /** @test */
@@ -299,5 +326,40 @@ class PostTest extends TestCase
         $post = factory('App\Post')->create();
 
         $this->get(route('posts.index'))->assertSee(route('posts.destroy', $post->id));
+    }
+
+    // Sistema deve salvar o campo 'conteudoBusca' sem tags e entities do HTML
+    /** @test */
+    function post_conteudoBusca_is_stored_with_no_tags()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Post')->raw();
+
+        $attributes['conteudo'] = '<p>unit_test' . $attributes['conteudo'] . '</p>';
+
+        $this->post(route('posts.store'), $attributes);
+
+        $post = Post::first();
+
+        $this->assertStringNotContainsString('<p>', $post->conteudoBusca);
+
+    }
+
+    //Sistema não deve permitir atualização de posts com título já existente
+    /** @test */
+    function post_title_cannot_be_updated_with_duplicated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $post2 = factory('App\Post')->create();
+
+        $post2->titulo = $post->titulo;
+
+        $this->patch(route('posts.update', $post2->id), $post2->getAttributes())->assertSessionHasErrors('titulo');
+
+        $this->assertEquals(1 , Post::where('titulo', $post->titulo)->count());
     }
 }

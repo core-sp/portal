@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Events\CrudEvent;
 use App\Post;
+use App\Pagina;
+use App\Http\Requests\PostRequest;
 use App\Repositories\PostRepository;
+use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class PostsController extends Controller
 {
-    // Nome da classe
+    use ControleAcesso;
+
+    private $class = 'PostsController';
     private $variaveis;
     private $post;
     private $postRepository;
@@ -24,45 +29,33 @@ class PostsController extends Controller
 
     public function index()
     {
-        $this->authorize('create', new Post());
+        // Verificando permissão de visualização de posts
+        $this->autoriza($this->class, __FUNCTION__);
+
         $resultados = $this->postRepository->getToTable();
         $tabela = $this->post->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    protected function validateRequest($id = null)
+    public function create()
     {
-        return request()->validate([
-            'idusuario' => 'required|integer',
-            'titulo' => 'required|unique:posts,titulo,'.$id,
-            'subtitulo' => 'required',
-            'img' => 'required',
-            'conteudo' => 'required'
-        ], [
-            'required' => 'Este campo é obrigatório',
-            'unique' => 'Já existe uma matéria com este mesmo nome'
-        ]);
-    }
-
-    public function create(Post $post)
-    {
-        $this->authorize('create', $post);
+        // Verificando permissão de criação de posts
+        $this->autoriza($this->class, __FUNCTION__);
 
         $variaveis = (object) $this->variaveis;
 
         return view('admin.crud.criar', compact('variaveis'));
     }
 
-    public function store(Post $post)
+    public function store(PostRequest $request)
     {
-        $this->authorize('create', $post);
+        // Verificando permissão de criação de posts (mesma do create)
+        $this->autoriza($this->class, 'create');
 
-        $array = $this->validateRequest();
+        $request->validated();
 
-        $array['slug'] = str_slug(request('titulo'));
-
-        $save = $post->create($array);
+        $save = $this->postRepository->store($request->toModel());
 
         event(new CrudEvent('post', 'criou', $save->id));
 
@@ -90,39 +83,38 @@ class PostsController extends Controller
 
     public function edit(Post $post)
     {
-        $this->authorize('create', $post);
+        // Verificando permissão de edição de posts
+        $this->autoriza($this->class, __FUNCTION__);
 
         $variaveis = (object) $this->variaveis;
 
         return view('admin.crud.editar', compact('post', 'variaveis'));
     }
 
-    public function update(Post $post)
+    public function update(PostRequest $request, $id)
     {
-        $this->authorize('create', $post);
+        // Verificando permissão de edição de posts (mesma do edit)
+        $this->autoriza($this->class, 'edit');
+        
+        $request->validated();
 
-        $array = $this->validateRequest($post->id);
+        $save = $this->postRepository->update($id, $request->toModel());
 
-        if(!empty(request('titulo'))) {
-            $array['slug'] = str_slug(request('titulo'));
-        }
-
-        $post->update($array);
-
-        event(new CrudEvent('post', 'editou', $post->id));
+        event(new CrudEvent('post', 'editou', $id));
 
         return redirect(route('posts.index'))
             ->with('message', '<i class="icon fa fa-check"></i>Post editado com sucesso!')
             ->with('class', 'alert-success');
     }
 
-    public function destroy(Post $post)
+    public function destroy($id)
     {
-        $this->authorize('create', $post);
+        // Verificando permissão de remoção de posts
+        $this->autoriza($this->class, __FUNCTION__);
 
-        $post->delete();
+        $this->postRepository->delete($id);
 
-        event(new CrudEvent('post', 'apagou', $post->id));
+        event(new CrudEvent('post', 'apagou', $id));
 
         return redirect(route('posts.index'))
             ->with('message', '<i class="icon fa fa-check"></i>Post deletado com sucesso!')

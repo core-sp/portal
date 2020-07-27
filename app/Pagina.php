@@ -13,7 +13,7 @@ class Pagina extends Model
     
     protected $primaryKey = 'idpagina';
     protected $fillable = ['titulo', 'subtitulo', 'slug', 'img',
-    'conteudo', 'idusuario'];
+    'conteudo', 'conteudoBusca', 'idusuario'];
 
     public function user()
     {

@@ -31,4 +31,19 @@ class PostRepository {
             ->orWhere('conteudo','LIKE','%'.$busca.'%')
             ->paginate(10);
     }
+
+    public function store($data)
+    {
+        return Post::create($data);
+    }
+
+    public function update($id, $data)
+    {
+        return Post::findOrFail($id)->update($data);
+    }
+
+    public function delete($id)
+    {
+        return Post::findOrFail($id)->delete();
+    }
 }

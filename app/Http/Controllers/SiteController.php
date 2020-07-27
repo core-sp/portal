@@ -58,7 +58,7 @@ class SiteController extends Controller
                         $query->where(function($q) use ($b) {
                             $q->where('titulo','LIKE','%'.$b.'%')
                                 ->orWhere('subtitulo','LIKE','%'.$b.'%')
-                                ->orWhere('conteudo','LIKE','%'.$b.'%');
+                                ->orWhere('conteudoBusca','LIKE','%'.$b.'%');
                         });
                     }
                 })->limit(10);
@@ -72,13 +72,13 @@ class SiteController extends Controller
                     }
                 })->orderBy('created_at', 'DESC')
                 ->limit(10);
-            $posts = Post::selectRaw("'Artigo' as tipo, titulo, subtitulo, slug, created_at,conteudo")
+            $posts = Post::selectRaw("'Post' as tipo, titulo, subtitulo, slug, created_at,conteudo")
                 ->where(function($query) use ($buscaArray) {
                     foreach($buscaArray as $b) {
                         $query->where(function($q) use ($b) {
                             $q->where('titulo','LIKE','%'.$b.'%')
                                 ->orWhere('subtitulo','LIKE','%'.$b.'%')
-                                ->orWhere('conteudo','LIKE','%'.$b.'%');
+                                ->orWhere('conteudoBusca','LIKE','%'.$b.'%');
                         });
                     }
                 })->orderBy('created_at', 'DESC')
