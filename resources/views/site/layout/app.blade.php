@@ -195,7 +195,7 @@ use \App\Http\Controllers\Helper;
             </div>
           </div>
         </div>
-        <a href="/noticias/o-pagamento-do-1o-quadrimestre-da-anuidade-de-2020-foi-mais-uma-vez-prorrogado-podendo-ser-efetuado-ate-31072020-sem-quaisquer-acrescimos" class="hide-768">
+        <a href="/noticias/o-pagamento-do-1o-quadrimestre-da-anuidade-de-2020-foi-mais-uma-vez-prorrogado-podendo-ser-efetuado-ate-31082020-sem-quaisquer-acrescimos" class="hide-768">
           <div class="container-fluid bg-warning pt-2 pb-2">
             <div class="row">
                 <div class="container">
