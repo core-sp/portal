@@ -107,14 +107,14 @@
                 @endif
             </ul>
         </li>
-        @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
+        @if(mostraItem($permissoes, 'PostsController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-rss"></i>
                 <p>Blog<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
+                @if(mostraItem($permissoes, 'PostsController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('posts.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -122,7 +122,7 @@
                     </a>
                 </li>
                 @endif
-                @if(auth()->user()->isAdmin() || auth()->user()->isEditor())
+                @if(mostraItem($permissoes, 'PostsController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('posts.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>

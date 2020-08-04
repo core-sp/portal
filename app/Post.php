@@ -2,13 +2,14 @@
 
 namespace App;
 
+use App\Traits\ControleAcesso;
 use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
 {
-    use SoftDeletes, TabelaAdmin;
+    use SoftDeletes, TabelaAdmin, ControleAcesso;
 
     protected $guarded = [];
 
@@ -48,14 +49,19 @@ class Post extends Model
     {
         return $query->map(function($row){
             $acoes = '<a href="/blog/'.$row->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if(auth()->user()->isAdmin() || auth()->user()->isEditor()) {
+
+            if($this->mostra('PostsController', 'edit')) {
                 $acoes .= '<a href="'.route('posts.edit', $row->id).'" class="btn btn-sm btn-primary">Editar</a> ';
+            }
+                
+            if($this->mostra('PostsController', 'destroy')) {
                 $acoes .= '<form method="POST" action="'.route('posts.destroy', $row->id).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Deletar" onclick="return confirm(\'Tem certeza que deseja deletar o post?\')" />';
                 $acoes .= '</form>';
             }
+            
             isset($row->user) ? $autor = $row->user->nome : $autor = 'Usuário Deletado';
             return [
                 $row->id,

@@ -6,94 +6,57 @@ use Illuminate\Http\Request;
 use App\Perfil;
 use App\User;
 use App\Permissao;
+use App\Repositories\PermissaoRepository;
+use App\Repositories\PerfilRepository;
+use App\Traits\ControleAcesso;
 use App\Events\CrudEvent;
 
 class PerfilController extends Controller
 {
-    public $variaveis = [
-        'singular' => 'perfil',
-        'singulariza' => 'o perfil',
-        'plural' => 'perfis',
-        'pluraliza' => 'perfis',
-        'titulo_criar' => 'Cadastrar perfil',
-        'btn_criar' => '<a href="/admin/usuarios/perfis/criar" class="btn btn-primary mr-1">Novo Perfil</a>',
-    ];
+    use ControleAcesso;
 
-    public function __construct()
+    private $permissao;
+    private $permissaoRepository;
+    private $permissaoVariaveis;
+    private $perfil;
+    private $perfilRepository;
+    private $variaveis;
+
+    public function __construct(Permissao $permissao, PermissaoRepository $permissaoRepository, Perfil $perfil, PerfilRepository $perfilRepository)
     {
         $this->middleware('auth');
-    }
-
-    public function resultados()
-    {
-        $resultados = Perfil::select('idperfil','nome')
-            ->withCount('user')
-            ->orderBy('created_at','DESC')
-            ->paginate(10);
-        return $resultados;
-    }
-
-    public function count($idperfil)
-    {
-        $count = User::where('idperfil',$idperfil)->count();
-        return $count;
-    }
-
-    public function tabelaCompleta($resultados)
-    {
-        // Opções de cabeçalho da tabela
-        $headers = [
-            'Código',
-            'Nome',
-            'Nº de Usuários',
-            'Ações'
-        ];
-        // Opções de conteúdo da tabela
-        $contents = [];
-        $resultados = $this->resultados();
-        foreach($resultados as $resultado) {
-            $acoes = '<a href="/admin/usuarios/perfis/editar/'.$resultado->idperfil.'" class="btn btn-sm btn-primary">Editar Permissões</a> ';
-            $acoes .= '<form method="POST" action="/admin/usuarios/perfis/apagar/'.$resultado->idperfil.'" class="d-inline">';
-            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-            $acoes .= '<input type="hidden" name="_method" value="delete" />';
-            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'CUIDADO! Isto pode influenciar diretamente no funcionamento do Portal. Tem certeza que deseja excluir o perfil?\')" />';
-            $acoes .= '</form>';
-            $conteudo = [
-                $resultado->idperfil,
-                $resultado->nome,
-                $this->count($resultado->idperfil),
-                $acoes
-            ];
-            array_push($contents, $conteudo);
-        }
-        // Classes da tabela
-        $classes = [
-            'table',
-            'table-hover'
-        ];
-        $tabela = CrudController::montaTabela($headers, $contents, $classes);
-        return $tabela;
+        $this->permissao = $permissao;
+        $this->permissaoRepository = $permissaoRepository;
+        $this->permissaoVariaveis = $permissao->variaveis();
+        $this->perfil = $perfil;
+        $this->perfilRepository = $perfilRepository;
+        $this->variaveis = $perfil->variaveis(); 
     }
 
     public function index()
     {
-        ControleController::autorizaStatic(['1']);
-        $resultados = $this->resultados();
-        $tabela = $this->tabelaCompleta($resultados);
+        $this->autorizaStatic(['1']);
+
+        $resultados = $this->perfilRepository->getToTable();
+        $tabela = $this->perfil->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
+
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function create()
     {
-        ControleController::autorizaStatic(['1']);
+        $this->autorizaStatic(['1']);
+
         $variaveis = (object) $this->variaveis;
+
         return view('admin.crud.criar', compact('variaveis'));
     }
 
     public function store(Request $request)
     {
-        ControleController::autorizaStatic(['1']);
+        $this->autorizaStatic(['1']);
+
         $regras = [
             'nome' => 'required|max:191',
         ];
@@ -103,52 +66,78 @@ class PerfilController extends Controller
         ];
         $erros = $request->validate($regras, $mensagens);
 
-        $save = Perfil::create(request(['nome']));
+        $save = $this->perfilRepository->store($request);
         
         if(!$save)
             abort(500);
+        
         event(new CrudEvent('perfil de usuário', 'criou', $save->idperfil));
+        
         return redirect('/admin/usuarios/perfis')
             ->with('message', '<i class="icon fa fa-check"></i>Perfil cadastrado com sucesso!')
             ->with('class', 'alert-success');
     }
 
+    /** Edição de perfil envolve recuperar todas as permissões. Neste método é construído um array contendo informações 
+     * sobre as configuração das permissões para mostrar na tela de edição.*/ 
     public function edit($id)
     {
-        ControleController::autorizaStatic(['1']);
-        $perfil = Perfil::findOrFail($id);
-        $idperfil = $perfil->idperfil; 
-        $permissoes = Permissao::all();
-        $permissoesGroup = $permissoes->groupBy('controller');
-        $permissoesArray = $permissoesGroup->toArray();
+        $this->autorizaStatic(['1']);
 
+        $perfil = $this->perfilRepository->findOrFail($id);
+        $idperfil = $perfil->idperfil; 
+        $permissoesGroup = $this->permissaoRepository->getAll()->groupBy('controller');
+        $permissoesArray = array();
+
+        /** Array contendo ações de CRUD padrão (store e update são considerados create e edit respectivamente). */ 
+        $metodoArray = ['index', 'create', 'edit', 'destroy', 'show'];
+        $i = 0;
+
+        foreach($permissoesGroup as $group) {
+
+            $nomeController = $group->first()->controller;
+
+            array_push($permissoesArray, ['display' => $this->permissaoVariaveis[$nomeController], 'controller' => $nomeController, 'permissoes' => array()]);
+
+            foreach($metodoArray as $m) {
+                if($group->contains('metodo',$m)) {
+                    $permissao = $group->where('metodo', '=', $m)->first();
+                    $possuiPermissao = in_array($id, explode(',',$permissao->perfis));
+                    array_push($permissoesArray[$i]['permissoes'], ['metodo' => $m, 'editavel'=> true, 'autorizado' => $possuiPermissao]);
+                }
+                else {
+                    array_push($permissoesArray[$i]['permissoes'], ['metodo' => $m, 'editavel'=> false, 'autorizado' => false]);
+                }
+            }
+            $i++;
+        }
+
+        // Ordenando o nome da funcionalidade mostrado na tela em ordem alfabética.
+        array_multisort(array_column($permissoesArray, 'display'), SORT_ASC, $permissoesArray);
         $variaveis = (object) $this->variaveis;
+        
         return view('admin.crud.editar', compact('variaveis', 'permissoesArray', 'idperfil'));
     }
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizaStatic(['1']);
-        $permissoes = Permissao::all();
+        $this->autorizaStatic(['1']);
+
+        $permissoes = $this->permissaoRepository->getAll();
+
         foreach($permissoes as $permissao) {
-            $idpermissao = $permissao->idpermissao;
+            $idPermissao = $permissao->idpermissao;
             $cm = $permissao->controller.'_'.$permissao->metodo;
-            if(strpos($permissao->perfis, ','.$id.',') !== false || strpos($permissao->perfis, $id.',') === 0) {
+
+            if(in_array($id, explode(',',$permissao->perfis))) {
                 if($request->input($cm) !== 'on') {
-                    $permissaoSingle = Permissao::find($idpermissao);
-                    $perfisString = str_replace($id.',', '', $permissaoSingle->perfis);
-                    $permissaoSingle->perfis = $perfisString;
-                    $permissaoSingle->update();
+                    $this->permissaoRepository->removePerfisById($idPermissao, $id);
                 }
-            } else {
-                if($request->input($cm) === 'on') {
-                    $permissaoSingle = Permissao::find($idpermissao);
-                    $perfisString = $id.','.$permissaoSingle->perfis;
-                    $permissaoSingle->perfis = $perfisString;
-                    $permissaoSingle->update();
-                }
+            } elseif ($request->input($cm) === 'on') {
+                $this->permissaoRepository->addPerfisById($idPermissao, $id);              
             }
         }
+
         return redirect()->route('perfis.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Permissões atualizadas com sucesso!')
             ->with('class', 'alert-success');
@@ -156,12 +145,15 @@ class PerfilController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        ControleController::autorizaStatic(['1']);
-        $perfil = Perfil::findOrFail($id);
-        $delete = $perfil->delete();
+        $this->autorizaStatic(['1']);
+
+        $delete = $this->perfilRepository->destroy($id);
+        
         if(!$delete)
             abort(500);
-        event(new CrudEvent('perfil de usuário', 'apagou', $perfil->idperfil));
+
+        event(new CrudEvent('perfil de usuário', 'apagou', $id));
+        
         return redirect()->route('perfis.lista')
             ->with('message', '<i class="icon fa fa-ban"></i>Perfil deletado com sucesso!')
             ->with('class', 'alert-danger');
