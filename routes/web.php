@@ -2,10 +2,6 @@
 
 Route::get('/', 'SiteController@index')->name('site.home');
 
-Route::get('admin', function() {
-  return view('admin.home');
-});
-
 /*
  * ROTAS FECHADAS
  */

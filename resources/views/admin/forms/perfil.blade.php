@@ -13,225 +13,26 @@
                     <th>Criar</th>
                     <th>Editar</th>
                     <th>Apagar</th>
+                    <th>Show</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Usuários</td>
-                    @foreach($permissoesArray['UserController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Regionais</td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    @foreach($permissoesArray['RegionalController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Páginas</td>
-                    @foreach($permissoesArray['PaginaController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                </tr>
-                <tr>
-                    <td>Notícias</td>
-                    @foreach($permissoesArray['NoticiaController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                </tr>
-                <tr>
-                    <td>Cursos</td>
-                    @foreach($permissoesArray['CursoController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                </tr>
-                <tr>
-                    <td>Newsletter</td>
-                    @foreach($permissoesArray['NewsletterController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Imagens (Home)</td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    @foreach($permissoesArray['HomeImagemController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Cursos<br />(Inscritos)</td>
-                    @foreach($permissoesArray['CursoInscritoController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                </tr>
-                <tr>
-                    <td>B. de Oportunidades<br />(Empresas)</td>
-                    @foreach($permissoesArray['BdoEmpresaController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                </tr>
-                <tr>
-                    <td>B. de Oportunidades<br />(Oportunidades)</td>
-                    @foreach($permissoesArray['BdoOportunidadeController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                </tr>
-                <tr>
-                    <td>Agendamentos</td>
-                    @php
-                        $p = $permissoesArray['AgendamentoController'][0];
-                        $name = $p['controller'].'_'.$p['metodo'];
-                    @endphp
-                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                    @else
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                    @endif
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    @php
-                        $p = $permissoesArray['AgendamentoController'][1];
-                        $name = $p['controller'].'_'.$p['metodo'];
-                    @endphp
-                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                    @else
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                    @endif
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Agendamentos<br />(Bloqueios)</td>
-                    @foreach($permissoesArray['AgendamentoBloqueioController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                </tr>
-                <tr>
-                    <td>Representante - Cadastrados</td>
-                    @php
-                        $p = $permissoesArray['RepresentanteController'][0];
-                        $name = $p['controller'].'_'.$p['metodo'];
-                    @endphp
-                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                    @else
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                    @endif
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Representante - Endereços</td>
-                    @php
-                        $p = $permissoesArray['RepresentanteEnderecoController'][0];
-                        $name = $p['controller'].'_'.$p['metodo'];
-                    @endphp
-                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                    @else
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                    @endif
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                    @php
-                        $p = $permissoesArray['RepresentanteEnderecoController'][1];
-                        $name = $p['controller'].'_'.$p['metodo'];
-                    @endphp
-                    @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                    @else
-                        <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                    @endif
-                    <td><input type="checkbox" class="form-check-input" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Licitações</td>
-                    @foreach($permissoesArray['LicitacaoController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                </tr>
-                <tr>
-                    <td>Concursos</td>
-                    @foreach($permissoesArray['ConcursoController'] as $p)
-                    @php $name = $p['controller'].'_'.$p['metodo']; @endphp
-                        @if(strpos($p['perfis'], ','.$idperfil.',') !== false || strpos($p['perfis'], $idperfil.',') === 0)
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" checked /></td>
-                        @else
-                            <td><input type="checkbox" class="form-check-input" name="{{ $name }}" /></td>
-                        @endif
-                    @endforeach
-                </tr>
+                @foreach($permissoesArray as $controller)
+                    <tr>
+                        <td>{{ $controller['display'] }}</td>
+                            @foreach($controller['permissoes'] as $permissao)
+
+                                @if(!$permissao['editavel'])
+                                    <td><input type="checkbox" class="form-check-input" disabled /></td>
+                                @elseif($permissao['autorizado'])
+                                    <td><input type="checkbox" class="form-check-input" name="{{ $controller['controller'].'_'.$permissao['metodo'] }}" checked /></td>
+                                @else
+                                    <td><input type="checkbox" class="form-check-input" name="{{ $controller['controller'].'_'.$permissao['metodo'] }}" /></td>
+                                @endif
+
+                            @endforeach
+                    </tr>    
+                @endforeach
             </tbody>
         </table>
         @else
