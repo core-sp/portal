@@ -127,7 +127,7 @@ class BdoSiteController extends Controller
         $agradece .= '<br><br>';
         $agradece .= 'A(s) vaga(s) será(ão) disponibilizada(s) em até 03 (três) dias úteis, após a verificação dos dados informados.';
         $agradece .= '<br><br>';
-        $agradece .= 'Caso necessite mais esclarecimentos, entre em contato conosco através do email samuel.santos@core-sp.org.br.';
+        $agradece .= 'Caso necessite mais esclarecimentos, entre em contato conosco através do email informacoes@core-sp.org.br.';
         return $agradece;
     }
 
@@ -181,7 +181,7 @@ class BdoSiteController extends Controller
                 return redirect()
                     ->back()
                     ->with([
-                        'message' => 'A empresa informada <strong>já possui uma vaga sob análise ou em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do telefone <strong>(11) 3243-5523</strong> e/ou através do e-mail: <strong>samuel.santos@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.',
+                        'message' => 'A empresa informada <strong>já possui uma vaga sob análise ou em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do telefone <strong>(11) 3243-5523</strong> e/ou através do e-mail: <strong>informacoes@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.',
                         'class' => 'alert-danger'
                     ]);
             }
@@ -199,7 +199,7 @@ class BdoSiteController extends Controller
 
         event(new ExternoEvent($this->stringEvento($razaoSocial, $empresaEmail)));
 
-        Mail::to(['samuel.santos@core-sp.org.br', 'merielen.brito@corcesp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
+        Mail::to(['informacoes@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
         // Mail::to('desenvolvimento@core-sp.org.br')->queue(new AnunciarVagaMail($this->bodyEmail($this->idoportunidade)));
 
         return view('site.agradecimento')->with([
