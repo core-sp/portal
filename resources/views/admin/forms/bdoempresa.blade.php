@@ -1,11 +1,3 @@
-@php
-use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
-use \App\Http\Controllers\Helpers\BdoEmpresaControllerHelper;
-$status = BdoOportunidadeControllerHelper::status();
-$regioes = BdoOportunidadeControllerHelper::regioes();
-$capitais = BdoEmpresaControllerHelper::capitalSocial();
-@endphp
-
 <form role="form" method="POST">
     @csrf
     @if(isset($resultado))
@@ -61,7 +53,7 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
         <div class="col">
             <label for="segmento">Segmento</label>
             <select name="segmento" class="form-control" id="segmento">
-            @foreach(segmentos() as $segmento)
+            @foreach($segmentos as $segmento)
                 @if(!empty(old('segmento')))
                     @if(old('segmento') === $segmento)
                         <option value="{{ $segmento }}" selected>{{ $segmento }}</option>
@@ -141,11 +133,16 @@ $capitais = BdoEmpresaControllerHelper::capitalSocial();
         </div>
         <div class="form-group mt-2">
             <label for="descricao">Descrição</label>
-            <textarea class="form-control"
+            <textarea class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }}"
                 name="descricao"
                 id="descricao"
                 rows="5"
                 placeholder="Descrição da empresa">@if(!empty(old('descricao'))){{ old('descricao') }}@else @if(isset($resultado)){{ $resultado->descricao }}@endif @endif</textarea>
+                @if($errors->has('descricao'))
+                    <div class="invalid-feedback">
+                     {{ $errors->first('descricao') }}
+                    </div>
+                @endif
         </div>
         <h5 class="mt-4 mb-2">Informações da empresa</h5>
         <div class="form-row">

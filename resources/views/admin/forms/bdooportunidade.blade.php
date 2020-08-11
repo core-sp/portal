@@ -1,10 +1,4 @@
-@php
-use \App\Http\Controllers\Helper;
-use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
-$status = BdoOportunidadeControllerHelper::status();
-@endphp
-
-<form role="form" method="POST">
+<form role="form" method="POST" action="{{ !isset($resultado) ? route('bdooportunidades.store') : route('bdooportunidades.update', Request::route('id')) }}">
     @csrf
     @if(isset($resultado))
         @method('PUT')
@@ -45,14 +39,24 @@ $status = BdoOportunidadeControllerHelper::status();
             </div>
         </div>
         @php
-            isset($resultado->segmento) ? $seg = $resultado->segmento : $seg = $empresa->segmento;
+            if(isset($resultado->segmento)) {
+                $seg = $resultado->segmento;
+
+                if(!in_array($seg, $segmentos)) {
+                    array_push($segmentos, $seg);
+                }
+                
+            }
+            else {
+                $seg = $empresa->segmento;
+            }
         @endphp
         <div class="form-row mt-2">
             <div class="col">
                 <div class="row nomargin">
                     <label for="segmento">Segmento</label>
                     <select name="segmento" class="form-control" id="segmento">
-                    @foreach(segmentosWithAddons($seg) as $segmento)
+                    @foreach($segmentos as $segmento)
                         @if(!empty(old('segmento')))
                             @if(old('segmento') === $segmento)
                                 <option class="{{ $segmento }}" selected>{{ $segmento }}</option>
@@ -132,13 +136,13 @@ $status = BdoOportunidadeControllerHelper::status();
             </div>
             <div class="col">
                 <label for="regiaoatuacao">Região de Atuação</label>
-                <select name="regiaoatuacao[]" id="regiaoAtuacaoOportunidade" class="form-control" size="4" multiple>
+                <select name="regiaoatuacao[]" id="regiaoAtuacaoOportunidade" class="form-control {{ $errors->has('regiaoatuacao') ? 'is-invalid' : '' }}" size="4" multiple>
                 @foreach($regioes as $regiao)
                     @if(isset($resultado))
-                        @if($regioesEdit->contains('idregional',$regiao->idregional))
-                        <option value="{{ $regiao->idregional }}" selected>{{ $regiao->regional }}</option>
+                        @if(in_array($regiao->idregional, $regioesEdit))
+                            <option value="{{ $regiao->idregional }}" selected>{{ $regiao->regional }}</option>
                         @else
-                        <option value="{{ $regiao->idregional }}">{{ $regiao->regional }}</option>
+                            <option value="{{ $regiao->idregional }}">{{ $regiao->regional }}</option>
                         @endif
                     @else
                     <option value="{{ $regiao->idregional }}">{{ $regiao->regional }}</option>

@@ -7,11 +7,7 @@
 @section('content')
 
 @php
-use \App\Http\Controllers\Helpers\BdoOportunidadeControllerHelper;
-use \App\Http\Controllers\Helpers\BdoSiteControllerHelper;
-use \App\Http\Controllers\BdoSiteController;
-$segmentos = BdoOportunidadeControllerHelper::segmentos();
-$regionais = BdoSiteControllerHelper::regionais();
+use \App\BdoOportunidade;
 @endphp
 
 <section id="pagina-cabecalho">
@@ -84,7 +80,7 @@ $regionais = BdoSiteControllerHelper::regionais();
             </div>
             <div class="col align-self-end pesquisaLicitacao-btn">
               <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
-              <button type="reset" class="btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</button>
+              <a href="/balcao-de-oportunidades" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
             </div>
           </div>
           </div>
@@ -114,7 +110,7 @@ $regionais = BdoSiteControllerHelper::regionais();
                 @endif
                 &nbsp;&nbsp;&nbsp;
                 <i class="fas fa-map-marker-alt"></i>&nbsp;
-                {{ BdoOportunidadeControllerHelper::listRegioes($oportunidade->regiaoatuacao) }}
+                {{ $oportunidade->regiaoFormatada }}
                 &nbsp;&nbsp;&nbsp;
                 <i class="fas fa-suitcase"></i>&nbsp;
                 @if($oportunidade->vagasdisponiveis > 1)
@@ -155,8 +151,8 @@ $regionais = BdoSiteControllerHelper::regionais();
                     </div>
                     <div class="flex-one">
                       <p><strong>Segmento:</strong> {{ $oportunidade->segmento }}</p>
-                      <p><strong>Última atualização:</strong> {{ BdoOportunidadeControllerHelper::onlyDate($oportunidade->updated_at) }}</p>
-                      <p class="d-inline"><strong>Status:</strong> </p>{{ BdoSiteControllerHelper::btnStatus($oportunidade->status) }}
+                      <p><strong>Última atualização:</strong> {{ onlyDate($oportunidade->updated_at) }}</p>
+                      <p class="d-inline"><strong>Status:</strong> </p>{!! BdoOportunidade::statusDestacado($oportunidade->status) !!}
                     </div>
                   </div>
                 </div>
@@ -166,7 +162,7 @@ $regionais = BdoSiteControllerHelper::regionais();
             <div class="licitacao-grid-bottom">
               <div class="col nopadding">
                 <div class="text-right">
-                  <h6 class="light marrom"><strong>Data de inclusão da oportunidade:</strong> {{ BdoOportunidadeControllerHelper::onlyDate($oportunidade->datainicio) }}</h6>
+                  <h6 class="light marrom"><strong>Data de inclusão da oportunidade:</strong> {{ onlyDate($oportunidade->datainicio) }}</h6>
                 </div>
               </div>
             </div>

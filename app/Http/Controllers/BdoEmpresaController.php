@@ -2,146 +2,72 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\BdoEmpresaRequest;
+use App\Traits\ControleAcesso;
+use App\Repositories\BdoEmpresaRepository;
 use App\BdoEmpresa;
 use App\BdoOportunidade;
-use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
-use App\Rules\Cnpj;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoEmpresaController extends Controller
 {
+    use ControleAcesso; 
+
     // Nome da Classe
     private $class = 'BdoEmpresaController';
-    // Variáveis
-    public $variaveis = [
-        'singular' => 'empresa',
-        'singulariza' => 'a empresa',
-        'plural' => 'empresas',
-        'pluraliza' => 'empresas',
-        'titulo_criar' => 'Cadastrar nova empresa',
-        'form' => 'bdoempresa',
-        'btn_criar' => '<a href="/admin/bdo/empresas/criar" class="btn btn-primary mr-1">Nova Empresa</a>',
-        'busca' => 'bdo/empresas',
-        'slug' => 'bdo/empresas'
-    ];
+    private $bdoEmpresa;
+    private $bdoEmpresaRepository;
+    private $variaveis;
 
-    public function __construct()
+    public function __construct(BdoEmpresa $bdoEmpresa, BdoEmpresaRepository $bdoEmpresaRepository)
     {
         $this->middleware('auth', ['except' => ['show', 'apiGetEmpresa']]);
-    }
-
-    public function resultados()
-    {
-        $resultados = BdoEmpresa::orderBy('idempresa', 'DESC')->paginate(10);
-        return $resultados;
-    }
-
-    public function tabelaCompleta($resultados)
-    {
-        // Opções de cabeçalho da tabela
-        $headers = [
-            'Código',
-            'Segmento',
-            'Razão Social',
-            'Ações'
-        ];
-        // Opções de conteúdo da tabela
-        $contents = [];
-        foreach($resultados as $resultado) {
-            if(ControleController::mostra('BdoOportunidadeController', 'create'))
-                $acoes = '<a href="/admin/bdo/criar?empresa='.$resultado->idempresa.'" class="btn btn-sm btn-secondary">Nova Oportunidade</a> ';
-            else
-                $acoes = '';
-            if(ControleController::mostra($this->class, 'edit'))
-                $acoes .= '<a href="/admin/bdo/empresas/editar/'.$resultado->idempresa.'" class="btn btn-sm btn-primary">Editar</a> ';
-            if(ControleController::mostra($this->class, 'destroy')) {
-                $acoes .= '<form method="POST" action="/admin/bdo/empresas/apagar/'.$resultado->idempresa.'" class="d-inline">';
-                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-                $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a empresa?\')" />';
-                $acoes .= '</form>';
-            }
-            if(empty($acoes))
-                $acoes = '<i class="fas fa-lock text-muted"></i>';
-            $conteudo = [
-                $resultado->idempresa,
-                $resultado->segmento,
-                $resultado->razaosocial,
-                $acoes
-            ];
-            array_push($contents, $conteudo);
-        }
-        // Classes da tabela
-        $classes = [
-            'table',
-            'table-hover'
-        ];
-        // Monta e retorna tabela        
-        $tabela = CrudController::montaTabela($headers, $contents, $classes);
-        return $tabela;
-    }
-
-    protected function regras()
-    {
-        return [
-            'segmento' => 'max:191',
-            'cnpj' => ['required', 'max:191', new Cnpj],
-            'razaosocial' => 'required|max:191',
-            'capitalsocial' => 'max:191',
-            'endereco' => 'required|max:191',
-            'descricao' => 'required',
-            'email' => 'required|email|max:191',
-            'telefone' => 'required|max:191',
-            'site' => 'max:191',
-            'contatonome' => 'max:191',
-            'contatotelefone' => 'max:191',
-            'contatoemail' => 'email|max:191',
-        ];
-    }
-
-    protected function mensagens()
-    {
-        return [
-            'required' => 'O :attribute é obrigatório',
-            'cnpj.unique' => 'Já existe uma empresa cadastrada com este CNPJ',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'email' => 'Email inválido'
-        ];
+        $this->bdoEmpresa = $bdoEmpresa;
+        $this->bdoEmpresaRepository = $bdoEmpresaRepository;
+        $this->variaveis = $bdoEmpresa->variaveis();
     }
 
     public function index()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $resultados = $this->resultados();
-        $tabela = $this->tabelaCompleta($resultados);
-        if(!ControleController::mostra($this->class, 'create'))
+        $this->autoriza($this->class, __FUNCTION__);
+
+        if(!$this->mostra($this->class, 'create')) {
             unset($this->variaveis['btn_criar']);
+        }
+            
+        $resultados = $this->bdoEmpresaRepository->getToTable();
+        $tabela = $this->bdoEmpresa->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
+
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function create()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
+
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.criar', compact('variaveis'));
+        $capitais = $this->bdoEmpresa::capitalSocial();
+        $segmentos = $this->bdoEmpresa::segmentos();
+
+        return view('admin.crud.criar', compact('variaveis', 'capitais', 'segmentos'));
     }
 
-    public function store(Request $request)
+    public function store(BdoEmpresaRequest $request)
     {
-        ControleController::autoriza($this->class, 'create');
-        $regras = $this->regras();
-        array_push($regras['cnpj'], 'unique:bdo_empresas');
-        $erros = $request->validate($regras, $this->mensagens());
+        $this->autoriza($this->class, 'create');
 
-        $save = BdoEmpresa::create(request(['segmento', 'cnpj', 'razaosocial', 'fantasia', 'descricao', 'capitalsocial',
-        'endereco', 'site', 'email', 'telefone', 'contatonome', 'contatotelefone', 'contatoemail', 'idusuario']));
+        $request->validated();
 
-        if(!$save)
+        $save = $this->bdoEmpresaRepository->store($request->toModel());
+
+        if(!$save) {
             abort(500);
+        }
+            
         event(new CrudEvent('empresa (Balcão de Oportunidades)', 'criou', $save->idempresa));
+
         return redirect()->route('bdoempresas.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Empresa cadastrada com sucesso!')
             ->with('class', 'alert-success');
@@ -149,23 +75,30 @@ class BdoEmpresaController extends Controller
 
     public function edit($id)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = BdoEmpresa::findOrFail($id);
+        $this->autoriza($this->class, __FUNCTION__);
+
+        $resultado = $this->bdoEmpresaRepository->findOrFail($id);
         $variaveis = (object) $this->variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+        $capitais = $this->bdoEmpresa::capitalSocial();
+        $segmentos = $this->bdoEmpresa::segmentos();
+
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'capitais', 'segmentos'));
     }
 
-    public function update(Request $request, $id)
+    public function update(BdoEmpresaRequest $request, $id)
     {
-        ControleController::autoriza($this->class, 'edit');
-        $erros = $request->validate($this->regras(), $this->mensagens());
+        $this->autoriza($this->class, 'edit');
 
-        $update = BdoEmpresa::findOrFail($id)->update(request(['segmento', 'cnpj', 'razaosocial', 'fantasia', 'descricao', 'capitalsocial',
-        'endereco', 'site', 'email', 'telefone', 'contatonome', 'contatotelefone', 'contatoemail', 'idusuario']));
+        $request->validated();
+
+        $update = $this->bdoEmpresaRepository->update($id, $request->toModel());
         
-        if(!$update)
+        if(!$update) {
             abort(500);
+        }
+            
         event(new CrudEvent('empresa (Balcão de Oportunidades)', 'editou', $id));
+
         return redirect()->route('bdoempresas.lista')
             ->with('message', '<i class="icon fa fa-check"></i>Empresa editada com sucesso!')
             ->with('class', 'alert-success');
@@ -173,70 +106,71 @@ class BdoEmpresaController extends Controller
 
     public function destroy($id)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $empresa = BdoEmpresa::findOrFail($id);
-        $count = BdoOportunidade::where('idempresa',$id)->count();
-        if($count >= 1) {
+        $this->autoriza($this->class, __FUNCTION__);
+
+        $empresa = $this->bdoEmpresaRepository->getOportunidadesbyEmpresa($id);
+
+        if($empresa->oportunidade_count >= 1) {
             return redirect()->route('bdoempresas.lista')
-                ->with('message', '<i class="icon fa fa-ban"></i>Não é possível deletar empresas com oportunidades abertas!')
+                ->with('message', '<i class="icon fa fa-ban"></i>Não é possível apagar empresas com oportunidades!')
                 ->with('class', 'alert-danger');
-        } else {
-            $delete = $empresa->delete();
-            if(!$delete)
+        } 
+        else {
+            $delete = $this->bdoEmpresaRepository->destroy($id);
+
+            if(!$delete) {
                 abort(500);
+            }
+                
             event(new CrudEvent('empresa (Balcão de Oportunidades)', 'apagou', $empresa->idempresa));
+
             return redirect()->route('bdoempresas.lista')
                 ->with('message', '<i class="icon fa fa-ban"></i>Empresa deletada com sucesso!')
-                ->with('class', 'alert-danger');
+                ->with('class', 'alert-success');
         }
     }
 
     public function busca()
     {
-        ControleController::autoriza($this->class, 'index');
+        $this->autoriza($this->class, 'index');
+
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
-        $resultados = BdoEmpresa::where('segmento','LIKE','%'.$busca.'%')
-            ->orWhere('razaosocial','LIKE','%'.$busca.'%')
-            ->orWhere('cnpj','LIKE','%'.$busca.'%')
-            ->paginate(10);
-        $tabela = $this->tabelaCompleta($resultados);
+        $resultados = $this->bdoEmpresaRepository->busca($busca);
+        $tabela = $this->bdoEmpresa->tabelaCompleta($resultados);
+        
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 
+    /** Função usada por JQuery na tela de anúncio de vagas */
     public function apiGetEmpresa($cnpj)
     {
         $cnpj = preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj);
 
-        $empresa = BdoEmpresa::select('idempresa', 'cnpj', 'razaosocial', 'fantasia', 'telefone', 'segmento', 'endereco', 'site', 'email')
-            ->where('cnpj', '=', $cnpj)
-            ->first();
+        $empresa = $this->bdoEmpresaRepository->getToApi($cnpj);
 
-        isset($empresa) ? $count = $this->temOportunidade($empresa->idempresa) : $count = 0;
+        isset($empresa) ? $count = $empresa->oportunidade_count : $count = 0;
 
         if($count > 0) {
-            $message = 'A empresa informada <strong>já possui uma vaga em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do telefone <strong>(11) 3243-5523</strong> e/ou através do e-mail: <strong>informacoes@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.';
+            $message = 'A empresa informada <strong>já possui uma vaga sob análise ou em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do telefone <strong>(11) 3243-5523</strong> e/ou através do e-mail: <strong>informacoes@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.';
             $class = 'alert-warning';
-        } else {
+        } 
+        else {
             $message = 'Empresa já cadastrada. Favor seguir com o preenchimento da oportunidade abaixo.';
             $class = 'alert-success';
         }
 
         if(isset($empresa)) {
+            unset($empresa->oportunidade_count);
+
             return [
                 'empresa' => $empresa->toJson(),
                 'message' => $message,
                 'class' => $class
             ];
-        } else {
+        } 
+        else {
             abort(500);
         }
-    }
-
-    protected function temOportunidade($id)
-    {
-        return BdoOportunidade::where('idempresa', $id)
-            ->where('status', 'Em andamento')
-            ->count();
     }
 }

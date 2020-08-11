@@ -177,7 +177,7 @@ class RegionalTest extends TestCase
 
         $regional = factory('App\Regional')->create();
 
-        $this->get(route('regionais.busca', ['q' => $regional->reginoal]))
+        $this->get(route('regionais.busca', ['q' => $regional->regional]))
             ->assertSeeText($regional->regional);
     }
 
