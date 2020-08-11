@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 
 $factory->define(User::class, function (Faker $faker) {
     return [
-        'nome' => $faker->name,
+        'nome' => 'Usuário',
         'email' => $faker->unique()->safeEmail,
         'username' => $faker->userName,
         'email_verified_at' => now(),

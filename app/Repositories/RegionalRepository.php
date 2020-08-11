@@ -54,4 +54,9 @@ class RegionalRepository {
     {
         return Regional::find($id)->horariosDisponiveis($dia);
     }
+
+    public function getToOportunidade()
+    {
+        return Regional::select('idregional', 'regional')->get();
+    }
 }

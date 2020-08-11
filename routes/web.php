@@ -69,20 +69,20 @@ Route::prefix('admin')->group(function() {
   // Rota para Balcão de Oportunidades
   Route::prefix('bdo')->group(function(){
     Route::get('/', 'BdoOportunidadeController@index')->name('bdooportunidades.lista');
-    Route::get('/busca', 'BdoOportunidadeController@busca');
-    Route::get('/criar', 'BdoOportunidadeController@create');
-    Route::post('/criar', 'BdoOportunidadeController@store');
-    Route::get('/editar/{id}', 'BdoOportunidadeController@edit');
-    Route::put('/editar/{id}', 'BdoOportunidadeController@update');
-    Route::delete('/apagar/{id}', 'BdoOportunidadeController@destroy');
+    Route::get('/busca', 'BdoOportunidadeController@busca')->name('bdooportunidades.busca');
+    Route::get('/criar/{id}', 'BdoOportunidadeController@create')->name('bdooportunidades.create');
+    Route::post('/criar', 'BdoOportunidadeController@store')->name('bdooportunidades.store');
+    Route::get('/editar/{id}', 'BdoOportunidadeController@edit')->name('bdooportunidades.edit');
+    Route::put('/editar/{id}', 'BdoOportunidadeController@update')->name('bdooportunidades.update');
+    Route::delete('/apagar/{id}', 'BdoOportunidadeController@destroy')->name('bdooportunidades.destroy');
     // Lida com as empresas
     Route::get('/empresas', 'BdoEmpresaController@index')->name('bdoempresas.lista');
-    Route::get('/empresas/busca', 'BdoEmpresaController@busca');
-    Route::get('/empresas/criar', 'BdoEmpresaController@create');
-    Route::post('/empresas/criar', 'BdoEmpresaController@store');
-    Route::get('/empresas/editar/{id}', 'BdoEmpresaController@edit');
-    Route::put('/empresas/editar/{id}', 'BdoEmpresaController@update');
-    Route::delete('/empresas/apagar/{id}', 'BdoEmpresaController@destroy');
+    Route::get('/empresas/busca', 'BdoEmpresaController@busca')->name('bdoempresas.busca');
+    Route::get('/empresas/criar', 'BdoEmpresaController@create')->name('bdoempresas.create');
+    Route::post('/empresas/criar', 'BdoEmpresaController@store')->name('bdoempresas.store');
+    Route::get('/empresas/editar/{id}', 'BdoEmpresaController@edit')->name('bdoempresas.edit');
+    Route::put('/empresas/editar/{id}', 'BdoEmpresaController@update')->name('bdoempresas.update');
+    Route::delete('/empresas/apagar/{id}', 'BdoEmpresaController@destroy')->name('bdoempresas.destroy');
   });
 
   // Rota para Agendamentos
@@ -151,11 +151,11 @@ Route::prefix('/')->group(function() {
   require('site/cursos.php');
   
   //Balcão de Oportunidades
-  Route::get('balcao-de-oportunidades', 'BdoSiteController@index');
-  Route::get('balcao-de-oportunidades/busca', 'BdoSiteController@buscaOportunidades');
-  Route::get('anunciar-vaga', 'BdoSiteController@anunciarVagaView');
-  Route::post('anunciar-vaga', 'BdoSiteController@anunciarVaga');
-  Route::get('/info-empresa/{cnpj}', 'BdoEmpresaController@apiGetEmpresa');
+  Route::get('balcao-de-oportunidades', 'BdoSiteController@index')->name('bdosite.index');
+  Route::get('balcao-de-oportunidades/busca', 'BdoSiteController@buscaOportunidades')->name('bdosite.buscaOportunidades');
+  Route::get('anunciar-vaga', 'BdoSiteController@anunciarVagaView')->name('bdosite.anunciarVagaView');
+  Route::post('anunciar-vaga', 'BdoSiteController@anunciarVaga')->name('bdosite.anunciarVaga');
+  Route::get('/info-empresa/{cnpj}', 'BdoEmpresaController@apiGetEmpresa')->name('bdosite.apiGetEmpresa');
   
   // Busca geral
   Route::get('/busca', 'SiteController@busca');
