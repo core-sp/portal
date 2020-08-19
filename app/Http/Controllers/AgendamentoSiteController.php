@@ -2,232 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Agendamento;
-use App\Regional;
-use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
-use App\Http\Controllers\Helper;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\AgendamentoMailGuest;
-use App\Rules\Cpf;
-use App\Events\ExternoEvent;
-use App\Repositories\RegionalRepository;
-use Illuminate\Support\Facades\Request as IlluminateRequest;
-use Illuminate\Support\Facades\Validator;
 use Redirect;
+use App\Regional;
+use App\Rules\Cpf;
+use App\Agendamento;
+use App\Events\ExternoEvent;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Helper;
+use App\Mail\AgendamentoMailGuest;
+use Illuminate\Support\Facades\Mail;
+use App\Repositories\RegionalRepository;
+use Illuminate\Support\Facades\Validator;
+use App\Repositories\AgendamentoRepository;
+use App\Http\Requests\AgendamentoSiteRequest;
+use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
+use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 
 class AgendamentoSiteController extends Controller
 {
+    private $agendamentoRepository;
+    private $regionalRepository;
+
+    public function __construct(AgendamentoRepository $agendamentoRepository,RegionalRepository $regionalRepository) {
+        $this->agendamentoRepository = $agendamentoRepository;
+        $this->regionalRepository = $regionalRepository;
+    }
+
     public function formView()
     {
-        $regionais = Regional::all();
-        return view('site.agendamento', compact('regionais'));
-    }
+        $regionais = $this->regionalRepository->all();
+        $pessoas = Agendamento::pessoas();
+        $servicos = Agendamento::servicos();
 
-    public function permiteAgendamento($dia, $hora, $idregional)
-    {
-        // Conta o número de atendentes da seccional
-        $contagem = Regional::select('ageporhorario')
-            ->where('idregional',$idregional)
-            ->first()
-            ->ageporhorario;
-        $checaAgendamento = Agendamento::where('dia',$dia)
-            ->where('hora',$hora)
-            ->where('idregional',$idregional)
-            ->whereNull('status')
-            ->count();
-        if($contagem == 1) {
-            if($checaAgendamento < 1)
-                return true;
-            else
-                return false;
-        } elseif($contagem > 1) {
-            if($checaAgendamento < $contagem)
-                return true;
-            else
-                return false;
-        } elseif($contagem < 1) {
-            return false;
-        }
-    }
-
-    public function checaHorariosDisponiveis($dia, $idregional)
-    {
-        $agendamentos = Agendamento::where('dia',$dia)
-            ->where('idregional',$idregional)
-            ->whereNull('status')
-            ->get();
-        $horarios = [];
-        $contagem = Regional::select('ageporhorario')->where('idregional',$idregional)->first()->ageporhorario;
-        if($contagem >= 1) {
-            foreach($agendamentos as $agendamento) {
-                array_push($horarios,$agendamento->hora);
-            }
-            return $horarios;
-        }
-    }
-
-    public function checaHorarios()
-    {
-        $idregional = $_POST['idregional'];
-        $dia = $_POST['dia'];
-        $dia = str_replace('/', '-', $_POST['dia']);
-        $dia = date('Y-m-d', strtotime($dia));
-        $horarios = (new RegionalRepository)->getHorariosAgendamento($idregional, $dia);
-        // Checa pela contagem
-        $contagem = Regional::select('ageporhorario')->where('idregional',$idregional)->first()->ageporhorario;
-        if($contagem == 1) {
-            $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
-            $horariosPossiveis = array_diff($horarios, $horariosJaMarcados);
-            foreach($horariosPossiveis as $h) {
-                echo "<option value='".$h."'>".$h."</option>";
-            }
-            return $horariosPossiveis;
-        } elseif($contagem > 1) {
-            $horariosJaMarcados = $this->checaHorariosDisponiveis($dia,$idregional);
-            $valores = array_count_values($horariosJaMarcados);
-            $horariosJaCheios = [];
-            foreach($valores as $chave => $numero) {
-                if($numero >= $contagem)
-                    array_push($horariosJaCheios, $chave);
-            }
-            $horariosPossiveis = array_diff($horarios, $horariosJaCheios);
-            foreach($horariosPossiveis as $h) {
-                echo "<option value='".$h."'>".$h."</option>";
-            }
-            return $horariosPossiveis;
-        } elseif($contagem < 1) {
-            $horarios = AgendamentoControllerHelper::todasHoras();
-            return $horarios;
-            // return null;
-        } else {
-            foreach($horarios as $h) {
-                echo "<option value='".$h."'>".$h."</option>";
-            }
-            return $horarios;
-        }
-    }
-
-    protected function bloqueioPorFalta($cpf)
-    {
-        $count = Agendamento::where('cpf',$cpf)
-            ->where('status', 'Não Compareceu')
-            ->count();
-        if($count >= 3)
-            return true;
-    }
-
-    public function store(Request $request)
-    {
-        $regras = [
-            'nome' => 'required|max:191',
-            'cpf' => ['required', 'max:191', new Cpf],
-            'email' => 'required|email|max:191',
-            'celular' => 'max:191|min:14',
-            'dia' => 'required',
-            'hora' => 'required|max:191',
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'dia.required' => 'Informe o dia do atendimento',
-            'hora.required' => 'Informe o horário do atendimento',
-            'email' => 'Email inválido',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'celular.min' => 'Número inválido'
-        ];
-        $validation = Validator::make($request->all(), $regras, $mensagens);
-        if($validation->fails()) {
-            return Redirect::back()->withErrors($validation)->withInput($request->all());
-        }
-        // Organiza dados de dia e hora
-        $regional = $request->input('idregional');
-        $dia_inalterado = $request->input('dia');
-        $dia = str_replace('/', '-', $request->input('dia'));
-        $dia = date('Y-m-d', strtotime($dia));
-        $diaAtual = date('Y-m-d');
-        if(!preg_match('/^[0-9-]+$/', $dia))
-            abort(500);
-        if($dia <= $diaAtual) 
-            abort(500);
-        $hora = $request->input('hora');
-        $cpf = $request->input('cpf');
-        if(!$this->permiteAgendamento($dia, $hora, $regional))
-            abort(500);
-        // Limita em até dois atendimentos por CPF por dia
-        if(!$this->limiteCpf($dia, $cpf))
-            abort(500, 'É permitido apenas 2 agendamentos por CPF por dia!');
-        // Cria bloqueio caso o usuário tenha faltado 3 vezes
-        if($this->bloqueioPorFalta($cpf))
-            abort(405, 'Agendamento bloqueado por excesso de falta. Favor entrar em contato com o Core-SP para regularizar o agendamento.');
-        // Monta a string de tipo de serviço
-        $tiposervico = $request->input('servico').' para '.$request->input('pessoa');
-        // Gera a HASH (protocolo) aleatória
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
-        do {
-            $random = substr(str_shuffle($characters), 0, 6);
-            $random = 'AGE-'.$random;
-            $checaProtocolo = Agendamento::where('protocolo',$random)->get();
-        } while(!$checaProtocolo->isEmpty()); 
-        $emailUser = $request->input('email');
-        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
-        //Inputa os dados
-        $agendamento = new Agendamento();
-        $agendamento->nome = $nomeUser;
-        $agendamento->cpf = $cpf;
-        $agendamento->email = $emailUser;
-        $agendamento->celular = $request->input('celular');
-        $agendamento->dia = $dia;
-        $agendamento->hora = $hora;
-        $agendamento->protocolo = $random;
-        $agendamento->tiposervico = $tiposervico;
-        $agendamento->idregional = $regional;
-        $save = $agendamento->save();
-        if(!$save)
-            abort(500);
-        // Gera evento de agendamento
-        $string = $nomeUser." (CPF: ".$cpf.")";
-        $string .= " *agendou* atendimento em *".$agendamento->regional->regional;
-        $string .= "* no dia ".$dia_inalterado;
-        event(new ExternoEvent($string));
-        // Gera mensagem de agradecimento
-        $agradece = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
-        $agradece .= "<br>";
-        $agradece .= "Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência e com o número de protocolo em mãos.";
-        $agradece .= "<br><br>";
-        $agradece .= "<strong>Protocolo:</strong> ".$random;
-        $agradece .= "<br><br>";
-        $agradece .= "<strong>Detalhes do agendamento</strong><br>";
-        $agradece .= "Nome: ".$nomeUser."<br>";
-        $agradece .= "CPF: ".$cpf."<br>";
-        $agradece .= "Dia: ".$dia_inalterado."<br>";
-        $agradece .= "Horário: ".$agendamento->hora."<br>";
-        $agradece .= "Cidade: ".$agendamento->regional->regional."<br>";
-        $agradece .= "Endereço: ".$agendamento->regional->endereco.", ".$agendamento->regional->numero;
-        $agradece .= " - ".$agendamento->regional->complemento."<br>";
-        $agradece .= "Serviço: ".$tiposervico.'<br>';
-        $adendo = '<i>* As informações serão enviadas ao email cadastrado no formulário</i>';
-        // Texto suplementar ao email de Agendamento
-        // $sup = AgendamentoControllerHelper::textoSuplementarMail();
-        $body = $agradece;
-        Mail::to($emailUser)->queue(new AgendamentoMailGuest($body));
-
-        // Retorna view de agradecimento
-        return view('site.agradecimento')->with([
-            'agradece' => $agradece,
-            'adendo' => $adendo
-        ]);
-    }
-
-    public function limiteCPF($dia, $cpf)
-    {
-        $count = Agendamento::where('dia',$dia)
-            ->where('cpf',$cpf)
-            ->whereNull('status')
-            ->count();
-        if($count >= 2)
-            return false;
-        else
-            return true;
+        return view('site.agendamento', compact('regionais', 'pessoas', 'servicos'));
     }
 
     public function consultaView()
@@ -238,59 +46,203 @@ class AgendamentoSiteController extends Controller
     public function consulta()
     {
         $protocolo = IlluminateRequest::input('protocolo');
-        if (!empty($protocolo)){
+
+        if (!empty($protocolo)) {
             $busca = true;
-        } else {
+        } 
+        else {
             $busca = false;
         }
-        $now = date('Y-m-d');
+
         $protocolo = 'AGE-'.$protocolo;
-        $resultado = Agendamento::where('protocolo','LIKE',$protocolo)
-            ->where('dia','>=',$now)
-            ->first();
+        
+        $resultado = $this->agendamentoRepository->getToConsulta($protocolo);
+
         return view('site.agendamento-consulta', compact('resultado', 'busca'));
     }
 
-    public function cancelamento(Request $request)
+    public function store(AgendamentoSiteRequest $request)
     {
-        $id = $request->input('idagendamento');
-        $cpf = $request->input('cpf');
-        $protocolo = $request->input('protocolo');
-        // Define as regras de validação
-        $regras = [
-            'cpf' => 'required|max:191'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
-        //Chama o banco
-        $agendamento = Agendamento::findOrFail($id);
-        if($agendamento->cpf != $cpf){
+        $request->validated();
+
+        // Trabalhando com o formato de data Y-m-d por questões de padronização no banco de dados
+        $dia = date('Y-m-d', strtotime(str_replace('/', '-', $request->dia)));
+        $diaAtual =  date('Y-m-d');
+        
+        // Validação para evitar agendamento no passado
+        if($dia <= $diaAtual) {
+            abort(500, 'Não é permitido criar agendamento no passado.');
+        }
+
+        // Validação se regional está aceitando agendamentos
+        if(!$this->permiteAgendamento($dia, $request->hora, $request->idregional)) {
+            abort(500);
+        }
+           
+        // Limita em até dois agendamentos por CPF por dia
+        if($this->limiteCpf($dia, $request->cpf)) {
+            abort(500, 'É permitido apenas 2 agendamentos por CPF por dia!');
+        }
+            
+        // Cria bloqueio caso o usuário tenha faltado 3 vezes nos últimos 90 dias
+        if($this->bloqueioPorFalta($request->cpf)) {
+            abort(405, 'Agendamento bloqueado por excesso de falta nos últimos 90 dias. Favor entrar em contato com o Core-SP para regularizar o agendamento.');
+        }
+        
+        // Gera a HASH (protocolo) aleatória
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
+        do {
+            $protocoloGerado = substr(str_shuffle($characters), 0, 6);
+            $protocoloGerado = 'AGE-'.$protocoloGerado;
+            $countProtocolo = $this->agendamentoRepository->checkProtocol($protocoloGerado);
+        } while($countProtocolo != 0);
+
+        $request->protocolo = $protocoloGerado;
+
+        $save = $this->agendamentoRepository->store($request->toModel());
+        
+        if(!$save) {
+            abort(500);
+        }
+            
+        // Gera evento de agendamento
+        $string = $save->nome . " (CPF: " . $save->cpf . ")";
+        $string .= " *agendou* atendimento em *" . $save->regional->regional;
+        $string .= "* no dia " . onlyDate($save->dia);
+        event(new ExternoEvent($string));
+        
+        // Enviando email de agendamento
+        $email = new AgendamentoMailGuest($save);
+        Mail::to($save->email)->queue($email);
+
+        // Reaproveita o corpo do email para mostrar na tela de agradecimento
+        $agradece = $email->body;
+        $adendo = '<i>* As informações serão enviadas ao email cadastrado no formulário</i>';
+
+        // Retorna view de agradecimento
+        return view('site.agradecimento')->with([
+            'agradece' => $agradece,
+            'adendo' => $adendo
+        ]);
+    }
+
+    public function cancelamento(AgendamentoSiteCancelamentoRequest $request)
+    {
+        $request->validated();
+
+        $agendamento = $this->agendamentoRepository->getById($request->idagendamento);
+
+        // Checagem se o CPF do Agendamentoé o mesmo fornecido, caso não seja, é retornada uma mensagem de erro
+        if($agendamento->cpf != $request->cpf) {
             return redirect('/agendamento-consulta')
                 ->with('message', '<i class="icon fa fa-ban"></i>O CPF informado não corresponde ao protocolo. Por favor, pesquise novamente o agendamento')
                 ->with('class', 'alert-danger');
-        } else {
+        } 
+        else {
             $now = date('Y-m-d');
+
+            // Agendamento deve ser cancelado com antecedência, não é permitido cancelar no mesmo dia do Agendamento
             if($now < $agendamento->dia) {
-                $agendamento->status = "Cancelado";
-                $update = $agendamento->update();
-                if(!$update)
+                $update = $this->agendamentoRepository->update($agendamento->idagendamento, ['status' => Agendamento::$status_cancelado], $agendamento);
+
+                if(!$update) {
                     abort(500);
+                }
+                    
                 // Gera evento de agendamento
-                $string = $agendamento->nome." (CPF: ".$agendamento->cpf.")";
-                $string .= " *cancelou* atendimento em *".$agendamento->regional->regional;
-                $string .= "* no dia ".Helper::onlyDate($agendamento->dia);
+                $string = $agendamento->nome . " (CPF: " . $agendamento->cpf . ")";
+                $string .= " *cancelou* atendimento em *" . $agendamento->regional->regional;
+                $string .= "* no dia " . onlyDate($agendamento->dia);
                 event(new ExternoEvent($string));
+
                 // Gera mensagem de agradecimento
                 $agradece = "Agendamento cancelado com sucesso!";
+
                 return view('site.agradecimento')->with('agradece', $agradece);
-            } else {
+            } 
+            // Caso cancelamento seja no mesmo dia, uma mensagem de erro é retornada
+            else {
                 return redirect('/agendamento-consulta')
                     ->with('message', '<i class="icon fa fa-ban"></i>Não é possível cancelar o agendamento no dia do atendimento')
                     ->with('class', 'alert-danger');
             }
         }
+    }
+
+    public function permiteAgendamento($dia, $hora, $idregional)
+    {
+        // Recupera os agendamentos de acordo com dia/horário/regional
+        $agendamentos = $this->agendamentoRepository->getAgendamentoPendeteByDiaHoraRegional($dia, $hora, $idregional);
+
+        // Se contagem for zero, não há nenhum agendamento no dado dia/horário/regional
+        if($agendamentos->count() == 0) {
+
+            // Não tendo nenhum agendamento, é necessário realizar uma query para verificar o número de agendamentos por horário da regional
+            // Se o número de agendamentos por horário da regional for maior que zero, um agendamento pode ser criado, caso contrário não
+            return $this->regionalRepository->getAgeporhorarioById($idregional) > 0;
+        }
+        else {
+
+            // A query do agendamento traz junto informação de sua região. Com isso verificamos se a contagem de agendamento no dado dia/horário/regional
+            // é menor que o número de agendamentos por horário da regional, se sim o agendamento pode ser criado, caso contrário não       
+            return $agendamentos->count() < $agendamentos->first()->regional->ageporhorario;
+        }
+    }
+
+    protected function bloqueioPorFalta($cpf)
+    {
+        return $this->agendamentoRepository->getCountAgendamentoNaoCompareceuByCpf($cpf) >= 3;
+    }
+
+    public function limiteCPF($dia, $cpf)
+    {
+        return $this->agendamentoRepository->getCountAgendamentoPendenteByCpfDay($dia, $cpf) >= 2;
+    }
+
+    public function checaHorariosMarcados($dia, $idregional)
+    {
+        $agendamentos = $this->agendamentoRepository->getAgendamentoPendenteByDiaRegional($dia, $idregional);
+        $horariosMarcados = [];
+
+        // Caso exista algum horário já agendado no dia e a regional permita agendamentos, montamos um array com todos os horários marcados
+        if($agendamentos->count() > 0) {
+            $agedamentoPorHorario = $agendamentos->first()->regional->ageporhorario;
+
+            if($agedamentoPorHorario >= 1) {
+                foreach($agendamentos as $agendamento) {
+                    array_push($horariosMarcados,$agendamento->hora);
+                }
+            }
+        }
+ 
+        return $horariosMarcados;
+    }
+
+    public function checaHorarios(Request $request)
+    {
+        $idregional = $request->idregional;
+        $dia = date('Y-m-d', strtotime(str_replace('/', '-', $request->dia)));
+        $horarios = [];
+
+        // Recupera quantos agendamentos podem ser criados por horário de acordo com a regional
+        $agedamentoPorHorario = $this->regionalRepository->getAgeporhorarioById($idregional);
+
+        // Se podemos criar agendamentos, contamos quantos agendamentos já estão marcados por horário.
+        if($agedamentoPorHorario > 0) {
+            $horarios = $this->regionalRepository->getHorariosAgendamento($idregional, $dia);
+            $horariosMarcados = $this->checaHorariosMarcados($dia,$idregional);
+            $contagemAgendamentosMarcados = array_count_values($horariosMarcados);
+
+            foreach($contagemAgendamentosMarcados as $hora => $contagem) {
+                
+                // Caso a contagem de agendamentos marcados por horário seja maior ou igual ao agendamento por horário da regional
+                // o horário em questão deve ser removido da lista de horários disponíveis
+                if($contagem >= $agedamentoPorHorario) {
+                    unset($horarios[array_search($hora, $horarios)]);
+                }
+            }
+        }
+
+        return response()->json($horarios);
     }
 }

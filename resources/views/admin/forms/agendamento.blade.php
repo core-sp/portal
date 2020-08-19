@@ -1,13 +1,9 @@
 @php
-    use App\Http\Controllers\Helper;
-    $status = App\Http\Controllers\Helpers\AgendamentoControllerHelper::status();
-    use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
     $now = date('Y-m-d');
-    $servicos = App\Http\Controllers\Helpers\AgendamentoControllerHelper::servicosCompletos();
 @endphp
 <div class="card-body pt-3 pl-3">
     <div class="col">
-        {{ AgendamentoControllerHelper::txtAgendamento($resultado->dia, $resultado->hora, $resultado->status, $resultado->protocolo, $resultado->idagendamento) }}
+        {!! $variaveis->mensagem_agendamento !!}
     </div>
 </div>
 <hr class="mb-0 mt-0">
@@ -30,7 +26,7 @@
                         @endif
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                    readonly
+                        readonly
                     @endif
                     />
                 @if($errors->has('nome'))
@@ -53,13 +49,13 @@
                         @endif
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                    readonly
+                        readonly
                     @endif
                     />
                 @if($errors->has('email'))
-                <div class="invalid-feedback">
-                {{ $errors->first('email') }}
-                </div>
+                    <div class="invalid-feedback">
+                        {{ $errors->first('email') }}
+                    </div>
                 @endif
             </div>
         </div>
@@ -78,13 +74,13 @@
                         @endif
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                    readonly
+                        readonly
                     @endif
                     />
                 @if($errors->has('cpf'))
-                <div class="invalid-feedback">
-                {{ $errors->first('cpf') }}
-                </div>
+                    <div class="invalid-feedback">
+                        {{ $errors->first('cpf') }}
+                    </div>
                 @endif
             </div>
             <div class="col">
@@ -101,7 +97,7 @@
                         @endif
                     @endif
                     @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                    readonly
+                        readonly
                     @endif
                     />
                 @if($errors->has('celular'))
@@ -165,29 +161,20 @@
         <div class="form-row mt-2">
             <div class="col">
                 <label for="idregional">Regional</label>
-                <select name="idregional"
+                <input type="text" name="idregional"
                     class="form-control"
                     readonly
-                    />
-                @foreach($regionais as $regional)
                     @if(isset($resultado))
-                        @if($resultado->idregional == $regional->idregional)
-                        <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
-                        @else
-                        <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                        @endif
-                    @else
-                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                        value="{{ $resultado->regional->regional }}"
                     @endif
-                @endforeach
-                </select>
+                    />
             </div>
             <div class="col">
                 <label for="atendente">Atendimento realizado por:</label>
                 <select name="idusuario"
                     class="form-control {{ $errors->has('idusuario') ? 'is-invalid' : '' }}"
                     @if($now < $resultado->dia)
-                    disabled
+                        disabled
                     @endif
                     />
                     <option value="">Ninguém</option>
@@ -219,7 +206,7 @@
             </div>
         </div>
         <div class="form-row mt-4">
-            <i>* Atendimento agendado pelo usuário no dia {{ Helper::onlyDate($resultado->created_at) }}.</i>
+            <i>* Atendimento agendado pelo usuário no dia {{ onlyDate($resultado->created_at) }}.</i>
         </div>
         @if($now < $resultado->dia || $resultado->status !== 'Cancelado')
         <div class="form-row mb-2">

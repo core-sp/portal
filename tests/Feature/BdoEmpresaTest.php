@@ -93,7 +93,7 @@ class BdoEmpresaTest extends TestCase
     */
     public function non_authorized_users_cannot_update_bdoempresa()
     {
-        $user = $this->signIn();
+        $this->signIn();
 
         $bdoEmpresa = factory('App\BdoEmpresa')->create();
         $bdoEmpresa->endereco = 'Novo Endereço';
@@ -156,7 +156,7 @@ class BdoEmpresaTest extends TestCase
     */
     public function authorized_users_can_update_bdoempresa()
     {
-        $user = $this->signInAsAdmin();
+        $this->signInAsAdmin();
 
         $bdoEmpresa = factory('App\BdoEmpresa')->create();
         $bdoEmpresa->endereco = 'Novo Endereço';

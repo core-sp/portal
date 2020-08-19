@@ -2,10 +2,6 @@
 
 @section('content')
 
-@php
-  use App\Http\Controllers\Helper;
-@endphp
-
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/cursos.png') }}" />
@@ -85,7 +81,7 @@
         <strong>Agendamento encontrado!</strong><br /><br/>
         <strong>Protocolo:</strong> {{ $resultado->protocolo }}<br />
         <strong>Nome:</strong> {{ $resultado->nome }}<br />
-        <strong>Dia:</strong> {{ Helper::onlyDate($resultado->dia) }}<br />
+        <strong>Dia:</strong> {{ onlyDate($resultado->dia) }}<br />
         <strong>Horário:</strong> {{ $resultado->hora }}<br />
         <strong>Cidade:</strong> {{ $resultado->regional->regional }}<br />
         <strong>Endereço:</strong> {{ $resultado->regional->endereco }}, {{ $resultado->regional->numero }} - {{ $resultado->regional->complemento }}<br />

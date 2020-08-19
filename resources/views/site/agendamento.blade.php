@@ -2,12 +2,6 @@
 
 @section('content')
 
-@php
-use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
-$servicos = AgendamentoControllerHelper::servicos();
-$pessoas = AgendamentoControllerHelper::pessoas();
-@endphp
-
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/cursos.png') }}" />
@@ -210,6 +204,7 @@ $pessoas = AgendamentoControllerHelper::pessoas();
       </div>
     </div>
   </div>
+  <div id="dialog_agendamento" title="Atenção"></div>
 </section>
 
 @endsection

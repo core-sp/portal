@@ -63,7 +63,7 @@ class RegionalTest extends TestCase
         $this->signInAsAdmin();
 
         $regional = factory('App\Regional')->create();
-        $attributes = factory('App\Regional')->raw();
+        $attributes = factory('App\Regional')->raw(['horariosage' => ['20:00', '21:00']]);
 
         $this->get(route('regionais.edit', $regional->idregional));
         $this->patch(route('regionais.update', $regional->idregional), $attributes);
@@ -77,7 +77,7 @@ class RegionalTest extends TestCase
         $user = $this->signInAsAdmin();
 
         $regional = factory('App\Regional')->create();
-        $attributes = factory('App\Regional')->raw();
+        $attributes = factory('App\Regional')->raw(['horariosage' => ['20:00', '21:00']]);
 
         $this->patch(route('regionais.update', $regional->idregional), $attributes);
         $log = tailCustom(storage_path($this->pathLogInterno()));

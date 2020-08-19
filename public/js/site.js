@@ -327,7 +327,7 @@ function noWeekendsOrHolidays(date) {
 					"idregional": $('#idregional').val(),
 					"dia": $('#datepicker').val()
 				},
-				dataType: 'HTML',
+				dataType: 'json',
 				url: "/checa-horarios",
 				beforeSend: function(){
 					$('#loadImage').show();
@@ -336,9 +336,17 @@ function noWeekendsOrHolidays(date) {
 					$('#loadImage').hide();
 				},
 				success: function(response) {
-					if (response !== "[]") {
-						$('#horarios').html(response);
-					} else {
+					if (!jQuery.isEmptyObject(response)) {
+						$('#horarios').empty();
+
+						$.each(response, function(i, horario) {
+							$('#horarios').append($('<option>', { 
+								value: horario,
+								text : horario 
+							}));
+						});
+					} 
+					else {
 						$('#horarios')
 							.find('option')
 							.remove()
@@ -351,7 +359,21 @@ function noWeekendsOrHolidays(date) {
 						.find('option')
 						.remove()
 						.end()
-						.append('<option value="" disabled selected>Nenhum horário disponível</option>');
+						.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
+
+					$("#dialog_agendamento")
+						.empty()
+						.append("Falha ao recuperar horários disponíveis. <br> Por favor recarregue a página ou tente mais tarde.");
+						
+					$("#dialog_agendamento").dialog({
+						draggable: false,
+						buttons: [{
+							text: "Recarregar",
+							click: function() {
+								location.reload(true);
+							}
+						}]	
+					});
 				}
 			});
 		});
@@ -361,27 +383,27 @@ function noWeekendsOrHolidays(date) {
 			}
 		});
 		// Muda Status agendamento no ADMIN
-		$('#btnSubmit').on('click', function(e){
-			e.preventDefault();
-			e.stopImmediatePropagation();
-			$.ajax({
-				url: $(this).attr('action'),
-				method: "POST",
-				data: {
-					"_method": $('#method').val(),
-					"_token": $('#tokenStatusAgendamento').val(),
-					"idagendamento": $('#idagendamento').val(),
-					"status": $('#status').val()
-				},
-				dataType: "html",
-				success: function(response) {
-					console.log(response);
-				},
-				error: function (jXHR, textStatus, errorThrown) {
-					alert(errorThrown);
-				}
-			});
-		});
+		// $('#btnSubmit').on('click', function(e){
+		// 	e.preventDefault();
+		// 	e.stopImmediatePropagation();
+		// 	$.ajax({
+		// 		url: $(this).attr('action'),
+		// 		method: "POST",
+		// 		data: {
+		// 			"_method": $('#method').val(),
+		// 			"_token": $('#tokenStatusAgendamento').val(),
+		// 			"idagendamento": $('#idagendamento').val(),
+		// 			"status": $('#status').val()
+		// 		},
+		// 		dataType: "html",
+		// 		success: function(response) {
+		// 			console.log(response);
+		// 		},
+		// 		error: function (jXHR, textStatus, errorThrown) {
+		// 			alert(errorThrown);
+		// 		}
+		// 	});
+		// });
 		// Switch para máscaras de contato Gerenti
 		function switchMascaras(conteudo, id)
 		{

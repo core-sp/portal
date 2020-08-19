@@ -2,318 +2,455 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Agendamento;
-use App\Regional;
 use App\User;
-use App\Http\Controllers\Helper;
-use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
-use App\Http\Controllers\ControleController;
+use App\Regional;
+use App\Agendamento;
+use App\Events\CrudEvent;
+use App\Traits\TabelaAdmin;
+use Illuminate\Http\Request;
+use App\Traits\ControleAcesso;
+use App\Mail\AgendamentoMailGuest;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\AgendamentoMailGuest;
-use App\Events\CrudEvent;
+use App\Repositories\RegionalRepository;
+use App\Repositories\AgendamentoRepository;
+use App\Http\Requests\AgendamentoUpdateRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoController extends Controller
 {
+    use ControleAcesso, TabelaAdmin;
+
     // Nome da classe
     private $class = 'AgendamentoController';
-    // Variáveis extras da página
-    public $variaveis = [
+    private $agendamentoRepository;
+    private $regionalRepository;
+    private $userRepository;
+
+    // Variáveis para páginas no Admin
+    private $agendamentoVariaveis = [
         'singular' => 'agendamento',
         'singulariza' => 'o agendamento',
         'plural' => 'agendamentos',
         'pluraliza' => 'agendamentos'
     ];
 
-    public function __construct()
+    public function __construct(AgendamentoRepository $agendamentoRepository, RegionalRepository $regionalRepository, UserRepository $userRepository)
     {
         $this->middleware('auth');
-    }
-
-    public function resultados($idregional = null)
-    {
-        $date = new \DateTime();
-        $dia = $date->format('Y-m-d');
-        if($idregional !== '999') {
-            $resultados = Agendamento::where('dia','=',$dia)
-                ->where('idregional',$idregional)
-                ->orderBy('dia','ASC')
-                ->orderBy('hora','ASC')
-                ->paginate(25);
-        } else {
-            $resultados = Agendamento::where('dia','=',$dia)
-                ->orderBy('dia','ASC')
-                ->orderBy('hora','ASC')
-                ->paginate(25);
-        }
-        return $resultados;
-    }
-
-    public function checaFiltros()
-    {
-        ControleController::autoriza($this->class, 'index');
-        if(IlluminateRequest::has('mindia')) {
-            if(!empty(IlluminateRequest::input('mindia'))) {
-                $mindia = IlluminateRequest::input('mindia');
-                $replace = str_replace('/','-',$mindia);
-                $mindia = new \DateTime($replace);
-                $mindia = $mindia->format('Y-m-d');
-            } else {
-                $date = new \DateTime();
-                $mindia = $date->format('Y-m-d');
-            }
-        } else {
-            $date = new \DateTime();
-            $mindia = $date->format('Y-m-d');
-        }
-        if(IlluminateRequest::has('maxdia')) {
-            if(!empty(IlluminateRequest::input('maxdia'))) {
-                $maxdia = IlluminateRequest::input('maxdia');
-                $replace = str_replace('/','-',$maxdia);
-                $maxdia = new \DateTime($replace);
-                $maxdia = $maxdia->format('Y-m-d');
-            } else {
-                $date = new \DateTime();
-                $maxdia = $date->format('Y-m-d');
-            }
-        } else {
-            $date = new \DateTime();
-            $maxdia = $date->format('Y-m-d');
-        }
-        if(IlluminateRequest::has('regional')) {
-            if(IlluminateRequest::input('regional') !== '999') {
-                $regional = IlluminateRequest::input('regional');
-            } else {
-                $regional = '';
-            }
-        } else {
-            $regional = Regional::select('idregional')->find(Auth::user()->idregional);
-            $regional = $regional->idregional;
-        }
-        if(IlluminateRequest::has('status')) {
-            if(!empty(IlluminateRequest::input('status'))) {
-                $status = IlluminateRequest::input('status');
-                if($status === 'Qualquer') {
-                    $status = null;
-                }
-            } else {
-                $status = '';
-            }
-        } else {
-            $status = '';
-        }
-        // Puxa os resultados
-        if(isset($status)) {
-            if(empty($regional)) {
-                $resultados = Agendamento::where('idregional','LIKE','%%')
-                    ->where('status','LIKE',$status)
-                    ->whereBetween('dia',[$mindia,$maxdia])
-                    ->orderBy('idregional','ASC')
-                    ->orderBy('dia','DESC')
-                    ->orderBy('hora','ASC')
-                    ->limit(50)
-                    ->paginate(25);
-            } else {
-                $resultados = Agendamento::where('idregional','LIKE',$regional)
-                    ->where('status','LIKE',$status)
-                    ->whereBetween('dia',[$mindia,$maxdia])
-                    ->orderBy('idregional','ASC')
-                    ->orderBy('dia','DESC')
-                    ->orderBy('hora','ASC')
-                    ->limit(50)
-                    ->paginate(25);
-            }    
-        } else {
-            if(empty($regional)) {
-                $resultados = Agendamento::where('idregional','LIKE','%%')
-                    ->where(function($q){
-                        $q->where('status','LIKE','%%')
-                            ->orWhereNull('status');
-                    })->whereBetween('dia',[$mindia,$maxdia])
-                    ->orderBy('idregional','ASC')
-                    ->orderBy('dia','DESC')
-                    ->orderBy('hora','ASC')
-                    ->limit(50)
-                    ->paginate(25);
-            } else {
-                $resultados = Agendamento::where('idregional','LIKE',$regional)
-                    ->where(function($q){
-                        $q->where('status','LIKE','%%')
-                            ->orWhereNull('status');
-                    })->whereBetween('dia',[$mindia,$maxdia])
-                    ->orderBy('idregional','ASC')
-                    ->orderBy('dia','DESC')
-                    ->orderBy('hora','ASC')
-                    ->limit(50)
-                    ->paginate(25);
-            }
-        }
-        return $resultados;
+        $this->agendamentoRepository = $agendamentoRepository;
+        $this->regionalRepository = $regionalRepository;
+        $this->userRepository = $userRepository;
     }
 
     public function index()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $regional = Auth::user()->idregional;
+        $this->autoriza($this->class, __FUNCTION__);
+
+        $variaveis = $this->agendamentoVariaveis;
+
         // Checa se tem filtro
         if(IlluminateRequest::input('filtro') === 'sim') {
             $temFiltro = true;
+
+            $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
+
+            $resultados = $this->checaAplicaFiltros();
+        } 
+        else {
+            $temFiltro = null;
+            $diaFormatado = date('d\/m\/Y');
+            $regional = $this->regionalRepository->getById(Auth::user()->idregional);
+            $variaveis['continuacao_titulo'] = 'em <strong>' . $regional->regional . ' - ' . $diaFormatado . '</strong>';
+
+            $resultados = $this->agendamentoRepository->getToTable($regional->idregional);
+        }
+        // Monta tabela com resultados
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis['filtro'] = $this->montaFiltros();
+        $variaveis['mostraFiltros'] = true;
+        $variaveis = (object) $variaveis;
+
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $idusuario = Auth::user()->idusuario;
+        $idagendamento = $request->idagendamento;
+        $status = $request->status;
+
+        $update = $this->agendamentoRepository->update($idagendamento, ['status' => $status, 'idusuario' => $idusuario]);
+
+        if(!$update) {
+            abort(500);
+        }
+
+        if($status === Agendamento::$status_compareceu) {
+            event(new CrudEvent('agendamento', 'confirmou presença', $idagendamento));
+        } 
+        else {
+            event(new CrudEvent('agendamento', 'confirmou falta', $idagendamento));
+        }
+        
+        return redirect()->back()
+            ->with('message', '<i class="icon fa fa-check"></i>Status editado com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function busca()
+    {
+        $this->autoriza($this->class, 'index');
+
+        $busca = IlluminateRequest::input('q');
+    
+        $resultados = $this->agendamentoRepository->getToBusca($busca);
+
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->agendamentoVariaveis;
+
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function edit($id)
+    {
+        $this->autoriza($this->class, __FUNCTION__);
+
+        $resultado = $this->agendamentoRepository->getById($id);
+
+        $atendentes = $this->userRepository->getAtendentesByRegional($resultado->idregional);
+
+        $servicos = Agendamento::servicosCompletos();
+        $status = Agendamento::status();
+        $variaveis = $this->agendamentoVariaveis;
+        $variaveis['mensagem_agendamento'] = $this->mensagemAgendamento($resultado->dia, $resultado->hora, $resultado->status, $resultado->protocolo, $id);
+        $variaveis['cancela_idusuario'] = true;
+        $variaveis = (object) $variaveis;
+
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'atendentes', 'servicos', 'status'));
+    }
+
+    public function update(AgendamentoUpdateRequest $request, $id)
+    {
+        $this->autoriza($this->class, 'edit');
+
+        $update = $this->agendamentoRepository->update($id, $request->toModel());
+
+        if(!$update) {
+            abort(500);
+        }
+
+        event(new CrudEvent('agendamento', 'editou', $id));
+
+        return redirect('/admin/agendamentos')
+            ->with('message', '<i class="icon fa fa-check"></i>Agendamento editado com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function reenviarEmail($id)
+    {
+        $agendamento = $this->agendamentoRepository->getById($id);
+       
+        // Reenvia o email
+        Mail::to($agendamento->email)->send(new AgendamentoMailGuest($agendamento));
+        
+        return redirect('/admin/agendamentos')
+            ->with('message', '<i class="icon fa fa-check"></i>Email enviado com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function pendentes()
+    {
+        $this->autoriza($this->class, 'index');
+
+        $idPerfil = Auth::user()->perfil->idperfil;
+
+        // "Coordenadoria de Atendimento" e "Admin" podem ver todos os agendamentos pendentes
+        if($idPerfil === 6 || $idPerfil === 1) {
+            $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendente();
+        } 
+        // "Gestão de Atendimento - Sede" pode ver apenas agendamentos pendentes da Sede (São Paulo, id=1)
+        elseif($idPerfil === 12 ) {
+            $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendenteSede();
+        }
+        // "Gestão de Atendimento - Seccionais" pode ver apenas agendamentos pendentes das seccionais (id!=1)
+        elseif($idPerfil === 13) {
+            $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendenteSeccionais();
+        } 
+        // "Atendente" pode ver apenas agendamentos pendentes da sua regional
+        elseif($idPerfil === 8) {
+            $resultados = $this->agendamentoRepository->getPastAgendamentoPendenteByRegional(Auth::user()->idregional);
+        } 
+        else {
+            abort(401);
+        }
+
+        if($resultados->isEmpty()) {
+            $resultados = [];
+        }
+
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = $this->agendamentoVariaveis;
+        $variaveis['continuacao_titulo'] = 'pendentes de validação';
+        $variaveis['plural'] = 'agendamentos pendentes';
+        $variaveis['btn_criar'] = '<a class="btn btn-primary" href="/admin/agendamentos">Lista de Agendamentos</a>';
+        $variaveis = (object) $variaveis;
+
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+    }
+
+    public function checaAplicaFiltros()
+    {
+        $this->autoriza($this->class, 'index');
+
+        // Valores default dos filtros
+        $mindia = date('Y-m-d');
+        $maxdia = date('Y-m-d');
+        $regional = '';
+        $status = '';
+
+        // Valida e prepara filtro de data mínima
+        if(IlluminateRequest::has('mindia')) {
             if(!empty(IlluminateRequest::input('mindia'))) {
-                $mindiaArray = explode('/',IlluminateRequest::input('mindia'));
+                $mindiaArray = explode('/', IlluminateRequest::input('mindia'));
                 $checaMindia = checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
+
                 if($checaMindia === false) {
                     return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
                         ->with('class', 'alert-danger');
                 }
-            } 
+
+                $mindia = date('Y-m-d', strtotime(str_replace('/', '-', IlluminateRequest::input('mindia'))));
+            }
+        } 
+
+        // Valida e prepara filtro de data máxima
+        if(IlluminateRequest::has('maxdia')) {
             if(!empty(IlluminateRequest::input('maxdia'))) {
-                $maxdiaArray = explode('/',IlluminateRequest::input('maxdia'));
+                $maxdiaArray = explode('/', IlluminateRequest::input('maxdia'));
                 $checaMaxdia = checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
+
                 if($checaMaxdia === false) {
                     return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
                         ->with('class', 'alert-danger');
                 }
+
+                $maxdia = date('Y-m-d', strtotime(str_replace('/', '-', IlluminateRequest::input('maxdia'))));
+            }         
+        } 
+
+        // Valida e prepara filtro de regional
+        if(IlluminateRequest::has('regional')) {
+            if(!empty(IlluminateRequest::input('regional'))) {
+                $regional = IlluminateRequest::input('regional');
             }
-            $resultados = $this->checaFiltros();
-            $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
-        } else {
-            $temFiltro = null;
-            $diaFormatado = date('d\/m\/Y');
-            $resultados = $this->resultados($regional);
-            $regionalId = Regional::find(Auth::user()->idregional);
-            $regionalNome = $regionalId->regional;
-            $this->variaveis['continuacao_titulo'] = 'em <strong>'.$regionalNome.' - '.$diaFormatado.'</strong>';
         }
-        // Monta tabela com resultados
-        $tabela = $this->tabelaCompleta($resultados);
-        // Variáveis globais
-        $variaveis = $this->variaveis;
-        $variaveis['filtro'] = $this->filtros();
-        $variaveis['mostraFiltros'] = true;
-        $variaveis = (object) $variaveis;
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
+        else {
+            $regional = Auth::user()->idregional;
+        }
+
+        // Valida e prepara filtro de status
+        if(IlluminateRequest::has('status')) {
+            if(!empty(IlluminateRequest::input('status')) && IlluminateRequest::input('status') !== 'Qualquer') {
+                $status = IlluminateRequest::input('status');
+            }
+        } 
+
+        return $this->agendamentoRepository->getToTableFilter($mindia, $maxdia, $regional, $status);
     }
 
-    public function filtros()
+    public function montaFiltros()
     {
-        $regionais = Regional::all();
-        $select = '<form method="GET" action="/admin/agendamentos/filtro" id="filtroAgendamento" class="mb-0">';
-        $select .= '<div class="form-row filtroAge">';
-        $select .= '<input type="hidden" name="filtro" value="sim" />';
-        if(ControleController::mostra($this->class, 'edit') && session('idperfil') !== 12) {
-            $select .= '<div class="form-group mb-0 col">';
-            $select .= '<label>Seccional</label>';
-            $select .= '<select class="custom-select custom-select-sm mr-2" id="regional" name="regional">';
-            if(IlluminateRequest::input('regional') === '999') {
-                $select .= '<option value="999" selected>Todas</option>';
-            } else {
-                $select .= '<option value="999">Todas</option>';
+        $regionais = $this->regionalRepository->getToList();
+
+        $filtro = '<form method="GET" action="/admin/agendamentos/filtro" id="filtroAgendamento" class="mb-0">';
+        $filtro .= '<div class="form-row filtroAge">';
+        $filtro .= '<input type="hidden" name="filtro" value="sim" />';
+
+        // Montando filtro de regional
+        // TODO - verificar condições do uso do filtro por regional (atualmente não existe perfil com idperfil == 12)
+        if($this->mostra($this->class, 'edit') && Auth::user()->perfil->idperfil !== 12) {
+            $filtro .= '<div class="form-group mb-0 col">';
+            $filtro .= '<label>Seccional</label>';
+            $filtro .= '<select class="custom-select custom-select-sm mr-2" id="regional" name="regional">';
+            
+            if(IlluminateRequest::input('regional') === '') {
+                $select .= '<option value="" selected>Todas</option>';
+            } 
+            else {
+                $filtro .= '<option value="">Todas</option>';
             }
+
             foreach($regionais as $regional) {
                 if(IlluminateRequest::has('regional')) {
                     if($regional->idregional == IlluminateRequest::input('regional')) {
-                        $select .= '<option value="'.$regional->idregional.'" selected>'.$regional->regional.'</option>';
-                    } else {
-                        $select .= '<option value="'.$regional->idregional.'">'.$regional->regional.'</option>';
+                        $filtro .= '<option value="' . $regional->idregional . '" selected>' . $regional->regional . '</option>';
+                    } 
+                    else {
+                        $filtro .= '<option value="' . $regional->idregional . '">' . $regional->regional . '</option>';
                     }
-                } else {
-                    $select .= '<option value="'.$regional->idregional.'">'.$regional->regional.'</option>';
+                } 
+                else {
+                    $filtro .= '<option value="' . $regional->idregional . '">' . $regional->regional . '</option>';
                 }
             }
-            $select .= '</select>';
-            $select .= '</div>';
+
+            $filtro .= '</select>';
+            $filtro .= '</div>';
         }
-        $select .= '<div class="form-group mb-0 col">';
-        $select .= '<label>Status</label>';
-        $select .= '<select class="custom-select custom-select-sm" name="status">';
-        if(IlluminateRequest::input('status') === 'Qualquer')
-            $select .= '<option value="Qualquer" selected>Qualquer</option>';
-        else
-            $select .= '<option value="Qualquer">Qualquer</option>';
-        // Pega os status
-        $status = AgendamentoControllerHelper::status();
+
+        $filtro .= '<div class="form-group mb-0 col">';
+        $filtro .= '<label>Status</label>';
+        $filtro .= '<select class="custom-select custom-select-sm" name="status">';
+        
+        // Montando filtro de status
+        if(IlluminateRequest::input('status') === 'Qualquer') {
+            $filtro .= '<option value="Qualquer" selected>Qualquer</option>';
+        }
+           
+        else {
+            $filtro .= '<option value="Qualquer">Qualquer</option>';
+        }
+        
+        $status = Agendamento::status();
+
         foreach($status as $s) {
             if(IlluminateRequest::has('status')) {
                 if(IlluminateRequest::input('status') === $s) {
-                    $select .= '<option value="'.$s.'" selected>'.$s.'</option>';
+                    $filtro .= '<option value="' . $s . '" selected>' . $s . '</option>';
                 } else {
-                    $select .= '<option value="'.$s.'">'.$s.'</option>';
+                    $filtro .= '<option value="' . $s . '">' . $s . '</option>';
                 }
             } else {
-                $select .= '<option value="'.$s.'">'.$s.'</option>';
+                $filtro .= '<option value="' . $s . '">' . $s . '</option>';
             }
         }
-        $select .= '</select>';
-        $select .= '</div>';
-        $select .= '<div class="form-group mb-0 col">';
+
+        $filtro .= '</select>';
+        $filtro .= '</div>';
+        $filtro .= '<div class="form-group mb-0 col">';
+
         $hoje = date('d\/m\/Y');
-        $select .= '<label>De</label>';
+
+        $filtro .= '<label>De</label>';
+       
+        // Montando filtro de data mínima
         if(IlluminateRequest::has('mindia')) {
             $mindia = IlluminateRequest::input('mindia');
-            $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="'.$mindia.'" />';
-        } else {
-            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="'.$hoje.'" />';
+            $filtro .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="' . $mindia . '" />';
+        } 
+        else {
+            $filtro .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="' . $hoje . '" />';
         }
-        $select .= '</div>';
-        $select .= '<div class="form-group mb-0 col">';
-        $select .= '<label>Até</label>';
+
+        $filtro .= '</div>';
+        $filtro .= '<div class="form-group mb-0 col">';
+        $filtro .= '<label>Até</label>';
+        
+        // Montando filtro de data máxima
         if(IlluminateRequest::has('maxdia')) {
             $maxdia = IlluminateRequest::input('maxdia');
-            $select .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="'.$maxdia.'" />';
-        } else {
-            $select .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="'.$hoje.'" />';
+            $filtro .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="' . $maxdia . '" />';
+        } 
+        else {
+            $filtro .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="' . $hoje . '" />';
         }
-        $select .= '</div>';
-        $select .= '<div class="form-group mb-0 col-auto align-self-end">';
-        $select .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
-        $select .= '</div>';
-        $select .= '</div>';
-        $select .= '</form>';
-        return $select;
+
+        $filtro .= '</div>';
+        $filtro .= '<div class="form-group mb-0 col-auto align-self-end">';
+        $filtro .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
+        $filtro .= '</div>';
+        $filtro .= '</div>';
+        $filtro .= '</form>';
+
+        return $filtro;
+    }
+
+    public function mensagemAgendamento($dia, $hora, $status, $protocolo, $id)
+    {
+        if(date('Y-m-d') >= $dia) {
+            if($status === Agendamento::$status_cancelado) {
+                $mensagem =  "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i>&nbsp;&nbsp;Atendimento cancelado</strong></p>";
+            } 
+            elseif($status === Agendamento::$status_nao_compareceu) {
+                $mensagem = "<p class='mb-0 text-warning'><strong><i class='fas fa-user-alt-slash'></i>&nbsp;&nbsp;Não compareceu</strong></p>";
+            } 
+            elseif($status === Agendamento::$status_compareceu) {
+                $mensagem = "<p class='mb-0 text-success'><strong><i class='fas fa-check-circle'></i>&nbsp;&nbsp;Atendimento realizado com sucesso no dia " . onlyDate($dia) . ", às " . $hora . "</strong></p>";
+            } 
+            else {
+                $mensagem = "<p class='mb-0 text-danger'><strong><i class='fas fa-exclamation-triangle'></i>&nbsp;&nbsp;Validação pendente</strong></p>";
+            }
+        } 
+        else {
+            if($status === Agendamento::$status_cancelado) {
+                $mensagem = "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i> Atendimento cancelado</strong></p>";
+            } 
+            else {
+                // Botão de reenviar email
+                $mensagem = '<form method="POST" action="/admin/agendamentos/reenviar-email/' . $id . '" class="d-inline">';
+                $mensagem .= '<input type="hidden" name="_token" value="' . csrf_token() . '" />';
+                $mensagem .= '<input type="submit" class="btn btn-sm btn-default" value="Reenviar email de confirmação"></input>';
+                $mensagem .= '</form>';
+            }
+        }
+
+        return $mensagem;
     }
 
     public function status($status, $id, $usuario = null)
     {
-        if(IlluminateRequest::has('regional') && session('idperfil') === 8) {
-            if(IlluminateRequest::input('regional') !== Auth::user()->idregional)
+        // Caso o usário seja do perfil "Atendente" (id=8) ele poderá apenas filtrar com sua respectiva regional
+        if(IlluminateRequest::has('regional') && Auth::user()->perfil->idperfil === 8) {
+            if(IlluminateRequest::input('regional') !== Auth::user()->idregional) {
                 abort(401);
+            }
         }
         switch ($status) {
-            case 'Cancelado':
-                $btn = "<strong>Cancelado</strong>";
-                if(ControleController::mostra($this->class, 'edit'))
-                    $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/".$id."' class='btn btn-sm btn-default'>Editar</a>";
+            case Agendamento::$status_cancelado:
+                $btn = "<strong>" . Agendamento::$status_cancelado . "</strong>";
+                if($this->mostra($this->class, 'edit')) {
+                    $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
+                }
+                    
                 return $btn;
             break;
 
-            case 'Compareceu':
-                $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;Compareceu&nbsp;&nbsp;</p>";
-                if(ControleController::mostra($this->class, 'edit'))
-                    $string .= "<a href='/admin/agendamentos/editar/".$id."' class='btn btn-sm btn-default'>Editar</a>";
-                if(isset($usuario))
-                    $string .= "<small class='d-block'>Atendido por: <strong>".$usuario."</strong></small>";
+            case Agendamento::$status_compareceu:
+                $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;" . Agendamento::$status_compareceu . "&nbsp;&nbsp;</p>";
+                if($this->mostra($this->class, 'edit')) {
+                    $string .= "<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
+                }
+                if(isset($usuario)) {
+                    $string .= "<small class='d-block'>Atendido por: <strong>" . $usuario . "</strong></small>";
+                }
+
                 return $string;
             break;
 
-            case 'Não Compareceu':
-                $btn = "<strong>Não Compareceu</strong>";
-                if(ControleController::mostra($this->class, 'edit'))
-                    $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/".$id."' class='btn btn-sm btn-default'>Editar</a>";
+            case Agendamento::$status_nao_compareceu:
+                $btn = "<strong>" . Agendamento::$status_nao_compareceu . "</strong>";
+                if($this->mostra($this->class, 'edit')) {
+                    $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
+                }
+
                 return $btn;
             break;
 
             default:
                 $acoes = '<form method="POST" id="statusAgendamento" action="/admin/agendamentos/status" class="d-inline">';
-                $acoes .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="' . csrf_token() . '" />';
                 $acoes .= '<input type="hidden" name="_method" value="PUT" id="method" />';
-                $acoes .= '<input type="hidden" name="idagendamento" value="'.$id.'" />';
-                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="Compareceu">Confirmar</button>';
-                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="Não Compareceu">Não Compareceu</button>';
+                $acoes .= '<input type="hidden" name="idagendamento" value="' . $id . '" />';
+                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="' . Agendamento::$status_compareceu . '">Confirmar</button>';
+                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="' . Agendamento::$status_nao_compareceu . '">' . Agendamento::$status_nao_compareceu . '</button>';
                 $acoes .= '</form>';
-                if(ControleController::mostra($this->class, 'edit'))
-                    $acoes .= " <a href='/admin/agendamentos/editar/".$id."' class='btn btn-sm btn-default'>Editar</a>";
+
+                if($this->mostra($this->class, 'edit')) {
+                    $acoes .= " <a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
+                }
+
                 return $acoes;
             break;
         }
@@ -333,17 +470,20 @@ class AgendamentoController extends Controller
         $contents = [];
         foreach($resultados as $resultado) {
             // Ações possíveis com cada resultado
-            if(isset($resultado->user->nome))
+            if(isset($resultado->user->nome)) {
                 $nomeusuario = $resultado->user->nome;
-            else
+            }  
+            else {
                 $nomeusuario = null;
+            }
+                
             $acoes = $this->status($resultado->status, $resultado->idagendamento, $nomeusuario);
             // Mostra dados na tabela
             $conteudo = [
-                $resultado->protocolo.'<br><small>Código: '.$resultado->idagendamento.'</small>',
-                $resultado->nome.'<br>'.$resultado->cpf,
-                $resultado->hora.'<br><small><strong>'.Helper::onlyDate($resultado->dia).'</strong></small>',
-                $resultado->tiposervico.'<br><small>('.$resultado->regional->regional.')',
+                $resultado->protocolo.'<br><small>Código: ' . $resultado->idagendamento . '</small>',
+                $resultado->nome . '<br>' . $resultado->cpf,
+                $resultado->hora . '<br><small><strong>' . onlyDate($resultado->dia) . '</strong></small>',
+                $resultado->tiposervico . '<br><small>(' . $resultado->regional->regional . ')',
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -354,172 +494,8 @@ class AgendamentoController extends Controller
             'table-bordered',
             'table-striped'
         ];
-        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        $tabela = $this->montaTabela($headers, $contents, $classes);
+        
         return $tabela;
-    }
-
-    public function updateStatus()
-    {
-        $idusuario = Auth::user()->idusuario;
-        $idagendamento = $_POST['idagendamento'];
-        $status = $_POST['status'];
-        $agendamento = Agendamento::findOrFail($idagendamento);
-        $agendamento->status = $status;
-        $agendamento->idusuario = $idusuario;
-        $update = $agendamento->update();
-        if(!$update)
-            abort(500);
-        if($status === 'Compareceu') {
-            event(new CrudEvent('agendamento', 'confirmou presença', $agendamento->idagendamento));
-        } else {
-            event(new CrudEvent('agendamento', 'confirmou falta', $agendamento->idagendamento));
-        }
-        return redirect()->back()
-            ->with('message', '<i class="icon fa fa-check"></i>Status editado com sucesso!')
-            ->with('class', 'alert-success');
-    }
-
-    public function busca()
-    {
-        ControleController::autoriza($this->class, 'index');
-        $busca = IlluminateRequest::input('q');
-        $variaveis = (object) $this->variaveis;
-        $resultados = Agendamento::where('nome','LIKE','%'.$busca.'%')
-            ->orWhere('idagendamento','LIKE', $busca)
-            ->orWhere('cpf','LIKE','%'.$busca.'%')
-            ->orWhere('email','LIKE','%'.$busca.'%')
-            ->orWhere('protocolo','LIKE','%'.$busca.'%')
-            ->paginate(25);
-        $tabela = $this->tabelaCompleta($resultados);
-        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
-    }
-
-    public function edit($id)
-    {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = Agendamento::findOrFail($id);
-        $atendentes = User::select('idusuario','nome')
-            ->where('idregional',$resultado->idregional)
-            ->whereHas('perfil', function($q) {
-                $q->where('nome','=','Atendimento');
-            })->get();
-        $regionais = Regional::select('idregional','regional')->get();
-        $variaveis = $this->variaveis;
-        $variaveis['cancela_idusuario'] = true;
-        $variaveis = (object) $variaveis;
-        return view('admin.crud.editar', compact('resultado', 'variaveis', 'atendentes', 'regionais'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        ControleController::autoriza($this->class, 'edit');
-        $regras = [
-            'nome' => 'required|max:191',
-            'email' => 'required|email|max:191',
-            'cpf' => 'required|max:191',
-            'celular' => 'required|max:191',
-            'tiposervico' => 'required|max:191',
-            'regional' => 'max:191',
-            'idusuario' => 'max:191|required_if:status,==,Compareceu',
-            'status' => 'max:191',
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'min' => 'O campo :attribute não possui o mínimo de caracteres obrigatório',
-            'required_if' => 'Informe o atendente que realizou o atendimento',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'email' => 'Email inválido'
-        ];
-        $erros = $request->validate($regras, $mensagens);
-        // Guarda dados no banco
-        if(empty($request->input('atendente')))
-            $status = $request->input('status');
-        else
-            $status = 'Compareceu';
-        $nomeUser = mb_convert_case(mb_strtolower(request('nome')), MB_CASE_TITLE);
-        $update = Agendamento::findOrFail($id)->update([
-            'nome' => $nomeUser,
-            'email' => request('email'),
-            'cpf' => request('cpf'),
-            'celular' => request('celular'),
-            'tiposervico' => request('tiposervico'),
-            'idregional' => request('idregional'),
-            'idusuario' => request('idusuario'),
-            'status' => $status
-        ]);
-        if(!$update)
-            abort(500);
-        event(new CrudEvent('agendamento', 'editou', $id));
-        return redirect('/admin/agendamentos')
-            ->with('message', '<i class="icon fa fa-check"></i>Agendamento editado com sucesso!')
-            ->with('class', 'alert-success');
-    }
-
-    public function reenviarEmail($id)
-    {
-        $resultado = Agendamento::findOrFail($id);
-        // Mensagem do email
-        $agradece = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
-        $agradece .= "<br>";
-        $agradece .= "Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência e com o número de protocolo em mãos.";
-        $agradece .= "<br><br>";
-        $agradece .= "<strong>Protocolo:</strong> ".$resultado->protocolo;
-        $agradece .= "<br><br>";
-        $agradece .= "<strong>Detalhes do agendamento</strong><br>";
-        $agradece .= "Nome: ".$resultado->nome."<br>";
-        $agradece .= "CPF: ".$resultado->cpf."<br>";
-        $agradece .= "Dia: ".Helper::onlyDate($resultado->dia)."<br>";
-        $agradece .= "Horário: ".$resultado->hora."<br>";
-        $agradece .= "Cidade: ".$resultado->regional->regional."<br>";
-        $agradece .= "Endereço: ".$resultado->regional->endereco.", ".$resultado->regional->numero;
-        $agradece .= " - ".$resultado->regional->complemento."<br>";
-        $agradece .= "Serviço: ".$resultado->tiposervico.'<br>';
-        // Manda o email
-        Mail::to($resultado->email)->send(new AgendamentoMailGuest($agradece));
-        return redirect('/admin/agendamentos')
-            ->with('message', '<i class="icon fa fa-check"></i>Email enviado com sucesso!')
-            ->with('class', 'alert-success');
-    }
-
-    public function pendentes()
-    {
-        ControleController::autoriza($this->class, 'index');
-        $now = date('Y-m-d');
-        if(session('idperfil') === 6 || session('idperfil') === 1) {
-            $resultados = Agendamento::where('dia','<',$now)
-                ->whereNull('status')
-                ->orderBy('dia','DESC')
-                ->paginate(10);
-        } elseif(session('idperfil') === 12 ) {
-            $resultados = Agendamento::where('dia','<',$now)
-                ->where('idregional',1)
-                ->whereNull('status')
-                ->orderBy('dia','DESC')
-                ->paginate(10);
-        } elseif(session('idperfil') === 13) {
-            $resultados = Agendamento::where('dia','<',$now)
-                ->where('idregional','!=',1)
-                ->whereNull('status')
-                ->orderBy('dia','DESC')
-                ->paginate(10);
-        } elseif(session('idperfil') === 8) {
-            $resultados = Agendamento::where('dia','<',$now)
-                ->where('idregional','=',Auth::user()->idregional)
-                ->whereNull('status')
-                ->orderBy('dia','DESC')
-                ->paginate(10);
-        } else {
-            abort(401);
-        }
-        if($resultados->isEmpty()) {
-            $resultados = [];
-        }
-        $tabela = $this->tabelaCompleta($resultados);
-        $variaveis = $this->variaveis;
-        $variaveis['continuacao_titulo'] = 'pendentes de validação';
-        $variaveis['plural'] = 'agendamentos pendentes';
-        $variaveis['btn_criar'] = '<a class="btn btn-primary" href="/admin/agendamentos">Lista de Agendamentos</a>';
-        $variaveis = (object) $variaveis;
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 }

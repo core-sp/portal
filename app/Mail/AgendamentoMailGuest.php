@@ -13,9 +13,23 @@ class AgendamentoMailGuest extends Mailable
 
     public $body;
 
-    public function __construct($body)
+    public function __construct($agendamento)
     {
-        $this->body = $body;
+        $this->body = "<strong>Seu atendimento foi agendado com sucesso!</strong>";
+        $this->body  .= "<br>";
+        $this->body  .= "Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência e com o número de protocolo em mãos.";
+        $this->body  .= "<br><br>";
+        $this->body  .= "<strong>Protocolo:</strong> " . $agendamento->protocolo;
+        $this->body  .= "<br><br>";
+        $this->body  .= "<strong>Detalhes do agendamento</strong><br>";
+        $this->body  .= "Nome: " . $agendamento->nome . "<br>";
+        $this->body  .= "CPF: " . $agendamento->cpf . "<br>";
+        $this->body  .= "Dia: " . onlyDate($agendamento->dia) . "<br>";
+        $this->body  .= "Horário: " . $agendamento->hora . "<br>";
+        $this->body  .= "Cidade: " . $agendamento->regional->regional . "<br>";
+        $this->body  .= "Endereço: " . $agendamento->regional->endereco.", " . $agendamento->regional->numero;
+        $this->body  .= " - " . $agendamento->regional->complemento . "<br>";
+        $this->body  .= "Serviço: " . $agendamento->tiposervico . '<br>';
     }
 
     public function build()

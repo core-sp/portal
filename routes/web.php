@@ -88,13 +88,13 @@ Route::prefix('admin')->group(function() {
   // Rota para Agendamentos
   Route::prefix('agendamentos')->group(function(){
     Route::get('/', 'AgendamentoController@index')->name('agendamentos.lista');
-    Route::get('/busca', 'AgendamentoController@busca');
-    Route::put('/status', 'AgendamentoController@updateStatus');
-    Route::get('/filtro', 'AgendamentoController@index');
-    Route::get('/pendentes', 'AgendamentoController@pendentes');
-    Route::get('/editar/{id}', 'AgendamentoController@edit');
-    Route::put('/editar/{id}', 'AgendamentoController@update');
-    Route::post('/reenviar-email/{id}', 'AgendamentoController@reenviarEmail');
+    Route::get('/busca', 'AgendamentoController@busca')->name('agendamentos.busca');
+    Route::put('/status', 'AgendamentoController@updateStatus')->name('agendamentos.updateStatus');
+    Route::get('/filtro', 'AgendamentoController@index')->name('agendamentos.filtro');
+    Route::get('/pendentes', 'AgendamentoController@pendentes')->name('agendamentos.pendentes');
+    Route::get('/editar/{id}', 'AgendamentoController@edit')->name('agendamentos.edit');
+    Route::put('/editar/{id}', 'AgendamentoController@update')->name('agendamentos.update');
+    Route::post('/reenviar-email/{id}', 'AgendamentoController@reenviarEmail')->name('agendamentos.reenviarEmail');
     // Lida com bloqueios
     Route::get('/bloqueios', 'AgendamentoBloqueioController@index')->name('agendamentobloqueios.lista');
     Route::get('/bloqueios/busca', 'AgendamentoBloqueioController@busca');
@@ -161,12 +161,12 @@ Route::prefix('/')->group(function() {
   Route::get('/busca', 'SiteController@busca');
 
   // Agendamentos
-  Route::get('agendamento', 'AgendamentoSiteController@formView');
-  Route::post('agendamento', 'AgendamentoSiteController@store');
-  Route::post('/checa-horarios', 'AgendamentoSiteController@checaHorarios');
-  Route::get('agendamento-consulta', 'AgendamentoSiteController@consultaView');
-  Route::get('agendamento-consulta/busca', 'AgendamentoSiteController@consulta');
-  Route::put('agendamento-consulta/busca', 'AgendamentoSiteController@cancelamento');
+  Route::get('agendamento', 'AgendamentoSiteController@formView')->name('agendamentosite.formview');
+  Route::post('agendamento', 'AgendamentoSiteController@store')->name('agendamentosite.store');
+  Route::post('/checa-horarios', 'AgendamentoSiteController@checaHorarios')->name('agendamentosite.checaHorarios');
+  Route::get('agendamento-consulta', 'AgendamentoSiteController@consultaView')->name('agendamentosite.consultaView');
+  Route::get('agendamento-consulta/busca', 'AgendamentoSiteController@consulta')->name('agendamentosite.consulta');
+  Route::put('agendamento-consulta/busca', 'AgendamentoSiteController@cancelamento')->name('agendamentosite.cancelamento');
 
   // Newsletter
   Route::post('newsletter', 'NewsletterController@store');

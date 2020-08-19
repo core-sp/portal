@@ -18,8 +18,9 @@ $factory->define(Regional::class, function (Faker $faker) {
         'fax' => $faker->phoneNumber,
         'email' => $faker->email,
         'funcionamento' => $faker->sentence,
-        'ageporhorario' => $faker->numberBetween(1, 5),
+        'ageporhorario' => 2,
         'responsavel' => $faker->name,
         'descricao' => $faker->paragraph,
+        'horariosage' => '10:00,11:00,12:00,13:00,14:00'
     ];
 });
