@@ -89,7 +89,7 @@
                   <div class="flex-one align-self-center ml-3">
                     <h5>{{ utf8_encode($resultado[0]['NOME']) }}</h5>
                     <p><strong>Registro:</strong> {{ substr_replace($resultado[0]['REGISTRONUM'], '/', -4, 0) }}</p>
-                    <p><strong>{{ strlen(Request::input('cpfCnpj')) === 14 ? 'CPF:' : 'CNPJ:' }}</strong> {{ Request::input('cpfCnpj') }}</p>
+                    <p><strong>{{ strlen(Request::input('cpfCnpj')) === 14 ? 'CNPJ:' : 'CPF:' }}</strong> {{ Request::input('cpfCnpj') }}</p>
                     <p class="mt-2"><strong>Situação:</strong> {!! badgeConsulta($resultado[0]['SITUACAO']) !!}</p>
                   </div>
                 </div>
