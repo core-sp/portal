@@ -59,12 +59,12 @@ use \App\Http\Controllers\Helper;
         <div class="container">
           <div class="row header-margin">
             <div class="col-lg-4 col-md-6 text-left center-768">
-                <a href="/"><img src="{{ asset('img/logo-branco.png') }}" alt="CORE-SP" id="logo-header" /></a>
+                <a href="/"><img src="{{ asset('img/logo-core.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
-                <h3><a href="/servicos-atendimento-ao-rc" class="nohoverbranco">Atendimento on-line</a></h3>
-                <p class="light"><a href="/servicos-atendimento-ao-rc" class="nohover"><small>Clique aqui e tenha acesso aos principais<br>serviços pelo Setor de Atendimento do Core-SP.</small></a></p>
+                <h3 class="preto">#setembroamarelo</h3>
+                <p class="preto">Campanha Brasileira de Prevenção ao Suicídio</p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
@@ -195,23 +195,20 @@ use \App\Http\Controllers\Helper;
             </div>
           </div>
         </div>
-        <!--a href="/noticias/o-pagamento-do-1o-quadrimestre-da-anuidade-de-2020-foi-mais-uma-vez-prorrogado-podendo-ser-efetuado-ate-31082020-sem-quaisquer-acrescimos" class="hide-768">
-          <div class="container-fluid bg-warning pt-2 pb-2">
+        <a href="/servicos-atendimento-ao-rc" class="hide-768">
+          <div class="container-fluid azul-bg pt-2 pb-2">
             <div class="row">
                 <div class="container">
                   <div class="d-flex">
-                    <div class="flex-one as-center">
-                      <h5 class="d-inline pr-3 text-dark"><strong>ANUIDADE 2020</strong></h5>
-                      <p class="d-inline text-dark">Vencimento do 1º quadrimestre da anuidade 2020 foi prorrogado para 31/08. <span class="nowrap">Baixe o boleto atualizado!</span></p>
-                    </div>
-                    <div class="as-center ml-2">
-                      <p class="text-dark btn-faixa"><strong>SAIBA MAIS</strong></p>
+                    <div class="flex-one aai">
+                      <h5 class="d-inline pr-3"><strong>Atendimento on-line</strong></h5>
+                      <p class="d-inline">Clique aqui e tenha acesso aos principais serviços pelo Setor de Atendimento do Core-SP.</p>
                     </div>
                   </div>
                 </div>
             </div>
           </div>
-        </a-->  
+        </a>  
       </header>
 
       <header id="fixed-menu" class="pb-2">
