@@ -196,13 +196,13 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
         <a href="/servicos-atendimento-ao-rc" class="hide-768">
-          <div class="container-fluid azul-bg pt-2 pb-2">
+          <div class="container-fluid verde-escuro-bg pt-2 pb-2">
             <div class="row">
                 <div class="container">
                   <div class="d-flex">
                     <div class="flex-one aai">
-                      <h5 class="d-inline pr-3"><strong>Atendimento on-line</strong></h5>
-                      <p class="d-inline">Clique aqui e tenha acesso aos principais serviços pelo Setor de Atendimento do Core-SP.</p>
+                      <h5 class="d-inline pr-3 cinza-claro"><strong>Atendimento on-line</strong></h5>
+                      <p class="d-inline cinza-claro">Clique aqui e tenha acesso aos principais serviços pelo Setor de Atendimento do Core-SP.</p>
                     </div>
                   </div>
                 </div>
