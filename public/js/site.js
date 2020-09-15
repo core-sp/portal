@@ -11,6 +11,8 @@ $(document).ready(function(){
 	$('#registro_core').mask('0000000/0000', {reverse: true});
 	$('.numeroInput').mask('99');
 	$('.cep').mask('00000-000');
+	$('.codigo_certidao').mask('AAAAAAAA - AAAAAAAA - AAAAAAAA - AAAAAAAA');
+  	$('.horaInput').mask('00:00');
 	$('.numero').mask('ZZZZZZZZZZ', {
 		translation: {
 			'Z': {

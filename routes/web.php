@@ -44,6 +44,9 @@ Route::prefix('admin')->group(function() {
   // Rotas de concursos
   require('admin/cursos.php');
 
+
+  require('admin/fiscalizacao.php');
+
   // Rotas para usuários
   Route::prefix('usuarios')->group(function(){
     Route::get('/', 'UserController@index')->name('usuarios.lista');
@@ -222,12 +225,25 @@ Route::prefix('/')->group(function() {
     // Reset email routes
     Route::get('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmailView')->name('representante.email.reset.view');
     Route::post('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmail')->name('representante.email.reset');
+    
+    // Rotas para emissão de Certidão
+    Route::get('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidaoView')->name('representante.emitirCertidaoView');
+    Route::post('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidao')->name('representante.emitirCertidao');
   });
 
   Route::get('/chat', function(){
     return view('site.chat');
   });
 
+  // Rotas para o SIG (Sistema de Informação Geográfico)
+  Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
+  Route::get('/mapa-fiscalizacao/{ano}', 'FiscalizacaoController@mostrarMapaAno')->name('fiscalizacao.mapaano');
+
+  // Rotas para consulta de autenticidade da Certidão
+  Route::get('certidao/consulta', 'CertidaoController@consultaView')->name('certidao.consultaView');
+  Route::get('certidao/consulta/resultado', 'CertidaoController@consulta')->name('certidao.consulta');
+
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
+
 });

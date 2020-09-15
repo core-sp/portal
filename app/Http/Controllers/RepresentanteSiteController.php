@@ -2,28 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Connections\FirebirdConnection;
-use App\Events\ExternoEvent;
-use App\Mail\CadastroRepresentanteMail;
-use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Representante;
-use App\RepresentanteEndereco;
-use Illuminate\Http\Request;
 use App\Rules\CpfCnpj;
+use App\Mail\CertidaoMail;
+use App\Events\ExternoEvent;
+use Illuminate\Http\Request;
+use App\RepresentanteEndereco;
 use App\Traits\GerentiProcedures;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Connections\FirebirdConnection;
+use App\Mail\CadastroRepresentanteMail;
+use App\Http\Controllers\CertidaoController;
+use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
 {
     use GerentiProcedures;
 
+    private $certidaoController;
     protected $idendereco;
 
-    public function __construct()
+    public function __construct(CertidaoController $certidaoController)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
+        $this->certidaoController = $certidaoController;
     }
 
     public function index()
@@ -349,5 +354,130 @@ class RepresentanteSiteController extends Controller
     {
         $descricao = IlluminateRequest::input('descricao');
         event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") baixou o boleto "' . $descricao . '"'));
+    }
+
+    public function emitirCertidaoView($tipo) 
+    {
+        switch($tipo) {
+            case "Regularidade":
+                $titulo = "Certidão de Regularidade";
+
+                $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Regularidade.";
+            break;
+    
+            case "Parcelamento":
+                $titulo = "Certidão de Parcelamento";
+
+                $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Parcelamento.";
+            break;
+    
+            default:
+                abort(500, "Tipo de certidão inválida");
+            break;
+        }
+
+        return view("site.representante.emitir-certidao", compact("titulo", "mensagem"));
+    }
+    
+    public function emitirCertidao($tipo) 
+    {   
+        $testeMK = false;
+
+        if($testeMK) {
+            // Dados de Representante Comercial Teste
+            $dadosRepresentante = [
+                "nome" => "Teste", 
+                "cpf_cnpj" => "12345679000012",
+                "registro_core" => "12345/12345",
+                "email" => "teste@teste.com",
+                "data_inscricao" => "20/12/2020",
+                "tipo_empresa" => "Empresa Peguena",
+                "resp_tecnico" => "Reponsável Técnico Teste",
+                "resp_tecnico_registro_core" => "12345/12345"
+            ];
+
+            // Endereço teste
+            $endereco = "Rua Teste, 1234, Teste São Paulo/SP CEP: 1234-1234";
+        }
+        else {
+            // Recupera dados do Representante Comercial
+            $dadosRepresentante = [
+                "nome" => Auth::guard('representante')->user()->nome, 
+                "cpf_cnpj" => Auth::guard('representante')->user()->cpf_cnpj,
+                "registro_core" => Auth::guard('representante')->user()->registro_core,
+                "email" => Auth::guard('representante')->user()->email,
+                "tipo_empresa" => null,
+                "resp_tecnico" => null,
+                "resp_tecnico_registro_core" => null
+            ];
+            // Dados de PJ: "Data de início", "Tipo de empresa", "Responsável técnico" (falta CPF do resposável técnico)
+            // Dados de PF: "Data de início"
+            $dadosGerenti = Auth::guard('representante')->user()->dadosGerais();
+            $dadosRepresentante["data_inscricao"] = $dadosGerenti["Data de início"];
+            if(Auth::guard('representante')->user()->tipoPessoa() == "PJ") {
+                $dadosRepresentante["tipo_empresa"] = $dadosGerenti["Tipo de empresa"];
+                if(!empty($dadosGerenti['Responsável Técnico'])) {
+                    $rt = explode('(', $dados['Responsável Técnico']);
+                    $dadosRepresentante["resp_tecnico"] = trim($rt[0]);
+                    $dadosRepresentante["resp_tecnico_registro_core"] = trim(str_replace(")", "",$rt[0]));
+                }
+            }
+
+            // Recupera dados do endereço
+            $enderecoGerenti = Auth::guard('representante')->user()->enderecoFormatado();
+        }
+
+        switch($tipo) {
+            case "Regularidade":
+                $podeEmitir = true;
+                //$podeEmitir = Auth::guard('representante')->user()->status() === "" ? true : false;
+
+                if($podeEmitir) {                    
+                    return $this->certidaoController->storeCertidaoRegularidade(
+                        $testeMK ? "PF" : Auth::guard('representante')->user()->tipoPessoa(),
+                        $dadosRepresentante,
+                        $endereco,
+                    );
+                }
+                else {
+                    return view("site.representante.emitir-certidao")
+                        ->with("mensagem", "Certidão de Regularidade não pode ser expedida.<br><b>Motivo:</b> mensagem do motivo")
+                        ->with("titulo", "Certidão de Regularidade")
+                        ->with("erro", "mensagem explicando o motivo da falha da emissão.");;
+                }
+            break;
+    
+            case "Parcelamento":
+                $podeEmitir = true;
+                // $podeEmitir = Auth::guard('representante')->user()
+
+                if($podeEmitir) {
+                    $dadosParcelamento = [
+                        "parcelamento_ano_inicio" => "02/02/2020", 
+                        "parcelamento_ano_fim" => "02/02/2021",
+                        "numero_parcelas" => "10",
+                        "data_primeiro_pagamento" => "02/02/2020",
+                        "ano_quitado" => "2020"
+                    ];
+
+                    return $this->certidaoController->storeCertidaoParcelamento(
+                        $testeMK ? "PJ" : Auth::guard('representante')->user()->tipoPessoa(),
+                        $dadosRepresentante,
+                        $endereco,
+                        $dadosParcelamento
+                    );
+                }
+                else {
+                    return view("site.representante.emitir-certidao")
+                        ->with("mensagem", "Certidão de Parcelamento não pode ser expedida.<br><b>Motivo:</b> mensagem do motivo")
+                        ->with("titulo", "Certidão de Parcelamento")
+                        ->with("erro", "mensagem explicando o motivo da falha da emissão.");
+                }
+            break;
+    
+            default:
+                abort(500, "Tipo de certidão inválida.");
+            break;
+        }    
     }
 }

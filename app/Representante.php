@@ -169,4 +169,22 @@ class Representante extends Authenticable
         else
             return null;
     }
+
+    // Método para formatar os dados de endereço do GERENTI para emissão de Certidão
+    public function enderecoFormatado() 
+    {
+        $enderecoGerenti = $this->enderecos();
+
+        $enderecoFormatado = $enderecoGerenti["Logradouro"];
+        
+        if(isset($enderecoGerenti["Complemento"])) {
+            $enderecoFormatado .= ", " . $enderecoGerenti["Logradouro"];
+        }
+
+        $enderecoFormatado .= ", " . $enderecoGerenti["Bairro"];
+        $enderecoFormatado .= " - " . $enderecoGerenti["Cidade"] . "/" . $enderecoGerenti["UF"];
+        $enderecoFormatado .= " - CEP: " . $enderecoGerenti["CEP"];
+
+        return $enderecoFormatado;
+    }
 }
