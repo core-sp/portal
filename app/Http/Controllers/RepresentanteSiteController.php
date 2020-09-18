@@ -392,8 +392,8 @@ class RepresentanteSiteController extends Controller
                 "email" => "teste@teste.com",
                 "data_inscricao" => "20/12/2020",
                 "tipo_empresa" => "Empresa Peguena",
-                "resp_tecnico" => "Reponsável Técnico Teste",
-                "resp_tecnico_registro_core" => "12345/12345"
+                "resp_tecnico" => null,
+                "resp_tecnico_registro_core" => null
             ];
 
             // Endereço teste
@@ -410,21 +410,21 @@ class RepresentanteSiteController extends Controller
                 "resp_tecnico" => null,
                 "resp_tecnico_registro_core" => null
             ];
-            // Dados de PJ: "Data de início", "Tipo de empresa", "Responsável técnico" (falta CPF do resposável técnico)
-            // Dados de PF: "Data de início"
+            // Dados de PJ: "Data de homologação", "Tipo de empresa", "Responsável técnico" (falta CPF do resposável técnico)
+            // Dados de PF: "Data de homologação"
             $dadosGerenti = Auth::guard('representante')->user()->dadosGerais();
-            $dadosRepresentante["data_inscricao"] = $dadosGerenti["Data de início"];
+            $dadosRepresentante["data_inscricao"] = $dadosGerenti["Data de homologação"];
             if(Auth::guard('representante')->user()->tipoPessoa() == "PJ") {
                 $dadosRepresentante["tipo_empresa"] = $dadosGerenti["Tipo de empresa"];
-                if(!empty($dadosGerenti['Responsável Técnico'])) {
-                    $rt = explode('(', $dados['Responsável Técnico']);
+                if(!empty($dadosGerenti['Responsável técnico'])) {
+                    $rt = explode('(', $dados['Responsável técnico']);
                     $dadosRepresentante["resp_tecnico"] = trim($rt[0]);
-                    $dadosRepresentante["resp_tecnico_registro_core"] = trim(str_replace(")", "",$rt[0]));
+                    $dadosRepresentante["resp_tecnico_registro_core"] = trim(str_replace(")", "",$rt[1]));
                 }
             }
 
             // Recupera dados do endereço
-            $enderecoGerenti = Auth::guard('representante')->user()->enderecoFormatado();
+            $endereco = Auth::guard('representante')->user()->enderecoFormatado();
         }
 
         switch($tipo) {
@@ -436,7 +436,7 @@ class RepresentanteSiteController extends Controller
                     return $this->certidaoController->storeCertidaoRegularidade(
                         $testeMK ? "PF" : Auth::guard('representante')->user()->tipoPessoa(),
                         $dadosRepresentante,
-                        $endereco,
+                        $endereco
                     );
                 }
                 else {

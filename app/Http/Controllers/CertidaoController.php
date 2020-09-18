@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use PDF;
 use App\Certidao;
 use App\Mail\CertidaoMail;
+use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -56,6 +57,9 @@ class CertidaoController extends Controller
         $email = new CertidaoMail($pdf->output());
         Mail::to($dadosRepresentante["email"])->queue($email);
 
+        // Log externo de emissão de certidão
+        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" emitiu Certidão de Regularidade.'));
+
         return $pdf->stream("certidao.pdf");
     }
 
@@ -95,6 +99,9 @@ class CertidaoController extends Controller
         // Envio de e-mail com o PDF
         $email = new CertidaoMail($pdf->output());
         Mail::to($dadosRepresentante["email"])->queue($email);
+
+        // Log externo de emissão de certidão
+        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" emitiu Certidão de Parcelamento.'));
 
         return $pdf->stream("certidao.pdf");
     }

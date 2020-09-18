@@ -177,8 +177,8 @@ class Representante extends Authenticable
 
         $enderecoFormatado = $enderecoGerenti["Logradouro"];
         
-        if(isset($enderecoGerenti["Complemento"])) {
-            $enderecoFormatado .= ", " . $enderecoGerenti["Logradouro"];
+        if(!empty($enderecoGerenti["Complemento"])) {
+            $enderecoFormatado .= ", " . $enderecoGerenti["Complemento"];
         }
 
         $enderecoFormatado .= ", " . $enderecoGerenti["Bairro"];
