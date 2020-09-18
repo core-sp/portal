@@ -45,7 +45,7 @@ Route::prefix('admin')->group(function() {
   require('admin/cursos.php');
 
 
-  require('admin/fiscalizacao.php');
+  //require('admin/fiscalizacao.php');
 
   // Rotas para usuários
   Route::prefix('usuarios')->group(function(){
@@ -236,8 +236,8 @@ Route::prefix('/')->group(function() {
   });
 
   // Rotas para o SIG (Sistema de Informação Geográfico)
-  Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
-  Route::get('/mapa-fiscalizacao/{ano}', 'FiscalizacaoController@mostrarMapaAno')->name('fiscalizacao.mapaano');
+  // Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
+  // Route::get('/mapa-fiscalizacao/{ano}', 'FiscalizacaoController@mostrarMapaAno')->name('fiscalizacao.mapaano');
 
   // Rotas para consulta de autenticidade da Certidão
   Route::get('certidao/consulta', 'CertidaoController@consultaView')->name('certidao.consultaView');
