@@ -25,8 +25,8 @@ class ConsultaCertidaoRequest extends FormRequest
             "hora.date_format" => "Hora da emissão inválida",
             "data.required" => "Data da emissão é obrigatória",
             "data.date_format" => "Data da emissão inválida",
-            "g-recaptcha-response' => 'ReCAPTCHA inválido",
-            "g-recaptcha-response.required' => 'ReCAPTCHA obrigatório"
+            "g-recaptcha-response" => "ReCAPTCHA inválido",
+            "g-recaptcha-response.required" => "ReCAPTCHA obrigatório"
         ];
     }
 }
