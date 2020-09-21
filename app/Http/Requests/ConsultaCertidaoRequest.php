@@ -11,7 +11,8 @@ class ConsultaCertidaoRequest extends FormRequest
         return [
             "codigo" => "required|min:32",
             "hora" => "required|date_format:H:i",
-            "data" => "required|date_format:d/m/Y"
+            "data" => "required|date_format:d/m/Y",
+            "g-recaptcha-response" => "required|recaptcha"
         ];
     }
 
@@ -23,7 +24,9 @@ class ConsultaCertidaoRequest extends FormRequest
             "hora.required" => "Hora da emissão é obrigatória",
             "hora.date_format" => "Hora da emissão inválida",
             "data.required" => "Data da emissão é obrigatória",
-            "data.date_format" => "Data da emissão inválida"
+            "data.date_format" => "Data da emissão inválida",
+            "g-recaptcha-response' => 'ReCAPTCHA inválido",
+            "g-recaptcha-response.required' => 'ReCAPTCHA obrigatório"
         ];
     }
 }
