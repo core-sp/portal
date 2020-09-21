@@ -368,7 +368,7 @@ use \App\Http\Controllers\Helper;
       <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js"></script>
       <script type="text/javascript" src="{{ asset('/js/jquery.mask.js') }}"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.js"></script>
-      <script type="text/javascript" src='https://www.google.com/recaptcha/api.js'></script>
+      <script type="text/javascript" src='https://www.google.com/recaptcha/api.js?hl=pt-BR'></script>
       <script type="text/javascript" src="{{ asset('/js/site.js?'.time()) }}"></script>
       <script type="text/javascript" src="{{ asset('/js/acessibilidade.js') }}"></script>
     </body>
