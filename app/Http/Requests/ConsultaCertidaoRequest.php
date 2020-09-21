@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\RecaptchaRequired;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ConsultaCertidaoRequest extends FormRequest
@@ -12,7 +13,7 @@ class ConsultaCertidaoRequest extends FormRequest
             "codigo" => "required|min:32",
             "hora" => "required|date_format:H:i",
             "data" => "required|date_format:d/m/Y",
-            "g-recaptcha-response" => "required|recaptcha"
+            "g-recaptcha-response" => [new RecaptchaRequired, "recaptcha"]
         ];
     }
 
@@ -25,8 +26,7 @@ class ConsultaCertidaoRequest extends FormRequest
             "hora.date_format" => "Hora da emissão inválida",
             "data.required" => "Data da emissão é obrigatória",
             "data.date_format" => "Data da emissão inválida",
-            "g-recaptcha-response" => "ReCAPTCHA inválido",
-            "g-recaptcha-response.required" => "ReCAPTCHA obrigatório"
+            "g-recaptcha-response.recaptcha" => "ReCAPTCHA inválido"
         ];
     }
 }
