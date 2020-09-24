@@ -43,6 +43,8 @@ Route::prefix('admin')->group(function() {
   require('admin/concursos.php');
   // Rotas de concursos
   require('admin/cursos.php');
+  // Rotas do mapa de fiscalização (possivelmente será removido pois os dados virão do GERENTI)
+  require('admin/fiscalizacao.php');
 
   // Rotas para usuários
   Route::prefix('usuarios')->group(function(){
@@ -227,6 +229,10 @@ Route::prefix('/')->group(function() {
   Route::get('/chat', function(){
     return view('site.chat');
   });
+
+  // Rotas para o SIG (Sistema de Informação Geográfico)
+  Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
+  Route::get('/mapa-fiscalizacao/{ano}', 'FiscalizacaoController@mostrarMapaAno')->name('fiscalizacao.mapaano');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

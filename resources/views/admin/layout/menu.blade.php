@@ -317,6 +317,30 @@
                 @endif
             </ul>
         </li>
+    
+        <li class="nav-header">FISCALIZAÇÃO</li>
+            <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon far fa-file-alt"></i>
+                    <p>Dados de Fiscalização<i class="right fa fa-angle-left"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ route('fiscalizacao.index') }}" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Todos os anos</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('fiscalizacao.createano') }}" class="nav-link">
+                            <i class="nav-icon fa fa-angle-right"></i>
+                            <p>Abrir Ano</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        
+
     </ul>
 </nav>
 <!-- /.sidebar-menu -->

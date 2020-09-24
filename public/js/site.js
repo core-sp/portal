@@ -279,6 +279,23 @@ function noWeekendsOrHolidays(date) {
     }
 }
 
+$('.mapa_regional').on({
+	"click": function() {
+		$(".dado-regional").addClass('d-none');
+		$(".mapa_regional").removeClass("regional-selecionada");
+		$("#instrucao-mapa").addClass('dado-oculto');
+
+		$("#dado-" + $(this).attr('id')).removeClass('d-none');
+		$("#" + $(this).attr('id')).addClass("regional-selecionada");
+	},
+});
+
+$('#ano-mapa').on({
+	"change": function() {
+		window.location.href = "/mapa-fiscalizacao/" + $(this).val();
+	},
+});
+
 (function($){
 	$(function(){
 		// Botão Saiba Mais do Banco de Oportunidades
