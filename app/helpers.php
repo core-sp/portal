@@ -278,6 +278,7 @@ function gerentiTiposContatos()
         '4' => 'Fax',
         '5' => 'Home Page',
         '6' => 'Tel. Emergência',
+        '7' => 'Tel. Contato',
         '8' => 'Tel. Referência',
         '51' => 'SMS',
         '52' => 'WhatsApp',
