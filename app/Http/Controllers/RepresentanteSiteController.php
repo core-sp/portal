@@ -432,8 +432,15 @@ class RepresentanteSiteController extends Controller
                 if($testeMK) {
                     $podeEmitir = true;
                 }
-                else {
-                    $podeEmitir = Auth::guard("representante")->user()->pegaSituacao() === "Em dia." ? true : false;
+                else {    
+                    if(Auth::guard("representante")->user()->pegaSituacao() === "Em dia.") {
+                        $podeEmitir = true;
+                    }
+                    else {
+                        $podeEmitir = false;
+
+                        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de regularidade porque não está em dia.'));
+                    }
                 }
                 
                 if($podeEmitir) {                    
@@ -463,6 +470,8 @@ class RepresentanteSiteController extends Controller
                         // Se não existe outras cobranças, não há acordo de parcelamento
                         if(empty($cobrancas["outros"])) {
                             $podeEmitir = false;
+
+                            event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque não possui outras cobranças.'));
                         }
                         else {
                             $parcelamentosAgrupados = array();
@@ -477,6 +486,8 @@ class RepresentanteSiteController extends Controller
                                     // Se qualquer parcelamento estiver vencido, a certidão não pode ser emitida. Cancelamos a iteração.
                                     if($cobranca["SITUACAO"] === "Em aberto" && $cobranca["VENCIMENTOBOLETO"] === null) {
                                         $podeEmitir = false;
+
+                                        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque possui pagamento expirado.'));
                                         break;
                                     }
                                 }
@@ -484,7 +495,9 @@ class RepresentanteSiteController extends Controller
                             
                             // Não existe acordos em outras cobranças
                             if (empty($parcelamentosAgrupados)) {
-                                $podeEmitir =  false;
+                                $podeEmitir = false;
+
+                                event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque não possui acordos de parcelamento.'));
                             }
                             else {
                                 foreach($parcelamentosAgrupados as $grupo) {
@@ -525,7 +538,9 @@ class RepresentanteSiteController extends Controller
                         }
                     }
                     else {
-                        $podeEmitir =  false;
+                        $podeEmitir = false;
+
+                        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque sua situação não é parcelamento em aberto.'));
                     }
                 }
 
