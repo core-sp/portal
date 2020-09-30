@@ -159,7 +159,7 @@ class CertidaoController extends Controller
 
             // Se sertidão de parcelamento, adiciona informações do acordo de parcelamento
             if($certidao->tipo == Certidao::$tipo_parcelamento) {
-                array_merge($resultado, ["Acordo" => $certidao->acordo_parcelamento]);
+                $resultado = array_merge($resultado, ["Acordo" => $certidao->acordo_parcelamento]);
             }
         }
 

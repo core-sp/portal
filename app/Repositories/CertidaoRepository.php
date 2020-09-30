@@ -24,7 +24,7 @@ class CertidaoRepository
         ]);
 
         // Persistir os dados do parcelamento
-        if(Certidao::$tipo_parcelamento) {
+        if($tipo == Certidao::$tipo_parcelamento) {
             if($dadosParcelamento != null) {
                 $certidao->update(["acordo_parcelamento" => 
                     "referente à(s) anuidade(s) de " . $dadosParcelamento["parcelamento_ano"] . ", " .

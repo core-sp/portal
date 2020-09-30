@@ -167,7 +167,7 @@ class Representante extends Authenticable
      */
     public function pegaSituacao($ass_id = null)
     {
-        if($ass_id == null) {
+        if($ass_id != null) {
             $situacao = $this->gerentiStatus($ass_id);
         }
         else {
