@@ -22,9 +22,11 @@ class CreateCertidoesTable extends Migration
             $table->string('cpf_cnpj');
             $table->string('registro_core');
             $table->date('data_inscricao');
+            $table->string('endereco');
             $table->string('tipo_empresa')->nullable();
             $table->string('resp_tecnico')->nullable();
             $table->string('resp_tecnico_registro_core')->nullable();
+            $table->string('acordo_parcelamento')->nullable();
             $table->time('hora_emissao');
             $table->date('data_emissao');
         });

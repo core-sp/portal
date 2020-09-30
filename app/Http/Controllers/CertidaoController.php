@@ -29,9 +29,9 @@ class CertidaoController extends Controller
     {
         $certidao =  DB::transaction(function () use ($tipoPessoa, $dadosRepresentante, $endereco) {
             // Criar a certidao no banco de dados
-            $certidao = $this->certidaoRepository->store("Regularidade", $tipoPessoa, $dadosRepresentante);
+            $certidao = $this->certidaoRepository->store(Certidao::$tipo_regularidade , $tipoPessoa, $dadosRepresentante, $endereco);
 
-            //Atualizar o GERENTI com a certidão criada
+            // TODO - Atualizar o GERENTI com a certidão criada
 
             return $certidao;
         });
@@ -71,9 +71,9 @@ class CertidaoController extends Controller
     {
         $certidao =  DB::transaction(function () use ($tipoPessoa, $dadosRepresentante, $endereco, $dadosParcelamento) {
             // Criar a certidao no banco de dados
-            $certidao = $this->certidaoRepository->store("Parcelamento", $tipoPessoa, $dadosRepresentante);
+            $certidao = $this->certidaoRepository->store(Certidao::$tipo_parcelamento, $tipoPessoa, $dadosRepresentante, $endereco, $dadosParcelamento);
 
-            //Atualizar o GERENTI com a certidão criada
+            // TODO - Atualizar o GERENTI com a certidão criada
 
             return $certidao;
         });
@@ -155,6 +155,11 @@ class CertidaoController extends Controller
                     "Registro do Resp. Técnico" => $certidao->resp_tecnico_registro_core,
                     "Data de Emissão" => organizaData(date('Y-m-d H:i', strtotime($certidao->data_emissao . $certidao->hora_emissao)))
                 ];
+            }
+
+            // Se sertidão de parcelamento, adiciona informações do acordo de parcelamento
+            if($certidao->tipo == Certidao::$tipo_parcelamento) {
+                array_merge($resultado, ["Acordo" => $certidao->acordo_parcelamento]);
             }
         }
 

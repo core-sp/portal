@@ -161,6 +161,24 @@ class Representante extends Authenticable
         return $this->gerentiStatus($this->ass_id);
     }
 
+    /**
+     * Recupera status com parse (remove "Situação:" e remove espaços).
+     * Se ass_id não for passado, será usado o ass_id da instância atual do Representante.
+     */
+    public function pegaSituacao($ass_id = null)
+    {
+        if($ass_id == null) {
+            $situacao = $this->gerentiStatus($ass_id);
+        }
+        else {
+            $situacao = $this->status();
+        }
+        
+        $array = explode(':', $situacao);
+        
+        return trim($array[1]);
+    }
+
     public function boletoAnuidade()
     {
         $cpfCnpj = preg_replace('/[^0-9]+/', '', $this->cpf_cnpj);

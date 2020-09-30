@@ -424,40 +424,116 @@ class RepresentanteSiteController extends Controller
             }
 
             // Recupera dados do endereço
-            $endereco = Auth::guard('representante')->user()->enderecoFormatado();
+            $endereco = Auth::guard("representante")->user()->enderecoFormatado();
         }
 
         switch($tipo) {
             case "Regularidade":
-                $podeEmitir = true;
-                //$podeEmitir = Auth::guard('representante')->user()->status() === "" ? true : false;
-
+                if($testeMK) {
+                    $podeEmitir = true;
+                }
+                else {
+                    $podeEmitir = Auth::guard("representante")->user()->pegaSituacao() === "Em dia." ? true : false;
+                }
+                
                 if($podeEmitir) {                    
                     return $this->certidaoController->storeCertidaoRegularidade(
-                        $testeMK ? "PF" : Auth::guard('representante')->user()->tipoPessoa(),
+                        $testeMK ? "PF" : Auth::guard("representante")->user()->tipoPessoa(),
                         $dadosRepresentante,
                         $endereco
                     );
                 }
                 else {
                     return view("site.representante.emitir-certidao")
-                        ->with("mensagem", "Certidão de Regularidade não pode ser expedida.<br><b>Motivo:</b> mensagem do motivo")
-                        ->with("titulo", "Certidão de Regularidade")
-                        ->with("erro", "mensagem explicando o motivo da falha da emissão.");;
+                        ->with("mensagem", "Certidão de Regularidade não pode ser emitida. Por favor verificar sua situação finaceira com o CORE-SP.")
+                        ->with("titulo", "Certidão de Regularidade");
                 }
             break;
     
             case "Parcelamento":
-                $podeEmitir = true;
-                // $podeEmitir = Auth::guard('representante')->user()
+                if($testeMK) {
+                    $podeEmitir = true;
+                }
+                else {
+                    if(Auth::guard("representante")->user()->pegaSituacao() === "Parcelamento em aberto.") {
+                        $podeEmitir = true;
+                        
+                        $cobrancas = Auth::guard("representante")->user()->cobrancas();
+
+                        // Se não existe outras cobranças, não há acordo de parcelamento
+                        if(empty($cobrancas["outros"])) {
+                            $podeEmitir = false;
+                        }
+                        else {
+                            $parcelamentosAgrupados = array();
+
+                            // Agrupa todos os Acordos por anos parcelados
+                            foreach ($cobrancas["outros"] as $cobranca) {
+                                if(strpos($cobranca["DESCRICAO"], "Acordo") !== false) {
+                                    preg_match_all("/\((.*?)\)/", $cobranca["DESCRICAO"], $matches);
+
+                                    $parcelamentosAgrupados[$matches[1][0]][] = $cobranca;
+
+                                    // Se qualquer parcelamento estiver vencido, a certidão não pode ser emitida. Cancelamos a iteração.
+                                    if($cobranca["SITUACAO"] === "Em aberto" && $cobranca["VENCIMENTOBOLETO"] === null) {
+                                        $podeEmitir = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            // Não existe acordos em outras cobranças
+                            if (empty($parcelamentosAgrupados)) {
+                                $podeEmitir =  false;
+                            }
+                            else {
+                                foreach($parcelamentosAgrupados as $grupo) {
+                                    $acordoPago = true;
+                                    $primeiraParcelaPaga = false;
+
+                                    // Iterando para verificar se todas as parcelas foram pagas
+                                    foreach($grupo as $index => $parcelamento) {
+                                        // Caso uma parcela esteja em aberto, o acordo não foi totalmente pago
+                                        if($parcelamento["SITUACAO"] === "Em aberto") {
+                                            $acordoPago = false;
+                                        }
+
+                                        // Último valor do array contêm a primeira parcela do acordo
+                                        if($index == count($grupo) - 1) {
+                                            // Verifica se a primeira parcela foi paga
+                                            if($parcelamento["SITUACAO"] === "Pago") {
+                                                $primeiraParcelaPaga = true;
+                                            }
+                                        }
+                                    }
+
+                                    // Caso o acordo ainda não esteja totalmente pago e a primeira parcela foi paga, recuperamos dados do acordo
+                                    if(!$acordoPago && $primeiraParcelaPaga) {
+                                        // Recupera o número de parcelas ([0] = parcela atual, [1] = total de parcelas)
+                                        preg_match_all("/Parcela (.*?) Acordo/", $grupo[0]["DESCRICAO"], $matches); 
+                                        $numeroParcelas = explode("/", $matches[1][0]);
+
+                                        // Recupera os anos do parcelamento
+                                        preg_match_all("/\((.*?)\)/", $grupo[0]["DESCRICAO"], $matches); 
+                                        $anosParcelas = $matches[1][0];
+
+                                        // Recupera data do primeiro pagamento
+                                        $primeiroPagamento = onlyDate($grupo[count($grupo) - 1]["VENCIMENTO"]);
+                                    }
+                                }
+                            } 
+                        }
+                    }
+                    else {
+                        $podeEmitir =  false;
+                    }
+                }
 
                 if($podeEmitir) {
                     $dadosParcelamento = [
-                        "parcelamento_ano_inicio" => "02/02/2020", 
-                        "parcelamento_ano_fim" => "02/02/2021",
-                        "numero_parcelas" => "10",
-                        "data_primeiro_pagamento" => "02/02/2020",
-                        "ano_quitado" => "2020"
+                        "parcelamento_ano" => $anosParcelas, 
+                        "numero_parcelas" => $numeroParcelas[1],
+                        "data_primeiro_pagamento" => $primeiroPagamento
                     ];
 
                     return $this->certidaoController->storeCertidaoParcelamento(
@@ -469,9 +545,8 @@ class RepresentanteSiteController extends Controller
                 }
                 else {
                     return view("site.representante.emitir-certidao")
-                        ->with("mensagem", "Certidão de Parcelamento não pode ser expedida.<br><b>Motivo:</b> mensagem do motivo")
-                        ->with("titulo", "Certidão de Parcelamento")
-                        ->with("erro", "mensagem explicando o motivo da falha da emissão.");
+                        ->with("mensagem", "Certidão de Parcelamento não pode ser emitida. Por favor verificar sua situação finaceira com o CORE-SP.")
+                        ->with("titulo", "Certidão de Parcelamento");
                 }
             break;
     

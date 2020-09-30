@@ -10,6 +10,9 @@ class Certidao extends Model
     protected $guarded = [];
     public $timestamps = false;
 
+    static $tipo_regularidade = 'Regularidade';
+    static $tipo_parcelamento = 'Parcelamento';
+
     // Formata o código da Certidão para XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX
     public function codigoFormatado() 
     {

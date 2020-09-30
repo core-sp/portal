@@ -8,7 +8,7 @@
   @if(!empty($dadosRepresentante["resp_tecnico"]))
   Tendo como Responsável Técnico o(a) sr.(a) <b>{{ $dadosRepresentante["resp_tecnico"] }},</b> registrado(a) sob o número <b>{{ $dadosRepresentante["resp_tecnico_registro_core"] }}.</b> 
   @endif
-  A mencionada empresa firmou Acordo de Parcelamento referente à(s) anuidade(s) de <b>{{ $dadosParcelamento["parcelamento_ano_inicio"] }},</b> e <b>{{ $dadosParcelamento["parcelamento_ano_fim"] }},</b> em <b>{{ $dadosParcelamento["numero_parcelas"] }}</b> parcelas fixas e mensais, efetuando o primeiro pagamento em <b>{{ $dadosParcelamento["data_primeiro_pagamento"] }},</b> tendo quitado a anuidade de <b>{{ $dadosParcelamento["ano_quitado"] }}.</b>
+  A mencionada empresa firmou Acordo de Parcelamento referente à(s) anuidade(s) de <b>{{ $dadosParcelamento["parcelamento_ano"] }},</b>  em <b>{{ $dadosParcelamento["numero_parcelas"] }}</b> parcelas fixas e mensais, efetuando o primeiro pagamento em <b>{{ $dadosParcelamento["data_primeiro_pagamento"] }}.</b>
 </p>
 
 @endsection
