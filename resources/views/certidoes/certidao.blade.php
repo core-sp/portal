@@ -22,10 +22,10 @@
           <img src="{{ public_path('img/logo-core.png') }}" alt="CORE-SP" />
       </div>
       <div>
-        <h1 class="centro">{!! $titulo !!}}</h1>
+        <h1 class="centro">{!! $titulo !!}</h1>
 
         <p class="texto-certidao">
-          {!! $declaracao !!}}
+          {!! $declaracao !!}
         </p>
 
         <p class="texto-certidao">

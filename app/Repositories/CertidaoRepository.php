@@ -11,7 +11,7 @@ class CertidaoRepository
         // Certidão é criada no abnco primeiro para obter gerar a data de emissão e o ID
         $certidao = Certidao::create([
             "tipo" => $tipo,
-            "cpf_cnpj" => $dadosRepresentante["cpf_cnpj"],
+            "cpf_cnpj" => preg_replace('/[^0-9]+/', '', $dadosRepresentante["cpf_cnpj"]),
             "hora_emissao" => date("H:i"),
             "data_emissao" => date("Y-m-d")
         ]);
