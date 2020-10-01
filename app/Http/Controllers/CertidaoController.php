@@ -38,11 +38,9 @@ class CertidaoController extends Controller
         // Formata o código para facilitar a visualização (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)
         $codigoCertidao = $certidao->codigoFormatado();
 
-        // Setando o locale para pt-BR para recuperar o mês por extenso
-        setlocale(LC_TIME, "pt_BR.utf8");
+        Certidao::declaracaoRegularidade(true, $tipoPessoa, $dadosRepresentante, $endereco, $certidao->data_emissao);
+
         $data = [
-            "mes" => strftime("%B", strtotime($certidao->data_emissao)),
-            "ano" => strftime("%Y",  strtotime($certidao->data_emissao)),
             "hora" => strftime("%H:%M",  strtotime($certidao->hora_emissao)),
             "data" => onlyDate($certidao->data_emissao)
         ];
@@ -51,7 +49,7 @@ class CertidaoController extends Controller
         $nomeView = $tipoPessoa == "PF" ? "certidoes.regularidade-pf" : "certidoes.regularidade-pj";
 
         // Cria o PDF usando a view de acordo com o tipo de pessoa
-        $pdf = PDF::loadView($nomeView, compact("dadosRepresentante", "endereco", "codigoCertidao", "data"));
+        $pdf = PDF::loadView($nomeView, compact("declaracao", "codigoCertidao", "data"));
 
         // Envio de e-mail com o PDF
         $email = new CertidaoMail($pdf->output());
@@ -81,11 +79,9 @@ class CertidaoController extends Controller
         // Formata o código para facilitar a visualização (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)
         $codigoCertidao = $certidao->codigoFormatado();
 
-        // Setando o locale para pt-BR para recuperar o mês por extenso
-        setlocale(LC_TIME, "pt_BR.utf8");
+        Certidao::declaracaoParcelamento(true, $tipoPessoa, $dadosRepresentante, $endereco, $dadosParcelamento);
+
         $data = [
-            "mes" => strftime("%B", strtotime($certidao->data_emissao)),
-            "ano" => strftime("%Y",  strtotime($certidao->data_emissao)),
             "hora" => strftime("%H:%M",  strtotime($certidao->hora_emissao)),
             "data" => onlyDate($certidao->data_emissao)
         ];
@@ -94,7 +90,7 @@ class CertidaoController extends Controller
         $nomeView = $tipoPessoa == "PF" ? "certidoes.parcelamento-pf" : "certidoes.parcelamento-pj";
 
         // Cria o PDF usando a view de acordo com o tipo de pessoa
-        $pdf = PDF::loadView($nomeView, compact("dadosRepresentante", "dadosParcelamento", "endereco", "codigoCertidao", "data"));
+        $pdf = PDF::loadView($nomeView, compact("declaracao", "codigoCertidao", "data"));
 
         // Envio de e-mail com o PDF
         $email = new CertidaoMail($pdf->output());

@@ -17,16 +17,8 @@ class CreateCertidoesTable extends Migration
             $table->bigIncrements('id');
             $table->string('tipo');
             $table->string('codigo')->nullable();
-            $table->string('tipo_pessoa');
-            $table->string('nome');
             $table->string('cpf_cnpj');
-            $table->string('registro_core');
-            $table->date('data_inscricao');
-            $table->string('endereco');
-            $table->string('tipo_empresa')->nullable();
-            $table->string('resp_tecnico')->nullable();
-            $table->string('resp_tecnico_registro_core')->nullable();
-            $table->string('acordo_parcelamento')->nullable();
+            $table->text('declaracao')->nullable();
             $table->time('hora_emissao');
             $table->date('data_emissao');
         });
