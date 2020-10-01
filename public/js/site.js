@@ -198,20 +198,20 @@ $(document).ready(function(){
 			getInfoEmpresa(value);
 		}
 	}
-	// Popup Campanha
-	var campanha = localStorage.getItem('campanha');
-	if (campanha == null) {
-		localStorage.setItem('campanha', 1);
-		$(window).on('load', function(){
-			$('#popup-campanha').modal('show');
-		});
-	}
-	$('#popup-campanha').on('hidden.bs.modal', function(){
-		$('#video-campanha').get(0).pause();
-	});
-	$('#video-campanha').on('ended', function(){
-		$('#popup-campanha').modal('hide');
-	});
+	// Popup Campanha (removido)
+	// var campanha = localStorage.getItem('campanha');
+	// if (campanha == null) {
+	// 	localStorage.setItem('campanha', 1);
+	// 	$(window).on('load', function(){
+	// 		$('#popup-campanha').modal('show');
+	// 	});
+	// }
+	// $('#popup-campanha').on('hidden.bs.modal', function(){
+	// 	$('#video-campanha').get(0).pause();
+	// });
+	// $('#video-campanha').on('ended', function(){
+	// 	$('#popup-campanha').modal('hide');
+	// });
 });
 
 // Lightbox
