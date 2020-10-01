@@ -64,7 +64,7 @@ use \App\Http\Controllers\Helper;
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
                 <h3 class="cinza-claro">#eurepresento</h3>
-                <p class="cinza-claro">1º de outubro Dia Pan-americano do Representante Comercial</p>
+                <p class="cinza-claro">1º de outubro<br>Dia Pan-americano do<br>Representante Comercial</p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
