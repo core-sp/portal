@@ -35,10 +35,8 @@
       <div class="mt-3">
         @if($autenticado)
         <div class="alert alert-warning"> 
-          <h5><i class="icon fa fa-check"></i>Esta é uma certidão autêntica emitida pelo site oficial do CORE-SP. Esta certidão contêm as seguintes informações:</h5>
-          @foreach ($resultado as $key => $dado)
-          <p><strong>{{ $key }}:</strong> {{ $dado }}</p>
-          @endforeach
+          <h5><i class="icon fa fa-check"></i>Esta é uma certidão autêntica emitida pelo site oficial do CORE-SP. Esta certidão contêm a seguinte declaração:</h5>
+          <p><strong>{{ $resultado }}</strong></p>
         </div>
         @else
         <div class="alert">

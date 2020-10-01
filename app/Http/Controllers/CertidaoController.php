@@ -126,35 +126,7 @@ class CertidaoController extends Controller
         else {
             $autenticado = true;
 
-            // Informações diferentes de acordo com o tipo de pessoa
-            if($certidao->tipo_pessoa == "PF") {
-                $resultado = [
-                    "Tipo" => $certidao->tipo,
-                    "Nome" => $certidao->nome,
-                    "CPF" => $certidao->cpf_cnpj,
-                    "Registro" => $certidao->registro_core,
-                    "Data de Inscrição" => onlyDate($certidao->data_inscricao),
-                    "Data de Emissão" => organizaData(date('Y-m-d H:i', strtotime($certidao->data_emissao . $certidao->hora_emissao)))
-                ];
-            }
-            else {
-                $resultado = [
-                    "Tipo" => $certidao->tipo,
-                    "Razão Social" => $certidao->nome,
-                    "CNPJ" => $certidao->cpf_cnpj,
-                    "Registro" => $certidao->registro_core,
-                    "Data de Inscrição" => onlyDate($certidao->data_inscricao),
-                    "Tipo de Empresa" => $certidao->tipo_empresa,
-                    "Responsável Técnico" => $certidao->resp_tecnico,
-                    "Registro do Resp. Técnico" => $certidao->resp_tecnico_registro_core,
-                    "Data de Emissão" => organizaData(date('Y-m-d H:i', strtotime($certidao->data_emissao . $certidao->hora_emissao)))
-                ];
-            }
-
-            // Se sertidão de parcelamento, adiciona informações do acordo de parcelamento
-            if($certidao->tipo == Certidao::$tipo_parcelamento) {
-                $resultado = array_merge($resultado, ["Acordo" => $certidao->acordo_parcelamento]);
-            }
+            $resultado = $certidao->declaracao;
         }
 
         return view("site.consulta-certidao", compact(["autenticado", "resultado"]));
