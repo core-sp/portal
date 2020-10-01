@@ -38,18 +38,17 @@ class CertidaoController extends Controller
         // Formata o código para facilitar a visualização (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)
         $codigoCertidao = $certidao->codigoFormatado();
 
-        Certidao::declaracaoRegularidade(true, $tipoPessoa, $dadosRepresentante, $endereco, $certidao->data_emissao);
+        $declaracao = Certidao::declaracaoRegularidade(true, $tipoPessoa, $dadosRepresentante, $endereco, $certidao->data_emissao);
 
         $data = [
             "hora" => strftime("%H:%M",  strtotime($certidao->hora_emissao)),
             "data" => onlyDate($certidao->data_emissao)
         ];
         
-        // Checa o tipo de pessoa (física ou jurídica)
-        $nomeView = $tipoPessoa == "PF" ? "certidoes.regularidade-pf" : "certidoes.regularidade-pj";
+        $titulo = "Certidão de Regularidade";
 
         // Cria o PDF usando a view de acordo com o tipo de pessoa
-        $pdf = PDF::loadView($nomeView, compact("declaracao", "codigoCertidao", "data"));
+        $pdf = PDF::loadView("certidoes.certidao", compact("declaracao", "codigoCertidao", "data", "titulo"));
 
         // Envio de e-mail com o PDF
         $email = new CertidaoMail($pdf->output());
@@ -79,18 +78,17 @@ class CertidaoController extends Controller
         // Formata o código para facilitar a visualização (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)
         $codigoCertidao = $certidao->codigoFormatado();
 
-        Certidao::declaracaoParcelamento(true, $tipoPessoa, $dadosRepresentante, $endereco, $dadosParcelamento);
+        $declaracao = Certidao::declaracaoParcelamento(true, $tipoPessoa, $dadosRepresentante, $endereco, $dadosParcelamento);
 
         $data = [
             "hora" => strftime("%H:%M",  strtotime($certidao->hora_emissao)),
             "data" => onlyDate($certidao->data_emissao)
         ];
-
-        // Checa o tipo de pessoa (física ou jurídica)
-        $nomeView = $tipoPessoa == "PF" ? "certidoes.parcelamento-pf" : "certidoes.parcelamento-pj";
+        
+        $titulo = "Certidão de Parcelamento";
 
         // Cria o PDF usando a view de acordo com o tipo de pessoa
-        $pdf = PDF::loadView($nomeView, compact("declaracao", "codigoCertidao", "data"));
+        $pdf = PDF::loadView("certidoes.certidao", compact("declaracao", "codigoCertidao", "data", "titulo"));
 
         // Envio de e-mail com o PDF
         $email = new CertidaoMail($pdf->output());

@@ -113,5 +113,7 @@ class Certidao extends Model
                 } 
             break;
         }
+
+        return $declaracao;
     }
 }
