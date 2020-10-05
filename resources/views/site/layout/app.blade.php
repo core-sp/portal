@@ -63,8 +63,8 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
-                <h3 class="cinza-claro">#eurepresento</h3>
-                <p class="cinza-claro">1º de outubro<br>Dia Pan-americano do<br>Representante Comercial</p>
+                <h3 class="cinza-claro">#outubrorosa</h3>
+                <p class="cinza-claro">Luta contra o Câncer de mama</br>A conscientização é o melhor caminho</p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
@@ -196,13 +196,13 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
         <a href="/servicos-atendimento-ao-rc" class="hide-768">
-          <div class="container-fluid bg-warning pt-2 pb-2">
+          <div class="container-fluid azul-escuro-bg pt-2 pb-2">
             <div class="row">
                 <div class="container">
                   <div class="d-flex">
                     <div class="flex-one aai">
-                      <h5 class="d-inline pr-3 preto"><strong>Atendimento on-line</strong></h5>
-                      <p class="d-inline preto">Clique aqui e tenha acesso aos principais serviços pelo Setor de Atendimento do Core-SP.</p>
+                      <h5 class="d-inline pr-3 cinza-claro"><strong>Atendimento on-line</strong></h5>
+                      <p class="d-inline cinza-claro">Clique aqui e tenha acesso aos principais serviços pelo Setor de Atendimento do Core-SP.</p>
                     </div>
                   </div>
                 </div>
