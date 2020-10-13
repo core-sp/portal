@@ -381,167 +381,137 @@ class RepresentanteSiteController extends Controller
     
     public function emitirCertidao($tipo) 
     {   
-        $testeMK = false;
-
-        if($testeMK) {
-            // Dados de Representante Comercial Teste
-            $dadosRepresentante = [
-                "nome" => "Teste", 
-                "cpf_cnpj" => "12345679000012",
-                "registro_core" => "12345/12345",
-                "email" => "teste@teste.com",
-                "data_inscricao" => "20/12/2020",
-                "tipo_empresa" => "Empresa Peguena",
-                "resp_tecnico" => null,
-                "resp_tecnico_registro_core" => null
-            ];
-
-            // Endereço teste
-            $endereco = "Rua Teste, 1234, Teste São Paulo/SP CEP: 1234-1234";
-        }
-        else {
-            // Recupera dados do Representante Comercial
-            $dadosRepresentante = [
-                "nome" => Auth::guard('representante')->user()->nome, 
-                "cpf_cnpj" => Auth::guard('representante')->user()->cpf_cnpj,
-                "registro_core" => Auth::guard('representante')->user()->registro_core,
-                "email" => Auth::guard('representante')->user()->email,
-                "tipo_empresa" => null,
-                "resp_tecnico" => null,
-                "resp_tecnico_registro_core" => null
-            ];
-            // Dados de PJ: "Data de homologação", "Tipo de empresa", "Responsável técnico" (falta CPF do resposável técnico)
-            // Dados de PF: "Data de homologação"
-            $dadosGerenti = Auth::guard('representante')->user()->dadosGerais();
-            $dadosRepresentante["data_inscricao"] = $dadosGerenti["Data de homologação"];
-            if(Auth::guard('representante')->user()->tipoPessoa() == "PJ") {
-                $dadosRepresentante["tipo_empresa"] = $dadosGerenti["Tipo de empresa"];
-                if(!empty($dadosGerenti['Responsável técnico'])) {
-                    $rt = explode('(', $dados['Responsável técnico']);
-                    $dadosRepresentante["resp_tecnico"] = trim($rt[0]);
-                    $dadosRepresentante["resp_tecnico_registro_core"] = trim(str_replace(")", "",$rt[1]));
-                }
+        // Recupera dados do Representante Comercial
+        $dadosRepresentante = [
+            "nome" => Auth::guard('representante')->user()->nome, 
+            "cpf_cnpj" => Auth::guard('representante')->user()->cpf_cnpj,
+            "registro_core" => Auth::guard('representante')->user()->registro_core,
+            "email" => Auth::guard('representante')->user()->email,
+            "tipo_empresa" => null,
+            "resp_tecnico" => null,
+            "resp_tecnico_registro_core" => null
+        ];
+        // Dados de PJ: "Data de homologação", "Tipo de empresa", "Responsável técnico" (falta CPF do resposável técnico)
+        // Dados de PF: "Data de homologação"
+        $dadosGerenti = Auth::guard('representante')->user()->dadosGerais();
+        $dadosRepresentante["data_inscricao"] = $dadosGerenti["Data de homologação"];
+        if(Auth::guard('representante')->user()->tipoPessoa() == "PJ") {
+            $dadosRepresentante["tipo_empresa"] = $dadosGerenti["Tipo de empresa"];
+            if(!empty($dadosGerenti['Responsável técnico'])) {
+                $rt = explode('(', $dados['Responsável técnico']);
+                $dadosRepresentante["resp_tecnico"] = trim($rt[0]);
+                $dadosRepresentante["resp_tecnico_registro_core"] = trim(str_replace(")", "",$rt[1]));
             }
-
-            // Recupera dados do endereço
-            $endereco = Auth::guard("representante")->user()->enderecoFormatado();
         }
+
+        // Recupera dados do endereço
+        $endereco = Auth::guard("representante")->user()->enderecoFormatado();
 
         switch($tipo) {
             case "Regularidade":
-                if($testeMK) {
+                if(Auth::guard("representante")->user()->pegaSituacao() === "Em dia.") {
                     $podeEmitir = true;
                 }
-                else {    
-                    if(Auth::guard("representante")->user()->pegaSituacao() === "Em dia.") {
-                        $podeEmitir = true;
-                    }
-                    else {
-                        $podeEmitir = false;
+                else {
+                    $podeEmitir = false;
 
-                        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de regularidade porque não está em dia.'));
-                    }
+                    event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de regularidade porque não está em dia.'));
                 }
                 
                 if($podeEmitir) {                    
                     return $this->certidaoController->storeCertidaoRegularidade(
-                        $testeMK ? "PF" : Auth::guard("representante")->user()->tipoPessoa(),
+                        Auth::guard("representante")->user()->tipoPessoa(),
                         $dadosRepresentante,
                         $endereco
                     );
                 }
                 else {
                     return view("site.representante.emitir-certidao")
-                        ->with("mensagem", "Certidão de Regularidade não pode ser emitida. Por favor verificar sua situação finaceira com o CORE-SP.")
+                        ->with("mensagem", "Certidão de Regularidade não pode ser emitida. Por favor verificar sua situação finaceira no Portal do CORE-SP.")
                         ->with("titulo", "Certidão de Regularidade");
                 }
             break;
     
             case "Parcelamento":
-                if($testeMK) {
+                if(Auth::guard("representante")->user()->pegaSituacao() === "Parcelamento em aberto.") {
                     $podeEmitir = true;
-                }
-                else {
-                    if(Auth::guard("representante")->user()->pegaSituacao() === "Parcelamento em aberto.") {
-                        $podeEmitir = true;
-                        
-                        $cobrancas = Auth::guard("representante")->user()->cobrancas();
+                    
+                    $cobrancas = Auth::guard("representante")->user()->cobrancas();
 
-                        // Se não existe outras cobranças, não há acordo de parcelamento
-                        if(empty($cobrancas["outros"])) {
-                            $podeEmitir = false;
-
-                            event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque não possui outras cobranças.'));
-                        }
-                        else {
-                            $parcelamentosAgrupados = array();
-
-                            // Agrupa todos os Acordos por anos parcelados
-                            foreach ($cobrancas["outros"] as $cobranca) {
-                                if(strpos($cobranca["DESCRICAO"], "Acordo") !== false) {
-                                    preg_match_all("/\((.*?)\)/", $cobranca["DESCRICAO"], $matches);
-
-                                    $parcelamentosAgrupados[$matches[1][0]][] = $cobranca;
-
-                                    // Se qualquer parcelamento estiver vencido, a certidão não pode ser emitida. Cancelamos a iteração.
-                                    if($cobranca["SITUACAO"] === "Em aberto" && $cobranca["VENCIMENTOBOLETO"] === null) {
-                                        $podeEmitir = false;
-
-                                        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque possui pagamento expirado.'));
-                                        break;
-                                    }
-                                }
-                            }
-                            
-                            // Não existe acordos em outras cobranças
-                            if (empty($parcelamentosAgrupados)) {
-                                $podeEmitir = false;
-
-                                event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque não possui acordos de parcelamento.'));
-                            }
-                            else {
-                                foreach($parcelamentosAgrupados as $grupo) {
-                                    $acordoPago = true;
-                                    $primeiraParcelaPaga = false;
-
-                                    // Iterando para verificar se todas as parcelas foram pagas
-                                    foreach($grupo as $index => $parcelamento) {
-                                        // Caso uma parcela esteja em aberto, o acordo não foi totalmente pago
-                                        if($parcelamento["SITUACAO"] === "Em aberto") {
-                                            $acordoPago = false;
-                                        }
-
-                                        // Último valor do array contêm a primeira parcela do acordo
-                                        if($index == count($grupo) - 1) {
-                                            // Verifica se a primeira parcela foi paga
-                                            if($parcelamento["SITUACAO"] === "Pago") {
-                                                $primeiraParcelaPaga = true;
-                                            }
-                                        }
-                                    }
-
-                                    // Caso o acordo ainda não esteja totalmente pago e a primeira parcela foi paga, recuperamos dados do acordo
-                                    if(!$acordoPago && $primeiraParcelaPaga) {
-                                        // Recupera o número de parcelas ([0] = parcela atual, [1] = total de parcelas)
-                                        preg_match_all("/Parcela (.*?) Acordo/", $grupo[0]["DESCRICAO"], $matches); 
-                                        $numeroParcelas = explode("/", $matches[1][0]);
-
-                                        // Recupera os anos do parcelamento
-                                        preg_match_all("/\((.*?)\)/", $grupo[0]["DESCRICAO"], $matches); 
-                                        $anosParcelas = $matches[1][0];
-
-                                        // Recupera data do primeiro pagamento
-                                        $primeiroPagamento = onlyDate($grupo[count($grupo) - 1]["VENCIMENTO"]);
-                                    }
-                                }
-                            } 
-                        }
-                    }
-                    else {
+                    // Se não existe outras cobranças, não há acordo de parcelamento
+                    if(empty($cobrancas["outros"])) {
                         $podeEmitir = false;
 
-                        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque sua situação não é parcelamento em aberto.'));
+                        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque não possui outras cobranças.'));
                     }
+                    else {
+                        $parcelamentosAgrupados = array();
+
+                        // Agrupa todos os Acordos por anos parcelados
+                        foreach ($cobrancas["outros"] as $cobranca) {
+                            if(strpos($cobranca["DESCRICAO"], "Acordo") !== false) {
+                                preg_match_all("/\((.*?)\)/", $cobranca["DESCRICAO"], $matches);
+
+                                $parcelamentosAgrupados[$matches[1][0]][] = $cobranca;
+
+                                // Se qualquer parcelamento estiver vencido, a certidão não pode ser emitida. Cancelamos a iteração.
+                                if($cobranca["SITUACAO"] === "Em aberto" && $cobranca["VENCIMENTOBOLETO"] === null) {
+                                    $podeEmitir = false;
+
+                                    event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque possui pagamento expirado.'));
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // Não existe acordos em outras cobranças
+                        if (empty($parcelamentosAgrupados)) {
+                            $podeEmitir = false;
+
+                            event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque não possui acordos de parcelamento.'));
+                        }
+                        else {
+                            foreach($parcelamentosAgrupados as $grupo) {
+                                $acordoPago = true;
+                                $primeiraParcelaPaga = false;
+
+                                // Iterando para verificar se todas as parcelas foram pagas
+                                foreach($grupo as $index => $parcelamento) {
+                                    // Caso uma parcela esteja em aberto, o acordo não foi totalmente pago
+                                    if($parcelamento["SITUACAO"] === "Em aberto") {
+                                        $acordoPago = false;
+                                    }
+
+                                    // Último valor do array contêm a primeira parcela do acordo
+                                    if($index == count($grupo) - 1) {
+                                        // Verifica se a primeira parcela foi paga
+                                        if($parcelamento["SITUACAO"] === "Pago") {
+                                            $primeiraParcelaPaga = true;
+                                        }
+                                    }
+                                }
+
+                                // Caso o acordo ainda não esteja totalmente pago e a primeira parcela foi paga, recuperamos dados do acordo
+                                if(!$acordoPago && $primeiraParcelaPaga) {
+                                    // Recupera o número de parcelas ([0] = parcela atual, [1] = total de parcelas)
+                                    preg_match_all("/Parcela (.*?) Acordo/", $grupo[0]["DESCRICAO"], $matches); 
+                                    $numeroParcelas = explode("/", $matches[1][0]);
+
+                                    // Recupera os anos do parcelamento
+                                    preg_match_all("/\((.*?)\)/", $grupo[0]["DESCRICAO"], $matches); 
+                                    $anosParcelas = $matches[1][0];
+
+                                    // Recupera data do primeiro pagamento
+                                    $primeiroPagamento = onlyDate($grupo[count($grupo) - 1]["VENCIMENTO"]);
+                                }
+                            }
+                        } 
+                    }
+                }
+                else {
+                    $podeEmitir = false;
+
+                    event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" não emitiu certidão de parcelamento porque sua situação não é parcelamento em aberto.'));
                 }
 
                 if($podeEmitir) {
@@ -552,7 +522,7 @@ class RepresentanteSiteController extends Controller
                     ];
 
                     return $this->certidaoController->storeCertidaoParcelamento(
-                        $testeMK ? "PJ" : Auth::guard('representante')->user()->tipoPessoa(),
+                        Auth::guard('representante')->user()->tipoPessoa(),
                         $dadosRepresentante,
                         $endereco,
                         $dadosParcelamento
@@ -560,7 +530,7 @@ class RepresentanteSiteController extends Controller
                 }
                 else {
                     return view("site.representante.emitir-certidao")
-                        ->with("mensagem", "Certidão de Parcelamento não pode ser emitida. Por favor verificar sua situação finaceira com o CORE-SP.")
+                        ->with("mensagem", "Certidão de Parcelamento não pode ser emitida. Por favor verificar sua situação finaceira no Portal do CORE-SP.")
                         ->with("titulo", "Certidão de Parcelamento");
                 }
             break;
