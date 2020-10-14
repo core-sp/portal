@@ -7,15 +7,16 @@
         <h4 class="pt-1 pb-1">{!! $titulo !!}</h4>
         <div class="linha-lg-mini mb-3"></div>
         <p class="pt-2">
+            @if(!isset($erro))
             {!! $mensagem !!}
-            @if(isset($erro))
+            @else
             {!! $erro !!}
             @endif
         </p>
         @if(!isset($erro))
         <form method="POST">
             @csrf
-            <input type="submit" value="Verificar e Emitir" class="btn btn-sm btn-info" />
+            <input id="emitirCertidaoBtn" type="submit" value="Verificar e Baixar" class="btn btn-sm btn-info" />
         </form>
         @endif
     </div>

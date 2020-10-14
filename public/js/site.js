@@ -636,3 +636,7 @@ function showLoading()
 	$('#rc-main').hide();
 	$('#loading').show();
 }
+
+$('#emitirCertidaoBtn').on('click', function(){
+	$(this).hide();
+});

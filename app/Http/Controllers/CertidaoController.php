@@ -57,7 +57,7 @@ class CertidaoController extends Controller
         // Log externo de emissão de certidão
         event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" emitiu Certidão de Regularidade.'));
 
-        return $pdf->stream("certidao.pdf");
+        return $pdf->download("certidao.pdf");
     }
 
     /**
@@ -97,7 +97,7 @@ class CertidaoController extends Controller
         // Log externo de emissão de certidão
         event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" emitiu Certidão de Parcelamento.'));
 
-        return $pdf->stream("certidao.pdf");
+        return $pdf->download("certidao.pdf");
     }
 
     public function consultaView() 

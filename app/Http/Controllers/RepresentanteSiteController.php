@@ -362,13 +362,13 @@ class RepresentanteSiteController extends Controller
             case "Regularidade":
                 $titulo = "Certidão de Regularidade";
 
-                $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Regularidade.";
+                $mensagem = "Verifique abaixo se é possível emitir sua Certidão de Regularidade.</br>Em caso positivo você baixará a certidão e também a receberá em seu e-mail cadastrado no Portal.";
             break;
     
             case "Parcelamento":
                 $titulo = "Certidão de Parcelamento";
 
-                $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Parcelamento.";
+                $mensagem = "Verifique abaixo se é possível emitir sua Certidão de Parcelamento.</br>Em caso positivo você baixará a certidão e também a receberá em seu e-mail cadastrado no Portal.";
             break;
     
             default:
@@ -391,7 +391,7 @@ class RepresentanteSiteController extends Controller
             "resp_tecnico" => null,
             "resp_tecnico_registro_core" => null
         ];
-        // Dados de PJ: "Data de homologação", "Tipo de empresa", "Responsável técnico" (falta CPF do resposável técnico)
+        // Dados de PJ: "Data de homologação", "Tipo de empresa", "Responsável técnico"
         // Dados de PF: "Data de homologação"
         $dadosGerenti = Auth::guard('representante')->user()->dadosGerais();
         $dadosRepresentante["data_inscricao"] = $dadosGerenti["Data de homologação"];
@@ -427,7 +427,7 @@ class RepresentanteSiteController extends Controller
                 }
                 else {
                     return view("site.representante.emitir-certidao")
-                        ->with("mensagem", "Certidão de Regularidade não pode ser emitida. Por favor verificar sua situação finaceira no Portal do CORE-SP.")
+                        ->with("erro", "Certidão de Regularidade não pode ser emitida. Por favor verificar sua situação finaceira no Portal do CORE-SP.")
                         ->with("titulo", "Certidão de Regularidade");
                 }
             break;
@@ -530,7 +530,7 @@ class RepresentanteSiteController extends Controller
                 }
                 else {
                     return view("site.representante.emitir-certidao")
-                        ->with("mensagem", "Certidão de Parcelamento não pode ser emitida. Por favor verificar sua situação finaceira no Portal do CORE-SP.")
+                        ->with("erro", "Certidão de Parcelamento não pode ser emitida. Por favor verificar sua situação finaceira no Portal do CORE-SP.")
                         ->with("titulo", "Certidão de Parcelamento");
                 }
             break;
