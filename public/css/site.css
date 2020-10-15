@@ -408,8 +408,14 @@ figure.align-left {
 #header-principal {
 	top: 0;
 	left: 0;
-	background-color: #004587;
-	/* Setembro Amarelo background-color: #FFCD4D; */
+	
+	/* Outubro Rosa */
+	background-color: rgba(231,31,127,1);
+
+	/* Cor Padrão */
+	/* background-color: #004587; */
+	/* Setembro Amarelo */
+	/* background-color: #FFCD4D; */
 }
 
 .header-margin {

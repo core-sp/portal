@@ -39,7 +39,7 @@
           </div>
           @else
           <div class="callout callout-info">
-            <strong>Ultima alteração:</strong> {{ isset($resultado->user->nome) ? $resultado->user->nome : 'Usuário Deletado' }}, às {{ organizaData($resultado->updated_at) }}
+            <strong>Última alteração:</strong> {{ isset($resultado->user->nome) ? $resultado->user->nome : 'Usuário Deletado' }}, às {{ organizaData($resultado->updated_at) }}
           </div>
           @endif
         </div>
