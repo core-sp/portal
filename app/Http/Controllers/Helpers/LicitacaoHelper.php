@@ -13,12 +13,13 @@ class LicitacaoHelper extends Controller
             'Carta Convite',
             'Concorrência Pública',
             'Concurso',
+            'Cotação Eletrônica',
             'Credenciamento',
             'Leilão',
             'Pregão Eletrônico SRP',
             'Pregão Eletrônico Tradicional',
             'Pregão Presencial',
-            'Tomada de Preços',
+            'Tomada de Preços'
         ];
         return $modalidades;
     }
