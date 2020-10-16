@@ -254,4 +254,19 @@ trait GerentiProcedures
 
         return $run->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Consulta o GERENTI para verificar se Representante Comercial está ativo ou não usando CPF/CNPJ (SITUACAO).
+     * Retorna outras informações relacionadas ao Representante Comercial.
+     * TODO - refatorar consulta no site para usar este método (ConsultaSituacaoController).
+     */
+    public function gerentiAtivo($cpfCnpj)
+    {
+        $run = $this->connection->prepare("select SITUACAO, REGISTRONUM, ASS_ID, NOME, EMAILS from PROCSTATUSREGISTRO(:cpfCnpj)");
+        $run->execute([
+            'cpfCnpj' => $cpfCnpj
+        ]);
+
+        return $run->fetchAll();
+    }
 }

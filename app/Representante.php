@@ -188,7 +188,9 @@ class Representante extends Authenticable
             return null;
     }
 
-    // Método para formatar os dados de endereço do GERENTI para emissão de Certidão
+    /**
+     * Método para formatar os dados de endereço do GERENTI para emissão de Certidão
+     */
     public function enderecoFormatado() 
     {
         $enderecoGerenti = $this->enderecos();
@@ -204,5 +206,15 @@ class Representante extends Authenticable
         $enderecoFormatado .= " - CEP: " . $enderecoGerenti["CEP"];
 
         return $enderecoFormatado;
+    }
+
+    /**
+     * Informa se o Representante Comercial está ativo ou não.
+     */
+    public function ativo()
+    {
+        $resultado = $this->gerentiAtivo(preg_replace('/[^0-9]+/', '', $this->cpf_cnpj));
+        
+        return $resultado["SITUACAO"] == "Ativo" ? true : false;
     }
 }
