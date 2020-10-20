@@ -17,7 +17,7 @@ class AnoVigenteSiteController extends Controller
 
     public function anoVigente(Request $request)
     {
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
+        $cpfCnpj = apenasNumeros(request('cpfCnpj'));
 
         $request->request->set('cpfCnpj', $cpfCnpj);
 

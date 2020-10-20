@@ -7,18 +7,21 @@
         <h4 class="pt-1 pb-1">{!! $titulo !!}</h4>
         <div class="linha-lg-mini mb-3"></div>
         <p class="pt-2">
-            @if(!isset($erro))
             {!! $mensagem !!}
-            @else
-            {!! $erro !!}
-            @endif
         </p>
-        @if(!isset($erro))
-        <form method="POST">
+        @if($reuso)
+        <form method="POST" action="{{ route('representante.emitirCertidao', ['tipo' => $codigo]) }}" class="d-inline">
             @csrf
-            <input id="emitirCertidaoBtn" type="submit" value="Verificar e Baixar" class="btn btn-sm btn-info" />
+            <input type="submit" value="Baixar" class="emitirCertidaoBtn btn btn-sm btn-info" />
         </form>
         @endif
+
+        @if($emitir)
+        <form method="POST" class="d-inline">
+            @csrf
+            <input type="submit" value="Emitir" class="emitirCertidaoBtn btn btn-sm btn-info" />
+        </form>
+        @endif        
     </div>
 </div>
 

@@ -27,8 +27,8 @@ class RepresentanteForgotEmailController extends Controller
                 ]);
         }
 
-        $update = Representante::where('cpf_cnpj', preg_replace('/[^0-9]+/', '', $request['cpf_cnpj']))
-            ->where('registro_core', preg_replace('/[^0-9]+/', '', $request['registro_core']))
+        $update = Representante::where('cpf_cnpj', apenasNumeros($request['cpf_cnpj']))
+            ->where('registro_core', apenasNumeros($request['registro_core']))
             ->update(['email' => $request['email_novo']]);
         
         if(!$update)
@@ -63,8 +63,8 @@ class RepresentanteForgotEmailController extends Controller
     protected function checkInfo($attr)
     {
         $representante = Representante::where([
-            'cpf_cnpj' => preg_replace('/[^0-9]+/', '', $attr['cpf_cnpj']),
-            'registro_core' => preg_replace('/[^0-9]+/', '', $attr['registro_core']),
+            'cpf_cnpj' => apenasNumeros($attr['cpf_cnpj']),
+            'registro_core' => apenasNumeros($attr['registro_core']),
             'email' => $attr['email_antigo']
         ])->get();
 

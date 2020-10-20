@@ -637,6 +637,6 @@ function showLoading()
 	$('#loading').show();
 }
 
-$('#emitirCertidaoBtn').on('click', function(){
-	$(this).hide();
+$('.emitirCertidaoBtn').on('click', function(){
+	$('.emitirCertidaoBtn').hide();
 });

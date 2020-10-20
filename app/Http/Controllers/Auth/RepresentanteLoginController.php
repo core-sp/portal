@@ -28,7 +28,7 @@ class RepresentanteLoginController extends Controller
 
     protected function verificaGerentiLogin($cpfCnpj)
     {
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', $cpfCnpj);
+        $cpfCnpj = apenasNumeros($cpfCnpj);
         $registro = Representante::where('cpf_cnpj', $cpfCnpj)->first();
 
         if(isset($registro)) {
@@ -66,7 +66,7 @@ class RepresentanteLoginController extends Controller
 
     public function login(Request $request)
     {
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', $request->cpf_cnpj);
+        $cpfCnpj = apenasNumeros($request->cpf_cnpj);
 
         $request->request->set('cpf_cnpj', $cpfCnpj);
 

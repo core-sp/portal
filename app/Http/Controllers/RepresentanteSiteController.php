@@ -74,7 +74,7 @@ class RepresentanteSiteController extends Controller
 
         $save = Representante::create([
             'cpf_cnpj' => $cpfCnpj,
-            'registro_core' => preg_replace('/[^0-9]+/', '', request('registro_core')),
+            'registro_core' => apenasNumeros(request('registro_core')),
             'ass_id' => $ass_id,
             'nome' => $nome,
             'email' => request('email'),
@@ -104,7 +104,7 @@ class RepresentanteSiteController extends Controller
 
         $update = $rep->update([
             'cpf_cnpj' => $cpfCnpj,
-            'registro_core' => preg_replace('/[^0-9]+/', '', request('registro_core')),
+            'registro_core' => apenasNumeros(request('registro_core')),
             'ass_id' => $ass_id,
             'nome' => $nome,
             'email' => request('email'),
@@ -150,7 +150,7 @@ class RepresentanteSiteController extends Controller
     {
         $cpfCnpjCru = request('cpfCnpj');
 
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
+        $cpfCnpj = apenasNumeros(request('cpfCnpj'));
 
         $this->rules($request, $cpfCnpj);
 
@@ -362,32 +362,61 @@ class RepresentanteSiteController extends Controller
 
     public function emitirCertidaoView($tipo) 
     {
+        $codigo = null;
+
         switch($tipo) {
             case "Regularidade":
                 $titulo = "Certidão de Regularidade";
-
-                $mensagem = "Verifique abaixo se é possível emitir sua Certidão de Regularidade.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
+                $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Regularidade.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
+                $emitir = true;
+                $reuso = false;
             break;
     
             case "Parcelamento":
                 $titulo = "Certidão de Parcelamento";
-
-                $mensagem = "Verifique abaixo se é possível emitir sua Certidão de Parcelamento.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
+                $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Parcelamento.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
+                $emitir = true;
+                $reuso = false;
             break;
     
             default:
-                abort(500, "Tipo de certidão inválida");
+                abort(404);
             break;
         }
 
-        return view("site.representante.emitir-certidao", compact("titulo", "mensagem"));
+        // Checa se existe alguma certidão que foi emitida nos últimos 30 dias.
+        $ultimaCertidao = $this->certidaoRepository->consultaCertidao(apenasNumeros(Auth::guard('representante')->user()->cpf_cnpj), $tipo);
+
+        if($ultimaCertidao) {
+            $codigo = $ultimaCertidao->codigo;
+
+            // Caso exista uma certidão que já foi emitida nos últimos 15 dias atrás, o Portal não deve permitir a emissão, apenas o download da certidão existente.
+            if($ultimaCertidao->data_emissao > date('Y-m-d', strtotime('-15 days'))) {
+                $mensagem = 'Representante Comercial emitiu uma certidão há menos de 15 dias e não pode emitir uma nova certidão, devendo reutilizar a última certidão emitida.</br>Por favor clique no botão abaixo para obter a última certidão.';
+                $emitir = false;
+                $reuso = true;
+            }
+            // Caso a certidão tenha mais de 15 dias, o Portal deve dar a opção de emitir uma nova, ou de retutilizar a existente.
+            else {
+                $mensagem = 'Representante Comercial emitiu uma certidão e esta ainda se encontra válida, caso queria reutilizar essa certidão, por favor clique no botão "Baixar" para obter a última certidão. </br>Caso deseje emitir uma nova, clique no botão "Emitir".';
+                $emitir = true;
+                $reuso = true;
+            }
+        }
+
+        return view("site.representante.emitir-certidao", compact("titulo", "mensagem", "emitir", "reuso", "codigo"));
     }
     
     /**
      * Reúne dados do Representante Comercial para emitir a certidão.
      */
     public function emitirCertidao($tipo) 
-    {   
+    {    
+        // Caso o código seja passado no lugar do tipo de certidão, deve-se baixar a certidão com esse código.
+        if(!in_array($tipo, ["Regularidade", "Parcelamento"])) {
+            return $this->certidaoController->baixarCertidao($tipo);
+        }
+
         // Recupera dados do Representante Comercial
         $dadosGerenti = Auth::guard('representante')->user()->dadosGerais();
 
@@ -425,42 +454,5 @@ class RepresentanteSiteController extends Controller
             $endereco,
             $cobrancas
         );
-    }
-
-    /**
-     * Faz stream do PDF da certidão do Representante Comercial.
-     */
-    public function visualizaCertidaoRepresentante($codigo) 
-    {
-        $certidao = $this->certidaoRepository->recuperaCertidao($codigo);
-
-        // Certidão encontrada.
-        if($certidao) {
-            // Certidão precisa ser do mesmo Representante na sessão.
-            if($certidao->cpf_cnpj == preg_replace('/[^0-9]+/', '',Auth::guard('representante')->user()->cpf_cnpj)) {
-                $codigoCertidao = $certidao->codigoFormatado();
-
-                $data = [
-                    "hora" => strftime("%H:%M",  strtotime($certidao->hora_emissao)),
-                    "data" => onlyDate($certidao->data_emissao)
-                ];
-        
-                $titulo = "Certidão de " . $certidao->tipo;
-        
-                $declaracao = $certidao->declaracao;
-        
-                $pdf = PDF::loadView("certidoes.certidao", compact("declaracao", "codigoCertidao", "data", "titulo"));
-        
-                return $pdf->stream("certidao.pdf");
-            }
-            // Aborta e retorna erro de página não encontrada se certidão não pertence ao Representante Comercial.
-            else {
-                abort(404);
-            }
-        }
-        // Aborta e retorna erro de página não encontrada se certidão não for encontrada.
-        else {
-            abort(404);
-        }
     }
 }

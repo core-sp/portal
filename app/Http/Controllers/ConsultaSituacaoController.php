@@ -2,18 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Connections\FirebirdConnection;
 use App\Rules\CpfCnpj;
+use App\Traits\GerentiProcedures;
+use App\Connections\FirebirdConnection;
 
 class ConsultaSituacaoController extends Controller
 {
-    private $connection;
-
-    protected function connect()
-    {
-        // Conexão e criação do objeto de conexão na variável $connection
-        $this->connection = new FirebirdConnection();
-    }
+    use GerentiProcedures;
 
     public function consultaView()
     {
@@ -22,7 +17,7 @@ class ConsultaSituacaoController extends Controller
 
     protected function validateRequest()
     {
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
+        $cpfCnpj = apenasNumeros(request('cpfCnpj'));
 
         request()->request->set('cpfCnpj', $cpfCnpj);
 
@@ -34,27 +29,11 @@ class ConsultaSituacaoController extends Controller
         ]);
     }
 
-    protected function validateAndConnect()
-    {
-        // Validação e conexão
-        $this->validateRequest();
-
-        $this->connect();
-    }
-
     public function consulta()
     {
-        $this->validateAndConnect();
-
-        // Regex para CPF
-        $cpf = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
-
-        $run = $this->connection->prepare("select SITUACAO, REGISTRONUM, ASS_ID, NOME, EMAILS from PROCSTATUSREGISTRO(:cpf)");
-        $run->execute([
-            'cpf' => $cpf
-        ]);
-
-        $resultado = $run->fetchAll();
+        $this->validateRequest();
+        
+        $resultado = $this->gerentiAtivo(apenasNumeros($cpfCnpj));
 
         return view('site.consulta', compact('resultado'));
     }

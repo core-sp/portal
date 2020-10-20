@@ -181,7 +181,7 @@ class Representante extends Authenticable
 
     public function boletoAnuidade()
     {
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', $this->cpf_cnpj);
+        $cpfCnpj = apenasNumeros($this->cpf_cnpj);
         if(isset($this->gerentiAnuidadeVigente($cpfCnpj)[0]['NOSSONUMERO']))
             return $this->gerentiAnuidadeVigente($cpfCnpj)[0]['NOSSONUMERO'];
         else
@@ -213,8 +213,8 @@ class Representante extends Authenticable
      */
     public function ativo()
     {
-        $resultado = $this->gerentiAtivo(preg_replace('/[^0-9]+/', '', $this->cpf_cnpj));
+        $resultado = $this->gerentiAtivo(apenasNumeros($this->cpf_cnpj));
         
-        return $resultado["SITUACAO"] == "Ativo" ? true : false;
+        return $resultado[0]["SITUACAO"] == "Ativo" ? true : false;
     }
 }
