@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticable;
 use Illuminate\Support\Facades\Mail;
-use App\Connections\FirebirdConnection;
 use App\Traits\GerentiProcedures;
 
 class Representante extends Authenticable

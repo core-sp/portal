@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Rules\CpfCnpj;
 use App\Traits\GerentiProcedures;
-use App\Connections\FirebirdConnection;
 
 class ConsultaSituacaoController extends Controller
 {
@@ -33,7 +32,7 @@ class ConsultaSituacaoController extends Controller
     {
         $this->validateRequest();
         
-        $resultado = $this->gerentiAtivo(apenasNumeros($cpfCnpj));
+        $resultado = $this->gerentiAtivo(request('cpfCnpj'));
 
         return view('site.consulta', compact('resultado'));
     }

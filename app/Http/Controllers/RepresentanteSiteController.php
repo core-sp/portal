@@ -13,7 +13,6 @@ use App\Traits\GerentiProcedures;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use App\Connections\FirebirdConnection;
 use App\Mail\CadastroRepresentanteMail;
 use App\Repositories\CertidaoRepository;
 use App\Http\Controllers\CertidaoController;

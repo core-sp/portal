@@ -261,6 +261,8 @@ trait GerentiProcedures
      */
     public function gerentiAtivo($cpfCnpj)
     {
+        $this->connect();
+
         $run = $this->gerentiConnection->prepare("select SITUACAO, REGISTRONUM, ASS_ID, NOME, EMAILS from PROCSTATUSREGISTRO(:cpfCnpj)");
         $run->execute([
             'cpfCnpj' => $cpfCnpj
