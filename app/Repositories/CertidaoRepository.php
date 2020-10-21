@@ -11,7 +11,7 @@ class CertidaoRepository
      */
     public function store($tipo, $cpf_cnpj, $declaracao, $dataEmissao)
     {
-        // Certidão é criada no abnco primeiro para obter gerar a data de emissão e o ID
+        // Certidão é criada no abnco primeiro para obter gerar a data de emissão e o ID.
         $certidao = Certidao::create([
             "tipo" => $tipo,
             "cpf_cnpj" => apenasNumeros($cpf_cnpj),
@@ -20,10 +20,10 @@ class CertidaoRepository
             "data_emissao" => date("Y-m-d", strtotime($dataEmissao))
         ]);
 
-        // Construir o código da certidão. Encriptado com MD5 (32 caracteres hexadecimais)
+        // Construir o código da certidão. Encriptado com MD5 (32 caracteres hexadecimais).
         $idCodificado = strtoupper(md5(uniqid() . "-" . $certidao->id));
 
-        // Atualiza a certidão com o código gerado
+        // Atualiza a certidão com o código gerado.
         $certidao->update(["codigo" => $idCodificado]);
 
         return $certidao;

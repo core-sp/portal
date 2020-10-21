@@ -15,10 +15,26 @@ class Representante extends Authenticable
     use Notifiable, SoftDeletes, GerentiProcedures;
 
     protected $guard = 'representante';
-
     protected $fillable = ['cpf_cnpj', 'registro_core', 'ass_id', 'nome', 'email', 'password', 'verify_token', 'aceite', 'ativo'];
-
     protected $hidden = ['password', 'remember_token'];
+
+    // Tipos de pessoa.
+    const PESSOA_FISICA = "PF";
+    const PESSOA_JURIDICA = "PJ";
+
+    // Tipos de empresa.
+    const EMPRESA_INDIVIDUAL = "Empresa Individual";
+
+    // Situações do Representante Comercial.
+    const EM_DIA = "Em dia.";
+    const PARCELAMENTO_EM_ABERTO = "Parcelamento em aberto.";
+
+    // Status do Representante Comercial.
+    const ATIVO = "Ativo";
+
+    // Situações do pagamento de cobranças.
+    const PAGO = "Pago";
+    const EM_ABERTO = "Em aberto";
 
     public function sendPasswordResetNotification($token)
     {
@@ -42,12 +58,12 @@ class Representante extends Authenticable
 
     public function tipoPessoa()
     {
-        return strlen($this->cpf_cnpj) === 14 ? 'PF' : 'PJ';
+        return strlen($this->cpf_cnpj) === 14 ? Representante::PESSOA_FISICA : Representante::PESSOA_JURIDICA;
     }
 
     public function dadosGerais()
     {
-        if($this->tipoPessoa() === 'PF') {
+        if($this->tipoPessoa() === Representante::PESSOA_FISICA) {
             $dados = $this->gerentiDadosGeraisPF($this->ass_id);
             return $this->arrangeDgPf($dados);
         } else {
@@ -214,6 +230,6 @@ class Representante extends Authenticable
     {
         $resultado = $this->gerentiAtivo(apenasNumeros($this->cpf_cnpj));
         
-        return $resultado[0]["SITUACAO"] == "Ativo" ? true : false;
+        return $resultado[0]["SITUACAO"] == Representante::ATIVO ? true : false;
     }
 }

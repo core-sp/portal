@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use PDF;
 use App\Certidao;
+use App\Representante;
 use App\Mail\CertidaoMail;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
@@ -27,18 +28,18 @@ class CertidaoController extends Controller
 
         $podeEmitir = false;
 
-        // Representante Comercial precisa estar ativo para poder emitir certidão
+        // Representante Comercial precisa estar ativo para poder emitir certidão.
         if($dadosRepresentante["ativo"]) {
-            // Representante Comercial PJ que não seja "Empresa Individual" precisa ter responsável técnico para emitir certidão 
-            if($dadosRepresentante["tipo_pessoa"] == "PF" ||
-            ($dadosRepresentante["tipo_pessoa"] == "PJ" &&
-            ($dadosRepresentante["tipo_empresa"] == "Empresa Individual" || 
-            ($dadosRepresentante["tipo_empresa"] != "Empresa Individual" && !empty($dadosRepresentante["resp_tecnico"]))))) { 
+            // Representante Comercial PJ que não seja "Empresa Individual" precisa ter responsável técnico para emitir certidão. 
+            if($dadosRepresentante["tipo_pessoa"] == Representante::PESSOA_FISICA ||
+            ($dadosRepresentante["tipo_pessoa"] == Representante::PESSOA_JURIDICA &&
+            ($dadosRepresentante["tipo_empresa"] == Representante::EMPRESA_INDIVIDUAL || 
+            ($dadosRepresentante["tipo_empresa"] != Representante::EMPRESA_INDIVIDUAL && !empty($dadosRepresentante["resp_tecnico"]))))) { 
                 switch($tipo) {
-                    // Regras para emitir Certidão de Regularidade
-                    case "Regularidade":
+                    // Regras para emitir Certidão de Regularidade.
+                    case Certidao::REGULARIDADE:
                         // Representante Comercial precisa estar com situação "Em dia."
-                        if($dadosRepresentante["situacao"] == "Em dia.") {
+                        if($dadosRepresentante["situacao"] == Representante::EM_DIA ) {
                             $podeEmitir = true;
                             $declaracao = Certidao::declaracaoRegularidade($dadosRepresentante, $endereco, $dataEmissao);
                         }
@@ -47,16 +48,16 @@ class CertidaoController extends Controller
                         }
                     break;
 
-                    // Regras para emitir Certidão de Parcelamento
-                    case "Parcelamento":
-                        // Representante Comercial precisa estar com situação "Parcelamento em aberto."
-                        if($dadosRepresentante["situacao"] == "Parcelamento em aberto.") {
+                    // Regras para emitir Certidão de Parcelamento.
+                    case Certidao::PARCELAMENTO:
+                        // Representante Comercial precisa estar com situação "Parcelamento em aberto.".
+                        if($dadosRepresentante["situacao"] == Representante::PARCELAMENTO_EM_ABERTO) {
                             // Variável temporária usada para indicar falhas na verificação.
                             $flag = true;
 
                             // Se qualquer anuidade estiver expirada, a certidão não pode ser emitida. A flag é definida como falsa.
                             foreach($cobrancas["anuidades"] as $anuidade) {
-                                if($anuidade["SITUACAO"] === "Em aberto" && $anuidade["VENCIMENTOBOLETO"] === null) {
+                                if($anuidade["SITUACAO"] == Representante::EM_ABERTO && $anuidade["VENCIMENTOBOLETO"] == null) {
                                     $flag = false;
                                 }
                             }
@@ -68,13 +69,13 @@ class CertidaoController extends Controller
 
                                     // Agrupa todos os Acordos por anos parcelados
                                     foreach($cobrancas["outros"] as $cobranca) {
-                                        if(strpos($cobranca["DESCRICAO"], "Acordo") !== false) {
+                                        if(strpos($cobranca["DESCRICAO"], "Acordo") != false) {
                                             preg_match_all("/\((.*?)\)/", $cobranca["DESCRICAO"], $matches);
 
                                             $parcelamentosAgrupados[$matches[1][0]][] = $cobranca;
 
                                             // Se qualquer parcelamento estiver expirado, a certidão não pode ser emitida. Cancelamos a iteração.
-                                            if($cobranca["SITUACAO"] === "Em aberto" && $cobranca["VENCIMENTOBOLETO"] === null) {
+                                            if($cobranca["SITUACAO"] == Representante::EM_ABERTO && $cobranca["VENCIMENTOBOLETO"] == null) {
                                                 $flag = false;
                                             }
                                         }
@@ -87,33 +88,33 @@ class CertidaoController extends Controller
                                                 $acordoPago = true;
                                                 $primeiraParcelaPaga = false;
 
-                                                // Iterando para verificar se todas as parcelas foram pagas
+                                                // Iterando para verificar se todas as parcelas foram pagas.
                                                 foreach($grupo as $index => $parcelamento) {
-                                                    // Caso uma parcela esteja em aberto, o acordo não foi totalmente pago
-                                                    if($parcelamento["SITUACAO"] === "Em aberto") {
+                                                    // Caso uma parcela esteja em aberto, o acordo não foi totalmente pago.
+                                                    if($parcelamento["SITUACAO"] == Representante::EM_ABERTO) {
                                                         $acordoPago = false;
                                                     }
             
-                                                    // Último valor do array contêm a primeira parcela do acordo
+                                                    // Último valor do array contêm a primeira parcela do acordo.
                                                     if($index == count($grupo) - 1) {
-                                                        // Verifica se a primeira parcela foi paga
-                                                        if($parcelamento["SITUACAO"] === "Pago") {
+                                                        // Verifica se a primeira parcela foi paga.
+                                                        if($parcelamento["SITUACAO"] == Representante::PAGO) {
                                                             $primeiraParcelaPaga = true;
                                                         }
                                                     }
                                                 }
 
-                                                // Caso o acordo ainda não esteja totalmente pago e a primeira parcela foi paga, recuperamos dados do acordo
+                                                // Caso o acordo ainda não esteja totalmente pago e a primeira parcela foi paga, recuperamos dados do acordo.
                                                 if(!$acordoPago && $primeiraParcelaPaga) {
-                                                    // Recupera o número de parcelas ([0] = parcela atual, [1] = total de parcelas)
+                                                    // Recupera o número de parcelas ([0] = parcela atual, [1] = total de parcelas).
                                                     preg_match_all("/Parcela (.*?) Acordo/", $grupo[0]["DESCRICAO"], $matches); 
                                                     $numeroParcelas = explode("/", $matches[1][0]);
                 
-                                                    // Recupera os anos do parcelamento
+                                                    // Recupera os anos do parcelamento.
                                                     preg_match_all("/\((.*?)\)/", $grupo[0]["DESCRICAO"], $matches); 
                                                     $anosParcelas = $matches[1][0];
                 
-                                                    // Recupera data do primeiro pagamento
+                                                    // Recupera data do primeiro pagamento.
                                                     $primeiroPagamento = onlyDate($grupo[count($grupo) - 1]["VENCIMENTO"]);
                                                 }
                                             }
@@ -186,20 +187,20 @@ class CertidaoController extends Controller
     }
 
     /**
-     * Método salva a certidão no banco de dados, gera PDF e envia no e-mail do Representante Comercial
+     * Método salva a certidão no banco de dados, gera PDF e envia no e-mail do Representante Comercial.
      */
     public function salvarCertidao($tipo, $dadosRepresentante, $declaracao, $dataEmissao) 
     {
-        // Usando transaction para garantir consistência caso algum problema ocorra no processo de criação da certidão
+        // Usando transaction para garantir consistência caso algum problema ocorra no processo de criação da certidão.
         $certidao =  DB::transaction(function () use ($tipo, $dadosRepresentante, $declaracao, $dataEmissao) {
-            // Criar a certidao no banco de dados
+            // Criar a certidao no banco de dados.
             $certidao = $this->certidaoRepository->store($tipo, $dadosRepresentante["cpf_cnpj"], $declaracao, $dataEmissao);
 
-            // TODO - Atualizar o GERENTI com a certidão criada
+            // TODO - Atualizar o GERENTI com a certidão criada.
 
             return $certidao;
         });
-        // Formata o código para facilitar a visualização (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)
+        // Formata o código para facilitar a visualização (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX).
         $codigoCertidao = $certidao->codigoFormatado();
 
         $data = [
@@ -209,14 +210,14 @@ class CertidaoController extends Controller
 
         $titulo = "Certidão de " . $tipo;
 
-        // Cria o PDF usando a view de acordo com o tipo de pessoa
+        // Cria o PDF usando a view de acordo com o tipo de pessoa.
         $pdf = PDF::loadView("certidoes.certidao", compact("declaracao", "codigoCertidao", "data", "titulo"));
 
-        // Envio de e-mail com o PDF
+        // Envio de e-mail com o PDF.
         $email = new CertidaoMail($pdf->output());
         Mail::to($dadosRepresentante["email"])->queue($email);
 
-        // Log externo de emissão de certidão
+        // Log externo de emissão de certidão.
         event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" emitiu Certidão de ' . $tipo . '.'));
 
         return $pdf->download("certidao.pdf");
@@ -261,12 +262,12 @@ class CertidaoController extends Controller
      */
     public function consulta(ConsultaCertidaoRequest $request)
     {
-        //Busca o certificado com os dados fonecidos (removendo a máscara do código)
+        //Busca o certificado com os dados fonecidos (removendo a máscara do código).
         $certidao = $this->certidaoRepository->autenticaCertidao(str_replace(" - ", "", $request->codigo), $request->hora, $request->data);
 
         $resultado = null;;
 
-        // Caso os dados fornecidos não traga nenhum resultado, a certidão não existe no banco de dados ou está vencida
+        // Caso os dados fornecidos não traga nenhum resultado, a certidão não existe no banco de dados ou está vencida.
         if(!$certidao) {
             $autenticado = false;
         }

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Representante;
 use Illuminate\Database\Eloquent\Model;
 
 class Certidao extends Model
@@ -10,11 +11,23 @@ class Certidao extends Model
     protected $guarded = [];
     public $timestamps = false;
 
-    static $tipo_regularidade = 'Regularidade';
-    static $tipo_parcelamento = 'Parcelamento';
+    // Tipos de certidões.
+    const REGULARIDADE = 'Regularidade';
+    const PARCELAMENTO = 'Parcelamento';
 
     /**
-     * Formata o código da Certidão para XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX
+     * Método que retorna todos os tipos de certidões.
+     */
+    public static function tipos()
+    {
+        return [
+            Certidao::REGULARIDADE,
+            Certidao::PARCELAMENTO
+        ];
+    }
+
+    /**
+     * Formata o código da Certidão para XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX.
      */
     public function codigoFormatado() 
     {
@@ -32,7 +45,7 @@ class Certidao extends Model
     }
 
     /**
-     * Gera declaração da certidão de Regularidade (para o PDF e para salvar no banco)
+     * Gera declaração da certidão de Regularidade (para o PDF e para salvar no banco).
      */
     public static function declaracaoRegularidade($dadosRepresentante, $endereco, $dataEmissao) 
     {
@@ -43,11 +56,11 @@ class Certidao extends Model
         ];
 
         switch($dadosRepresentante["tipo_pessoa"]) {
-            case "PF":
+            case Representante::PESSOA_FISICA:
                 $declaracao =  "<span class='tab'>O <b>CORE-SP</b> certifica, atendendo ao requerimento do interessado, para fins de documentar-se, que revendo os assentamentos do Serviço de Registro, consta registrado(a), como pessoa natural, o(a) Sr(a). <b>" . $dadosRepresentante["nome"] . ",</b> sob o nº <b>" . $dadosRepresentante["registro_core"] . ",</b> desde <b>" . $dadosRepresentante["data_inscricao"] . ",</b> inscrito(a) no CPF/MF sob o nº <b>" . $dadosRepresentante["cpf_cnpj"] . ",</b> residente na <b>" . $endereco . ".</b> O(A) referido(a) Representante Comercial pagou contribuições a este Conselho Regional até o mês de <b>" . $data["mes"] . "</b> de <b>" . $data["ano"] . ".</b>";
             break;
 
-            case "PJ":
+            case Representante::PESSOA_JURIDICA:
                 $declaracao = "<span class='tab'>O <b>CORE-SP</b> certifica, atendendo ao requerimento do(a) interessado(a), para fins de documentar-se, que, revendo os assentamentos do Serviço de Registro, deles consta registrada como <b>" . $dadosRepresentante["tipo_empresa"] . " - " . $dadosRepresentante["nome"] . ",</b> sob o nº <b>" . $dadosRepresentante["registro_core"] . ",</b> desde de <b>" . $dadosRepresentante["data_inscricao"] . ",</b> inscrita no CNPJ sob o nº <b>" . $dadosRepresentante["cpf_cnpj"] . ",</b> com sede na <b>" . $endereco  . ".</b> ";
   
                 if(!empty($dadosRepresentante["resp_tecnico"])) {
@@ -62,16 +75,16 @@ class Certidao extends Model
     }
 
     /**
-     * Gera declaração da certidão de Parcelamento (para o PDF e para salvar no banco)
+     * Gera declaração da certidão de Parcelamento (para o PDF e para salvar no banco).
      */
     public static function declaracaoParcelamento($dadosRepresentante, $endereco, $numeroParcelas, $anosParcelas, $primeiroPagamento) 
     {
         switch($dadosRepresentante["tipo_pessoa"]) {
-            case "PF":
+            case Representante::PESSOA_FISICA:
                 $declaracao =  "<span class='tab'>O <b>CORE-SP</b> certifica, atendendo ao requerimento do interessado, para fins de documentar-se, que revendo os assentamentos do Serviço de Registro, consta registrado(a), como pessoa natural, o(a) Sr(a). <b>" . $dadosRepresentante["nome"] . ",</b> sob o nº <b>" . $dadosRepresentante["registro_core"] . ",</b> desde <b>" . $dadosRepresentante["data_inscricao"] . ",</b> inscrito(a) no CPF/MF sob o nº <b>" . $dadosRepresentante["cpf_cnpj"] . ",</b> residente na <b>" . $endereco . ".</b> O(A) referido(a) Representante Comercial firmou Acordo de Parcelamento referente à(s) anuidade(s) de <b>" . $dadosParcelamento["parcelamento_ano"] . ",</b> em <b>" . $dadosParcelamento["numero_parcelas"] . "</b> parcelas fixas e mensais, efetuando o primeiro pagamento em <b>" . $dadosParcelamento["data_primeiro_pagamento"] . ".</b>";
             break;
 
-            case "PJ":
+            case Representante::PESSOA_JURIDICA:
                 $declaracao = "<span class='tab'>O <b>CORE-SP</b> certifica, atendendo ao requerimento do(a) interessado(a), para fins de documentar-se, que, revendo os assentamentos do Serviço de Registro, deles consta registrada como <b>" . $dadosRepresentante["tipo_empresa"] . " - " . $dadosRepresentante["nome"] . ",</b> sob o nº <b>" . $dadosRepresentante["registro_core"] . ",</b> desde de <b>" . $dadosRepresentante["data_inscricao"] . ",</b> inscrita no CNPJ sob o nº <b>" . $dadosRepresentante["cpf_cnpj"] . ",</b> com sede na <b>" . $endereco . ".</b> ";                 
   
                 if(!empty($dadosRepresentante["resp_tecnico"])) {

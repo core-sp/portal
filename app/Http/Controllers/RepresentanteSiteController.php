@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use PDF;
+use App\Certidao;
 use App\Representante;
 use App\Rules\CpfCnpj;
 use App\Mail\CertidaoMail;
@@ -364,20 +365,21 @@ class RepresentanteSiteController extends Controller
         $codigo = null;
 
         switch($tipo) {
-            case "Regularidade":
+            case Certidao::REGULARIDADE:
                 $titulo = "Certidão de Regularidade";
                 $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Regularidade.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
                 $emitir = true;
                 $reuso = false;
             break;
     
-            case "Parcelamento":
+            case Certidao::PARCELAMENTO:
                 $titulo = "Certidão de Parcelamento";
                 $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Parcelamento.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
                 $emitir = true;
                 $reuso = false;
             break;
     
+            // Caso uma certidão inválida seja passada na URL, aborta com erro 404.
             default:
                 abort(404);
             break;
@@ -407,16 +409,16 @@ class RepresentanteSiteController extends Controller
     }
     
     /**
-     * Reúne dados do Representante Comercial para emitir a certidão.
+     * Reune dados do Representante Comercial para emitir a certidão.
      */
     public function emitirCertidao($tipo) 
     {    
         // Caso o código seja passado no lugar do tipo de certidão, deve-se baixar a certidão com esse código.
-        if(!in_array($tipo, ["Regularidade", "Parcelamento"])) {
+        if(!in_array($tipo, Certidao::tipos())) {
             return $this->certidaoController->baixarCertidao($tipo);
         }
 
-        // Recupera dados do Representante Comercial
+        // Recupera dados do Representante Comercial.
         $dadosGerenti = Auth::guard('representante')->user()->dadosGerais();
 
         $dadosRepresentante = [
@@ -430,9 +432,10 @@ class RepresentanteSiteController extends Controller
         ];
         $dadosRepresentante["data_inscricao"] = $dadosGerenti["Data de início"];
 
-        if($dadosRepresentante["tipo_pessoa"] == "PJ") {
+        if($dadosRepresentante["tipo_pessoa"] == Representante::PESSOA_JURIDICA) {
             $dadosRepresentante["tipo_empresa"] = $dadosGerenti["Tipo de empresa"];
 
+            // Verifica se Representante Comercial PJ possui resposável técnico. Se sim, faz um parse e define em $dadosRepresentante.
             if(!empty($dadosGerenti['Responsável técnico'])) {
                 $rt = explode('(', $dadosGerenti['Responsável técnico']);
                 $dadosRepresentante["resp_tecnico"] = trim($rt[0]);
@@ -442,7 +445,6 @@ class RepresentanteSiteController extends Controller
 
         // Recupera dados de endereço do Representante Comercial
         $endereco = Auth::guard("representante")->user()->enderecoFormatado();
-        
 
         // Recupera dados de cobrança do Representante Comercial
         $cobrancas = Auth::guard("representante")->user()->cobrancas();
