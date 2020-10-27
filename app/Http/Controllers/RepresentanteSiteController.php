@@ -414,7 +414,7 @@ class RepresentanteSiteController extends Controller
             // Caso exista uma certidão que já foi emitida nos últimos 15 dias atrás, o Portal não deve permitir a emissão, apenas o download da certidão existente.
             if($ultimaCertidao->data_emissao > date('Y-m-d', strtotime('-15 days'))) {
                 $mensagem = 'Representante Comercial emitiu uma certidão há menos de 15 dias e não pode emitir uma nova certidão, devendo reutilizar a última certidão emitida.</br>Por favor clique no botão abaixo para obter a última certidão.';
-                $emitir = true;
+                $emitir = false;
                 $reuso = true;
             }
             // Caso a certidão tenha mais de 15 dias, o Portal deve dar a opção de emitir uma nova, ou de retutilizar a existente.
