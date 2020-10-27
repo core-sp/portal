@@ -424,11 +424,11 @@ function formataCpfCnpj($value)
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
 }
 /**
- * Função usada para remover caracteres especiais de CPF/CNPJ e Registro CORE.
+ * Função usada para remover caracteres não numéricos (CPF, CNPJ, Registro CORE e CEP).
  */
 function apenasNumeros($value)
 {
-    return preg_replace('/[^0-9]+/', '', $value);
+    return preg_replace('/[^0-9]/', '', $value);
 }
 
 function onlyDate($data)

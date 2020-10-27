@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Rules\CpfCnpj;
-use App\Traits\GerentiProcedures;
+use App\Repositories\GerentiRepositoryInterface;
 
 class ConsultaSituacaoController extends Controller
 {
-    use GerentiProcedures;
+    private $gerentiRepository;
+    
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
+    {
+        $this->gerentiRepository = $gerentiRepository;
+    }
 
     public function consultaView()
     {
@@ -32,7 +37,7 @@ class ConsultaSituacaoController extends Controller
     {
         $this->validateRequest();
         
-        $resultado = $this->gerentiAtivo(request('cpfCnpj'));
+        $resultado = $this->gerentiRepository->gerentiAtivo(request('cpfCnpj'));
 
         return view('site.consulta', compact('resultado'));
     }

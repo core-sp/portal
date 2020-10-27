@@ -145,7 +145,7 @@ class BdoEmpresaController extends Controller
     /** Função usada por JQuery na tela de anúncio de vagas */
     public function apiGetEmpresa($cnpj)
     {
-        $cnpj = preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj);
+        $cnpj = formataCpfCnpj($cnpj);
 
         $empresa = $this->bdoEmpresaRepository->getToApi($cnpj);
 

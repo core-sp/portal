@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Representante;
+use App\Rules\CpfCnpj;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Representante;
 use Illuminate\Support\Facades\Auth;
-use App\Rules\CpfCnpj;
-use App\Traits\GerentiProcedures;
 use Illuminate\Support\Facades\Input;
+use App\Repositories\GerentiRepositoryInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteLoginController extends Controller
 {
-    use GerentiProcedures;
+    private $gerentiRepository;
 
-    public function __construct()
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('guest:representante')->except('logout');
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public function showLoginForm()
@@ -32,7 +33,7 @@ class RepresentanteLoginController extends Controller
         $registro = Representante::where('cpf_cnpj', $cpfCnpj)->first();
 
         if(isset($registro)) {
-            $checkGerenti = $this->checaAtivo($registro->registro_core, $cpfCnpj);
+            $checkGerenti = $this->gerentiRepository->gerentiChecaLogin($registro->registro_core, $cpfCnpj);
 
             if($checkGerenti === false) {
                 return redirect()

@@ -10,7 +10,6 @@ use App\Mail\CertidaoMail;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use App\RepresentanteEndereco;
-use App\Traits\GerentiProcedures;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -18,26 +17,67 @@ use App\Mail\CadastroRepresentanteMail;
 use App\Repositories\CertidaoRepository;
 use App\Http\Controllers\CertidaoController;
 use App\Mail\SolicitacaoAlteracaoEnderecoMail;
+use App\Repositories\GerentiRepositoryInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
 {
-    use GerentiProcedures;
-
     private $certidaoController;
     private $certidaoRepository;
+    private $gerentiRepository;
     protected $idendereco;
 
-    public function __construct(CertidaoController $certidaoController, CertidaoRepository $certidaoRepository)
+    public function __construct(CertidaoController $certidaoController, CertidaoRepository $certidaoRepository, GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->certidaoController = $certidaoController;
         $this->certidaoRepository = $certidaoRepository;
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public function index()
     {
-        return view('site.representante.home');
+        $resultado = $this->gerentiRepository->gerentiAnuidadeVigente(Auth::guard('representante')->user()->cpf_cnpj);
+        $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
+        $status = statusBold($this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id));
+        $ano = date("Y");
+
+        return view('site.representante.home', compact("nrBoleto", "status", "ano"));
+    }
+
+    public function dadosGeraisView()
+    {
+        $nome = Auth::guard('representante')->user()->nome;
+        $registroCore = Auth::guard('representante')->user()->registro_core;
+        $cpfCnpj = Auth::guard('representante')->user()->cpf_cnpj;
+        $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
+        $dadosGerais = $this->gerentiRepository->gerentiDadosGerais(Auth::guard('representante')->user()->tipoPessoa(), Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.dados-gerais', compact("nome", "registroCore", "cpfCnpj", "tipoPessoa", "dadosGerais"));
+    }
+
+    public function contatosView()
+    {
+        $contatos = $this->gerentiRepository->gerentiContatos(Auth::guard('representante')->user()->ass_id);
+        $gerentiTiposContatos = gerentiTiposContatos();
+
+        return view('site.representante.contatos', compact("contatos", "gerentiTiposContatos"));
+    }
+
+    public function enderecosView()
+    {
+        $solicitacoesEnderecos = Auth::guard('representante')->user()->solicitacoesEnderecos();
+        $possuiSolicitacaoEnderecos = $solicitacoesEnderecos->isNotEmpty();
+        $endereco = $this->gerentiRepository->gerentiEnderecos(Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.enderecos', compact("possuiSolicitacaoEnderecos", "solicitacoesEnderecos", "endereco"));
+    }
+
+    public function listaCobrancas()
+    {
+        $cobrancas = $this->gerentiRepository->gerentiCobrancas(Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.lista-cobrancas', compact("cobrancas"));
     }
 
     public function cadastroView()
@@ -156,7 +196,7 @@ class RepresentanteSiteController extends Controller
 
         strlen(request('registro_core')) === 11 ? $registro = '0' . request('registro_core') : $registro = request('registro_core');
 
-        $checkGerenti = $this->checaAtivo($registro, request('cpfCnpj'), request('email'));
+        $checkGerenti = $this->gerentiChecaLogin($registro, request('cpfCnpj'), request('email'));
 
         if (array_key_exists('Error', $checkGerenti)) {
             return redirect()
@@ -180,24 +220,9 @@ class RepresentanteSiteController extends Controller
         ]);
     }
 
-    public function dadosGeraisView()
-    {
-        return view('site.representante.dados-gerais');
-    }
-
     public function inserirContatoView()
     {
         return view('site.representante.inserir-contato');
-    }
-
-    public function contatosView()
-    {
-        return view('site.representante.contatos');
-    }
-
-    public function enderecosView()
-    {
-        return view('site.representante.enderecos');
     }
 
     public function inserirContato(Request $request)
@@ -349,11 +374,6 @@ class RepresentanteSiteController extends Controller
             ]);
     }
 
-    public function listaCobrancas()
-    {
-        return view('site.representante.lista-cobrancas');
-    }
-
     public function eventoBoleto()
     {
         $descricao = IlluminateRequest::input('descricao');
@@ -394,7 +414,7 @@ class RepresentanteSiteController extends Controller
             // Caso exista uma certidão que já foi emitida nos últimos 15 dias atrás, o Portal não deve permitir a emissão, apenas o download da certidão existente.
             if($ultimaCertidao->data_emissao > date('Y-m-d', strtotime('-15 days'))) {
                 $mensagem = 'Representante Comercial emitiu uma certidão há menos de 15 dias e não pode emitir uma nova certidão, devendo reutilizar a última certidão emitida.</br>Por favor clique no botão abaixo para obter a última certidão.';
-                $emitir = false;
+                $emitir = true;
                 $reuso = true;
             }
             // Caso a certidão tenha mais de 15 dias, o Portal deve dar a opção de emitir uma nova, ou de retutilizar a existente.
@@ -419,7 +439,7 @@ class RepresentanteSiteController extends Controller
         }
 
         // Recupera dados do Representante Comercial.
-        $dadosGerenti = Auth::guard('representante')->user()->dadosGerais();
+        $dadosGerenti = $this->gerentiRepository->gerentiDadosGerais(Auth::guard('representante')->user()->tipoPessoa(), Auth::guard('representante')->user()->ass_id);
 
         $dadosRepresentante = [
             "nome" => Auth::guard('representante')->user()->nome, 
@@ -427,8 +447,8 @@ class RepresentanteSiteController extends Controller
             "tipo_pessoa" => Auth::guard("representante")->user()->tipoPessoa(),
             "registro_core" => Auth::guard('representante')->user()->registro_core,
             "email" => Auth::guard('representante')->user()->email,
-            "situacao" => Auth::guard("representante")->user()->pegaSituacao(),
-            "ativo" => Auth::guard("representante")->user()->ativo()
+            "situacao" => trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]),
+            "ativo" => $this->gerentiRepository->gerentiAtivo(apenasNumeros(Auth::guard('representante')->user()->cpf_cnpj))[0]["SITUACAO"] == Representante::ATIVO
         ];
         $dadosRepresentante["data_inscricao"] = $dadosGerenti["Data de início"];
 
@@ -444,10 +464,10 @@ class RepresentanteSiteController extends Controller
         }
 
         // Recupera dados de endereço do Representante Comercial
-        $endereco = Auth::guard("representante")->user()->enderecoFormatado();
+        $endereco = $this->gerentiRepository->gerentiEnderecoFormatado(Auth::guard('representante')->user()->ass_id);
 
         // Recupera dados de cobrança do Representante Comercial
-        $cobrancas = Auth::guard("representante")->user()->cobrancas();
+        $cobrancas = $this->gerentiRepository->gerentiCobrancas(Auth::guard('representante')->user()->ass_id);
 
         return $this->certidaoController->verificaRegraCertidao(
             $tipo,

@@ -33,7 +33,7 @@ class NewsletterController extends Controller
         }
 
         // Remove máscara
-        $celular = preg_replace("/[^0-9]/", "", $request->input('celularNl'));
+        $celular = apenasNumeros($request->input('celularNl'));
         $nomeNl = mb_convert_case(mb_strtolower(request('nomeNl')), MB_CASE_TITLE);
 
         $newsletter = new Newsletter();

@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Schema;
 use Laravel\Horizon\Horizon;
+use Illuminate\Support\Facades\Schema;
+use App\Repositories\GerentiRepository;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
+use App\Repositories\GerentiRepositoryMock;
+use App\Repositories\GerentiRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,7 +19,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        if(env("APP_ENV") == "local" || env("APP_ENV") == "testing") {
+            $this->app->bind(GerentiRepositoryInterface::class, GerentiRepositoryMock::class);
+        }
+        else {
+            $this->app->bind(GerentiRepositoryInterface::class, GerentiRepository::class);
+        }
+        
+        
     }
 
     /**

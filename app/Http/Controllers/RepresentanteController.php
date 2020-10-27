@@ -5,16 +5,15 @@ namespace App\Http\Controllers;
 use App\Representante;
 use App\Rules\CpfCnpj;
 use Illuminate\Http\Request;
-use App\Traits\GerentiProcedures;
+use App\Repositories\GerentiRepositoryInterface;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 
 class RepresentanteController extends Controller
 {
-    use GerentiProcedures;
 
     // Nome da classe
     private $class = 'RepresentanteController';
-    private $representante;
+    private $gerentiRepository;
 
     // Variáveis
     public $variaveis = [
@@ -27,10 +26,10 @@ class RepresentanteController extends Controller
         'btn_lista' => '<a href="/admin/representantes/buscaGerenti" class="btn btn-primary">Nova Busca</a>'
     ];
 
-    public function __construct(Representante $representante)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('auth');
-        $this->representante = $representante;
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public function resultados()
@@ -108,7 +107,7 @@ class RepresentanteController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<form method="POST" action="/admin/representantes/info" class="d-inline">';
+            $acoes = '<form method="GET" action="/admin/representantes/info" class="d-inline">';
             $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
             $acoes .= '<input type="hidden" name="tipo" value="'.$resultado["ASS_TP_ASSOC"].'" />';
             $acoes .= '<input type="hidden" name="nome" value="'.$resultado["ASS_NOME"].'" />';
@@ -116,7 +115,7 @@ class RepresentanteController extends Controller
             $acoes .= '<input type="submit" class="btn btn-sm btn-default" value="Detalhes" />';
             $acoes .= '</form>';
             $conteudo = [
-                $resultado['ASS_NOME'] . ' <strong>(' . stringTipoPessoa($resultado['ASS_TP_ASSOC']) . ')</strong>',
+                $resultado['ASS_NOME'] . ' <strong>(' . Representante::mapaCodigoTipoPessoa($resultado['ASS_TP_ASSOC']) . ')</strong>',
                 formataRegistro($resultado['ASS_REGISTRO']),
                 '<span class="nowrap">' . formataCpfCnpj($resultado['ASS_CPF_CGC']) . '</span>',
                 $acoes
@@ -157,27 +156,30 @@ class RepresentanteController extends Controller
     public function buscaGerenti(Request $request)
     {
         $request->merge([
-            'registro' => preg_replace('/[^0-9]/', '', $request->registro),
-            'cpf_cnpj' => preg_replace('/[^0-9]/', '', $request->cpf_cnpj)
+            'registro' => apenasNumeros($request->registro),
+            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
         ]);
         $this->validateRequest();
         $variaveis = (object) $this->variaveis;
-        $resultados = $this->gerentiBusca($request->registro, $request->nome, $request->cpf_cnpj);
+        $resultados = $this->gerentiRepository->gerentiBusca($request->registro, $request->nome, $request->cpf_cnpj);
         $count = count($resultados);
         $count ? $tabela = $this->tabelaGerenti($resultados) : $tabela = 'vazia';
+        
         return view('admin.crud.criar', compact('variaveis', 'tabela', 'count'));
     }
 
     public function representanteInfo(Request $request)
     {
         ControleController::autoriza($this->class, 'index');
+
         $variaveis = (object) $this->variaveis;
         $nome = $request->nome;
-        $request->tipo === '2' || $request->tipo === '5' ? $dados_gerais = $this->representante::arrangeDgPf($this->gerentiDadosGeraisPF($request->ass_id)) : $dados_gerais = $this->representante::arrangeDgPj($this->gerentiDadosGeraisPJ($request->ass_id));
-        $contatos = $this->gerentiContatos($request->ass_id);
-        $enderecos = utf8_converter($this->gerentiEnderecos($request->ass_id));
-        $cobrancas = $this->representante->cobrancasById($request->ass_id);
-        $situacao = $this->representante->pegaSituacao($request->ass_id);
+        $tipoPessoa = $request->tipo === '2' || $request->tipo === '5' ? Representante::PESSOA_FISICA : Representante::PESSOA_JURIDICA;
+        $dados_gerais = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, $request->ass_id);
+        $contatos = $this->gerentiRepository->gerentiContatos($request->ass_id);
+        $enderecos = $this->gerentiRepository->gerentiEnderecos($request->ass_id);
+        $cobrancas = $this->gerentiRepository->gerentiCobrancas($request->ass_id);
+        $situacao = trim(explode(':', $this->gerentiRepository->gerentiStatus($request->ass_id))[1]);
         
         return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas'));
     }
