@@ -152,7 +152,7 @@ class BdoEmpresaController extends Controller
         isset($empresa) ? $count = $empresa->oportunidade_count : $count = 0;
 
         if($count > 0) {
-            $message = 'A empresa informada <strong>já possui uma vaga sob análise ou em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do telefone <strong>(11) 3243-5523</strong> e/ou através do e-mail: <strong>informacoes@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.';
+            $message = 'A empresa informada <strong>já possui uma vaga sob análise ou em andamento no Balcão de Oportunidades</strong> do Core-SP. Para solicitar nova inclusão, favor entrar em contato através do telefone <strong>(11) 3243-5523</strong> e/ou através do e-mail: <strong>assessoria.presidencia@core-sp.org.br</strong> informando CNPJ, nome do responsável e telefone para contato.';
             $class = 'alert-warning';
         } 
         else {
