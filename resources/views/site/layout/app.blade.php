@@ -63,8 +63,8 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
-                <h3 class="cinza-claro">#outubrorosa</h3>
-                <p class="cinza-claro">Luta contra o Câncer de mama</br>A conscientização é o melhor caminho</p>
+                <h3 class="cinza-claro">#novembroazul</h3>
+                <p class="cinza-claro">Mês mundial de combate<br>ao câncer de próstata</p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
@@ -196,7 +196,7 @@ use \App\Http\Controllers\Helper;
           </div>
         </div>
         <a href="/servicos-atendimento-ao-rc" class="hide-768">
-          <div class="container-fluid azul-escuro-bg pt-2 pb-2">
+          <div class="container-fluid azul-claro-bg pt-2 pb-2">
             <div class="row">
                 <div class="container">
                   <div class="d-flex">

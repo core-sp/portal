@@ -56,6 +56,10 @@ body {
 	background-color: #004587;
 }
 
+.azul-claro-bg {
+	background-color: rgba(0,138,191,1);
+}
+
 .cinza-claro {
 	color: #eaeaea;
 }
@@ -409,9 +413,11 @@ figure.align-left {
 	top: 0;
 	left: 0;
 	
-	/* Outubro Rosa */
-	background-color: rgba(231,31,127,1);
+	/* Novembro Azul */
+	background-color: rgba(0,31,137,1);
 
+	/* Outubro Rosa */
+	/* background-color: rgba(231,31,127,1); */
 	/* Cor Padrão */
 	/* background-color: #004587; */
 	/* Setembro Amarelo */
