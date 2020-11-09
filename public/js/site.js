@@ -634,3 +634,11 @@ function showLoading()
 	$('#rc-main').hide();
 	$('#loading').show();
 }
+
+// Função para mostrar dado oculto com slide.
+$('.mostra-dado-oculto').click(function(e) {
+	e.preventDefault();
+	var mostraDadoOculto = $(this);
+	var dadoOculto = mostraDadoOculto.next('.dado-oculto');
+	dadoOculto.slideToggle();
+});
