@@ -32,7 +32,7 @@ class AgendamentoSiteController extends Controller
     public function formView()
     {
         $regionais = $this->regionalRepository->all();
-        $pessoas = Agendamento::pessoas();
+        $pessoas = Agendamento::TIPOS_PESSOA;
         $servicos = Agendamento::servicos();
 
         return view('site.agendamento', compact('regionais', 'pessoas', 'servicos'));
@@ -143,7 +143,7 @@ class AgendamentoSiteController extends Controller
 
             // Agendamento deve ser cancelado com antecedência, não é permitido cancelar no mesmo dia do Agendamento
             if($now < $agendamento->dia) {
-                $update = $this->agendamentoRepository->update($agendamento->idagendamento, ['status' => Agendamento::$status_cancelado], $agendamento);
+                $update = $this->agendamentoRepository->update($agendamento->idagendamento, ['status' => Agendamento::STATUS_CANCELADO], $agendamento);
 
                 if(!$update) {
                     abort(500);

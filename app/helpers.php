@@ -525,6 +525,13 @@ function retornaDateTime($dia, $hora)
     return $format;
 }
 
+function retornaDate($dia)
+{
+    $dia = str_replace('/','-',$dia);
+    
+    return new \DateTime($dia);
+}
+
 function btnSituacao($situacao)
 {
     switch ($situacao) {
@@ -671,4 +678,13 @@ function todasHoras()
 function converterParaTextoCru($html)
 {
     return html_entity_decode(strip_tags($html));
+}
+
+function resumoTamanho($string, $tamanho)
+{
+    if (strlen($string) > 100)
+        $string = strip_tags($string);
+        $string = html_entity_decode($string);
+        $string = substr($string, 0, $tamanho) . '...';
+    return $string;
 }

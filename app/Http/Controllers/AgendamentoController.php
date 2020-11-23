@@ -87,7 +87,7 @@ class AgendamentoController extends Controller
             abort(500);
         }
 
-        if($status === Agendamento::$status_compareceu) {
+        if($status === Agendamento::STATUS_COMPARECEU) {
             event(new CrudEvent('agendamento', 'confirmou presença', $idagendamento));
         } 
         else {
@@ -370,13 +370,13 @@ class AgendamentoController extends Controller
     public function mensagemAgendamento($dia, $hora, $status, $protocolo, $id)
     {
         if(date('Y-m-d') >= $dia) {
-            if($status === Agendamento::$status_cancelado) {
+            if($status === Agendamento::STATUS_CANCELADO) {
                 $mensagem =  "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i>&nbsp;&nbsp;Atendimento cancelado</strong></p>";
             } 
-            elseif($status === Agendamento::$status_nao_compareceu) {
+            elseif($status === Agendamento::STATUS_NAO_COMPARECEU) {
                 $mensagem = "<p class='mb-0 text-warning'><strong><i class='fas fa-user-alt-slash'></i>&nbsp;&nbsp;Não compareceu</strong></p>";
             } 
-            elseif($status === Agendamento::$status_compareceu) {
+            elseif($status === Agendamento::STATUS_COMPARECEU) {
                 $mensagem = "<p class='mb-0 text-success'><strong><i class='fas fa-check-circle'></i>&nbsp;&nbsp;Atendimento realizado com sucesso no dia " . onlyDate($dia) . ", às " . $hora . "</strong></p>";
             } 
             else {
@@ -384,7 +384,7 @@ class AgendamentoController extends Controller
             }
         } 
         else {
-            if($status === Agendamento::$status_cancelado) {
+            if($status === Agendamento::STATUS_CANCELADO) {
                 $mensagem = "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i> Atendimento cancelado</strong></p>";
             } 
             else {
@@ -408,8 +408,8 @@ class AgendamentoController extends Controller
             }
         }
         switch ($status) {
-            case Agendamento::$status_cancelado:
-                $btn = "<strong>" . Agendamento::$status_cancelado . "</strong>";
+            case Agendamento::STATUS_CANCELADO:
+                $btn = "<strong>" . Agendamento::STATUS_CANCELADO . "</strong>";
                 if($this->mostra($this->class, 'edit')) {
                     $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
@@ -417,8 +417,8 @@ class AgendamentoController extends Controller
                 return $btn;
             break;
 
-            case Agendamento::$status_compareceu:
-                $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;" . Agendamento::$status_compareceu . "&nbsp;&nbsp;</p>";
+            case Agendamento::STATUS_COMPARECEU:
+                $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;" . Agendamento::STATUS_COMPARECEU . "&nbsp;&nbsp;</p>";
                 if($this->mostra($this->class, 'edit')) {
                     $string .= "<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
@@ -429,8 +429,8 @@ class AgendamentoController extends Controller
                 return $string;
             break;
 
-            case Agendamento::$status_nao_compareceu:
-                $btn = "<strong>" . Agendamento::$status_nao_compareceu . "</strong>";
+            case Agendamento::STATUS_NAO_COMPARECEU:
+                $btn = "<strong>" . Agendamento::STATUS_NAO_COMPARECEU . "</strong>";
                 if($this->mostra($this->class, 'edit')) {
                     $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
@@ -443,8 +443,8 @@ class AgendamentoController extends Controller
                 $acoes .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="' . csrf_token() . '" />';
                 $acoes .= '<input type="hidden" name="_method" value="PUT" id="method" />';
                 $acoes .= '<input type="hidden" name="idagendamento" value="' . $id . '" />';
-                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="' . Agendamento::$status_compareceu . '">Confirmar</button>';
-                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="' . Agendamento::$status_nao_compareceu . '">' . Agendamento::$status_nao_compareceu . '</button>';
+                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="' . Agendamento::STATUS_COMPARECEU . '">Confirmar</button>';
+                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="' . Agendamento::STATUS_NAO_COMPARECEU . '">' . Agendamento::STATUS_NAO_COMPARECEU . '</button>';
                 $acoes .= '</form>';
 
                 if($this->mostra($this->class, 'edit')) {

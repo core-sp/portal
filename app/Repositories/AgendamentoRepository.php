@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Agendamento;
+use Illuminate\Support\Facades\DB;
 
 class AgendamentoRepository 
 {
@@ -52,6 +53,13 @@ class AgendamentoRepository
             ->paginate(10);
     }
 
+    public function getCountPastAgendamentoPendente()
+    {
+        return Agendamento::where('dia', '<', date('Y-m-d'))
+            ->whereNull('status')
+            ->count();
+    }
+
     public function getAllPastAgendamentoPendenteSede()
     {
         return Agendamento::where('dia', '<', date('Y-m-d'))
@@ -59,6 +67,14 @@ class AgendamentoRepository
             ->whereNull('status')
             ->orderBy('dia', 'DESC')
             ->paginate(10);
+    }
+
+    public function getCountPastAgendamentoPendenteSede()
+    {
+        return Agendamento::where('dia', '<', date('Y-m-d'))
+            ->where('idregional', 1)
+            ->whereNull('status')
+            ->count();
     }
 
     public function getAllPastAgendamentoPendenteSeccionais()
@@ -70,6 +86,14 @@ class AgendamentoRepository
             ->paginate(10);
     }
 
+    public function getCountPastAgendamentoPendenteSeccionais()
+    {
+        return Agendamento::where('dia', '<', date('Y-m-d'))
+            ->where('idregional', '!=', 1)
+            ->whereNull('status')
+            ->count();
+    }
+
     public function getPastAgendamentoPendenteByRegional($idRegional)
     {
         return Agendamento::where('dia', '<', date('Y-m-d'))
@@ -79,10 +103,18 @@ class AgendamentoRepository
             ->paginate(10);
     }
 
+    public function getCountPastAgendamentoPendenteByRegional($idRegional)
+    {
+        return Agendamento::where('dia', '<', date('Y-m-d'))
+            ->where('idregional', '=', $idRegional)
+            ->whereNull('status')
+            ->count();
+    }
+
     public function getCountAgendamentoNaoCompareceuByCpf($cpf)
     {
         return Agendamento::where('cpf', $cpf)
-            ->where('status', Agendamento::$status_nao_compareceu)
+            ->where('status', Agendamento::STATUS_NAO_COMPARECEU)
             ->whereBetween('dia',[date('Y-m-d', strtotime('-90 days')), date('Y-m-d')])
             ->count();
     }
@@ -141,5 +173,15 @@ class AgendamentoRepository
             ->orderBy('hora','ASC')
             ->limit(50)
             ->paginate(25);
+    }
+
+    public function getAgendamentoConcluidoCountByRegional($idregional) 
+    {
+        return Agendamento::select(DB::raw("idusuario, count(1) as contagem"))
+            ->where("status", Agendamento::STATUS_COMPARECEU)
+            ->where("idregional", $idregional)
+            ->groupBy("idusuario")
+            ->orderBy('contagem', 'DESC')
+            ->get();
     }
 }
