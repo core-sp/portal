@@ -48,7 +48,7 @@
 
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        {!! file_get_contents(asset('/img/sp.svg')) !!}
+        {!! file_get_contents((public_path() . '/img/sp.svg')) !!}
       </div>
 
       <div id="dados-fiscalizacao" class="col-lg-4 align-self-center text-center">
