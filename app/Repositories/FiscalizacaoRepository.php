@@ -7,9 +7,17 @@ use App\DadoFiscalizacao;
 
 class FiscalizacaoRepository 
 {
-    public function getToTable() 
+    public function getPublicado() 
     {
-        return AnoFiscalizacao::orderBy('ano', 'DESC')->paginate(25);;
+        return AnoFiscalizacao::where('status', true)
+            ->orderBy('ano', 'DESC')
+            ->paginate(25);;
+    }
+
+    public function busca($criterio)
+    {
+        return AnoFiscalizacao::where('ano', $criterio)
+            ->paginate(10);
     }
 
     public function storeAno($data)
@@ -17,7 +25,7 @@ class FiscalizacaoRepository
         return AnoFiscalizacao::create($data);
     }
 
-    public function updateAno($ano, $data)
+    public function updateAnoStatus($ano, $data)
     {
         return AnoFiscalizacao::findOrFail($ano)->update($data);
     }
@@ -25,6 +33,25 @@ class FiscalizacaoRepository
     public function storeDadoFiscalizacao($idregional, $ano)
     {
         return DadoFiscalizacao::create(['idregional' => $idregional, 'ano' => $ano]);
+    }
+
+    public function updateDadoFiscalizacao($dadosFiscalizacao, $ano)
+    {
+        $anoUpdate = AnoFiscalizacao::findOrFail($ano);
+
+        foreach ($anoUpdate->dadoFiscalizacao as $dado) {
+            $dado->notificacaopf = $dadosFiscalizacao[$dado->idregional]["notificacaopf"];
+            $dado->notificacaopj = $dadosFiscalizacao[$dado->idregional]["notificacaopj"];
+            $dado->constatacaopf = $dadosFiscalizacao[$dado->idregional]["constatacaopf"];
+            $dado->constatacaopj = $dadosFiscalizacao[$dado->idregional]["constatacaopj"];
+            $dado->infracaopf = $dadosFiscalizacao[$dado->idregional]["infracaopf"];
+            $dado->infracaopj = $dadosFiscalizacao[$dado->idregional]["infracaopj"];
+            $dado->convertidopf = $dadosFiscalizacao[$dado->idregional]["convertidopf"];
+            $dado->convertidopj = $dadosFiscalizacao[$dado->idregional]["convertidopj"];
+            $dado->orientacao = $dadosFiscalizacao[$dado->idregional]["orientacao"];
+
+            $dado->update();
+        }
     }
 
     public function findOrFail($ano)

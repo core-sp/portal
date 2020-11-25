@@ -34,7 +34,12 @@
 
     <div class="row justify-content-center">
       <div class="col-md-2">
-        <select id="ano-mapa" class="form-control">
+          @if(empty($anos))
+          <select id="ano-mapa" class="form-control" disabled>
+          <option value="Ano indisponível" selected>Ano indisponível</option>
+
+          @else
+          <select id="ano-mapa" class="form-control">
           @foreach($anos as $ano)
           @if($anoSelecionado->ano == $ano)
           <option value="{{ $ano }}" selected>{{ $ano }}</option>
@@ -42,10 +47,12 @@
           <option value="{{ $ano }}">{{ $ano }}</option>
           @endif
           @endforeach
+          @endif
         </select>
       </div>
     </div>
 
+    @if(!empty($anos))
     <div class="row justify-content-center">
       <div class="col-lg-8">
         {!! file_get_contents((public_path() . '/img/sp.svg')) !!}
@@ -103,6 +110,7 @@
 
       </div>
     </div>  
+    @endif
 
   </div>
 </section>

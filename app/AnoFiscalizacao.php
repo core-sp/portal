@@ -12,11 +12,11 @@ class AnoFiscalizacao extends Model
     public $incrementing = false;
     protected $with = ['dadoFiscalizacao'];
 
+    const STATUS_PUBLICADO = 'Publicado';
+    const STATUS_NAO_PUBLICADO = 'Não Publicado';
+
     public function dadoFiscalizacao()
     {
     	return $this->hasMany('App\DadoFiscalizacao', 'ano');
     }
-
-    static $status_publicado = 'Publicado';
-    static $status_nao_publicado = 'Não Publicado';
 }

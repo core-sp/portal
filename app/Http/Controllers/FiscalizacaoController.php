@@ -6,16 +6,19 @@ use App\AnoFiscalizacao;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
+use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\RegionalRepository;
 use App\Repositories\FiscalizacaoRepository;
 use App\Http\Requests\AnoFiscalizacaoRequest;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class FiscalizacaoController extends Controller
 {
-    use TabelaAdmin;
+    use TabelaAdmin, ControleAcesso;
 
+    private $class = 'FiscalizacaoController';
     private $regionalRepository;
     private $fiscalizacaoRepository;
     
@@ -25,7 +28,9 @@ class FiscalizacaoController extends Controller
         'singulariza' => 'o ano de fiscalização',
         'plural' => 'anos de fiscalização',
         'pluraliza' => 'anos de fiscalização',
-        'titulo_criar' => 'Abrir ano de fiscalização'
+        'titulo_criar' => 'Cria ano de fiscalização',
+        'busca' => 'fiscalizacao',
+        'slug' => 'fiscalizacao'
     ];
     private $dadosFiscalizacaoVariaveis = [
         'singular' => 'dado de fiscalização',
@@ -46,7 +51,9 @@ class FiscalizacaoController extends Controller
 
     public function index()
     {
-        $resultados = $this->fiscalizacaoRepository->getToTable();
+        $this->autoriza($this->class, "index");
+
+        $resultados = $this->fiscalizacaoRepository->getAll();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->anoFiscalizacaoVariaveis;
 
@@ -54,7 +61,9 @@ class FiscalizacaoController extends Controller
     }
 
     public function createAno() 
-    {
+    {   
+        $this->autoriza($this->class, "create");
+
         $regionais = $this->regionalRepository->getToList();
         $variaveis = $this->anoFiscalizacaoVariaveis;
         $variaveis['form'] = 'anofiscalizacaocreate';
@@ -65,6 +74,8 @@ class FiscalizacaoController extends Controller
 
     public function storeAno(AnoFiscalizacaoRequest $request)
     {
+        $this->autoriza($this->class, "create");
+
         DB::transaction(function () use ($request) {
             $ano = $this->fiscalizacaoRepository->storeAno($request->toModel());
 
@@ -76,17 +87,19 @@ class FiscalizacaoController extends Controller
         });
 
         return redirect()->route('fiscalizacao.index')
-            ->with('message', '<i class="icon fa fa-check"></i>O ano foi aberto com sucesso')
+            ->with('message', '<i class="icon fa fa-check"></i>O ano foi criado com sucesso')
             ->with('class', 'alert-success');
     }
 
     public function updateStatus(Request $request)
     {
+        $this->autoriza($this->class, "edit");
+
         $idusuario = Auth::user()->idusuario;
         $ano = $request->ano;
         $status = $request->status;
 
-        $update = $this->fiscalizacaoRepository->updateAno($ano, ['status' => $status]);
+        $update = $this->fiscalizacaoRepository->updateAnoStatus($ano, ['status' => $status]);
 
         if(!$update) 
         {
@@ -109,6 +122,8 @@ class FiscalizacaoController extends Controller
 
     public function editAno($ano)
     {
+        $this->autoriza($this->class, "edit");
+
         $resultado = $this->fiscalizacaoRepository->findOrFail($ano);
         $variaveis = $this->anoFiscalizacaoVariaveis;
         $variaveis['form'] = 'anofiscalizacaoedit';
@@ -118,14 +133,38 @@ class FiscalizacaoController extends Controller
     }
 
 
-    public function updateAno(Request $request)
+    public function updateAno(Request $request, $ano)
     {
-        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+        $this->autoriza($this->class, "edit");
+
+        $dadosFiscalizacao = $request->regional;
+
+        DB::transaction(function () use ($dadosFiscalizacao, $ano) {
+            $ano = $this->fiscalizacaoRepository->updateDadoFiscalizacao($dadosFiscalizacao, $ano);
+        });
+
+        return redirect()->route('fiscalizacao.index')
+            ->with('message', '<i class="icon fa fa-check"></i>O ano foi editado com sucesso')
+            ->with('class', 'alert-success');
+    }
+
+    public function busca()
+    {
+        $this->autoriza($this->class, 'index');
+
+        $busca = IlluminateRequest::input('q');
+    
+        $resultados = $this->fiscalizacaoRepository->busca($busca);
+
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->anoFiscalizacaoVariaveis;
+
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 
     public function mostrarMapa()
     {
-        $todosAnos = $this->fiscalizacaoRepository->getAll();
+        $todosAnos = $this->fiscalizacaoRepository->getPublicado();
         $anoSelecionado = $todosAnos->first();
         $anos = [];
         
@@ -138,7 +177,7 @@ class FiscalizacaoController extends Controller
 
     public function mostrarMapaAno($ano)
     {
-        $todosAnos = $this->fiscalizacaoRepository->getAll();
+        $todosAnos = $this->fiscalizacaoRepository->getPublicado();
         $anoSelecionado = $todosAnos->find($ano);
 
         if(!$anoSelecionado) {
@@ -170,17 +209,25 @@ class FiscalizacaoController extends Controller
             $acoes .= "<input type='hidden' name='_token' value='" . csrf_token() . "'/>";
             
             if($row->status) {
-                $acoes .= "<button type='submit' name='status' class='btn btn-sm btn-danger ml-1' value='0'>Reverter Publicação</button>";
-                $status = AnoFiscalizacao::$status_publicado;
+                if($this->mostra($this->class, 'edit')) {
+                    $acoes .= "<button type='submit' name='status' class='btn btn-sm btn-danger ml-1' value='0'>Reverter Publicação</button>";
+                }
+                 
+                $status = AnoFiscalizacao::STATUS_PUBLICADO;
             }
             else {
-                $acoes .= "<button type='submit' name='status' class='btn btn-sm btn-primary' value='1'>Publicar</button>";
-                $status = AnoFiscalizacao::$status_nao_publicado;
+                if($this->mostra($this->class, 'edit')) {
+                    $acoes .= "<button type='submit' name='status' class='btn btn-sm btn-primary' value='1'>Publicar</button>";
+                }
+                
+                $status = AnoFiscalizacao::STATUS_NAO_PUBLICADO;
             }
 
             $acoes .= "</form>";
 
-            $acoes .= " <a href='" . route('fiscalizacao.editano', $row->ano) . "' class='btn btn-sm btn-default'>Editar</a>";
+            if($this->mostra($this->class, 'edit')) {
+                $acoes .= " <a href='" . route('fiscalizacao.editano', $row->ano) . "' class='btn btn-sm btn-default'>Editar</a>";
+            }
             
             return [
                 $row->ano,

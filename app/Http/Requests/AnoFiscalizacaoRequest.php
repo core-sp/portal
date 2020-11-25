@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\AnoFiscalizacao;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AnoFiscalizacaoRequest extends FormRequest
@@ -25,7 +26,8 @@ class AnoFiscalizacaoRequest extends FormRequest
     public function toModel()
     {
         return [
-            'ano' => $this->ano
+            'ano' => $this->ano,
+            'status' => false
         ];
     }
 }
