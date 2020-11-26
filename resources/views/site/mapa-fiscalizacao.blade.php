@@ -4,7 +4,7 @@
 
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-    <img src="{{ asset('img/banner-fiscalizacao.jpg') }}" />
+    <img src="{{ asset('img/banner-SIG.jpg') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
