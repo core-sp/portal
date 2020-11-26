@@ -166,13 +166,14 @@ class FiscalizacaoController extends Controller
     {
         $todosAnos = $this->fiscalizacaoRepository->getPublicado();
         $anoSelecionado = $todosAnos->first();
+        $dataAtualizacao = onlyDate($anoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at);
         $anos = [];
         
         foreach($todosAnos as $ano) {
             array_push($anos, $ano->ano);
         }
 
-        return view('site.mapa-fiscalizacao', compact('anos', 'anoSelecionado'));
+        return view('site.mapa-fiscalizacao', compact('anos', 'anoSelecionado', 'dataAtualizacao'));
     }
 
     public function mostrarMapaAno($ano)
@@ -184,13 +185,14 @@ class FiscalizacaoController extends Controller
             return redirect()->route('fiscalizacao.mapa');
         }
 
+        $dataAtualizacao = onlyDate($anoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at);
         $anos = [];
         
         foreach($todosAnos as $ano) {
             array_push($anos, $ano->ano);
         }
 
-        return view('site.mapa-fiscalizacao', compact('anos', 'anoSelecionado'));
+        return view('site.mapa-fiscalizacao', compact('anos', 'anoSelecionado', 'dataAtualizacao'));
     }
 
     public function tabelaCompleta($resultados)

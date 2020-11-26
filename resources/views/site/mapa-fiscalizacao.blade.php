@@ -108,6 +108,7 @@
         </div>
         @endforeach
 
+        <p>* Dados atualizados em: {{ $dataAtualizacao }}</p>
       </div>
     </div>  
     @endif
