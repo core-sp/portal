@@ -166,7 +166,7 @@ class FiscalizacaoController extends Controller
     {
         $todosAnos = $this->fiscalizacaoRepository->getPublicado();
         $anoSelecionado = $todosAnos->first();
-        $dataAtualizacao = onlyDate($anoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at);
+        $dataAtualizacao = $anoSelecionado ? onlyDate($anoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at) : null;
         $anos = [];
         
         foreach($todosAnos as $ano) {
@@ -185,7 +185,7 @@ class FiscalizacaoController extends Controller
             return redirect()->route('fiscalizacao.mapa');
         }
 
-        $dataAtualizacao = onlyDate($anoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at);
+        $dataAtualizacao = $anoSelecionado ? onlyDate($anoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at) : null;
         $anos = [];
         
         foreach($todosAnos as $ano) {
