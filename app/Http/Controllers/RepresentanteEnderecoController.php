@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Representante;
 use App\Events\CrudEvent;
+use Illuminate\Http\Request;
 use App\RepresentanteEndereco;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ControleController;
 use App\Repositories\GerentiRepositoryInterface;
 
@@ -141,5 +143,16 @@ class RepresentanteEnderecoController extends Controller
         return redirect('/admin/representante-enderecos')
                 ->with('message', 'A atualização de endereço foi recusada.')
                 ->with('class', 'alert-info');
+    }
+
+    public function visualizarComprovante(Request $request) 
+    {
+        
+        return response()->file(storage_path() . "/app/representantes/enderecos/" . $request->nome, ["Cache-Control" => "no-cache"]);
+    }
+
+    public function baixarComprovante(Request $request) 
+    {
+        return Storage::download("/representantes/enderecos/" . $request->nome, $request->nome);
     }
 }

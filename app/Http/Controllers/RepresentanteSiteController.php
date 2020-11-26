@@ -18,6 +18,8 @@ use App\Repositories\CertidaoRepository;
 use App\Http\Controllers\CertidaoController;
 use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Repositories\GerentiRepositoryInterface;
+use App\Http\Requests\RepresentanteEnderecoRequest;
+use App\Repositories\RepresentanteEnderecoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
@@ -25,14 +27,16 @@ class RepresentanteSiteController extends Controller
     private $certidaoController;
     private $certidaoRepository;
     private $gerentiRepository;
+    private $representanteEnderecoRepository;
     protected $idendereco;
 
-    public function __construct(CertidaoController $certidaoController, CertidaoRepository $certidaoRepository, GerentiRepositoryInterface $gerentiRepository)
+    public function __construct(CertidaoController $certidaoController, CertidaoRepository $certidaoRepository, GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->certidaoController = $certidaoController;
         $this->certidaoRepository = $certidaoRepository;
         $this->gerentiRepository = $gerentiRepository;
+        $this->representanteEnderecoRepository = $representanteEnderecoRepository;
     }
 
     public function index()
@@ -257,57 +261,8 @@ class RepresentanteSiteController extends Controller
 
     public function inserirEnderecoView()
     {
-        return view('site.representante.inserir-endereco');
-    }
-
-    protected function validateEndereco($request)
-    {
-        $this->validate($request, [
-            'cep' => 'required',
-            'bairro' => 'required|max:30',
-            'logradouro' => 'required|max:100',
-            'numero' => 'required|max:15',
-            'complemento' => 'max:100',
-            'estado' => 'required|max:5',
-            'municipio' => 'required|max:30',
-            'crimage' => 'required|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048'
-        ], [
-            'required' => 'Campo obrigatório',
-            'max' => 'Excedido limite de caracteres',
-            'crimage.required' => 'Favor adicionar um comprovante de residência',
-            'mimes' => 'Tipo de arquivo não suportado',
-            'crimage.max' => 'A imagem não pode ultrapassar 2MB'
-        ]);
-    }
-
-    public function saveEndereco($image, $imageDois = null)
-    {
-        $save = RepresentanteEndereco::create([
-            'ass_id' => Auth::guard('representante')->user()->ass_id,
-            'cep' => request('cep'),
-            'bairro' => request('bairro'),
-            'logradouro' => request('logradouro'),
-            'numero' => request('numero'),
-            'complemento' => request('complemento'),
-            'estado' => request('estado'),
-            'municipio' => request('municipio'),
-            'crimage' => $image,
-            'crimagedois' => $imageDois,
-            'status' => 'Aguardando confirmação'
-        ]);
-
-        if(!$save)
-            abort(403);
-
-        $this->idendereco = $save->id;
-    }
-
-    public function inserirEndereco(Request $request)
-    {
-        $this->validateEndereco($request);
-
-        // Checa se já tem solicitação de endereço sob análise.
-        $count = RepresentanteEndereco::where('ass_id', Auth::guard('representante')->user()->ass_id)->where('status', 'Aguardando confirmação')->count();
+        $count = $this->representanteEnderecoRepository->getCountByAssId(Auth::guard('representante')->user()->ass_id);
+        
         if($count >= 1) {
             return redirect()
                 ->route('representante.enderecos.view')
@@ -317,30 +272,32 @@ class RepresentanteSiteController extends Controller
                 ]);
         }
 
+        return view('site.representante.inserir-endereco');
+    }
+
+    public function inserirEndereco(RepresentanteEnderecoRequest $request)
+    {
         $imageName = Auth::guard('representante')->user()->id . '-' . time() . '.' . request()->crimage->getClientOriginalExtension();
 
-        request()->crimage->move(public_path('imagens/representantes/enderecos'), $imageName);
+        $request->file("crimage")->storeAs("representantes/enderecos", $imageName);
 
         if(isset(request()->crimagedois)) {
             $imageDoisName = Auth::guard('representante')->user()->id . '-2-' . time() . '.' . request()->crimagedois->getClientOriginalExtension();
-            request()->crimagedois->move(public_path('imagens/representantes/enderecos'), $imageDoisName);
-        } else {
+            $request->file("crimagedois")->storeAs("representantes/enderecos", $imageDoisName);
+        } 
+        else {
             $imageDoisName = null;
         }
 
-        $this->saveEndereco($imageName, $imageDoisName);
+        $save = $this->representanteEnderecoRepository->create(Auth::guard('representante')->user()->ass_id, request(["cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"]), $imageName, $imageDoisName);
 
-        // $this->gerentiInserirEndereco(Auth::guard('representante')->user()->ass_id, $request);
+        if(!$save) {
+            abort(500);
+        }
 
         event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") solicitou mudança no endereço de correspondência.'));
 
-        $body = 'Nova solicitação de alteração de endereço no Portal Core-SP.';
-        $body .= '<br /><br />';
-        $body .= '<strong>Código da solicitação:</strong> #'. $this->idendereco;
-        $body .= '<br /><br />';
-        $body .= 'Para verifica-la, acesse o <a href="' . route('site.home') . '/admin">painel de administração</a> do Portal Core-SP.';
-
-        Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($body));
+        Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($save->id));
 
         return redirect()
             ->route('representante.enderecos.view')
