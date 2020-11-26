@@ -407,10 +407,12 @@ figure.align-left {
 #header-principal {
 	top: 0;
 	left: 0;
+
+	/* 55 anos */
+	background-image: url('/img/banner-55-anos.png');
 	
 	/* Novembro Azul */
-	background-color: rgba(0,31,137,1);
-
+	/* background-color: rgba(0,31,137,1); */
 	/* Outubro Rosa */
 	/* background-color: rgba(231,31,127,1); */
 	/* Cor Padrão */
@@ -460,6 +462,11 @@ figure.align-left {
 
 .linha-azul-escuro {
 	background-color: #004587;
+	height: 0.5rem;
+}
+
+.linha-dourada {
+	background-color: rgb(212,175,55);
 	height: 0.5rem;
 }
 

@@ -53,13 +53,13 @@ use \App\Http\Controllers\Helper;
       <header id="header-principal">
         <div class="container-fluid">
           <div class="row">
-            <div class="linha-verde w-100"></div>
+            <div class="linha-dourada w-100"></div>
           </div>
         </div>
         <div class="container">
           <div class="row header-margin">
             <div class="col-lg-4 col-md-6 text-left center-768">
-                <a href="/"><img src="{{ asset('img/logo-branco.png') }}" alt="CORE-SP" id="logo-header" /></a>
+                <a href="/"><img src="{{ asset('img/logo-55-anos.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
@@ -248,7 +248,7 @@ use \App\Http\Controllers\Helper;
       @yield('content')
 
       @section('footer')
-      <div class="linha-verde"></div>
+      <div class="linha-dourada"></div>
       <footer class="pt-4" id="rodape">
         <div class="container mb-4">
           <div class="row">
