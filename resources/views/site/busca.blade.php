@@ -2,10 +2,6 @@
 
 @section('content')
 
-@php
-use App\Http\Controllers\Helper;
-@endphp
-
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/banner-busca.png') }}" />
@@ -48,8 +44,8 @@ use App\Http\Controllers\Helper;
             <a href="/noticia/{{ $resultado->slug }}"">
               <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
-            <h6 class="cinza mb-2">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
-            {!! Helper::resumo($resultado->conteudo) !!}
+            <h6 class="cinza mb-2">Publicado em: {{ onlyDate($resultado->created_at) }}</h6>
+            {!! resumo($resultado->conteudo) !!}
             <div>
               <a href="/noticia/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
             </div>
@@ -57,7 +53,7 @@ use App\Http\Controllers\Helper;
             <a href="/{{ $resultado->slug }}">
               <h5 class="normal mb-2"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
-            {!! Helper::resumo($resultado->conteudo) !!}
+            {!! resumo($resultado->conteudo) !!}
             <div>
               <a href="/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
             </div>
@@ -65,8 +61,8 @@ use App\Http\Controllers\Helper;
             <a href="/blog/{{ $resultado->slug }}"">
               <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
-            <h6 class="cinza mb-2">Publicado em: {{ Helper::onlyDate($resultado->created_at) }}</h6>
-            {!! Helper::resumo($resultado->conteudo) !!}
+            <h6 class="cinza mb-2">Publicado em: {{ onlyDate($resultado->created_at) }}</h6>
+            {!! resumo($resultado->conteudo) !!}
             <div>
               <a href="/blog/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
             </div>

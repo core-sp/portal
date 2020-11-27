@@ -184,4 +184,9 @@ class AgendamentoRepository
             ->orderBy('contagem', 'DESC')
             ->get();
     }
+
+    public function getCountAllAgendamentos()
+    {
+        return Agendamento::all()->count();
+    }
 }
