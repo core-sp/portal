@@ -17,7 +17,6 @@ use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoSiteRequest;
 use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
-use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 
 class AgendamentoSiteController extends Controller
 {

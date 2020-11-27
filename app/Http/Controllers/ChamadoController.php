@@ -49,9 +49,12 @@ class ChamadoController extends Controller
 
     public function create()
     {
+        $tipos = Chamado::tipos();
+        $prioridades = Chamado::prioridades();
+
         $variaveis = (object) $this->variaveis;
 
-        return view('admin.crud.criar', compact('variaveis'));
+        return view('admin.crud.criar', compact('variaveis', 'tipos', 'prioridades'));
     }
 
     public function store(ChamadoRequest $request)
@@ -83,10 +86,12 @@ class ChamadoController extends Controller
                 if(!$this->mostraStatic([1])) {
                     $variaveis['btn_lista'] = '';
                 }
-                    
+
+                $tipos = Chamado::tipos();
+                $prioridades = Chamado::prioridades();
                 $variaveis = (object) $variaveis;
                 
-                return view('admin.crud.editar', compact('resultado', 'variaveis'));
+                return view('admin.crud.editar', compact('resultado', 'variaveis', 'tipos', 'prioridades'));
             } 
             else {
                 abort(401);
