@@ -10,4 +10,8 @@ class RepresentanteEndereco extends Model
     use SoftDeletes;
 
     protected $fillable = ['ass_id', 'cep', 'bairro', 'logradouro', 'numero', 'complemento', 'estado', 'municipio', 'crimage', 'crimagedois', 'status', 'observacao'];
+
+    const STATUS_AGUARDANDO_CONFIRMACAO = "Aguardando confirmação";
+    const STATUS_ENVIADO = "Enviado";
+    const STATUS_RECUSADO = "Recusado";
 }

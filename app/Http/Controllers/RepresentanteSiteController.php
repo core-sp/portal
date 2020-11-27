@@ -261,7 +261,7 @@ class RepresentanteSiteController extends Controller
 
     public function inserirEnderecoView()
     {
-        $count = $this->representanteEnderecoRepository->getCountByAssId(Auth::guard('representante')->user()->ass_id);
+        $count = $this->representanteEnderecoRepository->getCountAguardandoConfirmacaoByAssId(Auth::guard('representante')->user()->ass_id);
         
         if($count >= 1) {
             return redirect()

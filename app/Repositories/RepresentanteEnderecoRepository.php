@@ -4,12 +4,23 @@ namespace App\Repositories;
 
 use App\RepresentanteEndereco;
 
-class RepresentanteEnderecoRepository {
+class RepresentanteEnderecoRepository 
+{
+    public function getAll()
+    {
+        return RepresentanteEndereco::orderBy('id','DESC')
+            ->paginate(10);
+    }
 
-    public function getCountByAssId($assId)
+    public function getById($id)
+    {
+        return RepresentanteEndereco::findOrFail($id);
+    }
+
+    public function getCountAguardandoConfirmacaoByAssId($assId)
     {
         return RepresentanteEndereco::where("ass_id", $assId)
-            ->where("status", "Aguardando confirmação")
+            ->where("status", RepresentanteEndereco::STATUS_AGUARDANDO_CONFIRMACAO)
             ->count();
     }
 
@@ -26,7 +37,19 @@ class RepresentanteEnderecoRepository {
             "municipio" => $endereco["municipio"],
             "crimage" => $image,
             "crimagedois" => $imageDois,
-            "status" => "Aguardando confirmação"
+            "status" => RepresentanteEndereco::STATUS_AGUARDANDO_CONFIRMACAO
         ]);
+    }
+
+    public function updateStatusEnviado($id)
+    {
+        return RepresentanteEndereco::findOrFail($id)
+            ->update(["status" => RepresentanteEndereco::STATUS_ENVIADO]);
+    }
+
+    public function updateStatusRecusado($id, $observacao)
+    {
+        return RepresentanteEndereco::findOrFail($id)
+            ->update(["status" => RepresentanteEndereco::STATUS_RECUSADO, "observacao" => $observacao]);
     }
 }
