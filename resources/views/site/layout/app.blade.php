@@ -63,8 +63,8 @@ use \App\Http\Controllers\Helper;
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
-                <h3 class="cinza-claro">#novembroazul</h3>
-                <p class="cinza-claro">Mês mundial de combate<br>ao câncer de próstata</p>
+                <h3><a href="/servicos-atendimento-ao-rc" class="cinza-claro">Atendimento on-line</a></h3>
+                <p class="light"><a href="/servicos-atendimento-ao-rc" class="cinza-claro"><small>Clique aqui e tenha acesso aos principais<br>serviços pelo Setor de Atendimento do Core-SP.</small></a></p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
