@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Permissao;
 use Tests\TestCase;
-use App\AnoFiscalizacao;
+use App\PeriodoFiscalizacao;
 use App\DadoFiscalizacao;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -42,9 +42,9 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
-     * Usuário sem autorização não pode listar anos de fiscalização.
+     * Usuário sem autorização não pode listar periodos de fiscalização.
     */
-    public function non_authorized_users_cannot_list_ano_fiscalizacao()
+    public function non_authorized_users_cannot_list_periodo_fiscalizacao()
     {
         $this->signIn();
 
@@ -53,71 +53,71 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
-     * Usuário sem autorização não pode criar ano de fiscalização.
+     * Usuário sem autorização não pode criar periodo de fiscalização.
     */
-    public function non_authorized_users_cannot_create_ano_fiscalizacao()
+    public function non_authorized_users_cannot_create_periodo_fiscalizacao()
     {
         $this->signIn();
 
-        $atributos = factory("App\AnoFiscalizacao")->raw();
+        $atributos = factory("App\PeriodoFiscalizacao")->raw();
 
-        $this->get(route("fiscalizacao.createano"))->assertForbidden();
-        $this->post(route("fiscalizacao.storeano", $atributos))->assertForbidden();
+        $this->get(route("fiscalizacao.createperiodo"))->assertForbidden();
+        $this->post(route("fiscalizacao.storeperiodo", $atributos))->assertForbidden();
 
-        $this->assertDatabaseMissing("anos_fiscalizacao", ["ano" => $atributos["ano"]]);  
+        $this->assertDatabaseMissing("periodos_fiscalizacao", ["periodo" => $atributos["periodo"]]);  
     }
 
     /** @test 
      * 
-     * Usuário sem autorização não pode editar ano de fiscalização.
+     * Usuário sem autorização não pode editar periodo de fiscalização.
     */
-    public function non_authorized_users_cannot_edit_ano_fiscalizacao()
+    public function non_authorized_users_cannot_edit_periodo_fiscalizacao()
     {
         $this->signIn();
 
-        $anoFiscalizacao = factory("App\AnoFiscalizacao")->create();
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
         $dados = factory("App\DadoFiscalizacao")->create();
         $atributos = factory("App\DadoFiscalizacao")->raw(["notificacaopf" => 11111]);
 
-        $this->get(route("fiscalizacao.editano", $anoFiscalizacao["ano"]))->assertForbidden();
-        $this->post(route("fiscalizacao.updateano", $anoFiscalizacao["ano"]), $atributos)->assertForbidden();
+        $this->get(route("fiscalizacao.editperiodo", $periodoFiscalizacao["id"]))->assertForbidden();
+        $this->post(route("fiscalizacao.updateperiodo", $periodoFiscalizacao["id"]), $atributos)->assertForbidden();
             
         $this->assertNotEquals(DadoFiscalizacao::find($dados->id)->notificacaopf, $atributos["notificacaopf"]);
     }
 
     /** @test 
      * 
-     * Usuário sem autorização não pode publicar ano de fiscalização.
+     * Usuário sem autorização não pode publicar periodo de fiscalização.
     */
-    public function non_authorized_users_cannot_publish_ano_fiscalizacao()
+    public function non_authorized_users_cannot_publish_periodo_fiscalizacao()
     {
         $this->signIn();
 
-        $anoFiscalizacao = factory("App\AnoFiscalizacao")->create();
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
 
-        $this->post(route("fiscalizacao.updatestatus"), ["ano" => 2020, "status" => 1])->assertForbidden();
+        $this->post(route("fiscalizacao.updatestatus"), ["id" => $periodoFiscalizacao->id, "status" => 1])->assertForbidden();
             
-        $this->assertEquals(AnoFiscalizacao::find($anoFiscalizacao->ano)->status, 0);
+        $this->assertEquals(PeriodoFiscalizacao::find($periodoFiscalizacao->id)->status, 0);
     }
 
     /** @test 
      * 
-     * Usuário sem autorização não pode buscar ano de fiscalização.
+     * Usuário sem autorização não pode buscar periodo de fiscalização.
     */
-    public function non_authorized_users_cannot_search_ano_fiscalizacao()
+    public function non_authorized_users_cannot_search_periodo_fiscalizacao()
     {
         $this->signIn();
 
-        $anoFiscalizacao = factory("App\AnoFiscalizacao")->create(["ano" => 2020]);
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020]);
 
         $this->get(route("fiscalizacao.busca", ["q" => "2020"]))->assertForbidden();
     }
 
     /** @test 
      * 
-     * Usuário com autorização pode listar anos de fiscalização.
+     * Usuário com autorização pode listar periodos de fiscalização.
     */
-    public function authorized_users_can_list_ano_fiscalizacao()
+    public function authorized_users_can_list_periodo_fiscalizacao()
     {
         $this->signInAsAdmin();
 
@@ -126,66 +126,66 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
-     * Usuário com autorização pode criar ano de fiscalização.
+     * Usuário com autorização pode criar periodo de fiscalização.
     */
-    public function authorized_users_can_create_ano_fiscalizacao()
+    public function authorized_users_can_create_periodo_fiscalizacao()
     {
         $this->signInAsAdmin();
 
-        $atributos = factory("App\AnoFiscalizacao")->raw();
+        $atributos = factory("App\PeriodoFiscalizacao")->raw();
 
-        $this->get(route("fiscalizacao.createano"))->assertOk();
-        $this->post(route("fiscalizacao.storeano", $atributos));
+        $this->get(route("fiscalizacao.createperiodo"))->assertOk();
+        $this->post(route("fiscalizacao.storeperiodo", $atributos));
 
-        $this->assertDatabaseHas("anos_fiscalizacao", ["ano" => $atributos["ano"]]);  
+        $this->assertDatabaseHas("periodos_fiscalizacao", ["periodo" => $atributos["periodo"]]);  
         $this->assertEquals(DadoFiscalizacao::count(), 1);
     }
 
     /** @test 
      * 
-     * Usuário com autorização pode editar ano de fiscalização.
+     * Usuário com autorização pode editar periodo de fiscalização.
     */
-    public function authorized_users_can_edit_ano_fiscalizacao()
+    public function authorized_users_can_edit_periodo_fiscalizacao()
     {
         $this->signInAsAdmin();
 
-        $anoAtributos = factory("App\AnoFiscalizacao")->raw();
-        $this->post(route("fiscalizacao.storeano", $anoAtributos));
+        $periodoAtributos = factory("App\PeriodoFiscalizacao")->raw();
+        $this->post(route("fiscalizacao.storeperiodo", $periodoAtributos));
         $dadoAtributos = factory("App\DadoFiscalizacao")->raw(["notificacaopf" => 11111]);
 
-        $this->get(route("fiscalizacao.editano", $anoAtributos["ano"]))->assertOk();
-        $this->post(route("fiscalizacao.updateano", $anoAtributos["ano"]), ["regional" => [1 => $dadoAtributos]]);
+        $this->get(route("fiscalizacao.editperiodo", $periodoAtributos["id"]))->assertOk();
+        $this->post(route("fiscalizacao.updateperiodo", $periodoAtributos["id"]), ["regional" => [1 => $dadoAtributos]]);
 
         $this->assertEquals(DadoFiscalizacao::find(1)->notificacaopf, $dadoAtributos["notificacaopf"]);
     }
 
     /** @test 
      * 
-     * Usuário com autorização pode publicar ano de fiscalização.
+     * Usuário com autorização pode publicar periodo de fiscalização.
     */
-    public function authorized_users_can_publish_ano_fiscalizacao()
+    public function authorized_users_can_publish_periodo_fiscalizacao()
     {
         $this->signInAsAdmin();
 
-        $anoAtributos = factory("App\AnoFiscalizacao")->raw();
-        $this->post(route("fiscalizacao.storeano", $anoAtributos));
+        $periodoAtributos = factory("App\PeriodoFiscalizacao")->raw();
+        $this->post(route("fiscalizacao.storeperiodo", $periodoAtributos));
 
-        $this->post(route("fiscalizacao.updatestatus"), ["ano" => 2020, "status" => 1]);
+        $this->post(route("fiscalizacao.updatestatus"), ["periodo" => 2020, "status" => 1]);
             
-        $this->assertEquals(AnoFiscalizacao::find($anoAtributos["ano"])->status, 1);
+        $this->assertEquals(PeriodoFiscalizacao::find($periodoAtributos["id"])->status, 1);
     }
 
     /** @test 
      * 
-     * Usuário com autorização pode buscar ano de fiscalização.
+     * Usuário com autorização pode buscar periodo de fiscalização.
     */
-    public function authorized_users_can_search_ano_fiscalizacao()
+    public function authorized_users_can_search_periodo_fiscalizacao()
     {
         $this->signInAsAdmin();
 
-        $anoFiscalizacao = factory("App\AnoFiscalizacao")->create(["ano" => 2020]);
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020]);
 
-        $this->get(route("fiscalizacao.busca", ["q" => "2020"]))->assertSeeText($anoFiscalizacao->ano);
+        $this->get(route("fiscalizacao.busca", ["q" => "2020"]))->assertSeeText($periodoFiscalizacao->periodo);
     }
 
     /** 
@@ -196,34 +196,34 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
-     * Sistema não deve permitir criação de anos repetidos.
+     * Sistema não deve permitir criação de periodos repetidos.
     */
-    public function cannot_create_duplicated_ano()
+    public function cannot_create_duplicated_periodo()
     {
         $this->signInAsAdmin();
 
-        factory("App\AnoFiscalizacao")->create();
+        factory("App\PeriodoFiscalizacao")->create();
 
-        $atributos = factory("App\AnoFiscalizacao")->raw();
+        $atributos = factory("App\PeriodoFiscalizacao")->raw();
 
-        $this->post(route("fiscalizacao.storeano", $atributos))->assertSessionHasErrors("ano");
+        $this->post(route("fiscalizacao.storeperiodo", $atributos))->assertSessionHasErrors("periodo");
 
-        $this->assertEquals(AnoFiscalizacao::count(), 1);
+        $this->assertEquals(PeriodoFiscalizacao::count(), 1);
     }
 
     /** @test 
      * 
-     * Sistema não deve permitir criação de anos com valores de ano inválido.
+     * Sistema não deve permitir criação de periodos com valores de periodo inválido.
     */
-    public function cannot_create_ano_with_invalid_ano()
+    public function cannot_create_periodo_with_invalid_periodo()
     {
         $this->signInAsAdmin();
 
-        $atributos = factory("App\AnoFiscalizacao")->raw(["ano" => 0]);
+        $atributos = factory("App\PeriodoFiscalizacao")->raw(["periodo" => 0]);
 
-        $this->post(route("fiscalizacao.storeano", $atributos))->assertSessionHasErrors("ano");
+        $this->post(route("fiscalizacao.storeperiodo", $atributos))->assertSessionHasErrors("periodo");
 
-        $this->assertEquals(AnoFiscalizacao::count(), 0);
+        $this->assertEquals(PeriodoFiscalizacao::count(), 0);
     }
 
     /** 
@@ -243,25 +243,25 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
-     * Se nenhum ano estiver publicado, mapa deve ser aberto com o combobox desabilitado e
-     * com o valor "Ano indisponível".
+     * Se nenhum periodo estiver publicado, mapa deve ser aberto com o combobox desabilitado e
+     * com o valor "Indisponível".
     */
-    public function access_ano_mapas_from_portal_with_no_ano_published()
+    public function access_periodo_mapas_from_portal_with_no_periodo_published()
     {
         $this->get(route("fiscalizacao.mapa"))
             ->assertOk()
-            ->assertSee("Ano indisponível");
+            ->assertSee("Indisponível");
     }
 
     /** @test 
      * 
-     * Se algum ano estiver publicado, mapa deve ser aberto com o combobox habilitado e
-     * com o valores dos anos publicados.
+     * Se algum periodo estiver publicado, mapa deve ser aberto com o combobox habilitado e
+     * com o valores dos periodos publicados.
     */
-    public function access_ano_mapas_from_portal_with_ano_published()
+    public function access_periodo_mapas_from_portal_with_periodo_published()
     {
-        factory("App\AnoFiscalizacao")->create(["ano" => 2020, "status" => 1]);
-        factory("App\AnoFiscalizacao")->create(["ano" => 2021, "status" => 1]);
+        factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
+        factory("App\PeriodoFiscalizacao")->create(["periodo" => 2021, "status" => 1]);
 
         $this->get(route("fiscalizacao.mapa"))
             ->assertOk()
@@ -271,13 +271,13 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
-     * Anos publicados devem mostrar seus respectivos dados de fiscalização.
-     * Página padrão sempre mostrar o maior ano.
+     * periodos publicados devem mostrar seus respectivos dados de fiscalização.
+     * Página padrão sempre mostrar o maior periodo.
     */
-    public function access_ano_mapas_from_portal_with_dados()
+    public function access_periodo_mapas_from_portal_with_dados()
     {
         factory("App\Regional")->create();
-        factory("App\AnoFiscalizacao")->create(["ano" => 2020, "status" => 1]);
+        factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
         factory("App\DadoFiscalizacao")->create(["notificacaopf" => 11111]);
 
         $this->get(route("fiscalizacao.mapa"))
@@ -287,23 +287,23 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
-     * Múltiplos anos publicados devem mostrar seus respectivos dados de fiscalização.
+     * Múltiplos periodos publicados devem mostrar seus respectivos dados de fiscalização.
     */
-    public function access_ano_mapas_from_portal_with_multiple_anos_and_dados()
+    public function access_periodo_mapas_from_portal_with_multiple_periodos_and_dados()
     {
         factory("App\Regional")->create();
-        factory("App\AnoFiscalizacao")->create(["ano" => 2020, "status" => 1]);
-        factory("App\DadoFiscalizacao")->create(["ano" => 2020, "notificacaopf" => 11111]);
+        factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
+        factory("App\DadoFiscalizacao")->create(["periodo" => 2020, "notificacaopf" => 11111]);
 
-        factory("App\AnoFiscalizacao")->create(["ano" => 2021, "status" => 1]);
-        factory("App\DadoFiscalizacao")->create(["ano" => 2021, "notificacaopf" => 22222]);
+        factory("App\PeriodoFiscalizacao")->create(["periodo" => 2021, "status" => 1]);
+        factory("App\DadoFiscalizacao")->create(["periodo" => 2021, "notificacaopf" => 22222]);
 
-        $this->get(route("fiscalizacao.mapaano", 2020))
+        $this->get(route("fiscalizacao.mapaperiodo", 2020))
             ->assertOk()
             ->assertSee("11111")
             ->assertDontSee("22222");
 
-        $this->get(route("fiscalizacao.mapaano", 2021))
+        $this->get(route("fiscalizacao.mapaperiodo", 2021))
             ->assertOk()
             ->assertDontSee("11111")
             ->assertSee("22222");

@@ -3,12 +3,12 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Model;
-use App\AnoFiscalizacao;
+use App\PeriodoFiscalizacao;
 use Faker\Generator as Faker;
 
-$factory->define(AnoFiscalizacao::class, function (Faker $faker) {
+$factory->define(PeriodoFiscalizacao::class, function (Faker $faker) {
     return [
-        'ano' => '2020',
+        'periodo' => '2020',
         'status' => '0'
     ];
 });

@@ -17,6 +17,6 @@ class DadoFiscalizacao extends Model
 
     public function ano()
     {
-    	return $this->belongsTo('App\AnoFiscalizacao', 'ano');
+    	return $this->belongsTo('App\PeriodoFiscalizacao', 'ano');
     }
 }

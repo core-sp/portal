@@ -385,7 +385,7 @@
                 @endif
                 @if(mostraItem($permissoes, 'FiscalizacaoController', 'create'))
                 <li class="nav-item">
-                    <a href="{{ route('fiscalizacao.createano') }}" class="nav-link">
+                    <a href="{{ route('fiscalizacao.createperiodo') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Criar Ano</p>
                     </a>

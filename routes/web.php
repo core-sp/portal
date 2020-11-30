@@ -232,7 +232,7 @@ Route::prefix('/')->group(function() {
 
   // Rotas para o SIG (Sistema de Informação Geográfico)
   Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
-  Route::get('/mapa-fiscalizacao/{ano}', 'FiscalizacaoController@mostrarMapaAno')->name('fiscalizacao.mapaano');
+  Route::get('/mapa-fiscalizacao/{id}', 'FiscalizacaoController@mostrarMapaPeriodo')->name('fiscalizacao.mapaperiodo');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

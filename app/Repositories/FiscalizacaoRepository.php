@@ -2,32 +2,32 @@
 
 namespace App\Repositories;
 
-use App\AnoFiscalizacao;
+use App\PeriodoFiscalizacao;
 use App\DadoFiscalizacao;
 
 class FiscalizacaoRepository 
 {
     public function getPublicado() 
     {
-        return AnoFiscalizacao::where('status', true)
+        return PeriodoFiscalizacao::where('status', true)
             ->orderBy('ano', 'DESC')
             ->paginate(25);;
     }
 
     public function busca($criterio)
     {
-        return AnoFiscalizacao::where('ano', $criterio)
+        return PeriodoFiscalizacao::where('ano', $criterio)
             ->paginate(10);
     }
 
     public function storeAno($data)
     {
-        return AnoFiscalizacao::create($data);
+        return PeriodoFiscalizacao::create($data);
     }
 
     public function updateAnoStatus($ano, $data)
     {
-        return AnoFiscalizacao::findOrFail($ano)->update($data);
+        return PeriodoFiscalizacao::findOrFail($ano)->update($data);
     }
 
     public function storeDadoFiscalizacao($idregional, $ano)
@@ -37,7 +37,7 @@ class FiscalizacaoRepository
 
     public function updateDadoFiscalizacao($dadosFiscalizacao, $ano)
     {
-        $anoUpdate = AnoFiscalizacao::findOrFail($ano);
+        $anoUpdate = PeriodoFiscalizacao::findOrFail($ano);
 
         foreach ($anoUpdate->dadoFiscalizacao as $dado) {
             $dado->notificacaopf = $dadosFiscalizacao[$dado->idregional]["notificacaopf"];
@@ -56,11 +56,11 @@ class FiscalizacaoRepository
 
     public function findOrFail($ano)
     {
-        return AnoFiscalizacao::findOrFail($ano);
+        return PeriodoFiscalizacao::findOrFail($ano);
     }
     
     public function getAll() 
     {
-        return AnoFiscalizacao::orderBy('ano', 'DESC')->get();
+        return PeriodoFiscalizacao::orderBy('ano', 'DESC')->get();
     }
 }

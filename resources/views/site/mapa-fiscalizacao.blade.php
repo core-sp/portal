@@ -36,7 +36,7 @@
       <div class="col-md-2">
           @if(empty($anos))
           <select id="ano-mapa" class="form-control" disabled>
-          <option value="Ano indisponível" selected>Ano indisponível</option>
+          <option value="Indisponível" selected>Indisponível</option>
 
           @else
           <select id="ano-mapa" class="form-control">
