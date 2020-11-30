@@ -224,6 +224,15 @@ Route::prefix('/')->group(function() {
     Route::post('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmail')->name('representante.email.reset');
   });
 
+  // Pré-Cadastro (site)
+  Route::prefix('pre-cadastro')->group(function(){
+    Route::get('/criar', 'PreCadastroController@create')->name('pre-cadastro.create');
+    Route::post('/criar', 'PreCadastroController@store')->name('pre-cadastro.store');
+    Route::get('/editar', 'PreCadastroController@edit')->name('pre-cadastro.edit');
+    Route::post('/editar', 'PreCadastroController@update')->name('pre-cadastro.update');
+  });
+
+
   Route::get('/chat', function(){
     return view('site.chat');
   });
