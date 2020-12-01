@@ -181,6 +181,7 @@ use \App\Http\Controllers\Helper;
                           <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
                         </div>
                       </div>
+                      <a href="/carta-de-servicos-ao-usuario" class="dropdown-item">Carta de Serviços ao Usuário</a>
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
