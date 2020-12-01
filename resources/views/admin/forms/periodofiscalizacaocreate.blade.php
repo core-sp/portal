@@ -5,7 +5,7 @@
             <div class="col">
                 <label for="periodo">Ano</label>
                 <input type="text"
-                    class="form-control periodoInput {{ $errors->has('periodo') ? 'is-invalid' : '' }}"
+                    class="form-control anoInput {{ $errors->has('periodo') ? 'is-invalid' : '' }}"
                     placeholder="Digite o ano de fiscalização"
                     name="periodo"
                     />

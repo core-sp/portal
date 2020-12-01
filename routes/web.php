@@ -177,7 +177,10 @@ Route::prefix('/')->group(function() {
   Route::get('feiras', 'SiteController@feiras');
 
   // Fiscalização
-  Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao');
+  Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao')->name('fiscalizacao.acoesfiscalizacao');
+  // Rotas para o SIG (Sistema de Informação Geográfico)
+  Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
+  Route::get('/mapa-fiscalizacao/{id}', 'FiscalizacaoController@mostrarMapaPeriodo')->name('fiscalizacao.mapaperiodo');
 
   // Simulador
   Route::get('simulador', 'SimuladorController@view');
@@ -229,10 +232,6 @@ Route::prefix('/')->group(function() {
   Route::get('/chat', function(){
     return view('site.chat');
   });
-
-  // Rotas para o SIG (Sistema de Informação Geográfico)
-  Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
-  Route::get('/mapa-fiscalizacao/{id}', 'FiscalizacaoController@mostrarMapaPeriodo')->name('fiscalizacao.mapaperiodo');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

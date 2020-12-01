@@ -10,7 +10,7 @@ class PeriodoFiscalizacaoRequest extends FormRequest
     public function rules()
     {
         return [
-            'periodo' => 'required|not_in:0|unique:anos_fiscalizacao,ano'
+            'periodo' => 'required|not_in:0|unique:periodos_fiscalizacao,periodo'
         ];
     }
 

@@ -9,15 +9,16 @@ use Faker\Generator as Faker;
 $factory->define(DadoFiscalizacao::class, function (Faker $faker) {
     return [
         "idregional" => 1,
-        "ano" => 2020,
-        "notificacaopf" => 1,
-        "notificacaopj" => 2,
-        "constatacaopf" => 3,
-        "constatacaopj" => 4,
-        "infracaopf" => 5,
-        "infracaopj" => 6,
-        "convertidopf" => 7,
-        "convertidopj" => 8,
-        "orientacao" => 9
+        "idperiodo" => 1,
+        "processofiscalizacaopf" => 1,
+        "processofiscalizacaopj" => 2,
+        "registroconvertidopf" => 3,
+        "registroconvertidopj" => 4,
+        "processoverificacao" => 5,
+        "dispensaregistro" => 6,
+        "notificacaort" => 7,
+        "orientacaorepresentada" => 8,
+        "orientacaorepresentante" => 9,
+        "cooperacaoinstitucional" => 10
     ];
 });

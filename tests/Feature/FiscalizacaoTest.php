@@ -149,14 +149,15 @@ class FiscalizacaoTest extends TestCase
     {
         $this->signInAsAdmin();
 
-        $periodoAtributos = factory("App\PeriodoFiscalizacao")->raw();
-        $this->post(route("fiscalizacao.storeperiodo", $periodoAtributos));
-        $dadoAtributos = factory("App\DadoFiscalizacao")->raw(["notificacaopf" => 11111]);
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao")->create(["idperiodo" => $periodoFiscalizacao->id, "idregional" => 1]);
 
-        $this->get(route("fiscalizacao.editperiodo", $periodoAtributos["id"]))->assertOk();
-        $this->post(route("fiscalizacao.updateperiodo", $periodoAtributos["id"]), ["regional" => [1 => $dadoAtributos]]);
+        $dadoAtributos = factory("App\DadoFiscalizacao")->raw(["processofiscalizacaopf" => 11111]);
 
-        $this->assertEquals(DadoFiscalizacao::find(1)->notificacaopf, $dadoAtributos["notificacaopf"]);
+        $this->get(route("fiscalizacao.editperiodo", $periodoFiscalizacao->id))->assertOk();
+        $this->post(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), ["regional" => [1 => $dadoAtributos]]);
+
+        $this->assertEquals(DadoFiscalizacao::find($dadoFiscalizacao->id)->processofiscalizacaopf, $dadoAtributos["processofiscalizacaopf"]);
     }
 
     /** @test 
@@ -167,12 +168,11 @@ class FiscalizacaoTest extends TestCase
     {
         $this->signInAsAdmin();
 
-        $periodoAtributos = factory("App\PeriodoFiscalizacao")->raw();
-        $this->post(route("fiscalizacao.storeperiodo", $periodoAtributos));
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020]);
 
-        $this->post(route("fiscalizacao.updatestatus"), ["periodo" => 2020, "status" => 1]);
+        $this->post(route("fiscalizacao.updatestatus"), ["idperiodo" => $periodoFiscalizacao->id , "status" => 1]);
             
-        $this->assertEquals(PeriodoFiscalizacao::find($periodoAtributos["id"])->status, 1);
+        $this->assertEquals(PeriodoFiscalizacao::find($periodoFiscalizacao->id)->status, 1);
     }
 
     /** @test 
@@ -260,8 +260,12 @@ class FiscalizacaoTest extends TestCase
     */
     public function access_periodo_mapas_from_portal_with_periodo_published()
     {
-        factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
-        factory("App\PeriodoFiscalizacao")->create(["periodo" => 2021, "status" => 1]);
+        $periodo2020 = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
+        $periodo2021 = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2021, "status" => 1]);
+
+        factory("App\Regional")->create();
+        factory("App\DadoFiscalizacao")->create(["idperiodo" => $periodo2020->id]);
+        factory("App\DadoFiscalizacao")->create(["idperiodo" => $periodo2021->id]);
 
         $this->get(route("fiscalizacao.mapa"))
             ->assertOk()
@@ -278,7 +282,7 @@ class FiscalizacaoTest extends TestCase
     {
         factory("App\Regional")->create();
         factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
-        factory("App\DadoFiscalizacao")->create(["notificacaopf" => 11111]);
+        factory("App\DadoFiscalizacao")->create(["processofiscalizacaopf" => 11111]);
 
         $this->get(route("fiscalizacao.mapa"))
             ->assertOk()
@@ -291,19 +295,19 @@ class FiscalizacaoTest extends TestCase
     */
     public function access_periodo_mapas_from_portal_with_multiple_periodos_and_dados()
     {
+        $periodo2020 = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
+        $periodo2021 = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2021, "status" => 1]);
+
         factory("App\Regional")->create();
-        factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
-        factory("App\DadoFiscalizacao")->create(["periodo" => 2020, "notificacaopf" => 11111]);
+        factory("App\DadoFiscalizacao")->create(["idperiodo" => $periodo2020->id, "processofiscalizacaopf" => 11111]);
+        factory("App\DadoFiscalizacao")->create(["idperiodo" => $periodo2021->id, "processofiscalizacaopf" => 22222]);
 
-        factory("App\PeriodoFiscalizacao")->create(["periodo" => 2021, "status" => 1]);
-        factory("App\DadoFiscalizacao")->create(["periodo" => 2021, "notificacaopf" => 22222]);
-
-        $this->get(route("fiscalizacao.mapaperiodo", 2020))
+        $this->get(route("fiscalizacao.mapaperiodo", $periodo2020->id))
             ->assertOk()
             ->assertSee("11111")
             ->assertDontSee("22222");
 
-        $this->get(route("fiscalizacao.mapaperiodo", 2021))
+        $this->get(route("fiscalizacao.mapaperiodo", $periodo2021->id))
             ->assertOk()
             ->assertDontSee("11111")
             ->assertSee("22222");

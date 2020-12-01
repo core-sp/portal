@@ -100,10 +100,10 @@ class FiscalizacaoController extends Controller
         $this->autoriza($this->class, "edit");
 
         $idusuario = Auth::user()->idusuario;
-        $periodo = $request->id;
+        $idperiodo = $request->idperiodo;
         $status = $request->status;
 
-        $update = $this->fiscalizacaoRepository->updatePeriodoStatus($id, ['status' => $status]);
+        $update = $this->fiscalizacaoRepository->updatePeriodoStatus($idperiodo, ['status' => $status]);
 
         if(!$update) 
         {
@@ -112,11 +112,11 @@ class FiscalizacaoController extends Controller
 
         if($status) 
         {
-            event(new CrudEvent('ano de fiscalização', 'publicou período com ID', $id));
+            event(new CrudEvent('ano de fiscalização', 'publicou período com ID', $idperiodo));
         } 
         else 
         {
-            event(new CrudEvent('ano de fiscalização', 'reverteu publicação do período com ID', $id));
+            event(new CrudEvent('ano de fiscalização', 'reverteu publicação do período com ID', $idperiodo));
         }
         
         return redirect()->back()
@@ -170,14 +170,10 @@ class FiscalizacaoController extends Controller
     {
         $todosPeriodos = $this->fiscalizacaoRepository->getPublicado();
         $periodoSelecionado = $todosPeriodos->first();
+        $todosPeriodos = $todosPeriodos->count() == 0 ? null : $todosPeriodos;
         $dataAtualizacao = $periodoSelecionado ? onlyDate($periodoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at) : null;
-        $periodos = [];
-        
-        foreach($todosPeriodos as $periodo) {
-            array_push($periodos, $periodo);
-        }
 
-        return view('site.mapa-fiscalizacao', compact('periodos', 'periodoSelecionado', 'dataAtualizacao'));
+        return view('site.mapa-fiscalizacao', compact('todosPeriodos', 'periodoSelecionado', 'dataAtualizacao'));
     }
 
     public function mostrarMapaPeriodo($id)
@@ -189,14 +185,10 @@ class FiscalizacaoController extends Controller
             return redirect()->route('fiscalizacao.mapa');
         }
 
+        $todosPeriodos = $todosPeriodos->count() == 0 ? null : $todosPeriodos;
         $dataAtualizacao = $periodoSelecionado ? onlyDate($periodoSelecionado->dadoFiscalizacao->sortByDesc("updated_at")->first()->updated_at) : null;
-        $periodos = [];
-        
-        foreach($todosPeriodos as $periodo) {
-            array_push($periodos, $periodo);
-        }
 
-        return view('site.mapa-fiscalizacao', compact('periodos', 'periodoSelecionado', 'dataAtualizacao'));
+        return view('site.mapa-fiscalizacao', compact('todosPeriodos', 'periodoSelecionado', 'dataAtualizacao'));
     }
 
     public function tabelaCompleta($resultados)
@@ -211,7 +203,7 @@ class FiscalizacaoController extends Controller
         // Conteúdo da tabela
         $contents =  $resultados->map(function($row) {
             $acoes = "<form method='POST' id='statusAgendamento' action='" . route('fiscalizacao.updatestatus') . "' class='d-inline'>";
-            $acoes .= "<input type='hidden' name='ano' value='$row->id'/>";
+            $acoes .= "<input type='hidden' name='idperiodo' value='$row->id'/>";
             $acoes .= "<input type='hidden' name='_token' value='" . csrf_token() . "'/>";
             
             if($row->status) {

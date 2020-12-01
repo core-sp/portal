@@ -10,29 +10,35 @@ class FiscalizacaoRepository
     public function getPublicado() 
     {
         return PeriodoFiscalizacao::where('status', true)
-            ->orderBy('ano', 'DESC')
+            ->orderBy('periodo', 'DESC')
+            ->paginate(25);;
+    }
+
+    public function getAll() 
+    {
+        return PeriodoFiscalizacao::orderBy('periodo', 'DESC')
             ->paginate(25);;
     }
 
     public function busca($criterio)
     {
-        return PeriodoFiscalizacao::where('ano', $criterio)
+        return PeriodoFiscalizacao::where('periodo', $criterio)
             ->paginate(10);
     }
 
-    public function storeAno($data)
+    public function storePeriodo($data)
     {
         return PeriodoFiscalizacao::create($data);
     }
 
-    public function updateAnoStatus($ano, $data)
+    public function updatePeriodoStatus($id, $data)
     {
-        return PeriodoFiscalizacao::findOrFail($ano)->update($data);
+        return PeriodoFiscalizacao::findOrFail($id)->update($data);
     }
 
-    public function storeDadoFiscalizacao($idregional, $ano)
+    public function storeDadoFiscalizacao($idregional, $idperiodo)
     {
-        return DadoFiscalizacao::create(['idregional' => $idregional, 'ano' => $ano]);
+        return DadoFiscalizacao::create(['idregional' => $idregional, 'idperiodo' => $idperiodo]);
     }
 
     public function updateDadoFiscalizacao($dadosFiscalizacao, $ano)
@@ -40,27 +46,23 @@ class FiscalizacaoRepository
         $anoUpdate = PeriodoFiscalizacao::findOrFail($ano);
 
         foreach ($anoUpdate->dadoFiscalizacao as $dado) {
-            $dado->notificacaopf = $dadosFiscalizacao[$dado->idregional]["notificacaopf"];
-            $dado->notificacaopj = $dadosFiscalizacao[$dado->idregional]["notificacaopj"];
-            $dado->constatacaopf = $dadosFiscalizacao[$dado->idregional]["constatacaopf"];
-            $dado->constatacaopj = $dadosFiscalizacao[$dado->idregional]["constatacaopj"];
-            $dado->infracaopf = $dadosFiscalizacao[$dado->idregional]["infracaopf"];
-            $dado->infracaopj = $dadosFiscalizacao[$dado->idregional]["infracaopj"];
-            $dado->convertidopf = $dadosFiscalizacao[$dado->idregional]["convertidopf"];
-            $dado->convertidopj = $dadosFiscalizacao[$dado->idregional]["convertidopj"];
-            $dado->orientacao = $dadosFiscalizacao[$dado->idregional]["orientacao"];
+            $dado->processofiscalizacaopf = $dadosFiscalizacao[$dado->idregional]["processofiscalizacaopf"];
+            $dado->processofiscalizacaopj = $dadosFiscalizacao[$dado->idregional]["processofiscalizacaopj"];
+            $dado->registroconvertidopf = $dadosFiscalizacao[$dado->idregional]["registroconvertidopf"];
+            $dado->registroconvertidopj = $dadosFiscalizacao[$dado->idregional]["registroconvertidopj"];
+            $dado->processoverificacao = $dadosFiscalizacao[$dado->idregional]["processoverificacao"];
+            $dado->dispensaregistro = $dadosFiscalizacao[$dado->idregional]["dispensaregistro"];
+            $dado->notificacaort = $dadosFiscalizacao[$dado->idregional]["notificacaort"];
+            $dado->orientacaorepresentada = $dadosFiscalizacao[$dado->idregional]["orientacaorepresentada"];
+            $dado->orientacaorepresentante = $dadosFiscalizacao[$dado->idregional]["orientacaorepresentante"];
+            $dado->cooperacaoinstitucional = $dadosFiscalizacao[$dado->idregional]["cooperacaoinstitucional"];
 
             $dado->update();
         }
     }
 
-    public function findOrFail($ano)
+    public function findOrFail($id)
     {
-        return PeriodoFiscalizacao::findOrFail($ano);
-    }
-    
-    public function getAll() 
-    {
-        return PeriodoFiscalizacao::orderBy('ano', 'DESC')->get();
+        return PeriodoFiscalizacao::findOrFail($id);
     }
 }

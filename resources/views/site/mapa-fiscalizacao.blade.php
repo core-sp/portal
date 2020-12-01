@@ -21,7 +21,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
-            <h2 class="stronger">Mapa da Fiscalização do Core-SP</h2>
+            <h2 class="stronger">Sistema de Informação Geográfica (SIG do CORE-SP)</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
@@ -34,17 +34,17 @@
 
     <div class="row justify-content-center">
       <div class="col-md-2">
-          @if(empty($anos))
+          @if(empty($todosPeriodos))
           <select id="ano-mapa" class="form-control" disabled>
           <option value="Indisponível" selected>Indisponível</option>
 
           @else
           <select id="ano-mapa" class="form-control">
-          @foreach($anos as $ano)
-          @if($anoSelecionado->ano == $ano)
-          <option value="{{ $ano }}" selected>{{ $ano }}</option>
+          @foreach($todosPeriodos as $periodo)
+          @if($periodoSelecionado->id == $periodo->id)
+          <option value="{{ $periodo->id }}" selected>{{ $periodo->periodo }}</option>
           @else
-          <option value="{{ $ano }}">{{ $ano }}</option>
+          <option value="{{ $periodo->id }}">{{ $periodo->periodo }}</option>
           @endif
           @endforeach
           @endif
@@ -52,18 +52,18 @@
       </div>
     </div>
 
-    @if(!empty($anos))
+    @if(!empty($todosPeriodos))
     <div class="row justify-content-center">
-      <div class="col-lg-8">
+      <div class="col-lg-7">
         {!! file_get_contents((public_path() . '/img/sp.svg')) !!}
       </div>
 
-      <div id="dados-fiscalizacao" class="col-lg-4 align-self-center text-center">
+      <div id="dados-fiscalizacao" class="col-lg-5 align-self-center text-center">
         <div id="instrucao-mapa" class="conteudo-txt">
-          <p>Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano {{ $anoSelecionado->ano }}.<p>
+          <p>Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano {{ $periodoSelecionado->periodo }}.<p>
         </div>
 
-        @foreach($anoSelecionado->dadoFiscalizacao as $r)
+        @foreach($periodoSelecionado->dadoFiscalizacao as $r)
         <div id="dado-{{ $r->regional->prefixo }}" class="card bg-light dado-regional d-none">
           <div class="card-header">
             <h5>{{ $r->regional->prefixo }} - {{ $r->regional->regional }}</h5>
@@ -72,43 +72,54 @@
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th style="width:60%">Ação</th>
+                  <th style="width:50%">Ação</th>
                   <th style="width:20%">PF</th>
                   <th style="width:20%">PJ</th>
                 <tr>
               </thead>
               <tbody>
                 <tr>
-                  <td style="width:60%">Notificação</td>
-                  <td style="width:20%">{{ $r->notificacaopf }}</td>
-                  <td style="width:20%">{{ $r->notificacaopj }}</td>
+                  <td class="text-left" style="width:50%; font-size: 15px">Processos de Fiscalização <small class="text-danger">*<small></td>
+                  <td style="width:20%">{{ $r->processofiscalizacaopf }}</td>
+                  <td style="width:20%">{{ $r->processofiscalizacaopj }}</td>
                 </tr>
                 <tr>
-                  <td style="width:60%">Auto de Constatação</td>
-                  <td style="width:20%">{{ $r->constatacaopf }}</td>
-                  <td style="width:20%">{{ $r->constatacaopj }}</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">Registros Convertidos</td>
+                  <td style="width:20%">{{ $r->registroconvertidopf }}</td>
+                  <td style="width:20%">{{ $r->registroconvertidopj }}</td>
                 </tr>
                 <tr>
-                  <td style="width:60%">Auto de Infração</td>
-                  <td style="width:20%">{{ $r->infracaopf }}</td>
-                  <td style="width:20%">{{ $r->infracaopj }}</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">Processos de Verificação</td>
+                  <td class="text-center" colspan="2">{{ $r->processoverificacao }}</td>
                 </tr>
                 <tr>
-                  <td style="width:60%">Registro Convertido</td>
-                  <td style="width:20%">{{ $r->convertidopf }}</td>
-                  <td style="width:20%">{{ $r->convertidopj }}</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">Dispensa de Registro (de ofício)</td>
+                  <td class="text-center" colspan="2">{{ $r->dispensaregistro }}</td>
                 </tr>
                 <tr>
-                  <td style="width:60%">Orientação</td>
-                  <td class="text-center" colspan="2">{{ $r->orientacao }}</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">Notificações de RT</td>
+                  <td class="text-center" colspan="2">{{ $r->notificacaort }}</td>
+                </tr>
+                <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">Orientações às representadas</td>
+                  <td class="text-center" colspan="2">{{ $r->orientacaorepresentada }}</td>
+                </tr>
+                <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">Orientações aos representantes</td>
+                  <td class="text-center" colspan="2">{{ $r->orientacaorepresentante }}</td>
+                </tr>
+                <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">Cooperação Institucional</td>
+                  <td class="text-center" colspan="2">{{ $r->cooperacaoinstitucional }}</td>
                 </tr>
               </tbody>
             </table>
+            <p class="text-danger text-left"><small>* notificações, ofícios e autos</small></p>
           </div>
         </div>
         @endforeach
 
-        <p>* Dados atualizados em: {{ $dataAtualizacao }}</p>
+        <p>Dados atualizados em: {{ $dataAtualizacao }}</p>
       </div>
     </div>  
     @endif
