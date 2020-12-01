@@ -169,7 +169,7 @@ use \App\Http\Controllers\Helper;
                           <a href="/agendamento-consulta" class="dropdown-item bb-0">Consultar</a>
                         </div>
                       </div>
-                      <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade 2020</a>
+                      <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade {{ date('Y') }}</a>
                       <a href="/representante/login" class="dropdown-item">Área Restrita</a>
                       <a href="/servicos-atendimento-ao-rc" class="dropdown-item">Atendimento</a>
                       <div class="sub-dropdown">
@@ -288,7 +288,7 @@ use \App\Http\Controllers\Helper;
                 <h5 class="branco">Serviços</h5>
               </div>
               <p class="branco"><a href="/agendamento">Agendamento</a></p>
-              <p class="branco"><a href="/anuidade-ano-vigente">Anuidade 2020</a></p>
+              <p class="branco"><a href="/anuidade-ano-vigente">Anuidade {{ date('Y') }}</a></p>
               <p class="branco"><a href="/representante/login">Área Restrita</a></p>
               <p class="branco"><a href="/servicos-atendimento-ao-rc">Atendimento</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
