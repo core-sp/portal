@@ -230,7 +230,7 @@
 
 
         <!-- Atendimento -->
-        @if(mostraTitulo($permissoes, ['AgendamentoController', 'AgendamentoBloqueioController', 'RepresentanteEnderecoController']))
+        @if(mostraTitulo($permissoes, ['AgendamentoController', 'AgendamentoBloqueioController', 'RepresentanteEnderecoController', 'RepresentanteController']))
         <li class="nav-header">ATENDIMENTO</li>
         
         @if(mostraTitulo($permissoes, ['AgendamentoController', 'AgendamentoBloqueioController']))
