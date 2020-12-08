@@ -15,9 +15,10 @@ class CreatePreCadastrosTable extends Migration
     {
         Schema::create('pre_cadastros', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('tipo');
+            $table->string('status');
             $table->string('cpf')->nullable();
             $table->string('cnpj')->nullable();
-            $table->string('tipo');
             $table->string('nome');
             $table->string('anexo');
             $table->timestamps();

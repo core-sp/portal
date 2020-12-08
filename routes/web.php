@@ -116,6 +116,13 @@ Route::prefix('admin')->group(function() {
     Route::put('/bannerprincipal', 'HomeImagemController@updateBannerPrincipal');
   });
 
+  // Pré-Cadastro (Admin)
+  Route::prefix('pre-cadastro')->group(function() {
+    Route::get('/mostrar/{id}', 'PreCadastroController@show')->name('pre-cadastro.show');
+    Route::get('/visualizar-anexo/{id}', 'PreCadastroController@visualizarAnexo')->name('pre-cadastro.visualizar');
+    Route::get('/baixar-anexo/{id}', 'PreCadastroController@baixarAnexo')->name('pre-cadastro.baixar');
+  });
+
   // Rotas para Blog Posts
   require('admin/posts.php');
 
