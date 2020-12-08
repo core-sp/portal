@@ -43,6 +43,8 @@ Route::prefix('admin')->group(function() {
   require('admin/concursos.php');
   // Rotas de concursos
   require('admin/cursos.php');
+  // Rotas do mapa de fiscalização (possivelmente será removido pois os dados virão do GERENTI)
+  require('admin/fiscalizacao.php');
 
   // Rotas para usuários
   Route::prefix('usuarios')->group(function(){
@@ -175,7 +177,10 @@ Route::prefix('/')->group(function() {
   Route::get('feiras', 'SiteController@feiras');
 
   // Fiscalização
-  Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao');
+  Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao')->name('fiscalizacao.acoesfiscalizacao');
+  // Rotas para o SIG (Sistema de Informação Geográfico)
+  Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
+  Route::get('/mapa-fiscalizacao/{id}', 'FiscalizacaoController@mostrarMapaPeriodo')->name('fiscalizacao.mapaperiodo');
 
   // Simulador
   Route::get('simulador', 'SimuladorController@view');

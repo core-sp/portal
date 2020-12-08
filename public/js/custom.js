@@ -179,4 +179,7 @@ $(document).ready(function(){
   $('#recusar-trigger').on('click', function(){
     $('#recusar-form').toggle();
   });
+
+  $('.anoInput').mask('0000');
+
 })(jQuery);
