@@ -149,7 +149,7 @@ use \App\Http\Controllers\Helper;
                   <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Fiscalização</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a href="{{ route('fiscalizacao.mapa') }}" class="dropdown-item">Mapa da fiscalização</a>
+                      <!-- <a href="{{ route('fiscalizacao.mapa') }}" class="dropdown-item">Mapa da fiscalização</a> -->
                       <a href="{{ route('fiscalizacao.acoesfiscalizacao') }}" class="dropdown-item">Ações da fiscalização</a>
                       <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank" class="dropdown-item">Denuncie</a>
                       <a href="/sobre-a-fiscalizacao" class="dropdown-item bb-0">Sobre o departamento</a>
