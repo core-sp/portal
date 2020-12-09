@@ -167,7 +167,7 @@ use \App\Http\Controllers\Helper;
                         </div>
                         <div class="sub-dropdown-menu">
                           <a href="/agendamento" class="dropdown-item">Agendar</a>
-                          <a href="/agendamento-consulta" class="dropdown-item bb-0">Consultar</a>
+                          <a href="/agendamento-consulta" class="dropdown-item bb-0">Consultar/Cancelar</a>
                         </div>
                       </div>
                       <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade {{ date('Y') }}</a>
