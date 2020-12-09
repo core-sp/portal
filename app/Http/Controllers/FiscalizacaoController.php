@@ -143,6 +143,15 @@ class FiscalizacaoController extends Controller
 
         $dadosFiscalizacao = $request->regional;
 
+        $this->validate($request, [
+            'regional.*.*' => 'required|integer|min:0|max:999999999'
+        ], [
+            'required' => 'Informe o valor',
+            'min' => 'Valor deve ser maior ou igual a 0',
+            'max' => 'Valor deve ser menor ou igual a 999999999',
+            'integer' => 'Valor deve ser um inteiro',
+        ]);
+
         DB::transaction(function () use ($dadosFiscalizacao, $id) {
             $periodo = $this->fiscalizacaoRepository->updateDadoFiscalizacao($dadosFiscalizacao, $id);
         });
