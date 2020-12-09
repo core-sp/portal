@@ -48,7 +48,7 @@ class Kernel extends ConsoleKernel
                     $count = Agendamento::where('idregional','=',$user->idregional)
                         ->where('dia','=',$hoje)
                         ->where(function($q){
-                            $q->where('status','!=','Cancelado')->orWhereNull('status');
+                            $q->whereNull('status');
                         })->count();
                     if($count >= 1) {
                         $body = '<h3><i>(Mensagem Programada)</i></h3>';
@@ -77,7 +77,7 @@ class Kernel extends ConsoleKernel
                         ->where('idregional','!=',1)
                         ->where('dia','=',$hoje)
                         ->where(function($q){
-                            $q->where('status','!=','Cancelado')->orWhereNull('status');
+                            $q->whereNull('status');
                         })->orderBy('idregional','ASC')
                         ->orderBy('hora','ASC')
                         ->get();
@@ -112,7 +112,7 @@ class Kernel extends ConsoleKernel
                         ->where('idregional','=',1)
                         ->where('dia','=',$hoje)
                         ->where(function($q){
-                            $q->where('status','!=','Cancelado')->orWhereNull('status');
+                            $q->whereNull('status');
                         })->orderBy('hora','ASC')
                         ->get();
                     if($agendamentos->isNotEmpty()) {
@@ -144,7 +144,7 @@ class Kernel extends ConsoleKernel
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('dia','=',$hoje)
                         ->where(function($q){
-                            $q->where('status','!=','Cancelado')->orWhereNull('status');
+                            $q->whereNull('status');
                         })->orderBy('idregional','ASC')
                         ->orderBy('hora','ASC')
                         ->get();
