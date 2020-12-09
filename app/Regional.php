@@ -75,7 +75,7 @@ class Regional extends Model
     {
         $horas = $this->horariosAge();
         $bloqueios = (new AgendamentoBloqueioRepository)->getByRegionalAndDay($this->idregional, $dia);
-        if($bloqueios) {
+        if($bloqueios && $horas) {
             foreach($bloqueios as $bloqueio) {
                 foreach($horas as $key => $hora) {
                     if($hora >= $bloqueio->horainicio && $hora <= $bloqueio->horatermino) {
