@@ -104,10 +104,10 @@
                   <td class="text-left" style="width:60%; font-size: 15px">Orientações às representadas</td>
                   <td class="text-center" colspan="2">{{ $r->orientacaorepresentada }}</td>
                 </tr>
-                <tr>
+                <!-- <tr>
                   <td class="text-left" style="width:60%; font-size: 15px">Orientações aos representantes</td>
                   <td class="text-center" colspan="2">{{ $r->orientacaorepresentante }}</td>
-                </tr>
+                </tr> -->
                 <tr>
                   <td class="text-left" style="width:60%; font-size: 15px">Cooperação Institucional</td>
                   <td class="text-center" colspan="2">{{ $r->cooperacaoinstitucional }}</td>
