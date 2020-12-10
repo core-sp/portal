@@ -81,7 +81,17 @@ class AgendamentoController extends Controller
         $idagendamento = $request->idagendamento;
         $status = $request->status;
 
-        $update = $this->agendamentoRepository->update($idagendamento, ['status' => $status, 'idusuario' => $idusuario]);
+        $agendamento = $this->agendamentoRepository->getById($idagendamento);
+
+        if($agendamento) {
+            if($agendamento->dia > date('Y-m-d')) {
+                return redirect()->back()
+                    ->with('message', '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado antes da data agendada')
+                    ->with('class', 'alert-danger');
+            }
+        }
+
+        $update = $this->agendamentoRepository->update($idagendamento, ['status' => $status, 'idusuario' => $idusuario], $agendamento);
 
         if(!$update) {
             abort(500);
