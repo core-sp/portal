@@ -380,7 +380,7 @@ $('#ano-mapa').on({
 
 					$("#dialog_agendamento")
 						.empty()
-						.append("Falha ao recuperar horários disponíveis. <br> Por favor recarregue a página ou tente mais tarde.");
+						.append("Falha ao recuperar horários disponíveis. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
 						
 					$("#dialog_agendamento").dialog({
 						draggable: false,
