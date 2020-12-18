@@ -17,7 +17,7 @@
 
 <section id="pagina-erro">
   <div class="container text-center">
-    <p>Por favor, verifique se sua sessão está válida e se o uso de cookies está habilitado e recarregue essa página.</p>
+    <p>Por favor, verifique se sua sessão está válida e se o uso de cookies está habilitado e tente novamente.</p>
   </div>
 </section>
 
