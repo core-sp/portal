@@ -169,7 +169,7 @@ class AgendamentoTest extends TestCase
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional,
-            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'dia' => date('Y-m-d'),
             'hora' => '10:00',
             'protocolo' => 'AGE-XXXXXX'
         ]);
