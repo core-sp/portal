@@ -286,6 +286,20 @@ function gerentiTiposContatos()
     ];
 }
 
+function gerentiTiposContatosInserir()
+{
+    return [
+        '1' => 'Telefone',
+        '2' => 'Celular',
+        '3' => 'E-mail',
+        '4' => 'Fax',
+        '5' => 'Home Page',
+        '6' => 'Tel. Emergência',
+        '7' => 'Tel. Contato',
+        '8' => 'Tel. Referência'
+    ];
+}
+
 function formataDataGerenti($date)
 {
     $array = explode('-', $date);
