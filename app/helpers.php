@@ -519,6 +519,7 @@ function situacoesLicitacao()
         'Deserto',
         'Em Andamento',
         'Em fase de recurso',
+        'Encerrado',
         'Homologado'
     ];
 }
