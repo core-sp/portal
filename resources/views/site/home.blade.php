@@ -111,8 +111,8 @@
         <a href="/anuidade-ano-vigente" class="d-block h-100">
           <div class="box text-center azul-bg h-100">
             <div class="inside-box">
-              <img src="{{ asset('img/printer.png') }}" class="inside-img" alt="Anuidade 2020 | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Boleto<br class="hide-992" /> anuidade 2020</h3>
+              <img src="{{ asset('img/printer.png') }}" class="inside-img" alt="Anuidade do ano vigente | Core-SP" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Boleto<br class="hide-992" /> anuidade {{ date('Y') }}</h3>
               <button class="btn-box azul">Acessar</button>
             </div>
           </div>
@@ -155,11 +155,11 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/resolucoes-anuidade-taxas-e-emolumentos" class="d-block h-100">
+        <a href="/noticias/anuidade-2021-taxas-e-emolumentos" class="d-block h-100">
           <div class="box text-center azul-escuro-bg h-100">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2020<br class="hide-992" /> taxas e emolumentos</h3>
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2021<br class="hide-992" /> taxas e emolumentos</h3>
               <button href="#" class="btn-box azul-escuro">ACESSAR</button>
             </div>
           </div>
