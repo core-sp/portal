@@ -991,8 +991,6 @@ input[type=file]::-webkit-file-upload-button {
 	background-position: center;
 	background-attachment: fixed;
 	border-radius: 5px;
-	padding-left: 2rem;
-	padding-right: 2rem;
 	position: relative;
 	z-index: 3;
 }

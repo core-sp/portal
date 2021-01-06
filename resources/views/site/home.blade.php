@@ -169,17 +169,23 @@
   </div>
 </section>
 
-<section id="novo-core" class="mb-5">
+<section id="beneficios" class="mb-5">
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <div class="text-center novo-core-box">
-          <h2 class="stronger branco text-uppercase">um novo core-sp para você!</h2>
-          <a href="/noticia/informativo-core-sp" class="btn-novo-core"><h4 class="normal">Informativo</h4></a>
-          <br class="show-576 br-novo-core" />
-          <a href="/acoes-da-fiscalizacao" class="btn-novo-core"><h4 class="normal">Fiscalização</h4></a>
-          <br class="show-576 br-novo-core" />
-          <a href="/cursos" class="btn-novo-core"><h4 class="normal">Cursos</h4></a>
+        <div class="beneficios-box row nomargin">
+          <div class="col-lg-5 hide-992">
+            <img class="lazy" data-src="{{ asset('img/benef-v2.png') }}" id="computer" alt="Programa de Benefícios | Core-SP" />
+          </div>
+          <div class="col-lg-7 beneficios-txt center-992">
+            <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
+            <p class="branco light">O Core-SP traz benefícios diferenciados para Representantes Comerciais.</p>
+            <p class="branco light">Faça parte do Grupo do WhatsApp e receba todos os dias os benefícios disponíveis.</p>
+            <div>
+              <a href="/programa-de-beneficios" class="btn-beneficios">saiba mais</a>
+              <a href="https://chat.whatsapp.com/Is3STR8sXOy6QiAqMIiixP" class="btn-beneficios"><i class="fab fa-whatsapp fa-lg"></i> Grupo WhatsApp</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -311,27 +317,6 @@
                 </div>
               </div>
             </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="beneficios">
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <div class="beneficios-box row nomargin">
-          <div class="col-lg-5 hide-992">
-            <img class="lazy" data-src="{{ asset('img/benef-v2.png') }}" id="computer" alt="Programa de Benefícios | Core-SP" />
-          </div>
-          <div class="col-lg-7 beneficios-txt center-992">
-            <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
-            <p class="branco light">O Core-SP traz benefícios diferenciados para Representantes Comerciais</p>
-            <div>
-              <a href="/programa-de-beneficios" class="btn-beneficios">saiba mais</a>
-            </div>
           </div>
         </div>
       </div>
