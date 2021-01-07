@@ -40,6 +40,7 @@ class Kernel extends ConsoleKernel
                 ->orWhere('idperfil','=',12)
                 ->orWhere('idperfil','=',8)
                 ->orWhere('idperfil','=',6)
+                ->orWhere('idperfil','=',21)
                 ->get();
             $hoje = date('Y-m-d');
             $diaFormatado = Helper::onlyDate($hoje);
@@ -72,7 +73,45 @@ class Kernel extends ConsoleKernel
                             \Log::error($e->getMessage());
                         }
                     }
-                } elseif($user->idperfil === 13) {
+                } 
+                elseif($user->idperfil === 21) {
+                    $agendamentos = Agendamento::select('nome', 'cpf', 'protocolo', 'hora', 'tiposervico', 'idregional')
+                        ->where('idregional', '=', $user->idregional)
+                        ->where('dia', '=', $hoje)
+                        ->where(function($q) {
+                            $q->whereNull('status');
+                        })->orderBy('idregional', 'ASC')
+                        ->orderBy('hora', 'ASC')
+                        ->get();
+
+                    if($agendamentos->isNotEmpty()) {
+                        $body = '<h3><i>(Mensagem Programada)</i></h3>';
+                        $body .= '<p>Confira abaixo a lista de agendamentos solicitados pelo Portal CORE-SP hoje, <strong>'.Helper::onlyDate($hoje).':</strong></p>';
+                        $body .= AgendamentoControllerHelper::tabelaEmailTop();
+                        foreach($agendamentos as $age) {
+                            $body .= '<tr>';
+                            $body .= '<td>'.$age->regional->regional.'</td>';
+                            $body .= '<td>'.$age->hora.'</td>';
+                            $body .= '<td>'.$age->protocolo.'</td>';
+                            $body .= '<td>'.$age->nome.'</td>';
+                            $body .= '<td>'.$age->cpf.'</td>';
+                            $body .= '<td>'.$age->tiposervico.'</td>';
+                            $body .= '</tr>';
+                        }
+                        $body .= AgendamentoControllerHelper::tabelaEmailBot();
+                        $body .= '<p>';
+                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
+                        $body .= '</p>';
+                        $regional = 'em '. $user->regional->regional;
+                        try {
+                            Mail::to($user->email)
+                                ->send(new InternoAgendamentoMail($body, $regional, $diaFormatado));
+                        } catch (\Exception $e) {
+                            \Log::error($e->getMessage());
+                        }
+                    }
+                }
+                elseif($user->idperfil === 13) {
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('idregional','!=',1)
                         ->where('dia','=',$hoje)
@@ -107,7 +146,8 @@ class Kernel extends ConsoleKernel
                             \Log::error($e->getMessage());
                         }
                     }
-                } elseif($user->idperfil === 12) {
+                } 
+                elseif($user->idperfil === 12) {
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('idregional','=',1)
                         ->where('dia','=',$hoje)
@@ -140,7 +180,8 @@ class Kernel extends ConsoleKernel
                             \Log::error($e->getMessage());
                         }
                     }
-                } elseif($user->idperfil === 6 || $user->idperfil === 1) {
+                } 
+                elseif($user->idperfil === 6 || $user->idperfil === 1) {
                     $agendamentos = Agendamento::select('nome','cpf','protocolo','hora','tiposervico','idregional')
                         ->where('dia','=',$hoje)
                         ->where(function($q){
