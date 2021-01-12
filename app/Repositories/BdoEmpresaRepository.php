@@ -42,7 +42,7 @@ class BdoEmpresaRepository {
     {
         return BdoEmpresa::withCount([
             'oportunidade' => function ($query){
-                $query->whereIn('status', [BdoOportunidade::$status_sob_analise, BdoOportunidade::$status_em_andamento]);
+                $query->whereIn('status', [BdoOportunidade::STATUS_SOB_ANALISE, BdoOportunidade::STATUS_EM_ANDAMENTO]);
             }])->findOrFail($id);
     }
 
@@ -52,7 +52,7 @@ class BdoEmpresaRepository {
             ->where('cnpj', '=', $cnpj)
             ->withCount([
                 'oportunidade' => function ($query){
-                    $query->whereIn('status', [BdoOportunidade::$status_sob_analise, BdoOportunidade::$status_em_andamento]);
+                    $query->whereIn('status', [BdoOportunidade::STATUS_SOB_ANALISE, BdoOportunidade::STATUS_EM_ANDAMENTO]);
             }])->first();
     }
 
