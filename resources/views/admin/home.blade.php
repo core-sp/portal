@@ -2,14 +2,6 @@
 
 @section('content')
 
-@php
-	use App\Http\Controllers\ControleController;
-	use App\Http\Controllers\Helper;
-	$alertas = App\Http\Controllers\AdminController::alertas();
-	$chamados = App\Http\Controllers\Helpers\ChamadoControllerHelper::getByUser(Auth::user()->idusuario);
-	$count = App\Http\Controllers\AdminController::countAtendimentos();
-@endphp
-
 <section class="content-header pb-1">
   @if(\Session::has('message'))
     <div class="container-fluid mb-2">
@@ -64,7 +56,7 @@
 		  <div class="card-body">
 		  	<div class="row">
 			  <div class="col">
-				{!! $count !!}
+				{!! $contagem !!}
 			  </div>
 			</div>
 		  </div>

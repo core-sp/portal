@@ -2,17 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\AgendamentoBloqueio;
+use DateTime;
 use App\Regional;
-use App\Http\Controllers\Helper;
-use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
+use App\Traits\TabelaAdmin;
+use App\AgendamentoBloqueio;
+use Illuminate\Http\Request;
+use App\Traits\ControleAcesso;
+use App\Repositories\RegionalRepository;
+use App\Http\Requests\AgendamentoBloqueioRequest;
+use App\Repositories\AgendamentoBloqueioRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoBloqueioController extends Controller
 {
+    use ControleAcesso, TabelaAdmin;
+
     private $class = 'AgendamentoBloqueioController';
+    private $regionalRepository;
+    private $agendamentoBloqueioRepository;
+
     // Variáveis extras da página
     public $variaveis = [
         'singular' => 'bloqueio',
@@ -26,16 +35,130 @@ class AgendamentoBloqueioController extends Controller
         'busca' => 'agendamentos/bloqueios',
     ];
 
-    public function __construct()
+    public function __construct(RegionalRepository $regionalRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository)
     {
         $this->middleware('auth');
+        $this->regionalRepository = $regionalRepository;
+        $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
+    }
+
+    public function index()
+    {
+        $this->autoriza($this->class, __FUNCTION__);
+
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+
+        if(!$this->mostra($this->class, 'create')) {
+            unset($this->variaveis['btn_criar']);
+        }
+            
+        $variaveis = (object) $this->variaveis;
+
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+    }
+
+    public function create()
+    {
+        $this->autoriza($this->class, __FUNCTION__);
+
+        $variaveis = (object) $this->variaveis;
+        $regionais = $this->regionalRepository->all();
+
+        return view('admin.crud.criar', compact('variaveis', 'regionais'));
+    }
+
+    public function store(AgendamentoBloqueioRequest $request)
+    {
+        $this->autoriza($this->class, 'create');
+
+        $diainicio = empty($request->input('diainicio')) ? new DateTime("2000-01-01") : retornaDate($request->input("diainicio"));
+        $diatermino = empty($request->input('diatermino')) ? new DateTime("2100-01-01") : retornaDate($request->input("diatermino"));
+
+        $request->merge(["diainicio" => $diainicio, "diatermino" => $diatermino]);
+
+        $save = $this->agendamentoBloqueioRepository->store($request->all());
+
+        if(!$save) {
+            abort(500);
+        }
+            
+        event(new CrudEvent('bloqueio de agendamento', 'criou', $save->idagendamentobloqueio));
+
+        return redirect()->route('agendamentobloqueios.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Bloqueio cadastrado com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function edit($id)
+    {
+        $this->autoriza($this->class, __FUNCTION__);
+
+        $resultado = $this->agendamentoBloqueioRepository->getById($id);
+        $variaveis = (object) $this->variaveis;
+        $regionais = $this->regionalRepository->all();
+
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
+    }
+
+    public function update(AgendamentoBloqueioRequest $request, $id)
+    {
+        $this->autoriza($this->class, 'edit');
+
+        $diainicio = empty($request->input('diainicio')) ? new DateTime("2000-01-01") : retornaDate($request->input("diainicio"));
+        $diatermino = empty($request->input('diatermino')) ? new DateTime("2100-01-01") : retornaDate($request->input("diatermino"));
+
+        $request->merge(["diainicio" => $diainicio, "diatermino" => $diatermino]);
+
+        $update = $this->agendamentoBloqueioRepository->update($id, $request->all());
+
+        if(!$update) {
+            abort(500);
+        }
+            
+        event(new CrudEvent('bloqueio de agendamento', 'editou', $id));
+
+        return redirect()->route('agendamentobloqueios.lista')
+            ->with('message', '<i class="icon fa fa-check"></i>Bloqueio editado com sucesso!')
+            ->with('class', 'alert-success');
+    }
+
+    public function destroy($id)
+    {
+        $this->autoriza($this->class, __FUNCTION__);
+
+        $delete = $this->agendamentoBloqueioRepository->delete($id);
+
+        if(!$delete) {
+            abort(500);
+        }
+            
+        event(new CrudEvent('bloqueio de agendamento', 'cancelou', $id));
+
+        return redirect()->route('agendamentobloqueios.lista')
+            ->with('message', '<i class="icon fa fa-danger"></i>Bloqueio cancelado com sucesso!')
+            ->with('class', 'alert-danger');
+    }
+
+    public function busca()
+    {
+        $this->autoriza($this->class, 'index');
+
+        $this->variaveis['slug'] = 'agendamentos/bloqueios';
+        $variaveis = (object) $this->variaveis;
+        $busca = IlluminateRequest::input('q');
+
+        $resultados = $this->agendamentoBloqueioRepository->getBusca($busca);
+        
+        $tabela = $this->tabelaCompleta($resultados);
+
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 
     public function resultados()
     {
-        $resultados = AgendamentoBloqueio::orderBy('idagendamentobloqueio','DESC')
-            ->where('diatermino','>=',date('Y-m-d'))
-            ->paginate(10);
+        $resultados = $this->agendamentoBloqueioRepository->getAll();
+
         return $resultados;
     }
 
@@ -55,192 +178,55 @@ class AgendamentoBloqueioController extends Controller
             if($resultado->diainicio == '2000-01-01') {
                 $duracao = 'Início: Indefinido<br />';
             } else {
-                $duracao = 'Início: '.Helper::onlyDate($resultado->diainicio).'<br />';
+                $duracao = 'Início: ' . onlyDate($resultado->diainicio) . '<br />';
             }
+
             if($resultado->diatermino == '2100-01-01') {
                 $duracao .= 'Término: Indefinido';
             } else {
-                $duracao .= 'Término: '.Helper::onlyDate($resultado->diatermino);
+                $duracao .= 'Término: ' . onlyDate($resultado->diatermino);
             }
-            if(ControleController::mostra($this->class, 'edit'))
-                $acoes = '<a href="/admin/agendamentos/bloqueios/editar/'.$resultado->idagendamentobloqueio.'" class="btn btn-sm btn-primary">Editar</a> ';
-            else
+
+            if($this->mostra($this->class, 'edit')) {
+                $acoes = '<a href="/admin/agendamentos/bloqueios/editar/' . $resultado->idagendamentobloqueio . '" class="btn btn-sm btn-primary">Editar</a> ';
+            }
+                
+            else {
                 $acoes = '';
-            if(ControleController::mostra($this->class, 'destroy')) {
-                $acoes .= '<form method="POST" action="/admin/agendamentos/bloqueios/apagar/'.$resultado->idagendamentobloqueio.'" class="d-inline-block">';
-                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            }
+               
+            if($this->mostra($this->class, 'destroy')) {
+                $acoes .= '<form method="POST" action="/admin/agendamentos/bloqueios/apagar/' . $resultado->idagendamentobloqueio . '" class="d-inline-block">';
+                $acoes .= '<input type="hidden" name="_token" value="' . csrf_token() . '" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o bloqueio?\')" />';
                 $acoes .= '</form>';
             }
-            if(empty($acoes))
+
+            if(empty($acoes)) {
                 $acoes = '<i class="fas fa-lock text-muted"></i>';
+            }
+                
             $conteudo = [
                 $resultado->idagendamentobloqueio,
                 $resultado->regional->regional,
                 $duracao,
-                'Das '.$resultado->horainicio.' às '.$resultado->horatermino,
+                'Das ' . $resultado->horainicio . ' às ' . $resultado->horatermino,
                 $acoes
             ];
+
             array_push($contents, $conteudo);
         }
+        
         // Classes da tabela
         $classes = [
             'table',
             'table-hover'
         ];
+
         // Monta e retorna tabela        
-        $tabela = CrudController::montaTabela($headers, $contents, $classes);
+        $tabela = $this->montaTabela($headers, $contents, $classes);
+
         return $tabela;
-    }
-
-    protected function regras()
-    {
-        return [
-            'idregional' => 'required',
-            'horainicio' => 'required',
-            'horatermino' => 'required',
-        ];
-    }
-
-    protected function mensagens()
-    {
-        return [
-            'idregional.required' => 'Selecione uma regional',
-            'horainicio.required' => 'Seleciona uma hora de início para o bloqueio',
-            'horatermino.required' => 'Seleciona uma hora de término para o bloqueio',
-        ];
-    }
-
-    public function index()
-    {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $resultados = $this->resultados();
-        $tabela = $this->tabelaCompleta($resultados);
-        if(!ControleController::mostra($this->class, 'create'))
-            unset($this->variaveis['btn_criar']);
-        $variaveis = (object) $this->variaveis;
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
-    }
-
-    public function create()
-    {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $variaveis = (object) $this->variaveis;
-        $regionais = Regional::all();
-        return view('admin.crud.criar', compact('variaveis', 'regionais'));
-    }
-
-    public function store(Request $request)
-    {
-        ControleController::autoriza($this->class, 'create');
-        $erros = $request->validate($this->regras(), $this->mensagens());
-        // Formata DateTime
-        if(empty($request->input('diainicio')) && empty($request->input('diatermino'))) {
-            $diainicio = '2000-01-01';
-            $diainicio = new \DateTime($diainicio);
-            $diatermino = '2100-01-01';
-            $diatermino = new \DateTime($diatermino);
-        } elseif(empty($request->input('diainicio'))) {
-            $diainicio = '2000-01-01';
-            $diainicio = new \DateTime($diainicio);
-            $diatermino = Helper::retornaDate($request->input('diatermino'));
-        } elseif(empty($request->input('diatermino'))) {
-            $diainicio = Helper::retornaDate($request->input('diainicio'));
-            $diatermino = '2100-01-01';
-            $diatermino = new \DateTime($diatermino);
-        } else {
-            $diainicio = Helper::retornaDate($request->input('diainicio'));
-            $diatermino = Helper::retornaDate($request->input('diatermino'));
-        }
-        // Inputa no BD
-        $save = AgendamentoBloqueio::create([
-            'diainicio' => $diainicio,
-            'diatermino' => $diatermino,
-            'horainicio' => request('horainicio'),
-            'horatermino' => request('horatermino'),
-            'idregional' => request('idregional'),
-            'idusuario' => request('idusuario')
-        ]);
-        if(!$save)
-            abort(500);
-        event(new CrudEvent('bloqueio de agendamento', 'criou', $save->idagendamentobloqueio));
-        return redirect()->route('agendamentobloqueios.lista')
-            ->with('message', '<i class="icon fa fa-check"></i>Bloqueio cadastrado com sucesso!')
-            ->with('class', 'alert-success');
-    }
-
-    public function edit($id)
-    {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $resultado = AgendamentoBloqueio::findOrFail($id);
-        $variaveis = (object) $this->variaveis;
-        $regionais = Regional::all();
-        return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        ControleController::autoriza($this->class, 'edit');
-        $erros = $request->validate($this->regras(), $this->mensagens());
-        // Formata DateTime
-        if(empty($request->input('diainicio')) && empty($request->input('diatermino'))) {
-            $diainicio = '2000-01-01';
-            $diainicio = new \DateTime($diainicio);
-            $diatermino = '2100-01-01';
-            $diatermino = new \DateTime($diatermino);
-        } elseif(empty($request->input('diainicio'))) {
-            $diainicio = '2000-01-01';
-            $diainicio = new \DateTime($diainicio);
-            $diatermino = Helper::retornaDate($request->input('diatermino'));
-        } elseif(empty($request->input('diatermino'))) {
-            $diainicio = Helper::retornaDate($request->input('diainicio'));
-            $diatermino = '2100-01-01';
-            $diatermino = new \DateTime($diatermino);
-        } else {
-            $diainicio = Helper::retornaDate($request->input('diainicio'));
-            $diatermino = Helper::retornaDate($request->input('diatermino'));
-        }
-        // Inputa no BD
-        $update = AgendamentoBloqueio::findOrFail($id)->update([
-            'diainicio' => $diainicio,
-            'diatermino' => $diatermino,
-            'horainicio' => request('horainicio'),
-            'horatermino' => request('horatermino'),
-            'idregional' => request('idregional'),
-            'idusuario' => request('idusuario')
-        ]);
-        if(!$update)
-            abort(500);
-        event(new CrudEvent('bloqueio de agendamento', 'editou', $id));
-        return redirect()->route('agendamentobloqueios.lista')
-            ->with('message', '<i class="icon fa fa-check"></i>Bloqueio editado com sucesso!')
-            ->with('class', 'alert-success');
-    }
-
-    public function destroy(Request $request, $id)
-    {
-        ControleController::autoriza($this->class, __FUNCTION__);
-        $bloqueio = AgendamentoBloqueio::findOrFail($id);
-        $delete = $bloqueio->delete();
-        if(!$delete)
-            abort(500);
-        event(new CrudEvent('bloqueio de agendamento', 'cancelou', $bloqueio->idagendamentobloqueio));
-        return redirect()->route('agendamentobloqueios.lista')
-            ->with('message', '<i class="icon fa fa-danger"></i>Bloqueio cancelado com sucesso!')
-            ->with('class', 'alert-danger');
-    }
-
-    public function busca()
-    {
-        ControleController::autoriza($this->class, 'index');
-        $this->variaveis['slug'] = 'agendamentos/bloqueios';
-        $variaveis = (object) $this->variaveis;
-        $busca = IlluminateRequest::input('q');
-        $resultados = AgendamentoBloqueio::whereHas('regional', function($q) use($busca){
-            $q->where('regional','LIKE','%'.$busca.'%');
-        })->get();
-        $tabela = $this->tabelaCompleta($resultados);
-        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

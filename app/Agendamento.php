@@ -14,9 +14,51 @@ class Agendamento extends Model
     protected $fillable = ['nome', 'cpf', 'email', 'celular', 'dia', 'hora', 'protocolo', 'tiposervico', 'idregional', 'idusuario', 'status'];
     protected $with = ['user', 'regional'];
 
-    static $status_compareceu = 'Compareceu';
-    static $status_nao_compareceu = 'Não Compareceu';
-    static $status_cancelado = 'Cancelado';
+    // Status de agendamento
+    const STATUS_COMPARECEU = "Compareceu";
+    const STATUS_NAO_COMPARECEU = "Não Compareceu";
+    const STATUS_CANCELADO = "Cancelado";
+
+    // Serviços no agendamento
+    const SERVICOS_ATUALIZACAO_DE_CADASTRO = "Atualização de Cadastro";
+    const SERVICOS_CANCELAMENTO_DE_REGISTRO = "Cancelamento de Registro";
+    const SERVICOS_REGISTRO_INICIAL = "Registro Inicial";
+    const SERVICOS_OUTROS = "Outros";
+
+    // Array de tipos de pessoas
+    const TIPOS_PESSOA = ['Pessoa Física' => 'PF', 'Pessoa Jurídica' => 'PJ', 'Ambas' => 'PF e PJ'];
+
+    public static function status()
+    { 
+        return [
+            Agendamento::STATUS_COMPARECEU,
+            Agendamento::STATUS_NAO_COMPARECEU,
+            Agendamento::STATUS_CANCELADO
+        ];
+    }
+
+    public static function servicos()
+    {
+        return [
+            Agendamento::SERVICOS_ATUALIZACAO_DE_CADASTRO,
+            Agendamento::SERVICOS_CANCELAMENTO_DE_REGISTRO,
+            Agendamento::SERVICOS_REGISTRO_INICIAL,
+            Agendamento::SERVICOS_OUTROS
+        ];
+    }
+
+    public static function servicosCompletos()
+    {
+        $resultado = array();
+
+        foreach(Agendamento::servicos() as $servico) {
+            foreach(Agendamento::TIPOS_PESSOA as $tipoPessoa) {
+                array_push($resultado, $servico . " para " . $tipoPessoa);
+            }
+        }
+
+        return $resultado;
+    }
 
     public function regional()
     {
@@ -26,51 +68,5 @@ class Agendamento extends Model
     public function user()
     {
     	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
-    }
-
-    public static function status()
-    {
-        return [
-            Agendamento::$status_compareceu,
-            Agendamento::$status_nao_compareceu,
-            Agendamento::$status_cancelado
-        ];
-    }
-
-    public static function servicos()
-    {
-        return [
-            'Atualização de Cadastro',
-            'Cancelamento de Registro',
-            'Registro Inicial',
-            'Outros'
-        ];
-    }
-
-    public static function pessoas()
-    {
-        return [
-            'Pessoa Física' => 'PF',
-            'Pessoa Jurídica' => 'PJ',
-            'Ambas' => 'PF e PJ'
-        ];
-    }
-
-    public static function servicosCompletos()
-    {
-        return [
-            'Atualização de Cadastro para PF',
-            'Atualização de Cadastro para PJ',
-            'Atualização de Cadastro para PF e PJ',
-            'Cancelamento de Registro para PF',
-            'Cancelamento de Registro para PJ',
-            'Cancelamento de Registro para PF e PJ',
-            'Registro Inicial para PF',
-            'Registro Inicial para PJ',
-            'Registro Inicial para PF e PJ',
-            'Outros para PF',
-            'Outros para PJ',
-            'Outros para PF e PJ'
-        ];
     }
 }
