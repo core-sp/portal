@@ -6,19 +6,25 @@ use App\User;
 use App\Agendamento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Repositories\CursoRepository;
 use App\Repositories\ChamadoRepository;
+use App\Repositories\NewsletterRepository;
 use App\Repositories\AgendamentoRepository;
 
 class AdminController extends Controller
 {
     private $agendamentoRepository;
     private $chamadoRepository;
+    private $cursoRepository;
+    private $newsletterRepository;
     
-    public function __construct(AgendamentoRepository $agendamentoRepository, ChamadoRepository $chamadoRepository)
+    public function __construct(AgendamentoRepository $agendamentoRepository, ChamadoRepository $chamadoRepository, CursoRepository $cursoRepository, NewsletterRepository $newsletterRepository)
     {
         $this->middleware('auth');
         $this->agendamentoRepository = $agendamentoRepository;
         $this->chamadoRepository = $chamadoRepository;
+        $this->cursoRepository = $cursoRepository;
+        $this->newsletterRepository = $newsletterRepository;
     }
 
     public function index()
@@ -26,8 +32,11 @@ class AdminController extends Controller
         $alertas = $this->alertas();
         $contagem = $this->contagemAtendimentos();
         $chamados = $this->chamadoRepository->getChamadoByIdUsuario(Auth::user()->idusuario);
+        $totalAgendamentos = $this->agendamentoRepository->getCountAllAgendamentos();
+        $totalInscritos = $this->cursoRepository->getTotalInscritos();
+        $totalNewsletter = $this->newsletterRepository->getCountAllNewsletter();
 
-    	return view("admin.home", compact("alertas", "contagem", "chamados"));
+    	return view("admin.home", compact("alertas", "contagem", "chamados", "totalAgendamentos", "totalInscritos", "totalNewsletter"));
     }
 
     public function alertas()

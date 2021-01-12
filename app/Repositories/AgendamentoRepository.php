@@ -126,7 +126,7 @@ class AgendamentoRepository
             ->whereNull('status')
             ->count();
     }
-    
+
     public function getCountAgendamentoPendenteByCpfDayHour($dia, $hora, $cpf)
     {
         return Agendamento::where('dia', $dia)
@@ -135,7 +135,7 @@ class AgendamentoRepository
             ->whereNull('status')
             ->count();
     }
-
+    
     public function getAgendamentoPendeteByDiaHoraRegional($dia, $hora, $idregional)
     {
         return Agendamento::where('dia', $dia)
@@ -192,5 +192,10 @@ class AgendamentoRepository
             ->groupBy("idusuario")
             ->orderBy('contagem', 'DESC')
             ->get();
+    }
+
+    public function getCountAllAgendamentos()
+    {
+        return Agendamento::all()->count();
     }
 }
