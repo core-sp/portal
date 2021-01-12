@@ -33,7 +33,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
             ];
         }
 
-        $verificaEmail = explode(';', $$resultado[0]['EMAILS']);
+        $verificaEmail = explode(';', $resultado['EMAILS']);
 
         if($resultado['SITUACAO'] !== 'Ativo')
             return ['Error' => 'O cadastro informado não está corretamente inscrito no Core-SP. Por favor, verifique as informações inseridas.'];

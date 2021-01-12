@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use PDO;
 use App\Representante;
 use App\Connections\FirebirdConnection;
 use App\Repositories\GerentiRepositoryInterface;
@@ -31,7 +32,7 @@ class GerentiRepository implements GerentiRepositoryInterface
         ]);
         $resultado = $run->fetchAll();
 
-        $verificaEmail = explode(';', $$resultado[0]['EMAILS']);
+        $verificaEmail = explode(';', $resultado[0]['EMAILS']);
 
         if($resultado[0]['SITUACAO'] !== 'Ativo')
             return ['Error' => 'O cadastro informado não está corretamente inscrito no Core-SP. Por favor, verifique as informações inseridas.'];
