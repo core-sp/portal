@@ -17,7 +17,6 @@ use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoSiteRequest;
 use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
-use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 
 class AgendamentoSiteController extends Controller
 {
@@ -83,12 +82,12 @@ class AgendamentoSiteController extends Controller
         if($this->limiteCpf($dia, $request->cpf)) {
             abort(500, 'É permitido apenas 2 agendamentos por CPF por dia!');
         }
-        
+
         // Limita em até um agendamento por CPF por dia/horário
         if($this->agendamentoRepository->getCountAgendamentoPendenteByCpfDayHour($dia, $request->hora, $request->cpf) > 0) {
             abort(500, 'É permitido apenas 1 agendamentos por CPF por dia/horário!');
-        }
-          
+        } 
+        
         // Cria bloqueio caso o usuário tenha faltado 3 vezes nos últimos 90 dias
         if($this->bloqueioPorFalta($request->cpf)) {
             abort(405, 'Agendamento bloqueado por excesso de falta nos últimos 90 dias. Favor entrar em contato com o Core-SP para regularizar o agendamento.');

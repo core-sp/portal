@@ -1,8 +1,3 @@
-@php
-    $tipos = App\Http\Controllers\Helpers\ChamadoControllerHelper::tipos();
-    $prioridades = App\Http\Controllers\Helpers\ChamadoControllerHelper::prioridades();
-@endphp
-
 <form role="form" method="POST">
     @csrf
     @if(isset($resultado))
