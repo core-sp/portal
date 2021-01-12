@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Representante;
+use App\Rules\CpfCnpj;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Representante;
 use Illuminate\Support\Facades\Auth;
-use App\Rules\CpfCnpj;
-use App\Traits\GerentiProcedures;
 use Illuminate\Support\Facades\Input;
+use App\Repositories\GerentiRepositoryInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteLoginController extends Controller
 {
-    use GerentiProcedures;
+    private $gerentiRepository;
 
-    public function __construct()
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('guest:representante')->except('logout');
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public function showLoginForm()
@@ -28,11 +29,11 @@ class RepresentanteLoginController extends Controller
 
     protected function verificaGerentiLogin($cpfCnpj)
     {
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', $cpfCnpj);
+        $cpfCnpj = apenasNumeros($cpfCnpj);
         $registro = Representante::where('cpf_cnpj', $cpfCnpj)->first();
 
         if(isset($registro)) {
-            $checkGerenti = $this->checaAtivo($registro->registro_core, $cpfCnpj);
+            $checkGerenti = $this->gerentiRepository->gerentiChecaLogin($registro->registro_core, $cpfCnpj);
 
             if($checkGerenti === false) {
                 return redirect()
@@ -66,7 +67,7 @@ class RepresentanteLoginController extends Controller
 
     public function login(Request $request)
     {
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', $request->cpf_cnpj);
+        $cpfCnpj = apenasNumeros($request->cpf_cnpj);
 
         $request->request->set('cpf_cnpj', $cpfCnpj);
 
@@ -80,7 +81,7 @@ class RepresentanteLoginController extends Controller
         if(!empty($this->verificaSeAtivo($cpfCnpj)))
             return $this->redirectWithErrors($request->only('cpf_cnpj', 'remember'), $this->verificaSeAtivo($cpfCnpj)['message'], $this->verificaSeAtivo($cpfCnpj)['class']);
 
-        $this->verificaGerentiLogin($request->cpf_cnpj);
+            $this->verificaGerentiLogin($request->cpf_cnpj);
 
         if (Auth::guard('representante')->attempt([
             'cpf_cnpj' => $cpfCnpj,

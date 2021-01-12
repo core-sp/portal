@@ -16,7 +16,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        if(env("APP_ENV") == "local" || env("APP_ENV") == "testing") {
+            $this->app->bind(GerentiRepositoryInterface::class, GerentiRepositoryMock::class);
+        }
+        else {
+            $this->app->bind(GerentiRepositoryInterface::class, GerentiRepository::class);
+        }
     }
 
     /**

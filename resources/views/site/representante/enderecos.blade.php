@@ -13,9 +13,9 @@
         <h4 class="pt-1 pb-1">Endereço de correspondência</h4>
         <div class="linha-lg-mini mb-2"></div>
         <h5 class="mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;SOLICITAÇÕES</h5>
-        @if (Auth::guard('representante')->user()->solicitacoesEnderecos()->isNotEmpty())
+        @if ($possuiSolicitacaoEnderecos)
             <div class="list-group w-100">
-                @foreach (Auth::guard('representante')->user()->solicitacoesEnderecos() as $item)
+                @foreach ($solicitacoesEnderecos as $item)
                     <div class="list-group-item light d-block bg-info">
                         <p class="pb-0 branco">Endereço: <strong>{{ $item->logradouro }}, {{ $item->numero }} {{ isset($item->complemento) ? ' - ' . $item->complemento : '' }}</strong></p>
                         <p class="pb-0 branco">Bairro: <strong>{{ $item->bairro }}</strong></p>
@@ -40,8 +40,8 @@
         </div>
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;END. DE CORRESPONDÊNCIA CADASTRADO</h5>
         <div class="contatos-table space-single">
-            @if(Auth::guard('representante')->user()->enderecos()['CEP'] !== null)
-                @foreach (Auth::guard('representante')->user()->enderecos() as $key => $item)
+            @if($endereco['CEP'] !== null)
+                @foreach ($endereco as $key => $item)
                     <p class="pb-0">{{ $key }}: <strong class="text-uppercase">{{ !empty($item) ? $item : '-----' }}</strong></p>
                 @endforeach
             @else
