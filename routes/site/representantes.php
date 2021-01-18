@@ -5,7 +5,6 @@ Route::prefix('representante')->group(function(){
     Route::get('/dados-gerais', 'RepresentanteSiteController@dadosGeraisView')->name('representante.dados-gerais');
     Route::get('/contatos', 'RepresentanteSiteController@contatosView')->name('representante.contatos.view');
     Route::get('/enderecos', 'RepresentanteSiteController@enderecosView')->name('representante.enderecos.view');
-    Route::get('/dados-gerais', 'RepresentanteSiteController@dadosGeraisView')->name('representante.dados-gerais');
     Route::get('/inserir-contato', 'RepresentanteSiteController@inserirContatoView')->name('representante.inserir-ou-alterar-contato.view');
     Route::post('/inserir-contato', 'RepresentanteSiteController@inserirContato')->name('representante.inserir-ou-alterar-contato');
     Route::post('/deletar-contato', 'RepresentanteSiteController@deletarContato')->name('representante.deletar-contato');

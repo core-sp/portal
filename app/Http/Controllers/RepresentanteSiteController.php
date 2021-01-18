@@ -229,9 +229,9 @@ class RepresentanteSiteController extends Controller
         $request->status === 'on' ? $status = 1 : $status = 0;
 
         if(isset($request->id)) {
-            $this->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo, $request->id, $status);
+            $this->gerentiRepository->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo, $request->id, $status);
         } else {
-            $this->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo);
+            $this->gerentiRepository->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo);
         }
 
         isset($request->id) ? $msg = 'Contato editado com sucesso!' : $msg = 'Contato cadastrado com sucesso!';
@@ -343,7 +343,7 @@ class RepresentanteSiteController extends Controller
 
     public function deletarContato(Request $request)
     {
-        $this->gerentiDeletarContato(Auth::guard('representante')->user()->ass_id, $request);
+        $this->gerentiRepository->gerentiDeletarContato(Auth::guard('representante')->user()->ass_id, $request);
 
         if($request->status === '1') {
             $msg = 'Contato ativado com sucesso!';
