@@ -107,7 +107,8 @@ class RepresentanteLoginController extends Controller
 
     public function logout(Request $request)
     {
-        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") desconectou-se da Área do Representante.'));
+        // Removendo log de logout do representante para evitar problema quando a sessão expira e o representante tenta fazer logout
+        // event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") desconectou-se da Área do Representante.'));
 
         Auth::guard('representante')->logout();
 
