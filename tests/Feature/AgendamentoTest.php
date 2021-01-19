@@ -1191,4 +1191,61 @@ class AgendamentoTest extends TestCase
         // Garantir que o status do Agendamento é nulo e não "Cancelado"
         $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, null);
     }
+
+    /** @test 
+     * 
+     * Mudança de status do Agendamento pelos botões "Confirmar"/"Não Compareceu" na tabela que lista os Agendamentos 
+     * não é permitida antes da data do agendamento.
+    */
+    public function agendamento_cannot_update_from_table_before_agendamento_date()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00',
+            'protocolo' => 'AGE-XXXXXX'
+        ]);
+
+        $this->put(route('agendamentos.updateStatus'), ['idagendamento' => $agendamento->idagendamento, 'status' => Agendamento::STATUS_COMPARECEU])->assertStatus(302);
+
+        // Checa se status continua nulo (siguinifica que o agendamento está pendente)
+        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, null);
+
+        $this->put(route('agendamentos.updateStatus'), ['idagendamento' => $agendamento->idagendamento, 'status' => Agendamento::STATUS_NAO_COMPARECEU])->assertStatus(302);
+
+        // Checa se status continua nulo (siguinifica que o agendamento está pendente)
+        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, null);
+    }
+    /** @test 
+     * 
+     * Agendamento não pode ser criado no memso horário com mesmo CPF/CNPJ.
+    */
+    public function cannot_create_agendamento_on_same_schedule_with_same_cpf_cnpj()
+    {
+        $regional = factory('App\Regional')->create([
+            'idregional' => 1,
+            'regional' => 'São Paulo', 
+            'ageporhorario' => 2, 
+            'horariosage' => '10:00,11:00,12:00,13:00,14:00'
+        ]);
+
+        // Criando Agendamento no dia atual para tentar cancelar no mesmo dia
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $regional->idregional,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00',
+            'protocolo' => 'AGE-XXXXXX'
+        ]);
+
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $regional->idregional,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00'
+        ]);
+
+        // Checa se ao tentar salvar o agendamento com mesmo horário e CPF retorna erro 500
+        $this->post(route('agendamentosite.store'), $dados)->assertStatus(500);
+    }
 }
