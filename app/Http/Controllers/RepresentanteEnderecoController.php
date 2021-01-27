@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\CrudEvent;
 use App\Representante;
+use App\Events\CrudEvent;
 use App\RepresentanteEndereco;
-use App\Traits\GerentiProcedures;
 use App\Http\Controllers\ControleController;
+use App\Repositories\GerentiRepositoryInterface;
 
 class RepresentanteEnderecoController extends Controller
 {
-    use GerentiProcedures;
-
-    // Nome da classe
     private $class = 'RepresentanteEnderecoController';
+    private $gerentiRepository;
+
     // Variáveis
     public $variaveis = [
         'singular' => 'solicitação de inclusão de endereço',
@@ -23,9 +22,10 @@ class RepresentanteEnderecoController extends Controller
         'mostra' => 'representante-endereco'
     ];
 
-    public function __construct()
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('auth');
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public function resultados()
@@ -91,24 +91,28 @@ class RepresentanteEnderecoController extends Controller
     public function index()
     {
         ControleController::autoriza($this->class, __FUNCTION__);
+
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
+
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function show($id)
     {
         ControleController::autoriza($this->class, __FUNCTION__);
+
         $resultado = RepresentanteEndereco::find($id);
         $representante = Representante::where('ass_id', '=', $resultado->ass_id)->first();
         $variaveis = (object) $this->variaveis;
+
         return view('admin.crud.mostra', compact('resultado', 'variaveis', 'representante'));
     }
 
     public function inserirEnderecoGerenti()
     {
-        $this->gerentiInserirEndereco(request('ass_id'), unserialize(request('infos')));
+        $this->gerentiRepository->gerentiInserirEndereco(request('ass_id'), unserialize(request('infos')));
 
         $endereco = RepresentanteEndereco::find(request('id'));
 

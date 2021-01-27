@@ -2,33 +2,73 @@
 
 namespace App\Http\Controllers;
 
-use App\Connections\FirebirdConnection;
-use App\Events\ExternoEvent;
-use App\Mail\CadastroRepresentanteMail;
-use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Representante;
-use App\RepresentanteEndereco;
-use Illuminate\Http\Request;
 use App\Rules\CpfCnpj;
-use App\Traits\GerentiProcedures;
+use App\Events\ExternoEvent;
+use Illuminate\Http\Request;
+use App\RepresentanteEndereco;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\CadastroRepresentanteMail;
+use App\Mail\SolicitacaoAlteracaoEnderecoMail;
+use App\Repositories\GerentiRepositoryInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
 {
-    use GerentiProcedures;
-
+    private $gerentiRepository;
     protected $idendereco;
 
-    public function __construct()
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public function index()
     {
-        return view('site.representante.home');
+        $resultado = $this->gerentiRepository->gerentiAnuidadeVigente(Auth::guard('representante')->user()->cpf_cnpj);
+        $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
+        $status = statusBold($this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id));
+        $ano = date("Y");
+
+        return view('site.representante.home', compact("nrBoleto", "status", "ano"));
+    }
+
+    public function dadosGeraisView()
+    {
+        $nome = Auth::guard('representante')->user()->nome;
+        $registroCore = Auth::guard('representante')->user()->registro_core;
+        $cpfCnpj = Auth::guard('representante')->user()->cpf_cnpj;
+        $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
+        $dadosGerais = $this->gerentiRepository->gerentiDadosGerais(Auth::guard('representante')->user()->tipoPessoa(), Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.dados-gerais', compact("nome", "registroCore", "cpfCnpj", "tipoPessoa", "dadosGerais"));
+    }
+
+    public function contatosView()
+    {
+        $contatos = $this->gerentiRepository->gerentiContatos(Auth::guard('representante')->user()->ass_id);
+        $gerentiTiposContatos = gerentiTiposContatos();
+
+        return view('site.representante.contatos', compact("contatos", "gerentiTiposContatos"));
+    }
+
+    public function enderecosView()
+    {
+        $solicitacoesEnderecos = Auth::guard('representante')->user()->solicitacoesEnderecos();
+        $possuiSolicitacaoEnderecos = $solicitacoesEnderecos->isNotEmpty();
+        $endereco = $this->gerentiRepository->gerentiEnderecos(Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.enderecos', compact("possuiSolicitacaoEnderecos", "solicitacoesEnderecos", "endereco"));
+    }
+
+    public function listaCobrancas()
+    {
+        $cobrancas = $this->gerentiRepository->gerentiCobrancas(Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.lista-cobrancas', compact("cobrancas"));
     }
 
     public function cadastroView()
@@ -65,7 +105,7 @@ class RepresentanteSiteController extends Controller
 
         $save = Representante::create([
             'cpf_cnpj' => $cpfCnpj,
-            'registro_core' => preg_replace('/[^0-9]+/', '', request('registro_core')),
+            'registro_core' => apenasNumeros(request('registro_core')),
             'ass_id' => $ass_id,
             'nome' => $nome,
             'email' => request('email'),
@@ -95,7 +135,7 @@ class RepresentanteSiteController extends Controller
 
         $update = $rep->update([
             'cpf_cnpj' => $cpfCnpj,
-            'registro_core' => preg_replace('/[^0-9]+/', '', request('registro_core')),
+            'registro_core' => apenasNumeros(request('registro_core')),
             'ass_id' => $ass_id,
             'nome' => $nome,
             'email' => request('email'),
@@ -141,13 +181,13 @@ class RepresentanteSiteController extends Controller
     {
         $cpfCnpjCru = request('cpfCnpj');
 
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
+        $cpfCnpj = apenasNumeros(request('cpfCnpj'));
 
         $this->rules($request, $cpfCnpj);
 
         strlen(request('registro_core')) === 11 ? $registro = '0' . request('registro_core') : $registro = request('registro_core');
 
-        $checkGerenti = $this->checaAtivo($registro, request('cpfCnpj'), request('email'));
+        $checkGerenti = $this->gerentiRepository->gerentiChecaLogin($registro, request('cpfCnpj'), request('email'));
 
         if (array_key_exists('Error', $checkGerenti)) {
             return redirect()
@@ -171,24 +211,9 @@ class RepresentanteSiteController extends Controller
         ]);
     }
 
-    public function dadosGeraisView()
-    {
-        return view('site.representante.dados-gerais');
-    }
-
     public function inserirContatoView()
     {
         return view('site.representante.inserir-contato');
-    }
-
-    public function contatosView()
-    {
-        return view('site.representante.contatos');
-    }
-
-    public function enderecosView()
-    {
-        return view('site.representante.enderecos');
     }
 
     public function inserirContato(Request $request)
@@ -204,9 +229,9 @@ class RepresentanteSiteController extends Controller
         $request->status === 'on' ? $status = 1 : $status = 0;
 
         if(isset($request->id)) {
-            $this->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo, $request->id, $status);
+            $this->gerentiRepository->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo, $request->id, $status);
         } else {
-            $this->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo);
+            $this->gerentiRepository->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo);
         }
 
         isset($request->id) ? $msg = 'Contato editado com sucesso!' : $msg = 'Contato cadastrado com sucesso!';
@@ -318,7 +343,7 @@ class RepresentanteSiteController extends Controller
 
     public function deletarContato(Request $request)
     {
-        $this->gerentiDeletarContato(Auth::guard('representante')->user()->ass_id, $request);
+        $this->gerentiRepository->gerentiDeletarContato(Auth::guard('representante')->user()->ass_id, $request);
 
         if($request->status === '1') {
             $msg = 'Contato ativado com sucesso!';
@@ -338,11 +363,6 @@ class RepresentanteSiteController extends Controller
                 'message' => $msg,
                 'class' => $class
             ]);
-    }
-
-    public function listaCobrancas()
-    {
-        return view('site.representante.lista-cobrancas');
     }
 
     public function eventoBoleto()

@@ -17,4 +17,25 @@ class Chamado extends Model
     {
         return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
+
+    public static function tipos()
+    {
+        return [
+            'Dúvida',
+            'Reportar Bug',
+            'Sugestão',
+            'Solicitar Funcionalidade'
+        ]; 
+    }
+
+    public static function prioridades()
+    {
+        return [
+            'Muito Baixa',
+            'Baixa',
+            'Normal',
+            'Alta',
+            'Muito Alta'
+        ];
+    }
 }
