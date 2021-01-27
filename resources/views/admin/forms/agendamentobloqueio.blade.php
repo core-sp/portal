@@ -1,8 +1,3 @@
-@php
-use App\Http\Controllers\Helper;
-use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
-@endphp
-
 <form role="form" method="POST">
     @csrf
     @if(isset($resultado))
@@ -54,7 +49,7 @@ use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
                     @else
                         @if(isset($resultado))
                             @if($resultado->diainicio != '2000-01-01')
-                                value="{{ Helper::OnlyDate($resultado->diainicio) }}"
+                                value="{{ onlyDate($resultado->diainicio) }}"
                             @endif
                         @endif
                     @endif
@@ -80,7 +75,7 @@ use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
                     @else
                         @if(isset($resultado))
                             @if($resultado->diatermino != '2100-01-01')
-                                value="{{ Helper::OnlyDate($resultado->diatermino) }}"
+                                value="{{ onlyDate($resultado->diatermino) }}"
                             @endif
                         @endif
                     @endif

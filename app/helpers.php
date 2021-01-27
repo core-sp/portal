@@ -437,6 +437,13 @@ function formataCpfCnpj($value)
     }
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
 }
+/**
+ * Função usada para remover caracteres não numéricos (CPF, CNPJ, Registro CORE e CEP).
+ */
+function apenasNumeros($value)
+{
+    return preg_replace('/[^0-9]/', '', $value);
+}
 
 function onlyDate($data)
 {
@@ -531,6 +538,13 @@ function retornaDateTime($dia, $hora)
     $date = new \DateTime($date);
     $format = $date->format('Y-m-d\TH:i:s');
     return $format;
+}
+
+function retornaDate($dia)
+{
+    $dia = str_replace('/','-',$dia);
+    
+    return new \DateTime($dia);
 }
 
 function btnSituacao($situacao)
@@ -679,4 +693,13 @@ function todasHoras()
 function converterParaTextoCru($html)
 {
     return html_entity_decode(strip_tags($html));
+}
+
+function resumoTamanho($string, $tamanho)
+{
+    if (strlen($string) > 100)
+        $string = strip_tags($string);
+        $string = html_entity_decode($string);
+        $string = substr($string, 0, $tamanho) . '...';
+    return $string;
 }
