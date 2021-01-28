@@ -59,7 +59,7 @@ class AdminController extends Controller
         } 
         // Contagem de atendimentos pendentes na regional do usuário (Atendimento)
         elseif(session('idperfil') === 8) {
-            $count = $this->agendamentoRepository->getPastAgendamentoPendenteByRegional(Auth::user()->idregional);
+            $count = $this->agendamentoRepository->getCountPastAgendamentoPendenteByRegional(Auth::user()->idregional);
         }
 
         if($count < 1) {
