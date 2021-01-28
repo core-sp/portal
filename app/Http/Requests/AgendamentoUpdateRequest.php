@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Agendamento;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AgendamentoUpdateRequest extends FormRequest
@@ -14,7 +15,7 @@ class AgendamentoUpdateRequest extends FormRequest
             'cpf' => 'required|max:191',
             'celular' => 'required|max:191',
             'tiposervico' => 'required|max:191',
-            'idusuario' => 'max:191|required_if:status,==,Compareceu',
+            'idusuario' => 'max:191|required_if:status,==,' . Agendamento::STATUS_COMPARECEU,
             'status' => 'max:191',
         ];
     }

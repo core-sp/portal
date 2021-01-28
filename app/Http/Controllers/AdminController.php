@@ -2,85 +2,80 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Agendamento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Agendamento;
-use App\User;
+use App\Repositories\CursoRepository;
+use App\Repositories\ChamadoRepository;
+use App\Repositories\NewsletterRepository;
+use App\Repositories\AgendamentoRepository;
 
 class AdminController extends Controller
 {
-    public function __construct()
+    private $agendamentoRepository;
+    private $chamadoRepository;
+    private $cursoRepository;
+    private $newsletterRepository;
+    
+    public function __construct(AgendamentoRepository $agendamentoRepository, ChamadoRepository $chamadoRepository, CursoRepository $cursoRepository, NewsletterRepository $newsletterRepository)
     {
-    	$this->middleware('auth');
+        $this->middleware('auth');
+        $this->agendamentoRepository = $agendamentoRepository;
+        $this->chamadoRepository = $chamadoRepository;
+        $this->cursoRepository = $cursoRepository;
+        $this->newsletterRepository = $newsletterRepository;
     }
 
     public function index()
     {
-    	return view('admin.home');
+        $alertas = $this->alertas();
+        $contagem = $this->contagemAtendimentos();
+        $chamados = $this->chamadoRepository->getChamadoByIdUsuario(Auth::user()->idusuario);
+        $totalAgendamentos = $this->agendamentoRepository->getCountAllAgendamentos();
+        $totalInscritos = $this->cursoRepository->getTotalInscritos();
+        $totalNewsletter = $this->newsletterRepository->getCountAllNewsletter();
+
+    	return view("admin.home", compact("alertas", "contagem", "chamados", "totalAgendamentos", "totalInscritos", "totalNewsletter"));
     }
 
-    public static function alertas()
+    public function alertas()
     {
         $alertas = [];
         $count = 0;
+
         // Alerta de atendimentos nulos
-        $hoje = date('Y-m-d');
+        // Contagem de atendimentos pendentes na Sede (perfil de Gestão de Atendimento - Sede)
         if(session('idperfil') === 12) {
-            $count = Agendamento::where('dia','<',$hoje)
-                ->where('status','=',null)
-                ->where('idregional','=',1)
-                ->count();
-            $alertas['agendamentoCount'] = $count;
-        } elseif(session('idperfil') === 13) {
-            $count = Agendamento::where('dia','<',$hoje)
-                ->where('status','=',null)
-                ->where('idregional','!=',1)
-                ->count();
-            $alertas['agendamentoCount'] = $count;
-        } elseif(session('idperfil') === 6 || session('idperfil') === 1) {
-            $count = Agendamento::where('dia','<',$hoje)
-                ->where('status','=',null)
-                ->count();
-            $alertas['agendamentoCount'] = $count;
-        } elseif(session('idperfil') === 8) {
-            $count = Agendamento::where('dia','<',$hoje)
-                ->where('status','=',null)
-                ->where('idregional','=',Auth::user()->idregional)
-                ->count();
-            $alertas['agendamentoCount'] = $count;
+            $count = $this->agendamentoRepository->getCountPastAgendamentoPendenteSede();
+        } 
+        // Contagem de atendimentos pendentes nas Seccionais (perfil de Gestão de Atendimento - Seccionais)
+        elseif(session('idperfil') === 13) {
+            $count = $this->agendamentoRepository->getCountPastAgendamentoPendenteSeccionais();
         }
+        // Contagem de todos os atendimentos pendentes (perfils de Admin e Coordenadoria de Atendimento)
+        elseif(session('idperfil') === 6 || session('idperfil') === 1) {
+            $count = $this->agendamentoRepository->getCountPastAgendamentoPendente();
+        } 
+        // Contagem de atendimentos pendentes na regional do usuário (Atendimento)
+        elseif(session('idperfil') === 8) {
+            $count = $this->agendamentoRepository->getPastAgendamentoPendenteByRegional(Auth::user()->idregional);
+        }
+
         if($count < 1) {
             $alertas = [];
         }
+        else {
+            $alertas['agendamentoCount'] = $count;
+        }
+        
         return $alertas;
     }
 
-    public static function countAtendimentos()
+    public function contagemAtendimentos()
     {
-        $array = Agendamento::select('idusuario')
-            ->with(['user' => function ($q) {
-                $q->select('idusuario');
-            }])->where('status','Compareceu')
-            ->where('idregional',1)
-            ->get()
-            ->toArray();
-        $count = [];
-        foreach($array as $a) {
-            array_push($count, $a['idusuario']);
-        }
-        $countPerUser = array_count_values($count);
-        $users = User::select('idusuario','nome')
-            ->where('idregional',1)
-            ->where('idperfil',8)
-            ->get();
-        foreach($users as $user) {
-            if(isset($countPerUser[$user["idusuario"]]))
-                $user->contagem = $countPerUser[$user["idusuario"]];
-            else
-                $user->contagem = 0;
-        }
-        $ordenados = $users->sortByDesc('contagem')
-              ->toArray();
+        $listaContagem = $this->agendamentoRepository->getAgendamentoConcluidoCountByRegional(1);
+
         $tabela = '<table class="table table-bordered table-striped">';
         $tabela .= '<thead>';
         $tabela .= '<tr>';
@@ -89,17 +84,20 @@ class AdminController extends Controller
         $tabela .= '</tr>';
         $tabela .= '</thead>';
         $tabela .= '<tbody>';
-        foreach($ordenados as $user) {
-            $tabela .= '<tr>';
-            $tabela .= '<td>'.$user["nome"].'</td>';
-            if(isset($countPerUser[$user["idusuario"]]))
-                $tabela .= '<td>'.$countPerUser[$user["idusuario"]].'</td>';
-            else
-            $tabela .= '<td>0</td>';
-            $tabela .= '</tr>';
+
+        foreach($listaContagem as $contagem) {
+            // Apenas usuários com perfil de Atendente são listados
+            if($contagem->user->idperfil == 8) {
+                $tabela .= '<tr>';
+                $tabela .= '<td>' . $contagem->user->nome . '</td>';
+                $tabela .= '<td>' . $contagem->contagem . '</td>';
+                $tabela .= '</tr>';
+            }
         }
+
         $tabela .= '</tbody>';
         $tabela .= '</table>';
+
         return $tabela;
     }
 }

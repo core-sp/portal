@@ -17,7 +17,6 @@ use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoSiteRequest;
 use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
-use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 
 class AgendamentoSiteController extends Controller
 {
@@ -32,7 +31,7 @@ class AgendamentoSiteController extends Controller
     public function formView()
     {
         $regionais = $this->regionalRepository->all();
-        $pessoas = Agendamento::pessoas();
+        $pessoas = Agendamento::TIPOS_PESSOA;
         $servicos = Agendamento::servicos();
 
         return view('site.agendamento', compact('regionais', 'pessoas', 'servicos'));
@@ -87,8 +86,8 @@ class AgendamentoSiteController extends Controller
         // Limita em até um agendamento por CPF por dia/horário
         if($this->agendamentoRepository->getCountAgendamentoPendenteByCpfDayHour($dia, $request->hora, $request->cpf) > 0) {
             abort(500, 'É permitido apenas 1 agendamentos por CPF por dia/horário!');
-        }
-            
+        } 
+        
         // Cria bloqueio caso o usuário tenha faltado 3 vezes nos últimos 90 dias
         if($this->bloqueioPorFalta($request->cpf)) {
             abort(405, 'Agendamento bloqueado por excesso de falta nos últimos 90 dias. Favor entrar em contato com o Core-SP para regularizar o agendamento.');
@@ -148,7 +147,7 @@ class AgendamentoSiteController extends Controller
 
             // Agendamento deve ser cancelado com antecedência, não é permitido cancelar no mesmo dia do Agendamento
             if($now < $agendamento->dia) {
-                $update = $this->agendamentoRepository->update($agendamento->idagendamento, ['status' => Agendamento::$status_cancelado], $agendamento);
+                $update = $this->agendamentoRepository->update($agendamento->idagendamento, ['status' => Agendamento::STATUS_CANCELADO], $agendamento);
 
                 if(!$update) {
                     abort(500);

@@ -2,14 +2,12 @@
 
 namespace App;
 
-use App\Traits\ControleAcesso;
-use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BdoEmpresa extends Model
 {
-    use SoftDeletes, ControleAcesso, TabelaAdmin;
+    use SoftDeletes;
 
 	protected $primaryKey = 'idempresa';
     protected $table = 'bdo_empresas';
@@ -24,21 +22,6 @@ class BdoEmpresa extends Model
     public function oportunidade()
     {
     	return $this->hasMany('App\BdoOportunidade', 'idempresa');
-    }
-
-    /** Variáveis usadas para abrir telas no Portal Admin */
-    public function variaveis() {
-        return [
-            'singular' => 'empresa',
-            'singulariza' => 'a empresa',
-            'plural' => 'empresas',
-            'pluraliza' => 'empresas',
-            'titulo_criar' => 'Cadastrar nova empresa',
-            'form' => 'bdoempresa',
-            'btn_criar' => '<a href="/admin/bdo/empresas/criar" class="btn btn-primary mr-1">Nova Empresa</a>',
-            'busca' => 'bdo/empresas',
-            'slug' => 'bdo/empresas'
-        ];
     }
 
     /** Valores pré-definidos para o campo segmento (BdoEmpresa.segmento) */
@@ -194,59 +177,5 @@ class BdoEmpresa extends Model
             'Maior que R$ 500.000,00'
         ];
         return $capitais;
-    }
-
-    protected function tabelaHeaders()
-    {
-        return [
-            'Código',
-            'Segmento',
-            'Razão Social',
-            'Ações'
-        ];
-    }
-
-    protected function tabelaContents($query)
-    {
-        return $query->map(function($row){
-            if($this->mostra('BdoOportunidadeController', 'create')) {
-                $acoes = '<a href="/admin/bdo/criar/'.$row->idempresa.'" class="btn btn-sm btn-secondary">Nova Oportunidade</a> ';
-            }
-            else {
-                $acoes = '';
-            }
-               
-            if($this->mostra('BdoEmpresaController', 'edit')) {
-                $acoes .= '<a href="/admin/bdo/empresas/editar/'.$row->idempresa.'" class="btn btn-sm btn-primary">Editar</a> ';
-            }
-                
-            if($this->mostra('BdoEmpresaController', 'destroy')) {
-                $acoes .= '<form method="POST" action="/admin/bdo/empresas/apagar/'.$row->idempresa.'" class="d-inline">';
-                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-                $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a empresa?\')" />';
-                $acoes .= '</form>';
-            }
-
-            if(empty($acoes)) {
-                $acoes = '<i class="fas fa-lock text-muted"></i>';
-            }
-                        
-            return [
-                $row->idempresa,
-                $row->segmento,
-                $row->razaosocial,
-                $acoes
-            ];
-        })->toArray();
-    }
-
-    public function tabelaCompleta($query)
-    {
-        return $this->montaTabela(
-            $this->tabelaHeaders(), 
-            $this->tabelaContents($query),
-            [ 'table', 'table-hover' ]
-        );
     }
 }

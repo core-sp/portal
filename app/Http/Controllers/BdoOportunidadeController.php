@@ -3,36 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\BdoEmpresa;
-use App\Http\Requests\BdoOportunidadeRequest;
-use App\Traits\ControleAcesso;
-use App\Repositories\BdoOportunidadeRepository;
-use App\Repositories\BdoEmpresaRepository;
-use App\Repositories\RegionalRepository;
 use App\BdoOportunidade;
 use App\Events\CrudEvent;
+use App\Traits\TabelaAdmin;
+use App\Traits\ControleAcesso;
+use App\Repositories\RegionalRepository;
+use App\Repositories\BdoEmpresaRepository;
+use App\Http\Requests\BdoOportunidadeRequest;
+use App\Repositories\BdoOportunidadeRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoOportunidadeController extends Controller
 {
-    use ControleAcesso;
+    use ControleAcesso, TabelaAdmin;
 
     // Nome da Classe
     private $class = 'BdoOportunidadeController';
-    private $bdoOportunidade;
     private $bdoOportunidadeRepository;
-    private $bdoOportunidadeVariaveis;
-    private $bdoEmpresa;
     private $bdoEmpresaRepository;
     private $regionalRepository;
 
-    public function __construct(BdoOportunidade $bdoOportunidade, BdoOportunidadeRepository $bdoOportunidadeRepository, BdoEmpresaRepository $bdoEmpresaRepository, RegionalRepository $regionalRepository, BdoEmpresa $bdoEmpresa)
+    private $bdoOportunidadeVariaveis = [
+        'singular' => 'oportunidade',
+        'singulariza' => 'a oportunidade',
+        'plural' => 'oportunidade',
+        'pluraliza' => 'oportunidades',
+        'titulo_criar' => 'Cadastrar nova oportunidade',
+        'form' => 'bdooportunidade',
+        'busca' => 'bdo',
+        'slug' => 'bdo'
+    ];
+
+    public function __construct(BdoOportunidadeRepository $bdoOportunidadeRepository, BdoEmpresaRepository $bdoEmpresaRepository, RegionalRepository $regionalRepository)
     {
         $this->middleware('auth', ['except' => 'show']);
 
-        $this->bdoOportunidade = $bdoOportunidade;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
-        $this->bdoOportunidadeVariaveis = $bdoOportunidade->variaveis();
-        $this->bdoEmpresa = $bdoEmpresa;
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->regionalRepository = $regionalRepository;
     }
@@ -42,7 +48,7 @@ class BdoOportunidadeController extends Controller
         $this->autoriza($this->class, __FUNCTION__);
 
         $resultados = $this->bdoOportunidadeRepository->getToTable();
-        $tabela = $this->bdoOportunidade->tabelaCompleta($resultados);
+        $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->bdoOportunidadeVariaveis;
 
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
@@ -58,8 +64,8 @@ class BdoOportunidadeController extends Controller
         
         if (isset($empresa)) {
             $variaveis = (object) $this->bdoOportunidadeVariaveis;
-            $status = $this->bdoOportunidade::status();
-            $segmentos = $this->bdoEmpresa::segmentos();
+            $status = BdoOportunidade::status();
+            $segmentos = BdoEmpresa::segmentos();
 
             return view('admin.crud.criar', compact('empresa', 'regioes', 'variaveis', 'status', 'segmentos'));
         } 
@@ -95,8 +101,8 @@ class BdoOportunidadeController extends Controller
         $regioes = $this->regionalRepository->getToList();
         $regioesEdit = explode(',', $resultado->regiaoatuacao);
         $variaveis = (object) $this->bdoOportunidadeVariaveis;
-        $status = $this->bdoOportunidade::status();
-        $segmentos = $this->bdoEmpresa::segmentos();
+        $status = BdoOportunidade::status();
+        $segmentos = BdoEmpresa::segmentos();
 
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regioes', 'regioesEdit', 'status', 'segmentos'));
     }
@@ -144,8 +150,71 @@ class BdoOportunidadeController extends Controller
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->bdoOportunidadeVariaveis;
         $resultados = $this->bdoOportunidadeRepository->busca($busca);
-        $tabela = $this->bdoOportunidade->tabelaCompleta($resultados);
+        $tabela = $this->tabelaCompleta($resultados);
 
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+    }
+
+    public function tabelaCompleta($query)
+    {
+        $headers = [
+            'Código',
+            'Empresa',
+            'Segmento',
+            'Vagas',
+            'Status',
+            'Ações'
+        ];
+
+        $contents = $query->map(function($row){
+            if($this->mostra('BdoOportunidadeController', 'edit')) {
+                $acoes = '<a href="/admin/bdo/editar/'.$row->idoportunidade.'" class="btn btn-sm btn-primary">Editar</a> ';
+            }     
+            else {
+                $acoes = '';
+            }
+
+            if($this->mostra('BdoOportunidadeController', 'destroy')) {
+                $acoes .= '<form method="POST" action="/admin/bdo/apagar/'.$row->idoportunidade.'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a oportunidade?\')" />';
+                $acoes .= '</form>';
+            }
+
+            if(empty($acoes)) {
+                $acoes = '<i class="fas fa-lock text-muted"></i>';
+            }
+
+            if(isset($row->vagaspreenchidas)) {
+                $relacaovagas = $row->vagaspreenchidas.' / '.$row->vagasdisponiveis;
+            }     
+            else {
+                $relacaovagas = 'X / '.$row->vagasdisponiveis;
+            }
+                
+            if(isset($row->empresa->razaosocial)) {
+                $razaosocial = $row->empresa->razaosocial;
+            }     
+            else {
+                $razaosocial = '';
+            }
+                        
+            return [
+                $row->idoportunidade,
+                $razaosocial,
+                $row->segmento,
+                $relacaovagas,
+                BdoOportunidade::statusDestacado($row->status),
+                $acoes
+            ];
+        })->toArray();
+
+        $classes = [
+            'table',
+            'table-hover'
+        ];
+
+        return $this->montaTabela($headers, $contents, $classes);
     }
 }
