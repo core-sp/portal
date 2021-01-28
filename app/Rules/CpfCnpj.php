@@ -15,7 +15,7 @@ class CpfCnpj implements Rule
     {
         if(strlen($value) === 11) {
             // Elimina possivel mascara
-            $cpf = preg_replace("/[^0-9]/", "", $value);
+            $cpf = apenasNumeros($value);
             $cpf = str_pad($cpf, 11, '0', STR_PAD_LEFT);
             // Verifica se o numero de digitos informados é igual a 11 
             if (strlen($cpf) != 11) {
@@ -49,7 +49,7 @@ class CpfCnpj implements Rule
                 return true;
             }
         } else {
-            $cnpj = preg_replace('/[^0-9]/', '', (string) $value);
+            $cnpj = apenasNumeros((string) $value);
             // Valida tamanho
             if (strlen($cnpj) != 14)
                 return false;

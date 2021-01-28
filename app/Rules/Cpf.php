@@ -14,7 +14,7 @@ class Cpf implements Rule
     public function passes($attribute, $cpf)
     {
         // Elimina possivel mascara
-        $cpf = preg_replace("/[^0-9]/", "", $cpf);
+        $cpf = apenasNumeros($cpf);
         $cpf = str_pad($cpf, 11, '0', STR_PAD_LEFT);
         // Verifica se o numero de digitos informados é igual a 11 
         if (strlen($cpf) != 11) {

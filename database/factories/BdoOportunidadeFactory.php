@@ -16,7 +16,7 @@ $factory->define(BdoOportunidade::class, function (Faker $faker) {
         'descricao' => $faker->text,
         'vagasdisponiveis' => $faker->numberBetween(1, 99),
         'vagaspreenchidas' => null,
-        'status' => BdoOportunidade::$status_em_andamento,
+        'status' => BdoOportunidade::STATUS_EM_ANDAMENTO,
         'observacao' => null,
         'datainicio' => now(),
         'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User')

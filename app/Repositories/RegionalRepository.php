@@ -5,12 +5,8 @@ namespace App\Repositories;
 use App\Noticia;
 use App\Regional;
 
-class RegionalRepository {
-    public function getToTable()
-    {
-        return Regional::all();
-    }
-
+class RegionalRepository 
+{
     public function all()
     {
         return Regional::all();

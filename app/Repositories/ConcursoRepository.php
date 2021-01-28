@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Concurso;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class ConcursoRepository {
@@ -77,28 +78,26 @@ class ConcursoRepository {
         return Concurso::orderBy('datarealizacao','DESC')->paginate(10);
     }
 
-    public function getBuscaSite()
+    public function getBuscaSite($buscaModalidade, $buscaSituacao, $buscaNrProcesso, $buscaDia)
     {
-        $buscaModalidade = IlluminateRequest::input('modalidade');
-        $buscaSituacao = IlluminateRequest::input('situacao');
-        $buscaNrProcesso = IlluminateRequest::input('nrprocesso');
-        $dia = IlluminateRequest::input('datarealizacao');
-        if(isset($dia)) {
-            $diaArray = explode('/',$dia);
-            $checaDia = checkdate($diaArray[1], $diaArray[0], $diaArray[2]);
-            if($checaDia === false) {
-                echo "<script>alert('Data inválida'); window.location.href='/concursos'</script>";
-            }
-            $replace = str_replace('/','-',$dia);
-            $dia = new \DateTime($replace);
-            $buscaDataRealizacao = $dia->format('Y-m-d');
-        } else {
-            $buscaDataRealizacao = '';
+        $concursos = DB::table('concursos');
+
+        if(!empty($buscaModalidade)) {
+            $concursos->where("modalidade", $buscaModalidade);
         }
-        return Concurso::where('modalidade','LIKE','%'.$buscaModalidade.'%')
-            ->where('situacao','LIKE','%'.$buscaSituacao.'%')
-            ->where('nrprocesso','LIKE',$buscaNrProcesso)
-            ->where('datarealizacao','LIKE','%'.$buscaDataRealizacao.'%')
-            ->paginate(10);
+
+        if(!empty($buscaSituacao)) {
+            $concursos->where("situacao", $buscaSituacao);
+        }
+
+        if(!empty($buscaNrProcesso)) {
+            $concursos->where("nrprocesso", "LIKE", "%" . $buscaNrProcesso . "%");
+        }
+
+        if(!empty($buscaDia)) {
+            $concursos->whereDate("datarealizacao", $buscaDia);
+        }
+
+        return $concursos->orderBy("datarealizacao", "DESC")->paginate(10);
     }
 }

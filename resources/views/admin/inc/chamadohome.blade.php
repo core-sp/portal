@@ -1,7 +1,3 @@
-@php
-    use App\Http\Controllers\Helper;
-@endphp
-
 <div class="row mt-2">
     <div class="col">
         <div class="card card-info">
@@ -23,7 +19,7 @@
                         @foreach($chamados as $chamado)
                         <tr>
                             <td>{{ $chamado->idchamado }}</td>
-                            <td>{{ $chamado->tipo }}<br /><small>{{ Helper::resumoTamanho($chamado->mensagem, 75) }}</small></td>
+                            <td>{{ $chamado->tipo }}<br /><small>{{ resumoTamanho($chamado->mensagem, 75) }}</small></td>
                             <td>{{ $chamado->prioridade }}</td>
                             <td>
                             @if(isset($chamado->deleted_at) && isset($chamado->resposta))
