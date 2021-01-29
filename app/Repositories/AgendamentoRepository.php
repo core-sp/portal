@@ -36,6 +36,16 @@ class AgendamentoRepository
             ->paginate(25);
     }
 
+    public function getToBuscaByRegional($criterio, $idRegional) 
+    {
+        return Agendamento::where('idregional', $idRegional)
+            ->where(function($query) use ($criterio) {
+                $query->where('cpf','LIKE','%' . $criterio . '%')
+                    ->orWhere('email','LIKE','%' . $criterio . '%')
+                    ->orWhere('protocolo','LIKE','%' . $criterio . '%');
+        })->paginate(25);
+    }
+
     public function update($id, $data, $agendamento = null) 
     {
         if($agendamento) {
@@ -165,7 +175,7 @@ class AgendamentoRepository
         return  Agendamento::where('protocolo', $protocolo)->count();
     }
    
-    public function getToTableFilter($mindia, $maxdia, $regional, $status)
+    public function getToTableFilter($mindia, $maxdia, $regional, $status, $servico)
     {
         $resultados = Agendamento::whereBetween('dia',[$mindia,$maxdia]);
 
@@ -175,6 +185,10 @@ class AgendamentoRepository
 
         if(!empty($status)) {
             $resultados->where('status', $status);
+        }
+
+        if(!empty($servico)) {
+            $resultados->where('tiposervico', $servico);
         }
 
         return $resultados->orderBy('idregional','ASC')
