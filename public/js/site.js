@@ -259,6 +259,8 @@ natDays = [
 	[12, 30, 'br'],
 	[12, 31, 'br'],
 ];
+var lotados = [];
+
 // Função para adicionar feriados
 function nationalDays(date) {
     for (i = 0; i < natDays.length; i++) {
@@ -269,14 +271,32 @@ function nationalDays(date) {
 	}	
 	return [true, ''];
 }
-// Função para feriados e fim-de-semana
+
+// Função para adicionar feriados
+function diasLotados(date) {
+    for (i = 0; i < lotados.length; i++) {
+      if (date.getMonth() == lotados[i][0] - 1 && date.getDate() == lotados[i][1]) {
+        return [false, lotados[i][2]];
+      }
+	}	
+	return [true, ''];
+}
+
+// Função para feriados, fim-de-semana e dias lotados
 function noWeekendsOrHolidays(date) {
-    var noWeekend = $.datepicker.noWeekends(date);
-    if (noWeekend[0]) {
-        return nationalDays(date);
-    } else {
-        return noWeekend;
-    }
+	var noWeekend = $.datepicker.noWeekends(date);
+	var feriado = nationalDays(date);
+	var lotado = diasLotados(date);
+
+	if(!feriado[0]) {
+		return feriado;
+	}
+	else if (!noWeekend[0]) {
+		return noWeekend;
+	}
+	else {
+		return lotado;
+	}
 }
 
 $('.mapa_regional').on({
@@ -324,21 +344,74 @@ $('#ano-mapa').on({
 			minDate: +1,
 			beforeShowDay: noWeekendsOrHolidays
 		});
+
 		// Zera o valor do dia, ao selecionar a regional
 		$('#idregional').change(function(){
 			$('#datepicker').val('');
+			$('#datepicker').prop('disabled', true);
+
 			$('#horarios')
 				.find('option')
 				.remove()
 				.end()
 				.append('<option value="" disabled selected>Selecione o dia do atendimento</option>');
+			$('#horarios').prop('disabled', true);
+
 			$('#selectServicos option[value="Plantão Jurídico"]').remove();
+
+			$('#idregional option[value=""]').remove();
+
+			$.ajax({
+				method: "GET",
+				data: {
+					"_token": $('#token').val(),
+					"idregional": $('#idregional').val()
+				},
+				dataType: 'json',
+				url: "/checa-mes",
+				beforeSend: function(){
+					$('#loadCalendario').show();
+				},
+				complete: function(){
+					$('#loadCalendario').hide();
+				},
+				success: function(response) {
+					lotados = response;
+					$('#datepicker').prop('disabled', false);
+					$('#datepicker').prop('placeholder', 'dd/mm/aaaaa');
+				},
+				error: function() {
+					$('#datepicker').val('');
+					$('#datepicker').prop('disabled', true);
+					$('#datepicker').prop('placeholder', 'Falha ao recuperar calendário');
+
+					$('#horarios')
+						.find('option')
+						.remove()
+						.end()
+						.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
+
+					$("#dialog_agendamento")
+						.empty()
+						.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
+						
+					$("#dialog_agendamento").dialog({
+						draggable: false,
+						buttons: [{
+							text: "Recarregar",
+							click: function() {
+								location.reload(true);
+							}
+						}]	
+					});
+				}
+			});
 		});
 		// Ajax após change no datepicker
 		$('#datepicker').change(function(){
 			atendimentoJuridico($(this).val(), $('#idregional').val());
 			$.ajax({
-				method: "POST",
+				method: "GET",
 				data: {
 					"_token": $('#token').val(),
 					"idregional": $('#idregional').val(),
@@ -347,10 +420,10 @@ $('#ano-mapa').on({
 				dataType: 'json',
 				url: "/checa-horarios",
 				beforeSend: function(){
-					$('#loadImage').show();
+					$('#loadHorario').show();
 				},
 				complete: function(){
-					$('#loadImage').hide();
+					$('#loadHorario').hide();
 				},
 				success: function(response) {
 					if (!jQuery.isEmptyObject(response)) {
@@ -362,6 +435,8 @@ $('#ano-mapa').on({
 								text : horario 
 							}));
 						});
+
+						$('#horarios').prop('disabled', false);
 					} 
 					else {
 						$('#horarios')

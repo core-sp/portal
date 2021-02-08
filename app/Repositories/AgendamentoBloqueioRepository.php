@@ -14,6 +14,13 @@ class AgendamentoBloqueioRepository
             ->get();
     }
 
+    public function getByRegional($idregional)
+    {
+        return AgendamentoBloqueio::where('idregional', $idregional)
+            ->where('diatermino','>=', date('Y-m-d'))
+            ->get();
+    }
+
     public function getAll()
     {
         return AgendamentoBloqueio::orderBy('idagendamentobloqueio', 'DESC')

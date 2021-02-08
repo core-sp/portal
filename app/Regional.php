@@ -68,7 +68,7 @@ class Regional extends Model
         if($this->horariosage)
             return explode(',', $this->horariosage);
 
-        return null;
+        return [];
     }
 
     public function horariosDisponiveis($dia)

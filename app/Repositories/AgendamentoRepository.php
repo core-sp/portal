@@ -163,6 +163,16 @@ class AgendamentoRepository
             ->get();
     }
 
+    public function getAgendamentoPendenteByMesRegional($idregional)
+    {
+        return Agendamento::select('dia', DB::raw('count(1) as total'))        
+            ->whereBetween('dia',[date('Y-m-d', strtotime('+1 day')), date('Y-m-d', strtotime('+1 month'))])
+            ->where('idregional', $idregional)
+            ->whereNull('status')
+            ->groupBy('dia')
+            ->get();
+    }
+
     public function getToConsulta($protocolo)
     {
         return  Agendamento::where('protocolo', $protocolo)

@@ -1627,14 +1627,14 @@ footer p {
 	cursor: pointer;
 }
 
-#loadImage {
+.loadImage {
 	position: absolute;
-	bottom: 4px;
+	top: 28px;
 	left: 11px;
 	display: none;
 }
 
-#loadImage img {
+.loadImage img {
 	width: 32px;
 }
 
@@ -1649,6 +1649,17 @@ footer p {
 	padding-bottom: 4px;
 	margin-bottom: 12px;
 	margin-top: 12px;
+}
+
+
+.ui-datepicker .lotado span
+{
+	background: none #e61818;
+}
+
+.ui-widget-content .ui-state-disabled.lotado
+{
+	opacity: 1;
 }
 
 /*
