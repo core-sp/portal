@@ -17,7 +17,7 @@
                 <label for="gerentiTipoContato">Tipo</label>
                 <select name="tipo" id="gerentiTipoContato" class="form-control">
                     <option selected disabled>Selecione o tipo...</option>
-                    @foreach(gerentiTiposContatos() as $key => $tipoCru)
+                    @foreach(gerentiTiposContatosInserir() as $key => $tipoCru)
                         <option value="{{ $key }}">{{ $tipoCru }}</option>
                     @endforeach
                 </select>

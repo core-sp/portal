@@ -43,6 +43,8 @@ Route::prefix('admin')->group(function() {
   require('admin/concursos.php');
   // Rotas de concursos
   require('admin/cursos.php');
+  // Rotas do mapa de fiscalização (possivelmente será removido pois os dados virão do GERENTI)
+  require('admin/fiscalizacao.php');
 
 
   //require('admin/fiscalizacao.php');
@@ -154,6 +156,8 @@ Route::prefix('/')->group(function() {
   require('site/concursos.php');
   // Cursos
   require('site/cursos.php');
+  // Representantes
+  require('site/representantes.php');
   
   //Balcão de Oportunidades
   Route::get('balcao-de-oportunidades', 'BdoSiteController@index')->name('bdosite.index');
@@ -168,7 +172,8 @@ Route::prefix('/')->group(function() {
   // Agendamentos
   Route::get('agendamento', 'AgendamentoSiteController@formView')->name('agendamentosite.formview');
   Route::post('agendamento', 'AgendamentoSiteController@store')->name('agendamentosite.store');
-  Route::post('/checa-horarios', 'AgendamentoSiteController@checaHorarios')->name('agendamentosite.checaHorarios');
+  Route::get('checa-horarios', 'AgendamentoSiteController@checaHorarios')->name('agendamentosite.checaHorarios');
+  Route::get('checa-mes', 'AgendamentoSiteController@checaMes')->name('agendamentosite.checaMes');
   Route::get('agendamento-consulta', 'AgendamentoSiteController@consultaView')->name('agendamentosite.consultaView');
   Route::get('agendamento-consulta/busca', 'AgendamentoSiteController@consulta')->name('agendamentosite.consulta');
   Route::put('agendamento-consulta/busca', 'AgendamentoSiteController@cancelamento')->name('agendamentosite.cancelamento');
@@ -180,7 +185,10 @@ Route::prefix('/')->group(function() {
   Route::get('feiras', 'SiteController@feiras');
 
   // Fiscalização
-  Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao');
+  Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao')->name('fiscalizacao.acoesfiscalizacao');
+  // Rotas para o SIG (Sistema de Informação Geográfico)
+  Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
+  Route::get('/mapa-fiscalizacao/{id}', 'FiscalizacaoController@mostrarMapaPeriodo')->name('fiscalizacao.mapaperiodo');
 
   // Simulador
   Route::get('simulador', 'SimuladorController@view');
@@ -198,41 +206,6 @@ Route::prefix('/')->group(function() {
   Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView')->name('anuidade-ano-vigente');
   Route::post('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigente');
 
-  // Representantes
-  Route::prefix('representante')->group(function(){
-    Route::get('/home', 'RepresentanteSiteController@index')->name('representante.dashboard');
-    Route::get('/dados-gerais', 'RepresentanteSiteController@dadosGeraisView')->name('representante.dados-gerais');
-    Route::get('/contatos', 'RepresentanteSiteController@contatosView')->name('representante.contatos.view');
-    Route::get('/enderecos', 'RepresentanteSiteController@enderecosView')->name('representante.enderecos.view');
-    Route::get('/dados-gerais', 'RepresentanteSiteController@dadosGeraisView')->name('representante.dados-gerais');
-    Route::get('/inserir-contato', 'RepresentanteSiteController@inserirContatoView')->name('representante.inserir-ou-alterar-contato.view');
-    Route::post('/inserir-contato', 'RepresentanteSiteController@inserirContato')->name('representante.inserir-ou-alterar-contato');
-    Route::post('/deletar-contato', 'RepresentanteSiteController@deletarContato')->name('representante.deletar-contato');
-    Route::get('/inserir-endereco', 'RepresentanteSiteController@inserirEnderecoView')->name('representante.inserir-endereco.view');
-    Route::post('/inserir-endereco', 'RepresentanteSiteController@inserirEndereco')->name('representante.inserir-endereco');
-    Route::get('/situacao-financeira', 'RepresentanteSiteController@listaCobrancas')->name('representante.lista-cobrancas');
-    Route::get('/verifica-email/{token}', 'RepresentanteSiteController@verificaEmail')->name('representante.verifica-email');
-    Route::get('/evento-boleto', 'RepresentanteSiteController@eventoBoleto')->name('representante.evento-boleto');
-    // Login e Cadastro
-    Route::get('/login', 'Auth\RepresentanteLoginController@showLoginForm')->name('representante.login');
-    Route::post('/login', 'Auth\RepresentanteLoginController@login')->name('representante.login.submit');
-    Route::get('/logout', 'Auth\RepresentanteLoginController@logout')->name('representante.logout');
-    Route::get('/cadastro', 'RepresentanteSiteController@cadastroView')->name('representante.cadastro');
-    Route::post('/cadastro', 'RepresentanteSiteController@cadastro')->name('representante.cadastro.submit');
-    // Reset password routes
-    Route::get('/password/reset', 'Auth\RepresentanteForgotPasswordController@showLinkRequestForm')->name('representante.password.request');
-    Route::post('/password/email', 'Auth\RepresentanteForgotPasswordController@sendResetLinkEmail')->name('representante.password.email');
-    Route::get('/password/reset/{token}', 'Auth\RepresentanteResetPasswordController@showResetForm')->name('representante.password.reset');
-    Route::post('/password/reset', 'Auth\RepresentanteResetPasswordController@reset')->name('representante.password.update');
-    // Reset email routes
-    Route::get('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmailView')->name('representante.email.reset.view');
-    Route::post('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmail')->name('representante.email.reset');
-    
-    // Rotas para emissão de Certidão
-    Route::get('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidaoView')->name('representante.emitirCertidaoView');
-    Route::post('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidao')->name('representante.emitirCertidao');
-  });
-
   Route::get('/chat', function(){
     return view('site.chat');
   });
@@ -247,5 +220,4 @@ Route::prefix('/')->group(function() {
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
-
 });

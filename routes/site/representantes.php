@@ -5,7 +5,6 @@ Route::prefix('representante')->group(function(){
     Route::get('/dados-gerais', 'RepresentanteSiteController@dadosGeraisView')->name('representante.dados-gerais');
     Route::get('/contatos', 'RepresentanteSiteController@contatosView')->name('representante.contatos.view');
     Route::get('/enderecos', 'RepresentanteSiteController@enderecosView')->name('representante.enderecos.view');
-    Route::get('/dados-gerais', 'RepresentanteSiteController@dadosGeraisView')->name('representante.dados-gerais');
     Route::get('/inserir-contato', 'RepresentanteSiteController@inserirContatoView')->name('representante.inserir-ou-alterar-contato.view');
     Route::post('/inserir-contato', 'RepresentanteSiteController@inserirContato')->name('representante.inserir-ou-alterar-contato');
     Route::post('/deletar-contato', 'RepresentanteSiteController@deletarContato')->name('representante.deletar-contato');
@@ -28,4 +27,8 @@ Route::prefix('representante')->group(function(){
     // Reset email routes
     Route::get('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmailView')->name('representante.email.reset.view');
     Route::post('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmail')->name('representante.email.reset');
+
+    // Rotas para emissão de Certidão
+    Route::get('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidaoView')->name('representante.emitirCertidaoView');
+    Route::post('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidao')->name('representante.emitirCertidao');
 });

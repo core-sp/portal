@@ -4,23 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Representante;
 use App\Events\CrudEvent;
-use App\Traits\TabelaAdmin;
-use Illuminate\Http\Request;
 use App\RepresentanteEndereco;
-use App\Traits\ControleAcesso;
-use Illuminate\Support\Facades\Storage;
-use App\Repositories\RepresentanteRepository;
+use App\Http\Controllers\ControleController;
 use App\Repositories\GerentiRepositoryInterface;
-use App\Repositories\RepresentanteEnderecoRepository;
 
 class RepresentanteEnderecoController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
-
     private $class = 'RepresentanteEnderecoController';
     private $gerentiRepository;
-    private $representanteEnderecoRepository;
-    private $representanteRepository;
 
     // Variáveis
     public $variaveis = [
@@ -31,12 +22,10 @@ class RepresentanteEnderecoController extends Controller
         'mostra' => 'representante-endereco'
     ];
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, RepresentanteRepository $representanteRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('auth');
         $this->gerentiRepository = $gerentiRepository;
-        $this->representanteEnderecoRepository = $representanteEnderecoRepository;
-        $this->representanteRepository = $representanteRepository;
     }
 
     public function resultados()
@@ -44,17 +33,6 @@ class RepresentanteEnderecoController extends Controller
         $resultados = $this->representanteEnderecoRepository->getAll();
 
         return $resultados;
-    }
-
-    public function index()
-    {
-        $this->autoriza($this->class, __FUNCTION__);
-
-        $resultados = $this->resultados();
-        $tabela = $this->tabelaCompleta($resultados);
-        $variaveis = (object) $this->variaveis;
-
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function show($id)
@@ -165,5 +143,16 @@ class RepresentanteEnderecoController extends Controller
                 return $string;
             break;
         }
+    }
+
+    public function index()
+    {
+        ControleController::autoriza($this->class, __FUNCTION__);
+
+        $resultados = $this->resultados();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
+
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 }

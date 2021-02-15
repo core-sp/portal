@@ -5,7 +5,8 @@ namespace App\Traits;
 use App\Repositories\PermissaoRepository;
 use Illuminate\Support\Facades\Auth;
 
-trait ControleAcesso {
+trait ControleAcesso 
+{
     public function autoriza($controller, $metodo)
     {
         $cm = $controller.'_'.$metodo;

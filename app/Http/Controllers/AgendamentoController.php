@@ -81,7 +81,25 @@ class AgendamentoController extends Controller
         $idagendamento = $request->idagendamento;
         $status = $request->status;
 
-        $update = $this->agendamentoRepository->update($idagendamento, ['status' => $status, 'idusuario' => $idusuario]);
+        $agendamento = $this->agendamentoRepository->getById($idagendamento);
+
+        // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
+        // de sua regional, aborta com erro de permissão.
+        if($this->limitaPorRegional()) {
+            if($agendamento->idregional != Auth::user()->idregional) {
+                abort(403);
+            }
+        }
+
+        if($agendamento) {
+            if($agendamento->dia > date('Y-m-d')) {
+                return redirect()->back()
+                    ->with('message', '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado antes da data agendada')
+                    ->with('class', 'alert-danger');
+            }
+        }
+
+        $update = $this->agendamentoRepository->update($idagendamento, ['status' => $status, 'idusuario' => $idusuario], $agendamento);
 
         if(!$update) {
             abort(500);
@@ -105,8 +123,14 @@ class AgendamentoController extends Controller
 
         $busca = IlluminateRequest::input('q');
     
-        $resultados = $this->agendamentoRepository->getToBusca($busca);
-
+        // "Atendente" e "Gerente Seccionais" devem visualizar apenas agendamentos de sua respectiva regional.
+        if(!$this->limitaPorRegional()) {
+            $resultados = $this->agendamentoRepository->getToBusca($busca);
+        }
+        else {
+            $resultados = $this->agendamentoRepository->getToBuscaByRegional($busca, Auth::user()->idregional);
+        }
+        
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->agendamentoVariaveis;
 
@@ -118,6 +142,14 @@ class AgendamentoController extends Controller
         $this->autoriza($this->class, __FUNCTION__);
 
         $resultado = $this->agendamentoRepository->getById($id);
+
+        // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
+        // de sua regional, aborta com erro de permissão.
+        if($this->limitaPorRegional()) {
+            if($resultado->idregional != Auth::user()->idregional) {
+                abort(403);
+            }
+        }
 
         $atendentes = $this->userRepository->getAtendentesByRegional($resultado->idregional);
 
@@ -134,6 +166,15 @@ class AgendamentoController extends Controller
     public function update(AgendamentoUpdateRequest $request, $id)
     {
         $this->autoriza($this->class, 'edit');
+
+        // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
+        // de sua regional, aborta com erro de permissão.
+        // Neste caso, é usado o nome da regional ao invés do ID.
+        if($this->limitaPorRegional()) {
+            if($request->idregional != Auth::user()->regional->regional) {
+                abort(403);
+            }
+        }
 
         $update = $this->agendamentoRepository->update($id, $request->toModel());
 
@@ -178,8 +219,8 @@ class AgendamentoController extends Controller
         elseif($idPerfil === 13) {
             $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendenteSeccionais();
         } 
-        // "Atendente" pode ver apenas agendamentos pendentes da sua regional
-        elseif($idPerfil === 8) {
+        // "Atendente" e "Gerente Seccionais" podem ver apenas agendamentos pendentes da sua regional
+        elseif($idPerfil === 8 || $idPerfil === 21) {
             $resultados = $this->agendamentoRepository->getPastAgendamentoPendenteByRegional(Auth::user()->idregional);
         } 
         else {
@@ -209,6 +250,7 @@ class AgendamentoController extends Controller
         $maxdia = date('Y-m-d');
         $regional = '';
         $status = '';
+        $servico = '';
 
         // Valida e prepara filtro de data mínima
         if(IlluminateRequest::has('mindia')) {
@@ -257,7 +299,14 @@ class AgendamentoController extends Controller
             }
         } 
 
-        return $this->agendamentoRepository->getToTableFilter($mindia, $maxdia, $regional, $status);
+        // Valida e prepara filtro de serviço
+        if(IlluminateRequest::has('servico')) {
+            if(!empty(IlluminateRequest::input('servico')) && IlluminateRequest::input('servico') !== 'Qualquer') {
+                $servico = IlluminateRequest::input('servico');
+            }
+        } 
+
+        return $this->agendamentoRepository->getToTableFilter($mindia, $maxdia, $regional, $status, $servico);
     }
 
     public function montaFiltros()
@@ -268,9 +317,8 @@ class AgendamentoController extends Controller
         $filtro .= '<div class="form-row filtroAge">';
         $filtro .= '<input type="hidden" name="filtro" value="sim" />';
 
-        // Montando filtro de regional
-        // TODO - verificar condições do uso do filtro por regional (atualmente não existe perfil com idperfil == 12)
-        if($this->mostra($this->class, 'edit') && Auth::user()->perfil->idperfil !== 12) {
+        // Montando filtro de regional. "Atendente" e "Gerente Seccionais" não podem usar este filtro.
+        if(!$this->limitaPorRegional()) {
             $filtro .= '<div class="form-group mb-0 col">';
             $filtro .= '<label>Seccional</label>';
             $filtro .= '<select class="custom-select custom-select-sm mr-2" id="regional" name="regional">';
@@ -329,6 +377,37 @@ class AgendamentoController extends Controller
 
         $filtro .= '</select>';
         $filtro .= '</div>';
+
+        // Montando filtro de serviço
+        $filtro .= '<div class="form-group mb-0 col">';
+        $filtro .= '<label>Serviço</label>';
+        $filtro .= '<select class="custom-select custom-select-sm" name="servico">';
+        
+        if(IlluminateRequest::input('servico') === 'Qualquer') {
+            $filtro .= '<option value="Qualquer" selected>Qualquer</option>';
+        }
+           
+        else {
+            $filtro .= '<option value="Qualquer">Qualquer</option>';
+        }
+        
+        $servicos = Agendamento::servicosCompletos();
+
+        foreach($servicos as $s) {
+            if(IlluminateRequest::has('servico')) {
+                if(IlluminateRequest::input('servico') === $s) {
+                    $filtro .= '<option value="' . $s . '" selected>' . $s . '</option>';
+                } else {
+                    $filtro .= '<option value="' . $s . '">' . $s . '</option>';
+                }
+            } else {
+                $filtro .= '<option value="' . $s . '">' . $s . '</option>';
+            }
+        }
+
+        $filtro .= '</select>';
+        $filtro .= '</div>';
+
         $filtro .= '<div class="form-group mb-0 col">';
 
         $hoje = date('d\/m\/Y');
@@ -397,6 +476,17 @@ class AgendamentoController extends Controller
         }
 
         return $mensagem;
+    }
+
+    /**
+     * Método usado para checar se o perfil do usuário exige limitação de visualização de agendamentos
+     * de sua própria regional. Retorna true se for necessário limitar, do contrário, retorna false.
+     * 
+     * Perfis limitados por regional são "Atendente" (8) e "Gerente Seccionais" (21).
+     */
+    protected function limitaPorRegional() 
+    {
+        return Auth::user()->perfil->idperfil == 8 || Auth::user()->perfil->idperfil == 21;
     }
 
     public function status($status, $id, $usuario = null)

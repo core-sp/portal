@@ -109,31 +109,29 @@
             <div class="form-row mt-2">
               <div class="col-md-4">
                 <label for="idregional">Regional *</label>
-                <select name="idregional" id="idregional" class="form-control">
+                <select name="idregional" id="idregional" class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}">
+                  <option value="" selected>Selecione a regional</option>
                   @foreach($regionais as $regional)
-                    @if($regional->idregional == old('idregional'))
-                    <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
-                    @else
                     <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                    @endif
                   @endforeach 
                 </select>
-                @if($errors->has('regional'))
+                @if($errors->has('idregional'))
                 <div class="invalid-feedback">
-                  {{ $errors->first('regional') }}
+                  {{ $errors->first('idregional') }}
                 </div>
                 @endif
               </div>
               <div class="col-md-4 mt-2-768">
-                <label for="dia">Dia *</label>
+                <label for="dia">Dia * <span>(datas em vermelho não possuem horário disponível)</span></label>
                 <div class="input-group">
                   <input type="text" 
                     class="form-control {{ $errors->has('dia') ? 'is-invalid' : '' }}"
                     id="datepicker"
                     name="dia"
-                    placeholder="dd/mm/aaaaa"
+                    placeholder="Selecione a regional"
                     autocomplete="off"
                     readonly
+                    disabled
                     />
                   @if($errors->has('dia'))
                   <div class="invalid-feedback">
@@ -141,22 +139,23 @@
                   </div>
                   @endif
                 </div>
+                <div id="loadCalendario" class="loadImage">
+                  <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
+                </div>
               </div>
               <div class="col-md-4 mt-2-768">
-                <div id="loadImage">
-                  <div class="loadeando">
-                    <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
-                  </div>
-                </div>
                 <label for="hora">Horários disponíveis *</label>
-                <select name="hora" id="horarios" class="form-control {{ $errors->has('hora') ? 'is-invalid' : '' }}">
-                  <option value="" disabled selected>Selecione o dia do atendimento</option>
+                <select name="hora" id="horarios" disabled class="form-control {{ $errors->has('hora') ? 'is-invalid' : '' }}">
+                  <option value="" selected>Selecione o dia do atendimento</option>
                 </select>
                 @if($errors->has('hora'))
                 <div class="invalid-feedback">
                   {{ $errors->first('hora') }}
                 </div>
                 @endif
+                <div id="loadHorario" class="loadImage">
+                  <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
+                </div>
               </div>
             </div>
             <div class="form-row mt-2">

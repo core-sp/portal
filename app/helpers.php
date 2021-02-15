@@ -286,6 +286,20 @@ function gerentiTiposContatos()
     ];
 }
 
+function gerentiTiposContatosInserir()
+{
+    return [
+        '1' => 'Telefone',
+        '2' => 'Celular',
+        '3' => 'E-mail',
+        '4' => 'Fax',
+        '5' => 'Home Page',
+        '6' => 'Tel. Emergência',
+        '7' => 'Tel. Contato',
+        '8' => 'Tel. Referência'
+    ];
+}
+
 function formataDataGerenti($date)
 {
     $array = explode('-', $date);
@@ -512,6 +526,7 @@ function situacoesLicitacao()
         'Deserto',
         'Em Andamento',
         'Em fase de recurso',
+        'Encerrado',
         'Homologado'
     ];
 }
@@ -634,7 +649,7 @@ function mostraChatScript()
     if(config('app.env') !== 'local') {
         $hour = date('H');
         $day = date('w');
-        if($hour >= 10 && $hour < 16 && $day !== '6' && $day !== '0') {
+        if($hour >= 9 && $hour < 18 && $day !== '6' && $day !== '0') {
             return '<script src="//code.jivosite.com/widget/X12I8gg4Qy" async></script>';
         }
     }

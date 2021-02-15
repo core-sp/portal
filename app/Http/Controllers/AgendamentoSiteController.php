@@ -15,6 +15,7 @@ use App\Repositories\RegionalRepository;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoSiteRequest;
+use App\Repositories\AgendamentoBloqueioRepository;
 use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
@@ -22,10 +23,12 @@ class AgendamentoSiteController extends Controller
 {
     private $agendamentoRepository;
     private $regionalRepository;
+    private $agendamentoBloqueioRepository;
 
-    public function __construct(AgendamentoRepository $agendamentoRepository,RegionalRepository $regionalRepository) {
+    public function __construct(AgendamentoRepository $agendamentoRepository, RegionalRepository $regionalRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository) {
         $this->agendamentoRepository = $agendamentoRepository;
         $this->regionalRepository = $regionalRepository;
+        $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
     }
 
     public function formView()
@@ -82,7 +85,12 @@ class AgendamentoSiteController extends Controller
         if($this->limiteCpf($dia, $request->cpf)) {
             abort(500, 'É permitido apenas 2 agendamentos por CPF por dia!');
         }
-            
+
+        // Limita em até um agendamento por CPF por dia/horário
+        if($this->agendamentoRepository->getCountAgendamentoPendenteByCpfDayHour($dia, $request->hora, $request->cpf) > 0) {
+            abort(500, 'É permitido apenas 1 agendamentos por CPF por dia/horário!');
+        } 
+        
         // Cria bloqueio caso o usuário tenha faltado 3 vezes nos últimos 90 dias
         if($this->bloqueioPorFalta($request->cpf)) {
             abort(405, 'Agendamento bloqueado por excesso de falta nos últimos 90 dias. Favor entrar em contato com o Core-SP para regularizar o agendamento.');
@@ -243,5 +251,81 @@ class AgendamentoSiteController extends Controller
         }
 
         return response()->json($horarios);
+    }
+
+    /**
+     * Função usada para auxiliar o calendário de agendamento no Portal. Verifica quais dias entre d+1 ~ d+m
+     * não possuem horários disponíveis. Retorna um array de dias lotados para interface gráfica.
+     */
+    public function checaMes(Request $request)
+    {
+        $idregional = $request->idregional;
+
+        // Variável retornada pela função
+        $diasLotados = [];
+
+        // Recupera o número de agendamentos para cada dia entre d+1 d+m
+        $contagemAgendamentos = $this->agendamentoRepository->getAgendamentoPendenteByMesRegional($idregional);
+
+        // Recupera dados da regional
+        $regional = $this->regionalRepository->getById($idregional);
+        $agedamentoPorHorario = $regional->ageporhorario;
+
+        // Recupera bloqueios ativos para a regional
+        $bloqueios = $this->agendamentoBloqueioRepository->getByRegional($idregional);
+
+        $date = date('Y-m-d', strtotime('+1 day'));
+        $endDate = date('Y-m-d', strtotime('+1 month'));
+
+        // Iteramos d+1 ~ d+m, verificando quais dias não possuem horários disponíveis
+        while(strtotime($date) <= strtotime($endDate)) {  
+            
+            // Recupera os possíveis horários de agendamento da regional
+            $horarios = $regional->horariosAge();
+
+            // Verifica se existe bloqueios para a regional
+            if($bloqueios->count() != 0 && $horarios) {
+                foreach($bloqueios as $bloqueio) {
+                    if($date >= $bloqueio->diainicio && $date <=$bloqueio->diatermino) {
+                        foreach($horarios as $key => $horario) {
+                            if($horario >= $bloqueio->horainicio && $horario <= $bloqueio->horatermino) {
+                                // Caso exista bloqueios válidos, remove-se horários informados no bloqueio
+                                unset($horarios[$key]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Verificando se existe contagem de agendamento para o dia
+            if($contagemAgendamentos->contains('dia', '=', $date)) {
+
+                // Recupera informações sobre a contagem de agendamento
+                $contagem = $contagemAgendamentos->filter(function ($contagemAgendamento) use ($date) {
+                    return $contagemAgendamento->dia == $date;
+                })->first();
+
+
+                // Caso a contagem de agendamento seja igual ou maior ao [(número de agendamentos por horário) * (horários disponíveis para agendamento)]
+                // o dia em questão é considerado lotado e inserido no array de retorno dessa função
+                if($contagem->total >= $agedamentoPorHorario * count($horarios)) {
+                    $timestamp = strtotime($contagem->dia);
+                    array_push($diasLotados, array(date('m', $timestamp), date('d', $timestamp), 'lotado'));
+                }
+            }
+
+            // Se nenhuma contagem de agendamento existe para o dia, verifica se existe disponibilidade de horários nessa regional.
+            // Verificação necessária caso exista bloqueios que impendem agendamento em todos os horários
+            else {
+                if(count($horarios) == 0) {
+                    $timestamp = strtotime($date);
+                    array_push($diasLotados, array(date('m', $timestamp), date('d', $timestamp), 'lotado'));
+                }
+            }
+
+            $date = date('Y-m-d', strtotime("+1 day", strtotime($date)));
+        }
+
+        return response()->json($diasLotados);
     }
 }

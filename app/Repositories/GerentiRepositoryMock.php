@@ -32,6 +32,12 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
                 "EMAILS" => "desenvolvimento@core-sp.org.br"
             ];
         }
+        else {
+            $resultado = [
+                "SITUACAO" => "Inexistente", 
+                "EMAILS" => ""
+            ];
+        }
 
         $verificaEmail = explode(';', $resultado['EMAILS']);
 

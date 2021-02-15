@@ -102,6 +102,6 @@
       <script type="text/javascript" src="{{ asset('/js/app.js') }}"></script>
       <script type="text/javascript" src="{{ asset('/js/jquery-ui.min.js') }}"></script>
       <script type="text/javascript" src="{{ asset('/js/jquery.mask.js') }}"></script>
-      <script type="text/javascript" src="{{ asset('/js/custom.js') }}"></script>
+      <script type="text/javascript" src="{{ asset('/js/custom.js?'.time()) }}"></script>
     </body>
 </html>

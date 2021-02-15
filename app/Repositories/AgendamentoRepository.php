@@ -36,6 +36,16 @@ class AgendamentoRepository
             ->paginate(25);
     }
 
+    public function getToBuscaByRegional($criterio, $idRegional) 
+    {
+        return Agendamento::where('idregional', $idRegional)
+            ->where(function($query) use ($criterio) {
+                $query->where('cpf','LIKE','%' . $criterio . '%')
+                    ->orWhere('email','LIKE','%' . $criterio . '%')
+                    ->orWhere('protocolo','LIKE','%' . $criterio . '%');
+        })->paginate(25);
+    }
+
     public function update($id, $data, $agendamento = null) 
     {
         if($agendamento) {
@@ -127,6 +137,15 @@ class AgendamentoRepository
             ->count();
     }
 
+    public function getCountAgendamentoPendenteByCpfDayHour($dia, $hora, $cpf)
+    {
+        return Agendamento::where('dia', $dia)
+            ->where('hora', $hora)
+            ->where('cpf', $cpf)
+            ->whereNull('status')
+            ->count();
+    }
+    
     public function getAgendamentoPendeteByDiaHoraRegional($dia, $hora, $idregional)
     {
         return Agendamento::where('dia', $dia)
@@ -144,6 +163,16 @@ class AgendamentoRepository
             ->get();
     }
 
+    public function getAgendamentoPendenteByMesRegional($idregional)
+    {
+        return Agendamento::select('dia', DB::raw('count(1) as total'))        
+            ->whereBetween('dia',[date('Y-m-d', strtotime('+1 day')), date('Y-m-d', strtotime('+1 month'))])
+            ->where('idregional', $idregional)
+            ->whereNull('status')
+            ->groupBy('dia')
+            ->get();
+    }
+
     public function getToConsulta($protocolo)
     {
         return  Agendamento::where('protocolo', $protocolo)
@@ -156,7 +185,7 @@ class AgendamentoRepository
         return  Agendamento::where('protocolo', $protocolo)->count();
     }
    
-    public function getToTableFilter($mindia, $maxdia, $regional, $status)
+    public function getToTableFilter($mindia, $maxdia, $regional, $status, $servico)
     {
         $resultados = Agendamento::whereBetween('dia',[$mindia,$maxdia]);
 
@@ -166,6 +195,10 @@ class AgendamentoRepository
 
         if(!empty($status)) {
             $resultados->where('status', $status);
+        }
+
+        if(!empty($servico)) {
+            $resultados->where('tiposervico', $servico);
         }
 
         return $resultados->orderBy('idregional','ASC')
