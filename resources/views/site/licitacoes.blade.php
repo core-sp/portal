@@ -28,13 +28,13 @@
           <div class="linha-lg-mini"></div>
           <div class="form-row mb-2">
             <div class="col-md-4">
-              <label for="palavra-chave">Palavra-chave</label>
+              <label for="palavrachave">Palavra-chave</label>
               <input type="text"
-                name="palavra-chave"
-                class="form-control {{ !empty(Request::input('palavra-chave')) ? 'bg-focus border-info' : '' }}"
-                placeholder="Insira uma palavra-chave"
-                @if(!empty(Request::input('palavra-chave')))
-                value="{{ Request::input('palavra-chave') }}"
+                name="palavrachave"
+                class="form-control {{ !empty(Request::input('palavrachave')) ? 'bg-focus border-info' : '' }}"
+                placeholder="Insira uma palavrachave"
+                @if(!empty(Request::input('palavrachave')))
+                value="{{ Request::input('palavrachave') }}"
                 @endif
                 />
             </div>
@@ -103,7 +103,7 @@
           	</div>
             <div class="col-lg-4 col-md-12 align-self-end pesquisaLicitacao-btn">
               <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
-              <button type="reset" class="btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</button>
+              <a href="/licitacoes" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
             </div>
           </div>
         </form>
@@ -173,7 +173,11 @@
           </div>
           @endforeach
         @else
+        @if(isset($erro))
+        <p>{{ $erro }}</p>  
+        @else
         <p>Nenhuma licitação encontrada!</p>
+        @endif
         @endif
       </div>
     </div>

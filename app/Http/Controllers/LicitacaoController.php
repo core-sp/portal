@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Licitacao;
 use App\Events\CrudEvent;
+use Illuminate\Http\Request;
+use App\Traits\ControleAcesso;
 use App\Http\Requests\LicitacaoRequest;
 use App\Repositories\LicitacaoRepository;
-use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class LicitacaoController extends Controller
@@ -143,26 +144,37 @@ class LicitacaoController extends Controller
             ->header('Cache-Control','no-cache');
     }
 
-    public function siteBusca()
+    public function siteBusca(Request $request)
     {
-        // Refatorar
-        $licitacoes = $this->licitacaoRepository->getBuscaSite();
-        if (!empty(IlluminateRequest::input('palavra-chave'))
-            or !empty(IlluminateRequest::input('modalidade')) 
-            or !empty(IlluminateRequest::input('situacao')) 
-            or !empty(IlluminateRequest::input('nrlicitacao'))
-            or !empty(IlluminateRequest::input('nrprocesso'))
-            or !empty(IlluminateRequest::input('datarealizacao'))
-        ){
-            $busca = true;
-        } else {
-            $busca = false;
+        $buscaDia = $request->datarealizacao;
+
+        // Se nenhum critério foi fornecido, chama método que abre a tela inical de busca
+        if(empty($request->palavrachave) && empty($request->modalidade) && empty($request->situacao) && empty($request->nrlicitacao) && empty($request->nrprocesso) && empty($request->datarealizacao)) {
+            $this->siteGrid();
         }
-        if (count($licitacoes) > 0) {
-            return view('site.licitacoes', compact('licitacoes', 'busca'));
-        } else {
+
+        if(isset($buscaDia)) {
+            $diaArray = explode('/', $buscaDia);
+            $checaDia = (count($diaArray) != 3 || $diaArray[2] == null)  ? false : checkdate($diaArray[1], $diaArray[0], $diaArray[2]);
+
+            if($checaDia == false) {
+                $licitacoes = null;
+
+                return view('site.licitacoes', compact('licitacoes'))
+                    ->with('erro', 'Data fornecida é inválida');
+            }
+
+            $buscaDia = date('Y-m-d', strtotime(str_replace('/', '-', $buscaDia)));
+        }
+
+        $licitacoes = $this->licitacaoRepository->getBuscaSite($request->palavrachave, $request->modalidade, $request->situacao, $request->nrlicitacao, $request->nrprocesso, $buscaDia);
+
+        $busca = true;
+
+        if (count($licitacoes) == 0) {
             $licitacoes = null;
-            return view('site.licitacoes', compact('licitacoes', 'busca'));
-        }
+        } 
+
+        return view('site.licitacoes', compact('licitacoes', 'busca'));
     }
 }
