@@ -182,21 +182,16 @@ class ConcursoController extends Controller
 
     public function siteBusca(Request $request)
     {
-        //$this->validate($request, ["datarealizacao" => "date_format:d/m/Y"], ["datarealizacao.date_format" => "Data inválida",]);
-
-        $buscaModalidade = IlluminateRequest::input('modalidade');
-        $buscaSituacao = IlluminateRequest::input('situacao');
-        $buscaNrProcesso = IlluminateRequest::input('nrprocesso');
-        $buscaDia = IlluminateRequest::input('datarealizacao');
+        $buscaDia = $request->datarealizacao;
 
         // Se nenhum critério foi fornecido, chama método que abre a tela inical de busca
-        if(empty($buscaModalidade) && empty($buscaSituacao) && empty($buscaNrProcesso) && empty($buscaDia)) {
+        if(empty($request->modalidade) && empty($request->situacao) && empty($request->nrprocesso) && empty($request->datarealizacao)) {
             $this->siteGrid();
         }
 
         if(isset($buscaDia)) {
             $diaArray = explode('/', $buscaDia);
-            $checaDia = checkdate($diaArray[1], $diaArray[0], $diaArray[2]);
+            $checaDia = (count($diaArray) != 3 || $diaArray[2] == null)  ? false : checkdate($diaArray[1], $diaArray[0], $diaArray[2]);
 
             if($checaDia == false) {
                 $concursos = null;
@@ -208,7 +203,7 @@ class ConcursoController extends Controller
             $buscaDia = date('Y-m-d', strtotime(str_replace('/', '-', $buscaDia)));
         }
 
-        $concursos = $this->concursoRepository->getBuscaSite($buscaModalidade, $buscaSituacao, $buscaNrProcesso, $buscaDia);
+        $concursos = $this->concursoRepository->getBuscaSite($request->modalidade, $request->situacao, $request->nrprocesso, $buscaDia);
 
         $busca = true;
 

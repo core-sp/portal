@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Licitacao;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class LicitacaoRepository {
@@ -75,35 +76,34 @@ class LicitacaoRepository {
         return Licitacao::orderBy('created_at','DESC')->paginate(10);
     }
 
-    public function getBuscaSite()
+    public function getBuscaSite($buscaPalavraChave, $buscaModalidade, $buscaSituacao, $buscaNrLicitacao, $buscaNrProcesso, $buscaDia)
     {
-        // Refatorar
-        $buscaPalavraChave = html_entity_decode(IlluminateRequest::input('palavra-chave'));
-        $buscaPalavraChave = htmlentities($buscaPalavraChave);
-        $buscaModalidade = IlluminateRequest::input('modalidade');
-        $buscaSituacao = IlluminateRequest::input('situacao');
-        $buscaNrLicitacao = IlluminateRequest::input('nrlicitacao');
-        $buscaNrProcesso = IlluminateRequest::input('nrprocesso');
-        $dia = IlluminateRequest::input('datarealizacao');
-        if(isset($dia)) {
-            $diaArray = explode('/',$dia);
-            $checaDia = checkdate($diaArray[1], $diaArray[0], $diaArray[2]);
-            if($checaDia === false) {
-                echo "<script>alert('Data inválida'); window.location.href='/licitacoes'</script>";
-            }
-            $replace = str_replace('/','-',$dia);
-            $dia = new \DateTime($replace);
-            $buscaDataRealizacao = $dia->format('Y-m-d');
-        } else {
-            $buscaDataRealizacao = '';
+        $licitacoes = DB::table('licitacoes');
+
+        if(!empty($buscaPalavraChave)) {
+            $licitacoes->where('objeto', 'LIKE', '%'.$buscaPalavraChave.'%');
         }
-        return Licitacao::where('objeto','LIKE','%'.$buscaPalavraChave.'%')
-            ->where('modalidade','LIKE','%'.$buscaModalidade.'%')
-            ->where('situacao','LIKE','%'.$buscaSituacao.'%')
-            ->where('nrlicitacao','LIKE',$buscaNrLicitacao)
-            ->where('nrprocesso','LIKE',$buscaNrProcesso)
-            ->where('datarealizacao','LIKE','%'.$buscaDataRealizacao.'%')
-            ->orderBy('created_at','DESC')
-            ->paginate(10);
+
+        if(!empty($buscaModalidade)) {
+            $licitacoes->where('modalidade', $buscaModalidade);
+        }
+
+        if(!empty($buscaSituacao)) {
+            $licitacoes->where('situacao', $buscaSituacao);
+        }
+
+        if(!empty($buscaNrLicitacao)) {
+            $licitacoes->where('nrlicitacao', 'LIKE', '%'.$buscaNrLicitacao.'%');
+        }
+
+        if(!empty($buscaNrProcesso)) {
+            $licitacoes->where('nrprocesso', 'LIKE', '%'.$buscaNrProcesso.'%');
+        }
+
+        if(!empty($buscaDia)) {
+            $licitacoes->whereDate('datarealizacao', $buscaDia);
+        }
+
+        return $licitacoes->orderBy('datarealizacao', 'DESC')->paginate(10);
     }
 }
