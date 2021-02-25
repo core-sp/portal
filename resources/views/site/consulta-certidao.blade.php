@@ -71,8 +71,21 @@
               </div>
             </div>
 
-            <div class="form-row mt-2">
-              <div class="col-md-6">
+            <div class="form-row mt-3">
+            <div class="col-md-4">
+                <label for="numero">Número *</label>
+                <input type="text"
+                  class="form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
+                  name="numero"
+                  value="{{ old('numero') }}"
+                  />
+                @if($errors->has('numero'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('numero') }}
+                  </div>
+                @endif
+              </div>
+              <div class="col-md-4">
                 <label for="hora">Hora da emissão *</label>
                 <input type="text"
                   class="form-control horaInput {{ $errors->has('hora') ? 'is-invalid' : '' }}"
@@ -86,7 +99,7 @@
                   </div>
                 @endif
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <label for="data">Data da emissão *</label>
                 <input type="text"
                   class="form-control dataInput {{ $errors->has('data') ? 'is-invalid' : '' }}"

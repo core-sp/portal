@@ -339,22 +339,21 @@ class RepresentanteSiteController extends Controller
 
     public function emitirCertidaoView($tipo) 
     {
-        $codigo = null;
-
         switch($tipo) {
             case Certidao::REGULARIDADE:
                 $titulo = "Certidão de Regularidade";
-                $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Regularidade.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
+                $mensagem = "Clique no botão abaixo para verificar e emitir sua Certidão de Regularidade.</br>";
                 $emitir = true;
-                $reuso = false;
+                $certidoes = $this->gerentiRepository->gerentiListarCertidoes(Auth::guard('representante')->user()->ass_id, 11);
             break;
     
-            case Certidao::PARCELAMENTO:
-                $titulo = "Certidão de Parcelamento";
-                $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Parcelamento.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
-                $emitir = true;
-                $reuso = false;
-            break;
+            // Certidão de Parcelamento não será incluida na solução neste momento
+            // case Certidao::PARCELAMENTO:
+            //     $titulo = "Certidão de Parcelamento";
+            //     $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Parcelamento.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
+            //     $emitir = true;
+            //     $reuso = false;
+            // break;
     
             // Caso uma certidão inválida seja passada na URL, aborta com erro 404.
             default:
@@ -362,75 +361,122 @@ class RepresentanteSiteController extends Controller
             break;
         }
 
-        // Checa se existe alguma certidão que foi emitida nos últimos 30 dias.
-        $ultimaCertidao = $this->certidaoRepository->consultaCertidao(apenasNumeros(Auth::guard('representante')->user()->cpf_cnpj), $tipo);
-
-        if($ultimaCertidao) {
-            $codigo = $ultimaCertidao->codigo;
-
-            // Caso exista uma certidão que já foi emitida nos últimos 15 dias atrás, o Portal não deve permitir a emissão, apenas o download da certidão existente.
-            if($ultimaCertidao->data_emissao > date('Y-m-d', strtotime('-15 days'))) {
-                $mensagem = 'Representante Comercial emitiu uma certidão há menos de 15 dias e não pode emitir uma nova certidão, devendo reutilizar a última certidão emitida.</br>Por favor clique no botão abaixo para obter a última certidão.';
-                $emitir = false;
-                $reuso = true;
-            }
-            // Caso a certidão tenha mais de 15 dias, o Portal deve dar a opção de emitir uma nova, ou de retutilizar a existente.
-            else {
-                $mensagem = 'Representante Comercial emitiu uma certidão e esta ainda se encontra válida, caso queria reutilizar essa certidão, por favor clique no botão "Baixar" para obter a última certidão. </br>Caso deseje emitir uma nova, clique no botão "Emitir".';
-                $emitir = true;
-                $reuso = true;
-            }
-        }
-
-        return view("site.representante.emitir-certidao", compact("titulo", "mensagem", "emitir", "reuso", "codigo"));
+        return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir', 'certidoes'));
     }
     
     /**
-     * Reune dados do Representante Comercial para emitir a certidão.
+     * Verifica se é possível emitir a certidão. Em caso positivo, a certidão será gerada, caso contrário, uma mensagem de erro é retornada.
      */
     public function emitirCertidao($tipo) 
     {    
-        // Caso o código seja passado no lugar do tipo de certidão, deve-se baixar a certidão com esse código.
-        if(!in_array($tipo, Certidao::tipos())) {
-            return $this->certidaoController->baixarCertidao($tipo);
+        $verificaEmissao = $this->gerentiRepository->gerentiEmitirCertidao(Auth::guard('representante')->user()->ass_id);
+
+        //$dadosRepresentante = $this->recuperarDadosRC();
+
+        if($verificaEmissao[0] == 1) {
+            $numero = $verificaEmissao[1];
+            $codigo = $verificaEmissao[2];
+            $data = $verificaEmissao[3]; 
+            $hora = $verificaEmissao[4];
+            $dataValidade = $verificaEmissao[5];
+
+            $dadosRepresentante = [
+                'nome' => $verificaEmissao[6], 
+                // Formatar CPF/CNPJ
+                'cpf_cnpj' => $verificaEmissao[7],
+                'tipo_pessoa' => Auth::guard('representante')->user()->tipoPessoa(),
+                'registro_core' => $verificaEmissao[8],
+                'data_inscricao' => $verificaEmissao[9],
+                'email' => Auth::guard('representante')->user()->email,
+                'endereco' => $verificaEmissao[10]
+            ];
+
+
+            return $this->certidaoController->gerarCertidao(
+                $tipo,
+                $dadosRepresentante,
+                $numero,
+                $codigo,
+                $data,
+                $hora,
+                $dataValidade
+            );
         }
 
-        // Recupera dados do Representante Comercial.
-        $dadosGerenti = $this->gerentiRepository->gerentiDadosGerais(Auth::guard('representante')->user()->tipoPessoa(), Auth::guard('representante')->user()->ass_id);
+        else {
+            $mensagem = "Não foi possível emitir a Certidão de " . $tipo . ". Por favor entre em contato com o CORE-SP para mais informações.";
 
-        $dadosRepresentante = [
-            "nome" => Auth::guard('representante')->user()->nome, 
-            "cpf_cnpj" => Auth::guard('representante')->user()->cpf_cnpj,
-            "tipo_pessoa" => Auth::guard("representante")->user()->tipoPessoa(),
-            "registro_core" => Auth::guard('representante')->user()->registro_core,
-            "email" => Auth::guard('representante')->user()->email,
-            "situacao" => trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]),
-            "ativo" => $this->gerentiRepository->gerentiAtivo(apenasNumeros(Auth::guard('representante')->user()->cpf_cnpj))[0]["SITUACAO"] == Representante::ATIVO
-        ];
-        $dadosRepresentante["data_inscricao"] = $dadosGerenti["Data de início"];
+            // Geração de log externo registrando motivo da falha na emissão.
+            event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" - ' . $mensagem));
+            $titulo = "Falha ao emitir certidão";
 
-        if($dadosRepresentante["tipo_pessoa"] == Representante::PESSOA_JURIDICA) {
-            $dadosRepresentante["tipo_empresa"] = $dadosGerenti["Tipo de empresa"];
+            // Em caso de falha na validação, não permitir que o botão para e emitir seja mostrado na tela.
+            $emitir = false;
+            
+            // Atribui valor nulo para vetor de certidões para não mostrar certidões na tela de mensagem de erro.
+            $certidoes = null;
 
-            // Verifica se Representante Comercial PJ possui resposável técnico. Se sim, faz um parse e define em $dadosRepresentante.
-            if(!empty($dadosGerenti['Responsável técnico'])) {
-                $rt = explode('(', $dadosGerenti['Responsável técnico']);
-                $dadosRepresentante["resp_tecnico"] = trim($rt[0]);
-                $dadosRepresentante["resp_tecnico_registro_core"] = trim(str_replace(")", "",$rt[1]));
+            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir', 'certidoes'));
+        }
+    }
+
+    /**
+     * Método usado para baixar certidões já existente e ativas.
+     */
+    public function baixarCertidao(Request $request) 
+    {    
+        $certidoes = $this->gerentiRepository->gerentiListarCertidoes(Auth::guard('representante')->user()->ass_id, $request->tipo);
+
+        foreach($certidoes as $certidao) {
+            if($certidao['numero'] == $request->numero && $certidao['status'] == 'Ativa') {
+                return $this->certidaoController->baixarCertidao($request->numero);
             }
         }
 
-        // Recupera dados de endereço do Representante Comercial
-        $endereco = $this->gerentiRepository->gerentiEnderecoFormatado(Auth::guard('representante')->user()->ass_id);
+        $titulo = "Falha ao baixar certidão";
 
-        // Recupera dados de cobrança do Representante Comercial
-        $cobrancas = $this->gerentiRepository->gerentiCobrancas(Auth::guard('representante')->user()->ass_id);
+        $mensagem = "Não foi possível baixar a certidão";
 
-        return $this->certidaoController->verificaRegraCertidao(
-            $tipo,
-            $dadosRepresentante,
-            $endereco,
-            $cobrancas
-        );
+        // Em caso de falha na validação, não permitir que o botão para emitir seja mostrado na tela.
+        $emitir = false;
+        
+        // Atribui valor nulo para vetor de certidões para não mostrar certidões na tela de mensagem de erro.
+        $certidoes = null;
+
+        return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir', 'certidoes'));
     }
+
+
+    // // TODO_CERTIDAO - Essas informação serão fornecidas pelo GERENTI, apenas o e-mail que será utilizado deve ser o cadastrado no Portal.
+    // protected function recuperarDadosRC() 
+    // {  
+    //     // Recupera dados do Representante Comercial.
+    //     $dadosGerenti = $this->gerentiRepository->gerentiDadosGerais(Auth::guard('representante')->user()->tipoPessoa(), Auth::guard('representante')->user()->ass_id);
+
+    //     $dadosRepresentante = [
+    //         'nome' => Auth::guard('representante')->user()->nome, 
+    //         'cpf_cnpj' => Auth::guard('representante')->user()->cpf_cnpj,
+    //         'tipo_pessoa' => Auth::guard('representante')->user()->tipoPessoa(),
+    //         'registro_core' => Auth::guard('representante')->user()->registro_core,
+    //         'email' => Auth::guard('representante')->user()->email,
+    //         'situacao' => trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]),
+    //         'ativo' => $this->gerentiRepository->gerentiAtivo(apenasNumeros(Auth::guard('representante')->user()->cpf_cnpj))[0]['SITUACAO'] == Representante::ATIVO,
+    //         'endereco' => $this->gerentiRepository->gerentiEnderecoFormatado(Auth::guard('representante')->user()->ass_id)
+    //     ];
+
+    //     $dadosRepresentante['data_inscricao'] = $dadosGerenti['Data de início'];
+
+    //     if($dadosRepresentante['tipo_pessoa'] == Representante::PESSOA_JURIDICA) {
+    //         $dadosRepresentante['tipo_empresa'] = $dadosGerenti['Tipo de empresa'];
+
+    //         // Verifica se Representante Comercial PJ possui resposável técnico. Se sim, faz um parse e define em $dadosRepresentante.
+    //         if(!empty($dadosGerenti['Responsável técnico'])) {
+    //             $rt = explode('(', $dadosGerenti['Responsável técnico']);
+    //             $dadosRepresentante['resp_tecnico'] = trim($rt[0]);
+    //             $dadosRepresentante['resp_tecnico_registro_core'] = trim(str_replace(')', '', $rt[1]));
+    //         }
+    //     }
+
+    //     return $dadosRepresentante;
+    // }
 }

@@ -404,4 +404,71 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
 
         return $resultado;
     }
+
+    /**
+     * Verifica no GERENTI se é possível emitir uma certidão para o Representante Comercial de acordo com o ASS_ID. Em caso negativo, uma flag com o valor "0" será retornada.
+     * Em caso positivo, uma flag com o valor "1" será retornada juntamente com informações da certidão (número, código, data e hora da emissão)
+     * 
+     * Adicionar dois parametros (web user e tericero parametro nulo) na chamada da procedure original
+     */
+    public function gerentiEmitirCertidao($ass_id) 
+    {
+        return [
+            1,
+            2,
+            'abcde',
+            '01/01/2021',
+            '00:00',
+            '01/01/2022',
+            'RC Teste 1', 
+            '86294373085', 
+            '0000000001', 
+            '01/01/1999',
+            'Rua Teste'
+        ];
+    }
+
+    /**
+     * Recupera no GERENTI as certidões que foram emitidas para o Representante Comercial de acordo com o ASS_ID.
+     * 
+     * 11 - Regularidade?
+     * 12 - Parcelamento?
+     */
+    public function gerentiListarCertidoes($ass_id, $tipo) 
+    {
+        $resultado[0] = [
+            'numero' => '1',
+            'status' => 'Ativa',
+            'codigo' => '123456789',
+            'data' => '01/01/2021',
+            'hora' => '00:00',
+            'data_validade' => '01/01/2022',
+        ];
+
+        $resultado[1] = [
+            'numero' => '2',
+            'status' => 'Suspensa',
+            'codigo' => '987654321',
+            'data' => '02/02/2021',
+            'hora' => '00:00',
+            'data_validade' => '02/02/2022',
+        ];
+
+        return $resultado;
+    }
+
+    /**
+     * Verifica no GERENTI a autenticidade e validade de uma certidão. Retorna uma flag que indica as seguintes situações: "0" (inexistente), "1" (válida), "2" (suspensa), "3" (vencida).
+     * Caso a flag indique que certidão está válida, informações sobre o Representante Comercial serão retornadas (Nome, Registro, CPF_CNPJ, data de validade da certidão). 
+     */
+    public function gerentiAutenticaCertidao($numero, $codigo, $data, $hora) 
+    {
+        return [
+            0,
+            'RC teste 1',
+            '0000000001',
+            '86294373085',
+            '02/02/2022'
+        ];
+    }
 }
