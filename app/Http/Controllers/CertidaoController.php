@@ -46,7 +46,7 @@ class CertidaoController extends Controller
         Mail::to($dadosRepresentante["email"])->queue($email);
 
         // Log externo de emissão de certidão.
-        event(new ExternoEvent('CPF/CNPJ: "'. $dadosRepresentante["cpf_cnpj"] .'" emitiu Certidão de ' . $tipo . '.'));
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") emitiu Certidão de ' . $tipo . '.'));
 
         return $pdf->download("certidao.pdf");
     }

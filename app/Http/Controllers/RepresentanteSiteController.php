@@ -406,7 +406,7 @@ class RepresentanteSiteController extends Controller
             $mensagem = "Não foi possível emitir a Certidão de " . $tipo . ". Por favor entre em contato com o CORE-SP para mais informações.";
 
             // Geração de log externo registrando motivo da falha na emissão.
-            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão de ' . $tipo));
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir Certidão de ' . $tipo));
             $titulo = "Falha ao emitir certidão";
 
             // Em caso de falha na validação, não permitir que o botão para e emitir seja mostrado na tela.
