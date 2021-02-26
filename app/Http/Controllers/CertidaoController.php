@@ -9,6 +9,7 @@ use App\Mail\CertidaoMail;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Repositories\CertidaoRepository;
 use App\Http\Requests\ConsultaCertidaoRequest;
