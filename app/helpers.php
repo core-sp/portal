@@ -437,6 +437,14 @@ function formataCpfCnpj($value)
     }
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
 }
+
+function tipoPessoaCpfCnpj($cpf_cpnj)
+{
+    $cpf_cnpj_numero = apenasNumeros($cpf_cpnj);
+
+    return strlen($cpf_cnpj_numero) === 11 ? Representante::PESSOA_FISICA : Representante::PESSOA_JURIDICA;
+}
+
 /**
  * Função usada para remover caracteres não numéricos (CPF, CNPJ, Registro CORE e CEP).
  */
