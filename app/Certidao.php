@@ -55,7 +55,7 @@ class Certidao extends Model
                     $declaracao .= 'Tendo como Responsável Técnico o(a) sr.(a) <b>' . $dadosRepresentante['resp_tecnico'] . ',</b> registrado(a) sob o número <b>' . $dadosRepresentante['resp_tecnico_registro_core'] . '.</b> '; 
                 }
 
-                $declaracao .= 'A mencionada empresa pagou contribuições a este Conselho Regional</p>';
+                $declaracao .= ' A mencionada empresa pagou contribuições a este Conselho Regional.</p>';
             break;
         }
 
