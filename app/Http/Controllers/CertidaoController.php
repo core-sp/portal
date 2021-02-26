@@ -56,8 +56,6 @@ class CertidaoController extends Controller
      */
     public function baixarCertidao($numero) 
     {
-        $teste = Certidao::where('numero', $numero)->first();
-
         $certidao = $this->certidaoRepository->recuperaCertidao($numero);
 
         $declaracao = $certidao->declaracao;

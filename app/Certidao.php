@@ -35,12 +35,6 @@ class Certidao extends Model
      */
     public static function declaracaoRegularidade($dadosRepresentante, $numero, $codigo, $data, $hora, $dataValidade) 
     {
-        setlocale(LC_TIME, 'pt_BR.utf8');
-        $dataEmissao = [
-            'mes' => strftime('%B', strtotime($data)),
-            'ano' => strftime('%Y', strtotime($data))
-        ];
-
         $dataFormatada = date('d/m/Y', strtotime($data));
         $dataValidadeFormatada = date('d/m/Y', strtotime($dataValidade));
 
@@ -50,18 +44,18 @@ class Certidao extends Model
         switch($dadosRepresentante['tipo_pessoa']) {
             case Representante::PESSOA_FISICA:
                 // Texto da certidão para PF
-                $declaracao .=  '<p class="texto-certidao"><span class="tab">O <b>CORE-SP</b> certifica, atendendo ao requerimento do interessado, para fins de documentar-se, que revendo os assentamentos do Serviço de Registro, consta registrado(a), como pessoa natural, o(a) Sr(a). <b>' . $dadosRepresentante['nome'] . ',</b> sob o nº <b>' . $dadosRepresentante['registro_core'] . ',</b> desde <b>' . $dadosRepresentante['data_inscricao'] . ',</b> inscrito(a) no CPF/MF sob o nº <b>' . $dadosRepresentante['cpf_cnpj'] . ',</b> residente na <b>' . $dadosRepresentante['endereco']  . '.</b> O(A) referido(a) Representante Comercial pagou contribuições a este Conselho Regional até o mês de <b>' . $dataEmissao['mes'] . '</b> de <b>' . $dataEmissao['ano'] . '.</b></p>';
+                $declaracao .=  '<p class="texto-certidao"><span class="tab">O <b>CORE-SP</b> certifica, atendendo ao requerimento do interessado, para fins de documentar-se, que revendo os assentamentos do Serviço de Registro, consta registrado(a), como pessoa natural, o(a) Sr(a). <b>' . $dadosRepresentante['nome'] . ',</b> sob o nº <b>' . $dadosRepresentante['registro_core'] . ',</b> desde <b>' . $dadosRepresentante['data_inscricao'] . ',</b> inscrito(a) no CPF/MF sob o nº <b>' . $dadosRepresentante['cpf_cnpj'] . ',</b> residente na <b>' . $dadosRepresentante['endereco']  . '.</b> O(A) referido(a) Representante Comercial pagou contribuições a este Conselho Regional.</p>';
             break;
 
             case Representante::PESSOA_JURIDICA:
                 // Texto da certidão para PJ
-                $declaracao .= '<p class="texto-certidao"><span class="tab">O <b>CORE-SP</b> certifica, atendendo ao requerimento do(a) interessado(a), para fins de documentar-se, que, revendo os assentamentos do Serviço de Registro, deles consta registrada como <b>' . $dadosRepresentante['tipo_empresa'] . ' - ' . $dadosRepresentante['nome'] . ',</b> sob o nº <b>' . $dadosRepresentante['registro_core'] . ',</b> desde de <b>' . $dadosRepresentante['data_inscricao'] . ',</b> inscrita no CNPJ sob o nº <b>' . $dadosRepresentante['cpf_cnpj'] . ',</b> com sede na <b>' . $dadosRepresentante['endereco']  . '.</b></p>';
+                $declaracao .= '<p class="texto-certidao"><span class="tab">O <b>CORE-SP</b> certifica, atendendo ao requerimento do(a) interessado(a), para fins de documentar-se, que, revendo os assentamentos do Serviço de Registro, deles consta registrada como <b>' . $dadosRepresentante['tipo_empresa'] . ' - ' . $dadosRepresentante['nome'] . ',</b> sob o nº <b>' . $dadosRepresentante['registro_core'] . ',</b> desde de <b>' . $dadosRepresentante['data_inscricao'] . ',</b> inscrita no CNPJ sob o nº <b>' . $dadosRepresentante['cpf_cnpj'] . ',</b> com sede na <b>' . $dadosRepresentante['endereco']  . '.</b>';
   
                 if(!empty($dadosRepresentante['resp_tecnico'])) {
                     $declaracao .= 'Tendo como Responsável Técnico o(a) sr.(a) <b>' . $dadosRepresentante['resp_tecnico'] . ',</b> registrado(a) sob o número <b>' . $dadosRepresentante['resp_tecnico_registro_core'] . '.</b> '; 
                 }
 
-                $declaracao .= 'A mencionada empresa pagou contribuições a este Conselho Regional até o mês de <b>' . $dataEmissao['mes'] . '</b> de <b>' . $dataEmissao['ano'] . '.</b>';
+                $declaracao .= 'A mencionada empresa pagou contribuições a este Conselho Regional</p>';
             break;
         }
 

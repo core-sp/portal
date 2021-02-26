@@ -424,7 +424,7 @@ class RepresentanteSiteController extends Controller
         $certidoes = $this->gerentiRepository->gerentiListarCertidoes(Auth::guard('representante')->user()->ass_id, $request->tipo);
 
         foreach($certidoes as $certidao) {
-            if($certidao['numero'] == $request->numero && $certidao['status'] == 'Ativa') {
+            if($certidao['NUMERO'] == $request->numero && trim($certidao['SITUACAO']) == 'Ativa') {
                 return $this->certidaoController->baixarCertidao($request->numero);
             }
         }

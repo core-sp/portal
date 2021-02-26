@@ -59,7 +59,7 @@
               <div class="col-md-12">
                 <label for="codigo">Código *</label>
                 <input type="text"
-                  class="form-control codigo_certidao {{ $errors->has('codigo') ? 'is-invalid' : '' }}"
+                  class="form-control {{ $errors->has('codigo') ? 'is-invalid' : '' }}"
                   name="codigo"
                   value="{{ old('codigo') }}"
                 />
@@ -90,7 +90,7 @@
                 <input type="text"
                   class="form-control horaInput {{ $errors->has('hora') ? 'is-invalid' : '' }}"
                   name="hora"
-                  placeholder="hh:mm"
+                  placeholder="hh:mm:ss"
                   value="{{ old('hora') }}"
                   />
                 @if($errors->has('hora'))

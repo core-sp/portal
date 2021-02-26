@@ -12,7 +12,7 @@ $(document).ready(function(){
 	$('.numeroInput').mask('99');
 	$('.cep').mask('00000-000');
 	$('.codigo_certidao').mask('AAAAAAAA - AAAAAAAA - AAAAAAAA - AAAAAAAA');
-  	$('.horaInput').mask('00:00');
+  	$('.horaInput').mask('00:00:00');
 	$('.numero').mask('ZZZZZZZZZZ', {
 		translation: {
 			'Z': {
