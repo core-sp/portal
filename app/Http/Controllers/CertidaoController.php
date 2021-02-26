@@ -81,8 +81,8 @@ class CertidaoController extends Controller
             $certidao = $this->certidaoRepository->recuperaCertidao($request->numero);
 
             $resultado = '<p>Nome: ' . $certidao->nome . '</p>';
-            $resultado .= '<p>Registro: ' . $certidao->registro . '</p>';
-            $resultado .= '<p>CPF/CNPJ: ' . $certidao->cpf_cnpj  . '</p>';
+            $resultado .= '<p>Registro: ' . $certidao->registro_core . '</p>';
+            $resultado .= '<p>CPF/CNPJ: ' . formataCpfCnpj($certidao->cpf_cnpj)  . '</p>';
             $resultado .= '<p>Data de validade da certidão: ' . date('d/m/Y', strtotime($autenticaCertidao['DATAVALIDADE'])) . '</p>';
         }
         // Caso os dados fornecidos não sejam autenticados pelo GERENTI, mostra uma mensagem de erro
