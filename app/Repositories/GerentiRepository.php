@@ -364,7 +364,7 @@ class GerentiRepository implements GerentiRepositoryInterface
 
         $this->gerentiConnection->getPDO()->commit();
 
-        return $resultado[0];
+        return utf8_converter($resultado)[0];
     }
 
     /** 
@@ -385,7 +385,7 @@ class GerentiRepository implements GerentiRepositoryInterface
             'TIPO' => $tipo
         ]);
 
-        return $run->fetchAll(PDO::FETCH_ASSOC);
+        return utf8_converter($run->fetchAll(PDO::FETCH_ASSOC));
     }
 
     /**
@@ -407,6 +407,6 @@ class GerentiRepository implements GerentiRepositoryInterface
 
         $resultado = $run->fetchAll(PDO::FETCH_ASSOC);
 
-        return $resultado[0];
+        return utf8_converter($resultado)[0];
     }
 }

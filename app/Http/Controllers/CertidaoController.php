@@ -75,10 +75,10 @@ class CertidaoController extends Controller
         $autenticaCertidao = $this->gerentiRepository->gerentiAutenticaCertidao($request->numero, $request->codigo, $request->hora, date('Y-m-d', strtotime(str_replace('/', '-', $request->data))));
 
         // Caso a certidão seja autenticada pelo GERENTI, mostramos os dados retornados pelo GERENTI
-        if($autenticaCertidao['SITUACAO'] == 1) {
+        if($autenticaCertidao['SITUACAO'] == 'Válida') {
             $autenticado = true;
 
-            $certidao = $this->certidaoRepository->recuperaCertidao($numero);
+            $certidao = $this->certidaoRepository->recuperaCertidao($request->numero);
 
             $resultado = '<p>Nome: ' . $certidao->nome . '</p>';
             $resultado .= '<p>Registro: ' . $certidao->registro . '</p>';
