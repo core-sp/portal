@@ -72,7 +72,7 @@ class CertidaoController extends Controller
     public function consulta(ConsultaCertidaoRequest $request)
     {
         // Autentica a certidão no GERENTI
-        $autenticaCertidao = $this->gerentiRepository->gerentiAutenticaCertidao($request->numero, $request->codigo, $request->hora, date('Y-m-d', strtotime($request->data)));
+        $autenticaCertidao = $this->gerentiRepository->gerentiAutenticaCertidao($request->numero, $request->codigo, $request->hora, date('Y-m-d', strtotime(str_replace('/', '-', $request->data))));
 
         // Caso a certidão seja autenticada pelo GERENTI, mostramos os dados retornados pelo GERENTI
         if($autenticaCertidao['SITUACAO'] == 1) {
