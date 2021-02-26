@@ -380,7 +380,7 @@ class RepresentanteSiteController extends Controller
 
             $dadosRepresentante = [
                 'nome' => $verificaEmissao['NOME'], 
-                'cpf_cnpj' => $verificaEmissao['CPFCNPJ'],
+                'cpf_cnpj' => formataCpfCnpj($verificaEmissao['CPFCNPJ']),
                 'tipo_pessoa' => tipoPessoaCpfCnpj($verificaEmissao['CPFCNPJ']),
                 'registro_core' => $verificaEmissao['REGISTRO'],
                 'data_inscricao' => date('d/m/Y', strtotime($verificaEmissao['DATAREGISTRO'])),
