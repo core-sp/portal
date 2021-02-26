@@ -338,31 +338,75 @@ class GerentiRepository implements GerentiRepositoryInterface
         return $run->fetchAll();
     }
 
-    /** TODO_CERTIDAO - realizar integração com GERENTI
-     * Verifica no GERENTI se é possível emitir uma certidão para o Representante Comercial de acordo com o ASS_ID. Em caso negativo, uma flag com o valor "0" será retornada.
-     * Em caso positivo, uma flag com o valor "1" será retornada juntamente com informações da certidão (número, código, data e hora da emissão)
+    /** 
+     * Verifica no GERENTI se é possível emitir uma certidão para o Representante Comercial de acordo com o ASS_ID e o tipo de certidão. Em caso negativo, uma flag com o valor "0" será retornada.
+     * Em caso positivo, uma flag com o valor "1" será retornada juntamente com informações da certidão (número, código, data e hora da emissão) e do Representante Comercial.
      * 
-     * Adicionar dois parametros (web user e tericero parametro nulo) na chamada da procedure original
+     * Códigos do tipo:
+     *  11 - Regularidade
+     *  12 - Parcelamento?
      */
-    public function gerentiEmitirCertidao($ass_id) 
+    public function gerentiEmitirCertidao($ass_id, $tipo) 
     {
+        $this->connect();
+
+        $run = $this->gerentiConnection->getPDO()->beginTransaction();
+
+        $run = $this->gerentiConnection->prepare('select EMISSAO, NUMERO, DATAEMISSAO, HORA, CODVALIDACAO, DATAVALIDADE, NOME, REGISTRO, CPFCNPJ, DATAREGISTRO, TIPOEMPRESA, RESPTECNICOS, REGISTROSRTS, ENDERECOCOMPLETO
+        from PROCNOVACERTIDAO(:ASS_ID, 210, null, :TIPO)');
+        
+        $run->execute([
+            'ASS_ID' => $ass_id,
+            'TIPO' => $tipo
+        ]);
+
+        $resultado = $run->fetchAll(PDO::FETCH_ASSOC);
+
+        $this->gerentiConnection->getPDO()->commit();
+
+        return $resultado[0];
     }
 
-    /** TODO_CERTIDAO - realizar integração com GERENTI
-     * Recupera no GERENTI as certidões que foram emitidas para o Representante Comercial de acordo com o ASS_ID.
+    /** 
+     * Recupera no GERENTI as certidões que foram emitidas para o Representante Comercial de acordo com o ASS_ID e o tipo.
      * 
-     * 11 - Regularidade?
-     * 12 - Parcelamento?
+     * Códigos do tipo:
+     *  11 - Regularidade
+     *  12 - Parcelamento?
      */
     public function gerentiListarCertidoes($ass_id, $tipo) 
     {
+        $this->connect();
+
+        $run = $this->gerentiConnection->prepare('select SITUACAO, NUMERO, DATAEMISSAO, HORAEMISSAO, CODVALIDACAO, VALIDADE from PROCLISTACERTIDOES(:ASS_ID, :TIPO)');
+        
+        $run->execute([
+            'ASS_ID' => $ass_id,
+            'TIPO' => $tipo
+        ]);
+
+        return $run->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** TODO_CERTIDAO - realizar integração com GERENTI
+    /**
      * Verifica no GERENTI a autenticidade e validade de uma certidão. Retorna uma flag que indica as seguintes situações: "0" (inexistente), "1" (válida), "2" (suspensa), "3" (vencida).
      * Caso a flag indique que certidão está válida, informações sobre o Representante Comercial serão retornadas (Nome, Registro, CPF_CNPJ, data de validade da certidão). 
      */
-    public function gerentiAutenticaCertidao($numero, $codigo, $data, $hora) 
+    public function gerentiAutenticaCertidao($numero, $codigo, $hora, $data) 
     {
+        $this->connect();
+
+        $run = $this->gerentiConnection->prepare('select SITUACAO, DATAVALIDADE from PROCCONSULTACODVALIDACAO(:CODVALIDACAO, :NUMERO, :DATAEMISSAO, :HORAEMISSAO)');
+        
+        $run->execute([
+            'CODVALIDACAO' => $codigo,
+            'NUMERO' => $numero,
+            'DATAEMISSAO' => $data,
+            'HORAEMISSAO' => $hora
+        ]);
+
+        $resultado = $run->fetchAll(PDO::FETCH_ASSOC);
+
+        return $resultado[0];
     }
 }

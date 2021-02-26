@@ -15,6 +15,10 @@ class Certidao extends Model
     const REGULARIDADE = 'Regularidade';
     const PARCELAMENTO = 'Parcelamento';
 
+    // Códigos usados no GERENTI (parcelamento ainda não implementado) 
+    const COD_REGULARIDADE = 11;
+    const COD_PARCELAMENTO = 0;
+
     /**
      * Método que retorna todos os tipos de certidões.
      */
@@ -26,24 +30,6 @@ class Certidao extends Model
         ];
     }
 
-    // /**
-    //  * Formata o código da Certidão para XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX.
-    //  */
-    // public function codigoFormatado() 
-    // {
-    //     if(isset($this->codigo)) {
-    //         $codigoFormatado = substr($this->codigo, 0, 8);
-
-    //         for ($i = 8; $i < strlen($this->codigo); $i = $i+8) {
-    //             $codigoFormatado .= "-";
-
-    //             $codigoFormatado .= substr($this->codigo, $i, 8);
-    //         }
-    //     }
-
-    //     return $codigoFormatado;
-    // }
-
     /**
      * Gera declaração da certidão de Regularidade (para o PDF).
      */
@@ -54,6 +40,9 @@ class Certidao extends Model
             'mes' => strftime('%B', strtotime($data)),
             'ano' => strftime('%Y', strtotime($data))
         ];
+
+        $dataFormatada = date('d/m/Y', strtotime($data));
+        $dataValidadeFormatada = date('d/m/Y', strtotime($dataValidade));
 
         // Título da certidão
         $declaracao = '<h1 class="centro">Certidão de Reguralidade</h1>';

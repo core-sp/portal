@@ -36,7 +36,7 @@ class CertidaoController extends Controller
         //     $declaracao = Certidao::declaracaoParcelamento($dadosRepresentante, $numero, $codigo, $data, $hora);
         // }
 
-        $certidao = $this->certidaoRepository->store($tipo, $declaracao, $numero, $codigo, $data, $hora, $dataValidade);
+        $certidao = $this->certidaoRepository->store($tipo, $declaracao, $numero, $codigo, $data, $hora, $dataValidade, $dadosRepresentante);
 
         // Cria o PDF usando a view de acordo com o tipo de pessoa.
         $pdf = $pdf = PDF::loadView("certidoes.certidao", compact("declaracao"));
@@ -74,16 +74,18 @@ class CertidaoController extends Controller
     public function consulta(ConsultaCertidaoRequest $request)
     {
         // Autentica a certidão no GERENTI
-        $autenticaCertidao = $this->gerentiRepository->gerentiAutenticaCertidao($request->numero, $request->codigo, $request->hora, $request->data);
+        $autenticaCertidao = $this->gerentiRepository->gerentiAutenticaCertidao($request->numero, $request->codigo, $request->hora, date('Y-m-d', strtotime($request->data)));
 
         // Caso a certidão seja autenticada pelo GERENTI, mostramos os dados retornados pelo GERENTI
-        if($autenticaCertidao[0] == 1) {
+        if($autenticaCertidao['SITUACAO'] == 1) {
             $autenticado = true;
 
-            $resultado = '<p>Nome: ' . $autenticaCertidao[1] . '</p>';
-            $resultado .= '<p>Registro: ' . $autenticaCertidao[2] . '</p>';
-            $resultado .= '<p>CPF/CNPJ: ' . $autenticaCertidao[3] . '</p>';
-            $resultado .= '<p>Data de validade da certidão: ' . $autenticaCertidao[4] . '</p>';
+            $certidao = $this->certidaoRepository->recuperaCertidao($numero);
+
+            $resultado = '<p>Nome: ' . $certidao->nome . '</p>';
+            $resultado .= '<p>Registro: ' . $certidao->registro . '</p>';
+            $resultado .= '<p>CPF/CNPJ: ' . $certidao->cpf_cnpj  . '</p>';
+            $resultado .= '<p>Data de validade da certidão: ' . date('d/m/Y', strtotime($autenticaCertidao['DATAVALIDADE'])) . '</p>';
         }
         // Caso os dados fornecidos não sejam autenticados pelo GERENTI, mostra uma mensagem de erro
         else {

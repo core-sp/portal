@@ -23,10 +23,10 @@
             @forelse ($certidoes as $certidao)
             <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
                 <p class="pb-0">
-                    Número: {{ $certidao['numero']}}
-                    <small class="light">({{ $certidao['status'] }})</small>
+                    Número: {{ $certidao['NUMERO']}}
+                    <small class="light">({{ $certidao['SITUACAO'] }})</small>
                 </p>
-                @if($certidao['status'] == 'Ativa')
+                @if($certidao['SITUACAO'] == 'Ativa')
                 <div class="contato-btns">
                     <form action="{{ route('representante.baixarCertidao') }}" method="GET" class="d-inline">
                         @csrf

@@ -409,7 +409,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
      * Verifica no GERENTI se é possível emitir uma certidão para o Representante Comercial de acordo com o ASS_ID. Em caso negativo, uma flag com o valor "0" será retornada.
      * Em caso positivo, uma flag com o valor "1" será retornada juntamente com informações da certidão (número, código, data e hora da emissão)
      * 
-     * Adicionar dois parametros (web user e tericero parametro nulo) na chamada da procedure original
+     * Adicionar três parametros (web user, tericero parametro nulo e o tipo) na chamada da procedure original
      */
     public function gerentiEmitirCertidao($ass_id) 
     {

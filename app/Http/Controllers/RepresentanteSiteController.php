@@ -344,7 +344,7 @@ class RepresentanteSiteController extends Controller
                 $titulo = "Certidão de Regularidade";
                 $mensagem = "Clique no botão abaixo para verificar e emitir sua Certidão de Regularidade.</br>";
                 $emitir = true;
-                $certidoes = $this->gerentiRepository->gerentiListarCertidoes(Auth::guard('representante')->user()->ass_id, 11);
+                $certidoes = $this->gerentiRepository->gerentiListarCertidoes(Auth::guard('representante')->user()->ass_id, Certidao::COD_REGULARIDADE);
             break;
     
             // Certidão de Parcelamento não será incluida na solução neste momento
@@ -369,28 +369,24 @@ class RepresentanteSiteController extends Controller
      */
     public function emitirCertidao($tipo) 
     {    
-        $verificaEmissao = $this->gerentiRepository->gerentiEmitirCertidao(Auth::guard('representante')->user()->ass_id);
+        $verificaEmissao = $this->gerentiRepository->gerentiEmitirCertidao(Auth::guard('representante')->user()->ass_id, Certidao::COD_REGULARIDADE);
 
-        //$dadosRepresentante = $this->recuperarDadosRC();
-
-        if($verificaEmissao[0] == 1) {
-            $numero = $verificaEmissao[1];
-            $codigo = $verificaEmissao[2];
-            $data = $verificaEmissao[3]; 
-            $hora = $verificaEmissao[4];
-            $dataValidade = $verificaEmissao[5];
+        if($verificaEmissao['EMISSAO'] == 1) {
+            $numero = $verificaEmissao['NUMERO'];
+            $codigo = $verificaEmissao['CODVALIDACAO'];
+            $data = date('d/m/Y', strtotime($verificaEmissao['DATAEMISSAO'])); 
+            $hora = $verificaEmissao['HORA'];
+            $dataValidade = date('d/m/Y', strtotime($verificaEmissao['DATAVALIDADE']));
 
             $dadosRepresentante = [
-                'nome' => $verificaEmissao[6], 
-                // Formatar CPF/CNPJ
-                'cpf_cnpj' => $verificaEmissao[7],
+                'nome' => $verificaEmissao['NOME'], 
+                'cpf_cnpj' => $verificaEmissao['CPFCNPJ'],
                 'tipo_pessoa' => Auth::guard('representante')->user()->tipoPessoa(),
-                'registro_core' => $verificaEmissao[8],
-                'data_inscricao' => $verificaEmissao[9],
+                'registro_core' => $verificaEmissao['REGISTRO'],
+                'data_inscricao' => date('d/m/Y', strtotime($verificaEmissao['DATAREGISTRO'])),
                 'email' => Auth::guard('representante')->user()->email,
-                'endereco' => $verificaEmissao[10]
+                'endereco' => $verificaEmissao['ENDERECOCOMPLETO']
             ];
-
 
             return $this->certidaoController->gerarCertidao(
                 $tipo,
@@ -445,38 +441,4 @@ class RepresentanteSiteController extends Controller
 
         return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir', 'certidoes'));
     }
-
-
-    // // TODO_CERTIDAO - Essas informação serão fornecidas pelo GERENTI, apenas o e-mail que será utilizado deve ser o cadastrado no Portal.
-    // protected function recuperarDadosRC() 
-    // {  
-    //     // Recupera dados do Representante Comercial.
-    //     $dadosGerenti = $this->gerentiRepository->gerentiDadosGerais(Auth::guard('representante')->user()->tipoPessoa(), Auth::guard('representante')->user()->ass_id);
-
-    //     $dadosRepresentante = [
-    //         'nome' => Auth::guard('representante')->user()->nome, 
-    //         'cpf_cnpj' => Auth::guard('representante')->user()->cpf_cnpj,
-    //         'tipo_pessoa' => Auth::guard('representante')->user()->tipoPessoa(),
-    //         'registro_core' => Auth::guard('representante')->user()->registro_core,
-    //         'email' => Auth::guard('representante')->user()->email,
-    //         'situacao' => trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]),
-    //         'ativo' => $this->gerentiRepository->gerentiAtivo(apenasNumeros(Auth::guard('representante')->user()->cpf_cnpj))[0]['SITUACAO'] == Representante::ATIVO,
-    //         'endereco' => $this->gerentiRepository->gerentiEnderecoFormatado(Auth::guard('representante')->user()->ass_id)
-    //     ];
-
-    //     $dadosRepresentante['data_inscricao'] = $dadosGerenti['Data de início'];
-
-    //     if($dadosRepresentante['tipo_pessoa'] == Representante::PESSOA_JURIDICA) {
-    //         $dadosRepresentante['tipo_empresa'] = $dadosGerenti['Tipo de empresa'];
-
-    //         // Verifica se Representante Comercial PJ possui resposável técnico. Se sim, faz um parse e define em $dadosRepresentante.
-    //         if(!empty($dadosGerenti['Responsável técnico'])) {
-    //             $rt = explode('(', $dadosGerenti['Responsável técnico']);
-    //             $dadosRepresentante['resp_tecnico'] = trim($rt[0]);
-    //             $dadosRepresentante['resp_tecnico_registro_core'] = trim(str_replace(')', '', $rt[1]));
-    //         }
-    //     }
-
-    //     return $dadosRepresentante;
-    // }
 }

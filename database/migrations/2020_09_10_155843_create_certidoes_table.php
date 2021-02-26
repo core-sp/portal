@@ -14,7 +14,10 @@ class CreateCertidoesTable extends Migration
     public function up()
     {
         Schema::create('certidoes', function (Blueprint $table) {
-            $table->bigInteger('numero');
+            $table->string('numero');
+            $table->string('nome');
+            $table->string('cpf_cnpj');
+            $table->string('registro_core');
             $table->string('tipo');
             $table->string('codigo');
             $table->text('declaracao');

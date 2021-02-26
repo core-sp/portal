@@ -7,13 +7,15 @@ use App\Certidao;
 class CertidaoRepository 
 {
     /**
-     * Método salva a certidão e gera um código para a mesma.
+     * Método salva a certidão.
      */
-    public function store($tipo, $declaracao, $numero, $codigo, $data, $hora, $dataValidade)
+    public function store($tipo, $declaracao, $numero, $codigo, $data, $hora, $dataValidade, $dadosRepresentante)
     {
-        // Certidão é criada no banco primeiro para obter gerar a data de emissão e o ID.
         $certidao = Certidao::create([
             'tipo' => $tipo,
+            'nome' => $dadosRepresentante['nome'],
+            'cpf_cnpj' => $dadosRepresentante['cpf_cnpj'],
+            'registro_core' => $dadosRepresentante['registro_core'],
             'declaracao' => $declaracao,
             'numero' => $numero,
             'codigo' =>  $codigo,
