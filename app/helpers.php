@@ -1,5 +1,6 @@
 <?php
 
+use App\Representante;
 use App\Repositories\PermissaoRepository;
 
 function badgeConsulta($situacao)

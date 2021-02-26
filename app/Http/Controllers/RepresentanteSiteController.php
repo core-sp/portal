@@ -385,7 +385,10 @@ class RepresentanteSiteController extends Controller
                 'registro_core' => $verificaEmissao['REGISTRO'],
                 'data_inscricao' => date('d/m/Y', strtotime($verificaEmissao['DATAREGISTRO'])),
                 'email' => Auth::guard('representante')->user()->email,
-                'endereco' => $verificaEmissao['ENDERECOCOMPLETO']
+                'endereco' => $verificaEmissao['ENDERECOCOMPLETO'],
+                'tipo_empresa' => $verificaEmissao['TIPOEMPRESA'],
+                'resp_tecnico' => $verificaEmissao['RESPTECNICOS'],
+                'resp_tecnico_registro_core' => $verificaEmissao['REGISTROSRTS']
             ];
 
             return $this->certidaoController->gerarCertidao(
