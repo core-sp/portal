@@ -10,9 +10,9 @@ class ConsultaCertidaoRequest extends FormRequest
     public function rules()
     {
         return [
-            'codigo' => 'required|min:32',
+            'codigo' => 'required',
             'numero' => 'required',
-            'hora' => 'required|date_format:H:i',
+            'hora' => 'required|date_format:H:i:s',
             'data' => 'required|date_format:d/m/Y',
             'g-recaptcha-response' => [new RecaptchaRequired, 'recaptcha']
         ];

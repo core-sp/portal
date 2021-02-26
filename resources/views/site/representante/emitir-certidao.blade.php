@@ -26,7 +26,7 @@
                     <b>Número:</b> {{ $certidao['NUMERO']}}
                     <small class="light">({{ $certidao['SITUACAO'] }})</small>
                 </p>
-                @if($certidao['SITUACAO'] == 'Ativa')
+                @if(trim($certidao['SITUACAO']) == 'Ativa')
                 <div class="contato-btns">
                     <form action="{{ route('representante.baixarCertidao') }}" method="GET" class="d-inline">
                         @csrf
