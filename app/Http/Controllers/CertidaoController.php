@@ -37,10 +37,12 @@ class CertidaoController extends Controller
         //     $declaracao = Certidao::declaracaoParcelamento($dadosRepresentante, $numero, $codigo, $data, $hora);
         // }
 
-        $certidao = $this->certidaoRepository->store($tipo, $declaracao, $numero, $codigo, $data, $hora, $dataValidade, $dadosRepresentante);
+        $dataFormatada = date('d/m/Y', strtotime($data));
+
+        $certidao = $this->certidaoRepository->store($tipo, $declaracao, $numero, $codigo, $dataFormatada, $hora, $dataValidade, $dadosRepresentante);
 
         // Cria o PDF usando a view de acordo com o tipo de pessoa.
-        $pdf = $pdf = PDF::loadView("certidoes.certidao", compact("declaracao"));
+        $pdf = $pdf = PDF::loadView("certidoes.certidao", compact('declaracao', 'numero', 'codigo', 'data', 'hora'));
 
         // Envio de e-mail com o PDF.
         $email = new CertidaoMail($pdf->output());
@@ -60,10 +62,13 @@ class CertidaoController extends Controller
         $certidao = $this->certidaoRepository->recuperaCertidao($numero);
 
         $declaracao = $certidao->declaracao;
+        $codigo = $certidao->codigo;
+        $data = date('d/m/Y', strtotime($certidao->data_emissao));
+        $hora = $certidao->hora_emissao;
 
-        $pdf = PDF::loadView("certidoes.certidao", compact("declaracao"));
+        $pdf = PDF::loadView('certidoes.certidao', compact('declaracao', 'numero', 'codigo', 'data', 'hora'));
 
-        return $pdf->download("certidao.pdf");
+        return $pdf->download('certidao.pdf');
     }
 
     /**
@@ -93,11 +98,16 @@ class CertidaoController extends Controller
             $resultado = null;
         }
 
-        return view("site.consulta-certidao", compact(["autenticado", "resultado"]));
+        return view('site.consulta-certidao', compact(['autenticado', 'resultado']));
     }
 
-    public function consultaView() 
+    public function consultaView(Request $request) 
     {
-        return view("site.consulta-certidao");
+        $numero = $request->numero;
+        $codigo = $request->codigo;
+        $data = $request->data;
+        $hora = $request->hora;
+
+        return view('site.consulta-certidao', compact(['numero', 'codigo', 'data', 'hora']));
     }
 }

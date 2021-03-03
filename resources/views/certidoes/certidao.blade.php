@@ -1,3 +1,4 @@
+
 <html>
   <head>
     <style>
@@ -23,6 +24,9 @@
       </div>
       <div>
         {!! $declaracao !!}
+      </div>
+      <div class="centro">
+        <img class="center" src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(150)->generate(url('/certidao/consulta?numero=' . $numero . '&codigo=' . $codigo . '&hora=' . $hora . '&data=' . $data))) !!}">
       </div>
     </div>
   </body>

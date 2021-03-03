@@ -728,6 +728,7 @@ figure.align-left {
 }
 
 .box {
+	height: 300px;
 	padding: 0.55rem;
 	border-radius: 5px;
 	transition: all .3s;

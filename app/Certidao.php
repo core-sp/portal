@@ -60,7 +60,7 @@ class Certidao extends Model
         }
 
         // Rodapé da certidão
-        $declaracao .=  '<p class="texto-certidao">Esta certidão possui o número <b>' . $numero . '</b>, emitida em <b>' . $data . ', </b>às<b> ' . $hora . '</b> e é válida até <b>' . $dataValidade . '</b>. Para verificar a autenticidade deste documento entre no site do CORE-SP https://www.core-sp.org.br/certidao/consulta e utilize o código abaixo:<p>';
+        $declaracao .=  '<p class="texto-certidao">Esta certidão possui o número <b>' . $numero . '</b>, emitida em <b>' . $data . ', </b>às<b> ' . $hora . '</b> e é válida até <b>' . $dataValidade . '</b>. Para verificar a autenticidade deste documento entre no site do CORE-SP https://www.core-sp.org.br/certidao/consulta e utilize o código abaixo ou leia o QR Code:<p>';
 
         // código da certidão
         $declaracao .=  '<p class="centro"><b>' . $codigo . '</b><p>';

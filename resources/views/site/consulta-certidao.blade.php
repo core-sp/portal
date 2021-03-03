@@ -35,7 +35,7 @@
       <div class="mt-3">
         @if($autenticado)
         <div class="alert alert-warning"> 
-          <h5><i class="icon fa fa-check"></i>Esta é uma certidão autêntica emitida pelo site oficial do CORE-SP.</h5>
+          <h5><i class="icon fa fa-check"></i>Esta é uma certidão emitida oficialmente pelo Core-SP.</h5>
           <p><strong>{!! $resultado !!}</strong></p>
         </div>
         @else
@@ -61,7 +61,7 @@
                 <input type="text"
                   class="form-control {{ $errors->has('codigo') ? 'is-invalid' : '' }}"
                   name="codigo"
-                  value="{{ old('codigo') }}"
+                  value="{{ $codigo }}"
                 />
                 @if($errors->has('codigo'))
                   <div class="invalid-feedback">
@@ -77,7 +77,7 @@
                 <input type="text"
                   class="form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
                   name="numero"
-                  value="{{ old('numero') }}"
+                  value="{{ $numero }}"
                   />
                 @if($errors->has('numero'))
                   <div class="invalid-feedback">
@@ -91,7 +91,7 @@
                   class="form-control horaInput {{ $errors->has('hora') ? 'is-invalid' : '' }}"
                   name="hora"
                   placeholder="hh:mm:ss"
-                  value="{{ old('hora') }}"
+                  value="{{ $hora }}"
                   />
                 @if($errors->has('hora'))
                   <div class="invalid-feedback">
@@ -105,7 +105,7 @@
                   class="form-control dataInput {{ $errors->has('data') ? 'is-invalid' : '' }}"
                   name="data"
                   placeholder="dd/mm/aaaaa"
-                  value="{{ old('data') }}"
+                  value="{{ $data }}"
                   />
                 @if($errors->has('data'))
                   <div class="invalid-feedback">

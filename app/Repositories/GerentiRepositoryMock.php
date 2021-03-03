@@ -414,17 +414,17 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
     public function gerentiEmitirCertidao($ass_id) 
     {
         return [
-            1,
-            2,
-            'abcde',
-            '01/01/2021',
-            '00:00',
-            '01/01/2022',
-            'RC Teste 1', 
-            '86294373085', 
-            '0000000001', 
-            '01/01/1999',
-            'Rua Teste'
+            'EMISSAO' => 1,
+            'NUMERO' => 2,
+            'CODVALIDACAO' => 'abcde',
+            'DATAEMISSAO' => '01/01/2021',
+            'HORA' => '00:00:00',
+            'DATAVALIDADE' => '01/01/2022',
+            'NOME' => 'RC Teste 1', 
+            'CPFCNPJ' => '86294373085', 
+            'REGISTRO' => '0000000001', 
+            'DATAREGISTRO' => '01/01/1999',
+            'ENDERECOCOMPLETO' => 'Rua Teste'
         ];
     }
 
@@ -437,21 +437,21 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
     public function gerentiListarCertidoes($ass_id, $tipo) 
     {
         $resultado[0] = [
-            'numero' => '1',
-            'status' => 'Ativa',
-            'codigo' => '123456789',
-            'data' => '01/01/2021',
-            'hora' => '00:00',
-            'data_validade' => '01/01/2022',
+            'NUMERO' => '1',
+            'SITUACAO' => 'Ativa',
+            'CODVALIDACAO' => '123456789',
+            'DATAEMISSAO' => '01/01/2021',
+            'HORAEMISSAO' => '00:00:00',
+            'VALIDADE' => '01/01/2022',
         ];
 
         $resultado[1] = [
-            'numero' => '2',
-            'status' => 'Suspensa',
-            'codigo' => '987654321',
-            'data' => '02/02/2021',
-            'hora' => '00:00',
-            'data_validade' => '02/02/2022',
+            'NUMERO' => '2',
+            'SITUACAO' => 'Suspensa',
+            'CODVALIDACAO' => '987654321',
+            'DATAEMISSAO' => '02/02/2021',
+            'HORAEMISSAO' => '00:00',
+            'VALIDADE' => '02/02/2022',
         ];
 
         return $resultado;
@@ -464,11 +464,8 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
     public function gerentiAutenticaCertidao($numero, $codigo, $data, $hora) 
     {
         return [
-            0,
-            'RC teste 1',
-            '0000000001',
-            '86294373085',
-            '02/02/2022'
+            'SITUACAO' => 'Válida',
+            'DATAVALIDADE' => '02/02/2022'
         ];
     }
 }

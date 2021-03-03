@@ -20,6 +20,7 @@
         "laravel/tinker": "^2.0",
         "nesbot/carbon": "^2.16.3",
         "predis/predis": "^1.1",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "unisharp/laravel-filemanager": "~1.8"
     },
     "require-dev": {

@@ -67,9 +67,9 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row justify-content-center">
       <div class="col-lg-3 col-sm-6 pb-15">
-        <div class="box text-center azul-escuro-bg h-100">
+        <div class="box text-center azul-escuro-bg">
           <div class="inside-box">
             <img src="{{ asset('img/padlock.png') }}" class="inside-img" alt="Área restrita do Representante | Core-SP" />
             <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Área restrita<br class="hide-992" /> do Representante</h3>
@@ -83,10 +83,10 @@
         </div>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/consulta-de-situacao" class="d-block h-100">
-          <div class="box text-center azul-bg h-100">
+        <a href="/consulta-de-situacao" class="d-block">
+          <div class="box text-center azul-bg">
             <div class="inside-box">
-              <img src="{{ asset('img/file.png') }}" alt="Consulta de Ativos | Core-SP">
+              <img src="{{ asset('img/file.png') }}" class="inside-img alt="Consulta de Ativos | Core-SP">
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> de situação</h3>
               <button class="btn-box azul">Consultar</button>
             </div>
@@ -94,7 +94,7 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <div class="box text-center azul-escuro-bg h-100">
+        <div class="box text-center azul-escuro-bg">
           <div class="inside-box">
             <img src="{{ asset('img/001-work.png') }}" class="inside-img" alt="Balcão de Oportunidades | Core-SP" />
             <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Balcão de<br class="hide-992" /> Oportunidades</h3>
@@ -109,7 +109,7 @@
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/anuidade-ano-vigente" class="d-block h-100">
-          <div class="box text-center azul-bg h-100">
+          <div class="box text-center azul-bg">
             <div class="inside-box">
               <img src="{{ asset('img/printer.png') }}" class="inside-img" alt="Anuidade do ano vigente | Core-SP" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Boleto<br class="hide-992" /> anuidade {{ date('Y') }}</h3>
@@ -120,9 +120,9 @@
       </div>
       <div class="col-lg-3 col-sm-6 text-right pb-15">
         <a href="/simulador" class="d-block h-100">
-          <div class="box text-center azul-bg h-100">
+          <div class="box text-center azul-bg">
             <div class="inside-box">
-              <img src="{{ asset('img/001-paper.png') }}" alt="Simulador | Core-SP">
+              <img src="{{ asset('img/001-paper.png') }}" class="inside-img" alt="Simulador | Core-SP">
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Simulador de<br class="hide-992" /> valores</h3>
               <button class="btn-box azul">Simular</button>
             </div>
@@ -130,7 +130,7 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <div class="box text-center azul-escuro-bg h-100">
+        <div class="box text-center azul-escuro-bg">
           <div class="inside-box">
             <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
             <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Agendamento<br class="hide-992" /> de Atendimento</h3>
@@ -145,7 +145,7 @@
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/cartilha-do-representante" class="d-block h-100">
-          <div class="box text-center azul-bg h-100">
+          <div class="box text-center azul-bg">
             <div class="inside-box">
               <img src="{{ asset('img/open-book.png') }}" class="inside-img" alt="Cartilha do Representante | Core-SP" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cartilha do<br class="hide-992" /> Representante</h3>
@@ -156,7 +156,7 @@
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="/noticias/anuidade-2021-taxas-e-emolumentos" class="d-block h-100">
-          <div class="box text-center azul-escuro-bg h-100">
+          <div class="box text-center azul-escuro-bg">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2021<br class="hide-992" /> taxas e emolumentos</h3>
@@ -165,6 +165,31 @@
           </div>
         </a>
       </div>
+
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="{{ route('cursos.index.website') }}" class="d-block h-100">
+          <div class="box text-center azul-bg">
+            <div class="inside-box">
+              <img src="{{ asset('img/teacher.png') }}" class="inside-img" alt="Cursos" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cursos<br class="hide-992" /> Programados</h3>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="{{ route('certidao.consultaView') }}" class="d-block h-100">
+          <div class="box text-center azul-escuro-bg">
+            <div class="inside-box">
+              <img src="{{ asset('img/file.png') }}" class="inside-img" alt="Consulta de certidão" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> de certidão</h3>
+              <button href="#" class="btn-box azul-escuro">CONSULTAR</button>
+            </div>
+          </div>
+        </a>
+      </div> 
+
     </div>
   </div>
 </section>
