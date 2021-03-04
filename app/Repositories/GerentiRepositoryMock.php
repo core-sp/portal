@@ -424,6 +424,9 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
             'CPFCNPJ' => '86294373085', 
             'REGISTRO' => '0000000001', 
             'DATAREGISTRO' => '01/01/1999',
+            'TIPOEMPRESA' => 'Empresa Teste', 
+            'RESPTECNICOS' => 'Nome do RT', 
+            'REGISTROSRTS' => 'Registro do RT',
             'ENDERECOCOMPLETO' => 'Rua Teste'
         ];
     }

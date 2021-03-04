@@ -1,5 +1,5 @@
 @php
-    use PDF;
+    $permissoes = permissoesPorPerfil();
 @endphp
 <!-- Sidebar Menu -->
 <nav class="mt-2 mb-2">
