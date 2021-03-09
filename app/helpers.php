@@ -626,19 +626,29 @@ function concursoSituacoes()
 
 function permissoesPorPerfil()
 {
-    $all = (new PermissaoRepository())->getAll();
+    $permissoes = session('permissoes');
+    $arrayPermissoes = array();
 
-    $filtered = $all->filter(function($permissao){
-        $perfis = explode(',', $permissao->perfis);
-        return in_array(Auth::user()->perfil->idperfil, $perfis);
-    });
+    foreach($permissoes as $permissao) {
+        $p = explode('_', $permissao);
+        array_push($arrayPermissoes, ['controller' => $p[0], 'metodo' => $p[1]]);
+    }
 
-    return $filtered->map(function($row){
-        return [
-            'controller' => $row->controller,
-            'metodo' => $row->metodo
-        ];
-    })->toArray();
+    return $arrayPermissoes;
+
+    // $all = (new PermissaoRepository())->getAll();
+
+    // $filtered = $all->filter(function($permissao){
+    //     $perfis = explode(',', $permissao->perfis);
+    //     return in_array(Auth::user()->perfil->idperfil, $perfis);
+    // });
+
+    // return dd($filtered->map(function($row){
+    //     return [
+    //         'controller' => $row->controller,
+    //         'metodo' => $row->metodo
+    //     ];
+    // })->toArray());
 }
 
 function mostraItem($permissoes, $controller, $metodo)

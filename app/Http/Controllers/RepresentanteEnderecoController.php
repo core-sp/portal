@@ -4,14 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Representante;
 use App\Events\CrudEvent;
+use App\Traits\TabelaAdmin;
+use Illuminate\Http\Request;
 use App\RepresentanteEndereco;
+use App\Traits\ControleAcesso;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ControleController;
+use App\Repositories\RepresentanteRepository;
 use App\Repositories\GerentiRepositoryInterface;
+use App\Repositories\RepresentanteEnderecoRepository;
 
 class RepresentanteEnderecoController extends Controller
 {
+    use ControleAcesso, TabelaAdmin;
+
     private $class = 'RepresentanteEnderecoController';
     private $gerentiRepository;
+    private $representanteEnderecoRepository;
+    private $representanteRepository;
 
     // Variáveis
     public $variaveis = [
@@ -22,10 +32,13 @@ class RepresentanteEnderecoController extends Controller
         'mostra' => 'representante-endereco'
     ];
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, RepresentanteRepository $representanteRepository)
     {
         $this->middleware('auth');
         $this->gerentiRepository = $gerentiRepository;
+        $this->representanteEnderecoRepository = $representanteEnderecoRepository;
+        $this->representanteRepository = $representanteRepository;
+
     }
 
     public function resultados()
@@ -147,7 +160,7 @@ class RepresentanteEnderecoController extends Controller
 
     public function index()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
 
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
