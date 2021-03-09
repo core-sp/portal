@@ -13,6 +13,7 @@ use App\Mail\AgendamentoMailGuest;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\RedirectResponse;
 use App\Repositories\RegionalRepository;
 use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoUpdateRequest;
@@ -57,6 +58,10 @@ class AgendamentoController extends Controller
             $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
 
             $resultados = $this->checaAplicaFiltros();
+
+            if($resultados instanceof RedirectResponse) {
+                return $resultados;
+            }
         } 
         else {
             $temFiltro = null;
@@ -256,7 +261,7 @@ class AgendamentoController extends Controller
         if(IlluminateRequest::has('mindia')) {
             if(!empty(IlluminateRequest::input('mindia'))) {
                 $mindiaArray = explode('/', IlluminateRequest::input('mindia'));
-                $checaMindia = checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
+                $checaMindia = (count($mindiaArray) != 3 || $mindiaArray[2] == null)  ? false : checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
 
                 if($checaMindia === false) {
                     return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
@@ -271,7 +276,7 @@ class AgendamentoController extends Controller
         if(IlluminateRequest::has('maxdia')) {
             if(!empty(IlluminateRequest::input('maxdia'))) {
                 $maxdiaArray = explode('/', IlluminateRequest::input('maxdia'));
-                $checaMaxdia = checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
+                $checaMaxdia = (count($maxdiaArray) != 3 || $maxdiaArray[2] == null)  ? false : checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
 
                 if($checaMaxdia === false) {
                     return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
