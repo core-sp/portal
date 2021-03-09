@@ -13,6 +13,7 @@ use App\Http\Controllers\ControleController;
 use App\Repositories\RepresentanteRepository;
 use App\Repositories\GerentiRepositoryInterface;
 use App\Repositories\RepresentanteEnderecoRepository;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteEnderecoController extends Controller
 {
@@ -29,7 +30,8 @@ class RepresentanteEnderecoController extends Controller
         'singulariza' => 'a solicitação de inclusão de endereço',
         'plural' => 'solicitações de inclusões de endereços',
         'pluraliza' => 'solicitações de inclusões de endereços',
-        'mostra' => 'representante-endereco'
+        'mostra' => 'representante-endereco',
+        'busca' => 'representante-enderecos'
     ];
 
     public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, RepresentanteRepository $representanteRepository)
@@ -167,5 +169,20 @@ class RepresentanteEnderecoController extends Controller
         $variaveis = (object) $this->variaveis;
 
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+    }
+
+    public function busca()
+    {
+        $this->autoriza($this->class, 'index');
+
+        $busca = IlluminateRequest::input('q');
+
+        $resultados = $this->representanteEnderecoRepository->getBusca($busca);
+        
+        $tabela = $this->tabelaCompleta($resultados);
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
+
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 }

@@ -52,4 +52,12 @@ class RepresentanteEnderecoRepository
         return RepresentanteEndereco::findOrFail($id)
             ->update(["status" => RepresentanteEndereco::STATUS_RECUSADO, "observacao" => $observacao]);
     }
+
+    public function getBusca($busca)
+    {
+        return RepresentanteEndereco::where('id', $busca)
+            ->orWhere('ass_id','LIKE','%'.$busca.'%')
+            ->orWhere('status','LIKE','%'.$busca.'%')
+            ->paginate(10);
+    }
 }

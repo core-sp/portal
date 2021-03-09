@@ -130,7 +130,9 @@ Route::prefix('admin')->group(function() {
   Route::get('/representantes/buscaGerenti', 'RepresentanteController@buscaGerentiView');
   Route::get('/representantes/buscaGerenti/resultado', 'RepresentanteController@buscaGerenti')->name('admin.representante.buscaGerenti');
   Route::get('/representantes/info', 'RepresentanteController@representanteInfo');
+
   Route::get('/representante-enderecos', 'RepresentanteEnderecoController@index');
+  Route::get('/representante-enderecos/busca', 'RepresentanteEnderecoController@busca')->name('representante-endereco.busca');
   Route::get('/representante-enderecos/{id}', 'RepresentanteEnderecoController@show')->name('admin.representante-endereco.show');
   Route::post('/representante-enderecos/inserir', 'RepresentanteEnderecoController@inserirEnderecoGerenti')->name('admin.representante-endereco.post');
   Route::post('/representante-enderecos/recusar', 'RepresentanteEnderecoController@recusarEndereco')->name('admin.representante-endereco-recusado.post');
