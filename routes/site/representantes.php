@@ -28,8 +28,8 @@ Route::prefix('representante')->group(function(){
     Route::get('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmailView')->name('representante.email.reset.view');
     Route::post('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmail')->name('representante.email.reset');
 
-    // Rotas para emissão de Certidão
-    Route::get('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidaoView')->name('representante.emitirCertidaoView');
-    Route::post('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidao')->name('representante.emitirCertidao');
-    Route::get('/baixar-certidao', 'RepresentanteSiteController@baixarCertidao')->name('representante.baixarCertidao');
+    // CERTIDAO_V3 - Rotas para emissão de Certidão
+    // Route::get('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidaoView')->name('representante.emitirCertidaoView');
+    // Route::post('/emitir-certidao/{tipo}', 'RepresentanteSiteController@emitirCertidao')->name('representante.emitirCertidao');
+    // Route::get('/baixar-certidao', 'RepresentanteSiteController@baixarCertidao')->name('representante.baixarCertidao');
 });

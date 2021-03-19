@@ -131,6 +131,7 @@ Route::prefix('admin')->group(function() {
   Route::get('/representantes/buscaGerenti/resultado', 'RepresentanteController@buscaGerenti')->name('admin.representante.buscaGerenti');
   Route::get('/representantes/info', 'RepresentanteController@representanteInfo');
 
+  // Mudança de endereço
   Route::get('/representante-enderecos', 'RepresentanteEnderecoController@index');
   Route::get('/representante-enderecos/busca', 'RepresentanteEnderecoController@busca')->name('representante-endereco.busca');
   Route::get('/representante-enderecos/{id}', 'RepresentanteEnderecoController@show')->name('admin.representante-endereco.show');
@@ -212,13 +213,9 @@ Route::prefix('/')->group(function() {
     return view('site.chat');
   });
 
-  // Rotas para o SIG (Sistema de Informação Geográfico)
-  // Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
-  // Route::get('/mapa-fiscalizacao/{ano}', 'FiscalizacaoController@mostrarMapaAno')->name('fiscalizacao.mapaano');
-
-  // Rotas para consulta de autenticidade da Certidão
-  Route::get('certidao/consulta', 'CertidaoController@consultaView')->name('certidao.consultaView');
-  Route::get('certidao/consulta/resultado', 'CertidaoController@consulta')->name('certidao.consulta');
+  // CERTIDAO_V3 - Rotas para consulta de autenticidade da Certidão
+  // Route::get('certidao/consulta', 'CertidaoController@consultaView')->name('certidao.consultaView');
+  // Route::get('certidao/consulta/resultado', 'CertidaoController@consulta')->name('certidao.consulta');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

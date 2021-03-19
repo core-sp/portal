@@ -60,17 +60,18 @@
               </a>
             </div>
 
-            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView' && Route::getCurrentRoute()->parameters['tipo'] === 'Regularidade')  ? 'mr-item-selected' : '' }}">
+            {{-- CERTIDAO_V3 --}}
+            {{-- <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView' && Route::getCurrentRoute()->parameters['tipo'] === 'Regularidade')  ? 'mr-item-selected' : '' }}">
               <a href="{{ route('representante.emitirCertidaoView', ['tipo' => 'Regularidade']) }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Certidão de Regularidade</h6>
               </a>
-            </div>
+            </div> --}}
             
-            <!-- <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView' && Route::getCurrentRoute()->parameters['tipo'] === 'Parcelamento') ? 'mr-item-selected' : '' }}">
+            {{-- <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView' && Route::getCurrentRoute()->parameters['tipo'] === 'Parcelamento') ? 'mr-item-selected' : '' }}">
               <a href="{{ route('representante.emitirCertidaoView', ['tipo' => 'Parcelamento']) }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Certidão de Parcelamento</h6>
               </a>
-            </div> -->
+            </div> --}}
 
           </div>
         </div>
