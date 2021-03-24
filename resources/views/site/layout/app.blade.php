@@ -205,7 +205,7 @@
                   <div class="d-flex">
                     <div class="flex-one text-center">
                       <h5 class="d-inline-block pr-3 cinza-claro"><strong>Dúvidas frequentes</strong></h5>
-                      <p class="d-inline-block cinza-claro">Clique aqui e tenha acesso aos principais serviços pelo Setor de Atendimento do Core-SP.</p>
+                      <p class="d-inline-block cinza-claro">Clique aqui e tenha acesso aos principais serviços <br class="show-768">pelo Setor de Atendimento do Core-SP.</p>
                     </div>
                   </div>
                 </div>
