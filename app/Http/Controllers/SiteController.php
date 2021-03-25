@@ -20,7 +20,7 @@ class SiteController extends Controller
             ->whereNull('idregional')
             ->whereNull('categoria')
             ->orderBy('created_at','DESC')
-            ->limit(3)
+            ->limit(6)
             ->get();
         $cotidianos = Noticia::where('publicada','Sim')
             ->where('categoria','Cotidiano')
