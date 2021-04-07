@@ -536,7 +536,8 @@ function situacoesLicitacao()
         'Em Andamento',
         'Em fase de recurso',
         'Encerrado',
-        'Homologado'
+        'Homologado',
+        'Suspenso'
     ];
 }
 
