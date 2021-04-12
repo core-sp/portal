@@ -15,7 +15,8 @@ class PreCadastroRequest extends FormRequest
             'cpf' => ['required', 'max:191', new Cpf],
             'cnpj' => ['required', 'max:191', new Cnpj],
             'email' => 'required|email|max:191',
-            'anexo' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048'
+            'anexo1' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+            'anexo2' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048'
         ];
     }
 

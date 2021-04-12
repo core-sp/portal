@@ -116,13 +116,6 @@ Route::prefix('admin')->group(function() {
     Route::put('/bannerprincipal', 'HomeImagemController@updateBannerPrincipal');
   });
 
-  // Pré-Cadastro (Admin)
-  Route::prefix('pre-cadastro')->group(function() {
-    Route::get('/mostrar/{id}', 'PreCadastroController@show')->name('pre-cadastro.show');
-    Route::get('/visualizar-anexo/{id}', 'PreCadastroController@visualizarAnexo')->name('pre-cadastro.visualizar');
-    Route::get('/baixar-anexo/{id}', 'PreCadastroController@baixarAnexo')->name('pre-cadastro.baixar');
-  });
-
   // Rotas para Blog Posts
   require('admin/posts.php');
 
@@ -136,6 +129,15 @@ Route::prefix('admin')->group(function() {
   Route::get('/representante-enderecos/{id}', 'RepresentanteEnderecoController@show')->name('admin.representante-endereco.show');
   Route::post('/representante-enderecos/inserir', 'RepresentanteEnderecoController@inserirEnderecoGerenti')->name('admin.representante-endereco.post');
   Route::post('/representante-enderecos/recusar', 'RepresentanteEnderecoController@recusarEndereco')->name('admin.representante-endereco-recusado.post');
+
+  // Pré-Cadastro (Admin)
+  Route::prefix('pre-cadastro')->group(function() {
+    Route::get('/', 'PreCadastroController@index')->name('pre-cadastro.index');
+    Route::get('/mostrar/{id}', 'PreCadastroController@show')->name('pre-cadastro.show');
+    Route::get('/visualizar-anexo/{id}', 'PreCadastroController@visualizarAnexo')->name('pre-cadastro.visualizar');
+    Route::get('/baixar-anexo/{id}', 'PreCadastroController@baixarAnexo')->name('pre-cadastro.baixar');
+    Route::post('/atualizarStatus', 'PreCadastroController@atualizarStatus')->name('pre-cadastro.atualizarStatus');
+  });
 });
 
 /*
@@ -235,8 +237,6 @@ Route::prefix('/')->group(function() {
   Route::prefix('pre-cadastro')->group(function(){
     Route::get('/criar', 'PreCadastroController@create')->name('pre-cadastro.create');
     Route::post('/criar', 'PreCadastroController@store')->name('pre-cadastro.store');
-    Route::get('/editar', 'PreCadastroController@edit')->name('pre-cadastro.edit');
-    Route::post('/editar', 'PreCadastroController@update')->name('pre-cadastro.update');
   });
 
 

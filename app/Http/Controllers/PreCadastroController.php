@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\PreCadastro;
+use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
 use App\Traits\ControleAcesso;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PreCadastroAprovadoMail;
+use App\Mail\PreCadastroRecusadoMail;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\PreCadastroRequest;
 use App\Repositories\PreCadastroRepository;
 
 class PreCadastroController extends Controller
 {
-    use ControleAcesso;
+    use ControleAcesso, TabelaAdmin;
     
     private $preCadastroRepository;
     private $variaveis;
@@ -32,7 +37,13 @@ class PreCadastroController extends Controller
 
     public function index()
     {
-        return view('site.pre-cadastro');
+        //$this->autoriza($this->class, __FUNCTION__);
+
+        $resultados = $this->preCadastroRepository->getToTable();
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis = (object) $this->variaveis;
+
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function show($id)
@@ -52,21 +63,34 @@ class PreCadastroController extends Controller
 
     public function store(PreCadastroRequest $request)
     {
-        $nomeAnexo = 'anexo.' . $request->file('anexo')->getClientOriginalExtension();
+        $nomeAnexo1 = 'anexo_1.' . $request->file('anexo1')->getClientOriginalExtension();
 
-        $preCadastro = $this->preCadastroRepository->store($request, $nomeAnexo);
+        $nomeAnexo2 = 'anexo_2.' . $request->file('anexo2')->getClientOriginalExtension();
 
-        $request->file('anexo')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexo);
+        $preCadastro = $this->preCadastroRepository->store($request, $nomeAnexo1, $nomeAnexo2);
+
+        $request->file('anexo1')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexo1);
+
+        $request->file('anexo2')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexo2);
     }
 
-    public function edit()
+    public function atualizarStatus(Request $request)
     {
-        
-    }
+        $preCadastro = $this->preCadastroRepository->getById($request->input('id'));
 
-    public function update()
-    {
-        
+        // TODO - Investigar forma melhor de verificação de status (usuário modificando request manualmente)
+        if($request->input('status') == PreCadastro::STATUS_APROVADO) {
+            $this->preCadastroRepository->updateStatus($preCadastro, PreCadastro::STATUS_APROVADO);
+
+            $email = new PreCadastroAprovadoMail();
+        }
+        elseif($request->input('status') == PreCadastro::STATUS_RECUSADO) {
+            $this->preCadastroRepository->updateStatus($preCadastro, PreCadastro::STATUS_RECUSADO, $request->input('motivo'));
+
+            $email = new PreCadastroRecusadoMail($preCadastro->motivo);
+        }
+
+        Mail::to($preCadastro->email)->queue($email);
     }
 
     public function visualizarAnexo(Request $request, $id) 
@@ -89,5 +113,39 @@ class PreCadastroController extends Controller
         }
     }
 
+    protected function tabelaCompleta($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'CPF',
+            'Solicitado em:', 
+            'Status',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
 
+        foreach($resultados as $resultado) {
+            $acoes = '<a href="/admin/pre-cadastro/mostrar/'.$resultado->id.'" class="btn btn-sm btn-default">Ver</a> ';
+            $conteudo = [
+                $resultado->id,
+                $resultado->cpf,
+                formataData($resultado->created_at),
+                $resultado->status,
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-bordered',
+            'table-striped'
+        ];
+        $tabela = $this->montaTabela($headers, $contents, $classes);
+        
+        return $tabela;
+    }
 }

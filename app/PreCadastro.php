@@ -9,7 +9,7 @@ class PreCadastro extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['cpf', 'cnpj', 'tipo', 'nome', 'anexo', 'status'];
+    protected $fillable = ['cpf', 'cnpj', 'tipo', 'nome', 'email', 'anexo1', 'anexo2', 'status', 'motivo'];
 
     const STATUS_APROVADO = 'Aprovado';
     const STATUS_RECUSADO = 'Recusado';

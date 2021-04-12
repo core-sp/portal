@@ -20,7 +20,10 @@ class CreatePreCadastrosTable extends Migration
             $table->string('cpf')->nullable();
             $table->string('cnpj')->nullable();
             $table->string('nome');
-            $table->string('anexo');
+            $table->string('email');
+            $table->string('anexo1');
+            $table->string('anexo2');
+            $table->string('motivo')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
