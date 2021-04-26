@@ -181,7 +181,7 @@
                       <a href="/carta-de-servicos-ao-usuario" class="dropdown-item">Carta de Serviços ao Usuário</a>
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
                       {{-- CERTIDAO_V3 --}}
-                      {{-- <a href="{{ route('certidao.consultaView') }}" class="dropdown-item">Consulta de Certidão</a> --}}
+                      <a href="{{ route('certidao.consultaView') }}" class="dropdown-item">Consulta de Certidão</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
                       <a href="/simulador" class="dropdown-item bb-0">Simulador de Valores</a>

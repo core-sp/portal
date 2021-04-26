@@ -167,7 +167,7 @@
       </div>
 
       {{-- CERTIDAO_V3 --}}
-      {{-- <div class="col-lg-3 col-sm-6 pb-15">
+      <div class="col-lg-3 col-sm-6 pb-15">
         <a href="{{ route('cursos.index.website') }}" class="d-block h-100">
           <div class="box text-center azul-bg">
             <div class="inside-box">
@@ -189,7 +189,7 @@
             </div>
           </div>
         </a>
-      </div>  --}}
+      </div>
 
     </div>
   </div>
