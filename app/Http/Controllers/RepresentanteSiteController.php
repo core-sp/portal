@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Certidao;
 use App\Representante;
 use App\Rules\CpfCnpj;
+use GuzzleHttp\Client;
 use App\Mail\CertidaoMail;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
@@ -375,7 +376,17 @@ class RepresentanteSiteController extends Controller
     {    
         //$verificaEmissao = $this->gerentiRepository->gerentiEmitirCertidao(Auth::guard('representante')->user()->ass_id, Certidao::COD_REGULARIDADE);
 
-        dd(teste()->json());
+        // CERTIDAO_V4 Token gerado
+        $token = json_decode($this->teste()->getBody()->getContents())->data->accessToken;
+
+        $pdfBase64 = json_decode($this->generateCertidao($token)->getBody()->getContents())->data->base64;
+
+        header('Content-Type: application/pdf');
+
+        return response()->streamDownload(function () use ($pdfBase64){
+            echo base64_decode($pdfBase64);
+        }, 'certidao.pdf');
+
 
 
         if($verificaEmissao['EMISSAO'] == 1) {
@@ -455,9 +466,35 @@ class RepresentanteSiteController extends Controller
     public function teste() 
     {
         // CERTIDAO_V4 - atualizar dados da API
-        return Http::post('http:///api/v1/auth', [
-            'appId' => '',
-            'appSecret' => ''
+
+        $client = new Client();
+
+        return $client->request('POST', 'http:///api/v1/auth', [
+            'json' => [
+                'appId' => '',
+                'appSecret' => ''
+            ]
+        ]);
+        
+    }
+
+    public function generateCertidao($token) 
+    {
+        $assId = Auth::guard('representante')->user()->ass_id;
+
+        $client = new Client();
+
+        return $client->request('POST', "http:///api/v1/representantes/$assId/documentos", [
+            'json' => [
+                'codigo' => 'CERTIDAO',
+                'timbrado' => true,
+                'cabecalho' => false,
+                'rodape' => false,
+                'marcadagua' => false
+            ],
+            'headers' => [
+                'Authorization' => "Bearer $token"
+            ]
         ]);
     }
 }
