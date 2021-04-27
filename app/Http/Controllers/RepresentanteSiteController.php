@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CadastroRepresentanteMail;
 use App\Repositories\CertidaoRepository;
 use App\Repositories\GerentiApiRepository;
+use GuzzleHttp\Exception\RequestException;
 use App\Http\Controllers\CertidaoController;
 use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Repositories\GerentiRepositoryInterface;
@@ -379,13 +380,16 @@ class RepresentanteSiteController extends Controller
     /**
      * CERTIDAO_V3 - Verifica se é possível emitir a certidão. Em caso positivo, a certidão será gerada, caso contrário, uma mensagem de erro é retornada.
      */
-    public function emitirCertidao($tipo) 
+    public function emitirCertidao() 
     {
         try {
             $responseGerentiJson = $this->gerentiApiRepository->gerentiGenerateCertidao(Auth::guard('representante')->user()->ass_id);
         } 
-        catch (\Exception $e) {
-            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão. Erro: '));
+        catch (RequestException $e) {
+
+            $responseGerentiJsonError = json_decode($e->getResponse()->getBody()->getContents());
+
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão. Erro: ' . $responseGerentiJsonError->messages[0]));
 
             $titulo = 'Falha ao emitir certidão';
             $mensagem = 'Não foi possível emitir a certidão. Por favor entre em contato com o CORE-SP para mais informações.';

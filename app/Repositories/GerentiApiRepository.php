@@ -22,13 +22,13 @@ class GerentiApiRepository
         $this->bearerToken = json_decode($response->getBody()->getContents())->data->accessToken;
     }
 
-    public function gerentiGenerateCertidao($ass_id)
+    public function gerentiGenerateCertidao($assId)
     {
         $this->generateToken();
 
         $client = new Client();
 
-        $response =  $client->request('POST', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/$assId/documentos', [
+        $response =  $client->request('POST', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $assId . '/documentos', [
             'json' => [
                 'codigo' => 'CERTIDAO',
                 'timbrado' => true,

@@ -61,9 +61,9 @@
             </div>
 
             {{-- CERTIDAO_V3 --}}
-            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView' && Route::getCurrentRoute()->parameters['tipo'] === 'Regularidade')  ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.emitirCertidaoView', ['tipo' => 'Regularidade']) }}" onclick="showLoading()">
-                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Certidão</h6>
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView')  ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.emitirCertidaoView') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Emitir Certidão</h6>
               </a>
             </div>
 
