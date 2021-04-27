@@ -213,10 +213,6 @@ Route::prefix('/')->group(function() {
     return view('site.chat');
   });
 
-  // CERTIDAO_V3 - Rotas para consulta de autenticidade da Certidão
-  Route::get('certidao/consulta', 'CertidaoController@consultaView')->name('certidao.consultaView');
-  Route::get('certidao/consulta/resultado', 'CertidaoController@consulta')->name('certidao.consulta');
-
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
 });

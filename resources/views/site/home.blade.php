@@ -166,7 +166,6 @@
         </a>
       </div>
 
-      {{-- CERTIDAO_V3 --}}
       <div class="col-lg-3 col-sm-6 pb-15">
         <a href="{{ route('cursos.index.website') }}" class="d-block h-100">
           <div class="box text-center azul-bg">
@@ -174,18 +173,6 @@
               <img src="{{ asset('img/teacher.png') }}" class="inside-img" alt="Cursos" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cursos<br class="hide-992" /> Programados</h3>
               <button href="#" class="btn-box azul-escuro">ACESSAR</button>
-            </div>
-          </div>
-        </a>
-      </div>
-      
-      <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="{{ route('certidao.consultaView') }}" class="d-block h-100">
-          <div class="box text-center azul-escuro-bg">
-            <div class="inside-box">
-              <img src="{{ asset('img/file.png') }}" class="inside-img" alt="Consulta de certidão" />
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Consulta<br class="hide-992" /> de certidão</h3>
-              <button href="#" class="btn-box azul-escuro">CONSULTAR</button>
             </div>
           </div>
         </a>

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CadastroRepresentanteMail;
 use App\Repositories\CertidaoRepository;
+use App\Repositories\GerentiApiRepository;
 use App\Http\Controllers\CertidaoController;
 use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Repositories\GerentiRepositoryInterface;
@@ -29,15 +30,17 @@ class RepresentanteSiteController extends Controller
     private $certidaoRepository;
     private $gerentiRepository;
     private $representanteEnderecoRepository;
+    private $gerentiApiRepository;
     protected $idendereco;
 
-    public function __construct(CertidaoController $certidaoController, CertidaoRepository $certidaoRepository, GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository)
+    public function __construct(CertidaoController $certidaoController, CertidaoRepository $certidaoRepository, GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->certidaoController = $certidaoController;
         $this->certidaoRepository = $certidaoRepository;
         $this->gerentiRepository = $gerentiRepository;
         $this->representanteEnderecoRepository = $representanteEnderecoRepository;
+        $this->gerentiApiRepository = $gerentiApiRepository;
     }
 
     public function index()
@@ -341,45 +344,60 @@ class RepresentanteSiteController extends Controller
     /**
      * CERTIDAO_V3 - Abre página da certidão de acordo com o tipo.
      */
-    public function emitirCertidaoView($tipo) 
+    public function emitirCertidaoView() 
     {
-        switch($tipo) {
-            case Certidao::REGULARIDADE:
-                $titulo = "Certidão de Regularidade";
-                $mensagem = "Clique no botão abaixo para verificar e emitir sua Certidão de Regularidade.</br>";
-                $emitir = true;
+        $titulo = 'Emissão de Certidão';
+        $mensagem = 'Clique no botão abaixo para verificar e emitir sua Certidão de Regularidade.</br>';
+        $emitir = true;
 
-                //$certidoes = $this->gerentiRepository->gerentiListarCertidoes(Auth::guard('representante')->user()->ass_id, Certidao::COD_REGULARIDADE);
-            break;
-    
-            // Certidão de Parcelamento não será incluida na solução neste momento
-            // case Certidao::PARCELAMENTO:
-            //     $titulo = "Certidão de Parcelamento";
-            //     $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Parcelamento.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
-            //     $emitir = true;
-            //     $reuso = false;
-            // break;
-    
-            // Caso uma certidão inválida seja passada na URL, aborta com erro 404.
-            default:
-                abort(404);
-            break;
-        }
+        return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir'));
 
-        return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir', 'certidoes'));
+        // switch($tipo) {
+        //     case Certidao::REGULARIDADE:
+        //         $titulo = "Certidão de Regularidade";
+        //         $mensagem = "Clique no botão abaixo para verificar e emitir sua Certidão de Regularidade.</br>";
+        //         $emitir = true;
+
+        //         $certidoes = $this->gerentiRepository->gerentiListarCertidoes(Auth::guard('representante')->user()->ass_id, Certidao::COD_REGULARIDADE);
+        //     break;
+    
+        //     // Certidão de Parcelamento não será incluida na solução neste momento
+        //     // case Certidao::PARCELAMENTO:
+        //     //     $titulo = "Certidão de Parcelamento";
+        //     //     $mensagem = "Clique no botão abaixo para verificar se é possível emitir sua Certidão de Parcelamento.</br>Em caso positivo você poderá baixar a certidão e também a receberá em seu e-mail cadastrado no Portal.";
+        //     //     $emitir = true;
+        //     //     $reuso = false;
+        //     // break;
+    
+        //     // Caso uma certidão inválida seja passada na URL, aborta com erro 404.
+        //     default:
+        //         abort(404);
+        //     break;
+        // }
     }
     
     /**
      * CERTIDAO_V3 - Verifica se é possível emitir a certidão. Em caso positivo, a certidão será gerada, caso contrário, uma mensagem de erro é retornada.
      */
     public function emitirCertidao($tipo) 
-    {    
-        //$verificaEmissao = $this->gerentiRepository->gerentiEmitirCertidao(Auth::guard('representante')->user()->ass_id, Certidao::COD_REGULARIDADE);
+    {
+        try {
+            $responseGerentiJson = $this->gerentiApiRepository->gerentiGenerateCertidao(Auth::guard('representante')->user()->ass_id);
+        } 
+        catch (\Exception $e) {
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão. Erro: '));
 
-        // CERTIDAO_V4 Token gerado
-        $token = json_decode($this->teste()->getBody()->getContents())->data->accessToken;
+            $titulo = 'Falha ao emitir certidão';
+            $mensagem = 'Não foi possível emitir a certidão. Por favor entre em contato com o CORE-SP para mais informações.';
+            $emitir = false;
 
-        $pdfBase64 = json_decode($this->generateCertidao($token)->getBody()->getContents())->data->base64;
+            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+        }
+
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson->data->numeroCertidao));
+
+        $email = new CertidaoMail($responseGerentiJson->data->base64);
+        Mail::to('desenvolvimento@core-sp.org.br')->queue($email);
 
         header('Content-Type: application/pdf');
 
@@ -389,93 +407,65 @@ class RepresentanteSiteController extends Controller
 
 
 
-        if($verificaEmissao['EMISSAO'] == 1) {
-            $numero = $verificaEmissao['NUMERO'];
-            $codigo = $verificaEmissao['CODVALIDACAO'];
-            $data = date('d/m/Y', strtotime($verificaEmissao['DATAEMISSAO'])); 
-            $hora = $verificaEmissao['HORA'];
-            $dataValidade = date('d/m/Y', strtotime($verificaEmissao['DATAVALIDADE']));
+        // if($verificaEmissao['EMISSAO'] == 1) {
+        //     $numero = $verificaEmissao['NUMERO'];
+        //     $codigo = $verificaEmissao['CODVALIDACAO'];
+        //     $data = date('d/m/Y', strtotime($verificaEmissao['DATAEMISSAO'])); 
+        //     $hora = $verificaEmissao['HORA'];
+        //     $dataValidade = date('d/m/Y', strtotime($verificaEmissao['DATAVALIDADE']));
 
-            $dadosRepresentante = [
-                'nome' => $verificaEmissao['NOME'], 
-                'cpf_cnpj' => formataCpfCnpj($verificaEmissao['CPFCNPJ']),
-                'tipo_pessoa' => tipoPessoaCpfCnpj($verificaEmissao['CPFCNPJ']),
-                'registro_core' => $verificaEmissao['REGISTRO'],
-                'data_inscricao' => date('d/m/Y', strtotime($verificaEmissao['DATAREGISTRO'])),
-                'email' => Auth::guard('representante')->user()->email,
-                'endereco' => $verificaEmissao['ENDERECOCOMPLETO'],
-                'tipo_empresa' => $verificaEmissao['TIPOEMPRESA'],
-                'resp_tecnico' => $verificaEmissao['RESPTECNICOS'],
-                'resp_tecnico_registro_core' => $verificaEmissao['REGISTROSRTS']
-            ];
+        //     $dadosRepresentante = [
+        //         'nome' => $verificaEmissao['NOME'], 
+        //         'cpf_cnpj' => formataCpfCnpj($verificaEmissao['CPFCNPJ']),
+        //         'tipo_pessoa' => tipoPessoaCpfCnpj($verificaEmissao['CPFCNPJ']),
+        //         'registro_core' => $verificaEmissao['REGISTRO'],
+        //         'data_inscricao' => date('d/m/Y', strtotime($verificaEmissao['DATAREGISTRO'])),
+        //         'email' => Auth::guard('representante')->user()->email,
+        //         'endereco' => $verificaEmissao['ENDERECOCOMPLETO'],
+        //         'tipo_empresa' => $verificaEmissao['TIPOEMPRESA'],
+        //         'resp_tecnico' => $verificaEmissao['RESPTECNICOS'],
+        //         'resp_tecnico_registro_core' => $verificaEmissao['REGISTROSRTS']
+        //     ];
 
-            return $this->certidaoController->gerarCertidao(
-                $tipo,
-                $dadosRepresentante,
-                $numero,
-                $codigo,
-                $data,
-                $hora,
-                $dataValidade
-            );
-        }
+        //     return $this->certidaoController->gerarCertidao(
+        //         $tipo,
+        //         $dadosRepresentante,
+        //         $numero,
+        //         $codigo,
+        //         $data,
+        //         $hora,
+        //         $dataValidade
+        //     );
+        // }
 
-        else {
-            $mensagem = "Não foi possível emitir a Certidão de " . $tipo . ". Por favor entre em contato com o CORE-SP para mais informações.";
+        // else {
+        //     $mensagem = "Não foi possível emitir a Certidão de " . $tipo . ". Por favor entre em contato com o CORE-SP para mais informações.";
 
-            // Geração de log externo registrando motivo da falha na emissão.
-            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir Certidão de ' . $tipo));
-            $titulo = "Falha ao emitir certidão";
+        //     // Geração de log externo registrando motivo da falha na emissão.
+        //     event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir Certidão de ' . $tipo));
+        //     $titulo = "Falha ao emitir certidão";
 
-            // Em caso de falha na validação, não permitir que o botão para e emitir seja mostrado na tela.
-            $emitir = false;
+        //     // Em caso de falha na validação, não permitir que o botão para e emitir seja mostrado na tela.
+        //     $emitir = false;
             
-            // Atribui valor nulo para vetor de certidões para não mostrar certidões na tela de mensagem de erro.
-            $certidoes = null;
+        //     // Atribui valor nulo para vetor de certidões para não mostrar certidões na tela de mensagem de erro.
+        //     $certidoes = null;
 
-            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir', 'certidoes'));
-        }
-    }
-
-    /**
-     * CERTIDAO_V3 - Método usado para baixar certidões já existente e ativas.
-     */
-    public function baixarCertidao(Request $request) 
-    {    
-        $certidoes = $this->gerentiRepository->gerentiListarCertidoes(Auth::guard('representante')->user()->ass_id, $request->tipo);
-
-        foreach($certidoes as $certidao) {
-            if($certidao['NUMERO'] == $request->numero && trim($certidao['SITUACAO']) == 'Ativa') {
-                return $this->certidaoController->baixarCertidao($request->numero);
-            }
-        }
-
-        $titulo = "Falha ao baixar certidão";
-
-        $mensagem = "Não foi possível baixar a certidão";
-
-        // Em caso de falha na validação, não permitir que o botão para emitir seja mostrado na tela.
-        $emitir = false;
-        
-        // Atribui valor nulo para vetor de certidões para não mostrar certidões na tela de mensagem de erro.
-        $certidoes = null;
-
-        return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir', 'certidoes'));
+        //     return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir', 'certidoes'));
+        // }
     }
 
     public function teste() 
     {
         // CERTIDAO_V4 - atualizar dados da API
-
         $client = new Client();
 
-        return $client->request('POST', 'http:///api/v1/auth', [
+        return $client->request('POST', env('GERENTI_API_BASE_URL') . '/api/v1/auth', [
             'json' => [
-                'appId' => '',
-                'appSecret' => ''
+                'appId' => env('GERENTI_API_APP_ID'),
+                'appSecret' => env('GERENTI_API_APP_SECRET')
             ]
         ]);
-        
     }
 
     public function generateCertidao($token) 
@@ -484,7 +474,7 @@ class RepresentanteSiteController extends Controller
 
         $client = new Client();
 
-        return $client->request('POST', "http:///api/v1/representantes/$assId/documentos", [
+        return $client->request('POST', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/$assId/documentos', [
             'json' => [
                 'codigo' => 'CERTIDAO',
                 'timbrado' => true,
