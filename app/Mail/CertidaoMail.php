@@ -16,7 +16,7 @@ class CertidaoMail extends Mailable
 
     public function __construct($pdf)
     {
-        $this->pdf = base64_encode($pdf);
+        $this->pdf = $pdf;
 
         $this->body = "<strong>Sua certidão eletrônica segue em anexo.</strong>";
     }
