@@ -344,7 +344,7 @@ class RepresentanteSiteController extends Controller
     }
 
     /**
-     * CERTIDAO_V3 - Abre página da certidão de acordo com o tipo.
+     * Abre página para emissão da certidão.
      */
     public function emitirCertidaoView() 
     {
@@ -356,17 +356,19 @@ class RepresentanteSiteController extends Controller
     }
     
     /**
-     * CERTIDAO_V3 - Verifica se é possível emitir a certidão. Em caso positivo, a certidão será gerada, caso contrário, uma mensagem de erro é retornada.
+     * Verifica se é possível emitir a certidão. Em caso positivo, a certidão será gerada e enviada por e-mail/download, caso contrário, uma mensagem de erro é retornada.
      */
     public function emitirCertidao() 
     {
         try {
             $responseGerentiJson = $this->gerentiApiRepository->gerentiGenerateCertidao(Auth::guard('representante')->user()->ass_id);
-        } 
+        }
+        // Erro lançado na integração HTTP
         catch (RequestException $e) {
 
             $responseGerentiJsonError = json_decode($e->getResponse()->getBody()->getContents());
 
+            // Log do erro que o representante comercial recebeu, com mensagem de erro direto do GERENTI
             event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão. Erro: ' . $responseGerentiJsonError->error->messages[0]));
 
             $titulo = 'Falha ao emitir certidão';
@@ -378,11 +380,14 @@ class RepresentanteSiteController extends Controller
 
         event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson->data->numeroCertidao));
 
+        // Arquivo enviado pelo GERENTI em base 64
         $pdfBase64 = $responseGerentiJson->data->base64;
 
+        // Envio do PDF por e-mail
         $email = new CertidaoMail($pdfBase64);
         Mail::to(Auth::guard('representante')->user()->email)->queue($email);
 
+        // Download do arquivo PDF
         header('Content-Type: application/pdf');
 
         return response()->streamDownload(function () use ($pdfBase64){

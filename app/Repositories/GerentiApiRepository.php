@@ -8,6 +8,7 @@ class GerentiApiRepository
 {
     private $bearerToken;
 
+    // Função usada para gerar tokens nas chamadas das APIs do GERENTI
     protected function generateToken()
     {
         $client = new Client();
@@ -22,8 +23,10 @@ class GerentiApiRepository
         $this->bearerToken = json_decode($response->getBody()->getContents())->data->accessToken;
     }
 
+    // API do GERENTI usada para emitir certidão
     public function gerentiGenerateCertidao($assId)
     {
+        // API exige geração de token
         $this->generateToken();
 
         $client = new Client();

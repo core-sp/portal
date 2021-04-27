@@ -28,7 +28,7 @@ Route::prefix('representante')->group(function(){
     Route::get('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmailView')->name('representante.email.reset.view');
     Route::post('/email/reset', 'Auth\RepresentanteForgotEmailController@resetEmail')->name('representante.email.reset');
 
-    // CERTIDAO_V3 - Rotas para emissão de Certidão
+    // Rotas para emissão de Certidão
     Route::get('/emitir-certidao', 'RepresentanteSiteController@emitirCertidaoView')->name('representante.emitirCertidaoView');
     Route::post('/emitir-certidao', 'RepresentanteSiteController@emitirCertidao')->name('representante.emitirCertidao');
 });

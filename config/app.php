@@ -179,10 +179,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\HorizonServiceProvider::class
-
-        // CERTIDAO_V3 - Geração de PDF e QR code usado na solução da certidão
-        // Barryvdh\DomPDF\ServiceProvider::class,
-        // SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
     ],
 
     /*
@@ -234,10 +230,6 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Image' => Intervention\Image\Facades\Image::class
-
-        // CERTIDAO_V3 - Geração de PDF e QR code usado na solução da certidão
-        // 'PDF' => Barryvdh\DomPDF\Facade::class,
-        // 'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
     ],
 
 ];

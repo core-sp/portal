@@ -60,7 +60,6 @@
               </a>
             </div>
 
-            {{-- CERTIDAO_V3 --}}
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView')  ? 'mr-item-selected' : '' }}">
               <a href="{{ route('representante.emitirCertidaoView') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Emitir Certidão</h6>
