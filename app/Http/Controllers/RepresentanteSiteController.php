@@ -378,7 +378,9 @@ class RepresentanteSiteController extends Controller
 
         event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson->data->numeroCertidao));
 
-        $email = new CertidaoMail($responseGerentiJson->data->base64);
+        $pdfBase64 = $responseGerentiJson->data->base64;
+
+        $email = new CertidaoMail($pdfBase64);
         Mail::to(Auth::guard('representante')->user()->email)->queue($email);
 
         header('Content-Type: application/pdf');
