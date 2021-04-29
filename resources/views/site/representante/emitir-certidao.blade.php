@@ -23,7 +23,9 @@
             @forelse ($certidoes as $certidao)
             <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
                 <p class="pb-0">
-                    <b>Nº: </b> {{ $certidao['numeroDocumento']}}
+                    <b>Nº: </b> {{ $certidao['numeroDocumento']}} - 
+                    <b>Data emissão: </b> {{ $certidao['dataEmissao']}} - 
+                    <b>Hora emissão: </b> {{ $certidao['horaEmissao']}}
                     <small class="light">({{ $certidao['status'] }})</small>
                 </p>
                 @if(trim($certidao['status']) == 'Emitido')

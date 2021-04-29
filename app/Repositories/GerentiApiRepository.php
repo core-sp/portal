@@ -2,39 +2,42 @@
 
 namespace App\Repositories;
 
+use Exception;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 class GerentiApiRepository
 {
     private $bearerToken;
 
-    public function __construct()
-    {
-        generateToken();
-    }
-
     // Função usada para gerar tokens nas chamadas das APIs do GERENTI
     protected function generateToken()
     {
-        $client = new Client();
+        if(is_null($this->bearerToken)) {
+            $client = new Client();
 
-        $response = $client->request('POST', env('GERENTI_API_BASE_URL') . '/api/v1/auth', [
-            'json' => [
-                'appId' => env('GERENTI_API_APP_ID'),
-                'appSecret' => env('GERENTI_API_APP_SECRET')
-            ]
-        ]);
+            try {
+                $response = $client->request('POST', env('GERENTI_API_BASE_URL') . '/api/v1/auth', [
+                    'json' => [
+                        'appId' => env('GERENTI_API_APP_ID'),
+                        'appSecret' => env('GERENTI_API_APP_SECRET')
+                    ]
+                ]);
+    
+                $this->bearerToken = json_decode($response->getBody()->getContents(), true)['data']['accessToken'];
+            }
+            catch (Exception $e) {
+                Log::error('ERROR WHEN GENERATING TOKEN. ' . $e->getTraceAsString());
 
-        $this->bearerToken = json_decode($response->getBody()->getContents(), true)['data']['accessToken'];
+                abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+            }
+        }
     }
 
     // API do GERENTI usada para emitir certidão
     public function gerentiGenerateCertidao($assId)
     {
-        // API exige geração de token
-        // if(is_null($this->bearerToken)) {
-        //     $this->generateToken();
-        // }
+        $this->generateToken();
 
         $client = new Client();
 
@@ -57,10 +60,7 @@ class GerentiApiRepository
     // API do GERENTI usada para recuperar certidão
     public function gerentiGetCertidao($assId)
     {
-        // API exige geração de token
-        // if(is_null($this->bearerToken)) {
-        //     $this->generateToken();
-        // }
+        $this->generateToken();
 
         $client = new Client();
 
