@@ -20,7 +20,7 @@ class GerentiApiRepository
             ]
         ]);
 
-        $this->bearerToken = json_decode($response->getBody()->getContents())->data->accessToken;
+        $this->bearerToken = json_decode($response->getBody()->getContents(), true)['data']['accessToken'];
     }
 
     // API do GERENTI usada para emitir certidão
@@ -44,7 +44,7 @@ class GerentiApiRepository
             ]
         ]);
 
-        return json_decode($response->getBody()->getContents());
+        return json_decode($response->getBody()->getContents(), true);
     }
 
     // API do GERENTI usada para recuperar certidão
@@ -61,6 +61,6 @@ class GerentiApiRepository
             ]
         ]);
 
-        return json_decode($response->getBody()->getContents());
+        return json_decode($response->getBody()->getContents(), true);
     }
 }

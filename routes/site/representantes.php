@@ -31,4 +31,5 @@ Route::prefix('representante')->group(function(){
     // Rotas para emissão de Certidão
     Route::get('/emitir-certidao', 'RepresentanteSiteController@emitirCertidaoView')->name('representante.emitirCertidaoView');
     Route::post('/emitir-certidao', 'RepresentanteSiteController@emitirCertidao')->name('representante.emitirCertidao');
+    Route::get('/baixar-certidao', 'RepresentanteSiteController@baixarCertidao')->name('representante.baixarCertidao');
 });

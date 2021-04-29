@@ -355,8 +355,7 @@ class RepresentanteSiteController extends Controller
 
         $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
 
-        $certidoes = $certidoes = $responseGerentiJson->data;
-
+        $certidoes = $responseGerentiJson['data'];
 
 
         return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir', 'certidoes'));
@@ -373,10 +372,10 @@ class RepresentanteSiteController extends Controller
         // Erro lançado na integração HTTP
         catch (RequestException $e) {
 
-            $responseGerentiJsonError = json_decode($e->getResponse()->getBody()->getContents());
+            $responseGerentiJsonError = json_decode($e->getResponse()->getBody()->getContents(), true);
 
             // Log do erro que o representante comercial recebeu, com mensagem de erro direto do GERENTI
-            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão. Erro: ' . $responseGerentiJsonError->error->messages[0]));
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão. Erro: ' . $responseGerentiJsonError['error']['messages'][0]));
 
             $titulo = 'Falha ao emitir certidão';
             $mensagem = 'Não foi possível emitir a certidão. Por favor entre em contato com o CORE-SP para mais informações.';
@@ -385,10 +384,10 @@ class RepresentanteSiteController extends Controller
             return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
         }
 
-        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson->data->numeroCertidao));
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson['data']['numeroCertidao']));
 
         // Arquivo enviado pelo GERENTI em base 64
-        $pdfBase64 = $responseGerentiJson->data->base64;
+        $pdfBase64 = $responseGerentiJson['data']['base64'];
 
         // Envio do PDF por e-mail
         $email = new CertidaoMail($pdfBase64);
@@ -409,7 +408,7 @@ class RepresentanteSiteController extends Controller
     {
         $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
 
-        $certidoes = $responseGerentiJson->data;
+        $certidoes = $responseGerentiJson['data'];
 
         $certidao = array_search($numero, array_column($certidoes, 'numeroDocumento'));
 
@@ -417,7 +416,7 @@ class RepresentanteSiteController extends Controller
             header('Content-Type: application/pdf');
 
             return response()->streamDownload(function () use ($pdfBase64){
-                echo base64_decode($certidao->base64);
+                echo base64_decode($certidao['base64']);
             }, 'certidao.pdf');
         }
         else {
