@@ -83,7 +83,8 @@
       </div>
     </div>
   </a>
-  <a href="/simulador">
+  {{-- CERTIDAO_V3 --}}
+  {{-- <a href="/simulador">
     <div class="box-dois azul-escuro-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
@@ -94,5 +95,5 @@
         </div>
       </div>
     </div>
-  </a>
+  </a>  --}}
 </div>
