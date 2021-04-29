@@ -8,6 +8,11 @@ class GerentiApiRepository
 {
     private $bearerToken;
 
+    public function __construct()
+    {
+        generateToken();
+    }
+
     // Função usada para gerar tokens nas chamadas das APIs do GERENTI
     protected function generateToken()
     {
@@ -27,7 +32,9 @@ class GerentiApiRepository
     public function gerentiGenerateCertidao($assId)
     {
         // API exige geração de token
-        $this->generateToken();
+        // if(is_null($this->bearerToken)) {
+        //     $this->generateToken();
+        // }
 
         $client = new Client();
 
@@ -51,7 +58,9 @@ class GerentiApiRepository
     public function gerentiGetCertidao($assId)
     {
         // API exige geração de token
-        $this->generateToken();
+        // if(is_null($this->bearerToken)) {
+        //     $this->generateToken();
+        // }
 
         $client = new Client();
 

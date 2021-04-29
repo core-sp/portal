@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Certidao;
 use App\Representante;
 use App\Rules\CpfCnpj;
@@ -353,9 +354,9 @@ class RepresentanteSiteController extends Controller
         $emitir = true;
 
 
-        $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
+        $responseGetCertidao = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
 
-        $certidoes = $responseGerentiJson['data'];
+        $certidoes = $responseGetCertidao['data'];
 
 
         return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir', 'certidoes'));
@@ -367,38 +368,67 @@ class RepresentanteSiteController extends Controller
     public function emitirCertidao() 
     {
         try {
-            $responseGerentiJson = $this->gerentiApiRepository->gerentiGenerateCertidao(Auth::guard('representante')->user()->ass_id);
+            $responseGetCertidao = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
         }
-        // Erro lançado na integração HTTP
-        catch (RequestException $e) {
+        catch (Exception $e) {
+            Log::error($e->getTraceAsString());
 
-            $responseGerentiJsonError = json_decode($e->getResponse()->getBody()->getContents(), true);
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+        }
 
-            // Log do erro que o representante comercial recebeu, com mensagem de erro direto do GERENTI
-            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão. Erro: ' . $responseGerentiJsonError['error']['messages'][0]));
+        $certidoes = $responseGetCertidao['data'];
+
+        $hasEmitido = in_array('Emitido', array_column($certidoes, 'status'));
+
+        if(!$hasEmitido) {
+            try {
+                $responseGerentiJson = $this->gerentiApiRepository->gerentiGenerateCertidao(Auth::guard('representante')->user()->ass_id);
+            }
+            // Erro lançado na integração HTTP
+            catch (RequestException $e) {
+    
+                $responseGerentiJsonError = json_decode($e->getResponse()->getBody()->getContents(), true);
+    
+                // Log do erro que o representante comercial recebeu, com mensagem de erro direto do GERENTI
+                event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão. Erro: ' . $responseGerentiJsonError['error']['messages'][0]));
+    
+                $titulo = 'Falha ao emitir certidão';
+                $mensagem = 'Não foi possível emitir a certidão. Por favor entre em contato com o CORE-SP para mais informações.';
+                $emitir = false;
+    
+                return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+            }
+            catch (Exception $e) {
+                Log::error($e->getTraceAsString());
+
+                abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+            }
+    
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson['data']['numeroDocumento']));
+    
+            // Arquivo enviado pelo GERENTI em base 64
+            $pdfBase64 = $responseGerentiJson['data']['base64'];
+    
+            // Envio do PDF por e-mail
+            $email = new CertidaoMail($pdfBase64);
+            Mail::to(Auth::guard('representante')->user()->email)->queue($email);
+    
+            // Download do arquivo PDF
+            header('Content-Type: application/pdf');
+    
+            return response()->streamDownload(function () use ($pdfBase64){
+                echo base64_decode($pdfBase64);
+            }, 'certidao.pdf');
+        }
+        else {
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão pois ainda possui certidão válida.'));
 
             $titulo = 'Falha ao emitir certidão';
-            $mensagem = 'Não foi possível emitir a certidão. Por favor entre em contato com o CORE-SP para mais informações.';
+            $mensagem = 'Não foi possível emitir a certidão pois ainda existe uma certidão válida.';
             $emitir = false;
 
             return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
         }
-
-        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson['data']['numeroDocumento']));
-
-        // Arquivo enviado pelo GERENTI em base 64
-        $pdfBase64 = $responseGerentiJson['data']['base64'];
-
-        // Envio do PDF por e-mail
-        $email = new CertidaoMail($pdfBase64);
-        Mail::to(Auth::guard('representante')->user()->email)->queue($email);
-
-        // Download do arquivo PDF
-        header('Content-Type: application/pdf');
-
-        return response()->streamDownload(function () use ($pdfBase64){
-            echo base64_decode($pdfBase64);
-        }, 'certidao.pdf');
     }
 
     /**
@@ -424,7 +454,7 @@ class RepresentanteSiteController extends Controller
         }
         else {
             $titulo = 'Falha ao baixar certidão';
-            $mensagem = 'Não foi possível baixar a certidão. Por favor entre em contato com o CORE-SP para mais informações.';
+            $mensagem = 'Não foi possível baixar a certidão.';
             $emitir = false;
 
             return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
