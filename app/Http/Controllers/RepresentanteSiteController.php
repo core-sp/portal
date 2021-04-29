@@ -349,8 +349,13 @@ class RepresentanteSiteController extends Controller
     public function emitirCertidaoView() 
     {
         $titulo = 'Emissão de Certidão';
-        $mensagem = 'Clique no botão abaixo para verificar e emitir sua Certidão de Regularidade.</br>';
+        $mensagem = 'Clique no botão abaixo para verificar e emitir sua Certidão.</br>';
         $emitir = true;
+
+
+        $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
+
+        
 
         return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir'));
     }

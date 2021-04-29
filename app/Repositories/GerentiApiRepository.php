@@ -46,4 +46,21 @@ class GerentiApiRepository
 
         return json_decode($response->getBody()->getContents());
     }
+
+    // API do GERENTI usada para recuperar certidão
+    public function gerentiGetCertidao($assId)
+    {
+        // API exige geração de token
+        $this->generateToken();
+
+        $client = new Client();
+
+        $response =  $client->request('GET', env('GERENTI_API_BASE_URL') . '/api/v1/representantes/' . $assId . '/documentos', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->bearerToken
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents());
+    }
 }
