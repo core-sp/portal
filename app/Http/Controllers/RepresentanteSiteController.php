@@ -355,9 +355,11 @@ class RepresentanteSiteController extends Controller
 
         $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
 
-        
+        $certidoes = $certidoes = $responseGerentiJson->data;
 
-        return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir'));
+
+
+        return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir', 'certidoes'));
     }
     
     /**
@@ -399,4 +401,32 @@ class RepresentanteSiteController extends Controller
             echo base64_decode($pdfBase64);
         }, 'certidao.pdf');
     }
+
+    /**
+     * Faz download do PDF da certidão do Representante Comercial através do númeo da certidão.
+     */
+    public function baixarCertidao($numero) 
+    {
+        $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
+
+        $certidoes = $responseGerentiJson->data;
+
+        $certidao = array_search($numero, array_column($certidoes, 'numeroDocumento'));
+
+        if($certidao->status = 'Emitido') {
+            header('Content-Type: application/pdf');
+
+            return response()->streamDownload(function () use ($pdfBase64){
+                echo base64_decode($certidao->base64);
+            }, 'certidao.pdf');
+        }
+        else {
+            $titulo = 'Falha ao baixar certidão';
+            $mensagem = 'Não foi possível baixar a certidão. Por favor entre em contato com o CORE-SP para mais informações.';
+            $emitir = false;
+
+            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+        }
+    }
+
 }
