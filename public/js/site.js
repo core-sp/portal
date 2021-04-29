@@ -731,4 +731,5 @@ function showLoading()
 
 $('.emitirCertidaoBtn').on('click', function(){
 	$('.emitirCertidaoBtn').hide();
+	$('.baixarCertidaoBtn').hide();
 });

@@ -33,7 +33,7 @@
                     <form action="{{ route('representante.baixarCertidao') }}" method="GET" class="d-inline">
                         @csrf
                         <input type="hidden" name="numero" value="{{ $certidao['numeroDocumento'] }}" />
-                        <input type="submit" value="Baixar" class="btn btn-sm btn-success" />
+                        <input type="submit" value="Baixar" class="baixarCertidaoBtn btn btn-sm btn-success" />
                     </form>
                 </div>
                 @endif
