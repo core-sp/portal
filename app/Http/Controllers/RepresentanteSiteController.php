@@ -384,7 +384,7 @@ class RepresentanteSiteController extends Controller
             return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
         }
 
-        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson['data']['numeroCertidao']));
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson['data']['numeroDocumento']));
 
         // Arquivo enviado pelo GERENTI em base 64
         $pdfBase64 = $responseGerentiJson['data']['base64'];
@@ -404,19 +404,22 @@ class RepresentanteSiteController extends Controller
     /**
      * Faz download do PDF da certidão do Representante Comercial através do númeo da certidão.
      */
-    public function baixarCertidao($numero) 
+    public function baixarCertidao(Request $request) 
     {
         $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
 
         $certidoes = $responseGerentiJson['data'];
 
-        $certidao = array_search($numero, array_column($certidoes, 'numeroDocumento'));
+        $posCertidao = array_search($request->numero, array_column($certidoes, 'numeroDocumento'));
 
-        if($certidao->status = 'Emitido') {
+        if($certidoes[$posCertidao]['status'] === 'Emitido') {
+
+            $pdfBase64 = $certidoes[$posCertidao]['base64'];
+
             header('Content-Type: application/pdf');
 
             return response()->streamDownload(function () use ($pdfBase64){
-                echo base64_decode($certidao['base64']);
+                echo base64_decode($pdfBase64);
             }, 'certidao.pdf');
         }
         else {
