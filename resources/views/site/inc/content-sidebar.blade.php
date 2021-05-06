@@ -83,17 +83,4 @@
       </div>
     </div>
   </a>
-  {{-- CERTIDAO_V3 --}}
-  {{-- <a href="/simulador">
-    <div class="box-dois azul-escuro-bg mb-3">
-      <div class="inside-box-dois d-flex">
-        <div class="align-self-center">
-          <img src="{{ asset('img/file.png') }}" class="inside-img" alt="Consulta de certidão">
-        </div>
-        <div class="flex-one align-self-center pl-4">
-          <h5 class="text-uppercase normal branco">Consulta de certidão</h5>
-        </div>
-      </div>
-    </div>
-  </a>  --}}
 </div>
