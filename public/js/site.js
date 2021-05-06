@@ -349,6 +349,11 @@ $('#ano-mapa').on({
 
 		// Zera o valor do dia, ao selecionar a regional
 		$('#idregional').change(function(){
+
+			if($('#idregional').val() == 14) {
+				alert('Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: Av. Brigadeiro Luís Antônio, 613, Térreo, CEP:01317-000, São Paulo/SP.');
+			}
+
 			$('#datepicker').val('');
 			$('#datepicker').prop('disabled', true);
 
