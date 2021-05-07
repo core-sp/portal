@@ -130,6 +130,7 @@ Route::prefix('admin')->group(function() {
   Route::get('/representantes/buscaGerenti', 'RepresentanteController@buscaGerentiView');
   Route::get('/representantes/buscaGerenti/resultado', 'RepresentanteController@buscaGerenti')->name('admin.representante.buscaGerenti');
   Route::get('/representantes/info', 'RepresentanteController@representanteInfo');
+  Route::get('/representantes/baixar-certidao', 'RepresentanteController@baixarCertidao')->name('admin.representante.baixarCertidao');
 
   // Mudança de endereço
   Route::get('/representante-enderecos', 'RepresentanteEnderecoController@index');

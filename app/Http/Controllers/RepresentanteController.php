@@ -15,6 +15,7 @@ class RepresentanteController extends Controller
     // Nome da classe
     private $class = 'RepresentanteController';
     private $gerentiRepository;
+    private $gerentiApiRepository;
 
     // Variáveis
     public $variaveis = [
@@ -31,6 +32,7 @@ class RepresentanteController extends Controller
     {
         $this->middleware('auth');
         $this->gerentiRepository = $gerentiRepository;
+        $this->gerentiApiRepository = $gerentiApiRepository;
     }
 
     public function resultados()
@@ -182,8 +184,9 @@ class RepresentanteController extends Controller
         $cobrancas = $this->gerentiRepository->gerentiCobrancas($request->ass_id);
         $situacao = trim(explode(':', $this->gerentiRepository->gerentiStatus($request->ass_id))[1]);
         $certidoes = $this->listarCertidao($request->ass_id);
+        $assId = $request->ass_id;
         
-        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes'));
+        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes'. 'assId'));
     }
 
     public function listarCertidao($assId) 
@@ -202,6 +205,32 @@ class RepresentanteController extends Controller
         array_multisort(array_column($certidoes, 'dataEmissao'), SORT_DESC, array_column($certidoes, 'horaEmissao'), SORT_DESC, $certidoes);
 
         return $certidoes;
+    }
 
+    public function baixarCertidao(Request $request) 
+    {
+        $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao($request->assId);
+
+        $certidoes = $responseGerentiJson['data'];
+
+        $posCertidao = array_search($request->numero, array_column($certidoes, 'numeroDocumento'));
+
+        if($certidoes[$posCertidao]['status'] === 'Emitido') {
+
+            $pdfBase64 = $certidoes[$posCertidao]['base64'];
+
+            header('Content-Type: application/pdf');
+
+            return response()->streamDownload(function () use ($pdfBase64){
+                echo base64_decode($pdfBase64);
+            }, 'certidao.pdf');
+        }
+        else {
+            $titulo = 'Falha ao baixar certidão';
+            $mensagem = 'Não foi possível baixar a certidão.';
+            $emitir = false;
+
+            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+        }
     }
 }

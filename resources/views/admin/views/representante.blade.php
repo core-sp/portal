@@ -195,17 +195,32 @@
                                                 <th>Data emissão</th>
                                                 <th>Hora emissão</th>
                                                 <th>Status</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($certidoes as $certidao)
-                                                <tr>
-                                                    <td>{{ $certidao['numeroDocumento'] }}</td>
-                                                    <td>{{ $certidao['dataEmissao'] }}</td>
-                                                    <td>{{ $certidao['horaEmissao'] }}</td>
-                                                    <td>{{ $certidao['status'] }}</td>
-                                                </tr>
-                                            @endforeach
+                                        @foreach($certidoes as $certidao)
+                                            <tr>
+                                                <td>{{ $certidao['numeroDocumento'] }}</td>
+                                                <td>{{ $certidao['dataEmissao'] }}</td>
+                                                <td>{{ $certidao['horaEmissao'] }}</td>
+                                                <td>{{ $certidao['status'] }}</td>
+                                                @if(trim($certidao['status']) == 'Emitido')
+                                                    <td>
+                                                        <div class="contato-btns">
+                                                            <form action="{{ route('admin.representante.baixarCertidao') }}" method="GET" class="d-inline">
+                                                                @csrf
+                                                                <input type="hidden" name="numero" value="{{ $certidao['numeroDocumento'] }}" />
+                                                                <input type="hidden" name="assId" value="{{ $assId }}" />
+                                                                <input type="submit" value="Baixar" class="baixarCertidaoBtn btn btn-sm btn-success" />
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                @else
+                                                    <td></td>
+                                                @endif
+                                            </tr>
+                                        @endforeach
                                         </tbody>
                                     </table>
                                 @else
