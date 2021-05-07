@@ -25,6 +25,9 @@
                         <a class="nav-link" id="vert-tabs-settings-tab" data-toggle="pill" href="#vert-tabs-settings" role="tab" aria-controls="vert-tabs-settings" aria-selected="false">
                             Situação Financeira
                         </a>
+                        <a class="nav-link" id="vert-tabs-certidoes-tab" data-toggle="pill" href="#vert-tabs-certidoes" role="tab" aria-controls="vert-tabs-certidoes" aria-selected="false">
+                            Certidões
+                        </a>
                     </div>
                 </div>
                 <div class="col-7 col-sm-9 setecinco">
@@ -175,6 +178,50 @@
                                 -----
                             @endif
                         </div>
+
+
+
+                        <div class="tab-pane fade" id="vert-tabs-certidoes" role="tabpanel" aria-labelledby="vert-tabs-certidoes-tab">
+                            @if (isset($certidoes))
+                                <h5 class="mb-2">
+                                    <i class="fas fa-level-up-alt rotate-90"></i>
+                                    &nbsp;&nbsp;CERTIDÕES EMITIDAS
+                                </h5>
+                                @if(count($certidoes))
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Número</th>
+                                                <th>Data emissão</th>
+                                                <th>Hora emissão</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($certidoes as $certidao)
+                                                <tr>
+                                                    <td>{{ $certidao['numeroDocumento'] }}</td>
+                                                    <td>{{ $certidao['dataEmissao'] }}</td>
+                                                    <td>{{ $certidao['horaEmissao'] }}</td>
+                                                    <td>{{ $certidao['status'] }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            <tr>
+                                                <td> Nada a mostrar aqui.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                @endif
+                            @else
+                                -----
+                            @endif
+                        </div>
+
                     </div>
                 </div>
             </div>
