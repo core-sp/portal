@@ -186,7 +186,7 @@ class RepresentanteController extends Controller
         $certidoes = $this->listarCertidao($request->ass_id);
         $assId = $request->ass_id;
         
-        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes'. 'assId'));
+        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes', 'assId'));
     }
 
     public function listarCertidao($assId) 
