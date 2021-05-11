@@ -255,10 +255,21 @@
                 <h5 class="branco">Localização</h5>
               </div>
               <p class="branco mb-1">
-                Av. Brigadeiro Luís Antônio, 613
+                <strong>SEDE</strong>
+                <br />Av. Brigadeiro Luís Antônio, 613
                 <br />5º andar - CEP: 01317-000
-                <br />São Paulo - SP
-                <br />CNPJ: 60.746.179/0001-52
+                <br />Bela Vista - São Paulo - SP
+              </p>
+              <br />
+              <p class="branco mb-1">
+                <strong>UNIDADE ADMINISTRATIVA ALAMENDA SANTOS</strong>
+                <br />Alameda Santos, 1787
+                <br />Cj. 61 - CEP: 01419-906
+                <br />Cerqueira César - São Paulo - SP
+              </p>
+              <br />
+              <p class="branco mb-1">
+                CNPJ: 60.746.179/0001-52
               </p>
               <div class="footer-title w-75 mb-3 mt-4">
                 <h5 class="branco">Contato</h5>
