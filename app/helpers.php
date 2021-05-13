@@ -536,6 +536,7 @@ function situacoesLicitacao()
         'Em Andamento',
         'Em fase de recurso',
         'Encerrado',
+        'Fase interna',
         'Homologado',
         'Suspenso'
     ];
