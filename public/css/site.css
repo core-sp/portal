@@ -311,6 +311,15 @@ strong, .bold {
 	font-weight: 300;
 }
 
+.conteudo-txt a,
+.conteudo-txt-mini a {
+	color: #ff0000;
+}
+
+.prestacao-txt a {
+	color: #000000;
+}
+
 .conteudo-txt a:hover,
 .conteudo-txt-mini a:hover {
 	text-decoration: underline;
