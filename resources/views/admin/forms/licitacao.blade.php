@@ -1,10 +1,3 @@
-@php
-  use \App\Licitacao;
-
-  $modalidades = Licitacao::modalidadesLicitacao();
-  $situacoes = Licitacao::situacoesLicitacao();
-@endphp
-
 <form role="form" method="POST" action="{{ isset($resultado) ? route('licitacoes.update', $resultado->idlicitacao) : route('licitacoes.store') }}">
     @csrf
     @if(isset($resultado))

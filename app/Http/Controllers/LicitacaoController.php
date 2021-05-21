@@ -57,8 +57,10 @@ class LicitacaoController extends Controller
         $this->autoriza($this->class, __FUNCTION__);
 
         $variaveis = (object) $this->variaveis;
+        $modalidades = Licitacao::modalidadesLicitacao();
+        $situacoes = Licitacao::situacoesLicitacao();
 
-        return view('admin.crud.criar', compact('variaveis'));
+        return view('admin.crud.criar', compact('variaveis', 'modalidades', 'situacoes'));
     }
 
     public function store(LicitacaoRequest $request)
@@ -84,8 +86,10 @@ class LicitacaoController extends Controller
 
         $resultado = $this->licitacaoRepository->findById($id);
         $variaveis = (object) $this->variaveis;
+        $modalidades = Licitacao::modalidadesLicitacao();
+        $situacoes = Licitacao::situacoesLicitacao();
 
-        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+        return view('admin.crud.editar', compact('resultado', 'variaveis', 'modalidades', 'situacoes'));
     }
 
     public function update(LicitacaoRequest $request, $id)
@@ -174,9 +178,11 @@ class LicitacaoController extends Controller
     public function siteGrid()
     {
         $licitacoes = $this->licitacaoRepository->getSiteGrid();
+        $modalidades = Licitacao::modalidadesLicitacao();
+        $situacoes = Licitacao::situacoesLicitacao();
 
         return response()
-            ->view('site.licitacoes', compact('licitacoes'))
+            ->view('site.licitacoes', compact('licitacoes', 'modalidades', 'situacoes'))
             ->header('Cache-Control','no-cache');
     }
 
@@ -211,7 +217,10 @@ class LicitacaoController extends Controller
             $licitacoes = null;
         } 
 
-        return view('site.licitacoes', compact('licitacoes', 'busca'));
+        $modalidades = Licitacao::modalidadesLicitacao();
+        $situacoes = Licitacao::situacoesLicitacao();
+
+        return view('site.licitacoes', compact('licitacoes', 'busca', 'modalidades', 'situacoes'));
     }
 
     protected function tabelaHeaders()

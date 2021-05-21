@@ -1,10 +1,3 @@
-@php
-  use \App\Licitacao;
-
-  $modalidades = Licitacao::modalidadesLicitacao();
-  $situacoes = Licitacao::situacoesLicitacao();
-@endphp
-
 @extends('site.layout.app', ['title' => 'Licitações'])
 
 @section('content')
@@ -39,7 +32,7 @@
               <input type="text"
                 name="palavrachave"
                 class="form-control {{ !empty(Request::input('palavrachave')) ? 'bg-focus border-info' : '' }}"
-                placeholder="Insira uma palavrachave"
+                placeholder="Insira uma palavra-chave"
                 @if(!empty(Request::input('palavrachave')))
                 value="{{ Request::input('palavrachave') }}"
                 @endif
