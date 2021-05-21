@@ -1,3 +1,10 @@
+@php
+  use \App\Licitacao;
+
+  $modalidades = Licitacao::modalidadesLicitacao();
+  $situacoes = Licitacao::situacoesLicitacao();
+@endphp
+
 @extends('site.layout.app', ['title' => 'Licitações'])
 
 @section('content')
@@ -40,9 +47,9 @@
             </div>
           	<div class="col-md-4">
           	  <label for="modalidade">Modalidade</label>
-          	  <select name="modalidade" class="form-control {{ !empty(Request::input('modalidade')) && in_array(Request::input('modalidade'), modalidadesLicitacao()) ? 'bg-focus border-info' : '' }}" id="modalidade">
+          	  <select name="modalidade" class="form-control {{ !empty(Request::input('modalidade')) && in_array(Request::input('modalidade'), $modalidades) ? 'bg-focus border-info' : '' }}" id="modalidade">
           	  	<option value="">Todas</option>
-	         	    @foreach(modalidadesLicitacao() as $modalidade)
+	         	    @foreach($modalidades as $modalidade)
                   @if($modalidade === Request::input('modalidade'))
                   <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
                   @else
@@ -79,9 +86,9 @@
           <div class="form-row">
           	<div class="col-lg-4 col-md-6">
           	  <label for="situacao">Situação</label>
-          	  <select name="situacao" class="form-control {{ !empty(Request::input('situacao')) && in_array(Request::input('situacao'), situacoesLicitacao()) ? 'bg-focus border-info' : '' }}" id="situacao">
+          	  <select name="situacao" class="form-control {{ !empty(Request::input('situacao')) && in_array(Request::input('situacao'), $situacoes) ? 'bg-focus border-info' : '' }}" id="situacao">
           	  	<option value="">Qualquer</option>
-	         	    @foreach(situacoesLicitacao() as $situacao)
+	         	    @foreach($situacoes as $situacao)
                   @if($situacao === Request::input('situacao'))
                   <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
                   @else

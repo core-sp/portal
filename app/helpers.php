@@ -508,40 +508,6 @@ function tailCustom($filepath, $lines = 1, $adaptive = true) {
     return trim($output);
 }
 
-function modalidadesLicitacao()
-{
-    return [
-        'Carta Convite',
-        'Concorrência Pública',
-        'Concurso',
-        'Cotação Eletrônica',
-        'Credenciamento',
-        'Leilão',
-        'Pregão Eletrônico SRP',
-        'Pregão Eletrônico Tradicional',
-        'Pregão Presencial',
-        'Tomada de Preços'
-    ];
-}
-
-function situacoesLicitacao()
-{
-    return [
-        'Aberto',
-        'Adjudicado',
-        'Anulado',
-        'Cancelado',
-        'Concluído',
-        'Deserto',
-        'Em Andamento',
-        'Em fase de recurso',
-        'Encerrado',
-        'Fase interna',
-        'Homologado',
-        'Suspenso'
-    ];
-}
-
 function retornaDateTime($dia, $hora)
 {
     $dia = str_replace('/','-',$dia);
