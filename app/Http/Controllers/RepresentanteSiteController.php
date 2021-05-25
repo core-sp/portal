@@ -454,7 +454,7 @@ class RepresentanteSiteController extends Controller
     {
         $valores = $this->gerentiRepository->gerentiCalculadoraRefis(Auth::guard('representante')->user()->ass_id);
 
-        return view('site.representante.calculadora-refis.blade', compact('valores'));
+        return view('site.representante.calculadora-refis', compact('valores'));
     }
 
 }
