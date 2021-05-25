@@ -96,6 +96,29 @@ class GerentiRepository implements GerentiRepositoryInterface
         return $resultado;
     }
 
+    public function gerentiCalculadoraRefis($ass_id)
+    {
+        $cobrancas = $this->gerentiBolestosLista($ass_id);
+        $cobrancas = utf8_converter($cobrancas);
+
+        $totalAnuidade = 0;
+        $totalDebito = 0;
+        
+        foreach($cobrancas as $cobranca) {
+            if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] === 'Em aberto' && $cobranca['VENCIMENTOBOLETO'] === null) {
+                $totalAnuidade += $cobranca['VALOR'];
+                $totalDebito += $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO'];
+            } 
+        }
+        
+        $resultado = [
+            'totalAnuidade' => $totalAnuidade,
+            'totalDebito' => $totalDebito
+        ];
+
+        return $resultado;
+    }
+
     /**
      * Método para formatar os dados de endereço do GERENTI para emissão de Certidão
      */

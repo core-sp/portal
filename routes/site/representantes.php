@@ -32,4 +32,7 @@ Route::prefix('representante')->group(function(){
     Route::get('/emitir-certidao', 'RepresentanteSiteController@emitirCertidaoView')->name('representante.emitirCertidaoView');
     Route::post('/emitir-certidao', 'RepresentanteSiteController@emitirCertidao')->name('representante.emitirCertidao');
     Route::get('/baixar-certidao', 'RepresentanteSiteController@baixarCertidao')->name('representante.baixarCertidao');
+
+    // Rota para calculadora Refis
+    Route::get('/calculadora-refis', 'RepresentanteSiteController@calculadoraRefis')->name('representante.calculadoraRefis');
 });
