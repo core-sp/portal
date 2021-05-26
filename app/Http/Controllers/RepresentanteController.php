@@ -7,7 +7,7 @@ use App\Rules\CpfCnpj;
 use Illuminate\Http\Request;
 use App\Repositories\GerentiApiRepository;
 use App\Repositories\GerentiRepositoryInterface;
-use Illuminate\Support\Facades\Request as FacadesRequest;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteController extends Controller
 {
@@ -87,7 +87,7 @@ class RepresentanteController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = preg_replace('/[^0-9A-Za-z]+/', '', FacadesRequest::input('q'));
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Representante::where('nome','LIKE','%'.$busca.'%')
             ->orWhere('registro_core','LIKE','%'.$busca.'%')
