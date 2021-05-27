@@ -25,12 +25,12 @@
                 @foreach ($anuidades as $i => $anuidade)
                     <tr>
                         <td class="ls-meio-neg"><input type="checkbox" id="{{ $i }}" class="refis-checkbox" /></td>
-                        <td id="{{ descricao_.$i }}" class="ls-meio-neg">{{ $anuidade['DESCRICAO'] }}</td>
-                        <td id="{{ valor_.$i }}" class="ls-meio-neg" value="{{ $anuidade['VALOR'] }}">R$ {{ toReais($anuidade['VALOR']) }}</td>
-                        <td id="{{ juros_.$i }}" class="ls-meio-neg" value="{{ $anuidade['JUROS'] }}">R$ {{ toReais($anuidade['JUROS']) }}</td>
-                        <td id="{{ multa_.$i }}" class="ls-meio-neg" value="{{ $anuidade['MULTA'] }}">R$ {{ toReais($anuidade['MULTA']) }}</td>
-                        <td id="{{ correcao_.$i }}" class="ls-meio-neg" value="{{ $anuidade['CORRECAO'] }}">R$ {{ toReais($anuidade['CORRECAO']) }}</td>
-                        <td id="{{ total_.$i }}" class="ls-meio-neg" value="{{ $anuidade['TOTAL'] }}">R$ {{ toReais($anuidade['TOTAL']) }}</td>
+                        <td id="{{ 'descricao_'.$i }}" class="ls-meio-neg">{{ $anuidade['DESCRICAO'] }}</td>
+                        <td id="{{ 'valor_'.$i }}" class="ls-meio-neg" value="{{ $anuidade['VALOR'] }}">R$ {{ toReais($anuidade['VALOR']) }}</td>
+                        <td id="{{ 'juros_'.$i }}" class="ls-meio-neg" value="{{ $anuidade['JUROS'] }}">R$ {{ toReais($anuidade['JUROS']) }}</td>
+                        <td id="{{ 'multa_'.$i }}" class="ls-meio-neg" value="{{ $anuidade['MULTA'] }}">R$ {{ toReais($anuidade['MULTA']) }}</td>
+                        <td id="{{ 'correcao_'.$i }}" class="ls-meio-neg" value="{{ $anuidade['CORRECAO'] }}">R$ {{ toReais($anuidade['CORRECAO']) }}</td>
+                        <td id="{{ 'total_'.$i }}" class="ls-meio-neg" value="{{ $anuidade['TOTAL'] }}">R$ {{ toReais($anuidade['TOTAL']) }}</td>
                     </tr>
                 @endforeach
             </tbody>
