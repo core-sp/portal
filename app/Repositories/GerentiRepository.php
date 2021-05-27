@@ -109,7 +109,7 @@ class GerentiRepository implements GerentiRepositoryInterface
                 // $totalDebito += $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO'];
                 // array_push($anuidades, $cobranca['DESCRICAO']);
 
-                array_push($anuidades, ['DESCRICAO' => $cobranca['DESCRICAO'], 'MULTA' => $cobranca['MULTA'], 'JUROS' => $cobranca['JUROS'], 'CORRECAO' => $cobranca['CORRECAO'], 'TOTAL' => $cobranca['VALOR'] + $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO']]);
+                array_push($anuidades, ['DESCRICAO' => $cobranca['DESCRICAO'], 'VALOR' => $cobranca['VALOR'], 'MULTA' => $cobranca['MULTA'], 'JUROS' => $cobranca['JUROS'], 'CORRECAO' => $cobranca['CORRECAO'], 'TOTAL' => $cobranca['VALOR'] + $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO']]);
             } 
         }
 
