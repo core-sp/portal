@@ -6,9 +6,9 @@
     <div class="nomargin conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Calculadora Refis</h4>
         <div class="linha-lg-mini mb-3"></div>
-        <p>Teste da calculadora Refis</p>
-        <h5 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;Anuidades em aberto</h5>
         @if (!empty($anuidades))
+        <p>Selecione as anuidades em aberto para consultar valores com descontos.</p>
+        <h5 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;Anuidades em aberto</h5>
         <table class="table table-bordered bg-white mb-0">
             <thead>
                 <tr>
@@ -37,17 +37,17 @@
         </table>
 
         <div class="contatos-table space-single">
-            <p class="light pb-0">Total: <div id="total" value="0">0</div></p>
-            <p class="light pb-0">Desconto 90%: <div id="total90" value="0">0</div></p>
-            <p class="light pb-0">Desconto 80%: <div id="total80" value="0">0</div></p>
-            <p class="light pb-0">Desconto 60%: <div id="total60" value="0">0</div></p>
+            <h3 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;Total s/ desconto: <div id="total" value="0">R$ 0,00</div></h3>
+            <h3 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;Total c/ 90% de desconto: <div id="total90" value="0">R$ 0,00</div></h3>
+            <h3 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;Total c/ 80% de desconto: <div id="total80" value="0">R$ 0,00</div></h3>
+            <h3 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;Total c/ 60% de desconto: <div id="total60" value="0">R$ 0,00</div></h3>
         </div>
 
         @else
-            <div class="contatos-table space-single">
-                <p class="light pb-0">Nada a mostrar aqui.</p>
-            </div>
+        <p>Não foi encontrado nenhuma anuidade em aberto elegível para Refis. Não é possível consultar valores com descontos.</p>
         @endif
+
+
     </div>            
 </div>
 

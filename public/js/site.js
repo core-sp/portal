@@ -716,19 +716,46 @@ function getDate() {
 	});
 
 	$(document).on('change', ".refis-checkbox", function() {
-		var total = parseFloat($('#total').attr('value'));
-		var total90 = parseFloat($('#total90').attr('value'));
-		var total80 = parseFloat($('#total80').attr('value'));
-		var total60 = parseFloat($('#total60').attr('value'));
-		var valorAnuidade = parseFloat($('#valor_' + $(this).attr('id')).attr('value'));
+		var anuidadesSelecionadas = $('.refis-checkbox:checkbox:checked');
+		if(anuidadesSelecionadas.length > 0) {
 
-		if(this.checked) {
-			
-			$('#total').attr('value', (total + valorAnuidade).toFixed(2));
+			var total = 0;
+			var anuidade = 0;
+			var debitos = 0;
 
+			anuidadesSelecionadas.each(function(){
+				total += parseFloat($('#total_' + $(this).attr('id')).attr('value'));
+				anuidade += parseFloat($('#valor_' + $(this).attr('id')).attr('value'));
+				debitos += parseFloat($('#multa_' + $(this).attr('id')).attr('value')) + parseFloat($('#juros_' + $(this).attr('id')).attr('value')) + parseFloat($('#correcao_' + $(this).attr('id')).attr('value'))
+			});
 
-		} else {
-			$('#total').attr('value', (total - valorAnuidade).toFixed(2));
+			$('#total').attr('value', total.toFixed(2));
+			$('#total').html('R$ ' + total.toFixed(2).replace('.', ','));
+
+			var total90 =  (anuidade + (debitos - (debitos * 0.9))).toFixed(2);
+			$('#total90').attr('value', total90);
+			$('#total90').html('R$ ' + total90.replace('.', ','));
+
+			var total80 =  (anuidade + (debitos - (debitos * 0.8))).toFixed(2);
+			$('#total80').attr('value', total80);
+			$('#total80').html('R$ ' + total80.replace('.', ','));
+
+			var total60 =  (anuidade + (debitos - (debitos * 0.6))).toFixed(2);
+			$('#total60').attr('value', total60);
+			$('#total60').html('R$ ' + total60.replace('.', ','));
+		}
+		else {
+			$('#total').attr('value', 0);
+			$('#total').html('R$ 0,00');
+
+			$('#total90').attr('value', 0);
+			$('#total90').html('R$ 0,00');
+
+			$('#total80').attr('value', 0);
+			$('#total80').html('R$ 0,00');
+
+			$('#total60').attr('value', 0);
+			$('#total60').html('R$ 0,00');
 		}
 	});
 
