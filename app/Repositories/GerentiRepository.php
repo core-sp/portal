@@ -101,22 +101,30 @@ class GerentiRepository implements GerentiRepositoryInterface
         $cobrancas = $this->gerentiBolestosLista($ass_id);
         $cobrancas = utf8_converter($cobrancas);
 
-        $totalAnuidade = 0;
-        $totalDebito = 0;
+        $anuidades = [];
         
         foreach($cobrancas as $cobranca) {
             if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] === 'Em aberto' && $cobranca['VENCIMENTOBOLETO'] === null) {
-                $totalAnuidade += $cobranca['VALOR'];
-                $totalDebito += $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO'];
+                // $totalAnuidade += $cobranca['VALOR'];
+                // $totalDebito += $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO'];
+                // array_push($anuidades, $cobranca['DESCRICAO']);
+
+                array_push($anuidades, ['DESCRICAO' => $cobranca['DESCRICAO'], 'MULTA' => $cobranca['MULTA'], 'JUROS' => $cobranca['JUROS'], 'CORRECAO' => $cobranca['CORRECAO'], 'TOTAL' => $cobranca['VALOR'] + $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO']]);
             } 
         }
-        
-        $resultado = [
-            'totalAnuidade' => $totalAnuidade,
-            'totalDebito' => $totalDebito
-        ];
 
-        return $resultado;
+        return $anuidades;
+        
+        // $resultado = [
+        //     'totalAnuidade' => $totalAnuidade,
+        //     'totalDebito' => $totalDebito,
+        //     'anuidades' => $anuidades,
+        //     'totalDebito90' => $totalDebito - $totalDebito * 0.9,
+        //     'totalDebito80' => $totalDebito - $totalDebito * 0.8,
+        //     'totalDebito60' => $totalDebito - $totalDebito * 0.6
+        // ];
+
+        // return $resultado;
     }
 
     /**

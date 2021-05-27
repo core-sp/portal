@@ -452,9 +452,9 @@ class RepresentanteSiteController extends Controller
 
     public function calculadoraRefis()
     {
-        $valores = $this->gerentiRepository->gerentiCalculadoraRefis(Auth::guard('representante')->user()->ass_id);
+        $anuidades = $this->gerentiRepository->gerentiCalculadoraRefis(Auth::guard('representante')->user()->ass_id);
 
-        return view('site.representante.calculadora-refis', compact('valores'));
+        return view('site.representante.calculadora-refis', compact('anuidades'));
     }
 
 }
