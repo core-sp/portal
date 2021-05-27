@@ -714,6 +714,24 @@ function getDate() {
 		$('#showCrimageDois').hide();
 		$('#divCrimageDois').show();
 	});
+
+	$(document).on('change', ".refis-checkbox", function() {
+		var total = $('#total').attr('value');
+		var total90 = $('#total90').attr('value');
+		var total80 = $('#total80').attr('value');
+		var total60 = $('#total60').attr('value');
+		var valorAnuidade = $('#valor_' + $(this).attr('id')).attr('value');
+
+		if(this.checked) {
+			
+			$('#total').attr('value', total + valorAnuidade);
+
+
+		} else {
+			$('#total').attr('value', total - valorAnuidade);
+		}
+	});
+
 })(jQuery);
 
 // Lazy-load

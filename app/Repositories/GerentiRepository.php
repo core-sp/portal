@@ -104,12 +104,12 @@ class GerentiRepository implements GerentiRepositoryInterface
         $anuidades = [];
         
         foreach($cobrancas as $cobranca) {
-            if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] === 'Em aberto' && date('Y', strtotime($cobrancas[10]['VENCIMENTO'])) < date('Y')) {
+            if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] === 'Em aberto' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y')) {
                 // $totalAnuidade += $cobranca['VALOR'];
                 // $totalDebito += $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO'];
                 // array_push($anuidades, $cobranca['DESCRICAO']);
 
-                array_push($anuidades, ['DESCRICAO' => $cobranca['DESCRICAO'], 'VALOR' => $cobranca['VALOR'], 'MULTA' => $cobranca['MULTA'], 'JUROS' => $cobranca['JUROS'], 'CORRECAO' => $cobranca['CORRECAO'], 'TOTAL' => $cobranca['VALOR'] + $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO']]);
+                array_push($anuidades, $cobranca);
             } 
         }
 
