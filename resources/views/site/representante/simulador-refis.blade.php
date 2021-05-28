@@ -28,7 +28,7 @@
                         </td>
                         <td id="parcelamento90" class="ls-meio-neg">R$ {{ toReais($total90/$nParcelas90[0]) }}</td>
                     @else
-                        <td class="ls-meio-neg">Total c/ 90% de desconto<p class="text-left"><small>* não disponível</small></p></td>
+                        <td class="ls-meio-neg">Total c/ 90% de desconto<p class="text-left alert-danger"><small>* não disponível devido ao valor mínimo de parcela</small></p></td>
                         <td class="ls-meio-neg"><div id="total90" value="0">-</div></td>
                         <td class="ls-meio-neg">-</td>
                         <td class="ls-meio-neg">-</td>
@@ -46,7 +46,7 @@
                         </td>
                         <td id="parcelamento80" class="ls-meio-neg">R$ {{ toReais($total80/$nParcelas80[0]) }}</td>
                     @else
-                        <td class="ls-meio-neg">Total c/ 80% de desconto<p class="text-left"><small>* não disponível</small></p></td>
+                        <td class="ls-meio-neg">Total c/ 80% de desconto<p class="text-left alert-danger"><small>* não disponível devido ao valor mínimo de parcela</small></p></td>
                         <td class="ls-meio-neg"><div id="total80" value="0">-</div></td>
                         <td class="ls-meio-neg">-</td>
                         <td class="ls-meio-neg">-</td>
@@ -64,7 +64,7 @@
                         </td>
                         <td id="parcelamento60" class="ls-meio-neg">R$ {{ toReais($total60/$nParcelas60[0]) }}</td>
                     @else
-                        <td class="ls-meio-neg">Total c/ 60% de desconto<p class="text-left"><small>* não disponível</small></p></td>
+                        <td class="ls-meio-neg">Total c/ 60% de desconto<p class="text-left alert-danger"><small>* não disponível devido ao valor mínimo de parcela</small></p></td>
                         <td class="ls-meio-neg"><div id="total60" value="0">-</div></td>
                         <td class="ls-meio-neg">-</td>
                         <td class="ls-meio-neg">-</td>
