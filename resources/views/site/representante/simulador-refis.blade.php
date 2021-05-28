@@ -4,9 +4,9 @@
 
 <div class="representante-content w-100">
     <div class="nomargin conteudo-txt-mini light">
-        <h4 class="pt-1 pb-1">SImulador Refis para anuidades em aberto</h4>
+        <h4 class="pt-1 pb-1">Simulador Refis para anuidades em aberto</h4>
         <div class="linha-lg-mini mb-3"></div>
-        @if (!empty($anuidades))
+        @if ($total !== 0))
         <p>Selecione as anuidades em aberto para consultar valores com descontos. Atenção, parcela deve ter o valor mínimo de R$ 100,00 (cem reais).</p>
 
         <h5 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;Valores</h5>
