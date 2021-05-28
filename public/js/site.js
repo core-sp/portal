@@ -717,8 +717,8 @@ function getDate() {
 
 	$(document).on('change', ".nParcela", function() {
 		var id = $(this).attr('id');
-		var nParcela = parseFloat($(this).attr('value'));
-		var total = parseFloat($('#total' + id));
+		var nParcela = parseFloat($('option:selected',this).attr('value'));
+		var total = parseFloat($('#total' + id).attr('value'));
 		var valorParcelado =  (total/nParcela).toFixed(2);
 
 		$('#parcelamento' + id).attr('value', valorParcelado);
