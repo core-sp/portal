@@ -21,13 +21,12 @@
                         <td class="ls-meio-neg">Total c/ 90% de desconto<p class="text-left"><small>* pagamento à vista, no boleto ou em até {{ end($nParcelas90) }} parcelas no cartão de crédito</small></p></td>
                         <td class="ls-meio-neg"><div id="total90" value="{{ $total90 }}">R$ {{ toReais($total90) }}</div></td>
                         <td class="ls-meio-neg">
-                            <select id="nParcela90" class="form-control">
-                                <option value="0" selected>Número de parcelas</option>
+                            <select id="90" class="form-control">
                                 @foreach($nParcelas90 as $n)
                                     <option value="{{ $n }}">{{ $n }}</option>
                                 @endforeach
                         </td>
-                        <td id="parcelamento90" class="ls-meio-neg">-</td>
+                        <td id="parcelamento90" class="ls-meio-neg">R$ {{ toReais($total90/$nParcelas90[0]) }}</td>
                     @else
                         <td class="ls-meio-neg">Total c/ 90% de desconto<p class="text-left"><small>* não disponível</small></p></td>
                         <td class="ls-meio-neg"><div id="total90" value="0">-</div></td>
@@ -40,13 +39,12 @@
                         <td class="ls-meio-neg">Total c/ 80% de desconto<p class="text-left"><small>* pagamento de {{ $nParcelas80[0] }} a {{ end($nParcelas80) }} parcelas no boleto</small></p></td>
                         <td class="ls-meio-neg"><div id="total80" value="{{ $total80 }}">R$ {{ toReais($total80) }}</div></td>
                         <td class="ls-meio-neg">
-                            <select id="nParcela80" class="form-control">
-                                <option value="0" selected>Número de parcelas</option>
+                            <select id="80" class="form-control nParcela">
                                 @foreach($nParcelas80 as $n)
                                     <option value="{{ $n }}">{{ $n }}</option>
                                 @endforeach
                         </td>
-                        <td id="parcelamento80" class="ls-meio-neg">-</td>
+                        <td id="parcelamento80" class="ls-meio-neg">-R$ {{ toReais($total80/$nParcelas80[0]) }}/td>
                     @else
                         <td class="ls-meio-neg">Total c/ 80% de desconto<p class="text-left"><small>* não disponível</small></p></td>
                         <td class="ls-meio-neg"><div id="total80" value="0">-</div></td>
@@ -59,13 +57,12 @@
                         <td class="ls-meio-neg">Total c/ 60% de desconto<p class="text-left"><small>* pagamento de {{ $nParcelas60[0] }} a {{ end($nParcelas60) }} parcelas no boleto</small></p></td>
                         <td class="ls-meio-neg"><div id="total60" value="{{ $total60 }}">R$ {{ toReais($total60) }}</div></td>
                         <td class="ls-meio-neg">
-                            <select id="nParcela60" class="form-control">
-                                <option value="0" selected>Número de parcelas</option>
+                            <select id="60" class="form-control nParcela">
                                 @foreach($nParcelas60 as $n)
                                     <option value="{{ $n }}">{{ $n }}</option>
                                 @endforeach
                         </td>
-                        <td id="parcelamento60" class="ls-meio-neg">-</td>
+                        <td id="parcelamento60" class="ls-meio-neg">R$ {{ toReais($total60/$nParcelas60[0]) }}</td>
                     @else
                         <td class="ls-meio-neg">Total c/ 60% de desconto<p class="text-left"><small>* não disponível</small></p></td>
                         <td class="ls-meio-neg"><div id="total60" value="0">-</div></td>
