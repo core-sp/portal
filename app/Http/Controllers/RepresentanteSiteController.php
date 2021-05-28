@@ -459,9 +459,9 @@ class RepresentanteSiteController extends Controller
         $total80 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.8);
         $total60 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.6);
 
-        $nParcelas90 = checaNumeroParcelas(1, 12, $total90);
-        $nParcelas80 = checaNumeroParcelas(2, 6, $total80);
-        $nParcelas60 = checaNumeroParcelas(7, 12, $total60);
+        $nParcelas90 = $this->checaNumeroParcelas(1, 12, $total90);
+        $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
+        $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
 
         return view('site.representante.simulador-refis', compact('total', 'total90', 'total80', 'total60', 'nParcelas90', 'nParcelas80', 'nParcelas60'));
     }
