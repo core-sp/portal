@@ -450,11 +450,34 @@ class RepresentanteSiteController extends Controller
         }
     }
 
-    public function calculadoraRefis()
+    public function simuladoraRefis()
     {
-        $anuidades = $this->gerentiRepository->gerentiCalculadoraRefis(Auth::guard('representante')->user()->ass_id);
+        $valores = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
 
-        return view('site.representante.calculadora-refis', compact('anuidades'));
+        $total = $valores['totalSemDesconto'];
+        $total90 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.9);
+        $total80 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.8);
+        $total60 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.6);
+
+        $nParcelas90 = checaNumeroParcelas(1, 12, $total90);
+        $nParcelas80 = checaNumeroParcelas(2, 6, $total80);
+        $nParcelas60 = checaNumeroParcelas(7, 12, $total60);
+
+        return view('site.representante.simulador-refis', compact('total', 'total90', 'total80', 'total60', 'nParcelas90', 'nParcelas80', 'nParcelas60'));
     }
 
+    private function checaNumeroParcelas ($min, $max, $valor) 
+    {
+        $nParcelas = intval($valor/100);
+
+        if($min > $nParcelas) {
+            $min = 0;
+            $max = 0;
+        }
+        elseif($max > $nParcelas) {
+            $max = $nParcelas;
+        }
+
+        return range($min, $max);
+    }
 }

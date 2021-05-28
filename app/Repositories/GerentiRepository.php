@@ -96,35 +96,41 @@ class GerentiRepository implements GerentiRepositoryInterface
         return $resultado;
     }
 
-    public function gerentiCalculadoraRefis($ass_id)
+    // public function gerentiSimualdorRefis($ass_id)
+    // {
+    //     $cobrancas = $this->gerentiBolestosLista($ass_id);
+    //     $cobrancas = utf8_converter($cobrancas);
+
+    //     $anuidades = [];
+        
+    //     foreach($cobrancas as $cobranca) {
+    //         if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] === 'Em aberto' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y')) {
+
+    //             array_push($anuidades, $cobranca);
+    //         } 
+    //     }
+
+    //     return $anuidades;
+    // }
+
+    public function gerentiValoresRefis($ass_id)
     {
         $cobrancas = $this->gerentiBolestosLista($ass_id);
         $cobrancas = utf8_converter($cobrancas);
-
-        $anuidades = [];
+      
+        $totalSemDesconto = 0;
+        $totalAnuidadeIPCA = 0;
+        $totalDebito = 0;
         
         foreach($cobrancas as $cobranca) {
             if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] === 'Em aberto' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y')) {
-                // $totalAnuidade += $cobranca['VALOR'];
-                // $totalDebito += $cobranca['MULTA'] + $cobranca['JUROS'] + $cobranca['CORRECAO'];
-                // array_push($anuidades, $cobranca['DESCRICAO']);
-
-                array_push($anuidades, $cobranca);
+                $totalSemDesconto += $cobranca['TOTAL'];
+                $totalAnuidadeIPCA += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
+                $totalDebito += ($cobranca['MULTA'] + $cobranca['JUROS']);
             } 
         }
 
-        return $anuidades;
-        
-        // $resultado = [
-        //     'totalAnuidade' => $totalAnuidade,
-        //     'totalDebito' => $totalDebito,
-        //     'anuidades' => $anuidades,
-        //     'totalDebito90' => $totalDebito - $totalDebito * 0.9,
-        //     'totalDebito80' => $totalDebito - $totalDebito * 0.8,
-        //     'totalDebito60' => $totalDebito - $totalDebito * 0.6
-        // ];
-
-        // return $resultado;
+        return ['totalSemDesconto' => $totalSemDesconto, 'totalAnuidadeIPCA' => $totalAnuidadeIPCA, 'totalDebito' => $totalDebito];
     }
 
     /**

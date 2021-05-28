@@ -66,9 +66,9 @@
               </a>
             </div>
 
-            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.calculadoraRefis')  ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('representante.calculadoraRefis') }}" onclick="showLoading()">
-                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Calculadora Refis</h6>
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.simuladorRefis')  ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.simuladorRefis') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Simualdor Refis</h6>
               </a>
             </div>
 
