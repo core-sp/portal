@@ -36,12 +36,42 @@
                     @endif
                 </tr>
                 <tr>
-                    <td class="ls-meio-neg">Total c/ 80% de desconto<p class="text-left"><small>* pagamento de 2 a 6 parcelas no boleto</small></p></td>
-                    <td class="ls-meio-neg"><div id="total80" value="{{ $total80 }}">R$ {{ toReais($total80) }}</div></td>
+                    @if($nParcelas80[0] !== 0)
+                        <td class="ls-meio-neg">Total c/ 80% de desconto<p class="text-left"><small>* pagamento de {{ $nParcelas80[0] }} a {{ end($nParcelas80) }} parcelas no boleto</small></p></td>
+                        <td class="ls-meio-neg"><div id="total80" value="{{ $total80 }}">R$ {{ toReais($total80) }}</div></td>
+                        <td class="ls-meio-neg">
+                            <select id="nParcela80" class="form-control">
+                                <option value="0" selected>Número de parcelas</option>
+                                @foreach($nParcelas80 as $n)
+                                    <option value="{{ $n }}">{{ $n }}</option>
+                                @endforeach
+                        </td>
+                        <td id="parcelamento80" class="ls-meio-neg">-</td>
+                    @else
+                        <td class="ls-meio-neg">Total c/ 80% de desconto<p class="text-left"><small>* não disponível</small></p></td>
+                        <td class="ls-meio-neg"><div id="total80" value="0">-</div></td>
+                        <td class="ls-meio-neg">-</td>
+                        <td class="ls-meio-neg">-</td>
+                    @endif
                 </tr>
                 <tr>
-                    <td class="ls-meio-neg">Total c/ 60% de desconto<p class="text-left"><small>* para pagamento de 7 a 12 parcelas no boleto</small></p></td>
-                    <td class="ls-meio-neg"><div id="total60" value="{{ $total60 }}">R$ {{ toReais($total60) }}</div></td>
+                    @if($nParcelas60[0] !== 0)
+                        <td class="ls-meio-neg">Total c/ 60% de desconto<p class="text-left"><small>* pagamento de {{ $nParcelas60[0] }} a {{ end($nParcelas60) }} parcelas no boleto</small></p></td>
+                        <td class="ls-meio-neg"><div id="total60" value="{{ $total60 }}">R$ {{ toReais($total60) }}</div></td>
+                        <td class="ls-meio-neg">
+                            <select id="nParcela60" class="form-control">
+                                <option value="0" selected>Número de parcelas</option>
+                                @foreach($nParcelas60 as $n)
+                                    <option value="{{ $n }}">{{ $n }}</option>
+                                @endforeach
+                        </td>
+                        <td id="parcelamento60" class="ls-meio-neg">-</td>
+                    @else
+                        <td class="ls-meio-neg">Total c/ 60% de desconto<p class="text-left"><small>* não disponível</small></p></td>
+                        <td class="ls-meio-neg"><div id="total60" value="0">-</div></td>
+                        <td class="ls-meio-neg">-</td>
+                        <td class="ls-meio-neg">-</td>
+                    @endif
                 </tr>
             </tbody>
         </table>
