@@ -450,7 +450,7 @@ class RepresentanteSiteController extends Controller
         }
     }
 
-    public function simuladoraRefis()
+    public function simuladorRefis()
     {
         $valores = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
 
