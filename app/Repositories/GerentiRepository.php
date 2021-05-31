@@ -146,7 +146,7 @@ class GerentiRepository implements GerentiRepositoryInterface
             }
         }
 
-        if($contagemPrescricao > 3) {
+        if($contagemPrescricao < 3) {
             $totalSemDesconto += $totalSemDescontoPrescricao;
             $totalAnuidadeIPCA += $totalAnuidadeIPCAPrescricao;
             $totalDebito += $totalDebitoPrescricao;
