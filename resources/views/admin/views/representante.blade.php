@@ -309,7 +309,7 @@
                             <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;ANUIDADES COBRADAS</h5>
                             <table class="table table-bordered bg-white mb-0">
                                 <tbody>
-                                    @foreach ($valoresRefis[anuidadesRefis] as $anuidade)
+                                    @foreach ($valoresRefis['anuidadesRefis'] as $anuidade)
                                         <tr>
                                             <td class="ls-meio-neg">
                                                 {{ $anuidade }}
