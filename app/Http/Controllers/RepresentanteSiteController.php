@@ -463,7 +463,9 @@ class RepresentanteSiteController extends Controller
         $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
         $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
 
-        return view('site.representante.simulador-refis', compact('total', 'total90', 'total80', 'total60', 'nParcelas90', 'nParcelas80', 'nParcelas60'));
+        $anuidadesRefis = $valores['anuidadesRefis'];
+
+        return view('site.representante.simulador-refis', compact('total', 'total90', 'total80', 'total60', 'nParcelas90', 'nParcelas80', 'nParcelas60', 'anuidadesRefis'));
     }
 
     private function checaNumeroParcelas ($min, $max, $valor) 

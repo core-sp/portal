@@ -121,16 +121,40 @@ class GerentiRepository implements GerentiRepositoryInterface
         $totalSemDesconto = 0;
         $totalAnuidadeIPCA = 0;
         $totalDebito = 0;
+        $anuidadesRefis = [];
+        $totalSemDescontoPrescricao = 0;
+        $totalAnuidadeIPCAPrescricao = 0;
+        $totalDebitoPrescricao = 0;
+        $anuidadesRefisPrescricao = [];
+        $contagemPrescricao = 0;
         
         foreach($cobrancas as $cobranca) {
-            if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] === 'Em aberto' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y')) {
-                $totalSemDesconto += $cobranca['TOTAL'];
-                $totalAnuidadeIPCA += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
-                $totalDebito += ($cobranca['MULTA'] + $cobranca['JUROS']);
-            } 
+            if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] === 'Em aberto' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y') && date('Y', strtotime($cobranca['VENCIMENTO'])) >= date('Y', strtotime('2012-01-01'))) {
+                if(date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y',strtotime('-4 year'))) {
+                    $totalSemDescontoPrescricao += $cobranca['TOTAL'];
+                    $totalAnuidadeIPCAPrescricao += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
+                    $totalDebitoPrescricao += ($cobranca['MULTA'] + $cobranca['JUROS']);
+                    $contagemPrescricao++;
+                    array_push($anuidadesRefisPrescricao, $cobranca['DESCRICAO']);
+                }
+                else {
+                    $totalSemDesconto += $cobranca['TOTAL'];
+                    $totalAnuidadeIPCA += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
+                    $totalDebito += ($cobranca['MULTA'] + $cobranca['JUROS']);
+                    array_push($anuidadesRefis, $cobranca['DESCRICAO']);
+                }
+            }
         }
 
-        return ['totalSemDesconto' => $totalSemDesconto, 'totalAnuidadeIPCA' => $totalAnuidadeIPCA, 'totalDebito' => $totalDebito];
+        if($contagemPrescricao > 3) {
+            $totalSemDesconto += $totalSemDescontoPrescricao;
+            $totalAnuidadeIPCA += $totalAnuidadeIPCAPrescricao;
+            $totalDebito += $totalDebitoPrescricao;
+            $anuidadesRefis = $anuidadesRefis + $anuidadesRefisPrescricao;
+
+        }
+
+        return ['totalSemDesconto' => $totalSemDesconto, 'totalAnuidadeIPCA' => $totalAnuidadeIPCA, 'totalDebito' => $totalDebito, 'anuidadesRefis' => $anuidadesRefis];
     }
 
     /**

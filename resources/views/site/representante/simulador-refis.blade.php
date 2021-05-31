@@ -73,6 +73,24 @@
             </tbody>
         </table>
 
+        <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;ANUIDADES COBRADAS</h5>
+        <table class="table table-bordered bg-white mb-0">
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($anuidadesRefis as $anuidade)
+                    <tr>
+                        <td class="ls-meio-neg">
+                            {{ $anuidade }}
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
         @else
         <p>Não foi encontrada nenhuma anuidade em aberto elegível para Refis. Não é possível consultar valores com descontos.</p>
         @endif
