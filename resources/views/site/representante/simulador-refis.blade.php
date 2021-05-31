@@ -9,7 +9,7 @@
         @if ($total !== 0)
         <p>Abaixo valores com descontos disponíveis com seus respectivos parcelamentos. Atenção, parcela deve ter o valor mínimo de R$ 100,00 (cem reais).</p>
 
-        <h5 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;Valores</h5>
+        <h5 class="mt-0 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;VALORES</h5>
         <table class="table table-bordered bg-white mb-0">
             <tbody>
                 <tr>
@@ -75,11 +75,6 @@
 
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;ANUIDADES COBRADAS</h5>
         <table class="table table-bordered bg-white mb-0">
-            <thead>
-                <tr>
-                    <th>Descrição</th>
-                </tr>
-            </thead>
             <tbody>
                 @foreach ($anuidadesRefis as $anuidade)
                     <tr>
