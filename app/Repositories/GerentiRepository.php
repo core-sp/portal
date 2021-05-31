@@ -125,7 +125,7 @@ class GerentiRepository implements GerentiRepositoryInterface
         $anuidadesRefis = [];
         $statusRepresentante = null;
 
-        $status = $this->gerentiStatus($assId);
+        $status = $this->gerentiStatus($ass_id);
 
         if($status !== Representante::PARCELAMENTO_EM_ABERTO || $status !== Representante::EM_DIA || $status !== Representante::EXECUÇÃO_FISCAL) {
             $cobrancas = $this->gerentiBolestosLista($ass_id);
