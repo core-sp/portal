@@ -87,7 +87,7 @@
         </table>
 
         @else
-        <p>Não foi encontrada nenhuma anuidade em aberto elegível para Refis. Não é possível consultar valores com descontos.</p>
+        <p>Não é possível simular valores Refis para quitar anuidades em aberto devido a situação do representante comercial. Em caso de dúvidas, por favor contactar o CORE-SP.</p>
         @endif
 
     </div>            

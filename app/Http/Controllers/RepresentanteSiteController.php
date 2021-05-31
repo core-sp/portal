@@ -452,18 +452,32 @@ class RepresentanteSiteController extends Controller
 
     public function simuladorRefis()
     {
-        $valores = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
+        $total = 0;
+        $total90 = 0;
+        $total80 = 0;
+        $total60 = 0;
+        $nParcelas90 = 0;
+        $nParcelas80 = 0;
+        $nParcelas60 = 0;
+        $anuidadesRefis = [];
+        $statusRepresentante = null;
 
-        $total = $valores['totalSemDesconto'];
-        $total90 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.9);
-        $total80 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.8);
-        $total60 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.6);
+        $status = $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id);
 
-        $nParcelas90 = $this->checaNumeroParcelas(1, 12, $total90);
-        $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
-        $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
+        if($status !== Representante::PARCELAMENTO_EM_ABERTO || $status !== Representante::EM_DIA) {
+            $valores = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
 
-        $anuidadesRefis = $valores['anuidadesRefis'];
+            $total = $valores['totalSemDesconto'];
+            $total90 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.9);
+            $total80 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.8);
+            $total60 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.6);
+    
+            $nParcelas90 = $this->checaNumeroParcelas(1, 12, $total90);
+            $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
+            $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
+    
+            $anuidadesRefis = $valores['anuidadesRefis'];
+        }
 
         return view('site.representante.simulador-refis', compact('total', 'total90', 'total80', 'total60', 'nParcelas90', 'nParcelas80', 'nParcelas60', 'anuidadesRefis'));
     }
