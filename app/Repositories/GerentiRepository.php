@@ -146,12 +146,11 @@ class GerentiRepository implements GerentiRepositoryInterface
             }
         }
 
-        if($contagemPrescricao < 3) {
+        if($contagemPrescricao <= 3) {
             $totalSemDesconto += $totalSemDescontoPrescricao;
             $totalAnuidadeIPCA += $totalAnuidadeIPCAPrescricao;
             $totalDebito += $totalDebitoPrescricao;
-            $anuidadesRefis = $anuidadesRefis + $anuidadesRefisPrescricao;
-
+            $anuidadesRefis = array_merge($anuidadesRefis, $anuidadesRefisPrescricao);
         }
 
         return ['totalSemDesconto' => $totalSemDesconto, 'totalAnuidadeIPCA' => $totalAnuidadeIPCA, 'totalDebito' => $totalDebito, 'anuidadesRefis' => $anuidadesRefis];
