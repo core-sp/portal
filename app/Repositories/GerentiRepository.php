@@ -115,45 +115,82 @@ class GerentiRepository implements GerentiRepositoryInterface
 
     public function gerentiValoresRefis($ass_id)
     {
-        $cobrancas = $this->gerentiBolestosLista($ass_id);
-        $cobrancas = utf8_converter($cobrancas);
-      
-        $totalSemDesconto = 0;
-        $totalAnuidadeIPCA = 0;
-        $totalDebito = 0;
+        $total = 0;
+        $total90 = 0;
+        $total80 = 0;
+        $total60 = 0;
+        $nParcelas90 = 0;
+        $nParcelas80 = 0;
+        $nParcelas60 = 0;
         $anuidadesRefis = [];
-        $totalSemDescontoPrescricao = 0;
-        $totalAnuidadeIPCAPrescricao = 0;
-        $totalDebitoPrescricao = 0;
-        $anuidadesRefisPrescricao = [];
-        $contagemPrescricao = 0;
-        
-        foreach($cobrancas as $cobranca) {
-            if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] !== 'Pago' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y') && date('Y', strtotime($cobranca['VENCIMENTO'])) >= date('Y', strtotime('2012-01-01'))) {
-                if(date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y',strtotime('-4 year'))) {
-                    $totalSemDescontoPrescricao += $cobranca['TOTAL'];
-                    $totalAnuidadeIPCAPrescricao += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
-                    $totalDebitoPrescricao += ($cobranca['MULTA'] + $cobranca['JUROS']);
-                    $contagemPrescricao++;
-                    array_push($anuidadesRefisPrescricao, $cobranca['DESCRICAO']);
-                }
-                else {
-                    $totalSemDesconto += $cobranca['TOTAL'];
-                    $totalAnuidadeIPCA += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
-                    $totalDebito += ($cobranca['MULTA'] + $cobranca['JUROS']);
-                    array_push($anuidadesRefis, $cobranca['DESCRICAO']);
+        $statusRepresentante = null;
+
+        $status = $this->gerentiStatus($assId);
+
+        if($status !== Representante::PARCELAMENTO_EM_ABERTO || $status !== Representante::EM_DIA || $status !== Representante::EXECUÇÃO_FISCAL) {
+            $cobrancas = $this->gerentiBolestosLista($ass_id);
+            $cobrancas = utf8_converter($cobrancas);
+          
+            $totalAnuidadeIPCA = 0;
+            $totalDebito = 0;
+            $totalPrescricao = 0;
+            $totalAnuidadeIPCAPrescricao = 0;
+            $totalDebitoPrescricao = 0;
+            $anuidadesRefisPrescricao = [];
+            $contagemPrescricao = 0;
+            
+            foreach($cobrancas as $cobranca) {
+                if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] !== 'Pago' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y') && date('Y', strtotime($cobranca['VENCIMENTO'])) >= date('Y', strtotime('2012-01-01'))) {
+                    if(date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y',strtotime('-4 year'))) {
+                        $totalPrescricao += $cobranca['TOTAL'];
+                        $totalAnuidadeIPCAPrescricao += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
+                        $totalDebitoPrescricao += ($cobranca['MULTA'] + $cobranca['JUROS']);
+                        $contagemPrescricao++;
+                        array_push($anuidadesRefisPrescricao, $cobranca['DESCRICAO']);
+                    }
+                    else {
+                        $total += $cobranca['TOTAL'];
+                        $totalAnuidadeIPCA += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
+                        $totalDebito += ($cobranca['MULTA'] + $cobranca['JUROS']);
+                        array_push($anuidadesRefis, $cobranca['DESCRICAO']);
+                    }
                 }
             }
+    
+            if($contagemPrescricao <= 3) {
+                $total += $totalPrescricao;
+                $totalAnuidadeIPCA += $totalAnuidadeIPCAPrescricao;
+                $totalDebito += $totalDebitoPrescricao;
+                $anuidadesRefis = array_merge($anuidadesRefis, $anuidadesRefisPrescricao);
+            }
+
+            $total90 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.9);
+            $total80 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.8);
+            $total60 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.6);
+    
+            $nParcelas90 = $this->checaNumeroParcelas(1, 12, $total90);
+            $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
+            $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
+    
+            $anuidadesRefis = $valores['anuidadesRefis'];
         }
 
-        if($contagemPrescricao <= 3) {
-            $totalSemDesconto += $totalSemDescontoPrescricao;
-            $totalAnuidadeIPCA += $totalAnuidadeIPCAPrescricao;
-            $totalDebito += $totalDebitoPrescricao;
-            $anuidadesRefis = array_merge($anuidadesRefis, $anuidadesRefisPrescricao);
+        return ['total' => $total, 'total90' => $total90, 'total80' => $total80, 'total60' => $total60, 'nParcelas90' => $nParcelas90, 'nParcelas80' => $nParcelas80, 'nParcelas60' => $nParcelas60, 'anuidadesRefis' => $anuidadesRefis];
+    }
+
+    private function checaNumeroParcelas ($min, $max, $valor) 
+    {
+        $nParcelas = intval($valor/100);
+
+        if($min > $nParcelas) {
+            $min = 0;
+            $max = 0;
+        }
+        elseif($max > $nParcelas) {
+            $max = $nParcelas;
         }
 
-        return ['totalSemDesconto' => $totalSemDesconto, 'totalAnuidadeIPCA' => $totalAnuidadeIPCA, 'totalDebito' => $totalDebito, 'anuidadesRefis' => $anuidadesRefis];
+        return range($min, $max);
     }
 
     /**

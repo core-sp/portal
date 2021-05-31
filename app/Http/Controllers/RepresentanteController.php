@@ -185,9 +185,9 @@ class RepresentanteController extends Controller
         $situacao = trim(explode(':', $this->gerentiRepository->gerentiStatus($request->ass_id))[1]);
         $certidoes = $this->listarCertidao($request->ass_id);
         $assId = $request->ass_id;
-        $refis = $this->simuladorRefis($request->ass_id);
+        $valoresRefis = $this->simuladorRefis($request->ass_id);
         
-        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes', 'assId', 'refis'));
+        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes', 'assId', 'valoresRefis'));
     }
 
     public function listarCertidao($assId) 
@@ -237,33 +237,8 @@ class RepresentanteController extends Controller
 
     public function simuladorRefis($assId)
     {
-        $total = 0;
-        $total90 = 0;
-        $total80 = 0;
-        $total60 = 0;
-        $nParcelas90 = 0;
-        $nParcelas80 = 0;
-        $nParcelas60 = 0;
-        $anuidadesRefis = [];
-        $statusRepresentante = null;
+        $valoresRefis = $this->gerentiRepository->gerentiValoresRefis($assId);
 
-        $status = $this->gerentiRepository->gerentiStatus($assId);
-
-        if($status !== Representante::PARCELAMENTO_EM_ABERTO || $status !== Representante::EM_DIA || $status !== Representante::EXECUÇÃO_FISCAL) {
-            $valores = $this->gerentiRepository->gerentiValoresRefis($assId);
-
-            $total = $valores['totalSemDesconto'];
-            $total90 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.9);
-            $total80 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.8);
-            $total60 = $valores['totalAnuidadeIPCA'] + ($valores['totalDebito'] - $valores['totalDebito'] * 0.6);
-    
-            $nParcelas90 = $this->checaNumeroParcelas(1, 12, $total90);
-            $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
-            $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
-    
-            $anuidadesRefis = $valores['anuidadesRefis'];
-        }
-
-        return ['total' => $total, 'total90' => $total90, 'total80' => $total80, 'total60' => $total60, 'nParcelas90' => $nParcelas90, 'nParcelas80' => $nParcelas80, 'nParcelas60' => $nParcelas60, 'anuidadesRefis' => $anuidadesRefis];
+        return $valoresRefis;
     }
 }
