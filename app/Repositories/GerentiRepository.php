@@ -171,8 +171,6 @@ class GerentiRepository implements GerentiRepositoryInterface
             $nParcelas90 = $this->checaNumeroParcelas(1, 12, $total90);
             $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
             $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
-    
-            $anuidadesRefis = $valores['anuidadesRefis'];
         }
 
         return ['total' => $total, 'total90' => $total90, 'total80' => $total80, 'total60' => $total60, 'nParcelas90' => $nParcelas90, 'nParcelas80' => $nParcelas80, 'nParcelas60' => $nParcelas60, 'anuidadesRefis' => $anuidadesRefis];
