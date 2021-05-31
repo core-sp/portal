@@ -464,7 +464,7 @@ class RepresentanteSiteController extends Controller
 
         $status = $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id);
 
-        if($status !== Representante::PARCELAMENTO_EM_ABERTO || $status !== Representante::EM_DIA) {
+        if($status !== Representante::PARCELAMENTO_EM_ABERTO || $status !== Representante::EM_DIA || $status !== Representante::EXECUÇÃO_FISCAL) {
             $valores = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
 
             $total = $valores['totalSemDesconto'];
