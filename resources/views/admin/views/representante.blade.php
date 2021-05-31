@@ -251,7 +251,7 @@
                                     </tr>
                                     <tr>
                                         @if($valoresRefis['nParcelas90'][0] !== 0)
-                                            <td class="ls-meio-neg">Total c/ 90% de desconto<p class="text-left"><small>* pagamento à vista, no boleto ou em até {{ end($nParcelas90) }} parcelas no cartão de crédito</small></p></td>
+                                            <td class="ls-meio-neg">Total c/ 90% de desconto<p class="text-left"><small>* pagamento à vista, no boleto ou em até {{ end($valoresRefis['nParcelas90']) }} parcelas no cartão de crédito</small></p></td>
                                             <td class="ls-meio-neg"><div id="total90" value="{{ $valoresRefis['total90'] }}">R$ {{ toReais($valoresRefis['total90']) }}</div></td>
                                             <td class="ls-meio-neg">
                                                 <select id="90" class="form-control nParcela">
