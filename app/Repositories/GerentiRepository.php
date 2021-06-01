@@ -129,7 +129,7 @@ class GerentiRepository implements GerentiRepositoryInterface
 
         if($status !== Representante::PARCELAMENTO_EM_ABERTO && $status !== Representante::EM_DIA && $status !== Representante::EXECUÇÃO_FISCAL && $status !== Representante::CANCELADO_BLOQUEADO) {
 
-            $checaParcelamentoDesativado = trim($this->gerentiChecaParcelamentoDesativado($ass_id));
+            $checaParcelamentoDesativado = $this->gerentiChecaParcelamentoDesativado($ass_id);
 
             if($checaParcelamentoDesativado['TEMPARCELDESATIVADO'] === 0) {
                 $cobrancas = $this->gerentiBolestosLista($ass_id);
