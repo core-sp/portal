@@ -127,50 +127,55 @@ class GerentiRepository implements GerentiRepositoryInterface
 
         $status = trim($this->gerentiStatus($ass_id));
 
-        if($status !== Representante::PARCELAMENTO_EM_ABERTO && $status !== Representante::EM_DIA && $status !== Representante::EXECUÇÃO_FISCAL) {
-            $cobrancas = $this->gerentiBolestosLista($ass_id);
-            $cobrancas = utf8_converter($cobrancas);
-          
-            $totalAnuidadeIPCA = 0;
-            $totalDebito = 0;
-            $totalPrescricao = 0;
-            $totalAnuidadeIPCAPrescricao = 0;
-            $totalDebitoPrescricao = 0;
-            $anuidadesRefisPrescricao = [];
-            $contagemPrescricao = 0;
-            
-            foreach($cobrancas as $cobranca) {
-                if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && strpos($cobranca['SITUACAO'], 'Pago') === false && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y') && date('Y', strtotime($cobranca['VENCIMENTO'])) >= date('Y', strtotime('2012-01-01'))) {
-                    if(date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y',strtotime('-4 year'))) {
-                        $totalPrescricao += $cobranca['TOTAL'];
-                        $totalAnuidadeIPCAPrescricao += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
-                        $totalDebitoPrescricao += ($cobranca['MULTA'] + $cobranca['JUROS']);
-                        $contagemPrescricao++;
-                        array_push($anuidadesRefisPrescricao, ['descricao' => $cobranca['DESCRICAO'], 'valor' => $cobranca['VALOR'], 'multa' => $cobranca['MULTA'], 'juros' => $cobranca['JUROS'], 'correcao' => $cobranca['CORRECAO'], 'total' => $cobranca['TOTAL']]);
-                    }
-                    else {
-                        $total += $cobranca['TOTAL'];
-                        $totalAnuidadeIPCA += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
-                        $totalDebito += ($cobranca['MULTA'] + $cobranca['JUROS']);
-                        array_push($anuidadesRefis, ['descricao' => $cobranca['DESCRICAO'], 'valor' => $cobranca['VALOR'], 'multa' => $cobranca['MULTA'], 'juros' => $cobranca['JUROS'], 'correcao' => $cobranca['CORRECAO'], 'total' => $cobranca['TOTAL']]);
+        if($status !== Representante::PARCELAMENTO_EM_ABERTO && $status !== Representante::EM_DIA && $status !== Representante::EXECUÇÃO_FISCAL && $status !== Representante::CANCELADO_BLOQUEADO) {
+
+            $checaParcelamentoDesativado = trim($this->gerentiChecaParcelamentoDesativado($ass_id));
+
+            if($checaParcelamentoDesativado['TEMPARCELDESATIVADO'] === 0) {
+                $cobrancas = $this->gerentiBolestosLista($ass_id);
+                $cobrancas = utf8_converter($cobrancas);
+              
+                $totalAnuidadeIPCA = 0;
+                $totalDebito = 0;
+                $totalPrescricao = 0;
+                $totalAnuidadeIPCAPrescricao = 0;
+                $totalDebitoPrescricao = 0;
+                $anuidadesRefisPrescricao = [];
+                $contagemPrescricao = 0;
+                
+                foreach($cobrancas as $cobranca) {
+                    if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && strpos($cobranca['SITUACAO'], 'Pago') === false && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y') && date('Y', strtotime($cobranca['VENCIMENTO'])) >= date('Y', strtotime('2012-01-01'))) {
+                        if(date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y',strtotime('-4 year'))) {
+                            $totalPrescricao += $cobranca['TOTAL'];
+                            $totalAnuidadeIPCAPrescricao += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
+                            $totalDebitoPrescricao += ($cobranca['MULTA'] + $cobranca['JUROS']);
+                            $contagemPrescricao++;
+                            array_push($anuidadesRefisPrescricao, ['descricao' => $cobranca['DESCRICAO'], 'valor' => $cobranca['VALOR'], 'multa' => $cobranca['MULTA'], 'juros' => $cobranca['JUROS'], 'correcao' => $cobranca['CORRECAO'], 'total' => $cobranca['TOTAL']]);
+                        }
+                        else {
+                            $total += $cobranca['TOTAL'];
+                            $totalAnuidadeIPCA += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
+                            $totalDebito += ($cobranca['MULTA'] + $cobranca['JUROS']);
+                            array_push($anuidadesRefis, ['descricao' => $cobranca['DESCRICAO'], 'valor' => $cobranca['VALOR'], 'multa' => $cobranca['MULTA'], 'juros' => $cobranca['JUROS'], 'correcao' => $cobranca['CORRECAO'], 'total' => $cobranca['TOTAL']]);
+                        }
                     }
                 }
-            }
+        
+                if($contagemPrescricao <= 3) {
+                    $total += $totalPrescricao;
+                    $totalAnuidadeIPCA += $totalAnuidadeIPCAPrescricao;
+                    $totalDebito += $totalDebitoPrescricao;
+                    $anuidadesRefis = array_merge($anuidadesRefis, $anuidadesRefisPrescricao);
+                }
     
-            if($contagemPrescricao <= 3) {
-                $total += $totalPrescricao;
-                $totalAnuidadeIPCA += $totalAnuidadeIPCAPrescricao;
-                $totalDebito += $totalDebitoPrescricao;
-                $anuidadesRefis = array_merge($anuidadesRefis, $anuidadesRefisPrescricao);
+                $total90 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.9);
+                $total80 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.8);
+                $total60 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.6);
+        
+                $nParcelas90 = $this->checaNumeroParcelas(1, 12, $total90);
+                $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
+                $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
             }
-
-            $total90 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.9);
-            $total80 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.8);
-            $total60 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.6);
-    
-            $nParcelas90 = $this->checaNumeroParcelas(1, 12, $total90);
-            $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
-            $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
         }
 
         return ['total' => $total, 'total90' => $total90, 'total80' => $total80, 'total60' => $total60, 'nParcelas90' => $nParcelas90, 'nParcelas80' => $nParcelas80, 'nParcelas60' => $nParcelas60, 'anuidadesRefis' => $anuidadesRefis];
@@ -501,6 +506,21 @@ class GerentiRepository implements GerentiRepositoryInterface
         ]);
 
         $resultado = $run->fetchAll(PDO::FETCH_ASSOC);
+
+        return utf8_converter($resultado)[0];
+    }
+
+    public function gerentiChecaParcelamentoDesativado($ass_id) 
+    {
+        $this->connect();
+
+        $run = $this->gerentiConnection->prepare('select TEMPARCELDESATIVADO from PROCVERPARCELDESATIVADO(:ASS_ID)');
+        
+        $run->execute([
+            'ASS_ID' => $ass_id
+        ]);
+
+        $resultado = $run->fetchAll();
 
         return utf8_converter($resultado)[0];
     }

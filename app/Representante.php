@@ -31,6 +31,7 @@ class Representante extends Authenticable
     const EM_DIA = "Situação: Em dia.";
     const PARCELAMENTO_EM_ABERTO = "Situação: Parcelamento em aberto.";
     const EXECUÇÃO_FISCAL = 'Situação: Execução Fiscal.';
+    const CANCELADO_BLOQUEADO = 'Situação: Cancelado ou Bloqueado';
 
     // Status do Representante Comercial.
     const ATIVO = "Ativo";
