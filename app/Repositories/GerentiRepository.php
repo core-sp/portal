@@ -146,13 +146,13 @@ class GerentiRepository implements GerentiRepositoryInterface
                         $totalAnuidadeIPCAPrescricao += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
                         $totalDebitoPrescricao += ($cobranca['MULTA'] + $cobranca['JUROS']);
                         $contagemPrescricao++;
-                        array_push($anuidadesRefisPrescricao, $cobranca['DESCRICAO']);
+                        array_push($anuidadesRefisPrescricao, ['descricao' => $cobranca['DESCRICAO'], 'valor' => $cobranca['VALOR'], 'multa' => $cobranca['MULTA'], 'juros' => $cobranca['JUROS'], 'correcao' => $cobranca['CORRECAO'], 'total' => $cobranca['TOTAL']]);
                     }
                     else {
                         $total += $cobranca['TOTAL'];
                         $totalAnuidadeIPCA += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
                         $totalDebito += ($cobranca['MULTA'] + $cobranca['JUROS']);
-                        array_push($anuidadesRefis, $cobranca['DESCRICAO']);
+                        array_push($anuidadesRefis, ['descricao' => $cobranca['DESCRICAO'], 'valor' => $cobranca['VALOR'], 'multa' => $cobranca['MULTA'], 'juros' => $cobranca['JUROS'], 'correcao' => $cobranca['CORRECAO'], 'total' => $cobranca['TOTAL']]);
                     }
                 }
             }

@@ -75,12 +75,25 @@
 
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;ANUIDADES COBRADAS</h5>
         <table class="table table-bordered bg-white mb-0">
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th class="quinze">Valor Original</th>
+                    <th class="quinze">Juros</th>
+                    <th class="quinze">Multa</th>
+                    <th class="quinze">IPCA</th>
+                    <th class="quinze">Total</th>
+                </tr>
+            </thead>
             <tbody>
                 @foreach ($valoresRefis['anuidadesRefis'] as $anuidade)
                     <tr>
-                        <td class="ls-meio-neg">
-                            {{ $anuidade }}
-                        </td>
+                        <td class="ls-meio-neg">{{ $anuidade['descricao'] }}</td>
+                        <td class="ls-meio-neg" value="{{ $anuidade['valor'] }}">R$ {{ toReais($anuidade['valor']) }}</td>
+                        <td class="ls-meio-neg" value="{{ $anuidade['juros'] }}">R$ {{ toReais($anuidade['juros']) }}</td>
+                        <td class="ls-meio-neg" value="{{ $anuidade['multa'] }}">R$ {{ toReais($anuidade['multa']) }}</td>
+                        <td class="ls-meio-neg" value="{{ $anuidade['correcao'] }}">R$ {{ toReais($anuidade['correcao']) }}</td>
+                        <td class="ls-meio-neg" value="{{ $anuidade['total'] }}">R$ {{ toReais($anuidade['total']) }}</td>
                     </tr>
                 @endforeach
             </tbody>
