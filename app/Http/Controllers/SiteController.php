@@ -111,4 +111,14 @@ class SiteController extends Controller
             ->paginate(9);
         return view('site.acoes-da-fiscalizacao', compact('noticias'));
     }
+
+    public function espacoContador()
+    {
+        $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
+            ->orderBy('created_at', 'DESC')
+            ->where('publicada','Sim')
+            ->where('categoria','Espaço do Contador')
+            ->paginate(9);
+        return view('site.espaco-do-contador', compact('noticias'));
+    }
 }
