@@ -34,9 +34,9 @@
     <div class="conteudo-txt">
       <p class="pb-0"><i>Novo ambiente virtual vai reunir documentos necessários e serviços essenciais para auxiliar os contadores que cuidam da rotina de representantes comerciais.</i></p></br>
       <p class="pb-0">Além de registrar, orientar, normatizar e fiscalizar o exercício da profissão, o Conselho Regional dos Representantes Comerciais no Estado de São Paulo também busca garantir o bem-estar de toda a sociedade.</p></br>
-      <p class="pb-0">Pensando nisso, o Setor de Fiscalização desenvolveu novo ambiente virtual em nosso Portal: <strong>O Espaço do Contador</strong>.</p></br>
-      <p class="pb-0">Nesta página, os profissionais de contabilidade vão encontrar as informações necessárias para solucionar questões de natureza burocrática, como o pagamento de taxas e regularização do registro, especialmente quando se trata de Pessoa Jurídica.</p></br>
-      <p class="pb-0">A nova ferramenta é o resultado de um Termo de Cooperação, firmado em setembro de 2020, entre o Core-SP e o Conselho Regional de Contabilidade deste Estado (CRC-SP) - que busca facilitar a rotina de contadores, representantes e até mesmo das empresas representadas. Assim, a realização de procedimentos administrativos se tornará mais prático e ágil,  possibilitando a rápida efetivação de novos negócios.</p></br>
+      <p class="pb-0">Pensando nisso, o Setor de Fiscalização desenvolveu um novo ambiente virtual em nosso Portal: <strong>O Espaço do Contador</strong>.</p></br>
+      <p class="pb-0">Nesta página, os profissionais de contabilidade vão encontrar as informações necessárias para solucionar questões administrativas, como o pagamento de taxas e regularização do registro, especialmente quando se trata de Pessoa Jurídica.</p></br>
+      <p class="pb-0">A nova ferramenta é o resultado de um Termo de Cooperação, firmado em setembro de 2020, entre o Core-SP e o Conselho Regional de Contabilidade deste Estado (CRC-SP) - que busca facilitar a rotina de contadores, representantes e até mesmo das empresas representadas. Assim, a realização de procedimentos administrativos se tornará mais prática e ágil,  possibilitando a rápida efetivação de novos negócios.</p></br>
     </div>
 
     <div class="col-12">
