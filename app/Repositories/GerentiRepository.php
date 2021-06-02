@@ -144,7 +144,7 @@ class GerentiRepository implements GerentiRepositoryInterface
                 $contagemPrescricao = 0;
                 
                 foreach($cobrancas as $cobranca) {
-                    if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && strpos($cobranca['SITUACAO'], 'Pago') === false && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y') && date('Y', strtotime($cobranca['VENCIMENTO'])) >= date('Y', strtotime('2012-01-01'))) {
+                    if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && strpos($cobranca['SITUACAO'], 'Pago') === false && $cobranca['SITUACAO'] !== 'Prescrito' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y') && date('Y', strtotime($cobranca['VENCIMENTO'])) >= date('Y', strtotime('2012-01-01'))) {
                         if(date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y',strtotime('-4 year'))) {
                             $totalPrescricao += $cobranca['TOTAL'];
                             $totalAnuidadeIPCAPrescricao += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
