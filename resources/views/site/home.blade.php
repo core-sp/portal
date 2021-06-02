@@ -196,7 +196,7 @@
             <p class="branco light">Faça parte do Grupo do WhatsApp e receba todos os dias os benefícios disponíveis.</p>
             <div>
               <a href="/programa-de-beneficios" class="btn-beneficios">saiba mais</a>
-              <a href="https://chat.whatsapp.com/Is3STR8sXOy6QiAqMIiixP" class="btn-beneficios"><i class="fab fa-whatsapp fa-lg"></i> Grupo WhatsApp</a>
+              <a href="https://chat.whatsapp.com/LBhX22ivLWxKSAzWENVy4i" class="btn-beneficios"><i class="fab fa-whatsapp fa-lg"></i> Grupo WhatsApp</a>
             </div>
           </div>
         </div>
