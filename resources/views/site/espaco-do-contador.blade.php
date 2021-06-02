@@ -38,23 +38,9 @@
       <p class="pb-0">Nesta página, os profissionais de contabilidade vão encontrar as informações necessárias para solucionar questões de natureza burocrática, como o pagamento de taxas e regularização do registro, especialmente quando se trata de Pessoa Jurídica.</p></br>
     </div>
 
-    <div class="linha-lg"></div>
-    <div class="mb-3">
-      <a href="https://www.core-sp.org.br/noticias/suspensao-por-inatividade" target="_blank"><img src="{{ asset('img/icone-suspensao.png') }}"></a>
-    </div>
-
-    <div class="mb-3">
-      <a href="https://www.core-sp.org.br/noticias/pagamento-de-anuidades" target="_blank"><img src="{{ asset('img/icone-pag-anuidades.png') }}"></a>
-    </div>
-
-    <div class="mb-3">
-      <a href="https://www.core-sp.org.br/noticias/refis-2021" target="_blank"><img src="{{ asset('img/icone-refis-2021.png') }}"></a>
-    </div>
-
     <div class="col-12">
       <div class="home-title">
         <blockquote>
-          <i></i>
           <h2 class="pr-3 ml-1">Notícias</h2>
         </blockquote>
       </div>
