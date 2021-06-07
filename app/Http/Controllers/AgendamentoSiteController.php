@@ -33,7 +33,7 @@ class AgendamentoSiteController extends Controller
 
     public function formView()
     {
-        $regionais = $this->regionalRepository->all();
+        $regionais = $this->regionalRepository->getRegionaisAgendamento();
         $pessoas = Agendamento::TIPOS_PESSOA;
         $servicos = Agendamento::servicos();
 

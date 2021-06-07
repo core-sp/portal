@@ -22,13 +22,15 @@ class CursoController extends Controller
     private $class = 'CursoController';
     private $cursoModel;
     private $cursoRepository;
+    private $regionalRepository;
     private $variaveis;
 
-    public function __construct(Curso $curso, CursoRepository $cursoRepository)
+    public function __construct(Curso $curso, CursoRepository $cursoRepository, RegionalRepository $regionalRepository)
     {
         $this->middleware('auth', ['except' => ['show', 'cursosView']]);
         $this->cursoModel = $curso;
         $this->cursoRepository = $cursoRepository;
+        $this->regionalRepository = $regionalRepository;
         $this->variaveis = $curso->variaveis();
     }
 
@@ -47,7 +49,7 @@ class CursoController extends Controller
     {
         $this->autoriza($this->class, __FUNCTION__);
         $variaveis = (object) $this->variaveis;
-        $regionais = (new RegionalRepository)->all();
+        $regionais = $this->regionalRepository->getRegionais();
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
@@ -69,7 +71,7 @@ class CursoController extends Controller
     {
         $this->autoriza($this->class, __FUNCTION__);
         $resultado = Curso::with('regional','user')->findOrFail($id);
-        $regionais = (new RegionalRepository)->all();
+        $regionais = $this->regionalRepository->getRegionais();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'regionais', 'variaveis'));
     }

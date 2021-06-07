@@ -659,6 +659,13 @@ class AgendamentoTest extends TestCase
     */
     public function access_agendamentos_from_portal()
     {
+        $regional = factory('App\Regional')->create([
+            'idregional' => 1,
+            'regional' => 'São Paulo', 
+            'ageporhorario' => 2, 
+            'horariosage' => '10:00,11:00,12:00,13:00,14:00'
+        ]);
+
         $this->get(route('agendamentosite.formview'))->assertOk();
     }
 

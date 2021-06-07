@@ -68,7 +68,7 @@ class FiscalizacaoController extends Controller
     {   
         $this->autoriza($this->class, "create");
 
-        $regionais = $this->regionalRepository->getToList();
+        $regionais = $this->regionalRepository->getRegionais();
         $variaveis = $this->periodoFiscalizacaoVariaveis;
         $variaveis['form'] = 'periodofiscalizacaocreate';
         $variaveis = (object) $variaveis;
@@ -83,7 +83,7 @@ class FiscalizacaoController extends Controller
         DB::transaction(function () use ($request) {
             $periodo = $this->fiscalizacaoRepository->storePeriodo($request->toModel());
 
-            $regionais = $this->regionalRepository->getToList();
+            $regionais = $this->regionalRepository->getRegionais();
 
             foreach($regionais as $regional) {
                 $this->fiscalizacaoRepository->storeDadoFiscalizacao($regional->idregional, $periodo->id);

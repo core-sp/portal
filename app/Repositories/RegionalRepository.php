@@ -17,6 +17,29 @@ class RegionalRepository
         return Regional::orderBy('regional', 'ASC')->get();
     }
 
+    /**
+     * Método retorna regionais para atendimento, incluindo unidade da Alameda Santos. Ordenando por regionais e 
+     * renomeando "São Paulo" para facilitar vizualização do Representante Comercial.
+     */
+    public function getRegionaisAgendamento()
+    {
+        $regionaisAtendimento = Regional::select('idregional', 'regional', 'prefixo')->orderByRaw('case prefixo WHEN "SEDE" THEN 0 ELSE 1 END, idregional ASC')->get();
+
+        $regionaisAtendimento[0]->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
+
+        return $regionaisAtendimento;
+    }
+
+    /**
+     * Método retorna apenas regionais. Retorna apenas SEDE, ES01 ~ ES12 (exclui Alamenda Santos).
+     */
+    public function getRegionais()
+    {
+        $regionaisFiscalizacao = Regional::select('idregional', 'regional', 'prefixo')->where('idregional', '<=', 13)->get();
+
+        return $regionaisFiscalizacao;
+    }
+
     public function getById($id)
     {
         return Regional::findOrFail($id);
