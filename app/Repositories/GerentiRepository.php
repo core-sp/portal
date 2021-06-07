@@ -96,23 +96,9 @@ class GerentiRepository implements GerentiRepositoryInterface
         return $resultado;
     }
 
-    // public function gerentiSimualdorRefis($ass_id)
-    // {
-    //     $cobrancas = $this->gerentiBolestosLista($ass_id);
-    //     $cobrancas = utf8_converter($cobrancas);
-
-    //     $anuidades = [];
-        
-    //     foreach($cobrancas as $cobranca) {
-    //         if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && $cobranca['SITUACAO'] === 'Em aberto' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y')) {
-
-    //             array_push($anuidades, $cobranca);
-    //         } 
-    //     }
-
-    //     return $anuidades;
-    // }
-
+    /**
+     * Verifica se é possível simular valores de Refis para o Representante Comercial e calcula valores.
+     */
     public function gerentiValoresRefis($ass_id)
     {
         $total = 0;
@@ -127,10 +113,11 @@ class GerentiRepository implements GerentiRepositoryInterface
 
         $status = trim($this->gerentiStatus($ass_id));
 
+        // Não é possível simular Refis caso a situação do Representante Comercial seja: "Em dia", "Parcelamento em aberto", "Execução Fiscal", "Cancelado ou Bloqueado"
         if($status !== Representante::PARCELAMENTO_EM_ABERTO && $status !== Representante::EM_DIA && $status !== Representante::EXECUÇÃO_FISCAL && $status !== Representante::CANCELADO_BLOQUEADO) {
-
             $checaParcelamentoDesativado = $this->gerentiChecaParcelamentoDesativado($ass_id);
 
+            // Não é possível simular Refis caso o Representante Comercial possua parcelamento em aberto
             if($checaParcelamentoDesativado['TEMPARCELDESATIVADO'] === 0) {
                 $cobrancas = $this->gerentiBolestosLista($ass_id);
                 $cobrancas = utf8_converter($cobrancas);
@@ -144,7 +131,9 @@ class GerentiRepository implements GerentiRepositoryInterface
                 $contagemPrescricao = 0;
                 
                 foreach($cobrancas as $cobranca) {
+                    // Cobranças usada no cálculo devem ser anuidades que não estejam pagas e não estão prescritas entre "ano atual" -1 e 2012.
                     if (strpos($cobranca['DESCRICAO'], 'Anuidade') !== false && strpos($cobranca['SITUACAO'], 'Pago') === false && $cobranca['SITUACAO'] !== 'Prescrito' && date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y') && date('Y', strtotime($cobranca['VENCIMENTO'])) >= date('Y', strtotime('2012-01-01'))) {
+                        // Verificando prescrição. Soma valores das anuidades antes de "ano atual" -4. Valor calculado será adicionado ao valor total de acordo com regras de prescrição
                         if(date('Y', strtotime($cobranca['VENCIMENTO'])) < date('Y',strtotime('-4 year'))) {
                             $totalPrescricao += $cobranca['TOTAL'];
                             $totalAnuidadeIPCAPrescricao += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
@@ -152,6 +141,7 @@ class GerentiRepository implements GerentiRepositoryInterface
                             $contagemPrescricao++;
                             array_push($anuidadesRefisPrescricao, ['descricao' => $cobranca['DESCRICAO'], 'valor' => $cobranca['VALOR'], 'multa' => $cobranca['MULTA'], 'juros' => $cobranca['JUROS'], 'correcao' => $cobranca['CORRECAO'], 'total' => $cobranca['TOTAL']]);
                         }
+                        // Anuidades antes de "ano atual" -4 sempre são incluídas no cálculo
                         else {
                             $total += $cobranca['TOTAL'];
                             $totalAnuidadeIPCA += ($cobranca['VALOR'] + $cobranca['CORRECAO']);
@@ -160,7 +150,8 @@ class GerentiRepository implements GerentiRepositoryInterface
                         }
                     }
                 }
-        
+
+                // Regra de prescrição, após somar valores de anuidades antes de "ano atual" -4, caso a quantidade de anuidades seja maior ou igual a 3, deve-se somar valores ao total, caso contrário, valores devem ser ignorados
                 if($contagemPrescricao <= 3) {
                     $total += $totalPrescricao;
                     $totalAnuidadeIPCA += $totalAnuidadeIPCAPrescricao;
@@ -168,10 +159,12 @@ class GerentiRepository implements GerentiRepositoryInterface
                     $anuidadesRefis = array_merge($anuidadesRefis, $anuidadesRefisPrescricao);
                 }
     
+                // Cálculo de descontos (90%, 80% e 60%). Desconto é aplicado apenas sobre juros e multas
                 $total90 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.9);
                 $total80 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.8);
                 $total60 = $totalAnuidadeIPCA + ($totalDebito - $totalDebito * 0.6);
         
+                // Cálculo do número de parcelas
                 $nParcelas90 = $this->checaNumeroParcelas(1, 12, $total90);
                 $nParcelas80 = $this->checaNumeroParcelas(2, 6, $total80);
                 $nParcelas60 = $this->checaNumeroParcelas(7, 12, $total60);
@@ -181,10 +174,15 @@ class GerentiRepository implements GerentiRepositoryInterface
         return ['total' => $total, 'total90' => $total90, 'total80' => $total80, 'total60' => $total60, 'nParcelas90' => $nParcelas90, 'nParcelas80' => $nParcelas80, 'nParcelas60' => $nParcelas60, 'anuidadesRefis' => $anuidadesRefis];
     }
 
+    /**
+     * Calcula número de parcelas de acordo com valor, número mínimo de parcelas e número máximo de parcelas.
+     * Regra de parcelamento exige que valor mínimo da parcela seja 100.
+     */
     private function checaNumeroParcelas ($min, $max, $valor) 
     {
         $nParcelas = intval($valor/100);
 
+        // Caso número de parcelas calculado seja menor que o número mínimo de parcelas, retorna 0 indicando que parcelamento não é possível
         if($min > $nParcelas) {
             $min = 0;
             $max = 0;
@@ -438,78 +436,10 @@ class GerentiRepository implements GerentiRepositoryInterface
         return $run->fetchAll();
     }
 
-    /** 
-     * Verifica no GERENTI se é possível emitir uma certidão para o Representante Comercial de acordo com o ASS_ID e o tipo de certidão. Em caso negativo, uma flag com o valor "0" será retornada.
-     * Em caso positivo, uma flag com o valor "1" será retornada juntamente com informações da certidão (número, código, data e hora da emissão) e do Representante Comercial.
-     * 
-     * Códigos do tipo:
-     *  11 - Regularidade
-     *  12 - Parcelamento?
-     */
-    public function gerentiEmitirCertidao($ass_id, $tipo) 
-    {
-        $this->connect();
-
-        $run = $this->gerentiConnection->getPDO()->beginTransaction();
-
-        $run = $this->gerentiConnection->prepare('select EMISSAO, NUMERO, DATAEMISSAO, HORA, CODVALIDACAO, DATAVALIDADE, NOME, REGISTRO, CPFCNPJ, DATAREGISTRO, TIPOEMPRESA, RESPTECNICOS, REGISTROSRTS, ENDERECOCOMPLETO
-        from PROCNOVACERTIDAO(:ASS_ID, 210, null, :TIPO)');
-        
-        $run->execute([
-            'ASS_ID' => $ass_id,
-            'TIPO' => $tipo
-        ]);
-
-        $resultado = $run->fetchAll(PDO::FETCH_ASSOC);
-
-        $this->gerentiConnection->getPDO()->commit();
-
-        return utf8_converter($resultado)[0];
-    }
-
-    /** 
-     * Recupera no GERENTI as certidões que foram emitidas para o Representante Comercial de acordo com o ASS_ID e o tipo.
-     * 
-     * Códigos do tipo:
-     *  11 - Regularidade
-     *  12 - Parcelamento?
-     */
-    public function gerentiListarCertidoes($ass_id, $tipo) 
-    {
-        $this->connect();
-
-        $run = $this->gerentiConnection->prepare('select SITUACAO, NUMERO, DATAEMISSAO, HORAEMISSAO, CODVALIDACAO, VALIDADE from PROCLISTACERTIDOES(:ASS_ID, :TIPO)');
-        
-        $run->execute([
-            'ASS_ID' => $ass_id,
-            'TIPO' => $tipo
-        ]);
-
-        return utf8_converter($run->fetchAll(PDO::FETCH_ASSOC));
-    }
-
     /**
-     * Verifica no GERENTI a autenticidade e validade de uma certidão. Retorna uma flag que indica as seguintes situações: "0" (inexistente), "1" (válida), "2" (suspensa), "3" (vencida).
-     * Caso a flag indique que certidão está válida, informações sobre o Representante Comercial serão retornadas (Nome, Registro, CPF_CNPJ, data de validade da certidão). 
+     * Consulta o GERENTI para verificar se Representante Comercial possui parcelamento destivado.
+     * Retorna 0 caso não exista parcelamento desativado, caso contrário, retorna 1.
      */
-    public function gerentiAutenticaCertidao($numero, $codigo, $hora, $data) 
-    {
-        $this->connect();
-
-        $run = $this->gerentiConnection->prepare('select SITUACAO, DATAVALIDADE from PROCCONSULTACODVALIDACAO(:CODVALIDACAO, :NUMERO, :DATAEMISSAO, :HORAEMISSAO)');
-        
-        $run->execute([
-            'CODVALIDACAO' => $codigo,
-            'NUMERO' => $numero,
-            'DATAEMISSAO' => $data,
-            'HORAEMISSAO' => $hora
-        ]);
-
-        $resultado = $run->fetchAll(PDO::FETCH_ASSOC);
-
-        return utf8_converter($resultado)[0];
-    }
-
     public function gerentiChecaParcelamentoDesativado($ass_id) 
     {
         $this->connect();
