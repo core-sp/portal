@@ -184,7 +184,7 @@ class RepresentanteSiteController extends Controller
                 'verify_token' => null
             ]);
         } else {
-            abort(500);
+            abort(500, 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Portal, caso contrário, por favor refazer cadastro no Portal.');
         }
 
         event(new ExternoEvent('Usuário ' . $find->id . ' ("'. $find->cpf_cnpj .'") verificou o email após o cadastro.'));
@@ -450,4 +450,10 @@ class RepresentanteSiteController extends Controller
         }
     }
 
+    public function simuladorRefis()
+    {
+        $valoresRefis = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.simulador-refis', compact('valoresRefis'));
+    }
 }

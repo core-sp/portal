@@ -63,7 +63,7 @@ class AgendamentoBloqueioController extends Controller
         $this->autoriza($this->class, __FUNCTION__);
 
         $variaveis = (object) $this->variaveis;
-        $regionais = $this->regionalRepository->all();
+        $regionais = $this->regionalRepository->getRegionaisAgendamento();
 
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
@@ -96,7 +96,7 @@ class AgendamentoBloqueioController extends Controller
 
         $resultado = $this->agendamentoBloqueioRepository->getById($id);
         $variaveis = (object) $this->variaveis;
-        $regionais = $this->regionalRepository->all();
+        $regionais = $this->regionalRepository->getRegionaisAgendamento();
 
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
     }

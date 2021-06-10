@@ -7,7 +7,7 @@ use App\Rules\CpfCnpj;
 use Illuminate\Http\Request;
 use App\Repositories\GerentiApiRepository;
 use App\Repositories\GerentiRepositoryInterface;
-use Illuminate\Support\Facades\Request as FacadesRequest;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteController extends Controller
 {
@@ -87,7 +87,7 @@ class RepresentanteController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = preg_replace('/[^0-9A-Za-z]+/', '', FacadesRequest::input('q'));
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Representante::where('nome','LIKE','%'.$busca.'%')
             ->orWhere('registro_core','LIKE','%'.$busca.'%')
@@ -185,8 +185,9 @@ class RepresentanteController extends Controller
         $situacao = trim(explode(':', $this->gerentiRepository->gerentiStatus($request->ass_id))[1]);
         $certidoes = $this->listarCertidao($request->ass_id);
         $assId = $request->ass_id;
+        $valoresRefis = $this->simuladorRefis($request->ass_id);
         
-        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes', 'assId'));
+        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes', 'assId', 'valoresRefis'));
     }
 
     public function listarCertidao($assId) 
@@ -232,5 +233,12 @@ class RepresentanteController extends Controller
 
             return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
         }
+    }
+
+    public function simuladorRefis($assId)
+    {
+        $valoresRefis = $this->gerentiRepository->gerentiValoresRefis($assId);
+
+        return $valoresRefis;
     }
 }

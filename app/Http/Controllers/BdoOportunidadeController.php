@@ -60,7 +60,7 @@ class BdoOportunidadeController extends Controller
 
         $empresa = $this->bdoEmpresaRepository->getToOportunidade($id);
 
-        $regioes = $this->regionalRepository->getToList();
+        $regioes = $this->regionalRepository->getRegionais();
         
         if (isset($empresa)) {
             $variaveis = (object) $this->bdoOportunidadeVariaveis;
@@ -98,7 +98,7 @@ class BdoOportunidadeController extends Controller
         $this->autoriza($this->class, __FUNCTION__);
 
         $resultado = $this->bdoOportunidadeRepository->findOrFail($id);
-        $regioes = $this->regionalRepository->getToList();
+        $regioes = $this->regionalRepository->getRegionais();
         $regioesEdit = explode(',', $resultado->regiaoatuacao);
         $variaveis = (object) $this->bdoOportunidadeVariaveis;
         $status = BdoOportunidade::status();

@@ -22,6 +22,7 @@ class Agendamento extends Model
     // Serviços no agendamento
     const SERVICOS_ATUALIZACAO_DE_CADASTRO = "Atualização de Cadastro";
     const SERVICOS_CANCELAMENTO_DE_REGISTRO = "Cancelamento de Registro";
+    const SERVICOS_REFIS = "Refis";
     const SERVICOS_REGISTRO_INICIAL = "Registro Inicial";
     const SERVICOS_OUTROS = "Outros";
 
@@ -42,6 +43,7 @@ class Agendamento extends Model
         return [
             Agendamento::SERVICOS_ATUALIZACAO_DE_CADASTRO,
             Agendamento::SERVICOS_CANCELAMENTO_DE_REGISTRO,
+            Agendamento::SERVICOS_REFIS,
             Agendamento::SERVICOS_REGISTRO_INICIAL,
             Agendamento::SERVICOS_OUTROS
         ];

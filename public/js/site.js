@@ -714,6 +714,17 @@ function getDate() {
 		$('#showCrimageDois').hide();
 		$('#divCrimageDois').show();
 	});
+
+	$(document).on('change', ".nParcela", function() {
+		var id = $(this).attr('id');
+		var nParcela = parseFloat($('option:selected',this).attr('value'));
+		var total = parseFloat($('#total' + id).attr('value'));
+		var valorParcelado =  (total/nParcela).toFixed(2);
+
+		$('#parcelamento' + id).attr('value', valorParcelado);
+		$('#parcelamento' + id).html('R$ ' + valorParcelado.replace('.', ','));
+	});
+
 })(jQuery);
 
 // Lazy-load

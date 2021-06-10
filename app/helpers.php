@@ -481,7 +481,8 @@ function noticiaCategorias()
         'Benefícios',
         'Cotidiano',
         'Feiras',
-        'Fiscalização'
+        'Fiscalização',
+        'Espaço do Contador'
     ];
 }
 

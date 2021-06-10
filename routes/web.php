@@ -194,6 +194,9 @@ Route::prefix('/')->group(function() {
   Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
   Route::get('/mapa-fiscalizacao/{id}', 'FiscalizacaoController@mostrarMapaPeriodo')->name('fiscalizacao.mapaperiodo');
 
+  // Fiscalização
+  Route::get('espaco-do-contador', 'SiteController@espacoContador')->name('fiscalizacao.espacoContador');
+
   // Simulador
   Route::get('simulador', 'SimuladorController@view');
   Route::post('simulador', 'SimuladorController@extrato');

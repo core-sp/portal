@@ -20,6 +20,10 @@ body {
 	background-color: #FFFFFF;
 }
 
+.verde {
+	color: #16d30f;
+}
+
 .verde-escuro {
 	color: #13632F;
 }
@@ -309,6 +313,15 @@ strong, .bold {
 	line-height: 1.6;
 	font-size: 1.1rem;
 	font-weight: 300;
+}
+
+.conteudo-txt a,
+.conteudo-txt-mini a {
+	color: #ff0000;
+}
+
+.prestacao-txt a {
+	color: #000000;
 }
 
 .conteudo-txt a:hover,

@@ -66,6 +66,13 @@
               </a>
             </div>
 
+            {{-- SIMULADOR_REFIS --}}
+            {{-- <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.simuladorRefis')  ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.simuladorRefis') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Simulador Refis</h6>
+              </a>
+            </div> --}}
+
           </div>
         </div>
       </div>
