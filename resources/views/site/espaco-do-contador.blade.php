@@ -31,7 +31,7 @@
     </div>
     <div class="linha-lg"></div>
 
-    <div class="conteudo-txt">
+    <div class="conteudo-txt text-justify">
       <p class="pb-0"><i>Novo ambiente virtual vai reunir documentos necessários e serviços essenciais para auxiliar os contadores que cuidam da rotina de representantes comerciais.</i></p></br>
       <p class="pb-0">Além de registrar, orientar, normatizar e fiscalizar o exercício da profissão, o Conselho Regional dos Representantes Comerciais no Estado de São Paulo também busca preservar os interesses públicos de toda a sociedade.</p></br>
       <p class="pb-0">Pensando nisso, a Coordenadoria de Fiscalização desenvolveu um novo ambiente virtual em nosso Portal: <strong>O Espaço do Contador</strong>.</p></br>
