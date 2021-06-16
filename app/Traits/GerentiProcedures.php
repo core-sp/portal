@@ -19,7 +19,7 @@ trait GerentiProcedures
     {
         $this->connect();
 
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', $cpfCnpj);
+        $cpfCnpj = apenasNumeros($cpfCnpj);
 
         $run = $this->gerentiConnection->prepare("select SITUACAO, REGISTRONUM, ASS_ID, NOME, EMAILS from PROCLOGINPORTAL(:registro, :cpfCnpj)");
 
@@ -172,7 +172,9 @@ trait GerentiProcedures
 
         $id !== 0 ? $nameProc = 'SP_CONTATOXPESS_U' : $nameProc = 'SP_CONTATOXPESS_I';
 
-        $run = $this->gerentiConnection->prepare("execute procedure ".$nameProc."(:ass_id, :id, 0, 210, CAST('NOW' AS DATE), :conteudo, :tipo, '', 1)");
+        // Adicionando 3 parâmetros finais (com valor 0) simbolizando respectivamente: SMS, WHATSAPP, TELEGRAM.
+        // TODO: permitir informar esses valores na interface gráfica (uso apenas para celulares).
+        $run = $this->gerentiConnection->prepare("execute procedure ".$nameProc."(:ass_id, :id, 0, 210, CAST('NOW' AS DATE), :conteudo, :tipo, '', 1, 0, 0, 0)");
         $run->execute([
             'ass_id' => $ass_id,
             'id' => $id,
@@ -253,5 +255,21 @@ trait GerentiProcedures
         ]);
 
         return $run->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Consulta o GERENTI para verificar se Representante Comercial está ativo ou não usando CPF/CNPJ (SITUACAO).
+     * Retorna outras informações relacionadas ao Representante Comercial.
+     */
+    public function gerentiAtivo($cpfCnpj)
+    {
+        $this->connect();
+
+        $run = $this->gerentiConnection->prepare("select SITUACAO, REGISTRONUM, ASS_ID, NOME, EMAILS from PROCSTATUSREGISTRO(:cpfCnpj)");
+        $run->execute([
+            'cpfCnpj' => $cpfCnpj
+        ]);
+
+        return $run->fetchAll();
     }
 }

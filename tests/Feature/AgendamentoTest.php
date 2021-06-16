@@ -47,7 +47,6 @@ class AgendamentoTest extends TestCase
     public function non_authorized_users_cannot_list_agendamento()
     {
         $this->signIn();
-        $this->withSession(['idperfil' => Auth::user()->perfil->idperfil]);
 
         $this->get(route('agendamentos.lista'))->assertForbidden();
 
@@ -72,7 +71,7 @@ class AgendamentoTest extends TestCase
             'hora' => '10:00',
             'protocolo' => 'AGE-XXXXXX'
         ]);
-        $agendamento->status = 'Não Compareceu';
+        $agendamento->status = Agendamento::STATUS_NAO_COMPARECEU;
 
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertForbidden();
 
@@ -89,7 +88,6 @@ class AgendamentoTest extends TestCase
     public function authorized_users_can_list_agendamento()
     {
         $this->signInAsAdmin();
-        $this->withSession(['idperfil' => Auth::user()->perfil->idperfil]);
 
         $this->get(route('agendamentos.lista'))->assertOk();
 
@@ -114,7 +112,7 @@ class AgendamentoTest extends TestCase
             'hora' => '10:00',
             'protocolo' => 'AGE-XXXXXX'
         ]);
-        $agendamento->status = 'Não Compareceu';
+        $agendamento->status = Agendamento::STATUS_NAO_COMPARECEU;
 
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
 
@@ -144,7 +142,7 @@ class AgendamentoTest extends TestCase
             'hora' => '10:00',
             'protocolo' => 'AGE-XXXXXX'
         ]);
-        $agendamento->status = 'Compareceu';
+        $agendamento->status = Agendamento::STATUS_COMPARECEU;
 
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
 
@@ -169,18 +167,18 @@ class AgendamentoTest extends TestCase
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional,
-            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'dia' => date('Y-m-d'),
             'hora' => '10:00',
             'protocolo' => 'AGE-XXXXXX'
         ]);
 
-        $this->put(route('agendamentos.updateStatus'), ['idagendamento' => $agendamento->idagendamento, 'status' => 'Compareceu'])->assertStatus(302);
+        $this->put(route('agendamentos.updateStatus'), ['idagendamento' => $agendamento->idagendamento, 'status' => Agendamento::STATUS_COMPARECEU])->assertStatus(302);
 
-        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, 'Compareceu');
+        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, Agendamento::STATUS_COMPARECEU);
 
-        $this->put(route('agendamentos.updateStatus'), ['idagendamento' => $agendamento->idagendamento, 'status' => 'Não Compareceu'])->assertStatus(302);
+        $this->put(route('agendamentos.updateStatus'), ['idagendamento' => $agendamento->idagendamento, 'status' => Agendamento::STATUS_NAO_COMPARECEU])->assertStatus(302);
 
-        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, 'Não Compareceu');
+        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, Agendamento::STATUS_NAO_COMPARECEU);
     }
 
     /** @test 
@@ -334,7 +332,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d', strtotime('-1 day')),
             'hora' => '10:00',
             'protocolo' => 'AGE-000002',
-            'status' => 'Compareceu'
+            'status' => Agendamento::STATUS_COMPARECEU
         ]);
 
         // Criando Agendamento pendente no futuro na sede
@@ -359,7 +357,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d', strtotime('-1 day')),
             'hora' => '10:00',
             'protocolo' => 'AGE-000005',
-            'status' => 'Compareceu'
+            'status' => Agendamento::STATUS_COMPARECEU
         ]);
 
         // Criando Agendamento pendente no futuro na seccional
@@ -475,7 +473,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d', strtotime('-1 day')),
             'hora' => '10:00',
             'protocolo' => 'AGE-000002',
-            'status' => 'Compareceu'
+            'status' => Agendamento::STATUS_COMPARECEU
         ]);
 
         // Criando Agendamento pendente no futuro na sede
@@ -500,7 +498,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d', strtotime('-1 day')),
             'hora' => '10:00',
             'protocolo' => 'AGE-000005',
-            'status' => 'Não Compareceu'
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
 
         // Criando Agendamento pendente no futuro na seccional
@@ -545,7 +543,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentos.filtro', [
             'filtro' => 'sim', 
             'regional' => 1, 
-            'status' => Agendamento::$status_compareceu, 
+            'status' => Agendamento::STATUS_COMPARECEU, 
             'mindia' => date('d/m/Y', strtotime('-1 day')), 
             'maxdia' => date('d/m/Y', strtotime('+1 day'))
         ]))
@@ -575,7 +573,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentos.filtro', [
             'filtro' => 'sim', 
             'regional' => 1, 
-            'status' => Agendamento::$status_compareceu, 
+            'status' => Agendamento::STATUS_COMPARECEU, 
             'mindia' => date('d/m/Y'), 
             'maxdia' => date('d/m/Y')
         ]))
@@ -606,7 +604,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentos.filtro', [
             'filtro' => 'sim', 
             'regional' => $regional_seccional->idregional,
-            'status' => Agendamento::$status_nao_compareceu, 
+            'status' => Agendamento::STATUS_NAO_COMPARECEU, 
             'mindia' => date('d/m/Y', strtotime('-1 day')), 
             'maxdia' => date('d/m/Y', strtotime('+1 day'))
         ]))
@@ -636,7 +634,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentos.filtro', [
             'filtro' => 'sim', 
             'regional' => $regional_seccional->idregional,
-            'status' => Agendamento::$status_compareceu, 
+            'status' => Agendamento::STATUS_COMPARECEU, 
             'mindia' => date('d/m/Y'), 
             'maxdia' => date('d/m/Y')
         ]))
@@ -661,6 +659,13 @@ class AgendamentoTest extends TestCase
     */
     public function access_agendamentos_from_portal()
     {
+        $regional = factory('App\Regional')->create([
+            'idregional' => 1,
+            'regional' => 'São Paulo', 
+            'ageporhorario' => 2, 
+            'horariosage' => '10:00,11:00,12:00,13:00,14:00'
+        ]);
+
         $this->get(route('agendamentosite.formview'))->assertOk();
     }
 
@@ -784,7 +789,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         // Verificando que ainda é possível agendar na regional_1 às 10:00 e em todos os outros horários
-        $this->post(route('agendamentosite.checaHorarios'), ['idregional' => 1, 'dia' => date('d/m/Y', strtotime('+1 day'))])
+        $this->get(route('agendamentosite.checaHorarios', ['idregional' => 1, 'dia' => date('d/m/Y', strtotime('+1 day'))]))
             ->assertSee('10:00')
             ->assertSee('11:00')
             ->assertSee('12:00')
@@ -800,7 +805,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         // Verificando que não é mais possível agendar na regional_1 às 10:00, mas ainda é possível em todos os outros horários
-        $this->post(route('agendamentosite.checaHorarios'), ['idregional' => 1, 'dia' => date('d/m/Y', strtotime('+1 day'))])
+        $this->get(route('agendamentosite.checaHorarios', ['idregional' => 1, 'dia' => date('d/m/Y', strtotime('+1 day'))]))
             ->assertDontSee('10:00')
             ->assertSee('11:00')
             ->assertSee('12:00')
@@ -808,7 +813,7 @@ class AgendamentoTest extends TestCase
             ->assertSee('14:00');
 
         // Verificando que o horário as 10:00 está disponível na outra regional "regional_2"
-        $this->post(route('agendamentosite.checaHorarios'), ['idregional' => 2, 'dia' => date('d/m/Y', strtotime('+1 day'))])
+        $this->get(route('agendamentosite.checaHorarios', ['idregional' => 2, 'dia' => date('d/m/Y', strtotime('+1 day'))]))
             ->assertSee('10:00')
             ->assertSee('11:00')
             ->assertSee('12:00')
@@ -940,7 +945,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d'),
             'hora' => '10:00',
             'protocolo' => 'AGE-XXXXXX',
-            'status' => 'Não Compareceu'
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
 
         // Segundo Agendamento em que a pessoa com o CPF não compareceu
@@ -949,7 +954,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d'),
             'hora' => '10:00',
             'protocolo' => 'AGE-YYYYYY',
-            'status' => 'Não Compareceu'
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
 
         // Terceiro Agendamento em que a pessoa com o CPF não compareceu
@@ -958,7 +963,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d'),
             'hora' => '10:00',
             'protocolo' => 'AGE-WWWWWW',
-            'status' => 'Não Compareceu'
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
 
         // Quarto Agendamento com o CPF da pessoa que não compareceu três vezes
@@ -994,7 +999,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d', strtotime('-91 days')),
             'hora' => '10:00',
             'protocolo' => 'AGE-XXXXXX',
-            'status' => 'Não Compareceu'
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
 
         // Segundo Agendamento em que a pessoa com o CPF não compareceu (91 dias atrás)
@@ -1003,7 +1008,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d', strtotime('-91 days')),
             'hora' => '10:00',
             'protocolo' => 'AGE-YYYYYY',
-            'status' => 'Não Compareceu'
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
 
         // Terceiro Agendamento em que a pessoa com o CPF não compareceu (91 dias atrás)
@@ -1012,7 +1017,7 @@ class AgendamentoTest extends TestCase
             'dia' => date('Y-m-d', strtotime('-91 days')),
             'hora' => '10:00',
             'protocolo' => 'AGE-WWWWWW',
-            'status' => 'Não Compareceu'
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
 
         // Quarto Agendamento com o CPF da pessoa que não compareceu três vezes
@@ -1192,5 +1197,62 @@ class AgendamentoTest extends TestCase
 
         // Garantir que o status do Agendamento é nulo e não "Cancelado"
         $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, null);
+    }
+
+    /** @test 
+     * 
+     * Mudança de status do Agendamento pelos botões "Confirmar"/"Não Compareceu" na tabela que lista os Agendamentos 
+     * não é permitida antes da data do agendamento.
+    */
+    public function agendamento_cannot_update_from_table_before_agendamento_date()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00',
+            'protocolo' => 'AGE-XXXXXX'
+        ]);
+
+        $this->put(route('agendamentos.updateStatus'), ['idagendamento' => $agendamento->idagendamento, 'status' => Agendamento::STATUS_COMPARECEU])->assertStatus(302);
+
+        // Checa se status continua nulo (siguinifica que o agendamento está pendente)
+        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, null);
+
+        $this->put(route('agendamentos.updateStatus'), ['idagendamento' => $agendamento->idagendamento, 'status' => Agendamento::STATUS_NAO_COMPARECEU])->assertStatus(302);
+
+        // Checa se status continua nulo (siguinifica que o agendamento está pendente)
+        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, null);
+    }
+    /** @test 
+     * 
+     * Agendamento não pode ser criado no memso horário com mesmo CPF/CNPJ.
+    */
+    public function cannot_create_agendamento_on_same_schedule_with_same_cpf_cnpj()
+    {
+        $regional = factory('App\Regional')->create([
+            'idregional' => 1,
+            'regional' => 'São Paulo', 
+            'ageporhorario' => 2, 
+            'horariosage' => '10:00,11:00,12:00,13:00,14:00'
+        ]);
+
+        // Criando Agendamento no dia atual para tentar cancelar no mesmo dia
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $regional->idregional,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00',
+            'protocolo' => 'AGE-XXXXXX'
+        ]);
+
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $regional->idregional,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00'
+        ]);
+
+        // Checa se ao tentar salvar o agendamento com mesmo horário e CPF retorna erro 500
+        $this->post(route('agendamentosite.store'), $dados)->assertStatus(500);
     }
 }

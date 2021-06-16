@@ -82,7 +82,7 @@ class AnunciarVagaRequest extends FormRequest
             'regiaoatuacao' => ','.implode(',',$this->regiaoAtuacao).',',
             'descricao' => $this->descricaoOportunidade,
             'vagasdisponiveis' => $this->nrVagas,
-            'status' => BdoOportunidade::$status_sob_analise
+            'status' => BdoOportunidade::STATUS_SOB_ANALISE
         ];
     }
 }

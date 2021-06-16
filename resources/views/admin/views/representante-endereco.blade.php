@@ -31,15 +31,15 @@
                 @isset($resultado->crimagedois)
                     <strong>1- </strong>
                 @endisset
-                <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimage }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
-                <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimage }}" class="btn btn-sm btn-secondary" target="_blank" download>Baixar</a>
+                <a href="{{ route('representante-endereco.visualizar', ['nome' => $resultado->crimage]) }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
+                <a href="{{ route('representante-endereco.baixar', ['nome' => $resultado->crimage]) }}" class="btn btn-sm btn-secondary" target="_blank">Baixar</a>
             </p>
                 @isset($resultado->crimagedois)
                     <div class="mt-2">
                         <p>
                             <strong>2- </strong>
-                            <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimagedois }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
-                            <a href="{{ url('imagens/representantes/enderecos') . '/' . $resultado->crimagedois }}" class="btn btn-sm btn-secondary" target="_blank" download>Baixar</a>
+                            <a href="{{ route('representante-endereco.visualizar', ['nome' => $resultado->crimagedois]) }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
+                            <a href="{{ route('representante-endereco.baixar', ['nome' => $resultado->crimagedois]) }}" class="btn btn-sm btn-secondary" target="_blank" download>Baixar</a>
                         </p>
                     </div>
                 @endisset

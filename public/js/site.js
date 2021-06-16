@@ -11,6 +11,8 @@ $(document).ready(function(){
 	$('#registro_core').mask('0000000/0000', {reverse: true});
 	$('.numeroInput').mask('99');
 	$('.cep').mask('00000-000');
+	$('.codigo_certidao').mask('AAAAAAAA - AAAAAAAA - AAAAAAAA - AAAAAAAA');
+  	$('.horaInput').mask('00:00:00');
 	$('.numero').mask('ZZZZZZZZZZ', {
 		translation: {
 			'Z': {
@@ -259,6 +261,8 @@ natDays = [
 	[12, 30, 'br'],
 	[12, 31, 'br'],
 ];
+var lotados = [];
+
 // Função para adicionar feriados
 function nationalDays(date) {
     for (i = 0; i < natDays.length; i++) {
@@ -269,15 +273,50 @@ function nationalDays(date) {
 	}	
 	return [true, ''];
 }
-// Função para feriados e fim-de-semana
-function noWeekendsOrHolidays(date) {
-    var noWeekend = $.datepicker.noWeekends(date);
-    if (noWeekend[0]) {
-        return nationalDays(date);
-    } else {
-        return noWeekend;
-    }
+
+// Função para adicionar feriados
+function diasLotados(date) {
+    for (i = 0; i < lotados.length; i++) {
+      if (date.getMonth() == lotados[i][0] - 1 && date.getDate() == lotados[i][1]) {
+        return [false, lotados[i][2]];
+      }
+	}	
+	return [true, ''];
 }
+
+// Função para feriados, fim-de-semana e dias lotados
+function noWeekendsOrHolidays(date) {
+	var noWeekend = $.datepicker.noWeekends(date);
+	var feriado = nationalDays(date);
+	var lotado = diasLotados(date);
+
+	if(!feriado[0]) {
+		return feriado;
+	}
+	else if (!noWeekend[0]) {
+		return noWeekend;
+	}
+	else {
+		return lotado;
+	}
+}
+
+$('.mapa_regional').on({
+	"click": function() {
+		$(".dado-regional").addClass('d-none');
+		$(".mapa_regional").removeClass("regional-selecionada");
+		$("#instrucao-mapa").addClass('dado-oculto');
+
+		$("#dado-" + $(this).attr('id')).removeClass('d-none');
+		$("#" + $(this).attr('id')).addClass("regional-selecionada");
+	},
+});
+
+$('#ano-mapa').on({
+	"change": function() {
+		window.location.href = "/mapa-fiscalizacao/" + $(this).val();
+	},
+});
 
 (function($){
 	$(function(){
@@ -307,21 +346,79 @@ function noWeekendsOrHolidays(date) {
 			minDate: +1,
 			beforeShowDay: noWeekendsOrHolidays
 		});
+
 		// Zera o valor do dia, ao selecionar a regional
 		$('#idregional').change(function(){
+
+			if($('#idregional').val() == 14) {
+				alert('Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: Av. Brigadeiro Luís Antônio, 613, Térreo, CEP:01317-000, São Paulo/SP.');
+			}
+
 			$('#datepicker').val('');
+			$('#datepicker').prop('disabled', true);
+
 			$('#horarios')
 				.find('option')
 				.remove()
 				.end()
 				.append('<option value="" disabled selected>Selecione o dia do atendimento</option>');
+			$('#horarios').prop('disabled', true);
+
 			$('#selectServicos option[value="Plantão Jurídico"]').remove();
+
+			$('#idregional option[value=""]').remove();
+
+			$.ajax({
+				method: "GET",
+				data: {
+					"_token": $('#token').val(),
+					"idregional": $('#idregional').val()
+				},
+				dataType: 'json',
+				url: "/checa-mes",
+				beforeSend: function(){
+					$('#loadCalendario').show();
+				},
+				complete: function(){
+					$('#loadCalendario').hide();
+				},
+				success: function(response) {
+					lotados = response;
+					$('#datepicker').prop('disabled', false);
+					$('#datepicker').prop('placeholder', 'dd/mm/aaaaa');
+				},
+				error: function() {
+					$('#datepicker').val('');
+					$('#datepicker').prop('disabled', true);
+					$('#datepicker').prop('placeholder', 'Falha ao recuperar calendário');
+
+					$('#horarios')
+						.find('option')
+						.remove()
+						.end()
+						.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
+
+					$("#dialog_agendamento")
+						.empty()
+						.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
+						
+					$("#dialog_agendamento").dialog({
+						draggable: false,
+						buttons: [{
+							text: "Recarregar",
+							click: function() {
+								location.reload(true);
+							}
+						}]	
+					});
+				}
+			});
 		});
 		// Ajax após change no datepicker
 		$('#datepicker').change(function(){
 			atendimentoJuridico($(this).val(), $('#idregional').val());
 			$.ajax({
-				method: "POST",
+				method: "GET",
 				data: {
 					"_token": $('#token').val(),
 					"idregional": $('#idregional').val(),
@@ -330,10 +427,10 @@ function noWeekendsOrHolidays(date) {
 				dataType: 'json',
 				url: "/checa-horarios",
 				beforeSend: function(){
-					$('#loadImage').show();
+					$('#loadHorario').show();
 				},
 				complete: function(){
-					$('#loadImage').hide();
+					$('#loadHorario').hide();
 				},
 				success: function(response) {
 					if (!jQuery.isEmptyObject(response)) {
@@ -345,6 +442,8 @@ function noWeekendsOrHolidays(date) {
 								text : horario 
 							}));
 						});
+
+						$('#horarios').prop('disabled', false);
 					} 
 					else {
 						$('#horarios')
@@ -363,7 +462,7 @@ function noWeekendsOrHolidays(date) {
 
 					$("#dialog_agendamento")
 						.empty()
-						.append("Falha ao recuperar horários disponíveis. <br> Por favor recarregue a página ou tente mais tarde.");
+						.append("Falha ao recuperar horários disponíveis. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
 						
 					$("#dialog_agendamento").dialog({
 						draggable: false,
@@ -615,6 +714,17 @@ function getDate() {
 		$('#showCrimageDois').hide();
 		$('#divCrimageDois').show();
 	});
+
+	$(document).on('change', ".nParcela", function() {
+		var id = $(this).attr('id');
+		var nParcela = parseFloat($('option:selected',this).attr('value'));
+		var total = parseFloat($('#total' + id).attr('value'));
+		var valorParcelado =  (total/nParcela).toFixed(2);
+
+		$('#parcelamento' + id).attr('value', valorParcelado);
+		$('#parcelamento' + id).html('R$ ' + valorParcelado.replace('.', ','));
+	});
+
 })(jQuery);
 
 // Lazy-load
@@ -634,3 +744,8 @@ function showLoading()
 	$('#rc-main').hide();
 	$('#loading').show();
 }
+
+$('.emitirCertidaoBtn').on('click', function(){
+	$('.emitirCertidaoBtn').hide();
+	$('.baixarCertidaoBtn').hide();
+});

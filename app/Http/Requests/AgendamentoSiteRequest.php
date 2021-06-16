@@ -16,6 +16,7 @@ class AgendamentoSiteRequest extends FormRequest
             'celular' => 'max:191|min:14',
             'dia' => 'required',
             'hora' => 'required|max:191',
+            'idregional' => 'required'
         ];
     }
 
@@ -34,6 +35,7 @@ class AgendamentoSiteRequest extends FormRequest
             'dia.required' => 'Informe o dia do atendimento',
             'hora.required' => 'Informe o horário do atendimento',
             'hora.max' => 'O Horário excedeu o limite de caracteres permitido',
+            'idregional.required' => 'Informe a regional do atendimento'
         ];
     }
     

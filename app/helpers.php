@@ -1,5 +1,6 @@
 <?php
 
+use App\Representante;
 use App\Repositories\PermissaoRepository;
 
 function badgeConsulta($situacao)
@@ -286,6 +287,20 @@ function gerentiTiposContatos()
     ];
 }
 
+function gerentiTiposContatosInserir()
+{
+    return [
+        '1' => 'Telefone',
+        '2' => 'Celular',
+        '3' => 'E-mail',
+        '4' => 'Fax',
+        '5' => 'Home Page',
+        '6' => 'Tel. Emergência',
+        '7' => 'Tel. Contato',
+        '8' => 'Tel. Referência'
+    ];
+}
+
 function formataDataGerenti($date)
 {
     $array = explode('-', $date);
@@ -424,6 +439,21 @@ function formataCpfCnpj($value)
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
 }
 
+function tipoPessoaCpfCnpj($cpf_cpnj)
+{
+    $cpf_cnpj_numero = apenasNumeros($cpf_cpnj);
+
+    return strlen($cpf_cnpj_numero) === 11 ? Representante::PESSOA_FISICA : Representante::PESSOA_JURIDICA;
+}
+
+/**
+ * Função usada para remover caracteres não numéricos (CPF, CNPJ, Registro CORE e CEP).
+ */
+function apenasNumeros($value)
+{
+    return preg_replace('/[^0-9]/', '', $value);
+}
+
 function onlyDate($data)
 {
     $date = new \DateTime($data);
@@ -451,7 +481,8 @@ function noticiaCategorias()
         'Benefícios',
         'Cotidiano',
         'Feiras',
-        'Fiscalização'
+        'Fiscalização',
+        'Espaço do Contador'
     ];
 }
 
@@ -478,37 +509,6 @@ function tailCustom($filepath, $lines = 1, $adaptive = true) {
     return trim($output);
 }
 
-function modalidadesLicitacao()
-{
-    return [
-        'Carta Convite',
-        'Concorrência Pública',
-        'Concurso',
-        'Cotação Eletrônica',
-        'Credenciamento',
-        'Leilão',
-        'Pregão Eletrônico SRP',
-        'Pregão Eletrônico Tradicional',
-        'Pregão Presencial',
-        'Tomada de Preços'
-    ];
-}
-
-function situacoesLicitacao()
-{
-    return [
-        'Aberto',
-        'Adjudicado',
-        'Anulado',
-        'Cancelado',
-        'Concluído',
-        'Deserto',
-        'Em Andamento',
-        'Em fase de recurso',
-        'Homologado'
-    ];
-}
-
 function retornaDateTime($dia, $hora)
 {
     $dia = str_replace('/','-',$dia);
@@ -516,6 +516,13 @@ function retornaDateTime($dia, $hora)
     $date = new \DateTime($date);
     $format = $date->format('Y-m-d\TH:i:s');
     return $format;
+}
+
+function retornaDate($dia)
+{
+    $dia = str_replace('/','-',$dia);
+    
+    return new \DateTime($dia);
 }
 
 function btnSituacao($situacao)
@@ -588,19 +595,29 @@ function concursoSituacoes()
 
 function permissoesPorPerfil()
 {
-    $all = (new PermissaoRepository())->getAll();
+    $permissoes = session('permissoes');
+    $arrayPermissoes = array();
 
-    $filtered = $all->filter(function($permissao){
-        $perfis = explode(',', $permissao->perfis);
-        return in_array(Auth::user()->perfil->idperfil, $perfis);
-    });
+    foreach($permissoes as $permissao) {
+        $p = explode('_', $permissao);
+        array_push($arrayPermissoes, ['controller' => $p[0], 'metodo' => $p[1]]);
+    }
 
-    return $filtered->map(function($row){
-        return [
-            'controller' => $row->controller,
-            'metodo' => $row->metodo
-        ];
-    })->toArray();
+    return $arrayPermissoes;
+
+    // $all = (new PermissaoRepository())->getAll();
+
+    // $filtered = $all->filter(function($permissao){
+    //     $perfis = explode(',', $permissao->perfis);
+    //     return in_array(Auth::user()->perfil->idperfil, $perfis);
+    // });
+
+    // return dd($filtered->map(function($row){
+    //     return [
+    //         'controller' => $row->controller,
+    //         'metodo' => $row->metodo
+    //     ];
+    // })->toArray());
 }
 
 function mostraItem($permissoes, $controller, $metodo)
@@ -664,4 +681,13 @@ function todasHoras()
 function converterParaTextoCru($html)
 {
     return html_entity_decode(strip_tags($html));
+}
+
+function resumoTamanho($string, $tamanho)
+{
+    if (strlen($string) > 100)
+        $string = strip_tags($string);
+        $string = html_entity_decode($string);
+        $string = substr($string, 0, $tamanho) . '...';
+    return $string;
 }

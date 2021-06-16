@@ -2,10 +2,6 @@
 
 @section('content')
 
-@php
-use App\Http\Controllers\Helper;
-@endphp
-
 <section class="content-header">
   @if(\Session::has('message'))
   <div class="container-fluid mb-2">

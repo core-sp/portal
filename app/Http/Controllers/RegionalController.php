@@ -27,7 +27,7 @@ class RegionalController extends Controller
     
     public function index()
     {
-        $resultados = $this->regionalRepository->getToTable();
+        $resultados = $this->regionalRepository->all();
         $tabela = $this->regionalModel->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
@@ -70,6 +70,7 @@ class RegionalController extends Controller
         $resultados = $this->regionalRepository->getBusca($busca);
         $tabela = $this->regionalModel->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
+
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 

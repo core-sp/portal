@@ -29,7 +29,8 @@ class Permissao extends Model
             'HomeImagemController' => 'Imagem (Home)',
             'PostsController' => 'Post',
             'RepresentanteEnderecoController' => 'Representante - Endereço',
-            'RepresentanteController' => 'Representante - Cadastrados'
+            'RepresentanteController' => 'Representante - Cadastrados',
+            'FiscalizacaoController' => 'Fiscalização'
         ];
     }
 }

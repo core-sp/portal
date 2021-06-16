@@ -40,6 +40,11 @@ class FirebirdConnection
         return $this->connection->prepare($query);
     }
 
+    public function getPDO()
+    {
+        return $this->connection;
+    }
+
     public function __destruct()
     {
         // Destrutor da conexão

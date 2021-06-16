@@ -63,8 +63,12 @@ class LoginController extends Controller
         $permissao = Permissao::all();
         $array = $permissao->toArray();
         $permissoes = [];
+        
         foreach($array as $a) {
-            if(strpos($a['perfis'], $idperfil.',') !== false) {
+
+            $perfis = explode(',', $a['perfis']);
+
+            if(in_array($idperfil, $perfis)) {
                 $cm = $a['controller'].'_'.$a['metodo'];
                 $perfis = $a['perfis'];
                 array_push($permissoes, $cm);

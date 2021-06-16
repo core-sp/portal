@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Rules\CpfCnpj;
-use App\Traits\GerentiProcedures;
 use Illuminate\Http\Request;
+use App\Repositories\GerentiRepositoryInterface;
 
 class AnoVigenteSiteController extends Controller
 {
-    use GerentiProcedures;
+    private $gerentiRepository;
+
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
+    {
+        $this->gerentiRepository = $gerentiRepository;
+    }
 
     public function anoVigenteView()
     {
@@ -17,7 +22,7 @@ class AnoVigenteSiteController extends Controller
 
     public function anoVigente(Request $request)
     {
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
+        $cpfCnpj = apenasNumeros(request('cpfCnpj'));
 
         $request->request->set('cpfCnpj', $cpfCnpj);
 
@@ -30,7 +35,7 @@ class AnoVigenteSiteController extends Controller
             'g-recaptcha-response.required' => 'ReCAPTCHA obrigatório'
         ]);
 
-        $nossonumero = $this->gerentiAnuidadeVigente($cpfCnpj);
+        $nossonumero = $this->gerentiRepository->gerentiAnuidadeVigente($cpfCnpj);
 
         if(!empty($nossonumero)) {
             return redirect()->back()->with('nossonumero', $nossonumero)->withInput();

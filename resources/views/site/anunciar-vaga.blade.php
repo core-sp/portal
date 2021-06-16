@@ -240,8 +240,8 @@
                     <div class="form-group mt-2">
                         <label for="regiaoAtuacao">Região de Atuação</label>
                         <select name="regiaoAtuacao[]" class="form-control {{ $errors->has('regiaoAtuacao') ? 'is-invalid' : '' }}" multiple>
-                            @foreach (regioes() as $key => $regiao)
-                                <option value="{{ $key }}" {{ in_array($regiao, $oldRA) ? 'selected' : '' }}>{{ $regiao }}</option>
+                            @foreach ($regionais as $regional)
+                                <option value="{{ $regional->idregional }}" {{ in_array($regional->regional, $oldRA) ? 'selected' : '' }}>{{ $regional->regional }}</option>
                             @endforeach
                         </select>
                         @if($errors->has('regiaoAtuacao'))

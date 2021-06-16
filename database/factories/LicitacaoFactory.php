@@ -10,8 +10,8 @@ $factory->define(Licitacao::class, function (Faker $faker) {
     $date->add(new DateInterval('P30D'));
     $format = $date->format('Y-m-d\TH:i:s');
     
-    $modalidades = modalidadesLicitacao();
-    $situacoes = situacoesLicitacao();
+    $modalidades = Licitacao::modalidadesLicitacao();
+    $situacoes = Licitacao::situacoesLicitacao();
     $modIndex = array_rand($modalidades);
     $sitIndex = array_rand($situacoes);
 

@@ -81,4 +81,9 @@ class CursoRepository {
             'idusuario' => $request->idusuario
         ]);
     }
+
+    public function getTotalInscritos()
+    {
+        return CursoInscrito::all()->count();
+    }
 }

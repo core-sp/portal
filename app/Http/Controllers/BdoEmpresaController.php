@@ -2,30 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\BdoEmpresaRequest;
-use App\Traits\ControleAcesso;
-use App\Repositories\BdoEmpresaRepository;
 use App\BdoEmpresa;
 use App\BdoOportunidade;
 use App\Events\CrudEvent;
+use App\Traits\TabelaAdmin;
+use App\Traits\ControleAcesso;
+use App\Http\Requests\BdoEmpresaRequest;
+use App\Repositories\BdoEmpresaRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoEmpresaController extends Controller
 {
-    use ControleAcesso; 
+    use ControleAcesso, TabelaAdmin; 
 
     // Nome da Classe
     private $class = 'BdoEmpresaController';
-    private $bdoEmpresa;
     private $bdoEmpresaRepository;
-    private $variaveis;
 
-    public function __construct(BdoEmpresa $bdoEmpresa, BdoEmpresaRepository $bdoEmpresaRepository)
+    private $variaveis = [
+        'singular' => 'empresa',
+        'singulariza' => 'a empresa',
+        'plural' => 'empresas',
+        'pluraliza' => 'empresas',
+        'titulo_criar' => 'Cadastrar nova empresa',
+        'form' => 'bdoempresa',
+        'btn_criar' => '<a href="/admin/bdo/empresas/criar" class="btn btn-primary mr-1">Nova Empresa</a>',
+        'busca' => 'bdo/empresas',
+        'slug' => 'bdo/empresas'
+    ];
+
+    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository)
     {
         $this->middleware('auth', ['except' => ['show', 'apiGetEmpresa']]);
-        $this->bdoEmpresa = $bdoEmpresa;
+
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
-        $this->variaveis = $bdoEmpresa->variaveis();
     }
 
     public function index()
@@ -37,7 +47,7 @@ class BdoEmpresaController extends Controller
         }
             
         $resultados = $this->bdoEmpresaRepository->getToTable();
-        $tabela = $this->bdoEmpresa->tabelaCompleta($resultados);
+        $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
 
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
@@ -48,8 +58,8 @@ class BdoEmpresaController extends Controller
         $this->autoriza($this->class, __FUNCTION__);
 
         $variaveis = (object) $this->variaveis;
-        $capitais = $this->bdoEmpresa::capitalSocial();
-        $segmentos = $this->bdoEmpresa::segmentos();
+        $capitais = BdoEmpresa::capitalSocial();
+        $segmentos = BdoEmpresa::segmentos();
 
         return view('admin.crud.criar', compact('variaveis', 'capitais', 'segmentos'));
     }
@@ -79,8 +89,8 @@ class BdoEmpresaController extends Controller
 
         $resultado = $this->bdoEmpresaRepository->findOrFail($id);
         $variaveis = (object) $this->variaveis;
-        $capitais = $this->bdoEmpresa::capitalSocial();
-        $segmentos = $this->bdoEmpresa::segmentos();
+        $capitais = BdoEmpresa::capitalSocial();
+        $segmentos = BdoEmpresa::segmentos();
 
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'capitais', 'segmentos'));
     }
@@ -137,7 +147,7 @@ class BdoEmpresaController extends Controller
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = $this->bdoEmpresaRepository->busca($busca);
-        $tabela = $this->bdoEmpresa->tabelaCompleta($resultados);
+        $tabela = $this->tabelaCompleta($resultados);
         
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
@@ -145,7 +155,7 @@ class BdoEmpresaController extends Controller
     /** Função usada por JQuery na tela de anúncio de vagas */
     public function apiGetEmpresa($cnpj)
     {
-        $cnpj = preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj);
+        $cnpj = formataCpfCnpj($cnpj);
 
         $empresa = $this->bdoEmpresaRepository->getToApi($cnpj);
 
@@ -172,5 +182,54 @@ class BdoEmpresaController extends Controller
         else {
             abort(500);
         }
+    }
+
+    public function tabelaCompleta($query)
+    {
+        $headers = [
+            'Código',
+            'Segmento',
+            'Razão Social',
+            'Ações'
+        ];
+
+        $contents = $query->map(function($row){
+            if($this->mostra('BdoOportunidadeController', 'create')) {
+                $acoes = '<a href="/admin/bdo/criar/'.$row->idempresa.'" class="btn btn-sm btn-secondary">Nova Oportunidade</a> ';
+            }
+            else {
+                $acoes = '';
+            }
+               
+            if($this->mostra('BdoEmpresaController', 'edit')) {
+                $acoes .= '<a href="/admin/bdo/empresas/editar/'.$row->idempresa.'" class="btn btn-sm btn-primary">Editar</a> ';
+            }
+                
+            if($this->mostra('BdoEmpresaController', 'destroy')) {
+                $acoes .= '<form method="POST" action="/admin/bdo/empresas/apagar/'.$row->idempresa.'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a empresa?\')" />';
+                $acoes .= '</form>';
+            }
+
+            if(empty($acoes)) {
+                $acoes = '<i class="fas fa-lock text-muted"></i>';
+            }
+                        
+            return [
+                $row->idempresa,
+                $row->segmento,
+                $row->razaosocial,
+                $acoes
+            ];
+        })->toArray();
+
+        $classes = [
+            'table',
+            'table-hover'
+        ];
+
+        return $this->montaTabela($headers, $contents, $classes);
     }
 }

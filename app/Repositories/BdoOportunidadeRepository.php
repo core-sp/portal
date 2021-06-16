@@ -42,13 +42,13 @@ class BdoOportunidadeRepository {
     {
         return BdoOportunidade::orderBy('datainicio','DESC')
             ->orderBy('idoportunidade', 'DESC')
-            ->whereNotIn('status', [BdoOportunidade::$status_sob_analise, BdoOportunidade::$status_concluido, BdoOportunidade::$status_recusado])
+            ->whereNotIn('status', [BdoOportunidade::STATUS_SOB_ANALISE, BdoOportunidade::STATUS_CONCLUIDO, BdoOportunidade::STATUS_RECUSADO])
             ->paginate(10);
     }
 
     public function buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave)  
     {
-        $oportunidades = BdoOportunidade::whereNotIn('status', [BdoOportunidade::$status_sob_analise, BdoOportunidade::$status_concluido, BdoOportunidade::$status_recusado]);
+        $oportunidades = BdoOportunidade::whereNotIn('status', [BdoOportunidade::STATUS_SOB_ANALISE, BdoOportunidade::STATUS_CONCLUIDO, BdoOportunidade::STATUS_RECUSADO]);
 
         if(!empty($buscaSegmento)) {
             $oportunidades->where('segmento',$buscaSegmento);

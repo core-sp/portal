@@ -82,7 +82,7 @@
           	</div>
             <div class="col-md-4 align-self-end pesquisaLicitacao-btn">
               <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
-              <button type="reset" class="btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</button>
+              <a href="/concursos" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
             </div>
           </div>
         </form>
@@ -151,7 +151,11 @@
           </div>
           @endforeach
         @else
+        @if(isset($erro))
+        <p>{{ $erro }}</p>  
+        @else
         <p>Nenhum concurso encontrado!</p>
+        @endif
         @endif
       </div>
     </div>

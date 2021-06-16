@@ -318,7 +318,7 @@ class BdoOportunidadeTest extends TestCase
 
         $bdoEmpresa = factory('App\BdoEmpresa')->create();
 
-        $bdoOportunidade_1 = factory('App\BdoOportunidade')->create(['idempresa' => $bdoEmpresa->idempresa, 'status' => BdoOportunidade::$status_concluido]);
+        $bdoOportunidade_1 = factory('App\BdoOportunidade')->create(['idempresa' => $bdoEmpresa->idempresa, 'status' => BdoOportunidade::STATUS_CONCLUIDO]);
 
         $bdoOportunidade_2 = factory('App\BdoOportunidade')->raw(['idempresa' => $bdoEmpresa->idempresa]);
 
@@ -366,7 +366,7 @@ class BdoOportunidadeTest extends TestCase
 
         $bdoEmpresa = factory('App\BdoEmpresa')->create();
 
-        $bdoOportunidade_1 = factory('App\BdoOportunidade')->create(['idempresa' => $bdoEmpresa->idempresa, 'status' => BdoOportunidade::$status_sob_analise]);
+        $bdoOportunidade_1 = factory('App\BdoOportunidade')->create(['idempresa' => $bdoEmpresa->idempresa, 'status' => BdoOportunidade::STATUS_SOB_ANALISE]);
 
         $bdoOportunidade_2 = factory('App\BdoOportunidade')->raw(['idempresa' => $bdoEmpresa->idempresa]);
 
@@ -396,7 +396,7 @@ class BdoOportunidadeTest extends TestCase
 
         $this->assertEquals(BdoOportunidade::where('titulo', $bdoOportunidade_2['titulo'])->count(), 0);
 
-        $bdoOportunidade_1->update(['status' => BdoOportunidade::$status_em_andamento]);
+        $bdoOportunidade_1->update(['status' => BdoOportunidade::STATUS_EM_ANDAMENTO]);
 
         $this->post(route('bdosite.anunciarVaga'), $anunciarVaga);
 
@@ -418,37 +418,37 @@ class BdoOportunidadeTest extends TestCase
 
         $bdoOportunidade_1 = factory('App\BdoOportunidade')->create([
             'idempresa' => $bdoEmpresa->idempresa, 
-            'status' => BdoOportunidade::$status_em_andamento, 
+            'status' => BdoOportunidade::STATUS_EM_ANDAMENTO, 
             'segmento' => BdoEmpresa::segmentos()[0],
             'regiaoatuacao' => ',1,',
         ]);
 
         $bdoOportunidade_2 = factory('App\BdoOportunidade')->create([
             'idempresa' => $bdoEmpresa->idempresa, 
-            'status' => BdoOportunidade::$status_expirado, 
+            'status' => BdoOportunidade::STATUS_EXPIRADO, 
             'segmento' => BdoEmpresa::segmentos()[1],
             'regiaoatuacao' => ',2,'
         ]);
         $bdoOportunidade_3 = factory('App\BdoOportunidade')->create([
             'idempresa' => $bdoEmpresa->idempresa, 
-            'status' => BdoOportunidade::$status_sob_analise, 
+            'status' => BdoOportunidade::STATUS_SOB_ANALISE, 
             'segmento' => BdoEmpresa::segmentos()[2]
         ]);
         
         $bdoOportunidade_4 = factory('App\BdoOportunidade')->create([
             'idempresa' => $bdoEmpresa->idempresa, 
-            'status' => BdoOportunidade::$status_concluido, 
+            'status' => BdoOportunidade::STATUS_CONCLUIDO, 
             'segmento' => BdoEmpresa::segmentos()[3]
         ]);
         
         $bdoOportunidade_5 = factory('App\BdoOportunidade')->create([
             'idempresa' => $bdoEmpresa->idempresa, 
-            'status' => BdoOportunidade::$status_recusado, 
+            'status' => BdoOportunidade::STATUS_RECUSADO, 
             'segmento' => BdoEmpresa::segmentos()[4]
         ]);
         $bdoOportunidade_6 = factory('App\BdoOportunidade')->create([
             'idempresa' => $bdoEmpresa->idempresa, 
-            'status' => BdoOportunidade::$status_em_andamento, 
+            'status' => BdoOportunidade::STATUS_EM_ANDAMENTO, 
             'segmento' => BdoEmpresa::segmentos()[0],
             'regiaoatuacao' => ',1,'
         ]);

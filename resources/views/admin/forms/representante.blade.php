@@ -1,4 +1,4 @@
-<form role="form" method="POST">
+<form role="form" method="GET" action="{{ route('admin.representante.buscaGerenti') }}">
     @csrf
     <div class="card-body">
         <div class="form-group  ">

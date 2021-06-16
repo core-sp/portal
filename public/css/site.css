@@ -20,6 +20,10 @@ body {
 	background-color: #FFFFFF;
 }
 
+.verde {
+	color: #16d30f;
+}
+
 .verde-escuro {
 	color: #13632F;
 }
@@ -311,6 +315,15 @@ strong, .bold {
 	font-weight: 300;
 }
 
+.conteudo-txt a,
+.conteudo-txt-mini a {
+	color: #ff0000;
+}
+
+.prestacao-txt a {
+	color: #000000;
+}
+
 .conteudo-txt a:hover,
 .conteudo-txt-mini a:hover {
 	text-decoration: underline;
@@ -407,10 +420,12 @@ figure.align-left {
 #header-principal {
 	top: 0;
 	left: 0;
+
+	/* 55 anos */
+	background-image: url('/img/banner-55-anos.png');
 	
 	/* Novembro Azul */
-	background-color: rgba(0,31,137,1);
-
+	/* background-color: rgba(0,31,137,1); */
 	/* Outubro Rosa */
 	/* background-color: rgba(231,31,127,1); */
 	/* Cor Padrão */
@@ -460,6 +475,11 @@ figure.align-left {
 
 .linha-azul-escuro {
 	background-color: #004587;
+	height: 0.5rem;
+}
+
+.linha-dourada {
+	background-color: rgb(212,175,55);
 	height: 0.5rem;
 }
 
@@ -721,6 +741,7 @@ figure.align-left {
 }
 
 .box {
+	height: 300px;
 	padding: 0.55rem;
 	border-radius: 5px;
 	transition: all .3s;
@@ -984,8 +1005,6 @@ input[type=file]::-webkit-file-upload-button {
 	background-position: center;
 	background-attachment: fixed;
 	border-radius: 5px;
-	padding-left: 2rem;
-	padding-right: 2rem;
 	position: relative;
 	z-index: 3;
 }
@@ -1622,14 +1641,14 @@ footer p {
 	cursor: pointer;
 }
 
-#loadImage {
+.loadImage {
 	position: absolute;
-	bottom: 4px;
+	top: 28px;
 	left: 11px;
 	display: none;
 }
 
-#loadImage img {
+.loadImage img {
 	width: 32px;
 }
 
@@ -1644,6 +1663,17 @@ footer p {
 	padding-bottom: 4px;
 	margin-bottom: 12px;
 	margin-top: 12px;
+}
+
+
+.ui-datepicker .lotado span
+{
+	background: none #e61818;
+}
+
+.ui-widget-content .ui-state-disabled.lotado
+{
+	opacity: 1;
 }
 
 /*

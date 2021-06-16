@@ -18,10 +18,10 @@
         </div>
         <h5 class="mt-3 mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;CONTATOS CADASTRADOS</h5>
             <div class="contatos-table">
-                @forelse (Auth::guard('representante')->user()->contatos() as $contato)
+                @forelse ($contatos as $contato)
                 <div class="contato-single {{ $loop->last ? '' : 'b-dashed' }}">
                     <p class="pb-0">
-                        {{ gerentiTiposContatos()[$contato['CXP_TIPO']] }}:&nbsp;<strong>{{ $contato['CXP_VALOR'] }}</strong>
+                        {{ $gerentiTiposContatos[$contato['CXP_TIPO']] }}:&nbsp;<strong>{{ $contato['CXP_VALOR'] }}</strong>
                         <small class="light">{{ $contato['CXP_STATUS'] === 1 ? '(Ativo)' : '(Inativo)' }}</small>
                     </p>
                     <div class="contato-btns">

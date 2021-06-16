@@ -59,6 +59,20 @@
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Situação Financeira</h6>
               </a>
             </div>
+
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView')  ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.emitirCertidaoView') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Emitir Certidão</h6>
+              </a>
+            </div>
+
+            {{-- SIMULADOR_REFIS --}}
+            {{-- <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.simuladorRefis')  ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.simuladorRefis') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Simulador Refis</h6>
+              </a>
+            </div> --}}
+
           </div>
         </div>
       </div>

@@ -2,33 +2,93 @@
 
 namespace App\Http\Controllers;
 
-use App\Connections\FirebirdConnection;
-use App\Events\ExternoEvent;
-use App\Mail\CadastroRepresentanteMail;
-use App\Mail\SolicitacaoAlteracaoEnderecoMail;
+use Exception;
+use App\Certidao;
 use App\Representante;
-use App\RepresentanteEndereco;
-use Illuminate\Http\Request;
 use App\Rules\CpfCnpj;
-use App\Traits\GerentiProcedures;
+use GuzzleHttp\Client;
+use App\Mail\CertidaoMail;
+use App\Events\ExternoEvent;
+use Illuminate\Http\Request;
+use App\RepresentanteEndereco;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\CadastroRepresentanteMail;
+use App\Repositories\CertidaoRepository;
+use App\Repositories\GerentiApiRepository;
+use GuzzleHttp\Exception\RequestException;
+use App\Http\Controllers\CertidaoController;
+use App\Mail\SolicitacaoAlteracaoEnderecoMail;
+use App\Repositories\GerentiRepositoryInterface;
+use App\Http\Requests\RepresentanteEnderecoRequest;
+use App\Repositories\RepresentanteEnderecoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
 {
-    use GerentiProcedures;
-
+    private $certidaoController;
+    private $certidaoRepository;
+    private $gerentiRepository;
+    private $representanteEnderecoRepository;
+    private $gerentiApiRepository;
     protected $idendereco;
 
-    public function __construct()
+    public function __construct(CertidaoController $certidaoController, CertidaoRepository $certidaoRepository, GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
+        $this->certidaoController = $certidaoController;
+        $this->certidaoRepository = $certidaoRepository;
+        $this->gerentiRepository = $gerentiRepository;
+        $this->representanteEnderecoRepository = $representanteEnderecoRepository;
+        $this->gerentiApiRepository = $gerentiApiRepository;
     }
 
     public function index()
     {
-        return view('site.representante.home');
+        $resultado = $this->gerentiRepository->gerentiAnuidadeVigente(Auth::guard('representante')->user()->cpf_cnpj);
+        $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
+        $status = statusBold($this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id));
+        $ano = date("Y");
+
+        return view('site.representante.home', compact("nrBoleto", "status", "ano"));
+    }
+
+    public function dadosGeraisView()
+    {
+        $nome = Auth::guard('representante')->user()->nome;
+        $registroCore = Auth::guard('representante')->user()->registro_core;
+        $cpfCnpj = Auth::guard('representante')->user()->cpf_cnpj;
+        $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
+        $dadosGerais = $this->gerentiRepository->gerentiDadosGerais(Auth::guard('representante')->user()->tipoPessoa(), Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.dados-gerais', compact("nome", "registroCore", "cpfCnpj", "tipoPessoa", "dadosGerais"));
+    }
+
+    public function contatosView()
+    {
+        $contatos = $this->gerentiRepository->gerentiContatos(Auth::guard('representante')->user()->ass_id);
+        $gerentiTiposContatos = gerentiTiposContatos();
+
+        return view('site.representante.contatos', compact("contatos", "gerentiTiposContatos"));
+    }
+
+    public function enderecosView()
+    {
+        $solicitacoesEnderecos = Auth::guard('representante')->user()->solicitacoesEnderecos();
+        $possuiSolicitacaoEnderecos = $solicitacoesEnderecos->isNotEmpty();
+        $endereco = $this->gerentiRepository->gerentiEnderecos(Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.enderecos', compact("possuiSolicitacaoEnderecos", "solicitacoesEnderecos", "endereco"));
+    }
+
+    public function listaCobrancas()
+    {
+        $cobrancas = $this->gerentiRepository->gerentiCobrancas(Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.lista-cobrancas', compact("cobrancas"));
     }
 
     public function cadastroView()
@@ -65,7 +125,7 @@ class RepresentanteSiteController extends Controller
 
         $save = Representante::create([
             'cpf_cnpj' => $cpfCnpj,
-            'registro_core' => preg_replace('/[^0-9]+/', '', request('registro_core')),
+            'registro_core' => apenasNumeros(request('registro_core')),
             'ass_id' => $ass_id,
             'nome' => $nome,
             'email' => request('email'),
@@ -95,7 +155,7 @@ class RepresentanteSiteController extends Controller
 
         $update = $rep->update([
             'cpf_cnpj' => $cpfCnpj,
-            'registro_core' => preg_replace('/[^0-9]+/', '', request('registro_core')),
+            'registro_core' => apenasNumeros(request('registro_core')),
             'ass_id' => $ass_id,
             'nome' => $nome,
             'email' => request('email'),
@@ -124,7 +184,7 @@ class RepresentanteSiteController extends Controller
                 'verify_token' => null
             ]);
         } else {
-            abort(500);
+            abort(500, 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Portal, caso contrário, por favor refazer cadastro no Portal.');
         }
 
         event(new ExternoEvent('Usuário ' . $find->id . ' ("'. $find->cpf_cnpj .'") verificou o email após o cadastro.'));
@@ -141,13 +201,13 @@ class RepresentanteSiteController extends Controller
     {
         $cpfCnpjCru = request('cpfCnpj');
 
-        $cpfCnpj = preg_replace('/[^0-9]+/', '', request('cpfCnpj'));
+        $cpfCnpj = apenasNumeros(request('cpfCnpj'));
 
         $this->rules($request, $cpfCnpj);
 
         strlen(request('registro_core')) === 11 ? $registro = '0' . request('registro_core') : $registro = request('registro_core');
 
-        $checkGerenti = $this->checaAtivo($registro, request('cpfCnpj'), request('email'));
+        $checkGerenti = $this->gerentiRepository->gerentiChecaLogin($registro, request('cpfCnpj'), request('email'));
 
         if (array_key_exists('Error', $checkGerenti)) {
             return redirect()
@@ -171,24 +231,9 @@ class RepresentanteSiteController extends Controller
         ]);
     }
 
-    public function dadosGeraisView()
-    {
-        return view('site.representante.dados-gerais');
-    }
-
     public function inserirContatoView()
     {
         return view('site.representante.inserir-contato');
-    }
-
-    public function contatosView()
-    {
-        return view('site.representante.contatos');
-    }
-
-    public function enderecosView()
-    {
-        return view('site.representante.enderecos');
     }
 
     public function inserirContato(Request $request)
@@ -204,9 +249,9 @@ class RepresentanteSiteController extends Controller
         $request->status === 'on' ? $status = 1 : $status = 0;
 
         if(isset($request->id)) {
-            $this->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo, $request->id, $status);
+            $this->gerentiRepository->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo, $request->id, $status);
         } else {
-            $this->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo);
+            $this->gerentiRepository->gerentiInserirContato(Auth::guard('representante')->user()->ass_id, $request->contato, $request->tipo);
         }
 
         isset($request->id) ? $msg = 'Contato editado com sucesso!' : $msg = 'Contato cadastrado com sucesso!';
@@ -223,57 +268,8 @@ class RepresentanteSiteController extends Controller
 
     public function inserirEnderecoView()
     {
-        return view('site.representante.inserir-endereco');
-    }
-
-    protected function validateEndereco($request)
-    {
-        $this->validate($request, [
-            'cep' => 'required',
-            'bairro' => 'required|max:30',
-            'logradouro' => 'required|max:100',
-            'numero' => 'required|max:15',
-            'complemento' => 'max:100',
-            'estado' => 'required|max:5',
-            'municipio' => 'required|max:30',
-            'crimage' => 'required|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048'
-        ], [
-            'required' => 'Campo obrigatório',
-            'max' => 'Excedido limite de caracteres',
-            'crimage.required' => 'Favor adicionar um comprovante de residência',
-            'mimes' => 'Tipo de arquivo não suportado',
-            'crimage.max' => 'A imagem não pode ultrapassar 2MB'
-        ]);
-    }
-
-    public function saveEndereco($image, $imageDois = null)
-    {
-        $save = RepresentanteEndereco::create([
-            'ass_id' => Auth::guard('representante')->user()->ass_id,
-            'cep' => request('cep'),
-            'bairro' => request('bairro'),
-            'logradouro' => request('logradouro'),
-            'numero' => request('numero'),
-            'complemento' => request('complemento'),
-            'estado' => request('estado'),
-            'municipio' => request('municipio'),
-            'crimage' => $image,
-            'crimagedois' => $imageDois,
-            'status' => 'Aguardando confirmação'
-        ]);
-
-        if(!$save)
-            abort(403);
-
-        $this->idendereco = $save->id;
-    }
-
-    public function inserirEndereco(Request $request)
-    {
-        $this->validateEndereco($request);
-
-        // Checa se já tem solicitação de endereço sob análise.
-        $count = RepresentanteEndereco::where('ass_id', Auth::guard('representante')->user()->ass_id)->where('status', 'Aguardando confirmação')->count();
+        $count = $this->representanteEnderecoRepository->getCountAguardandoConfirmacaoByAssId(Auth::guard('representante')->user()->ass_id);
+        
         if($count >= 1) {
             return redirect()
                 ->route('representante.enderecos.view')
@@ -283,30 +279,32 @@ class RepresentanteSiteController extends Controller
                 ]);
         }
 
+        return view('site.representante.inserir-endereco');
+    }
+
+    public function inserirEndereco(RepresentanteEnderecoRequest $request)
+    {
         $imageName = Auth::guard('representante')->user()->id . '-' . time() . '.' . request()->crimage->getClientOriginalExtension();
 
-        request()->crimage->move(public_path('imagens/representantes/enderecos'), $imageName);
+        $request->file("crimage")->storeAs("representantes/enderecos", $imageName);
 
         if(isset(request()->crimagedois)) {
             $imageDoisName = Auth::guard('representante')->user()->id . '-2-' . time() . '.' . request()->crimagedois->getClientOriginalExtension();
-            request()->crimagedois->move(public_path('imagens/representantes/enderecos'), $imageDoisName);
-        } else {
+            $request->file("crimagedois")->storeAs("representantes/enderecos", $imageDoisName);
+        } 
+        else {
             $imageDoisName = null;
         }
 
-        $this->saveEndereco($imageName, $imageDoisName);
+        $save = $this->representanteEnderecoRepository->create(Auth::guard('representante')->user()->ass_id, request(["cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"]), $imageName, $imageDoisName);
 
-        // $this->gerentiInserirEndereco(Auth::guard('representante')->user()->ass_id, $request);
+        if(!$save) {
+            abort(500);
+        }
 
         event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") solicitou mudança no endereço de correspondência.'));
 
-        $body = 'Nova solicitação de alteração de endereço no Portal Core-SP.';
-        $body .= '<br /><br />';
-        $body .= '<strong>Código da solicitação:</strong> #'. $this->idendereco;
-        $body .= '<br /><br />';
-        $body .= 'Para verifica-la, acesse o <a href="' . route('site.home') . '/admin">painel de administração</a> do Portal Core-SP.';
-
-        Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($body));
+        Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($save->id));
 
         return redirect()
             ->route('representante.enderecos.view')
@@ -318,7 +316,7 @@ class RepresentanteSiteController extends Controller
 
     public function deletarContato(Request $request)
     {
-        $this->gerentiDeletarContato(Auth::guard('representante')->user()->ass_id, $request);
+        $this->gerentiRepository->gerentiDeletarContato(Auth::guard('representante')->user()->ass_id, $request);
 
         if($request->status === '1') {
             $msg = 'Contato ativado com sucesso!';
@@ -340,14 +338,122 @@ class RepresentanteSiteController extends Controller
             ]);
     }
 
-    public function listaCobrancas()
-    {
-        return view('site.representante.lista-cobrancas');
-    }
-
     public function eventoBoleto()
     {
         $descricao = IlluminateRequest::input('descricao');
         event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") baixou o boleto "' . $descricao . '"'));
+    }
+
+    /**
+     * Abre página para emissão da certidão.
+     */
+    public function emitirCertidaoView() 
+    {
+        try {
+            $responseGetCertidao = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
+        }
+        catch (Exception $e) {
+            Log::error($e->getTraceAsString());
+
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+        }
+
+        $certidoes = $responseGetCertidao['data'];
+
+        array_multisort(array_column($certidoes, 'dataEmissao'), SORT_DESC, array_column($certidoes, 'horaEmissao'), SORT_DESC, $certidoes);
+
+        $titulo = 'Emissão de Certidão';
+        $mensagem = 'Clique no botão abaixo para verificar e emitir sua Certidão.</br>';
+        $emitir = true;
+        
+        $hasEmitido = in_array('Emitido', array_column($certidoes, 'status'));
+
+        if($hasEmitido) {
+            $mensagem .='<strong>Atenção, existem certidões que ainda estão válidas, caso opte em emitir uma nova, essas serão canceladas.</strong></br>';
+        }
+
+        return view('site.representante.emitir-certidao', compact('titulo', 'mensagem', 'emitir', 'certidoes'));
+    }
+    
+    /**
+     * Verifica se é possível emitir a certidão. Em caso positivo, a certidão será gerada e enviada por e-mail/download, caso contrário, uma mensagem de erro é retornada.
+     */
+    public function emitirCertidao() 
+    {
+        try {
+            $responseGerentiJson = $this->gerentiApiRepository->gerentiGenerateCertidao(Auth::guard('representante')->user()->ass_id);
+        }
+        // Erro lançado na integração HTTP
+        catch (RequestException $e) {
+
+            $responseGerentiJsonError = json_decode($e->getResponse()->getBody()->getContents(), true);
+
+            // Log do erro que o representante comercial recebeu, com mensagem de erro direto do GERENTI
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") não conseguiu emitir certidão. Erro: ' . $responseGerentiJsonError['error']['messages'][0]));
+
+            $titulo = 'Falha ao emitir certidão';
+            $mensagem = 'Não foi possível emitir a certidão. Por favor entre em contato com o CORE-SP para mais informações.';
+            $emitir = false;
+
+            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+        }
+        catch (Exception $e) {
+            Log::error($e->getTraceAsString());
+
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+        }
+
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") gerou certidão com código: ' . $responseGerentiJson['data']['numeroDocumento']));
+
+        // Arquivo enviado pelo GERENTI em base 64
+        $pdfBase64 = $responseGerentiJson['data']['base64'];
+
+        // Envio do PDF por e-mail
+        $email = new CertidaoMail($pdfBase64);
+        Mail::to(Auth::guard('representante')->user()->email)->queue($email);
+
+        // Download do arquivo PDF
+        header('Content-Type: application/pdf');
+
+        return response()->streamDownload(function () use ($pdfBase64){
+            echo base64_decode($pdfBase64);
+        }, 'certidao.pdf');
+    }
+
+    /**
+     * Faz download do PDF da certidão do Representante Comercial através do númeo da certidão.
+     */
+    public function baixarCertidao(Request $request) 
+    {
+        $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao(Auth::guard('representante')->user()->ass_id);
+
+        $certidoes = $responseGerentiJson['data'];
+
+        $posCertidao = array_search($request->numero, array_column($certidoes, 'numeroDocumento'));
+
+        if($certidoes[$posCertidao]['status'] === 'Emitido') {
+
+            $pdfBase64 = $certidoes[$posCertidao]['base64'];
+
+            header('Content-Type: application/pdf');
+
+            return response()->streamDownload(function () use ($pdfBase64){
+                echo base64_decode($pdfBase64);
+            }, 'certidao.pdf');
+        }
+        else {
+            $titulo = 'Falha ao baixar certidão';
+            $mensagem = 'Não foi possível baixar a certidão.';
+            $emitir = false;
+
+            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+        }
+    }
+
+    public function simuladorRefis()
+    {
+        $valoresRefis = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
+
+        return view('site.representante.simulador-refis', compact('valoresRefis'));
     }
 }

@@ -18,13 +18,15 @@ class NoticiaController extends Controller
     private $class = 'NoticiaController';
     private $noticiaModel;
     private $noticiaRepository;
+    private $regionalRepository;
     private $variaveis;
 
-    public function __construct(Noticia $noticia, NoticiaRepository $noticiaRepository)
+    public function __construct(Noticia $noticia, NoticiaRepository $noticiaRepository, RegionalRepository $regionalRepository)
     {
         $this->middleware('auth', ['except' => ['show', 'siteGrid']]);
         $this->noticiaModel = $noticia;
         $this->noticiaRepository = $noticiaRepository;
+        $this->regionalRepository = $regionalRepository;
         $this->variaveis = $noticia->variaveis();
     }
 
@@ -42,7 +44,7 @@ class NoticiaController extends Controller
     public function create()
     {
         $this->autoriza($this->class, __FUNCTION__);
-        $regionais = (new RegionalRepository)->getAsc();
+        $regionais = $this->regionalRepository->getAsc();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
@@ -74,7 +76,7 @@ class NoticiaController extends Controller
     {
         $this->autoriza($this->class, __FUNCTION__);
         $resultado = Noticia::findOrFail($id);
-        $regionais = (new RegionalRepository)->getAsc();
+        $regionais = $this->regionalRepository->getAsc();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
     }

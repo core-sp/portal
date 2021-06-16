@@ -1,5 +1,5 @@
 var show_list;
-var sort_type = 'updated';
+var sort_type = 'alphabetic';
 
 $(document).ready(function () {
   bootbox.setDefaults({locale:lang['locale-bootbox']});
@@ -300,6 +300,15 @@ function useFile(file_url) {
     }
   }
 
+  function useTinymce5(url) {
+    parent.postMessage({
+      mceAction: 'insert',
+      content: url
+    });
+    
+    parent.postMessage({ mceAction: 'close' });
+}
+
   function useCkeditor3(url) {
     if (window.opener) {
       // Popup
@@ -320,16 +329,21 @@ function useFile(file_url) {
 
   var url = file_url;
   var field_name = getUrlParam('field_name');
+  var editor = getUrlParam('editor');
   var is_ckeditor = getUrlParam('CKEditor');
   var is_fcke = typeof data != 'undefined' && data['Properties']['Width'] != '';
   var file_path = url.replace(route_prefix, '');
 
-  if (window.opener || window.tinyMCEPopup || field_name || getUrlParam('CKEditorCleanUpFuncNum') || is_ckeditor) {
+  if (window.opener || window.tinyMCEPopup || field_name || editor || getUrlParam('CKEditorCleanUpFuncNum') || is_ckeditor) {
     if (window.tinyMCEPopup) { // use TinyMCE > 3.0 integration method
       useTinymce3(url);
     } else if (field_name) {   // tinymce 4 and colorbox
       useTinymce4AndColorbox(url, field_name);
-    } else if(is_ckeditor) {   // use CKEditor 3.0 + integration method
+    } 
+    else if (editor) {   // tinymce 5
+      useTinymce5(url);
+    } 
+    else if(is_ckeditor) {   // use CKEditor 3.0 + integration method
       useCkeditor3(url);
     } else if (is_fcke) {      // use FCKEditor 2.0 integration method
       useFckeditor2(url);

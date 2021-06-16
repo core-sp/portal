@@ -3,8 +3,8 @@
 @section('content')
 
 <section id="pagina-cabecalho">
-  <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-    <img src="{{ asset('img/cursos.png') }}" />
+  <div class="container-fluid text-center nopadding position-relative">
+    <img src="{{ asset('img/banner-interno-agendamento.png') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
@@ -37,7 +37,8 @@
           <p><strong>Importante:</strong> O atendimento presencial está suspenso temporariamente, neste período os serviços deverão ser solicitados via email. O prazo para análise e resposta do email depende do tipo de serviço solicitado.</p>
           <p>Para mais informações, acesse <a href="/servicos-atendimento-ao-rc">este link</a>.</p>
           -->
-          <p class="pb-0">Agende seu atendimento presencial no Core-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="/agendamento-consulta" class="text-primary">informações do atendimento já agendado.</a></p>
+          <p class="pb-0">Agende seu atendimento presencial no Core-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="/agendamento-consulta" class="text-primary">informações do atendimento já agendado.</a></p></br>
+          <p><strong>Atenção:</strong> Orientação jurídica – dúvidas deverão ser enviadas para o e-mail juridico@core-sp.org.br, que serão respondidas em até 5 (cinco) dias úteis, conforme PORTARIA 27/2020. Não há atendimento jurídico presencial, excepcionalmente, nesse período de pandemia.</p>
           <div class="mb-3">
             <a href="https://www.saopaulo.sp.gov.br/planosp/" target="_blank"><img src="{{ asset('img/icone-mapasp.png') }}"></a>
           </div>
@@ -109,31 +110,29 @@
             <div class="form-row mt-2">
               <div class="col-md-4">
                 <label for="idregional">Regional *</label>
-                <select name="idregional" id="idregional" class="form-control">
+                <select name="idregional" id="idregional" class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}">
+                  <option value="" selected>Selecione a regional</option>
                   @foreach($regionais as $regional)
-                    @if($regional->idregional == old('idregional'))
-                    <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
-                    @else
                     <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                    @endif
                   @endforeach 
                 </select>
-                @if($errors->has('regional'))
+                @if($errors->has('idregional'))
                 <div class="invalid-feedback">
-                  {{ $errors->first('regional') }}
+                  {{ $errors->first('idregional') }}
                 </div>
                 @endif
               </div>
               <div class="col-md-4 mt-2-768">
-                <label for="dia">Dia *</label>
+                <label for="dia">Dia * <span>(datas em vermelho não possuem horário disponível)</span></label>
                 <div class="input-group">
                   <input type="text" 
                     class="form-control {{ $errors->has('dia') ? 'is-invalid' : '' }}"
                     id="datepicker"
                     name="dia"
-                    placeholder="dd/mm/aaaaa"
+                    placeholder="Selecione a regional"
                     autocomplete="off"
                     readonly
+                    disabled
                     />
                   @if($errors->has('dia'))
                   <div class="invalid-feedback">
@@ -141,22 +140,23 @@
                   </div>
                   @endif
                 </div>
+                <div id="loadCalendario" class="loadImage">
+                  <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
+                </div>
               </div>
               <div class="col-md-4 mt-2-768">
-                <div id="loadImage">
-                  <div class="loadeando">
-                    <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
-                  </div>
-                </div>
                 <label for="hora">Horários disponíveis *</label>
-                <select name="hora" id="horarios" class="form-control {{ $errors->has('hora') ? 'is-invalid' : '' }}">
-                  <option value="" disabled selected>Selecione o dia do atendimento</option>
+                <select name="hora" id="horarios" disabled class="form-control {{ $errors->has('hora') ? 'is-invalid' : '' }}">
+                  <option value="" selected>Selecione o dia do atendimento</option>
                 </select>
                 @if($errors->has('hora'))
                 <div class="invalid-feedback">
                   {{ $errors->first('hora') }}
                 </div>
                 @endif
+                <div id="loadHorario" class="loadImage">
+                  <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
+                </div>
               </div>
             </div>
             <div class="form-row mt-2">

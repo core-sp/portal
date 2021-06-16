@@ -46,7 +46,7 @@ class BdoOportunidadeRequest extends FormRequest
             'vagaspreenchidas' => $this->vagaspreenchidas,
             'status' => $this->status,
             'observacao' => $this->observacao,
-            'datainicio' => (!isset($this->datainicio) && $this->status === BdoOportunidade::$status_em_andamento) ? now() : null,
+            'datainicio' => (!isset($this->datainicio) && $this->status === BdoOportunidade::STATUS_EM_ANDAMENTO) ? now() : null,
             'idusuario' => $this->idusuario
         ];
     }

@@ -375,13 +375,13 @@ class BdoEmpresaTest extends TestCase
     {
         $bdoEmpresa = factory('App\BdoEmpresa')->create();
 
-        $this->get(route('bdosite.apiGetEmpresa', preg_replace('/[^0-9]/', '', $bdoEmpresa->cnpj)))
+        $this->get(route('bdosite.apiGetEmpresa', apenasNumeros($bdoEmpresa->cnpj)))
             ->assertOk()
             ->assertSeeText('alert-success');
 
         $bdoOportunidade = factory('App\BdoOportunidade')->create(['idempresa' => $bdoEmpresa->idempresa]);
 
-        $this->get(route('bdosite.apiGetEmpresa', preg_replace('/[^0-9]/', '', $bdoEmpresa->cnpj)))
+        $this->get(route('bdosite.apiGetEmpresa', apenasNumeros($bdoEmpresa->cnpj)))
             ->assertOk()
             ->assertSeeText('alert-warning');
     }

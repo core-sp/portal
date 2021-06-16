@@ -5,15 +5,18 @@ namespace App\Http\Controllers;
 use App\Representante;
 use App\Rules\CpfCnpj;
 use Illuminate\Http\Request;
-use App\Traits\GerentiProcedures;
-use Illuminate\Support\Facades\Request as FacadesRequest;
+use App\Repositories\GerentiApiRepository;
+use App\Repositories\GerentiRepositoryInterface;
+use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteController extends Controller
 {
-    use GerentiProcedures;
 
     // Nome da classe
     private $class = 'RepresentanteController';
+    private $gerentiRepository;
+    private $gerentiApiRepository;
+
     // Variáveis
     public $variaveis = [
         'singular' => 'representante',
@@ -25,9 +28,11 @@ class RepresentanteController extends Controller
         'btn_lista' => '<a href="/admin/representantes/buscaGerenti" class="btn btn-primary">Nova Busca</a>'
     ];
 
-    public function __construct()
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, GerentiApiRepository $gerentiApiRepository)
     {
         $this->middleware('auth');
+        $this->gerentiRepository = $gerentiRepository;
+        $this->gerentiApiRepository = $gerentiApiRepository;
     }
 
     public function resultados()
@@ -82,7 +87,7 @@ class RepresentanteController extends Controller
     public function busca()
     {
         ControleController::autoriza($this->class, 'index');
-        $busca = preg_replace('/[^0-9A-Za-z]+/', '', FacadesRequest::input('q'));
+        $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Representante::where('nome','LIKE','%'.$busca.'%')
             ->orWhere('registro_core','LIKE','%'.$busca.'%')
@@ -105,7 +110,7 @@ class RepresentanteController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $acoes = '<form method="POST" action="/admin/representantes/info" class="d-inline">';
+            $acoes = '<form method="GET" action="/admin/representantes/info" class="d-inline">';
             $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
             $acoes .= '<input type="hidden" name="tipo" value="'.$resultado["ASS_TP_ASSOC"].'" />';
             $acoes .= '<input type="hidden" name="nome" value="'.$resultado["ASS_NOME"].'" />';
@@ -113,7 +118,7 @@ class RepresentanteController extends Controller
             $acoes .= '<input type="submit" class="btn btn-sm btn-default" value="Detalhes" />';
             $acoes .= '</form>';
             $conteudo = [
-                $resultado['ASS_NOME'] . ' <strong>(' . stringTipoPessoa($resultado['ASS_TP_ASSOC']) . ')</strong>',
+                $resultado['ASS_NOME'] . ' <strong>(' . Representante::mapaCodigoTipoPessoa($resultado['ASS_TP_ASSOC']) . ')</strong>',
                 formataRegistro($resultado['ASS_REGISTRO']),
                 '<span class="nowrap">' . formataCpfCnpj($resultado['ASS_CPF_CGC']) . '</span>',
                 $acoes
@@ -154,35 +159,86 @@ class RepresentanteController extends Controller
     public function buscaGerenti(Request $request)
     {
         $request->merge([
-            'registro' => preg_replace('/[^0-9]/', '', $request->registro),
-            'cpf_cnpj' => preg_replace('/[^0-9]/', '', $request->cpf_cnpj)
+            'registro' => apenasNumeros($request->registro),
+            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
         ]);
         $this->validateRequest();
         $variaveis = (object) $this->variaveis;
-        $resultados = $this->gerentiBusca($request->registro, $request->nome, $request->cpf_cnpj);
+        $resultados = $this->gerentiRepository->gerentiBusca($request->registro, $request->nome, $request->cpf_cnpj);
         $count = count($resultados);
         $count ? $tabela = $this->tabelaGerenti($resultados) : $tabela = 'vazia';
+        
         return view('admin.crud.criar', compact('variaveis', 'tabela', 'count'));
-    }
-
-    protected function pegaSituacao($ass_id)
-    {
-        $situacao = $this->gerentiStatus($ass_id);
-        $array = explode(':', $situacao);
-        return trim($array[1]);
     }
 
     public function representanteInfo(Request $request)
     {
         ControleController::autoriza($this->class, 'index');
+
         $variaveis = (object) $this->variaveis;
         $nome = $request->nome;
-        $request->tipo === '2' || $request->tipo === '5' ? $dados_gerais = Representante::arrangeDgPf($this->gerentiDadosGeraisPF($request->ass_id)) : $dados_gerais = Representante::arrangeDgPj($this->gerentiDadosGeraisPJ($request->ass_id));
-        $contatos = $this->gerentiContatos($request->ass_id);
-        $situacao = $this->pegaSituacao($request->ass_id);
-        $enderecos = utf8_converter($this->gerentiEnderecos($request->ass_id));
-        $rep = new Representante();
-        $cobrancas = $rep->cobrancasById($request->ass_id);
-        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas'));
+        $tipoPessoa = $request->tipo === '2' || $request->tipo === '5' ? Representante::PESSOA_FISICA : Representante::PESSOA_JURIDICA;
+        $dados_gerais = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, $request->ass_id);
+        $contatos = $this->gerentiRepository->gerentiContatos($request->ass_id);
+        $enderecos = $this->gerentiRepository->gerentiEnderecos($request->ass_id);
+        $cobrancas = $this->gerentiRepository->gerentiCobrancas($request->ass_id);
+        $situacao = trim(explode(':', $this->gerentiRepository->gerentiStatus($request->ass_id))[1]);
+        $certidoes = $this->listarCertidao($request->ass_id);
+        $assId = $request->ass_id;
+        $valoresRefis = $this->simuladorRefis($request->ass_id);
+        
+        return view('admin.crud.mostra', compact('variaveis', 'nome', 'situacao', 'dados_gerais', 'contatos', 'enderecos', 'cobrancas', 'certidoes', 'assId', 'valoresRefis'));
+    }
+
+    public function listarCertidao($assId) 
+    {
+        try {
+            $responseGetCertidao = $this->gerentiApiRepository->gerentiGetCertidao(($assId));
+        }
+        catch (Exception $e) {
+            Log::error($e->getTraceAsString());
+
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+        }
+
+        $certidoes = $responseGetCertidao['data'];
+
+        array_multisort(array_column($certidoes, 'dataEmissao'), SORT_DESC, array_column($certidoes, 'horaEmissao'), SORT_DESC, $certidoes);
+
+        return $certidoes;
+    }
+
+    public function baixarCertidao(Request $request) 
+    {
+        $responseGerentiJson = $this->gerentiApiRepository->gerentiGetCertidao($request->assId);
+
+        $certidoes = $responseGerentiJson['data'];
+
+        $posCertidao = array_search($request->numero, array_column($certidoes, 'numeroDocumento'));
+
+        if($certidoes[$posCertidao]['status'] === 'Emitido') {
+
+            $pdfBase64 = $certidoes[$posCertidao]['base64'];
+
+            header('Content-Type: application/pdf');
+
+            return response()->streamDownload(function () use ($pdfBase64){
+                echo base64_decode($pdfBase64);
+            }, 'certidao.pdf');
+        }
+        else {
+            $titulo = 'Falha ao baixar certidão';
+            $mensagem = 'Não foi possível baixar a certidão.';
+            $emitir = false;
+
+            return view("site.representante.emitir-certidao", compact('titulo', 'mensagem', 'emitir'));
+        }
+    }
+
+    public function simuladorRefis($assId)
+    {
+        $valoresRefis = $this->gerentiRepository->gerentiValoresRefis($assId);
+
+        return $valoresRefis;
     }
 }

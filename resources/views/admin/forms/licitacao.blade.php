@@ -9,7 +9,7 @@
         <div class="col-sm-6">
             <label for="modalidade">Modalidade</label>
             <select name="modalidade" class="form-control {{ $errors->has('modalidade') ? 'is-invalid' : '' }}">
-            @foreach(modalidadesLicitacao() as $modalidade)
+            @foreach($modalidades as $modalidade)
                 @if(!empty(old('modalidade')))
                     @if(old('modalidade') === $modalidade)
                         <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
@@ -38,7 +38,7 @@
         <div class="col-sm-3">
             <label for="situacao">Situação</label>
             <select name="situacao" class="form-control {{ $errors->has('situacao') ? 'is-invalid' : '' }}">
-            @foreach(situacoesLicitacao() as $situacao)
+            @foreach($situacoes as $situacao)
                 @if(!empty(old('situacao')))
                     @if(old('situacao') === $situacao)
                             <option value="{{ $situacao }}" selected>{{ $situacao }}</option>

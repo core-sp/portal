@@ -30,7 +30,7 @@ class BdoSiteController extends Controller
     public function index()
     {
         $oportunidades = $this->bdoOportunidadeRepository->getToBalcaoSite();
-        $regionais = $this->regionalRepository->getToList();
+        $regionais = $this->regionalRepository->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
 
         foreach($oportunidades as $o) {
@@ -47,7 +47,7 @@ class BdoSiteController extends Controller
         $buscaRegional = IlluminateRequest::input('regional') === 'todas' ?  $buscaRegional = '' : ','. IlluminateRequest::input('regional').',';
 
         $oportunidades = $this->bdoOportunidadeRepository->buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave);
-        $regionais = $this->regionalRepository->getToList();
+        $regionais = $this->regionalRepository->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
         
         if (count($oportunidades) > 0) {
@@ -64,7 +64,9 @@ class BdoSiteController extends Controller
 
     public function anunciarVagaView()
     {
-        return view('site.anunciar-vaga');
+        $regionais = $this->regionalRepository->getRegionais();
+
+        return view('site.anunciar-vaga', compact('regionais'));
     }
 
     public function anunciarVaga(AnunciarVagaRequest $request)

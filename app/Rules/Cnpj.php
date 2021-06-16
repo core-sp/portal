@@ -25,7 +25,7 @@ class Cnpj implements Rule
      */
     public function passes($attribute, $cnpj)
     {
-        $cnpj = preg_replace('/[^0-9]/', '', (string) $cnpj);
+        $cnpj = apenasNumeros((string) $cnpj);
         // Valida tamanho
         if (strlen($cnpj) != 14)
             return false;

@@ -1,7 +1,3 @@
-@php
-use \App\Http\Controllers\Helper;
-@endphp
-
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -53,18 +49,18 @@ use \App\Http\Controllers\Helper;
       <header id="header-principal">
         <div class="container-fluid">
           <div class="row">
-            <div class="linha-verde w-100"></div>
+            <div class="linha-dourada w-100"></div>
           </div>
         </div>
         <div class="container">
           <div class="row header-margin">
             <div class="col-lg-4 col-md-6 text-left center-768">
-                <a href="/"><img src="{{ asset('img/logo-branco.png') }}" alt="CORE-SP" id="logo-header" /></a>
+                <a href="/"><img src="{{ asset('img/logo-55-anos.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
-                <h3 class="cinza-claro">#novembroazul</h3>
-                <p class="cinza-claro">Mês mundial de combate<br>ao câncer de próstata</p>
+                <h3><a href="/servicos-atendimento-ao-rc" class="cinza-claro">Dúvidas frequentes</a></h3>
+                <p class="light"><a href="/servicos-atendimento-ao-rc" class="cinza-claro"><small>Clique aqui e tenha acesso aos principais<br>serviços pelo Setor de Atendimento do Core-SP.</small></a></p>
               </div>
             </div>
             <div class="col-lg-4 align-self-end mt-15-992">
@@ -149,7 +145,9 @@ use \App\Http\Controllers\Helper;
                   <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Fiscalização</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a href="/acoes-da-fiscalizacao" class="dropdown-item">Ações da fiscalização</a>
+                      <a href="{{ route('fiscalizacao.mapa') }}" class="dropdown-item">Mapa da fiscalização</a>
+                      <a href="{{ route('fiscalizacao.acoesfiscalizacao') }}" class="dropdown-item">Ações da fiscalização</a>
+                      <a href="{{ route('fiscalizacao.espacoContador') }}" class="dropdown-item">Espaço do Contador</a>
                       <a href="http://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" target="_blank" class="dropdown-item">Denuncie</a>
                       <a href="/sobre-a-fiscalizacao" class="dropdown-item bb-0">Sobre o departamento</a>
                     </div>
@@ -166,10 +164,10 @@ use \App\Http\Controllers\Helper;
                         </div>
                         <div class="sub-dropdown-menu">
                           <a href="/agendamento" class="dropdown-item">Agendar</a>
-                          <a href="/agendamento-consulta" class="dropdown-item bb-0">Consultar</a>
+                          <a href="/agendamento-consulta" class="dropdown-item bb-0">Consultar/Cancelar</a>
                         </div>
                       </div>
-                      <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade 2020</a>
+                      <a href="/anuidade-ano-vigente" class="dropdown-item">Anuidade {{ date('Y') }}</a>
                       <a href="/representante/login" class="dropdown-item">Área Restrita</a>
                       <a href="/servicos-atendimento-ao-rc" class="dropdown-item">Atendimento</a>
                       <div class="sub-dropdown">
@@ -181,6 +179,7 @@ use \App\Http\Controllers\Helper;
                           <a href="/anunciar-vaga" class="dropdown-item bb-0">Anunciar</a>
                         </div>
                       </div>
+                      <a href="/carta-de-servicos-ao-usuario" class="dropdown-item">Carta de Serviços ao Usuário</a>
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
@@ -198,14 +197,14 @@ use \App\Http\Controllers\Helper;
             </div>
           </div>
         </div>
-        <a href="/servicos-atendimento-ao-rc" class="hide-768">
+        <a href="/servicos-atendimento-ao-rc">
           <div class="container-fluid azul-claro-bg pt-2 pb-2">
             <div class="row">
                 <div class="container">
                   <div class="d-flex">
-                    <div class="flex-one aai">
-                      <h5 class="d-inline pr-3 cinza-claro"><strong>Atendimento on-line</strong></h5>
-                      <p class="d-inline cinza-claro">Clique aqui e tenha acesso aos principais serviços pelo Setor de Atendimento do Core-SP.</p>
+                    <div class="flex-one text-center">
+                      <h5 class="d-inline-block pr-3 cinza-claro"><strong>Dúvidas frequentes</strong></h5>
+                      <p class="d-inline-block cinza-claro">Clique aqui e tenha acesso aos principais serviços <br class="show-768">pelo Setor de Atendimento do Core-SP.</p>
                     </div>
                   </div>
                 </div>
@@ -248,7 +247,7 @@ use \App\Http\Controllers\Helper;
       @yield('content')
 
       @section('footer')
-      <div class="linha-verde"></div>
+      <div class="linha-dourada"></div>
       <footer class="pt-4" id="rodape">
         <div class="container mb-4">
           <div class="row">
@@ -257,10 +256,21 @@ use \App\Http\Controllers\Helper;
                 <h5 class="branco">Localização</h5>
               </div>
               <p class="branco mb-1">
-                Av. Brigadeiro Luís Antônio, 613
+                <strong>SEDE</strong>
+                <br />Av. Brigadeiro Luís Antônio, 613
                 <br />5º andar - CEP: 01317-000
-                <br />São Paulo - SP
-                <br />CNPJ: 60.746.179/0001-52
+                <br />Bela Vista - São Paulo - SP
+              </p>
+              <br />
+              <p class="branco mb-1">
+                <strong>UNIDADE ADMINISTRATIVA ALAMENDA SANTOS</strong>
+                <br />Alameda Santos, 1787
+                <br />Cj. 61 - CEP: 01419-906
+                <br />Cerqueira César - São Paulo - SP
+              </p>
+              <br />
+              <p class="branco mb-1">
+                CNPJ: 60.746.179/0001-52
               </p>
               <div class="footer-title w-75 mb-3 mt-4">
                 <h5 class="branco">Contato</h5>
@@ -287,7 +297,7 @@ use \App\Http\Controllers\Helper;
                 <h5 class="branco">Serviços</h5>
               </div>
               <p class="branco"><a href="/agendamento">Agendamento</a></p>
-              <p class="branco"><a href="/anuidade-ano-vigente">Anuidade 2020</a></p>
+              <p class="branco"><a href="/anuidade-ano-vigente">Anuidade {{ date('Y') }}</a></p>
               <p class="branco"><a href="/representante/login">Área Restrita</a></p>
               <p class="branco"><a href="/servicos-atendimento-ao-rc">Atendimento</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
@@ -370,7 +380,7 @@ use \App\Http\Controllers\Helper;
       <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js"></script>
       <script type="text/javascript" src="{{ asset('/js/jquery.mask.js') }}"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.js"></script>
-      <script type="text/javascript" src='https://www.google.com/recaptcha/api.js'></script>
+      <script type="text/javascript" src='https://www.google.com/recaptcha/api.js?hl=pt-BR'></script>
       <script type="text/javascript" src="{{ asset('/js/site.js?'.time()) }}"></script>
       <script type="text/javascript" src="{{ asset('/js/acessibilidade.js') }}"></script>
     </body>

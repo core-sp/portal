@@ -21,9 +21,10 @@ class EventServiceProvider extends ServiceProvider
         'Illuminate\Auth\Events\Login' => [
             'App\Listeners\LogSuccessfulLogin',
         ],
-        'Illuminate\Auth\Events\Logout' => [
-            'App\Listeners\LogSuccessfulLogout',
-        ],
+        // Removendo log de logout do usuário para evitar problema quando a sessão expira e o usuário tenta fazer logout
+        // 'Illuminate\Auth\Events\Logout' => [
+        //     'App\Listeners\LogSuccessfulLogout',
+        // ],
         'App\Events\CrudEvent' => [
             'App\Listeners\CrudEventListener',
         ],

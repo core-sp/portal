@@ -1,7 +1,3 @@
-@php
-  use App\Http\Controllers\Helper;
-@endphp
-
 <div class="card-body">
   @if(isset($resultado->resposta))
   <div class="row">
@@ -32,7 +28,7 @@
         <img class="direct-chat-img border border-dark" src="{{ asset('img/user.png') }}" alt="USER">
         <div class="direct-chat-text">
           <h5 class="mb-0">{{ $resultado->tipo }}</h5>
-          <small>(Criado por: {{ $resultado->user->nome }} - {{ Helper::formataData($resultado->created_at) }})</small>
+          <small>(Criado por: {{ $resultado->user->nome }} - {{ formataData($resultado->created_at) }})</small>
           <p class="mt-2 mb-2"><i>Mensagem:</i> {{ $resultado->mensagem }}</p>
           @if(isset($resultado->img))
           <hr>
@@ -51,7 +47,7 @@
       </form>
       @else
       <hr>
-      <p class="mb-0"><i>* Chamado concluído em {{ Helper::formataData($resultado->deleted_at) }}</i></p>
+      <p class="mb-0"><i>* Chamado concluído em {{ formataData($resultado->deleted_at) }}</i></p>
       @endif
     </div>
   </div>

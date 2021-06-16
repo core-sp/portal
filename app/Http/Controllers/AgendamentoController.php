@@ -13,6 +13,7 @@ use App\Mail\AgendamentoMailGuest;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\RedirectResponse;
 use App\Repositories\RegionalRepository;
 use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoUpdateRequest;
@@ -57,6 +58,10 @@ class AgendamentoController extends Controller
             $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
 
             $resultados = $this->checaAplicaFiltros();
+
+            if($resultados instanceof RedirectResponse) {
+                return $resultados;
+            }
         } 
         else {
             $temFiltro = null;
@@ -81,13 +86,31 @@ class AgendamentoController extends Controller
         $idagendamento = $request->idagendamento;
         $status = $request->status;
 
-        $update = $this->agendamentoRepository->update($idagendamento, ['status' => $status, 'idusuario' => $idusuario]);
+        $agendamento = $this->agendamentoRepository->getById($idagendamento);
+
+        // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
+        // de sua regional, aborta com erro de permissão.
+        if($this->limitaPorRegional()) {
+            if($agendamento->idregional != Auth::user()->idregional) {
+                abort(403);
+            }
+        }
+
+        if($agendamento) {
+            if($agendamento->dia > date('Y-m-d')) {
+                return redirect()->back()
+                    ->with('message', '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado antes da data agendada')
+                    ->with('class', 'alert-danger');
+            }
+        }
+
+        $update = $this->agendamentoRepository->update($idagendamento, ['status' => $status, 'idusuario' => $idusuario], $agendamento);
 
         if(!$update) {
             abort(500);
         }
 
-        if($status === Agendamento::$status_compareceu) {
+        if($status === Agendamento::STATUS_COMPARECEU) {
             event(new CrudEvent('agendamento', 'confirmou presença', $idagendamento));
         } 
         else {
@@ -105,8 +128,14 @@ class AgendamentoController extends Controller
 
         $busca = IlluminateRequest::input('q');
     
-        $resultados = $this->agendamentoRepository->getToBusca($busca);
-
+        // "Atendente" e "Gerente Seccionais" devem visualizar apenas agendamentos de sua respectiva regional.
+        if(!$this->limitaPorRegional()) {
+            $resultados = $this->agendamentoRepository->getToBusca($busca);
+        }
+        else {
+            $resultados = $this->agendamentoRepository->getToBuscaByRegional($busca, Auth::user()->idregional);
+        }
+        
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->agendamentoVariaveis;
 
@@ -118,6 +147,14 @@ class AgendamentoController extends Controller
         $this->autoriza($this->class, __FUNCTION__);
 
         $resultado = $this->agendamentoRepository->getById($id);
+
+        // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
+        // de sua regional, aborta com erro de permissão.
+        if($this->limitaPorRegional()) {
+            if($resultado->idregional != Auth::user()->idregional) {
+                abort(403);
+            }
+        }
 
         $atendentes = $this->userRepository->getAtendentesByRegional($resultado->idregional);
 
@@ -134,6 +171,15 @@ class AgendamentoController extends Controller
     public function update(AgendamentoUpdateRequest $request, $id)
     {
         $this->autoriza($this->class, 'edit');
+
+        // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
+        // de sua regional, aborta com erro de permissão.
+        // Neste caso, é usado o nome da regional ao invés do ID.
+        if($this->limitaPorRegional()) {
+            if($request->idregional != Auth::user()->regional->regional) {
+                abort(403);
+            }
+        }
 
         $update = $this->agendamentoRepository->update($id, $request->toModel());
 
@@ -178,8 +224,8 @@ class AgendamentoController extends Controller
         elseif($idPerfil === 13) {
             $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendenteSeccionais();
         } 
-        // "Atendente" pode ver apenas agendamentos pendentes da sua regional
-        elseif($idPerfil === 8) {
+        // "Atendente" e "Gerente Seccionais" podem ver apenas agendamentos pendentes da sua regional
+        elseif($idPerfil === 8 || $idPerfil === 21) {
             $resultados = $this->agendamentoRepository->getPastAgendamentoPendenteByRegional(Auth::user()->idregional);
         } 
         else {
@@ -209,12 +255,13 @@ class AgendamentoController extends Controller
         $maxdia = date('Y-m-d');
         $regional = '';
         $status = '';
+        $servico = '';
 
         // Valida e prepara filtro de data mínima
         if(IlluminateRequest::has('mindia')) {
             if(!empty(IlluminateRequest::input('mindia'))) {
                 $mindiaArray = explode('/', IlluminateRequest::input('mindia'));
-                $checaMindia = checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
+                $checaMindia = (count($mindiaArray) != 3 || $mindiaArray[2] == null)  ? false : checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
 
                 if($checaMindia === false) {
                     return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
@@ -229,7 +276,7 @@ class AgendamentoController extends Controller
         if(IlluminateRequest::has('maxdia')) {
             if(!empty(IlluminateRequest::input('maxdia'))) {
                 $maxdiaArray = explode('/', IlluminateRequest::input('maxdia'));
-                $checaMaxdia = checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
+                $checaMaxdia = (count($maxdiaArray) != 3 || $maxdiaArray[2] == null)  ? false : checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
 
                 if($checaMaxdia === false) {
                     return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
@@ -257,7 +304,14 @@ class AgendamentoController extends Controller
             }
         } 
 
-        return $this->agendamentoRepository->getToTableFilter($mindia, $maxdia, $regional, $status);
+        // Valida e prepara filtro de serviço
+        if(IlluminateRequest::has('servico')) {
+            if(!empty(IlluminateRequest::input('servico')) && IlluminateRequest::input('servico') !== 'Qualquer') {
+                $servico = IlluminateRequest::input('servico');
+            }
+        } 
+
+        return $this->agendamentoRepository->getToTableFilter($mindia, $maxdia, $regional, $status, $servico);
     }
 
     public function montaFiltros()
@@ -268,9 +322,8 @@ class AgendamentoController extends Controller
         $filtro .= '<div class="form-row filtroAge">';
         $filtro .= '<input type="hidden" name="filtro" value="sim" />';
 
-        // Montando filtro de regional
-        // TODO - verificar condições do uso do filtro por regional (atualmente não existe perfil com idperfil == 12)
-        if($this->mostra($this->class, 'edit') && Auth::user()->perfil->idperfil !== 12) {
+        // Montando filtro de regional. "Atendente" e "Gerente Seccionais" não podem usar este filtro.
+        if(!$this->limitaPorRegional()) {
             $filtro .= '<div class="form-group mb-0 col">';
             $filtro .= '<label>Seccional</label>';
             $filtro .= '<select class="custom-select custom-select-sm mr-2" id="regional" name="regional">';
@@ -329,6 +382,37 @@ class AgendamentoController extends Controller
 
         $filtro .= '</select>';
         $filtro .= '</div>';
+
+        // Montando filtro de serviço
+        $filtro .= '<div class="form-group mb-0 col">';
+        $filtro .= '<label>Serviço</label>';
+        $filtro .= '<select class="custom-select custom-select-sm" name="servico">';
+        
+        if(IlluminateRequest::input('servico') === 'Qualquer') {
+            $filtro .= '<option value="Qualquer" selected>Qualquer</option>';
+        }
+           
+        else {
+            $filtro .= '<option value="Qualquer">Qualquer</option>';
+        }
+        
+        $servicos = Agendamento::servicosCompletos();
+
+        foreach($servicos as $s) {
+            if(IlluminateRequest::has('servico')) {
+                if(IlluminateRequest::input('servico') === $s) {
+                    $filtro .= '<option value="' . $s . '" selected>' . $s . '</option>';
+                } else {
+                    $filtro .= '<option value="' . $s . '">' . $s . '</option>';
+                }
+            } else {
+                $filtro .= '<option value="' . $s . '">' . $s . '</option>';
+            }
+        }
+
+        $filtro .= '</select>';
+        $filtro .= '</div>';
+
         $filtro .= '<div class="form-group mb-0 col">';
 
         $hoje = date('d\/m\/Y');
@@ -370,13 +454,13 @@ class AgendamentoController extends Controller
     public function mensagemAgendamento($dia, $hora, $status, $protocolo, $id)
     {
         if(date('Y-m-d') >= $dia) {
-            if($status === Agendamento::$status_cancelado) {
+            if($status === Agendamento::STATUS_CANCELADO) {
                 $mensagem =  "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i>&nbsp;&nbsp;Atendimento cancelado</strong></p>";
             } 
-            elseif($status === Agendamento::$status_nao_compareceu) {
+            elseif($status === Agendamento::STATUS_NAO_COMPARECEU) {
                 $mensagem = "<p class='mb-0 text-warning'><strong><i class='fas fa-user-alt-slash'></i>&nbsp;&nbsp;Não compareceu</strong></p>";
             } 
-            elseif($status === Agendamento::$status_compareceu) {
+            elseif($status === Agendamento::STATUS_COMPARECEU) {
                 $mensagem = "<p class='mb-0 text-success'><strong><i class='fas fa-check-circle'></i>&nbsp;&nbsp;Atendimento realizado com sucesso no dia " . onlyDate($dia) . ", às " . $hora . "</strong></p>";
             } 
             else {
@@ -384,7 +468,7 @@ class AgendamentoController extends Controller
             }
         } 
         else {
-            if($status === Agendamento::$status_cancelado) {
+            if($status === Agendamento::STATUS_CANCELADO) {
                 $mensagem = "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i> Atendimento cancelado</strong></p>";
             } 
             else {
@@ -399,6 +483,17 @@ class AgendamentoController extends Controller
         return $mensagem;
     }
 
+    /**
+     * Método usado para checar se o perfil do usuário exige limitação de visualização de agendamentos
+     * de sua própria regional. Retorna true se for necessário limitar, do contrário, retorna false.
+     * 
+     * Perfis limitados por regional são "Atendente" (8) e "Gerente Seccionais" (21).
+     */
+    protected function limitaPorRegional() 
+    {
+        return Auth::user()->perfil->idperfil == 8 || Auth::user()->perfil->idperfil == 21;
+    }
+
     public function status($status, $id, $usuario = null)
     {
         // Caso o usário seja do perfil "Atendente" (id=8) ele poderá apenas filtrar com sua respectiva regional
@@ -408,8 +503,8 @@ class AgendamentoController extends Controller
             }
         }
         switch ($status) {
-            case Agendamento::$status_cancelado:
-                $btn = "<strong>" . Agendamento::$status_cancelado . "</strong>";
+            case Agendamento::STATUS_CANCELADO:
+                $btn = "<strong>" . Agendamento::STATUS_CANCELADO . "</strong>";
                 if($this->mostra($this->class, 'edit')) {
                     $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
@@ -417,8 +512,8 @@ class AgendamentoController extends Controller
                 return $btn;
             break;
 
-            case Agendamento::$status_compareceu:
-                $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;" . Agendamento::$status_compareceu . "&nbsp;&nbsp;</p>";
+            case Agendamento::STATUS_COMPARECEU:
+                $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;" . Agendamento::STATUS_COMPARECEU . "&nbsp;&nbsp;</p>";
                 if($this->mostra($this->class, 'edit')) {
                     $string .= "<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
@@ -429,8 +524,8 @@ class AgendamentoController extends Controller
                 return $string;
             break;
 
-            case Agendamento::$status_nao_compareceu:
-                $btn = "<strong>" . Agendamento::$status_nao_compareceu . "</strong>";
+            case Agendamento::STATUS_NAO_COMPARECEU:
+                $btn = "<strong>" . Agendamento::STATUS_NAO_COMPARECEU . "</strong>";
                 if($this->mostra($this->class, 'edit')) {
                     $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
@@ -443,8 +538,8 @@ class AgendamentoController extends Controller
                 $acoes .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="' . csrf_token() . '" />';
                 $acoes .= '<input type="hidden" name="_method" value="PUT" id="method" />';
                 $acoes .= '<input type="hidden" name="idagendamento" value="' . $id . '" />';
-                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="' . Agendamento::$status_compareceu . '">Confirmar</button>';
-                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="' . Agendamento::$status_nao_compareceu . '">' . Agendamento::$status_nao_compareceu . '</button>';
+                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="' . Agendamento::STATUS_COMPARECEU . '">Confirmar</button>';
+                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="' . Agendamento::STATUS_NAO_COMPARECEU . '">' . Agendamento::STATUS_NAO_COMPARECEU . '</button>';
                 $acoes .= '</form>';
 
                 if($this->mostra($this->class, 'edit')) {
