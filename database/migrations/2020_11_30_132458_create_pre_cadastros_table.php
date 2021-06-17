@@ -15,15 +15,53 @@ class CreatePreCadastrosTable extends Migration
     {
         Schema::create('pre_cadastros', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('tipo');
-            $table->string('status');
-            $table->string('cpf')->nullable();
-            $table->string('cnpj')->nullable();
-            $table->string('nome');
-            $table->string('email');
-            $table->string('anexo1');
-            $table->string('anexo2');
+
+            // Informação da requisição de pré-cadastro
+            $table->string('tipo')->nullable();
+            $table->string('status')->nullable();
             $table->string('motivo')->nullable();
+
+            // Informações de pessoa física
+            $table->string('nome')->nullable();
+            $table->string('cpf')->nullable();
+            $table->string('tipoDocumento')->nullable();
+            $table->string('numeroDocumento')->nullable();
+            $table->string('orgaoEmissorDocumento')->nullable();
+            $table->string('dataEmissaoDocumento')->nullable();
+            $table->date('dataNascimento')->nullable();
+            $table->string('estadoCivil')->nullable();
+            $table->string('sexo')->nullable();
+            $table->string('naturalizado')->nullable();
+            $table->string('nacionalidade')->nullable();
+            $table->string('nomePai')->nullable();
+            $table->string('nomeMae')->nullable();
+
+            // Informações de pessoa jurídica
+            $table->string('cnpj')->nullable();
+            $table->string('formaRegistro')->nullable();
+            $table->string('numeroRegistro')->nullable();
+            $table->date('dataRegistro')->nullable();
+            $table->string('ramoAtividade')->nullable();
+
+            // Informações do CORE
+            $table->string('capitalSocial')->nullable();
+            $table->string('segmento')->nullable();
+
+            // Informações de contato
+            $table->string('email')->nullable();
+            $table->string('celular')->nullable();
+            $table->string('telefoneFixo')->nullable();
+
+            // Informação de endereço
+            $table->string('cep')->nullable();
+            $table->string('bairro')->nullable();
+            $table->string('logradouro')->nullable();
+            $table->string('numero')->nullable();
+            $table->string('complemento')->nullable();
+            $table->string('estado')->nullable();
+            $table->string('municipio')->nullable();
+            
+            
             $table->timestamps();
             $table->softDeletes();
         });

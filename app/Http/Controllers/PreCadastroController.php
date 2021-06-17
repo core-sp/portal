@@ -52,8 +52,34 @@ class PreCadastroController extends Controller
 
         $resultado = $this->preCadastroRepository->getById($id);
         $variaveis = (object) $this->variaveis;
+        $anexos = Storage::files('pre-cadastro/' . $id . '/');
+        $listaAnexos = [];
+        $nomeArquivo;
 
-        return view('admin.crud.mostra', compact('resultado', 'variaveis'));
+        foreach($anexos as $anexo) {
+            if (strpos($anexo, 'CPF') !== false) {
+                $nomeArquivo = 'CPF';
+            }
+            elseif (strpos($anexo, 'RG') !== false) {
+                $nomeArquivo = 'RG';
+            }
+            elseif (strpos($anexo, 'CNH') !== false) {
+                $nomeArquivo = 'CNH';
+            }
+            elseif (strpos($anexo, 'Comprovante_Residencia') !== false) {
+                $nomeArquivo = 'Comprovante de Residência';
+            }
+            elseif (strpos($anexo, 'Certidao_Quitacao_Eleitoral') !== false) {
+                $nomeArquivo = 'Certidão de Quitação Eleitoral';
+            }
+            elseif (strpos($anexo, 'Reservista_Militar') !== false) {
+                $nomeArquivo = 'Reservista Militar';
+            }
+
+            $listaAnexos[$nomeArquivo ] = $anexo;
+        }
+
+        return view('admin.crud.mostra', compact('resultado', 'variaveis', 'listaAnexos'));
     }
 
     public function create()
@@ -63,15 +89,24 @@ class PreCadastroController extends Controller
 
     public function store(PreCadastroRequest $request)
     {
-        $nomeAnexo1 = 'anexo_1.' . $request->file('anexo1')->getClientOriginalExtension();
+        $preCadastro = $this->preCadastroRepository->store($request);
 
-        $nomeAnexo2 = 'anexo_2.' . $request->file('anexo2')->getClientOriginalExtension();
+        $nomeAnexoCpf = $preCadastro->id . '_' . 'CPF.' . $request->file('anexoCpf')->getClientOriginalExtension();
+        $request->file('anexoCpf')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoCpf);
+        
+        $nomeAnexoDocumento = $preCadastro->id . '_' . $preCadastro->tipoDocumento . '.' . $request->file('anexoDocumento')->getClientOriginalExtension();
+        $request->file('anexoDocumento')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoDocumento);
 
-        $preCadastro = $this->preCadastroRepository->store($request, $nomeAnexo1, $nomeAnexo2);
+        $nomeAnexoComprovanteResidencia = $preCadastro->id . '_' . 'Comprovante_Residencia.' . $request->file('anexoComprovanteResidencia')->getClientOriginalExtension();
+        $request->file('anexoComprovanteResidencia')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoComprovanteResidencia);
 
-        $request->file('anexo1')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexo1);
+        $nomeAnexoCertidaoQuitacaoEleitoral = $preCadastro->id . '_' . 'Certidao_Quitacao_Eleitoral.' . $request->file('anexoCertidaoQuitacaoEleitoral')->getClientOriginalExtension();
+        $request->file('anexoCertidaoQuitacaoEleitoral')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoCertidaoQuitacaoEleitoral);
 
-        $request->file('anexo2')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexo2);
+        if($request->file('anexoReservistaMilitar') !== null) {
+            $nomeAnexoComprovanteResidencia = $preCadastro->id . '_' . 'Reservista_Militar.' . $request->file('anexoReservistaMilitar')->getClientOriginalExtension();
+            $request->file('anexoReservistaMilitar')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoComprovanteResidencia);
+        }
     }
 
     public function atualizarStatus(Request $request)
@@ -93,20 +128,20 @@ class PreCadastroController extends Controller
         Mail::to($preCadastro->email)->queue($email);
     }
 
-    public function visualizarAnexo(Request $request, $id) 
+    public function visualizarAnexo(Request $request) 
     {
-        if(Storage::exists('pre-cadastro/' . $id . '/' . $request->nomeArquivo)) {
-            return response()->file(Storage::path('pre-cadastro/' . $id . '/' . $request->nomeArquivo), ["Cache-Control" => "no-cache"]);
+        if(Storage::exists($request->arquivo)) {
+            return response()->file(Storage::path($request->arquivo), ["Cache-Control" => "no-cache"]);
         }
         else {
             abort(404);
         }
     }
 
-    public function baixarAnexo(Request $request, $id) 
+    public function baixarAnexo(Request $request) 
     {
-        if(Storage::exists('pre-cadastro/' . $id . '/' . $request->nomeArquivo)) {
-            return Storage::download('pre-cadastro/' . $id . '/' . $request->nomeArquivo, $request->nomeArquivo);
+        if(Storage::exists($request->arquivo)) {
+            return Storage::download($request->arquivo);
         }
         else {
             abort(404);
@@ -118,8 +153,9 @@ class PreCadastroController extends Controller
         // Opções de cabeçalho da tabela
         $headers = [
             'Código',
-            'CPF',
-            'Solicitado em:', 
+            'Tipo Pré-Cadastro',
+            'CPF/CNPJ',
+            'Solicitado em', 
             'Status',
             'Ações'
         ];
@@ -128,9 +164,12 @@ class PreCadastroController extends Controller
 
         foreach($resultados as $resultado) {
             $acoes = '<a href="/admin/pre-cadastro/mostrar/'.$resultado->id.'" class="btn btn-sm btn-default">Ver</a> ';
+            $cpfCnpj = $resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA || $resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_RT ? $resultado->cpf : $resultado->cnpj;
+            
             $conteudo = [
                 $resultado->id,
-                $resultado->cpf,
+                $resultado->tipo,
+                $cpfCnpj,
                 formataData($resultado->created_at),
                 $resultado->status,
                 $acoes

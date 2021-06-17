@@ -27,6 +27,13 @@ function formataData($data)
     return $format;
 }
 
+function formataDataUTC($data)
+{
+    return date('Y-m-d', strtotime(str_replace('/', '-', $data)));
+}
+
+
+
 function formataImageUrl($urlBruta)
 {
     $lastSlash = strrpos($urlBruta, '/') + 1;

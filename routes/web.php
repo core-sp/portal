@@ -145,8 +145,8 @@ Route::prefix('admin')->group(function() {
   Route::prefix('pre-cadastro')->group(function() {
     Route::get('/', 'PreCadastroController@index')->name('pre-cadastro.index');
     Route::get('/mostrar/{id}', 'PreCadastroController@show')->name('pre-cadastro.show');
-    Route::get('/visualizar-anexo/{id}', 'PreCadastroController@visualizarAnexo')->name('pre-cadastro.visualizar');
-    Route::get('/baixar-anexo/{id}', 'PreCadastroController@baixarAnexo')->name('pre-cadastro.baixar');
+    Route::get('/visualizar-anexo/', 'PreCadastroController@visualizarAnexo')->name('pre-cadastro.visualizar');
+    Route::get('/baixar-anexo/', 'PreCadastroController@baixarAnexo')->name('pre-cadastro.baixar');
     Route::post('/atualizarStatus', 'PreCadastroController@atualizarStatus')->name('pre-cadastro.atualizarStatus');
   });
 });

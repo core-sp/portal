@@ -7,7 +7,7 @@ use App\PreCadastro;
         <div class="col">
             @switch($resultado->status)
                 @case(PreCadastro::STATUS_APROVADO)
-                    <p><strong class="text-success"><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Enviado ao Gerenti em {{ formataData($resultado->updated_at) }}</strong></p>
+                    <p><strong class="text-success"><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Aprovado em {{ formataData($resultado->updated_at) }}</strong></p>
                     <hr>
                 @break
                 @case(PreCadastro::STATUS_RECUSADO)
@@ -19,28 +19,54 @@ use App\PreCadastro;
                 @break
             @endswitch
 
-            <h4>Solicitação de pré-cadastro:</h4>
-            <p class="mb-0">Tipo: <strong>{{ $resultado->tipo }}</strong></p>
-            <p class="mb-0">Nome: <strong>{{ $resultado->nome }}</strong></p>
+            <h4>Solicitação de pré-cadastro para {{ $resultado->tipo }}</h4>
+            <hr>
+            
+            <h5>Informações de cadastro</h5>
+            <p class="mb-0">Nome completo: <strong>{{ $resultado->nome }}</strong></p>
             <p class="mb-0">CPF: <strong>{{ $resultado->cpf }}</strong></p>
-            <p class="mb-0">CNPJ: <strong>{{ $resultado->cnpj }}</strong></p>
-            <p class="mb-0">E-mail: <strong>{{ $resultado->email }}</strong></p>
+            <p class="mb-0">Número {{ $resultado->tipoDocumento }}: <strong>{{ $resultado->numeroDocumento }}</strong></p>
+            <p class="mb-0">Orgão Emissor: <strong>{{ $resultado->orgaoEmissorDocumento }}</strong></p>
+            <p class="mb-0">Data Emissão: <strong>{{ onlyDate($resultado->dataEmissaoDocumento) }}</strong></p>
+            <p class="mb-0">Data Nascimento: <strong>{{ onlyDate($resultado->dataNascimento) }}</strong></p>
+            <p class="mb-0">Estado Civil: <strong>{{ $resultado->estadoCivil }}</strong></p>
+            <p class="mb-0">Sexo: <strong>{{ $resultado->sexo }}</strong></p>
+            <p class="mb-0">Naturalizado: <strong>{{ $resultado->naturalizado }}</strong></p>
+            <p class="mb-0">Nacionalidade: <strong>{{ $resultado->nacionalidade }}</strong></p>
+            <p class="mb-0">Naturalizado: <strong>{{ $resultado->naturalizado }}</strong></p>
+            <p class="mb-0">Nome do Pai: <strong>{{ $resultado->nomePai }}</strong></p>
+            <p class="mb-0">Nome da Mãe: <strong>{{ $resultado->nomeMae }}</strong></p>
+            <hr>
 
+            <h5>Informações de contato</h5>
+            <p class="mb-0">E-mail: <strong>{{ $resultado->email }}</strong></p>
+            <p class="mb-0">Celular: <strong>{{ $resultado->celular }}</strong></p>
+            <p class="mb-0">Telefone Fixo: <strong>{{ $resultado->telefoneFixo }}</strong></p>
+            <hr>
+
+            <h5>Informações de endereço</h5>
+            <p class="mb-0">CEP: <strong>{{ $resultado->cep }}</strong></p>
+            <p class="mb-0">Logradouro: <strong>{{ $resultado->logradouro }}</strong></p>
+            <p class="mb-0">Número: <strong>{{ $resultado->numero }}</strong></p>
+            <p class="mb-0">Complemento: <strong>{{ $resultado->complemento }}</strong></p>
+            <p class="mb-0">Bairro: <strong>{{ $resultado->cpf }}</strong></p>
+            <p class="mb-0">Município: <strong>{{ $resultado->municipio }}</strong></p>
+            <p class="mb-0">Estado: <strong>{{ $resultado->estado }}</strong></p>
+            <hr>
+
+            <h5>Informações sobre atividade</h5>
+            <p class="mb-0">Segmento: <strong>{{ $resultado->segmento }}</strong></p>
             <hr>
 
             <h5>Anexos:</h5>
 
-            <p>
-                <strong>Anexo-1: </strong>
-                <a href="{{ route('pre-cadastro.visualizar', ['id' => $resultado->id, 'nomeArquivo' => $resultado->anexo1]) }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
-                <a href="{{ route('pre-cadastro.baixar', ['id' => $resultado->id, 'nomeArquivo' => $resultado->anexo1]) }}" class="btn btn-sm btn-secondary" target="_blank">Baixar</a>
+            @foreach($listaAnexos as $nome => $anexo)
+            <p>     
+                <strong>{{ $nome }}: </strong>
+                <a href="{{ route('pre-cadastro.visualizar', ['arquivo' => $anexo]) }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
+                <a href="{{ route('pre-cadastro.baixar', ['arquivo' => $anexo]) }}" class="btn btn-sm btn-secondary" target="_blank">Baixar</a>
             </p>
-            
-            <p>
-                <strong>Anexo-2: </strong>
-                <a href="{{ route('pre-cadastro.visualizar', ['id' => $resultado->id, 'nomeArquivo' => $resultado->anexo2]) }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
-                <a href="{{ route('pre-cadastro.baixar', ['id' => $resultado->id, 'nomeArquivo' => $resultado->anexo2]) }}" class="btn btn-sm btn-secondary" target="_blank">Baixar</a>
-            </p>
+            @endforeach
  
             @if ($resultado->status === PreCadastro::STATUS_PEDENTE)
                 <hr>
