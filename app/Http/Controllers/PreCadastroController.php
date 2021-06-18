@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\PreCadastro;
+use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
+use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
+use App\Mail\PreCadastroMail;
 use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PreCadastroAprovadoMail;
@@ -107,25 +110,49 @@ class PreCadastroController extends Controller
             $nomeAnexoComprovanteResidencia = $preCadastro->id . '_' . 'Reservista_Militar.' . $request->file('anexoReservistaMilitar')->getClientOriginalExtension();
             $request->file('anexoReservistaMilitar')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoComprovanteResidencia);
         }
+
+        $email = new PreCadastroMail();
+
+        Mail::to($preCadastro->email)->queue($email);
+
+        $string = $preCadastro->nome . " (CPF: " . $preCadastro->cpf . ")";
+        $string .= " requisitou pré-cadastro para " . $preCadastro->tipo;
+        event(new ExternoEvent($string));
+
+        $texto = "<strong>Sua requisição de pré-cadastro foi submetida com sucesso!</strong>";
+        $texto  .= "<br>";
+        $texto  .= "Análise será realizada em 10 dias e resultado retornado por e-mail.";
+
+        // Retorna view de agradecimento
+        return view('site.agradecimento')->with([
+            'agradece' => $texto,
+        ]);
     }
 
     public function atualizarStatus(Request $request)
     {
-        $preCadastro = $this->preCadastroRepository->getById($request->input('id'));
+        $preCadastro = $this->preCadastroRepository->updateStatus($request->input('id'), $request->input('status'), $request->input('motivo'));
 
-        // TODO - Investigar forma melhor de verificação de status (usuário modificando request manualmente)
-        if($request->input('status') == PreCadastro::STATUS_APROVADO) {
-            $this->preCadastroRepository->updateStatus($preCadastro, PreCadastro::STATUS_APROVADO);
+        if($preCadastro->status == PreCadastro::STATUS_APROVADO) {
 
             $email = new PreCadastroAprovadoMail();
+            $mensagem = 'Requisição de pré-cadastro aprovada.';
+            $class = 'alert-success';
+            event(new CrudEvent('pré-cadastro', 'aprovou', $preCadastro->id));
         }
-        elseif($request->input('status') == PreCadastro::STATUS_RECUSADO) {
-            $this->preCadastroRepository->updateStatus($preCadastro, PreCadastro::STATUS_RECUSADO, $request->input('motivo'));
+        elseif($preCadastro->status == PreCadastro::STATUS_RECUSADO) {
 
             $email = new PreCadastroRecusadoMail($preCadastro->motivo);
+            $mensagem = 'Requisição de pré-cadastro recusada.';
+            $class = 'alert-danger';
+            event(new CrudEvent('pré-cadastro', 'recusou', $preCadastro->id));
         }
 
         Mail::to($preCadastro->email)->queue($email);
+
+        return redirect(route('pre-cadastro.index'))
+                ->with('message', $mensagem)
+                ->with('class', $class);
     }
 
     public function visualizarAnexo(Request $request) 
@@ -171,7 +198,7 @@ class PreCadastroController extends Controller
                 $resultado->tipo,
                 $cpfCnpj,
                 formataData($resultado->created_at),
-                $resultado->status,
+                $this->showStatus($resultado->status),
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -186,5 +213,27 @@ class PreCadastroController extends Controller
         $tabela = $this->montaTabela($headers, $contents, $classes);
         
         return $tabela;
+    }
+
+
+    protected function showStatus($status)
+    {
+        switch ($status) {
+            case PreCadastro::STATUS_PENDENTE:
+                return '<strong><i>' . $status . '</i></strong>';
+            break;
+
+            case PreCadastro::STATUS_RECUSADO:
+                return '<strong class="text-danger">' . $status . '</strong>';
+            break;
+
+            case PreCadastro::STATUS_APROVADO:
+                return '<strong class="text-success">' . $status . '</strong>';
+            break;
+            
+            default:
+                return $status;
+            break;
+        }
     }
 }

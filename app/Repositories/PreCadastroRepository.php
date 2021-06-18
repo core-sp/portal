@@ -45,12 +45,14 @@ class PreCadastroRepository {
             'estado' => $request->estado,
             'municipio' => $request->municipio,
             'tipo' => PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA,
-            'status' => PreCadastro::STATUS_PEDENTE
+            'status' => PreCadastro::STATUS_PENDENTE
         ]);
     }
 
-    public function updateStatus($preCadastro, $status, $motivo = null) 
+    public function updateStatus($id, $status, $motivo = null) 
     {
+        $preCadastro = $this->getById($id);
+
         $preCadastro->status = $status;
 
         if($motivo != null) {
@@ -58,5 +60,7 @@ class PreCadastroRepository {
         }
 
         $preCadastro->update();
+
+        return $preCadastro;
     }
 }

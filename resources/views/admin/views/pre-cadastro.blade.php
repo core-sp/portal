@@ -11,9 +11,9 @@ use App\PreCadastro;
                     <hr>
                 @break
                 @case(PreCadastro::STATUS_RECUSADO)
-                    <p class="{{ isset($resultado->observacao) ? 'mb-0' : '' }}"><strong class="text-danger"><i class="fas fa-ban"></i>&nbsp;&nbsp;Recusado em {{ formataData($resultado->updated_at) }}</strong></p>
-                    @isset($resultado->observacao)
-                        <p class="light"><small class="light">{!! '—————<br><strong>Motivo:</strong> ' . $resultado->observacao !!}</small></p>
+                    <p class="{{ isset($resultado->motivo) ? 'mb-0' : '' }}"><strong class="text-danger"><i class="fas fa-ban"></i>&nbsp;&nbsp;Recusado em {{ formataData($resultado->updated_at) }}</strong></p>
+                    @isset($resultado->motivo)
+                        <p class="light"><small class="light">{!! '—————<br><strong>Motivo:</strong> ' . $resultado->motivo !!}</small></p>
                     @endisset
                     <hr>
                 @break
@@ -58,33 +58,43 @@ use App\PreCadastro;
             <p class="mb-0">Segmento: <strong>{{ $resultado->segmento }}</strong></p>
             <hr>
 
-            <h5>Anexos:</h5>
+            @if($resultado->status === PreCadastro::STATUS_PENDENTE)
+                <h5>Anexos:</h5>
 
-            @foreach($listaAnexos as $nome => $anexo)
-            <p>     
-                <strong>{{ $nome }}: </strong>
-                <a href="{{ route('pre-cadastro.visualizar', ['arquivo' => $anexo]) }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
-                <a href="{{ route('pre-cadastro.baixar', ['arquivo' => $anexo]) }}" class="btn btn-sm btn-secondary" target="_blank">Baixar</a>
-            </p>
-            @endforeach
+                <table class="table table-bordered bg-white mb-0">
+                    <tbody>
+                        @foreach($listaAnexos as $nome => $anexo)
+                            <tr>
+                                <td class="ls-meio-neg">
+                                    {{ $nome }}
+                                </td>
+                                <td class="ls-meio-neg">
+                                    <a href="{{ route('pre-cadastro.visualizar', ['arquivo' => $anexo]) }}" class="btn btn-sm btn-info" target="_blank">Visualizar</a>
+                                    <a href="{{ route('pre-cadastro.baixar', ['arquivo' => $anexo]) }}" class="btn btn-sm btn-secondary" target="_blank">Baixar</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
  
-            @if ($resultado->status === PreCadastro::STATUS_PEDENTE)
+            @if($resultado->status === PreCadastro::STATUS_PENDENTE)
                 <hr>
                 <h4 class="mb-3">Ações</h4>
-                <form action="{{ route('pre-cadastro.atualizarStatus') }}" method="POST" class="d-inline">
+                <form action="{{ route('pre-cadastro.atualizarStatus') }}" method="POST" class="d-inline form-pre-cadastro">
                     @csrf
                     <input type="hidden" name="id" value="{{ $resultado->id }}">
                     <input type="hidden" name="status" value="{{ PreCadastro::STATUS_APROVADO}}">
-                    <button type="submit" class="btn btn-primary">Aprovar</button>
+                    <button type="submit" class="btn btn-primary btn-pre-cadastro">Aprovar</button>
                 </form>
                 <button class="btn btn-info" id="recusar-trigger">Recusar&nbsp;&nbsp;<i class="fas fa-chevron-down"></i></button>
                 <div class="w-100" id="recusar-form">
-                    <form action="{{ route('pre-cadastro.atualizarStatus') }}" method="POST" class="mt-2">
+                    <form action="{{ route('pre-cadastro.atualizarStatus') }}" method="POST" class="mt-2 form-pre-cadastro">
                         @csrf
                         <input type="hidden" name="id" value="{{ $resultado->id }}">
                         <input type="hidden" name="status" value="{{ PreCadastro::STATUS_RECUSADO }}">
                         <textarea name="motivo" rows="3" placeholder="Insira aqui o motivo pelo qual a solicitação foi recusada..." class="form-control"></textarea>
-                        <button type="submit" class="btn btn-danger mt-2">Recusar</button>
+                        <button type="submit" class="btn btn-danger mt-2 btn-pre-cadastro">Recusar</button>
                     </form>
                 </div>
             @endif

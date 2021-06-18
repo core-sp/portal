@@ -192,4 +192,10 @@ $(document).ready(function(){
 		$('#parcelamento' + id).html('R$ ' + valorParcelado.replace('.', ','));
 	});
 
+  $('.btn-pre-cadastro').on('click', function(event){
+    if(!confirm('Ao prosseguir com essa ação os anexos desta requisição serão apagados. Por favor, antes de prosseguir verifique se os anexos não são mais necessários.')) {
+      event.preventDefault();
+    }
+  });
+
 })(jQuery);

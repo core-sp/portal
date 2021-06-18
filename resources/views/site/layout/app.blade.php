@@ -183,6 +183,7 @@
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
+                      <a href="{{ route('pre-cadastro.create') }}" class="dropdown-item bb-0">Pré-cadastro</a>
                       <a href="/simulador" class="dropdown-item bb-0">Simulador de Valores</a>
                     </div>
                   </li>

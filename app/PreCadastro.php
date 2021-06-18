@@ -14,7 +14,7 @@ class PreCadastro extends Model
     // Status de pré-cadastro
     const STATUS_APROVADO = 'Aprovado';
     const STATUS_RECUSADO = 'Recusado';
-    const STATUS_PEDENTE = 'Pendente';
+    const STATUS_PENDENTE = 'Pendente';
 
     // Tipos de pré-cadastro
     const TIPO_PRE_CADASTRO_PF_AUTONOMA = 'Pessoa Física Autônoma';
@@ -54,7 +54,7 @@ class PreCadastro extends Model
         return [
             PreCadastro::STATUS_APROVADO,
             PreCadastro::STATUS_RECUSADO,
-            PreCadastro::STATUS_PEDENTE
+            PreCadastro::STATUS_PENDENTE
         ];
     }
 
