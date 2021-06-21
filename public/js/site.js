@@ -248,31 +248,31 @@ var primeira = document.getElementById('menu-principal');
 var segunda = document.getElementById('append-menu');
 segunda.innerHTML = primeira.innerHTML;
 // Feriados para desablitar calendário
-natDays = [
-	[6, 20, 'br'],
-	[6, 21, 'br'],
-	[11, 15, 'br'],
-	[11, 20, 'br'],
-	[12, 23, 'br'],
-	[12, 24, 'br'],
-	[12, 25, 'br'],
-	[12, 26, 'br'],
-	[12, 27, 'br'],
-	[12, 30, 'br'],
-	[12, 31, 'br'],
-];
+// natDays = [
+// 	[6, 20, 'br'],
+// 	[6, 21, 'br'],
+// 	[11, 15, 'br'],
+// 	[11, 20, 'br'],
+// 	[12, 23, 'br'],
+// 	[12, 24, 'br'],
+// 	[12, 25, 'br'],
+// 	[12, 26, 'br'],
+// 	[12, 27, 'br'],
+// 	[12, 30, 'br'],
+// 	[12, 31, 'br'],
+// ];
 var lotados = [];
 
 // Função para adicionar feriados
-function nationalDays(date) {
-    for (i = 0; i < natDays.length; i++) {
-      if (date.getMonth() == natDays[i][0] - 1
-          && date.getDate() == natDays[i][1]) {
-        return [false, natDays[i][2] + '_day'];
-      }
-	}	
-	return [true, ''];
-}
+// function nationalDays(date) {
+//     for (i = 0; i < natDays.length; i++) {
+//       if (date.getMonth() == natDays[i][0] - 1
+//           && date.getDate() == natDays[i][1]) {
+//         return [false, natDays[i][2] + '_day'];
+//       }
+// 	}	
+// 	return [true, ''];
+// }
 
 // Função para adicionar feriados
 function diasLotados(date) {
@@ -287,13 +287,13 @@ function diasLotados(date) {
 // Função para feriados, fim-de-semana e dias lotados
 function noWeekendsOrHolidays(date) {
 	var noWeekend = $.datepicker.noWeekends(date);
-	var feriado = nationalDays(date);
+	//var feriado = nationalDays(date);
 	var lotado = diasLotados(date);
 
-	if(!feriado[0]) {
-		return feriado;
-	}
-	else if (!noWeekend[0]) {
+	// if(!feriado[0]) {
+	// 	return feriado;
+	// }
+	if (!noWeekend[0]) {
 		return noWeekend;
 	}
 	else {
