@@ -1,6 +1,7 @@
-@extends('site.layout.app', ['title' => 'Pre-Cadastro - Pessoa Física Autônoma'])
+@extends('site.layout.app', ['title' => 'Pre-Cadastro - ' . $tipo])
 
 @php 
+  use App\PreCadastro;
   $listaEstadoCivil = ['Solteiro', 'Casado'];
   $listaSexo = ['Masculino', 'Feminino'];
   $listaNaturalizado = ['Não', 'Sim'];
@@ -17,7 +18,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Pré-Cadastro - Pessoa Física Autônoma
+          Pré-Cadastro - {{ $tipo }}
         </h1>
       </div>
     </div>
@@ -30,7 +31,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
-            <h2 class="stronger">Forneça informações para o pré-cadastro de Pessoa Física Autônoma</h2>
+            <h2 class="stronger">Forneça informações para o pré-cadastro de {{ $tipo }}</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
@@ -43,10 +44,11 @@
     <div class="form-row mb-4">
       <div class="col">
         <div class="mt-2">
-          <form method="POST" class="inscricaoCurso" enctype="multipart/form-data">
+          <form method="POST" action="{{ route('pre-cadastro.store') }}" class="inscricaoCurso" enctype="multipart/form-data">
+            <input type="hidden" name="tipo" value="{{ $tipo }}" />
+            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 
             <h5>Informações do cadastro</h5>
-            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             
             <div class="form-row mt-2">
               <div class="col-md-12">
@@ -86,7 +88,7 @@
                 <select name="tipoDocumento" class="form-control {{ $errors->has('tipoDocumento') ? 'is-invalid' : '' }}">
                   <option value="">Selecione</option>
                   @foreach($listaTipoDocumento as $tipoDocumento)
-                    <option value="{{ $tipoDocumento }}">{{ $tipoDocumento }}</option>
+                  <option value="{{ $tipoDocumento }}" {{ old('tipoDocumento') === $tipoDocumento ? 'selected' : '' }}>{{ $tipoDocumento }}</option>
                   @endforeach
                 </select>
                 @if($errors->has('tipoDocumento'))
@@ -164,7 +166,7 @@
                 <select name="estadoCivil" class="form-control {{ $errors->has('estadoCivil') ? 'is-invalid' : '' }}">
                   <option value="">Selecione</option>
                   @foreach($listaEstadoCivil as $estadoCivil)
-                    <option value="{{ $estadoCivil }}">{{ $estadoCivil }}</option>
+                    <option value="{{ $estadoCivil }}" {{ old('estadoCivil') === $estadoCivil ? 'selected' : '' }}>{{ $estadoCivil }}</option>
                   @endforeach
                 </select>
                 @if($errors->has('estadoCivil'))
@@ -179,7 +181,7 @@
                 <select name="sexo" class="form-control {{ $errors->has('sexo') ? 'is-invalid' : '' }}">
                   <option value="">Selecione</option>
                   @foreach($listaSexo as $sexo)
-                    <option value="{{ $sexo }}">{{ $sexo }}</option>
+                    <option value="{{ $sexo }}" {{ old('sexo') === $sexo ? 'selected' : '' }}>{{ $sexo }}</option>
                   @endforeach
                 </select>
                 @if($errors->has('sexo'))
@@ -194,7 +196,7 @@
                 <select name="naturalizado" class="form-control {{ $errors->has('naturalizado') ? 'is-invalid' : '' }}">
                   <option value="">Selecione</option>
                   @foreach($listaNaturalizado as $naturalizado)
-                    <option value="{{ $naturalizado }}">{{ $naturalizado }}</option>
+                    <option value="{{ $naturalizado }}" {{ old('naturalizado') === $naturalizado ? 'selected' : '' }}>{{ $naturalizado }}</option>
                   @endforeach
                 </select>
                 @if($errors->has('naturalizado'))
@@ -421,22 +423,59 @@
             </div>
 
             </br><h5>Informações sobre atividade</h5>
-            <div class="col-md-4 mt-2-768">
-              <label for="segmento">Segmento *</label>
-              <select name="segmento" class="form-control {{ $errors->has('segmento') ? 'is-invalid' : '' }}">
-                <option value="">Selecione</option>
-                @foreach($listaSegmento as $segmento)
-                  <option value="{{ $segmento }}">{{ $segmento }}</option>
-                @endforeach
-              </select>
-              @if($errors->has('segmento'))
-              <div class="invalid-feedback">
-                {{ $errors->first('segmento') }}
+            <div class="form-row mt-2">
+              <div class="col-md-4 mt-2-768">
+                <label for="segmento">Segmento *</label>
+                <select name="segmento" class="form-control {{ $errors->has('segmento') ? 'is-invalid' : '' }}">
+                  <option value="">Selecione</option>
+                  @foreach($listaSegmento as $segmento)
+                    <option value="{{ $segmento }}" {{ old('segmento') === $segmento ? 'selected' : '' }}>{{ $segmento }}</option>
+                  @endforeach
+                </select>
+                @if($errors->has('segmento'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('segmento') }}
+                </div>
+                @endif
               </div>
-              @endif
             </div>
 
+            @if($tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_RT)
+            <div class="form-row mt-2">
+              <div class="col-md-6">
+                <label for="razaoSocial">Razão social da empresa do resposável técnico *</label>
+                <input type="text"
+                  class="form-control {{ $errors->has('razaoSocial') ? 'is-invalid' : '' }}"
+                  name="razaoSocial"
+                  value="{{ old('razaoSocial') }}"
+                  placeholder="Razão Social" 
+                />
+                @if($errors->has('razaoSocial'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('razaoSocial') }}
+                  </div>
+                @endif
+              </div>
+
+              <div class="col-md-6">
+                <label for="cnpj">CNPJ da empresa do resposável técnico *</label>
+                <input type="text"
+                  class="form-control cnpjInput {{ $errors->has('cnpj') ? 'is-invalid' : '' }}"
+                  name="cnpj"
+                  placeholder="CNPJ"
+                  value="{{ old('cnpj') }}"
+                />
+                @if($errors->has('cnpj'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('cnpj') }}
+                </div>
+                @endif
+              </div>
+            </div>
+            @endif
+
             </br><h5>Anexos</h5>
+
             <div class="mt-2">
               <label>CPF *</label>
             </div>
@@ -513,7 +552,7 @@
               @endif
             </div>
             
-            <div class="cadastroRepresentante">
+            <div class="mt-2">
               <label>Reservista Militar (obrigatório para homens brasileiros com até 45 anos)</label>
             </div>
             <div class="custom-file">
@@ -531,6 +570,27 @@
                 </div>
               @endif
             </div>
+
+            @if($tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_RT)
+            <div class="mt-2">
+              <label>Formulário de Indicação de Responsável Técnico *</label>
+            </div>
+            <div class="custom-file">
+              <input
+                type="file"
+                name="anexoIndicacaoRT"
+                class="custom-file-input anexo {{ $errors->has('anexoIndicacaoRT') ? 'is-invalid' : '' }}"
+                id="anexoIndicacaoRT"
+                role="button"
+              />
+              <label class="custom-file-label" for="anexoIndicacaoRT">Selecionar arquivo...</label>
+              @if($errors->has('anexoIndicacaoRT'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('anexoIndicacaoRT') }}
+                </div>
+              @endif
+            </div>
+            @endif
 
             <div class="float-right mt-4">
               <a href="/" class="btn btn-default">Cancelar</a>

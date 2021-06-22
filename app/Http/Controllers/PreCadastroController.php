@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\Cpf;
+use App\Rules\Cnpj;
 use App\PreCadastro;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
@@ -13,7 +15,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\PreCadastroAprovadoMail;
 use App\Mail\PreCadastroRecusadoMail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\PreCadastroRequest;
+use Illuminate\Support\Facades\Validator;
 use App\Repositories\PreCadastroRepository;
 
 class PreCadastroController extends Controller
@@ -25,7 +29,7 @@ class PreCadastroController extends Controller
 
     public function __construct(PreCadastroRepository $preCadastroRepository)
     {
-        $this->middleware('auth', ['except' => ['create', 'store']]);
+        $this->middleware('auth', ['except' => ['createPFAutonomo', 'createPFRT', 'store']]);
 
         $this->preCadastroRepository = $preCadastroRepository;
 
@@ -85,31 +89,34 @@ class PreCadastroController extends Controller
         return view('admin.crud.mostra', compact('resultado', 'variaveis', 'listaAnexos'));
     }
 
-    public function create()
+    public function createPFAutonomo()
     {
-        return view('site.pre-cadastro');
+        $tipo = PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA;
+
+        return view('site.pre-cadastro-pf', compact('tipo'));
     }
 
-    public function store(PreCadastroRequest $request)
+    public function createPFRT()
     {
+        $tipo = PreCadastro::TIPO_PRE_CADASTRO_PF_RT;
+
+        return view('site.pre-cadastro-pf', compact('tipo'));
+    }
+
+    public function store(Request $request)
+    {
+        $regras = $this->regrasByTipo($request->tipo);
+        $mensagens = $this->mensagensByTipo($request->tipo);
+
+        $validacao = Validator::make($request->all(), $regras, $mensagens);
+        
+        if($validacao->fails()) {
+            return Redirect::back()->withErrors($validacao)->withInput($request->all());
+        }
+
         $preCadastro = $this->preCadastroRepository->store($request);
 
-        $nomeAnexoCpf = $preCadastro->id . '_' . 'CPF.' . $request->file('anexoCpf')->getClientOriginalExtension();
-        $request->file('anexoCpf')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoCpf);
-        
-        $nomeAnexoDocumento = $preCadastro->id . '_' . $preCadastro->tipoDocumento . '.' . $request->file('anexoDocumento')->getClientOriginalExtension();
-        $request->file('anexoDocumento')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoDocumento);
-
-        $nomeAnexoComprovanteResidencia = $preCadastro->id . '_' . 'Comprovante_Residencia.' . $request->file('anexoComprovanteResidencia')->getClientOriginalExtension();
-        $request->file('anexoComprovanteResidencia')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoComprovanteResidencia);
-
-        $nomeAnexoCertidaoQuitacaoEleitoral = $preCadastro->id . '_' . 'Certidao_Quitacao_Eleitoral.' . $request->file('anexoCertidaoQuitacaoEleitoral')->getClientOriginalExtension();
-        $request->file('anexoCertidaoQuitacaoEleitoral')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoCertidaoQuitacaoEleitoral);
-
-        if($request->file('anexoReservistaMilitar') !== null) {
-            $nomeAnexoComprovanteResidencia = $preCadastro->id . '_' . 'Reservista_Militar.' . $request->file('anexoReservistaMilitar')->getClientOriginalExtension();
-            $request->file('anexoReservistaMilitar')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoComprovanteResidencia);
-        }
+        $this->salvarAnexos($request);
 
         $email = new PreCadastroMail();
 
@@ -127,6 +134,132 @@ class PreCadastroController extends Controller
         return view('site.agradecimento')->with([
             'agradece' => $texto,
         ]);
+    }
+
+    protected function regrasByTipo($tipo) 
+    {
+        switch ($tipo) {
+            case PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA:
+                return [
+                    'nome' => 'required|max:191',
+                    'cpf' => ['required', new Cpf],
+                    'tipoDocumento' => 'required|max:191',
+                    'numeroDocumento' => 'required|max:191',
+                    'orgaoEmissor' => 'required|max:191',
+                    'dataExpedicao' => 'required|date_format:d/m/Y',
+                    'dataNascimento' => 'required|date_format:d/m/Y',
+                    'estadoCivil' => 'required|max:191',
+                    'sexo' => 'required|max:191',
+                    'naturalizado' => 'required|max:191',
+                    'nacionalidade' => 'required|max:191',
+                    'nomeMae' => 'required|max:191',
+                    'nomePai' => 'required|max:191',
+                    'email' => 'required|email|max:191',
+                    'celular' => 'max:191|min:14',
+                    'telefoneFixo' => 'max:191',
+                    'segmento' => 'required|max:191',
+                    'cep' => 'required',
+                    'bairro' => 'required|max:30',
+                    'logradouro' => 'required|max:100',
+                    'numero' => 'required|max:15',
+                    'complemento' => 'max:100',
+                    'estado' => 'required|max:5',
+                    'municipio' => 'required|max:30',
+                    'anexoCpf' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoDocumento' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoComprovanteResidencia' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoCertidaoQuitacaoEleitoral' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoReservistaMilitar' => 'mimes:jpeg,png,jpg,gif,pdf|max:2048'
+                ];
+            break;
+            case PreCadastro::TIPO_PRE_CADASTRO_PF_RT:
+                return [
+                    'nome' => 'required|max:191',
+                    'cpf' => ['required', new Cpf],
+                    'tipoDocumento' => 'required|max:191',
+                    'numeroDocumento' => 'required|max:191',
+                    'orgaoEmissor' => 'required|max:191',
+                    'dataExpedicao' => 'required|date_format:d/m/Y',
+                    'dataNascimento' => 'required|date_format:d/m/Y',
+                    'estadoCivil' => 'required|max:191',
+                    'sexo' => 'required|max:191',
+                    'naturalizado' => 'required|max:191',
+                    'nacionalidade' => 'required|max:191',
+                    'nomeMae' => 'required|max:191',
+                    'nomePai' => 'required|max:191',
+                    'email' => 'required|email|max:191',
+                    'celular' => 'max:191|min:14',
+                    'telefoneFixo' => 'max:191',
+                    'segmento' => 'required|max:191',
+                    'cep' => 'required',
+                    'bairro' => 'required|max:30',
+                    'logradouro' => 'required|max:100',
+                    'numero' => 'required|max:15',
+                    'complemento' => 'max:100',
+                    'estado' => 'required|max:5',
+                    'municipio' => 'required|max:30',
+                    'anexoCpf' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoDocumento' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoComprovanteResidencia' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoCertidaoQuitacaoEleitoral' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoReservistaMilitar' => 'mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'cnpj' => ['required', new Cnpj],
+                    'razaoSocial' => 'required|max:191',
+                    'anexoIndicacaoRT' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048'
+                ];
+            break;
+        }
+    }
+
+    protected function mensagensByTipo($tipo) 
+    {
+        return [
+            'required' => 'Campo obrigatório',
+            'max' => 'Excedido limite de caracteres',
+            'mimes' => 'Tipo de arquivo não suportado',
+            'max' => 'Arquivo não pode ultrapassar 2MB',
+            'date_format' => 'Data inválida',
+        ];
+
+        // switch ($tipo) {
+        //     case PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA:
+        //         return [
+        //             'required' => 'Campo obrigatório',
+        //             'max' => 'Excedido limite de caracteres',
+        //             'mimes' => 'Tipo de arquivo não suportado',
+        //             'max' => 'Arquivo não pode ultrapassar 2MB',
+        //             'date_format' => 'Data inválida',
+        //         ];
+        //     break;
+        // }
+    }
+
+    protected function salvarAnexos($request) 
+    {
+        if($request->file('anexoCpf') !== null) {
+            $nomeAnexoCpf = $preCadastro->id . '_' . 'CPF.' . $request->file('anexoCpf')->getClientOriginalExtension();
+            $request->file('anexoCpf')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoCpf);
+        }
+        
+        if($request->file('anexoDocumento') !== null) {
+            $nomeAnexoDocumento = $preCadastro->id . '_' . $preCadastro->tipoDocumento . '.' . $request->file('anexoDocumento')->getClientOriginalExtension();
+            $request->file('anexoDocumento')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoDocumento);
+        }
+
+        if($request->file('anexoComprovanteResidencia') !== null) {
+            $nomeAnexoComprovanteResidencia = $preCadastro->id . '_' . 'Comprovante_Residencia.' . $request->file('anexoComprovanteResidencia')->getClientOriginalExtension();
+            $request->file('anexoComprovanteResidencia')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoComprovanteResidencia);
+        }
+
+        if($request->file('anexoCertidaoQuitacaoEleitoral') !== null) {
+            $nomeAnexoCertidaoQuitacaoEleitoral = $preCadastro->id . '_' . 'Certidao_Quitacao_Eleitoral.' . $request->file('anexoCertidaoQuitacaoEleitoral')->getClientOriginalExtension();
+            $request->file('anexoCertidaoQuitacaoEleitoral')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoCertidaoQuitacaoEleitoral);
+        }
+
+        if($request->file('anexoReservistaMilitar') !== null) {
+            $nomeAnexoComprovanteResidencia = $preCadastro->id . '_' . 'Reservista_Militar.' . $request->file('anexoReservistaMilitar')->getClientOriginalExtension();
+            $request->file('anexoReservistaMilitar')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoComprovanteResidencia);
+        }
     }
 
     public function atualizarStatus(Request $request)

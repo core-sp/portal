@@ -183,7 +183,15 @@
                       <a href="/consulta-de-situacao" class="dropdown-item">Consulta de Situação</a>
                       <a href="/cursos" class="dropdown-item">Cursos</a>
                       <a href="/downloads" class="dropdown-item">Downloads</a>
-                      <a href="{{ route('pre-cadastro.create') }}" class="dropdown-item bb-0">Pré-cadastro</a>
+                      <div class="sub-dropdown">
+                        <div class="dropdown-item">
+                          Pré-cadastro <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
+                        </div>
+                        <div class="sub-dropdown-menu">
+                          <a href="{{ route('pre-cadastro.createPFAutonomo') }}" class="dropdown-item">PF Autônoma</a>
+                          <a href="{{ route('pre-cadastro.createPFRT') }}" class="dropdown-item bb-0">PF Responsável Técnico</a>
+                        </div>
+                      </div>
                       <a href="/simulador" class="dropdown-item bb-0">Simulador de Valores</a>
                     </div>
                   </li>

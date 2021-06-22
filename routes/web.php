@@ -224,7 +224,8 @@ Route::prefix('/')->group(function() {
 
   // Pré-Cadastro (site)
   Route::prefix('pre-cadastro')->group(function(){
-    Route::get('/criar', 'PreCadastroController@create')->name('pre-cadastro.create');
+    Route::get('/criar/pf-autonomo', 'PreCadastroController@createPFAutonomo')->name('pre-cadastro.createPFAutonomo');
+    Route::get('/criar/pf-rt', 'PreCadastroController@createPFRT')->name('pre-cadastro.createPFRT');
     Route::post('/criar', 'PreCadastroController@store')->name('pre-cadastro.store');
   });
 
