@@ -29,7 +29,7 @@ class PreCadastroController extends Controller
 
     public function __construct(PreCadastroRepository $preCadastroRepository)
     {
-        $this->middleware('auth', ['except' => ['createPFAutonomo', 'createPFRT', 'store']]);
+        $this->middleware('auth', ['except' => ['createPFAutonomo', 'createPFRT', 'createPJFirmaIndividual', 'createPJVariado', 'store']]);
 
         $this->preCadastroRepository = $preCadastroRepository;
 
@@ -61,29 +61,9 @@ class PreCadastroController extends Controller
         $variaveis = (object) $this->variaveis;
         $anexos = Storage::files('pre-cadastro/' . $id . '/');
         $listaAnexos = [];
-        $nomeArquivo;
 
         foreach($anexos as $anexo) {
-            if (strpos($anexo, 'CPF') !== false) {
-                $nomeArquivo = 'CPF';
-            }
-            elseif (strpos($anexo, 'RG') !== false) {
-                $nomeArquivo = 'RG';
-            }
-            elseif (strpos($anexo, 'CNH') !== false) {
-                $nomeArquivo = 'CNH';
-            }
-            elseif (strpos($anexo, 'Comprovante_Residencia') !== false) {
-                $nomeArquivo = 'Comprovante de Residência';
-            }
-            elseif (strpos($anexo, 'Certidao_Quitacao_Eleitoral') !== false) {
-                $nomeArquivo = 'Certidão de Quitação Eleitoral';
-            }
-            elseif (strpos($anexo, 'Reservista_Militar') !== false) {
-                $nomeArquivo = 'Reservista Militar';
-            }
-
-            $listaAnexos[$nomeArquivo ] = $anexo;
+            $listaAnexos[explode('/', $anexo)[2]] = $anexo;
         }
 
         return view('admin.crud.mostra', compact('resultado', 'variaveis', 'listaAnexos'));
@@ -103,6 +83,20 @@ class PreCadastroController extends Controller
         return view('site.pre-cadastro-pf', compact('tipo'));
     }
 
+    public function createPJFirmaIndividual()
+    {
+        $tipo = PreCadastro::TIPO_PRE_CADASTRO_PJ_INDIVIDUAL;
+
+        return view('site.pre-cadastro-pj', compact('tipo'));
+    }
+
+    public function createPJVariado()
+    {
+        $tipo = PreCadastro::TIPO_PRE_CADASTRO_PJ_VARIADO;
+
+        return view('site.pre-cadastro-pj', compact('tipo'));
+    }
+
     public function store(Request $request)
     {
         $regras = $this->regrasByTipo($request->tipo);
@@ -116,7 +110,7 @@ class PreCadastroController extends Controller
 
         $preCadastro = $this->preCadastroRepository->store($request);
 
-        $this->salvarAnexos($request);
+        $this->salvarAnexos($request, $preCadastro->id);
 
         $email = new PreCadastroMail();
 
@@ -208,6 +202,86 @@ class PreCadastroController extends Controller
                     'anexoIndicacaoRT' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048'
                 ];
             break;
+            case PreCadastro::TIPO_PRE_CADASTRO_PJ_INDIVIDUAL:
+                return [
+                    'nome' => 'required|max:191',
+                    'cpf' => ['required', new Cpf],
+                    'tipoDocumento' => 'required|max:191',
+                    'numeroDocumento' => 'required|max:191',
+                    'orgaoEmissor' => 'required|max:191',
+                    'dataExpedicao' => 'required|date_format:d/m/Y',
+                    'dataNascimento' => 'required|date_format:d/m/Y',
+                    'estadoCivil' => 'required|max:191',
+                    'sexo' => 'required|max:191',
+                    'naturalizado' => 'required|max:191',
+                    'nacionalidade' => 'required|max:191',
+                    'nomeMae' => 'required|max:191',
+                    'nomePai' => 'required|max:191',
+                    'email' => 'required|email|max:191',
+                    'celular' => 'max:191|min:14',
+                    'telefoneFixo' => 'max:191',
+                    'segmento' => 'required|max:191',
+                    'cep' => 'required',
+                    'bairro' => 'required|max:30',
+                    'logradouro' => 'required|max:100',
+                    'numero' => 'required|max:15',
+                    'complemento' => 'max:100',
+                    'estado' => 'required|max:5',
+                    'municipio' => 'required|max:30',
+                    'anexoCpf' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoDocumento' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoComprovanteResidencia' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'cnpj' => ['required', new Cnpj],
+                    'razaoSocial' => 'required|max:191',
+                    'formaRegistro' => 'required|max:191',
+                    'numeroRegistro' => 'required|max:191',
+                    'dataRegistro' => 'required|date_format:d/m/Y',
+                    'ramoAtividade' => 'required|max:191',
+                    'capitalSocial' => 'required|max:191',
+                    'anexoCnpj' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoRequerimentoFirmaIndividual' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048'
+                ];
+            break;
+            case PreCadastro::TIPO_PRE_CADASTRO_PJ_VARIADO:
+                return [
+                    'nome' => 'required|max:191',
+                    'cpf' => ['required', new Cpf],
+                    'tipoDocumento' => 'required|max:191',
+                    'numeroDocumento' => 'required|max:191',
+                    'orgaoEmissor' => 'required|max:191',
+                    'dataExpedicao' => 'required|date_format:d/m/Y',
+                    'dataNascimento' => 'required|date_format:d/m/Y',
+                    'estadoCivil' => 'required|max:191',
+                    'sexo' => 'required|max:191',
+                    'naturalizado' => 'required|max:191',
+                    'nacionalidade' => 'required|max:191',
+                    'nomeMae' => 'required|max:191',
+                    'nomePai' => 'required|max:191',
+                    'email' => 'required|email|max:191',
+                    'celular' => 'max:191|min:14',
+                    'telefoneFixo' => 'max:191',
+                    'segmento' => 'required|max:191',
+                    'cep' => 'required',
+                    'bairro' => 'required|max:30',
+                    'logradouro' => 'required|max:100',
+                    'numero' => 'required|max:15',
+                    'complemento' => 'max:100',
+                    'estado' => 'required|max:5',
+                    'municipio' => 'required|max:30',
+                    'cnpj' => ['required', new Cnpj],
+                    'razaoSocial' => 'required|max:191',
+                    'formaRegistro' => 'required|max:191',
+                    'numeroRegistro' => 'required|max:191',
+                    'dataRegistro' => 'required|date_format:d/m/Y',
+                    'ramoAtividade' => 'required|max:191',
+                    'capitalSocial' => 'required|max:191',
+                    'anexoCnpj' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoContratoSocial' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoCpfQuadro' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoDocumentoQuadro' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                    'anexoComprovanteResidenciaQuadro' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+                ];
+            break;
         }
     }
 
@@ -234,31 +308,61 @@ class PreCadastroController extends Controller
         // }
     }
 
-    protected function salvarAnexos($request) 
+    protected function salvarAnexos($request, $preCadastroId) 
     {
         if($request->file('anexoCpf') !== null) {
-            $nomeAnexoCpf = $preCadastro->id . '_' . 'CPF.' . $request->file('anexoCpf')->getClientOriginalExtension();
-            $request->file('anexoCpf')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoCpf);
+            $nomeAnexo = $preCadastroId . '_' . 'CPF.' . $request->file('anexoCpf')->getClientOriginalExtension();
+            $request->file('anexoCpf')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
         }
         
         if($request->file('anexoDocumento') !== null) {
-            $nomeAnexoDocumento = $preCadastro->id . '_' . $preCadastro->tipoDocumento . '.' . $request->file('anexoDocumento')->getClientOriginalExtension();
-            $request->file('anexoDocumento')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoDocumento);
+            $nomeAnexo = $preCadastroId . '_' . $request->tipoDocumento . '.' . $request->file('anexoDocumento')->getClientOriginalExtension();
+            $request->file('anexoDocumento')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
         }
 
         if($request->file('anexoComprovanteResidencia') !== null) {
-            $nomeAnexoComprovanteResidencia = $preCadastro->id . '_' . 'Comprovante_Residencia.' . $request->file('anexoComprovanteResidencia')->getClientOriginalExtension();
-            $request->file('anexoComprovanteResidencia')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoComprovanteResidencia);
+            $nomeAnexo = $preCadastroId . '_' . 'Comprovante_Residencia.' . $request->file('anexoComprovanteResidencia')->getClientOriginalExtension();
+            $request->file('anexoComprovanteResidencia')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
         }
 
         if($request->file('anexoCertidaoQuitacaoEleitoral') !== null) {
-            $nomeAnexoCertidaoQuitacaoEleitoral = $preCadastro->id . '_' . 'Certidao_Quitacao_Eleitoral.' . $request->file('anexoCertidaoQuitacaoEleitoral')->getClientOriginalExtension();
-            $request->file('anexoCertidaoQuitacaoEleitoral')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoCertidaoQuitacaoEleitoral);
+            $nomeAnexo = $preCadastroId . '_' . 'Certidao_Quitacao_Eleitoral.' . $request->file('anexoCertidaoQuitacaoEleitoral')->getClientOriginalExtension();
+            $request->file('anexoCertidaoQuitacaoEleitoral')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
         }
 
         if($request->file('anexoReservistaMilitar') !== null) {
-            $nomeAnexoComprovanteResidencia = $preCadastro->id . '_' . 'Reservista_Militar.' . $request->file('anexoReservistaMilitar')->getClientOriginalExtension();
-            $request->file('anexoReservistaMilitar')->storeAs('pre-cadastro/' . $preCadastro->id , $nomeAnexoComprovanteResidencia);
+            $nomeAnexo = $preCadastroId . '_' . 'Reservista_Militar.' . $request->file('anexoReservistaMilitar')->getClientOriginalExtension();
+            $request->file('anexoReservistaMilitar')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
+        }
+
+        if($request->file('anexoCnpj') !== null) {
+            $nomeAnexo = $preCadastroId . '_' . 'CNPJ.' . $request->file('anexoCnpj')->getClientOriginalExtension();
+            $request->file('anexoCnpj')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
+        }
+
+        if($request->file('anexoRequerimentoFirmaIndividual') !== null) {
+            $nomeAnexo = $preCadastroId . '_' . 'Requerimento_Firma_Individual.' . $request->file('anexoRequerimentoFirmaIndividual')->getClientOriginalExtension();
+            $request->file('anexoRequerimentoFirmaIndividual')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
+        }
+
+        if($request->file('anexoContratoSocial') !== null) {
+            $nomeAnexo = $preCadastroId . '_' . 'Contrato_Social.' . $request->file('anexoContratoSocial')->getClientOriginalExtension();
+            $request->file('anexoContratoSocial')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
+        }
+
+        if($request->file('anexoCpfQuadro') !== null) {
+            $nomeAnexo = $preCadastroId . '_' . 'CPF_Quadro_Societario.' . $request->file('anexoCpfQuadro')->getClientOriginalExtension();
+            $request->file('anexoCpfQuadro')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
+        }
+
+        if($request->file('anexoDocumentoQuadro') !== null) {
+            $nomeAnexo = $preCadastroId . '_' . 'Documento_Quadro_Societario.' . $request->file('anexoDocumentoQuadro')->getClientOriginalExtension();
+            $request->file('anexoDocumentoQuadro')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
+        }
+
+        if($request->file('anexoComprovanteResidenciaQuadro') !== null) {
+            $nomeAnexo = $preCadastroId . '_' . 'Comprovante_Residencia_Quadro_Societario.' . $request->file('anexoComprovanteResidenciaQuadro')->getClientOriginalExtension();
+            $request->file('anexoComprovanteResidenciaQuadro')->storeAs('pre-cadastro/' . $preCadastroId , $nomeAnexo);
         }
     }
 

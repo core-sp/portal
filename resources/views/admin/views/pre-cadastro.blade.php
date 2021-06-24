@@ -1,5 +1,5 @@
 @php
-use App\PreCadastro;
+    use App\PreCadastro;
 @endphp
 
 <div class="card-body">
@@ -23,6 +23,41 @@ use App\PreCadastro;
             <hr>
             
             <h5>Informações de cadastro</h5>
+
+            @if($resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA || $resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_RT)
+            <p class="mb-0">Nome completo: <strong>{{ $resultado->nome }}</strong></p>
+            <p class="mb-0">CPF: <strong>{{ $resultado->cpf }}</strong></p>
+            <p class="mb-0">Número {{ $resultado->tipoDocumento }}: <strong>{{ $resultado->numeroDocumento }}</strong></p>
+            <p class="mb-0">Orgão Emissor: <strong>{{ $resultado->orgaoEmissorDocumento }}</strong></p>
+            <p class="mb-0">Data Emissão: <strong>{{ onlyDate($resultado->dataEmissaoDocumento) }}</strong></p>
+            <p class="mb-0">Data Nascimento: <strong>{{ onlyDate($resultado->dataNascimento) }}</strong></p>
+            <p class="mb-0">Estado Civil: <strong>{{ $resultado->estadoCivil }}</strong></p>
+            <p class="mb-0">Sexo: <strong>{{ $resultado->sexo }}</strong></p>
+            <p class="mb-0">Naturalizado: <strong>{{ $resultado->naturalizado }}</strong></p>
+            <p class="mb-0">Nacionalidade: <strong>{{ $resultado->nacionalidade }}</strong></p>
+            <p class="mb-0">Naturalizado: <strong>{{ $resultado->naturalizado }}</strong></p>
+            <p class="mb-0">Nome do Pai: <strong>{{ $resultado->nomePai }}</strong></p>
+            <p class="mb-0">Nome da Mãe: <strong>{{ $resultado->nomeMae }}</strong></p>
+
+            @elseif($resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PJ_INDIVIDUAL || $resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PJ_VARIADO)
+            <p class="mb-0">Razão Social: <strong>{{ $resultado->razaoSocial }}</strong></p>
+            <p class="mb-0">CNPJ: <strong>{{ $resultado->cnpj }}</strong></p>
+            <p class="mb-0">Forma de Registro <strong>{{ $resultado->formaRegistro }}</strong></p>
+            <p class="mb-0">Número do Registro: <strong>{{ $resultado->numeroRegistro }}</strong></p>
+            <p class="mb-0">Data do Registro: <strong>{{ onlyDate($resultado->dataRegistro) }}</strong></p>
+            <p class="mb-0">Ramo Atividade: <strong>{{ $resultado->ramoAtividade }}</strong></p>
+            @endif
+
+            <hr>
+
+            @if($resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_RT)
+            <h5>Informações de relacionamento</h5>
+            <p class="mb-0">Razão Social: <strong>{{ $resultado->razaoSocial }}</strong></p>
+            <p class="mb-0">CNPJ: <strong>{{ $resultado->cnpj }}</strong></p>
+            <hr>
+
+            @elseif($resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PJ_INDIVIDUAL || $resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PJ_VARIADO)
+            <h5>Informações de relacionamento</h5>
             <p class="mb-0">Nome completo: <strong>{{ $resultado->nome }}</strong></p>
             <p class="mb-0">CPF: <strong>{{ $resultado->cpf }}</strong></p>
             <p class="mb-0">Número {{ $resultado->tipoDocumento }}: <strong>{{ $resultado->numeroDocumento }}</strong></p>
@@ -37,6 +72,7 @@ use App\PreCadastro;
             <p class="mb-0">Nome do Pai: <strong>{{ $resultado->nomePai }}</strong></p>
             <p class="mb-0">Nome da Mãe: <strong>{{ $resultado->nomeMae }}</strong></p>
             <hr>
+            @endif
 
             <h5>Informações de contato</h5>
             <p class="mb-0">E-mail: <strong>{{ $resultado->email }}</strong></p>
@@ -56,6 +92,11 @@ use App\PreCadastro;
 
             <h5>Informações sobre atividade</h5>
             <p class="mb-0">Segmento: <strong>{{ $resultado->segmento }}</strong></p>
+
+            @if($resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PJ_INDIVIDUAL || $resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PJ_VARIADO)
+            <p class="mb-0">Capital Social: <strong>{{ $resultado->capitalSocial }}</strong></p>
+            @endif
+            
             <hr>
 
             @if($resultado->status === PreCadastro::STATUS_PENDENTE)

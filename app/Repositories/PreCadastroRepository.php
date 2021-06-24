@@ -44,7 +44,14 @@ class PreCadastroRepository {
             'complemento' => $request->complemento,
             'estado' => $request->estado,
             'municipio' => $request->municipio,
-            'tipo' => PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA,
+            'cnpj' =>  $request->cnpj,
+            'razaoSocial' => $request->razaoSocial,
+            'formaRegistro' => $request->formaRegistro,
+            'numeroRegistro' => $request->numeroRegistro,
+            'dataRegistro' => formataDataUTC($request->dataRegistro),
+            'ramoAtividade' => $request->ramoAtividade,
+            'capitalSocial' => $request->capitalSocial,
+            'tipo' => $request->tipo,
             'status' => PreCadastro::STATUS_PENDENTE
         ]);
     }

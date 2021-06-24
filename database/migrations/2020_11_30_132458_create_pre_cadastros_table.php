@@ -38,6 +38,7 @@ class CreatePreCadastrosTable extends Migration
 
             // Informações de pessoa jurídica
             $table->string('cnpj')->nullable();
+            $table->string('razaoSocial')->nullable();
             $table->string('formaRegistro')->nullable();
             $table->string('numeroRegistro')->nullable();
             $table->date('dataRegistro')->nullable();

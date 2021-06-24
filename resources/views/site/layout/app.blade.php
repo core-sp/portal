@@ -189,7 +189,9 @@
                         </div>
                         <div class="sub-dropdown-menu">
                           <a href="{{ route('pre-cadastro.createPFAutonomo') }}" class="dropdown-item">PF Autônoma</a>
-                          <a href="{{ route('pre-cadastro.createPFRT') }}" class="dropdown-item bb-0">PF Responsável Técnico</a>
+                          <a href="{{ route('pre-cadastro.createPFRT') }}" class="dropdown-item">PF Responsável Técnico</a>
+                          <a href="{{ route('pre-cadastro.createPJFirmaIndividual') }}" class="dropdown-item">PJ Firma Individual</a>
+                          <a href="{{ route('pre-cadastro.createPJVariado') }}" class="dropdown-item">PJ LTDA/EIRELI/Unipessoal LTDA</a>
                         </div>
                       </div>
                       <a href="/simulador" class="dropdown-item bb-0">Simulador de Valores</a>

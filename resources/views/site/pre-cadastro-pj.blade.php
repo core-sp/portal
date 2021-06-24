@@ -6,7 +6,17 @@
   $listaSexo = ['Masculino', 'Feminino'];
   $listaNaturalizado = ['Não', 'Sim'];
   $listaTipoDocumento = ['RG', 'CNH'];
-  $listaSegmento = ['segmento1', 'segmento2']
+  $listaFormaRegistro = ['JUCESP', 'Cartório'];
+  $listaSegmento = ['segmento1', 'segmento2'];
+  $listaRamoAtividade = ['Representação', 'Intermediação e agenciamento', 'Distribuição'];
+  $listaCapitalSocial = [
+        'Até R$ 10.000,00',
+        'Até R$ 50.000,00',
+        'Até R$ 100.000,00',
+        'Até R$ 300.000,00',
+        'Até R$ 500.000,00',
+        'Maior que R$ 500.000,00'
+    ];
 @endphp
 
 
@@ -49,6 +59,104 @@
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 
             <h5>Informações do Cadastro</h5>
+
+            <div class="form-row mt-2">
+              <div class="col-md-12">
+                <label for="razaoSocial">Razão Social *</label>
+                <input type="text"
+                  class="form-control {{ $errors->has('razaoSocial') ? 'is-invalid' : '' }}"
+                  name="razaoSocial"
+                  value="{{ old('razaoSocial') }}"
+                  placeholder="Razão Social" 
+                />
+                @if($errors->has('razaoSocial'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('razaoSocial') }}
+                  </div>
+                @endif
+              </div>
+            </div>
+
+            <div class="form-row mt-2">
+              <div class="col-md-4">
+                <label for="cnpj">CNPJ *</label>
+                <input type="text"
+                  class="form-control cnpjInput {{ $errors->has('cnpj') ? 'is-invalid' : '' }}"
+                  name="cnpj"
+                  placeholder="CNPJ"
+                  value="{{ old('cnpj') }}"
+                />
+                @if($errors->has('cnpj'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('cnpj') }}
+                </div>
+                @endif
+              </div>
+
+              <div class="col-md-2 mt-2-768">
+                <label for="formaRegistro">Forma de Registro *</label>
+                <select name="formaRegistro" class="form-control {{ $errors->has('formaRegistro') ? 'is-invalid' : '' }}">
+                  <option value="">Selecione</option>
+                  @foreach($listaFormaRegistro as $formaRegistro)
+                  <option value="{{ $formaRegistro }}" {{ old('formaRegistro') === $formaRegistro ? 'selected' : '' }}>{{ $formaRegistro }}</option>
+                  @endforeach
+                </select>
+                @if($errors->has('formaRegistro'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('formaRegistro') }}
+                </div>
+                @endif
+              </div>
+
+              <div class="col-md-4 mt-2-768">
+                <label for="numeroRegistro">Número do Registro *</label>
+                <input type="text"
+                  class="form-control {{ $errors->has('numeroRegistro') ? 'is-invalid' : '' }}"
+                  name="numeroRegistro"
+                  placeholder="Número do documento"
+                  value="{{ old('numeroRegistro') }}"
+                />
+                @if($errors->has('numeroRegistro'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('numeroRegistro') }}
+                </div>
+                @endif
+              </div>
+
+              <div class="col-md-2 mt-2-768">
+                <label for="dataRegistro">Data do Registro *</label>
+                <input type="text"
+                  class="form-control dataInput {{ $errors->has('dataRegistro') ? 'is-invalid' : '' }}"
+                  name="dataRegistro"
+                  placeholder="dd/mm/aaaa"
+                  value="{{ old('dataRegistro') }}"
+                />
+                @if($errors->has('dataRegistro'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('dataRegistro') }}
+                </div>
+                @endif
+              </div>
+            </div>
+
+            <div class="form-row mt-2">
+              <div class="col-md-12 mt-2-768">
+                <label for="ramoAtividade">Ramo Atividade *</label>
+                <select name="ramoAtividade" class="form-control {{ $errors->has('ramoAtividade') ? 'is-invalid' : '' }}">
+                  <option value="">Selecione</option>
+                  @foreach($listaRamoAtividade as $ramoAtividade)
+                    <option value="{{ $ramoAtividade }}" {{ old('ramoAtividade') === $ramoAtividade ? 'selected' : '' }}>{{ $ramoAtividade }}</option>
+                  @endforeach
+                </select>
+                @if($errors->has('ramoAtividade'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('ramoAtividade') }}
+                </div>
+                @endif
+              </div>
+            </div>
+
+            </br><h5>Informações de Relacionamento</h5>
             
             <div class="form-row mt-2">
               <div class="col-md-12">
@@ -257,41 +365,6 @@
               </div>
             </div>
 
-            @if($tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_RT)
-            </br><h5>Informações de Relacionamento</h5>
-            <div class="form-row mt-2">
-              <div class="col-md-6">
-                <label for="razaoSocial">Razão social da empresa do responsável técnico *</label>
-                <input type="text"
-                  class="form-control {{ $errors->has('razaoSocial') ? 'is-invalid' : '' }}"
-                  name="razaoSocial"
-                  value="{{ old('razaoSocial') }}"
-                  placeholder="Razão Social" 
-                />
-                @if($errors->has('razaoSocial'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('razaoSocial') }}
-                  </div>
-                @endif
-              </div>
-
-              <div class="col-md-6">
-                <label for="cnpj">CNPJ da empresa do responsável técnico *</label>
-                <input type="text"
-                  class="form-control cnpjInput {{ $errors->has('cnpj') ? 'is-invalid' : '' }}"
-                  name="cnpj"
-                  placeholder="CNPJ"
-                  value="{{ old('cnpj') }}"
-                />
-                @if($errors->has('cnpj'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('cnpj') }}
-                </div>
-                @endif
-              </div>
-            </div>
-            @endif
-
             </br><h5>Informações de Contato</h5>
             <div class="form-row mt-2">
               <div class="col-md-4">
@@ -340,7 +413,7 @@
               </div>
             </div>
 
-            </br><h5>Informações de Endereço</h5>
+            </br><h5>Informações de Endereço - Sede da Empresa</h5>
             <div class="form-row mb-2 ">
               <div class="col-sm mb-2-576">
                 <label for="cep">CEP *</label>
@@ -457,6 +530,7 @@
               </div>
             </div>
 
+
             </br><h5>Informações de Atividade</h5>
             <div class="form-row mt-2">
               <div class="col-md-4 mt-2-768">
@@ -475,7 +549,63 @@
               </div>
             </div>
 
+            <div class="form-row mt-2">
+              <div class="col-md-4 mt-2-768">
+                <label for="capitalSocial">Capital Social *</label>
+                <select name="capitalSocial" class="form-control {{ $errors->has('capitalSocial') ? 'is-invalid' : '' }}">
+                  <option value="">Selecione</option>
+                  @foreach($listaCapitalSocial as $capitalSocial)
+                    <option value="{{ $capitalSocial }}" {{ old('capitalSocial') === $capitalSocial ? 'selected' : '' }}>{{ $capitalSocial }}</option>
+                  @endforeach
+                </select>
+                @if($errors->has('capitalSocial'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('capitalSocial') }}
+                </div>
+                @endif
+              </div>
+            </div>
+
             </br><h5>Anexos</h5>
+
+            <div class="mt-2">
+              <label>CNPJ *</label>
+            </div>
+            <div class="custom-file">
+              <input
+                type="file"
+                name="anexoCnpj"
+                class="custom-file-input anexo {{ $errors->has('anexoCnpj') ? 'is-invalid' : '' }}"
+                id="anexoCnpj"
+                role="button"
+              />
+              <label class="custom-file-label" for="anexoCnpj">Selecionar arquivo...</label>
+              @if($errors->has('anexoCnpj'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('anexoCnpj') }}
+                </div>
+              @endif
+            </div>
+
+            @if($tipo === PreCadastro::TIPO_PRE_CADASTRO_PJ_INDIVIDUAL)
+            <div class="mt-2">
+              <label>Requerimento de Firma Individual *</label>
+            </div>
+            <div class="custom-file">
+              <input
+                type="file"
+                name="anexoRequerimentoFirmaIndividual"
+                class="custom-file-input anexo {{ $errors->has('anexoRequerimentoFirmaIndividual') ? 'is-invalid' : '' }}"
+                id="anexoRequerimentoFirmaIndividual"
+                role="button"
+              />
+              <label class="custom-file-label" for="anexoRequerimentoFirmaIndividual">Selecionar arquivo...</label>
+              @if($errors->has('anexoRequerimentoFirmaIndividual'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('anexoRequerimentoFirmaIndividual') }}
+                </div>
+              @endif
+            </div>
 
             <div class="mt-2">
               <label>CPF *</label>
@@ -534,63 +664,83 @@
               @endif
             </div>
 
+            @elseif($tipo === PreCadastro::TIPO_PRE_CADASTRO_PJ_VARIADO)
             <div class="mt-2">
-              <label>Certidão de Quitação Eleitoral *</label>
+              <label>Contrato Social *</label>
             </div>
             <div class="custom-file">
               <input
                 type="file"
-                name="anexoCertidaoQuitacaoEleitoral"
-                class="custom-file-input anexo {{ $errors->has('anexoCertidaoQuitacaoEleitoral') ? 'is-invalid' : '' }}"
-                id="anexoCertidaoQuitacaoEleitoral"
+                name="anexoContratoSocial"
+                class="custom-file-input anexo {{ $errors->has('anexoContratoSocial') ? 'is-invalid' : '' }}"
+                id="anexoContratoSocial"
                 role="button"
               />
-              <label class="custom-file-label" for="anexoCertidaoQuitacaoEleitoral">Selecionar arquivo...</label>
-              @if($errors->has('anexoCertidaoQuitacaoEleitoral'))
+              <label class="custom-file-label" for="anexoContratoSocial">Selecionar arquivo...</label>
+              @if($errors->has('anexoContratoSocial'))
                 <div class="invalid-feedback">
-                  {{ $errors->first('anexoCertidaoQuitacaoEleitoral') }}
-                </div>
-              @endif
-            </div>
-            
-            <div class="mt-2">
-              <label>Reservista Militar (obrigatório para homens brasileiros com até 45 anos)</label>
-            </div>
-            <div class="custom-file">
-              <input
-                type="file"
-                name="anexoReservistaMilitar"
-                class="custom-file-input anexo {{ $errors->has('anexoReservistaMilitar') ? 'is-invalid' : '' }}"
-                id="anexoReservistaMilitar"
-                role="button"
-              />
-              <label class="custom-file-label" for="anexoReservistaMilitar">Selecionar arquivo...</label>
-              @if($errors->has('anexoReservistaMilitar'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('anexoReservistaMilitar') }}
+                  {{ $errors->first('anexoContratoSocial') }}
                 </div>
               @endif
             </div>
 
-            @if($tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_RT)
             <div class="mt-2">
-              <label>Formulário de Indicação de Responsável Técnico *</label>
+              <label>CPF (de todo o quadro societário) *</label>
             </div>
             <div class="custom-file">
               <input
                 type="file"
-                name="anexoIndicacaoRT"
-                class="custom-file-input anexo {{ $errors->has('anexoIndicacaoRT') ? 'is-invalid' : '' }}"
-                id="anexoIndicacaoRT"
+                name="anexoCpfQuadro"
+                class="custom-file-input anexo {{ $errors->has('anexoCpfQuadro') ? 'is-invalid' : '' }}"
+                id="anexoCpfQuadro"
                 role="button"
               />
-              <label class="custom-file-label" for="anexoIndicacaoRT">Selecionar arquivo...</label>
-              @if($errors->has('anexoIndicacaoRT'))
+              <label class="custom-file-label" for="anexoCpfQuadro">Selecionar arquivo...</label>
+              @if($errors->has('anexoCpfQuadro'))
                 <div class="invalid-feedback">
-                  {{ $errors->first('anexoIndicacaoRT') }}
+                  {{ $errors->first('anexoCpfQuadro') }}
                 </div>
               @endif
             </div>
+
+            <div class="mt-2">
+              <label>Documento de Identificação (RG ou CNH de todo o quadro societário) *</label>
+            </div>
+            <div class="custom-file">
+              <input
+                type="file"
+                name="anexoDocumentoQuadro"
+                class="custom-file-input anexo {{ $errors->has('anexoDocumentoQuadro') ? 'is-invalid' : '' }}"
+                id="anexoDocumentoQuadro"
+                role="button"
+              />
+              <label class="custom-file-label" for="anexoDocumentoQuadro">Selecionar arquivo...</label>
+              @if($errors->has('anexoDocumentoQuadro'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('anexoDocumentoQuadro') }}
+                </div>
+              @endif
+            </div>
+
+            <div class="mt-2">
+              <label>Comprovante de Residência (de todo o quadro societário) *</label>
+            </div>
+            <div class="custom-file">
+              <input
+                type="file"
+                name="anexoComprovanteResidenciaQuadro"
+                class="custom-file-input anexo {{ $errors->has('anexoComprovanteResidenciaQuadro') ? 'is-invalid' : '' }}"
+                id="anexoComprovanteResidenciaQuadro"
+                role="button"
+              />
+              <label class="custom-file-label" for="anexoComprovanteResidenciaQuadro">Selecionar arquivo...</label>
+              @if($errors->has('anexoComprovanteResidenciaQuadro'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('anexoComprovanteResidenciaQuadro') }}
+                </div>
+              @endif
+            </div>
+
             @endif
 
             <div class="float-right mt-4">

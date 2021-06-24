@@ -226,6 +226,8 @@ Route::prefix('/')->group(function() {
   Route::prefix('pre-cadastro')->group(function(){
     Route::get('/criar/pf-autonomo', 'PreCadastroController@createPFAutonomo')->name('pre-cadastro.createPFAutonomo');
     Route::get('/criar/pf-rt', 'PreCadastroController@createPFRT')->name('pre-cadastro.createPFRT');
+    Route::get('/criar/pj-firma-individual', 'PreCadastroController@createPJFirmaIndividual')->name('pre-cadastro.createPJFirmaIndividual');
+    Route::get('/criar/pj-ltda-eireli-unipessoal-ltda', 'PreCadastroController@createPJVariado')->name('pre-cadastro.createPJVariado');
     Route::post('/criar', 'PreCadastroController@store')->name('pre-cadastro.store');
   });
 
