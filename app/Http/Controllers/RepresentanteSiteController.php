@@ -17,10 +17,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CadastroRepresentanteMail;
-use App\Repositories\CertidaoRepository;
 use App\Repositories\GerentiApiRepository;
 use GuzzleHttp\Exception\RequestException;
-use App\Http\Controllers\CertidaoController;
 use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Repositories\GerentiRepositoryInterface;
 use App\Http\Requests\RepresentanteEnderecoRequest;
@@ -29,18 +27,14 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
 {
-    private $certidaoController;
-    private $certidaoRepository;
     private $gerentiRepository;
     private $representanteEnderecoRepository;
     private $gerentiApiRepository;
     protected $idendereco;
 
-    public function __construct(CertidaoController $certidaoController, CertidaoRepository $certidaoRepository, GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
-        $this->certidaoController = $certidaoController;
-        $this->certidaoRepository = $certidaoRepository;
         $this->gerentiRepository = $gerentiRepository;
         $this->representanteEnderecoRepository = $representanteEnderecoRepository;
         $this->gerentiApiRepository = $gerentiApiRepository;
