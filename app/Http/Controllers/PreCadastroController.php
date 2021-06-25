@@ -293,6 +293,7 @@ class PreCadastroController extends Controller
             'mimes' => 'Tipo de arquivo não suportado',
             'max' => 'Arquivo não pode ultrapassar 2MB',
             'date_format' => 'Data inválida',
+            'upload' => 'Arquivo não pode ultrapassar 2MB'
         ];
 
         // switch ($tipo) {
