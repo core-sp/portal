@@ -31,7 +31,7 @@ class RegionalRepository
     }
 
     /**
-     * Método retorna apenas regionais. Retorna apenas SEDE, ES01 ~ ES12 (exclui Alamenda Santos).
+     * Método retorna apenas regionais. Retorna apenas SEDE, ES01 ~ ES12 (exclui Alameda Santos).
      */
     public function getRegionais()
     {
