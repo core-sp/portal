@@ -99,8 +99,8 @@ class PreCadastroController extends Controller
 
     public function store(Request $request)
     {
-        $regras = $this->regrasByTipo($request->tipo);
-        $mensagens = $this->mensagensByTipo($request->tipo);
+        $regras = $this->regras($request);
+        $mensagens = $this->mensagens();
 
         $validacao = Validator::make($request->all(), $regras, $mensagens);
         
@@ -130,162 +130,107 @@ class PreCadastroController extends Controller
         ]);
     }
 
-    protected function regrasByTipo($tipo) 
+    protected function regras($request) 
     {
-        switch ($tipo) {
+        $regras = [
+            'nome' => 'required|max:191',
+            'cpf' => ['required', new Cpf],
+            'tipoDocumento' => 'required|max:191',
+            'numeroDocumento' => 'required|max:191',
+            'orgaoEmissor' => 'required|max:191',
+            'dataExpedicao' => 'required|date_format:d/m/Y',
+            'dataNascimento' => 'required|date_format:d/m/Y',
+            'estadoCivil' => 'required|max:191',
+            'sexo' => 'required|max:191',
+            'naturalizado' => 'required|max:191',
+            'nacionalidade' => 'required|max:191',
+            'nomeMae' => 'required|max:191',
+            'nomePai' => 'required|max:191',
+            'email' => 'required|email|max:191',
+            'celular' => 'max:191|min:14',
+            'telefoneFixo' => 'max:191',
+            'segmento' => 'required|max:191',
+            'cep' => 'required',
+            'bairro' => 'required|max:30',
+            'logradouro' => 'required|max:100',
+            'numero' => 'required|max:15',
+            'complemento' => 'max:100',
+            'estado' => 'required|max:5',
+            'municipio' => 'required|max:30',
+            'g-recaptcha-response' => 'required|recaptcha'
+        ];
+
+        switch ($request->tipo) {
             case PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA:
-                return [
-                    'nome' => 'required|max:191',
-                    'cpf' => ['required', new Cpf],
-                    'tipoDocumento' => 'required|max:191',
-                    'numeroDocumento' => 'required|max:191',
-                    'orgaoEmissor' => 'required|max:191',
-                    'dataExpedicao' => 'required|date_format:d/m/Y',
-                    'dataNascimento' => 'required|date_format:d/m/Y',
-                    'estadoCivil' => 'required|max:191',
-                    'sexo' => 'required|max:191',
-                    'naturalizado' => 'required|max:191',
-                    'nacionalidade' => 'required|max:191',
-                    'nomeMae' => 'required|max:191',
-                    'nomePai' => 'required|max:191',
-                    'email' => 'required|email|max:191',
-                    'celular' => 'max:191|min:14',
-                    'telefoneFixo' => 'max:191',
-                    'segmento' => 'required|max:191',
-                    'cep' => 'required',
-                    'bairro' => 'required|max:30',
-                    'logradouro' => 'required|max:100',
-                    'numero' => 'required|max:15',
-                    'complemento' => 'max:100',
-                    'estado' => 'required|max:5',
-                    'municipio' => 'required|max:30',
-                    'anexoCpf' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoDocumento' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoComprovanteResidencia' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoCertidaoQuitacaoEleitoral' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoReservistaMilitar' => 'mimes:jpeg,png,jpg,gif,pdf|max:2048'
-                ];
+                $regras['anexoCpf'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoDocumento'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoComprovanteResidencia'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoCertidaoQuitacaoEleitoral'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                
+                if(formataDataUTC($request->dataNascimento) <= date('Y-m-d', strtotime('-46 years'))) {
+                    $regras['anexoReservistaMilitar'] = 'mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                }
+                else {
+                    $regras['anexoReservistaMilitar'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                }
             break;
+
             case PreCadastro::TIPO_PRE_CADASTRO_PF_RT:
-                return [
-                    'nome' => 'required|max:191',
-                    'cpf' => ['required', new Cpf],
-                    'tipoDocumento' => 'required|max:191',
-                    'numeroDocumento' => 'required|max:191',
-                    'orgaoEmissor' => 'required|max:191',
-                    'dataExpedicao' => 'required|date_format:d/m/Y',
-                    'dataNascimento' => 'required|date_format:d/m/Y',
-                    'estadoCivil' => 'required|max:191',
-                    'sexo' => 'required|max:191',
-                    'naturalizado' => 'required|max:191',
-                    'nacionalidade' => 'required|max:191',
-                    'nomeMae' => 'required|max:191',
-                    'nomePai' => 'required|max:191',
-                    'email' => 'required|email|max:191',
-                    'celular' => 'max:191|min:14',
-                    'telefoneFixo' => 'max:191',
-                    'segmento' => 'required|max:191',
-                    'cep' => 'required',
-                    'bairro' => 'required|max:30',
-                    'logradouro' => 'required|max:100',
-                    'numero' => 'required|max:15',
-                    'complemento' => 'max:100',
-                    'estado' => 'required|max:5',
-                    'municipio' => 'required|max:30',
-                    'anexoCpf' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoDocumento' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoComprovanteResidencia' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoCertidaoQuitacaoEleitoral' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoReservistaMilitar' => 'mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'cnpj' => ['required', new Cnpj],
-                    'razaoSocial' => 'required|max:191',
-                    'anexoIndicacaoRT' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048'
-                ];
+                $regras['cnpj'] = ['required', new Cnpj];
+                $regras['razaoSocial'] = 'required|max:191';
+                $regras['anexoCpf'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoDocumento'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoComprovanteResidencia'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoCertidaoQuitacaoEleitoral'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoIndicacaoRT'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+
+                if(formataDataUTC($request->dataNascimento) <= date('Y-m-d', strtotime('-46 years'))) {
+                    $regras['anexoReservistaMilitar'] = 'mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                }
+                else {
+                    $regras['anexoReservistaMilitar'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                }
             break;
+
             case PreCadastro::TIPO_PRE_CADASTRO_PJ_INDIVIDUAL:
-                return [
-                    'nome' => 'required|max:191',
-                    'cpf' => ['required', new Cpf],
-                    'tipoDocumento' => 'required|max:191',
-                    'numeroDocumento' => 'required|max:191',
-                    'orgaoEmissor' => 'required|max:191',
-                    'dataExpedicao' => 'required|date_format:d/m/Y',
-                    'dataNascimento' => 'required|date_format:d/m/Y',
-                    'estadoCivil' => 'required|max:191',
-                    'sexo' => 'required|max:191',
-                    'naturalizado' => 'required|max:191',
-                    'nacionalidade' => 'required|max:191',
-                    'nomeMae' => 'required|max:191',
-                    'nomePai' => 'required|max:191',
-                    'email' => 'required|email|max:191',
-                    'celular' => 'max:191|min:14',
-                    'telefoneFixo' => 'max:191',
-                    'segmento' => 'required|max:191',
-                    'cep' => 'required',
-                    'bairro' => 'required|max:30',
-                    'logradouro' => 'required|max:100',
-                    'numero' => 'required|max:15',
-                    'complemento' => 'max:100',
-                    'estado' => 'required|max:5',
-                    'municipio' => 'required|max:30',
-                    'anexoCpf' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoDocumento' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoComprovanteResidencia' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'cnpj' => ['required', new Cnpj],
-                    'razaoSocial' => 'required|max:191',
-                    'formaRegistro' => 'required|max:191',
-                    'numeroRegistro' => 'required|max:191',
-                    'dataRegistro' => 'required|date_format:d/m/Y',
-                    'ramoAtividade' => 'required|max:191',
-                    'capitalSocial' => 'required|max:191',
-                    'anexoCnpj' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoRequerimentoFirmaIndividual' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048'
-                ];
+                $regras['cnpj'] = ['required', new Cnpj];
+                $regras['razaoSocial'] = 'required|max:191';
+                $regras['formaRegistro'] = 'required|max:191';
+                $regras['numeroRegistro'] = 'required|max:191';
+                $regras['dataRegistro'] = 'required|date_format:d/m/Y';
+                $regras['ramoAtividade'] = 'required|max:191';
+                $regras['capitalSocial'] = 'required|max:191';
+                $regras['anexoCpf'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoCnpj'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoDocumento'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoComprovanteResidencia'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoRequerimentoFirmaIndividual'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
             break;
+
             case PreCadastro::TIPO_PRE_CADASTRO_PJ_VARIADO:
-                return [
-                    'nome' => 'required|max:191',
-                    'cpf' => ['required', new Cpf],
-                    'tipoDocumento' => 'required|max:191',
-                    'numeroDocumento' => 'required|max:191',
-                    'orgaoEmissor' => 'required|max:191',
-                    'dataExpedicao' => 'required|date_format:d/m/Y',
-                    'dataNascimento' => 'required|date_format:d/m/Y',
-                    'estadoCivil' => 'required|max:191',
-                    'sexo' => 'required|max:191',
-                    'naturalizado' => 'required|max:191',
-                    'nacionalidade' => 'required|max:191',
-                    'nomeMae' => 'required|max:191',
-                    'nomePai' => 'required|max:191',
-                    'email' => 'required|email|max:191',
-                    'celular' => 'max:191|min:14',
-                    'telefoneFixo' => 'max:191',
-                    'segmento' => 'required|max:191',
-                    'cep' => 'required',
-                    'bairro' => 'required|max:30',
-                    'logradouro' => 'required|max:100',
-                    'numero' => 'required|max:15',
-                    'complemento' => 'max:100',
-                    'estado' => 'required|max:5',
-                    'municipio' => 'required|max:30',
-                    'cnpj' => ['required', new Cnpj],
-                    'razaoSocial' => 'required|max:191',
-                    'formaRegistro' => 'required|max:191',
-                    'numeroRegistro' => 'required|max:191',
-                    'dataRegistro' => 'required|date_format:d/m/Y',
-                    'ramoAtividade' => 'required|max:191',
-                    'capitalSocial' => 'required|max:191',
-                    'anexoCnpj' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoContratoSocial' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoCpfQuadro' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoDocumentoQuadro' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                    'anexoComprovanteResidenciaQuadro' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-                ];
+                $regras['cnpj'] = ['required', new Cnpj];
+                $regras['razaoSocial'] = 'required|max:191';
+                $regras['formaRegistro'] = 'required|max:191';
+                $regras['numeroRegistro'] = 'required|max:191';
+                $regras['dataRegistro'] = 'required|date_format:d/m/Y';
+                $regras['ramoAtividade'] = 'required|max:191';
+                $regras['capitalSocial'] = 'required|max:191';
+                $regras['anexoCnpj'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoContratoSocial'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoCpfQuadro'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoDocumentoQuadro'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+                $regras['anexoComprovanteResidenciaQuadro'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
+            break;
+
+            default:
+                abort(500, 'Tipo de pré-cadastro inválido.');
             break;
         }
+
+        return $regras;
     }
 
-    protected function mensagensByTipo($tipo) 
+    protected function mensagens() 
     {
         return [
             'required' => 'Campo obrigatório',
@@ -293,20 +238,10 @@ class PreCadastroController extends Controller
             'mimes' => 'Tipo de arquivo não suportado',
             'max' => 'Arquivo não pode ultrapassar 2MB',
             'date_format' => 'Data inválida',
-            'upload' => 'Arquivo não pode ultrapassar 2MB'
+            'upload' => 'Arquivo não pode ultrapassar 2MB',
+            'g-recaptcha-response' => 'ReCAPTCHA inválido',
+            'g-recaptcha-response.required' => 'ReCAPTCHA obrigatório'
         ];
-
-        // switch ($tipo) {
-        //     case PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA:
-        //         return [
-        //             'required' => 'Campo obrigatório',
-        //             'max' => 'Excedido limite de caracteres',
-        //             'mimes' => 'Tipo de arquivo não suportado',
-        //             'max' => 'Arquivo não pode ultrapassar 2MB',
-        //             'date_format' => 'Data inválida',
-        //         ];
-        //     break;
-        // }
     }
 
     protected function salvarAnexos($request, $preCadastroId) 

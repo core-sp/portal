@@ -726,8 +726,21 @@ function getDate() {
 	});
 
 	$('.anexo').on('change',function(e){
-		var fileName = e.target.files[0].name;
-		$(this).next('.custom-file-label').html(fileName);
+		if(e.target.files[0].size > 2048000) {
+			$("#dialog_pre_cadastro")
+			.empty()
+			.append("Upload de arquivo não pode ultrapassar 2MB.")
+			.dialog({
+				resizable: false,
+				draggable: false,
+				modal: true,
+			});
+			$(this).val(null);
+			$(this).next('.custom-file-label').html("Selecionar arquivo...");
+		}
+		else {
+			$(this).next('.custom-file-label').html(e.target.files[0].name);
+		}
 	})
 
 })(jQuery);

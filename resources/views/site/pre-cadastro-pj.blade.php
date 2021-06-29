@@ -743,6 +743,17 @@
 
             @endif
 
+            <div class="form-group mt-2">
+                @if(env('GOOGLE_RECAPTCHA_KEY'))
+                    <div class="g-recaptcha {{ $errors->has('g-recaptcha-response') ? 'is-invalid' : '' }}" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                    @if($errors->has('g-recaptcha-response'))
+                        <div class="invalid-feedback" style="display:block;">
+                            {{ $errors->first('g-recaptcha-response') }}
+                        </div>
+                    @endif
+                @endif
+            </div>
+
             <div class="float-right mt-4">
               <a href="/" class="btn btn-default">Cancelar</a>
               <button type="submit" class="btn btn-primary">Criar</button>
@@ -753,7 +764,7 @@
       </div>
     </div>
   </div>
-  <div id="dialog_agendamento" title="Atenção"></div>
+  <div id="dialog_pre_cadastro" title="Atenção"></div>
 </section>
 
 @endsection
