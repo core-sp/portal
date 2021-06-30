@@ -24,6 +24,7 @@ class PreCadastroController extends Controller
 {
     use ControleAcesso, TabelaAdmin;
     
+    private $class = 'PreCadastroController';
     private $preCadastroRepository;
     private $variaveis;
 
@@ -44,7 +45,7 @@ class PreCadastroController extends Controller
 
     public function index()
     {
-        //$this->autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
 
         $resultados = $this->preCadastroRepository->getToTable();
         $tabela = $this->tabelaCompleta($resultados);
@@ -55,7 +56,7 @@ class PreCadastroController extends Controller
 
     public function show($id)
     {
-        //$this->autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
 
         $resultado = $this->preCadastroRepository->getById($id);
         $variaveis = (object) $this->variaveis;
@@ -67,6 +68,58 @@ class PreCadastroController extends Controller
         }
 
         return view('admin.crud.mostra', compact('resultado', 'variaveis', 'listaAnexos'));
+    }
+
+    public function atualizarStatus(Request $request)
+    {
+        $this->autoriza($this->class, 'edit');
+
+        $preCadastro = $this->preCadastroRepository->updateStatus($request->input('id'), $request->input('status'), $request->input('motivo'));
+
+        if($preCadastro->status == PreCadastro::STATUS_APROVADO) {
+
+            $email = new PreCadastroAprovadoMail();
+            $mensagem = 'Requisição de pré-cadastro aprovada.';
+            $class = 'alert-success';
+            event(new CrudEvent('pré-cadastro', 'aprovou', $preCadastro->id));
+        }
+        elseif($preCadastro->status == PreCadastro::STATUS_RECUSADO) {
+
+            $email = new PreCadastroRecusadoMail($preCadastro->motivo);
+            $mensagem = 'Requisição de pré-cadastro recusada.';
+            $class = 'alert-danger';
+            event(new CrudEvent('pré-cadastro', 'recusou', $preCadastro->id));
+        }
+
+        Mail::to($preCadastro->email)->queue($email);
+
+        return redirect(route('pre-cadastro.index'))
+                ->with('message', $mensagem)
+                ->with('class', $class);
+    }
+
+    public function visualizarAnexo(Request $request) 
+    {
+        $this->autoriza($this->class, 'show');
+
+        if(Storage::exists($request->arquivo)) {
+            return response()->file(Storage::path($request->arquivo), ["Cache-Control" => "no-cache"]);
+        }
+        else {
+            abort(404);
+        }
+    }
+
+    public function baixarAnexo(Request $request) 
+    {
+        $this->autoriza($this->class, 'show');
+
+        if(Storage::exists($request->arquivo)) {
+            return Storage::download($request->arquivo);
+        }
+        else {
+            abort(404);
+        }
     }
 
     public function createPFAutonomo()
@@ -302,52 +355,6 @@ class PreCadastroController extends Controller
         }
     }
 
-    public function atualizarStatus(Request $request)
-    {
-        $preCadastro = $this->preCadastroRepository->updateStatus($request->input('id'), $request->input('status'), $request->input('motivo'));
-
-        if($preCadastro->status == PreCadastro::STATUS_APROVADO) {
-
-            $email = new PreCadastroAprovadoMail();
-            $mensagem = 'Requisição de pré-cadastro aprovada.';
-            $class = 'alert-success';
-            event(new CrudEvent('pré-cadastro', 'aprovou', $preCadastro->id));
-        }
-        elseif($preCadastro->status == PreCadastro::STATUS_RECUSADO) {
-
-            $email = new PreCadastroRecusadoMail($preCadastro->motivo);
-            $mensagem = 'Requisição de pré-cadastro recusada.';
-            $class = 'alert-danger';
-            event(new CrudEvent('pré-cadastro', 'recusou', $preCadastro->id));
-        }
-
-        Mail::to($preCadastro->email)->queue($email);
-
-        return redirect(route('pre-cadastro.index'))
-                ->with('message', $mensagem)
-                ->with('class', $class);
-    }
-
-    public function visualizarAnexo(Request $request) 
-    {
-        if(Storage::exists($request->arquivo)) {
-            return response()->file(Storage::path($request->arquivo), ["Cache-Control" => "no-cache"]);
-        }
-        else {
-            abort(404);
-        }
-    }
-
-    public function baixarAnexo(Request $request) 
-    {
-        if(Storage::exists($request->arquivo)) {
-            return Storage::download($request->arquivo);
-        }
-        else {
-            abort(404);
-        }
-    }
-
     protected function tabelaCompleta($resultados)
     {
         // Opções de cabeçalho da tabela
@@ -363,7 +370,11 @@ class PreCadastroController extends Controller
         $contents = [];
 
         foreach($resultados as $resultado) {
-            $acoes = '<a href="/admin/pre-cadastro/mostrar/'.$resultado->id.'" class="btn btn-sm btn-default">Ver</a> ';
+            $acoes = '';
+            if($this->mostra($this->class, 'show')) {
+                $acoes .= '<a href="/admin/pre-cadastro/mostrar/'.$resultado->id.'" class="btn btn-sm btn-default">Ver</a> ';
+            }
+            
             $cpfCnpj = $resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_AUTONOMA || $resultado->tipo === PreCadastro::TIPO_PRE_CADASTRO_PF_RT ? $resultado->cpf : $resultado->cnpj;
             
             $conteudo = [

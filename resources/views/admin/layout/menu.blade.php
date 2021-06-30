@@ -276,6 +276,7 @@
                         <p>Busca Gerenti</p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a href="/admin/representantes" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -284,12 +285,14 @@
                 </li>
                 @endif
 
+                @if (mostraItem($permissoes, 'PreCadastroController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('pre-cadastro.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Pré-Cadastros</p>
                     </a>
                 </li>
+                @endif
 
                 @if (mostraItem($permissoes, 'RepresentanteEnderecoController', 'index'))
                 <li class="nav-item">
