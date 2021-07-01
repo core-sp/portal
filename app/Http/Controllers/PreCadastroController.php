@@ -63,8 +63,11 @@ class PreCadastroController extends Controller
         $anexos = Storage::files('pre-cadastro/' . $id . '/');
         $listaAnexos = [];
 
-        foreach($anexos as $anexo) {
-            $listaAnexos[explode('/', $anexo)[2]] = $anexo;
+        // Caso o pré-cadastro esteja pendente, recupera os anexos da solicitação para mostrar na tela
+        if($resultado->status === PreCadastro::STATUS_PENDENTE) {
+            foreach($anexos as $anexo) {
+                $listaAnexos[explode('/', $anexo)[2]] = $anexo;
+            }
         }
 
         return view('admin.crud.mostra', compact('resultado', 'variaveis', 'listaAnexos'));
@@ -74,16 +77,25 @@ class PreCadastroController extends Controller
     {
         $this->autoriza($this->class, 'edit');
 
-        $preCadastro = $this->preCadastroRepository->updateStatus($request->input('id'), $request->input('status'), $request->input('motivo'));
+        if($request->status == PreCadastro::STATUS_APROVADO) {
 
-        if($preCadastro->status == PreCadastro::STATUS_APROVADO) {
+            $preCadastro = $this->preCadastroRepository->updateStatus($request->id, $request->status, null);
 
             $email = new PreCadastroAprovadoMail();
             $mensagem = 'Requisição de pré-cadastro aprovada.';
             $class = 'alert-success';
             event(new CrudEvent('pré-cadastro', 'aprovou', $preCadastro->id));
         }
-        elseif($preCadastro->status == PreCadastro::STATUS_RECUSADO) {
+        elseif($request->status == PreCadastro::STATUS_RECUSADO) {
+
+            // Em caso de recusa, é obrigatório fornecer o motivo
+            if($request->motivo === null || trim($request->motivo) === '') {
+                return Redirect::back()
+                    ->with('message', 'Motivo é obrigatório quando recusando solicitação!')
+                    ->with('class', 'alert-danger');
+            }
+
+            $preCadastro = $this->preCadastroRepository->updateStatus($request->id, $request->status, $request->motivo);
 
             $email = new PreCadastroRecusadoMail($preCadastro->motivo);
             $mensagem = 'Requisição de pré-cadastro recusada.';
@@ -91,6 +103,7 @@ class PreCadastroController extends Controller
             event(new CrudEvent('pré-cadastro', 'recusou', $preCadastro->id));
         }
 
+        // Envia e-mail ao solicitante informando o resultado da requisição de pré-cadastro
         Mail::to($preCadastro->email)->queue($email);
 
         return redirect(route('pre-cadastro.index'))
@@ -155,8 +168,10 @@ class PreCadastroController extends Controller
         $regras = $this->regras($request);
         $mensagens = $this->mensagens();
 
+        // Valida os campos de acordo com as regras
         $validacao = Validator::make($request->all(), $regras, $mensagens);
         
+        // Caso algum erro ocorra, retorna para a tela do fomulário com mensagens de erro
         if($validacao->fails()) {
             return Redirect::back()->withErrors($validacao)->withInput($request->all());
         }
@@ -165,10 +180,11 @@ class PreCadastroController extends Controller
 
         $this->salvarAnexos($request, $preCadastro->id);
 
+        // Envia e-mail ao solicitante confirmando a requisição de pré-cadastro
         $email = new PreCadastroMail();
-
         Mail::to($preCadastro->email)->queue($email);
 
+        // Geranto log da solicitação de pré-cadastro
         $string = $preCadastro->nome . " (CPF: " . $preCadastro->cpf . ")";
         $string .= " requisitou pré-cadastro para " . $preCadastro->tipo;
         event(new ExternoEvent($string));
@@ -183,8 +199,13 @@ class PreCadastroController extends Controller
         ]);
     }
 
+    /**
+     * Método que retorna as regras para validar o request da solicitação de pré-cadastro de acordo 
+     * com o tipo.
+     */
     protected function regras($request) 
     {
+        // Regras usadas em todos os tipos
         $regras = [
             'nome' => 'required|max:191',
             'cpf' => ['required', new Cpf],
@@ -275,6 +296,7 @@ class PreCadastroController extends Controller
                 $regras['anexoComprovanteResidenciaQuadro'] = 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048';
             break;
 
+            // Caso tipo fornecido não seja válido, aborta e com mensagem deerro.
             default:
                 abort(500, 'Tipo de pré-cadastro inválido.');
             break;
@@ -283,6 +305,9 @@ class PreCadastroController extends Controller
         return $regras;
     }
 
+    /**
+     * Método para retornar mensagens de erro de acordo com as regras.
+     */
     protected function mensagens() 
     {
         return [
@@ -291,12 +316,16 @@ class PreCadastroController extends Controller
             'mimes' => 'Tipo de arquivo não suportado',
             'max' => 'Arquivo não pode ultrapassar 2MB',
             'date_format' => 'Data inválida',
-            'upload' => 'Arquivo não pode ultrapassar 2MB',
+            'upload' => 'Falha ao fazer o upload do arquivo',
             'g-recaptcha-response' => 'ReCAPTCHA inválido',
             'g-recaptcha-response.required' => 'ReCAPTCHA obrigatório'
         ];
     }
 
+    /**
+     * Método usado para salvar os arquivos de upload no servidor. Renomeia e cria os diretórios de acordo 
+     * com o documento e o id da solicitação do pré-cadastro.
+     */
     protected function salvarAnexos($request, $preCadastroId) 
     {
         if($request->file('anexoCpf') !== null) {
@@ -398,7 +427,6 @@ class PreCadastroController extends Controller
         
         return $tabela;
     }
-
 
     protected function showStatus($status)
     {
