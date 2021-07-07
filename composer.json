@@ -9,7 +9,6 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
-        "barryvdh/laravel-dompdf": "^0.8.6",
         "binarytorch/larecipe": "^2.1",
         "doctrine/dbal": "v2.9.2",
         "fideloper/proxy": "^4.0",
@@ -20,7 +19,6 @@
         "laravel/tinker": "^2.0",
         "nesbot/carbon": "^2.16.3",
         "predis/predis": "^1.1",
-        "simplesoftwareio/simple-qrcode": "^4.2",
         "unisharp/laravel-filemanager": "~1.8"
     },
     "require-dev": {
