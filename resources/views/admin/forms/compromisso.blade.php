@@ -109,7 +109,7 @@
             <label for="descricao">Descrição</label>
 
             @php
-                $value;
+                $value = null;
 
                 if(!empty(old('descricao'))) {
                     $value = old('descricao');
