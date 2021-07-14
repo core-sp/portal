@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
 use App\Traits\ControleAcesso;
@@ -65,25 +66,47 @@ class CompromissoController extends Controller
 
     }
 
-    public function edit(Request $request)
+    public function edit($id)
     {
+        //$this->autoriza($this->class, __FUNCTION__);
+
+        $resultado = $this->compromissoRepository->getById($id);
+        $variaveis = (object) $this->variaveis;
+
+        return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
-    public function update(Request $request, $id)
+    public function update(CompromissoRequest $request, $id)
     {
+        //$this->autoriza($this->class, __FUNCTION__);
+
+        $compromisso = $this->compromissoRepository->update($id, $request);
+
+        if(!$compromisso) {
+            abort(500, 'Erro ao editar o compromisso');
+        }
+
+        event(new CrudEvent('compromisso', 'editou', $id));
+
+        return redirect(route('compromisso.index'))
+            ->with('message', '<i class="icon fa fa-check"></i>Compromisso editado com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function destroy($id)
     {
         //$this->autoriza($this->class, __FUNCTION__);
         
-        $delete = $this->paginaRepository->findById($id)->delete();
-        if(!$delete)
-            abort(500);
-        
-        event(new CrudEvent('página', 'apagou', $id));
-        return redirect(route('paginas.index'))
-            ->with('message', '<i class="icon fa fa-ban"></i>Página deletada com sucesso!')
+        $delete = $this->compromissoRepository->deleteBy($id);
+
+        if(!$delete) {
+            abort(500, 'Erro ao apagar o compromisso');
+        }
+            
+        event(new CrudEvent('compromisso', 'apagou', $id));
+
+        return redirect(route('compromisso.index'))
+            ->with('message', '<i class="icon fa fa-ban"></i>Compromisso apagado com sucesso!')
             ->with('class', 'alert-danger');
     }
 
@@ -91,6 +114,7 @@ class CompromissoController extends Controller
     {
         // Opções de cabeçalho da tabela
         $headers = [
+            'ID',
             'Data',
             'Início',
             'Término',
@@ -104,10 +128,18 @@ class CompromissoController extends Controller
         foreach($resultados as $resultado) {
             $acoes = '<a href="/admin/compromissos/edit/'.$resultado->id.'" class="btn btn-sm btn-default">Editar</a> ';
             
+            $acoes .= '<form method="POST" action="' . route('compromisso.destroy', $resultado->id) . '" class="d-inline">';
+            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $acoes .= '<input type="hidden" name="_method" value="delete" />';
+            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o compromisso?\')" />';
+            $acoes .= '</form>';
+            
+            
             $conteudo = [
-                formataData($resultado->data),
-                $resultado->horarioinicio,
-                $resultado->horariotermino,
+                $resultado->id,
+                onlyDate($resultado->data),
+                onlyHour($resultado->horarioinicio),
+                onlyHour($resultado->horariotermino),
                 $resultado->local,
                 $resultado->titulo,
                 $acoes

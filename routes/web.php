@@ -220,6 +220,7 @@ Route::prefix('/')->group(function() {
   });
 
   Route::get('/calendario-institucional', 'SiteController@calendarioInstitucional')->name('calendario-institucional');
+  Route::get('/calendario-institucional/{data}', 'SiteController@calendarioInstitucionalByData')->name('calendario-institucional-data');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

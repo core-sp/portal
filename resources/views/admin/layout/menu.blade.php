@@ -208,6 +208,35 @@
         </li>
         @endif
 
+      {{--  @if(mostraTitulo($permissoes, ['BdoEmpresaController', 'BdoOportunidadeController'])) --}}
+        <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <p>Compromissos<i class="right fa fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+                {{--  @if(mostraItem($permissoes, 'BdoEmpresaController', 'index')) --}}
+                <li class="nav-item">
+                    <a href="{{ route('compromisso.index') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Todos os compromissos</p>
+                    </a>
+                </li>
+                {{--  @endif --}}
+
+                {{--  @if(mostraItem($permissoes, 'BdoOportunidadeController', 'index')) --}}
+                <li class="nav-item">
+                    <a href="{{ route('compromisso.create') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Criar novo compromisso</p>
+                    </a>
+                </li>
+                {{--  @endif --}}
+
+            </ul>
+        </li>
+        {{-- @endif --}}
+
         @if(mostraTitulo($permissoes, ['HomeImagemController']))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">

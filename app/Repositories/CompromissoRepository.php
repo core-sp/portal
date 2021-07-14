@@ -11,15 +11,45 @@ class CompromissoRepository
         return Compromisso::orderBy('data','DESC')->paginate(10);
     }
 
+    public function getById($id)
+    {
+        return Compromisso::findOrFail($id);
+    }
+
+    public function getByData($data)
+    {
+        return Compromisso::where('data', $data)
+            ->orderBy('horarioinicio','ASC')
+            ->get();
+
+    }
+
     public function store($request)
     {
         return Compromisso::create([
             'titulo' => $request->titulo,
             'descricao' => $request->descricao,
             'local' => $request->local,
-            'data' => $request->data,
+            'data' => retornaDate($request->data),
             'horarioinicio' => onlyHour($request->horarioinicio),
             'horariotermino' => onlyHour($request->horariotermino)
         ]);
+    }
+
+    public function update($id, $request)
+    {
+        return Compromisso::findOrFail($id)->update([
+            'titulo' => $request->titulo,
+            'descricao' => $request->descricao,
+            'local' => $request->local,
+            'data' => retornaDate($request->data),
+            'horarioinicio' => onlyHour($request->horarioinicio),
+            'horariotermino' => onlyHour($request->horariotermino)
+        ]);
+    }
+
+    public function deleteBy($id)
+    {
+        return Compromisso::findOrFail($id)->delete();
     }
 }

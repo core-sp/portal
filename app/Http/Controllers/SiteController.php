@@ -2,18 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Cache;
-use App\Noticia;
+use App\Post;
 use App\Pagina;
+use App\Noticia;
 use App\Licitacao;
 use App\HomeImagem;
-use App\Post;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Input;
+use App\Repositories\CompromissoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class SiteController extends Controller
 {
+    private $compromissoRepository;
+
+    public function __construct(CompromissoRepository $compromissoRepository)
+    {
+        $this->compromissoRepository = $compromissoRepository;
+    }
+
     public function index()
     {
         $noticias = Noticia::where('publicada','Sim')
@@ -124,8 +132,15 @@ class SiteController extends Controller
 
     public function calendarioInstitucional()
     {
-        $oportunidades = [1, 2, 3];
+        //$resultados = $this->compromissoRepository->getByData(date('Y-m-d'));
+        //return $this->calendarioInstitucionalByData(date('d-m-Y'));
+        return redirect()->route('calendario-institucional-data', date('d-m-Y'));
+    }
 
-        return view('site.calendario-institucional', compact('oportunidades'));
+    public function calendarioInstitucionalByData($data)
+    {
+        $resultados = $this->compromissoRepository->getByData(date('Y-m-d', strtotime($data)));
+
+        return view('site.calendario-institucional', compact('resultados', 'data'));
     }
 }

@@ -348,13 +348,15 @@ $('#ano-mapa').on({
 		});
 
 		$( "#calendario-institucional" ).datepicker({
-			dateFormat: 'dd/mm/yy',
+			dateFormat: 'dd-mm-yy',
+			todayHighlight: false,
 			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
 			dayNamesMin: ['D','S','T','Q','Q','S','S'],
 			dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
 			monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-			monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
-		});
+			monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+		})
+		.datepicker('setDate', $('#data').text());
 
 		// Zera o valor do dia, ao selecionar a regional
 		$('#idregional').change(function(){
@@ -577,6 +579,10 @@ $('#ano-mapa').on({
 		// Menu mobile representante
 		$('#bars-representante').on('click', function(){
 			$('#mobile-menu-representante').slideToggle();
+		});
+
+		$('#calendario-institucional').change(function(){
+			window.location.href = "/calendario-institucional/" + $(this).val();
 		});
 	});
 })(jQuery);

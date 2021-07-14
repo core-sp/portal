@@ -15,9 +15,8 @@ use \App\BdoOportunidade;
     <img src="{{ asset('img/bdo.png') }}" />
     <div class="row position-absolute pagina-titulo" id="bdo-titulo">
       <div class="container text-center">
-        <h1 class="branco text-uppercase">
-          Calendário Institucional
-        </h1>
+        <h1 class="branco text-uppercase">Calendário Institucional</h1>
+        <h2 class="branco text-uppercase" id="data">{{ $data }}</h2>
       </div>
     </div>
   </div>
@@ -31,23 +30,21 @@ use \App\BdoOportunidade;
   <div class="container">
     <div class="row mt-4">
       <div class="col">
-        @if(isset($oportunidades))
-          @foreach($oportunidades as $oportunidade)
+        @if(isset($resultados) && $resultados->count() > 0)
+          @foreach($resultados as $compromisso)
           <div class="licitacao-grid">
             <div class="licitacao-grid-main">
-              <h5 class="marrom mb-1">Título do compromisso</h5>
+              <h5 class="marrom mb-1">{{ $compromisso->titulo }}</h5>
               <h6 class="light">
-                <i class="fas fa-clock"></i>&nbsp; 00h00 - 00h00
+                <i class="fas fa-clock"></i>&nbsp; {{ onlyHour($compromisso->horarioinicio) }} - {{ onlyHour($compromisso->horariotermino) }}
                 &nbsp;&nbsp;&nbsp;
-                <i class="fas fa-map-marker-alt"></i>&nbsp; Local
+                <i class="fas fa-map-marker-alt"></i>&nbsp; {{ $compromisso->local }}
               </h6>
-              <div class="linha-lg-mini"></div>
-            
               <div class="bdo-info">
                 <div class="row mt-3 bot-lg">
                   <div class="col d-flex">
                     <div class="flex-one">
-                      <p>Descrição do compromisso</p>
+                      <p>{{ $compromisso->descricao }}</p>
                     </div>
                   </div>
                 </div>
@@ -62,7 +59,6 @@ use \App\BdoOportunidade;
       </div>
     </div>
   </div>  
-
 </section>
 
 @endsection
