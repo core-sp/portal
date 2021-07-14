@@ -121,4 +121,11 @@ class SiteController extends Controller
             ->paginate(9);
         return view('site.espaco-do-contador', compact('noticias'));
     }
+
+    public function calendarioInstitucional()
+    {
+        $oportunidades = [1, 2, 3];
+
+        return view('site.calendario-institucional', compact('oportunidades'));
+    }
 }

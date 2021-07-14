@@ -81,7 +81,7 @@ $(document).ready(function(){
       var horaTermino = $('#horaTermino').val();
       if(horaInicio) {
         if(horaTermino <= horaInicio) {
-          alert('O horário de término do curso não pode ser menor ou igual ao horário de início do curso.');
+          alert('O horário de término não pode ser menor ou igual ao horário de início.');
           $('#horaTermino').val('');
         }
       }
@@ -93,7 +93,7 @@ $(document).ready(function(){
       var horaTermino = $('#horaTermino').val();
       if(horaTermino) {
         if(horaInicio > horaTermino) {
-          alert('O horário de início do curso não pode ser maior que o horário de término do curso.');
+          alert('O horário de início não pode ser maior que o horário de término.');
           $('#horaInicio').val('');
         }
       }

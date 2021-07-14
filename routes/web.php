@@ -45,6 +45,8 @@ Route::prefix('admin')->group(function() {
   require('admin/cursos.php');
   // Rotas do mapa de fiscalização (possivelmente será removido pois os dados virão do GERENTI)
   require('admin/fiscalizacao.php');
+ 
+  require('admin/compromissos.php');
 
 
   //require('admin/fiscalizacao.php');
@@ -216,6 +218,8 @@ Route::prefix('/')->group(function() {
   Route::get('/chat', function(){
     return view('site.chat');
   });
+
+  Route::get('/calendario-institucional', 'SiteController@calendarioInstitucional')->name('calendario-institucional');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
