@@ -167,11 +167,11 @@
       </div>
 
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/servicos-atendimento-ao-rc" class="d-block h-100">
+        <a href="{{ route('agenda-institucional') }}" class="d-block h-100">
           <div class="box text-center azul-escuro-bg">
             <div class="inside-box">
-              <img src="{{ asset('img/icone-servicos-do-atendimento.png') }}" class="inside-img" alt="Serviços do Atendimento" />
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Serviço de <br class="hide-992" /> Atendimento</h3>
+              <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Serviços do Atendimento" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Agenda<br class="hide-992" /> Institucional</h3>
               <button href="#" class="btn-box azul-escuro">ACESSAR</button>
             </div>
           </div>
