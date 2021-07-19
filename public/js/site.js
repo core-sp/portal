@@ -347,7 +347,7 @@ $('#ano-mapa').on({
 			beforeShowDay: noWeekendsOrHolidays
 		});
 
-		$( "#calendario-institucional" ).datepicker({
+		$( "#agenda-institucional" ).datepicker({
 			dateFormat: 'dd-mm-yy',
 			todayHighlight: false,
 			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
@@ -581,8 +581,8 @@ $('#ano-mapa').on({
 			$('#mobile-menu-representante').slideToggle();
 		});
 
-		$('#calendario-institucional').change(function(){
-			window.location.href = "/calendario-institucional/" + $(this).val();
+		$('#agenda-institucional').change(function(){
+			window.location.href = "/agenda-institucional/" + $(this).val();
 		});
 	});
 })(jQuery);

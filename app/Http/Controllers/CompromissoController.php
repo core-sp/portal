@@ -14,6 +14,8 @@ class CompromissoController extends Controller
 {
     use ControleAcesso, TabelaAdmin;
 
+    private $class = 'CompromissoController';
+
     private $compromissoRepository;
 
     public function __construct(CompromissoRepository $compromissoRepository)
@@ -31,21 +33,18 @@ class CompromissoController extends Controller
 
     public function index(Request $request)
     {
-        //$this->autoriza($this->class, "index");
+        $this->autoriza($this->class, "index");
 
         $variaveis = $this->variaveis;
 
-        // Checa se tem filtro
         if($request->filtro === 'sim') {
 
             $regras = [
                 'data' => 'date_format:d/m/Y'
             ];
     
-            // Valida os campos de acordo com as regras
             $validacao = Validator::make($request->all(), $regras, []);
-            
-            // Caso algum erro ocorra, retorna para a tela do fomulário com mensagens de erro
+
             if($validacao->fails()) {
                 return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data do filtro inválida')
                         ->with('class', 'alert-danger');
@@ -75,7 +74,7 @@ class CompromissoController extends Controller
 
     public function create()
     {
-        //$this->autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, 'create');
 
         $variaveis = (object) $this->variaveis;
 
@@ -84,7 +83,7 @@ class CompromissoController extends Controller
 
     public function store(CompromissoRequest $request)
     {
-        //$this->autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, 'create');
 
         $compromisso = $this->compromissoRepository->store($request);
 
@@ -97,12 +96,11 @@ class CompromissoController extends Controller
         return redirect(route('compromisso.index'))
             ->with('message', '<i class="icon fa fa-check"></i>Compromisso criado com sucesso!')
             ->with('class', 'alert-success');
-
     }
 
     public function edit($id)
     {
-        //$this->autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, 'edit');
 
         $resultado = $this->compromissoRepository->getById($id);
         $variaveis = (object) $this->variaveis;
@@ -112,7 +110,7 @@ class CompromissoController extends Controller
 
     public function update(CompromissoRequest $request, $id)
     {
-        //$this->autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, 'edit');
 
         $compromisso = $this->compromissoRepository->update($id, $request);
 
@@ -129,7 +127,7 @@ class CompromissoController extends Controller
 
     public function destroy($id)
     {
-        //$this->autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, 'destroy');
         
         $delete = $this->compromissoRepository->deleteBy($id);
 
@@ -146,7 +144,7 @@ class CompromissoController extends Controller
 
     public function busca(Request $request)
     {
-        //$this->autoriza($this->class, 'index');
+        $this->autoriza($this->class, 'index');
 
         $busca = $request->q;
         $variaveis = (object) $this->variaveis;
@@ -155,7 +153,6 @@ class CompromissoController extends Controller
 
         return view('admin.crud.home', compact('resultados', 'variaveis', 'tabela', 'busca'));
     }
-
 
     public function montaFiltros($request)
     {

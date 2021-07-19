@@ -30,7 +30,8 @@ class Permissao extends Model
             'PostsController' => 'Post',
             'RepresentanteEnderecoController' => 'Representante - Endereço',
             'RepresentanteController' => 'Representante - Cadastrados',
-            'FiscalizacaoController' => 'Fiscalização'
+            'FiscalizacaoController' => 'Fiscalização',
+            'CompromissoController' => 'Compromisso'
         ];
     }
 }

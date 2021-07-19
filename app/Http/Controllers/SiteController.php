@@ -130,17 +130,15 @@ class SiteController extends Controller
         return view('site.espaco-do-contador', compact('noticias'));
     }
 
-    public function calendarioInstitucional()
+    public function agendaInstitucional()
     {
-        //$resultados = $this->compromissoRepository->getByData(date('Y-m-d'));
-        //return $this->calendarioInstitucionalByData(date('d-m-Y'));
-        return redirect()->route('calendario-institucional-data', date('d-m-Y'));
+        return redirect()->route('agenda-institucional-data', date('d-m-Y'));
     }
 
-    public function calendarioInstitucionalByData($data)
+    public function agendaInstitucionalByData($data)
     {
         $resultados = $this->compromissoRepository->getByData(date('Y-m-d', strtotime($data)));
 
-        return view('site.calendario-institucional', compact('resultados', 'data'));
+        return view('site.agenda-institucional', compact('resultados', 'data'));
     }
 }

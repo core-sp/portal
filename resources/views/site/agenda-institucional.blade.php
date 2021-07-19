@@ -1,7 +1,7 @@
-@extends('site.layout.app', ['title' => 'Calendário Institucional'])
+@extends('site.layout.app', ['title' => 'Agenda Institucional'])
 
 @section('description')
-  <meta name="description" content="Calendário Institucional ooficial contendo a agenda do CORE-SP." />
+  <meta name="description" content="Agenda Institucional ooficial contendo a agenda do CORE-SP." />
 @endsection
 
 @section('content')
@@ -15,7 +15,7 @@ use \App\BdoOportunidade;
     <img src="{{ asset('img/bdo.png') }}" />
     <div class="row position-absolute pagina-titulo" id="bdo-titulo">
       <div class="container text-center">
-        <h1 class="branco text-uppercase">Calendário Institucional</h1>
+        <h1 class="branco text-uppercase">Agenda Institucional</h1>
         <h2 class="branco text-uppercase" id="data">{{ $data }}</h2>
       </div>
     </div>
@@ -24,7 +24,7 @@ use \App\BdoOportunidade;
 
 <section id="pagina-bdo">
   <div class="form-row justify-content-center">
-    <div id="calendario-institucional"></div> 
+    <div id="agenda-institucional"></div> 
   </div>
 
   <div class="container">
