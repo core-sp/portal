@@ -301,6 +301,7 @@
               <p class="branco"><a href="/representante/login">Área Restrita</a></p>
               <p class="branco"><a href="/servicos-atendimento-ao-rc">Atendimento</a></p>
               <p class="branco"><a href="/balcao-de-oportunidades">Balcão de Oportunidades</a></p>
+              <p class="branco"><a href="/carta-de-servicos-ao-usuario">Carta de Serviços ao Usuário</a></p>
               <p class="branco"><a href="/consulta-de-situacao">Consulta de Situação</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="/downloads">Downloads</a></p>

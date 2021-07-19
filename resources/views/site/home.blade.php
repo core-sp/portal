@@ -166,17 +166,53 @@
         </a>
       </div>
 
-      {{--<div class="col-lg-3 col-sm-6 pb-15">
-        <a href="{{ route('cursos.index.website') }}" class="d-block h-100">
-          <div class="box text-center azul-bg">
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="/servicos-atendimento-ao-rc" class="d-block h-100">
+          <div class="box text-center azul-escuro-bg">
             <div class="inside-box">
-              <img src="{{ asset('img/teacher.png') }}" class="inside-img" alt="Cursos" />
-              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cursos<br class="hide-992" /> Programados</h3>
+              <img src="{{ asset('img/icone-servicos-do-atendimento.png') }}" class="inside-img" alt="Serviços do Atendimento" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Serviço de <br class="hide-992" /> Atendimento</h3>
               <button href="#" class="btn-box azul-escuro">ACESSAR</button>
             </div>
           </div>
         </a>
-      </div>--}}
+      </div>
+
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="https://core-sp.implanta.net.br/portaltransparencia/#publico/inicio" class="d-block h-100">
+          <div class="box text-center azul-bg">
+            <div class="inside-box">
+              <img src="{{ asset('img/icone-portal-da-transparencia.png') }}" class="inside-img" alt="Portal da transparência" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Portal da <br class="hide-992" /> Transparência</h3>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="/denuncie-o-exercicio-ilegal-da-profissao" class="d-block h-100">
+          <div class="box text-center azul-escuro-bg">
+            <div class="inside-box">
+              <img src="{{ asset('img/icone-denuncie.png') }}" class="inside-img" alt="Exercício ilegal da profissão" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Denuncie o Exercício<br class="hide-992" /> Ilegal da Profissão</h3>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-lg-3 col-sm-6 pb-15">
+        <a href="{{ route('cursos.index.website') }}" class="d-block h-100">
+          <div class="box text-center azul-bg">
+            <div class="inside-box">
+              <img src="{{ asset('img/icone-curso.png') }}" class="inside-img" alt="Cursos" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cursos</h3>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
+            </div>
+          </div>
+        </a>
+      </div>
 
     </div>
   </div>
