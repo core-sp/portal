@@ -60,7 +60,7 @@
 
 
         <!-- Conteúdo -->
-        @if(mostraTitulo($permissoes, ['PaginaController', 'NoticiaController', 'PostsController', 'CursoController', 'BdoEmpresaController', 'BdoOportunidadeController', 'HomeImagemController']))
+        @if(mostraTitulo($permissoes, ['PaginaController', 'NoticiaController', 'PostsController', 'CursoController', 'BdoEmpresaController', 'BdoOportunidadeController', 'HomeImagemController', 'CompromissoController']))
         <li class="nav-header">CONTEÚDO</li>
 
         @if(mostraTitulo($permissoes, ['PaginaController']))
@@ -208,34 +208,34 @@
         </li>
         @endif
 
-      {{--  @if(mostraTitulo($permissoes, ['BdoEmpresaController', 'BdoOportunidadeController'])) --}}
+      @if(mostraTitulo($permissoes, ['CompromissoController']))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-calendar-alt"></i>
                 <p>Compromissos<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                {{--  @if(mostraItem($permissoes, 'BdoEmpresaController', 'index')) --}}
+                @if(mostraItem($permissoes, 'CompromissoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('compromisso.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os compromissos</p>
                     </a>
                 </li>
-                {{--  @endif --}}
+                @endif
 
-                {{--  @if(mostraItem($permissoes, 'BdoOportunidadeController', 'index')) --}}
+                @if(mostraItem($permissoes, 'CompromissoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('compromisso.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Criar novo compromisso</p>
                     </a>
                 </li>
-                {{--  @endif --}}
+                @endif
 
             </ul>
         </li>
-        {{-- @endif --}}
+        @endif
 
         @if(mostraTitulo($permissoes, ['HomeImagemController']))
         <li class="nav-item has-treeview">
