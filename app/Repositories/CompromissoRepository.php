@@ -20,8 +20,16 @@ class CompromissoRepository
     {
         return Compromisso::where('data', $data)
             ->orderBy('horarioinicio','ASC')
-            ->get();
+            ->paginate(10);
 
+    }
+
+    public function getBusca($busca)
+    {
+        return Compromisso::where('titulo','LIKE','%'.$busca.'%')
+            ->orWhere('descricao','LIKE','%'.$busca.'%')
+            ->orWhere('local','LIKE','%'.$busca.'%')
+            ->paginate(10);
     }
 
     public function store($request)

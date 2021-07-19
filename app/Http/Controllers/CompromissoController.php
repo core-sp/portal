@@ -6,6 +6,7 @@ use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
 use App\Traits\ControleAcesso;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\CompromissoRequest;
 use App\Repositories\CompromissoRepository;
 
@@ -28,15 +29,48 @@ class CompromissoController extends Controller
         ];
     }
 
-    public function index()
+    public function index(Request $request)
     {
         //$this->autoriza($this->class, "index");
 
-        $resultados = $this->compromissoRepository->getAll();
-        $tabela = $this->tabelaCompleta($resultados);
-        $variaveis = (object) $this->variaveis;
+        $variaveis = $this->variaveis;
 
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+        // Checa se tem filtro
+        if($request->filtro === 'sim') {
+
+            $regras = [
+                'data' => 'date_format:d/m/Y'
+            ];
+    
+            // Valida os campos de acordo com as regras
+            $validacao = Validator::make($request->all(), $regras, []);
+            
+            // Caso algum erro ocorra, retorna para a tela do fomulário com mensagens de erro
+            if($validacao->fails()) {
+                return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data do filtro inválida')
+                        ->with('class', 'alert-danger');
+            }
+
+            $temFiltro = true;
+
+            $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
+
+            $resultados = $this->compromissoRepository->getByData(date('Y-m-d', strtotime(str_replace('/', '-', $request->data))));
+        } 
+        else {
+            $temFiltro = null;
+            $diaFormatado = date('d\/m\/Y');
+            $variaveis['continuacao_titulo'] = 'para <strong>' . $diaFormatado . '</strong>';
+
+            $resultados = $this->compromissoRepository->getByData(date('Y-m-d'));
+        }
+
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis['filtro'] = $this->montaFiltros($request);
+        $variaveis['mostraFiltros'] = true;
+        $variaveis = (Object)  $variaveis;
+
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
 
     public function create()
@@ -108,6 +142,49 @@ class CompromissoController extends Controller
         return redirect(route('compromisso.index'))
             ->with('message', '<i class="icon fa fa-ban"></i>Compromisso apagado com sucesso!')
             ->with('class', 'alert-danger');
+    }
+
+    public function busca(Request $request)
+    {
+        //$this->autoriza($this->class, 'index');
+
+        $busca = $request->q;
+        $variaveis = (object) $this->variaveis;
+        $resultados = $this->compromissoRepository->getBusca($busca);
+        $tabela = $this->tabelaCompleta($resultados);
+
+        return view('admin.crud.home', compact('resultados', 'variaveis', 'tabela', 'busca'));
+    }
+
+
+    public function montaFiltros($request)
+    {
+        $filtro = '<form method="GET" action="' . route('compromisso.filtro') . '" id="filtroCompromisso" class="mb-0">';
+        $filtro .= '<div class="form-row filtroAge">';
+        $filtro .= '<input type="hidden" name="filtro" value="sim" />';
+
+        $filtro .= '<div class="form-group mb-0 col">';
+
+        $hoje = date('d\/m\/Y');
+
+        $filtro .= '<label>Data</label>';
+       
+        if(isset($request->data)) {
+            $data = $request->data;
+            $filtro .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="data" id="dataFiltro" placeholder="dd/mm/aaaa" value="' . $data . '" />';
+        } 
+        else {
+            $filtro .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="data" id="dataFiltro" placeholder="dd/mm/aaaa" value="' . $hoje . '" />';
+        }
+        $filtro .= '</div>';
+
+        $filtro .= '<div class="form-group mb-0 col-auto align-self-end">';
+        $filtro .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
+        $filtro .= '</div>';
+        $filtro .= '</div>';
+        $filtro .= '</form>';
+
+        return $filtro;
     }
 
     protected function tabelaCompleta($resultados)
