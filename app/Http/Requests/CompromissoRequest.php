@@ -15,7 +15,7 @@ class CompromissoRequest extends FormRequest
             'horariotermino' => 'required|date_format:H:i',
             'local' => 'required|max:191',
             'titulo' => 'required|max:191',
-            'descricao' => 'required|max:191'
+            'descricao' => 'required'
         ];
     }
 
