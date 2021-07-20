@@ -191,7 +191,7 @@
       </div>
 
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/denuncie-o-exercicio-ilegal-da-profissao" class="d-block h-100">
+        <a href="https://core-sp.implanta.net.br/portaltransparencia/#OUV/Home" class="d-block h-100">
           <div class="box text-center azul-escuro-bg">
             <div class="inside-box">
               <img src="{{ asset('img/icone-denuncie.png') }}" class="inside-img" alt="Exercício ilegal da profissão" />
