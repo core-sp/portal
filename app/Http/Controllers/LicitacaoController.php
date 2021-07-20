@@ -190,6 +190,9 @@ class LicitacaoController extends Controller
     {
         $buscaDia = $request->datarealizacao;
 
+        $modalidades = Licitacao::modalidadesLicitacao();
+        $situacoes = Licitacao::situacoesLicitacao();
+
         // Se nenhum critério foi fornecido, chama método que abre a tela inical de busca
         if(empty($request->palavrachave) && empty($request->modalidade) && empty($request->situacao) && empty($request->nrlicitacao) && empty($request->nrprocesso) && empty($request->datarealizacao)) {
             $this->siteGrid();
@@ -202,7 +205,7 @@ class LicitacaoController extends Controller
             if($checaDia == false) {
                 $licitacoes = null;
 
-                return view('site.licitacoes', compact('licitacoes'))
+                return view('site.licitacoes', compact('licitacoes', 'modalidades', 'situacoes'))
                     ->with('erro', 'Data fornecida é inválida');
             }
 
@@ -216,9 +219,6 @@ class LicitacaoController extends Controller
         if (count($licitacoes) == 0) {
             $licitacoes = null;
         } 
-
-        $modalidades = Licitacao::modalidadesLicitacao();
-        $situacoes = Licitacao::situacoesLicitacao();
 
         return view('site.licitacoes', compact('licitacoes', 'busca', 'modalidades', 'situacoes'));
     }

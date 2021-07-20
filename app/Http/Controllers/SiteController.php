@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use Exception;
 use App\Pagina;
 use App\Noticia;
 use App\Licitacao;
@@ -10,6 +11,7 @@ use App\HomeImagem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
 use App\Repositories\CompromissoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
@@ -137,6 +139,10 @@ class SiteController extends Controller
 
     public function agendaInstitucionalByData($data)
     {
+        if(!validDate($data)) {
+            abort(404);
+        }
+
         $resultados = $this->compromissoRepository->getByData(date('Y-m-d', strtotime($data)));
 
         return view('site.agenda-institucional', compact('resultados', 'data'));

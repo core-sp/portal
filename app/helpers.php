@@ -691,3 +691,14 @@ function resumoTamanho($string, $tamanho)
         $string = substr($string, 0, $tamanho) . '...';
     return $string;
 }
+
+/**
+ * Função usada para validar data. Usa formato padrão como 'd-m-Y'
+ */
+function validDate($date, $format = 'd-m-Y') {
+    date_create_from_format($format, $date);
+
+    $errors = date_get_last_errors();
+
+    return ($errors['warning_count'] + $errors['error_count'] === 0) ? true : false;
+}
