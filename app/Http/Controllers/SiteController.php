@@ -139,7 +139,7 @@ class SiteController extends Controller
 
     public function agendaInstitucionalByData($data)
     {
-        if(!validDate($data)) {
+        if(!validDate($data, '01-01-1700', 'd-m-Y')) {
             abort(404);
         }
 

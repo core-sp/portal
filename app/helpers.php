@@ -693,12 +693,22 @@ function resumoTamanho($string, $tamanho)
 }
 
 /**
- * Função usada para validar data. Usa formato padrão como 'd-m-Y'
+ * Função usada para validar data. Usa formato padrão como 'd-m-Y'. 
+ * 
+ * Datas menores que 01/01/1970 não são aceitas.
  */
-function validDate($date, $format = 'd-m-Y') {
+function validDate($date, $minDate, $format) {
+
+    $checkMinDate = true;
+
     date_create_from_format($format, $date);
 
     $errors = date_get_last_errors();
 
-    return ($errors['warning_count'] + $errors['error_count'] === 0) ? true : false;
+    if ($minDate !== null) {
+        $checkMinDate = date_create_from_format($format, $date) > date_create_from_format($format, $minDate);
+    }
+    
+
+    return ($errors['warning_count'] + $errors['error_count'] === 0) && $checkMinDate ? true : false;
 }
