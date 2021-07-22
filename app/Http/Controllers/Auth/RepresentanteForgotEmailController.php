@@ -6,9 +6,17 @@ use App\Events\ExternoEvent;
 use App\Http\Controllers\Controller;
 use App\Representante;
 use Illuminate\Http\Request;
+use App\Repositories\GerentiRepositoryInterface;
 
 class RepresentanteForgotEmailController extends Controller
 {
+
+    private $gerentiRepository;
+
+    public function __construct(GerentiRepositoryInterface $gerentiRepository)
+    {
+        $this->gerentiRepository = $gerentiRepository;
+    }
     public function resetEmailView()
     {
         return view('site.representante.email-reset');
@@ -23,6 +31,19 @@ class RepresentanteForgotEmailController extends Controller
                 ->route('representante.email.reset.view')
                 ->with([
                     'message' => 'Não foi possível encontrar o cadastro informado. Por favor, verifique as informações inseridas.',
+                    'class' => 'alert-danger'
+                ]);
+        }
+        
+        $registro = strlen($request->registro_core) === 11 ? '0' . $request->registro_core : $request->registro_core;
+
+        $checkGerenti = $this->gerentiRepository->gerentiChecaLogin($registro, $request->cpf_cnpj, $request->email_novo);
+
+        if (array_key_exists('Error', $checkGerenti)) {
+            return redirect()
+                ->route('representante.email.reset.view')
+                ->with([
+                    'message' =>  $checkGerenti['Error'],
                     'class' => 'alert-danger'
                 ]);
         }
