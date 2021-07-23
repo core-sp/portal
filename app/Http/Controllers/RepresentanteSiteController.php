@@ -22,7 +22,9 @@ use GuzzleHttp\Exception\RequestException;
 use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Repositories\GerentiRepositoryInterface;
 use App\Http\Requests\RepresentanteEnderecoRequest;
+use App\Http\Requests\SolicitaCedulaRequest;
 use App\Repositories\RepresentanteEnderecoRepository;
+use App\Repositories\SolicitaCedulaRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
@@ -31,13 +33,15 @@ class RepresentanteSiteController extends Controller
     private $representanteEnderecoRepository;
     private $gerentiApiRepository;
     protected $idendereco;
+    private $solicitaCedulaRepository;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, SolicitaCedulaRepository $solicitaCedulaRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->gerentiRepository = $gerentiRepository;
         $this->representanteEnderecoRepository = $representanteEnderecoRepository;
         $this->gerentiApiRepository = $gerentiApiRepository;
+        $this->solicitaCedulaRepository = $solicitaCedulaRepository;
     }
 
     public function index()
@@ -76,6 +80,14 @@ class RepresentanteSiteController extends Controller
         $endereco = $this->gerentiRepository->gerentiEnderecos(Auth::guard('representante')->user()->ass_id);
 
         return view('site.representante.enderecos', compact("possuiSolicitacaoEnderecos", "solicitacoesEnderecos", "endereco"));
+    }
+
+    public function cedulaView()
+    {
+        $cedulas = $this->solicitaCedulaRepository->getAll();
+        $possuiSolicitacaoCedulas = $this->solicitaCedulaRepository;
+
+        return view('site.representante.cedulas', compact("possuiSolicitacaoCedulas", "cedulas"));
     }
 
     public function listaCobrancas()
@@ -276,6 +288,24 @@ class RepresentanteSiteController extends Controller
         return view('site.representante.inserir-endereco');
     }
 
+
+    public function inserirsolicitarCedulaView()
+    {
+        // $count = $this->solicitaCedulaRepository->getCountEmAndamentoByIdRepresentante(Auth::guard('representante')->user()->id);
+        
+        // if($count >= 1) {
+        //     return redirect()
+        //         ->route('representante.enderecos.view')
+        //         ->with([
+        //             'message' => 'Você já possui uma solicitação de alteração de endereço sob análise. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
+        //             'class' => 'alert-danger'
+        //         ]);
+        // }
+
+        return view('site.representante.inserir-solicita-cedula');
+    }
+
+
     public function inserirEndereco(RepresentanteEnderecoRequest $request)
     {
         $imageName = Auth::guard('representante')->user()->id . '-' . time() . '.' . request()->crimage->getClientOriginalExtension();
@@ -307,6 +337,27 @@ class RepresentanteSiteController extends Controller
                 'class' => 'alert-success'
             ]);
     }
+
+    public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
+    {
+        $save = $this->solicitaCedulaRepository->create(Auth::guard('representante')->user()->id, request(["cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"]),);
+
+        if(!$save) {
+            abort(500);
+        }
+
+        event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") solicitou cédula.'));
+
+        // Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($save->id));
+
+        return redirect()
+            ->route('representante.solicitarCedulaView')
+            ->with([
+                'message' => 'Solicitação enviada com sucesso! Após verificação das informações, será atualizado.',
+                'class' => 'alert-success'
+            ]);
+    }
+
 
     public function deletarContato(Request $request)
     {

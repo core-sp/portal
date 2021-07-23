@@ -73,6 +73,12 @@
               </a>
             </div> --}}
 
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.solicitarCedulaView')  ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('representante.solicitarCedulaView') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Solicitar Cédula</h6>
+              </a>
+            </div>
+
           </div>
         </div>
       </div>

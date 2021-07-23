@@ -142,6 +142,11 @@ Route::prefix('admin')->group(function() {
   Route::post('/representante-enderecos/recusar', 'RepresentanteEnderecoController@recusarEndereco')->name('admin.representante-endereco-recusado.post');
   Route::get('/representante-enderecos-visualizar', 'RepresentanteEnderecoController@visualizarComprovante')->name('representante-endereco.visualizar');
   Route::get('/representante-enderecos-baixar', 'RepresentanteEnderecoController@baixarComprovante')->name('representante-endereco.baixar');
+
+  // Solicita cedula
+  Route::get('/solicita-cedula', 'SolicitaCedulaController@index');
+  Route::get('/solicita-cedula/{id}', 'SolicitaCedulaController@show')->name('admin.solicita-cedula.show');
+  Route::post('/solicita-cedula/inserir', 'SolicitaCedulaController@inserirSolicitaCedula')->name('admin.representante-solicita-cedula.post');
 });
 
 /*

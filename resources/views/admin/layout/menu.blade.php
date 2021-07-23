@@ -322,6 +322,15 @@
                 </li>    
                 @endif
 
+                @if (mostraItem($permissoes, 'SolicitaCedulaController', 'index'))
+                <li class="nav-item">
+                    <a href="/admin/solicita-cedula" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Solicita Cédula</p>
+                    </a>
+                </li>    
+                @endif
+
             </ul>
         </li>
         @endif
