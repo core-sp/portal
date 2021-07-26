@@ -16,6 +16,6 @@ class SolicitaCedula extends Model
 
     public function representante()
     {
-    	return $this->belongsTo('App\Representante');
+    	return $this->belongsTo('App\Representante', 'idrepresentante');
     }
 }

@@ -85,7 +85,7 @@ class RepresentanteSiteController extends Controller
     public function cedulaView()
     {
         $cedulas = $this->solicitaCedulaRepository->getAll();
-        $possuiSolicitacaoCedulas = $this->solicitaCedulaRepository;
+        $possuiSolicitacaoCedulas = $cedulas->isNotEmpty();
 
         return view('site.representante.cedulas', compact("possuiSolicitacaoCedulas", "cedulas"));
     }

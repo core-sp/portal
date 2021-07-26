@@ -326,7 +326,7 @@
                 <li class="nav-item">
                     <a href="/admin/solicita-cedula" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
-                        <p>Solicita Cédula</p>
+                        <p>Cédulas</p>
                     </a>
                 </li>    
                 @endif

@@ -53,27 +53,27 @@ class SolicitaCedulaController extends Controller
         return view('admin.crud.mostra', compact('resultado', 'variaveis'));
     }
 
-    public function inserirSolicitacaoCedula(Request $request)
+    public function inserirSolicitaCedula(Request $request)
     {
         // $this->gerentiRepository->gerentiInserirEndereco($request->ass_id, unserialize($request->infos));
 
-        $this->solicitaCedulaRepository->updateStatusEmAndamento($request->id);
+        $this->solicitaCedulaRepository->updateStatusAprovado($request->id);
 
-        event(new CrudEvent('endereço representante', 'enviou para o Gerenti', $request->id));
+        // event(new CrudEvent('endereço representante', 'enviou para o Gerenti', $request->id));
 
-        return redirect('/admin/representante-enderecos')
-                ->with('message', 'O endereço foi cadastrado com sucesso no Gerenti.')
+        return redirect('/admin/solicita-cedula')
+                ->with('message', 'A solicitação da cédula foi cadastrada com sucesso no Gerenti.')
                 ->with('class', 'alert-success');
     }
 
-    public function reprovarCedula(Request $request)
+    public function reprovarSolicitaCedula(Request $request)
     {
-        $this->representanteEnderecoRepository->updateStatusRecusado($request->id, $request->observacao);
+        $this->solicitaCedulaRepository->updateStatusReprovado($request->id, $request->justificativa);
 
-        event(new CrudEvent('endereço representante', 'recusou', $request->id));
+        // event(new CrudEvent('endereço representante', 'recusou', $request->id));
 
-        return redirect('/admin/representante-enderecos')
-                ->with('message', 'A atualização de endereço foi recusada.')
+        return redirect('/admin/solicita-cedula')
+                ->with('message', 'A solicitação de cédula foi reprovada.')
                 ->with('class', 'alert-info');
     }
 
@@ -93,7 +93,7 @@ class SolicitaCedulaController extends Controller
             $acoes = '<a href="/admin/solicita-cedula/' . $resultado->id . '" class="btn btn-sm btn-default">Ver</a> ';
             $conteudo = [
                 $resultado->id,
-                $resultado->idrepresentante,
+                $resultado->representante->ass_id,
                 formataData($resultado->created_at),
                 $this->showStatus($resultado->status),
                 $acoes
@@ -150,7 +150,6 @@ class SolicitaCedulaController extends Controller
 
         $resultados = $this->solicitaCedulaRepository->getBusca($busca);
         
-        $tabela = $this->tabelaCompleta($resultados);
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
 

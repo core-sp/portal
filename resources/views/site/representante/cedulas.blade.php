@@ -10,7 +10,7 @@
 
 <div class="representante-content w-100">
     <div class="conteudo-txt-mini light">
-        <h4 class="pt-1 pb-1">Solicitações de Cédulas</h4>
+        <h4 class="pt-1 pb-1">Solicitações de Cédula</h4>
         <div class="linha-lg-mini mb-2"></div>
         <h5 class="mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;SOLICITAÇÕES</h5>
         @if ($possuiSolicitacaoCedulas)
@@ -23,7 +23,7 @@
                         <p class="pb-0 branco">Estado: <strong>{{ $item->estado }}</strong></p>
                         <p class="pb-0 branco">CEP: <strong>{{ $item->cep }}</strong></p>
                         <p class="pb-2 branco"><small><i>(Novo endereço para correspondência)</i></small></p>
-                        <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-danger' : 'text-warning' }} text-uppercase">{{ $item->status }}</strong></p>
+                        <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Reprovado' ? 'text-danger' : 'text-warning' }} text-uppercase">{{ $item->status }}</strong></p>
                         @isset($item->justificativa)
                             <p class="pb-0 lh-1 cinza-claro"><small class="light">{!! '—————<br>' . $item->justificativa !!}</small></p>
                         @endisset

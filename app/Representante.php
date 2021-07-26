@@ -97,4 +97,9 @@ class Representante extends Authenticable
     {
         return RepresentanteEndereco::where('ass_id', '=', $this->ass_id)->where('status', '!=', 'Enviado')->orderBy('created_at', 'DESC')->get();
     }
+
+    public function cedulas()
+    {
+        return $this->hasMany('App\SolicitaCedula', 'id');
+    }
 }

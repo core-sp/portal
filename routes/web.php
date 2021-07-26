@@ -146,7 +146,9 @@ Route::prefix('admin')->group(function() {
   // Solicita cedula
   Route::get('/solicita-cedula', 'SolicitaCedulaController@index');
   Route::get('/solicita-cedula/{id}', 'SolicitaCedulaController@show')->name('admin.solicita-cedula.show');
+  Route::get('/solicita-cedulas/busca', 'SolicitaCedulaController@busca')->name('solicita-cedula.busca');
   Route::post('/solicita-cedula/inserir', 'SolicitaCedulaController@inserirSolicitaCedula')->name('admin.representante-solicita-cedula.post');
+  Route::post('/solicita-cedula/reprovar', 'SolicitaCedulaController@reprovarSolicitaCedula')->name('admin.representante-solicita-cedula-reprovada.post');
 });
 
 /*

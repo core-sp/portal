@@ -15,10 +15,12 @@
                 @break
             @endswitch
             <h4>Representante:</h4>
+            <p class="mb-0">Nome: <strong>{{ $resultado->representante->nome }}</strong></p>
+            <p class="mb-0">Email: <strong>{{ $resultado->representante->email }}</strong></p>
             <p class="mb-0">Registro: <strong>{{ $resultado->representante->registro_core }}</strong></p>
             <p>CPF/CNPJ: <strong>{{ $resultado->representante->cpf_cnpj }}</strong></p>
             <hr>
-            <h4>Solicitação de novo endereço de correspondência:</h4>
+            <h4>Solicitação de envio de cédula:</h4>
             <p class="mb-0">CEP: <strong>{{ $resultado->cep }}</strong></p>
             <p class="mb-0">Bairro: <strong>{{ $resultado->bairro }}</strong></p>
             <p class="mb-0">Logradouro: <strong>{{ $resultado->logradouro }}</strong></p>
@@ -26,8 +28,8 @@
             <p class="mb-0">Complemento: <strong>{{ isset($resultado->complemento) ? $resultado->complemento : '---' }}</strong></p>
             <p class="mb-0">Estado: <strong>{{ $resultado->estado }}</strong></p>
             <p>Município: <strong>{{ $resultado->municipio }}</strong></p>
-            <h5>Comprovante de residência:</h5>
             @if ($resultado->status === 'Em andamento')
+            <h5>Solicitação de cédula:</h5>
                 <hr>
                 <h4 class="mb-3">Ações</h4>
                 <form action="{{ route('admin.representante-solicita-cedula.post') }}" method="POST" class="d-inline">
@@ -41,10 +43,10 @@
                 </form>
                 <button class="btn btn-info" id="recusar-trigger">Reprovar&nbsp;&nbsp;<i class="fas fa-chevron-down"></i></button>
                 <div class="w-100" id="recusar-form">
-                    <form action="{{ route('admin.representante-endereco-recusado.post') }}" method="POST" class="mt-2">
+                    <form action="{{ route('admin.representante-solicita-cedula-reprovada.post') }}" method="POST" class="mt-2">
                         @csrf
                         <input type="hidden" name="id" value="{{ $resultado->id }}">
-                        <textarea name="justificativa" rows="3" placeholder="Insira aqui o motivo pelo qual a solicitação foi recusada..." class="form-control"></textarea>
+                        <textarea name="justificativa" rows="3" placeholder="Insira aqui o motivo pelo qual a solicitação foi reprovada..." class="form-control"></textarea>
                         <button type="submit" class="btn btn-danger mt-2">
                             Reprovar
                         </button>

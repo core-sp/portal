@@ -17,13 +17,6 @@ class SolicitaCedulaRepository
         return SolicitaCedula::findOrFail($id);
     }
 
-    public function getCountEmAndamentoByIdRepresentante($idrepresentante)
-    {
-        return SolicitaCedula::where('idrepresentante', $id)
-            ->where("status", SolicitaCedula::STATUS_EM_ANDAMENTO)
-            ->count();
-    }
-
     public function create($idrepresentante, $endereco) 
     {
         return SolicitaCedula::create([
@@ -54,8 +47,13 @@ class SolicitaCedulaRepository
     public function getBusca($busca)
     {
         return SolicitaCedula::where('id', $busca)
-            ->orWhere('idrepresentante','LIKE','%'.$busca.'%')
             ->orWhere('status','LIKE','%'.$busca.'%')
+            ->orWhereHas(
+                'representante', function ($query) use ($busca) {
+                    $query->where('cpf_cnpj', 'LIKE','%'.$busca.'%')
+                    ->orWhere('registro_core','LIKE','%'.$busca.'%');
+                }
+            )
             ->paginate(10);
     }
 }

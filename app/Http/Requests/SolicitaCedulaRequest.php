@@ -10,12 +10,12 @@ class SolicitaCedulaRequest extends FormRequest
     {
         return [
             "cep" => "required",
-            "bairro" => "required|max:30",
+            "bairro" => "required|max:100",
             "logradouro" => "required|max:100",
             "numero" => "required|max:15",
             "complemento" => "max:100",
             "estado" => "required|max:5",
-            "municipio" => "required|max:30"
+            "municipio" => "required|max:100"
         ];
     }
 
