@@ -17,6 +17,11 @@ class SolicitaCedulaRepository
         return SolicitaCedula::findOrFail($id);
     }
 
+    public function getAllByIdRepresentante($id)
+    {
+        return SolicitaCedula::where('idrepresentante', $id)->get();
+    }
+
     public function create($idrepresentante, $endereco) 
     {
         return SolicitaCedula::create([
