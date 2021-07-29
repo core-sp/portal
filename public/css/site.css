@@ -2989,7 +2989,7 @@ h5 {
   
   .box-cookies {
 	position: fixed;
-	background: rgba(255, 255, 255, .9);
+	background: #fff;
 	width: 60%;
 	z-index: 998;
 	bottom: 0;
@@ -2999,17 +2999,20 @@ h5 {
   }
   
   .box-cookies .msg-cookies,
-  .box-cookies .btn-cookies {
+  .box-cookies {
 	text-align: center;
-	padding: 15px;
+	padding: 10px;
 	color: #000;
-	font-size: 16px;
+	font-size: 14px;
   }
   
-  .box-cookies .btn-cookies {
-	background: #fff;
+  .btn-cookies {
+	font-size: 12px;
+	text-align: center;
+	background: #007bff;
 	cursor: pointer;
 	align-self: normal;
+	color: #fff;
   }
   
   @media screen and (max-width: 900px) {
