@@ -134,6 +134,7 @@
                       <a href="/institucional" class="dropdown-item">Institucional</a>
                       <a href="/legislacao" class="dropdown-item">Legislação</a>
                       <a href="/missao-visao-e-valores" class="dropdown-item bb-0">Missão, Visão e Valores</a>
+                      <a href="/politica-de-privacidade" class="dropdown-item bb-0">Política de Privacidade</a>
                     </div>
                   </li>
                   <li class="nav-item">
@@ -305,6 +306,7 @@
               <p class="branco"><a href="/consulta-de-situacao">Consulta de Situação</a></p>
               <p class="branco"><a href="/cursos">Cursos</a></p>
               <p class="branco"><a href="/downloads">Downloads</a></p>
+              <p class="branco"><a href="/politica-de-privacidade">Política de Privacidade</a></p>
               <p class="branco"><a href="/simulador">Simulador de Valores</a></p>
             </div>
             <div class="col-md-4">
