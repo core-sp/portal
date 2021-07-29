@@ -3000,7 +3000,7 @@ h5 {
   
   .box-cookies .msg-cookies,
   .box-cookies {
-	text-align: center;
+	text-align: justify;
 	padding: 10px;
 	color: #000;
 	font-size: 14px;
@@ -3018,5 +3018,8 @@ h5 {
   @media screen and (max-width: 900px) {
 	.box-cookies {
 	  flex-direction: column;
+	}
+	.box-cookies .msg-cookies {
+	  text-align: center;
 	}
   }

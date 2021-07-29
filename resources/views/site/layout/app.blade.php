@@ -381,8 +381,8 @@
       <div class="container">
         <div class="row d-flex justify-content-center">
           <div class="box-cookies hide">
-            <p class="msg-cookies text-justify">Coletamos dados exclusivamente para atendimento das atividades finais desta autarquia, e para funcionamento de serviços de legítimo interesse do usuário de acordo com a nossa <strong><u><a href="/politica-de-privacidade">Política de Privacidade</a></u></strong> e, ao continuar navegando, você concorda com estas condições.</p>
-            <button class="btn-cookies btn btn-default">ENTENDI!</button>
+            <p class="msg-cookies">Coletamos dados exclusivamente para atendimento das atividades finais desta autarquia, e para funcionamento de serviços de legítimo interesse do usuário de acordo com a nossa <strong><u><a href="/politica-de-privacidade">Política de Privacidade</a></u></strong> e, ao continuar navegando, você concorda com estas condições.</p>
+            <button class="btn-cookies btn btn-default">CONCORDO</button>
           </div>     
         </div>    
       </div>     
