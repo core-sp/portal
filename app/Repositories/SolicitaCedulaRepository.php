@@ -67,4 +67,13 @@ class SolicitaCedulaRepository
             )
             ->paginate(10);
     }
+
+    public function getToTableFilter($mindia, $maxdia)
+    {
+        return SolicitaCedula::whereBetween('updated_at',[$mindia,$maxdia])
+            ->orderBy('id','ASC')
+            ->orderBy('updated_at','ASC')
+            ->limit(50)
+            ->paginate(25);
+    }
 }
