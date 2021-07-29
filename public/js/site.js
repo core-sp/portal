@@ -764,3 +764,20 @@ $('.emitirCertidaoBtn').on('click', function(){
 	$('.emitirCertidaoBtn').hide();
 	$('.baixarCertidaoBtn').hide();
 });
+
+// Cuida do comportamento da mensagem do cookie e armazena na maquina do cliente a opção, e somente apos a limpeza que volta a pedir
+
+(() => {
+	if (!localStorage.pureJavaScriptCookies) {
+	  document.querySelector(".box-cookies").classList.remove('hide');
+	}
+	
+	const acceptCookies = () => {
+	  document.querySelector(".box-cookies").classList.add('hide');
+	  localStorage.setItem("pureJavaScriptCookies", "accept");
+	};
+	
+	const btnCookies = document.querySelector(".btn-cookies");
+	
+	btnCookies.addEventListener('click', acceptCookies);
+  })();
