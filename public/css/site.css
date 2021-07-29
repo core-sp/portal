@@ -2978,3 +2978,42 @@ h5 {
 		height: 100%;
 	}
 }
+
+/* 
+	Cuida do comportamento da mensagem do uso dos cookies
+*/
+
+.box-cookies.hide {
+	display: none !important;
+  }
+  
+  .box-cookies {
+	position: fixed;
+	background: rgba(255, 255, 255, .9);
+	width: 60%;
+	z-index: 998;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  }
+  
+  .box-cookies .msg-cookies,
+  .box-cookies .btn-cookies {
+	text-align: center;
+	padding: 15px;
+	color: #000;
+	font-size: 16px;
+  }
+  
+  .box-cookies .btn-cookies {
+	background: #fff;
+	cursor: pointer;
+	align-self: normal;
+  }
+  
+  @media screen and (max-width: 900px) {
+	.box-cookies {
+	  flex-direction: column;
+	}
+  }
