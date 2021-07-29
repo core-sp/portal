@@ -17,6 +17,11 @@ class SolicitaCedulaRepository
         return SolicitaCedula::findOrFail($id);
     }
 
+    public function getByStatusEmAndamento($idrepresentante)
+    {
+        return SolicitaCedula::where('status', '=', 'Em andamento')->where('idrepresentante', '=', $idrepresentante)->first();
+    }
+
     public function getAllByIdRepresentante($id)
     {
         return SolicitaCedula::where('idrepresentante', $id)->get();
@@ -37,16 +42,16 @@ class SolicitaCedulaRepository
         ]);
     }
 
-    public function updateStatusAprovado($id)
+    public function updateStatusAceito($id, $iduser)
     {
         return SolicitaCedula::findOrFail($id)
-            ->update(["status" => SolicitaCedula::STATUS_APROVADO]);
+            ->update(["status" => SolicitaCedula::STATUS_ACEITO, 'idusuario' => $iduser]);
     }
 
-    public function updateStatusReprovado($id, $justificativa)
+    public function updateStatusRecusado($id, $justificativa, $iduser)
     {
         return SolicitaCedula::findOrFail($id)
-            ->update(["status" => SolicitaCedula::STATUS_REPROVADO, "justificativa" => $justificativa]);
+            ->update(["status" => SolicitaCedula::STATUS_RECUSADO, "justificativa" => $justificativa, 'idusuario' => $iduser]);
     }
 
     public function getBusca($busca)
@@ -56,6 +61,7 @@ class SolicitaCedulaRepository
             ->orWhereHas(
                 'representante', function ($query) use ($busca) {
                     $query->where('cpf_cnpj', 'LIKE','%'.$busca.'%')
+                    ->orWhere('nome','LIKE','%'.$busca.'%')
                     ->orWhere('registro_core','LIKE','%'.$busca.'%');
                 }
             )

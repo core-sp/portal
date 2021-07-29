@@ -2,12 +2,12 @@
     <div class="row">
         <div class="col">
             @switch($resultado->status)
-                @case('Aprovado')
-                    <p><strong class="text-success"><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Enviado ao Gerenti em {{ formataData($resultado->updated_at) }}</strong></p>
+                @case('Aceito')
+                    <p><strong class="text-success"><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Solicitação aceita pelo(a) atendente {{$resultado->usuario->nome}} em {{ formataData($resultado->updated_at) }}</strong></p>
                     <hr>
                 @break
-                @case('Reprovado')
-                    <p class="{{ isset($resultado->justificativa) ? 'mb-0' : '' }}"><strong class="text-danger"><i class="fas fa-ban"></i>&nbsp;&nbsp;Reprovado em {{ formataData($resultado->updated_at) }}</strong></p>
+                @case('Recusado')
+                    <p class="{{ isset($resultado->justificativa) ? 'mb-0' : '' }}"><strong class="text-danger"><i class="fas fa-ban"></i>&nbsp;&nbsp;Solicitação reprovada pelo(a) atendente {{$resultado->usuario->nome}} em {{ formataData($resultado->updated_at) }}</strong></p>
                     @isset($resultado->justificativa)
                         <p class="light"><small class="light">{!! '—————<br><strong>Motivo:</strong> ' . $resultado->justificativa !!}</small></p>
                     @endisset
@@ -29,7 +29,6 @@
             <p class="mb-0">Estado: <strong>{{ $resultado->estado }}</strong></p>
             <p>Município: <strong>{{ $resultado->municipio }}</strong></p>
             @if ($resultado->status === 'Em andamento')
-            <h5>Solicitação de cédula:</h5>
                 <hr>
                 <h4 class="mb-3">Ações</h4>
                 <form action="{{ route('admin.representante-solicita-cedula.post') }}" method="POST" class="d-inline">
@@ -38,17 +37,17 @@
                     <input type="hidden" name="ass_id" value="{{ $resultado->representante->ass_id }}">
                     <input type="hidden" name="infos" value="{{ serialize($resultado->representante->toArray()) }}">
                     <button type="submit" class="btn btn-primary">
-                        Enviar para o Gerenti
+                        Aceito
                     </button>
                 </form>
-                <button class="btn btn-info" id="recusar-trigger">Reprovar&nbsp;&nbsp;<i class="fas fa-chevron-down"></i></button>
+                <button class="btn btn-info" id="recusar-trigger">Recusar&nbsp;&nbsp;<i class="fas fa-chevron-down"></i></button>
                 <div class="w-100" id="recusar-form">
                     <form action="{{ route('admin.representante-solicita-cedula-reprovada.post') }}" method="POST" class="mt-2">
                         @csrf
                         <input type="hidden" name="id" value="{{ $resultado->id }}">
-                        <textarea name="justificativa" rows="3" placeholder="Insira aqui o motivo pelo qual a solicitação foi reprovada..." class="form-control"></textarea>
+                        <textarea name="justificativa" rows="3" placeholder="Insira aqui o motivo pelo qual a solicitação foi recusada..." class="form-control"></textarea>
                         <button type="submit" class="btn btn-danger mt-2">
-                            Reprovar
+                            Recusar
                         </button>
                     </form>
                 </div>

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
 use App\SolicitaCedula;
 use App\Traits\ControleAcesso;
 use App\Http\Controllers\ControleController;
-use App\Repositories\GerentiRepositoryInterface;
 use App\Repositories\SolicitaCedulaRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
@@ -17,7 +17,6 @@ class SolicitaCedulaController extends Controller
     use ControleAcesso, TabelaAdmin;
 
     private $class = 'SolicitaCedulaController';
-    private $gerentiRepository;
     private $solicitaCedulaRepository;
 
     // Variáveis
@@ -27,12 +26,13 @@ class SolicitaCedulaController extends Controller
         'plural' => 'solicitações de cédulas',
         'pluraliza' => 'solicitações de cédulas',
         'mostra' => 'solicita-cedula',
+        'slug' => 'solicita-cedula',
         'busca' => 'solicita-cedulas'
     ];
 
     public function __construct(SolicitaCedulaRepository $solicitaCedulaRepository)
     {
-        // $this->middleware('auth');
+        $this->middleware('auth');
         $this->solicitaCedulaRepository = $solicitaCedulaRepository;
     }
 
@@ -45,7 +45,7 @@ class SolicitaCedulaController extends Controller
 
     public function show($id)
     {
-        // $this->autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
 
         $resultado = $this->solicitaCedulaRepository->getById($id);
         $variaveis = (object) $this->variaveis;
@@ -55,25 +55,23 @@ class SolicitaCedulaController extends Controller
 
     public function inserirSolicitaCedula(Request $request)
     {
-        // $this->gerentiRepository->gerentiInserirEndereco($request->ass_id, unserialize($request->infos));
+        $this->solicitaCedulaRepository->updateStatusAceito($request->id, Auth::user()->idusuario);
 
-        $this->solicitaCedulaRepository->updateStatusAprovado($request->id);
-
-        // event(new CrudEvent('endereço representante', 'enviou para o Gerenti', $request->id));
+        event(new CrudEvent('solicitação de cédula alterada', 'atendente aceitou', $request->id));
 
         return redirect('/admin/solicita-cedula')
-                ->with('message', 'A solicitação da cédula foi cadastrada com sucesso no Gerenti.')
+                ->with('message', 'A solicitação de cédula foi cadastrada com sucesso.')
                 ->with('class', 'alert-success');
     }
 
     public function reprovarSolicitaCedula(Request $request)
     {
-        $this->solicitaCedulaRepository->updateStatusReprovado($request->id, $request->justificativa);
+        $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, Auth::user()->idusuario);
 
-        // event(new CrudEvent('endereço representante', 'recusou', $request->id));
+        event(new CrudEvent('solicitação de cédula alterada', 'atendente recusou e justificou', $request->id));
 
         return redirect('/admin/solicita-cedula')
-                ->with('message', 'A solicitação de cédula foi reprovada.')
+                ->with('message', 'A solicitação de cédula foi recusada.')
                 ->with('class', 'alert-info');
     }
 
@@ -82,8 +80,11 @@ class SolicitaCedulaController extends Controller
         // Opções de cabeçalho da tabela
         $headers = [
             'Código',
-            'ID do Representante',
+            'Representante',
+            'CPF/CNPJ',
+            'Registro CORE',
             'Solicitado em:',
+            'Atualizado em:',
             'Status',
             'Ações'
         ];
@@ -93,8 +94,11 @@ class SolicitaCedulaController extends Controller
             $acoes = '<a href="/admin/solicita-cedula/' . $resultado->id . '" class="btn btn-sm btn-default">Ver</a> ';
             $conteudo = [
                 $resultado->id,
-                $resultado->representante->ass_id,
+                $resultado->representante->nome,
+                $resultado->representante->cpf_cnpj,
+                $resultado->representante->registro_core,
                 formataData($resultado->created_at),
+                formataData($resultado->updated_at),
                 $this->showStatus($resultado->status),
                 $acoes
             ];
@@ -114,15 +118,15 @@ class SolicitaCedulaController extends Controller
     {
         switch ($string) {
             case SolicitaCedula::STATUS_EM_ANDAMENTO:
-                return '<strong><i>Em andamento</i></strong>';
+                return '<strong><i>'.SolicitaCedula::STATUS_EM_ANDAMENTO.'</i></strong>';
             break;
 
-            case SolicitaCedula::STATUS_REPROVADO:
-                return '<strong class="text-danger">Reprovado</strong>';
+            case SolicitaCedula::STATUS_RECUSADO:
+                return '<strong class="text-danger">'.SolicitaCedula::STATUS_RECUSADO.'</strong>';
             break;
 
-            case SolicitaCedula::STATUS_APROVADO:
-                return '<strong class="text-success">Aprovado</strong>';
+            case SolicitaCedula::STATUS_ACEITO:
+                return '<strong class="text-success">'.SolicitaCedula::STATUS_ACEITO.'</strong>';
             break;
             
             default:
@@ -133,7 +137,7 @@ class SolicitaCedulaController extends Controller
 
     public function index()
     {
-        // $this->autoriza($this->class, __FUNCTION__);
+        $this->autoriza($this->class, __FUNCTION__);
 
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
@@ -144,7 +148,7 @@ class SolicitaCedulaController extends Controller
 
     public function busca()
     {
-        // $this->autoriza($this->class, 'index');
+        $this->autoriza($this->class, 'index');
 
         $busca = IlluminateRequest::input('q');
 

@@ -82,12 +82,13 @@ class RepresentanteSiteController extends Controller
         return view('site.representante.enderecos', compact("possuiSolicitacaoEnderecos", "solicitacoesEnderecos", "endereco"));
     }
 
-    public function cedulaView()
+    public function cedulasView()
     {
         $cedulas = $this->solicitaCedulaRepository->getAllByIdRepresentante(Auth::guard('representante')->user()->id);
-        $possuiSolicitacaoCedulas = $cedulas->isNotEmpty();
+        $possuiSolicitacaoCedula = $cedulas->isNotEmpty();
+        $possuiSolicitacaoCedulaEmAndamento = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
 
-        return view('site.representante.cedulas', compact("possuiSolicitacaoCedulas", "cedulas"));
+        return view('site.representante.cedulas', compact("possuiSolicitacaoCedula", "cedulas", 'possuiSolicitacaoCedulaEmAndamento'));
     }
 
     public function listaCobrancas()
@@ -272,6 +273,11 @@ class RepresentanteSiteController extends Controller
             ]);
     }
 
+    public function inserirsolicitarCedulaView()
+    {
+        return view('site.representante.inserir-solicita-cedula');
+    }
+
     public function inserirEnderecoView()
     {
         $count = $this->representanteEnderecoRepository->getCountAguardandoConfirmacaoByAssId(Auth::guard('representante')->user()->ass_id);
@@ -287,24 +293,6 @@ class RepresentanteSiteController extends Controller
 
         return view('site.representante.inserir-endereco');
     }
-
-
-    public function inserirsolicitarCedulaView()
-    {
-        // $count = $this->solicitaCedulaRepository->getCountEmAndamentoByIdRepresentante(Auth::guard('representante')->user()->id);
-        
-        // if($count >= 1) {
-        //     return redirect()
-        //         ->route('representante.enderecos.view')
-        //         ->with([
-        //             'message' => 'Você já possui uma solicitação de alteração de endereço sob análise. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
-        //             'class' => 'alert-danger'
-        //         ]);
-        // }
-
-        return view('site.representante.inserir-solicita-cedula');
-    }
-
 
     public function inserirEndereco(RepresentanteEnderecoRequest $request)
     {
@@ -340,7 +328,9 @@ class RepresentanteSiteController extends Controller
 
     public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
     {
-        $save = $this->solicitaCedulaRepository->create(Auth::guard('representante')->user()->id, request(["cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"]),);
+        $save = $this->solicitaCedulaRepository->create(
+            Auth::guard('representante')->user()->id, 
+            request(["cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"]));
 
         if(!$save) {
             abort(500);
@@ -353,7 +343,7 @@ class RepresentanteSiteController extends Controller
         return redirect()
             ->route('representante.solicitarCedulaView')
             ->with([
-                'message' => 'Solicitação enviada com sucesso! Após verificação das informações, será atualizado.',
+                'message' => 'Solicitação enviada com sucesso! Após verificação das informações, será atualizada.',
                 'class' => 'alert-success'
             ]);
     }
