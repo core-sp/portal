@@ -17,11 +17,16 @@ class TermoConsentimentoRepository
         return TermoConsentimento::findOrFail($id);
     }
 
-    public function create($ip, $registro_core) 
+    public function getByEmail($email)
+    {
+        return TermoConsentimento::where('email', $email)->first();
+    }
+
+    public function create($ip, $email) 
     {
         return TermoConsentimento::create([
             "ip" => $ip,
-            "registro_core" => $registro_core
+            "email" => $email
         ]);
     }
 }

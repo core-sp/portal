@@ -16,7 +16,7 @@ class CreateTermosConsentimentosTable extends Migration
         Schema::create('termos_consentimentos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('ip');
-            $table->string('registro_core');
+            $table->string('email');
             $table->timestamps();
         });
     }

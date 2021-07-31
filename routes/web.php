@@ -225,6 +225,7 @@ Route::prefix('/')->group(function() {
   // Página do termo de consentimento com o acesso via email
   Route::get('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimentoView')->name('termo.consentimento.view');
   Route::post('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimento')->name('termo.consentimento.post');
+  Route::get('/termo-consentimento-pdf', 'TermoConsentimentoController@termoConsentimentoPdf')->name('termo.consentimento.pdf');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

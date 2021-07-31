@@ -24,12 +24,35 @@ class TermoConsentimentoController extends Controller
 
     public function termoConsentimento(Request $request)
     {
-        $this->termoConsentimentoRepository->create(request()->ip(), $request->registro_core);
+        $regras = [
+            'email' => 'required|email|max:191'
+        ];
+        $mensagens = [
+            'required' => 'O campo :attribute é obrigatório',
+            'max' => 'Excedido limite de caracteres',
+            'email' => 'Email inválido'
+        ];
 
-        event(new CrudEvent('termo de consentimento aceito', 'registrado no banco', $request->id));
+        $errors = $request->validate($regras, $mensagens);
+
+        $ja_existe = $this->termoConsentimentoRepository->getByEmail($request->email);
+
+        if($ja_existe)
+        {
+            return redirect('/termo-de-consentimento')
+                ->with('message', 'E-mail já cadastrado para continuar recebendo nossos informativos.')
+                ->with('class', 'alert-warning');
+        }
+
+        $this->termoConsentimentoRepository->create(request()->ip(), $request->email);
 
         return redirect('/termo-de-consentimento')
-                ->with('message', 'O seu registro CORE foi salvo com sucesso para continuar recebendo nossos e-mails.')
+                ->with('message', 'E-mail cadastrado com sucesso para continuar recebendo nossos informativos.')
                 ->with('class', 'alert-success');
+    }
+
+    public function termoConsentimentoPdf()
+    {
+        return response()->file('arquivos/CORE-SP_Termo_de_consentimento.pdf');
     }
 }
