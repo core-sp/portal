@@ -229,6 +229,11 @@ Route::prefix('/')->group(function() {
   Route::get('/agenda-institucional', 'SiteController@agendaInstitucional')->name('agenda-institucional');
   Route::get('/agenda-institucional/{data}', 'SiteController@agendaInstitucionalByData')->name('agenda-institucional-data');
 
+  // Página do termo de consentimento com o acesso via email
+  Route::get('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimentoView')->name('termo.consentimento.view');
+  Route::post('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimento')->name('termo.consentimento.post');
+  Route::get('/termo-consentimento-pdf', 'TermoConsentimentoController@termoConsentimentoPdf')->name('termo.consentimento.pdf');
+
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
 });
