@@ -133,7 +133,7 @@
                       <a href="/conselho" class="dropdown-item">Conselho</a>
                       <a href="/institucional" class="dropdown-item">Institucional</a>
                       <a href="/legislacao" class="dropdown-item">Legislação</a>
-                      <a href="/missao-visao-e-valores" class="dropdown-item bb-0">Missão, Visão e Valores</a>
+                      <a href="/missao-visao-e-valores" class="dropdown-item">Missão, Visão e Valores</a>
                       <a href="/politica-de-privacidade" class="dropdown-item bb-0">Política de Privacidade</a>
                     </div>
                   </li>
