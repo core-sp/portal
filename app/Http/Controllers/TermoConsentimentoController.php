@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\TermoConsentimento;
 use App\Repositories\TermoConsentimentoRepository;
-use App\Events\CrudEvent;
+use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
@@ -44,7 +44,13 @@ class TermoConsentimentoController extends Controller
                 ->with('class', 'alert-warning');
         }
 
-        $this->termoConsentimentoRepository->create(request()->ip(), $request->email);
+        $save = $this->termoConsentimentoRepository->create(request()->ip(), $request->email);
+
+        if(!$save) {
+            abort(500);
+        }
+        
+        event(new ExternoEvent("foi criado um novo registro no termo de consentimento, com a id: " . $save->id));
 
         return redirect('/termo-de-consentimento')
                 ->with('message', 'E-mail cadastrado com sucesso para continuar recebendo nossos informativos.')
