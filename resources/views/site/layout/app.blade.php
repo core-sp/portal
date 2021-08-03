@@ -55,7 +55,7 @@
         <div class="container">
           <div class="row header-margin">
             <div class="col-lg-4 col-md-6 text-left center-768">
-                <a href="/"><img src="{{ asset('img/Selo-para-site_380x99px.png') }}" alt="CORE-SP" id="logo-header" /></a>
+                <a href="/"><img src="{{ asset('img/Selo-para-site-1518x394px002.png') }}" alt="CORE-SP" id="logo-header" /></a>
             </div>
             <div class="col-lg-4 col-md-6 center-768 aai hide-768">
               <div class="d-block setembro">
