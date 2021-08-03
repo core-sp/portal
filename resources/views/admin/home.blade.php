@@ -65,7 +65,25 @@
 		@if(session('idperfil') === 1 || session('idperfil') === 3)
 		</a>
 		@endif
-		</div>	  
+		</div>	 	
+		<div class="col">
+			@if(session('idperfil') === 1 || session('idperfil') === 3)
+			<a href="{{route('termo.consentimento.download')}}" class="inherit">
+			@endif
+				<div class="info-box">
+					<span class="info-box-icon bg-info">
+						<i class="fas fa-newspaper"></i>
+					</span>
+					<div class="info-box-content">
+						<span class="info-box-text inherit">E-mails de aceite do Termo de Consentimento</span>
+						<!-- <span class="info-box-number inherit d-inline">{{ $totalNewsletter }}</span> -->
+						@if(session('idperfil') === 1 || session('idperfil') === 3)
+						&nbsp;<span class="linkDownload d-inline">(Baixar CSV)</span>
+						@endif
+					</div>
+				</div>
+			</a>
+		</div>
 	</div>
   </div>
 </section>

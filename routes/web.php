@@ -142,6 +142,10 @@ Route::prefix('admin')->group(function() {
   Route::post('/representante-enderecos/recusar', 'RepresentanteEnderecoController@recusarEndereco')->name('admin.representante-endereco-recusado.post');
   Route::get('/representante-enderecos-visualizar', 'RepresentanteEnderecoController@visualizarComprovante')->name('representante-endereco.visualizar');
   Route::get('/representante-enderecos-baixar', 'RepresentanteEnderecoController@baixarComprovante')->name('representante-endereco.baixar');
+
+  // Termo de Consentimento, baixar CSV
+  Route::get('/termo-consentimento/download', 'TermoConsentimentoController@download')->name('termo.consentimento.download');
+
 });
 
 /*

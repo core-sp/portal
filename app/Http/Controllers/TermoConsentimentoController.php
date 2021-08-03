@@ -6,6 +6,7 @@ use App\TermoConsentimento;
 use App\Repositories\TermoConsentimentoRepository;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
+use Response;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class TermoConsentimentoController extends Controller
@@ -60,5 +61,30 @@ class TermoConsentimentoController extends Controller
     public function termoConsentimentoPdf()
     {
         return response()->file('arquivos/CORE-SP_Termo_de_consentimento.pdf');
+    }
+
+    public function download()
+    {
+        // Autorização para acessar
+        $now = date('Ymd');
+        $headers = [
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=emails-termo_consentimento-'.$now.'.csv',
+            'Expires' => '0',
+            'Pragma' => 'public',
+        ];
+        $lista = $this->termoConsentimentoRepository->getListaTermosAceitos();
+        $lista = $lista->toArray();
+        array_unshift($lista, array_keys($lista[0]));
+        $callback = function() use($lista) {
+            $fh = fopen('php://output','w');
+            fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
+            foreach($lista as $linha) {
+                fputcsv($fh,$linha,';');
+            }
+            fclose($fh);
+        };
+        return Response::stream($callback, 200, $headers);
     }
 }
