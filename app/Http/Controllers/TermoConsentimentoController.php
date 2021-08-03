@@ -6,6 +6,7 @@ use App\TermoConsentimento;
 use App\Repositories\TermoConsentimentoRepository;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
+use App\Http\Controllers\ControleController;
 use Response;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
@@ -51,7 +52,7 @@ class TermoConsentimentoController extends Controller
             abort(500);
         }
         
-        event(new ExternoEvent("foi criado um novo registro no termo de consentimento, com a id: " . $save->id));
+        event(new ExternoEvent("[IP: " . $save->ip . "] - foi criado um novo registro no termo de consentimento, com a id: " . $save->id));
 
         return redirect('/termo-de-consentimento')
                 ->with('message', 'E-mail cadastrado com sucesso para continuar recebendo nossos informativos.')
@@ -65,7 +66,7 @@ class TermoConsentimentoController extends Controller
 
     public function download()
     {
-        // Autorização para acessar
+        ControleController::autorizaStatic(['1','3']);
         $now = date('Ymd');
         $headers = [
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
@@ -74,13 +75,18 @@ class TermoConsentimentoController extends Controller
             'Expires' => '0',
             'Pragma' => 'public',
         ];
-        $lista = $this->termoConsentimentoRepository->getListaTermosAceitos();
-        $lista = $lista->toArray();
-        array_unshift($lista, array_keys($lista[0]));
-        $callback = function() use($lista) {
+
+        $lista1 = $this->termoConsentimentoRepository->getListaTermosAceitos();
+        $array;
+        foreach($lista1 as $temp) {
+            $array[] = $temp->attributesToArray();
+        }
+
+        array_unshift($array, array_keys($array[0]));
+        $callback = function() use($array) {
             $fh = fopen('php://output','w');
             fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
-            foreach($lista as $linha) {
+            foreach($array as $linha) {
                 fputcsv($fh,$linha,';');
             }
             fclose($fh);
