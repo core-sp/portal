@@ -11,6 +11,7 @@ use App\Traits\ControleAcesso;
 use App\Http\Controllers\ControleController;
 use App\Repositories\SolicitaCedulaRepository;
 use App\Mail\SolicitaCedulaMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class SolicitaCedulaController extends Controller
@@ -65,8 +66,7 @@ class SolicitaCedulaController extends Controller
 
         event(new CrudEvent('solicitação de cédula alterada', 'atendente aceitou', $request->id));
         
-        // $cedula->representante->email
-        Mail::to("desenvolvimento@core-sp.org.br")->queue(new SolicitaCedulaMail($cedula));
+        Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
 
         return redirect('/admin/solicita-cedula')
                 ->with('message', 'A solicitação de cédula foi cadastrada com sucesso.')
@@ -84,8 +84,7 @@ class SolicitaCedulaController extends Controller
 
         event(new CrudEvent('solicitação de cédula alterada', 'atendente recusou e justificou', $request->id));
 
-        // $cedula->representante->email
-        Mail::to("desenvolvimento@core-sp.org.br")->queue(new SolicitaCedulaMail($cedula));
+        Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
 
         return redirect('/admin/solicita-cedula')
                 ->with('message', 'A solicitação de cédula foi recusada.')
