@@ -87,8 +87,9 @@ class RepresentanteSiteController extends Controller
         $cedulas = $this->solicitaCedulaRepository->getAllByIdRepresentante(Auth::guard('representante')->user()->id);
         $possuiSolicitacaoCedula = $cedulas->isNotEmpty();
         $possuiSolicitacaoCedulaEmAndamento = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
-
-        return view('site.representante.cedulas', compact("possuiSolicitacaoCedula", "cedulas", 'possuiSolicitacaoCedulaEmAndamento'));
+        $emdia = $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id);
+        $emdia = $emdia === "Situação: Em dia." ? true : null;
+        return view('site.representante.cedulas', compact("possuiSolicitacaoCedula", "cedulas", 'possuiSolicitacaoCedulaEmAndamento', 'emdia'));
     }
 
     public function listaCobrancas()

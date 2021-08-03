@@ -10,6 +10,7 @@ use App\SolicitaCedula;
 use App\Traits\ControleAcesso;
 use App\Http\Controllers\ControleController;
 use App\Repositories\SolicitaCedulaRepository;
+use App\Mail\SolicitaCedulaMail;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class SolicitaCedulaController extends Controller
@@ -55,9 +56,17 @@ class SolicitaCedulaController extends Controller
 
     public function inserirSolicitaCedula(Request $request)
     {
-        $this->solicitaCedulaRepository->updateStatusAceito($request->id, Auth::user()->idusuario);
+        $cedula = $this->solicitaCedulaRepository->updateStatusAceito($request->id, Auth::user()->idusuario);
+
+        if(!$cedula)
+            abort(500);
+
+        $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
         event(new CrudEvent('solicitação de cédula alterada', 'atendente aceitou', $request->id));
+        
+        // $cedula->representante->email
+        Mail::to("desenvolvimento@core-sp.org.br")->queue(new SolicitaCedulaMail($cedula));
 
         return redirect('/admin/solicita-cedula')
                 ->with('message', 'A solicitação de cédula foi cadastrada com sucesso.')
@@ -66,9 +75,17 @@ class SolicitaCedulaController extends Controller
 
     public function reprovarSolicitaCedula(Request $request)
     {
-        $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, Auth::user()->idusuario);
+        $cedula = $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, Auth::user()->idusuario);
+
+        if(!$cedula)
+            abort(500);
+
+        $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
         event(new CrudEvent('solicitação de cédula alterada', 'atendente recusou e justificou', $request->id));
+
+        // $cedula->representante->email
+        Mail::to("desenvolvimento@core-sp.org.br")->queue(new SolicitaCedulaMail($cedula));
 
         return redirect('/admin/solicita-cedula')
                 ->with('message', 'A solicitação de cédula foi recusada.')
@@ -139,41 +156,11 @@ class SolicitaCedulaController extends Controller
     {
         $this->autoriza($this->class, __FUNCTION__);
 
-
-        // Checa se tem filtro
-        if(IlluminateRequest::input('filtro') === 'sim') {
-            $temFiltro = true;
-
-            $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
-
-            $resultados = $this->checaAplicaFiltros();
-
-            if($resultados instanceof RedirectResponse) {
-                return $resultados;
-            }
-        } 
-        else {
-            $temFiltro = null;
-            $diaFormatado = date('d\/m\/Y');
-            $regional = $this->regionalRepository->getById(Auth::user()->idregional);
-            $variaveis['continuacao_titulo'] = 'em <strong>' . $regional->regional . ' - ' . $diaFormatado . '</strong>';
-
-            $resultados = $this->agendamentoRepository->getToTable($regional->idregional);
-        }
-        // Monta tabela com resultados
-        $tabela = $this->tabelaCompleta($resultados);
-        $variaveis['filtro'] = $this->montaFiltros();
-        $variaveis['mostraFiltros'] = true;
-        $variaveis = (object) $variaveis;
-
-
-
-
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
 
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function busca()
