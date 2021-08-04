@@ -52,7 +52,7 @@ class TermoConsentimentoController extends Controller
             abort(500);
         }
         
-        event(new ExternoEvent("[IP: " . $save->ip . "] - foi criado um novo registro no termo de consentimento, com a id: " . $save->id));
+        event(new ExternoEvent("foi criado um novo registro no termo de consentimento, com a id: " . $save->id));
 
         return redirect('/termo-de-consentimento')
                 ->with('message', 'E-mail cadastrado com sucesso para continuar recebendo nossos informativos.')
