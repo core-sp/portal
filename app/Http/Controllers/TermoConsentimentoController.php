@@ -78,19 +78,28 @@ class TermoConsentimentoController extends Controller
 
         $lista1 = $this->termoConsentimentoRepository->getListaTermosAceitos();
         $array;
-        foreach($lista1 as $temp) {
-            $array[] = $temp->attributesToArray();
+
+        if(!$lista1->isEmpty())
+        {
+            foreach($lista1 as $temp) {
+                $array[] = $temp->attributesToArray();
+            }
+    
+            array_unshift($array, array_keys($array[0]));
+            $callback = function() use($array) {
+                $fh = fopen('php://output','w');
+                fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
+                foreach($array as $linha) {
+                    fputcsv($fh,$linha,';');
+                }
+                fclose($fh);
+            };
+
+            return Response::stream($callback, 200, $headers);
         }
 
-        array_unshift($array, array_keys($array[0]));
-        $callback = function() use($array) {
-            $fh = fopen('php://output','w');
-            fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
-            foreach($array as $linha) {
-                fputcsv($fh,$linha,';');
-            }
-            fclose($fh);
-        };
-        return Response::stream($callback, 200, $headers);
+        return redirect('/admin')
+            ->with('message', 'Não há emails cadastrados na tabela de Termo de Consentimento.')
+            ->with('class', 'alert-warning');
     }
 }
