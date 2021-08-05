@@ -21,7 +21,7 @@ class SolicitaCedulaMail extends Mailable
         $this->body .= '<br /><br />';
         $this->body .= '<strong>Status:</strong> '. $cedula->status;
         $this->body .= '<br /><br />';
-        $this->body .= 'Para verifica-la, acesse a <a href="' . route('representante.login') . '">área restrita do Representante Comercial</a> do Portal Core-SP.';
+        $this->body .= 'Para verificá-la, acesse a <a href="' . route('representante.login') . '">área restrita do Representante Comercial</a> do Portal Core-SP.';
     }
 
     public function build()

@@ -22,7 +22,7 @@ class SolicitaCedulaController extends Controller
     private $solicitaCedulaRepository;
 
     // Variáveis
-    public $variaveis = [
+    private $variaveis = [
         'singular' => 'solicitação de cédula',
         'singulariza' => 'a solicitação de cédula',
         'plural' => 'solicitações de cédulas',
@@ -36,13 +36,6 @@ class SolicitaCedulaController extends Controller
     {
         $this->middleware('auth');
         $this->solicitaCedulaRepository = $solicitaCedulaRepository;
-    }
-
-    public function resultados()
-    {
-        $resultados = $this->solicitaCedulaRepository->getAll();
-
-        return $resultados;
     }
 
     public function show($id)
@@ -155,11 +148,30 @@ class SolicitaCedulaController extends Controller
     {
         $this->autoriza($this->class, __FUNCTION__);
 
-        $resultados = $this->resultados();
-        $tabela = $this->tabelaCompleta($resultados);
-        $variaveis = (object) $this->variaveis;
+        $variaveis = $this->variaveis;
 
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+        // Checa se tem filtro
+        if(IlluminateRequest::input('filtro') === 'sim') {
+            $temFiltro = true;
+
+            $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
+
+            $resultados = $this->checaAplicaFiltros();
+
+            if($resultados instanceof RedirectResponse) {
+                return $resultados;
+            }
+        }else {
+            $temFiltro = null;
+            $resultados = $this->solicitaCedulaRepository->getAll();
+        }
+
+        $tabela = $this->tabelaCompleta($resultados);
+        $variaveis['filtro'] = $this->montaFiltros();
+        $variaveis['mostraFiltros'] = true;
+        $variaveis = (object) $variaveis;
+
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
 
     public function busca()
@@ -176,7 +188,7 @@ class SolicitaCedulaController extends Controller
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 
-    public function confereAplicaFiltros()
+    public function checaAplicaFiltros()
     {
         $this->autoriza($this->class, 'index');
 
@@ -219,7 +231,7 @@ class SolicitaCedulaController extends Controller
 
     public function montaFiltros()
     {
-        $filtro = '<form method="GET" action="/admin/agendamentos/filtro" id="filtroAgendamento" class="mb-0">';
+        $filtro = '<form method="GET" action="'.route('solicita-cedula.filtro').'" id="filtroAgendamento" class="mb-0">';
         $filtro .= '<div class="form-row filtroAge">';
         $filtro .= '<input type="hidden" name="filtro" value="sim" />';
 
