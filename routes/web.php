@@ -150,6 +150,10 @@ Route::prefix('admin')->group(function() {
   Route::get('/solicita-cedulas/busca', 'SolicitaCedulaController@busca')->name('solicita-cedula.busca');
   Route::post('/solicita-cedula/inserir', 'SolicitaCedulaController@inserirSolicitaCedula')->name('admin.representante-solicita-cedula.post');
   Route::post('/solicita-cedula/reprovar', 'SolicitaCedulaController@reprovarSolicitaCedula')->name('admin.representante-solicita-cedula-reprovada.post');
+  
+  // Termo de Consentimento, baixar CSV
+  Route::get('/termo-consentimento/download', 'TermoConsentimentoController@download')->name('termo.consentimento.download');
+
 });
 
 /*

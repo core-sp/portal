@@ -29,4 +29,9 @@ class TermoConsentimentoRepository
             "email" => $email
         ]);
     }
+
+    public function getListaTermosAceitos()
+    {
+        return TermoConsentimento::select('email','created_at')->whereNotNull('email')->get();
+    }
 }

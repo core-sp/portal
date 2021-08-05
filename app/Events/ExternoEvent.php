@@ -23,7 +23,7 @@ class ExternoEvent
      */
     public function __construct($string)
     {
-        $this->string = $string;
+        $this->string = "[IP: " . request()->ip() . "] - " . $string;
     }
 
     /**
