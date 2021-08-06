@@ -88,7 +88,13 @@ class RepresentanteSiteController extends Controller
         $possuiSolicitacaoCedula = $cedulas->isNotEmpty();
         $possuiSolicitacaoCedulaEmAndamento = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
         $emdia = $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id);
-        $emdia = $emdia === "Situação: Em dia." ? true : null;
+        if($emdia === "Situação: Em dia.")
+            $emdia = true;
+        else {
+            $emdia = null;
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") Não pôde solicitar cédula devido a validação no sistema GERENTI.'));
+        }
+
         return view('site.representante.cedulas', compact("possuiSolicitacaoCedula", "cedulas", 'possuiSolicitacaoCedulaEmAndamento', 'emdia'));
     }
 

@@ -139,6 +139,15 @@ $(document).ready(function(){
       }
     }
   });
+
+  $('#filtroCedula').submit(function(e){
+    var maxDataFiltro = $('#datemax').val();
+    var minDataFiltro = $('#datemin').val();
+    if(new Date(minDataFiltro) >= new Date(maxDataFiltro)) {
+      alert('Data inválida. A data inicial não deve ser maior ou igual a data de término.');
+      e.preventDefault();
+    }
+  });
 });
 
 (function($){

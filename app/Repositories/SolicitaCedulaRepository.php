@@ -72,7 +72,6 @@ class SolicitaCedulaRepository
     {
         return SolicitaCedula::whereBetween('updated_at',[$mindia,$maxdia])
             ->orderBy('id','ASC')
-            ->orderBy('updated_at','ASC')
             ->limit(50)
             ->paginate(25);
     }

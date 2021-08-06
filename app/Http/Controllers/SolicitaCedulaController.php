@@ -12,6 +12,8 @@ use App\Http\Controllers\ControleController;
 use App\Repositories\SolicitaCedulaRepository;
 use App\Mail\SolicitaCedulaMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\RedirectResponse;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class SolicitaCedulaController extends Controller
@@ -118,9 +120,11 @@ class SolicitaCedulaController extends Controller
             'table',
             'table-hover'
         ];
+
         // Monta e retorna tabela        
         $tabela = $this->montaTabela($headers, $contents, $classes);
         return $tabela;
+
     }
 
     protected function showStatus($string)
@@ -155,6 +159,7 @@ class SolicitaCedulaController extends Controller
             $temFiltro = true;
 
             $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
+            $variaveis['plural'] = 'solicita-cedula';
 
             $resultados = $this->checaAplicaFiltros();
 
@@ -165,7 +170,7 @@ class SolicitaCedulaController extends Controller
             $temFiltro = null;
             $resultados = $this->solicitaCedulaRepository->getAll();
         }
-
+        
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis['filtro'] = $this->montaFiltros();
         $variaveis['mostraFiltros'] = true;
@@ -180,6 +185,9 @@ class SolicitaCedulaController extends Controller
 
         $busca = IlluminateRequest::input('q');
 
+        // Verifica se o texto buscado contem numero para remover a máscara
+        $busca = preg_match('/\d+/', $busca) > 0 ? apenasNumeros($busca) : $busca;
+
         $resultados = $this->solicitaCedulaRepository->getBusca($busca);
         
         $tabela = $this->tabelaCompleta($resultados);
@@ -192,75 +200,57 @@ class SolicitaCedulaController extends Controller
     {
         $this->autoriza($this->class, 'index');
 
-        // Valores default dos filtros
-        $mindia = date('Y-m-d');
-        $maxdia = date('Y-m-d');
+        $result;
 
-        // Valida e prepara filtro de data mínima
-        if(IlluminateRequest::has('mindia')) {
-            if(!empty(IlluminateRequest::input('mindia'))) {
-                $mindiaArray = explode('/', IlluminateRequest::input('mindia'));
-                $checaMindia = (count($mindiaArray) != 3 || $mindiaArray[2] == null)  ? false : checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
-
-                if($checaMindia === false) {
-                    return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
-                        ->with('class', 'alert-danger');
-                }
-
-                $mindia = date('Y-m-d', strtotime(str_replace('/', '-', IlluminateRequest::input('mindia'))));
+        // Confere se a data consta no request
+        if(IlluminateRequest::has('mindia') && IlluminateRequest::has('maxdia')) {
+            // Confere se a data de início é menor que a do término
+            try {
+                $mindia = Carbon::createFromFormat('Y-m-d', IlluminateRequest::input('mindia'));
+                $maxdia = Carbon::createFromFormat('Y-m-d', IlluminateRequest::input('maxdia'));
+                $result = $mindia->lt($maxdia) ? $this->solicitaCedulaRepository->getToTableFilter($mindia->toDateString(), $maxdia->toDateString()) : null;
+            } catch(\Exception $err) {
+                $result = null;
             }
-        } 
+        }
 
-        // Valida e prepara filtro de data máxima
-        if(IlluminateRequest::has('maxdia')) {
-            if(!empty(IlluminateRequest::input('maxdia'))) {
-                $maxdiaArray = explode('/', IlluminateRequest::input('maxdia'));
-                $checaMaxdia = (count($maxdiaArray) != 3 || $maxdiaArray[2] == null)  ? false : checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
+        if($result)
+            return $result;
 
-                if($checaMaxdia === false) {
-                    return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
-                        ->with('class', 'alert-danger');
-                }
-
-                $maxdia = date('Y-m-d', strtotime(str_replace('/', '-', IlluminateRequest::input('maxdia'))));
-            }         
-        } 
-
-        return $this->solicitaCedulaRepository->getToTableFilter($mindia, $maxdia);
+        return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data inválida. Data de início deve ser menor que a do término. ')->with('class', 'alert-danger');
     }
 
     public function montaFiltros()
     {
-        $filtro = '<form method="GET" action="'.route('solicita-cedula.filtro').'" id="filtroAgendamento" class="mb-0">';
+        $filtro = '<form method="GET" action="'.route('solicita-cedula.filtro').'" id="filtroCedula" class="mb-0">';
         $filtro .= '<div class="form-row filtroAge">';
+
         $filtro .= '<input type="hidden" name="filtro" value="sim" />';
 
         $filtro .= '<div class="form-group mb-0 col">';
 
-        $hoje = date('d\/m\/Y');
-
-        $filtro .= '<label>De</label>';
+        $filtro .= '<label for="datemin">De</label>';
        
         // Montando filtro de data mínima
         if(IlluminateRequest::has('mindia')) {
             $mindia = IlluminateRequest::input('mindia');
-            $filtro .= '<input type="date" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="' . $mindia . '" />';
+            $filtro .= '<input type="date" class="form-control d-inline-block form-control-sm" name="mindia" id="datemin" min="2021-08-01" value="' . $mindia . '" />';
         } 
         else {
-            $filtro .= '<input type="date" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="' . $hoje . '" />';
+            $filtro .= '<input type="date" class="form-control d-inline-block form-control-sm" name="mindia" id="datemin" min="2021-08-01"/>';
         }
 
         $filtro .= '</div>';
         $filtro .= '<div class="form-group mb-0 col">';
-        $filtro .= '<label>Até</label>';
+        $filtro .= '<label for="datemax">Até</label>';
         
         // Montando filtro de data máxima
         if(IlluminateRequest::has('maxdia')) {
             $maxdia = IlluminateRequest::input('maxdia');
-            $filtro .= '<input type="date" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="' . $maxdia . '" />';
+            $filtro .= '<input type="date" class="form-control d-inline-block form-control-sm" name="maxdia" id="datemax" max="3000-08-01" value="' . $maxdia . '" />';
         } 
         else {
-            $filtro .= '<input type="date" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="' . $hoje . '" />';
+            $filtro .= '<input type="date" class="form-control d-inline-block form-control-sm" name="maxdia" id="datemax" max="3000-08-01"/>';
         }
 
         $filtro .= '</div>';
