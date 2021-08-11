@@ -331,6 +331,7 @@
                       class="form-control {{ $errors->has('nomeNl') ? 'is-invalid' : '' }}"
                       value="{{ old('nomeNl') }}"
                       placeholder="Nome *"
+                      required
                       />
                       @if($errors->has('nomeNl'))
                       <div class="invalid-feedback">
@@ -344,6 +345,7 @@
                       class="form-control {{ $errors->has('emailNl') ? 'is-invalid' : '' }}"
                       value="{{ old('emailNl') }}"
                       placeholder="E-mail *"
+                      required
                       />
                       @if($errors->has('emailNl'))
                       <div class="invalid-feedback">
@@ -357,12 +359,30 @@
                       class="form-control celularInput {{ $errors->has('celularNl') ? 'is-invalid' : '' }}"
                       value="{{ old('celularNl') }}"
                       placeholder="Celular *"
+                      required
                       />
                       @if($errors->has('celularNl'))
                       <div class="invalid-feedback">
                       {{ $errors->first('celularNl') }}
                       </div>
                       @endif
+                  </div>
+                  <p class="branco mb-2 text-justify textoTermo">Você pode cancelar a sua inscrição a qualquer momento. Suas informações serão armazenadas dentro dos mais rígidos critérios de segurança no banco de dados do CORE-SP e serão tratadas de acordo com a Lei Geral de Proteção de Dados Pessoais (LGPD)</p>
+                  <div class="form-check">
+                    <input type="checkbox"
+                      name="termo"
+                      class="form-check-input {{ $errors->has('termo') ? 'is-invalid' : '' }}"
+                      id="termo"
+                      {{ old('termo') ? 'checked' : '' }}
+                      required
+                    /> 
+                    <label for="termo" class="branco textoTermo text-justify">Li e concordo com o <a href="{{route('termo.consentimento.pdf')}}" target="_blank"><u>Termo de Consentimento</u></a> de uso de dados, e aceito receber boletins informativos a respeito de parcerias e serviços do CORE-SP.
+                    </label>
+                    @if($errors->has('termo'))
+                    <div class="invalid-feedback">
+                      {{ $errors->first('termo') }}
+                    </div>
+                    @endif
                   </div>
                   <div class="form-group">
                     <button type="submit" class="btn btn-default">Inscrever-se</button>

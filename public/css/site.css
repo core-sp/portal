@@ -1136,6 +1136,10 @@ footer p {
 	border-bottom: 2px solid #FFFFFF;
 }
 
+.textoTermo {
+	font-size: 14px;
+}
+
 #newsletter input[type="text"] {
 	background-color: transparent;
 	border: 1px solid #FFFFFF;

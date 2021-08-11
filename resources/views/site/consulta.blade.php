@@ -39,6 +39,8 @@
         <div class="row nomargin mb-3">
           <p class="mb-2 light">A consulta de situação, novo serviço oferecido pelo Core-SP, é uma solução informatizada que permite verificar a situação do Representante Comercial junto ao Conselho.</p>
           <p class="light">Um recurso simples, ágil e moderno que visa contribuir para uma melhor administração do tempo de Representantes Comerciais e de seus contadores.</p>
+          <p class="light mt-3">Ao consultar, os seus dados serão apenas utilizados para consulta, não sendo utilizados para outros fins além do serviço solicitado. Para mais informações, verifique a nossa <a href="/politica-de-privacidade"  target="_blank"><strong><u>Política de Privacidade</u></strong></a>.
+        </p>
         </div>
         <div class="row nomargin consulta">
           <form method="post" class="d-flex w-100">

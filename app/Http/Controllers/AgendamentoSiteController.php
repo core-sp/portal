@@ -17,6 +17,7 @@ use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoSiteRequest;
 use App\Repositories\AgendamentoBloqueioRepository;
 use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
+use App\Repositories\TermoConsentimentoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoSiteController extends Controller
@@ -24,11 +25,13 @@ class AgendamentoSiteController extends Controller
     private $agendamentoRepository;
     private $regionalRepository;
     private $agendamentoBloqueioRepository;
+    private $termoConsentimentoRepository;
 
-    public function __construct(AgendamentoRepository $agendamentoRepository, RegionalRepository $regionalRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository) {
+    public function __construct(AgendamentoRepository $agendamentoRepository, RegionalRepository $regionalRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository, TermoConsentimentoRepository $termoConsentimentoRepository) {
         $this->agendamentoRepository = $agendamentoRepository;
         $this->regionalRepository = $regionalRepository;
         $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
+        $this->termoConsentimentoRepository = $termoConsentimentoRepository;
     }
 
     public function formView()
@@ -111,11 +114,13 @@ class AgendamentoSiteController extends Controller
         if(!$save) {
             abort(500);
         }
+
+        $termo = $this->termoConsentimentoRepository->create(request()->ip(), null, null, null, $save->idagendamento, null);
             
         // Gera evento de agendamento
         $string = $save->nome . " (CPF: " . $save->cpf . ")";
         $string .= " *agendou* atendimento em *" . $save->regional->regional;
-        $string .= "* no dia " . onlyDate($save->dia);
+        $string .= "* no dia " . onlyDate($save->dia) . "  e foi criado um novo registro no termo de consentimento, com a id: " . $termo->id;
         event(new ExternoEvent($string));
         
         // Enviando email de agendamento
