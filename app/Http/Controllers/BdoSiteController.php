@@ -12,6 +12,7 @@ use App\BdoEmpresa;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AnunciarVagaMail;
+use App\Repositories\TermoConsentimentoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoSiteController extends Controller
@@ -19,12 +20,14 @@ class BdoSiteController extends Controller
     private $bdoEmpresaRepository;
     private $bdoOportunidadeRepository;
     private $regionalRepository;
+    private $termoConsentimentoRepository;
 
-    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository) 
+    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository, TermoConsentimentoRepository $termoConsentimentoRepository) 
     {
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->regionalRepository = $regionalRepository;
+        $this->termoConsentimentoRepository = $termoConsentimentoRepository;
     }
 
     public function index()
@@ -106,7 +109,9 @@ class BdoSiteController extends Controller
             abort(403);
         }
 
-        event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades.'));
+        $termo = $this->termoConsentimentoRepository->create(request()->ip(), null, null, null, null, $oportunidade->idoportunidade);
+
+        event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e foi criado um novo registro no termo de consentimento, com a id: ' . $termo->id));
 
         Mail::to(['assessoria.presidencia@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
 
