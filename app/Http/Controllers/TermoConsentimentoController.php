@@ -46,9 +46,9 @@ class TermoConsentimentoController extends Controller
                 ->with('class', 'alert-warning');
         }
 
-        $save = $this->termoConsentimentoRepository->create(request()->ip(), $request->email);
+        $save = $this->termoConsentimentoRepository->create(request()->ip(), $request->email, null, null, null, null);
 
-        if(!$save) {
+        if($save->isEmpty()) {
             abort(500);
         }
         

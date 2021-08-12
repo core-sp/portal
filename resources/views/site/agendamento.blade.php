@@ -197,6 +197,22 @@
                 @endif
               </div>
             </div>
+            <div class="form-check mt-3">
+              <input type="checkbox"
+                name="termo"
+                class="form-check-input {{ $errors->has('termo') ? 'is-invalid' : '' }}"
+                id="termo"
+                {{ old('termo') ? 'checked' : '' }}
+                required
+              /> 
+              <label for="termo" class="textoTermo text-justify">Li e concordo com o <a href="{{route('termo.consentimento.pdf')}}" target="_blank"><u>Termo de Consentimento</u></a>  de uso de dados, e estou ciente de que os meus dados serão utilizados apenas para notificações por e-mail a respeito do agendamento solicitado.
+              </label>
+              @if($errors->has('termo'))
+              <div class="invalid-feedback">
+                {{ $errors->first('termo') }}
+              </div>
+              @endif
+            </div>
             <div class="float-right mt-4">
               <a href="/" class="btn btn-default">Cancelar</a>
               <button type="submit" class="btn btn-primary">Agendar</button>

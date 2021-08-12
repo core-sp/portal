@@ -30,7 +30,7 @@
         </div>
         <div class="linha-lg"></div>
         <div class="row mt-2">
-            <div class="col-lg-8 conteudo-txt pr-4">
+            <div class="col-lg-8 conteudo-txt link-bdo pr-4">
                 @if(Session::has('message'))
                     <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
                 @endif
@@ -315,6 +315,22 @@
                             </div>
                         @endif
                     </div>
+                    <div class="form-check mt-2">
+                    <input type="checkbox"
+                      name="termo"
+                      class="form-check-input {{ $errors->has('termo') ? 'is-invalid' : '' }}"
+                      id="termo"
+                      {{ old('termo') ? 'checked' : '' }}
+                      required
+                    /> 
+                    <label for="termo" class="textoTermo text-justify">Li e concordo com o <a href="{{route('termo.consentimento.pdf')}}" target="_blank"><u>Termo de Consentimento</u></a> de uso de dados, e permito divulgação dos meus dados de contato apenas para os fins supracitados.
+                    </label>
+                    @if($errors->has('termo'))
+                    <div class="invalid-feedback">
+                      {{ $errors->first('termo') }}
+                    </div>
+                    @endif
+                  </div>
                     <div class="form-group mt-3">
                         <button
                             type="submit"

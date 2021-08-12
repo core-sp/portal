@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ControleController;
+use App\Repositories\TermoConsentimentoRepository;
 use App\Newsletter;
 use App\Events\ExternoEvent;
 use Response;
@@ -12,12 +13,20 @@ use Illuminate\Support\Facades\Validator;
 
 class NewsletterController extends Controller
 {
+    private $termoConsentimentoRepository;
+
+    public function __construct(TermoConsentimentoRepository $termoConsentimentoRepository)
+    {
+        $this->termoConsentimentoRepository = $termoConsentimentoRepository;
+    }
+
     public function store(Request $request)
     {
         $regras = [
             'nomeNl' => 'required|max:191|regex:/^[a-zA-Z ÁáÉéÍíÓóÚúÃãÕõÂâÊêÔô]+$/',
             'emailNl' => 'required|email|unique:newsletters,email',
-            'celularNl' => 'required'
+            'celularNl' => 'required',
+            'termo' => 'accepted'
         ];
         $mensagens = [
             'nomeNl.required' => 'O nome é obrigatório',
@@ -25,7 +34,8 @@ class NewsletterController extends Controller
             'emailNl.email' => 'Email inválido',
             'emailNl.required' => 'O email é obrigatório',
             'celularNl.required' => 'O celular é obrigatório',
-            'emailNl.unique' => 'Este email já está cadastrado em nosso sistema'
+            'emailNl.unique' => 'Este email já está cadastrado em nosso sistema',
+            'accepted' => 'Você deve concordar com o Termo de Consentimento'
         ];
         $validation = Validator::make($request->all(), $regras, $mensagens);
         if($validation->fails()) {
@@ -41,12 +51,17 @@ class NewsletterController extends Controller
         $newsletter->email = $request->input('emailNl');
         $newsletter->celular = $celular;
         $save = $newsletter->save();
+
         if(!$save)
             abort(500);
-        // Gera evento de inscrição no Curso
+
+        $termo = $this->termoConsentimentoRepository->create(request()->ip(), null, null, $newsletter->idnewsletter, null, null);
+
+        // Gera evento de inscrição na Newsletter
         $string = "*".$newsletter->nome."* (".$newsletter->email.")";
-        $string .= " *registrou-se* na newsletter";
+        $string .= " *registrou-se* na newsletter e foi criado um novo registro no termo de consentimento, com a id: " . $termo->id;
         event(new ExternoEvent($string));
+
         // Gera mensagem de agradecimento
         $agradece = "Muito obrigado por inscrever-se em nossa newsletter";
         // Retorna view de agradecimento

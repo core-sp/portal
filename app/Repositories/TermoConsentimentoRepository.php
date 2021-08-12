@@ -22,11 +22,15 @@ class TermoConsentimentoRepository
         return TermoConsentimento::where('email', $email)->first();
     }
 
-    public function create($ip, $email) 
+    public function create($ip, $email, $representante, $newletter, $agendamento, $bdo) 
     {
         return TermoConsentimento::create([
             "ip" => $ip,
-            "email" => $email
+            "email" => $email,
+            "idrepresentante" => $representante,
+            "idnewsletter" => $newletter,
+            "idagendamento" => $agendamento,
+            "idbdo" => $bdo
         ]);
     }
 

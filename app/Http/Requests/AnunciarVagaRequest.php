@@ -27,7 +27,8 @@ class AnunciarVagaRequest extends FormRequest
             'descricaoOportunidade' => 'required|max:500',
             'contatonome' => 'required|max:191',
             'contatotelefone' => 'required|max:191',
-            'contatoemail' => 'required|email|max:191'
+            'contatoemail' => 'required|email|max:191',
+            'termo' => 'accepted'
         ];
     }
 
@@ -49,7 +50,8 @@ class AnunciarVagaRequest extends FormRequest
             'required' => 'Por favor, informe o :attribute',
             'required_if' => 'Por favor, informe o :attribute',
             'email' => 'Email inválido',
-            'max' => 'Excedido número máximo de caracteres'
+            'max' => 'Excedido número máximo de caracteres',
+            'accepted' => 'Você deve concordar com o Termo de Consentimento'
         ];
     }
 
