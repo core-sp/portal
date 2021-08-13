@@ -87,8 +87,9 @@ class RepresentanteSiteController extends Controller
         $cedulas = $this->solicitaCedulaRepository->getAllByIdRepresentante(Auth::guard('representante')->user()->id);
         $possuiSolicitacaoCedula = $cedulas->isNotEmpty();
         $possuiSolicitacaoCedulaEmAndamento = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
-        $emdia = $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id);
-        if($emdia === "Em dia.")
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]);
+        
+        if($emdia == "Em dia.")
             $emdia = true;
         else {
             $emdia = null;
