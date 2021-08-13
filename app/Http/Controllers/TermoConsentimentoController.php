@@ -8,6 +8,7 @@ use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ControleController;
 use Response;
+use Exception;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class TermoConsentimentoController extends Controller
@@ -46,9 +47,9 @@ class TermoConsentimentoController extends Controller
                 ->with('class', 'alert-warning');
         }
 
-        $save = $this->termoConsentimentoRepository->create(request()->ip(), $request->email, null, null, null, null);
-
-        if($save->isEmpty()) {
+        try {
+            $save = $this->termoConsentimentoRepository->create(request()->ip(), $request->email, null, null, null, null);
+        } catch(\Exception $e) {
             abort(500);
         }
         
