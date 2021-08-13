@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\SolicitaCedula;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -20,6 +21,10 @@ class SolicitaCedulaMail extends Mailable
         $this->body .= '<strong>Código da solicitação:</strong> #'. $cedula->id;
         $this->body .= '<br /><br />';
         $this->body .= '<strong>Status:</strong> '. $cedula->status;
+        if($cedula->status == SolicitaCedula::STATUS_RECUSADO) {
+            $this->body .= '<br /><br />';
+            $this->body .= '<strong>Justificativa:</strong> '. $cedula->justificativa;
+        }
         $this->body .= '<br /><br />';
         $this->body .= 'Para verificá-la, acesse a <a href="' . route('representante.login') . '">área restrita do Representante Comercial</a> do Portal Core-SP.';
     }

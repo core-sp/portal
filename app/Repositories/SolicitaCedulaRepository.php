@@ -70,7 +70,7 @@ class SolicitaCedulaRepository
 
     public function getToTableFilter($mindia, $maxdia)
     {
-        return SolicitaCedula::whereBetween('updated_at',[$mindia,$maxdia])
+        return SolicitaCedula::whereDate('created_at', '>=', $mindia)->whereDate('created_at', '<=', $maxdia)
             ->orderBy('id','ASC')
             ->limit(50)
             ->paginate(25);

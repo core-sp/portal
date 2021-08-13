@@ -143,8 +143,12 @@ $(document).ready(function(){
   $('#filtroCedula').submit(function(e){
     var maxDataFiltro = $('#datemax').val();
     var minDataFiltro = $('#datemin').val();
-    if(new Date(minDataFiltro) >= new Date(maxDataFiltro)) {
-      alert('Data inválida. A data inicial não deve ser maior ou igual a data de término.');
+    if(new Date(minDataFiltro) > new Date(maxDataFiltro)) {
+      alert('Data inválida. A data inicial deve ser menor ou igual a data de término.');
+      e.preventDefault();
+    }
+    if(!minDataFiltro || !maxDataFiltro) {
+      alert('Selecione data de início e término.');
       e.preventDefault();
     }
   });

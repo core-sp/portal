@@ -8,7 +8,6 @@ use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
 use App\SolicitaCedula;
 use App\Traits\ControleAcesso;
-use App\Http\Controllers\ControleController;
 use App\Repositories\SolicitaCedulaRepository;
 use App\Mail\SolicitaCedulaMail;
 use Illuminate\Support\Facades\Mail;
@@ -52,41 +51,44 @@ class SolicitaCedulaController extends Controller
 
     public function inserirSolicitaCedula(Request $request)
     {
-        $cedula = $this->solicitaCedulaRepository->updateStatusAceito($request->id, Auth::user()->idusuario);
+        try {
+            $cedula = $this->solicitaCedulaRepository->updateStatusAceito($request->id, Auth::user()->idusuario);
 
-        if(!$cedula)
-            abort(500);
+            $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
-        $cedula = $this->solicitaCedulaRepository->getById($request->id);
-
-        event(new CrudEvent('solicitação de cédula alterada', 'atendente aceitou', $request->id));
-        
-        Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
+            event(new CrudEvent('solicitação de cédula alterada', 'atendente aceitou', $request->id));
+            
+            Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao atualizar o status da solicitação de cédula.");
+        }
 
         return redirect('/admin/solicita-cedula')
-                ->with('message', 'A solicitação de cédula foi cadastrada com sucesso.')
+                ->with('message', 'A solicitação de cédula foi aceita.')
                 ->with('class', 'alert-success');
     }
 
     public function reprovarSolicitaCedula(Request $request)
     {
-        $cedula = $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, Auth::user()->idusuario);
+        try {
+            $cedula = $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, Auth::user()->idusuario);
 
-        if(!$cedula)
-            abort(500);
+            $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
-        $cedula = $this->solicitaCedulaRepository->getById($request->id);
+            event(new CrudEvent('solicitação de cédula alterada', 'atendente recusou e justificou', $request->id));
 
-        event(new CrudEvent('solicitação de cédula alterada', 'atendente recusou e justificou', $request->id));
-
-        Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
-
+            Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao atualizar o status da solicitação de cédula.");
+        }
         return redirect('/admin/solicita-cedula')
                 ->with('message', 'A solicitação de cédula foi recusada.')
                 ->with('class', 'alert-info');
     }
 
-    public function tabelaCompleta($resultados)
+    private function tabelaCompleta($resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -196,7 +198,7 @@ class SolicitaCedulaController extends Controller
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 
-    public function checaAplicaFiltros()
+    private function checaAplicaFiltros()
     {
         $this->autoriza($this->class, 'index');
 
@@ -208,7 +210,7 @@ class SolicitaCedulaController extends Controller
             try {
                 $mindia = Carbon::createFromFormat('Y-m-d', IlluminateRequest::input('mindia'));
                 $maxdia = Carbon::createFromFormat('Y-m-d', IlluminateRequest::input('maxdia'));
-                $result = $mindia->lt($maxdia) ? $this->solicitaCedulaRepository->getToTableFilter($mindia->toDateString(), $maxdia->toDateString()) : null;
+                $result = $mindia->lte($maxdia) ? $this->solicitaCedulaRepository->getToTableFilter($mindia->toDateString(), $maxdia->toDateString()) : null;
             } catch(\Exception $err) {
                 $result = null;
             }
@@ -217,10 +219,10 @@ class SolicitaCedulaController extends Controller
         if($result)
             return $result;
 
-        return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data inválida. Data de início deve ser menor que a do término. ')->with('class', 'alert-danger');
+        return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data inválida. Data de início deve ser menor ou igual a data do término. ')->with('class', 'alert-danger');
     }
 
-    public function montaFiltros()
+    private function montaFiltros()
     {
         $filtro = '<form method="GET" action="'.route('solicita-cedula.filtro').'" id="filtroCedula" class="mb-0">';
         $filtro .= '<div class="form-row filtroAge">';
