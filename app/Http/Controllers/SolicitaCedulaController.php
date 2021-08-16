@@ -231,7 +231,7 @@ class SolicitaCedulaController extends Controller
 
         $filtro .= '<div class="form-group mb-0 col">';
 
-        $filtro .= '<label for="datemin">De</label>';
+        $filtro .= '<label for="datemin">Solicitado em</label>';
        
         // Montando filtro de data mínima
         if(IlluminateRequest::has('mindia')) {
@@ -244,7 +244,7 @@ class SolicitaCedulaController extends Controller
 
         $filtro .= '</div>';
         $filtro .= '<div class="form-group mb-0 col">';
-        $filtro .= '<label for="datemax">Até</label>';
+        $filtro .= '<label for="datemax">até</label>';
         
         // Montando filtro de data máxima
         if(IlluminateRequest::has('maxdia')) {
