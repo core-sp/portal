@@ -12,7 +12,7 @@
         @if($emitir)
         <form method="POST" class="d-inline">
             @csrf
-            <input type="submit" value="Emitir certidão" class="emitirCertidaoBtn btn btn-primary link-nostyle branco" onclick="showLoading()"/>
+            <input type="submit" value="Emitir certidão" class="emitirCertidaoBtn btn btn-primary link-nostyle branco"/>
         </form>
         @endif    
 
