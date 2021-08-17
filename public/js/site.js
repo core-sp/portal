@@ -765,6 +765,15 @@ $('.emitirCertidaoBtn').on('click', function(){
 	$('.baixarCertidaoBtn').hide();
 });
 
+// Loading na página de certidão para usuario aguardar o download
+
+$(function(){
+	if(document.contentType === 'application/pdf'){
+		$('#rc-main').show();
+		$('#loading').hide();
+	}
+});
+
 // Cuida do comportamento da mensagem do cookie e armazena na maquina do cliente a opção, e somente apos a limpeza que volta a pedir
 
 (() => {
