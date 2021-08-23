@@ -18,6 +18,7 @@
             <p class="mb-0">Nome: <strong>{{ $resultado->representante->nome }}</strong></p>
             <p class="mb-0">Email: <strong>{{ $resultado->representante->email }}</strong></p>
             <p class="mb-0">Registro: <strong>{{ $resultado->representante->registro_core }}</strong></p>
+            <p class="mb-0">Regional (desta solicitação): <strong>{{ $resultado->regional }}</strong></p>
             <p>CPF/CNPJ: <strong>{{ $resultado->representante->cpf_cnpj }}</strong></p>
             <hr>
             <h4>Solicitação de envio de cédula:</h4>
@@ -34,18 +35,25 @@
                 <form action="{{ route('admin.representante-solicita-cedula.post') }}" method="POST" class="d-inline">
                     @csrf
                     <input type="hidden" name="id" value="{{ $resultado->id }}">
-                    <input type="hidden" name="ass_id" value="{{ $resultado->representante->ass_id }}">
-                    <input type="hidden" name="infos" value="{{ serialize($resultado->representante->toArray()) }}">
                     <button type="submit" class="btn btn-primary">
                         Aceito
                     </button>
                 </form>
                 <button class="btn btn-info" id="recusar-trigger">Recusar&nbsp;&nbsp;<i class="fas fa-chevron-down"></i></button>
                 <div class="w-100" id="recusar-form">
-                    <form action="{{ route('admin.representante-solicita-cedula-reprovada.post') }}" method="POST" class="mt-2">
+                    <form action="{{ route('admin.representante-solicita-cedula-reprovada.post') }}" method="POST" class="mt-2 cedula_recusada">
                         @csrf
                         <input type="hidden" name="id" value="{{ $resultado->id }}">
-                        <textarea name="justificativa" rows="3" placeholder="Insira aqui o motivo pelo qual a solicitação foi recusada..." class="form-control"></textarea>
+                        <textarea 
+                            name="justificativa" 
+                            rows="3" 
+                            placeholder="Insira aqui o motivo pelo qual a solicitação foi recusada..." 
+                            class="form-control {{ $errors->has('justificativa') ? 'is-invalid' : '' }}">{{ old('justificativa') }}</textarea>
+                        @if($errors->has('justificativa'))
+                            <div class="invalid-feedback">
+                            {{ $errors->first('justificativa') }}
+                            </div>
+                        @endif
                         <button type="submit" class="btn btn-danger mt-2">
                             Recusar
                         </button>

@@ -24,13 +24,14 @@ class SolicitaCedulaRepository
 
     public function getAllByIdRepresentante($id)
     {
-        return SolicitaCedula::where('idrepresentante', $id)->get();
+        return SolicitaCedula::where('idrepresentante', $id)->orderBy('id','DESC')->get();
     }
 
-    public function create($idrepresentante, $endereco) 
+    public function create($idrepresentante, $regional, $endereco) 
     {
         return SolicitaCedula::create([
             "idrepresentante" => $idrepresentante,
+            "regional" => $regional,
             "cep" => $endereco["cep"],
             "bairro" => $endereco["bairro"],
             "logradouro" => $endereco["logradouro"],
@@ -57,6 +58,7 @@ class SolicitaCedulaRepository
     public function getBusca($busca)
     {
         return SolicitaCedula::where('id', $busca)
+            ->orWhere('regional','LIKE','%'.$busca.'%')
             ->orWhere('status','LIKE','%'.$busca.'%')
             ->orWhereHas(
                 'representante', function ($query) use ($busca) {
@@ -73,6 +75,6 @@ class SolicitaCedulaRepository
         return SolicitaCedula::whereDate('created_at', '>=', $mindia)->whereDate('created_at', '<=', $maxdia)
             ->orderBy('id','ASC')
             ->limit(50)
-            ->paginate(25);
+            ->paginate(15);
     }
 }

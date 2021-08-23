@@ -337,13 +337,13 @@ class RepresentanteSiteController extends Controller
     public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
     {
         try {
+            $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
+            $regional = $tipoPessoa === Representante::PESSOA_FISICA ? $this->gerentiRepository->gerentiDadosGeraisPF(Auth::guard('representante')->user()->ass_id)['Regional'] : $this->gerentiRepository->gerentiDadosGeraisPJ(Auth::guard('representante')->user()->ass_id)['Regional'];
             $save = $this->solicitaCedulaRepository->create(
-                Auth::guard('representante')->user()->id, 
+                Auth::guard('representante')->user()->id, $regional, 
                 request(["cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"]));
 
             event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") solicitou cédula.'));
-
-            // Mail::to(['desenvolvimento@core-sp.org.br', 'atendimento.adm@core-sp.org.br'])->queue(new SolicitacaoAlteracaoEnderecoMail($save->id));
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao criar sua solicitação de cédula.");

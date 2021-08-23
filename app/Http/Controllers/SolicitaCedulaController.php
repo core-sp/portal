@@ -71,6 +71,16 @@ class SolicitaCedulaController extends Controller
 
     public function reprovarSolicitaCedula(Request $request)
     {
+        $regras = [
+            'justificativa' => 'required|min:5|max:191'
+        ];
+        $mensagens = [
+            'required' => 'O :attribute é obrigatório',
+            'min' => 'O :attribute deve ter, no mínimo, 5 caracteres',
+            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+        ];
+        $request->validate($regras, $mensagens);
+
         try {
             $cedula = $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, Auth::user()->idusuario);
 
@@ -96,6 +106,7 @@ class SolicitaCedulaController extends Controller
             'Representante',
             'CPF/CNPJ',
             'Registro CORE',
+            'Regional',
             'Solicitado em:',
             'Atualizado em:',
             'Status',
@@ -110,6 +121,7 @@ class SolicitaCedulaController extends Controller
                 $resultado->representante->nome,
                 $resultado->representante->cpf_cnpj,
                 $resultado->representante->registro_core,
+                $resultado->regional,
                 formataData($resultado->created_at),
                 formataData($resultado->updated_at),
                 $this->showStatus($resultado->status),

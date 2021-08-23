@@ -193,6 +193,18 @@ $(document).ready(function(){
     $('#recusar-form').toggle();
   });
 
+  $('.cedula_recusada').submit(function(e){
+    if($('[name="justificativa"]').val().trim().length < 5) {
+      e.preventDefault();
+      alert("O campo de justificativa deve ter, no mínimo, 5 caracteres");
+    }else if($('[name="justificativa"]').val().trim().length > 191) {
+      e.preventDefault();
+      alert("O campo de justificativa deve ter, no máximo, 191 caracteres");
+    }
+    else
+      $('.cedula_recusada').submit();
+  });
+
   $('.anoInput').mask('0000');
 
   $(document).on('change', ".nParcela", function() {
