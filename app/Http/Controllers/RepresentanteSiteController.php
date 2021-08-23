@@ -338,7 +338,7 @@ class RepresentanteSiteController extends Controller
     {
         try {
             $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
-            $regional = $tipoPessoa === Representante::PESSOA_FISICA ? $this->gerentiRepository->gerentiDadosGeraisPF(Auth::guard('representante')->user()->ass_id)['Regional'] : $this->gerentiRepository->gerentiDadosGeraisPJ(Auth::guard('representante')->user()->ass_id)['Regional'];
+            $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, Auth::guard('representante')->user()->ass_id)['Regional'];
             $save = $this->solicitaCedulaRepository->create(
                 Auth::guard('representante')->user()->id, $regional, 
                 request(["cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"]));
