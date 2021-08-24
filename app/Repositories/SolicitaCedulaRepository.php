@@ -27,11 +27,11 @@ class SolicitaCedulaRepository
         return SolicitaCedula::where('idrepresentante', $id)->orderBy('id','DESC')->get();
     }
 
-    public function create($idrepresentante, $regional, $endereco) 
+    public function create($idrepresentante, $idregional, $endereco) 
     {
         return SolicitaCedula::create([
             "idrepresentante" => $idrepresentante,
-            "regional" => $regional,
+            "idregional" => $idregional,
             "cep" => $endereco["cep"],
             "bairro" => $endereco["bairro"],
             "logradouro" => $endereco["logradouro"],
@@ -58,13 +58,16 @@ class SolicitaCedulaRepository
     public function getBusca($busca)
     {
         return SolicitaCedula::where('id', $busca)
-            ->orWhere('regional','LIKE','%'.$busca.'%')
             ->orWhere('status','LIKE','%'.$busca.'%')
             ->orWhereHas(
                 'representante', function ($query) use ($busca) {
                     $query->where('cpf_cnpj', 'LIKE','%'.$busca.'%')
                     ->orWhere('nome','LIKE','%'.$busca.'%')
                     ->orWhere('registro_core','LIKE','%'.$busca.'%');
+                })
+            ->orWhereHas(
+                'regional', function ($query) use ($busca) {
+                    $query->where('regional', 'LIKE','%'.$busca.'%');
                 }
             )
             ->paginate(10);

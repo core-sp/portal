@@ -121,7 +121,7 @@ class SolicitaCedulaController extends Controller
                 $resultado->representante->nome,
                 $resultado->representante->cpf_cnpj,
                 $resultado->representante->registro_core,
-                $resultado->regional,
+                $resultado->regional->regional,
                 formataData($resultado->created_at),
                 formataData($resultado->updated_at),
                 $this->showStatus($resultado->status),

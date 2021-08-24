@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class SolicitaCedula extends Model
 {
-    protected $table = 'solicita_cedula';
+    protected $table = 'solicitacoes_cedulas';
     protected $guarded = [];
-    protected $with = ['representante', 'usuario'];
+    protected $with = ['representante', 'usuario', 'regional'];
 
     const STATUS_EM_ANDAMENTO = "Em andamento";
     const STATUS_ACEITO = "Aceito";
@@ -22,5 +22,10 @@ class SolicitaCedula extends Model
     public function usuario()
     {
     	return $this->belongsTo('App\User', 'idusuario');
+    }
+
+    public function regional()
+    {
+    	return $this->belongsTo('App\Regional', 'idregional');
     }
 }

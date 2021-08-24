@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSolicitaCedulaTable extends Migration
+class CreateSolicitacoesCedulasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class CreateSolicitaCedulaTable extends Migration
      */
     public function up()
     {
-        Schema::create('solicita_cedula', function (Blueprint $table) {
+        Schema::create('solicitacoes_cedulas', function (Blueprint $table) {
             $table->bigIncrements('id');
+			$table->bigInteger('idregional')->unsigned();
+			$table->foreign('idregional')->references('idregional')->on('regionais');
             $table->string('cep');
             $table->string('bairro');
             $table->string('logradouro');
@@ -26,6 +28,8 @@ class CreateSolicitaCedulaTable extends Migration
             $table->text('justificativa')->nullable();
             $table->bigInteger('idrepresentante')->unsigned();
             $table->foreign('idrepresentante')->references('id')->on('representantes');
+            $table->bigInteger('idusuario')->unsigned()->nullable();
+            $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();
         });
     }
@@ -37,6 +41,6 @@ class CreateSolicitaCedulaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('solicita_cedula');
+        Schema::dropIfExists('solicitacoes_cedulas');
     }
 }

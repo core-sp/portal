@@ -19,7 +19,7 @@
             <p class="mb-0">Email: <strong>{{ $resultado->representante->email }}</strong></p>
             <p class="mb-0">Registro: <strong>{{ $resultado->representante->registro_core }}</strong></p>
             <p class="mb-0">CPF/CNPJ: <strong>{{ $resultado->representante->cpf_cnpj }}</strong></p>
-            <p>Regional (desta solicitação): <strong>{{ $resultado->regional }}</strong></p>
+            <p>Regional (desta solicitação): <strong>{{ $resultado->regional->regional }}</strong></p>
             <hr>
             <h4>Solicitação de envio de cédula:</h4>
             <p class="mb-0">CEP: <strong>{{ $resultado->cep }}</strong></p>

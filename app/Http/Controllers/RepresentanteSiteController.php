@@ -25,6 +25,7 @@ use App\Http\Requests\RepresentanteEnderecoRequest;
 use App\Http\Requests\SolicitaCedulaRequest;
 use App\Repositories\RepresentanteEnderecoRepository;
 use App\Repositories\SolicitaCedulaRepository;
+use App\Repositories\RegionalRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
@@ -34,14 +35,16 @@ class RepresentanteSiteController extends Controller
     private $gerentiApiRepository;
     protected $idendereco;
     private $solicitaCedulaRepository;
+    private $regionalRepository;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, SolicitaCedulaRepository $solicitaCedulaRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, SolicitaCedulaRepository $solicitaCedulaRepository, RegionalRepository $regionalRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->gerentiRepository = $gerentiRepository;
         $this->representanteEnderecoRepository = $representanteEnderecoRepository;
         $this->gerentiApiRepository = $gerentiApiRepository;
         $this->solicitaCedulaRepository = $solicitaCedulaRepository;
+        $this->regionalRepository = $regionalRepository;
     }
 
     public function index()
@@ -339,8 +342,9 @@ class RepresentanteSiteController extends Controller
         try {
             $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
             $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, Auth::guard('representante')->user()->ass_id)['Regional'];
+            $idregional = $this->regionalRepository->getIdByRegional($regional);
             $save = $this->solicitaCedulaRepository->create(
-                Auth::guard('representante')->user()->id, $regional, 
+                Auth::guard('representante')->user()->id, $idregional, 
                 request(["cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"]));
 
             event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") solicitou cédula.'));
