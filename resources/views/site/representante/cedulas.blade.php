@@ -23,7 +23,7 @@
                             <p class="pb-0 branco">CEP: <strong>{{ $item->cep }}</strong></p>
                             <p class="pb-0 branco">Estado: <strong>{{ $item->estado }}</strong></p>
                             <p class="pb-0 branco">Município: <strong>{{ $item->municipio }}</strong></p>
-                            <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-danger' : 'text-warning' }} text-uppercase">{{ $item->status }}</strong></p>
+                            <p class="pb-0 branco">Status: <strong class="{{ $item->status === 'Recusado' ? 'text-dark' : 'text-warning' }} text-uppercase">{{ $item->status }}</strong></p>
                             @isset($item->justificativa)
                                 <p class="pb-0 lh-1 cinza-claro"><small class="light">{!! '—————<br>' . $item->justificativa !!}</small></p>
                             @endisset
