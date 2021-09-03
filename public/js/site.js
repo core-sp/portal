@@ -692,7 +692,7 @@ function getDate() {
 	});
 
 	// Calendário Simulador
-	var hoje = $('#dataInicio').val();
+	var hoje = $('#dataInicio').attr('max');
 
 	if($('#tipoPessoa').val() != '1') {
 		$('#dataInicio').prop('readonly', true);
@@ -728,7 +728,7 @@ function getDate() {
 		var fileName = e.target.files[0].name;
 		$(this).next('.custom-file-label').html(fileName);
 	})
-	
+
 	// Mostra Crimage Dois
 	$('#linkShowCrimageDois').on('click', function(){
 		$('#showCrimageDois').hide();
