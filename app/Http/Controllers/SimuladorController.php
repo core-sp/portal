@@ -210,7 +210,8 @@ class SimuladorController extends Controller
         }
 
         $total = number_format($total, 2, ',', '.');
+        $hoje = date('Y-m-d');
 
-        return view('site.simulador', compact('extrato', 'taxas', 'total', 'rt', 'rtTaxas', 'rtTotal', 'totalGeral'));
+        return view('site.simulador', compact('extrato', 'taxas', 'total', 'rt', 'rtTaxas', 'rtTotal', 'totalGeral', 'hoje'));
     }
 }
