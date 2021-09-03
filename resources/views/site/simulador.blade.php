@@ -55,19 +55,18 @@
               <div class="col-sm">
                 <label for="dataInicio">Data de início das atividades *</label>
                 <input
-                  type="text"
+                  type="date"
                   name="dataInicio"
                   id="dataInicio" 
-                  class="form-control dataInput {{ $errors->has('dataInicio') ? 'is-invalid' : '' }}"
+                  class="form-control {{ $errors->has('dataInicio') ? 'is-invalid' : '' }}"
                   @if(Request::input('dataInicio'))
                     value="{{ Request::input('dataInicio') }}"
-                  @elseif($errors->has('dataInicio'))
-                    value=""
                   @else
-                    value="{{ date('d\/m\/Y') }}"
+                    value="{{ $hoje }}"
                   @endif
-                  placeholder="dd/mm/aaaa"
                   autocomplete="off"
+                  min="1900-01-01"
+                  max="{{ $hoje }}"
                   readonly
                   required
                 />

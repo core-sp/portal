@@ -136,14 +136,15 @@ class SimuladorController extends Controller
 
     public function view()
     {
-        return view('site.simulador');
+        $hoje = date('Y-m-d');
+        return view('site.simulador', compact('hoje'));
     }
 
     protected function consertaData($data)
     {
         // Formatação da data
-        $array = explode('/', $data);
-        return $array[2] . '.' . $array[1] . '.' . $array[0];
+        $novaDt = str_replace('-', '.', $data);
+        return $novaDt;
     }
 
     protected function validateRequest()
