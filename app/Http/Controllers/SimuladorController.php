@@ -48,7 +48,7 @@ class SimuladorController extends Controller
         ]);
 
         $array = $run->fetchAll();
-
+        dd($array);
         foreach($array as $single) {
             if (strpos($single['DESCRICAO'], 'Anuidade') !== false) {
                 $desconto = $this->descontoAnuidade($single['VALOR_TOTAL']);
