@@ -56,7 +56,7 @@ class SimuladorController extends Controller
                     array_push($array, $desconto);
             }
         }
-        dd($array);
+        
         return $array;
     }
 
