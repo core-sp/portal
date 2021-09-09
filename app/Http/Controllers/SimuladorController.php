@@ -57,6 +57,7 @@ class SimuladorController extends Controller
             }
             if (strpos($single['DESCRICAO'], 'Multa') !== false) {
                 $k = key($single);
+                dd($k);
                 unset($array[$k]);
             }
         }
