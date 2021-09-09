@@ -58,7 +58,8 @@ class SimuladorController extends Controller
         }
 
         $p = array_search('Multa', array_column($array, 'DESCRICAO'));
-        ($p !== false) ? unset($array[$p]) : null;
+        if($p !== false) 
+            unset($array[$p]);
         dd($array);
         return $array;
     }
