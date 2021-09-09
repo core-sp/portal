@@ -55,13 +55,13 @@ class SimuladorController extends Controller
                 if(isset($desconto))
                     array_push($array, $desconto);
             }
+            dd(strpos($single['DESCRICAO'], 'Multa') !== false);
+            if (strpos($single['DESCRICAO'], 'Multa') !== false) {
+                $k = key($single);
+                unset($array[$k]);
+            }
         }
-
-        $p = array_search('Multa', array_column($array, 'DESCRICAO'));
-        var_dump($p);
-        if($p !== false) 
-            unset($array[$p]);
-        // dd($array);
+        dd($array);
         return $array;
     }
 
