@@ -55,7 +55,6 @@ class SimuladorController extends Controller
                 if(isset($desconto))
                     array_push($array, $desconto);
             }
-            dd(strpos($single['DESCRICAO'], 'Multa') !== false);
             if (strpos($single['DESCRICAO'], 'Multa') !== false) {
                 $k = key($single);
                 unset($array[$k]);
