@@ -56,9 +56,9 @@ class SimuladorController extends Controller
                     array_push($array, $desconto);
             }
             if (strpos($value['DESCRICAO'], 'Multa') !== false) {
-                $k = $key;
+                $k = key($value);
                 dd($k);
-                // unset($array[$k]);
+                unset($array[$k]);
             }
         }
         dd($array);
