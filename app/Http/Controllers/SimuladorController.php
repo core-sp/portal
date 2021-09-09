@@ -56,12 +56,11 @@ class SimuladorController extends Controller
                     array_push($array, $desconto);
             }
             if (strpos($single['DESCRICAO'], 'Multa') !== false) {
-                unset($single);
+                unset($array[$single]);
             }
         }
-        $array2 = array_values($array);
-        dd($array2);
-        return $array2;
+        dd($array);
+        return $array;
     }
 
     protected function descontoAnuidade($anuidade)
