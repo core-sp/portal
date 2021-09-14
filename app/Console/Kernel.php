@@ -14,7 +14,6 @@ use App\Http\Controllers\Helper;
 use App\Http\Controllers\Helpers\AgendamentoControllerHelper;
 use App\Representante;
 use Carbon\Carbon;
-use App\Connections\FirebirdConnection;
 
 class Kernel extends ConsoleKernel
 {
@@ -238,16 +237,14 @@ class Kernel extends ConsoleKernel
         // Verifica conexão com o gerenti a cada hora, caso não consiga se conectar, envia emails
         $schedule->call(function(){
             // $users = User::where('idperfil', 1)->get();
-            try{
-                $conexao = new FirebirdConnection();
-            } catch (\Exception $e) {
+            $url = substr(env('GERENTI_HOST'), 0, 15);
+            $conexao = exec("ping -c 5 ".$url);
+            if(strlen($conexao) <= 0){
                 $body = '<h3><i>(Mensagem Programada)</i></h3>';
                 $body .= '<p><strong>Erro!!!</strong> Não foi possível estabelecer uma conexão com o sistema Gerenti no dia de hoje: <strong>'.Carbon::now()->format('d/m/Y, \à\s H:i').'</strong></p>';
                 Mail::to(['desenvolvimento@core-sp.org.br', 'edson@core-sp.org.br'])->queue(new ConexaoGerentiMail($body));
                 // foreach($users as $user)
                     // Mail::to($user->email)->send(new ConexaoGerentiMail($body));
-            } finally{
-                unset($conexao);
             }
         })->hourly();
     }
