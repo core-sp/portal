@@ -237,7 +237,7 @@ class Kernel extends ConsoleKernel
         // Verifica conexão com o gerenti a cada hora, caso não consiga se conectar, envia emails
         $schedule->call(function(){
             // $users = User::where('idperfil', 1)->get();
-            $url = substr(env('GERENTI_HOST'), 0, 15);
+            $url = env('GERENTI_HOST');
             $conexao = exec("ping -c 5 ".$url);
             if(strlen($conexao) <= 0){
                 $body = '<h3><i>(Mensagem Programada)</i></h3>';
