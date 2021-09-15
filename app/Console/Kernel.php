@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Mail\InternoAgendamentoMail;
 use App\Mail\InternoSolicitaCedulaMail;
+use App\Mail\ConexaoGerentiMail;
 use Illuminate\Support\Facades\Mail;
 use App\User;
 use App\Agendamento;
@@ -224,6 +225,20 @@ class Kernel extends ConsoleKernel
                 }
             }
         })->dailyAt('4:30');
+
+        // Verifica conexão com o gerenti a cada hora, caso não consiga se conectar, envia emails
+        $schedule->call(function(){
+            // $users = User::where('idperfil', 1)->get();
+            $url = env('GERENTI_HOST');
+            $conexao = exec("ping -c 5 ".$url);
+            if(strlen($conexao) <= 0){
+                $body = '<h3><i>(Mensagem Programada)</i></h3>';
+                $body .= '<p><strong>Erro!!!</strong> Não foi possível estabelecer uma conexão com o sistema Gerenti no dia de hoje: <strong>'.Carbon::now()->format('d/m/Y, \à\s H:i').'</strong></p>';
+                Mail::to(['desenvolvimento@core-sp.org.br', 'edson@core-sp.org.br'])->queue(new ConexaoGerentiMail($body));
+                // foreach($users as $user)
+                    // Mail::to($user->email)->send(new ConexaoGerentiMail($body));
+            }
+        })->hourly();
     }
 
     // realiza o try/catch para o envio de email, pois se repete no código e deixa o método mais limpo

@@ -867,6 +867,10 @@ input[type=file]::-webkit-file-upload-button {
 	letter-spacing: -0.1rem;
 }
 
+.novo-core-box a:hover {
+	color: #000 !important;
+}
+
 .novo-core-box {
 	border-radius: 5px;
 	position: relative;

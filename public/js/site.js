@@ -690,27 +690,30 @@ function getDate() {
 	$('#submitSimulador, #anoVigenteButton').on('click', function(){
 		$('#loadingSimulador').css('display', 'inline-block');
 	});
+
 	// Calendário Simulador
-	$('#dataInicio').datepicker(options);
-	// Datepicker options
+	var hoje = $('#dataInicio').attr('max');
+
 	if($('#tipoPessoa').val() != '1') {
-		$('#dataInicio').datepicker("destroy");
+		$('#dataInicio').prop('readonly', true);
 	} else {
-		$('#dataInicio').addClass('notReadOnly');
+		$('#dataInicio').prop('readonly', false);
 	}
+
 	// Mudanças on change tipo de Pessoa
 	$(document).on('change', '#tipoPessoa', function(){
 		$('#simuladorTxt').hide();
 		if ($('#tipoPessoa').val() == 1) {
 			$('#simuladorAddons').show();
 			$('#simuladorAddons').css('display','flex');
-			$('#dataInicio').val('').datepicker(options).addClass('notReadOnly');
+			$('#dataInicio').prop('readonly', false);
 		} else {
 			$('#simuladorAddons').hide();
 			$('#filial').prop('disabled', 'disabled').val('');
-			$('#dataInicio').val(getDate()).datepicker("destroy").removeClass('notReadOnly');
+			$('#dataInicio').val(hoje).prop('readonly', true);
 		}
 	});
+
 	// Filial
 	$(document).on('change', "#filialCheck", function() {
 		if(this.checked) {
@@ -719,11 +722,13 @@ function getDate() {
 			$('#filial').prop('disabled', 'disabled').val('');
 		}
 	});
+
 	// Filename comprovante de residência
 	$('#comprovante-residencia, #comprovante-residencia-dois').on('change',function(e){
 		var fileName = e.target.files[0].name;
 		$(this).next('.custom-file-label').html(fileName);
 	})
+
 	// Mostra Crimage Dois
 	$('#linkShowCrimageDois').on('click', function(){
 		$('#showCrimageDois').hide();

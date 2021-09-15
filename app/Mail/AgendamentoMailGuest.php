@@ -30,6 +30,8 @@ class AgendamentoMailGuest extends Mailable
         $this->body  .= "Endereço: " . $agendamento->regional->endereco.", " . $agendamento->regional->numero;
         $this->body  .= " - " . $agendamento->regional->complemento . "<br>";
         $this->body  .= "Serviço: " . $agendamento->tiposervico . '<br>';
+        $this->body  .= "<br>";
+        $this->body  .= 'Antes de comparecer no CORE-SP, acesse o link a seguir e verifique os procedimentos (documentação e valores) que precisam ser apresentados no dia do agendamento - <a href="' . route('site.home') . '/servicos-atendimento-ao-rc"><u>Atendimento ao Representante Comercial</u></a>';
     }
 
     public function build()

@@ -17,22 +17,22 @@ class SimuladorController extends Controller
     protected function taxas($tipo)
     {
         // Retorno das taxas de acordo com o tipo de pessoa
-        $run = $this->connection->prepare("select TAX_ID, TAX_DESCRICAO, TAX_VALOR from PROCTAXAINICIAIS(:tipo)");
-        $run->execute(['tipo' => $tipo]);
+        // $run = $this->connection->prepare("select TAX_ID, TAX_DESCRICAO, TAX_VALOR from PROCTAXAINICIAIS(:tipo)");
+        // $run->execute(['tipo' => $tipo]);
 
-        return $run->fetchAll();
+        // return $run->fetchAll();
     }
 
     protected function taxasTotal($tipo)
     {
         // Cálculo do total de taxas de acordo com o tipo de pessoa
-        $total = 0;
+        // $total = 0;
 
-        foreach($this->taxas($tipo) as $calc) {
-            $total += $calc['TAX_VALOR'];
-        }
+        // foreach($this->taxas($tipo) as $calc) {
+        //     $total += $calc['TAX_VALOR'];
+        // }
 
-        return $total;
+        // return $total;
     }
 
     protected function simulador($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 24)
@@ -48,16 +48,20 @@ class SimuladorController extends Controller
         ]);
 
         $array = $run->fetchAll();
-
-        foreach($array as $single) {
-            if (strpos($single['DESCRICAO'], 'Anuidade') !== false) {
-                $desconto = $this->descontoAnuidade($single['VALOR_TOTAL']);
+        
+        foreach($array as $key => $value) {
+            if (strpos($value['DESCRICAO'], 'Anuidade') !== false) {
+                $desconto = $this->descontoAnuidade($value['VALOR_TOTAL']);
                 if(isset($desconto))
                     array_push($array, $desconto);
             }
+            if (strpos($value['DESCRICAO'], 'Multa') !== false)
+                unset($array[$key]);
         }
 
-        return $array;
+        $array2 = array_values($array);
+
+        return $array2;
     }
 
     protected function descontoAnuidade($anuidade)
@@ -136,14 +140,15 @@ class SimuladorController extends Controller
 
     public function view()
     {
-        return view('site.simulador');
+        $hoje = date('Y-m-d');
+        return view('site.simulador', compact('hoje'));
     }
 
     protected function consertaData($data)
     {
         // Formatação da data
-        $array = explode('/', $data);
-        return $array[2] . '.' . $array[1] . '.' . $array[0];
+        $novaDt = str_replace('-', '.', $data);
+        return $novaDt;
     }
 
     protected function validateRequest()
@@ -176,7 +181,7 @@ class SimuladorController extends Controller
     protected function simpleRtTaxas()
     {
         // Retorno das taxas do RT na data atual
-        return $this->taxas(5);
+        // return $this->taxas(5);
     }
 
     public function extrato()
@@ -189,17 +194,17 @@ class SimuladorController extends Controller
         request('tipoPessoa') !== '1' || request('filial') === '50' || request('filial') === null ? $filial = 24 : $filial = request('filial');
 
         // Total, extrato, e taxas separados por variáveis únicas
-        $total = $this->simuladorTotal($this->validateRequest()['tipoPessoa'], $this->consertaData($this->validateRequest()['dataInicio']), $capitalSocial, $filial) + $this->taxasTotal(request('tipoPessoa'));
+        $total = $this->simuladorTotal($this->validateRequest()['tipoPessoa'], $this->consertaData($this->validateRequest()['dataInicio']), $capitalSocial, $filial)/* + $this->taxasTotal(request('tipoPessoa'))*/;
 
         $extrato = $this->simulador($this->validateRequest()['tipoPessoa'], $this->consertaData($this->validateRequest()['dataInicio']), $capitalSocial, $filial);    
         
-        $taxas = $this->taxas($this->validateRequest()['tipoPessoa']);
+        $taxas/* = $this->taxas($this->validateRequest()['tipoPessoa'])*/;
 
         // Regras para mostrar opções do extrato na tela do Portal
         if(request('tipoPessoa') == 1 && request('empresaIndividual') != 'on') {
             $rt = $this->simpleRt();
             $rtTaxas = $this->simpleRtTaxas();
-            $rtTotal = number_format($this->simuladorTotal(5, date('Y.m.d')) + $this->taxasTotal(5), 2);
+            $rtTotal = number_format($this->simuladorTotal(5, date('Y.m.d'))/* + $this->taxasTotal(5)*/, 2);
             $totalGeral = number_format($total + $rtTotal, 2, ',', '.');
         } else {
             $rt = null;
@@ -209,7 +214,8 @@ class SimuladorController extends Controller
         }
 
         $total = number_format($total, 2, ',', '.');
+        $hoje = date('Y-m-d');
 
-        return view('site.simulador', compact('extrato', 'taxas', 'total', 'rt', 'rtTaxas', 'rtTotal', 'totalGeral'));
+        return view('site.simulador', compact('extrato', /*'taxas', */'total', 'rt', /*'rtTaxas', */'rtTotal', 'totalGeral', 'hoje'));
     }
 }
