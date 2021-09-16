@@ -215,6 +215,8 @@ function emailResetRepresentante($token)
 {
     $body = 'Você está recebendo este email pois solicitou alteração de senha no Portal Core-SP.';
     $body .= '<br>';
+    $body .= 'Lembrando que este link é válido por 60 minutos.';
+    $body .= '<br>';
     $body .= 'Clique no link abaixo para continuar o procedimento.';
     $body .= '<br><br>';
     $body .= '<a href="'. route('representante.password.reset', $token) .'">Alterar senha</a>';

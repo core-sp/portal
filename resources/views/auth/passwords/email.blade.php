@@ -19,7 +19,7 @@
     <p class="login-box-msg">Digite o email abaixo para reconfigurar sua senha.</p>
     @if (session('status'))
       <div class="alert alert-success" role="alert">
-        {{ session('status') }}
+        {!! session('status') !!}
       </div>
     @endif
     <form action="{{ route('password.email') }}" method="POST">

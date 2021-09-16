@@ -91,12 +91,13 @@ class RepresentanteLoginController extends Controller
 
             return redirect()->intended(route('representante.dashboard'));
         }
-
+        
         return $this->redirectWithErrors($request->only('cpf_cnpj', 'remember'));
     }
 
     protected function redirectWithErrors($withInput, $message = 'Login inválido.', $class = 'alert-danger')
     {
+        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$withInput['cpf_cnpj']. ' não conseguiu logar.'));
         return redirect()
             ->back()
             ->with([
