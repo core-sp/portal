@@ -37,7 +37,7 @@
             @endif
             @if (session('status'))
               <div class="alert alert-success" role="alert">
-                {{ session('status') }}
+                {!! session('status') !!}
               </div>
             @endif
             <p>Digite o CPF ou CNPJ abaixo para reconfigurar sua senha.</p>

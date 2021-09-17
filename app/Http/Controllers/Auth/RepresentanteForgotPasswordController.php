@@ -59,7 +59,7 @@ class RepresentanteForgotPasswordController extends Controller
         $email = $this->getEmail($cpf_cnpj);
 
         return $response == Password::RESET_LINK_SENT
-                    ? $this->sendResetLinkResponse($request, 'O link de confirmação da senha foi enviado ao email ' . $email)
+                    ? $this->sendResetLinkResponse($request, 'O link de reconfiguração de senha foi enviado ao email ' . $email . '<br>Esse link é válido por 60 minutos')
                     : $this->sendResetLinkFailedResponse($request, $response);
     }
 

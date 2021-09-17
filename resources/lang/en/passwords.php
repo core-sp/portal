@@ -15,8 +15,8 @@ return [
 
     'password' => 'A senha precisa ter no mínimo 8 caracteres, e ser idêntica à confirmação.',
     'reset' => 'Sua senha foi resetada!',
-    'sent' => 'O link de confirmação da senha foi enviado ao seu email!',
-    'token' => 'O token de reset da senha é inválido!',
+    'sent' => 'O link de reconfiguração da senha foi enviado ao seu email!<br>O link é válido por 15 minutos',
+    'token' => 'O token é inválido! Solicite novamente a alteração de senha',
     'user' => 'Não foi possível encontrar um usuário com este e-mail.',
 
 ];

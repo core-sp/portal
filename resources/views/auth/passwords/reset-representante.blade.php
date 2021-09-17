@@ -30,6 +30,17 @@
             </div>
         </div>
         <div class="linha-lg"></div>
+        @php
+          if(strpos($errors->first(), 'token'))
+            $msg = $errors->first();
+          else
+            $msg = null;
+        @endphp
+        @if($msg)
+        <p class="alert alert-danger">
+            {{ $msg }}
+        </p>
+        @endif
         <div class="row mt-2">
           <div class="col-lg-8 conteudo-txt">
             <p>Preencha as informações abaixo para reconfigurar sua senha.</p>
