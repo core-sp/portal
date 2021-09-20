@@ -407,11 +407,17 @@ class RepresentanteSiteController extends Controller
         Mail::to(Auth::guard('representante')->user()->email)->queue($email);
 
         // Download do arquivo PDF
-        header('Content-Type: application/pdf');
+        $headers = [
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Content-type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename=certidao.pdf',
+            'Expires' => '0',
+            'Pragma' => 'public',
+        ];
 
         return response()->streamDownload(function () use ($pdfBase64){
             echo base64_decode($pdfBase64);
-        }, 'certidao.pdf');
+        }, 'certidao.pdf', $headers);
     }
 
     /**
@@ -429,11 +435,18 @@ class RepresentanteSiteController extends Controller
 
             $pdfBase64 = $certidoes[$posCertidao]['base64'];
 
-            header('Content-Type: application/pdf');
+            // Download do arquivo PDF
+            $headers = [
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Content-type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename=certidao.pdf',
+                'Expires' => '0',
+                'Pragma' => 'public',
+            ];
 
             return response()->streamDownload(function () use ($pdfBase64){
                 echo base64_decode($pdfBase64);
-            }, 'certidao.pdf');
+            }, 'certidao.pdf', $headers);
         }
         else {
             $titulo = 'Falha ao baixar certidão';
