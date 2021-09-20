@@ -237,23 +237,23 @@ class Kernel extends ConsoleKernel
         })->dailyAt('3:00');
         
         // Verifica conexão com o gerenti a cada hora, caso não consiga se conectar, envia emails
-        // $schedule->call(function(){
-        //     $users = User::whereIn('idusuario', [2, 68])->get();
-        //     try {
-        //         $host = env('GERENTI_HOST');
-        //         $dbname = env('GERENTI_DATABASE');
-        //         $username = env('GERENTI_USERNAME');
-        //         $password = env('GERENTI_PASSWORD');
-        //         $conexao = new PDO('firebird:dbname='.$host.':'.$dbname.';charset=UTF8',$username,$password);
-        //         } catch (PDOException $e) {
-        //             $body = '<h3><i>(Mensagem Programada)</i></h3>';
-        //             $body .= '<p><strong>Erro!!!</strong> Não foi possível estabelecer uma conexão com o sistema Gerenti no dia de hoje: <strong>'.Carbon::now()->format('d/m/Y, \à\s H:i').'</strong></p>';
-        //             foreach($users as $user)
-        //                 Mail::to($user->email)->send(new ConexaoGerentiMail($body));
-        //         } finally{
-        //             $conexao = null;
-        //         }
-        // })->hourly();
+        $schedule->call(function(){
+            $user = User::where('idusuario', 68)->first();
+            $body = '<h3><i>(Mensagem Programada)</i></h3>';
+            $body .= '<p><strong>Erro!</strong> Não foi possível estabelecer uma conexão com o sistema Gerenti no dia de hoje: <strong>'.Carbon::now()->format('d/m/Y, \à\s H:i').'</strong></p>';
+            try {
+                $host = env('GERENTI_HOST');
+                $dbname = env('GERENTI_DATABASE');
+                $username = env('GERENTI_USERNAME');
+                $password = env('GERENTI_PASSWORD');
+                $conexao = new PDO('firebird:dbname='.$host.':'.$dbname.';charset=UTF8',$username,$password);
+                Mail::to($user->email)->send(new ConexaoGerentiMail($body .= 'LOGADO'));
+            } catch (PDOException $e) {
+                Mail::to($user->email)->send(new ConexaoGerentiMail($body .= $e->getMessage()));
+            } finally{
+                $conexao = null;
+            }
+        })->hourly();
     }
 
     /**
