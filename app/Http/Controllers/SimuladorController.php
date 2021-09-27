@@ -55,8 +55,9 @@ class SimuladorController extends Controller
                 if(isset($desconto))
                     array_push($array, $desconto);
             }
-            if (strpos($value['DESCRICAO'], 'Multa') !== false)
-                unset($array[$key]);
+            // Remove a multa do array
+            // if (strpos($value['DESCRICAO'], 'Multa') !== false)
+            //     unset($array[$key]);
         }
 
         $array2 = array_values($array);
