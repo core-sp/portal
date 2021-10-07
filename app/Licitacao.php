@@ -21,6 +21,7 @@ class Licitacao extends Model
     const MOD_CONCURSO = 'Concurso';
     const MOD_COTACAO_ELETRONICA = 'Cotação Eletrônica';
     const MOD_CREDENCIAMENTO = 'Credenciamento';
+    const MOD_DISPENSA_ELETRONICA = 'Dispensa Eletrônica - Lei 14.133/2021';
     const MOD_LEILAO = 'Leilão';
     const MOD_PREGAO_ELETRONICO_SRP = 'Pregão Eletrônico SRP';
     const MOD_PREGAO_ELETRONICO_TRADICIONAL = 'Pregão Eletrônico Tradicional';
@@ -54,6 +55,7 @@ class Licitacao extends Model
             Licitacao::MOD_CONCURSO,
             Licitacao::MOD_COTACAO_ELETRONICA,
             Licitacao::MOD_CREDENCIAMENTO,
+            Licitacao::MOD_DISPENSA_ELETRONICA,
             Licitacao::MOD_LEILAO,
             Licitacao::MOD_PREGAO_ELETRONICO_SRP,
             Licitacao::MOD_PREGAO_ELETRONICO_TRADICIONAL,

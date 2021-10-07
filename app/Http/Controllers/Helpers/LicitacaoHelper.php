@@ -15,6 +15,7 @@ class LicitacaoHelper extends Controller
             'Concurso',
             'Cotação Eletrônica',
             'Credenciamento',
+            'Dispensa Eletrônica - Lei 14.133/2021',
             'Leilão',
             'Pregão Eletrônico SRP',
             'Pregão Eletrônico Tradicional',

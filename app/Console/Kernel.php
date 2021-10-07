@@ -231,10 +231,10 @@ class Kernel extends ConsoleKernel
         })->dailyAt('2:00');
 
         $schedule->call(function(){
-            Representante::where('created_at', '<=', Carbon::now()->subHours(24)->toDateString())
+            Representante::where('created_at', '<=', Carbon::now()->subHours(24)->toDateTimeString())
                 ->where('ativo', '=', 0)
                 ->delete();
-        })->dailyAt('3:00');
+        })->hourly();
         
         // Verifica conexão com o gerenti a cada hora, caso não consiga se conectar, envia emails
         // $schedule->call(function(){
