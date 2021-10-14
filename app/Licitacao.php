@@ -23,7 +23,7 @@ class Licitacao extends Model
     const MOD_CONCURSO_LEI2021 = 'Concurso - Lei 14.133/2021';
     const MOD_COTACAO_ELETRONICA = 'Cotação Eletrônica';
     const MOD_CREDENCIAMENTO = 'Credenciamento';
-    const MOD_DIALOGO = 'Diálogo competitivo - Lei 14.133/2021';
+    const MOD_DIALOGO = 'Diálogo Competitivo - Lei 14.133/2021';
     const MOD_DISPENSA_ELETRONICA = 'Dispensa Eletrônica - Lei 14.133/2021';
     const MOD_INEXIGIBILIDADE = 'Inexigibilidade - Lei 14.133/2021';
     const MOD_LEILAO = 'Leilão';
@@ -38,11 +38,11 @@ class Licitacao extends Model
     const SIT_ABERTO = 'Aberto';
     const SIT_ADJUDICADO = 'Adjudicado';
     const SIT_ANULADO = 'Anulado';
-    const SIT_APRESENTACAO = 'Apresentação de propostas e lances';
+    const SIT_APRESENTACAO = 'Apresentação de Propostas e Lances';
     const SIT_CANCELADO = 'Cancelado';
     const SIT_CONCLUIDO = 'Concluído';
     const SIT_DESERTO = 'Deserto';
-    const SIT_DIVULGACAO = 'Divulgação do edital de licitação';
+    const SIT_DIVULGACAO = 'Divulgação do Edital de Licitação';
     const SIT_EM_ANDAMENTO = 'Em Andamento';
     const SIT_EM_FASE_DE_RECURSO = 'Em fase de recurso';
     const SIT_ENCERRADO = 'Encerrado';
