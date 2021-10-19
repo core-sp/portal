@@ -143,108 +143,28 @@ class Kernel extends ConsoleKernel
 
         // Rotina diária que deleta o cadastro do Representante se ele não confirmar via token no email enviado.
         $schedule->call(function(){
-            Representante::where('created_at', '<=', Carbon::now()->subHours(24)->toDateString())
+            Representante::where('created_at', '<=', Carbon::now()->subHours(24)->toDateTimeString())
                 ->where('ativo', '=', 0)
                 ->delete();
-        })->dailyAt('3:00');
-
-        // Rotina que envia emails para os perfis especificados com as solicitações de cédulas 'em andamento' as 4:00 de segunda a sexta
-        $schedule->call(function() {
-            $users = User::select('email','idregional','idperfil')
-                ->where('idperfil','=',1)
-                ->orWhere('idperfil','=',13)
-                ->orWhere('idperfil','=',12)
-                ->orWhere('idperfil','=',8)
-                ->orWhere('idperfil','=',6)
-                ->orWhere('idperfil','=',21)
-                ->get();
-            $hoje = date('Y-m-d');
-            foreach($users as $user) {
-                if($user->idperfil === 8) {
-                    $count = SolicitaCedula::where('idregional','=',$user->idregional)
-                        ->where('status','=',SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->count();
-                    if($count >= 1) {
-                        $body = '<h3><i>(Mensagem Programada)</i></h3><p>';
-                        if($count === 1)
-                            $body .= 'Existe <strong>1 solicitação de cédula em andamento</strong> ';
-                        else
-                            $body .= 'Existem <strong>'.$count.' solicitações de cédulas em andamento<strong> ';
-                        $body .= 'em '.$user->regional->regional.' hoje, dia <strong>'.Helper::onlyDate($hoje).'.</strong>';
-                        $body .= '</p><p>----------</p><p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
-                        $body .= '</p>';
-                        $regional = 'em '.$user->regional->regional;
-                        $this->sendMails(SolicitaCedula::class, $user, $body, $regional);
-                    }
-                } 
-                elseif($user->idperfil === 21) {
-                    $cedulas = SolicitaCedula::where('idregional', '=', $user->idregional)
-                        ->where('status', '=', SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->orderBy('idregional', 'ASC')
-                        ->orderBy('id', 'ASC')
-                        ->get();
-
-                    if($cedulas->isNotEmpty()) {
-                        $body = $this->tabelaSolicitaCedulaMail($cedulas);
-                        $regional = 'em '. $user->regional->regional;
-                        $this->sendMails(SolicitaCedula::class, $user, $body, $regional);
-                    }
-                }
-                elseif($user->idperfil === 13) {
-                    $cedulas = SolicitaCedula::where('idregional','!=',1)
-                        ->where('status', '=', SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->orderBy('idregional','ASC')
-                        ->orderBy('id','ASC')
-                        ->get();
-                    if($cedulas->isNotEmpty()) {
-                        $body = $this->tabelaSolicitaCedulaMail($cedulas);
-                        $regional = 'nas Seccionais';
-                        $this->sendMails(SolicitaCedula::class, $user, $body, $regional);
-                    }
-                } 
-                elseif($user->idperfil === 12) {
-                    $cedulas = SolicitaCedula::where('idregional','=',1)
-                        ->where('status', '=', SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->orderBy('id','ASC')
-                        ->get();
-                    if($cedulas->isNotEmpty()) {
-                        $body = $this->tabelaSolicitaCedulaMail($cedulas);
-                        $regional = 'em '.$user->regional->regional;
-                        $this->sendMails(SolicitaCedula::class, $user, $body, $regional);
-                    }
-                } 
-                elseif($user->idperfil === 6 || $user->idperfil === 1) {
-                    $cedulas = SolicitaCedula::where('status', '=', SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->orderBy('idregional','ASC')
-                        ->orderBy('id','ASC')
-                        ->get();
-                    if($cedulas->isNotEmpty()) {
-                        $body = $this->tabelaSolicitaCedulaMail($cedulas);
-                        $regional = 'em São Paulo e Seccionais';
-                        $this->sendMails(SolicitaCedula::class, $user, $body, $regional);
-                    }
-                }
-            }
-        })->dailyAt('4:30');
-
+        })->hourly();
+        
         // Verifica conexão com o gerenti a cada hora, caso não consiga se conectar, envia emails
         // $schedule->call(function(){
-        //     $users = User::whereIn('idusuario', [2, 68])->get();
+        //     $user = User::where('idusuario', 68)->first();
+        //     $body = '<h3><i>(Mensagem Programada)</i></h3>';
+        //     $body .= '<p><strong>Erro!</strong> Não foi possível estabelecer uma conexão com o sistema Gerenti no dia de hoje: <strong>'.Carbon::now()->format('d/m/Y, \à\s H:i').'</strong></p>';
         //     try {
         //         $host = env('GERENTI_HOST');
         //         $dbname = env('GERENTI_DATABASE');
         //         $username = env('GERENTI_USERNAME');
         //         $password = env('GERENTI_PASSWORD');
         //         $conexao = new PDO('firebird:dbname='.$host.':'.$dbname.';charset=UTF8',$username,$password);
-        //         } catch (PDOException $e) {
-        //             $body = '<h3><i>(Mensagem Programada)</i></h3>';
-        //             $body .= '<p><strong>Erro!!!</strong> Não foi possível estabelecer uma conexão com o sistema Gerenti no dia de hoje: <strong>'.Carbon::now()->format('d/m/Y, \à\s H:i').'</strong></p>';
-        //             foreach($users as $user)
-        //                 Mail::to($user->email)->send(new ConexaoGerentiMail($body));
-        //         } finally{
-        //             $conexao = null;
-        //         }
+        //         Mail::to($user->email)->send(new ConexaoGerentiMail($body .= 'LOGADO'));
+        //     } catch (PDOException $e) {
+        //         Mail::to($user->email)->send(new ConexaoGerentiMail($body .= $e->getMessage()));
+        //     } finally{
+        //         $conexao = null;
+        //     }
         // })->hourly();
     }
 
