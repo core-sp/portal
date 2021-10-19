@@ -58,7 +58,7 @@ class SolicitaCedulaController extends Controller
 
             event(new CrudEvent('solicitação de cédula alterada', 'atendente aceitou', $request->id));
             
-            Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
+            // Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao atualizar o status da solicitação de cédula.");
@@ -88,7 +88,7 @@ class SolicitaCedulaController extends Controller
 
             event(new CrudEvent('solicitação de cédula alterada', 'atendente recusou e justificou', $request->id));
 
-            Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
+            // Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao atualizar o status da solicitação de cédula.");

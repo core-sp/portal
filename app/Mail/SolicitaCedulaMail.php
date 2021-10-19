@@ -16,22 +16,36 @@ class SolicitaCedulaMail extends Mailable
 
     public function __construct($cedula)
     {
-        $this->body = 'Atualização de status da sua solicitação de cédula no Portal Core-SP.';
-        $this->body .= '<br /><br />';
-        $this->body .= '<strong>Código da solicitação:</strong> #'. $cedula->id;
-        $this->body .= '<br /><br />';
-        $this->body .= '<strong>Status:</strong> '. $cedula->status;
-        if($cedula->status == SolicitaCedula::STATUS_RECUSADO) {
+        if($cedula->status == SolicitaCedula::STATUS_EM_ANDAMENTO) {
+            $this->body = 'Bem vindo ao CORE-SP. O seu pedido de emissão cédula profissional está em análise! ';
             $this->body .= '<br /><br />';
-            $this->body .= '<strong>Justificativa:</strong> '. $cedula->justificativa;
+            $this->body .= '<strong>Código da solicitação:</strong> #'. $cedula->id;
+            $this->body .= '<br /><br />';
+            $this->body .= '<strong>Status:</strong> '. $cedula->status;
+            $this->body .= '<br /><br />';
+            $this->body .= 'Poderá acompanhar o andamento de seu pedido pela sua própria área restrita.';
+            $this->body .= '<br /><br />';
+            $this->body .= 'A cédula será emitida após a aprovação. O documento será postado em até 10 dias úteis após a aprovação do pedido.';
+        } else{
+            $this->body = 'Falta o texto para a atualização';
+            // $this->body .= '<br /><br />';
+            // $this->body .= '<strong>Código da solicitação:</strong> #'. $cedula->id;
+            // $this->body .= '<br /><br />';
+            // $this->body .= '<strong>Status:</strong> '. $cedula->status;
+            // if($cedula->status == SolicitaCedula::STATUS_RECUSADO) {
+            //     $this->body .= '<br /><br />';
+            //     $this->body .= '<strong>Justificativa:</strong> '. $cedula->justificativa;
+            // }
         }
         $this->body .= '<br /><br />';
-        $this->body .= 'Para verificá-la, acesse a <a href="' . route('representante.login') . '">área restrita do Representante Comercial</a> do Portal Core-SP.';
+        $this->body .= 'Atenciosamente';
+        $this->body .= '<br /><br />';
+        $this->body .= 'Equipe CORE-SP.';
     }
 
     public function build()
     {
-        return $this->subject('Atualização do status da solicitação de cédula')
+        return $this->subject('Solicitação de cédula no Portal CORE-SP')
             ->view('emails.default');
     }
 }

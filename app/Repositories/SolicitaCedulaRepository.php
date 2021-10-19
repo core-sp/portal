@@ -24,7 +24,7 @@ class SolicitaCedulaRepository
 
     public function getAllByIdRepresentante($id)
     {
-        return SolicitaCedula::where('idrepresentante', $id)->orderBy('id','DESC')->get();
+        return SolicitaCedula::where('idrepresentante', $id)->orderBy('id','DESC')->paginate(5);
     }
 
     public function create($idrepresentante, $idregional, $endereco) 

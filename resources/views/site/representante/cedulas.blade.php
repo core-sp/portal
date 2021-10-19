@@ -49,6 +49,11 @@
                 <p class="light pb-0">Infelizmente não é possível solicitar cédula no momento. Por favor, entre em contato com o atendimento para mais informações.</p>
             </div>
         @endif
+        <div class="float-left mt-3">
+        @if($cedulas instanceof \Illuminate\Pagination\LengthAwarePaginator)
+            {{ $cedulas->appends(request()->input())->links() }}
+        @endif
+        </div>
     </div>
 </div>
 

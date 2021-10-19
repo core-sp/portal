@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CadastroRepresentanteMail;
+use App\Mail\SolicitaCedulaMail;
 use App\Repositories\GerentiApiRepository;
 use GuzzleHttp\Exception\RequestException;
 use App\Mail\SolicitacaoAlteracaoEnderecoMail;
@@ -286,6 +287,15 @@ class RepresentanteSiteController extends Controller
 
     public function inserirsolicitarCedulaView()
     {
+        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
+        if($has) {
+            return redirect()
+                ->route('representante.solicitarCedulaView')
+                ->with([
+                    'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
+                    'class' => 'alert-danger'
+                ]);
+        }
         return view('site.representante.inserir-solicita-cedula');
     }
 
@@ -339,15 +349,27 @@ class RepresentanteSiteController extends Controller
 
     public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
     {
+        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
+        if($has) {
+            return redirect()
+                ->route('representante.solicitarCedulaView')
+                ->with([
+                    'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
+                    'class' => 'alert-danger'
+                ]);
+        }
         try {
             $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
             $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, Auth::guard('representante')->user()->ass_id)['Regional'];
             $idregional = $this->regionalRepository->getIdByRegional($regional);
             $save = $this->solicitaCedulaRepository->create(
                 Auth::guard('representante')->user()->id, $idregional, 
-                request(["cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"]));
+                request([
+                    "cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"
+                ]));
 
             event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") solicitou cédula.'));
+            // Mail::to(Auth::guard('representante')->user()->email)->queue(new SolicitaCedulaMail($save));
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao criar sua solicitação de cédula.");
