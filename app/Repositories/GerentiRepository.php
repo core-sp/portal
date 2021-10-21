@@ -464,6 +464,6 @@ class GerentiRepository implements GerentiRepositoryInterface
         ]);
         $resultado = $run->fetchAll();
         
-        return utf8_converter($resultado)
+        return utf8_converter($resultado);
     }
 }
