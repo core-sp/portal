@@ -10,4 +10,9 @@ class RepresentanteRepository
     {
         return Representante::where("ass_id", $assId)->first();
     }
+
+    public function getByCpfCnpj($cpfCnpj)
+    {
+        return Representante::where('cpf_cnpj', $cpfCnpj)->first();
+    }    
 }

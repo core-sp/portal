@@ -786,3 +786,12 @@ $('.emitirCertidaoBtn').on('click', function(){
 	
 	btnCookies.addEventListener('click', acceptCookies);
   })();
+
+// Logout
+$("#logout").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var link = "/pre-representante/logout";
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+	$('body').append(form);
+	$(form).submit();
+});

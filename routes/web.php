@@ -168,6 +168,21 @@ Route::prefix('/')->group(function() {
   require('site/cursos.php');
   // Representantes
   require('site/representantes.php');
+
+  Route::prefix('pre-representante')->group(function(){
+    // Login e Cadastro
+    Route::get('/login', 'Auth\PreRepresentanteLoginController@showLoginForm')->name('prerepresentante.login');
+    Route::post('/login', 'Auth\PreRepresentanteLoginController@login')->name('prerepresentante.login.submit');
+    Route::post('/logout', 'Auth\PreRepresentanteLoginController@logout')->name('prerepresentante.logout');
+    Route::get('/cadastro', 'PreRepresentanteSiteController@cadastroView')->name('prerepresentante.cadastro');
+    Route::post('/cadastro', 'PreRepresentanteSiteController@cadastro')->name('prerepresentante.cadastro.submit');
+    Route::get('/verifica-email/{token}', 'PreRepresentanteSiteController@verificaEmail')->name('prerepresentante.verifica-email');
+    // Reset password routes
+    Route::get('/password/reset', 'Auth\PreRepresentanteForgotPasswordController@showLinkRequestForm')->name('prerepresentante.password.request');
+    Route::post('/password/email', 'Auth\PreRepresentanteForgotPasswordController@sendResetLinkEmail')->name('prerepresentante.password.email');
+    Route::get('/password/reset/{token}', 'Auth\PreRepresentanteResetPasswordController@showResetForm')->name('prerepresentante.password.reset');
+    Route::post('/password/reset', 'Auth\PreRepresentanteResetPasswordController@reset')->name('prerepresentante.password.update');
+  });
   
   //Balcão de Oportunidades
   Route::get('balcao-de-oportunidades', 'BdoSiteController@index')->name('bdosite.index');

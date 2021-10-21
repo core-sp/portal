@@ -57,6 +57,17 @@ return [
             'provider' => 'representantes',
             'hash' => false,
         ],
+
+        'pre_representante' => [
+            'driver' => 'session',
+            'provider' => 'pre_representantes',
+        ],
+
+        'pre_representante-api' => [
+            'driver' => 'token',
+            'provider' => 'pre_representantes',
+            'hash' => false,
+        ],
     ],
 
     /*
@@ -85,7 +96,12 @@ return [
         'representantes' => [
             'driver' => 'eloquent',
             'model' => App\Representante::class,
-        ]
+        ],
+
+        'pre_representantes' => [
+            'driver' => 'eloquent',
+            'model' => App\PreRepresentante::class,
+        ],
 
         // 'users' => [
         //     'driver' => 'database',
@@ -117,6 +133,12 @@ return [
 
         'representantes' => [
             'provider' => 'representantes',
+            'table' => 'password_resets',
+            'expire' => 60,
+        ],
+
+        'pre_representantes' => [
+            'provider' => 'pre_representantes',
             'table' => 'password_resets',
             'expire' => 60,
         ],
