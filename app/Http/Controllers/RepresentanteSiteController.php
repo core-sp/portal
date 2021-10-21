@@ -23,6 +23,8 @@ use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Repositories\GerentiRepositoryInterface;
 use App\Http\Requests\RepresentanteEnderecoRequest;
 use App\Repositories\RepresentanteEnderecoRepository;
+use App\Repositories\BdoOportunidadeRepository;
+use App\Repositories\RegionalRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
@@ -31,13 +33,27 @@ class RepresentanteSiteController extends Controller
     private $representanteEnderecoRepository;
     private $gerentiApiRepository;
     protected $idendereco;
+    private $bdoOportunidadeRepository;
+    private $regionalRepository;
+    private $seccional;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->gerentiRepository = $gerentiRepository;
         $this->representanteEnderecoRepository = $representanteEnderecoRepository;
         $this->gerentiApiRepository = $gerentiApiRepository;
+        $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
+        $this->regionalRepository = $regionalRepository;
+    }
+
+    private function avisosBdo()
+    {
+        $this->seccional = $this->gerentiRepository->gerentiDadosGerais(Auth::guard('representante')->user()->tipoPessoa(), Auth::guard('representante')->user()->ass_id)["Regional"];
+        $idregional = $this->regionalRepository->getByName($this->seccional)->idregional;
+        $segmento = $this->gerentiRepository->gerentiGetSegmentosByAssId(Auth::guard('representante')->user()->ass_id);
+        $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento[0]["SEGMENTO"], $idregional) : collect();
+        return $bdo;
     }
 
     public function index()
@@ -46,8 +62,10 @@ class RepresentanteSiteController extends Controller
         $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
         $status = statusBold($this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id));
         $ano = date("Y");
+        $bdo = $this->avisosBdo();
+        $seccional = $this->seccional;
 
-        return view('site.representante.home', compact("nrBoleto", "status", "ano"));
+        return view('site.representante.home', compact("nrBoleto", "status", "ano", 'bdo', 'seccional'));
     }
 
     public function dadosGeraisView()
