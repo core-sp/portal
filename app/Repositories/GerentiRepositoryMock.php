@@ -19,7 +19,8 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
                 "REGISTRONUM" => "0000000001", 
                 "ASS_ID" => "000001", 
                 "NOME" => "RC Teste 1", 
-                "EMAILS" => "desenvolvimento@core-sp.org.br"
+                "EMAILS" => "desenvolvimento@core-sp.org.br",
+                "EMAILS" => "desenvolvimento2@core-sp.org.br"
             ];
         }
         // RC Teste 2 (PJ)

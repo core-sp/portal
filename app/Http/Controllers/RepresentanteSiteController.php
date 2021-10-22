@@ -49,14 +49,17 @@ class RepresentanteSiteController extends Controller
         // avisos do Bdo para todas as rotas desse controller
         $this->middleware(function ($request, $next) {
             $rep = Auth::guard('representante')->user();
-            $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
-            $idregional = $this->regionalRepository->getByName($seccional)->idregional;
-            $segmento = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
-            $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento[0]["SEGMENTO"], $idregional) : collect();
-            foreach($bdo as $b)
-                // usei o campo observação do model para armazenar temporariamente o link
-                $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento[0]["SEGMENTO"].'&regional='.$idregional;
-            View::share(['bdo' => $bdo, 'bdoSeccional' => $seccional]);
+            if(isset($rep))
+            {
+                $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
+                $idregional = $this->regionalRepository->getByName($seccional)->idregional;
+                $segmento = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
+                $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento[0]["SEGMENTO"], $idregional) : collect();
+                foreach($bdo as $b)
+                    // usei o campo observação do model para armazenar temporariamente o link
+                    $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento[0]["SEGMENTO"].'&regional='.$idregional;
+                View::share(['bdo' => $bdo, 'bdoSeccional' => $seccional]);
+            }
             return $next($request);
         });
     }

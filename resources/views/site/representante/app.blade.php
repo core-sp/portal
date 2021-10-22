@@ -27,28 +27,30 @@
     </div>
     <div class="linha-lg"></div>
     <!-- Local de avisos de oportunidades no Balcão por segmento do RC, caso tenha -->
-    @if($bdo->count() > 0)
-    <div id="accordion">
-      <div class="card">
-        <div class="card-header bg-info">
-          <a data-toggle="collapse" href="#collapseOne"><i class="fas fa-angle-down"></i>&nbsp;&nbsp;
-            {!! $bdo->count() == 1 ? 'Foi encontrada 1 oportunidade' : 'Foram encontradas <strong>'.$bdo->count().'</strong> oportunidades' !!} em andamento para o seu segmento - <strong>{{ $bdo[0]->segmento }}</strong> e sua seccional - <strong>{{ $bdoSeccional }}</strong>
-          </a>
-        </div>
-        <div id="collapseOne" class="collapse" data-parent="#accordion">
-          <div class="card-body bg-light">
-          @foreach($bdo as $b)
-            <p>
-              <strong>{{ $b->titulo }} -</strong> Essa empresa possui {{ $b->vagasdisponiveis }} {{ $b->vagasdisponiveis > 1 ? 'vagas disponíveis' : 'vaga disponível' }}! <a href="{{ $b->observacao }}" target="_blank" class="alert-link"><u>Confira aqui</u></a>.
-            </p>
-            @if (!$loop->last)
-              <hr class="m-2">
-            @endif
-          @endforeach
+    @if(isset($bdo))
+      @if($bdo->count() > 0)
+      <div id="accordion">
+        <div class="card">
+          <div class="card-header bg-info">
+            <a data-toggle="collapse" href="#collapseOne"><i class="fas fa-angle-down"></i>&nbsp;&nbsp;
+              {!! $bdo->count() == 1 ? 'Foi encontrada 1 oportunidade' : 'Foram encontradas <strong>'.$bdo->count().'</strong> oportunidades' !!} em andamento para o seu segmento - <strong>{{ $bdo[0]->segmento }}</strong> e sua seccional - <strong>{{ $bdoSeccional }}</strong>
+            </a>
+          </div>
+          <div id="collapseOne" class="collapse" data-parent="#accordion">
+            <div class="card-body bg-light">
+            @foreach($bdo as $b)
+              <p>
+                <strong>{{ $b->titulo }} -</strong> Essa empresa possui {{ $b->vagasdisponiveis }} {{ $b->vagasdisponiveis > 1 ? 'vagas disponíveis' : 'vaga disponível' }}! <a href="{{ $b->observacao }}" target="_blank" class="alert-link"><u>Confira aqui</u></a>.
+              </p>
+              @if (!$loop->last)
+                <hr class="m-2">
+              @endif
+            @endforeach
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      @endif
     @endif
     <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <div class="row">

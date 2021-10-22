@@ -68,7 +68,11 @@ class RepresentanteTest extends TestCase
     */
     public function access_tabs_on_restrict_area()
     {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
         $representante = factory('App\Representante')->create();
+        
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
         // Checa acesso a página principal
@@ -93,6 +97,9 @@ class RepresentanteTest extends TestCase
     */
     public function insert_new_contact_for_representante()
     {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -108,6 +115,9 @@ class RepresentanteTest extends TestCase
     */
     public function remove_contact_from_representante()
     {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -126,6 +136,9 @@ class RepresentanteTest extends TestCase
     */
     public function insert_new_address_for_representante()
     {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         
@@ -162,15 +175,20 @@ class RepresentanteTest extends TestCase
     */
     public function modify_email_for_representante()
     {
-        $representante = factory('App\Representante')->create();
-        $emailNovo = 'novo@core-sp.org.br';
+        // os emails devem ser iguais ao do GerentiMock
+        $representante = factory('App\Representante')->create([
+            'email' => 'desenvolvimento@core-sp.org.br'
+        ]);
+        $emailNovo = 'desenvolvimento2@core-sp.org.br';
 
         $this->get(route('representante.email.reset.view'))->assertOk();
 
-        $this->post(route('representante.email.reset'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'registro_core' => $representante['registro_core'], 'email_antigo' => $representante['email'], 'email_novo' => $emailNovo]);
+        $this->post(route('representante.email.reset'), ['cpf_cnpj' => $representante->cpf_cnpj, 'registro_core' => $representante->registro_core, 'email_antigo' => $representante->email, 'email_novo' => $emailNovo]);
 
         // Checa se o e-mail do representante foi atualizado no banco de dados
-        $this->assertEquals(Representante::first()->email, $emailNovo);
+        $this->assertDatabaseHas('representantes', [
+            'email' => $emailNovo
+        ]);
     }
 
     /** @test 
