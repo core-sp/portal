@@ -471,4 +471,15 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
             'DATAVALIDADE' => '02/02/2022'
         ];
     }
+
+    public function gerentiGetSegmentosByAssId($ass_id) 
+    {
+        // Segmentos igual ao do BDO
+        return [
+            [
+                "SEGMENTO" => "Alimentício",
+                0 => "Alimentício",
+            ],
+        ];
+    }
 }

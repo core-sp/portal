@@ -28,16 +28,27 @@
     <div class="linha-lg"></div>
     <!-- Local de avisos de oportunidades no Balcão por segmento do RC, caso tenha -->
     @if($bdo->count() > 0)
-        <div class="alert alert-info alert-dismissible fade show">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <p class="text-white">{{ $bdo->count() == 1 ? 'Foi encontrada 1 oportunidade' : 'Foram encontradas '.$bdo->count().' oportunidades' }} para o seu segmento - {{ $bdo[0]->segmento }} e sua seccional - {{ $seccional }}</p>
-          <hr>
-          @foreach($bdo as $b)
-          <p class="text-white">
-            <strong>{{ $b->titulo }} -</strong> Essa empresa possui {{ $b->vagasdisponiveis }} {{ $b->vagasdisponiveis > 1 ? 'vagas disponíveis' : 'vaga disponível' }}! <a href="#" target="_blank" class="alert-link">Confira aqui</a>.
-          </p>
-          @endforeach
+    <div id="accordion">
+      <div class="card">
+        <div class="card-header bg-info">
+          <a data-toggle="collapse" href="#collapseOne"><i class="fas fa-angle-down"></i>&nbsp;&nbsp;
+            {!! $bdo->count() == 1 ? 'Foi encontrada 1 oportunidade' : 'Foram encontradas <strong>'.$bdo->count().'</strong> oportunidades' !!} em andamento para o seu segmento - <strong>{{ $bdo[0]->segmento }}</strong> e sua seccional - <strong>{{ $bdoSeccional }}</strong>
+          </a>
         </div>
+        <div id="collapseOne" class="collapse" data-parent="#accordion">
+          <div class="card-body bg-light">
+          @foreach($bdo as $b)
+            <p>
+              <strong>{{ $b->titulo }} -</strong> Essa empresa possui {{ $b->vagasdisponiveis }} {{ $b->vagasdisponiveis > 1 ? 'vagas disponíveis' : 'vaga disponível' }}! <a href="{{ $b->observacao }}" target="_blank" class="alert-link"><u>Confira aqui</u></a>.
+            </p>
+            @if (!$loop->last)
+              <hr class="m-2">
+            @endif
+          @endforeach
+          </div>
+        </div>
+      </div>
+    </div>
     @endif
     <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <div class="row">
