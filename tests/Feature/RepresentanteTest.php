@@ -280,6 +280,9 @@ class RepresentanteTest extends TestCase
     */
     public function insert_new_contact_with_missing_mandatory_input_cannot_be_created()
     {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -296,6 +299,9 @@ class RepresentanteTest extends TestCase
     */
     public function insert_new_address_with_missing_mandatory_input_cannot_be_created()
     {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -376,5 +382,79 @@ class RepresentanteTest extends TestCase
                 'email_antigo',
                 'email_novo'
             ]);
+    }
+
+    /** @test 
+     * 
+     * Visualiza as oportunidades no bdo se possuir segmento.
+     * Tem de visualizar qual segmento está no GerentiMock 
+    */
+    public function view_alert_bdo_if_has_segment()
+    {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $bdo = factory('App\BdoOportunidade')->create([
+            'segmento' => 'Alimentício',
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $response = $this->get(route('representante.dashboard'));
+        $response->assertSeeText($bdo->segmento);
+    }
+
+    /** @test 
+     * 
+     * Não visualiza as oportunidades no bdo se não possuir segmento. 
+     * Tem de comentar o array do segmento no GerentiMock
+    */
+    public function cannot_view_alert_bdo_if_hasnt_segment()
+    {
+        // Tem de comentar o array do segmento no GerentiMock
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $bdo = factory('App\BdoOportunidade')->create([
+            'segmento' => 'Alimentício',
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $response = $this->get(route('representante.dashboard'));
+        $response->assertDontSee($bdo->segmento);
+    }
+
+    /** @test 
+     * 
+     * Não visualiza as oportunidades no bdo se não possuir oportunidade do mesmo segmento. 
+    */
+    public function cannot_view_alert_bdo_if_hasnt_bdo()
+    {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        factory('App\BdoOportunidade')->create();
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $response = $this->get(route('representante.dashboard'));
+        $response->assertDontSee('Alimentício');
+    }
+
+    /** @test 
+     * 
+     * Não visualiza as oportunidades no bdo se não possuir oportunidade do mesmo segmento com status em andamento. 
+    */
+    public function cannot_view_alert_bdo_if_hasnt_bdo_status_em_andamento()
+    {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $bdo = factory('App\BdoOportunidade')->create([
+            'segmento' => 'Alimentício',
+            'status' => 'Expirado'
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $response = $this->get(route('representante.dashboard'));
+        $response->assertDontSee($bdo->segmento);
     }
 }
