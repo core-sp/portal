@@ -288,9 +288,15 @@ class RepresentanteSiteController extends Controller
     public function inserirsolicitarCedulaView()
     {
         $has = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]);
+        
+        if($emdia != "Em dia."){
+            return redirect(route('representante.solicitarCedulaView'))
+            ->with('emdia', $emdia);
+        }
+            
         if($has) {
-            return redirect()
-                ->route('representante.solicitarCedulaView')
+            return redirect(route('representante.solicitarCedulaView'))
                 ->with([
                     'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
                     'class' => 'alert-danger'
@@ -350,9 +356,14 @@ class RepresentanteSiteController extends Controller
     public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
     {
         $has = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]);
+        
+        if($emdia != "Em dia."){
+            return redirect(route('representante.solicitarCedulaView'))
+            ->with('emdia', $emdia);
+        }
         if($has) {
-            return redirect()
-                ->route('representante.solicitarCedulaView')
+            return redirect(route('representante.solicitarCedulaView'))
                 ->with([
                     'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
                     'class' => 'alert-danger'
@@ -361,7 +372,7 @@ class RepresentanteSiteController extends Controller
         try {
             $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
             $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, Auth::guard('representante')->user()->ass_id)['Regional'];
-            $idregional = $this->regionalRepository->getIdByRegional($regional);
+            $idregional = $this->regionalRepository->getByName($regional)->idregional;
             $save = $this->solicitaCedulaRepository->create(
                 Auth::guard('representante')->user()->id, $idregional, 
                 request([

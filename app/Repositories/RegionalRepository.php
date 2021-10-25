@@ -84,7 +84,9 @@ class RegionalRepository
         return Regional::findOrFail($id)->ageporhorario;
     }
 
-    public function getIdByRegional($regional){
-        return Regional::select('idregional')->where('regional', '=', $regional)->first()->idregional;
+    public function getByName($regional){
+        return Regional::where('regional','LIKE','%'.$regional.'%')
+        ->get()
+        ->first();
     }
 }

@@ -14,6 +14,15 @@
         <div class="linha-lg-mini mb-2"></div>
         <h5 class="mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;SOLICITAÇÕES</h5>
         @if ($emdia)
+            @if (!$possuiSolicitacaoCedulaEmAndamento)
+                <div class="d-block mb-3 mt-2">
+                    <a href="{{ route('representante.inserirSolicitarCedulaView') }}" class="btn btn-primary link-nostyle branco">Adicionar nova solicitação de cédula</a>
+                </div>
+            @else
+                <div class="contatos-table space-single mb-3">
+                    <p class="light pb-0">Você já possui uma solicitação de cédula em andamento. Por favor, aguarde a atualização do status para solicitar novamente, se necessário.</p>
+                </div>
+            @endif
             @if ($possuiSolicitacaoCedula)
                 <div class="list-group w-100">
                     @foreach ($cedulas as $item)
@@ -35,25 +44,16 @@
                     <p class="light pb-0">Você não possui nenhuma solicitação de cédula.</p>
                 </div>
             @endif
-            @if (!$possuiSolicitacaoCedulaEmAndamento)
-                <div class="d-block mt-2 mb-3">
-                    <a href="{{ route('representante.inserirSolicitarCedulaView') }}" class="btn btn-primary link-nostyle branco">Adicionar nova solicitação de cédula</a>
-                </div>
-            @else
-                <div class="contatos-table space-single mt-3">
-                    <p class="light pb-0">Você já possui uma solicitação de cédula em andamento. Por favor, aguarde a atualização do status para solicitar novamente, se necessário.</p>
-                </div>
+            <div class="float-left mt-3">
+            @if($cedulas instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $cedulas->appends(request()->input())->links() }}
             @endif
+            </div>
         @else
             <div class="contatos-table space-single mt-3">
                 <p class="light pb-0">Infelizmente não é possível solicitar cédula no momento. Por favor, entre em contato com o atendimento para mais informações.</p>
             </div>
         @endif
-        <div class="float-left mt-3">
-        @if($cedulas instanceof \Illuminate\Pagination\LengthAwarePaginator)
-            {{ $cedulas->appends(request()->input())->links() }}
-        @endif
-        </div>
     </div>
 </div>
 

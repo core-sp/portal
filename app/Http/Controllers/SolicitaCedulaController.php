@@ -51,6 +51,7 @@ class SolicitaCedulaController extends Controller
 
     public function inserirSolicitaCedula(Request $request)
     {
+        $this->autoriza($this->class, 'show');
         try {
             $cedula = $this->solicitaCedulaRepository->updateStatusAceito($request->id, Auth::user()->idusuario);
 
@@ -71,6 +72,7 @@ class SolicitaCedulaController extends Controller
 
     public function reprovarSolicitaCedula(Request $request)
     {
+        $this->autoriza($this->class, 'show');
         $regras = [
             'justificativa' => 'required|min:5|max:191'
         ];
