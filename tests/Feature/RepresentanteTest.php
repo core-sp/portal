@@ -457,4 +457,19 @@ class RepresentanteTest extends TestCase
         $response = $this->get(route('representante.dashboard'));
         $response->assertDontSee($bdo->segmento);
     }
+
+    /** @test 
+     * 
+     * Não visualiza o aviso do bdo se não possuir oportunidade e segmento. 
+    */
+    public function cannot_view_alert_bdo_if_hasnt_bdo_and_segmento()
+    {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $response = $this->get(route('representante.dashboard'));
+        $response->assertDontSee('Alimentício');
+    }
 }
