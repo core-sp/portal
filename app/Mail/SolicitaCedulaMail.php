@@ -17,15 +17,15 @@ class SolicitaCedulaMail extends Mailable
     public function __construct($cedula)
     {
         if($cedula->status == SolicitaCedula::STATUS_EM_ANDAMENTO) {
-            $this->body = 'Bem vindo ao CORE-SP. O seu pedido de emissão cédula profissional está em análise! ';
+            $this->body = 'Bem vindo ao CORE-SP. Seu pedido de emissão da cédula profissional está em análise e será postado em até 10 dias após a aprovação.';
             $this->body .= '<br /><br />';
             $this->body .= '<strong>Código da solicitação:</strong> #'. $cedula->id;
             $this->body .= '<br /><br />';
             $this->body .= '<strong>Status:</strong> '. $cedula->status;
             $this->body .= '<br /><br />';
-            $this->body .= 'Poderá acompanhar o andamento de seu pedido pela sua própria área restrita.';
+            $this->body .= 'Poderá acompanhar o andamento pela sua própria área restrita.';
             $this->body .= '<br /><br />';
-            $this->body .= 'A cédula será emitida após a aprovação. O documento será postado em até 10 dias úteis após a aprovação do pedido.';
+            $this->body .= 'O CORE-SP agradece sua solicitação.';
         } else{
             $this->body = 'Falta o texto para a atualização';
             // $this->body .= '<br /><br />';
