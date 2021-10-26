@@ -257,200 +257,52 @@ class Kernel extends ConsoleKernel
         //     }
         // })->hourly();
 
+        // Rotina para envio de relatório de solicitações de cédula feitas no dia anterior
         $schedule->call(function() {
-            $users = User::select('email','idregional','idperfil')
-                ->where('idperfil','=',1)
-                ->orWhere('idperfil','=',13)
-                ->orWhere('idperfil','=',12)
-                ->orWhere('idperfil','=',8)
-                ->orWhere('idperfil','=',6)
-                ->orWhere('idperfil','=',21)
+            $users = User::where('idperfil', 1)
+                ->orWhere('idusuario', 54)
+                ->orWhere('idusuario', 77)
                 ->get();
             $hoje = date('Y-m-d');
             $ontem = Carbon::yesterday()->toDateString();
             $diaFormatado = Helper::onlyDate($ontem);
             foreach($users as $user) {
-                if($user->idperfil === 8) {
-                    $count = SolicitaCedula::where('idregional','=',$user->idregional)
-                        ->whereDate('created_at','=',$ontem)
-                        ->where('status', SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->count();
-                    if($count >= 1) {
-                        $body = '<h3><i>(Mensagem Programada)</i></h3>';
-                        $body .= '<p>';
-                        if($count === 1)
-                            $body .= 'Existe <strong>1 solicitação de cédula</strong> ';
-                        else
-                            $body .= 'Existem <strong>'.$count.' solicitações de cédulas<strong> ';
-                        $body .= 'em '.$user->regional->regional.' ontem, dia <strong>'.Helper::onlyDate($ontem).'.</strong>';
-                        $body .= '</p>';
-                        $body .= '<p>';
-                        $body .= '----------';
-                        $body .= '</p>';
-                        $body .= '<p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
-                        $body .= '</p>';
-                        try {
-                            Mail::to($user->email)
-                                ->send(new InternoSolicitaCedulaMail($body, 'em '.$user->regional->regional, $diaFormatado));
-                        } catch (\Exception $e) {
-                            \Log::error($e->getMessage());
-                        }
-                    }
-                } 
-                elseif($user->idperfil === 21) {
-                    $cedulas = SolicitaCedula::where('idregional', '=', $user->idregional)
-                        ->whereDate('created_at', '=', $ontem)
-                        ->where('status',SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->orderBy('idregional', 'ASC')
-                        ->get();
-
-                    if($cedulas->isNotEmpty()) {
-                        $body = '<h3><i>(Mensagem Programada)</i></h3>';
-                        $body .= '<p>Confira abaixo a lista de cédulas solicitadas pelo Portal CORE-SP ontem, <strong>'.Helper::onlyDate($ontem).':</strong></p>';
-                        $body .= '<table border="1" cellspacing="0" cellpadding="6">';
-                        $body .= '<thead>';
+                $cedulas = SolicitaCedula::whereDate('created_at', $ontem)
+                    ->where('status', SolicitaCedula::STATUS_EM_ANDAMENTO)
+                    ->get()
+                    ->sortBy(function($q){
+                        return $q->regional->regional;
+                    });
+                if($cedulas->isNotEmpty()) {
+                    $body = '<h3><i>(Mensagem Programada)</i></h3>';
+                    $body .= '<p>Confira abaixo a lista de cédulas solicitadas pelo Portal CORE-SP ontem, <strong>'.Helper::onlyDate($ontem).':</strong></p>';
+                    $body .= '<table border="1" cellspacing="0" cellpadding="6">';
+                    $body .= '<thead>';
+                    $body .= '<tr>';
+                    $body .= '<th>Regional</th>';
+                    $body .= '<th>Representante</th>';
+                    $body .= '<th>Registro Core</th>';
+                    $body .= '</tr>';
+                    $body .= '</thead>';
+                    $body .= '<tbody>';
+                    foreach($cedulas as $cedula) {
                         $body .= '<tr>';
-                        $body .= '<th>Regional</th>';
-                        $body .= '<th>Representante</th>';
-                        $body .= '<th>Registro Core</th>';
+                        $body .= '<td>'.$cedula->regional->regional.'</td>';
+                        $body .= '<td>'.$cedula->representante->nome.'</td>';
+                        $body .= '<td>'.$cedula->representante->registro_core.'</td>';
                         $body .= '</tr>';
-                        $body .= '</thead>';
-                        $body .= '<tbody>';
-                        foreach($cedulas as $cedula) {
-                            $body .= '<tr>';
-                            $body .= '<td>'.$cedula->regional->regional.'</td>';
-                            $body .= '<td>'.$cedula->representante->nome.'</td>';
-                            $body .= '<td>'.$cedula->representante->registro_core.'</td>';
-                            $body .= '</tr>';
-                        }
-                        $body .= '</tbody>';
-                        $body .= '</table>';
-                        $body .= '<p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
-                        $body .= '</p>';
-                        $regional = 'em '. $user->regional->regional;
-                        try {
-                            Mail::to($user->email)
-                                ->send(new InternoSolicitaCedulaMail($body, $regional, $diaFormatado));
-                        } catch (\Exception $e) {
-                            \Log::error($e->getMessage());
-                        }
                     }
-                }
-                elseif($user->idperfil === 13) {
-                    $cedulas = SolicitaCedula::where('idregional','!=',1)
-                        ->whereDate('created_at', '=', $ontem)
-                        ->where('status', SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->orderBy('idregional', 'ASC')
-                        ->get();
-                    if($cedulas->isNotEmpty()) {
-                        $body = '<h3><i>(Mensagem Programada)</i></h3>';
-                        $body .= '<p>Confira abaixo a lista de cédulas solicitadas pelo Portal CORE-SP ontem, <strong>'.Helper::onlyDate($ontem).':</strong></p>';
-                        $body .= '<table border="1" cellspacing="0" cellpadding="6">';
-                        $body .= '<thead>';
-                        $body .= '<tr>';
-                        $body .= '<th>Regional</th>';
-                        $body .= '<th>Representante</th>';
-                        $body .= '<th>Registro Core</th>';
-                        $body .= '</tr>';
-                        $body .= '</thead>';
-                        $body .= '<tbody>';
-                        foreach($cedulas as $cedula) {
-                            $body .= '<tr>';
-                            $body .= '<td>'.$cedula->regional->regional.'</td>';
-                            $body .= '<td>'.$cedula->representante->nome.'</td>';
-                            $body .= '<td>'.$cedula->representante->registro_core.'</td>';
-                            $body .= '</tr>';
-                        }
-                        $body .= '</tbody>';
-                        $body .= '</table>';
-                        $body .= '<p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
-                        $body .= '</p>';
-                        $regional = 'nas Seccionais';
-                        try {
-                            Mail::to($user->email)
-                                ->send(new InternoSolicitaCedulaMail($body, $regional, $diaFormatado));
-                        } catch (\Exception $e) {
-                            \Log::error($e->getMessage());
-                        }
-                    }
-                } 
-                elseif($user->idperfil === 12) {
-                    $cedulas = SolicitaCedula::where('idregional','=',1)
-                        ->whereDate('created_at', '=', $ontem)
-                        ->where('status', SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->orderBy('idregional', 'ASC')
-                        ->get();
-                    if($cedulas->isNotEmpty()) {
-                        $body = '<h3><i>(Mensagem Programada)</i></h3>';
-                        $body .= '<p>Confira abaixo a lista de cédulas solicitadas pelo Portal CORE-SP ontem, <strong>'.Helper::onlyDate($ontem).':</strong></p>';
-                        $body .= '<table border="1" cellspacing="0" cellpadding="6">';
-                        $body .= '<thead>';
-                        $body .= '<tr>';
-                        $body .= '<th>Regional</th>';
-                        $body .= '<th>Representante</th>';
-                        $body .= '<th>Registro Core</th>';
-                        $body .= '</tr>';
-                        $body .= '</thead>';
-                        $body .= '<tbody>';
-                        foreach($cedulas as $cedula) {
-                            $body .= '<tr>';
-                            $body .= '<td>'.$cedula->regional->regional.'</td>';
-                            $body .= '<td>'.$cedula->representante->nome.'</td>';
-                            $body .= '<td>'.$cedula->representante->registro_core.'</td>';
-                            $body .= '</tr>';
-                        }
-                        $body .= '</tbody>';
-                        $body .= '</table>';
-                        $body .= '<p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
-                        $body .= '</p>';
-                        try {
-                            Mail::to($user->email)
-                                ->send(new InternoSolicitaCedulaMail($body, 'em '.$user->regional->regional, $diaFormatado));
-                        } catch (\Exception $e) {
-                            \Log::error($e->getMessage());
-                        }
-                    }
-                } 
-                elseif($user->idperfil === 6 || $user->idperfil === 1) {
-                    $cedulas = SolicitaCedula::whereDate('created_at', '=', $ontem)
-                        ->where('status', SolicitaCedula::STATUS_EM_ANDAMENTO)
-                        ->orderBy('idregional', 'ASC')
-                        ->get();
-                    if($cedulas->isNotEmpty()) {
-                        $body = '<h3><i>(Mensagem Programada)</i></h3>';
-                        $body .= '<p>Confira abaixo a lista de cédulas solicitadas pelo Portal CORE-SP ontem, <strong>'.Helper::onlyDate($ontem).':</strong></p>';
-                        $body .= '<table border="1" cellspacing="0" cellpadding="6">';
-                        $body .= '<thead>';
-                        $body .= '<tr>';
-                        $body .= '<th>Regional</th>';
-                        $body .= '<th>Representante</th>';
-                        $body .= '<th>Registro Core</th>';
-                        $body .= '</tr>';
-                        $body .= '</thead>';
-                        $body .= '<tbody>';
-                        foreach($cedulas as $cedula) {
-                            $body .= '<tr>';
-                            $body .= '<td>'.$cedula->regional->regional.'</td>';
-                            $body .= '<td>'.$cedula->representante->nome.'</td>';
-                            $body .= '<td>'.$cedula->representante->registro_core.'</td>';
-                            $body .= '</tr>';
-                        }
-                        $body .= '</tbody>';
-                        $body .= '</table>';
-                        $body .= '<p>';
-                        $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
-                        $body .= '</p>';
-                        $regional = 'em São Paulo e Seccionais';
-                        try {
-                            Mail::to($user->email)
-                                ->send(new InternoSolicitaCedulaMail($body, $regional, $diaFormatado));
-                        } catch (\Exception $e) {
-                            \Log::error($e->getMessage());
-                        }
+                    $body .= '</tbody>';
+                    $body .= '</table>';
+                    $body .= '<p>';
+                    $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
+                    $body .= '</p>';
+                    $regional = 'Seccionais';
+                    try {
+                        Mail::to($user->email)
+                            ->send(new InternoSolicitaCedulaMail($body, $regional, $diaFormatado));
+                    } catch (\Exception $e) {
+                        \Log::error($e->getMessage());
                     }
                 }
             }
