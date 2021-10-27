@@ -10,9 +10,11 @@ use App\SolicitaCedula;
 use App\Traits\ControleAcesso;
 use App\Repositories\SolicitaCedulaRepository;
 use App\Mail\SolicitaCedulaMail;
+use App\Repositories\GerentiRepositoryInterface;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Carbon\Carbon;
+use PDF;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class SolicitaCedulaController extends Controller
@@ -21,6 +23,7 @@ class SolicitaCedulaController extends Controller
 
     private $class = 'SolicitaCedulaController';
     private $solicitaCedulaRepository;
+    private $gerentiRepository;
 
     // Variáveis
     private $variaveis = [
@@ -33,10 +36,11 @@ class SolicitaCedulaController extends Controller
         'busca' => 'solicita-cedulas'
     ];
 
-    public function __construct(SolicitaCedulaRepository $solicitaCedulaRepository)
+    public function __construct(SolicitaCedulaRepository $solicitaCedulaRepository, GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('auth');
         $this->solicitaCedulaRepository = $solicitaCedulaRepository;
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public function show($id)
@@ -117,7 +121,11 @@ class SolicitaCedulaController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
+            $data_limite = Carbon::parse($resultado->updated_at)->addWeeks(4)->toDateString();
             $acoes = '<a href="/admin/solicita-cedula/' . $resultado->id . '" class="btn btn-sm btn-default">Ver</a> ';
+            // se for aceito e somente pode gerar até 4 semanas de aceito, pois o limite para envio é de 10 dias úteis.
+            if(($resultado->status == SolicitaCedula::STATUS_ACEITO) && (now()->lte($data_limite)))
+                $acoes .= '<a href="/admin/solicita-cedula/pdf/' . $resultado->id . '" class="btn btn-sm btn-warning">PDF</a> ';
             $conteudo = [
                 $resultado->id,
                 $resultado->representante->nome,
@@ -277,5 +285,24 @@ class SolicitaCedulaController extends Controller
         $filtro .= '</form>';
 
         return $filtro;
+    }
+
+    public function gerarPdf($id)
+    {
+        $this->autoriza($this->class, 'show');
+        $resultado = $this->solicitaCedulaRepository->getById($id);
+        $data_limite = Carbon::parse($resultado->updated_at)->addWeeks(4)->toDateString();
+        if(($resultado->status == SolicitaCedula::STATUS_ACEITO) && (now()->lte($data_limite)))
+        {
+            // pegar identidade PF no Gerenti e PJ ????
+            $identidade = $resultado->representante->tipoPessoa() == 'PF' ? 
+            $this->gerentiRepository->gerentiDadosGeraisPF($resultado->representante->ass_id)['identidade'] : 
+            $this->gerentiRepository->gerentiDadosGeraisPJ($resultado->representante->ass_id)['Inscrição estadual'];
+            $pdf = PDF::loadView('admin.forms.cedulaPDF', compact('resultado', 'identidade'))->setWarnings(false);
+            return $pdf->stream('cedula_codigo_'.$id.'.pdf');
+        }
+        return redirect('/admin/solicita-cedula')
+                ->with('message', 'Ou a cédula não foi aceita ou o prazo de gerar o pdf expirou.')
+                ->with('class', 'alert-danger');
     }
 }

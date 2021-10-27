@@ -29,12 +29,6 @@ class SolicitaCedulaTest extends TestCase
         ]);
     }
 
-    /** 
-     * =======================================================================================================
-     * TESTES DE AUTORIZAÇÃO NO ADMIN
-     * =======================================================================================================
-     */
-
     /** @test 
      * 
      * Usuário sem autorização não pode listar Solicitações de Cédulas. Verificando autorização no uso
@@ -74,7 +68,10 @@ class SolicitaCedulaTest extends TestCase
         $user = $this->signIn();
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertForbidden();
-        $this->post(route('admin.representante-solicita-cedula.post'), ['id' => $cedula->id])->assertForbidden();
+        $this->post(route('admin.representante-solicita-cedula.post'), [
+            'id' => $cedula->id,
+            'idusuario' => $user->idusuario
+            ])->assertForbidden();
         $this->assertDatabaseMissing('solicitacoes_cedulas', ['status' => 'Aceito']);
     }
 
@@ -87,7 +84,10 @@ class SolicitaCedulaTest extends TestCase
         $user = $this->signIn();
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertOk();
-        $this->post(route('admin.representante-solicita-cedula.post'), ['id' => $cedula->id])->assertStatus(302);
+        $this->post(route('admin.representante-solicita-cedula.post'), [
+            'id' => $cedula->id,
+            'idusuario' => $user->idusuario
+            ])->assertStatus(302);
         $this->assertDatabaseHas('solicitacoes_cedulas', ['status' => 'Aceito']);
     }
 
@@ -104,7 +104,8 @@ class SolicitaCedulaTest extends TestCase
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertForbidden();
         $this->post(route('admin.representante-solicita-cedula-reprovada.post'), [
             'id' => $cedula->id,
-            'justificativa' => 'Não foi aprovado...'
+            'justificativa' => 'Não foi aprovado...',
+            'idusuario' => $user->idusuario
             ])->assertForbidden();
         $this->assertDatabaseMissing('solicitacoes_cedulas', ['status' => 'Recusado']);
     }
@@ -120,7 +121,8 @@ class SolicitaCedulaTest extends TestCase
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertOk();
         $this->post(route('admin.representante-solicita-cedula-reprovada.post'), [
             'id' => $cedula->id,
-            'justificativa' => 'Não foi aprovado...'
+            'justificativa' => 'Não foi aprovado...',
+            'idusuario' => $user->idusuario
             ])->assertStatus(302);
         $this->assertDatabaseHas('solicitacoes_cedulas', ['status' => 'Recusado']);
     }
@@ -136,7 +138,8 @@ class SolicitaCedulaTest extends TestCase
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertOk();
         $this->post(route('admin.representante-solicita-cedula-reprovada.post'), [
             'id' => $cedula->id,
-            'justificativa' => ''
+            'justificativa' => '',
+            'idusuario' => $user->idusuario
             ])->assertSessionHasErrors(['justificativa']);
         $this->assertDatabaseMissing('solicitacoes_cedulas', ['status' => 'Recusado']);
     }
@@ -227,4 +230,99 @@ class SolicitaCedulaTest extends TestCase
         ->assertDontSeeText($cedula->status);
     }
 
+    /** @test 
+     * 
+     * Usuário com autorização pode ver o botão pdf após o aceite.
+    */
+    public function authorized_users_can_to_view_pdf_button()
+    {
+        $user = $this->signIn();
+        $cedula = factory('App\SolicitaCedula')->create();
+        $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertOk();
+        $this->post(route('admin.representante-solicita-cedula.post'), [
+            'id' => $cedula->id,
+            'idusuario' => $user->idusuario
+            ])->assertStatus(302);
+        $this->get(route('solicita-cedula.index'))->assertSeeText('PDF');
+    }
+
+    /** @test 
+     * 
+     * Usuário sem autorização não pode ver o botão pdf após o aceite.
+    */
+    public function non_authorized_users_cannot_to_view_pdf_button()
+    {
+        // para criar mais perfis e ser diferente do "Permissao::insert()"
+        factory('App\Perfil', 5)->create();
+        $user = $this->signIn();
+        $cedula = factory('App\SolicitaCedula')->create();
+        $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertForbidden();
+        $this->post(route('admin.representante-solicita-cedula.post'), [
+            'id' => $cedula->id,
+            'idusuario' => $user->idusuario
+            ])->assertForbidden();
+        $this->get(route('solicita-cedula.index'))->assertDontSeeText('PDF');
+    }
+
+    /** @test 
+     * 
+     * Usuário sem autorização não pode acessar a rota do pdf gerado
+    */
+    public function non_authorized_users_cannot_access_route_pdf()
+    {
+        // para criar mais perfis e ser diferente do "Permissao::insert()"
+        factory('App\Perfil', 5)->create();
+        $user = $this->signIn();
+        $cedula = factory('App\SolicitaCedula')->create([
+            'status' => 'Aceito',
+            'idusuario' => $user->idusuario
+        ]);
+        $this->get(route('solicita-cedula.index'))->assertDontSeeText('PDF');
+        $this->get(route('admin.solicita-cedula.pdf', $cedula->id))->assertForbidden();
+    }
+
+    /** @test 
+     * 
+     * Usuário com autorização pode acessar a rota do pdf gerado
+    */
+    public function authorized_users_can_access_route_pdf()
+    {
+        $user = $this->signIn();
+        $cedula = factory('App\SolicitaCedula')->create([
+            'status' => 'Aceito',
+            'idusuario' => $user->idusuario
+        ]);
+        $this->get(route('solicita-cedula.index'))->assertSeeText('PDF');
+        $this->get(route('admin.solicita-cedula.pdf', $cedula->id))->assertOk();
+    }
+
+    /** @test 
+     * 
+     * Usuário não pode gerar o pdf após 4 semanas da atualização, pois o prazoo é de 10 dias úteis para o procedimento
+    */
+    public function authorized_users_cannot_to_view_pdf_after_4_weeks()
+    {
+        $user = $this->signIn();
+        $cedula = factory('App\SolicitaCedula')->create([
+            'status' => 'Aceito',
+            'idusuario' => $user->idusuario,
+            'updated_at' => now()->subWeeks(5)
+        ]);
+        $this->get(route('solicita-cedula.index'))->assertDontSeeText('PDF');
+        $this->get(route('admin.solicita-cedula.pdf', $cedula->id))->assertStatus(302);
+        $this->get(route('solicita-cedula.index'))->assertSeeText('Ou a cédula não foi aceita ou o prazo de gerar o pdf expirou.');
+    }
+
+    /** @test 
+     * 
+     * Usuário não pode gerar o pdf se a cédula não possui status Aceito
+    */
+    public function authorized_users_cannot_to_view_pdf_with_status_differnt_aceito()
+    {
+        $user = $this->signIn();
+        $cedula = factory('App\SolicitaCedula')->create();
+        $this->get(route('solicita-cedula.index'))->assertDontSeeText('PDF');
+        $this->get(route('admin.solicita-cedula.pdf', $cedula->id))->assertStatus(302);
+        $this->get(route('solicita-cedula.index'))->assertSeeText('Ou a cédula não foi aceita ou o prazo de gerar o pdf expirou.');
+    }
 }
