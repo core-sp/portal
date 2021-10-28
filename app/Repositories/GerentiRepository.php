@@ -454,18 +454,4 @@ class GerentiRepository implements GerentiRepositoryInterface
 
         return utf8_converter($resultado)[0];
     }
-
-    public function gerentiTeste($ass_id)
-    {
-        $this->connect();
-        
-        $query = 'select * from PROCPORTALDADOSGERAISPJ(:ass_id)';
-
-        $run = $this->gerentiConnection->prepare($query);
-        
-        $run->execute([
-            'ass_id' => $ass_id
-        ]);
-        return $run->fetchAll(PDO::FETCH_ASSOC)[0];
-    }
 }
