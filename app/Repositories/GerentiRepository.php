@@ -237,7 +237,7 @@ class GerentiRepository implements GerentiRepositoryInterface
     {
         $this->connect();
         
-        $query = 'select DATACADASTRO "Data de cadastro", DATAREGSOCIAL "Data do Registro Social", 
+        $query = 'select IDENTIDADE "identidade", DATACADASTRO "Data de cadastro", DATAREGSOCIAL "Data do Registro Social", 
             DATAHOMOLOGACAO "Data de homologação", NIRE "Nire", TIPOPESSOA "Tipo de pessoa", 
             REGIONAL "Regional", DATA_JUNTA "Data do reg. na junta comercial", DT_INICIO "Data de início",
             REG_SECUNDARIO "Registro secundário", CORE_ORIGEM "Core de origem", INSCR_ESTADUAL "Inscrição estadual", 
