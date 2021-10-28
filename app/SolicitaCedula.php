@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class SolicitaCedula extends Model
 {
@@ -32,7 +31,6 @@ class SolicitaCedula extends Model
 
     public function podeGerarPdf()
     {
-        $data_limite = Carbon::parse($this->updated_at)->addWeeks(4)->toDateString();
-        return ($this->status == SolicitaCedula::STATUS_ACEITO) && (now()->lte($data_limite)) ? true : false;
+        return ($this->status == SolicitaCedula::STATUS_ACEITO) ? true : false;
     }
 }

@@ -119,7 +119,6 @@ class SolicitaCedulaController extends Controller
         $contents = [];
         foreach($resultados as $resultado) {
             $acoes = '<a href="'. route('admin.solicita-cedula.show', $resultado->id) . '" class="btn btn-sm btn-default">Ver</a> ';
-            // se for aceito e somente pode gerar até 4 semanas de aceito, pois o limite para envio é de 10 dias úteis.
             if($resultado->podeGerarPdf())
                 $acoes .= '<a href="' . route('admin.solicita-cedula.pdf', $resultado->id) . '" class="btn btn-sm btn-warning">PDF</a> ';
             $conteudo = [
@@ -289,7 +288,7 @@ class SolicitaCedulaController extends Controller
             return $pdf->stream('cedula_codigo_'.$id.'.pdf');
         }
         return redirect(route('solicita-cedula.index'))
-                ->with('message', '<i class="fas fa-ban"></i> Ou a cédula não foi aceita ou o prazo de gerar o pdf expirou.')
+                ->with('message', '<i class="fas fa-ban"></i> A cédula não foi aceita.')
                 ->with('class', 'alert-danger');
     }
 }

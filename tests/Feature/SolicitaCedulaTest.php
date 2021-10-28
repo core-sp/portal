@@ -298,23 +298,6 @@ class SolicitaCedulaTest extends TestCase
 
     /** @test 
      * 
-     * Usuário não pode gerar o pdf após 4 semanas da atualização, pois o prazoo é de 10 dias úteis para o procedimento
-    */
-    public function authorized_users_cannot_to_view_pdf_after_4_weeks()
-    {
-        $user = $this->signIn();
-        $cedula = factory('App\SolicitaCedula')->create([
-            'status' => 'Aceito',
-            'idusuario' => $user->idusuario,
-            'updated_at' => now()->subWeeks(5)
-        ]);
-        $this->get(route('solicita-cedula.index'))->assertDontSeeText('PDF');
-        $this->get(route('admin.solicita-cedula.pdf', $cedula->id))->assertStatus(302);
-        $this->get(route('solicita-cedula.index'))->assertSeeText('Ou a cédula não foi aceita ou o prazo de gerar o pdf expirou.');
-    }
-
-    /** @test 
-     * 
      * Usuário não pode gerar o pdf se a cédula não possui status Aceito
     */
     public function authorized_users_cannot_to_view_pdf_with_status_differnt_aceito()
@@ -323,6 +306,6 @@ class SolicitaCedulaTest extends TestCase
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('solicita-cedula.index'))->assertDontSeeText('PDF');
         $this->get(route('admin.solicita-cedula.pdf', $cedula->id))->assertStatus(302);
-        $this->get(route('solicita-cedula.index'))->assertSeeText('Ou a cédula não foi aceita ou o prazo de gerar o pdf expirou.');
+        $this->get(route('solicita-cedula.index'))->assertSeeText('A cédula não foi aceita.');
     }
 }
