@@ -237,7 +237,7 @@ class GerentiRepository implements GerentiRepositoryInterface
     {
         $this->connect();
         
-        $query = 'select IDENTIDADE "identidade", DATACADASTRO "Data de cadastro", DATAREGSOCIAL "Data do Registro Social", 
+        $query = 'select DATACADASTRO "Data de cadastro", DATAREGSOCIAL "Data do Registro Social", 
             DATAHOMOLOGACAO "Data de homologação", NIRE "Nire", TIPOPESSOA "Tipo de pessoa", 
             REGIONAL "Regional", DATA_JUNTA "Data do reg. na junta comercial", DT_INICIO "Data de início",
             REG_SECUNDARIO "Registro secundário", CORE_ORIGEM "Core de origem", INSCR_ESTADUAL "Inscrição estadual", 
@@ -453,5 +453,19 @@ class GerentiRepository implements GerentiRepositoryInterface
         $resultado = $run->fetchAll();
 
         return utf8_converter($resultado)[0];
+    }
+
+    public function gerentiTeste($ass_id)
+    {
+        $this->connect();
+        
+        $query = 'select * from PROCPORTALDADOSGERAISPJ(:ass_id)';
+
+        $run = $this->gerentiConnection->prepare($query);
+        
+        $run->execute([
+            'ass_id' => $ass_id
+        ]);
+        return $run->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 }
