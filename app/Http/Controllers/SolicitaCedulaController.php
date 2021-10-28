@@ -46,7 +46,6 @@ class SolicitaCedulaController extends Controller
     public function show($id)
     {
         $this->autoriza($this->class, __FUNCTION__);
-
         $resultado = $this->solicitaCedulaRepository->getById($id);
         $variaveis = (object) $this->variaveis;
 
@@ -58,7 +57,6 @@ class SolicitaCedulaController extends Controller
         $this->autoriza($this->class, 'show');
         try {
             $cedula = $this->solicitaCedulaRepository->updateStatusAceito($request->id, Auth::user()->idusuario);
-
             $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
             event(new CrudEvent('solicitação de cédula alterada', 'atendente aceitou', $request->id));
@@ -69,8 +67,8 @@ class SolicitaCedulaController extends Controller
             abort(500, "Erro ao atualizar o status da solicitação de cédula.");
         }
 
-        return redirect('/admin/solicita-cedula')
-                ->with('message', 'A solicitação de cédula foi aceita.')
+        return redirect(route('solicita-cedula.index'))
+                ->with('message', '<i class="fas fa-check"></i> A solicitação de cédula foi aceita.')
                 ->with('class', 'alert-success');
     }
 
@@ -89,7 +87,6 @@ class SolicitaCedulaController extends Controller
 
         try {
             $cedula = $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, Auth::user()->idusuario);
-
             $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
             event(new CrudEvent('solicitação de cédula alterada', 'atendente recusou e justificou', $request->id));
@@ -99,9 +96,9 @@ class SolicitaCedulaController extends Controller
             \Log::error($e->getMessage());
             abort(500, "Erro ao atualizar o status da solicitação de cédula.");
         }
-        return redirect('/admin/solicita-cedula')
-                ->with('message', 'A solicitação de cédula foi recusada.')
-                ->with('class', 'alert-info');
+        return redirect(route('solicita-cedula.index'))
+                ->with('message', '<i class="fas fa-check"></i> A solicitação de cédula foi recusada.')
+                ->with('class', 'alert-success');
     }
 
     private function tabelaCompleta($resultados)
@@ -121,11 +118,10 @@ class SolicitaCedulaController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            $data_limite = Carbon::parse($resultado->updated_at)->addWeeks(4)->toDateString();
-            $acoes = '<a href="/admin/solicita-cedula/' . $resultado->id . '" class="btn btn-sm btn-default">Ver</a> ';
+            $acoes = '<a href="'. route('admin.solicita-cedula.show', $resultado->id) . '" class="btn btn-sm btn-default">Ver</a> ';
             // se for aceito e somente pode gerar até 4 semanas de aceito, pois o limite para envio é de 10 dias úteis.
-            if(($resultado->status == SolicitaCedula::STATUS_ACEITO) && (now()->lte($data_limite)))
-                $acoes .= '<a href="/admin/solicita-cedula/pdf/' . $resultado->id . '" class="btn btn-sm btn-warning">PDF</a> ';
+            if($resultado->podeGerarPdf())
+                $acoes .= '<a href="' . route('admin.solicita-cedula.pdf', $resultado->id) . '" class="btn btn-sm btn-warning">PDF</a> ';
             $conteudo = [
                 $resultado->id,
                 $resultado->representante->nome,
@@ -175,16 +171,13 @@ class SolicitaCedulaController extends Controller
     public function index()
     {
         $this->autoriza($this->class, __FUNCTION__);
-
         $variaveis = $this->variaveis;
 
         // Checa se tem filtro
         if(IlluminateRequest::input('filtro') === 'sim') {
             $temFiltro = true;
-
             $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
             $variaveis['plural'] = 'solicita-cedula';
-
             $resultados = $this->checaAplicaFiltros();
 
             if($resultados instanceof RedirectResponse) {
@@ -206,14 +199,11 @@ class SolicitaCedulaController extends Controller
     public function busca()
     {
         $this->autoriza($this->class, 'index');
-
         $busca = IlluminateRequest::input('q');
 
         // Verifica se o texto buscado contem numero para remover a máscara
         $busca = preg_match('/\d+/', $busca) > 0 ? apenasNumeros($busca) : $busca;
-
         $resultados = $this->solicitaCedulaRepository->getBusca($busca);
-        
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
 
@@ -223,7 +213,6 @@ class SolicitaCedulaController extends Controller
     private function checaAplicaFiltros()
     {
         $this->autoriza($this->class, 'index');
-
         $result;
 
         // Confere se a data consta no request
@@ -238,21 +227,20 @@ class SolicitaCedulaController extends Controller
             }
         }
 
-        if($result)
+        if(isset($result))
             return $result;
 
-        return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data inválida. Data de início deve ser menor ou igual a data do término. ')->with('class', 'alert-danger');
+        return redirect()->back()
+        ->with('message', '<i class="fas fa-ban"></i> Data inválida. Data de início deve ser menor ou igual a data do término.')
+        ->with('class', 'alert-danger');
     }
 
     private function montaFiltros()
     {
-        $filtro = '<form method="GET" action="'.route('solicita-cedula.filtro').'" id="filtroCedula" class="mb-0">';
+        $filtro = '<form method="GET" action="' . route('solicita-cedula.filtro') . '" id="filtroCedula" class="mb-0">';
         $filtro .= '<div class="form-row filtroAge">';
-
         $filtro .= '<input type="hidden" name="filtro" value="sim" />';
-
         $filtro .= '<div class="form-group mb-0 col">';
-
         $filtro .= '<label for="datemin">Solicitado em</label>';
        
         // Montando filtro de data mínima
@@ -291,8 +279,7 @@ class SolicitaCedulaController extends Controller
     {
         $this->autoriza($this->class, 'show');
         $resultado = $this->solicitaCedulaRepository->getById($id);
-        $data_limite = Carbon::parse($resultado->updated_at)->addWeeks(4)->toDateString();
-        if(($resultado->status == SolicitaCedula::STATUS_ACEITO) && (now()->lte($data_limite)))
+        if($resultado->podeGerarPdf())
         {
             // pegar identidade PF no Gerenti e PJ ????
             $identidade = $resultado->representante->tipoPessoa() == 'PF' ? 
@@ -301,8 +288,8 @@ class SolicitaCedulaController extends Controller
             $pdf = PDF::loadView('admin.forms.cedulaPDF', compact('resultado', 'identidade'))->setWarnings(false);
             return $pdf->stream('cedula_codigo_'.$id.'.pdf');
         }
-        return redirect('/admin/solicita-cedula')
-                ->with('message', 'Ou a cédula não foi aceita ou o prazo de gerar o pdf expirou.')
+        return redirect(route('solicita-cedula.index'))
+                ->with('message', '<i class="fas fa-ban"></i> Ou a cédula não foi aceita ou o prazo de gerar o pdf expirou.')
                 ->with('class', 'alert-danger');
     }
 }

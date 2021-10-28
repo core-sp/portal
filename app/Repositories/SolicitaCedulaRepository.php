@@ -8,8 +8,11 @@ class SolicitaCedulaRepository
 {
     public function getAll()
     {
-        return SolicitaCedula::orderBy('id','DESC')
-            ->paginate(10);
+        // Ordena primeiro pelas solicitações que, caso exista, estão Em andamento (idusuario nulo), 
+        // e então depois pelo id mais recente
+        return SolicitaCedula::orderBy('idusuario')
+        ->orderBy('id','DESC')
+        ->paginate(10);
     }
 
     public function getById($id)
@@ -19,12 +22,16 @@ class SolicitaCedulaRepository
 
     public function getByStatusEmAndamento($idrepresentante)
     {
-        return SolicitaCedula::where('status', '=', 'Em andamento')->where('idrepresentante', '=', $idrepresentante)->first();
+        return SolicitaCedula::where('status', SolicitaCedula::STATUS_EM_ANDAMENTO)
+        ->where('idrepresentante', $idrepresentante)
+        ->count();
     }
 
     public function getAllByIdRepresentante($id)
     {
-        return SolicitaCedula::where('idrepresentante', $id)->orderBy('id','DESC')->paginate(5);
+        return SolicitaCedula::where('idrepresentante', $id)
+        ->orderBy('id','DESC')
+        ->paginate(5);
     }
 
     public function create($idrepresentante, $idregional, $endereco) 
@@ -46,13 +53,20 @@ class SolicitaCedulaRepository
     public function updateStatusAceito($id, $iduser)
     {
         return SolicitaCedula::findOrFail($id)
-            ->update(["status" => SolicitaCedula::STATUS_ACEITO, 'idusuario' => $iduser]);
+            ->update([
+                "status" => SolicitaCedula::STATUS_ACEITO, 
+                'idusuario' => $iduser
+            ]);
     }
 
     public function updateStatusRecusado($id, $justificativa, $iduser)
     {
         return SolicitaCedula::findOrFail($id)
-            ->update(["status" => SolicitaCedula::STATUS_RECUSADO, "justificativa" => $justificativa, 'idusuario' => $iduser]);
+            ->update([
+                "status" => SolicitaCedula::STATUS_RECUSADO, 
+                "justificativa" => $justificativa, 
+                'idusuario' => $iduser
+            ]);
     }
 
     public function getBusca($busca)
@@ -70,14 +84,16 @@ class SolicitaCedulaRepository
                     $query->where('regional', 'LIKE','%'.$busca.'%');
                 }
             )
+            ->limit(25)
             ->paginate(10);
     }
 
     public function getToTableFilter($mindia, $maxdia)
     {
-        return SolicitaCedula::whereDate('created_at', '>=', $mindia)->whereDate('created_at', '<=', $maxdia)
+        return SolicitaCedula::whereDate('created_at', '>=', $mindia)
+        ->whereDate('created_at', '<=', $maxdia)
             ->orderBy('id','ASC')
-            ->limit(50)
-            ->paginate(15);
+            ->limit(25)
+            ->paginate(10);
     }
 }

@@ -14,7 +14,7 @@
         <div class="linha-lg-mini mb-2"></div>
         <h5 class="mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;SOLICITAÇÕES</h5>
         @if ($emdia)
-            @if (!$possuiSolicitacaoCedulaEmAndamento)
+            @if ($possuiSolicitacaoCedulaEmAndamento == 0)
                 <div class="d-block mb-3 mt-2">
                     <a href="{{ route('representante.inserirSolicitarCedulaView') }}" class="btn btn-primary link-nostyle branco">Adicionar nova solicitação de cédula</a>
                 </div>
