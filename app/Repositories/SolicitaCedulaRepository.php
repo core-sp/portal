@@ -8,10 +8,7 @@ class SolicitaCedulaRepository
 {
     public function getAll()
     {
-        // Ordena primeiro pelas solicitações que, caso exista, estão Em andamento (idusuario nulo), 
-        // e então depois pelo id mais recente
-        return SolicitaCedula::orderBy('idusuario')
-        ->orderBy('id','DESC')
+        return SolicitaCedula::orderByDesc('id')
         ->paginate(10);
     }
 
