@@ -26,33 +26,6 @@
       </div>
     </div>
     <div class="linha-lg"></div>
-    <!-- Local de avisos de oportunidades no Balcão por segmento do RC, caso tenha -->
-    @if(isset($bdo))
-      @if($bdo->count() > 0)
-      <div id="accordion">
-        <div class="card">
-          <div class="card-header bg-info">
-            <a data-toggle="collapse" href="#collapseOne"><i class="fas fa-angle-down"></i>&nbsp;&nbsp;
-              {!! $bdo->count() == 1 ? 'Foi encontrada 1 oportunidade' : 'Foram encontradas <strong>'.$bdo->count().'</strong> oportunidades' !!} em andamento para o seu segmento - <strong>{{ $bdo[0]->segmento }}</strong> e sua seccional - <strong>{{ $bdoSeccional }}</strong>
-            </a>
-          </div>
-          <div id="collapseOne" class="collapse" data-parent="#accordion">
-            <div class="card-body bg-light">
-            @foreach($bdo as $b)
-              <p>
-                <strong>{{ $b->titulo }} -</strong> Essa empresa possui {{ $b->vagasdisponiveis }} {{ $b->vagasdisponiveis > 1 ? 'vagas disponíveis' : 'vaga disponível' }}! <a href="{{ $b->observacao }}" target="_blank" class="alert-link"><u>Confira aqui</u></a>.
-              </p>
-              @if (!$loop->last)
-                <hr class="m-2">
-              @endif
-            @endforeach
-            </div>
-          </div>
-        </div>
-      </div>
-      @endif
-    @endif
-    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <div class="row">
       <div class="col-xl-3 pb-15-992">
         <div class="menu-representante">
@@ -90,6 +63,12 @@
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView')  ? 'mr-item-selected' : '' }}">
               <a href="{{ route('representante.emitirCertidaoView') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Emitir Certidão</h6>
+              </a>
+            </div>
+
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.bdo')  ? 'mr-item-selected' : '' }}">  
+              <a href="{{ route('representante.bdo') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-briefcase"></i>&nbsp;&nbsp;Oportunidades&nbsp;&nbsp;&nbsp;<span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm"></span></span></h6>
               </a>
             </div>
 

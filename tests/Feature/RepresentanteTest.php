@@ -68,6 +68,7 @@ class RepresentanteTest extends TestCase
     */
     public function access_tabs_on_restrict_area()
     {
+        // exige ao acessar a aba bdo
         factory('App\Regional')->create([
             'regional' => 'SÃO PAULO',
         ]);
@@ -89,6 +90,9 @@ class RepresentanteTest extends TestCase
 
         // Checa acesso a aba "Situação Financeira"
         $this->get(route('representante.lista-cobrancas'))->assertOk();
+
+        // Checa acesso a aba "Oportunidades"
+        $this->get(route('representante.bdo'))->assertOk();
     }
 
     /** @test 
@@ -97,9 +101,6 @@ class RepresentanteTest extends TestCase
     */
     public function insert_new_contact_for_representante()
     {
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -115,9 +116,6 @@ class RepresentanteTest extends TestCase
     */
     public function remove_contact_from_representante()
     {
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -136,9 +134,6 @@ class RepresentanteTest extends TestCase
     */
     public function insert_new_address_for_representante()
     {
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         
@@ -280,9 +275,6 @@ class RepresentanteTest extends TestCase
     */
     public function insert_new_contact_with_missing_mandatory_input_cannot_be_created()
     {
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -299,9 +291,6 @@ class RepresentanteTest extends TestCase
     */
     public function insert_new_address_with_missing_mandatory_input_cannot_be_created()
     {
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -340,6 +329,11 @@ class RepresentanteTest extends TestCase
     */
     public function cannot_access_tabs_on_restrict_area_without_login()
     {
+        // exige ao acessar a aba bdo
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+
         // Checa acesso a página principal é bloqueado e redirecionado para tela de login
         $this->get(route('representante.dashboard'))->assertRedirect(route('representante.login'));
 
@@ -354,6 +348,9 @@ class RepresentanteTest extends TestCase
 
         // Checa acesso a aba "Situação Financeira" é bloqueado e redirecionado para tela de login
         $this->get(route('representante.lista-cobrancas'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Oportunidades" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.bdo'))->assertRedirect(route('representante.login'));
     }
 
     /** @test 
@@ -399,8 +396,8 @@ class RepresentanteTest extends TestCase
         ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.dashboard'));
-        $response->assertSeeText($bdo->segmento);
+        $response = $this->get(route('representante.bdo'));
+        $this->assertNotEquals($response->getOriginalContent()->getData()['bdo']->count(), 0);
     }
 
     /** @test 
@@ -419,7 +416,7 @@ class RepresentanteTest extends TestCase
         ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.dashboard'));
+        $response = $this->get(route('representante.bdo'));
         $response->assertDontSee($bdo->segmento);
     }
 
@@ -429,14 +426,15 @@ class RepresentanteTest extends TestCase
     */
     public function cannot_view_alert_bdo_if_hasnt_bdo()
     {
+        // Alterar no GerentiMock para não achar dados
         factory('App\Regional')->create([
             'regional' => 'SÃO PAULO',
         ]);
         factory('App\BdoOportunidade')->create();
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.dashboard'));
-        $response->assertDontSee('Alimentício');
+        $response = $this->get(route('representante.bdo'));
+        $this->assertEquals($response->getOriginalContent()->getData()['bdo']->count(), 0);
     }
 
     /** @test 
@@ -454,8 +452,8 @@ class RepresentanteTest extends TestCase
         ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.dashboard'));
-        $response->assertDontSee($bdo->segmento);
+        $response = $this->get(route('representante.bdo'));
+        $this->assertEquals($response->getOriginalContent()->getData()['bdo']->count(), 0);
     }
 
     /** @test 
@@ -464,12 +462,13 @@ class RepresentanteTest extends TestCase
     */
     public function cannot_view_alert_bdo_if_hasnt_bdo_and_segmento()
     {
+        // Comentar o segmento no GerentiMock
         factory('App\Regional')->create([
             'regional' => 'SÃO PAULO',
         ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.dashboard'));
+        $response = $this->get(route('representante.bdo'));
         $response->assertDontSee('Alimentício');
     }
 }

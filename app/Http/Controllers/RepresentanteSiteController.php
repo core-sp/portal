@@ -46,22 +46,14 @@ class RepresentanteSiteController extends Controller
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->regionalRepository = $regionalRepository;
 
-        // avisos do Bdo para todas as rotas desse controller
-        $this->middleware(function ($request, $next) {
-            $rep = Auth::guard('representante')->user();
-            if(isset($rep))
-            {
-                $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
-                $idregional = $this->regionalRepository->getByName($seccional)->idregional;
-                $segmento = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
-                $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento[0]["SEGMENTO"], $idregional) : collect();
-                foreach($bdo as $b)
-                    // usei o campo observação do model para armazenar temporariamente o link
-                    $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento[0]["SEGMENTO"].'&regional='.$idregional;
-                View::share(['bdo' => $bdo, 'bdoSeccional' => $seccional]);
-            }
-            return $next($request);
-        });
+        // $this->middleware(function ($request, $next) {
+        //     $rep = Auth::guard('representante')->user();
+        //     if(isset($rep))
+        //     {
+        //         View::share(['bdo' => $bdo, 'bdoSeccional' => $seccional]);
+        //     }
+        //     return $next($request);
+        // });
     }
 
     public function index()
@@ -486,5 +478,19 @@ class RepresentanteSiteController extends Controller
         $valoresRefis = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
 
         return view('site.representante.simulador-refis', compact('valoresRefis'));
+    }
+
+    public function bdo()
+    {
+        $rep = Auth::guard('representante')->user();
+        $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
+        $idregional = $this->regionalRepository->getByName($seccional)->idregional;
+        $segmentoGerenti = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
+        $segmento = !empty($segmentoGerenti) ? $segmentoGerenti[0]["SEGMENTO"] : $segmentoGerenti;
+        $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento, $idregional) : collect();
+        foreach($bdo as $b)
+            // usei o campo observação do model para armazenar temporariamente o link
+            $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento.'&regional='.$idregional;
+        return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional'));
     }
 }
