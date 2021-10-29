@@ -458,10 +458,13 @@ class GerentiRepository implements GerentiRepositoryInterface
     public function gerentiGetSegmentosByAssId($ass_id)
     {
         $this->connect();
-        $run = $this->gerentiConnection->prepare('select * from PROCLISTASEGMENTOSASSID(:ASS_ID)');
+
+        $run = $this->gerentiConnection->prepare('select SEGMENTO from PROCLISTASEGMENTOSASSID(:ASS_ID)');
+
         $run->execute([
             'ASS_ID' => $ass_id
         ]);
+
         $resultado = $run->fetchAll();
         
         return utf8_converter($resultado);
