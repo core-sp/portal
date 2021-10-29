@@ -8,7 +8,15 @@ class SolicitaCedulaRepository
 {
     public function getAll()
     {
-        return SolicitaCedula::orderByDesc('id')
+        // Ordenando por status 'Em andamento', caso não exista, 
+        // pela solicitação atualizada mais recente
+        return SolicitaCedula::orderByRaw(
+            'CASE WHEN 
+            status = "' . SolicitaCedula::STATUS_EM_ANDAMENTO . '" 
+            THEN 0
+            END DESC'
+        )
+        ->orderByDesc('updated_at')
         ->paginate(10);
     }
 
@@ -89,7 +97,7 @@ class SolicitaCedulaRepository
     {
         return SolicitaCedula::whereDate('created_at', '>=', $mindia)
         ->whereDate('created_at', '<=', $maxdia)
-            ->orderBy('id','ASC')
+            ->orderBy('id')
             ->limit(25)
             ->paginate(10);
     }

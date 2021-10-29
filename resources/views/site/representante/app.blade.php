@@ -75,7 +75,11 @@
 
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.solicitarCedulaView')  ? 'mr-item-selected' : '' }}">
               <a href="{{ route('representante.solicitarCedulaView') }}" onclick="showLoading()">
-                <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Solicitar Cédula</h6>
+                <h6 class="brancar">
+                  <i class="fas fa-id-card"></i>&nbsp;&nbsp;Solicitação de Cédula&nbsp;&nbsp;&nbsp;
+                    <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm"></span>
+                  </span>
+                </h6>
               </a>
             </div>
 

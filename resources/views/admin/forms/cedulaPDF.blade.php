@@ -96,7 +96,7 @@
 
     #assinatura {
       text-align: center;
-      margin-top: 0;
+      margin-top: 11%;
     }
 
     #footer {
@@ -150,8 +150,8 @@
     </div>
     <p class="texto">
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      Eu, {{ $resultado->representante->nome }}, portador(a) da identidade nº {{ $identidade }}, do CPF/CNPJ
-      {{ $resultado->representante->cpf_cnpj }} e do registro nº {{ $resultado->representante->registro_core }}, realizado em {{ onlyDate($resultado->updated_at->toDateString()) }}, venho requerer,
+      Eu, {{ $resultado->representante->nome }}, portador(a) do RG {{ $identidade }}, do CPF
+      {{ $resultado->representante->tipoPessoa() == 'PF' ? $resultado->representante->cpf_cnpj : '***PJ buscar no gerenti***' }} e do registro CORE {{ $resultado->representante->registro_core }}, venho requerer,
       pelo presente, o envio, via postal, por meio do serviço de remessa de documentos dos Correios, de minha cédula de identidade profissional, com 
       fundamento na Resolução nº 1.186/2021 - CORE-SP, declarando estar de acordo com a Resolução em referência.
       </p>
@@ -169,10 +169,9 @@
     <p id="data">
       São Paulo, {{ now()->isoFormat('D') }} de {{ ucFirst(now()->isoFormat('MMMM')) }} de {{ now()->isoFormat('G') }}.
     </p>
-    <hr id="hr-texto">
-    <p id="assinatura">
-      xxxxxxxxxxxxxxxxxxxxxxxx
-    </p>
+      <p id="assinatura">
+        COORDENADORIA DE ATENDIMENTO CORE-SP
+      </p>
   </div>
   <!-- fim do conteúdo do doc -->
 

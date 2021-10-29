@@ -300,7 +300,7 @@ class SolicitaCedulaTest extends TestCase
      * 
      * Usuário não pode gerar o pdf se a cédula não possui status Aceito
     */
-    public function authorized_users_cannot_to_view_pdf_with_status_differnt_aceito()
+    public function authorized_users_cannot_to_view_pdf_with_status_different_aceito()
     {
         $user = $this->signIn();
         $cedula = factory('App\SolicitaCedula')->create();

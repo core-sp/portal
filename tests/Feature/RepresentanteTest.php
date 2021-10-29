@@ -235,6 +235,7 @@ class RepresentanteTest extends TestCase
     */
     public function register_with_nonexistent_representante_on_gerenti_cannot_be_created()
     {
+        // Editar o GerentiMock para não encontrar o representante
         $representante = factory('App\Representante')->raw(['password' => 'teste102030']);
 
         $this->post(route('representante.cadastro.submit'), ['cpfCnpj' => '04377629042', 'registro_core' => $representante['registro_core'], 'email' => $representante['email'], 'password' => $representante['password'], 'password_confirmation' => $representante['password'], 'checkbox-tdu' => 'on'])
@@ -415,6 +416,7 @@ class RepresentanteTest extends TestCase
     */
     public function cannot_insert_new_solicitacao_cedula_hasnt_em_dia()
     {
+        // Editar GerentiMock para situação sem ser 'em dia'
         $regional = factory('App\Regional')->create([
             'regional' => 'SÃO PAULO'
         ]);
