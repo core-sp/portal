@@ -61,19 +61,19 @@
                     </div>
                     <div class="form-row mt-2">
                         <div class="col-sm-4 mb-2-576">
-                            <label for="cpfCnpj">CPF ou CNPJ *</label>
+                            <label for="cpf_cnpj">CPF ou CNPJ *</label>
                             <input
                                 type="text"
-                                name="cpfCnpj"
-                                class="form-control cpfOuCnpj {{ $errors->has('cpfCnpj') ? 'is-invalid' : '' }}"
-                                id="cpfCnpj"
-                                value="{{ old('cpfCnpj') }}"
+                                name="cpf_cnpj"
+                                class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
+                                id="cpf_cnpj"
+                                value="{{ old('cpf_cnpj') }}"
                                 placeholder="CPF ou CNPJ"
                                 required
                             >
-                            @if($errors->has('cpfCnpj'))
+                            @if($errors->has('cpf_cnpj'))
                                 <div class="invalid-feedback">
-                                    {{ $errors->first('cpfCnpj') }}
+                                    {{ $errors->first('cpf_cnpj') }}
                                 </div>
                             @endif
                         </div>

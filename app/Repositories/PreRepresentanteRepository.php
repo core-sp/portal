@@ -7,39 +7,52 @@ use Illuminate\Support\Facades\Hash;
 
 class PreRepresentanteRepository 
 {
-    public function store($validated, $token){
+    public function store($validated, $token)
+    {
         return PreRepresentante::create([
-            'cpf_cnpj' => $validated->cpfCnpj,
-            'nome' => $validated->nome,
+            'cpf_cnpj' => $validated->cpf_cnpj,
+            'nome' => strtoupper($validated->nome),
             'email' => $validated->email,
             'verify_token' => $token,
             'password' => Hash::make($validated->password)
         ]);
     }
 
-    public function update($id, $validated, $token){
+    public function update($id, $validated, $token)
+    {
         PreRepresentante::withTrashed()->findOrFail($id)->restore();
         return PreRepresentante::findOrFail($id)->update([
-            'cpf_cnpj' => $validated->cpfCnpj,
-            'nome' => $validated->nome,
+            'cpf_cnpj' => $validated->cpf_cnpj,
+            'nome' => strtoupper($validated->nome),
             'email' => $validated->email,
             'verify_token' => $token,
             'password' => Hash::make($validated->password)
         ]);
     }
 
-    public function updatePosVerificarEmail($prerepresentante){
+    public function updatePosVerificarEmail($prerepresentante)
+    {
         return PreRepresentante::findOrFail($prerepresentante->id)->update([
             'ativo' => 1,
             'verify_token' => null
         ]);
     }
 
-    public function jaExiste($cpfCnpj){
-        return PreRepresentante::where('cpf_cnpj', $cpfCnpj)->where('ativo', 0)->withTrashed()->first();
+    public function jaExiste($cpfCnpj)
+    {
+        return PreRepresentante::where('cpf_cnpj', $cpfCnpj)
+        ->where('ativo', 0)
+        ->withTrashed()
+        ->first();
     }
 
-    public function getByToken($token){
+    public function getByToken($token)
+    {
         return PreRepresentante::where('verify_token', $token)->first();
+    }
+
+    public function getByCpfCnpj($cpfCnpj)
+    {
+        return PreRepresentante::where('cpf_cnpj', $cpfCnpj)->first();
     }
 }

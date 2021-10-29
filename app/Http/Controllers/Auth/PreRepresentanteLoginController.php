@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
+use App\Http\Requests\PreRepresentanteRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class PreRepresentanteLoginController extends Controller
@@ -44,29 +45,21 @@ class PreRepresentanteLoginController extends Controller
         }
     }
 
-    public function login(Request $request)
+    public function login(PreRepresentanteRequest $request)
     {
-        $cpfCnpj = apenasNumeros($request->cpf_cnpj);
+        $validated = (object) $request->validated();
+        $validated->cpf_cnpj = apenasNumeros(request('cpf_cnpj'));
 
-        $request->request->set('cpf_cnpj', $cpfCnpj);
-
-        $this->validate($request, [
-            'cpf_cnpj' => ['required', new CpfCnpj],
-            'password' => 'required'
-        ], [
-            'required' => 'Campo obrigatório'
-        ]);
-
-        if(!empty($this->verificaSeAtivo($cpfCnpj)))
+        if(!empty($this->verificaSeAtivo($validated->cpf_cnpj)))
             return $this->redirectWithErrors(
                 $request->only('cpf_cnpj'), 
-                $this->verificaSeAtivo($cpfCnpj)['message'], 
-                $this->verificaSeAtivo($cpfCnpj)['class']
+                $this->verificaSeAtivo($validated->cpf_cnpj)['message'], 
+                $this->verificaSeAtivo($validated->cpf_cnpj)['class']
             );
 
         if (Auth::guard('pre_representante')->attempt([
-            'cpf_cnpj' => $cpfCnpj,
-            'password' => $request->password
+            'cpf_cnpj' => $validated->cpf_cnpj,
+            'password' => $validated->password
         ])) {
             event(new ExternoEvent('Usuário ' . Auth::guard('pre_representante')->user()->id . ' conectou-se à Área do Pré Registro.'));
 
