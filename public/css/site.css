@@ -422,12 +422,12 @@ figure.align-left {
 	left: 0;
 
 	/* 55 anos */
-	/* background-image: url('/img/banner-55-anos.png'); */
+	background-image: url('/img/banner-55-anos.png');
 	
 	/* Novembro Azul */
 	/* background-color: rgba(0,31,137,1); */
 	/* Outubro Rosa */
-	background-color: rgba(198,22,117,1);
+	/* background-color: rgba(198,22,117,1); */
 	/* Cor Padrão */
 	/* background-color: #004587; */
 	/* Setembro Amarelo */
