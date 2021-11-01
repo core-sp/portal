@@ -127,8 +127,11 @@
                             {{ old('checkbox-tdu') === 'on' ? 'checked' : '' }}
                         />
                         <p class="d-inline ml-1 lh-28">
-                            <small class="light lh-28">
+                            <!-- <small class="light lh-28">
                                 Li e concordo com os <a class="azul-obrigatorio" id="link-termo-de-uso" data-toggle="modal" data-target="#modal-termo-de-uso">Termos de Uso</a> da Área Restrita do Representante do Core-SP.
+                            </small> -->
+                            <small class="light lh-28">
+                                Li e concordo com os <a class="text-primary" href="/arquivos/Termo_de_Uso_e_Consentimento_Area_Restrita_rev.pdf" target="_blank">Termos de Uso</a> da Área Restrita do Representante do Core-SP.
                             </small>
                         </p>
                         @if($errors->has('checkbox-tdu'))
@@ -137,10 +140,10 @@
                             </div>
                         @endif
                     </div>
-                    <div class="modal" id="modal-termo-de-uso">
-                        @component('components.termo-de-uso')
-                        @endcomponent
-                    </div>
+                    <!-- <div class="modal" id="modal-termo-de-uso">
+                        {{--@component('components.termo-de-uso')--}}
+                        {{--@endcomponent--}}
+                    </div> -->
                     <div class="form-group mt-3">
                         <button
                             type="submit"
