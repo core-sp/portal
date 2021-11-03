@@ -26,6 +26,18 @@
       </div>
     </div>
     <div class="linha-lg"></div>
+    <!-- Área do aviso -->
+    @if(isset($aviso))
+      @component('components.aviso-representante', 
+        [
+          'cor_fundo_titulo' => $aviso->cor_fundo_titulo,
+          'titulo' => $aviso->titulo, 
+          'conteudo' => $aviso->conteudo
+        ]
+      )
+      @endcomponent
+    @endif
+    <!-- Fim da Área do aviso -->
     <div class="row">
       <div class="col-xl-3 pb-15-992">
         <div class="menu-representante">

@@ -24,6 +24,7 @@ use App\Repositories\GerentiRepositoryInterface;
 use App\Http\Requests\RepresentanteEnderecoRequest;
 use App\Repositories\RepresentanteEnderecoRepository;
 use App\Repositories\BdoOportunidadeRepository;
+use App\Repositories\AvisoRepository;
 use App\Repositories\RegionalRepository;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
@@ -37,7 +38,7 @@ class RepresentanteSiteController extends Controller
     private $bdoOportunidadeRepository;
     private $regionalRepository;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository, AvisoRepository $avisoRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->gerentiRepository = $gerentiRepository;
@@ -46,14 +47,11 @@ class RepresentanteSiteController extends Controller
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->regionalRepository = $regionalRepository;
 
-        // $this->middleware(function ($request, $next) {
-        //     $rep = Auth::guard('representante')->user();
-        //     if(isset($rep))
-        //     {
-        //         View::share(['bdo' => $bdo, 'bdoSeccional' => $seccional]);
-        //     }
-        //     return $next($request);
-        // });
+        if($avisoRepository->avisoAtivado(1))
+        {
+            $aviso = $avisoRepository->getById(1);
+            View::share('aviso', $aviso);
+        }
     }
 
     public function index()

@@ -31,7 +31,8 @@ class Permissao extends Model
             'RepresentanteEnderecoController' => 'Representante - Endereço',
             'RepresentanteController' => 'Representante - Cadastrados',
             'FiscalizacaoController' => 'Fiscalização',
-            'CompromissoController' => 'Compromisso'
+            'CompromissoController' => 'Compromisso',
+            'AvisoController' => 'Aviso'
         ];
     }
 }
