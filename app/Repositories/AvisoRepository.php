@@ -16,9 +16,15 @@ class AvisoRepository
         return Aviso::findOrFail($id);
     }
 
-    public function avisoAtivado($id)
+    public function getByArea($area)
     {
-        return Aviso::findOrFail($id)->isAtivado();
+        return Aviso::where('area', $area)->first();
+    }
+
+    public function avisoAtivado($area)
+    {
+        $aviso = $this->getByArea($area);
+        return isset($aviso) ? $aviso->isAtivado() : false;
     }
 
     public function update($request, $id, $user)

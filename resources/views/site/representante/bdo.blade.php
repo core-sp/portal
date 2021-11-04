@@ -16,7 +16,11 @@
     @if($segmento)
         <div class="contatos-table space-single bg-info mb-2">
             <p class="light pb-0 text-white">
+                @if($bdo->count() == 0)
+                Não foi encontrada nenhuma oportunidade <strong>em andamento</strong> para o seu segmento - <strong>{{ $segmento }}</strong> e sua seccional - <strong>{{ $seccional }}</strong>
+                @else
                 {!! $bdo->count() == 1 ? 'Foi encontrada 1 oportunidade' : 'Foram encontradas <strong>'.$bdo->count().'</strong> oportunidades' !!} <strong>em andamento</strong> para o seu segmento - <strong>{{ $segmento }}</strong> e sua seccional - <strong>{{ $seccional }}</strong>
+                @endif
             </p>
         </div>
         <div class="contatos-table">

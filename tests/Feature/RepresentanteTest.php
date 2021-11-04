@@ -383,6 +383,24 @@ class RepresentanteTest extends TestCase
 
     /** @test 
      * 
+     * Visualiza a opção de outras oportunidades no bdo.
+     * 
+    */
+    public function view_option_outras_oportunidades()
+    {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $bdo = factory('App\BdoOportunidade', 5)->create([
+            'segmento' => 'Alimentício',
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.bdo'))->assertSee('Outras oportunidades');
+    }
+
+    /** @test 
+     * 
      * Visualiza as oportunidades no bdo se possuir segmento.
      * Tem de visualizar qual segmento está no GerentiMock 
     */
@@ -391,13 +409,12 @@ class RepresentanteTest extends TestCase
         factory('App\Regional')->create([
             'regional' => 'SÃO PAULO',
         ]);
-        $bdo = factory('App\BdoOportunidade')->create([
+        $bdo = factory('App\BdoOportunidade', 5)->create([
             'segmento' => 'Alimentício',
         ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.bdo'));
-        $this->assertNotEquals($response->getOriginalContent()->getData()['bdo']->count(), 0);
+        $this->get(route('representante.bdo'))->assertSee('Foram encontradas');
     }
 
     /** @test 
@@ -416,8 +433,7 @@ class RepresentanteTest extends TestCase
         ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.bdo'));
-        $response->assertDontSee($bdo->segmento);
+        $this->get(route('representante.bdo'))->assertDontSee($bdo->segmento);
     }
 
     /** @test 
@@ -426,15 +442,13 @@ class RepresentanteTest extends TestCase
     */
     public function cannot_view_alert_bdo_if_hasnt_bdo()
     {
-        // Alterar no GerentiMock para não achar dados
         factory('App\Regional')->create([
             'regional' => 'SÃO PAULO',
         ]);
-        factory('App\BdoOportunidade')->create();
+        factory('App\BdoOportunidade', 5)->create();
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.bdo'));
-        $this->assertEquals($response->getOriginalContent()->getData()['bdo']->count(), 0);
+        $this->get(route('representante.bdo'))->assertSee('Não foi encontrada');
     }
 
     /** @test 
@@ -446,14 +460,13 @@ class RepresentanteTest extends TestCase
         factory('App\Regional')->create([
             'regional' => 'SÃO PAULO',
         ]);
-        $bdo = factory('App\BdoOportunidade')->create([
+        $bdo = factory('App\BdoOportunidade', 5)->create([
             'segmento' => 'Alimentício',
             'status' => 'Expirado'
         ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.bdo'));
-        $this->assertEquals($response->getOriginalContent()->getData()['bdo']->count(), 0);
+        $this->get(route('representante.bdo'))->assertSee('Não foi encontrada');
     }
 
     /** @test 
@@ -468,7 +481,100 @@ class RepresentanteTest extends TestCase
         ]);
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $response = $this->get(route('representante.bdo'));
-        $response->assertDontSee('Alimentício');
+        $this->get(route('representante.bdo'))->assertDontSee('Alimentício');
+    }
+
+    /** @test 
+     * 
+     * Visualiza o aviso que está ativado.
+     * 
+    */
+    public function view_aviso_with_status_ativado()
+    {
+        $aviso = factory('App\Aviso')->create([
+            'status' => 'Ativado',
+            'idusuario' => factory('App\User')
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertSee($aviso->titulo);
+    }
+
+    /** @test 
+     * 
+     * Não visualiza o aviso que está desativado.
+     * 
+    */
+    public function cannot_view_aviso_with_status_desativado()
+    {
+        $aviso = factory('App\Aviso')->create();
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertDontSee($aviso->titulo);
+    }
+
+    /** @test 
+     * 
+     * Não visualiza o aviso que não existe.
+     * 
+    */
+    public function cannot_view_aviso_uncreated()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertViewMissing('aviso');
+    }
+
+    /** @test 
+     * 
+     * Visualiza o aviso ativado em todas as rotas do RC após logon.
+     * 
+    */
+    public function view_aviso_ativado_in_all_routes_get_after_logon()
+    {
+        $aviso = factory('App\Aviso')->create([
+            'status' => 'Ativado',
+            'idusuario' => factory('App\User')
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertSee($aviso->titulo);
+        $this->get(route('representante.dados-gerais'))->assertSee($aviso->titulo);
+        $this->get(route('representante.contatos.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.enderecos.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.inserir-endereco.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.lista-cobrancas'))->assertSee($aviso->titulo);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        factory('App\BdoOportunidade')->create();
+        $this->get(route('representante.bdo'))->assertSee($aviso->titulo);
+    }
+
+    /** @test 
+     * 
+     * Não visualiza o aviso desativado em todas as rotas do RC após logon.
+     * 
+    */
+    public function cannot_view_aviso_desativado_in_all_routes_get_after_logon()
+    {
+        $aviso = factory('App\Aviso')->create([
+            'idusuario' => factory('App\User')
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.dados-gerais'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.contatos.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.enderecos.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.inserir-endereco.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.lista-cobrancas'))->assertDontSee($aviso->titulo);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        factory('App\BdoOportunidade')->create();
+        $this->get(route('representante.bdo'))->assertDontSee($aviso->titulo);
     }
 }

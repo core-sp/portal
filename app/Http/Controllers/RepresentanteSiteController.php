@@ -47,9 +47,9 @@ class RepresentanteSiteController extends Controller
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->regionalRepository = $regionalRepository;
 
-        if($avisoRepository->avisoAtivado(1))
+        if($avisoRepository->avisoAtivado('Representante'))
         {
-            $aviso = $avisoRepository->getById(1);
+            $aviso = $avisoRepository->getByArea('Representante');
             View::share('aviso', $aviso);
         }
     }

@@ -62,10 +62,14 @@ class AvisoController extends Controller
     {
         $this->autoriza($this->class, 'edit');
         $request->validated();
-        $update = $this->avisoRepository->update($request, $id, auth()->user());
-        if(!$update)
+        if(auth()->user() == null)
+            abort(500, 'Não foi encontrado o usuário');
+        try{
+            $update = $this->avisoRepository->update($request, $id, auth()->user());
+        }catch(\Exception $e){
             abort(500, 'Erro ao atualizar o aviso');
-
+        }
+    
         event(new CrudEvent('aviso', 'editou', $id));
 
         return redirect(route('avisos.index'))
@@ -76,10 +80,14 @@ class AvisoController extends Controller
     public function updateStatus($id)
     {
         $this->autoriza($this->class, 'edit');
-        $update = $this->avisoRepository->updateCampoStatus($id, auth()->user());
-        if(!$update)
-            abort(500, 'Erro ao atualizar o status do aviso');
-
+        if(auth()->user() == null)
+            abort(500, 'Não foi encontrado o usuário');
+        try{
+            $update = $this->avisoRepository->updateCampoStatus($id, auth()->user());
+        }catch(\Exception $e){
+            abort(500, 'Erro ao atualizar o aviso');
+        }
+        
         $aviso = $this->avisoRepository->getById($id);
         event(new CrudEvent('aviso', 'editou o status para ' . $aviso->status, $id));
 
