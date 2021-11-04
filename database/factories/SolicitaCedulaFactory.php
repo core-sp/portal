@@ -17,6 +17,6 @@ $factory->define(SolicitaCedula::class, function (Faker $faker) {
         'municipio' => $faker->city,
         'status' => SolicitaCedula::STATUS_EM_ANDAMENTO,
         'idrepresentante' => factory('App\Representante'),
-        'idusuario' => Auth::id() !== null ? Auth::id() : null
+        'idusuario' => null
     ];
 });

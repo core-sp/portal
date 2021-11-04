@@ -9,13 +9,14 @@ class SolicitaCedulaRequest extends FormRequest
     public function rules()
     {
         return [
-            "cep" => "required",
-            "bairro" => "required|max:100",
-            "logradouro" => "required|max:100",
-            "numero" => "required|max:15",
+            "cep" => "sometimes|required",
+            "bairro" => "sometimes|required|max:100",
+            "logradouro" => "sometimes|required|max:100",
+            "numero" => "sometimes|required|max:15",
             "complemento" => "max:100",
-            "estado" => "required|max:5",
-            "municipio" => "required|max:100"
+            "estado" => "sometimes|required|max:5",
+            "municipio" => "sometimes|required|max:100",
+            'justificativa' => 'sometimes|required|min:5|max:191'
         ];
     }
 
@@ -24,6 +25,7 @@ class SolicitaCedulaRequest extends FormRequest
         return [
             "required" => "Campo obrigatório",
             "max" => "Excedido limite de caracteres",
+            'min' => 'O :attribute deve ter, no mínimo, 5 caracteres',
         ];
     }
 }

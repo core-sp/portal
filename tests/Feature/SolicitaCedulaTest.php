@@ -107,7 +107,7 @@ class SolicitaCedulaTest extends TestCase
             'justificativa' => 'Não foi aprovado...',
             'idusuario' => $user->idusuario
             ])->assertForbidden();
-        $this->assertDatabaseMissing('solicitacoes_cedulas', ['status' => 'Recusado']);
+        // $this->assertDatabaseMissing('solicitacoes_cedulas', ['status' => 'Recusado']);
     }
 
     /** @test 
@@ -307,5 +307,42 @@ class SolicitaCedulaTest extends TestCase
         $this->get(route('solicita-cedula.index'))->assertDontSeeText('PDF');
         $this->get(route('admin.solicita-cedula.pdf', $cedula->id))->assertStatus(302);
         $this->get(route('solicita-cedula.index'))->assertSeeText('A cédula não foi aceita.');
+    }
+
+    /** @test 
+     * 
+     * Gerar log ao aceitar a solicitação
+    */
+    public function log_is_generated_when_cedula_is_accepted()
+    {
+        $user = $this->signInAsAdmin();
+        $cedula = factory('App\SolicitaCedula')->create();
+        $this->post(route('admin.representante-solicita-cedula.post'), [
+            'idusuario' => $user->idusuario,
+            'id' => $cedula->id
+        ]);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('atendente aceitou', $log);
+        $this->assertStringContainsString('solicitação de cédula', $log);
+    }
+
+    /** @test 
+     * 
+     * Gerar log ao recusar a solicitação
+    */
+    public function log_is_generated_when_cedula_is_refuse()
+    {
+        $user = $this->signInAsAdmin();
+        $cedula = factory('App\SolicitaCedula')->create();
+        $this->post(route('admin.representante-solicita-cedula-reprovada.post'), [
+            'idusuario' => $user->idusuario,
+            'id' => $cedula->id,
+            'justificativa' => 'teste com logs'
+        ]);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('atendente recusou e justificou', $log);
+        $this->assertStringContainsString('solicitação de cédula', $log);
     }
 }

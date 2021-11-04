@@ -21,7 +21,7 @@ class SolicitaCedula extends Model
 
     public function usuario()
     {
-    	return $this->belongsTo('App\User', 'idusuario');
+    	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
 
     public function regional()

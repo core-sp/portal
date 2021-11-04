@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
+use App\Http\Requests\SolicitaCedulaRequest;
 use App\SolicitaCedula;
 use App\Traits\ControleAcesso;
 use App\Repositories\SolicitaCedulaRepository;
@@ -55,11 +56,13 @@ class SolicitaCedulaController extends Controller
     public function inserirSolicitaCedula(Request $request)
     {
         $this->autoriza($this->class, 'show');
+        if(Auth::user() == null)
+            abort(500, "Usuário não encontrado");
         try {
             $cedula = $this->solicitaCedulaRepository->updateStatusAceito($request->id, Auth::user()->idusuario);
             $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
-            event(new CrudEvent('solicitação de cédula alterada', 'atendente aceitou', $request->id));
+            event(new CrudEvent('solicitação de cédula', 'atendente aceitou', $request->id));
             
             // Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
         } catch (\Exception $e) {
@@ -72,24 +75,18 @@ class SolicitaCedulaController extends Controller
                 ->with('class', 'alert-success');
     }
 
-    public function reprovarSolicitaCedula(Request $request)
+    public function reprovarSolicitaCedula(SolicitaCedulaRequest $request)
     {
         $this->autoriza($this->class, 'show');
-        $regras = [
-            'justificativa' => 'required|min:5|max:191'
-        ];
-        $mensagens = [
-            'required' => 'O :attribute é obrigatório',
-            'min' => 'O :attribute deve ter, no mínimo, 5 caracteres',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
-        ];
-        $request->validate($regras, $mensagens);
+        $request->validated();
 
+        if(Auth::user() == null)
+            abort(500, "Usuário não encontrado");
         try {
             $cedula = $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, Auth::user()->idusuario);
             $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
-            event(new CrudEvent('solicitação de cédula alterada', 'atendente recusou e justificou', $request->id));
+            event(new CrudEvent('solicitação de cédula', 'atendente recusou e justificou', $request->id));
 
             // Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
         } catch (\Exception $e) {
