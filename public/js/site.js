@@ -795,3 +795,15 @@ $("#logout").click(function(){
 	$('body').append(form);
 	$(form).submit();
 });
+
+// Remove tudo que não é numero do cpf_cnpj
+$('#cadastro-pre-registro').submit(function() {
+	var cpfCnpj = $('#cpf_cnpj').val().replace(/\D/g,'');
+	$('#cpf_cnpj').val(cpfCnpj);
+});
+
+// Remove tudo que não é numero do cpf_cnpj
+$('#login-pre-registro').submit(function() {
+	var cpfCnpj = $('#login').val().replace(/\D/g,'');
+	$('#login').val(cpfCnpj);
+});

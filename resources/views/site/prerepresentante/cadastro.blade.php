@@ -39,7 +39,7 @@
                 <p>A Área Restrita do Pré Registro é destinada exclusivamente aos que pretendem se tornar Representantes Comerciais.</p>
                 <p>Preencha as informações abaixo e realize o seu cadastro.</p>
                 <hr>
-                <form action="{{-- route('prerepresentante.cadastro.submit') --}}" method="POST" class="cadastroRepresentante">
+                <form action="{{-- route('prerepresentante.cadastro.submit') --}}" method="POST" class="cadastroRepresentante" id="cadastro-pre-registro">
                     @csrf
                     <div class="form-row">
                         <div class="col-sm mb-2-576">
@@ -117,11 +117,16 @@
                             <input
                                 type="password"
                                 name="password_confirmation"
-                                class="form-control"
+                                class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}"
                                 id="password_confirmation"
                                 placeholder="Confirme a senha"
                                 required
                             >
+                            @if($errors->has('password_confirmation'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('password_confirmation') }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <small class="form-text text-muted">

@@ -13,7 +13,6 @@ class CpfCnpj implements Rule
 
     public function passes($attribute, $value)
     {
-        $value = apenasNumeros($value);
         if(strlen($value) === 11) {
             // Elimina possivel mascara
             $cpf = apenasNumeros($value);

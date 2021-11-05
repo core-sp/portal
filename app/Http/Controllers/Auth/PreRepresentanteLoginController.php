@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\PreRepresentante;
-use App\Rules\CpfCnpj;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -24,56 +23,52 @@ class PreRepresentanteLoginController extends Controller
         return view('auth.prerepresentante-login'); 
     }
 
-    protected function verificaSeAtivo($cpfCnpj)
+    protected function verificaSeAtivo($login)
     {
-        $prerepresentante = PreRepresentante::where('cpf_cnpj', $cpfCnpj)->first();
+        $prerepresentante = PreRepresentante::where('cpf_cnpj', $login)->first();
 
-        if(isset($prerepresentante)) {
-            if($prerepresentante->ativo === 0) {
+        if(isset($prerepresentante))
+            if($prerepresentante->ativo === 0)
                 return [
                     'message' => 'Por favor, acesse o email informado no momento do cadastro para verificar sua conta.',
                     'class' => 'alert-warning'
                 ];
-            } else {
+            else
                 return [];
-            }
-        } else {
+        else   
             return [
                 'message' => 'Login inválido.',
                 'class' => 'alert-danger'
             ];
-        }
     }
 
     public function login(PreRepresentanteRequest $request)
     {
         $validated = (object) $request->validated();
-        $validated->cpf_cnpj = apenasNumeros(request('cpf_cnpj'));
-
-        if(!empty($this->verificaSeAtivo($validated->cpf_cnpj)))
+        $verificou = $this->verificaSeAtivo($validated->login);
+        if(!empty($verificou))
             return $this->redirectWithErrors(
-                $request->only('cpf_cnpj'), 
-                $this->verificaSeAtivo($validated->cpf_cnpj)['message'], 
-                $this->verificaSeAtivo($validated->cpf_cnpj)['class']
+                $request->only('login'), 
+                $verificou['message'], 
+                $verificou['class']
             );
 
-        if (Auth::guard('pre_representante')->attempt([
-            'cpf_cnpj' => $validated->cpf_cnpj,
+        if(Auth::guard('pre_representante')->attempt([
+            'cpf_cnpj' => $validated->login,
             'password' => $validated->password
-        ])) {
+        ])) 
+        {
             event(new ExternoEvent('Usuário ' . Auth::guard('pre_representante')->user()->id . ' conectou-se à Área do Pré Registro.'));
-
             return redirect()->intended(route('prerepresentante.dashboard'));
         }
         
-        return $this->redirectWithErrors($request->only('cpf_cnpj'));
+        return $this->redirectWithErrors($request->only('login'));
     }
 
     protected function redirectWithErrors($withInput, $message = 'Login inválido.', $class = 'alert-danger')
     {
-        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$withInput['cpf_cnpj']. ' não conseguiu logar.'));
-        return redirect()
-            ->back()
+        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$withInput['login']. ' não conseguiu logar.'));
+        return redirect()->back()
             ->with([
                 'message' => $message,
                 'class' => $class
@@ -86,7 +81,6 @@ class PreRepresentanteLoginController extends Controller
         // event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") desconectou-se da Área do Representante.'));
 
         Auth::guard('pre_representante')->logout();
-
         $request->session()->invalidate();
 
         return redirect('/');

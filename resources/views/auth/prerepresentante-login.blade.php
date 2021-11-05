@@ -33,25 +33,28 @@
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt">
                 @if(Session::has('message'))
-                    <p class="alert {{ Session::get('class') }}">{{ Session::get('message') }}</p>
+                    <p class="alert {{ Session::get('class') }}">
+                        {{ Session::get('message') }}
+                    </p>
                 @endif
                 <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área restrita do Pré Registro.</strong></p>
                 <p>Ou então, <a href="{{ route('prerepresentante.cadastro') }}">realize o cadastro</a> e depois efetue o login.</p>
-                <form action="{{ route('prerepresentante.login.submit') }}" method="POST" class="cadastroRepresentante">
+                <form action="{{ route('prerepresentante.login.submit') }}" method="POST" class="cadastroRepresentante" id="login-pre-registro">
                     @csrf
                     <div class="form-group">
-                        <label for="cpf_cnpj">CPF ou CNPJ</label>
+                        <label for="login">CPF ou CNPJ</label>
                         <input id="login"
                             type="text"
-                            class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') || $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
-                            name="cpf_cnpj"
-                            value="{{ old('cpf_cnpj') ?: old('cpf_cnpj') }}"
+                            class="form-control cpfOuCnpj {{ $errors->has('login') ? ' is-invalid' : '' }}"
+                            name="login"
+                            value="{{ old('login') }}"
                             placeholder="CPF ou CNPJ"
+                            required
                         >
-                        @if ($errors->has('cpf_cnpj') || $errors->has('cpf_cnpj'))
-                            <span class="invalid-feedback">
-                                <strong>{{ $errors->first('cpf_cnpj') ?: $errors->first('cpf_cnpj') }}</strong>
-                            </span>
+                        @if($errors->has('login'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('login') }}
+                        </div>
                         @endif
                     </div>
                     <div class="form-group mt-2">
@@ -62,11 +65,12 @@
                             class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}"
                             name="password"
                             placeholder="Senha"
+                            required
                         >
-                        @if ($errors->has('password'))
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $errors->first('password') }}</strong>
-                            </span>
+                        @if($errors->has('password'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('password') }}
+                        </div>
                         @endif
                     </div>
                     <div class="form-group mt-2">

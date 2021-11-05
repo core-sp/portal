@@ -32,20 +32,6 @@ class PreRepresentanteSiteController extends Controller
     public function cadastro(PreRepresentanteRequest $request)
     {
         $validated = (object) $request->validated();
-        $validated->cpf_cnpj = apenasNumeros(request('cpf_cnpj'));
-        // verificar 'se existir no gerenti'
-        if($this->prerepresentanteRepository->getByCpfCnpj($validated->cpf_cnpj))
-            return redirect(route('prerepresentante.cadastro'))
-                ->with([
-                    'message' => 'Esse CPF / CNPJ já está cadastrado.',
-                    'class' => 'alert-warning'
-                ]);
-        if($this->representanteRepository->getByCpfCnpj($validated->cpf_cnpj))
-            return redirect(route('prerepresentante.cadastro'))
-                ->with([
-                    'message' => 'Já existe esse CPF / CNPJ no nosso cadastro de Representante Comercial.',
-                    'class' => 'alert-warning'
-                ]);
         $checkSoftDeleted = $this->prerepresentanteRepository->jaExiste($validated->cpf_cnpj);
         $token = str_random(32);
 

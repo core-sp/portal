@@ -217,8 +217,10 @@ class PreRepresentanteTest extends TestCase
             'password_confirmation' => 'Teste102030'
         ]);
         $this->get(route('prerepresentante.cadastro'))->assertOk();
-        $response = $this->post(route('prerepresentante.cadastro.submit'), $dados)->assertStatus(302);
-        $response->assertSessionHas('message', 'Já existe esse CPF / CNPJ no nosso cadastro de Representante Comercial.');
+        $this->post(route('prerepresentante.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
         $this->assertDatabaseMissing('pre_representantes', [
             'cpf_cnpj' => $dados['cpf_cnpj']
         ]);
@@ -238,7 +240,10 @@ class PreRepresentanteTest extends TestCase
             'password_confirmation' => 'Teste102030'
         ]);
         $this->get(route('prerepresentante.cadastro'))->assertOk();
-        $this->post(route('prerepresentante.cadastro.submit'), $dados);
+        $this->post(route('prerepresentante.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
         $this->assertDatabaseMissing('pre_representantes', [
             'nome' => $dados['nome']
         ]);
@@ -251,11 +256,8 @@ class PreRepresentanteTest extends TestCase
     public function register_new_prerepresentante()
     {
         Mail::fake();
-
-        $dados = factory('App\PreRepresentante')->raw(['password' => 'Teste102030']);
-
+        $dados = factory('App\PreRepresentante')->raw();
         $this->get(route('prerepresentante.cadastro'))->assertOk();
-
         $this->post(route('prerepresentante.cadastro.submit'), [
             'cpf_cnpj' => $dados['cpf_cnpj'], 
             'nome' => $dados['nome'],
@@ -277,19 +279,55 @@ class PreRepresentanteTest extends TestCase
         $this->assertEquals(PreRepresentante::first()->ativo, 1);
     }
 
-    // /** @test 
-    //  * 
-    //  * Representante Comercial pode logar na área restrita do Portal.
-    // */
-    // public function login_on_restrict_area()
-    // {
-    //     $representante = factory('App\Representante')->create();
+    /** @test 
+     * 
+     * Pre Representante Comercial pode logar na área restrita do Portal.
+    */
+    public function login_on_pre_registro()
+    {
+        $prerep = factory('App\PreRepresentante')->create();
+        $dados = [
+            'login' => $prerep['cpf_cnpj'],
+            'password' => $prerep['password']
+        ];
+        $this->get(route('prerepresentante.login'))->assertOk();
+        $this->post(route('prerepresentante.login.submit'), $dados)
+        ->assertRedirect(route('prerepresentante.dashboard'));
+    }
 
-    //     $this->get(route('representante.login'))->assertOk();
+    /** @test 
+     * 
+     * Pre Representante Comercial não pode logar se não está cadastrado.
+    */
+    public function cannot_login_on_pre_registro()
+    {
+        $prerep = factory('App\PreRepresentante')->raw();
+        $dados = [
+            'login' => $prerep['cpf_cnpj'],
+            'password' => $prerep['password']
+        ];
+        $this->get(route('prerepresentante.login'))->assertOk();
+        $this->post(route('prerepresentante.login.submit'), $dados)
+        ->assertRedirect(route('prerepresentante.login'));
+    }
 
-    //     // Checa se depois de enviar dados de login, o representante é redirecionado para a home page da área restrita
-    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030'])->assertRedirect(route('representante.dashboard'));
-    // }
+    /** @test 
+     * 
+     * Pre Representante Comercial não pode logar se senha está errada.
+    */
+    public function cannot_login_on_pre_registro_whit_password_wrong()
+    {
+        $prerep = factory('App\PreRepresentante')->create();
+        $dados = [
+            'login' => $prerep['cpf_cnpj'],
+            'password' => 'teste102030'
+        ];
+        $this->get(route('prerepresentante.login'))->assertOk();
+        $this->post(route('prerepresentante.login.submit'), $dados)
+        ->assertSessionHasErrors([
+            'password'
+        ]);
+    }
 
     // /** @test 
     //  * 
@@ -316,74 +354,21 @@ class PreRepresentanteTest extends TestCase
     //     $this->get(route('representante.lista-cobrancas'))->assertOk();
     // }
 
-    // /** @test 
-    //  * 
-    //  * Representante Comercial pode inserir contato.
-    // */
-    // public function insert_new_contact_for_representante()
-    // {
-    //     $representante = factory('App\Representante')->create();
-    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-
-    //     $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertOk();
-
-    //     // Checa inserção de novo contato (teste não cobre integração com o GERENTI)
-    //     $this->post(route('representante.inserir-ou-alterar-contato'), ['tipo' => 7, 'contato' => '(11) 9999-9999'])->assertRedirect(route('representante.contatos.view'));
-    // }
-
-    // /** @test 
-    //  * 
-    //  * Representante Comercial pode ativar/desativar contato existente.
-    // */
-    // public function remove_contact_from_representante()
-    // {
-    //     $representante = factory('App\Representante')->create();
-    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-
-    //     // Checa desativar/ativar contato (teste não cobre integração com o GERENTI)
-    //     $this->post(route('representante.deletar-contato'), ['id' => 1, 'status' => 0])->assertRedirect(route('representante.contatos.view'));
-    //     $this->post(route('representante.deletar-contato'), ['id' => 1, 'status' => 1])->assertRedirect(route('representante.contatos.view'));
-    // }
-
-    // /** @test 
-    //  * 
-    //  * Representante Comercial pode ativar/desativar contato existente. 
-    //  * 
-    //  * TODO - Após modificar a forma de guardar os comprovantes (anexos), adicionar
-    //  * "Storage::fake('public'); ... Storage::disk('public')->assertExists('file/' . $file->hashName());"
-    //  * para simular o registro do anexo e verificar se e;e é salvo corretamente.
-    // */
-    // public function insert_new_address_for_representante()
-    // {
-    //     $representante = factory('App\Representante')->create();
-    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        
-    //     $this->get(route('representante.inserir-endereco.view'))->assertOk();
-        
-    //     // Checa criação de soliticação para mudança de endereço
-    //     $this->post(route('representante.inserir-endereco'), ['cep' => '000-000', 'bairro' => 'Bairro Teste', 'logradouro' => 'Rua Teste', 'numero' => 999, 'complemento' => null, 'estado' => 'SP', 'municipio' => 'São Paulo', 'crimage' => $file = UploadedFile::fake()->image('random.jpg')])->assertRedirect(route('representante.enderecos.view'));
-
-    //     // Checa se a solicitação de mudança de endereço foi registrado no banco de dados
-    //     $this->assertEquals(RepresentanteEndereco::count(), 1);
-    // }
-
-    // /** @test 
-    //  * 
-    //  * Representante Comercial pode resetar senha.
-    // */
-    // public function reset_password_for_representante()
-    // {
-    //     Mail::fake();
-
-    //     $representante = factory('App\Representante')->create();
-
-    //     $this->get(route('representante.password.request'))->assertOk();
-
-    //     $this->post(route('representante.password.email'), ['cpf_cnpj' => $representante['cpf_cnpj']]);
-
-    //     // Checa se e-mail contendo link para resetar senha foi enviado
-    //     Mail::assertSent(RepresentanteResetPasswordMail::class);
-    // }
+    /** @test 
+     * 
+     * Pre Representante Comercial pode resetar senha.
+    */
+    public function reset_password_for_prerepresentante()
+    {
+        Mail::fake();
+        $prerep = factory('App\PreRepresentante')->create();
+        $this->get(route('prerepresentante.password.request'))->assertOk();
+        $this->post(route('prerepresentante.password.email'), [
+            'cpf_cnpj' => $prerep['cpf_cnpj']
+        ]);
+        // Notification::assertSentTo($prerep, ResetPassword::class);
+        // Mail::assertSent(\MailMessage::class);
+    }
 
     // /** @test 
     //  * 
