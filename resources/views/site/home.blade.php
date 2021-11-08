@@ -155,15 +155,15 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/noticias/anuidade-2021-taxas-e-emolumentos" class="d-block h-100">
+        <!-- <a href="/noticias/anuidade-2021-taxas-e-emolumentos" class="d-block h-100"> -->
           <div class="box text-center azul-escuro-bg">
             <div class="inside-box">
               <img src="{{ asset('img/003-bill.png') }}" class="inside-img" alt="Anuidade 2019 | Core-SP" />
               <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Anuidade 2021<br class="hide-992" /> taxas e emolumentos</h3>
-              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
+              <!-- <button href="#" class="btn-box azul-escuro">ACESSAR</button> -->
             </div>
           </div>
-        </a>
+        <!-- </a> -->
       </div>
 
       <div class="col-lg-3 col-sm-6 pb-15">
