@@ -287,8 +287,13 @@ class RepresentanteSiteController extends Controller
 
     public function inserirsolicitarCedulaView()
     {
-        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
-        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]);
+        $representante = Auth::guard('representante')->user();
+        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento($representante->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus($representante->ass_id))[1]);
+        $nome = $representante->tipoPessoa() == 'PF' ? $representante->nome : null;
+        $rg = $representante->tipoPessoa() == 'PF' ? 
+            $this->gerentiRepository->gerentiDadosGeraisPF($representante->ass_id)['identidade'] : null;
+        $cpf = $representante->tipoPessoa() == 'PF' ? $representante->cpf_cnpj : null;
         
         if($emdia != "Em dia."){
             return redirect(route('representante.solicitarCedulaView'))
@@ -302,7 +307,7 @@ class RepresentanteSiteController extends Controller
                     'class' => 'alert-danger'
                 ]);
         }
-        return view('site.representante.inserir-solicita-cedula');
+        return view('site.representante.inserir-solicita-cedula', compact('nome', 'rg', 'cpf'));
     }
 
     public function inserirEnderecoView()
@@ -355,8 +360,10 @@ class RepresentanteSiteController extends Controller
 
     public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
     {
-        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
-        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]);
+        $validate = (object) $request->validated();
+        $representante = Auth::guard('representante')->user();
+        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento($representante->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus($representante->ass_id))[1]);
         
         if($emdia != "Em dia."){
             return redirect(route('representante.solicitarCedulaView'))
@@ -370,17 +377,18 @@ class RepresentanteSiteController extends Controller
                 ]);
         }
         try {
-            $tipoPessoa = Auth::guard('representante')->user()->tipoPessoa();
-            $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, Auth::guard('representante')->user()->ass_id)['Regional'];
+            $tipoPessoa = $representante->tipoPessoa();
+            $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, $representante->ass_id)['Regional'];
             $idregional = $this->regionalRepository->getByName($regional)->idregional;
-            $save = $this->solicitaCedulaRepository->create(
-                Auth::guard('representante')->user()->id, $idregional, 
-                request([
-                    "cep", "bairro", "logradouro", "numero", "complemento", "estado", "municipio"
-                ]));
+            if($tipoPessoa == 'PF')
+            {
+                $validate->nome = null;
+                $validate->cpf = null;
+            }
+            $save = $this->solicitaCedulaRepository->create($representante->id, $idregional, $validate);
 
-            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") solicitou cédula.'));
-            // Mail::to(Auth::guard('representante')->user()->email)->queue(new SolicitaCedulaMail($save));
+            event(new ExternoEvent('Usuário ' . $representante->id . ' ("'. $representante->registro_core .'") solicitou cédula.'));
+            // Mail::to($representante->email)->queue(new SolicitaCedulaMail($save));
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao criar sua solicitação de cédula.");

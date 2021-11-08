@@ -786,3 +786,10 @@ $('.emitirCertidaoBtn').on('click', function(){
 	
 	btnCookies.addEventListener('click', acceptCookies);
   })();
+
+  $('#cedula').submit(function() {
+	  var rg = $('#rg').val().replace(/[^a-zA-Z0-9]/g,'');
+	  var cpf = $('#cpf').val().replace(/\D/g,'');
+	  $('#rg').val(rg);
+	  $('#cpf').val(cpf);
+  })

@@ -39,18 +39,21 @@ class SolicitaCedulaRepository
         ->paginate(5);
     }
 
-    public function create($idrepresentante, $idregional, $endereco) 
+    public function create($idrepresentante, $idregional, $validate) 
     {
         return SolicitaCedula::create([
             "idrepresentante" => $idrepresentante,
             "idregional" => $idregional,
-            "cep" => $endereco["cep"],
-            "bairro" => $endereco["bairro"],
-            "logradouro" => $endereco["logradouro"],
-            "numero" => $endereco["numero"],
-            "complemento" => $endereco["complemento"],
-            "estado" => $endereco["estado"],
-            "municipio" => $endereco["municipio"],
+            'nome' => strtoupper($validate->nome),
+            'rg' => $validate->rg,
+            'cpf' => $validate->cpf,
+            "cep" => $validate->cep,
+            "bairro" => $validate->bairro,
+            "logradouro" => $validate->logradouro,
+            "numero" => $validate->numero,
+            "complemento" => $validate->complemento,
+            "estado" => $validate->estado,
+            "municipio" => $validate->municipio,
             "status" => SolicitaCedula::STATUS_EM_ANDAMENTO
         ]);
     }

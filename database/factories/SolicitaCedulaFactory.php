@@ -8,6 +8,9 @@ use Faker\Generator as Faker;
 $factory->define(SolicitaCedula::class, function (Faker $faker) {
     return [
         'idregional' => factory('App\Regional'),
+        'rg' => '123456789',
+        'cpf' => '19700585018',
+        'nome' => $faker->name,
         'cep' => $faker->postcode,
         'bairro' => $faker->streetAddress,
         'logradouro' => $faker->streetName,

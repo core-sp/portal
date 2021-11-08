@@ -6,9 +6,69 @@
     <div class="conteudo-txt-mini light w-100">
         <h4 class="pt-0 pb-0">Solicitar cédula</h4>
         <div class="linha-lg-mini mb-3"></div>
-        <p>Preencha as informações abaixo para solicitar uma <strong>cédula.</strong></p>
-        <form action="{{ route('representante.inserirSolicitarCedula') }}" method="POST">
+        <p>Preencha as informações abaixo para solicitar sua <strong>cédula profissional.</strong></p>
+        <form action="{{ route('representante.inserirSolicitarCedula') }}" method="POST" id="cedula">
             @csrf
+            <div class="form-row mb-2 cadastroRepresentante">
+                <div class="col-sm mb-2-576">
+                    <label for="nome">Nome *</label>
+                    <input
+                        type="text"
+                        name="nome"
+                        class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
+                        id="nome"
+                        placeholder="Nome Completo"
+                        value="{{ isset($nome) ? $nome : old('nome') }}"
+                        {{ isset($nome) ? 'readonly' : ''}}
+                        maxlength="191"
+                        required
+                    >
+                    @if($errors->has('nome'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('nome') }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+            <div class="form-row mb-2 cadastroRepresentante">
+                <div class="col-sm mb-2-576">
+                    <label for="rg">RG *</label>
+                    <input
+                        type="text"
+                        name="rg"
+                        class="form-control rgInput {{ $errors->has('rg') ? 'is-invalid' : '' }}"
+                        id="rg"
+                        placeholder="RG"
+                        value="{{ isset($rg) ? $rg : old('rg') }}"
+                        {{ isset($rg) ? 'readonly' : ''}}
+                        maxlength="15"
+                        required
+                    >
+                    @if($errors->has('rg'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('rg') }}
+                        </div>
+                    @endif
+                </div>
+                <div class="col-sm">
+                    <label for="cpf">CPF *</label>
+                    <input
+                        type="text"
+                        name="cpf"
+                        class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
+                        id="cpf"
+                        placeholder="CPF"
+                        value="{{ isset($cpf) ? $cpf : old('cpf') }}"
+                        {{ isset($cpf) ? 'readonly' : ''}}
+                        required
+                    >
+                    @if($errors->has('cpf'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('cpf') }}
+                        </div>
+                    @endif
+                </div>
+            </div>
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
                     <label for="cep">CEP *</label>
@@ -19,6 +79,7 @@
                         id="cep"
                         placeholder="CEP"
                         value="{{ old('cep') }}"
+                        required
                     >
                     @if($errors->has('cep'))
                         <div class="invalid-feedback">
@@ -35,6 +96,7 @@
                         id="bairro"
                         placeholder="Bairro"
                         value="{{ old('bairro') }}"
+                        required
                     >
                     @if($errors->has('bairro'))
                         <div class="invalid-feedback">
@@ -52,6 +114,7 @@
                     id="rua"
                     placeholder="Logradouro"
                     value="{{ old('logradouro') }}"
+                    required
                 >
                 @if($errors->has('logradouro'))
                     <div class="invalid-feedback">
@@ -69,6 +132,7 @@
                         id="numero"
                         placeholder="Número"
                         value="{{ old('numero') }}"
+                        required
                     >
                     @if($errors->has('numero'))
                         <div class="invalid-feedback">
@@ -116,6 +180,7 @@
                         class="form-control {{ $errors->has('municipio') ? 'is-invalid' : '' }}"
                         placeholder="Município"
                         value="{{ old('municipio') }}"
+                        required
                     >
                     @if($errors->has('municipio'))
                         <div class="invalid-feedback">

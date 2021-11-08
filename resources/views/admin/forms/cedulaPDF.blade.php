@@ -150,8 +150,8 @@
     </div>
     <p class="texto">
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      Eu, {{ $resultado->representante->nome }}, portador(a) do RG {{ $identidade }}, do CPF
-      {{ $resultado->representante->tipoPessoa() == 'PF' ? $resultado->representante->cpf_cnpj : '***PJ buscar no gerenti***' }} e do registro CORE {{ $resultado->representante->registro_core }}, venho requerer,
+      Eu, {{ $resultado->representante->tipoPessoa() == 'PJ' ? $resultado->nome : $resultado->representante->nome }}, portador(a) do RG {{ $resultado->rg }}, do CPF
+      {{ $resultado->representante->tipoPessoa() == 'PJ' ? formataCpfCnpj($resultado->cpf) : $resultado->representante->cpf_cnpj }} e do registro CORE {{ $resultado->representante->registro_core }}, venho requerer,
       pelo presente, o envio, via postal, por meio do serviço de remessa de documentos dos Correios, de minha cédula de identidade profissional, com 
       fundamento na Resolução nº 1.186/2021 - CORE-SP, declarando estar de acordo com a Resolução em referência.
       </p>

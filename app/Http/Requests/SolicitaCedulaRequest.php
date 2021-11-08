@@ -3,12 +3,20 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\CpfCnpj;
 
 class SolicitaCedulaRequest extends FormRequest
 {
     public function rules()
     {
         return [
+            'nome' => 'sometimes|required|min:6|max:191',
+            'rg' => 'sometimes|required',
+            'cpf' => [
+                'sometimes', 
+                'required', 
+                new CpfCnpj
+            ],
             "cep" => "sometimes|required",
             "bairro" => "sometimes|required|max:100",
             "logradouro" => "sometimes|required|max:100",

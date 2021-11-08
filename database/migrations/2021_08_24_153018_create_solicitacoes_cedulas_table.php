@@ -15,6 +15,9 @@ class CreateSolicitacoesCedulasTable extends Migration
     {
         Schema::create('solicitacoes_cedulas', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('nome')->nullable();
+            $table->string('rg');
+            $table->string('cpf')->nullable();
 			$table->bigInteger('idregional')->unsigned();
 			$table->foreign('idregional')->references('idregional')->on('regionais');
             $table->string('cep');

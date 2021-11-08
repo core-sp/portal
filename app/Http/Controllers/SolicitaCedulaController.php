@@ -277,11 +277,7 @@ class SolicitaCedulaController extends Controller
         $resultado = $this->solicitaCedulaRepository->getById($id);
         if($resultado->podeGerarPdf())
         {
-            // pegar identidade PF no Gerenti e PJ ????
-            $identidade = $resultado->representante->tipoPessoa() == 'PF' ? 
-            $this->gerentiRepository->gerentiDadosGeraisPF($resultado->representante->ass_id)['identidade'] : 
-            $this->gerentiRepository->gerentiDadosGeraisPJ($resultado->representante->ass_id)['Inscrição estadual'];
-            $pdf = PDF::loadView('admin.forms.cedulaPDF', compact('resultado', 'identidade'))->setWarnings(false);
+            $pdf = PDF::loadView('admin.forms.cedulaPDF', compact('resultado'))->setWarnings(false);
             return $pdf->stream('cedula_codigo_'.$id.'.pdf');
         }
         return redirect(route('solicita-cedula.index'))

@@ -7,7 +7,9 @@
                     <hr>
                 @break
                 @case('Recusado')
-                    <p class="{{ isset($resultado->justificativa) ? 'mb-0' : '' }}"><strong class="text-danger"><i class="fas fa-ban"></i>&nbsp;&nbsp;Solicitação reprovada pelo(a) atendente {{$resultado->usuario->nome}} em {{ formataData($resultado->updated_at) }}</strong></p>
+                    <p class="{{ isset($resultado->justificativa) ? 'mb-0' : '' }}"><strong class="text-danger"><i class="fas fa-ban"></i>
+                        &nbsp;&nbsp;Solicitação reprovada pelo(a) atendente {{$resultado->usuario->nome}} em {{ formataData($resultado->updated_at) }}</strong>
+                    </p>
                     @isset($resultado->justificativa)
                         <p class="light"><small class="light">{!! '—————<br><strong>Motivo:</strong> ' . $resultado->justificativa !!}</small></p>
                     @endisset
@@ -22,6 +24,11 @@
             <p>Regional (desta solicitação): <strong>{{ $resultado->regional->regional }}</strong></p>
             <hr>
             <h4>Solicitação de envio de cédula:</h4>
+            @if($resultado->representante->tipoPessoa() == 'PJ')
+            <p class="mb-0">Nome: <strong>{{ $resultado->nome }}</strong></p>
+            <p class="mb-0">CPF: <strong>{{ formataCpfCnpj($resultado->cpf) }}</strong></p>
+            @endif
+            <p class="mb-0">RG: <strong>{{ $resultado->rg }}</strong></p>
             <p class="mb-0">CEP: <strong>{{ $resultado->cep }}</strong></p>
             <p class="mb-0">Bairro: <strong>{{ $resultado->bairro }}</strong></p>
             <p class="mb-0">Logradouro: <strong>{{ $resultado->logradouro }}</strong></p>
