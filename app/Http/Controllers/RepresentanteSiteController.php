@@ -387,7 +387,7 @@ class RepresentanteSiteController extends Controller
             } else
             {
                 $validate->nome = strtoupper($validate->nome);
-                $validate->rg = strtoupper($validate->rg);
+                $validate->rg = strtoupper(apenasNumerosLetras($validate->rg));
             }
             $save = $this->solicitaCedulaRepository->create($representante->id, $idregional, $validate);
 
