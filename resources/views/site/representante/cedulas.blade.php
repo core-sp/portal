@@ -30,7 +30,7 @@
                             <p class="pb-0 branco">Código: <strong>{{ $item->id }}</strong></p>
                             <p class="pb-0 branco">Data de solicitação: <strong>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</strong></p>
                             <p class="pb-0 branco">Nome: <strong>{{ $item->representante->tipoPessoa() == 'PJ' ? $item->nome : $item->representante->nome }}</strong></p>
-                            <p class="pb-0 branco">RG: <strong>{{ $item->rg }}</strong>&nbsp;&nbsp;|&nbsp;&nbsp;CPF: <strong>{{ $item->representante->tipoPessoa() == 'PJ' ? formataCpfCnpj($item->cpf) : $item->representante->cpf_cnpj }}</strong></p>
+                            <p class="pb-0 branco">RG: <strong>{{ mascaraRG($item->rg) }}</strong>&nbsp;&nbsp;|&nbsp;&nbsp;CPF: <strong>{{ $item->representante->tipoPessoa() == 'PJ' ? formataCpfCnpj($item->cpf) : $item->representante->cpf_cnpj }}</strong></p>
                             <p class="pb-0 branco">CEP: <strong>{{ $item->cep }}</strong></p>
                             <p class="pb-0 branco">Estado: <strong>{{ $item->estado }}</strong></p>
                             <p class="pb-0 branco">Município: <strong>{{ $item->municipio }}</strong></p>

@@ -380,7 +380,7 @@ class RepresentanteTest extends TestCase
      * 
      * Representante em dia pode solicitar cédula pela primeira vez
     */
-    public function insert_new_solicitacao_cedula_()
+    public function insert_new_solicitacao_cedula()
     {
         $regional = factory('App\Regional')->create([
             'regional' => 'SÃO PAULO'
@@ -389,24 +389,19 @@ class RepresentanteTest extends TestCase
             'regional' => 'SÃO PAULO - Alameda Santos'
         ]);
         $representante = factory('App\Representante')->create();
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id
+        ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
-
-        $dados = [
-            'cep' => '00000-000', 
-            'bairro' => 'Bairro Teste', 
-            'logradouro' => 'Rua Teste', 
-            'numero' => 999, 
-            'complemento' => null, 
-            'estado' => 'SP', 
-            'municipio' => 'São Paulo'
-        ];
-        $this->post(route('representante.inserirSolicitarCedula'), $dados)->assertRedirect(route('representante.solicitarCedulaView'));
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
+        ->assertRedirect(route('representante.solicitarCedulaView'));
         $this->assertDatabaseHas('solicitacoes_cedulas', [
             'idrepresentante' => $representante->id,
-            'bairro' => $dados['bairro'], 
-            'logradouro' => $dados['logradouro'],
-            'numero' => $dados['numero']
+            'rg' => $cedula['rg'],
+            'bairro' => $cedula['bairro'], 
+            'logradouro' => $cedula['logradouro'],
+            'numero' => $cedula['numero']
         ]);
     }
 
@@ -424,26 +419,18 @@ class RepresentanteTest extends TestCase
             'regional' => 'SÃO PAULO - Alameda Santos'
         ]);
         $representante = factory('App\Representante')->create();
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id
+        ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.solicitarCedulaView'))->assertOk();
         $this->get(route('representante.inserirSolicitarCedulaView'))->assertStatus(302);
-        
-        $dados = [
-            'cep' => '00000-000', 
-            'bairro' => 'Bairro Teste', 
-            'logradouro' => 'Rua Teste', 
-            'numero' => 999, 
-            'complemento' => null, 
-            'estado' => 'SP', 
-            'municipio' => 'São Paulo'
-        ];
-    
-        $this->post(route('representante.inserirSolicitarCedula'), $dados)->assertStatus(302);
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)->assertStatus(302);
         $this->assertDatabaseMissing('solicitacoes_cedulas', [
             'idrepresentante' => $representante->id,
-            'bairro' => $dados['bairro'], 
-            'logradouro' => $dados['logradouro'],
-            'numero' => $dados['numero']
+            'bairro' => $cedula['bairro'], 
+            'logradouro' => $cedula['logradouro'],
+            'numero' => $cedula['numero']
         ]);
     }
 
@@ -463,25 +450,18 @@ class RepresentanteTest extends TestCase
         $cedula = factory('App\SolicitaCedula')->create([
             'idrepresentante' => $representante->id
         ]);
+        $cedulaNova = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id
+        ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.solicitarCedulaView'))->assertOk();
         $this->get(route('representante.inserirSolicitarCedulaView'))->assertStatus(302);
-        
-        $dados = [
-            'cep' => '00000-000', 
-            'bairro' => 'Bairro Teste', 
-            'logradouro' => 'Rua Teste', 
-            'numero' => 999, 
-            'complemento' => null, 
-            'estado' => 'SP', 
-            'municipio' => 'São Paulo'
-        ];
-        $this->post(route('representante.inserirSolicitarCedula'), $dados)->assertStatus(302);
+        $this->post(route('representante.inserirSolicitarCedula'), $cedulaNova)->assertStatus(302);
         $this->assertDatabaseMissing('solicitacoes_cedulas', [
             'idrepresentante' => $representante->id,
-            'bairro' => $dados['bairro'], 
-            'logradouro' => $dados['logradouro'],
-            'numero' => $dados['numero']
+            'bairro' => $cedulaNova['bairro'], 
+            'logradouro' => $cedulaNova['logradouro'],
+            'numero' => $cedulaNova['numero']
         ]);
     }
 
@@ -502,25 +482,18 @@ class RepresentanteTest extends TestCase
             'idrepresentante' => $representante->id,
             'status' => 'Aceito'
         ]);
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id
+        ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.solicitarCedulaView'))->assertOk();
         $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
-        
-        $dados = [
-            'cep' => '00000-000', 
-            'bairro' => 'Bairro Teste', 
-            'logradouro' => 'Rua Teste', 
-            'numero' => 999, 
-            'complemento' => null, 
-            'estado' => 'SP', 
-            'municipio' => 'São Paulo'
-        ];
-        $this->post(route('representante.inserirSolicitarCedula'), $dados)->assertStatus(302);
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)->assertStatus(302);
         $this->assertDatabaseHas('solicitacoes_cedulas', [
             'idrepresentante' => $representante->id,
-            'bairro' => $dados['bairro'], 
-            'logradouro' => $dados['logradouro'],
-            'numero' => $dados['numero']
+            'bairro' => $cedula['bairro'], 
+            'logradouro' => $cedula['logradouro'],
+            'numero' => $cedula['numero']
         ]);
     }
 
@@ -537,8 +510,10 @@ class RepresentanteTest extends TestCase
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.solicitarCedulaView'))->assertOk();
         $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
-        
         $dados = [
+            'nome' => '',
+            'cpf' => '',
+            'rg' => '',
             'cep' => null, 
             'bairro' => null, 
             'logradouro' => null, 
@@ -548,6 +523,9 @@ class RepresentanteTest extends TestCase
         ];
         $this->post(route('representante.inserirSolicitarCedula'), $dados)
         ->assertSessionHasErrors([
+            'nome',
+            'cpf',
+            'rg',
             'cep', 
             'bairro', 
             'logradouro', 
@@ -556,8 +534,7 @@ class RepresentanteTest extends TestCase
             'municipio'
         ]);
         $this->assertDatabaseMissing('solicitacoes_cedulas', [
-            'idrepresentante' => $representante->id,
-            'bairro' => $dados['bairro']
+            'idrepresentante' => $representante->id
         ]);
     }
 
@@ -571,13 +548,93 @@ class RepresentanteTest extends TestCase
             'regional' => 'SÃO PAULO'
         ]);
         $representante = factory('App\Representante')->create();
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+            'cep' => null,
+            'numero' => null
+        ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.solicitarCedulaView'))->assertOk();
         $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
-        $this->post(route('representante.inserirSolicitarCedula'), ['cep' => null, 'numero' => null])
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
             ->assertSessionHasErrors([
                 'cep', 
                 'numero'
+            ]);
+    }
+
+    /** @test 
+     * 
+     * Erro ao não informar o nome ao inserir nova solicitação de cédula.
+    */
+    public function cannot_insert_new_solicitacao_cedula_with_missing_mandatory_input_nome()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        // Colocar um CNPJ, pois não carrega dados como nome
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '30735253000174'
+        ]);
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+            'nome' => null
+        ]);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.solicitarCedulaView'))->assertOk();
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
+            ->assertSessionHasErrors([
+                'nome'
+            ]);
+    }
+
+    /** @test 
+     * 
+     * Erro ao não informar rg ao inserir nova solicitação de cédula.
+    */
+    public function cannot_insert_new_solicitacao_cedula_with_missing_mandatory_input_rg()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        // Colocar um CNPJ, pois não carrega dados como rg
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '30735253000174'
+        ]);
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+            'rg' => null
+        ]);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.solicitarCedulaView'))->assertOk();
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
+            ->assertSessionHasErrors([
+                'rg'
+            ]);
+    }
+
+    /** @test 
+     * 
+     * Erro ao não informar cpf ao inserir nova solicitação de cédula.
+    */
+    public function cannot_insert_new_solicitacao_cedula_with_missing_mandatory_input_cpf()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        $representante = factory('App\Representante')->create();
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+            'cpf' => null
+        ]);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.solicitarCedulaView'))->assertOk();
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
+            ->assertSessionHasErrors([
+                'cpf'
             ]);
     }
 
@@ -594,17 +651,70 @@ class RepresentanteTest extends TestCase
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.solicitarCedulaView'))->assertOk();
         $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
-        $dados = [
-            'cep' => '00000-000', 
-            'bairro' => 'Bairro Teste', 
-            'logradouro' => 'Rua Teste', 
-            'numero' => 999, 
-            'complemento' => null, 
-            'estado' => 'SP', 
-            'municipio' => 'São Paulo'
-        ];
-        $this->post(route('representante.inserirSolicitarCedula'), $dados)->assertSessionHasNoErrors();
-        $this->assertDatabaseHas('solicitacoes_cedulas', ['idrepresentante' => $representante->id]);
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+        ]);
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('solicitacoes_cedulas', [
+            'rg' => $cedula['rg'],
+            'cep' => $cedula['cep']
+        ]);
+    }
+
+    /** @test 
+     * 
+     * Deve trazer nome, rg e cpf do gerenti e do bd se for PF
+    */
+    public function fill_nome_rg_cpf_if_pf()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.solicitarCedulaView'))->assertOk();
+        $response = $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+            'nome' => $response->getOriginalContent()->getData()['nome'],
+            'rg' => apenasNumerosLetras($response->getOriginalContent()->getData()['rg']),
+            'cpf' => apenasNumeros($response->getOriginalContent()->getData()['cpf'])
+        ]);
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('solicitacoes_cedulas', [
+            'cpf' => null,
+            'rg' => $cedula['rg'],
+            'nome' => null,
+            'cep' => $cedula['cep']
+        ]);
+    }
+
+    /** @test 
+     * 
+     * Não deve preencher os campos nome, rg e cpf se for PJ
+    */
+    public function if_pj_inputs_nome_rg_cpf_empty_in_form()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '30735253000174'
+        ]);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.solicitarCedulaView'))->assertOk();
+        $response = $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+            'nome' => $response->getOriginalContent()->getData()['nome'],
+            'rg' => apenasNumerosLetras($response->getOriginalContent()->getData()['rg']),
+            'cpf' => apenasNumeros($response->getOriginalContent()->getData()['cpf'])
+        ]);
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)->assertSessionHasErrors([
+            'nome',
+            'rg',
+            'cpf'
+        ]);
     }
 
     /** @test 
@@ -621,7 +731,8 @@ class RepresentanteTest extends TestCase
             'idrepresentante' => $representante->id
         ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.solicitarCedulaView'))->assertSeeText($cedula->cep);
+        $this->get(route('representante.solicitarCedulaView'))
+        ->assertSeeText($cedula->cep);
     }
 
     /** @test 
@@ -641,6 +752,7 @@ class RepresentanteTest extends TestCase
             'idrepresentante' => $fake->id
         ]);
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.solicitarCedulaView'))->assertDontSeeText($cedula->cep);
+        $this->get(route('representante.solicitarCedulaView'))
+        ->assertDontSeeText($cedula->cep);
     }
 }

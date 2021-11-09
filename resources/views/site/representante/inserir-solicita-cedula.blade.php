@@ -41,7 +41,7 @@
                         placeholder="RG"
                         value="{{ isset($rg) ? $rg : old('rg') }}"
                         {{ isset($rg) ? 'readonly' : ''}}
-                        maxlength="15"
+                        maxlength="20"
                         required
                     >
                     @if($errors->has('rg'))

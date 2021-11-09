@@ -28,7 +28,7 @@
             <p class="mb-0">Nome: <strong>{{ $resultado->nome }}</strong></p>
             <p class="mb-0">CPF: <strong>{{ formataCpfCnpj($resultado->cpf) }}</strong></p>
             @endif
-            <p class="mb-0">RG: <strong>{{ $resultado->rg }}</strong></p>
+            <p class="mb-0">RG: <strong>{{ mascaraRG($resultado->rg) }}</strong></p>
             <p class="mb-0">CEP: <strong>{{ $resultado->cep }}</strong></p>
             <p class="mb-0">Bairro: <strong>{{ $resultado->bairro }}</strong></p>
             <p class="mb-0">Logradouro: <strong>{{ $resultado->logradouro }}</strong></p>

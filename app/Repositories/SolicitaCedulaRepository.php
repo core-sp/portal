@@ -44,7 +44,7 @@ class SolicitaCedulaRepository
         return SolicitaCedula::create([
             "idrepresentante" => $idrepresentante,
             "idregional" => $idregional,
-            'nome' => strtoupper($validate->nome),
+            'nome' => $validate->nome,
             'rg' => $validate->rg,
             'cpf' => $validate->cpf,
             "cep" => $validate->cep,

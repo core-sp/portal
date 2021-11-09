@@ -793,3 +793,18 @@ $('.emitirCertidaoBtn').on('click', function(){
 	  $('#rg').val(rg);
 	  $('#cpf').val(cpf);
   })
+
+  // Para quantos digitos forem necessarios, sendo dígito verificador sempre unitario
+	$(".rgInput").focusout(function() {
+		var rg = $(this).val();
+		var dv = '-' + rg.slice(rg.length - 1, rg.length);
+		var rgSemDV = rg.slice(0, rg.length - 1);
+		var rgFinal = dv;
+		while(rgSemDV.length > 3)
+		{
+			rgFinal = '.' + rgSemDV.slice(rgSemDV.length - 3, rgSemDV.length) + rgFinal;
+			rgSemDV = rgSemDV.slice(0, rgSemDV.length - 3);
+		}
+		rgFinal = rgSemDV + rgFinal;
+		$(this).val(rgFinal);
+	});

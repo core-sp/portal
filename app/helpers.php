@@ -714,3 +714,24 @@ function validDate($date, $minDate, $format) {
 
     return ($errors['warning_count'] + $errors['error_count'] === 0) && $checkMinDate ? true : false;
 }
+
+// Máscara para quantos dígitos forem necessários no rg
+function mascaraRG($rg)
+{
+    $dv = '-' .substr($rg, strlen($rg) - 1, strlen($rg));
+    $rgSemDV = substr($rg, 0, strlen($rg) - 1);
+    $rgMascara = $dv;
+    while(strlen($rgSemDV) > 3)
+    {
+        $rgMascara = '.' .substr($rgSemDV, strlen($rgSemDV) - 3, strlen($rgSemDV)). $rgMascara;
+        $rgSemDV = substr($rgSemDV, 0, strlen($rgSemDV) - 3);
+    }
+    $rgMascara = $rgSemDV . $rgMascara;
+
+    return $rgMascara;
+}
+
+function apenasNumerosLetras($string)
+{
+    return preg_replace('/[^a-zA-Z0-9]/', '', $string);
+}

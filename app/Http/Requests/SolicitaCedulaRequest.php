@@ -11,7 +11,7 @@ class SolicitaCedulaRequest extends FormRequest
     {
         return [
             'nome' => 'sometimes|required|min:6|max:191',
-            'rg' => 'sometimes|required',
+            'rg' => 'sometimes|required|max:15',
             'cpf' => [
                 'sometimes', 
                 'required', 
