@@ -794,17 +794,33 @@ $('.emitirCertidaoBtn').on('click', function(){
 	  $('#cpf').val(cpf);
   })
 
-  // Para quantos digitos forem necessarios, sendo dígito verificador sempre unitario
-	$(".rgInput").focusout(function() {
-		var rg = $(this).val();
-		var dv = '-' + rg.slice(rg.length - 1, rg.length);
-		var rgSemDV = rg.slice(0, rg.length - 1);
-		var rgFinal = dv;
-		while(rgSemDV.length > 3)
-		{
-			rgFinal = '.' + rgSemDV.slice(rgSemDV.length - 3, rgSemDV.length) + rgFinal;
-			rgSemDV = rgSemDV.slice(0, rgSemDV.length - 3);
-		}
-		rgFinal = rgSemDV + rgFinal;
-		$(this).val(rgFinal);
-	});
+  // Para quantos dígitos forem necessários, sendo o dígito verificador sempre unitário
+  function mascaraRG(rg){
+	  var dv = '-' + rg.slice(rg.length - 1, rg.length);
+	  var rgSemDV = rg.slice(0, rg.length - 1);
+	  var rgFinal = dv;
+	  while(rgSemDV.length > 3)
+	  {
+		  rgFinal = '.' + rgSemDV.slice(rgSemDV.length - 3, rgSemDV.length) + rgFinal;
+		  rgSemDV = rgSemDV.slice(0, rgSemDV.length - 3);
+	  }
+	  rgFinal = rgSemDV + rgFinal;
+	  return rgFinal;
+  }
+
+// Máscara para o RG ao digitar
+$(".rgInput").keyup(function() {
+	// Remove qualquer caracter que não seja número ou letra e somente a máscara insere os pontos e traço
+	var texto = $(this).val().replace(/[^a-zA-Z0-9]/g,'');
+	if(texto.length > 3)
+		$(this).val(mascaraRG(texto));
+});
+
+// Carrega a máscara quando já possui um rg
+$('#cedula').ready(function() {
+	if($(".rgInput").index($('#rg')) > -1){
+		var texto = $('#rg').val().replace(/[^a-zA-Z0-9]/g,'');
+		if(texto.length > 3)
+			$('#rg').val(mascaraRG(texto));
+	}
+});

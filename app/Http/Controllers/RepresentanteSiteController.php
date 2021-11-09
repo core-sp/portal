@@ -385,7 +385,10 @@ class RepresentanteSiteController extends Controller
                 $validate->nome = null;
                 $validate->cpf = null;
             } else
+            {
                 $validate->nome = strtoupper($validate->nome);
+                $validate->rg = strtoupper($validate->rg);
+            }
             $save = $this->solicitaCedulaRepository->create($representante->id, $idregional, $validate);
 
             event(new ExternoEvent('Usuário ' . $representante->id . ' ("'. $representante->registro_core .'") solicitou cédula.'));
