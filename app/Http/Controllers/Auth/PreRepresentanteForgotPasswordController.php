@@ -7,6 +7,7 @@ use App\PreRepresentante;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
+use App\Rules\CpfCnpj;
 
 class PreRepresentanteForgotPasswordController extends Controller
 {
@@ -26,7 +27,7 @@ class PreRepresentanteForgotPasswordController extends Controller
     {
         $this->validate(
             $request,
-            ['cpf_cnpj' => 'required'],
+            ['cpf_cnpj' => ['required', new CpfCnpj]],
             ['required' => 'Por favor, informe o campo de CPF/CNPJ.']
         );
     }

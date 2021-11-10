@@ -38,7 +38,22 @@ class PreRepresentanteRepository
         ]);
     }
 
-    public function jaExiste($cpfCnpj)
+    public function updateEditarNomeEmail($id, $validated)
+    {
+        return PreRepresentante::findOrFail($id)->update([
+            'nome' => strtoupper($validated->nome),
+            'email' => $validated->email
+        ]);
+    }
+
+    public function updateSenha($id, $validated, $senhaAtual)
+    {
+        return Hash::check($validated->password_atual, $senhaAtual) ? PreRepresentante::findOrFail($id)->update([
+                'password' => Hash::make($validated->password)
+            ]) : false;
+    }
+
+    public function getDeletadoNaoAtivo($cpfCnpj)
     {
         return PreRepresentante::where('cpf_cnpj', $cpfCnpj)
         ->where('ativo', 0)
@@ -54,5 +69,10 @@ class PreRepresentanteRepository
     public function getByCpfCnpj($cpfCnpj)
     {
         return PreRepresentante::where('cpf_cnpj', $cpfCnpj)->first();
+    }
+
+    public function getById($id)
+    {
+        return PreRepresentante::findOrFail($id);
     }
 }

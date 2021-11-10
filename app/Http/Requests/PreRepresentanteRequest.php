@@ -26,8 +26,10 @@ class PreRepresentanteRequest extends FormRequest
             ],
             'nome' => 'sometimes|required|min:5|max:191',
             'email' => 'sometimes|required|email|max:191',
-            'password' => 'sometimes|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
+            'password_login' => 'sometimes|required|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
+            'password' => 'sometimes|required|confirmed|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
             'password_confirmation' => 'sometimes|required|same:password',
+            'password_atual' => 'sometimes|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
             'checkbox-tdu' => 'sometimes|required|accepted'
         ];
     }
@@ -40,6 +42,7 @@ class PreRepresentanteRequest extends FormRequest
             'min' => 'O campo possui menos caracteres que o mínimo necessário',
             'password.min' => 'A senha precisa ter, no mínimo, 8 caracteres.',
             'password_confirmation.same' => 'As senhas precisam ser idênticas entre si.',
+            'password.confirmed' => 'Faltou digitar a confirmação da senha.',
             'password.regex' => 'A senha deve conter um número, uma letra maiúscula e uma minúscula.',
             'cpf_cnpj.regex' => 'Somente numeros devem ser inseridos.',
             'cpf_cnpj.unique' => 'Já existe esse CPF / CNPJ cadastrado no Pré Registro ou como Representante Comercial.',

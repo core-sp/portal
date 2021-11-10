@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Events\ExternoEvent;
+use App\Rules\CpfCnpj;
 
 class PreRepresentanteResetPasswordController extends Controller
 {
@@ -46,8 +47,9 @@ class PreRepresentanteResetPasswordController extends Controller
     {
         return [
             'token' => 'required',
-            'cpf_cnpj' => 'required',
+            'cpf_cnpj' => ['required', new CpfCnpj],
             'password' => 'required|confirmed|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
+            'password_confirmation' => 'required|same:password'
         ];
     }
 
@@ -58,6 +60,8 @@ class PreRepresentanteResetPasswordController extends Controller
             'confirmed' => 'A senha e a confirmação precisam ser idênticas',
             'password.min' => 'A senha precisa ter no mínimo 8 caracteres',
             'password.regex' => 'A senha deve conter um número, uma letra maiúscula e uma minúscula.',
+            'password_confirmation.same' => 'As senhas precisam ser idênticas entre si.',
+            'password.confirmed' => 'Faltou digitar a confirmação da senha.',
         ];
     }
 
@@ -80,9 +84,7 @@ class PreRepresentanteResetPasswordController extends Controller
     {
         event(new ExternoEvent('Usuário do Pré Registro com o cpf/cnpj ' .$request->cpf_cnpj. ' alterou a senha com sucesso.'));
 
-        return redirect()
-            ->route('prerepresentante.login')
-            ->with([
+        return redirect(route('prerepresentante.login'))->with([
                 'message' => 'Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.',
                 'class' => 'alert-success'
             ]);
@@ -90,8 +92,9 @@ class PreRepresentanteResetPasswordController extends Controller
 
     public function showResetForm(Request $request, $token = null)
     {
-        return view('auth.passwords.reset-prerepresentante')->with(
-            ['token' => $token, 'cpf_cnpj' => $request->cpf_cnpj]
-        );
+        return view('auth.passwords.reset-prerepresentante')->with([
+            'token' => $token, 
+            'cpf_cnpj' => $request->cpf_cnpj
+        ]);
     }
 }

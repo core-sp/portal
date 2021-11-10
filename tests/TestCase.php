@@ -32,6 +32,11 @@ abstract class TestCase extends BaseTestCase
         return 'logs/interno/'.date('Y').'/'.date('m').'/laravel-'.date('Y-m-d').'.log';
     }
 
+    protected function pathLogExterno()
+    {
+        return 'logs/externo/'.date('Y').'/'.date('m').'/laravel-'.date('Y-m-d').'.log';
+    }
+
     protected function permissoes()
     {
         $user = Auth::user();

@@ -58,18 +58,18 @@
                         @endif
                     </div>
                     <div class="form-group mt-2">
-                        <label for="password">Senha</label>
+                        <label for="password_login">Senha</label>
                         <input
-                            id="password"
+                            id="password_login"
                             type="password"
-                            class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}"
-                            name="password"
+                            class="form-control {{ $errors->has('password_login') ? ' is-invalid' : '' }}"
+                            name="password_login"
                             placeholder="Senha"
                             required
                         >
-                        @if($errors->has('password'))
+                        @if($errors->has('password_login'))
                         <div class="invalid-feedback">
-                            {{ $errors->first('password') }}
+                            {{ $errors->first('password_login') }}
                         </div>
                         @endif
                     </div>

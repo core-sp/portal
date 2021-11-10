@@ -1,10 +1,10 @@
 <div class="row nomargin mb-3 login-header">
-    @if(Auth::guard('pre_representante')->check())
+    @if(auth()->guard('pre_representante')->check())
         <p class="cinza-claro p-restrita m-auto-992">
             <small>
-                <a href="{{-- route('prerepresentante.dashboard') --}}">
+                <a href="{{ route('prerepresentante.dashboard') }}">
                     <i class="fas fa-user"></i>&nbsp;
-                   {{ limitRepresentanteName(Auth::guard('pre_representante')->user()->nome) }}
+                   {{ limitRepresentanteName(auth()->guard('pre_representante')->user()->nome) }}
                 </a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <a id="logout" href="#">

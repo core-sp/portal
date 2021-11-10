@@ -8,20 +8,17 @@ use Illuminate\Http\Request;
 use App\Http\Requests\PreRepresentanteRequest;
 use App\Mail\CadastroPreRepresentanteMail;
 use App\Repositories\PreRepresentanteRepository;
-use App\Repositories\RepresentanteRepository;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class PreRepresentanteSiteController extends Controller
 {
     private $prerepresentanteRepository;
-    private $representanteRepository;
 
-    public function __construct(PreRepresentanteRepository $prerepresentanteRepository, RepresentanteRepository $representanteRepository)
+    public function __construct(PreRepresentanteRepository $prerepresentanteRepository)
     {
         $this->middleware('auth:pre_representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->prerepresentanteRepository = $prerepresentanteRepository;
-        $this->representanteRepository = $representanteRepository;
     }
 
     public function cadastroView()
@@ -32,7 +29,7 @@ class PreRepresentanteSiteController extends Controller
     public function cadastro(PreRepresentanteRequest $request)
     {
         $validated = (object) $request->validated();
-        $checkSoftDeleted = $this->prerepresentanteRepository->jaExiste($validated->cpf_cnpj);
+        $checkSoftDeleted = $this->prerepresentanteRepository->getDeletadoNaoAtivo($validated->cpf_cnpj);
         $token = str_random(32);
 
         try{
@@ -79,4 +76,64 @@ class PreRepresentanteSiteController extends Controller
             ]);
     }
 
+    public function index()
+    {
+        return view('site.prerepresentante.home');
+    }
+
+    public function editarView()
+    {
+        $prerep = auth()->guard('pre_representante')->user();
+        $resultado = $this->prerepresentanteRepository->getById($prerep->id);
+
+        return view('site.prerepresentante.dados', compact('resultado'));
+    }
+
+    public function editarSenhaView()
+    {
+        $alterarSenha = true;
+        return view('site.prerepresentante.dados', compact('alterarSenha'));
+    }
+
+    public function editar(PreRepresentanteRequest $request)
+    {
+        $validate = (object) $request->validated();
+        $prerep = auth()->guard('pre_representante')->user();
+        if(isset($validate->password))
+        {
+            $senhaAtual = $prerep->password;
+            try{
+                $update = $this->prerepresentanteRepository->updateSenha($prerep->id, $validate, $senhaAtual);
+                if(!$update)
+                    return redirect(route('prerepresentante.editar.senha.view'))->with([
+                        'message' => '<i class="icon fa fa-ban"></i>A senha atual digitada está incorreta!',
+                        'class' => 'alert-danger',
+                    ]);
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage());
+                abort(500, 'Erro ao atualizar a senha no Pré Registro');
+            }
+        }else
+        {
+            try{
+                $update = $this->prerepresentanteRepository->updateEditarNomeEmail($prerep->id, $validate);
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage());
+                abort(500, 'Erro ao atualizar os dados no Pré Registro');
+            }
+        }
+
+        event(new ExternoEvent('Pré Representante ' . $prerep->id . ' ("'. $prerep->cpf_cnpj .'") alterou os dados com sucesso.'));
+
+        return redirect(route('prerepresentante.editar.view'))->with([
+            'message' => 'Dados alterados com sucesso.',
+            'class' => 'alert-success'
+        ]);
+    }
+    
+    public function preRegistro()
+    {
+        // Verificar se já possui a solicitação
+        // return view('site.prerepresentante.pre-registro');
+    }
 }

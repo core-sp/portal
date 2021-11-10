@@ -182,6 +182,14 @@ Route::prefix('/')->group(function() {
     Route::post('/password/email', 'Auth\PreRepresentanteForgotPasswordController@sendResetLinkEmail')->name('prerepresentante.password.email');
     Route::get('/password/reset/{token}', 'Auth\PreRepresentanteResetPasswordController@showResetForm')->name('prerepresentante.password.reset');
     Route::post('/password/reset', 'Auth\PreRepresentanteResetPasswordController@reset')->name('prerepresentante.password.update');
+    // Home
+    Route::get('/home', 'PreRepresentanteSiteController@index')->name('prerepresentante.dashboard');
+    // Editar dados do cadastro
+    Route::get('/editar', 'PreRepresentanteSiteController@editarView')->name('prerepresentante.editar.view');
+    Route::get('/editar/senha', 'PreRepresentanteSiteController@editarSenhaView')->name('prerepresentante.editar.senha.view');
+    Route::put('/editar', 'PreRepresentanteSiteController@editar')->name('prerepresentante.editar');
+    // Pré Registro
+    Route::get('/pre-registro', 'PreRepresentanteSiteController@preRegistro')->name('prerepresentante.preregistro');
   });
   
   //Balcão de Oportunidades

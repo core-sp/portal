@@ -39,7 +39,7 @@
                 <p>A Área Restrita do Pré Registro é destinada exclusivamente aos que pretendem se tornar Representantes Comerciais.</p>
                 <p>Preencha as informações abaixo e realize o seu cadastro.</p>
                 <hr>
-                <form action="{{-- route('prerepresentante.cadastro.submit') --}}" method="POST" class="cadastroRepresentante" id="cadastro-pre-registro">
+                <form action="{{ route('prerepresentante.cadastro.submit') }}" method="POST" class="cadastroRepresentante" id="cadastro-pre-registro">
                     @csrf
                     <div class="form-row">
                         <div class="col-sm mb-2-576">
