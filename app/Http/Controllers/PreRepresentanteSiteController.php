@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\PreRepresentante;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use App\Http\Requests\PreRepresentanteRequest;
@@ -29,7 +28,7 @@ class PreRepresentanteSiteController extends Controller
     public function cadastro(PreRepresentanteRequest $request)
     {
         $validated = (object) $request->validated();
-        $checkSoftDeleted = $this->prerepresentanteRepository->getDeletadoNaoAtivo($validated->cpf_cnpj);
+        $checkSoftDeleted = $this->prerepresentanteRepository->getDeletadoNaoAtivo($validated->cpf_cnpj_cad);
         $token = str_random(32);
 
         try{
@@ -47,7 +46,7 @@ class PreRepresentanteSiteController extends Controller
         $body .= 'Para concluir o processo, basta clicar <a href="'. route('prerepresentante.verifica-email', $token) .'">NESTE LINK</a>.';
 
         Mail::to($validated->email)->queue(new CadastroPreRepresentanteMail($body));
-        event(new ExternoEvent('"' . request('cpf_cnpj') . '" ("' . request('email') . '") cadastrou-se na Área do Pré Registro.'));
+        event(new ExternoEvent('"' . $validated->cpf_cnpj_cad . '" ("' . $validated->email . '") cadastrou-se na Área do Pré Registro.'));
 
         return view('site.agradecimento')->with([
             'agradece' => 'Cadastro no Pré Registro realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>'
@@ -106,7 +105,7 @@ class PreRepresentanteSiteController extends Controller
                 $update = $this->prerepresentanteRepository->updateSenha($prerep->id, $validate, $senhaAtual);
                 if(!$update)
                     return redirect(route('prerepresentante.editar.senha.view'))->with([
-                        'message' => '<i class="icon fa fa-ban"></i>A senha atual digitada está incorreta!',
+                        'message' => 'A senha atual digitada está incorreta!',
                         'class' => 'alert-danger',
                     ]);
             } catch (\Exception $e) {
@@ -131,9 +130,13 @@ class PreRepresentanteSiteController extends Controller
         ]);
     }
     
-    public function preRegistro()
+    public function preRegistroView()
     {
-        // Verificar se já possui a solicitação
-        // return view('site.prerepresentante.pre-registro');
+        return view('site.prerepresentante.pre-registro');
+    }
+
+    public function inserirPreRegistroView()
+    {
+        return view('site.prerepresentante.inserir-pre-registro');
     }
 }

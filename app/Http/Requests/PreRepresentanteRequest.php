@@ -10,13 +10,13 @@ class PreRepresentanteRequest extends FormRequest
     public function rules()
     {
         return [
-            'login' => [
+            'cpf_cnpj' => [
                 'sometimes',
                 'required',
                 new CpfCnpj,
                 'regex:/^\d+$/',
             ],
-            'cpf_cnpj' => [
+            'cpf_cnpj_cad' => [
                 'sometimes',
                 'required', 
                 new CpfCnpj, 
@@ -29,7 +29,6 @@ class PreRepresentanteRequest extends FormRequest
             'password_login' => 'sometimes|required|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
             'password' => 'sometimes|required|confirmed|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
             'password_confirmation' => 'sometimes|required|same:password',
-            'password_atual' => 'sometimes|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
             'checkbox-tdu' => 'sometimes|required|accepted'
         ];
     }
@@ -41,8 +40,7 @@ class PreRepresentanteRequest extends FormRequest
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
             'min' => 'O campo possui menos caracteres que o mínimo necessário',
             'password.min' => 'A senha precisa ter, no mínimo, 8 caracteres.',
-            'password_confirmation.same' => 'As senhas precisam ser idênticas entre si.',
-            'password.confirmed' => 'Faltou digitar a confirmação da senha.',
+            'password.confirmed' => 'As senhas precisam ser idênticas entre si.',
             'password.regex' => 'A senha deve conter um número, uma letra maiúscula e uma minúscula.',
             'cpf_cnpj.regex' => 'Somente numeros devem ser inseridos.',
             'cpf_cnpj.unique' => 'Já existe esse CPF / CNPJ cadastrado no Pré Registro ou como Representante Comercial.',

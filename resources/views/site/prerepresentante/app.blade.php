@@ -48,8 +48,9 @@
               </a>
             </div>
 
-            <div class="mr-item bt-unset {{ Route::currentRouteName() === 'prerepresentante.preregistro' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('prerepresentante.preregistro') }}" onclick="showLoading()">
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'prerepresentante.preregistro.view') || 
+              (Route::currentRouteName() === 'prerepresentante.inserir.preregistro.view') ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('prerepresentante.preregistro.view') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-file-alt"></i>&nbsp;&nbsp;Pré Registro</h6>
               </a>
             </div>

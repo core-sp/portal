@@ -13,7 +13,7 @@
             </small>
         </p>
     @else
-        <a href="{{ route('prerepresentante.login') }}">
+        <a href="#">
             <p class="cinza-claro p-restrita m-auto-992">
                 <small>
                     <a href="{{ route('prerepresentante.login') }}">

@@ -10,7 +10,7 @@ class PreRepresentanteRepository
     public function store($validated, $token)
     {
         return PreRepresentante::create([
-            'cpf_cnpj' => $validated->cpf_cnpj,
+            'cpf_cnpj' => $validated->cpf_cnpj_cad,
             'nome' => strtoupper($validated->nome),
             'email' => $validated->email,
             'verify_token' => $token,
@@ -22,7 +22,7 @@ class PreRepresentanteRepository
     {
         PreRepresentante::withTrashed()->findOrFail($id)->restore();
         return PreRepresentante::findOrFail($id)->update([
-            'cpf_cnpj' => $validated->cpf_cnpj,
+            'cpf_cnpj' => $validated->cpf_cnpj_cad,
             'nome' => strtoupper($validated->nome),
             'email' => $validated->email,
             'verify_token' => $token,
@@ -48,7 +48,7 @@ class PreRepresentanteRepository
 
     public function updateSenha($id, $validated, $senhaAtual)
     {
-        return Hash::check($validated->password_atual, $senhaAtual) ? PreRepresentante::findOrFail($id)->update([
+        return Hash::check($validated->password_login, $senhaAtual) ? PreRepresentante::findOrFail($id)->update([
                 'password' => Hash::make($validated->password)
             ]) : false;
     }

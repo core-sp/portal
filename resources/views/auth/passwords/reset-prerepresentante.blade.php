@@ -82,15 +82,20 @@
                   @endif
                 </div>
                 <div class="col-sm mt-2-576">
-                  <label for="password-confirm">Confirmação de senha</label>
+                  <label for="password_confirmation">Confirmação de senha</label>
                   <input
-                    id="password-confirm"
+                    id="password_confirmation"
                     type="password"
                     class="form-control"
                     name="password_confirmation"
                     placeholder="Confirmar senha"
                     required
                   >
+                  @if ($errors->has('password_confirmation'))
+                    <span class="invalid-feedback" role="alert">
+                      <strong>{{ $errors->first('password_confirmation') }}</strong>
+                    </span>
+                  @endif
                 </div>
               </div>
               <small class="form-text text-muted">

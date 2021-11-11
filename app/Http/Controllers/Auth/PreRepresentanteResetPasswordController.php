@@ -57,11 +57,9 @@ class PreRepresentanteResetPasswordController extends Controller
     {
         return [
             'required' => 'Campo obrigatório',
-            'confirmed' => 'A senha e a confirmação precisam ser idênticas',
+            'confirmed' => 'As senhas precisam ser idênticas entre si.',
             'password.min' => 'A senha precisa ter no mínimo 8 caracteres',
             'password.regex' => 'A senha deve conter um número, uma letra maiúscula e uma minúscula.',
-            'password_confirmation.same' => 'As senhas precisam ser idênticas entre si.',
-            'password.confirmed' => 'Faltou digitar a confirmação da senha.',
         ];
     }
 

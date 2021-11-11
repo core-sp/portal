@@ -39,21 +39,21 @@
                 @endif
                 <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área restrita do Pré Registro.</strong></p>
                 <p>Ou então, <a href="{{ route('prerepresentante.cadastro') }}">realize o cadastro</a> e depois efetue o login.</p>
-                <form action="{{ route('prerepresentante.login.submit') }}" method="POST" class="cadastroRepresentante" id="login-pre-registro">
+                <form action="{{ route('prerepresentante.login.submit') }}" method="POST" class="cadastroRepresentante">
                     @csrf
                     <div class="form-group">
-                        <label for="login">CPF ou CNPJ</label>
-                        <input id="login"
+                        <label for="cpf_cnpj">CPF ou CNPJ</label>
+                        <input id="cpf_cnpj"
                             type="text"
-                            class="form-control cpfOuCnpj {{ $errors->has('login') ? ' is-invalid' : '' }}"
-                            name="login"
-                            value="{{ old('login') }}"
+                            class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
+                            name="cpf_cnpj"
+                            value="{{ old('cpf_cnpj') }}"
                             placeholder="CPF ou CNPJ"
                             required
                         >
-                        @if($errors->has('login'))
+                        @if($errors->has('cpf_cnpj'))
                         <div class="invalid-feedback">
-                            {{ $errors->first('login') }}
+                            {{ $errors->first('cpf_cnpj') }}
                         </div>
                         @endif
                     </div>

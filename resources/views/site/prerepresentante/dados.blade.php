@@ -4,7 +4,7 @@
 
 @if(Session::has('message'))
     <div class="d-block w-100">
-        <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+        <p class="alert {{ Session::get('class') }}">{{ Session::get('message') }}</p>
     </div>
 @endif
 
@@ -73,17 +73,17 @@
             @else
             <div class="form-row">
                 <div class="col-sm mb-2-576">
-                    <label for="password_atual">Senha atual *</label>
+                    <label for="password_login">Senha atual *</label>
                     <input
                         type="password"
-                        name="password_atual"
-                        class="form-control {{ $errors->has('password_atual') ? 'is-invalid' : '' }}"
+                        name="password_login"
+                        class="form-control {{ $errors->has('password_login') ? 'is-invalid' : '' }}"
                         placeholder="Senha Atual"
                         required
                     >
-                    @if($errors->has('password_atual'))
+                    @if($errors->has('password_login'))
                     <div class="invalid-feedback">
-                        {{ $errors->first('password_atual') }}
+                        {{ $errors->first('password_login') }}
                     </div>
                     @endif
                 </div>
@@ -110,7 +110,7 @@
                     <input
                         type="password"
                         name="password_confirmation"
-                        class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}"
+                        class="form-control"
                         id="password_confirmation"
                         placeholder="Confirme a senha"
                         required

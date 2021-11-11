@@ -25,9 +25,9 @@ class PreRepresentanteLoginController extends Controller
         return view('auth.prerepresentante-login'); 
     }
 
-    protected function verificaSeAtivo($login)
+    protected function verificaSeAtivo($cpf_cnpj)
     {
-        $prerepresentante = $this->prerepresentanteRepository->getByCpfCnpj($login);
+        $prerepresentante = $this->prerepresentanteRepository->getByCpfCnpj($cpf_cnpj);
 
         if(isset($prerepresentante))
             if($prerepresentante->ativo == 0)
@@ -47,16 +47,15 @@ class PreRepresentanteLoginController extends Controller
     public function login(PreRepresentanteRequest $request)
     {
         $validated = (object) $request->validated();
-        $verificou = $this->verificaSeAtivo($validated->login);
+        $verificou = $this->verificaSeAtivo($validated->cpf_cnpj);
         if(!empty($verificou))
-            return $this->redirectWithErrors(
-                $request->only('login'), 
-                $verificou['message'], 
-                $verificou['class']
-            );
+        {
+            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$validated->cpf_cnpj. ' não conseguiu logar após verificação se ativo.'));
+            return redirect()->back()->with($verificou);
+        }
 
         if(auth()->guard('pre_representante')->attempt([
-            'cpf_cnpj' => $validated->login,
+            'cpf_cnpj' => $validated->cpf_cnpj,
             'password' => $validated->password_login
         ])) 
         {
@@ -64,17 +63,12 @@ class PreRepresentanteLoginController extends Controller
             return redirect()->intended(route('prerepresentante.dashboard'));
         }
         
-        return $this->redirectWithErrors($request->only('login'));
-    }
+        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$validated->cpf_cnpj. ' não conseguiu logar.'));
 
-    protected function redirectWithErrors($withInput, $message = 'Login inválido.', $class = 'alert-danger')
-    {
-        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$withInput['login']. ' não conseguiu logar.'));
-        return redirect()->back()
-            ->with([
-                'message' => $message,
-                'class' => $class
-            ])->withInput($withInput);
+        return redirect()->back()->with([
+            'message' => 'Login inválido.',
+            'class' => 'alert-danger'
+        ]);
     }
 
     public function logout(Request $request)

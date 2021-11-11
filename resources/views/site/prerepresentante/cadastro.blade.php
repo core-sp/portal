@@ -39,7 +39,7 @@
                 <p>A Área Restrita do Pré Registro é destinada exclusivamente aos que pretendem se tornar Representantes Comerciais.</p>
                 <p>Preencha as informações abaixo e realize o seu cadastro.</p>
                 <hr>
-                <form action="{{ route('prerepresentante.cadastro.submit') }}" method="POST" class="cadastroRepresentante" id="cadastro-pre-registro">
+                <form action="{{ route('prerepresentante.cadastro.submit') }}" method="POST" class="cadastroRepresentante">
                     @csrf
                     <div class="form-row">
                         <div class="col-sm mb-2-576">
@@ -61,19 +61,19 @@
                     </div>
                     <div class="form-row mt-2">
                         <div class="col-sm-4 mb-2-576">
-                            <label for="cpf_cnpj">CPF ou CNPJ *</label>
+                            <label for="cpf_cnpj_cad">CPF ou CNPJ *</label>
                             <input
                                 type="text"
-                                name="cpf_cnpj"
-                                class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
-                                id="cpf_cnpj"
-                                value="{{ old('cpf_cnpj') }}"
+                                name="cpf_cnpj_cad"
+                                class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj_cad') ? 'is-invalid' : '' }}"
+                                id="cpf_cnpj_cad"
+                                value="{{ old('cpf_cnpj_cad') }}"
                                 placeholder="CPF ou CNPJ"
                                 required
                             >
-                            @if($errors->has('cpf_cnpj'))
+                            @if($errors->has('cpf_cnpj_cad'))
                                 <div class="invalid-feedback">
-                                    {{ $errors->first('cpf_cnpj') }}
+                                    {{ $errors->first('cpf_cnpj_cad') }}
                                 </div>
                             @endif
                         </div>
@@ -117,7 +117,7 @@
                             <input
                                 type="password"
                                 name="password_confirmation"
-                                class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}"
+                                class="form-control"
                                 id="password_confirmation"
                                 placeholder="Confirme a senha"
                                 required

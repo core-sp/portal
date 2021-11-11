@@ -28,7 +28,7 @@ class PreRepresentanteTest extends TestCase
     {
         $this->get(route('prerepresentante.cadastro'))->assertOk();
         $this->post(route('prerepresentante.cadastro.submit'), [
-            'cpf_cnpj' => null, 
+            'cpf_cnpj_cad' => null, 
             'nome' => null,
             'email' => '', 
             'password' => '', 
@@ -36,7 +36,7 @@ class PreRepresentanteTest extends TestCase
             'checkbox-tdu' => ''
         ])
         ->assertSessionHasErrors([
-            'cpf_cnpj',
+            'cpf_cnpj_cad',
             'nome',
             'email',
             'password',
@@ -52,7 +52,7 @@ class PreRepresentanteTest extends TestCase
     public function cannot_register_without_cpfcnpj_input()
     {
         $dados = factory('App\PreRepresentante')->raw([
-            'cpf_cnpj' => null, 
+            'cpf_cnpj_cad' => null, 
             'checkbox-tdu' => 'on',
             'password' => 'Teste102030',
             'password_confirmation' => 'Teste102030'
@@ -60,7 +60,7 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.cadastro'))->assertOk();
         $this->post(route('prerepresentante.cadastro.submit'), $dados)
         ->assertSessionHasErrors([
-            'cpf_cnpj'
+            'cpf_cnpj_cad'
         ]);
 
         $this->assertDatabaseMissing('pre_representantes', [
@@ -235,7 +235,7 @@ class PreRepresentanteTest extends TestCase
             'cpf_cnpj' => '36982299007'
         ]);
         $dados = factory('App\PreRepresentante')->raw([
-            'cpf_cnpj' => '36982299007',
+            'cpf_cnpj_cad' => '36982299007',
             'checkbox-tdu' => 'on',
             'password' => 'Teste102030',
             'password_confirmation' => 'Teste102030'
@@ -243,10 +243,10 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.cadastro'))->assertOk();
         $this->post(route('prerepresentante.cadastro.submit'), $dados)
         ->assertSessionHasErrors([
-            'cpf_cnpj'
+            'cpf_cnpj_cad'
         ]);
         $this->assertDatabaseMissing('pre_representantes', [
-            'cpf_cnpj' => $dados['cpf_cnpj']
+            'cpf_cnpj' => $dados['cpf_cnpj_cad']
         ]);
     }
 
@@ -258,7 +258,7 @@ class PreRepresentanteTest extends TestCase
     {
         $pre = factory('App\PreRepresentante')->create();
         $dados = factory('App\PreRepresentante')->raw([
-            'cpf_cnpj' => $pre->cpf_cnpj,
+            'cpf_cnpj_cad' => $pre->cpf_cnpj,
             'checkbox-tdu' => 'on',
             'password' => 'Teste102030',
             'password_confirmation' => 'Teste102030'
@@ -266,7 +266,7 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.cadastro'))->assertOk();
         $this->post(route('prerepresentante.cadastro.submit'), $dados)
         ->assertSessionHasErrors([
-            'cpf_cnpj'
+            'cpf_cnpj_cad'
         ]);
         $this->assertDatabaseMissing('pre_representantes', [
             'nome' => $dados['nome']
@@ -281,26 +281,66 @@ class PreRepresentanteTest extends TestCase
     {
         Mail::fake();
 
-        $dados = factory('App\PreRepresentante')->raw([
+        $this->get(route('prerepresentante.cadastro'))->assertOk();
+        $this->post(route('prerepresentante.cadastro.submit'), [
+            'cpf_cnpj_cad' => '36982299007',
+            'email' => 'teste@teste.com',
+            'nome' => 'Teste do Registro',
             'password' => 'Teste102030', 
             'password_confirmation' => 'Teste102030', 
             'checkbox-tdu' => 'on'
         ]);
-        $this->get(route('prerepresentante.cadastro'))->assertOk();
-        $this->post(route('prerepresentante.cadastro.submit'), $dados);
 
         // Checa se o e-mail para confirmação do e-mail foi enviado
         Mail::assertQueued(CadastroPreRepresentanteMail::class);
 
         $this->assertDatabaseHas('pre_representantes', [
-            'cpf_cnpj' => $dados['cpf_cnpj'], 
+            'cpf_cnpj' => '36982299007', 
             'ativo' => 0
         ]);
 
         // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
         $this->get(route('prerepresentante.verifica-email', PreRepresentante::first()->verify_token));
         $this->assertDatabaseHas('pre_representantes', [
-            'cpf_cnpj' => $dados['cpf_cnpj'], 
+            'cpf_cnpj' => '36982299007', 
+            'ativo' => 1
+        ]);
+    }
+
+    /** @test 
+     * 
+     * Pode se registrar se deletado e ativo 0.
+    */
+    public function register_new_prerepresentante_when_deleted_and_ativo_0()
+    {
+        Mail::fake();
+
+        $prerep = factory('App\PreRepresentante')->create([
+            'ativo' => 0,
+            'deleted_at' => '2021-11-11 10:35:05'
+        ]);
+        $this->get(route('prerepresentante.cadastro'))->assertOk();
+        $this->post(route('prerepresentante.cadastro.submit'), [
+            'nome' => $prerep['nome'],
+            'cpf_cnpj_cad' => $prerep['cpf_cnpj'],
+            'email' => $prerep['email'],
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'checkbox-tdu' => 'on',
+        ]);
+
+        // Checa se o e-mail para confirmação do e-mail foi enviado
+        Mail::assertQueued(CadastroPreRepresentanteMail::class);
+        $this->assertDatabaseHas('pre_representantes', [
+            'cpf_cnpj' => $prerep['cpf_cnpj'], 
+            'ativo' => 0,
+            'deleted_at' => null
+        ]);
+
+        // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
+        $this->get(route('prerepresentante.verifica-email', PreRepresentante::first()->verify_token));
+        $this->assertDatabaseHas('pre_representantes', [
+            'cpf_cnpj' => $prerep['cpf_cnpj'], 
             'ativo' => 1
         ]);
     }
@@ -311,16 +351,18 @@ class PreRepresentanteTest extends TestCase
     */
     public function log_is_generated_when_new_prerepresentante()
     {
-        $dados = factory('App\PreRepresentante')->raw([
+        $this->get(route('prerepresentante.cadastro'))->assertOk();
+        $this->post(route('prerepresentante.cadastro.submit'), [
+            'cpf_cnpj_cad' => '36982299007',
+            'email' => 'teste@teste.com',
+            'nome' => 'Teste do Registro',
             'password' => 'Teste102030', 
             'password_confirmation' => 'Teste102030', 
             'checkbox-tdu' => 'on'
         ]);
-        $this->get(route('prerepresentante.cadastro'))->assertOk();
-        $this->post(route('prerepresentante.cadastro.submit'), $dados);
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString($dados['cpf_cnpj'], $log);
+        $this->assertStringContainsString('36982299007', $log);
         $this->assertStringContainsString('cadastrou-se na Área do Pré Registro.', $log);
     }
 
@@ -330,15 +372,18 @@ class PreRepresentanteTest extends TestCase
     */
     public function log_is_generated_when_verifica_email()
     {
-        $dados = factory('App\PreRepresentante')->raw([
+        $this->get(route('prerepresentante.cadastro'))->assertOk();
+        $this->post(route('prerepresentante.cadastro.submit'), [
+            'cpf_cnpj_cad' => '36982299007',
+            'email' => 'teste@teste.com',
+            'nome' => 'Teste do Registro',
             'password' => 'Teste102030', 
             'password_confirmation' => 'Teste102030', 
             'checkbox-tdu' => 'on'
         ]);
-        $this->post(route('prerepresentante.cadastro.submit'), $dados);
         $this->get(route('prerepresentante.verifica-email', PreRepresentante::first()->verify_token));
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString($dados['cpf_cnpj'], $log);
+        $this->assertStringContainsString('36982299007', $log);
         $this->assertStringContainsString('verificou o email após o cadastro.', $log);
     }
 
@@ -350,7 +395,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -366,7 +411,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->post(route('prerepresentante.login.submit'), $dados);
@@ -377,14 +422,31 @@ class PreRepresentanteTest extends TestCase
 
     /** @test 
      * 
-     * Log externo ao não conseguir logar.
+     * Log externo ao não conseguir logar com cpf/cnpj válido, mas não existe no banco.
     */
     public function log_is_generated_when_error_logon()
     {
+        factory('App\PreRepresentante')->create();
+        $dados = [
+            'cpf_cnpj' => '72027756000135',
+            'password_login' => 'Teste102030'
+        ];
+        $this->post(route('prerepresentante.login.submit'), $dados);
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString('72027756000135', $log);
+        $this->assertStringContainsString('não conseguiu logar após verificação se ativo.', $log);
+    }
+
+    /** @test 
+     * 
+     * Log externo ao não conseguir logar com senha errada.
+    */
+    public function log_is_generated_when_error_logon_with_password_wrong()
+    {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
-            'password_login' => 'Teste1020'
+            'cpf_cnpj' => $prerep->cpf_cnpj,
+            'password_login' => 'Teste10203040'
         ];
         $this->post(route('prerepresentante.login.submit'), $dados);
         $log = tailCustom(storage_path($this->pathLogExterno()));
@@ -400,7 +462,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->raw();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -419,7 +481,7 @@ class PreRepresentanteTest extends TestCase
         ]);
         $this->get(route('prerepresentante.login'))->assertOk();
         $this->post(route('prerepresentante.login.submit'), [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030',
         ])
         ->assertRedirect(route('prerepresentante.login'));
@@ -433,7 +495,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -523,6 +585,7 @@ class PreRepresentanteTest extends TestCase
             'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password' => 'Teste102030', 
             'password_confirmation' => 'Teste102030', 
+            'token' => $token
         ])->assertSessionHasErrors([
             'cpf_cnpj'
         ]);
@@ -541,6 +604,7 @@ class PreRepresentanteTest extends TestCase
             'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password' => 'teste102030', 
             'password_confirmation' => 'teste102030', 
+            'token' => $token
         ])->assertSessionHasErrors([
             'password'
         ]);
@@ -559,6 +623,7 @@ class PreRepresentanteTest extends TestCase
             'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password' => 'Teste102030', 
             'password_confirmation' => 'teste102030', 
+            'token' => $token
         ])->assertSessionHasErrors([
             'password_confirmation'
         ]);
@@ -577,6 +642,7 @@ class PreRepresentanteTest extends TestCase
             'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password' => 'Teste102030', 
             'password_confirmation' => 'Teste10203040', 
+            'token' => $token
         ])->assertSessionHasErrors([
             'password_confirmation'
         ]);
@@ -595,6 +661,7 @@ class PreRepresentanteTest extends TestCase
             'cpf_cnpj' => '',
             'password' => '', 
             'password_confirmation' => '', 
+            'token' => $token
         ])->assertSessionHasErrors([
             'cpf_cnpj',
             'password',
@@ -623,13 +690,33 @@ class PreRepresentanteTest extends TestCase
 
     /** @test 
      * 
+     * Log externo ao alterar a senha em 'Esqueci a senha'.
+    */
+    public function log_is_generated_when_reset_password()
+    {
+        $prerep = factory('App\PreRepresentante')->create();
+        $token = Password::broker()->createToken($prerep);
+        $this->get(route('prerepresentante.password.reset', $token));
+        $this->post(route('prerepresentante.password.update'), [
+            'token' => $token,
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+        ]);
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString($prerep['cpf_cnpj'], $log);
+        $this->assertStringContainsString('alterou a senha com sucesso.', $log);
+    }
+
+    /** @test 
+     * 
      * Pode editar os dados cadastrais.
     */
     public function can_after_login_update_nome_and_email()
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -650,13 +737,37 @@ class PreRepresentanteTest extends TestCase
 
     /** @test 
      * 
+     * Log externo ao alterar os dados cadastrais.
+    */
+    public function log_is_generated_when_update_data()
+    {
+        $prerep = factory('App\PreRepresentante')->create();
+        $dados = [
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
+            'password_login' => 'Teste102030'
+        ];
+        $this->get(route('prerepresentante.login'));
+        $this->post(route('prerepresentante.login.submit'), $dados);
+        $this->get(route('prerepresentante.editar.view'));
+        $this->put(route('prerepresentante.editar', [
+            'nome' => 'Novo nome do Pre Representante',
+            'email' => 'teste@email.com.br'
+        ]));
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString($prerep->id, $log);
+        $this->assertStringContainsString($prerep->cpf_cnpj, $log);
+        $this->assertStringContainsString('alterou os dados com sucesso.', $log);
+    }
+
+    /** @test 
+     * 
      * Pode editar o nome.
     */
     public function can_after_login_update_nome()
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -681,7 +792,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -706,7 +817,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -725,7 +836,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -753,7 +864,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -779,7 +890,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -805,7 +916,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -831,7 +942,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -839,7 +950,7 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.editar.view'))->assertOk();
         $this->get(route('prerepresentante.editar.senha.view'))->assertOk();
         $this->put(route('prerepresentante.editar', [
-            'password_atual' => 'Teste102030',
+            'password_login' => 'Teste102030',
             'password' => 'Teste10203040',
             'password_confirmation' => 'Teste10203040'
         ]));
@@ -855,7 +966,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -863,7 +974,7 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.editar.view'))->assertOk();
         $this->get(route('prerepresentante.editar.senha.view'))->assertOk();
         $this->put(route('prerepresentante.editar', [
-            'password_atual' => 'Teste10203040',
+            'password_login' => 'Teste10203040',
             'password' => 'Teste10203040',
             'password_confirmation' => 'Teste10203040'
         ]));
@@ -879,7 +990,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -887,7 +998,7 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.editar.view'))->assertOk();
         $this->get(route('prerepresentante.editar.senha.view'))->assertOk();
         $this->put(route('prerepresentante.editar', [
-            'password_atual' => 'Teste102030',
+            'password_login' => 'Teste102030',
             'password' => 'teste10203040',
             'password_confirmation' => 'teste10203040'
         ]))->assertSessionHasErrors([
@@ -903,7 +1014,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -911,7 +1022,7 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.editar.view'))->assertOk();
         $this->get(route('prerepresentante.editar.senha.view'))->assertOk();
         $this->put(route('prerepresentante.editar', [
-            'password_atual' => 'Teste102030',
+            'password_login' => 'Teste102030',
             'password' => 'Teste10203040',
             'password_confirmation' => 'teste10203040'
         ]))->assertSessionHasErrors([
@@ -927,7 +1038,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -935,7 +1046,7 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.editar.view'))->assertOk();
         $this->get(route('prerepresentante.editar.senha.view'))->assertOk();
         $this->put(route('prerepresentante.editar', [
-            'password_atual' => 'Teste102030',
+            'password_login' => 'Teste102030',
             'password' => 'Teste10203040',
             'password_confirmation' => 'Teste1020304050'
         ]))->assertSessionHasErrors([
@@ -951,7 +1062,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -959,7 +1070,7 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.editar.view'))->assertOk();
         $this->get(route('prerepresentante.editar.senha.view'))->assertOk();
         $this->put(route('prerepresentante.editar', [
-            'password_atual' => 'Teste102030',
+            'password_login' => 'Teste102030',
             'password' => '',
             'password_confirmation' => 'Teste1020304050'
         ]))->assertSessionHasErrors([
@@ -975,7 +1086,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $dados = [
-            'login' => $prerep['cpf_cnpj'],
+            'cpf_cnpj' => $prerep['cpf_cnpj'],
             'password_login' => 'Teste102030'
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
@@ -983,7 +1094,7 @@ class PreRepresentanteTest extends TestCase
         $this->get(route('prerepresentante.editar.view'))->assertOk();
         $this->get(route('prerepresentante.editar.senha.view'))->assertOk();
         $this->put(route('prerepresentante.editar', [
-            'password_atual' => 'Teste102030',
+            'password_login' => 'Teste102030',
             'password' => 'Teste1020304050',
             'password_confirmation' => ''
         ]))->assertSessionHasErrors([
@@ -1001,7 +1112,7 @@ class PreRepresentanteTest extends TestCase
     {
         $prerep = factory('App\PreRepresentante')->create();
         $this->post(route('prerepresentante.login.submit'), [
-            'login' => $prerep['cpf_cnpj'], 
+            'cpf_cnpj' => $prerep['cpf_cnpj'], 
             'password_login' => 'Teste102030'
         ]);
         $this->get(route('prerepresentante.dashboard'))->assertOk();
