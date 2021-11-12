@@ -824,7 +824,7 @@ class PreRepresentanteTest extends TestCase
         $this->post(route('prerepresentante.login.submit'), $dados);
         $this->get(route('prerepresentante.editar.view'))
         ->assertSee($prerep['nome'])
-        ->assertSee($prerep['cpf_cnpj'])
+        ->assertSee(formataCpfCnpj($prerep['cpf_cnpj']))
         ->assertSee($prerep['email']);
     }
 

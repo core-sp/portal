@@ -82,8 +82,7 @@ class PreRepresentanteSiteController extends Controller
 
     public function editarView()
     {
-        $prerep = auth()->guard('pre_representante')->user();
-        $resultado = $this->prerepresentanteRepository->getById($prerep->id);
+        $resultado = auth()->guard('pre_representante')->user();
 
         return view('site.prerepresentante.dados', compact('resultado'));
     }
@@ -100,9 +99,8 @@ class PreRepresentanteSiteController extends Controller
         $prerep = auth()->guard('pre_representante')->user();
         if(isset($validate->password))
         {
-            $senhaAtual = $prerep->password;
             try{
-                $update = $this->prerepresentanteRepository->updateSenha($prerep->id, $validate, $senhaAtual);
+                $update = $this->prerepresentanteRepository->updateSenha($prerep, $validate);
                 if(!$update)
                     return redirect(route('prerepresentante.editar.senha.view'))->with([
                         'message' => 'A senha atual digitada está incorreta!',
@@ -132,11 +130,16 @@ class PreRepresentanteSiteController extends Controller
     
     public function preRegistroView()
     {
-        return view('site.prerepresentante.pre-registro');
+        $resultado = null;
+        return view('site.prerepresentante.pre-registro', compact('resultado'));
     }
 
     public function inserirPreRegistroView()
     {
-        return view('site.prerepresentante.inserir-pre-registro');
+        $prerep = auth()->guard('pre_representante')->user();
+        // temporário
+        $estados_civil = ['Casado(a)', 'Solteiro(a)', 'Viúvo(a)'];
+        $nacionalidades = ['Brasileira', 'Portuguesa'];
+        return view('site.prerepresentante.inserir-pre-registro', compact('prerep', 'estados_civil', 'nacionalidades'));
     }
 }

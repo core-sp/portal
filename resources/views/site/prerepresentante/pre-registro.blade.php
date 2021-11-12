@@ -14,7 +14,13 @@
         <div class="linha-lg-mini mb-2"></div>
             <div class="list-group w-100">
                 <div class="d-block mt-2 mb-3">
-                    <a href="{{ route('prerepresentante.inserir.preregistro.view') }}" class="btn btn-primary link-nostyle branco">Iniciar o pré registro</a>
+                    <p>Ao iniciar o preenchimento do formulário, você poderá salvar os dados sem precisar enviar de imediato para o atendimento do CORE-SP.</p>
+                    <p>Em cada aba do formulário terá o botão <button class="btn btn-sm btn-primary">Salvar</button> para armazenar seus dados para futuras alterações.</p>
+                    <p>E após o término, você terá na última aba do formulário o botão <button class="btn btn-sm btn-success">Enviar</button> para o atendimento fazer a análise.</p>
+                    <p>Aqui mesmo o resultado será atualizado e seus dados estarão disponíveis para as correções, se forem necessárias.</p>
+                    <a href="{{ route('prerepresentante.inserir.preregistro.view') }}" class="btn btn-secondary link-nostyle branco mt-3">
+                        {{ isset($resultado->id) ? 'Continuar' : 'Iniciar' }} o pré registro
+                    </a>
                 </div>      
             </div>
     </div>

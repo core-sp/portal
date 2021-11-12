@@ -39,9 +39,9 @@
                     <label for="cpf_cnpj">CPF ou CNPJ *</label>
                     <input
                         type="text"
-                        class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
+                        class="form-control {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
                         id="cpf_cnpj"
-                        value="{{ isset($resultado->cpf_cnpj) ? $resultado->cpf_cnpj : '' }}"
+                        value="{{ formataCpfCnpj(auth()->guard('pre_representante')->user()->cpf_cnpj) }}"
                         placeholder="CPF ou CNPJ"
                         required
                         readonly
@@ -50,7 +50,7 @@
                 <div class="col-sm mb-2-576">
                     <label for="email">Email *</label>
                     <input
-                        type="text"
+                        type="email"
                         name="email"
                         class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                         id="email"

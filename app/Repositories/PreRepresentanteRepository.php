@@ -46,9 +46,10 @@ class PreRepresentanteRepository
         ]);
     }
 
-    public function updateSenha($id, $validated, $senhaAtual)
+    public function updateSenha($prerep, $validated)
     {
-        return Hash::check($validated->password_login, $senhaAtual) ? PreRepresentante::findOrFail($id)->update([
+        return Hash::check($validated->password_login, $prerep->password) ? 
+        PreRepresentante::findOrFail($prerep->id)->update([
                 'password' => Hash::make($validated->password)
             ]) : false;
     }
