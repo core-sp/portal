@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Login no Pré Registro'])
+@extends('site.layout.app', ['title' => 'Login no Pré-registro'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Recuperar senha do Pré Registro
+          Recuperar senha do Pré-registro
         </h1>
       </div>
     </div>
@@ -21,7 +21,7 @@
             <div class="col">
                 <div class="row nomargin">
                     <div class="flex-one pr-4 align-self-center">
-                        <h2 class="stronger">Reconfigurar senha no Pré Registro</h2>
+                        <h2 class="stronger">Reconfigurar senha no Pré-registro</h2>
                     </div>
                     <div class="align-self-center">
                         <a href="/" class="btn-voltar">Voltar</a>
@@ -29,26 +29,21 @@
                 </div>
             </div>
         </div>
-        <div class="linha-lg"></div>
-        @php
-          if(strpos($errors->first(), 'token'))
-            $msg = $errors->first();
-          else
-            $msg = null;
-        @endphp
-        @if($msg)
-        <p class="alert alert-danger">
-            {{ $msg }}
+
+        @if(strpos($errors->first(), 'token'))
+        <p class="alert alert-danger mt-2">
+            {{ $errors->first() }}
         </p>
         @endif
+        
         <div class="row mt-2">
           <div class="col-lg-8 conteudo-txt">
-            <p>Preencha as informações abaixo para reconfigurar sua senha no Pré Registro.</p>
-            <form method="POST" action="{{ route('prerepresentante.password.update') }}" class="mt-3 cadastroRepresentante">
+            <p>Preencha as informações abaixo para reconfigurar sua senha no Pré-registro.</p>
+            <form method="POST" action="{{ route('prerepresentante.password.update') }}" class="cadastroRepresentante">
               @csrf
               <input type="hidden" name="token" value="{{ $token }}">
               <div class="form-group">
-                <label for="cpf_cnpj">CPF ou CNPJ</label>
+                <label for="cpf_cnpj">CPF ou CNPJ *</label>
                 <input
                   id="cpf_cnpj"
                   type="text"

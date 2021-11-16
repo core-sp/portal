@@ -38,18 +38,18 @@ class PreRepresentanteSiteController extends Controller
                 $prerepresentante = $this->prerepresentanteRepository->store($validated, $token);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            abort(500, 'Erro ao criar o cadastro no Pré Registro');
+            abort(500, 'Erro ao criar o cadastro no Pré-registro');
         }
 
-        $body = '<strong>Cadastro no Pré Registro do Portal Core-SP realizado com sucesso!</strong>';
+        $body = '<strong>Cadastro no Pré-registro do Portal Core-SP realizado com sucesso!</strong>';
         $body .= '<br /><br />';
         $body .= 'Para concluir o processo, basta clicar <a href="'. route('prerepresentante.verifica-email', $token) .'">NESTE LINK</a>.';
 
         Mail::to($validated->email)->queue(new CadastroPreRepresentanteMail($body));
-        event(new ExternoEvent('"' . $validated->cpf_cnpj_cad . '" ("' . $validated->email . '") cadastrou-se na Área do Pré Registro.'));
+        event(new ExternoEvent('"' . $validated->cpf_cnpj_cad . '" ("' . $validated->email . '") cadastrou-se na Área do Pré-registro.'));
 
         return view('site.agradecimento')->with([
-            'agradece' => 'Cadastro no Pré Registro realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>'
+            'agradece' => 'Cadastro no Pré-registro realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>'
         ]);
     }
 
@@ -61,10 +61,10 @@ class PreRepresentanteSiteController extends Controller
                 $prerep = $this->prerepresentanteRepository->updatePosVerificarEmail($prerepresentante);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
-                abort(500, 'Erro ao atualizar a verificação de email do cadastro no Pré Registro');
+                abort(500, 'Erro ao atualizar a verificação de email do cadastro no Pré-registro');
             }
         } else 
-            abort(500, 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Pré Registro, caso contrário, por favor refazer cadastro no Pré Registro.');
+            abort(500, 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Pré-registro, caso contrário, por favor refazer cadastro no Pré-registro.');
 
         event(new ExternoEvent('Pré Representante ' . $prerepresentante->id . ' ("'. $prerepresentante->cpf_cnpj .'") verificou o email após o cadastro.'));
 
@@ -108,7 +108,7 @@ class PreRepresentanteSiteController extends Controller
                     ]);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
-                abort(500, 'Erro ao atualizar a senha no Pré Registro');
+                abort(500, 'Erro ao atualizar a senha no Pré-registro');
             }
         }else
         {
@@ -116,7 +116,7 @@ class PreRepresentanteSiteController extends Controller
                 $update = $this->prerepresentanteRepository->updateEditarNomeEmail($prerep->id, $validate);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
-                abort(500, 'Erro ao atualizar os dados no Pré Registro');
+                abort(500, 'Erro ao atualizar os dados no Pré-registro');
             }
         }
 

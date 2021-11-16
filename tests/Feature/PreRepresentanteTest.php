@@ -363,7 +363,7 @@ class PreRepresentanteTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString('36982299007', $log);
-        $this->assertStringContainsString('cadastrou-se na Área do Pré Registro.', $log);
+        $this->assertStringContainsString('cadastrou-se na Área do Pré-registro.', $log);
     }
 
     /** @test 
@@ -417,7 +417,7 @@ class PreRepresentanteTest extends TestCase
         $this->post(route('prerepresentante.login.submit'), $dados);
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString($prerep->id, $log);
-        $this->assertStringContainsString('conectou-se à Área do Pré Registro.', $log);
+        $this->assertStringContainsString('conectou-se à Área do Pré-registro.', $log);
     }
 
     /** @test 
@@ -545,6 +545,9 @@ class PreRepresentanteTest extends TestCase
     */
     public function cannot_send_mail_reset_password_when_not_find_cpfcnpj()
     {
+        factory('App\PreRepresentante')->create([
+            'cpf_cnpj' => '43795442818'
+        ]);
         $prerep = factory('App\PreRepresentante')->raw();
         $this->get(route('prerepresentante.password.request'))->assertOk();
         $this->post(route('prerepresentante.password.email'), [

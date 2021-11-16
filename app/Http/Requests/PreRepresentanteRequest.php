@@ -29,7 +29,7 @@ class PreRepresentanteRequest extends FormRequest
             'password_login' => 'sometimes|required|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
             'password' => 'sometimes|required|confirmed|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
             'password_confirmation' => 'sometimes|required|same:password',
-            'checkbox-tdu' => 'sometimes|required|accepted'
+            'checkbox-tdu' => 'sometimes|required|accepted',
         ];
     }
 
@@ -43,7 +43,7 @@ class PreRepresentanteRequest extends FormRequest
             'password.confirmed' => 'As senhas precisam ser idênticas entre si.',
             'password.regex' => 'A senha deve conter um número, uma letra maiúscula e uma minúscula.',
             'cpf_cnpj.regex' => 'Somente numeros devem ser inseridos.',
-            'cpf_cnpj.unique' => 'Já existe esse CPF / CNPJ cadastrado no Pré Registro ou como Representante Comercial.',
+            'cpf_cnpj.unique' => 'Já existe esse CPF / CNPJ cadastrado no Pré-registro ou como Representante Comercial.',
         ];
     }
 }

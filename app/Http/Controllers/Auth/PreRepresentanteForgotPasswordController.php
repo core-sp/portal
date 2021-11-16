@@ -7,7 +7,7 @@ use App\PreRepresentante;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use App\Rules\CpfCnpj;
+use App\Http\Requests\PreRepresentanteRequest;
 
 class PreRepresentanteForgotPasswordController extends Controller
 {
@@ -25,10 +25,13 @@ class PreRepresentanteForgotPasswordController extends Controller
 
     protected function validateEmail(Request $request)
     {
+        $pre = new PreRepresentanteRequest();
+        $requestRules = new Request($pre->rules());
+        $requestMessages = new Request($pre->messages());
         $this->validate(
             $request,
-            ['cpf_cnpj' => ['required', new CpfCnpj]],
-            ['required' => 'Por favor, informe o campo de CPF/CNPJ.']
+            $requestRules->all(),
+            $requestMessages->all()
         );
     }
 
@@ -36,14 +39,12 @@ class PreRepresentanteForgotPasswordController extends Controller
     {
         $first = PreRepresentante::where('cpf_cnpj', $cpfCnpj)->first();
         
-        if(isset($first)) {
+        if(isset($first))
             return $first->email;
-        } else {
-            return redirect()
-                ->back()
-                ->with('message', 'CPF ou CNPJ não cadastrado.')
-                ->with('class', 'alert-danger');
-        }
+        return redirect()->back()->with([
+            'message' => 'CPF ou CNPJ não cadastrado.',
+            'class' => 'alert-danger'
+        ]);
     }
 
     public function sendResetLinkEmail(Request $request)

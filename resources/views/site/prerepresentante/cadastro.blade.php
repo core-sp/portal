@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Cadastro no Pré Registro'])
+@extends('site.layout.app', ['title' => 'Cadastro no Pré-registro'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
         <div class="row position-absolute pagina-titulo">
             <div class="container text-center">
                 <h1 class="branco text-uppercase">
-                    Cadastro no Pré Registro
+                    Cadastro no Pré-registro
                 </h1>
             </div>
         </div>
@@ -21,7 +21,7 @@
             <div class="col">
                 <div class="row nomargin">
                     <div class="flex-one pr-4 align-self-center">
-                        <h2 class="stronger">Cadastro para o Pré Registro</h2>
+                        <h2 class="stronger">Cadastro para o Pré-registro</h2>
                     </div>
                     <div class="align-self-center">
                         <a href="/" class="btn-voltar">Voltar</a>
@@ -36,7 +36,7 @@
                     <p class="alert alert-danger">{{ Session::get('message') }}</p>
                 @endif
                 <p>Seja bem-vindo(a).</p>
-                <p>A Área Restrita do Pré Registro é destinada exclusivamente aos que pretendem se tornar Representantes Comerciais.</p>
+                <p>A Área Restrita do Pré-registro é destinada exclusivamente aos que pretendem se tornar Representantes Comerciais.</p>
                 <p>Preencha as informações abaixo e realize o seu cadastro.</p>
                 <hr>
                 <form action="{{ route('prerepresentante.cadastro.submit') }}" method="POST" class="cadastroRepresentante">
@@ -142,7 +142,7 @@
                         />
                         <p class="d-inline ml-1 lh-28">
                             <small class="light lh-28">
-                                Li e concordo com os <a class="text-primary" href="/arquivos/Termo_de_Uso_e_Consentimento_Area_Restrita_rev.pdf" target="_blank">Termos de Uso</a> da Área Restrita do Pré Registro do Core-SP.
+                                Li e concordo com os <a class="text-primary" href="/arquivos/Termo_de_Uso_e_Consentimento_Area_Restrita_rev.pdf" target="_blank">Termos de Uso</a> da Área Restrita do Pré-registro do Core-SP.
                             </small>
                         </p>
                         @if($errors->has('checkbox-tdu'))

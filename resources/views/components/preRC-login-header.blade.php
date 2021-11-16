@@ -18,7 +18,7 @@
                 <small>
                     <a href="{{ route('prerepresentante.login') }}">
                         <i class="fas fa-lock"></i>&nbsp;
-                        Área restrita do Pré Registro
+                        Área restrita do Pré-registro
                     </a>
                     &nbsp;&nbsp;|&nbsp;&nbsp;
                     <a href="{{ route('prerepresentante.cadastro') }}">

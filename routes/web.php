@@ -188,7 +188,7 @@ Route::prefix('/')->group(function() {
     Route::get('/editar', 'PreRepresentanteSiteController@editarView')->name('prerepresentante.editar.view');
     Route::get('/editar/senha', 'PreRepresentanteSiteController@editarSenhaView')->name('prerepresentante.editar.senha.view');
     Route::put('/editar', 'PreRepresentanteSiteController@editar')->name('prerepresentante.editar');
-    // Pré Registro
+    // Pré-registro
     Route::get('/pre-registro', 'PreRepresentanteSiteController@preRegistroView')->name('prerepresentante.preregistro.view');
     Route::get('/inserir-pre-registro', 'PreRepresentanteSiteController@inserirPreRegistroView')->name('prerepresentante.inserir.preregistro.view');
   });

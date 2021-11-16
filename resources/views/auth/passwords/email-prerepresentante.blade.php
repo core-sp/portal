@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Recuperar Senha do Pré Registro'])
+@extends('site.layout.app', ['title' => 'Recuperar Senha do Pré-registro'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Recuperar Senha do Pré Registro
+          Recuperar Senha do Pré-registro
         </h1>
       </div>
     </div>
@@ -21,7 +21,7 @@
             <div class="col">
                 <div class="row nomargin">
                     <div class="flex-one pr-4 align-self-center">
-                        <h2 class="stronger">Reconfigurar senha no Pré Registro</h2>
+                        <h2 class="stronger">Reconfigurar senha no Pré-registro</h2>
                     </div>
                     <div class="align-self-center">
                         <a href="/" class="btn-voltar">Voltar</a>
@@ -32,7 +32,7 @@
         <div class="linha-lg"></div>
         <div class="row mt-2">
           <div class="col-lg-8 conteudo-txt">
-            @if(Session::has('message'))
+          @if(Session::has('message'))
               <p class="alert {{ Session::get('class') }}">{{ Session::get('message') }}</p>
             @endif
             @if (session('status'))
@@ -43,20 +43,19 @@
             <p>Digite o CPF ou CNPJ abaixo para reconfigurar sua senha.</p>
             <form action="{{ route('prerepresentante.password.email') }}" method="POST">
               @csrf
-              <div class="form-group has-feedback {{ $errors->has('cpf_cnpj') ? 'has-error' : '' }}">
+              <div class="form-group">
                 <input 
                   type="text"
                   name="cpf_cnpj"
-                  class="form-control cpfOuCnpj"
+                  class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
                   value="{{ isset($cpf_cnpj) ? $cpf_cnpj : old('cpf_cnpj') }}"
                   placeholder="CPF / CNPJ"
                   required
                 >
-                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                 @if ($errors->has('cpf_cnpj'))
-                    <span class="help-block">
-                      <strong>{{ $errors->first('cpf_cnpj') }}</strong>
-                    </span>
+                  <span class="invalid-feedback" role="alert">
+                    <strong>{{ $errors->first('cpf_cnpj') }}</strong>
+                  </span>
                 @endif
               </div>
               <div class="form-group mt-2">

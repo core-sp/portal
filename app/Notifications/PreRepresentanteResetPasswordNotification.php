@@ -27,10 +27,10 @@ class PreRepresentanteResetPasswordNotification extends ResetPasswordNotificatio
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Alteração de senha no Pré Registro')
-            ->line('Você está recebendo este e-mail pois solicitou a reconfiguração de senha no Pré Registro do Portal do Core-SP.')
+            ->subject('Alteração de senha no Pré-registro')
+            ->line('Você está recebendo este e-mail pois solicitou a reconfiguração de senha no Pré-registro do Portal do Core-SP.')
             ->line('Lembrando que este link é válido por 60 minutos.')
-            ->action('Alteração de Senha no Pré Registro', route('prerepresentante.password.reset', $this->token))
+            ->action('Alteração de Senha no Pré-registro', route('prerepresentante.password.reset', $this->token))
             ->line('Caso não tenha solicitado a reconfiguração, favor desconsiderar este e-mail');
     }
 

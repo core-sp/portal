@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Login no Pré Registro'])
+@extends('site.layout.app', ['title' => 'Login no Pré-registro'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
         <div class="row position-absolute pagina-titulo">
             <div class="container text-center">
                 <h1 class="branco text-uppercase">
-                    Login no Pré Registro
+                    Login no Pré-registro
                 </h1>
             </div>
         </div>
@@ -21,7 +21,7 @@
             <div class="col">
                 <div class="row nomargin">
                     <div class="flex-one pr-4 align-self-center">
-                        <h2 class="stronger">Login - Área do Pré Registro</h2>
+                        <h2 class="stronger">Login - Área do Pré-registro</h2>
                     </div>
                     <div class="align-self-center">
                         <a href="/" class="btn-voltar">Voltar</a>
@@ -37,7 +37,7 @@
                         {{ Session::get('message') }}
                     </p>
                 @endif
-                <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área restrita do Pré Registro.</strong></p>
+                <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área restrita do Pré-registro.</strong></p>
                 <p>Ou então, <a href="{{ route('prerepresentante.cadastro') }}">realize o cadastro</a> e depois efetue o login.</p>
                 <form action="{{ route('prerepresentante.login.submit') }}" method="POST" class="cadastroRepresentante">
                     @csrf

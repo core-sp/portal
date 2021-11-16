@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Events\ExternoEvent;
-use App\Rules\CpfCnpj;
+use App\Http\Requests\PreRepresentanteRequest;
 
 class PreRepresentanteResetPasswordController extends Controller
 {
@@ -30,7 +30,7 @@ class PreRepresentanteResetPasswordController extends Controller
         ])->save();
 
         if(!$pre)
-            event(new ExternoEvent('Usuário do Pré Registro ' . $prerep->id . ' não conseguiu alterar a senha.'));
+            event(new ExternoEvent('Usuário do Pré-registro ' . $prerep->id . ' não conseguiu alterar a senha.'));
     }
 
     protected function guard()
@@ -45,22 +45,16 @@ class PreRepresentanteResetPasswordController extends Controller
 
     protected function rules()
     {
-        return [
-            'token' => 'required',
-            'cpf_cnpj' => ['required', new CpfCnpj],
-            'password' => 'required|confirmed|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
-            'password_confirmation' => 'required|same:password'
-        ];
+        $pre = new PreRepresentanteRequest();
+        $request = new Request($pre->rules());
+        return $request->all();
     }
 
     protected function validationErrorMessages()
     {
-        return [
-            'required' => 'Campo obrigatório',
-            'confirmed' => 'As senhas precisam ser idênticas entre si.',
-            'password.min' => 'A senha precisa ter no mínimo 8 caracteres',
-            'password.regex' => 'A senha deve conter um número, uma letra maiúscula e uma minúscula.',
-        ];
+        $pre = new PreRepresentanteRequest();
+        $request = new Request($pre->messages());
+        return $request->all();
     }
 
     public function getEmailForPasswordReset()
@@ -80,7 +74,7 @@ class PreRepresentanteResetPasswordController extends Controller
 
     protected function sendResetResponse(Request $request, $response)
     {
-        event(new ExternoEvent('Usuário do Pré Registro com o cpf/cnpj ' .$request->cpf_cnpj. ' alterou a senha com sucesso.'));
+        event(new ExternoEvent('Usuário do Pré-registro com o cpf/cnpj ' .$request->cpf_cnpj. ' alterou a senha com sucesso.'));
 
         return redirect(route('prerepresentante.login'))->with([
                 'message' => 'Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.',

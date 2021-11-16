@@ -59,7 +59,7 @@ class PreRepresentanteLoginController extends Controller
             'password' => $validated->password_login
         ])) 
         {
-            event(new ExternoEvent('Usuário ' . auth()->guard('pre_representante')->user()->id . ' conectou-se à Área do Pré Registro.'));
+            event(new ExternoEvent('Usuário ' . auth()->guard('pre_representante')->user()->id . ' conectou-se à Área do Pré-registro.'));
             return redirect()->intended(route('prerepresentante.dashboard'));
         }
         

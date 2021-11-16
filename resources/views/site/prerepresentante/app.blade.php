@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Área do Pré Registro'])
+@extends('site.layout.app', ['title' => 'Área do Pré-registro'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Área do Pré Registro
+          Área do Pré-registro
         </h1>
       </div>
     </div>
@@ -51,7 +51,7 @@
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'prerepresentante.preregistro.view') || 
               (Route::currentRouteName() === 'prerepresentante.inserir.preregistro.view') ? 'mr-item-selected' : '' }}">
               <a href="{{ route('prerepresentante.preregistro.view') }}" onclick="showLoading()">
-                <h6 class="brancar"><i class="fas fa-file-alt"></i>&nbsp;&nbsp;Pré Registro</h6>
+                <h6 class="brancar"><i class="fas fa-file-alt"></i>&nbsp;&nbsp;Pré-registro</h6>
               </a>
             </div>
 

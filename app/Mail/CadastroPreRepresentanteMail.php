@@ -20,7 +20,7 @@ class CadastroPreRepresentanteMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Cadastro no Pré Registro do Portal Core-SP')
+        return $this->subject('Cadastro no Pré-registro do Portal Core-SP')
             ->view('emails.default');
     }
 }
