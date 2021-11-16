@@ -77,7 +77,7 @@
               <a href="{{ route('representante.solicitarCedulaView') }}" onclick="showLoading()">
                 <h6 class="brancar">
                   <i class="fas fa-id-card"></i>&nbsp;&nbsp;Solicitação de Cédula&nbsp;&nbsp;&nbsp;
-                    <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm"></span>
+                    <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
                   </span>
                 </h6>
               </a>

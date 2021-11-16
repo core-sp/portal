@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
 use App\Http\Requests\SolicitaCedulaRequest;
-use App\SolicitaCedula;
 use App\Traits\ControleAcesso;
 use App\Repositories\SolicitaCedulaRepository;
 use App\Mail\SolicitaCedulaMail;
@@ -56,10 +54,10 @@ class SolicitaCedulaController extends Controller
     public function inserirSolicitaCedula(Request $request)
     {
         $this->autoriza($this->class, 'show');
-        if(Auth::user() == null)
+        if(auth()->user() == null)
             abort(500, "Usuário não encontrado");
         try {
-            $cedula = $this->solicitaCedulaRepository->updateStatusAceito($request->id, Auth::user()->idusuario);
+            $cedula = $this->solicitaCedulaRepository->updateStatusAceito($request->id, auth()->user()->idusuario);
             $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
             event(new CrudEvent('solicitação de cédula', 'atendente aceitou', $request->id));
@@ -80,10 +78,10 @@ class SolicitaCedulaController extends Controller
         $this->autoriza($this->class, 'show');
         $request->validated();
 
-        if(Auth::user() == null)
+        if(auth()->user() == null)
             abort(500, "Usuário não encontrado");
         try {
-            $cedula = $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, Auth::user()->idusuario);
+            $cedula = $this->solicitaCedulaRepository->updateStatusRecusado($request->id, $request->justificativa, auth()->user()->idusuario);
             $cedula = $this->solicitaCedulaRepository->getById($request->id);
 
             event(new CrudEvent('solicitação de cédula', 'atendente recusou e justificou', $request->id));
@@ -126,7 +124,7 @@ class SolicitaCedulaController extends Controller
                 $resultado->regional->regional,
                 formataData($resultado->created_at),
                 formataData($resultado->updated_at),
-                $this->showStatus($resultado->status),
+                '<strong class="' .$resultado->showStatus(). '">' .$resultado->status. '</strong>',
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -141,27 +139,6 @@ class SolicitaCedulaController extends Controller
         $tabela = $this->montaTabela($headers, $contents, $classes);
         return $tabela;
 
-    }
-
-    protected function showStatus($string)
-    {
-        switch ($string) {
-            case SolicitaCedula::STATUS_EM_ANDAMENTO:
-                return '<strong><i>'.SolicitaCedula::STATUS_EM_ANDAMENTO.'</i></strong>';
-            break;
-
-            case SolicitaCedula::STATUS_RECUSADO:
-                return '<strong class="text-danger">'.SolicitaCedula::STATUS_RECUSADO.'</strong>';
-            break;
-
-            case SolicitaCedula::STATUS_ACEITO:
-                return '<strong class="text-success">'.SolicitaCedula::STATUS_ACEITO.'</strong>';
-            break;
-            
-            default:
-                return $string;
-            break;
-        }
     }
 
     public function index()

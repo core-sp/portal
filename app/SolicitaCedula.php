@@ -33,4 +33,25 @@ class SolicitaCedula extends Model
     {
         return ($this->status == SolicitaCedula::STATUS_ACEITO) ? true : false;
     }
+
+    public function showStatus()
+    {
+        switch ($this->status) {
+            case SolicitaCedula::STATUS_EM_ANDAMENTO:
+                return 'font-italic';
+            break;
+
+            case SolicitaCedula::STATUS_RECUSADO:
+                return 'text-danger';
+            break;
+
+            case SolicitaCedula::STATUS_ACEITO:
+                return 'text-success';
+            break;
+            
+            default:
+                return $null;
+            break;
+        }
+    }
 }
