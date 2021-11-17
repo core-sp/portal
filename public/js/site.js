@@ -45,7 +45,10 @@ $(document).ready(function(){
 			$('.cpfOuCnpj').mask((cpf.length > 14) ? masks[1] : masks[0], op);
 		}
 	}
-	$('.cpfOuCnpj').length > 11 ? $('.cpfOuCnpj').mask('00.000.000/0000-00', options) : $('.cpfOuCnpj').mask('000.000.000-00#', options);
+	$('.cpfOuCnpj').index() > -1 && $('.cpfOuCnpj').val().length > 11 ? 
+	$('.cpfOuCnpj').mask('00.000.000/0000-00', options) : 
+	$('.cpfOuCnpj').mask('000.000.000-00#', options);
+
 	// Menu responsivo
 	var first = document.getElementById('menu-principal');
 	var second = document.getElementById('sidebarContent');
@@ -804,4 +807,75 @@ $('form').submit(function() {
 		$('.cpfOuCnpj').val(valor);
 	}
 });
+
+// --------------------------------------------------------------------------------------------------------
+// gerencia os arquivos, cria os inputs, remove os inputs, controla as quantidades de inputs e files vindo do bd
+// 
+
+var pre_registro_total_files = 5;
+
+// ao carregar a pagina, verifica se possui o limite maximo de arquivos permitidos, caso sim, ele impede de adicionar mais
+$('form').ready(function(){
+	if($(".ArquivoBD_resid").length == 1)
+		$(".Arquivo_resid").hide();
+
+	if($(".ArquivoBD_doc").length == pre_registro_total_files)
+		$(".Arquivo_doc").hide();
+
+	if($(".ArquivoBD_resid_socios").length == pre_registro_total_files)
+		$(".Arquivo_resid_socios").hide();
+}); 
+
+// Faz aparecer o nome do arquivo na máscara do input estilizado, remove as mensagens de erro
+//  e adiciona, caso seja possível, um novo input
+$(".files").on("change", function() {
+	var fileName = $(this).val().split("\\").pop();
+	$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+	$(this).removeClass("is-invalid");
+	$(this).parent().remove("div .invalid-feedback");
+	var nomeClasse = $(this).parent().parent().parent().parent().attr('class');
+	var nome = nomeClasse.slice(nomeClasse.indexOf('_') + 1);
+	addArquivo(nome);
+});
+
+// remove a div com input file ou limpa o campo se for 1 input
+$(".limparFile").click(function(){
+	var todoArquivo = $(this).parent().parent().parent().parent();
+	var classe = todoArquivo.attr('class');
+	if($('.' + classe).length > 1)
+		todoArquivo.remove();
+	else {
+		$('.' + classe + ' .custom-file-input:last').val("");
+		$('.' + classe + ' .custom-file-input:last').siblings(".custom-file-label").removeClass("selected").html("Escolher arquivo");
+		$('.' + classe + ' .custom-file-input:last').removeClass('is-invalid');
+		$('.' + classe + " .invalid-feedback:last").remove();
+	}
+});
+
+// Confere se o ultimo input file está vazio 
+function arquivoVazio(nome){
+	if($(nome + " .custom-file-input:last").val().length == 0)
+		return true;
+}
+
+function addArquivo(nome){
+	if(nome == '')
+		return false;
+		
+	// somente files que exigem somente 1 arquivo
+	var array_para_um_file = ['resid'];
+	var total = $(".Arquivo_" + nome).length + $(".ArquivoBD_" + nome).length;
+	var total_files = array_para_um_file.indexOf(nome) == -1 ? pre_registro_total_files : 1 ;
+
+	if(($(".ArquivoBD_" + nome).length < total_files) && ($(".Arquivo_" + nome).css("display") == "none")){ //quando usa o hide
+		$(".Arquivo_" + nome).show();
+	} else if((total < total_files) && (!arquivoVazio(".Arquivo_" + nome))){
+		var novoInput = $(".Arquivo_" + nome + ":last");
+		novoInput.after(novoInput.clone(true));
+		$(".Arquivo_" + nome + " .custom-file-input:last").val("");
+		$(".Arquivo_" + nome + " .custom-file-input:last").siblings(".custom-file-label").removeClass("selected").html("Escolher arquivo");
+	}
+}
+
+//	--------------------------------------------------------------------------------------------------------
 

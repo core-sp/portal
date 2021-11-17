@@ -140,6 +140,7 @@ class PreRepresentanteSiteController extends Controller
         // temporário
         $estados_civil = ['Casado(a)', 'Solteiro(a)', 'Viúvo(a)'];
         $nacionalidades = ['Brasileira', 'Portuguesa'];
-        return view('site.prerepresentante.inserir-pre-registro', compact('prerep', 'estados_civil', 'nacionalidades'));
+        $totalFiles = 5;
+        return view('site.prerepresentante.inserir-pre-registro', compact('prerep', 'estados_civil', 'nacionalidades', 'totalFiles'));
     }
 }

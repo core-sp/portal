@@ -39,9 +39,9 @@
                     <label for="cpf_cnpj">CPF ou CNPJ *</label>
                     <input
                         type="text"
-                        class="form-control {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
+                        class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
                         id="cpf_cnpj"
-                        value="{{ formataCpfCnpj(auth()->guard('pre_representante')->user()->cpf_cnpj) }}"
+                        value="{{ auth()->guard('pre_representante')->user()->cpf_cnpj }}"
                         placeholder="CPF ou CNPJ"
                         required
                         readonly
