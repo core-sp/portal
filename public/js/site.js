@@ -808,9 +808,18 @@ $('form').submit(function() {
 	}
 });
 
+$('[name="tipo"]').change(function() {
+	var valor = $(this).val();
+	var display = $("#campo_anexo_indica_rt").css("display");
+	var isHide = display == "none" || display == undefined ? true : false;
+	if((valor == 'RT') && (isHide))
+		$("#campo_anexo_indica_rt").show();
+	else
+		$("#campo_anexo_indica_rt").hide();
+});
+
 // --------------------------------------------------------------------------------------------------------
 // gerencia os arquivos, cria os inputs, remove os inputs, controla as quantidades de inputs e files vindo do bd
-// 
 
 var pre_registro_total_files = 5;
 
@@ -818,6 +827,30 @@ var pre_registro_total_files = 5;
 $('form').ready(function(){
 	if($(".ArquivoBD_resid").length == 1)
 		$(".Arquivo_resid").hide();
+
+	if($(".ArquivoBD_tse").length == 1)
+		$(".Arquivo_tse").hide();
+
+	if($(".ArquivoBD_reservista").length == 1)
+		$(".Arquivo_reservista").hide();
+
+	if($(".ArquivoBD_cp_identidade").length == 1)
+		$(".Arquivo_cp_identidade").hide();
+
+	if($(".ArquivoBD_cp_cpf").length == 1)
+		$(".Arquivo_cp_cpf").hide();
+
+	if($(".ArquivoBD_indica_rt").length == 1)
+		$(".Arquivo_indica_rt").hide();
+
+	if($(".ArquivoBD_indica_rt_pj").length == 1)
+		$(".Arquivo_indica_rt_pj").hide();
+
+	if($(".ArquivoBD_inscr_cnpj").length == 1)
+		$(".Arquivo_inscr_cnpj").hide();
+
+	if($(".ArquivoBD_contrato_social").length == 1)
+		$(".Arquivo_contrato_social").hide();
 
 	if($(".ArquivoBD_doc").length == pre_registro_total_files)
 		$(".Arquivo_doc").hide();
@@ -829,10 +862,17 @@ $('form').ready(function(){
 // Faz aparecer o nome do arquivo na máscara do input estilizado, remove as mensagens de erro
 //  e adiciona, caso seja possível, um novo input
 $(".files").on("change", function() {
+
+	// procedimento usado no bootstrap 4 para usar um input file customizado
 	var fileName = $(this).val().split("\\").pop();
 	$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+	// fim do procedimento do input customizado do bootstrap 4
+
+	// limpa o input caso esteja com erro de validação
 	$(this).removeClass("is-invalid");
 	$(this).parent().remove("div .invalid-feedback");
+
+	// procedimento para recuperar a classe e adicionar o final do nome para o método de add input
 	var nomeClasse = $(this).parent().parent().parent().parent().attr('class');
 	var nome = nomeClasse.slice(nomeClasse.indexOf('_') + 1);
 	addArquivo(nome);
@@ -846,7 +886,7 @@ $(".limparFile").click(function(){
 		todoArquivo.remove();
 	else {
 		$('.' + classe + ' .custom-file-input:last').val("");
-		$('.' + classe + ' .custom-file-input:last').siblings(".custom-file-label").removeClass("selected").html("Escolher arquivo");
+		$('.' + classe + ' .custom-file-input:last').siblings(".custom-file-label").removeClass("selected").html('<span class="text-secondary">Escolher arquivo</span>');
 		$('.' + classe + ' .custom-file-input:last').removeClass('is-invalid');
 		$('.' + classe + " .invalid-feedback:last").remove();
 	}
@@ -863,7 +903,17 @@ function addArquivo(nome){
 		return false;
 		
 	// somente files que exigem somente 1 arquivo
-	var array_para_um_file = ['resid'];
+	var array_para_um_file = [
+		'resid', 
+		'tse', 
+		'reservista', 
+		'cp_identidade', 
+		'cp_cpf', 
+		'indica_rt', 
+		'indica_rt_pj', 
+		'inscr_cnpj',
+		'contrato_social'
+	];
 	var total = $(".Arquivo_" + nome).length + $(".ArquivoBD_" + nome).length;
 	var total_files = array_para_um_file.indexOf(nome) == -1 ? pre_registro_total_files : 1 ;
 
@@ -873,9 +923,8 @@ function addArquivo(nome){
 		var novoInput = $(".Arquivo_" + nome + ":last");
 		novoInput.after(novoInput.clone(true));
 		$(".Arquivo_" + nome + " .custom-file-input:last").val("");
-		$(".Arquivo_" + nome + " .custom-file-input:last").siblings(".custom-file-label").removeClass("selected").html("Escolher arquivo");
+		$(".Arquivo_" + nome + " .custom-file-input:last").siblings(".custom-file-label").removeClass("selected").html('<span class="text-secondary">Escolher arquivo</span>');
 	}
 }
-
 //	--------------------------------------------------------------------------------------------------------
 

@@ -138,9 +138,10 @@ class PreRepresentanteSiteController extends Controller
     {
         $prerep = auth()->guard('pre_representante')->user();
         // temporário
+        $tipos = ['PF' => 'Pessoa Física', 'RT' => 'Responsável Técnico', 'PJ' => 'Pessoa Jurídica'];
         $estados_civil = ['Casado(a)', 'Solteiro(a)', 'Viúvo(a)'];
         $nacionalidades = ['Brasileira', 'Portuguesa'];
         $totalFiles = 5;
-        return view('site.prerepresentante.inserir-pre-registro', compact('prerep', 'estados_civil', 'nacionalidades', 'totalFiles'));
+        return view('site.prerepresentante.inserir-pre-registro', compact('tipos', 'prerep', 'estados_civil', 'nacionalidades', 'totalFiles'));
     }
 }
