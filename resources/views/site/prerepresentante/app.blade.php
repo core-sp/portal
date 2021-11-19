@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Área do Pré-registro'])
+@extends('site.layout.app', ['title' => 'Área Restrita'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Área do Pré-registro
+          Área Restrita
         </h1>
       </div>
     </div>

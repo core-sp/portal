@@ -18,6 +18,8 @@
                     <p>Em cada aba do formulário terá o botão <button class="btn btn-sm btn-primary">Salvar</button> para armazenar seus dados para futuras alterações.</p>
                     <p>E após o término, você terá na última aba do formulário o botão <button class="btn btn-sm btn-success">Enviar</button> para o atendimento fazer a análise.</p>
                     <p>Aqui mesmo o resultado será atualizado e seus dados estarão disponíveis para as correções, se forem necessárias.</p>
+                    <p>As informações sobre os documentos exigidos, podem ser conferidas <a href="/registro-inicial">aqui</a>.</p>
+
                     <a href="{{ route('prerepresentante.inserir.preregistro.view') }}" class="btn btn-secondary link-nostyle branco mt-3">
                         {{ isset($resultado->id) ? 'Continuar' : 'Iniciar' }} o pré-registro
                     </a>

@@ -1180,7 +1180,7 @@
             <div id="parte4" class="container tab-pane fade"><br>
                 <p class="text-dark mb-3"><i class="fas fa-info-circle"></i> Limite de até {{ $totalFiles }} anexos para cada</p>
 
-                <h5 class="bold mb-2">Documento de todos os sócios *</h5>
+                <h5 class="bold mb-2">Documento de identidade de todos os sócios</h5>
                 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
                 @if(isset($resultado->anexos_socios))
                 <div class="ArquivoBD_doc">
@@ -1203,7 +1203,7 @@
 
                 <!-- Inputs para anexar o arquivo -->	
                 <div class="Arquivo_doc">
-                    <label for="anexos_socios">Anexo RG ou CNH *</label>
+                    <label for="anexos_socios">Cópia RG ou CNH *</label>
                     <div class="form-row mb-2">
                         <div class="input-group col-sm mb-2-576 pl-0">
                             <div class="custom-file">
@@ -1229,7 +1229,7 @@
 
                 <div class="linha-lg-mini"></div>
 
-                <h5 class="bold mb-2">Comprovante de residência de todos os sócios *</h5>
+                <h5 class="bold mb-2">Comprovante de residência de todos os sócios</h5>
                 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
                 @if(isset($resultado->anexos_resid_socios))
                 <div class="ArquivoBD_resid_socios">
