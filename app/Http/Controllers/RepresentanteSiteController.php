@@ -481,14 +481,20 @@ class RepresentanteSiteController extends Controller
     public function bdo()
     {
         $rep = Auth::guard('representante')->user();
-        $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
-        $idregional = $this->regionalRepository->getByName($seccional)->idregional;
-        $segmentoGerenti = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
-        $segmento = !empty($segmentoGerenti) ? $segmentoGerenti[0]["SEGMENTO"] : $segmentoGerenti;
-        $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento, $idregional) : collect();
-        foreach($bdo as $b)
-            // usei o campo observação do model para armazenar temporariamente o link
-            $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento.'&regional='.$idregional;
+        try{
+            $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
+            $idregional = $this->regionalRepository->getByName($seccional)->idregional;
+            $segmentoGerenti = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
+            $segmento = !empty($segmentoGerenti) ? $segmentoGerenti[0]["SEGMENTO"] : $segmentoGerenti;
+            $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento, $idregional) : collect();
+            foreach($bdo as $b)
+                // usei o campo observação do model para armazenar temporariamente o link
+                $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento.'&regional='.$idregional;
+        }catch (Exception $e) {
+            Log::error($e->getTraceAsString());
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+        }
+        
         return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional'));
     }
 }
