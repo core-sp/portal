@@ -23,6 +23,10 @@ use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Repositories\GerentiRepositoryInterface;
 use App\Http\Requests\RepresentanteEnderecoRequest;
 use App\Repositories\RepresentanteEnderecoRepository;
+use App\Repositories\BdoOportunidadeRepository;
+use App\Repositories\AvisoRepository;
+use App\Repositories\RegionalRepository;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
@@ -31,13 +35,23 @@ class RepresentanteSiteController extends Controller
     private $representanteEnderecoRepository;
     private $gerentiApiRepository;
     protected $idendereco;
+    private $bdoOportunidadeRepository;
+    private $regionalRepository;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository, AvisoRepository $avisoRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->gerentiRepository = $gerentiRepository;
         $this->representanteEnderecoRepository = $representanteEnderecoRepository;
         $this->gerentiApiRepository = $gerentiApiRepository;
+        $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
+        $this->regionalRepository = $regionalRepository;
+
+        if($avisoRepository->avisoAtivado('Representante'))
+        {
+            $aviso = $avisoRepository->getByArea('Representante');
+            View::share('aviso', $aviso);
+        }
     }
 
     public function index()
@@ -462,5 +476,25 @@ class RepresentanteSiteController extends Controller
         $valoresRefis = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
 
         return view('site.representante.simulador-refis', compact('valoresRefis'));
+    }
+
+    public function bdo()
+    {
+        $rep = Auth::guard('representante')->user();
+        try{
+            $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
+            $idregional = $this->regionalRepository->getByName($seccional)->idregional;
+            $segmentoGerenti = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
+            $segmento = !empty($segmentoGerenti) ? $segmentoGerenti[0]["SEGMENTO"] : $segmentoGerenti;
+            $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento, $idregional) : collect();
+            foreach($bdo as $b)
+                // usei o campo observação do model para armazenar temporariamente o link
+                $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento.'&regional='.$idregional;
+        }catch (Exception $e) {
+            Log::error($e->getTraceAsString());
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+        }
+        
+        return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional'));
     }
 }

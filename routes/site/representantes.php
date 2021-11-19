@@ -35,4 +35,7 @@ Route::prefix('representante')->group(function(){
 
     // SIMULADOR_REFIS - Rota para simulador Refis
     //Route::get('/simulador-refis', 'RepresentanteSiteController@simuladorRefis')->name('representante.simuladorRefis');
+
+    // Rotas para emissão de Certidão
+    Route::get('/oportunidades', 'RepresentanteSiteController@bdo')->name('representante.bdo');
 });
