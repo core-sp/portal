@@ -90,12 +90,12 @@ class RepresentanteTest extends TestCase
 
         // Checa acesso a aba "Situação Financeira"
         $this->get(route('representante.lista-cobrancas'))->assertOk();
-
-        // Checa acesso a aba "Solicitação de Cédula"
-        $this->get(route('representante.solicitarCedulaView'))->assertOk();
         
         // Checa acesso a aba "Oportunidades"
         $this->get(route('representante.bdo'))->assertOk();
+
+        // Checa acesso a aba "Solicitação de Cédula"
+        $this->get(route('representante.solicitarCedulaView'))->assertOk();
     }
 
     /** @test 
@@ -361,12 +361,12 @@ class RepresentanteTest extends TestCase
 
         // Checa acesso a aba "Situação Financeira" é bloqueado e redirecionado para tela de login
         $this->get(route('representante.lista-cobrancas'))->assertRedirect(route('representante.login'));
-
-        // Checa acesso a aba "Situação Financeira" é bloqueado e redirecionado para tela de login
-        $this->get(route('representante.solicitarCedulaView'))->assertRedirect(route('representante.login'));
         
         // Checa acesso a aba "Oportunidades" é bloqueado e redirecionado para tela de login
         $this->get(route('representante.bdo'))->assertRedirect(route('representante.login'));
+
+        // Checa acesso a aba "Solicitação de Cédula" é bloqueado e redirecionado para tela de login
+        $this->get(route('representante.solicitarCedulaView'))->assertRedirect(route('representante.login'));
     }
 
     /** @test 
@@ -399,35 +399,6 @@ class RepresentanteTest extends TestCase
 
     /** @test 
      * 
-     * Representante em dia pode solicitar cédula pela primeira vez
-    */
-    public function insert_new_solicitacao_cedula()
-    {
-        $regional = factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO'
-        ]);
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO - Alameda Santos'
-        ]);
-        $representante = factory('App\Representante')->create();
-        $cedula = factory('App\SolicitaCedula')->raw([
-            'idrepresentante' => $representante->id
-        ]);
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
-        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
-        ->assertRedirect(route('representante.solicitarCedulaView'));
-        $this->assertDatabaseHas('solicitacoes_cedulas', [
-            'idrepresentante' => $representante->id,
-            'rg' => $cedula['rg'],
-            'bairro' => $cedula['bairro'], 
-            'logradouro' => $cedula['logradouro'],
-            'numero' => $cedula['numero']
-        ]);
-    }
-
-    /** @test 
-     * 
      * Visualiza a opção de outras oportunidades no bdo.
      * 
     */
@@ -442,6 +413,189 @@ class RepresentanteTest extends TestCase
         $representante = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
         $this->get(route('representante.bdo'))->assertSee('Outras oportunidades');
+    }
+    
+    /** @test 
+     *
+     * Visualiza as oportunidades no bdo se possuir segmento.
+     * Tem de visualizar qual segmento está no GerentiMock 
+    */
+    public function view_alert_bdo_if_has_segment()
+    {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $bdo = factory('App\BdoOportunidade', 5)->create([
+            'segmento' => 'Alimentício',
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.bdo'))->assertSee('Foram encontradas');
+    }
+     
+    /** @test 
+     * 
+     * Não visualiza as oportunidades no bdo se não possuir segmento. 
+     * Tem de comentar o array do segmento no GerentiMock
+    */
+    public function cannot_view_alert_bdo_if_hasnt_segment()
+    {
+        // Tem de comentar o array do segmento no GerentiMock
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $bdo = factory('App\BdoOportunidade')->create([
+            'segmento' => 'Alimentício',
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.bdo'))->assertDontSee($bdo->segmento);
+    }
+
+    /** @test 
+    *  
+    * Não visualiza as oportunidades no bdo se não possuir oportunidade do mesmo segmento. 
+    */
+    public function cannot_view_alert_bdo_if_hasnt_bdo()
+    {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        factory('App\BdoOportunidade', 5)->create();
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.bdo'))->assertSee('Não foi encontrada');
+    }
+
+    /** @test 
+     * 
+     * Não visualiza as oportunidades no bdo se não possuir oportunidade do mesmo segmento com status em andamento. 
+    */
+    public function cannot_view_alert_bdo_if_hasnt_bdo_status_em_andamento()
+    {
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $bdo = factory('App\BdoOportunidade', 5)->create([
+            'segmento' => 'Alimentício',
+            'status' => 'Expirado'
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.bdo'))->assertSee('Não foi encontrada');
+    }
+
+    /** @test 
+     *  
+    * Não visualiza o aviso do bdo se não possuir oportunidade e segmento. 
+    */
+    public function cannot_view_alert_bdo_if_hasnt_bdo_and_segmento()
+    {
+        // Comentar o segmento no GerentiMock
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.bdo'))->assertDontSee('Alimentício');
+    }
+
+    /** @test 
+     * 
+     * Visualiza o aviso que está ativado.
+     * 
+    */
+    public function view_aviso_with_status_ativado()
+    {
+        $aviso = factory('App\Aviso')->create([
+            'status' => 'Ativado',
+            'idusuario' => factory('App\User')
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertSee($aviso->titulo);
+    }
+
+    /** @test 
+     * 
+     * Não visualiza o aviso que está desativado.
+     * 
+    */
+    public function cannot_view_aviso_with_status_desativado()
+    {
+        $aviso = factory('App\Aviso')->create();
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertDontSee($aviso->titulo);
+    }
+
+    /** @test 
+     *
+     * Não visualiza o aviso que não existe.
+     * 
+    */
+    public function cannot_view_aviso_uncreated()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertViewMissing('aviso');
+    }
+
+    /** @test 
+     * 
+     * Visualiza o aviso ativado em todas as rotas do RC após logon.
+     * 
+    */
+    public function view_aviso_ativado_in_all_routes_get_after_logon()
+    {
+        $aviso = factory('App\Aviso')->create([
+            'status' => 'Ativado',
+            'idusuario' => factory('App\User')
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertSee($aviso->titulo);
+        $this->get(route('representante.dados-gerais'))->assertSee($aviso->titulo);
+        $this->get(route('representante.contatos.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.enderecos.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.inserir-endereco.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.lista-cobrancas'))->assertSee($aviso->titulo);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        factory('App\BdoOportunidade')->create();
+        $this->get(route('representante.bdo'))->assertSee($aviso->titulo);
+        $this->get(route('representante.solicitarCedulaView'))->assertSee($aviso->titulo);
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertSee($aviso->titulo);
+    }
+
+    /** @test 
+     *
+     * Não visualiza o aviso desativado em todas as rotas do RC após logon.
+     * 
+    */
+    public function cannot_view_aviso_desativado_in_all_routes_get_after_logon()
+    {
+        $aviso = factory('App\Aviso')->create([
+            'idusuario' => factory('App\User')
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.dados-gerais'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.contatos.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.enderecos.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.inserir-endereco.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.lista-cobrancas'))->assertDontSee($aviso->titulo);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        factory('App\BdoOportunidade')->create();
+        $this->get(route('representante.bdo'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.solicitarCedulaView'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertDontSee($aviso->titulo);
     }
 
     /** @test 
@@ -471,24 +625,6 @@ class RepresentanteTest extends TestCase
             'logradouro' => $cedula['logradouro'],
             'numero' => $cedula['numero']
         ]);
-    }
-     
-    /** @test 
-     *
-     * Visualiza as oportunidades no bdo se possuir segmento.
-     * Tem de visualizar qual segmento está no GerentiMock 
-    */
-    public function view_alert_bdo_if_has_segment()
-    {
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
-        $bdo = factory('App\BdoOportunidade', 5)->create([
-            'segmento' => 'Alimentício',
-        ]);
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.bdo'))->assertSee('Foram encontradas');
     }
 
     /** @test 
@@ -521,25 +657,6 @@ class RepresentanteTest extends TestCase
             'numero' => $cedulaNova['numero']
         ]);
     }
-     
-    /** @test 
-     * 
-     * Não visualiza as oportunidades no bdo se não possuir segmento. 
-     * Tem de comentar o array do segmento no GerentiMock
-    */
-    public function cannot_view_alert_bdo_if_hasnt_segment()
-    {
-        // Tem de comentar o array do segmento no GerentiMock
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
-        $bdo = factory('App\BdoOportunidade')->create([
-            'segmento' => 'Alimentício',
-        ]);
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.bdo'))->assertDontSee($bdo->segmento);
-    }
 
     /** @test 
      * 
@@ -571,21 +688,6 @@ class RepresentanteTest extends TestCase
             'logradouro' => $cedula['logradouro'],
             'numero' => $cedula['numero']
         ]);
-    }
-
-    /** @test 
-     *  
-    * Não visualiza as oportunidades no bdo se não possuir oportunidade do mesmo segmento. 
-    */
-    public function cannot_view_alert_bdo_if_hasnt_bdo()
-    {
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
-        factory('App\BdoOportunidade', 5)->create();
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.bdo'))->assertSee('Não foi encontrada');
     }
 
     /** @test 
@@ -631,24 +733,6 @@ class RepresentanteTest extends TestCase
 
     /** @test 
      * 
-     * Não visualiza as oportunidades no bdo se não possuir oportunidade do mesmo segmento com status em andamento. 
-    */
-    public function cannot_view_alert_bdo_if_hasnt_bdo_status_em_andamento()
-    {
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
-        $bdo = factory('App\BdoOportunidade', 5)->create([
-            'segmento' => 'Alimentício',
-            'status' => 'Expirado'
-        ]);
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.bdo'))->assertSee('Não foi encontrada');
-    }
-
-    /** @test 
-     * 
      * Erro ao não informar alguns dados obrigatórios ao inserir nova solicitação de cédula.
     */
     public function cannot_insert_new_solicitacao_cedula_with_missing_mandatory_input_cep_and_numero()
@@ -670,22 +754,6 @@ class RepresentanteTest extends TestCase
                 'cep', 
                 'numero'
             ]);
-        }
-
-
-    /** @test 
-     *  
-    * Não visualiza o aviso do bdo se não possuir oportunidade e segmento. 
-    */
-    public function cannot_view_alert_bdo_if_hasnt_bdo_and_segmento()
-    {
-        // Comentar o segmento no GerentiMock
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.bdo'))->assertDontSee('Alimentício');
     }
 
     /** @test 
@@ -742,22 +810,6 @@ class RepresentanteTest extends TestCase
 
     /** @test 
      * 
-     * Visualiza o aviso que está ativado.
-     * 
-    */
-    public function view_aviso_with_status_ativado()
-    {
-        $aviso = factory('App\Aviso')->create([
-            'status' => 'Ativado',
-            'idusuario' => factory('App\User')
-        ]);
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.dashboard'))->assertSee($aviso->titulo);
-    }
-
-    /** @test 
-     * 
      * Erro ao não informar cpf ao inserir nova solicitação de cédula.
     */
     public function cannot_insert_new_solicitacao_cedula_with_missing_mandatory_input_cpf()
@@ -777,19 +829,6 @@ class RepresentanteTest extends TestCase
             ->assertSessionHasErrors([
                 'cpf'
             ]);
-    }
-
-    /** @test 
-     * 
-     * Não visualiza o aviso que está desativado.
-     * 
-    */
-    public function cannot_view_aviso_with_status_desativado()
-    {
-        $aviso = factory('App\Aviso')->create();
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.dashboard'))->assertDontSee($aviso->titulo);
     }
 
     /** @test 
@@ -816,22 +855,10 @@ class RepresentanteTest extends TestCase
     }
 
     /** @test 
-     *
-     * Não visualiza o aviso que não existe.
      * 
+     * Deve trazer nome, rg e cpf do gerenti e do bd se for PF ao solicitar a cedula
     */
-    public function cannot_view_aviso_uncreated()
-    {
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.dashboard'))->assertViewMissing('aviso');
-    }
-
-    /** @test 
-     * 
-     * Deve trazer nome, rg e cpf do gerenti e do bd se for PF
-    */
-    public function fill_nome_rg_cpf_if_pf()
+    public function fill_nome_rg_cpf_if_pf_in_solicitacao_cedula()
     {
         $regional = factory('App\Regional')->create([
             'regional' => 'SÃO PAULO'
@@ -857,36 +884,9 @@ class RepresentanteTest extends TestCase
 
     /** @test 
      * 
-     * Visualiza o aviso ativado em todas as rotas do RC após logon.
-     * 
+     * Não deve preencher os campos nome, rg e cpf se for PJ ao solicitar a cedula
     */
-    public function view_aviso_ativado_in_all_routes_get_after_logon()
-    {
-        $aviso = factory('App\Aviso')->create([
-            'status' => 'Ativado',
-            'idusuario' => factory('App\User')
-        ]);
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.dashboard'))->assertSee($aviso->titulo);
-        $this->get(route('representante.dados-gerais'))->assertSee($aviso->titulo);
-        $this->get(route('representante.contatos.view'))->assertSee($aviso->titulo);
-        $this->get(route('representante.enderecos.view'))->assertSee($aviso->titulo);
-        $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertSee($aviso->titulo);
-        $this->get(route('representante.inserir-endereco.view'))->assertSee($aviso->titulo);
-        $this->get(route('representante.lista-cobrancas'))->assertSee($aviso->titulo);
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
-        ]);
-        factory('App\BdoOportunidade')->create();
-        $this->get(route('representante.bdo'))->assertSee($aviso->titulo);
-    }
-
-    /** @test 
-     * 
-     * Não deve preencher os campos nome, rg e cpf se for PJ
-    */
-    public function if_pj_inputs_nome_rg_cpf_empty_in_form()
+    public function if_pj_inputs_nome_rg_cpf_empty_in_solicitacao_cedula()
     {
         $regional = factory('App\Regional')->create([
             'regional' => 'SÃO PAULO'
@@ -950,28 +950,31 @@ class RepresentanteTest extends TestCase
     }
 
     /** @test 
-     *
-     * Não visualiza o aviso desativado em todas as rotas do RC após logon.
      * 
+     * Representante em dia pode solicitar cédula pela primeira vez
     */
-    public function cannot_view_aviso_desativado_in_all_routes_get_after_logon()
+    public function insert_new_solicitacao_cedula()
     {
-        $aviso = factory('App\Aviso')->create([
-            'idusuario' => factory('App\User')
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO - Alameda Santos'
         ]);
         $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-        $this->get(route('representante.dashboard'))->assertDontSee($aviso->titulo);
-        $this->get(route('representante.dados-gerais'))->assertDontSee($aviso->titulo);
-        $this->get(route('representante.contatos.view'))->assertDontSee($aviso->titulo);
-        $this->get(route('representante.enderecos.view'))->assertDontSee($aviso->titulo);
-        $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertDontSee($aviso->titulo);
-        $this->get(route('representante.inserir-endereco.view'))->assertDontSee($aviso->titulo);
-        $this->get(route('representante.lista-cobrancas'))->assertDontSee($aviso->titulo);
-        factory('App\Regional')->create([
-            'regional' => 'SÃO PAULO',
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id
         ]);
-        factory('App\BdoOportunidade')->create();
-        $this->get(route('representante.bdo'))->assertDontSee($aviso->titulo);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
+        ->assertRedirect(route('representante.solicitarCedulaView'));
+        $this->assertDatabaseHas('solicitacoes_cedulas', [
+            'idrepresentante' => $representante->id,
+            'rg' => $cedula['rg'],
+            'bairro' => $cedula['bairro'], 
+            'logradouro' => $cedula['logradouro'],
+            'numero' => $cedula['numero']
+        ]);
     }
 }
