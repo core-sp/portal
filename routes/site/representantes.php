@@ -37,6 +37,9 @@ Route::prefix('representante')->group(function(){
     // SIMULADOR_REFIS - Rota para simulador Refis
     //Route::get('/simulador-refis', 'RepresentanteSiteController@simuladorRefis')->name('representante.simuladorRefis');
 
+    // Conferir as oportunidades do BDO
+    Route::get('/oportunidades', 'RepresentanteSiteController@bdo')->name('representante.bdo');
+
     // Solicitar cédula
     Route::get('/cedulas', 'RepresentanteSiteController@cedulasView')->name('representante.solicitarCedulaView');
     Route::get('/inserir-solicita-cedula', 'RepresentanteSiteController@inserirsolicitarCedulaView')->name('representante.inserirSolicitarCedulaView');

@@ -155,6 +155,13 @@ Route::prefix('admin')->group(function() {
   // Termo de Consentimento, baixar CSV
   Route::get('/termo-consentimento/download', 'TermoConsentimentoController@download')->name('termo.consentimento.download');
 
+  // Avisos
+  Route::get('/avisos', 'AvisoController@index')->name('avisos.index');
+  Route::get('/avisos/{id}', 'AvisoController@show')->name('avisos.show');
+  Route::get('/avisos/editar/{id}', 'AvisoController@edit')->name('avisos.editar.view');
+  Route::put('/avisos/editar/{id}', 'AvisoController@update')->name('avisos.editar');
+  Route::put('/avisos/status/{id}', 'AvisoController@updateStatus')->name('avisos.editar.status');
+
 });
 
 /*

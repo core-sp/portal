@@ -255,6 +255,15 @@
             </ul>
         </li>
         @endif
+
+        @if(mostraItem($permissoes, 'AvisoController', 'index'))
+        <li class="nav-item">
+            <a href="{{ route('avisos.index') }}" class="nav-link">
+                <i class="nav-icon fas fa-info-circle"></i>
+                <p>Avisos</p>
+            </a>
+        </li>
+        @endif
         @endif
 
 

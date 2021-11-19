@@ -13,16 +13,18 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
         $cpfCnpj = apenasNumeros($cpfCnpj);
 
         // RC Teste 1 (PF)
+        // if($cpfCnpj == '86294373085') {
         if(strlen($cpfCnpj) == 11) {
             $resultado = [
                 "SITUACAO" => "Ativo", 
                 "REGISTRONUM" => "0000000001", 
                 "ASS_ID" => '000001', 
                 "NOME" => "RC Teste 1", 
-                "EMAILS" => "desenvolvimento@core-sp.org.br"
+                "EMAILS" => "desenvolvimento@core-sp.org.br;desenvolvimento2@core-sp.org.br"
             ];
         }
         // RC Teste 2 (PJ)
+        // elseif($cpfCnpj == '84825147000100') {
         elseif(strlen($cpfCnpj) == 14) {
             $resultado = [
                 "SITUACAO" => "Ativo", 
@@ -308,11 +310,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
     }
 
     public function gerentiStatus($ass_id)
-    {
-        // if($ass_id == $this->assid) {
-        //     $resultado = "Situação: Em dia.";
-        // }
-        
+    {        
         return $resultado = "Situação: Em dia.";
     }
 
@@ -466,6 +464,17 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
         return [
             'SITUACAO' => 'Válida',
             'DATAVALIDADE' => '02/02/2022'
+        ];
+    }
+
+    public function gerentiGetSegmentosByAssId($ass_id) 
+    {
+        // Segmentos igual ao do BDO
+        return [
+            [
+                "SEGMENTO" => "Alimentício",
+                0 => "Alimentício",
+            ],
         ];
     }
 }

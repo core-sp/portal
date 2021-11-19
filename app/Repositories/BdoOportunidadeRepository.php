@@ -67,4 +67,13 @@ class BdoOportunidadeRepository {
 
         return $oportunidades->orderBy('datainicio','DESC')->orderBy('idoportunidade', 'DESC')->paginate(10);
     }
+
+    public function buscaBySegmentoEmAndamento($segmento, $regional)
+    {
+        return BdoOportunidade::where('segmento', $segmento)
+            ->where('status', BdoOportunidade::STATUS_EM_ANDAMENTO)
+            ->where('regiaoatuacao','LIKE','%,'.$regional.',%')
+            ->orderBy('idoportunidade', 'DESC')
+            ->get();
+    }
 }

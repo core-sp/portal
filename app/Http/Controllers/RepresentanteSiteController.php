@@ -26,7 +26,10 @@ use App\Http\Requests\RepresentanteEnderecoRequest;
 use App\Http\Requests\SolicitaCedulaRequest;
 use App\Repositories\RepresentanteEnderecoRepository;
 use App\Repositories\SolicitaCedulaRepository;
+use App\Repositories\BdoOportunidadeRepository;
+use App\Repositories\AvisoRepository;
 use App\Repositories\RegionalRepository;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
@@ -35,17 +38,25 @@ class RepresentanteSiteController extends Controller
     private $representanteEnderecoRepository;
     private $gerentiApiRepository;
     protected $idendereco;
-    private $solicitaCedulaRepository;
+    private $bdoOportunidadeRepository;
     private $regionalRepository;
+    private $solicitaCedulaRepository;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, SolicitaCedulaRepository $solicitaCedulaRepository, RegionalRepository $regionalRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository, AvisoRepository $avisoRepository, SolicitaCedulaRepository $solicitaCedulaRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->gerentiRepository = $gerentiRepository;
         $this->representanteEnderecoRepository = $representanteEnderecoRepository;
         $this->gerentiApiRepository = $gerentiApiRepository;
-        $this->solicitaCedulaRepository = $solicitaCedulaRepository;
+        $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->regionalRepository = $regionalRepository;
+        $this->solicitaCedulaRepository = $solicitaCedulaRepository;
+
+        if($avisoRepository->avisoAtivado('Representante'))
+        {
+            $aviso = $avisoRepository->getByArea('Representante');
+            View::share('aviso', $aviso);
+        }
     }
 
     public function index()
@@ -84,23 +95,6 @@ class RepresentanteSiteController extends Controller
         $endereco = $this->gerentiRepository->gerentiEnderecos(Auth::guard('representante')->user()->ass_id);
 
         return view('site.representante.enderecos', compact("possuiSolicitacaoEnderecos", "solicitacoesEnderecos", "endereco"));
-    }
-
-    public function cedulasView()
-    {
-        $cedulas = $this->solicitaCedulaRepository->getAllByIdRepresentante(Auth::guard('representante')->user()->id);
-        $possuiSolicitacaoCedula = $cedulas->isNotEmpty();
-        $possuiSolicitacaoCedulaEmAndamento = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
-        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]);
-        
-        if($emdia == "Em dia.")
-            $emdia = true;
-        else {
-            $emdia = null;
-            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") Não pôde solicitar cédula devido a validação no sistema GERENTI.'));
-        }
-
-        return view('site.representante.cedulas', compact("possuiSolicitacaoCedula", "cedulas", 'possuiSolicitacaoCedulaEmAndamento', 'emdia'));
     }
 
     public function listaCobrancas()
@@ -285,31 +279,6 @@ class RepresentanteSiteController extends Controller
             ]);
     }
 
-    public function inserirsolicitarCedulaView()
-    {
-        $representante = Auth::guard('representante')->user();
-        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento($representante->id);
-        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus($representante->ass_id))[1]);
-        $nome = $representante->tipoPessoa() == 'PF' ? $representante->nome : null;
-        $rg = $representante->tipoPessoa() == 'PF' ? 
-            $this->gerentiRepository->gerentiDadosGeraisPF($representante->ass_id)['identidade'] : null;
-        $cpf = $representante->tipoPessoa() == 'PF' ? $representante->cpf_cnpj : null;
-        
-        if($emdia != "Em dia."){
-            return redirect(route('representante.solicitarCedulaView'))
-            ->with('emdia', $emdia);
-        }
-            
-        if($has) {
-            return redirect(route('representante.solicitarCedulaView'))
-                ->with([
-                    'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
-                    'class' => 'alert-danger'
-                ]);
-        }
-        return view('site.representante.inserir-solicita-cedula', compact('nome', 'rg', 'cpf'));
-    }
-
     public function inserirEnderecoView()
     {
         $count = $this->representanteEnderecoRepository->getCountAguardandoConfirmacaoByAssId(Auth::guard('representante')->user()->ass_id);
@@ -357,55 +326,6 @@ class RepresentanteSiteController extends Controller
                 'class' => 'alert-success'
             ]);
     }
-
-    public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
-    {
-        $validate = (object) $request->validated();
-        $representante = Auth::guard('representante')->user();
-        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento($representante->id);
-        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus($representante->ass_id))[1]);
-        
-        if($emdia != "Em dia."){
-            return redirect(route('representante.solicitarCedulaView'))
-            ->with('emdia', $emdia);
-        }
-        if($has) {
-            return redirect(route('representante.solicitarCedulaView'))
-                ->with([
-                    'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
-                    'class' => 'alert-danger'
-                ]);
-        }
-        try {
-            $tipoPessoa = $representante->tipoPessoa();
-            $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, $representante->ass_id)['Regional'];
-            $idregional = $this->regionalRepository->getByName($regional)->idregional;
-            if($tipoPessoa == 'PF')
-            {
-                $validate->nome = null;
-                $validate->cpf = null;
-            } else
-            {
-                $validate->nome = strtoupper($validate->nome);
-                $validate->rg = strtoupper(apenasNumerosLetras($validate->rg));
-            }
-            $save = $this->solicitaCedulaRepository->create($representante->id, $idregional, $validate);
-
-            event(new ExternoEvent('Usuário ' . $representante->id . ' ("'. $representante->registro_core .'") solicitou cédula.'));
-            // Mail::to($representante->email)->queue(new SolicitaCedulaMail($save));
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            abort(500, "Erro ao criar sua solicitação de cédula.");
-        }
-
-        return redirect()
-            ->route('representante.solicitarCedulaView')
-            ->with([
-                'message' => 'Solicitação enviada com sucesso! Após verificação das informações, será atualizada.',
-                'class' => 'alert-success'
-            ]);
-    }
-
 
     public function deletarContato(Request $request)
     {
@@ -561,5 +481,115 @@ class RepresentanteSiteController extends Controller
         $valoresRefis = $this->gerentiRepository->gerentiValoresRefis(Auth::guard('representante')->user()->ass_id);
 
         return view('site.representante.simulador-refis', compact('valoresRefis'));
+    }
+
+    public function bdo()
+    {
+        $rep = Auth::guard('representante')->user();
+        try{
+            $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
+            $idregional = $this->regionalRepository->getByName($seccional)->idregional;
+            $segmentoGerenti = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
+            $segmento = !empty($segmentoGerenti) ? $segmentoGerenti[0]["SEGMENTO"] : $segmentoGerenti;
+            $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento, $idregional) : collect();
+            foreach($bdo as $b)
+                // usei o campo observação do model para armazenar temporariamente o link
+                $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento.'&regional='.$idregional;
+        }catch (Exception $e) {
+            Log::error($e->getTraceAsString());
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+        }
+        
+        return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional'));
+    }
+
+    public function cedulasView()
+    {
+        $cedulas = $this->solicitaCedulaRepository->getAllByIdRepresentante(Auth::guard('representante')->user()->id);
+        $possuiSolicitacaoCedula = $cedulas->isNotEmpty();
+        $possuiSolicitacaoCedulaEmAndamento = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]);
+        
+        if($emdia == "Em dia.")
+            $emdia = true;
+        else {
+            $emdia = null;
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") Não pôde solicitar cédula devido a validação no sistema GERENTI.'));
+        }
+
+        return view('site.representante.cedulas', compact("possuiSolicitacaoCedula", "cedulas", 'possuiSolicitacaoCedulaEmAndamento', 'emdia'));
+    }
+
+    public function inserirsolicitarCedulaView()
+    {
+        $representante = Auth::guard('representante')->user();
+        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento($representante->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus($representante->ass_id))[1]);
+        $nome = $representante->tipoPessoa() == 'PF' ? $representante->nome : null;
+        $rg = $representante->tipoPessoa() == 'PF' ? 
+            $this->gerentiRepository->gerentiDadosGeraisPF($representante->ass_id)['identidade'] : null;
+        $cpf = $representante->tipoPessoa() == 'PF' ? $representante->cpf_cnpj : null;
+        
+        if($emdia != "Em dia."){
+            return redirect(route('representante.solicitarCedulaView'))
+            ->with('emdia', $emdia);
+        }
+            
+        if($has) {
+            return redirect(route('representante.solicitarCedulaView'))
+                ->with([
+                    'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
+                    'class' => 'alert-danger'
+                ]);
+        }
+        return view('site.representante.inserir-solicita-cedula', compact('nome', 'rg', 'cpf'));
+    }
+
+    public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
+    {
+        $validate = (object) $request->validated();
+        $representante = Auth::guard('representante')->user();
+        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento($representante->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus($representante->ass_id))[1]);
+        
+        if($emdia != "Em dia."){
+            return redirect(route('representante.solicitarCedulaView'))
+            ->with('emdia', $emdia);
+        }
+        if($has) {
+            return redirect(route('representante.solicitarCedulaView'))
+                ->with([
+                    'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
+                    'class' => 'alert-danger'
+                ]);
+        }
+        try {
+            $tipoPessoa = $representante->tipoPessoa();
+            $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, $representante->ass_id)['Regional'];
+            $idregional = $this->regionalRepository->getByName($regional)->idregional;
+            if($tipoPessoa == 'PF')
+            {
+                $validate->nome = null;
+                $validate->cpf = null;
+            } else
+            {
+                $validate->nome = strtoupper($validate->nome);
+                $validate->rg = strtoupper(apenasNumerosLetras($validate->rg));
+            }
+            $save = $this->solicitaCedulaRepository->create($representante->id, $idregional, $validate);
+
+            event(new ExternoEvent('Usuário ' . $representante->id . ' ("'. $representante->registro_core .'") solicitou cédula.'));
+            // Mail::to($representante->email)->queue(new SolicitaCedulaMail($save));
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao criar sua solicitação de cédula.");
+        }
+
+        return redirect()
+            ->route('representante.solicitarCedulaView')
+            ->with([
+                'message' => 'Solicitação enviada com sucesso! Após verificação das informações, será atualizada.',
+                'class' => 'alert-success'
+            ]);
     }
 }

@@ -47,7 +47,8 @@ class AdminTest extends TestCase
             ->assertSee(route('concursos.create'))
             ->assertSee(route('cursos.index'))
             ->assertSee(route('cursos.create'))
-            ->assertSee(route('solicita-cedula.index'));
+            ->assertSee(route('solicita-cedula.index'))
+            ->assertSee(route('avisos.index'));
     }
 
     /** @test */
@@ -66,6 +67,7 @@ class AdminTest extends TestCase
             ->assertDontSee(route('concursos.create'))
             ->assertDontSee(route('cursos.index'))
             ->assertDontSee(route('cursos.create'))
-            ->assertDontSee(route('solicita-cedula.index'));
+            ->assertDontSee(route('solicita-cedula.index'))
+            ->assertDontSee(route('avisos.index'));
     }
 }

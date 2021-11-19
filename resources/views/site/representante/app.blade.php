@@ -26,6 +26,18 @@
       </div>
     </div>
     <div class="linha-lg"></div>
+    <!-- Área do aviso -->
+    @if(isset($aviso))
+      @component('components.aviso-representante', 
+        [
+          'cor_fundo_titulo' => $aviso->cor_fundo_titulo,
+          'titulo' => $aviso->titulo, 
+          'conteudo' => $aviso->conteudo
+        ]
+      )
+      @endcomponent
+    @endif
+    <!-- Fim da Área do aviso -->
     <div class="row">
       <div class="col-xl-3 pb-15-992">
         <div class="menu-representante">
@@ -63,6 +75,15 @@
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.emitirCertidaoView')  ? 'mr-item-selected' : '' }}">
               <a href="{{ route('representante.emitirCertidaoView') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Emitir Certidão</h6>
+              </a>
+            </div>
+
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.bdo')  ? 'mr-item-selected' : '' }}">  
+              <a href="{{ route('representante.bdo') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-briefcase"></i>&nbsp;&nbsp;Oportunidades&nbsp;&nbsp;&nbsp;
+                <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
+                </span>
+              </h6>
               </a>
             </div>
 
