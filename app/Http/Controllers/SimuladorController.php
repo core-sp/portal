@@ -35,7 +35,7 @@ class SimuladorController extends Controller
         // return $total;
     }
 
-    protected function simulador($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 24)
+    protected function simulador($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 0)
     {
         // Retorno do extrato de acordo com o tipo de pessoa, data de início, capital social e filial
         $run = $this->connection->prepare("SELECT descricao, valor_total, data_vencimento FROM procextrato ('', :tipopessoa, :datainicio, :capitalsocial, cast('NOW' as date), :filial)");
@@ -127,7 +127,7 @@ class SimuladorController extends Controller
         }
     }
 
-    protected function simuladorTotal($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 24)
+    protected function simuladorTotal($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 0)
     {
         // Cálculo do total do extrato de acordo com o tipo de pessoa, data de início, capital social e filial
         $total = 0;
@@ -192,7 +192,7 @@ class SimuladorController extends Controller
 
         // Validações do formulário
         empty(request('capitalSocial')) ? $capitalSocial = 1 : $capitalSocial = str_replace(',', '.', str_replace('.', '', request('capitalSocial')));
-        request('tipoPessoa') !== '1' || request('filial') === '50' || request('filial') === null ? $filial = 24 : $filial = request('filial');
+        request('tipoPessoa') !== '1' || request('filial') === '50' || request('filial') === null ? $filial = 0 : $filial = request('filial');
 
         // Total, extrato, e taxas separados por variáveis únicas
         $total = $this->simuladorTotal($this->validateRequest()['tipoPessoa'], $this->consertaData($this->validateRequest()['dataInicio']), $capitalSocial, $filial)/* + $this->taxasTotal(request('tipoPessoa'))*/;
