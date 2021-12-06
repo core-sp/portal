@@ -107,7 +107,7 @@ class SolicitaCedulaTest extends TestCase
             'justificativa' => 'Não foi aprovado...',
             'idusuario' => $user->idusuario
             ])->assertForbidden();
-        // $this->assertDatabaseMissing('solicitacoes_cedulas', ['status' => 'Recusado']);
+        $this->assertDatabaseMissing('solicitacoes_cedulas', ['status' => 'Recusado']);
     }
 
     /** @test 
