@@ -530,18 +530,9 @@ class RepresentanteSiteController extends Controller
             $this->gerentiRepository->gerentiDadosGeraisPF($representante->ass_id)['identidade'] : null;
         $cpf = $representante->tipoPessoa() == 'PF' ? $representante->cpf_cnpj : null;
         
-        if($emdia != "Em dia."){
-            return redirect(route('representante.solicitarCedulaView'))
-            ->with('emdia', $emdia);
-        }
+        if(($emdia != "Em dia.") || $has)
+            return redirect(route('representante.solicitarCedulaView'));
             
-        if($has) {
-            return redirect(route('representante.solicitarCedulaView'))
-                ->with([
-                    'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
-                    'class' => 'alert-danger'
-                ]);
-        }
         return view('site.representante.inserir-solicita-cedula', compact('nome', 'rg', 'cpf'));
     }
 
@@ -552,17 +543,9 @@ class RepresentanteSiteController extends Controller
         $has = $this->solicitaCedulaRepository->getByStatusEmAndamento($representante->id);
         $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus($representante->ass_id))[1]);
         
-        if($emdia != "Em dia."){
-            return redirect(route('representante.solicitarCedulaView'))
-            ->with('emdia', $emdia);
-        }
-        if($has) {
-            return redirect(route('representante.solicitarCedulaView'))
-                ->with([
-                    'message' => 'Você já possui uma solicitação de cédula em andamento. Não é possível solicitar uma nova até que a anterior seja analisada e protocolada pela equipe do Core-SP.',
-                    'class' => 'alert-danger'
-                ]);
-        }
+        if(($emdia != "Em dia.") || $has)
+            return redirect(route('representante.solicitarCedulaView'));
+                
         try {
             $tipoPessoa = $representante->tipoPessoa();
             $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, $representante->ass_id)['Regional'];
