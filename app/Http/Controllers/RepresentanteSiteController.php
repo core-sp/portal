@@ -61,7 +61,7 @@ class RepresentanteSiteController extends Controller
         $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
         $status = statusBold($this->gerentiRepository->gerentiStatus($rep->ass_id));
         $ano = date("Y");
-        $dadosBasicos = $this->gerentiRepository->gerentiChecaLogin($rep->registro_core, $rep->cpf_cnpj, $rep->email);
+        $dadosBasicos = utf8_converter($this->gerentiRepository->gerentiChecaLogin($rep->registro_core, $rep->cpf_cnpj, $rep->email));
 
         if(isset($dadosBasicos['NOME']) && ($dadosBasicos['NOME'] != $rep->nome))
             $rep->update(['nome' => strtoupper($dadosBasicos['NOME'])]);
