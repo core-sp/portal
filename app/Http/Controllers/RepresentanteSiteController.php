@@ -61,10 +61,15 @@ class RepresentanteSiteController extends Controller
 
     public function index()
     {
-        $resultado = $this->gerentiRepository->gerentiAnuidadeVigente(Auth::guard('representante')->user()->cpf_cnpj);
+        $rep = Auth::guard('representante')->user();
+        $resultado = $this->gerentiRepository->gerentiAnuidadeVigente($rep->cpf_cnpj);
         $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
-        $status = statusBold($this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id));
+        $status = statusBold($this->gerentiRepository->gerentiStatus($rep->ass_id));
         $ano = date("Y");
+        $dadosBasicos = utf8_converter($this->gerentiRepository->gerentiChecaLogin($rep->registro_core, $rep->cpf_cnpj, $rep->email));
+
+        if(isset($dadosBasicos['NOME']) && ($dadosBasicos['NOME'] != $rep->nome))
+            $rep->update(['nome' => strtoupper($dadosBasicos['NOME'])]);
 
         return view('site.representante.home', compact("nrBoleto", "status", "ano"));
     }
