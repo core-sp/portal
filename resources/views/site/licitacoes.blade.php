@@ -52,11 +52,11 @@
 	            </select>
           	</div>
           	<div class="col-md-2 col-sm-6 mt-2-768">
-          	  <label for="nrprocesso">Nº do processo</label>
+          	  <label for="nrprocesso">Nº do Processo Adm.</label>
           	  <input type="text"
                 name="nrprocesso"
                 class="form-control nrprocessoInput {{ !empty(Request::input('nrprocesso')) ? 'bg-focus border-info' : '' }}"
-                placeholder="Nº do processo"
+                placeholder="Nº do Processo Adm."
                 id="nrprocesso"
                 @if(!empty(Request::input('nrprocesso')))
                 value="{{ Request::input('nrprocesso') }}"
@@ -68,7 +68,7 @@
           	  <input type="text"
                 name="nrlicitacao"
                 class="form-control nrlicitacaoInput {{ !empty(Request::input('nrlicitacao')) ? 'bg-focus border-info' : '' }}"
-                placeholder="Nº da licitação"
+                placeholder="Nº da Licitação"
                 id="nrlicitacao"
                 @if(!empty(Request::input('nrlicitacao')))
                 value="{{ Request::input('nrlicitacao') }}"
@@ -133,8 +133,8 @@
                     </div>
                     <div class="flex-one align-self-center">
                       <h6 class="light">
-                        <strong>Número:</strong> {{ $licitacao->nrprocesso }}<br />
-                        <strong>Processo:</strong> {{ $licitacao->nrlicitacao }}
+                        <strong>Nº do Processo Adm.:</strong> {{ $licitacao->nrprocesso }}<br />
+                        <strong>Nº da Licitação:</strong> {{ $licitacao->nrlicitacao }}
                       </h6>
                     </div>
                   </div>
