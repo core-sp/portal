@@ -215,7 +215,7 @@
       </div>
 
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="{{ route('termo.consentimento.pdf') }}" class="d-block h-100">
+        <a href="{{ route('termo.consentimento.view') }}" class="d-block h-100">
           <div class="box text-center azul-bg">
             <div class="inside-box">
               <img src="{{ asset('img/icone-termo.png') }}" class="inside-img" alt="Termo de Consentimento" />
