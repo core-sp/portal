@@ -215,15 +215,15 @@
       </div>
 
       <div class="col-lg-3 col-sm-6 pb-15">
-        <!-- <a href="{{ route('cursos.index.website') }}" class="d-block h-100"> -->
+        <a href="{{ route('termo.consentimento.pdf') }}" class="d-block h-100">
           <div class="box text-center azul-bg">
             <div class="inside-box">
-              <!-- <img src="{{ asset('img/icone-curso.png') }}" class="inside-img" alt="Cursos" /> -->
-              <!-- <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Cursos</h3> -->
-              <!-- <button href="#" class="btn-box azul-escuro">ACESSAR</button> -->
+              <img src="{{ asset('img/icone-termo.png') }}" class="inside-img" alt="Termo de Consentimento" />
+              <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Termo de Consentimento</h3>
+              <button href="#" class="btn-box azul-escuro">ACESSAR</button>
             </div>
           </div>
-        <!-- </a> -->
+        </a>
       </div>
 
     </div>
