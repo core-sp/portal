@@ -68,11 +68,11 @@
                         <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" class="pt-0" alt="Loading"></div>
                     </div>
                 </form>
-                @if(Session::get('nossonumero'))
+                @if(isset($nossonumero))
                     <hr>
                     <p class="pb-0"><strong>Anuidade encontrada!</strong> Baixe o boleto clicando no link abaixo:</p>
                     <h3 class="text-uppercase">
-                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ Session::get('nossonumero')[0]['NOSSONUMERO'] }}" class="normal text-info">
+                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $nossonumero[0]['NOSSONUMERO'] }}" class="normal text-info">
                             <button class="btn btn-success btn-lg"
                                 onClick="gtag('event', 'download', {
                                     'event_category': 'boleto',
@@ -86,7 +86,7 @@
                     <hr>
                     <p><small class="light">Observação: Atente-se às datas informadas no corpo do boleto para pagar a anuidade com desconto.</small></p>
                 @endif
-                @if(Session::get('notFound'))
+                @if(isset($notFound))
                     <hr>
                     <strong>Nenhum boleto encontrado para o CPF/CNPJ informado.</strong>
                 @endif
