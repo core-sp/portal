@@ -318,6 +318,24 @@ $('#ano-mapa').on({
 	},
 });
 
+function regionaisExcluidasPlantaoJuridico()
+{
+	return regionaisExcluidas = ["1", "4", "5", "7", "8", "10", "12", "14"];
+}
+
+function datasPorRegionalPlantaoJuridico(regional)
+{
+	var datas = []
+	datas[2] = [17,18],
+	datas[3] = [27,28],
+	datas[6] = [18,19],
+	datas[9] = [19,20],
+	datas[11] = [20,21],
+	datas[13] = [25,26]
+	
+	return datas[regional];
+}
+
 (function($){
 	$(function(){
 		// Botão Saiba Mais do Banco de Oportunidades
@@ -332,6 +350,20 @@ $('#ano-mapa').on({
 				}
 			});
 		});
+
+		// Para quando houver Plantão Jurídico
+		$('#selectServicos').change(function(){
+			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
+			$("#idregional").val("");
+
+			if($(this).val() == "Plantão Jurídico")
+				for(var regional of regionaisExcluidas)
+					$('#idregional option[value="' + regional + '"]').attr('disabled', 'disabled');
+			else
+				for(var regional of regionaisExcluidas)
+					$('#idregional option[value="' + regional + '"]').siblings().removeAttr('disabled');
+		});	
+
 		// Datepicker Agendamentos
 		$('#datepicker').datepicker({
 			dateFormat: 'dd/mm/yy',
@@ -346,8 +378,8 @@ $('#ano-mapa').on({
 			minDate: +1,
 			beforeShowDay: noWeekendsOrHolidays
 		});
-
-		$( "#agenda-institucional" ).datepicker({
+		
+		$("#agenda-institucional").datepicker({
 			dateFormat: 'dd-mm-yy',
 			todayHighlight: false,
 			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
@@ -360,13 +392,23 @@ $('#ano-mapa').on({
 
 		// Zera o valor do dia, ao selecionar a regional
 		$('#idregional').change(function(){
-
 			if($('#idregional').val() == 14) {
 				alert('Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: Av. Brigadeiro Luís Antônio, 613, Térreo, CEP:01317-000, São Paulo/SP.');
 			}
 
 			$('#datepicker').val('');
 			$('#datepicker').prop('disabled', true);
+			if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
+				var datas = datasPorRegionalPlantaoJuridico($('#idregional').val());
+				$('#datepicker').datepicker('option', {
+					maxDate: new Date("2022-01-" + datas[1] + " 00:00:00"),
+					minDate: new Date("2022-01-" + datas[0] + " 00:00:00")
+				});
+			}else
+				$('#datepicker').datepicker('option', {
+					maxDate: '+1m',
+					minDate: +1
+				});
 
 			$('#horarios')
 				.find('option')
@@ -375,15 +417,14 @@ $('#ano-mapa').on({
 				.append('<option value="" disabled selected>Selecione o dia do atendimento</option>');
 			$('#horarios').prop('disabled', true);
 
-			$('#selectServicos option[value="Plantão Jurídico"]').remove();
-
-			$('#idregional option[value=""]').remove();
+			$('#idregional option[value=""]').hide();
 
 			$.ajax({
 				method: "GET",
 				data: {
 					"_token": $('#token').val(),
-					"idregional": $('#idregional').val()
+					"idregional": $('#idregional').val(),
+					"servico": $('#selectServicos').val()
 				},
 				dataType: 'json',
 				url: "/checa-mes",
@@ -425,15 +466,16 @@ $('#ano-mapa').on({
 				}
 			});
 		});
+
 		// Ajax após change no datepicker
 		$('#datepicker').change(function(){
-			atendimentoJuridico($(this).val(), $('#idregional').val());
 			$.ajax({
 				method: "GET",
 				data: {
 					"_token": $('#token').val(),
 					"idregional": $('#idregional').val(),
-					"dia": $('#datepicker').val()
+					"dia": $('#datepicker').val(),
+					"servico": $('#selectServicos').val()
 				},
 				dataType: 'json',
 				url: "/checa-horarios",
@@ -586,38 +628,6 @@ $('#ano-mapa').on({
 		});
 	});
 })(jQuery);
-
-// Atendimento Jurídico
-function atendimentoJuridico(dia, regional)
-{
-	if(dia === '17/02/2020' && regional === '8' ||
-	   dia === '18/02/2020' && regional === '8' ||
-	   dia === '19/02/2020' && regional === '4' ||
-	   dia === '20/02/2020' && regional === '4' ||
-	   dia === '16/03/2020' && regional === '7' ||
-	   dia === '17/03/2020' && regional === '7' ||
-	   dia === '16/03/2020' && regional === '12' ||
-	   dia === '17/03/2020' && regional === '12' ||
-	   dia === '07/04/2020' && regional === '13' ||
-	   dia === '08/04/2020' && regional === '13' ||
-	   dia === '27/04/2020' && regional === '3' ||
-	   dia === '28/04/2020' && regional === '3' ||
-	   dia === '18/05/2020' && regional === '9' ||
-	   dia === '19/05/2020' && regional === '9' ||
-	   dia === '20/05/2020' && regional === '2' ||
-	   dia === '21/05/2020' && regional === '2' ||
-	   dia === '22/06/2020' && regional === '11' ||
-	   dia === '23/06/2020' && regional === '11' ||
-	   dia === '25/06/2020' && regional === '6' ||
-	   dia === '26/06/2020' && regional === '6') {
-		if($("#selectServicos option[value='Plantão Jurídico']").length == 0) {
-			$('#selectServicos').prepend(new Option("Plantão Jurídico", "Plantão Jurídico")).attr('selected','selected');
-		}
-		$("#selectServicos")[0].options[0].selected = true;
-	} else {
-		$('#selectServicos option[value="Plantão Jurídico"]').remove();
-	}
-}
 
 // Get informação empresa
 function getInfoEmpresa(value)

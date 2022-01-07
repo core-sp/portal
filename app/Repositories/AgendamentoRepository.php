@@ -222,4 +222,115 @@ class AgendamentoRepository
     {
         return Agendamento::all()->count();
     }
+
+    private function countPlantaoJuridicoByRegionalAndDia($regional, $dia)
+    {
+        return Agendamento::where('idregional', $regional)
+            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+            ->whereNull('status')
+            ->where('dia', $dia)
+            ->count();
+    }
+
+    private function getPlantaoJuridicoByRegionalAndDia($regional, $dia)
+    {
+        return Agendamento::select('hora')
+            ->where('idregional', $regional)
+            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+            ->whereNull('status')
+            ->where('dia', $dia)
+            ->get();
+    }
+
+    public function getPlantaoJuridicoByCPF($cpf, $regional)
+    {
+        return Agendamento::where('cpf', $cpf)
+            ->where('idregional', $regional)
+            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+            ->whereNull('status')
+            ->count();
+    }
+
+    public function estaLotadoPlantaoJuridico($regional, $dia)
+    {
+        $total = $this->countPlantaoJuridicoByRegionalAndDia($regional, $dia);
+
+        // Em Janeiro de 2022
+        $regionaisTotalRCs = [
+            2 => [
+                '2022-01-17' => 9,
+                '2022-01-18' => 11
+            ],
+            3 => [
+                '2022-01-27' => 11,
+                '2022-01-28' => /*7*/1
+            ], 
+            6 => [
+                '2022-01-18' => 9,
+                '2022-01-19' => 11
+            ], 
+            9 => [
+                '2022-01-19' => 9,
+                '2022-01-20' => 11
+            ], 
+            11 => [
+                '2022-01-20' => 11,
+                '2022-01-21' => 11
+            ], 
+            13 => [
+                '2022-01-25' => 11,
+                '2022-01-26' => 7
+            ],
+        ];
+
+        if(!isset($regionaisTotalRCs[$regional][$dia]))
+            return null;
+
+        return $regionaisTotalRCs[$regional][$dia] == $total ? true : false;
+    }
+
+    public function getHorasPlantaoJuridicoByRegionalAndDia($regional, $dia)
+    {
+        $horasCheias = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia);
+        $horasTotais = explode(';', $this->diasHorasPlantaoJuridico()[$regional][$dia]);
+
+        foreach($horasCheias as $hora)
+        {
+            if(isset($horasTotais[array_search($hora->hora, $horasTotais)]))
+                unset($horasTotais[array_search($hora->hora, $horasTotais)]);
+        }
+
+        return $horasTotais;
+    }
+
+    public function diasHorasPlantaoJuridico()
+    {
+        // Em Janeiro de 2022
+        return $regionaisDiasHoras = [
+            2 => [
+                '2022-01-17' => '11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00',
+                '2022-01-18' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00'
+            ],
+            3 => [
+                '2022-01-27' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00',
+                '2022-01-28' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00'
+            ], 
+            6 => [
+                '2022-01-18' => '11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00',
+                '2022-01-19' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00'
+            ], 
+            9 => [
+                '2022-01-19' => '11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00',
+                '2022-01-20' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00'
+            ], 
+            11 => [
+                '2022-01-20' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00',
+                '2022-01-21' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00'
+            ], 
+            13 => [
+                '2022-01-25' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00',
+                '2022-01-26' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00'
+            ],
+        ];
+    }
 }
