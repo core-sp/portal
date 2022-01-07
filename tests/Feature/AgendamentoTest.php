@@ -697,7 +697,8 @@ class AgendamentoTest extends TestCase
         $agendamento = factory('App\Agendamento')->raw([
             'idregional' => $regional->idregional,
             'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00'
+            'hora' => '10:00',
+            'termo' => 'on'
         ]);
 
         $this->post(route('agendamentosite.store'), $agendamento)->assertOk();
@@ -916,7 +917,8 @@ class AgendamentoTest extends TestCase
         $agendamento_3 = factory('App\Agendamento')->raw([
             'idregional' => $regional->idregional,
             'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '12:00'
+            'hora' => '12:00',
+            'termo' => 'on'
         ]);
 
         $this->post(route('agendamentosite.store'), $agendamento_3)->assertStatus(500);
@@ -970,7 +972,8 @@ class AgendamentoTest extends TestCase
         $agendamento_4 = factory('App\Agendamento')->raw([
             'idregional' => $regional->idregional,
             'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00'
+            'hora' => '10:00',
+            'termo' => 'on'
         ]);
 
         $this->post(route('agendamentosite.store'), $agendamento_4)->assertStatus(405);
@@ -1024,7 +1027,8 @@ class AgendamentoTest extends TestCase
         $agendamento_4 = factory('App\Agendamento')->raw([
             'idregional' => $regional->idregional,
             'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00'
+            'hora' => '10:00',
+            'termo' => 'on'
         ]);
 
         $this->post(route('agendamentosite.store'), $agendamento_4)->assertOk();
@@ -1050,7 +1054,8 @@ class AgendamentoTest extends TestCase
         $agendamento = factory('App\Agendamento')->raw([
             'idregional' => $regional->idregional,
             'dia' => date('Y-m-d', strtotime('-1 day')),
-            'hora' => '10:00'
+            'hora' => '10:00',
+            'termo' => 'on'
         ]);
 
         $this->post(route('agendamentosite.store'), $agendamento)->assertStatus(500);
@@ -1086,6 +1091,7 @@ class AgendamentoTest extends TestCase
             'idregional' => $regional->idregional,
             'dia' => date('Y-m-d', strtotime('+1 day')),
             'hora' => '10:00',
+            'termo' =>'on'
         ]);
 
         $this->post(route('agendamentosite.store'), $agendamento_2)->assertStatus(500);
@@ -1105,6 +1111,7 @@ class AgendamentoTest extends TestCase
             'idregional' => $regional_2->idregional,
             'dia' => date('Y-m-d', strtotime('+1 day')),
             'hora' => '10:00',
+            'termo' => 'on'
         ]);
 
         $this->post(route('agendamentosite.store'), $agendamento_3)->assertStatus(500);
@@ -1249,7 +1256,8 @@ class AgendamentoTest extends TestCase
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $regional->idregional,
             'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00'
+            'hora' => '10:00',
+            'termo' => 'on'
         ]);
 
         // Checa se ao tentar salvar o agendamento com mesmo horário e CPF retorna erro 500

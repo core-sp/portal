@@ -57,7 +57,7 @@ class RepresentanteSiteController extends Controller
     public function index()
     {
         $rep = Auth::guard('representante')->user();
-        $resultado = $this->gerentiRepository->gerentiAnuidadeVigente($rep->cpf_cnpj);
+        $resultado = $this->gerentiRepository->gerentiAnuidadeVigente(apenasNumeros($rep->cpf_cnpj));
         $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
         $status = statusBold($this->gerentiRepository->gerentiStatus($rep->ass_id));
         $ano = date("Y");
