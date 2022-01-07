@@ -110,6 +110,42 @@
             </div>
             <h5 class="mt-4">Informações de agendamento</h5>
             <div class="form-row mt-2">
+              <div class="col-md-6">
+                <label for="servico">Tipo de Serviço *</label>
+                <select name="servico" class="form-control" id="selectServicos">
+                  @foreach($servicos as $servico)
+                    @if($servico == old('servico'))
+                    <option value="{{ $servico }}" selected>{{ $servico }}</option>
+                    @else
+                    <option value="{{ $servico }}">{{ $servico }}</option>
+                    @endif
+                  @endforeach 
+                </select>
+                @if($errors->has('servico'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('servico') }}
+                </div>
+                @endif
+              </div>
+              <div class="col-md-6 mt-2-768">
+                <label for="pessoa">Para:</label>
+                <select name="pessoa" class="form-control">
+                  @foreach($pessoas as $pessoa => $diminutivo)
+                    @if(old('pessoa') == $diminutivo)
+                    <option value="{{ $diminutivo }}" selected>{{ $pessoa }}</option>
+                    @else
+                    <option value="{{ $diminutivo }}">{{ $pessoa }}</option>
+                    @endif
+                  @endforeach 
+                </select>
+                @if($errors->has('pessoa'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('pessoa') }}
+                </div>
+                @endif
+              </div>
+            </div>
+            <div class="form-row mt-2">
               <div class="col-md-4">
                 <label for="idregional">Regional *</label>
                 <select name="idregional" id="idregional" class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}">
@@ -159,42 +195,6 @@
                 <div id="loadHorario" class="loadImage">
                   <img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading">
                 </div>
-              </div>
-            </div>
-            <div class="form-row mt-2">
-              <div class="col-md-6">
-                <label for="servico">Tipo de Serviço *</label>
-                <select name="servico" class="form-control" id="selectServicos">
-                  @foreach($servicos as $servico)
-                    @if($servico == old('servico'))
-                    <option value="{{ $servico }}" selected>{{ $servico }}</option>
-                    @else
-                    <option value="{{ $servico }}">{{ $servico }}</option>
-                    @endif
-                  @endforeach 
-                </select>
-                @if($errors->has('servico'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('servico') }}
-                </div>
-                @endif
-              </div>
-              <div class="col-md-6 mt-2-768">
-                <label for="pessoa">Para:</label>
-                <select name="pessoa" class="form-control">
-                  @foreach($pessoas as $pessoa => $diminutivo)
-                    @if(old('pessoa') == $diminutivo)
-                    <option value="{{ $diminutivo }}" selected>{{ $pessoa }}</option>
-                    @else
-                    <option value="{{ $diminutivo }}">{{ $pessoa }}</option>
-                    @endif
-                  @endforeach 
-                </select>
-                @if($errors->has('pessoa'))
-                <div class="invalid-feedback">
-                  {{ $errors->first('pessoa') }}
-                </div>
-                @endif
               </div>
             </div>
             <div class="form-check mt-3">

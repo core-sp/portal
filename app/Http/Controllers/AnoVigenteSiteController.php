@@ -37,7 +37,7 @@ class AnoVigenteSiteController extends Controller
 
         $nossonumero = $this->gerentiRepository->gerentiAnuidadeVigente($cpfCnpj);
 
-        if(!empty($nossonumero)) {
+        if(isset($nossonumero[0]['NOSSONUMERO'])) {
             return redirect()->back()->with('nossonumero', $nossonumero)->withInput();
         } else {
             $notFound = true;
