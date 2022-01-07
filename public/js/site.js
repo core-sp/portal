@@ -378,7 +378,14 @@ function datasPorRegionalPlantaoJuridico(regional)
 			minDate: +1,
 			beforeShowDay: noWeekendsOrHolidays
 		});
-		
+
+		if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
+			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
+			$("#idregional").val("");
+			for(var regional of regionaisExcluidas)
+				$('#idregional option[value="' + regional + '"]').attr('disabled', 'disabled');
+		}
+
 		$("#agenda-institucional").datepicker({
 			dateFormat: 'dd-mm-yy',
 			todayHighlight: false,
