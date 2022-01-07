@@ -358,10 +358,10 @@ function datasPorRegionalPlantaoJuridico(regional)
 
 			if($(this).val() == "Plantão Jurídico")
 				for(var regional of regionaisExcluidas)
-					$('#idregional option[value="' + regional + '"]').attr('disabled', 'disabled');
+					$('#idregional option[value="' + regional + '"]').hide();
 			else
 				for(var regional of regionaisExcluidas)
-					$('#idregional option[value="' + regional + '"]').siblings().removeAttr('disabled');
+					$('#idregional option[value="' + regional + '"]').show();
 		});	
 
 		// Datepicker Agendamentos
@@ -383,8 +383,14 @@ function datasPorRegionalPlantaoJuridico(regional)
 			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
 			$("#idregional").val("");
 			for(var regional of regionaisExcluidas)
-				$('#idregional option[value="' + regional + '"]').attr('disabled', 'disabled');
+				$('#idregional option[value="' + regional + '"]').hide();
+		}else{
+			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
+			$("#idregional").val("");
+			for(var regional of regionaisExcluidas)
+				$('#idregional option[value="' + regional + '"]').show();
 		}
+
 
 		$("#agenda-institucional").datepicker({
 			dateFormat: 'dd-mm-yy',
