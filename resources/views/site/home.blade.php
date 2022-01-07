@@ -330,7 +330,7 @@
           </blockquote>
         </div>
         <div class="row">
-          <div class="col-lg-6 faleSingle">
+          {{--<div class="col-lg-6 faleSingle">
             <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
               <div class="row nomargin">
                 <div class="align-self-center">
@@ -341,7 +341,7 @@
                 </div>
               </div>
             </a>
-          </div>
+          </div>--}}
           <div class="col-lg-6 faleSingle">
             <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
               <div class="row nomargin">
@@ -366,7 +366,7 @@
               </div>
             </a>
           </div>
-          <div class="col-lg-6 faleSingle">
+          {{--<div class="col-lg-6 faleSingle">
             <a href="#">
               <div class="row nomargin">
                 <div class="align-self-center">
@@ -378,7 +378,7 @@
                 </div>
               </div>
             </a>
-          </div>
+          </div>--}}
         </div>
       </div>
     </div>
