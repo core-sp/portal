@@ -8,7 +8,6 @@ use App\Agendamento;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
-use App\Traits\ControleAcesso;
 use App\Mail\AgendamentoMailGuest;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +20,7 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     // Nome da classe
     private $class = 'AgendamentoController';
@@ -47,7 +46,7 @@ class AgendamentoController extends Controller
 
     public function index()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
 
         $variaveis = $this->agendamentoVariaveis;
 
@@ -124,7 +123,7 @@ class AgendamentoController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $busca = IlluminateRequest::input('q');
     
@@ -144,7 +143,7 @@ class AgendamentoController extends Controller
 
     public function edit($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
 
         $resultado = $this->agendamentoRepository->getById($id);
 
@@ -170,7 +169,7 @@ class AgendamentoController extends Controller
 
     public function update(AgendamentoUpdateRequest $request, $id)
     {
-        $this->autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
 
         // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
         // de sua regional, aborta com erro de permissão.
@@ -208,7 +207,7 @@ class AgendamentoController extends Controller
 
     public function pendentes()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $idPerfil = Auth::user()->perfil->idperfil;
 
@@ -248,7 +247,7 @@ class AgendamentoController extends Controller
 
     public function checaAplicaFiltros()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         // Valores default dos filtros
         $mindia = date('Y-m-d');
@@ -505,7 +504,7 @@ class AgendamentoController extends Controller
         switch ($status) {
             case Agendamento::STATUS_CANCELADO:
                 $btn = "<strong>" . Agendamento::STATUS_CANCELADO . "</strong>";
-                if($this->mostra($this->class, 'edit')) {
+                if(auth()->user()->can('updateOther', auth()->user())) {
                     $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
                     
@@ -514,7 +513,7 @@ class AgendamentoController extends Controller
 
             case Agendamento::STATUS_COMPARECEU:
                 $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;" . Agendamento::STATUS_COMPARECEU . "&nbsp;&nbsp;</p>";
-                if($this->mostra($this->class, 'edit')) {
+                if(auth()->user()->can('updateOther', auth()->user())) {
                     $string .= "<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
                 if(isset($usuario)) {
@@ -526,7 +525,7 @@ class AgendamentoController extends Controller
 
             case Agendamento::STATUS_NAO_COMPARECEU:
                 $btn = "<strong>" . Agendamento::STATUS_NAO_COMPARECEU . "</strong>";
-                if($this->mostra($this->class, 'edit')) {
+                if(auth()->user()->can('updateOther', auth()->user())) {
                     $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
 
@@ -542,7 +541,7 @@ class AgendamentoController extends Controller
                 $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="' . Agendamento::STATUS_NAO_COMPARECEU . '">' . Agendamento::STATUS_NAO_COMPARECEU . '</button>';
                 $acoes .= '</form>';
 
-                if($this->mostra($this->class, 'edit')) {
+                if(auth()->user()->can('updateOther', auth()->user())) {
                     $acoes .= " <a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
                 }
 

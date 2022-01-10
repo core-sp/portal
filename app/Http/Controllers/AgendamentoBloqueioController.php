@@ -8,7 +8,6 @@ use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use App\AgendamentoBloqueio;
 use Illuminate\Http\Request;
-use App\Traits\ControleAcesso;
 use App\Repositories\RegionalRepository;
 use App\Http\Requests\AgendamentoBloqueioRequest;
 use App\Repositories\AgendamentoBloqueioRepository;
@@ -16,7 +15,7 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoBloqueioController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     private $class = 'AgendamentoBloqueioController';
     private $regionalRepository;
@@ -44,12 +43,12 @@ class AgendamentoBloqueioController extends Controller
 
     public function index()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
 
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
 
-        if(!$this->mostra($this->class, 'create')) {
+        if(auth()->user()->cannot('create', auth()->user())) {
             unset($this->variaveis['btn_criar']);
         }
             
@@ -60,7 +59,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function create()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('create', auth()->user());
 
         $variaveis = (object) $this->variaveis;
         $regionais = $this->regionalRepository->getRegionaisAgendamento();
@@ -70,7 +69,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function store(AgendamentoBloqueioRequest $request)
     {
-        $this->autoriza($this->class, 'create');
+        $this->authorize('create', auth()->user());
 
         $diainicio = empty($request->input('diainicio')) ? new DateTime("2000-01-01") : retornaDate($request->input("diainicio"));
         $diatermino = empty($request->input('diatermino')) ? new DateTime("2100-01-01") : retornaDate($request->input("diatermino"));
@@ -92,7 +91,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function edit($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
 
         $resultado = $this->agendamentoBloqueioRepository->getById($id);
         $variaveis = (object) $this->variaveis;
@@ -103,7 +102,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function update(AgendamentoBloqueioRequest $request, $id)
     {
-        $this->autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
 
         $diainicio = empty($request->input('diainicio')) ? new DateTime("2000-01-01") : retornaDate($request->input("diainicio"));
         $diatermino = empty($request->input('diatermino')) ? new DateTime("2100-01-01") : retornaDate($request->input("diatermino"));
@@ -125,7 +124,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function destroy($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('delete', auth()->user());
 
         $delete = $this->agendamentoBloqueioRepository->delete($id);
 
@@ -142,7 +141,7 @@ class AgendamentoBloqueioController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $this->variaveis['slug'] = 'agendamentos/bloqueios';
         $variaveis = (object) $this->variaveis;
@@ -187,7 +186,7 @@ class AgendamentoBloqueioController extends Controller
                 $duracao .= 'Término: ' . onlyDate($resultado->diatermino);
             }
 
-            if($this->mostra($this->class, 'edit')) {
+            if(auth()->user()->can('updateOther', auth()->user())) {
                 $acoes = '<a href="/admin/agendamentos/bloqueios/editar/' . $resultado->idagendamentobloqueio . '" class="btn btn-sm btn-primary">Editar</a> ';
             }
                 
@@ -195,7 +194,7 @@ class AgendamentoBloqueioController extends Controller
                 $acoes = '';
             }
                
-            if($this->mostra($this->class, 'destroy')) {
+            if(auth()->user()->can('delete', auth()->user())) {
                 $acoes .= '<form method="POST" action="/admin/agendamentos/bloqueios/apagar/' . $resultado->idagendamentobloqueio . '" class="d-inline-block">';
                 $acoes .= '<input type="hidden" name="_token" value="' . csrf_token() . '" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';

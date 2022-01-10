@@ -1,44 +1,37 @@
-@php
-    $permissoes = permissoesPorPerfil();
-@endphp
 <!-- Sidebar Menu -->
 <nav class="mt-2 mb-2">
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
-
         <!-- Usuários -->
-        @if(mostraTitulo($permissoes, ['UserController']))
+        @if(perfisPermitidos('UserController', 'index'))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fa fa-users"></i>
                 <p>Usuários<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-            @if(mostraItem($permissoes, 'UserController', 'index'))
-            <li class="nav-item">
-                <a href="/admin/usuarios" class="nav-link">
-                    <i class="nav-icon fa fa-angle-right"></i>
-                    <p>Todos os usuários</p>
-                </a>
-            </li>
-            @endif
+                <li class="nav-item">
+                    <a href="/admin/usuarios" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Todos os usuários</p>
+                    </a>
+                </li>
 
-            @if(auth()->user()->isAdmin())
-            <li class="nav-item">
-                <a href="/admin/usuarios/criar" class="nav-link">
-                    <i class="nav-icon fa fa-angle-right"></i>
-                    <p>Novo usuário</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/usuarios/perfis" class="nav-link">
-                    <i class="nav-icon fa fa-angle-right"></i>
-                    <p>Perfis</p>
-                </a>
-            </li>
-            @endif
-
-        </ul>
+                @if(auth()->user()->isAdmin())
+                <li class="nav-item">
+                    <a href="/admin/usuarios/criar" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Novo usuário</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/usuarios/perfis" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Perfis</p>
+                    </a>
+                </li>
+                @endif
+            </ul>
         </li>
         @endif
 
@@ -49,8 +42,7 @@
                 <p>Chamados</p>
             </a>
         </li>
-        @endif
-        
+        @endif 
         <li class="nav-item">
             <a href="{{ route('regionais.index') }}" class="nav-link">
                 <i class="nav-icon fas fa-globe-americas"></i>
@@ -58,12 +50,24 @@
             </a>
         </li>
 
-
         <!-- Conteúdo -->
-        @if(mostraTitulo($permissoes, ['PaginaController', 'NoticiaController', 'PostsController', 'CursoController', 'BdoEmpresaController', 'BdoOportunidadeController', 'HomeImagemController', 'CompromissoController']))
+
+        @php
+            $pagina = perfisPermitidos('PaginaController', 'index');
+            $noticia = perfisPermitidos('NoticiaController', 'index');
+            $posts = perfisPermitidos('PostsController', 'index');
+            $curso = perfisPermitidos('CursoController', 'index');
+            $bdoEmpresa = perfisPermitidos('BdoEmpresaController', 'index');
+            $bdoOportunidade = perfisPermitidos('BdoOportunidadeController', 'index');
+            $home = perfisPermitidos('HomeImagemController', 'edit');
+            $compromisso = perfisPermitidos('CompromissoController', 'index');
+            $aviso = perfisPermitidos('AvisoController', 'index');
+        @endphp
+
+        @if($pagina || $noticia || $posts || $curso || $bdoEmpresa || $bdoOportunidade || $home || $compromisso || $aviso)
         <li class="nav-header">CONTEÚDO</li>
 
-        @if(mostraTitulo($permissoes, ['PaginaController']))
+        @if($pagina)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-file-alt"></i>
@@ -71,16 +75,14 @@
             </a>
         
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'PaginaController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('paginas.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todas as páginas</p>
                     </a>
                 </li>
-                @endif
 
-                @if(mostraItem($permissoes, 'PaginaController', 'create'))
+                @if(perfisPermitidos('PaginaController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('paginas.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -93,23 +95,21 @@
         </li>
         @endif
 
-        @if(mostraTitulo($permissoes, ['NoticiaController']))
+        @if($noticia)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-newspaper"></i>
                 <p>Notícias<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'NoticiaController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('noticias.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todas as notícias</p>
                     </a>
                 </li>
-                @endif
 
-                @if(mostraItem($permissoes, 'NoticiaController', 'create'))
+                @if(perfisPermitidos('NoticiaController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('noticias.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -122,23 +122,21 @@
         </li>
         @endif
 
-        @if(mostraTitulo($permissoes, ['PostsController']))
+        @if($posts)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-rss"></i>
                 <p>Blog<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'PostsController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('posts.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os posts</p>
                     </a>
                 </li>
-                @endif
 
-                @if(mostraItem($permissoes, 'PostsController', 'create'))
+                @if(perfisPermitidos('PostsController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('posts.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -150,23 +148,21 @@
             </ul>
         @endif
 
-        @if(mostraTitulo($permissoes, ['CursoController']))
+        @if($curso)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-graduation-cap"></i>
                 <p>Cursos<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'CursoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('cursos.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os cursos</p>
                     </a>
                 </li>
-                @endif
 
-                @if(mostraItem($permissoes, 'CursoController', 'create'))
+                @if(perfisPermitidos('CursoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('cursos.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -179,14 +175,14 @@
         </li>
         @endif
 
-        @if(mostraTitulo($permissoes, ['BdoEmpresaController', 'BdoOportunidadeController']))
+        @if($bdoEmpresa || $bdoOportunidade)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-briefcase"></i>
                 <p>B. de Oportunidades<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'BdoEmpresaController', 'index'))
+                @if($bdoEmpresa)
                 <li class="nav-item">
                     <a href="/admin/bdo/empresas" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -195,7 +191,7 @@
                 </li>
                 @endif
 
-                @if(mostraItem($permissoes, 'BdoOportunidadeController', 'index'))
+                @if($bdoOportunidade)
                 <li class="nav-item">
                     <a href="/admin/bdo" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -208,23 +204,21 @@
         </li>
         @endif
 
-      @if(mostraTitulo($permissoes, ['CompromissoController']))
+        @if($compromisso)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-calendar-alt"></i>
                 <p>Compromissos<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'CompromissoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('compromisso.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os compromissos</p>
                     </a>
                 </li>
-                @endif
 
-                @if(mostraItem($permissoes, 'CompromissoController', 'create'))
+                @if(perfisPermitidos('CompromissoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('compromisso.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -237,26 +231,24 @@
         </li>
         @endif
 
-        @if(mostraTitulo($permissoes, ['HomeImagemController']))
+        @if($home)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-image"></i>
                 <p>Imagens<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'HomeImagemController', 'edit'))
                 <li class="nav-item">
                     <a href="/admin/imagens/bannerprincipal" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Banner principal</p>
                     </a>
                 </li>
-                @endif
             </ul>
         </li>
         @endif
 
-        @if(mostraItem($permissoes, 'AvisoController', 'index'))
+        @if($aviso)
         <li class="nav-item">
             <a href="{{ route('avisos.index') }}" class="nav-link">
                 <i class="nav-icon fas fa-info-circle"></i>
@@ -265,20 +257,26 @@
         </li>
         @endif
         @endif
-
-
+         
         <!-- Atendimento -->
-        @if(mostraTitulo($permissoes, ['AgendamentoController', 'AgendamentoBloqueioController', 'RepresentanteEnderecoController', 'RepresentanteController']))
+        @php
+            $agendamento = perfisPermitidos('AgendamentoController', 'index');
+            $agendamentobloqueio = perfisPermitidos('AgendamentoBloqueioController', 'index');
+            $representante = perfisPermitidos('RepresentanteController', 'index');
+            $representanteEndereco = perfisPermitidos('RepresentanteEnderecoController', 'index');
+        @endphp
+        
+        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco)
         <li class="nav-header">ATENDIMENTO</li>
         
-        @if(mostraTitulo($permissoes, ['AgendamentoController', 'AgendamentoBloqueioController']))
+        @if($agendamento || $agendamentobloqueio)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-clock"></i>
                 <p>Agendamentos<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'AgendamentoController', 'index'))
+                @if($agendamento)
                 <li class="nav-item">
                     <a href="/admin/agendamentos" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -287,7 +285,7 @@
                 </li>
                 @endif
 
-                @if(mostraItem($permissoes, 'AgendamentoBloqueioController', 'index'))
+                @if($agendamentobloqueio)
                 <li class="nav-item">
                     <a href="/admin/agendamentos/bloqueios" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -298,8 +296,8 @@
             </ul>
         </li>
         @endif
-
-        @if (mostraTitulo($permissoes, ['RepresentanteEnderecoController', 'RepresentanteController']))
+        
+        @if($representante || $representanteEndereco)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fa fa-users"></i>
@@ -307,7 +305,7 @@
             </a>
 
             <ul class="nav nav-treeview">
-                @if (mostraItem($permissoes, 'RepresentanteController', 'index'))
+                @if($representante)
                 <li class="nav-item">
                     <a href="/admin/representantes/buscaGerenti" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -322,7 +320,7 @@
                 </li>
                 @endif
 
-                @if (mostraItem($permissoes, 'RepresentanteEnderecoController', 'index'))
+                @if($representanteEndereco)
                 <li class="nav-item">
                     <a href="/admin/representante-enderecos" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -336,12 +334,16 @@
         @endif
         @endif
 
-
         <!-- Jurídico -->
-        @if(mostraTitulo($permissoes, ['LicitacaoController', 'ConcursoController']))
+        @php
+            $licitacao = perfisPermitidos('LicitacaoController', 'index');
+            $concurso = perfisPermitidos('ConcursoController', 'index');
+        @endphp
+
+        @if($licitacao || $concurso)
         <li class="nav-header">JURÍDICO</li>
 
-        @if(mostraTitulo($permissoes, ['LicitacaoController']))
+        @if($licitacao)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-file-alt"></i>
@@ -349,16 +351,14 @@
             </a>
 
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'LicitacaoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('licitacoes.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todas as licitações</p>
                     </a>
                 </li>
-                @endif
 
-                @if(mostraItem($permissoes, 'LicitacaoController', 'create'))
+                @if(perfisPermitidos('LicitacaoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('licitacoes.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -371,7 +371,7 @@
         </li>
         @endif
 
-        @if(mostraTitulo($permissoes, ['ConcursoController']))
+        @if($concurso)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon far fa-edit"></i>
@@ -379,16 +379,14 @@
             </a>
         
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'ConcursoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('concursos.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os concursos</p>
                     </a>
                 </li>
-                @endif
 
-                @if(mostraItem($permissoes, 'ConcursoController', 'create'))
+                @if(perfisPermitidos('ConcursoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('concursos.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -402,9 +400,8 @@
         @endif
         @endif
     
-
         <!-- Fiscalização -->
-        @if(mostraTitulo($permissoes, ['FiscalizacaoController']))
+        @if(perfisPermitidos('FiscalizacaoController', 'index'))
         <li class="nav-header">FISCALIZAÇÃO</li>
         
         <li class="nav-item has-treeview">
@@ -413,15 +410,14 @@
                 <p>Dados de Fiscalização<i class="right fa fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview">
-                @if(mostraItem($permissoes, 'FiscalizacaoController', 'index'))
                 <li class="nav-item">
                     <a href="{{ route('fiscalizacao.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os anos</p>
                     </a>
                     </li>
-                @endif
-                @if(mostraItem($permissoes, 'FiscalizacaoController', 'create'))
+
+                @if(perfisPermitidos('FiscalizacaoController', 'create'))
                 <li class="nav-item">
                     <a href="{{ route('fiscalizacao.createperiodo') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
