@@ -293,6 +293,7 @@ class BdoOportunidadeTest extends TestCase
         $anunciarVaga['regiaoAtuacao'] = explode(',', trim($bdoOportunidade['regiaoatuacao'], ','));
         $anunciarVaga['descricaoOportunidade'] = $bdoOportunidade['descricao'];
         $anunciarVaga['nrVagas'] = $bdoOportunidade['vagasdisponiveis'];
+        $anunciarVaga['termo'] = 'on';
 
         $this->post(route('bdosite.anunciarVaga'), $anunciarVaga);
 
@@ -343,6 +344,7 @@ class BdoOportunidadeTest extends TestCase
         $anunciarVaga['regiaoAtuacao'] = explode(',', trim($bdoOportunidade_2['regiaoatuacao'], ','));
         $anunciarVaga['descricaoOportunidade'] = $bdoOportunidade_2['descricao'];
         $anunciarVaga['nrVagas'] = $bdoOportunidade_2['vagasdisponiveis'];
+        $anunciarVaga['termo'] = 'on';
 
         $this->post(route('bdosite.anunciarVaga'), $anunciarVaga);
 

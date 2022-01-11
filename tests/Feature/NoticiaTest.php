@@ -228,10 +228,11 @@ class NoticiaTest extends TestCase
 
         $this->get(route('noticias.edit', $noticia->idnoticia))->assertForbidden();
 
-        $titulo = 'Novo titulo';
+        $noticia2 = $noticia->toArray();
+        $noticia2['titulo'] = 'Novo título';
 
-        $this->patch(route('noticias.update', $noticia->idnoticia), ['titulo' => $titulo])->assertForbidden();
-        $this->assertDatabaseMissing('noticias', ['titulo' => $titulo]);
+        $this->patch(route('noticias.update', $noticia->idnoticia), $noticia2)->assertForbidden();
+        $this->assertDatabaseMissing('noticias', ['titulo' => $noticia2['titulo']]);
     }
 
     /** @test */

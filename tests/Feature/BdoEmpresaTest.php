@@ -422,6 +422,7 @@ class BdoEmpresaTest extends TestCase
         $anunciarVaga['regiaoAtuacao'] = explode(',', trim($bdoOportunidade['regiaoatuacao'], ','));
         $anunciarVaga['descricaoOportunidade'] = $bdoOportunidade['descricao'];
         $anunciarVaga['nrVagas'] = $bdoOportunidade['vagasdisponiveis'];
+        $anunciarVaga['termo'] = 'on';
 
         $this->post(route('bdosite.anunciarVaga'), $anunciarVaga);
 

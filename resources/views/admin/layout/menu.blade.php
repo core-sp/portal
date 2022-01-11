@@ -11,7 +11,7 @@
             </a>
             <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="/admin/usuarios" class="nav-link">
+                    <a href="{{ route('usuarios.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os usuários</p>
                     </a>
@@ -25,7 +25,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/admin/usuarios/perfis" class="nav-link">
+                    <a href="{{ route('perfis.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Perfis</p>
                     </a>
@@ -37,7 +37,7 @@
 
         @if(auth()->user()->isAdmin())
         <li class="nav-item">
-            <a href="/admin/chamados" class="nav-link">
+            <a href="{{ route('chamados.lista') }}" class="nav-link">
                 <i class="nav-icon fas fa-ticket-alt"></i>
                 <p>Chamados</p>
             </a>
@@ -184,7 +184,7 @@
             <ul class="nav nav-treeview">
                 @if($bdoEmpresa)
                 <li class="nav-item">
-                    <a href="/admin/bdo/empresas" class="nav-link">
+                    <a href="{{ route('bdoempresas.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Empresas</p>
                     </a>
@@ -193,7 +193,7 @@
 
                 @if($bdoOportunidade)
                 <li class="nav-item">
-                    <a href="/admin/bdo" class="nav-link">
+                    <a href="{{ route('bdooportunidades.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Oportunidades</p>
                     </a>
@@ -278,7 +278,7 @@
             <ul class="nav nav-treeview">
                 @if($agendamento)
                 <li class="nav-item">
-                    <a href="/admin/agendamentos" class="nav-link">
+                    <a href="{{ route('agendamentos.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Todos os agendamentos</p>
                     </a>
@@ -287,7 +287,7 @@
 
                 @if($agendamentobloqueio)
                 <li class="nav-item">
-                    <a href="/admin/agendamentos/bloqueios" class="nav-link">
+                    <a href="{{ route('agendamentobloqueios.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Bloqueios</p>
                     </a>
