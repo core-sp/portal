@@ -7,9 +7,7 @@ use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
 use App\RepresentanteEndereco;
-use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\ControleController;
 use App\Repositories\RepresentanteRepository;
 use App\Repositories\GerentiRepositoryInterface;
 use App\Repositories\RepresentanteEnderecoRepository;
@@ -17,7 +15,7 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteEnderecoController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     private $class = 'RepresentanteEnderecoController';
     private $gerentiRepository;
@@ -52,7 +50,7 @@ class RepresentanteEnderecoController extends Controller
 
     public function show($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateShow', auth()->user());
 
         $resultado = $this->representanteEnderecoRepository->getById($id);
         $representante = $this->representanteRepository->getByAssId($resultado->ass_id);
@@ -63,6 +61,8 @@ class RepresentanteEnderecoController extends Controller
 
     public function inserirEnderecoGerenti(Request $request)
     {
+        $this->authorize('updateShow', auth()->user());
+
         $this->gerentiRepository->gerentiInserirEndereco($request->ass_id, unserialize($request->infos));
 
         $this->representanteEnderecoRepository->updateStatusEnviado($request->id);
@@ -76,6 +76,8 @@ class RepresentanteEnderecoController extends Controller
 
     public function recusarEndereco(Request $request)
     {
+        $this->authorize('updateShow', auth()->user());
+
         $this->representanteEnderecoRepository->updateStatusRecusado($request->id, $request->observacao);
 
         event(new CrudEvent('endereço representante', 'recusou', $request->id));
@@ -162,7 +164,7 @@ class RepresentanteEnderecoController extends Controller
 
     public function index()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
 
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
@@ -173,7 +175,7 @@ class RepresentanteEnderecoController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $busca = IlluminateRequest::input('q');
 

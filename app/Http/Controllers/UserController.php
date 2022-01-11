@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\Regional;
 use App\Perfil;
-use App\Http\Controllers\ControleController;
 use App\Http\Controllers\Helper;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
@@ -61,7 +60,7 @@ class UserController extends Controller
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
-            if(ControleController::mostraStatic(['1']) === true) {
+            if(auth()->user()->can('onlyAdmin', auth()->user())) {
                 $acoes = '<a href="/admin/usuarios/editar/'.$resultado->idusuario.'" class="btn btn-sm btn-primary">Editar</a> ';
                 $acoes .= '<form method="POST" action="/admin/usuarios/apagar/'.$resultado->idusuario.'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
@@ -105,10 +104,10 @@ class UserController extends Controller
     
     public function index()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
-        if(ControleController::mostraStatic(['1']) !== true)
+        if(auth()->user()->cannot('onlyAdmin', auth()->user()))
             unset($this->variaveis['btn_criar']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
@@ -116,7 +115,7 @@ class UserController extends Controller
 
     public function create()
     {
-        ControleController::autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
         $variaveis = (object) $this->variaveis;
         $regionais = Regional::all();
         $perfis = Perfil::all();
@@ -125,7 +124,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
         $regras = [
             'nome' => 'required|max:191',
             'email' => 'email|required',
@@ -160,7 +159,7 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        ControleController::autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
         $resultado = User::findOrFail($id);
         $regionais = Regional::all();
         $perfis = Perfil::all();
@@ -170,7 +169,7 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
         $usuario = User::findOrFail($id);
         $regras = [
             'nome' => 'required|max:191',
@@ -198,7 +197,7 @@ class UserController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        ControleController::autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
         $usuario = User::findOrFail($id);
         $delete = $usuario->delete();
         if(!$delete)
@@ -212,7 +211,7 @@ class UserController extends Controller
 
     public function lixeira(Request $request)
     {
-        ControleController::autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
         $resultados = User::onlyTrashed()->paginate(10);
         // Opções de cabeçalho da tabela
         $headers = [
@@ -247,7 +246,7 @@ class UserController extends Controller
 
     public function restore(Request $request, $id)
     {
-        ControleController::autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
         $usuario = User::onlyTrashed()->findOrFail($id);
         $restore = $usuario->restore();
         if(!$restore)
@@ -305,7 +304,7 @@ class UserController extends Controller
 
     public function busca()
     {
-        ControleController::autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = User::where('nome','LIKE','%'.$busca.'%')

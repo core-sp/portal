@@ -77,7 +77,7 @@ class RepresentanteController extends Controller
 
     public function index()
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
@@ -86,7 +86,7 @@ class RepresentanteController extends Controller
 
     public function busca()
     {
-        ControleController::autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = Representante::where('nome','LIKE','%'.$busca.'%')
@@ -137,7 +137,7 @@ class RepresentanteController extends Controller
 
     public function buscaGerentiView()
     {
-        ControleController::autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
@@ -173,7 +173,7 @@ class RepresentanteController extends Controller
 
     public function representanteInfo(Request $request)
     {
-        ControleController::autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $variaveis = (object) $this->variaveis;
         $nome = $request->nome;

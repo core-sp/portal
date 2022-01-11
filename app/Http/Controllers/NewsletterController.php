@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\ControleController;
 use App\Repositories\TermoConsentimentoRepository;
 use App\Newsletter;
 use App\Events\ExternoEvent;
@@ -83,7 +82,7 @@ class NewsletterController extends Controller
 
     public function download()
     {
-        ControleController::autorizaStatic(['1','3','2']);
+        $this->authorize('viewAny', auth()->user());
         $now = date('Ymd');
         $headers = [
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',

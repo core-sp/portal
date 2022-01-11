@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\ControleController;
 use App\HomeImagem;
 use App\Events\CrudEvent;
 
@@ -13,7 +12,7 @@ class HomeImagemController extends Controller
     
     public function editBannerPrincipal()
     {
-        ControleController::autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
         $resultado = HomeImagem::select('ordem','url','url_mobile','link','target')
             ->orderBy('ordem','ASC')
             ->get();
@@ -30,7 +29,7 @@ class HomeImagemController extends Controller
 
     public function updateBannerPrincipal(Request $request)
     {
-        ControleController::autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
         $array = $request->all();
         unset($array['_token'], $array['_method']);
         $chunk = array_chunk($array, 4);

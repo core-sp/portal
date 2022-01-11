@@ -173,7 +173,7 @@ class ConcursoController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
