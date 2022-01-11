@@ -2,17 +2,14 @@
 
 namespace App\Http\Requests;
 
-use App\Traits\ControleAcesso;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CursoRequest extends FormRequest
 {
-    use ControleAcesso;
-
-    public function authorize()
-    {
-        return $this->autoriza('CursoController', 'create');
-    }
+    // public function authorize()
+    // {
+    //     return false;
+    // }
 
     public function rules()
     {
