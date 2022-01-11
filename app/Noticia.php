@@ -2,14 +2,13 @@
 
 namespace App;
 
-use App\Traits\ControleAcesso;
 use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Noticia extends Model
 {
-    use SoftDeletes, TabelaAdmin, ControleAcesso;
+    use SoftDeletes, TabelaAdmin;
 
     protected $primaryKey = 'idnoticia';
     protected $fillable = ['titulo', 'slug', 'img', 'conteudo', 'conteudoBusca', 'categoria',
@@ -54,9 +53,9 @@ class Noticia extends Model
     {
         return $query->map(function($row){
             $acoes = '<a href="/noticia/'.$row->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if($this->mostra('NoticiaController', 'edit'))
+            if(auth()->user()->can('updateOther', auth()->user()))
                 $acoes .= '<a href="'.route('noticias.edit', $row->idnoticia).'" class="btn btn-sm btn-primary">Editar</a> ';
-            if($this->mostra('NoticiaController', 'destroy')) {
+            if(auth()->user()->can('delete', auth()->user())) {
                 $acoes .= '<form method="POST" action="'.route('noticias.destroy', $row->idnoticia).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';

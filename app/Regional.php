@@ -3,13 +3,12 @@
 namespace App;
 
 use App\Repositories\AgendamentoBloqueioRepository;
-use App\Traits\ControleAcesso;
 use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 
 class Regional extends Model
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     protected $table = 'regionais';
     protected $primaryKey = 'idregional';
@@ -42,7 +41,7 @@ class Regional extends Model
     {
         return $query->map(function($row){
             $acoes = '<a href="'.route('regionais.show', $row->idregional).'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if($this->mostra('RegionalController', 'edit'))
+            if(auth()->user()->can('updateOther', auth()->user()))
                 $acoes .= '<a href="'.route('regionais.edit', $row->idregional).'" class="btn btn-sm btn-primary">Editar</a>';
             return [
                 $row->idregional,

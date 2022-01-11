@@ -33,12 +33,12 @@ class User extends Authenticatable
 
     public function isAdmin()
     {
-        return $this->perfil->nome === 'Admin';
+        return $this->idperfil == 1;
     }
 
     public function isEditor()
     {
-        return $this->perfil->nome === 'Editor';
+        return $this->idperfil == 3;
     }
 
     public function pagina()
