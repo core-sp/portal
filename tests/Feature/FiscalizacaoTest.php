@@ -40,6 +40,20 @@ class FiscalizacaoTest extends TestCase
      * =======================================================================================================
      */
 
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $fiscal = factory('App\PeriodoFiscalizacao')->create();
+
+        $this->get(route('fiscalizacao.index'))->assertRedirect(route('login'));
+        $this->get(route('fiscalizacao.createperiodo'))->assertRedirect(route('login'));
+        $this->get(route('fiscalizacao.editperiodo', $fiscal->id))->assertRedirect(route('login'));
+        $this->get(route('fiscalizacao.busca'))->assertRedirect(route('login'));
+        $this->post(route('fiscalizacao.storeperiodo'))->assertRedirect(route('login'));
+        $this->post(route('fiscalizacao.updatestatus'))->assertRedirect(route('login'));
+        $this->post(route('fiscalizacao.updateperiodo', $fiscal->id))->assertRedirect(route('login'));
+    }
+    
     /** @test 
      * 
      * Usuário sem autorização não pode listar periodos de fiscalização.

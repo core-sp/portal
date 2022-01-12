@@ -28,6 +28,18 @@ class AvisoTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $aviso = factory('App\Aviso')->create();
+
+        $this->get(route('avisos.index'))->assertRedirect(route('login'));
+        $this->get(route('avisos.show', $aviso->id))->assertRedirect(route('login'));
+        $this->get(route('avisos.editar.view', $aviso->id))->assertRedirect(route('login'));
+        $this->put(route('avisos.editar', $aviso->id))->assertRedirect(route('login'));
+        $this->put(route('avisos.editar.status', $aviso->id))->assertRedirect(route('login'));
+    }
+
     /** @test 
      * 
      * Log gerado após editar o aviso.

@@ -54,6 +54,33 @@ class CursoTest extends TestCase
     }
 
     /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $this->get(route('cursos.index'))->assertRedirect(route('login'));
+        $this->get(route('cursos.busca'))->assertRedirect(route('login'));
+        $this->get(route('cursos.edit', $curso->idcurso))->assertRedirect(route('login'));
+        $this->get(route('cursos.create'))->assertRedirect(route('login'));
+        $this->get(route('cursos.lixeira'))->assertRedirect(route('login'));
+        $this->get(route('cursos.restore', $curso->idcurso))->assertRedirect(route('login'));
+        $this->post(route('cursos.store'))->assertRedirect(route('login'));
+        $this->patch(route('cursos.update', $curso->idcurso))->assertRedirect(route('login'));
+        $this->delete(route('cursos.destroy', $curso->idcurso))->assertRedirect(route('login'));
+
+        $this->get(route('inscritos.index', $curso->idcurso))->assertRedirect(route('login'));
+        $this->get('/admin/cursos/inscritos/'.$curso->idcurso.'/busca')->assertRedirect(route('login'));
+        $this->get('/admin/cursos/inscritos/editar/'.$curso->idcurso)->assertRedirect(route('login'));
+        $this->put('/admin/cursos/inscritos/editar/'.$curso->idcurso)->assertRedirect(route('login'));
+        $this->put('/admin/cursos/inscritos/confirmar-presenca/'.$curso->idcurso)->assertRedirect(route('login'));
+        $this->put('/admin/cursos/inscritos/confirmar-falta/'.$curso->idcurso)->assertRedirect(route('login'));
+        $this->get('/admin/cursos/adicionar-inscrito/'.$curso->idcurso)->assertRedirect(route('login'));
+        $this->post('/admin/cursos/adicionar-inscrito/'.$curso->idcurso)->assertRedirect(route('login'));
+        $this->get('/admin/cursos/inscritos/download/'.$curso->idcurso)->assertRedirect(route('login'));
+        $this->delete('/admin/cursos/cancelar-inscricao/'.$curso->idcurso)->assertRedirect(route('login'));
+    }
+
+    /** @test */
     public function curso_can_be_created()
     {
         $curso = factory('App\Curso')->create();

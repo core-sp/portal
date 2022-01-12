@@ -57,6 +57,20 @@ class BdoEmpresaTest extends TestCase
      * =======================================================================================================
      */
 
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $bdoEmpresa = factory('App\BdoEmpresa')->create();
+
+        $this->get(route('bdoempresas.lista'))->assertRedirect(route('login'));
+        $this->get(route('bdoempresas.busca'))->assertRedirect(route('login'));
+        $this->get(route('bdoempresas.create'))->assertRedirect(route('login'));
+        $this->get(route('bdoempresas.edit', $bdoEmpresa->idempresa))->assertRedirect(route('login'));
+        $this->put(route('bdoempresas.update', $bdoEmpresa->idempresa))->assertRedirect(route('login'));
+        $this->post(route('bdoempresas.store'))->assertRedirect(route('login'));
+        $this->delete(route('bdoempresas.destroy', $bdoEmpresa->idempresa))->assertRedirect(route('login'));
+    }
+
     /** @test 
      * 
      * Usuário sem autorização não pode listar BdoEmpresa.

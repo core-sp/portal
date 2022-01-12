@@ -38,6 +38,22 @@ class NoticiaTest extends TestCase
     }
     
     /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.index'))->assertRedirect(route('login'));
+        $this->get(route('noticias.create'))->assertRedirect(route('login'));
+        $this->get(route('noticias.edit', $noticia->idnoticia))->assertRedirect(route('login'));
+        $this->post(route('noticias.store'))->assertRedirect(route('login'));
+        $this->patch(route('noticias.update', $noticia->idnoticia))->assertRedirect(route('login'));
+        $this->delete(route('noticias.destroy', $noticia->idnoticia))->assertRedirect(route('login'));
+        $this->get(route('noticias.restore', $noticia->idnoticia))->assertRedirect(route('login'));
+        $this->get(route('noticias.busca'))->assertRedirect(route('login'));
+        $this->get(route('noticias.trashed'))->assertRedirect(route('login'));
+    }
+
+    /** @test */
     public function noticia_can_be_created_by_an_user()
     {
         $this->signInAsAdmin();

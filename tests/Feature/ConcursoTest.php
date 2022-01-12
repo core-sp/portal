@@ -36,6 +36,22 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $concurso = factory('App\Concurso')->create();
+
+        $this->get(route('concursos.index'))->assertRedirect(route('login'));
+        $this->get(route('concursos.busca'))->assertRedirect(route('login'));
+        $this->get(route('concursos.edit', $concurso->idconcurso))->assertRedirect(route('login'));
+        $this->get(route('concursos.create'))->assertRedirect(route('login'));
+        $this->get(route('concursos.lixeira'))->assertRedirect(route('login'));
+        $this->get(route('concursos.restore', $concurso->idconcurso))->assertRedirect(route('login'));
+        $this->post(route('concursos.store'))->assertRedirect(route('login'));
+        $this->patch(route('concursos.update', $concurso->idconcurso))->assertRedirect(route('login'));
+        $this->delete(route('concursos.destroy', $concurso->idconcurso))->assertRedirect(route('login'));
+    }
+
+    /** @test */
     function a_concurso_can_be_created()
     {
         $concurso = factory('App\Concurso')->create();

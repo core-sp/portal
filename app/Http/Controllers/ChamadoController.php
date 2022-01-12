@@ -79,7 +79,7 @@ class ChamadoController extends Controller
             abort(401);
         } 
         else {
-            if(Auth::id() === $resultado->idusuario) {
+            if(Auth::id() == $resultado->idusuario) {
                 $variaveis = $this->variaveis;
 
                 if(auth()->user()->cannot('onlyAdmin', auth()->user())) {
@@ -197,6 +197,8 @@ class ChamadoController extends Controller
 
     public function resposta(Request $request, $id)
     {
+        $this->authorize('onlyAdmin', auth()->user());
+        
         $resposta = "<i>(" . date('d\/m\/Y, \à\s H:i') . "):</i> " . $request->input('resposta');
         
         $update = $this->chamadoRepository->updateResposta($id, $resposta);

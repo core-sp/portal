@@ -43,6 +43,21 @@ class CompromissoTest extends TestCase
      * =======================================================================================================
      */
 
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $compromisso = factory('App\Compromisso')->create();
+
+        $this->get(route('compromisso.index'))->assertRedirect(route('login'));
+        $this->get(route('compromisso.create'))->assertRedirect(route('login'));
+        $this->get(route('compromisso.edit', $compromisso->id))->assertRedirect(route('login'));
+        $this->get(route('compromisso.busca'))->assertRedirect(route('login'));
+        $this->get(route('compromisso.filtro'))->assertRedirect(route('login'));
+        $this->post(route('compromisso.store'))->assertRedirect(route('login'));
+        $this->post(route('compromisso.update', $compromisso->id))->assertRedirect(route('login'));
+        $this->delete(route('compromisso.destroy', $compromisso->id))->assertRedirect(route('login'));
+    }
+
     /** @test 
      * 
      * Usuário sem autorização não pode listar crompromisso.

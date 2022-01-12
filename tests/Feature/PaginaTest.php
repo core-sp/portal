@@ -35,6 +35,22 @@ class PaginaTest extends TestCase
             ]
         ]);
     }
+
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $pagina = factory('App\Pagina')->create();
+
+        $this->get(route('paginas.index'))->assertRedirect(route('login'));
+        $this->get(route('paginas.create'))->assertRedirect(route('login'));
+        $this->get(route('paginas.edit', $pagina->idpagina))->assertRedirect(route('login'));
+        $this->post(route('paginas.store'))->assertRedirect(route('login'));
+        $this->patch(route('paginas.update', $pagina->idpagina))->assertRedirect(route('login'));
+        $this->delete(route('paginas.destroy', $pagina->idpagina))->assertRedirect(route('login'));
+        $this->get(route('paginas.restore', $pagina->idpagina))->assertRedirect(route('login'));
+        $this->get(route('paginas.busca'))->assertRedirect(route('login'));
+        $this->get(route('paginas.trashed'))->assertRedirect(route('login'));
+    }
     
     /** @test */
     public function pagina_can_be_created()

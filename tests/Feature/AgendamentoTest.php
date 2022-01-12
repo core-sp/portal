@@ -39,6 +39,35 @@ class AgendamentoTest extends TestCase
      * =======================================================================================================
      */
 
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => factory('App\Regional')->create(),
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00',
+            'protocolo' => 'AGE-XXXXXX'
+        ]);
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->create();
+
+        $this->get(route('agendamentos.lista'))->assertRedirect(route('login'));
+        $this->get(route('agendamentos.busca'))->assertRedirect(route('login'));
+        $this->get(route('agendamentos.filtro'))->assertRedirect(route('login'));
+        $this->get(route('agendamentos.pendentes'))->assertRedirect(route('login'));
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertRedirect(route('login'));
+        $this->put(route('agendamentos.edit', $agendamento->idagendamento))->assertRedirect(route('login'));
+        $this->post(route('agendamentos.reenviarEmail', $agendamento->idagendamento))->assertRedirect(route('login'));
+
+        $this->get(route('agendamentobloqueios.lista'))->assertRedirect(route('login'));
+        $this->get('/admin/agendamentos/bloqueios/busca')->assertRedirect(route('login'));
+        $this->get('/admin/agendamentos/bloqueios/criar')->assertRedirect(route('login'));
+        $this->get('/admin/agendamentos/bloqueios/editar/'.$bloqueio->idagendamentobloqueio)->assertRedirect(route('login'));
+        $this->post('/admin/agendamentos/bloqueios/criar')->assertRedirect(route('login'));
+        $this->put('/admin/agendamentos/bloqueios/editar/'.$bloqueio->idagendamentobloqueio)->assertRedirect(route('login'));
+        $this->delete('/admin/agendamentos/bloqueios/apagar/'.$bloqueio->idagendamentobloqueio)->assertRedirect(route('login'));
+    }
+
     /** @test 
      * 
      * Usuário sem autorização não pode listar Agendamentos. Verificando autorização no uso

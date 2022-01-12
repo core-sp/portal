@@ -45,6 +45,21 @@ class BdoOportunidadeTest extends TestCase
      * =======================================================================================================
      */
 
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $bdoEmpresa = factory('App\BdoEmpresa')->create();
+        $bdoOportunidade = factory('App\BdoOportunidade')->create();
+
+        $this->get(route('bdooportunidades.lista'))->assertRedirect(route('login'));
+        $this->get(route('bdooportunidades.busca'))->assertRedirect(route('login'));
+        $this->get(route('bdooportunidades.create', $bdoEmpresa->idempresa))->assertRedirect(route('login'));
+        $this->get(route('bdooportunidades.edit', $bdoOportunidade->idoportunidade))->assertRedirect(route('login'));
+        $this->put(route('bdooportunidades.update', $bdoOportunidade->idoportunidade))->assertRedirect(route('login'));
+        $this->post(route('bdooportunidades.store'))->assertRedirect(route('login'));
+        $this->delete(route('bdooportunidades.destroy', $bdoOportunidade->idoportunidade))->assertRedirect(route('login'));
+    }
+
     /** @test 
      * 
      * Usuário sem autorização não pode listar BdoOportunidade.

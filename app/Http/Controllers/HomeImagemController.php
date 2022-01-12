@@ -9,6 +9,11 @@ use App\Events\CrudEvent;
 class HomeImagemController extends Controller
 {
     private $class = 'HomeImagemController';
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     
     public function editBannerPrincipal()
     {
