@@ -40,6 +40,8 @@ class NoticiaTest extends TestCase
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
+        $this->assertGuest();
+        
         $noticia = factory('App\Noticia')->create();
 
         $this->get(route('noticias.index'))->assertRedirect(route('login'));
@@ -51,6 +53,25 @@ class NoticiaTest extends TestCase
         $this->get(route('noticias.restore', $noticia->idnoticia))->assertRedirect(route('login'));
         $this->get(route('noticias.busca'))->assertRedirect(route('login'));
         $this->get(route('noticias.trashed'))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.index'))->assertForbidden();
+        $this->get(route('noticias.create'))->assertForbidden();
+        $this->get(route('noticias.edit', $noticia->idnoticia))->assertForbidden();
+        $this->post(route('noticias.store'), $noticia->toArray())->assertForbidden();
+        $this->patch(route('noticias.update', $noticia->idnoticia), $noticia->toArray())->assertForbidden();
+        $this->delete(route('noticias.destroy', $noticia->idnoticia))->assertForbidden();
+        $this->get(route('noticias.restore', $noticia->idnoticia))->assertForbidden();
+        $this->get(route('noticias.busca'))->assertForbidden();
+        $this->get(route('noticias.trashed'))->assertForbidden();
     }
 
     /** @test */

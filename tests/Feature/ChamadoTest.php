@@ -12,6 +12,8 @@ class ChamadoTest extends TestCase
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
+        $this->assertGuest();
+        
         $chamado = factory('App\Chamado')->create();
 
         $this->get(route('chamados.lista'))->assertRedirect(route('login'));
@@ -31,6 +33,8 @@ class ChamadoTest extends TestCase
     public function non_authorized_users_cannot_access_links()
     {
         $this->signIn();
+        $this->assertAuthenticated('web');
+        
         $chamado = factory('App\Chamado')->create();
 
         $this->get(route('chamados.lista'))->assertForbidden();

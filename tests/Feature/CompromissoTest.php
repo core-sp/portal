@@ -46,6 +46,8 @@ class CompromissoTest extends TestCase
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
+        $this->assertGuest();
+        
         $compromisso = factory('App\Compromisso')->create();
 
         $this->get(route('compromisso.index'))->assertRedirect(route('login'));
@@ -56,6 +58,28 @@ class CompromissoTest extends TestCase
         $this->post(route('compromisso.store'))->assertRedirect(route('login'));
         $this->post(route('compromisso.update', $compromisso->id))->assertRedirect(route('login'));
         $this->delete(route('compromisso.destroy', $compromisso->id))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $compromisso = factory('App\Compromisso')->create();
+
+        $this->get(route('compromisso.index'))->assertForbidden();
+        $this->get(route('compromisso.create'))->assertForbidden();
+        $this->get(route('compromisso.edit', $compromisso->id))->assertForbidden();
+        $this->get(route('compromisso.busca'))->assertForbidden();
+        $this->get(route('compromisso.filtro'))->assertForbidden();
+
+        $dados = factory('App\Compromisso')->raw([
+            'data' => '20/01/2022'
+        ]);
+        $this->post(route('compromisso.store'), $dados)->assertForbidden();
+        $this->post(route('compromisso.update', $compromisso->id), $dados)->assertForbidden();
+        $this->delete(route('compromisso.destroy', $compromisso->id))->assertForbidden();
     }
 
     /** @test 

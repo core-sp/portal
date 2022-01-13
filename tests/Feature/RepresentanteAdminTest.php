@@ -1,0 +1,106 @@
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use App\Permissao;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+
+class RepresentanteAdminTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Permissao::insert([
+            [
+                'controller' => 'RepresentanteController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ],[
+                'controller' => 'RepresentanteEnderecoController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ],[
+                'controller' => 'RepresentanteEnderecoController',
+                'metodo' => 'show',
+                'perfis' => '1,'
+            ]
+        ]);
+    }
+
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $this->assertGuest();
+        
+        $repEndereco = factory('App\RepresentanteEndereco')->create();
+        
+        $this->get('/admin/representantes')->assertRedirect(route('login'));
+        $this->get('/admin/representantes/busca')->assertRedirect(route('login'));
+        $this->get('/admin/representantes/buscaGerenti')->assertRedirect(route('login'));
+        $this->get(route('admin.representante.buscaGerenti'))->assertRedirect(route('login'));
+        $this->get('/admin/representantes/info')->assertRedirect(route('login'));
+        $this->get(route('admin.representante.baixarCertidao'))->assertRedirect(route('login'));
+
+        $this->get('/admin/representante-enderecos')->assertRedirect(route('login'));
+        $this->get(route('representante-endereco.busca'))->assertRedirect(route('login'));
+        $this->get(route('admin.representante-endereco.show', $repEndereco->id))->assertRedirect(route('login'));
+        $this->post(route('admin.representante-endereco.post'))->assertRedirect(route('login'));
+        $this->post(route('admin.representante-endereco-recusado.post'))->assertRedirect(route('login'));
+        $this->get(route('representante-endereco.visualizar'))->assertRedirect(route('login'));
+        $this->get(route('representante-endereco.baixar'))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $repEndereco = factory('App\RepresentanteEndereco')->create();
+
+        $this->get('/admin/representantes')->assertForbidden();
+        $this->get('/admin/representantes/busca')->assertForbidden();
+        $this->get('/admin/representantes/buscaGerenti')->assertForbidden();
+        $this->get('/admin/representantes/info')->assertForbidden();
+
+        $this->get('/admin/representante-enderecos')->assertForbidden();
+        $this->get(route('representante-endereco.busca'))->assertForbidden();
+        $this->get(route('admin.representante-endereco.show', $repEndereco->id))->assertForbidden();
+        $this->post(route('admin.representante-endereco.post'))->assertForbidden();
+        $this->post(route('admin.representante-endereco-recusado.post'))->assertForbidden();
+        $this->get(route('representante-endereco.visualizar'))->assertForbidden();
+        $this->get(route('representante-endereco.baixar'))->assertForbidden();
+    }
+
+    /** @test */
+    public function admin_can_access_links()
+    {
+        $this->signInAsAdmin();
+        $repEndereco = factory('App\RepresentanteEndereco')->create();
+
+        $this->get('/admin/representantes')->assertOk();
+        $this->get('/admin/representantes/busca')->assertOk();
+        $this->get('/admin/representantes/buscaGerenti')->assertOk();
+
+        $this->get('/admin/representante-enderecos')->assertOk();
+        $this->get(route('representante-endereco.busca'))->assertOk();
+        $this->get(route('admin.representante-endereco.show', $repEndereco->id))->assertOk();
+        $this->post(route('admin.representante-endereco.post'), $repEndereco->toArray())->assertStatus(302);
+
+        $repEndereco->observacao = "Teste de recusa do endereço.";
+        $this->post(route('admin.representante-endereco-recusado.post'), $repEndereco->toArray())->assertStatus(302);
+
+        $file = UploadedFile::fake()->image($repEndereco->crimage);
+        Storage::putFileAs('representantes/enderecos/', $file, $repEndereco->crimage);
+        Storage::assertExists('representantes/enderecos/'.$repEndereco->crimage);
+
+        $this->get(route('representante-endereco.visualizar', ['nome' => $repEndereco->crimage]))->assertOk();
+        $this->get(route('representante-endereco.baixar', ['nome' => $repEndereco->crimage]))->assertOk();
+    }
+}

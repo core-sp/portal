@@ -60,6 +60,8 @@ class BdoEmpresaTest extends TestCase
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
+        $this->assertGuest();
+        
         $bdoEmpresa = factory('App\BdoEmpresa')->create();
 
         $this->get(route('bdoempresas.lista'))->assertRedirect(route('login'));
@@ -69,6 +71,26 @@ class BdoEmpresaTest extends TestCase
         $this->put(route('bdoempresas.update', $bdoEmpresa->idempresa))->assertRedirect(route('login'));
         $this->post(route('bdoempresas.store'))->assertRedirect(route('login'));
         $this->delete(route('bdoempresas.destroy', $bdoEmpresa->idempresa))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $bdoEmpresa = factory('App\BdoEmpresa')->create();
+        $bdo2 = factory('App\BdoEmpresa')->raw([
+            'cnpj' => '32173979000196'
+        ]);
+
+        $this->get(route('bdoempresas.lista'))->assertForbidden();
+        $this->get(route('bdoempresas.busca'))->assertForbidden();
+        $this->get(route('bdoempresas.create'))->assertForbidden();
+        $this->get(route('bdoempresas.edit', $bdoEmpresa->idempresa))->assertForbidden();
+        $this->put(route('bdoempresas.update', $bdoEmpresa->idempresa), $bdoEmpresa->toArray())->assertForbidden();
+        $this->post(route('bdoempresas.store'), $bdo2)->assertForbidden();
+        $this->delete(route('bdoempresas.destroy', $bdoEmpresa->idempresa))->assertForbidden();
     }
 
     /** @test 

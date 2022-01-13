@@ -48,6 +48,8 @@ class BdoOportunidadeTest extends TestCase
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
+        $this->assertGuest();
+        
         $bdoEmpresa = factory('App\BdoEmpresa')->create();
         $bdoOportunidade = factory('App\BdoOportunidade')->create();
 
@@ -58,6 +60,28 @@ class BdoOportunidadeTest extends TestCase
         $this->put(route('bdooportunidades.update', $bdoOportunidade->idoportunidade))->assertRedirect(route('login'));
         $this->post(route('bdooportunidades.store'))->assertRedirect(route('login'));
         $this->delete(route('bdooportunidades.destroy', $bdoOportunidade->idoportunidade))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $bdoEmpresa = factory('App\BdoEmpresa')->create();
+        $bdoOportunidade = factory('App\BdoOportunidade')->create();
+
+        $this->get(route('bdooportunidades.lista'))->assertForbidden();
+        $this->get(route('bdooportunidades.busca'))->assertForbidden();
+        $this->get(route('bdooportunidades.create', $bdoEmpresa->idempresa))->assertForbidden();
+        $this->get(route('bdooportunidades.edit', $bdoOportunidade->idoportunidade))->assertForbidden();
+
+        $dados = $bdoOportunidade->toArray();
+        $dados['regiaoatuacao'] = ['1', '2'];
+        $this->put(route('bdooportunidades.update', $bdoOportunidade->idoportunidade), $dados)->assertForbidden();
+
+        $this->post(route('bdooportunidades.store'), $dados)->assertForbidden();
+        $this->delete(route('bdooportunidades.destroy', $bdoOportunidade->idoportunidade))->assertForbidden();
     }
 
     /** @test 

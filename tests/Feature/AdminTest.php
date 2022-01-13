@@ -149,6 +149,7 @@ class AdminTest extends TestCase
     public function the_admin_menu_has_correct_links()
     {
         $this->signInAsAdmin();
+        $this->assertAuthenticated('web');
 
         // Ordem do menu
         $this->get('/admin')
@@ -188,6 +189,7 @@ class AdminTest extends TestCase
     public function non_authorized_users_cannot_see_links()
     {
         $this->signIn();
+        $this->assertAuthenticated('web');
 
         // Ordem do menu
         $this->get('/admin')

@@ -29,6 +29,22 @@ class AgendamentoTest extends TestCase
                 'controller' => 'AgendamentoController',
                 'metodo' => 'edit',
                 'perfis' => '1,'
+            ], [
+                'controller' => 'AgendamentoBloqueioController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'AgendamentoBloqueioController',
+                'metodo' => 'create',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'AgendamentoBloqueioController',
+                'metodo' => 'edit',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'AgendamentoBloqueioController',
+                'metodo' => 'destroy',
+                'perfis' => '1,'
             ]
         ]);
     }
@@ -42,6 +58,8 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
+        $this->assertGuest();
+        
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => factory('App\Regional')->create(),
             'dia' => date('Y-m-d', strtotime('+1 day')),
@@ -66,6 +84,37 @@ class AgendamentoTest extends TestCase
         $this->post('/admin/agendamentos/bloqueios/criar')->assertRedirect(route('login'));
         $this->put('/admin/agendamentos/bloqueios/editar/'.$bloqueio->idagendamentobloqueio)->assertRedirect(route('login'));
         $this->delete('/admin/agendamentos/bloqueios/apagar/'.$bloqueio->idagendamentobloqueio)->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => factory('App\Regional')->create(),
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00',
+            'protocolo' => 'AGE-XXXXXX'
+        ]);
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->create();
+
+        $this->get(route('agendamentos.lista'))->assertForbidden();
+        $this->get(route('agendamentos.busca'))->assertForbidden();
+        $this->get(route('agendamentos.filtro'))->assertForbidden();
+        $this->get(route('agendamentos.pendentes'))->assertForbidden();
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertForbidden();
+        $this->put(route('agendamentos.edit', $agendamento->idagendamento), $agendamento->toArray())->assertForbidden();
+
+        $this->get(route('agendamentobloqueios.lista'))->assertForbidden();
+        $this->get('/admin/agendamentos/bloqueios/busca')->assertForbidden();
+        $this->get('/admin/agendamentos/bloqueios/criar')->assertForbidden();
+        $this->get('/admin/agendamentos/bloqueios/editar/'.$bloqueio->idagendamentobloqueio)->assertForbidden();
+        $this->post('/admin/agendamentos/bloqueios/criar', $bloqueio->toArray())->assertForbidden();
+        $this->put('/admin/agendamentos/bloqueios/editar/'.$bloqueio->idagendamentobloqueio, $bloqueio->toArray())->assertForbidden();
+        $this->delete('/admin/agendamentos/bloqueios/apagar/'.$bloqueio->idagendamentobloqueio)->assertForbidden();
     }
 
     /** @test 

@@ -1,7 +1,6 @@
 <?php
 
 use App\HomeImagem;
-use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 
 $factory->define(HomeImagem::class, function (Faker $faker) {

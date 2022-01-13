@@ -38,6 +38,8 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
+        $this->assertGuest();
+        
         $licitacao = factory('App\Licitacao')->create();
 
         $this->get(route('licitacoes.index'))->assertRedirect(route('login'));
@@ -49,6 +51,25 @@ class LicitacaoTest extends TestCase
         $this->get(route('licitacoes.restore', $licitacao->idlicitacao))->assertRedirect(route('login'));
         $this->get(route('licitacoes.busca'))->assertRedirect(route('login'));
         $this->get(route('licitacoes.trashed'))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $licitacao = factory('App\Licitacao')->create();
+
+        $this->get(route('licitacoes.index'))->assertForbidden();
+        $this->get(route('licitacoes.create'))->assertForbidden();
+        $this->get(route('licitacoes.edit', $licitacao->idlicitacao))->assertForbidden();
+        $this->post(route('licitacoes.store'), $licitacao->toArray())->assertForbidden();
+        $this->patch(route('licitacoes.update', $licitacao->idlicitacao), $licitacao->toArray())->assertForbidden();
+        $this->delete(route('licitacoes.destroy', $licitacao->idlicitacao))->assertForbidden();
+        $this->get(route('licitacoes.restore', $licitacao->idlicitacao))->assertForbidden();
+        $this->get(route('licitacoes.busca'))->assertForbidden();
+        $this->get(route('licitacoes.trashed'))->assertForbidden();
     }
 
     /** @test */

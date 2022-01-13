@@ -89,6 +89,8 @@ class RepresentanteEnderecoController extends Controller
 
     public function visualizarComprovante(Request $request) 
     {
+        $this->authorize('updateShow', auth()->user());
+
         if(Storage::exists("representantes/enderecos/" . $request->nome)) {
             return response()->file(Storage::path("representantes/enderecos/" . $request->nome), ["Cache-Control" => "no-cache"]);
         }
@@ -100,6 +102,8 @@ class RepresentanteEnderecoController extends Controller
 
     public function baixarComprovante(Request $request) 
     {
+        $this->authorize('updateShow', auth()->user());
+        
         if(Storage::exists("representantes/enderecos/" . $request->nome)) {
             return Storage::download("/representantes/enderecos/" . $request->nome, $request->nome);
         }

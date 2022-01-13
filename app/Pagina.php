@@ -79,7 +79,7 @@ class Pagina extends Model
     {
         $headers = ['Código', 'Título', 'Deletada em:', 'Ações'];
         $contents = $query->map(function($row){
-            $acoes = '<a href="'.route('paginas.destroy', $row->idpagina).'" class="btn btn-sm btn-primary">Restaurar</a>';
+            $acoes = '<a href="'.route('paginas.restore', $row->idpagina).'" class="btn btn-sm btn-primary">Restaurar</a>';
             return [
                 $row->idpagina,
                 $row->titulo,
