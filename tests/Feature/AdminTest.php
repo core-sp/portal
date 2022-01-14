@@ -223,4 +223,30 @@ class AdminTest extends TestCase
             ->assertDontSee(route('fiscalizacao.index'))
             ->assertDontSee(route('fiscalizacao.createperiodo'));
     }
+
+    /** @test */
+    public function admin_can_access_horizon()
+    {
+        $this->signInAsAdmin();
+        $this->assertAuthenticated('web');
+
+        $this->get('/horizon')->assertOk();
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_horizon()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+
+        $this->get('/horizon')->assertForbidden();
+    }
+
+    /** @test */
+    public function non_authenticated_users_cannot_access_horizon()
+    {
+        $this->assertGuest();
+
+        $this->get('/horizon')->assertRedirect(route('login'));
+    }
 }
