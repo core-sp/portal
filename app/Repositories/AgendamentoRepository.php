@@ -248,6 +248,7 @@ class AgendamentoRepository
             ->where('idregional', $regional)
             ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
             ->whereNull('status')
+            ->where('dia', 'LIKE', date('Y').'-%')
             ->count();
     }
 
