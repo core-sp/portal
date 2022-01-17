@@ -2,10 +2,6 @@
 
 @section('content')
 
-@php
-  use App\Http\Controllers\ControleController;
-@endphp
-
 <section class="content-header">
   @if(\Session::has('message'))
     <div class="container-fluid mb-2">
@@ -30,7 +26,7 @@
         @if(isset($variaveis->btn_criar))
         {!! $variaveis->btn_criar !!}
         @endif
-        @if(ControleController::mostraStatic(['1']))
+        @if(auth()->user()->isAdmin())
           @if(isset($variaveis->btn_lixeira))
             {!! $variaveis->btn_lixeira !!}
           @endif

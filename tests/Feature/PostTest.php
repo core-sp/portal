@@ -37,6 +37,41 @@ class PostTest extends TestCase
     }
 
     /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $this->assertGuest();
+        
+        $post = factory('App\Post')->create();
+
+        $this->get('/admin/posts/busca')->assertRedirect(route('login'));
+        $this->get('/admin/posts/')->assertRedirect(route('login'));
+        $this->get('/admin/posts/create')->assertRedirect(route('login'));
+        $this->post('admin/posts')->assertRedirect(route('login'));
+        $this->get('/admin/posts/'.$post->id.'/edit')->assertRedirect(route('login'));
+        $this->patch('/admin/posts/'.$post->id)->assertRedirect(route('login'));
+        $this->delete('/admin/posts/'.$post->id)->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $post = factory('App\Post')->create();
+
+        $this->get('/admin/posts/busca')->assertForbidden();
+        $this->get('/admin/posts/')->assertForbidden();
+        $this->get('/admin/posts/create')->assertForbidden();
+
+        $post->titulo = 'Teste do store';
+        $this->post('admin/posts', $post->toArray())->assertForbidden();
+        $this->get('/admin/posts/'.$post->id.'/edit')->assertForbidden();
+        $this->patch('/admin/posts/'.$post->id, $post->toArray())->assertForbidden();
+        $this->delete('/admin/posts/'.$post->id)->assertForbidden();
+    }
+
+    /** @test */
     function a_post_can_be_created()
     {
         $post = factory('App\Post')->create();

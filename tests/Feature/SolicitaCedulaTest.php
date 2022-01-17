@@ -29,6 +29,40 @@ class SolicitaCedulaTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $this->assertGuest();
+    
+        $repCedula = factory('App\SolicitaCedula')->create();
+
+        $this->get(route('solicita-cedula.index'))->assertRedirect(route('login'));
+        $this->get(route('solicita-cedula.filtro'))->assertRedirect(route('login'));
+        $this->get(route('admin.solicita-cedula.show', $repCedula->id))->assertRedirect(route('login'));
+        $this->get(route('admin.solicita-cedula.pdf', $repCedula->id))->assertRedirect(route('login'));
+        $this->get(route('solicita-cedula.busca'))->assertRedirect(route('login'));
+        $this->post(route('admin.representante-solicita-cedula.post'))->assertRedirect(route('login'));
+        $this->post(route('admin.representante-solicita-cedula-reprovada.post'))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        factory('App\User')->create();
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $repCedula = factory('App\SolicitaCedula')->create();
+
+        $this->get(route('solicita-cedula.index'))->assertForbidden();
+        $this->get(route('solicita-cedula.filtro'))->assertForbidden();
+        $this->get(route('admin.solicita-cedula.show', $repCedula->id))->assertForbidden();
+        $this->get(route('admin.solicita-cedula.pdf', $repCedula->id))->assertForbidden();
+        $this->get(route('solicita-cedula.busca'))->assertForbidden();
+        $this->post(route('admin.representante-solicita-cedula.post'))->assertForbidden();
+        $this->post(route('admin.representante-solicita-cedula-reprovada.post'))->assertForbidden();
+    }
+
     /** @test 
      * 
      * Usuário sem autorização não pode listar Solicitações de Cédulas. Verificando autorização no uso

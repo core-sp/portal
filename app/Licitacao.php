@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Traits\ControleAcesso;
 use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

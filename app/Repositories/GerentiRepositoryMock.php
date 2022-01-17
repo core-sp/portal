@@ -13,8 +13,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
         $cpfCnpj = apenasNumeros($cpfCnpj);
 
         // RC Teste 1 (PF)
-        // if($cpfCnpj == '86294373085') {
-        if(strlen($cpfCnpj) == 11) {
+        if($cpfCnpj == '86294373085') {
             $resultado = [
                 "SITUACAO" => "Ativo", 
                 "REGISTRONUM" => "0000000001", 
@@ -24,8 +23,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
             ];
         }
         // RC Teste 2 (PJ)
-        // elseif($cpfCnpj == '84825147000100') {
-        elseif(strlen($cpfCnpj) == 14) {
+        elseif($cpfCnpj == '84825147000100') {
             $resultado = [
                 "SITUACAO" => "Ativo", 
                 "REGISTRONUM" => "0000000002", 

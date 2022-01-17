@@ -604,7 +604,7 @@ class RepresentanteTest extends TestCase
     */
     public function cannot_insert_new_solicitacao_cedula_hasnt_em_dia()
     {
-        // Editar GerentiMock para situação sem ser 'em dia'
+        // Editar GerentiMock gerentiStatus($ass_id) para situação sem ser 'em dia'
         $regional = factory('App\Regional')->create([
             'regional' => 'SÃO PAULO'
         ]);

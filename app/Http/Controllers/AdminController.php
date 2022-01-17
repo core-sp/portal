@@ -46,19 +46,19 @@ class AdminController extends Controller
 
         // Alerta de atendimentos nulos
         // Contagem de atendimentos pendentes na Sede (perfil de Gestão de Atendimento - Sede)
-        if(session('idperfil') === 12) {
+        if(auth()->user()->idperfil == 12) {
             $count = $this->agendamentoRepository->getCountPastAgendamentoPendenteSede();
         } 
         // Contagem de atendimentos pendentes nas Seccionais (perfil de Gestão de Atendimento - Seccionais)
-        elseif(session('idperfil') === 13) {
+        elseif(auth()->user()->idperfil == 13) {
             $count = $this->agendamentoRepository->getCountPastAgendamentoPendenteSeccionais();
         }
         // Contagem de todos os atendimentos pendentes (perfils de Admin e Coordenadoria de Atendimento)
-        elseif(session('idperfil') === 6 || session('idperfil') === 1) {
+        elseif(auth()->user()->idperfil == 6 || auth()->user()->idperfil == 1) {
             $count = $this->agendamentoRepository->getCountPastAgendamentoPendente();
         } 
         // Contagem de atendimentos pendentes na regional do usuário (Atendimento)
-        elseif(session('idperfil') === 8) {
+        elseif(auth()->user()->idperfil == 8) {
             $count = $this->agendamentoRepository->getCountPastAgendamentoPendenteByRegional(Auth::user()->idregional);
         }
 

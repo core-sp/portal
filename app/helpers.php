@@ -1,5 +1,6 @@
 <?php
 
+use App\Permissao;
 use App\Representante;
 use App\Repositories\PermissaoRepository;
 
@@ -595,45 +596,6 @@ function concursoSituacoes()
     ];
 }
 
-function permissoesPorPerfil()
-{
-    $permissoes = session('permissoes');
-    $arrayPermissoes = array();
-
-    foreach($permissoes as $permissao) {
-        $p = explode('_', $permissao);
-        array_push($arrayPermissoes, ['controller' => $p[0], 'metodo' => $p[1]]);
-    }
-
-    return $arrayPermissoes;
-
-    // $all = (new PermissaoRepository())->getAll();
-
-    // $filtered = $all->filter(function($permissao){
-    //     $perfis = explode(',', $permissao->perfis);
-    //     return in_array(Auth::user()->perfil->idperfil, $perfis);
-    // });
-
-    // return dd($filtered->map(function($row){
-    //     return [
-    //         'controller' => $row->controller,
-    //         'metodo' => $row->metodo
-    //     ];
-    // })->toArray());
-}
-
-function mostraItem($permissoes, $controller, $metodo)
-{
-    $check = ['controller' => $controller, 'metodo' => $metodo];
-    return in_array($check, $permissoes) || auth()->user()->isAdmin() ? true : false;
-}
-
-function mostraTitulo($permissoes, $controllers)
-{
-    $column = array_column($permissoes, 'controller');
-    return !empty(array_intersect($column, $controllers)) || auth()->user()->isAdmin() ? true : false;
-}
-
 function mostraChatScript()
 {
     if(config('app.env') !== 'local') {
@@ -713,6 +675,13 @@ function validDate($date, $minDate, $format) {
     
 
     return ($errors['warning_count'] + $errors['error_count'] === 0) && $checkMinDate ? true : false;
+}
+
+function perfisPermitidos($nameController, $metodo)
+{
+    $idProfile = auth()->user()->idperfil;
+    $permissao = Permissao::where('controller', $nameController)->where('metodo', $metodo)->first();
+    return $permissao ? in_array($idProfile, explode(',', $permissao->perfis)) : false;
 }
 
 // Máscara para quantos dígitos forem necessários no rg

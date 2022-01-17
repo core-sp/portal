@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Regional;
-use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
 use App\Http\Requests\RegionalRequest;
 use App\Repositories\RegionalRepository;
@@ -35,7 +34,7 @@ class RegionalController extends Controller
 
     public function edit(Request $request, $id)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
         $resultado = $this->regionalRepository->getById($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -43,6 +42,8 @@ class RegionalController extends Controller
 
     public function update(RegionalRequest $request, $id)
     {
+        $this->authorize('updateOther', auth()->user());
+        
         $request->validated();
 
         $update = $this->regionalRepository->update($id, $request);

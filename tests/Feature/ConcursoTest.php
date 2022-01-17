@@ -36,6 +36,45 @@ class ConcursoTest extends TestCase
     }
 
     /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $this->assertGuest();
+        
+        $concurso = factory('App\Concurso')->create();
+
+        $this->get(route('concursos.index'))->assertRedirect(route('login'));
+        $this->get(route('concursos.busca'))->assertRedirect(route('login'));
+        $this->get(route('concursos.edit', $concurso->idconcurso))->assertRedirect(route('login'));
+        $this->get(route('concursos.create'))->assertRedirect(route('login'));
+        $this->get(route('concursos.lixeira'))->assertRedirect(route('login'));
+        $this->get(route('concursos.restore', $concurso->idconcurso))->assertRedirect(route('login'));
+        $this->post(route('concursos.store'))->assertRedirect(route('login'));
+        $this->patch(route('concursos.update', $concurso->idconcurso))->assertRedirect(route('login'));
+        $this->delete(route('concursos.destroy', $concurso->idconcurso))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $concurso = factory('App\Concurso')->create();
+
+        $this->get(route('concursos.index'))->assertForbidden();
+        $this->get(route('concursos.busca'))->assertForbidden();
+        $this->get(route('concursos.edit', $concurso->idconcurso))->assertForbidden();
+        $this->get(route('concursos.create'))->assertForbidden();
+        $this->get(route('concursos.lixeira'))->assertForbidden();
+        $this->get(route('concursos.restore', $concurso->idconcurso))->assertForbidden();
+
+        $concurso->nrprocesso = 555;
+        $this->post(route('concursos.store'), $concurso->toArray())->assertForbidden();
+        $this->patch(route('concursos.update', $concurso->idconcurso), $concurso->toArray())->assertForbidden();
+        $this->delete(route('concursos.destroy', $concurso->idconcurso))->assertForbidden();
+    }
+
+    /** @test */
     function a_concurso_can_be_created()
     {
         $concurso = factory('App\Concurso')->create();

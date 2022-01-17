@@ -6,7 +6,6 @@ use App\BdoEmpresa;
 use App\BdoOportunidade;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
-use App\Traits\ControleAcesso;
 use App\Repositories\RegionalRepository;
 use App\Repositories\BdoEmpresaRepository;
 use App\Http\Requests\BdoOportunidadeRequest;
@@ -15,7 +14,7 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoOportunidadeController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     // Nome da Classe
     private $class = 'BdoOportunidadeController';
@@ -45,7 +44,7 @@ class BdoOportunidadeController extends Controller
     
     public function index()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
 
         $resultados = $this->bdoOportunidadeRepository->getToTable();
         $tabela = $this->tabelaCompleta($resultados);
@@ -56,7 +55,7 @@ class BdoOportunidadeController extends Controller
 
     public function create($id)
     {       
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('create', auth()->user());
 
         $empresa = $this->bdoEmpresaRepository->getToOportunidade($id);
 
@@ -76,7 +75,7 @@ class BdoOportunidadeController extends Controller
 
     public function store(BdoOportunidadeRequest $request)
     {
-        $this->autoriza($this->class, 'create');
+        $this->authorize('create', auth()->user());
 
         $request->validated();
 
@@ -95,7 +94,7 @@ class BdoOportunidadeController extends Controller
 
     public function edit($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
 
         $resultado = $this->bdoOportunidadeRepository->findOrFail($id);
         $regioes = $this->regionalRepository->getRegionais();
@@ -109,7 +108,7 @@ class BdoOportunidadeController extends Controller
 
     public function update(BdoOportunidadeRequest $request, $id)
     {
-        $this->autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
 
         $request->validated();
 
@@ -128,7 +127,7 @@ class BdoOportunidadeController extends Controller
 
     public function destroy($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('delete', auth()->user());
 
         $delete = $this->bdoOportunidadeRepository->destroy($id);
 
@@ -145,7 +144,7 @@ class BdoOportunidadeController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->bdoOportunidadeVariaveis;
@@ -167,14 +166,14 @@ class BdoOportunidadeController extends Controller
         ];
 
         $contents = $query->map(function($row){
-            if($this->mostra('BdoOportunidadeController', 'edit')) {
+            if(auth()->user()->can('updateOther', auth()->user())) {
                 $acoes = '<a href="/admin/bdo/editar/'.$row->idoportunidade.'" class="btn btn-sm btn-primary">Editar</a> ';
             }     
             else {
                 $acoes = '';
             }
 
-            if($this->mostra('BdoOportunidadeController', 'destroy')) {
+            if(auth()->user()->can('delete', auth()->user())) {
                 $acoes .= '<form method="POST" action="/admin/bdo/apagar/'.$row->idoportunidade.'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';

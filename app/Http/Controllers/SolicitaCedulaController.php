@@ -6,7 +6,6 @@ use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
 use App\Http\Requests\SolicitaCedulaRequest;
-use App\Traits\ControleAcesso;
 use App\Repositories\SolicitaCedulaRepository;
 use App\Mail\SolicitaCedulaMail;
 use App\Repositories\GerentiRepositoryInterface;
@@ -18,7 +17,7 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class SolicitaCedulaController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     private $class = 'SolicitaCedulaController';
     private $solicitaCedulaRepository;
@@ -44,7 +43,7 @@ class SolicitaCedulaController extends Controller
 
     public function show($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateShow', auth()->user());
         $resultado = $this->solicitaCedulaRepository->getById($id);
         $variaveis = (object) $this->variaveis;
 
@@ -53,7 +52,7 @@ class SolicitaCedulaController extends Controller
 
     public function inserirSolicitaCedula(Request $request)
     {
-        $this->autoriza($this->class, 'show');
+        $this->authorize('updateShow', auth()->user());
         if(auth()->user() == null)
             abort(500, "Usuário não encontrado");
         try {
@@ -75,7 +74,7 @@ class SolicitaCedulaController extends Controller
 
     public function reprovarSolicitaCedula(SolicitaCedulaRequest $request)
     {
-        $this->autoriza($this->class, 'show');
+        $this->authorize('updateShow', auth()->user());
         $request->validated();
 
         if(auth()->user() == null)
@@ -143,7 +142,7 @@ class SolicitaCedulaController extends Controller
 
     public function index()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
         $variaveis = $this->variaveis;
 
         // Checa se tem filtro
@@ -171,7 +170,7 @@ class SolicitaCedulaController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
         $busca = IlluminateRequest::input('q');
 
         // Verifica se o texto buscado contem numero para remover a máscara
@@ -185,7 +184,7 @@ class SolicitaCedulaController extends Controller
 
     private function checaAplicaFiltros()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
         $result;
 
         // Confere se a data consta no request
@@ -250,7 +249,7 @@ class SolicitaCedulaController extends Controller
 
     public function gerarPdf($id)
     {
-        $this->autoriza($this->class, 'show');
+        $this->authorize('updateShow', auth()->user());
         $resultado = $this->solicitaCedulaRepository->getById($id);
         if($resultado->podeGerarPdf())
         {

@@ -8,7 +8,6 @@ use App\Curso;
 use App\CursoInscrito;
 use App\Http\Controllers\Helper;
 use App\Http\Controllers\CrudController;
-use App\Http\Controllers\ControleController;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CursoInscritoMailGuest;
@@ -56,7 +55,7 @@ class CursoInscritoController extends Controller
         foreach($resultados as $resultado) {
             $acoes = '';
             if($curso->datatermino >= $now) {
-                if(ControleController::mostra('CursoInscritoController', 'destroy')) {
+                if(auth()->user()->can('delete', auth()->user())) {
                     $acoes .= '<form method="POST" action="/admin/cursos/cancelar-inscricao/'.$resultado->idcursoinscrito.'" class="d-inline">';
                     $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                     $acoes .= '<input type="hidden" name="_method" value="delete" />';
@@ -81,7 +80,7 @@ class CursoInscritoController extends Controller
                     $acoes .= "<p class='d-inline text-danger'><strong><i class='fas fa-ban checkIcone'></i> Não Compareceu&nbsp;</strong></p>";
                 }
             }
-            if(ControleController::mostra('CursoInscritoController', 'edit'))
+            if(auth()->user()->can('updateOther', auth()->user()))
                 $acoes .= ' <a href="/admin/cursos/inscritos/editar/'.$resultado->idcursoinscrito.'" class="btn btn-sm btn-default">Editar</a> ';
             else
                 $acoes .= '';
@@ -108,7 +107,7 @@ class CursoInscritoController extends Controller
 
     public function create($idcurso)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->authorize('create', auth()->user());
         $now = date('Y-m-d H:i:s');
         $curso = Curso::findOrFail($idcurso);
         if(!$curso)
@@ -126,7 +125,7 @@ class CursoInscritoController extends Controller
 
     public function store(Request $request)
     {
-        ControleController::autoriza($this->class, 'create');
+        $this->authorize('create', auth()->user());
         $regras = [
             'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,NULL,idcurso,idcurso,'.$request->input('idcurso').',deleted_at,NULL', new Cpf],
             'nome' => 'required|max:191',
@@ -165,7 +164,7 @@ class CursoInscritoController extends Controller
 
     public function edit($id)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
         $resultado = CursoInscrito::findOrFail($id);
         $variaveis = [
             'form' => 'cursoinscrito',
@@ -178,7 +177,7 @@ class CursoInscritoController extends Controller
 
     public function update(Request $request, $id)
     {
-        ControleController::autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
         $idcurso = $request->input('idcurso');
         $regras = [
             'cpf' => ['required', 'max:191', 'unique:curso_inscritos,cpf,'.$id.',idcursoinscrito,idcurso,'.$idcurso.',deleted_at,NULL', new Cpf],
@@ -324,7 +323,7 @@ class CursoInscritoController extends Controller
 
     public function destroy($id)
     {
-        ControleController::autoriza($this->class, __FUNCTION__);
+        $this->authorize('delete', auth()->user());
         $curso = CursoInscrito::findOrFail($id);
         $now = date('Y-m-d H:i:s');
         if($curso->datatermino >= $now)
@@ -340,7 +339,7 @@ class CursoInscritoController extends Controller
 
     public function busca($id)
     {
-        ControleController::autoriza('CursoInscritoController', 'index');
+        $this->authorize('viewAny', auth()->user());
         $busca = IlluminateRequest::input('q');
         $curso = Curso::findOrFail($id);
         $now = date('Y-m-d H:i:s');
@@ -363,7 +362,7 @@ class CursoInscritoController extends Controller
 
     public function download($id)
     {
-        ControleController::autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
         $headers = [
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Content-type' => 'text/csv',
@@ -390,7 +389,7 @@ class CursoInscritoController extends Controller
 
     public function confirmarPresenca(Request $request, $id)
     {
-        ControleController::autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
         $idusuario = Auth::user()->idusuario;
         $inscrito = CursoInscrito::findOrFail($id);
         $inscrito->presenca = 'Sim';
@@ -405,7 +404,7 @@ class CursoInscritoController extends Controller
 
     public function confirmarFalta(Request $request, $id)
     {
-        ControleController::autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
         $idusuario = Auth::user()->idusuario;
         $inscrito = CursoInscrito::findOrFail($id);
         $inscrito->presenca = 'Não';

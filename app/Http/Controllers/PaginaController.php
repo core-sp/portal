@@ -8,13 +8,10 @@ use Illuminate\Support\Str;
 use App\Events\CrudEvent;
 use App\Http\Requests\PaginaRequest;
 use App\Repositories\PaginaRepository;
-use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class PaginaController extends Controller
 {
-    use ControleAcesso;
-
     // Nome da classe
     private $class = 'PaginaController';
     private $paginaModel;
@@ -31,10 +28,10 @@ class PaginaController extends Controller
 
     public function index()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
         $resultados = $this->paginaRepository->getToTable();
         $tabela = $this->paginaModel->tabelaCompleta($resultados);
-        if(!$this->mostra($this->class, 'create'))
+        if(auth()->user()->cannot('create', auth()->user()))
             unset($this->variaveis['btn_criar']);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
@@ -42,13 +39,15 @@ class PaginaController extends Controller
 
     public function create()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('create', auth()->user());
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis'));
     }
 
     public function store(PaginaRequest $request)
     {
+        $this->authorize('create', auth()->user());
+
         $request->validated();
 
         $slug = Str::slug($request->input('titulo'), '-');
@@ -71,7 +70,7 @@ class PaginaController extends Controller
 
     public function edit($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
         $resultado = $this->paginaRepository->findById($id);
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
@@ -79,6 +78,8 @@ class PaginaController extends Controller
 
     public function update(PaginaRequest $request, $id)
     {
+        $this->authorize('updateOther', auth()->user());
+
         $request->validated();
         
         $slug = Str::slug($request->input('titulo'), '-');
@@ -107,7 +108,7 @@ class PaginaController extends Controller
 
     public function destroy($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('delete', auth()->user());
         
         $delete = $this->paginaRepository->findById($id)->delete();
         if(!$delete)
@@ -121,7 +122,7 @@ class PaginaController extends Controller
 
     public function lixeira()
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
         $resultados = $this->paginaRepository->getTrashed();
         $variaveis = (object) $this->variaveis;
         $tabela = $this->paginaModel->tabelaTrashed($resultados);
@@ -130,7 +131,7 @@ class PaginaController extends Controller
 
     public function restore($id)
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $restore = $this->paginaRepository->getTrashedById($id)->restore();
         if(!$restore)
@@ -144,7 +145,7 @@ class PaginaController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
         $resultados = $this->paginaRepository->getBusca($busca);

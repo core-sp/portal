@@ -7,13 +7,10 @@ use App\Post;
 use App\Pagina;
 use App\Http\Requests\PostRequest;
 use App\Repositories\PostRepository;
-use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class PostsController extends Controller
 {
-    use ControleAcesso;
-
     private $class = 'PostsController';
     private $variaveis;
     private $post;
@@ -30,7 +27,7 @@ class PostsController extends Controller
     public function index()
     {
         // Verificando permissão de visualização de posts
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
 
         $resultados = $this->postRepository->getToTable();
         $tabela = $this->post->tabelaCompleta($resultados);
@@ -41,7 +38,7 @@ class PostsController extends Controller
     public function create()
     {
         // Verificando permissão de criação de posts
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('create', auth()->user());
 
         $variaveis = (object) $this->variaveis;
 
@@ -51,7 +48,7 @@ class PostsController extends Controller
     public function store(PostRequest $request)
     {
         // Verificando permissão de criação de posts (mesma do create)
-        $this->autoriza($this->class, 'create');
+        $this->authorize('create', auth()->user());
 
         $request->validated();
 
@@ -84,7 +81,7 @@ class PostsController extends Controller
     public function edit(Post $post)
     {
         // Verificando permissão de edição de posts
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
 
         $variaveis = (object) $this->variaveis;
 
@@ -94,7 +91,7 @@ class PostsController extends Controller
     public function update(PostRequest $request, $id)
     {
         // Verificando permissão de edição de posts (mesma do edit)
-        $this->autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
         
         $request->validated();
 
@@ -110,7 +107,7 @@ class PostsController extends Controller
     public function destroy($id)
     {
         // Verificando permissão de remoção de posts
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('delete', auth()->user());
 
         $this->postRepository->delete($id);
 
@@ -123,7 +120,7 @@ class PostsController extends Controller
 
     public function busca()
     {
-        $this->authorize('create', new Post());
+        $this->authorize('viewAny', auth()->user());
 
         $busca = IlluminateRequest::input('q');
 

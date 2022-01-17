@@ -6,14 +6,13 @@ use App\BdoEmpresa;
 use App\BdoOportunidade;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
-use App\Traits\ControleAcesso;
 use App\Http\Requests\BdoEmpresaRequest;
 use App\Repositories\BdoEmpresaRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoEmpresaController extends Controller
 {
-    use ControleAcesso, TabelaAdmin; 
+    use TabelaAdmin; 
 
     // Nome da Classe
     private $class = 'BdoEmpresaController';
@@ -40,9 +39,9 @@ class BdoEmpresaController extends Controller
 
     public function index()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
 
-        if(!$this->mostra($this->class, 'create')) {
+        if(auth()->user()->cannot('create', auth()->user())) {
             unset($this->variaveis['btn_criar']);
         }
             
@@ -55,7 +54,7 @@ class BdoEmpresaController extends Controller
 
     public function create()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('create', auth()->user());
 
         $variaveis = (object) $this->variaveis;
         $capitais = BdoEmpresa::capitalSocial();
@@ -66,7 +65,7 @@ class BdoEmpresaController extends Controller
 
     public function store(BdoEmpresaRequest $request)
     {
-        $this->autoriza($this->class, 'create');
+        $this->authorize('create', auth()->user());
 
         $request->validated();
 
@@ -85,7 +84,7 @@ class BdoEmpresaController extends Controller
 
     public function edit($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
 
         $resultado = $this->bdoEmpresaRepository->findOrFail($id);
         $variaveis = (object) $this->variaveis;
@@ -97,7 +96,7 @@ class BdoEmpresaController extends Controller
 
     public function update(BdoEmpresaRequest $request, $id)
     {
-        $this->autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
 
         $request->validated();
 
@@ -116,7 +115,7 @@ class BdoEmpresaController extends Controller
 
     public function destroy($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('delete', auth()->user());
 
         $empresa = $this->bdoEmpresaRepository->getOportunidadesbyEmpresa($id);
 
@@ -142,7 +141,7 @@ class BdoEmpresaController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
@@ -194,18 +193,18 @@ class BdoEmpresaController extends Controller
         ];
 
         $contents = $query->map(function($row){
-            if($this->mostra('BdoOportunidadeController', 'create')) {
+            if(perfisPermitidos('BdoOportunidadeController', 'create')) {
                 $acoes = '<a href="/admin/bdo/criar/'.$row->idempresa.'" class="btn btn-sm btn-secondary">Nova Oportunidade</a> ';
             }
             else {
                 $acoes = '';
             }
                
-            if($this->mostra('BdoEmpresaController', 'edit')) {
+            if(auth()->user()->can('updateOther', auth()->user())) {
                 $acoes .= '<a href="/admin/bdo/empresas/editar/'.$row->idempresa.'" class="btn btn-sm btn-primary">Editar</a> ';
             }
                 
-            if($this->mostra('BdoEmpresaController', 'destroy')) {
+            if(auth()->user()->can('delete', auth()->user())) {
                 $acoes .= '<form method="POST" action="/admin/bdo/empresas/apagar/'.$row->idempresa.'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';

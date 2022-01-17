@@ -35,6 +35,43 @@ class PaginaTest extends TestCase
             ]
         ]);
     }
+
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $this->assertGuest();
+        
+        $pagina = factory('App\Pagina')->create();
+
+        $this->get(route('paginas.index'))->assertRedirect(route('login'));
+        $this->get(route('paginas.create'))->assertRedirect(route('login'));
+        $this->get(route('paginas.edit', $pagina->idpagina))->assertRedirect(route('login'));
+        $this->post(route('paginas.store'))->assertRedirect(route('login'));
+        $this->patch(route('paginas.update', $pagina->idpagina))->assertRedirect(route('login'));
+        $this->delete(route('paginas.destroy', $pagina->idpagina))->assertRedirect(route('login'));
+        $this->get(route('paginas.restore', $pagina->idpagina))->assertRedirect(route('login'));
+        $this->get(route('paginas.busca'))->assertRedirect(route('login'));
+        $this->get(route('paginas.trashed'))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $pagina = factory('App\Pagina')->create();
+
+        $this->get(route('paginas.index'))->assertForbidden();
+        $this->get(route('paginas.create'))->assertForbidden();
+        $this->get(route('paginas.edit', $pagina->idpagina))->assertForbidden();
+        $this->post(route('paginas.store'), $pagina->toArray())->assertForbidden();
+        $this->patch(route('paginas.update', $pagina->idpagina), $pagina->toArray())->assertForbidden();
+        $this->delete(route('paginas.destroy', $pagina->idpagina))->assertForbidden();
+        $this->get(route('paginas.restore', $pagina->idpagina))->assertForbidden();
+        $this->get(route('paginas.busca'))->assertForbidden();
+        $this->get(route('paginas.trashed'))->assertForbidden();
+    }
     
     /** @test */
     public function pagina_can_be_created()
