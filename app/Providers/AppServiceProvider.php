@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use Laravel\Horizon\Horizon;
 use Illuminate\Support\Facades\Schema;
 use App\Repositories\GerentiRepository;
 use Illuminate\Support\ServiceProvider;
@@ -26,7 +25,8 @@ class AppServiceProvider extends ServiceProvider
             $this->app->bind(GerentiRepositoryInterface::class, GerentiRepository::class);
         }
         
-        
+        $this->app->bind('App\Contracts\MediadorServiceInterface', 'App\Services\MediadorService');
+        $this->app->bind('App\Contracts\SuporteServiceInterface', 'App\Services\SuporteService');
     }
 
     /**

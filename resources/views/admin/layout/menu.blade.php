@@ -17,7 +17,7 @@
                     </a>
                 </li>
 
-                @if(auth()->user()->isAdmin())
+                @can('onlyAdmin', auth()->user())
                 <li class="nav-item">
                     <a href="/admin/usuarios/criar" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -30,19 +30,39 @@
                         <p>Perfis</p>
                     </a>
                 </li>
-                @endif
+                @endcan
             </ul>
         </li>
         @endif
 
-        @if(auth()->user()->isAdmin())
+        @can('onlyAdmin', auth()->user())
+        <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-tools"></i>
+                <p>Suporte<i class="right fa fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="{{ route('suporte.log.externo.index') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Log Externo</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#{{-- route('suporte.erros.index') --}}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Erros</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
         <li class="nav-item">
             <a href="{{ route('chamados.lista') }}" class="nav-link">
                 <i class="nav-icon fas fa-ticket-alt"></i>
                 <p>Chamados</p>
             </a>
         </li>
-        @endif 
+        @endcan 
         <li class="nav-item">
             <a href="{{ route('regionais.index') }}" class="nav-link">
                 <i class="nav-icon fas fa-globe-americas"></i>
