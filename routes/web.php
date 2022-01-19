@@ -158,7 +158,8 @@ Route::prefix('admin')->group(function() {
     Route::get('/log-externo', 'SuporteController@logExternoIndex')->name('suporte.log.externo.index');
     Route::get('/log-externo/hoje', 'SuporteController@viewLogExternoDoDia')->name('suporte.log.externo.hoje.view');
     Route::get('/log-externo/busca', 'SuporteController@buscaLogExterno')->name('suporte.log.externo.busca');
-    Route::get('/log-externo/log', 'SuporteController@viewLogExterno')->name('suporte.log.externo.view');
+    Route::get('/log-externo/log/{data}', 'SuporteController@viewLogExterno')->name('suporte.log.externo.view');
+    Route::get('/erros', 'SuporteController@errosIndex')->name('suporte.erros.index');
   });
 
 });

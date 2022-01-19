@@ -1,4 +1,5 @@
 <div class="card-body">
+    {{--
     <p class="mb-4">Obs: Para buscar uma informação no log use Ctrl + F para acionar o Localizar do navegador</p>
     <div class="row mb-4">
         <div class="col-3">
@@ -118,4 +119,5 @@
         </div>
     </div>
     @endif
+    --}}
 </div>

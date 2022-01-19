@@ -49,7 +49,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#{{-- route('suporte.erros.index') --}}" class="nav-link">
+                    <a href="{{ route('suporte.erros.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Erros</p>
                     </a>

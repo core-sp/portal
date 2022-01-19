@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Contracts\MediadorServiceInterface;
+use App\Http\Requests\SuporteRequest;
+use Illuminate\Support\Facades\View;
 
 class SuporteController extends Controller
 {
@@ -13,34 +15,34 @@ class SuporteController extends Controller
     {
         $this->middleware('auth');
         $this->service = $service;
+
+        if(isset($service) && \Route::is('suporte.log.externo.*'))
+        {
+            $dados = $this->service->getService('Suporte')->indexLog();
+            $info = $dados['info'];
+            $variaveis = $dados['variaveis'];
+            View::share([
+                'info' => $info, 
+                'variaveis' => $variaveis
+            ]);
+        }
     }
 
     public function logExternoIndex()
     {
         $this->authorize('onlyAdmin', auth()->user());
-        try{
-            $dados = $this->service->getService('Suporte')->indexLog();
-            $info = $dados['info'];
-            $variaveis = $dados['variaveis'];
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            abort(500, "Erro ao carregar o serviço de suporte.");
-        }
-
-        return view('admin.crud.mostra', compact('info', 'variaveis'))->with([
-            'message' => 'Ainda não há log do dia de hoje: '.date('d/m/Y'),
-            'class' => 'alert-warning'
-        ]);
+    
+        return view('admin.crud.mostra');
     }
 
     public function viewLogExternoDoDia()
     {
         $this->authorize('onlyAdmin', auth()->user());
         try{
-            $log = $this->service->getService('Suporte')->logDoDia();
+            $log = $this->service->getService('Suporte')->logPorData(date('Y-m-d'));
             $headers = [
                 'Content-Type' => 'text/plain; charset=UTF-8',
-                'Content-Disposition' => 'inline; filename="laravel-'.date('Y').'-'.date('m').'-'.date('d').'.log"'
+                'Content-Disposition' => 'inline; filename="laravel-'.date('Y-m-d').'.log"'
             ];
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -53,18 +55,22 @@ class SuporteController extends Controller
         ]);
     }
 
-    public function buscaLogExterno(Request $request)
+    public function buscaLogExterno(SuporteRequest $request)
     {
+        $request->validated();
+
         $this->authorize('onlyAdmin', auth()->user());
         try{
-            $resultado = $this->service->getService('Suporte')->busca($request->all());
-            $tipo = isset($request->data) ? 'data' : 'texto'; 
+            $dados = $this->service->getService('Suporte')->logBusca($request);
+            $busca = isset($request->data) ? onlyDate($request->data) : $request->texto;
+            $resultado = $dados['resultado'];
+            $tipo = isset($request->data) ? 'data' : 'texto';
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao carregar o log da busca.");
         }
 
-        return redirect()->back()->with(compact('resultado', 'tipo'));
+        return view('admin.crud.mostra', compact('resultado', 'tipo', 'busca'));
     }
 
     public function viewLogExterno($data)
@@ -76,14 +82,30 @@ class SuporteController extends Controller
                 'Content-Type' => 'text/plain; charset=UTF-8',
                 'Content-Disposition' => 'inline; filename="laravel-'.$data.'.log"'
             ];
+            $dataFormatada = onlyDate($data);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao carregar o log da data escolhida.");
         }
 
         return isset($log) ? response()->stream($log, 200, $headers) : redirect()->back()->with([
-            'message' => 'Ainda não há log do dia: '.$data,
+            'message' => 'Não há log do dia: '.$dataFormatada,
             'class' => 'alert-warning'
         ]);
+    }
+
+    public function errosIndex()
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+        try{
+            $dados = $this->service->getService('Suporte')->indexErros();
+            $erros = $dados['erros'];
+            $variaveis = $dados['variaveis'];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar a tabela de erros.");
+        }
+    
+        return view('admin.crud.mostra', compact('erros', 'variaveis'));
     }
 }
