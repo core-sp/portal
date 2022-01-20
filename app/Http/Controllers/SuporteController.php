@@ -50,7 +50,7 @@ class SuporteController extends Controller
         }
 
         return isset($log) ? response()->stream($log, 200, $headers) : redirect()->back()->with([
-            'message' => 'Ainda não há log do dia de hoje: '.date('d/m/Y'),
+            'message' => '<i class="icon fa fa-ban"></i>Ainda não há log do dia de hoje: '.date('d/m/Y'),
             'class' => 'alert-warning'
         ]);
     }
@@ -89,7 +89,7 @@ class SuporteController extends Controller
         }
 
         return isset($log) ? response()->stream($log, 200, $headers) : redirect()->back()->with([
-            'message' => 'Não há log do dia: '.$dataFormatada,
+            'message' => '<i class="icon fa fa-ban"></i>Não há log do dia: '.$dataFormatada,
             'class' => 'alert-warning'
         ]);
     }
@@ -107,5 +107,40 @@ class SuporteController extends Controller
         }
     
         return view('admin.crud.mostra', compact('erros', 'variaveis'));
+    }
+
+    public function uploadFileErros(SuporteRequest $request)
+    {
+        $request->validated();
+        $liberado = auth()->user()->can('onlyAdmin', auth()->user()) && auth()->user()->email == 'desenvolvimento@core-sp.org.br';
+        abort_if(!$liberado, 403);
+        try{
+            $this->service->getService('Suporte')->uploadFileErros($request->file);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar a tabela de erros.");
+        }
+    
+        return redirect()->back()->with([
+            'message' => '<i class="icon fa fa-check"></i>Arquivo atualizado com sucesso!',
+            'class' => 'alert-success'
+        ]);
+    }
+
+    public function getErrosFile()
+    {
+        $liberado = auth()->user()->can('onlyAdmin', auth()->user()) && auth()->user()->email == 'desenvolvimento@core-sp.org.br';
+        abort_if(!$liberado, 403);
+        try{
+            $path = $this->service->getService('Suporte')->getFileErros();
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar a tabela de erros.");
+        }
+    
+        return isset($path) ? response()->download($path) : redirect()->back()->with([
+            'message' => '<i class="icon fa fa-ban"></i>Não há arquivo',
+            'class' => 'alert-warning'
+        ]);
     }
 }

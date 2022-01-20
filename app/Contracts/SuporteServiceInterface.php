@@ -11,4 +11,8 @@ interface SuporteServiceInterface {
     public function logPorData($data);
 
     public function indexErros();
+
+    public function uploadFileErros($file);
+
+    public function getFileErros();
 }

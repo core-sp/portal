@@ -10,6 +10,7 @@ class SuporteService implements SuporteServiceInterface {
 
     private $variaveisLog;
     private $variaveisErros;
+    private $nomeFileErros;
 
     public function __construct()
     {
@@ -24,6 +25,8 @@ class SuporteService implements SuporteServiceInterface {
             'singular' => 'Tabela de Erros',
             'singulariza' => 'os erros',
         ];
+
+        $this->nomeFileErros = 'suporte-tabela-erros.txt';
     }
 
     private function getLog($data)
@@ -90,10 +93,9 @@ class SuporteService implements SuporteServiceInterface {
         return Storage::disk('log_externo')->exists($log);
     }
 
-    private function getFileErros()
+    private function editarConteudoErros($erros)
     {
-        // Criar arquivo no servidor para tabelar os erros
-        // \Storage::disk('local')->put('tabela-erros.txt');
+        return explode(PHP_EOL, $erros);
     }
 
     public function indexLog()
@@ -135,9 +137,20 @@ class SuporteService implements SuporteServiceInterface {
 
     public function indexErros()
     {
+        $erros = Storage::disk('local')->exists($this->nomeFileErros) ? $this->editarConteudoErros(Storage::disk('local')->get($this->nomeFileErros)) : null;
         return $dados = [
-            'erros' => $this->getFileErros(),
+            'erros' => $erros,
             'variaveis' => (object) $this->variaveisErros
         ];
+    }
+
+    public function uploadFileErros($file)
+    {
+        $file->storeAs('', $this->nomeFileErros, 'local');
+    }
+
+    public function getFileErros()
+    {
+        return Storage::disk('local')->exists($this->nomeFileErros) ? Storage::disk('local')->path($this->nomeFileErros) : null;
     }
 }

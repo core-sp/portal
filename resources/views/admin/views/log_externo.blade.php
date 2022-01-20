@@ -1,5 +1,5 @@
 <div class="card-body">
-    <p class="mb-4">Obs: Para buscar uma informação no log use Ctrl + F para acionar o Localizar do navegador</p>
+    <p class="mb-4">Obs: Para buscar uma informação no log use <kbd>Ctrl + F</kbd> para acionar o Localizar do navegador</p>
     <div class="row mb-4">
         <div class="col-3">
             @if(isset($info))
@@ -13,6 +13,7 @@
         </div>
         <div class="col-3">
             <form action="{{ route('suporte.log.externo.busca') }}">
+                @csrf
                 <div class="form-group">
                     <label for="buscar-data">Buscar por data:</label>
                     <input type="date" 
@@ -32,6 +33,7 @@
         </div>
         <div class="col">
             <form action="{{ route('suporte.log.externo.busca') }}">
+                @csrf
                 <div class="form-group">    
                     <label for="buscar-texto">Buscar por texto nos últimos 3 logs:</label>
                     <input type="text" 

@@ -160,6 +160,8 @@ Route::prefix('admin')->group(function() {
     Route::get('/log-externo/busca', 'SuporteController@buscaLogExterno')->name('suporte.log.externo.busca');
     Route::get('/log-externo/log/{data}', 'SuporteController@viewLogExterno')->name('suporte.log.externo.view');
     Route::get('/erros', 'SuporteController@errosIndex')->name('suporte.erros.index');
+    Route::post('/erros/file', 'SuporteController@uploadFileErros')->name('suporte.erros.file.post');
+    Route::get('/erros/file', 'SuporteController@getErrosFile')->name('suporte.erros.file.get');
   });
 
 });
