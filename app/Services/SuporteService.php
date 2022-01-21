@@ -65,7 +65,7 @@ class SuporteService implements SuporteServiceInterface {
     {
         $data = Carbon::createFromFormat('Y-m-d', $data);
         $anoMes = $data->format('Y').'/'.$data->format('m').'/';
-        $nomeArquivo = 'laravel-'.$data->format('Y').'-'.$data->format('m').'-'.$data->format('d').'.log';
+        $nomeArquivo = 'laravel-'.$data->format('Y-m-d').'.log';
 
         return $anoMes.$nomeArquivo;
     }
