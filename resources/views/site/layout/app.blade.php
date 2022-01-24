@@ -154,7 +154,7 @@
                     </div>
                   </li>
                   <li class="nav-item">
-                    <a href="/licitacoes" class="nav-link">Licitações</a>
+                    <a href="/licitacoes" class="nav-link">Licitações e Contratação Direta</a>
                   </li>
                   <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Serviços</a>
@@ -191,7 +191,7 @@
                     <a href="/seccionais" class="nav-link">Seccionais</a>
                   </li>
                   <li class="nav-item">
-                    <a href="/blog" class="nav-link">Blog</a>
+                    <a href="/blog" class="nav-link">Imprensa</a>
                   </li>
                 </ul>
               </nav>
