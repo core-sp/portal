@@ -22,6 +22,31 @@ class RegionalTest extends TestCase
     }
 
     /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $this->assertGuest();
+        
+        $regional = factory('App\Regional')->create();
+
+        $this->get(route('regionais.index'))->assertRedirect(route('login'));
+        $this->get(route('regionais.busca'))->assertRedirect(route('login'));
+        $this->get(route('regionais.edit', $regional->idregional))->assertRedirect(route('login'));
+        $this->patch(route('regionais.update', $regional->idregional))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $regional = factory('App\Regional')->create();
+
+        $this->get(route('regionais.edit', $regional->idregional))->assertForbidden();
+        $this->patch(route('regionais.update', $regional->idregional), $regional->toArray())->assertForbidden();
+    }
+
+    /** @test */
     public function regionais_are_shown_on_admin_panel()
     {
         $this->signIn();

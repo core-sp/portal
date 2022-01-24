@@ -6,7 +6,6 @@ use App\Chamado;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
-use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ChamadoRequest;
 use App\Repositories\ChamadoRepository;
@@ -14,7 +13,7 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class ChamadoController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     private $chamadoRepository;
 
@@ -38,7 +37,7 @@ class ChamadoController extends Controller
 
     public function index()
     {
-        $this->autorizaStatic([1]);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $resultados = $this->resultados();
         $tabela = $this->tabelaCompleta($resultados, "lista");
@@ -80,10 +79,10 @@ class ChamadoController extends Controller
             abort(401);
         } 
         else {
-            if(Auth::id() === $resultado->idusuario) {
+            if(Auth::id() == $resultado->idusuario) {
                 $variaveis = $this->variaveis;
 
-                if(!$this->mostraStatic([1])) {
+                if(auth()->user()->cannot('onlyAdmin', auth()->user())) {
                     $variaveis['btn_lista'] = '';
                 }
 
@@ -122,10 +121,10 @@ class ChamadoController extends Controller
             abort(401);
         } 
         else {
-            if(Auth::id() === $resultado->idusuario || session('idperfil') === 1) {
+            if(Auth::id() === $resultado->idusuario || auth()->user()->idperfil === 1) {
                 $variaveis = $this->variaveis;
 
-                if(!$this->mostraStatic([1])) {
+                if(auth()->user()->cannot('onlyAdmin', auth()->user())) {
                     $variaveis['btn_lista'] = '';
                 }
                     
@@ -141,7 +140,7 @@ class ChamadoController extends Controller
 
     public function destroy($id)
     {
-        $this->autorizaStatic([1]);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $delete = $this->chamadoRepository->delete($id);
 
@@ -158,7 +157,7 @@ class ChamadoController extends Controller
 
     public function lixeira()
     {
-        $this->autorizaStatic([1]);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $resultados = $this->chamadoRepository->getAllTrashedChamados();
         $variaveis = (object) $this->variaveis;
@@ -169,7 +168,7 @@ class ChamadoController extends Controller
 
     public function restore($id)
     {
-        $this->autorizaStatic([1]);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $restore = $this->chamadoRepository->restore($id);
 
@@ -186,7 +185,7 @@ class ChamadoController extends Controller
 
     public function busca()
     {
-        $this->autorizaStatic([1]);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
@@ -198,6 +197,8 @@ class ChamadoController extends Controller
 
     public function resposta(Request $request, $id)
     {
+        $this->authorize('onlyAdmin', auth()->user());
+        
         $resposta = "<i>(" . date('d\/m\/Y, \à\s H:i') . "):</i> " . $request->input('resposta');
         
         $update = $this->chamadoRepository->updateResposta($id, $resposta);

@@ -2,17 +2,14 @@
 
 namespace App\Http\Requests;
 
-use App\Traits\ControleAcesso;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ConcursoRequest extends FormRequest
 {
-    use ControleAcesso;
-
-    public function authorize()
-    {
-        return $this->autoriza('ConcursoController', 'create');
-    }
+    // public function authorize()
+    // {
+    //     return false;
+    // }
 
     public function rules()
     {

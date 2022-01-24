@@ -8,13 +8,10 @@ use App\User;
 use App\Permissao;
 use App\Repositories\PermissaoRepository;
 use App\Repositories\PerfilRepository;
-use App\Traits\ControleAcesso;
 use App\Events\CrudEvent;
 
 class PerfilController extends Controller
 {
-    use ControleAcesso;
-
     private $permissao;
     private $permissaoRepository;
     private $permissaoVariaveis;
@@ -35,7 +32,7 @@ class PerfilController extends Controller
 
     public function index()
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $resultados = $this->perfilRepository->getToTable();
         $tabela = $this->perfil->tabelaCompleta($resultados);
@@ -46,7 +43,7 @@ class PerfilController extends Controller
 
     public function create()
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $variaveis = (object) $this->variaveis;
 
@@ -55,7 +52,7 @@ class PerfilController extends Controller
 
     public function store(Request $request)
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $regras = [
             'nome' => 'required|max:191',
@@ -82,7 +79,7 @@ class PerfilController extends Controller
      * sobre as configuração das permissões para mostrar na tela de edição.*/ 
     public function edit($id)
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $perfil = $this->perfilRepository->findOrFail($id);
         $idperfil = $perfil->idperfil; 
@@ -121,7 +118,7 @@ class PerfilController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $permissoes = $this->permissaoRepository->getAll();
 
@@ -145,7 +142,7 @@ class PerfilController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $delete = $this->perfilRepository->destroy($id);
         

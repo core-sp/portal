@@ -6,7 +6,6 @@ use App\PeriodoFiscalizacao;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
-use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\RegionalRepository;
@@ -16,7 +15,7 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class FiscalizacaoController extends Controller
 {
-    use TabelaAdmin, ControleAcesso;
+    use TabelaAdmin;
 
     private $class = 'FiscalizacaoController';
     private $regionalRepository;
@@ -55,7 +54,7 @@ class FiscalizacaoController extends Controller
 
     public function index()
     {
-        $this->autoriza($this->class, "index");
+        $this->authorize('viewAny', auth()->user());
 
         $resultados = $this->fiscalizacaoRepository->getAll();
         $tabela = $this->tabelaCompleta($resultados);
@@ -66,7 +65,7 @@ class FiscalizacaoController extends Controller
 
     public function createPeriodo() 
     {   
-        $this->autoriza($this->class, "create");
+        $this->authorize('create', auth()->user());
 
         $regionais = $this->regionalRepository->getRegionais();
         $variaveis = $this->periodoFiscalizacaoVariaveis;
@@ -78,7 +77,7 @@ class FiscalizacaoController extends Controller
 
     public function storePeriodo(PeriodoFiscalizacaoRequest $request)
     {
-        $this->autoriza($this->class, "create");
+        $this->authorize('create', auth()->user());
 
         DB::transaction(function () use ($request) {
             $periodo = $this->fiscalizacaoRepository->storePeriodo($request->toModel());
@@ -97,7 +96,7 @@ class FiscalizacaoController extends Controller
 
     public function updateStatus(Request $request)
     {
-        $this->autoriza($this->class, "edit");
+        $this->authorize('updateOther', auth()->user());
 
         $idusuario = Auth::user()->idusuario;
         $idperiodo = $request->idperiodo;
@@ -126,7 +125,7 @@ class FiscalizacaoController extends Controller
 
     public function editPeriodo($id)
     {
-        $this->autoriza($this->class, "edit");
+        $this->authorize('updateOther', auth()->user());
 
         $resultado = $this->fiscalizacaoRepository->findOrFail($id);
         $variaveis = $this->periodoFiscalizacaoVariaveis;
@@ -139,7 +138,7 @@ class FiscalizacaoController extends Controller
 
     public function updatePeriodo(Request $request, $id)
     {
-        $this->autoriza($this->class, "edit");
+        $this->authorize('updateOther', auth()->user());
 
         $dadosFiscalizacao = $request->regional;
 
@@ -163,7 +162,7 @@ class FiscalizacaoController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $busca = IlluminateRequest::input('q');
     
@@ -216,14 +215,14 @@ class FiscalizacaoController extends Controller
             $acoes .= "<input type='hidden' name='_token' value='" . csrf_token() . "'/>";
             
             if($row->status) {
-                if($this->mostra($this->class, 'edit')) {
+                if(auth()->user()->can('updateOther', auth()->user())) {
                     $acoes .= "<button type='submit' name='status' class='btn btn-sm btn-danger ml-1' value='0'>Reverter Publicação</button>";
                 }
                  
                 $status = PeriodoFiscalizacao::STATUS_PUBLICADO;
             }
             else {
-                if($this->mostra($this->class, 'edit')) {
+                if(auth()->user()->can('updateOther', auth()->user())) {
                     $acoes .= "<button type='submit' name='status' class='btn btn-sm btn-primary' value='1'>Publicar</button>";
                 }
                 
@@ -232,7 +231,7 @@ class FiscalizacaoController extends Controller
 
             $acoes .= "</form>";
 
-            if($this->mostra($this->class, 'edit')) {
+            if(auth()->user()->can('updateOther', auth()->user())) {
                 $acoes .= " <a href='" . route('fiscalizacao.editperiodo', $row->id) . "' class='btn btn-sm btn-default'>Editar</a>";
             }
             

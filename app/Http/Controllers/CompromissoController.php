@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
-use App\Traits\ControleAcesso;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\CompromissoRequest;
 use App\Repositories\CompromissoRepository;
 
 class CompromissoController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     private $class = 'CompromissoController';
 
@@ -33,7 +32,7 @@ class CompromissoController extends Controller
 
     public function index(Request $request)
     {
-        $this->autoriza($this->class, "index");
+        $this->authorize('viewAny', auth()->user());
 
         $variaveis = $this->variaveis;
 
@@ -74,7 +73,7 @@ class CompromissoController extends Controller
 
     public function create()
     {
-        $this->autoriza($this->class, 'create');
+        $this->authorize('create', auth()->user());
 
         $variaveis = (object) $this->variaveis;
 
@@ -83,7 +82,7 @@ class CompromissoController extends Controller
 
     public function store(CompromissoRequest $request)
     {
-        $this->autoriza($this->class, 'create');
+        $this->authorize('create', auth()->user());
 
         $compromisso = $this->compromissoRepository->store($request);
 
@@ -100,7 +99,7 @@ class CompromissoController extends Controller
 
     public function edit($id)
     {
-        $this->autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
 
         $resultado = $this->compromissoRepository->getById($id);
         $variaveis = (object) $this->variaveis;
@@ -110,7 +109,7 @@ class CompromissoController extends Controller
 
     public function update(CompromissoRequest $request, $id)
     {
-        $this->autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
 
         $compromisso = $this->compromissoRepository->update($id, $request);
 
@@ -127,7 +126,7 @@ class CompromissoController extends Controller
 
     public function destroy($id)
     {
-        $this->autoriza($this->class, 'destroy');
+        $this->authorize('delete', auth()->user());
         
         $delete = $this->compromissoRepository->deleteBy($id);
 
@@ -144,7 +143,7 @@ class CompromissoController extends Controller
 
     public function busca(Request $request)
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $busca = $request->q;
         $variaveis = (object) $this->variaveis;

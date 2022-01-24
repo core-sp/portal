@@ -6,14 +6,13 @@ use App\Licitacao;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
-use App\Traits\ControleAcesso;
 use App\Http\Requests\LicitacaoRequest;
 use App\Repositories\LicitacaoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class LicitacaoController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     private $class = 'LicitacaoController';
     private $licitacaoRepository;
@@ -38,12 +37,12 @@ class LicitacaoController extends Controller
 
     public function index()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
 
         $resultados = $this->licitacaoRepository->getToTable();
         $tabela = $this->tabelaCompleta($resultados);
 
-        if(!$this->mostra($this->class, 'create')) {
+        if(auth()->user()->cannot('create', auth()->user())) {
             unset($this->variaveis['btn_criar']);
         }
             
@@ -54,7 +53,7 @@ class LicitacaoController extends Controller
 
     public function create()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('create', auth()->user());
 
         $variaveis = (object) $this->variaveis;
         $modalidades = Licitacao::modalidadesLicitacao();
@@ -65,6 +64,8 @@ class LicitacaoController extends Controller
 
     public function store(LicitacaoRequest $request)
     {
+        $this->authorize('create', auth()->user());
+
         $request->validated();
         
         $save = $this->licitacaoRepository->store($request);
@@ -82,7 +83,7 @@ class LicitacaoController extends Controller
 
     public function edit($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
 
         $resultado = $this->licitacaoRepository->findById($id);
         $variaveis = (object) $this->variaveis;
@@ -94,6 +95,8 @@ class LicitacaoController extends Controller
 
     public function update(LicitacaoRequest $request, $id)
     {
+        $this->authorize('updateOther', auth()->user());
+
         $request->validated();
         
         $update = $this->licitacaoRepository->update($id, $request);
@@ -120,7 +123,7 @@ class LicitacaoController extends Controller
 
     public function destroy($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('delete', auth()->user());
         
         $delete = $this->licitacaoRepository->findById($id)->delete();
 
@@ -137,7 +140,7 @@ class LicitacaoController extends Controller
 
     public function lixeira()
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
 
         $variaveis = (object) $this->variaveis;
         $resultados = $this->licitacaoRepository->getTrashed();
@@ -148,7 +151,7 @@ class LicitacaoController extends Controller
 
     public function restore($id)
     {
-        $this->autorizaStatic(['1']);
+        $this->authorize('onlyAdmin', auth()->user());
         
         $restore = $this->licitacaoRepository->getTrashedById($id)->restore();
 
@@ -165,7 +168,7 @@ class LicitacaoController extends Controller
 
     public function busca()
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
 
         $busca = IlluminateRequest::input('q');
         $variaveis = (object) $this->variaveis;
@@ -240,9 +243,9 @@ class LicitacaoController extends Controller
     {
         return $query->map(function($row){
             $acoes = '<a href="/licitacao/'.$row->idlicitacao.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if($this->mostra('LicitacaoController', 'edit'))
+            if(auth()->user()->can('updateOther', auth()->user()))
                 $acoes .= '<a href="'.route('licitacoes.edit', $row->idlicitacao).'" class="btn btn-sm btn-primary">Editar</a> ';
-            if($this->mostra('LicitacaoController', 'destroy')) {
+            if(auth()->user()->can('delete', auth()->user())) {
                 $acoes .= '<form method="POST" action="'.route('licitacoes.destroy', $row->idlicitacao).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';

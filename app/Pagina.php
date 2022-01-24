@@ -2,14 +2,13 @@
 
 namespace App;
 
-use App\Traits\ControleAcesso;
 use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pagina extends Model
 {
-    use SoftDeletes, TabelaAdmin, ControleAcesso;
+    use SoftDeletes, TabelaAdmin;
     
     protected $primaryKey = 'idpagina';
     protected $fillable = ['titulo', 'subtitulo', 'slug', 'img',
@@ -43,9 +42,9 @@ class Pagina extends Model
     {
         return $query->map(function($row) {
             $acoes = '<a href="/'.$row->slug.'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if($this->mostra('PaginaController', 'edit'))
+            if(auth()->user()->can('updateOther', auth()->user()))
                 $acoes .= '<a href="'.route('paginas.edit', $row->idpagina).'" class="btn btn-sm btn-primary">Editar</a> ';
-            if($this->mostra('PaginaController', 'destroy')) {
+            if(auth()->user()->can('delete', auth()->user())) {
                 $acoes .= '<form method="POST" action="'.route('paginas.destroy', $row->idpagina).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
@@ -80,7 +79,7 @@ class Pagina extends Model
     {
         $headers = ['Código', 'Título', 'Deletada em:', 'Ações'];
         $contents = $query->map(function($row){
-            $acoes = '<a href="'.route('paginas.destroy', $row->idpagina).'" class="btn btn-sm btn-primary">Restaurar</a>';
+            $acoes = '<a href="'.route('paginas.restore', $row->idpagina).'" class="btn btn-sm btn-primary">Restaurar</a>';
             return [
                 $row->idpagina,
                 $row->titulo,

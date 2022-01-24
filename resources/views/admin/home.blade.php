@@ -47,7 +47,7 @@
 			</div>
 		</div>
 		<div class="col">
-		@if(session('idperfil') === 1 || session('idperfil') === 3)
+		@if(auth()->user()->idperfil == 1 || auth()->user()->idperfil == 3)
 		<a href="/admin/newsletter/download" class="inherit">
 		@endif
 		<div class="info-box">
@@ -57,16 +57,16 @@
 			<div class="info-box-content">
 				<span class="info-box-text inherit">Inscrições na Newsletter</span>
 				<span class="info-box-number inherit d-inline">{{ $totalNewsletter }}</span>
-				@if(session('idperfil') === 1 || session('idperfil') === 3)
+				@if(auth()->user()->idperfil == 1 || auth()->user()->idperfil == 3)
 				&nbsp;<span class="linkDownload d-inline">(Baixar CSV)</span>
 				@endif
 			</div>
 		</div>
-		@if(session('idperfil') === 1 || session('idperfil') === 3)
+		@if(auth()->user()->idperfil == 1 || auth()->user()->idperfil == 3)
 		</a>
 		@endif
 		</div>	 	
-		@if(session('idperfil') === 1 || session('idperfil') === 3)
+		@if(auth()->user()->idperfil == 1 || auth()->user()->idperfil == 3)
 		<div class="col">
 			<a href="{{route('termo.consentimento.download')}}" class="inherit">
 				<div class="info-box">
@@ -92,7 +92,7 @@
   	  <div class="col">
   	  	<div class="card card-info">
   	  	  <div class="card-header">
-  	  	  	<h3 class="card-title">Conectado como: <strong>{{ session('perfil') }}</strong></h3>
+  	  	  	<h3 class="card-title">Conectado como: <strong>{{ auth()->user()->perfil->nome }}</strong></h3>
   	  	  </div>
   	  	  <div class="card-body">
 			<p>Este é o painel de administrador do Portal do CORE-SP!</p>
@@ -104,7 +104,7 @@
 		  </div>
   	  	</div>
   	  </div>
-	  @if(session('idperfil') === 6 || session('idperfil') === 1 || session('idperfil') === 12)
+	  @if(auth()->user()->idperfil == 6 || auth()->user()->idperfil == 1 || auth()->user()->idperfil == 12)
 	  <div class="col">
 		<div class="card card-info">
 		  <div class="card-header">

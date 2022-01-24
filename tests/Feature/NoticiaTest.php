@@ -38,6 +38,43 @@ class NoticiaTest extends TestCase
     }
     
     /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $this->assertGuest();
+        
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.index'))->assertRedirect(route('login'));
+        $this->get(route('noticias.create'))->assertRedirect(route('login'));
+        $this->get(route('noticias.edit', $noticia->idnoticia))->assertRedirect(route('login'));
+        $this->post(route('noticias.store'))->assertRedirect(route('login'));
+        $this->patch(route('noticias.update', $noticia->idnoticia))->assertRedirect(route('login'));
+        $this->delete(route('noticias.destroy', $noticia->idnoticia))->assertRedirect(route('login'));
+        $this->get(route('noticias.restore', $noticia->idnoticia))->assertRedirect(route('login'));
+        $this->get(route('noticias.busca'))->assertRedirect(route('login'));
+        $this->get(route('noticias.trashed'))->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
+        
+        $noticia = factory('App\Noticia')->create();
+
+        $this->get(route('noticias.index'))->assertForbidden();
+        $this->get(route('noticias.create'))->assertForbidden();
+        $this->get(route('noticias.edit', $noticia->idnoticia))->assertForbidden();
+        $this->post(route('noticias.store'), $noticia->toArray())->assertForbidden();
+        $this->patch(route('noticias.update', $noticia->idnoticia), $noticia->toArray())->assertForbidden();
+        $this->delete(route('noticias.destroy', $noticia->idnoticia))->assertForbidden();
+        $this->get(route('noticias.restore', $noticia->idnoticia))->assertForbidden();
+        $this->get(route('noticias.busca'))->assertForbidden();
+        $this->get(route('noticias.trashed'))->assertForbidden();
+    }
+
+    /** @test */
     public function noticia_can_be_created_by_an_user()
     {
         $this->signInAsAdmin();
@@ -228,10 +265,11 @@ class NoticiaTest extends TestCase
 
         $this->get(route('noticias.edit', $noticia->idnoticia))->assertForbidden();
 
-        $titulo = 'Novo titulo';
+        $noticia2 = $noticia->toArray();
+        $noticia2['titulo'] = 'Novo título';
 
-        $this->patch(route('noticias.update', $noticia->idnoticia), ['titulo' => $titulo])->assertForbidden();
-        $this->assertDatabaseMissing('noticias', ['titulo' => $titulo]);
+        $this->patch(route('noticias.update', $noticia->idnoticia), $noticia2)->assertForbidden();
+        $this->assertDatabaseMissing('noticias', ['titulo' => $noticia2['titulo']]);
     }
 
     /** @test */

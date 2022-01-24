@@ -6,13 +6,12 @@ use Illuminate\Http\Request;
 use App\Events\CrudEvent;
 use App\Http\Requests\AvisoRequest;
 use App\Repositories\AvisoRepository;
-use App\Traits\ControleAcesso;
 use App\Traits\TabelaAdmin;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AvisoController extends Controller
 {
-    use ControleAcesso, TabelaAdmin;
+    use TabelaAdmin;
 
     // Nome da classe
     private $class = 'AvisoController';
@@ -33,7 +32,7 @@ class AvisoController extends Controller
 
     public function index()
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('viewAny', auth()->user());
         $resultados = $this->avisoRepository->getAll();
         $variaveis = (object) $this->variaveis;
         $tabela = $this->tabelaCompleta($resultados);
@@ -42,7 +41,7 @@ class AvisoController extends Controller
 
     public function show($id)
     {
-        $this->autoriza($this->class, 'index');
+        $this->authorize('viewAny', auth()->user());
         $resultado = $this->avisoRepository->getById($id);
         $this->variaveis['singulariza'] = 'o aviso da área do ' .$resultado->area;
         $variaveis = (object) $this->variaveis;
@@ -51,7 +50,7 @@ class AvisoController extends Controller
 
     public function edit($id)
     {
-        $this->autoriza($this->class, __FUNCTION__);
+        $this->authorize('updateOther', auth()->user());
         $resultado = $this->avisoRepository->getById($id);
         $variaveis = (object) $this->variaveis;
         $cores = $this->avisoRepository->cores();
@@ -60,7 +59,7 @@ class AvisoController extends Controller
 
     public function update(AvisoRequest $request, $id)
     {
-        $this->autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
         $request->validated();
         if(auth()->user() == null)
             abort(500, 'Não foi encontrado o usuário');
@@ -79,7 +78,7 @@ class AvisoController extends Controller
 
     public function updateStatus($id)
     {
-        $this->autoriza($this->class, 'edit');
+        $this->authorize('updateOther', auth()->user());
         if(auth()->user() == null)
             abort(500, 'Não foi encontrado o usuário');
         try{

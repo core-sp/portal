@@ -51,7 +51,7 @@
       @endif
     </div>
   </div>
-  @if(session('idperfil') === 1 && !isset($resultado->resposta) && !isset($resultado->deleted_at))
+  @if(auth()->user()->idperfil === 1 && !isset($resultado->resposta) && !isset($resultado->deleted_at))
   <hr>
   <form role="form" method="POST" action="/admin/chamados/resposta/{{ $resultado->idchamado }}">
     @csrf
