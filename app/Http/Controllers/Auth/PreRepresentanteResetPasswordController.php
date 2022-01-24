@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\ResetsPasswords;
-use Illuminate\Support\Str;
+use App\Events\ExternoEvent;
+use App\Http\Requests\PreRepresentanteRequest;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Events\ExternoEvent;
-use App\Http\Requests\PreRepresentanteRequest;
+use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Support\Str;
 
 class PreRepresentanteResetPasswordController extends Controller
 {
@@ -22,25 +22,12 @@ class PreRepresentanteResetPasswordController extends Controller
         $this->middleware('guest:pre_representante');
     }
 
-    protected function resetPassword($prerep, $password)
+    public function showResetForm(Request $request, $token = null)
     {
-        $pre = $prerep->forceFill([
-            'password' => bcrypt($password),
-            'remember_token' => Str::random(60),
-        ])->save();
-
-        if(!$pre)
-            event(new ExternoEvent('Usuário do Pré-registro ' . $prerep->id . ' não conseguiu alterar a senha.'));
-    }
-
-    protected function guard()
-    {
-        return Auth::guard('pre_representante');
-    }
-
-    protected function broker()
-    {
-        return Password::broker('pre_representantes');
+        return view('auth.passwords.reset-prerepresentante')->with([
+            'token' => $token, 
+            'cpf_cnpj' => $request->cpf_cnpj
+        ]);
     }
 
     protected function rules()
@@ -57,11 +44,6 @@ class PreRepresentanteResetPasswordController extends Controller
         return $request->all();
     }
 
-    public function getEmailForPasswordReset()
-    {
-        return $this->cpf_cnpj;
-    }
-
     protected function credentials(Request $request)
     {
         return [
@@ -70,6 +52,17 @@ class PreRepresentanteResetPasswordController extends Controller
             'password_confirmation' => $request->password_confirmation,
             'token' => $request->token
         ];
+    }
+
+    protected function resetPassword($prerep, $password)
+    {
+        $pre = $prerep->forceFill([
+            'password' => bcrypt($password),
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        if(!$pre)
+            event(new ExternoEvent('Usuário do Pré-registro ' . $prerep->id . ' não conseguiu alterar a senha.'));
     }
 
     protected function sendResetResponse(Request $request, $response)
@@ -82,11 +75,13 @@ class PreRepresentanteResetPasswordController extends Controller
             ]);
     }
 
-    public function showResetForm(Request $request, $token = null)
+    protected function broker()
     {
-        return view('auth.passwords.reset-prerepresentante')->with([
-            'token' => $token, 
-            'cpf_cnpj' => $request->cpf_cnpj
-        ]);
+        return Password::broker('pre_representantes');
+    }
+
+    protected function guard()
+    {
+        return Auth::guard('pre_representante');
     }
 }

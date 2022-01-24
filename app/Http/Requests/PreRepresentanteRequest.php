@@ -26,9 +26,9 @@ class PreRepresentanteRequest extends FormRequest
             ],
             'nome' => 'sometimes|required|min:5|max:191',
             'email' => 'sometimes|required|email|max:191',
-            'password_login' => 'sometimes|required|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
-            'password' => 'sometimes|required|confirmed|min:8|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
-            'password_confirmation' => 'sometimes|required|same:password',
+            'password_login' => 'sometimes|required|max:191',
+            'password' => 'sometimes|required|confirmed|min:8|max:191|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
+            'password_confirmation' => 'sometimes|required|same:password|max:191',
             'checkbox-tdu' => 'sometimes|required|accepted',
         ];
     }
@@ -42,8 +42,9 @@ class PreRepresentanteRequest extends FormRequest
             'password.min' => 'A senha precisa ter, no mínimo, 8 caracteres.',
             'password.confirmed' => 'As senhas precisam ser idênticas entre si.',
             'password.regex' => 'A senha deve ter, no mínimo, 8 caracteres contendo um número, uma letra maiúscula e uma minúscula.',
-            'cpf_cnpj.regex' => 'Somente numeros devem ser inseridos.',
-            'cpf_cnpj.unique' => 'Já existe esse CPF / CNPJ cadastrado no Pré-registro ou como Representante Comercial.',
+            'cpf_cnpj.regex' => 'Somente números devem ser inseridos.',
+            'cpf_cnpj_cad.regex' => 'Somente números devem ser inseridos.',
+            'cpf_cnpj_cad.unique' => 'Já existe esse CPF / CNPJ cadastrado no Pré-registro ou como Representante Comercial.',
         ];
     }
 }

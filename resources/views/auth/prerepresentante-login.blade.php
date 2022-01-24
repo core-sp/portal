@@ -47,7 +47,7 @@
                             type="text"
                             class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
                             name="cpf_cnpj"
-                            value="{{ old('cpf_cnpj') }}"
+                            value="{{ Session::get('cpf_cnpj') ?? old('cpf_cnpj') }}"
                             placeholder="CPF ou CNPJ"
                             required
                         >
