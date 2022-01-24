@@ -139,6 +139,15 @@ $(document).ready(function(){
       }
     }
   });
+
+  // Buscar na tabela da página 'suporte_erros.blade.php'
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+
 });
 
 (function($){

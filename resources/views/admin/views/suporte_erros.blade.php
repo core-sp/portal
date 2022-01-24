@@ -41,6 +41,9 @@
     @if(isset($erros))
     <div class="row">
         <div class="col">
+            <label for="myInput">Buscar texto:</label>  
+            <input class="form-control" id="myInput" type="text" placeholder="Buscar...">
+            <br>
             <div class="table-responsive-lg">
                 <table class="table table-hover mb-0">
                     <thead class="thead">
@@ -52,17 +55,17 @@
                             <th>Sugestões de resolução</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="myTable">
                     @foreach($erros as $key => $value)
                         @php
                             $campos = explode('*', $value);
                         @endphp
                         <tr>
                             <td>{{ $key }}</td>
-                            <td class="text-danger">{{ $campos[0] }}</a></td>
-                            <td>{{ $campos[1] }}</td>
-                            <td>{{ $campos[2] }}</td>
-                            <td class="text-primary">{{ $campos[3] }}</td>
+                            <td class="text-danger">{{ isset($campos[0]) ? $campos[0] : 'Item vazio' }}</a></td>
+                            <td>{{ isset($campos[1]) ? $campos[1] : 'Item vazio' }}</td>
+                            <td>{{ isset($campos[2]) ? $campos[2] : 'Item vazio' }}</td>
+                            <td class="text-primary">{{ isset($campos[3]) ? $campos[3] : 'Item vazio' }}</td>
                         </tr>
                     @endforeach
                     </tbody>
