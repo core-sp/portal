@@ -504,9 +504,9 @@ figure.align-left {
 }
 
 .nav-item a {
-	padding: 0.375rem 0.5rem;
+	padding: 0.300rem 0.300rem;
 	font-weight: 700;
-	font-size: 0.95rem;
+	font-size: 0.85rem;
 	letter-spacing: -0.1px;
 }
 
@@ -2580,7 +2580,7 @@ h5 {
 		z-index: 999;
 		display: block;
 		top: 0;
-		left: -250px;
+		left: -275px;
 		transition: left 0.3s;
 		-webkit-box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
 		-moz-box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);

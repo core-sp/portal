@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Licitações'])
+@extends('site.layout.app', ['title' => 'Licitações e Contratação Direta'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Licitações
+          Licitações e Contratação Direta
         </h1>
       </div>
     </div>
