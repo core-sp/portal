@@ -567,7 +567,7 @@ class RepresentanteSiteController extends Controller
             $save = $this->solicitaCedulaRepository->create($representante->id, $idregional, $validate);
 
             event(new ExternoEvent('Usuário ' . $representante->id . ' ("'. $representante->registro_core .'") solicitou cédula.'));
-            // Mail::to($representante->email)->queue(new SolicitaCedulaMail($save));
+            Mail::to($representante->email)->queue(new SolicitaCedulaMail($save));
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao criar sua solicitação de cédula.");

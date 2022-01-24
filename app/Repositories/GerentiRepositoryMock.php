@@ -6,8 +6,7 @@ use App\Representante;
 use App\Connections\FirebirdConnection;
 use App\Repositories\GerentiRepositoryInterface;
 
-class GerentiRepositoryMock implements GerentiRepositoryInterface
-{    
+class GerentiRepositoryMock implements GerentiRepositoryInterface{
     public function gerentiChecaLogin($registro, $cpfCnpj, $email = null)
     {
         $cpfCnpj = apenasNumeros($cpfCnpj);
@@ -17,13 +16,13 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
             $resultado = [
                 "SITUACAO" => "Ativo", 
                 "REGISTRONUM" => "0000000001", 
-                "ASS_ID" => '000001', 
+                "ASS_ID" => "000001", 
                 "NOME" => "RC Teste 1", 
                 "EMAILS" => "desenvolvimento@core-sp.org.br;desenvolvimento2@core-sp.org.br"
             ];
         }
         // RC Teste 2 (PJ)
-        elseif($cpfCnpj == '84825147000100') {
+        elseif($cpfCnpj == '11748345000144') {
             $resultado = [
                 "SITUACAO" => "Ativo", 
                 "REGISTRONUM" => "0000000002", 
@@ -126,7 +125,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
     public function gerentiDadosGeraisPF($ass_id)
     {
         // RC Teste 1 (PF)
-        // if($ass_id == $this->assid) {
+        if($ass_id == "000001") {
             $resultado = [
                 "Data de cadastro" => "2006-04-12", 
                 "Data de nascimento" => "30/09/1962",
@@ -146,7 +145,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
                 "Registro secundário" => "Não",
                 "Core de origem" => null
             ];
-        // }
+        }
 
         return $resultado;
     }
@@ -154,7 +153,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
     public function gerentiDadosGeraisPJ($ass_id)
     {
         // RC Teste 2 (PJ)
-        // if($ass_id == $this->assid) {
+        if($ass_id == "000002") {
             $resultado = [
                 "Data de cadastro" => "2016-03-02",
                 "Data do Registro Social" => "2016-03-02",
@@ -171,7 +170,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
                 "Inscrição municipal" => null,
                 "Responsável Técnico" => ""
             ];
-        // }
+        }
 
         return $resultado;
     }
@@ -308,8 +307,8 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
     }
 
     public function gerentiStatus($ass_id)
-    {        
-        return $resultado = "Situação: Em dia.";
+    {
+        return "Situação: Em dia.";
     }
 
     /**
@@ -376,7 +375,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
      */
     public function gerentiAtivo($cpfCnpj)
     {
-        if(strlen($cpfCnpj) == 11) {
+        if($cpfCnpj == "86294373085") {
             $resultado[0] = [
                 "SITUACAO" => "Ativo", 
                 "REGISTRONUM" => "0000000001", 
@@ -385,7 +384,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
                 "EMAILS" => "desenvolvimento@core-sp.org.br"
             ];
         }
-        elseif(strlen($cpfCnpj) == 14) {
+        elseif($cpfCnpj == "11748345000144") {
             $resultado[0] = [
                 "SITUACAO" => "Ativo", 
                 "REGISTRONUM" => "0000000002", 

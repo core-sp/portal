@@ -61,7 +61,7 @@ class SolicitaCedulaController extends Controller
 
             event(new CrudEvent('solicitação de cédula', 'atendente aceitou', $request->id));
             
-            // Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
+            Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao atualizar o status da solicitação de cédula.");
@@ -85,7 +85,7 @@ class SolicitaCedulaController extends Controller
 
             event(new CrudEvent('solicitação de cédula', 'atendente recusou e justificou', $request->id));
 
-            // Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
+            Mail::to($cedula->representante->email)->queue(new SolicitaCedulaMail($cedula));
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao atualizar o status da solicitação de cédula.");
@@ -114,7 +114,7 @@ class SolicitaCedulaController extends Controller
         foreach($resultados as $resultado) {
             $acoes = '<a href="'. route('admin.solicita-cedula.show', $resultado->id) . '" class="btn btn-sm btn-default">Ver</a> ';
             if($resultado->podeGerarPdf())
-                $acoes .= '<a href="' . route('admin.solicita-cedula.pdf', $resultado->id) . '" class="btn btn-sm btn-warning">PDF</a> ';
+                $acoes .= '<a href="' . route('admin.solicita-cedula.pdf', $resultado->id) . '" target="_blank" class="btn btn-sm btn-warning">PDF</a> ';
             $conteudo = [
                 $resultado->id,
                 $resultado->representante->nome,
