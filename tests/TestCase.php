@@ -31,6 +31,11 @@ abstract class TestCase extends BaseTestCase
         return 'logs/interno/'.date('Y').'/'.date('m').'/laravel-'.date('Y-m-d').'.log';
     }
 
+    protected function pathLogExterno()
+    {
+        return 'logs/externo/'.date('Y').'/'.date('m').'/laravel-'.date('Y-m-d').'.log';
+    }
+
     protected function signIn($user = null)
     {
         factory('App\Perfil')->create([
@@ -44,14 +49,15 @@ abstract class TestCase extends BaseTestCase
         return $user;
     }
 
-    protected function signInAsAdmin()
+    protected function signInAsAdmin($email = null)
     {
         $perfilDeAdmin = factory('App\Perfil')->create([
             'nome' => 'Admin'
         ]);
 
         $user = factory('App\User')->create([
-            'idperfil' => $perfilDeAdmin->idperfil
+            'idperfil' => $perfilDeAdmin->idperfil,
+            'email' => isset($email) ? $email : 'email_fake_admin@core-sp.org.br'
         ]);
 
         $this->actingAs($user);

@@ -64,6 +64,11 @@ return [
             'url' => env('AWS_URL'),
         ],
 
+        'log_externo' => [
+            'driver' => 'local',
+            'root' => storage_path('logs/externo'),
+            'url' => env('APP_URL').'/storage/log/externo',
+        ],
     ],
 
 ];
