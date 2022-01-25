@@ -48,7 +48,6 @@ $(document).ready(function(){
 	$('.cpfOuCnpj').index() > -1 && $('.cpfOuCnpj').val().length > 11 ? 
 	$('.cpfOuCnpj').mask('00.000.000/0000-00', options) : 
 	$('.cpfOuCnpj').mask('000.000.000-00#', options);
-
 	// Menu responsivo
 	var first = document.getElementById('menu-principal');
 	var second = document.getElementById('sidebarContent');
@@ -323,18 +322,19 @@ $('#ano-mapa').on({
 
 function regionaisExcluidasPlantaoJuridico()
 {
-	return regionaisExcluidas = ["1", "4", "5", "7", "8", "10", "12", "14"];
+	return regionaisExcluidas = ["1", "2", "6", "7", "9", "11", "14"];
 }
 
 function datasPorRegionalPlantaoJuridico(regional)
 {
 	var datas = []
-	datas[2] = [17,18],
-	datas[3] = [27,28],
-	datas[6] = [18,19],
-	datas[9] = [19,20],
-	datas[11] = [20,21],
-	datas[13] = [25,26]
+	datas[3] = ['01-27','01-28'],
+	datas[13] = ['01-25','01-26'],
+	datas[4] = ['02-09','02-11'],
+	datas[5] = ['02-07','02-08'],
+	datas[8] = ['02-07','02-08'],
+	datas[10] = ['02-10','02-11'],
+	datas[12] = ['02-09','02-10']
 	
 	return datas[regional];
 }
@@ -417,8 +417,8 @@ function datasPorRegionalPlantaoJuridico(regional)
 			if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
 				var datas = datasPorRegionalPlantaoJuridico($('#idregional').val());
 				$('#datepicker').datepicker('option', {
-					maxDate: new Date("2022-01-" + datas[1] + " 00:00:00"),
-					minDate: new Date("2022-01-" + datas[0] + " 00:00:00")
+					maxDate: new Date("2022-" + datas[1] + " 00:00:00"),
+					minDate: new Date("2022-" + datas[0] + " 00:00:00")
 				});
 			}else
 				$('#datepicker').datepicker('option', {
