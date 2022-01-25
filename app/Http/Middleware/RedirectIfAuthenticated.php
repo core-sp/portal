@@ -14,6 +14,10 @@ class RedirectIfAuthenticated
                 case 'representante':
                     return redirect()->route('representante.dashboard');
                 break;
+
+                case 'pre_representante':
+                    return redirect()->route('prerepresentante.dashboard');
+                break;
                 
                 default:
                     return redirect('/admin');

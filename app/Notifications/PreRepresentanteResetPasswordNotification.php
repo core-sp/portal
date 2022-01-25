@@ -14,6 +14,25 @@ class PreRepresentanteResetPasswordNotification extends ResetPasswordNotificatio
 
     public $token;
 
+    private function emailReset($token)
+    {
+        $body = 'Você está recebendo este email pois solicitou alteração de senha na área restrita do Pré-Registro no Portal Core-SP.';
+        $body .= '<br>';
+        $body .= 'Lembrando que este link é válido por 60 minutos.';
+        $body .= '<br>';
+        $body .= 'Clique no link abaixo para continuar o procedimento.';
+        $body .= '<br><br>';
+        $body .= '<a href="'. route('prerepresentante.password.reset', $token) .'">Alterar senha</a>';
+        $body .= '<br><br>';
+        $body .= 'Caso não tenha solicitado, favor desconsiderar este email.';
+        $body .= '<br><br>';
+        $body .= 'Atenciosamente,';
+        $body .= '<br>';
+        $body .= 'Portal Core-SP';
+    
+        return $body;
+    }
+
     public function __construct($token)
     {
         $this->token = $token;
@@ -28,10 +47,7 @@ class PreRepresentanteResetPasswordNotification extends ResetPasswordNotificatio
     {
         return (new MailMessage)
             ->subject('Alteração de senha no Pré-registro')
-            ->line('Você está recebendo este e-mail pois solicitou a reconfiguração de senha no Pré-registro do Portal do Core-SP.')
-            ->line('Lembrando que este link é válido por 60 minutos.')
-            ->action('Alteração de Senha no Pré-registro', route('prerepresentante.password.reset', $this->token))
-            ->line('Caso não tenha solicitado a reconfiguração, favor desconsiderar este e-mail');
+            ->view('emails.default', ['body' => $this->emailReset($this->token)]);
     }
 
     public function toArray($notifiable)

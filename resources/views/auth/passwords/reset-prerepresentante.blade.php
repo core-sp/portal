@@ -28,14 +28,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        @if(strpos($errors->first(), 'token'))
-        <p class="alert alert-danger mt-2">
-            {{ $errors->first() }}
-        </p>
-        @endif
-        
+        </div>        
         <div class="row mt-2">
           <div class="col-lg-8 conteudo-txt">
             <p>Preencha as informações abaixo para reconfigurar sua senha no Pré-registro.</p>
@@ -49,11 +42,11 @@
                   type="text"
                   class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
                   name="cpf_cnpj"
-                  value="{{ $cpf_cnpj ?? old('cpf_cnpj') }}"
+                  value="{{ old('cpf_cnpj') }}"
                   placeholder="CPF ou CNPJ"
                   required
                 >
-                @if ($errors->has('cpf_cnpj'))
+                @if($errors->has('cpf_cnpj'))
                   <span class="invalid-feedback" role="alert">
                     <strong>{{ $errors->first('cpf_cnpj') }}</strong>
                   </span>
@@ -70,7 +63,7 @@
                     placeholder="Nova senha"
                     required
                   >
-                  @if ($errors->has('password'))
+                  @if($errors->has('password'))
                     <span class="invalid-feedback" role="alert">
                       <strong>{{ $errors->first('password') }}</strong>
                     </span>
@@ -86,7 +79,7 @@
                     placeholder="Confirmar senha"
                     required
                   >
-                  @if ($errors->has('password_confirmation'))
+                  @if($errors->has('password_confirmation'))
                     <span class="invalid-feedback" role="alert">
                       <strong>{{ $errors->first('password_confirmation') }}</strong>
                     </span>

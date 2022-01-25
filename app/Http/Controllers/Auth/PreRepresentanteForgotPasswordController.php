@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\PreRepresentante;
 use App\Http\Requests\PreRepresentanteRequest;
+use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\Controller;
@@ -38,6 +39,9 @@ class PreRepresentanteForgotPasswordController extends Controller
         $response = $this->broker()->sendResetLink($arrayCC);
 
         $email = $this->getEmail($cpf_cnpj);
+        
+        if($response == Password::RESET_LINK_SENT)
+            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' solicitou o envio de link para alterar a senha.'));
 
         return $response == Password::RESET_LINK_SENT
                     ? $this->sendResetLinkResponse($request, 'O link de reconfiguração de senha foi enviado ao email ' . $email . '<br>Esse link é válido por 60 minutos')

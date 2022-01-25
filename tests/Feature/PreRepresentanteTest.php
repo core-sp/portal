@@ -434,7 +434,7 @@ class PreRepresentanteTest extends TestCase
         $this->post(route('prerepresentante.login.submit'), $dados);
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString('72027756000135', $log);
-        $this->assertStringContainsString('não conseguiu logar após verificação se ativo.', $log);
+        $this->assertStringContainsString('não conseguiu logar. Erro: CPF/CNPJ não encontrado.', $log);
     }
 
     /** @test 
@@ -485,6 +485,7 @@ class PreRepresentanteTest extends TestCase
             'password_login' => 'Teste102030',
         ])
         ->assertRedirect(route('prerepresentante.login'));
+        $this->get(route('prerepresentante.login'))->assertSeeText('Por favor, acesse o email informado no momento do cadastro para verificar sua conta.');
     }
 
     /** @test 
@@ -500,9 +501,8 @@ class PreRepresentanteTest extends TestCase
         ];
         $this->get(route('prerepresentante.login'))->assertOk();
         $this->post(route('prerepresentante.login.submit'), $dados)
-        ->assertSessionHasErrors([
-            'password_login'
-        ]);
+        ->assertRedirect(route('prerepresentante.login'));
+        $this->get(route('prerepresentante.login'))->assertSeeText('Login inválido');
     }
 
     /** @test 
@@ -571,6 +571,23 @@ class PreRepresentanteTest extends TestCase
         ])->assertSessionHasErrors([
             'cpf_cnpj'
         ]);
+    }
+
+    /** @test 
+     * 
+     * Log externo ao alterar a senha em 'Esqueci a senha'.
+    */
+    public function log_is_generated_when_send_mail_reset_password()
+    {
+        $prerep = factory('App\PreRepresentante')->create();
+        $this->get(route('prerepresentante.password.request'));
+        $this->post(route('prerepresentante.password.email'), [
+            'cpf_cnpj' => $prerep['cpf_cnpj']
+        ]);
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString($prerep['cpf_cnpj'], $log);
+        $this->assertStringContainsString('solicitou o envio de link para alterar a senha.', $log);
     }
 
     /** @test 
@@ -1111,7 +1128,7 @@ class PreRepresentanteTest extends TestCase
      * 
      * Pode acessar todas as abas na área restrita do Portal.
     */
-    public function access_tabs_on_restrict_area_pre_registro()
+    public function after_login_can_access_tabs_on_restrict_area_pre_registro()
     {
         $prerep = factory('App\PreRepresentante')->create();
         $this->post(route('prerepresentante.login.submit'), [

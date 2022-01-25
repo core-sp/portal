@@ -75,6 +75,14 @@ class PreRepresentanteResetPasswordController extends Controller
             ]);
     }
 
+    // Caso o token seja inválido ou o usuário, ele devolve o aviso no campo cpf_cnpj
+    protected function sendResetFailedResponse(Request $request, $response)
+    {
+        return redirect()->back()
+                    ->withInput($request->only('cpf_cnpj'))
+                    ->withErrors(['cpf_cnpj' => trans($response)]);
+    }
+
     protected function broker()
     {
         return Password::broker('pre_representantes');

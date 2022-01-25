@@ -17,6 +17,6 @@ return [
     'reset' => 'Sua senha foi resetada!',
     'sent' => 'O link de reconfiguração da senha foi enviado ao seu email!<br>O link é válido por 15 minutos',
     'token' => 'O token é inválido! Solicite novamente a alteração de senha',
-    'user' => 'Não foi possível encontrar um usuário com este e-mail.',
+    'user' => 'Não foi possível encontrar um usuário',
 
 ];
