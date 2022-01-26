@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\MediadorServiceInterface;
 use App\Contracts\SuporteServiceInterface;
+use App\Contracts\PlantaoJuridicoServiceInterface;
 
 class MediadorService implements MediadorServiceInterface {
 
@@ -11,11 +12,13 @@ class MediadorService implements MediadorServiceInterface {
 
     // Adicione o Serviço e o nome do Model
     public function __construct(
-        SuporteServiceInterface $suporteService
+        SuporteServiceInterface $suporteService,
+        PlantaoJuridicoServiceInterface $plantaoJuridicoService
     )
     {
         $this->service = [
             'Suporte' => $suporteService,
+            'PlantaoJuridico' => $plantaoJuridicoService,
         ];
     }
 
