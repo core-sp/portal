@@ -66,7 +66,7 @@ class PreRepresentanteLoginController extends Controller
         $verificou = $this->verificaSeAtivo($request->cpf_cnpj);
         if(!empty($verificou))
         {
-            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar. Erro: '.$verificou['message']));
+            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar no Pré-registro. Erro: '.$verificou['message']));
             return redirect()->back()->with($verificou);
         }
 
@@ -88,7 +88,7 @@ class PreRepresentanteLoginController extends Controller
         // user surpasses their maximum number of attempts they will get locked out.
         $this->incrementLoginAttempts($request);
 
-        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar.'));
+        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar no Pré-registro.'));
 
         return redirect()->back()->with([
             'message' => 'Login inválido.',

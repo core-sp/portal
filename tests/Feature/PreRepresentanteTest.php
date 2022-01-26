@@ -434,7 +434,7 @@ class PreRepresentanteTest extends TestCase
         $this->post(route('prerepresentante.login.submit'), $dados);
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString('72027756000135', $log);
-        $this->assertStringContainsString('não conseguiu logar. Erro: CPF/CNPJ não encontrado.', $log);
+        $this->assertStringContainsString('não conseguiu logar no Pré-registro. Erro: CPF/CNPJ não encontrado.', $log);
     }
 
     /** @test 
@@ -451,7 +451,7 @@ class PreRepresentanteTest extends TestCase
         $this->post(route('prerepresentante.login.submit'), $dados);
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString($prerep->cpf_cnpj, $log);
-        $this->assertStringContainsString('não conseguiu logar.', $log);
+        $this->assertStringContainsString('não conseguiu logar no Pré-registro.', $log);
     }
 
     /** @test 
@@ -587,7 +587,7 @@ class PreRepresentanteTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString($prerep['cpf_cnpj'], $log);
-        $this->assertStringContainsString('solicitou o envio de link para alterar a senha.', $log);
+        $this->assertStringContainsString('solicitou o envio de link para alterar a senha no Pré-registro.', $log);
     }
 
     /** @test 

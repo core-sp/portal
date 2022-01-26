@@ -41,11 +41,12 @@ class PreRepresentanteForgotPasswordController extends Controller
         $email = $this->getEmail($cpf_cnpj);
         
         if($response == Password::RESET_LINK_SENT)
-            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' solicitou o envio de link para alterar a senha.'));
+        {
+            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' solicitou o envio de link para alterar a senha no Pré-registro.'));
+            return $this->sendResetLinkResponse($request, 'O link de reconfiguração de senha foi enviado ao email ' . $email . '<br>Esse link é válido por 60 minutos');
+        }
 
-        return $response == Password::RESET_LINK_SENT
-                    ? $this->sendResetLinkResponse($request, 'O link de reconfiguração de senha foi enviado ao email ' . $email . '<br>Esse link é válido por 60 minutos')
-                    : $this->sendResetLinkFailedResponse($request, $response);
+        return $this->sendResetLinkFailedResponse($request, $response);
     }
 
     protected function validateEmail(Request $request)
