@@ -1,153 +1,85 @@
-{{--
-<form role="form" method="POST">
+<form method="POST" action="{{ route('plantao.juridico.editar', $resultado->id) }}">
     @csrf
     @if(isset($resultado))
         @method('PUT')
     @endif
     <div class="card-body">
+        <h4>Regional - {{ $resultado->regional->regional }}</h4>
+        <p>
+            <i>Obs: para desativar o plantão jurídico nesta regional, coloque 0 na quantidade de advogados</i>
+        </p>
         <div class="form-row">
-            <div class="col">
-                <label for="idregional">Regional</label>
-                <select name="idregional" class="form-control">
-                @foreach($regionais as $regional)
-                    @if(!empty(old('idregional')))
-                        @if(old('idregional') == $regional->idregional)
-                            <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
-                        @else
-                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                        @endif
-                    @else
-                        @if(isset($resultado))
-                            @if($resultado->idregional === $regional->idregional)
-                            <option value="{{ $regional->idregional }}" selected>{{ $regional->regional }}</option>
-                            @else
-                            <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                            @endif
-                        @else
-                        <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
-                        @endif
-                    @endif
-                @endforeach
-                </select>
-                @if($errors->has('regional'))
-                <div class="invalid-feedback">
-                {{ $errors->first('regional') }}
-                </div>
-                @endif
-            </div>
-        </div>
-        <div class="form-row mt-2">
-            <div class="col">
-                <label for="diainicio">Data de início</label>
+            <div class="col-2">
+                <label for="qtd_advogados">Quantidade de advogados</label>
                 <input type="text"
-                    class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
-                    placeholder="dd/mm/aaaa"
-                    id="dataInicio"
-                    name="diainicio"
-                    @if(!empty(old('diainicio')))
-                        value="{{ old('diainicio') }}"
-                    @else
-                        @if(isset($resultado))
-                            @if($resultado->diainicio != '2000-01-01')
-                                value="{{ onlyDate($resultado->diainicio) }}"
-                            @endif
-                        @endif
-                    @endif
-                    />
-                <small class="form-text text-muted">
-                    <em>* Deixe o campo vazio para aplicar a regra a partir de hoje</em>
-                </small>
-                @if($errors->has('diainicio'))
+                    class="form-control {{ $errors->has('qtd_advogados') ? 'is-invalid' : '' }}"
+                    name="qtd_advogados"
+                    id="qtd_advogados"
+                    value="{{ old('qtd_advogados') ? old('qtd_advogados') : $resultado->qtd_advogados }}"
+                    maxlength="1"
+                />
+                @if($errors->has('qtd_advogados'))
                 <div class="invalid-feedback">
-                {{ $errors->first('diainicio') }}
+                    {{ $errors->first('qtd_advogados') }}
                 </div>
                 @endif
             </div>
             <div class="col">
-                <label for="diatermino">Data de término</label>
-                <input type="text"
-                    class="form-control {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
-                    placeholder="dd/mm/aaaa"
-                    id="dataTermino"
-                    name="diatermino"
-                    @if(!empty(old('diatermino')))
-                        value="{{ old('diatermino') }}"
-                    @else
-                        @if(isset($resultado))
-                            @if($resultado->diatermino != '2100-01-01')
-                                value="{{ onlyDate($resultado->diatermino) }}"
-                            @endif
-                        @endif
-                    @endif
-                    />
-                <small class="form-text text-muted">
-                    <em>* Deixe o campo vazio para aplicar a regra por tempo indeterminado</em>
-                </small>
-                @if($errors->has('diatermino'))
-                <div class="invalid-feedback">
-                {{ $errors->first('diatermino') }}
-                </div>
-                @endif
-            </div>
-        </div>
-        <div class="form-row mt-2">
-            <div class="col">
-                <label for="horainicio">Hora de início</label>
-                <select name="horainicio" class="form-control {{ $errors->has('horainicio') ? 'is-invalid' : '' }}" id="horaInicioBloqueio">
-                <option selected disabled>Selecione o horário</option>
-                @foreach(todasHoras() as $hora)
-                    @if(!empty(old('horainicio')))
-                        @if(old('horainicio') == $hora)
-                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
-                        @else
-                            <option value="{{ $hora }}">{{ $hora }}</option>
-                        @endif
-                    @else
-                        @if(isset($resultado))
-                            @if($resultado->horainicio === $hora)
-                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
-                            @else
-                            <option value="{{ $hora }}">{{ $hora }}</option>
-                            @endif
-                        @else
-                        <option value="{{ $hora }}">{{ $hora }}</option>
-                        @endif
-                    @endif
-                @endforeach
+                <label for="horarios">Horários p/ agendamento</label>
+                <select 
+                    name="horarios[]" 
+                    class="form-control {{ $errors->has('horarios') ? 'is-invalid' : '' }}" 
+                    id="horarios" 
+                    multiple
+                >
+                    @php
+                        $horarios = explode(',', $resultado->horarios);
+                    @endphp
+                    @foreach (todasHoras() as $hora)
+                        <option value="{{ $hora }}" {{ in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
+                    @endforeach
                 </select>
-                @if($errors->has('horainicio'))
+
+                @if($errors->has('horarios'))
                 <div class="invalid-feedback">
-                {{ $errors->first('horainicio') }}
+                    {{ $errors->first('horarios') }}
                 </div>
                 @endif
+
+                <small class="form-text text-muted">
+                    <em>* Segure Ctrl para selecionar mais de um horário ou Shift para selecionar um grupo de horários</em>
+                </small>
             </div>
             <div class="col">
-            <label for="horatermino">Hora de término</label>
-                <select name="horatermino" class="form-control {{ $errors->has('horatermino') ? 'is-invalid' : '' }}" id="horaTerminoBloqueio">
-                <option selected disabled>Selecione o horário</option>
-                @foreach(todasHoras() as $hora)
-                    @if(!empty(old('horatermino')))
-                        @if(old('horatermino') == $hora)
-                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
-                        @else
-                            <option value="{{ $hora }}">{{ $hora }}</option>
-                        @endif
-                    @else
-                        @if(isset($resultado))
-                            @if($resultado->horatermino === $hora)
-                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
-                            @else
-                            <option value="{{ $hora }}">{{ $hora }}</option>
-                            @endif
-                        @else
-                        <option value="{{ $hora }}">{{ $hora }}</option>
-                        @endif
-                    @endif
-                @endforeach
-                </select>
-                @if($errors->has('horatermino'))
+                <label for="dataInicial">Data inicial</label>
+                <input 
+                    type="date" 
+                    name="dataInicial" 
+                    class="form-control {{ $errors->has('dataInicial') ? 'is-invalid' : '' }}" 
+                    id="dataInicial" 
+                    value="{{ old('dataInicial') ? old('dataInicial') : $resultado->dataInicial }}"
+                />
+
+                @if($errors->has('dataInicial'))
                 <div class="invalid-feedback">
-                {{ $errors->first('horatermino') }}
+                    {{ $errors->first('dataInicial') }}
+                </div>
+                @endif
+
+                <br>
+
+                <label for="dataFinal">Data final</label>
+                <input 
+                    type="date" 
+                    name="dataFinal" 
+                    class="form-control {{ $errors->has('dataFinal') ? 'is-invalid' : '' }}" 
+                    id="dataFinal"
+                    value="{{ old('dataFinal') ? old('dataFinal') : $resultado->dataFinal }}" 
+                />
+
+                @if($errors->has('dataFinal'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('dataFinal') }}
                 </div>
                 @endif
             </div>
@@ -155,15 +87,10 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            <a href="/admin/agendamentos/bloqueios" class="btn btn-default">Cancelar</a>
+            <a href="{{ route('plantao.juridico.index') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">
-            @if(isset($resultado))
                 Salvar
-            @else
-                Publicar
-            @endif
             </button>
         </div>
     </div>
 </form>
---}}

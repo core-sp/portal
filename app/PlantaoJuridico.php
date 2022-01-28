@@ -13,4 +13,9 @@ class PlantaoJuridico extends Model
     {
     	return $this->belongsTo('App\Regional', 'idregional');
     }
+
+    public function temPlantaoJuridico()
+    {
+        return $this->qtd_advogados > 0 ? true : false;
+    }
 }

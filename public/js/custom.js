@@ -148,6 +148,45 @@ $(document).ready(function(){
     });
   });
 
+  // Funcionalidade Plantão Jurídico
+  function setCamposDatas(plantao)
+  {
+      $("#dataInicialBloqueio").prop('min', plantao['datas'][0]);
+      $("#dataInicialBloqueio").prop('max', plantao['datas'][1]);
+      $("#dataFinalBloqueio").prop('min', plantao['datas'][0]);
+      $("#dataFinalBloqueio").prop('max', plantao['datas'][1]);
+  }
+
+  function setCampoHorarios(plantao)
+  {
+    $('#horarios option').show();
+    $('#horarios option').each(function(){
+      if($(this).val() < plantao['horarios'][0])
+        $(this).hide();
+      if($(this).val() > plantao['horarios'][1])
+        $(this).hide();
+    });
+  }
+
+  $('#plantaoBloqueio').change(function(){
+    if($(this).val() > 0)
+      $.ajax({
+        method: "GET",
+        data: {
+          "_token": $('#token').val(),
+          "id": $(this).val(),
+        },
+        dataType: 'json',
+        url: "/admin/plantao-juridico/ajax",
+        success: function(response) {
+          plantao = response;
+          setCamposDatas(plantao);
+          setCampoHorarios(plantao);
+        }
+      });
+  });
+  // Fim da Funcionalidade Plantão Jurídico
+
 });
 
 (function($){

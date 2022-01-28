@@ -17,8 +17,10 @@ class CreatePlantoesJuridicos extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('idregional')->unsigned();
             $table->foreign('idregional')->references('idregional')->on('regionais');
-            $table->tinyInteger('qtd_advogados')->default(1);
-            $table->string('horarios')->default('10:00,10:30,11:00,11:30,12:00,12:30,14:00,14:30,15:00,15:30,16:00,16:30');
+            $table->tinyInteger('qtd_advogados')->default(0);
+            $table->string('horarios')->nullable();
+            $table->date('dataInicial')->nullable();
+            $table->date('dataFinal')->nullable();
             $table->timestamps();
         });
     }

@@ -418,6 +418,28 @@
             </ul>
         </li>
         @endif
+
+        <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <p>Plantão Jurídico<i class="right fa fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="{{ route('plantao.juridico.index') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Plantões</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('plantao.juridico.bloqueios.index') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Bloqueios</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         @endif
     
         <!-- Fiscalização -->
