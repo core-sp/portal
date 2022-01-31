@@ -9,7 +9,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <video id="video-campanha" controls autoplay muted>
+            <video id="video-campanha" controls autoplay>
                 <source src="{{ asset('img/video_comunicado.mp4') }}" type="video/mp4">
                 {{--<source src="{{ asset('img/compressed.webm') }}" type="video/webm">--}}
             </video>
