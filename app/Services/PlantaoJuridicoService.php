@@ -47,11 +47,12 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
+            $msgAtivado = '<span class="text-success">Ativado</span><br><small>com '.$resultado->qtd_advogados.' advogado(s)</small>';
             $acoes = '<a href="' .route('plantao.juridico.editar.view', $resultado->id). '" class="btn btn-sm btn-primary">Editar</a> ';
             $conteudo = [
                 $resultado->id,
                 $resultado->regional->regional,
-                $resultado->temPlantaoJuridico() ? '<span class="text-success">Ativado</span>' : '<span class="text-danger">Desativado</span>',
+                $resultado->temPlantaoJuridico() ? $msgAtivado : '<span class="text-danger">Desativado</span>',
                 isset($resultado->dataInicial) && isset($resultado->dataFinal) ? onlyDate($resultado->dataInicial).' - '.onlyDate($resultado->dataFinal) : '',
                 $resultado->horarios,
                 $acoes
