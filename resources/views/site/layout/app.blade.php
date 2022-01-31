@@ -37,8 +37,6 @@
     </head>
     <body>
 
-    @include('site.inc.popup')
-
     <!-- ACESSIBILIDADE -->
     <a href="#header-principal" accesskey="1"></a>
     <a href="#conteudo-principal" accesskey="3"></a>
@@ -157,7 +155,7 @@
                     </div>
                   </li>
                   <li class="nav-item">
-                    <a href="/licitacoes" class="nav-link">Licitações e Contratação Direta</a>
+                    <a href="/licitacoes" class="nav-link">Licitações e Aquisições</a>
                   </li>
                   <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Serviços</a>

@@ -200,7 +200,8 @@ $(document).ready(function(){
 			getInfoEmpresa(value);
 		}
 	}
-	// Popup Campanha (removido)
+	// // Popup Campanha
+	// // carrega um video, mas no modal já faz isso
 	// var campanha = localStorage.getItem('campanha');
 	// if (campanha == null) {
 	// 	localStorage.setItem('campanha', 1);
@@ -208,12 +209,15 @@ $(document).ready(function(){
 	// 		$('#popup-campanha').modal('show');
 	// 	});
 	// }
-	// $('#popup-campanha').on('hidden.bs.modal', function(){
-	// 	$('#video-campanha').get(0).pause();
-	// });
-	// $('#video-campanha').on('ended', function(){
-	// 	$('#popup-campanha').modal('hide');
-	// });
+	$(window).on('load', function(){
+		$('#popup-campanha').modal('show');
+	});
+	$('#popup-campanha').on('hidden.bs.modal', function(){
+		$('#video-campanha').get(0).pause();
+	});
+	$('#video-campanha').on('ended', function(){
+		$('#popup-campanha').modal('hide');
+	});
 });
 
 // Lightbox
@@ -322,14 +326,12 @@ $('#ano-mapa').on({
 
 function regionaisExcluidasPlantaoJuridico()
 {
-	return regionaisExcluidas = ["1", "2", "6", "7", "9", "11", "14"];
+	return regionaisExcluidas = ["1", "2", "3", "6", "7", "9", "11", "13", "14"];
 }
 
 function datasPorRegionalPlantaoJuridico(regional)
 {
 	var datas = []
-	datas[3] = ['01-27','01-28'],
-	datas[13] = ['01-25','01-26'],
 	datas[4] = ['02-09','02-11'],
 	datas[5] = ['02-07','02-08'],
 	datas[8] = ['02-07','02-08'],
