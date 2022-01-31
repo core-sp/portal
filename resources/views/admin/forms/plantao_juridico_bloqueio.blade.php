@@ -1,4 +1,4 @@
-<form method="POST" action="{{-- isset($resultado) ? route('plantao.juridico.bloqueios.editar', $resultado->id) : route('plantao.juridico.bloqueios.criar') --}}">
+<form method="POST" action="{{ isset($resultado) ? route('plantao.juridico.bloqueios.editar', $resultado->id) : route('plantao.juridico.bloqueios.criar') }}">
     @csrf
     @if(isset($resultado))
         @method('PUT')
@@ -11,17 +11,16 @@
                     name="plantaoBloqueio" 
                     class="form-control {{ $errors->has('plantaoBloqueio') ? 'is-invalid' : '' }}"
                     id="plantaoBloqueio"
+                    required
                 >
+                @if(isset($plantoes))
                     <option value="">Selecione um plantão...</option>
-                @foreach($plantoes as $plantao)
-                    @if(old('plantao'))
-                    <option value="{{ $plantao->id }}" {{ old('plantaoBloqueio') == $plantao->id ? 'selected' : '' }}>{{ $plantao->regional->regional }}</option>
-                    @elseif(isset($resultado))
-                    <option value="{{ $plantao->id }}" {{ $resultado->idplantaojuridico == $plantao->id ? 'selected' : '' }}>{{ $plantao->regional->regional }}</option>
-                    @else
-                    <option value="{{ $plantao->id }}">{{ $plantao->regional->regional }}</option>
-                    @endif
-                @endforeach
+                    @foreach($plantoes as $plantao)
+                        <option value="{{ $plantao->id }}" {{ old('plantaoBloqueio') == $plantao->id ? 'selected' : '' }}>{{ $plantao->regional->regional }}</option>
+                    @endforeach
+                @else
+                    <option value="{{ $resultado->idplantaojuridico }}" selected>{{ $resultado->plantaoJuridico->regional->regional }}</option>
+                @endif
                 </select>
                 @if($errors->has('plantaoBloqueio'))
                 <div class="invalid-feedback">
@@ -29,7 +28,7 @@
                 </div>
                 @endif
             </div>
-            <div class="col-2">
+            <div class="col-3">
                 <label for="dataInicialBloqueio">Data inicial</label>
                 <input 
                     type="date" 
@@ -39,6 +38,7 @@
                     min=""
                     max=""
                     value="{{ isset($resultado->dataInicial) ? $resultado->dataInicial : old('dataInicialBloqueio') }}"
+                    required
                 />
 
                 @if($errors->has('dataInicialBloqueio'))
@@ -47,7 +47,7 @@
                 </div>
                 @endif
             </div>
-            <div class="col-2">
+            <div class="col-3">
                 <label for="dataFinalBloqueio">Data final</label>
                 <input 
                     type="date" 
@@ -56,7 +56,9 @@
                     id="dataFinalBloqueio"
                     min=""
                     max=""
-                    value="{{ isset($resultado->dataFinal) ? $resultado->dataFinal : old('dataFinalBloqueio') }}" />
+                    value="{{ isset($resultado->dataFinal) ? $resultado->dataFinal : old('dataFinalBloqueio') }}" 
+                    required
+                />
 
                 @if($errors->has('dataFinalBloqueio'))
                 <div class="invalid-feedback">
@@ -65,12 +67,13 @@
                 @endif
             </div>
             <div class="col">
-                <label for="horarios">Horários bloqueados</label>
+                <label for="horariosBloqueio">Horários bloqueados</label>
                 <select 
-                    name="horarios[]" 
-                    class="form-control {{ $errors->has('horarios') ? 'is-invalid' : '' }}" 
-                    id="horarios" 
+                    name="horariosBloqueio[]" 
+                    class="form-control {{ $errors->has('horariosBloqueio') ? 'is-invalid' : '' }}" 
+                    id="horariosBloqueio" 
                     multiple
+                    required
                 >
                     @php
                         $horarios = isset($resultado->horarios) ? explode(',', $resultado->horarios) : null;
@@ -80,9 +83,9 @@
                     @endforeach
                 </select>
 
-                @if($errors->has('horarios'))
+                @if($errors->has('horariosBloqueio'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('horarios') }}
+                    {{ $errors->first('horariosBloqueio') }}
                 </div>
                 @endif
 

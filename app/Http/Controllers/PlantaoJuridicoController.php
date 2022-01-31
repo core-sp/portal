@@ -106,7 +106,7 @@ class PlantaoJuridicoController extends Controller
             abort(500, "Erro ao criar o bloqueio do plantão jurídico.");
         }
 
-        return redirect(route('plantao.juridico.bloqueios.criar'))->with([
+        return redirect(route('plantao.juridico.bloqueios.index'))->with([
             'message' => isset($erro) ? $erro['message'] : '<i class="icon fa fa-check"></i>Novo bloqueio criado com sucesso!',
             'class' => isset($erro) ? $erro['class'] : 'alert-success'
         ]);
@@ -123,5 +123,20 @@ class PlantaoJuridicoController extends Controller
         }
 
         return response()->json($plantao);
+    }
+
+    public function editBloqueio($id)
+    {
+        // $this->authorize('onlyAdmin', auth()->user());
+        try{
+            $dados = $this->service->getService('PlantaoJuridico')->visualizarBloqueio($id);
+            $variaveis = $dados['variaveis'];
+            $resultado = $dados['resultado'];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar a página para editar o bloqueio.");
+        }
+
+        return view('admin.crud.editar', compact('variaveis', 'resultado'));
     }
 }

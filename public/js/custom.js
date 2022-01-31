@@ -151,6 +151,8 @@ $(document).ready(function(){
   // Funcionalidade Plantão Jurídico
   function setCamposDatas(plantao)
   {
+      $("#dataInicialBloqueio").val('');
+      $("#dataFinalBloqueio").val('');
       $("#dataInicialBloqueio").prop('min', plantao['datas'][0]);
       $("#dataInicialBloqueio").prop('max', plantao['datas'][1]);
       $("#dataFinalBloqueio").prop('min', plantao['datas'][0]);
@@ -159,22 +161,42 @@ $(document).ready(function(){
 
   function setCampoHorarios(plantao)
   {
-    $('#horarios option').show();
-    $('#horarios option').each(function(){
-      if($(this).val() < plantao['horarios'][0])
-        $(this).hide();
-      if($(this).val() > plantao['horarios'][1])
+    $('#horariosBloqueio option').show();
+    $('#horariosBloqueio option').each(function(){
+      var valor = $(this).val();
+      if(jQuery.inArray(valor, plantao['horarios']) != -1)
+        $(this).show();
+      else
         $(this).hide();
     });
   }
 
+  $('#plantaoBloqueio').ready(function(){
+    var valor = $('#plantaoBloqueio').val();
+      if(valor > 0)
+        $.ajax({
+          method: "GET",
+          data: {
+            "_token": $('#token').val(),
+            "id": valor,
+          },
+          dataType: 'json',
+          url: "/admin/plantao-juridico/ajax",
+          success: function(response) {
+            plantao = response;
+            setCampoHorarios(plantao);
+          }
+        });
+  });
+
   $('#plantaoBloqueio').change(function(){
-    if($(this).val() > 0)
+    var valor = $('#plantaoBloqueio').val();
+    if(valor > 0)
       $.ajax({
         method: "GET",
         data: {
           "_token": $('#token').val(),
-          "id": $(this).val(),
+          "id": valor,
         },
         dataType: 'json',
         url: "/admin/plantao-juridico/ajax",

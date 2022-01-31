@@ -119,14 +119,21 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
     private function validacaoBloqueio($request, $id = null)
     {
         $plantao = $this->getById($request->plantaoBloqueio);
+        $horarios = explode(',', $plantao->horarios);
 
-        if(!Carbon::parse($request->dataInicialBloqueio)->gte($plantao->dataInicial) && 
-        !Carbon::parse($request->dataFinalBloqueio)->lte($plantao->dataFinal))
+        if(Carbon::parse($request->dataInicialBloqueio)->lt($plantao->dataInicial) && 
+        Carbon::parse($request->dataFinalBloqueio)->gt($plantao->dataFinal))
             return $erro = [
-                'messagem' => '<i class="icon fa fa-ban"></i>As datas escolhidas estão fora da datas do plantão',
+                'message' => '<i class="icon fa fa-ban"></i>A(s) data(s) escolhida(s) fora da datas do plantão',
                 'class' => 'alert-danger'
             ];
-        // validar horarios
+
+        foreach($request->horariosBloqueio as $hora)
+            if(!in_array($hora, $horarios))
+                return $erro = [
+                    'message' => '<i class="icon fa fa-ban"></i>A(s) hora(s) escolhida(s) não inclusa(s) nas horas do plantão',
+                    'class' => 'alert-danger'
+                ];
 
         return null;
     }
@@ -156,9 +163,9 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
     {
         $this->getById($id)->update([
             'qtd_advogados' => $request->qtd_advogados,
-            'horarios' => implode(',', $request->horarios),
-            'dataInicial' => $request->dataInicial,
-            'dataFinal' => $request->dataFinal
+            'horarios' => isset($request->horarios) ? implode(',', $request->horarios) : null,
+            'dataInicial' => isset($request->dataInicial) ? $request->dataInicial : null,
+            'dataFinal' => isset($request->dataFinal) ? $request->dataFinal : null
         ]);
     }
 
@@ -178,7 +185,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         if(isset($id))
         {
             return $dados = [
-                'resultado' => $this->getById($id),
+                'resultado' => PlantaoJuridicoBloqueio::findOrFail($id),
                 'variaveis' => (object) $this->variaveisBloqueios
             ];
         }
@@ -193,10 +200,9 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
     public function getDatasHorasPlantaoAjax($id)
     {
         $plantao = $this->getById($id);
-        $horarios = explode(',', $plantao->horarios);
         
         return [
-            'horarios' => [$horarios[0], $horarios[count($horarios) - 1]],
+            'horarios' => explode(',', $plantao->horarios),
             'datas' => [$plantao->dataInicial, $plantao->dataFinal]
         ];
     }
@@ -205,18 +211,28 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
     {
         $valid = $this->validacaoBloqueio($request, $id);
 
-        if(isset($id))
+        if(!isset($valid))
         {
-            return null;
-        }      
+            if(isset($id))
+            {
+                PlantaoJuridicoBloqueio::findOrFail($id)->update([
+                    'dataInicial' => $request->dataInicialBloqueio,
+                    'dataFinal' => $request->dataFinalBloqueio,
+                    'horarios' => implode(',', $request->horariosBloqueio),
+                    'idusuario' => auth()->user()->idusuario
+                ]);
 
-        PlantaoJuridicoBloqueio::create([
-            'idplantaojuridico' => $request->plantaoBloqueio,
-            'dataInicial' => $request->dataInicialBloqueio,
-            'dataFinal' => $request->dataFinalBloqueio,
-            'horarios' => implode(',', $request->horarios),
-            'idusuario' => auth()->user()->idusuario
-        ]);
+                return null;
+            }      
+    
+            PlantaoJuridicoBloqueio::create([
+                'idplantaojuridico' => $request->plantaoBloqueio,
+                'dataInicial' => $request->dataInicialBloqueio,
+                'dataFinal' => $request->dataFinalBloqueio,
+                'horarios' => implode(',', $request->horariosBloqueio),
+                'idusuario' => auth()->user()->idusuario
+            ]);
+        }
 
         return $valid;
     }

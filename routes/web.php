@@ -172,8 +172,8 @@ Route::prefix('admin')->group(function() {
     Route::get('/bloqueios', 'PlantaoJuridicoController@indexBloqueios')->name('plantao.juridico.bloqueios.index');
     Route::get('/bloqueios/criar', 'PlantaoJuridicoController@create')->name('plantao.juridico.bloqueios.criar.view');
     Route::post('/bloqueios/criar', 'PlantaoJuridicoController@store')->name('plantao.juridico.bloqueios.criar');
-    Route::get('/bloqueios/editar/{id}', 'PlantaoJuridicoController@edit')->name('plantao.juridico.bloqueios.editar.view');
-    Route::put('/bloqueios/editar/{id}', 'PlantaoJuridicoController@update')->name('plantao.juridico.bloqueios.editar');
+    Route::get('/bloqueios/editar/{id}', 'PlantaoJuridicoController@editBloqueio')->name('plantao.juridico.bloqueios.editar.view');
+    Route::put('/bloqueios/editar/{id}', 'PlantaoJuridicoController@updateBloqueio')->name('plantao.juridico.bloqueios.editar');
     Route::delete('/bloqueios/apagar/{id}', 'PlantaoJuridicoController@destroy')->name('plantao.juridico.bloqueios.excluir');
     Route::get('/ajax', 'PlantaoJuridicoController@getPlantaoAjax')->name('plantao.juridico.bloqueios.ajax');
   });

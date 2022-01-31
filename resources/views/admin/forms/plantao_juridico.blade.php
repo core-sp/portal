@@ -17,6 +17,7 @@
                     id="qtd_advogados"
                     value="{{ old('qtd_advogados') ? old('qtd_advogados') : $resultado->qtd_advogados }}"
                     maxlength="1"
+                    required
                 />
                 @if($errors->has('qtd_advogados'))
                 <div class="invalid-feedback">
