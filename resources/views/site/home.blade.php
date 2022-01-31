@@ -6,6 +6,8 @@
 
 @section('content')
 
+@include('site.inc.popup')
+
 <section>
   <div class="container-fluid">
     <div class="row" id="conteudo-principal">

@@ -501,8 +501,8 @@ class RepresentanteSiteController extends Controller
                 // usei o campo observação do model para armazenar temporariamente o link
                 $b->observacao = '/balcao-de-oportunidades/busca?palavra-chave='.str_replace('"', '', $b->titulo).'&segmento='.$segmento.'&regional='.$idregional;
         }catch (Exception $e) {
-            Log::error($e->getTraceAsString());
-            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+            Log::error($e->getMessage());
+            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente mais tarde.');
         }
         
         return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional'));

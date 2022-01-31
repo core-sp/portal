@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Licitações e Contratação Direta'])
+@extends('site.layout.app', ['title' => 'Licitações e Aquisições'])
 
 @section('content')
 
