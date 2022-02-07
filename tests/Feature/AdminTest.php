@@ -114,6 +114,14 @@ class AdminTest extends TestCase
                 'metodo' => 'create',
                 'perfis' => '1,'
             ], [
+                'controller' => 'PlantaoJuridicoController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'PlantaoJuridicoBloqueioController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ], [
                 'controller' => 'FiscalizacaoController',
                 'metodo' => 'index',
                 'perfis' => '1,'
@@ -183,6 +191,8 @@ class AdminTest extends TestCase
             ->assertSee(route('licitacoes.create'))
             ->assertSee(route('concursos.index'))
             ->assertSee(route('concursos.create'))
+            ->assertSee(route('plantao.juridico.index'))
+            ->assertSee(route('plantao.juridico.bloqueios.index'))
             ->assertSee(route('fiscalizacao.index'))
             ->assertSee(route('fiscalizacao.createperiodo'));
     }
@@ -224,6 +234,8 @@ class AdminTest extends TestCase
             ->assertDontSee(route('licitacoes.create'))
             ->assertDontSee(route('concursos.index'))
             ->assertDontSee(route('concursos.create'))
+            ->assertDontSee(route('plantao.juridico.index'))
+            ->assertDontSee(route('plantao.juridico.bloqueios.index'))
             ->assertDontSee(route('fiscalizacao.index'))
             ->assertDontSee(route('fiscalizacao.createperiodo'));
     }

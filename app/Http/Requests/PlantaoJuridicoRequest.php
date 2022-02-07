@@ -28,7 +28,7 @@ class PlantaoJuridicoRequest extends FormRequest
             'required' => 'É obrigatório o preenchimento do campo',
             'qtd_advogados.regex' => 'Permitido somente um número de 0 a 9',
             'dataFinalBloqueio.after_or_equal' => 'Deve selecionar uma data igual ou depois de '.onlyDate(request('dataInicialBloqueio')),
-            'dataInicialBloqueio.after' => 'Deve selecionar uma data após '.date('d/m/Y'),
+            'dataInicialBloqueio.after_or_equal' => 'Deve selecionar uma data igual ou depois de '.date('d/m/Y'),
         ];
     }
 }

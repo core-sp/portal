@@ -15,8 +15,13 @@ class PlantaoJuridicoBloqueio extends Model
     	return $this->belongsTo('App\PlantaoJuridico', 'idplantaojuridico');
     }
 
+    public function user()
+    {
+    	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
+    }
+
     public function podeEditar()
     {
-        return Carbon::parse($this->dataInicial)->gte(date('Y-m-d')) || Carbon::parse($this->dataFinal)->gte(date('Y-m-d')) ? true : false;
+        return Carbon::parse($this->dataFinal)->gte(date('Y-m-d')) ? true : false;
     }
 }

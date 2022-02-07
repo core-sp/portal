@@ -358,9 +358,11 @@
         @php
             $licitacao = perfisPermitidos('LicitacaoController', 'index');
             $concurso = perfisPermitidos('ConcursoController', 'index');
+            $plantao = perfisPermitidos('PlantaoJuridicoController', 'index');
+            $plantaoBloqueio = perfisPermitidos('PlantaoJuridicoBloqueioController', 'index');
         @endphp
 
-        @if($licitacao || $concurso)
+        @if($licitacao || $concurso || $plantao | $plantaoBloqueio)
         <li class="nav-header">JURÍDICO</li>
 
         @if($licitacao)
@@ -419,26 +421,34 @@
         </li>
         @endif
 
+        @if($plantao || $plantaoBloqueio)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-calendar-alt"></i>
                 <p>Plantão Jurídico<i class="right fa fa-angle-left"></i></p>
             </a>
+            
             <ul class="nav nav-treeview">
+                @if($plantao)
                 <li class="nav-item">
                     <a href="{{ route('plantao.juridico.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Plantões</p>
                     </a>
                 </li>
+                @endif
+
+                @if($plantaoBloqueio)
                 <li class="nav-item">
                     <a href="{{ route('plantao.juridico.bloqueios.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Bloqueios</p>
                     </a>
                 </li>
+                @endif
             </ul>
         </li>
+        @endif
 
         @endif
     

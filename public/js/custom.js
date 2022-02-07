@@ -151,8 +151,6 @@ $(document).ready(function(){
   // Funcionalidade Plantão Jurídico
   function setCamposDatas(plantao)
   {
-      $("#dataInicialBloqueio").val('');
-      $("#dataFinalBloqueio").val('');
       $("#dataInicialBloqueio").prop('min', plantao['datas'][0]);
       $("#dataInicialBloqueio").prop('max', plantao['datas'][1]);
       $("#dataFinalBloqueio").prop('min', plantao['datas'][0]);
@@ -184,7 +182,11 @@ $(document).ready(function(){
           url: "/admin/plantao-juridico/ajax",
           success: function(response) {
             plantao = response;
+            setCamposDatas(plantao);
             setCampoHorarios(plantao);
+          },
+          error: function() {
+            alert('Erro ao carregar as datas e/ou os horários. Tente novamente mais tarde.');
           }
         });
   });
@@ -202,8 +204,13 @@ $(document).ready(function(){
         url: "/admin/plantao-juridico/ajax",
         success: function(response) {
           plantao = response;
+          $("#dataInicialBloqueio").val('');
+          $("#dataFinalBloqueio").val('');
           setCamposDatas(plantao);
           setCampoHorarios(plantao);
+        },
+        error: function() {
+          alert('Erro ao carregar as datas e/ou os horários. Tente novamente mais tarde.');
         }
       });
   });

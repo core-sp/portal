@@ -6,6 +6,7 @@ use App\Contracts\PlantaoJuridicoServiceInterface;
 use App\PlantaoJuridico;
 use App\PlantaoJuridicoBloqueio;
 use Carbon\Carbon;
+use App\Events\CrudEvent;
 
 class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
@@ -47,13 +48,16 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) {
+            $msgPrazoExpirado = $resultado->expirou() ? '<br><small class="text-danger"><strong>Período expirado, DESATIVE o plantão</strong></small>' : '';
             $msgAtivado = '<span class="text-success">Ativado</span><br><small>com '.$resultado->qtd_advogados.' advogado(s)</small>';
-            $acoes = '<a href="' .route('plantao.juridico.editar.view', $resultado->id). '" class="btn btn-sm btn-primary">Editar</a> ';
+            $acoes = '';
+            if(auth()->user()->can('updateOther', auth()->user()))
+                $acoes = '<a href="' .route('plantao.juridico.editar.view', $resultado->id). '" class="btn btn-sm btn-primary">Editar</a> ';
             $conteudo = [
                 $resultado->id,
                 $resultado->regional->regional,
-                $resultado->temPlantaoJuridico() ? $msgAtivado : '<span class="text-danger">Desativado</span>',
-                isset($resultado->dataInicial) && isset($resultado->dataFinal) ? onlyDate($resultado->dataInicial).' - '.onlyDate($resultado->dataFinal) : '',
+                $resultado->ativado() ? $msgAtivado : '<span class="text-danger">Desativado</span>',
+                isset($resultado->dataInicial) && isset($resultado->dataFinal) ? onlyDate($resultado->dataInicial).' - '.onlyDate($resultado->dataFinal).$msgPrazoExpirado : '',
                 $resultado->horarios,
                 $acoes
             ];
@@ -84,13 +88,16 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         $contents = [];
         foreach($resultados as $resultado) {
             $acoes = '';
-            if($resultado->podeEditar())
+            if($resultado->podeEditar() && auth()->user()->can('updateOther', auth()->user()))
                 $acoes .= '<a href="' .route('plantao.juridico.bloqueios.editar.view', $resultado->id). '" class="btn btn-sm btn-primary">Editar</a> ';
-            $acoes .= '<form method="POST" action="'.route('plantao.juridico.bloqueios.excluir', $resultado->id).'" class="d-inline">';
-            $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-            $acoes .= '<input type="hidden" name="_method" value="delete" />';
-            $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir esse bloqueio?\')" />';
-            $acoes .= '</form>';
+            if(auth()->user()->can('delete', auth()->user()))
+            {
+                $acoes .= '<form method="POST" action="'.route('plantao.juridico.bloqueios.excluir', $resultado->id).'" class="d-inline">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir esse bloqueio?\')" />';
+                $acoes .= '</form>';
+            }
             $conteudo = [
                 $resultado->id,
                 $resultado->plantaoJuridico->regional->regional,
@@ -116,15 +123,19 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         return PlantaoJuridico::findOrFail($id);
     }
 
-    private function validacaoBloqueio($request, $id = null)
+    private function validacaoBloqueio($request)
     {
         $plantao = $this->getById($request->plantaoBloqueio);
         $horarios = explode(',', $plantao->horarios);
+        $inicial = Carbon::parse($plantao->dataInicial);
+        $final = Carbon::parse($plantao->dataFinal);
 
-        if(Carbon::parse($request->dataInicialBloqueio)->lt($plantao->dataInicial) && 
-        Carbon::parse($request->dataFinalBloqueio)->gt($plantao->dataFinal))
+        if(Carbon::parse($request->dataInicialBloqueio)->lt($inicial) ||
+        Carbon::parse($request->dataInicialBloqueio)->gt($final) ||
+        Carbon::parse($request->dataFinalBloqueio)->lt($inicial) ||
+        Carbon::parse($request->dataFinalBloqueio)->gt($final))
             return $erro = [
-                'message' => '<i class="icon fa fa-ban"></i>A(s) data(s) escolhida(s) fora da datas do plantão',
+                'message' => '<i class="icon fa fa-ban"></i>A(s) data(s) escolhida(s) fora das datas do plantão',
                 'class' => 'alert-danger'
             ];
 
@@ -167,11 +178,15 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
             'dataInicial' => isset($request->dataInicial) ? $request->dataInicial : null,
             'dataFinal' => isset($request->dataFinal) ? $request->dataFinal : null
         ]);
+        event(new CrudEvent('plantão juridico', 'editou', $id));
     }
 
     public function listarBloqueios()
     {
-        $bloqueios = PlantaoJuridicoBloqueio::with('plantaoJuridico')->get();
+        $bloqueios = PlantaoJuridicoBloqueio::with('plantaoJuridico', 'user')->get();
+
+        if(auth()->user()->cannot('create', auth()->user()))
+            unset($this->variaveis['btn_criar']);
 
         return $dados = [
             'tabela' => $this->tabelaCompletaBloqueios($bloqueios),
@@ -192,7 +207,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
         return $dados = [
             'plantoes' => PlantaoJuridico::with('regional')
-            ->whereDate('dataInicial', '>=', date('Y-m-d'))->get(),
+            ->whereDate('dataFinal', '>=', date('Y-m-d'))->get(),
             'variaveis' => (object) $this->variaveisBloqueios
         ];
     }
@@ -209,7 +224,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function saveBloqueio($request, $id = null)
     {
-        $valid = $this->validacaoBloqueio($request, $id);
+        $valid = $this->validacaoBloqueio($request);
 
         if(!isset($valid))
         {
@@ -221,19 +236,25 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
                     'horarios' => implode(',', $request->horariosBloqueio),
                     'idusuario' => auth()->user()->idusuario
                 ]);
-
-                return null;
-            }      
-    
-            PlantaoJuridicoBloqueio::create([
-                'idplantaojuridico' => $request->plantaoBloqueio,
-                'dataInicial' => $request->dataInicialBloqueio,
-                'dataFinal' => $request->dataFinalBloqueio,
-                'horarios' => implode(',', $request->horariosBloqueio),
-                'idusuario' => auth()->user()->idusuario
-            ]);
+                event(new CrudEvent('plantão juridico bloqueio', 'editou', $id));
+            }else  
+            {
+                $id = PlantaoJuridicoBloqueio::create([
+                    'idplantaojuridico' => $request->plantaoBloqueio,
+                    'dataInicial' => $request->dataInicialBloqueio,
+                    'dataFinal' => $request->dataFinalBloqueio,
+                    'horarios' => implode(',', $request->horariosBloqueio),
+                    'idusuario' => auth()->user()->idusuario
+                ]);
+                event(new CrudEvent('plantão juridico bloqueio', 'criou', $id));
+            }    
         }
 
         return $valid;
+    }
+
+    public function destroy($id)
+    {
+        PlantaoJuridicoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('plantão juridico bloqueio', 'excluiu', $id)) : null;
     }
 }

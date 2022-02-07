@@ -32,7 +32,9 @@ class Permissao extends Model
             'RepresentanteController' => 'Representante - Cadastrados',
             'FiscalizacaoController' => 'Fiscalização',
             'CompromissoController' => 'Compromisso',
-            'AvisoController' => 'Aviso'
+            'AvisoController' => 'Aviso',
+            'PlantaoJuridicoController' => 'Plantão Jurídico',
+            'PlantaoJuridicoBloqueioController' => 'Plantão Jurídico Bloqueio',
         ];
     }
 }
