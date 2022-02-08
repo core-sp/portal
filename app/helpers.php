@@ -683,3 +683,24 @@ function perfisPermitidos($nameController, $metodo)
     $permissao = Permissao::where('controller', $nameController)->where('metodo', $metodo)->first();
     return $permissao ? in_array($idProfile, explode(',', $permissao->perfis)) : false;
 }
+
+// Máscara para quantos dígitos forem necessários no rg
+function mascaraRG($rg)
+{
+    $dv = '-' .substr($rg, strlen($rg) - 1, strlen($rg));
+    $rgSemDV = substr($rg, 0, strlen($rg) - 1);
+    $rgMascara = $dv;
+    while(strlen($rgSemDV) > 3)
+    {
+        $rgMascara = '.' .substr($rgSemDV, strlen($rgSemDV) - 3, strlen($rgSemDV)). $rgMascara;
+        $rgSemDV = substr($rgSemDV, 0, strlen($rgSemDV) - 3);
+    }
+    $rgMascara = $rgSemDV . $rgMascara;
+
+    return $rgMascara;
+}
+
+function apenasNumerosLetras($string)
+{
+    return preg_replace('/[^a-zA-Z0-9]/', '', $string);
+}

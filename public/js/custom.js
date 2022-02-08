@@ -148,6 +148,18 @@ $(document).ready(function(){
     });
   });
 
+  $('#filtroCedula').submit(function(e){
+    var maxDataFiltro = $('#datemax').val();
+    var minDataFiltro = $('#datemin').val();
+    if(new Date(minDataFiltro) > new Date(maxDataFiltro)) {
+      alert('Data inválida. A data inicial deve ser menor ou igual a data de término.');
+      e.preventDefault();
+    }
+    if(!minDataFiltro || !maxDataFiltro) {
+      alert('Selecione data de início e término.');
+      e.preventDefault();
+    }
+  });
 });
 
 (function($){
@@ -187,6 +199,18 @@ $(document).ready(function(){
   // Recusar endereço
   $('#recusar-trigger').on('click', function(){
     $('#recusar-form').toggle();
+  });
+
+  $('.cedula_recusada').submit(function(e){
+    if($('[name="justificativa"]').val().trim().length < 5) {
+      e.preventDefault();
+      alert("O campo de justificativa deve ter, no mínimo, 5 caracteres");
+    }else if($('[name="justificativa"]').val().trim().length > 191) {
+      e.preventDefault();
+      alert("O campo de justificativa deve ter, no máximo, 191 caracteres");
+    }
+    else
+      $('.cedula_recusada').submit();
   });
 
   $('.anoInput').mask('0000');

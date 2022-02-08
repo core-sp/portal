@@ -90,4 +90,9 @@ class User extends Authenticatable
     {
         return $this->hasOne('App\Sessao', 'idusuario');
     }
+
+    public function solicitaCedula()
+    {
+        return $this->hasMany('App\SolicitaCedula');
+    }
 }

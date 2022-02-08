@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);/*!
  * Bootstrap v4.3.1 (https://getbootstrap.com/)
  * Copyright 2011-2019 The Bootstrap Authors
@@ -21312,6 +21314,10 @@ body,
   .sidebar-mini.sidebar-collapse .main-sidebar.sidebar-focused .user-panel > .info {
     display: block !important;
     -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
   }
   .sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-sidebar > .nav-item > .nav-link > span, .sidebar-mini.sidebar-collapse .main-sidebar.sidebar-focused .nav-sidebar > .nav-item > .nav-link > span {
     display: inline-block !important;
@@ -21410,6 +21416,10 @@ body,
   .sidebar-mini-md.sidebar-collapse .main-sidebar.sidebar-focused .user-panel > .info {
     display: block !important;
     -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
   }
   .sidebar-mini-md.sidebar-collapse .main-sidebar:hover .nav-sidebar > .nav-item > .nav-link > span, .sidebar-mini-md.sidebar-collapse .main-sidebar.sidebar-focused .nav-sidebar > .nav-item > .nav-link > span {
     display: inline-block !important;
@@ -30257,7 +30267,7 @@ a.text-muted:hover {
 
 .link-black:hover, .link-black:focus {
   color: #e6e8ea;
-}@charset "UTF-8";
+}
 
 /*!
  * Font Awesome Free 5.10.2 by @fontawesome - https://fontawesome.com
@@ -30475,32 +30485,38 @@ a.text-muted:hover {
 
 .fa-rotate-90 {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
   transform: rotate(90deg);
 }
 
 .fa-rotate-180 {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);
   transform: rotate(180deg);
 }
 
 .fa-rotate-270 {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
   transform: rotate(270deg);
 }
 
 .fa-flip-horizontal {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)";
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1);
   transform: scale(-1, 1);
 }
 
 .fa-flip-vertical {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)";
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);
   transform: scale(1, -1);
 }
 
 .fa-flip-both,
 .fa-flip-horizontal.fa-flip-vertical {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)";
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);
   transform: scale(-1, -1);
 }
 

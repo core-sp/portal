@@ -32,7 +32,8 @@ class Permissao extends Model
             'RepresentanteController' => 'Representante - Cadastrados',
             'FiscalizacaoController' => 'Fiscalização',
             'CompromissoController' => 'Compromisso',
-            'AvisoController' => 'Aviso'
+            'AvisoController' => 'Aviso',
+            'SolicitaCedulaController' => 'Representante - Cédula',
         ];
     }
 }

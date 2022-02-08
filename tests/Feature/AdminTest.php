@@ -98,6 +98,10 @@ class AdminTest extends TestCase
                 'metodo' => 'index',
                 'perfis' => '1,'
             ], [
+                'controller' => 'SolicitaCedulaController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ], [
                 'controller' => 'LicitacaoController',
                 'metodo' => 'index',
                 'perfis' => '1,'
@@ -179,6 +183,7 @@ class AdminTest extends TestCase
             ->assertSee('/admin/representantes/buscaGerenti')
             ->assertSee('/admin/representantes')
             ->assertSee('/admin/representante-enderecos')
+            ->assertSee(route('solicita-cedula.index'))
             ->assertSee(route('licitacoes.index'))
             ->assertSee(route('licitacoes.create'))
             ->assertSee(route('concursos.index'))
@@ -220,6 +225,7 @@ class AdminTest extends TestCase
             ->assertDontSee('/admin/representantes/buscaGerenti')
             ->assertDontSee('/admin/representantes')
             ->assertDontSee('/admin/representante-enderecos')
+            ->assertDontSee(route('solicita-cedula.index'))
             ->assertDontSee(route('licitacoes.index'))
             ->assertDontSee(route('licitacoes.create'))
             ->assertDontSee(route('concursos.index'))
