@@ -284,9 +284,10 @@
             $agendamentobloqueio = perfisPermitidos('AgendamentoBloqueioController', 'index');
             $representante = perfisPermitidos('RepresentanteController', 'index');
             $representanteEndereco = perfisPermitidos('RepresentanteEnderecoController', 'index');
+            $representanteCedula = perfisPermitidos('SolicitaCedulaController', 'index');
         @endphp
         
-        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco)
+        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula)
         <li class="nav-header">ATENDIMENTO</li>
         
         @if($agendamento || $agendamentobloqueio)
@@ -345,6 +346,15 @@
                     <a href="/admin/representante-enderecos" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Endereços</p>
+                    </a>
+                </li>    
+                @endif
+
+                @if($representanteCedula)
+                <li class="nav-item">
+                    <a href="{{ route('solicita-cedula.index') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Cédulas</p>
                     </a>
                 </li>    
                 @endif

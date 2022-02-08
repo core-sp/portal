@@ -17,12 +17,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CadastroRepresentanteMail;
+use App\Mail\SolicitaCedulaMail;
 use App\Repositories\GerentiApiRepository;
 use GuzzleHttp\Exception\RequestException;
 use App\Mail\SolicitacaoAlteracaoEnderecoMail;
 use App\Repositories\GerentiRepositoryInterface;
 use App\Http\Requests\RepresentanteEnderecoRequest;
+use App\Http\Requests\SolicitaCedulaRequest;
 use App\Repositories\RepresentanteEnderecoRepository;
+use App\Repositories\SolicitaCedulaRepository;
 use App\Repositories\BdoOportunidadeRepository;
 use App\Repositories\AvisoRepository;
 use App\Repositories\RegionalRepository;
@@ -37,8 +40,9 @@ class RepresentanteSiteController extends Controller
     protected $idendereco;
     private $bdoOportunidadeRepository;
     private $regionalRepository;
+    private $solicitaCedulaRepository;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository, AvisoRepository $avisoRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository, AvisoRepository $avisoRepository, SolicitaCedulaRepository $solicitaCedulaRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->gerentiRepository = $gerentiRepository;
@@ -46,6 +50,7 @@ class RepresentanteSiteController extends Controller
         $this->gerentiApiRepository = $gerentiApiRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->regionalRepository = $regionalRepository;
+        $this->solicitaCedulaRepository = $solicitaCedulaRepository;
 
         if($avisoRepository->avisoAtivado('Representante'))
         {
@@ -501,5 +506,78 @@ class RepresentanteSiteController extends Controller
         }
         
         return view('site.representante.bdo', compact('bdo', 'segmento', 'seccional'));
+    }
+
+    public function cedulasView()
+    {
+        $cedulas = $this->solicitaCedulaRepository->getAllByIdRepresentante(Auth::guard('representante')->user()->id);
+        $possuiSolicitacaoCedula = $cedulas->isNotEmpty();
+        $possuiSolicitacaoCedulaEmAndamento = $this->solicitaCedulaRepository->getByStatusEmAndamento(Auth::guard('representante')->user()->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus(Auth::guard('representante')->user()->ass_id))[1]);
+        
+        if($emdia == "Em dia.")
+            $emdia = true;
+        else {
+            $emdia = null;
+            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") Não pôde solicitar cédula devido a validação no sistema GERENTI.'));
+        }
+
+        return view('site.representante.cedulas', compact("possuiSolicitacaoCedula", "cedulas", 'possuiSolicitacaoCedulaEmAndamento', 'emdia'));
+    }
+
+    public function inserirsolicitarCedulaView()
+    {
+        $representante = Auth::guard('representante')->user();
+        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento($representante->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus($representante->ass_id))[1]);
+        $nome = $representante->tipoPessoa() == 'PF' ? $representante->nome : null;
+        $rg = $representante->tipoPessoa() == 'PF' ? 
+            $this->gerentiRepository->gerentiDadosGeraisPF($representante->ass_id)['identidade'] : null;
+        $cpf = $representante->tipoPessoa() == 'PF' ? $representante->cpf_cnpj : null;
+        
+        if(($emdia != "Em dia.") || $has)
+            return redirect(route('representante.solicitarCedulaView'));
+            
+        return view('site.representante.inserir-solicita-cedula', compact('nome', 'rg', 'cpf'));
+    }
+
+    public function inserirsolicitarCedula(SolicitaCedulaRequest $request)
+    {
+        $validate = (object) $request->validated();
+        $representante = Auth::guard('representante')->user();
+        $has = $this->solicitaCedulaRepository->getByStatusEmAndamento($representante->id);
+        $emdia = trim(explode(':', $this->gerentiRepository->gerentiStatus($representante->ass_id))[1]);
+        
+        if(($emdia != "Em dia.") || $has)
+            return redirect(route('representante.solicitarCedulaView'));
+                
+        try {
+            $tipoPessoa = $representante->tipoPessoa();
+            $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, $representante->ass_id)['Regional'];
+            $idregional = $this->regionalRepository->getByName($regional)->idregional;
+            if($tipoPessoa == 'PF')
+            {
+                $validate->nome = null;
+                $validate->cpf = null;
+            } else
+            {
+                $validate->nome = strtoupper($validate->nome);
+                $validate->rg = strtoupper(apenasNumerosLetras($validate->rg));
+            }
+            $save = $this->solicitaCedulaRepository->create($representante->id, $idregional, $validate);
+
+            event(new ExternoEvent('Usuário ' . $representante->id . ' ("'. $representante->registro_core .'") solicitou cédula.'));
+            Mail::to($representante->email)->queue(new SolicitaCedulaMail($save));
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao criar sua solicitação de cédula.");
+        }
+
+        return redirect()
+            ->route('representante.solicitarCedulaView')
+            ->with([
+                'message' => 'Solicitação enviada com sucesso! Após verificação das informações, será atualizada.',
+                'class' => 'alert-success'
+            ]);
     }
 }

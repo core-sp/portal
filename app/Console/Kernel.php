@@ -16,6 +16,8 @@ use App\Representante;
 use Carbon\Carbon;
 use PDO;
 use PDOException;
+use App\SolicitaCedula;
+use App\Mail\InternoSolicitaCedulaMail;
 
 class Kernel extends ConsoleKernel
 {
@@ -254,6 +256,57 @@ class Kernel extends ConsoleKernel
         //         $conexao = null;
         //     }
         // })->hourly();
+
+        // Rotina para envio de relatório de solicitações de cédula feitas no dia anterior
+        $schedule->call(function() {
+            $users = User::where('idperfil', 1)
+                ->orWhere('idusuario', 54)
+                ->orWhere('idusuario', 77)
+                ->get();
+            $hoje = date('Y-m-d');
+            $ontem = Carbon::yesterday()->toDateString();
+            $diaFormatado = Helper::onlyDate($ontem);
+            foreach($users as $user) {
+                $cedulas = SolicitaCedula::whereDate('created_at', $ontem)
+                    ->where('status', SolicitaCedula::STATUS_EM_ANDAMENTO)
+                    ->get()
+                    ->sortBy(function($q){
+                        return $q->regional->regional;
+                    });
+                if($cedulas->isNotEmpty()) {
+                    $body = '<h3><i>(Mensagem Programada)</i></h3>';
+                    $body .= '<p>Confira abaixo a lista de cédulas solicitadas pelo Portal CORE-SP ontem, <strong>'.Helper::onlyDate($ontem).':</strong></p>';
+                    $body .= '<table border="1" cellspacing="0" cellpadding="6">';
+                    $body .= '<thead>';
+                    $body .= '<tr>';
+                    $body .= '<th>Regional</th>';
+                    $body .= '<th>Representante</th>';
+                    $body .= '<th>Registro Core</th>';
+                    $body .= '</tr>';
+                    $body .= '</thead>';
+                    $body .= '<tbody>';
+                    foreach($cedulas as $cedula) {
+                        $body .= '<tr>';
+                        $body .= '<td>'.$cedula->regional->regional.'</td>';
+                        $body .= '<td>'.$cedula->representante->nome.'</td>';
+                        $body .= '<td>'.$cedula->representante->registro_core.'</td>';
+                        $body .= '</tr>';
+                    }
+                    $body .= '</tbody>';
+                    $body .= '</table>';
+                    $body .= '<p>';
+                    $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
+                    $body .= '</p>';
+                    $regional = 'Seccionais';
+                    try {
+                        Mail::to($user->email)
+                            ->send(new InternoSolicitaCedulaMail($body, $regional, $diaFormatado));
+                    } catch (\Exception $e) {
+                        \Log::error($e->getMessage());
+                    }
+                }
+            }
+        })->dailyAt('4:15');
     }
 
     /**

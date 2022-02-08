@@ -148,51 +148,43 @@ $(document).ready(function(){
     });
   });
 
-  // Funcionalidade Plantão Jurídico
-  function setCamposDatas(plantao)
-  {
-      $("#dataInicialBloqueio").prop('min', plantao['datas'][0]);
-      $("#dataInicialBloqueio").prop('max', plantao['datas'][1]);
-      $("#dataFinalBloqueio").prop('min', plantao['datas'][0]);
-      $("#dataFinalBloqueio").prop('max', plantao['datas'][1]);
-  }
-
-  function setCampoHorarios(plantao)
-  {
-    $('#horariosBloqueio option').show();
-    $('#horariosBloqueio option').each(function(){
-      var valor = $(this).val();
-      if(jQuery.inArray(valor, plantao['horarios']) != -1)
-        $(this).show();
-      else
-        $(this).hide();
-    });
-  }
-
-  $('#plantaoBloqueio').ready(function(){
-    var valor = $('#plantaoBloqueio').val();
-      if(valor > 0)
-        $.ajax({
-          method: "GET",
-          data: {
-            "_token": $('#token').val(),
-            "id": valor,
-          },
-          dataType: 'json',
-          url: "/admin/plantao-juridico/ajax",
-          success: function(response) {
-            plantao = response;
-            setCamposDatas(plantao);
-            setCampoHorarios(plantao);
-          },
-          error: function() {
-            alert('Erro ao carregar as datas e/ou os horários. Tente novamente mais tarde.');
-          }
-        });
+  $('#filtroCedula').submit(function(e){
+    var maxDataFiltro = $('#datemax').val();
+    var minDataFiltro = $('#datemin').val();
+    if(new Date(minDataFiltro) > new Date(maxDataFiltro)) {
+      alert('Data inválida. A data inicial deve ser menor ou igual a data de término.');
+      e.preventDefault();
+    }
+    if(!minDataFiltro || !maxDataFiltro) {
+      alert('Selecione data de início e término.');
+      e.preventDefault();
+    }
   });
+});
 
-  $('#plantaoBloqueio').change(function(){
-    var valor = $('#plantaoBloqueio').val();
+// Funcionalidade Plantão Jurídico
+function setCamposDatas(plantao)
+{
+    $("#dataInicialBloqueio").prop('min', plantao['datas'][0]);
+    $("#dataInicialBloqueio").prop('max', plantao['datas'][1]);
+    $("#dataFinalBloqueio").prop('min', plantao['datas'][0]);
+    $("#dataFinalBloqueio").prop('max', plantao['datas'][1]);
+}
+
+function setCampoHorarios(plantao)
+{
+  $('#horariosBloqueio option').show();
+  $('#horariosBloqueio option').each(function(){
+    var valor = $(this).val();
+    if(jQuery.inArray(valor, plantao['horarios']) != -1)
+      $(this).show();
+    else
+      $(this).hide();
+  });
+}
+
+$('#plantaoBloqueio').ready(function(){
+  var valor = $('#plantaoBloqueio').val();
     if(valor > 0)
       $.ajax({
         method: "GET",
@@ -204,8 +196,6 @@ $(document).ready(function(){
         url: "/admin/plantao-juridico/ajax",
         success: function(response) {
           plantao = response;
-          $("#dataInicialBloqueio").val('');
-          $("#dataFinalBloqueio").val('');
           setCamposDatas(plantao);
           setCampoHorarios(plantao);
         },
@@ -213,10 +203,32 @@ $(document).ready(function(){
           alert('Erro ao carregar as datas e/ou os horários. Tente novamente mais tarde.');
         }
       });
-  });
-  // Fim da Funcionalidade Plantão Jurídico
-
 });
+
+$('#plantaoBloqueio').change(function(){
+  var valor = $('#plantaoBloqueio').val();
+  if(valor > 0)
+    $.ajax({
+      method: "GET",
+      data: {
+        "_token": $('#token').val(),
+        "id": valor,
+      },
+      dataType: 'json',
+      url: "/admin/plantao-juridico/ajax",
+      success: function(response) {
+        plantao = response;
+        $("#dataInicialBloqueio").val('');
+        $("#dataFinalBloqueio").val('');
+        setCamposDatas(plantao);
+        setCampoHorarios(plantao);
+      },
+      error: function() {
+        alert('Erro ao carregar as datas e/ou os horários. Tente novamente mais tarde.');
+      }
+    });
+});
+// Fim da Funcionalidade Plantão Jurídico
 
 (function($){
   // Função para tornar menu ativo dinâmico
@@ -255,6 +267,18 @@ $(document).ready(function(){
   // Recusar endereço
   $('#recusar-trigger').on('click', function(){
     $('#recusar-form').toggle();
+  });
+
+  $('.cedula_recusada').submit(function(e){
+    if($('[name="justificativa"]').val().trim().length < 5) {
+      e.preventDefault();
+      alert("O campo de justificativa deve ter, no mínimo, 5 caracteres");
+    }else if($('[name="justificativa"]').val().trim().length > 191) {
+      e.preventDefault();
+      alert("O campo de justificativa deve ter, no máximo, 191 caracteres");
+    }
+    else
+      $('.cedula_recusada').submit();
   });
 
   $('.anoInput').mask('0000');

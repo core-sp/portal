@@ -6,14 +6,13 @@ use App\Representante;
 use App\Connections\FirebirdConnection;
 use App\Repositories\GerentiRepositoryInterface;
 
-class GerentiRepositoryMock implements GerentiRepositoryInterface
-{
+class GerentiRepositoryMock implements GerentiRepositoryInterface{
     public function gerentiChecaLogin($registro, $cpfCnpj, $email = null)
     {
         $cpfCnpj = apenasNumeros($cpfCnpj);
 
         // RC Teste 1 (PF)
-        if($cpfCnpj == "86294373085") {
+        if($cpfCnpj == '86294373085') {
             $resultado = [
                 "SITUACAO" => "Ativo", 
                 "REGISTRONUM" => "0000000001", 
@@ -23,7 +22,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
             ];
         }
         // RC Teste 2 (PJ)
-        elseif($cpfCnpj == "11748345000144") {
+        elseif($cpfCnpj == '11748345000144') {
             $resultado = [
                 "SITUACAO" => "Ativo", 
                 "REGISTRONUM" => "0000000002", 
@@ -309,14 +308,7 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface
 
     public function gerentiStatus($ass_id)
     {
-        if($ass_id == "000001") {
-            $resultado = "Situação: Em dia.";
-        }
-        elseif($ass_id == "000002") {
-            $resultado = "Situação: Em dia.";
-        }
-
-        return $resultado;
+        return "Situação: Em dia.";
     }
 
     /**

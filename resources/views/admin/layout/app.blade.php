@@ -93,7 +93,7 @@
             <div class="float-right d-none d-sm-block">
               <b>Versão</b> 3.1.4
             </div>
-            <strong>Portal CORE-SP &copy; 2019.</strong> Todos direitos reservados.
+            <strong>Portal CORE-SP &copy; {{ date('Y') }}.</strong> Todos direitos reservados.
           </footer>
 
         </div>

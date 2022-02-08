@@ -186,7 +186,6 @@ class RepresentanteEnderecoController extends Controller
         $resultados = $this->representanteEnderecoRepository->getBusca($busca);
         
         $tabela = $this->tabelaCompleta($resultados);
-        $tabela = $this->tabelaCompleta($resultados);
         $variaveis = (object) $this->variaveis;
 
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));

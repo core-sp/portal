@@ -33,6 +33,7 @@ class Permissao extends Model
             'FiscalizacaoController' => 'Fiscalização',
             'CompromissoController' => 'Compromisso',
             'AvisoController' => 'Aviso',
+            'SolicitaCedulaController' => 'Representante - Cédula',
             'PlantaoJuridicoController' => 'Plantão Jurídico',
             'PlantaoJuridicoBloqueioController' => 'Plantão Jurídico Bloqueio',
         ];

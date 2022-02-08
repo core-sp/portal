@@ -32,10 +32,16 @@ Route::prefix('representante')->group(function(){
     Route::get('/emitir-certidao', 'RepresentanteSiteController@emitirCertidaoView')->name('representante.emitirCertidaoView');
     Route::post('/emitir-certidao', 'RepresentanteSiteController@emitirCertidao')->name('representante.emitirCertidao');
     Route::get('/baixar-certidao', 'RepresentanteSiteController@baixarCertidao')->name('representante.baixarCertidao');
+    
 
     // SIMULADOR_REFIS - Rota para simulador Refis
     //Route::get('/simulador-refis', 'RepresentanteSiteController@simuladorRefis')->name('representante.simuladorRefis');
 
-    // Rotas para emissão de Certidão
+    // Conferir as oportunidades do BDO
     Route::get('/oportunidades', 'RepresentanteSiteController@bdo')->name('representante.bdo');
+
+    // Solicitar cédula
+    Route::get('/cedulas', 'RepresentanteSiteController@cedulasView')->name('representante.solicitarCedulaView');
+    Route::get('/inserir-solicita-cedula', 'RepresentanteSiteController@inserirsolicitarCedulaView')->name('representante.inserirSolicitarCedulaView');
+    Route::post('/inserir-solicita-cedula', 'RepresentanteSiteController@inserirsolicitarCedula')->name('representante.inserirSolicitarCedula');
 });
