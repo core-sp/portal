@@ -12,11 +12,11 @@ class PlantaoJuridicoRequest extends FormRequest
             'qtd_advogados' => 'sometimes|required|regex:/^[0-9]{1}$/',
             'horarios' => request('qtd_advogados') == 0 ? '' : 'required|array',
             'dataInicial' => request('qtd_advogados') == 0 ? '' : 'required|after:'.date('Y-m-d'),
-            'dataFinal' => request('qtd_advogados') == 0 ? '' : 'required|after_or_equal:'.request('dataInicial'),
+            'dataFinal' => request('qtd_advogados') == 0 ? '' : 'required|after_or_equal:dataInicial',
             'plantaoBloqueio' => 'sometimes|required',
             'horariosBloqueio' => 'sometimes|required|array',
             'dataInicialBloqueio' => 'sometimes|required|after_or_equal:'.date('Y-m-d'),
-            'dataFinalBloqueio' => 'sometimes|required|after_or_equal:'.request('dataInicialBloqueio'),
+            'dataFinalBloqueio' => 'sometimes|required|after_or_equal:dataInicialBloqueio',
         ];
     }
 
