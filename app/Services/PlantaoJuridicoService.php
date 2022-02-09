@@ -199,10 +199,12 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
     {
         if(isset($id))
         {
-            return $dados = [
-                'resultado' => PlantaoJuridicoBloqueio::findOrFail($id),
-                'variaveis' => (object) $this->variaveisBloqueios
-            ];
+            $bloqueio = PlantaoJuridicoBloqueio::findOrFail($id);
+
+            return $bloqueio->podeEditar() ? 
+                ['resultado' => $bloqueio, 'variaveis' => (object) $this->variaveisBloqueios] : 
+                ['message' => '<i class="icon fa fa-ban"></i>O bloqueio não pode mais ser editado devido o período do plantão ter expirado',
+                'class' => 'alert-danger'];
         }
 
         return $dados = [
@@ -230,7 +232,15 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         {
             if(isset($id))
             {
-                PlantaoJuridicoBloqueio::findOrFail($id)->update([
+                $bloqueio = PlantaoJuridicoBloqueio::findOrFail($id);
+
+                if(!$bloqueio->podeEditar()) 
+                    return [
+                        'message' => '<i class="icon fa fa-ban"></i>O bloqueio não pode mais ser editado devido o período do plantão ter expirado',
+                        'class' => 'alert-danger'
+                    ];
+
+                $bloqueio->update([
                     'dataInicial' => $request->dataInicialBloqueio,
                     'dataFinal' => $request->dataFinalBloqueio,
                     'horarios' => implode(',', $request->horariosBloqueio),

@@ -141,6 +141,25 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_plantao_is_edited()
+    {
+        $user = $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+
+        $dados = $plantao->toArray();
+        $dados['qtd_advogados'] = 1;
+        $dados['dataInicial'] = date('Y-m-d', strtotime('+2 month'));
+        $dados['dataFinal'] = date('Y-m-d', strtotime('+2 month'));
+        $dados['horarios'] = ['10:00', '11:00', '12:00'];
+
+        $this->put(route('plantao.juridico.editar', $plantao->id), $dados);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('plantão juridico', $log);
+        $this->assertStringContainsString('editou', $log);
+    }
+
+    /** @test */
     public function plantao_can_be_edited_without_data_inicial_when_qtd_advogados_0()
     {
         $this->signInAsAdmin();
@@ -480,6 +499,26 @@ class PlantaoJuridicoTest extends TestCase
             'horarios' => '11:00,11:30',
             'idplantaojuridico' => $plantao->id
         ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_bloqueio_is_created()
+    {
+        $user = $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+
+        $dados = [
+            'plantaoBloqueio' => $plantao->id,
+            'dataInicialBloqueio' => $plantao->dataInicial,
+            'dataFinalBloqueio' => $plantao->dataInicial,
+            'horariosBloqueio' => ['11:00', '11:30']
+        ];
+
+        $this->post(route('plantao.juridico.bloqueios.criar'), $dados);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('plantão juridico bloqueio', $log);
+        $this->assertStringContainsString('criou', $log);
     }
 
     /** @test */
@@ -834,6 +873,26 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_bloqueio_is_edited()
+    {
+        $user = $this->signInAsAdmin();
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+
+        $dados = [
+            'plantaoBloqueio' => $bloqueio->idplantaojuridico,
+            'dataInicialBloqueio' => $bloqueio->dataInicial,
+            'dataFinalBloqueio' => $bloqueio->dataInicial,
+            'horariosBloqueio' => ['11:30', '12:00']
+        ];
+
+        $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('plantão juridico bloqueio', $log);
+        $this->assertStringContainsString('editou', $log);
+    }
+
+    /** @test */
     public function bloqueio_cannot_be_edited_without_plantao()
     {
         $this->signInAsAdmin();
@@ -1160,57 +1219,90 @@ class PlantaoJuridicoTest extends TestCase
         ]);
     }
 
-    // /** @test */
-    // public function bloqueio_cannot_be_edited_with_expired_data_final()
-    // {
-    //     $this->signInAsAdmin();
-    //     $plantao = factory('App\PlantaoJuridico')->create([
-    //         'qtd_advogados' => 1,
-    //         'dataInicial' => date('Y-m-d', strtotime('-1 day')),
-    //         'dataFinal' => date('Y-m-d', strtotime('-1 day'))
-    //     ]);
+    /** @test */
+    public function bloqueio_cannot_be_edited_with_expired_data_final()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'dataInicial' => date('Y-m-d', strtotime('-1 day')),
+            'dataFinal' => date('Y-m-d', strtotime('-1 day'))
+        ]);
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id,
+            'dataInicial' => $plantao->dataInicial,
+            'dataFinal' => $plantao->dataFinal
+        ]);
 
-    //     $this->get(route('plantao.juridico.index'))->assertSeeText('Período expirado, DESATIVE o plantão');
-    // }
+        $this->get(route('plantao.juridico.bloqueios.index'))
+        ->assertDontSeeText('Editar');
 
-    // /** @test */
-    // public function show_status()
-    // {
-    //     $this->signInAsAdmin();
+        $this->get(route('plantao.juridico.bloqueios.editar.view', $bloqueio->id))
+        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
 
-    //     $plantao1 = factory('App\PlantaoJuridico')->create();
+        $this->get(route('plantao.juridico.bloqueios.index'))
+        ->assertSeeText('O bloqueio não pode mais ser editado devido o período do plantão ter expirado');
 
-    //     $this->get(route('plantao.juridico.index'))
-    //     ->assertSeeText('Desativado');
+        $dados = [
+            'plantaoBloqueio' => $bloqueio->idplantaojuridico,
+            'dataInicialBloqueio' => date('Y-m-d'),
+            'dataFinalBloqueio' => date('Y-m-d'),
+            'horariosBloqueio' => ['09:30']
+        ];
 
-    //     $plantao2 = factory('App\PlantaoJuridico')->create([
-    //         'qtd_advogados' => 1,
-    //     ]);
+        $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)
+        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
 
-    //     $this->get(route('plantao.juridico.index'))
-    //     ->assertSeeText('Ativado')
-    //     ->assertSeeText('com '.$plantao2->qtd_advogados.' advogado(s)');
-    // }
+        $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
+            'horarios' => '09:30'
+        ]);
+    }
 
-    // /** @test */
-    // public function show_periodo()
-    // {
-    //     $this->signInAsAdmin();
+    /** @test */
+    public function bloqueio_can_be_deleted()
+    {
+        $this->signInAsAdmin();
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+                
+        $this->get(route('plantao.juridico.bloqueios.index'))->assertOk();
+        
+        $this->delete(route('plantao.juridico.bloqueios.excluir', $bloqueio->id))
+        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
 
-    //     $plantao = factory('App\PlantaoJuridico')->create();
+        $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
+            'id' => $bloqueio->id
+        ]);
+    }
 
-    //     $this->get(route('plantao.juridico.index'))
-    //     ->assertSeeText(onlyDate($plantao->dataInicial).' - '.onlyDate($plantao->dataFinal));
-    // }
+    /** @test */
+    public function log_is_generated_when_bloqueio_is_deleted()
+    {
+        $user = $this->signInAsAdmin();
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
 
-    // /** @test */
-    // public function show_horarios()
-    // {
-    //     $this->signInAsAdmin();
+        $this->delete(route('plantao.juridico.bloqueios.excluir', $bloqueio->id));
 
-    //     $plantao = factory('App\PlantaoJuridico')->create();
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('plantão juridico bloqueio', $log);
+        $this->assertStringContainsString('excluiu', $log);
+    }
 
-    //     $this->get(route('plantao.juridico.index'))
-    //     ->assertSeeText($plantao->horarios);
-    // }
+    /** @test */
+    public function show_periodo_bloqueio()
+    {
+        $this->signInAsAdmin();
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+
+        $this->get(route('plantao.juridico.bloqueios.index'))
+        ->assertSeeText(onlyDate($bloqueio->dataInicial).' - '.onlyDate($bloqueio->dataFinal));
+    }
+
+    /** @test */
+    public function show_horarios_bloqueio()
+    {
+        $this->signInAsAdmin();
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+
+        $this->get(route('plantao.juridico.bloqueios.index'))
+        ->assertSeeText($bloqueio->horarios);
+    }
 }

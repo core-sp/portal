@@ -82,12 +82,18 @@ class PlantaoJuridicoBloqueioController extends Controller
         $this->authorize('updateOther', auth()->user());
         try{
             $dados = $this->service->getService('PlantaoJuridico')->visualizarBloqueio($id);
-            $variaveis = $dados['variaveis'];
-            $resultado = $dados['resultado'];
+            $variaveis = isset($dados['variaveis']) ? $dados['variaveis'] : null;
+            $resultado = isset($dados['resultado']) ? $dados['resultado'] : null;
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao carregar a página para editar o bloqueio.");
         }
+
+        if(isset($dados['message']))
+            return redirect(route('plantao.juridico.bloqueios.index'))->with([
+                'message' => $dados['message'],
+                'class' => $dados['class']
+            ]);
 
         return view('admin.crud.editar', compact('variaveis', 'resultado'));
     }
