@@ -228,6 +228,8 @@ Route::prefix('/')->group(function() {
   Route::get('agendamento-consulta', 'AgendamentoSiteController@consultaView')->name('agendamentosite.consultaView');
   Route::get('agendamento-consulta/busca', 'AgendamentoSiteController@consulta')->name('agendamentosite.consulta');
   Route::put('agendamento-consulta/busca', 'AgendamentoSiteController@cancelamento')->name('agendamentosite.cancelamento');
+  Route::get('regionais-excluidas-plantao-juridico', 'AgendamentoSiteController@regionaisExcluidasPlantaoJuridico')->name('agendamentosite.regionaisExcluidasPlantaoJuridico');
+  Route::get('datas-plantao-juridico', 'AgendamentoSiteController@datasPlantaoJuridico')->name('agendamentosite.datasPlantaoJuridico');
 
   // Newsletter
   Route::post('newsletter', 'NewsletterController@store');

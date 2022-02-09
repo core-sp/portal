@@ -19,4 +19,10 @@ interface PlantaoJuridicoServiceInterface {
     public function saveBloqueio($request, $id = null);
 
     public function destroy($id);
+
+    public function plantaoJuridicoAtivo();
+
+    public function getRegionaisDesativadas();
+
+    public function getDatasPorRegional($idregional);
 }

@@ -324,21 +324,100 @@ $('#ano-mapa').on({
 	},
 });
 
-function regionaisExcluidasPlantaoJuridico()
+function getRegionaisExcluidasPlantaJuridico()
 {
-	return regionaisExcluidas = ["1", "2", "3", "6", "7", "9", "11", "13", "14"];
+	$.ajax({
+		method: "GET",
+		dataType: 'json',
+		url: "/regionais-excluidas-plantao-juridico",
+		beforeSend: function(){
+			$('#loadCalendario').show();
+		},
+		complete: function(){
+			$('#loadCalendario').hide();
+		},
+		success: function(response) {
+			regionaisExcluidas = response;
+			for(var regional of regionaisExcluidas)
+				$('#idregional option[value="' + regional + '"]').hide();
+		},
+		error: function() {
+			$('#datepicker').val('');
+			$('#datepicker').prop('disabled', true);
+			$('#datepicker').prop('placeholder', 'Falha ao recuperar calendário');
+
+			$('#horarios')
+				.find('option')
+				.remove()
+				.end()
+				.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
+
+			$("#dialog_agendamento")
+				.empty()
+				.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
+				
+			$("#dialog_agendamento").dialog({
+				draggable: false,
+				buttons: [{
+					text: "Recarregar",
+					click: function() {
+						location.reload(true);
+					}
+				}]	
+			});
+		}
+	});
 }
 
-function datasPorRegionalPlantaoJuridico(regional)
+function getDatasPorRegionalPlantaJuridico()
 {
-	var datas = []
-	datas[4] = ['02-09','02-11'],
-	datas[5] = ['02-07','02-08'],
-	datas[8] = ['02-07','02-08'],
-	datas[10] = ['02-10','02-11'],
-	datas[12] = ['02-09','02-10']
-	
-	return datas[regional];
+	$.ajax({
+		method: "GET",
+		data: {
+			"_token": $('#token').val(),
+			"idregional": $('#idregional').val(),
+		},
+		dataType: 'json',
+		url: "/datas-plantao-juridico",
+		beforeSend: function(){
+			$('#loadCalendario').show();
+		},
+		complete: function(){
+			$('#loadCalendario').hide();
+		},
+		success: function(response) {
+			datas = response;
+			$('#datepicker').datepicker('option', {
+				minDate: new Date(datas[0] + " 00:00:00"),
+				maxDate: new Date(datas[1] + " 00:00:00")
+			});
+		},
+		error: function() {
+			$('#datepicker').val('');
+			$('#datepicker').prop('disabled', true);
+			$('#datepicker').prop('placeholder', 'Falha ao recuperar calendário');
+
+			$('#horarios')
+				.find('option')
+				.remove()
+				.end()
+				.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
+
+			$("#dialog_agendamento")
+				.empty()
+				.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
+				
+			$("#dialog_agendamento").dialog({
+				draggable: false,
+				buttons: [{
+					text: "Recarregar",
+					click: function() {
+						location.reload(true);
+					}
+				}]	
+			});
+		}
+	});
 }
 
 (function($){
@@ -358,15 +437,11 @@ function datasPorRegionalPlantaoJuridico(regional)
 
 		// Para quando houver Plantão Jurídico
 		$('#selectServicos').change(function(){
-			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
 			$("#idregional").val("");
-
 			if($(this).val() == "Plantão Jurídico")
-				for(var regional of regionaisExcluidas)
-					$('#idregional option[value="' + regional + '"]').hide();
+				getRegionaisExcluidasPlantaJuridico();
 			else
-				for(var regional of regionaisExcluidas)
-					$('#idregional option[value="' + regional + '"]').show();
+				$('#idregional option').show();
 		});	
 
 		// Datepicker Agendamentos
@@ -385,15 +460,11 @@ function datasPorRegionalPlantaoJuridico(regional)
 		});
 
 		if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
-			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
 			$("#idregional").val("");
-			for(var regional of regionaisExcluidas)
-				$('#idregional option[value="' + regional + '"]').hide();
+			getRegionaisExcluidasPlantaJuridico();
 		}else{
-			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
 			$("#idregional").val("");
-			for(var regional of regionaisExcluidas)
-				$('#idregional option[value="' + regional + '"]').show();
+			$('#idregional option').show();
 		}
 
 
@@ -417,11 +488,7 @@ function datasPorRegionalPlantaoJuridico(regional)
 			$('#datepicker').val('');
 			$('#datepicker').prop('disabled', true);
 			if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
-				var datas = datasPorRegionalPlantaoJuridico($('#idregional').val());
-				$('#datepicker').datepicker('option', {
-					maxDate: new Date("2022-" + datas[1] + " 00:00:00"),
-					minDate: new Date("2022-" + datas[0] + " 00:00:00")
-				});
+				getDatasPorRegionalPlantaJuridico();
 			}else
 				$('#datepicker').datepicker('option', {
 					maxDate: '+1m',

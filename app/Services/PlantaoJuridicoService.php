@@ -47,11 +47,12 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
+        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
         foreach($resultados as $resultado) {
             $msgPrazoExpirado = $resultado->expirou() ? '<br><small class="text-danger"><strong>Período expirado, DESATIVE o plantão</strong></small>' : '';
             $msgAtivado = '<span class="text-success">Ativado</span><br><small>com '.$resultado->qtd_advogados.' advogado(s)</small>';
             $acoes = '';
-            if(auth()->user()->can('updateOther', auth()->user()))
+            if($userPodeEditar)
                 $acoes = '<a href="' .route('plantao.juridico.editar.view', $resultado->id). '" class="btn btn-sm btn-primary">Editar</a> ';
             $conteudo = [
                 $resultado->id,
@@ -86,11 +87,13 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
+        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
+        $userPodeExcluir = auth()->user()->can('delete', auth()->user());
         foreach($resultados as $resultado) {
             $acoes = '';
-            if($resultado->podeEditar() && auth()->user()->can('updateOther', auth()->user()))
+            if($resultado->podeEditar() && $userPodeEditar)
                 $acoes .= '<a href="' .route('plantao.juridico.bloqueios.editar.view', $resultado->id). '" class="btn btn-sm btn-primary">Editar</a> ';
-            if(auth()->user()->can('delete', auth()->user()))
+            if($userPodeExcluir)
             {
                 $acoes .= '<form method="POST" action="'.route('plantao.juridico.bloqueios.excluir', $resultado->id).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
@@ -266,5 +269,25 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
     public function destroy($id)
     {
         PlantaoJuridicoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('plantão juridico bloqueio', 'excluiu', $id)) : null;
+    }
+
+    public function plantaoJuridicoAtivo()
+    {
+        return PlantaoJuridico::where('qtd_advogados', '>', 0)->count() > 0 ? true : false;
+    }
+
+    public function getRegionaisDesativadas()
+    {
+        $plantoes = PlantaoJuridico::select('idregional')->where('qtd_advogados', 0)->get();
+        $resultado = array();
+        foreach($plantoes as $plantao)
+            array_push($resultado, $plantao->idregional);
+
+        return $resultado;
+    }
+
+    public function getDatasPorRegional($idregional)
+    {
+        return PlantaoJuridico::select('dataInicial', 'dataFinal')->where('idregional', $idregional)->first();
     }
 }

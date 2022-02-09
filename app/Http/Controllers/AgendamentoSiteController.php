@@ -18,6 +18,7 @@ use App\Http\Requests\AgendamentoSiteRequest;
 use App\Repositories\AgendamentoBloqueioRepository;
 use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
 use App\Repositories\TermoConsentimentoRepository;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoSiteController extends Controller
@@ -26,12 +27,14 @@ class AgendamentoSiteController extends Controller
     private $regionalRepository;
     private $agendamentoBloqueioRepository;
     private $termoConsentimentoRepository;
+    private $service;
 
-    public function __construct(AgendamentoRepository $agendamentoRepository, RegionalRepository $regionalRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository, TermoConsentimentoRepository $termoConsentimentoRepository) {
+    public function __construct(AgendamentoRepository $agendamentoRepository, RegionalRepository $regionalRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository, TermoConsentimentoRepository $termoConsentimentoRepository, MediadorServiceInterface $service) {
         $this->agendamentoRepository = $agendamentoRepository;
         $this->regionalRepository = $regionalRepository;
         $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
         $this->termoConsentimentoRepository = $termoConsentimentoRepository;
+        $this->service = $service;
     }
 
     public function formView()
@@ -39,6 +42,9 @@ class AgendamentoSiteController extends Controller
         $regionais = $this->regionalRepository->getRegionaisAgendamento();
         $pessoas = Agendamento::TIPOS_PESSOA;
         $servicos = Agendamento::servicos();
+
+        if(!$this->service->getService('PlantaoJuridico')->plantaoJuridicoAtivo())
+            unset($servicos[array_search(Agendamento::SERVICOS_PLANTAO_JURIDICO, $servicos)]);        
 
         return view('site.agendamento', compact('regionais', 'pessoas', 'servicos'));
     }
@@ -292,10 +298,8 @@ class AgendamentoSiteController extends Controller
 
         if($servico == Agendamento::SERVICOS_PLANTAO_JURIDICO)
         {
-            $dias = $this->agendamentoRepository->diasHorasPlantaoJuridico()[$idregional];
-            foreach($dias as $key => $dia)
-                if($this->agendamentoRepository->estaLotadoPlantaoJuridico($idregional, $key)) 
-                    array_push($diasLotados, array(date('m', strtotime($key)), date('d', strtotime($key)), 'lotado'));
+            // verificar os horarios, verifcar os bloqueios, verificar quantidade de agendados etc... devolver se esta lotado
+
         }else
         {
             // Recupera o número de agendamentos para cada dia entre d+1 d+m
@@ -362,5 +366,24 @@ class AgendamentoSiteController extends Controller
         }
 
         return response()->json($diasLotados);
+    }
+
+    public function regionaisExcluidasPlantaoJuridico()
+    {
+        $regionaisExcluidas = $this->service->getService('PlantaoJuridico')->getRegionaisDesativadas();
+
+        return response()->json($regionaisExcluidas);
+    }
+
+    public function datasPlantaoJuridico(Request $request)
+    {
+        $idregional = $request->idregional;
+        $plantao = $this->service->getService('PlantaoJuridico')->getDatasPorRegional($idregional);
+        $datas = [
+            $plantao->dataInicial, 
+            $plantao->dataFinal
+        ];
+
+        return response()->json($datas);
     }
 }
