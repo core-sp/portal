@@ -24,7 +24,7 @@ class SolicitaCedulaRequest extends FormRequest
             "complemento" => "max:100",
             "estado" => "sometimes|required|max:5",
             "municipio" => "sometimes|required|max:100",
-            'justificativa' => 'sometimes|required|min:5|max:191'
+            'justificativa' => 'sometimes|required|min:5|max:600'
         ];
     }
 
@@ -32,6 +32,7 @@ class SolicitaCedulaRequest extends FormRequest
     {
         return [
             "required" => "Campo obrigatório",
+            "justificativa.max" => "Excedido limite de 600 caracteres",
             "max" => "Excedido limite de caracteres",
             'min' => 'O :attribute deve ter, no mínimo, 5 caracteres',
         ];
