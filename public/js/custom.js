@@ -273,9 +273,9 @@ $('#plantaoBloqueio').change(function(){
     if($('[name="justificativa"]').val().trim().length < 5) {
       e.preventDefault();
       alert("O campo de justificativa deve ter, no mínimo, 5 caracteres");
-    }else if($('[name="justificativa"]').val().trim().length > 191) {
+    }else if($('[name="justificativa"]').val().trim().length > 600) {
       e.preventDefault();
-      alert("O campo de justificativa deve ter, no máximo, 191 caracteres");
+      alert("O campo de justificativa deve ter, no máximo, 600 caracteres");
     }
     else
       $('.cedula_recusada').submit();
