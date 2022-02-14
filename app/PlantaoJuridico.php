@@ -15,6 +15,11 @@ class PlantaoJuridico extends Model
     	return $this->belongsTo('App\Regional', 'idregional');
     }
 
+    public function bloqueios()
+    {
+    	return $this->hasMany('App\PlantaoJuridicoBloqueio', 'idplantaojuridico');
+    }
+
     public function ativado()
     {
         return $this->qtd_advogados > 0 ? true : false;

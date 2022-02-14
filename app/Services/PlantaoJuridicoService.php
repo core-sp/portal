@@ -152,6 +152,48 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         return null;
     }
 
+    private function getPlantaoComBloqueioPorRegional($idregional)
+    {
+        return PlantaoJuridico::with('bloqueios')
+        ->where('idregional', $idregional)
+        ->where('qtd_advogados', '>', 0)
+        ->first();
+    }
+
+    private function getHorariosComBloqueio($plantao, $dia)
+    {
+        $horarios = explode(',', $plantao->horarios);
+
+        if($plantao->bloqueios->count() > 0)
+        {
+            foreach($plantao->bloqueios as $bloqueio)
+            {
+                $inicialBloqueio = Carbon::parse($bloqueio->dataInicial);
+                $finalBloqueio = Carbon::parse($bloqueio->dataFinal);
+                $dia = Carbon::parse($dia);
+
+                if($inicialBloqueio->lte($dia) && $finalBloqueio->gte($dia))
+                {
+                    $horariosBloqueios = explode(',', $bloqueio->horarios);
+                    foreach($horariosBloqueios as $horario)
+                        unset($horarios[array_search($horario, $horarios)]);
+                }
+            }
+        }
+
+        return $horarios;
+    }
+
+    private function getHorariosPlantaoPorRegional($plantao, $dia)
+    {
+        $horarios = array();
+
+        if(isset($plantao))
+            $horarios = $this->getHorariosComBloqueio($plantao, $dia);
+
+        return $horarios;
+    }
+
     public function listar()
     {
         $plantoes = PlantaoJuridico::with('regional')
@@ -286,8 +328,35 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         return $resultado;
     }
 
-    public function getDatasPorRegional($idregional)
+    public function getPlantaoPorRegional($idregional)
     {
-        return PlantaoJuridico::select('dataInicial', 'dataFinal')->where('idregional', $idregional)->first();
+        return $this->getPlantaoComBloqueioPorRegional($idregional);
+    }
+
+    public function removeHorariosSeLotado($agendados, $plantao, $dia)
+    {
+        $horarios = $this->getHorariosPlantaoPorRegional($plantao, $dia);
+
+        foreach($agendados as $agendado)
+            if($plantao->qtd_advogados == $agendado->total)
+                unset($horarios[array_search($agendado->hora, $horarios)]);
+        
+        return $horarios;
+    }
+
+    public function getDiasSeLotado($agendados, $plantao)
+    {
+        $inicial = Carbon::parse($plantao->dataInicial);
+        $final = Carbon::parse($plantao->dataFinal);
+        $diasLotados = array();
+
+        for($dia = $inicial; $dia->lte($final); $dia->addDay())
+        {
+            $horarios = $this->removeHorariosSeLotado($agendados, $plantao, $dia);
+            if(empty($horarios))
+                array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+        }
+        
+        return $diasLotados;
     }
 }

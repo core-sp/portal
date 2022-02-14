@@ -7,6 +7,8 @@
         <h4>Regional - {{ $resultado->regional->regional }}</h4>
         <p>
             <i>Obs: para desativar o plantão jurídico nesta regional, coloque 0 na quantidade de advogados</i>
+            <br>
+            <i>Obs 2: a quantidade de advogados determina quantos agendamentos permitidos em cada hora selecionada</i>
         </p>
         <div class="form-row">
             <div class="col-2">
