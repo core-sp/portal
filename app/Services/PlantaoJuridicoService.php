@@ -328,7 +328,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         return $resultado;
     }
 
-    public function getPlantaoPorRegional($idregional)
+    public function getPlantaoAtivoPorRegional($idregional)
     {
         return $this->getPlantaoComBloqueioPorRegional($idregional);
     }
@@ -338,7 +338,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         $horarios = $this->getHorariosPlantaoPorRegional($plantao, $dia);
 
         foreach($agendados as $agendado)
-            if($plantao->qtd_advogados == $agendado->total)
+            if(isset($agendado->total) && ($plantao->qtd_advogados == $agendado->total))
                 unset($horarios[array_search($agendado->hora, $horarios)]);
         
         return $horarios;
@@ -349,14 +349,42 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         $inicial = Carbon::parse($plantao->dataInicial);
         $final = Carbon::parse($plantao->dataFinal);
         $diasLotados = array();
+        $hoje = Carbon::parse(date('Y-m-d'));
 
         for($dia = $inicial; $dia->lte($final); $dia->addDay())
         {
             $horarios = $this->removeHorariosSeLotado($agendados, $plantao, $dia);
-            if(empty($horarios))
+            if(empty($horarios)/* || $dia->lte($hoje)*/)
                 array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
         }
         
         return $diasLotados;
+    }
+
+    public function validacaoAgendarPlantao($plantao, $diaEscolhido, $agendados = null, $horaEscolhida = null)
+    {
+        $inicial = Carbon::parse($plantao->dataInicial);
+        $final = Carbon::parse($plantao->dataFinal);
+        $dia = Carbon::parse($diaEscolhido);
+        $hoje = Carbon::parse(date('Y-m-d'));
+
+        if($dia->lt($inicial) || $dia->gt($final) || $dia->lte($hoje))
+            return false;
+
+        if(isset($agendados) && isset($horaEscolhida))
+        {
+            $horarios = $this->removeHorariosSeLotado($agendados, $plantao, $dia);
+            if(!in_array($horaEscolhida, $horarios))
+                return false;
+        }
+
+        if(isset($agendados) && !isset($horaEscolhida))
+        {
+            $diasLotados = $this->getDiasSeLotado($agendados, $plantao);
+            if(in_array([$dia->month, $dia->day, 'lotado'], $diasLotados))
+                return false;
+        }
+
+        return true;
     }
 }

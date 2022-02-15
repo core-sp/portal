@@ -324,6 +324,27 @@ $('#ano-mapa').on({
 	},
 });
 
+function validarDatasPlantaoJuridico(datas)
+{
+	var datasNovas = [];
+
+	if((datas[0] != null) && (datas[1] != null))
+	{
+		datasNovas[0] = new Date(datas[0] + " 00:00:00");
+		datasNovas[1] = new Date(datas[1] + " 00:00:00");
+		return datasNovas;
+	}
+
+	if((datas[0] == null) && (datas[1] != null))
+	{
+		datasNovas[0] = '+1';
+		datasNovas[1] = new Date(datas[1] + " 00:00:00");
+		return datasNovas;
+	}
+
+	return datas;
+}
+
 function getRegionaisExcluidasPlantaJuridico()
 {
 	$.ajax({
@@ -387,9 +408,10 @@ function getDatasPorRegionalPlantaJuridico()
 		},
 		success: function(response) {
 			datas = response;
+			datasNovas = validarDatasPlantaoJuridico(datas);
 			$('#datepicker').datepicker('option', {
-				minDate: new Date(datas[0] + " 00:00:00"),
-				maxDate: new Date(datas[1] + " 00:00:00")
+				minDate: datasNovas[0],
+				maxDate: datasNovas[1]
 			});
 		},
 		error: function() {
