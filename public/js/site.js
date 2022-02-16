@@ -342,7 +342,7 @@ function validarDatasPlantaoJuridico(datas)
 		return datasNovas;
 	}
 
-	return datas;
+	return null;
 }
 
 function getRegionaisExcluidasPlantaJuridico()
@@ -363,9 +363,10 @@ function getRegionaisExcluidasPlantaJuridico()
 				$('#idregional option[value="' + regional + '"]').hide();
 		},
 		error: function() {
-			$('#datepicker').val('');
-			$('#datepicker').prop('disabled', true);
-			$('#datepicker').prop('placeholder', 'Falha ao recuperar calendário');
+			$('#datepicker')
+			.val('')
+			.prop('disabled', true)
+			.prop('placeholder', 'Falha ao recuperar calendário');
 
 			$('#horarios')
 				.find('option')
@@ -409,15 +410,21 @@ function getDatasPorRegionalPlantaJuridico()
 		success: function(response) {
 			datas = response;
 			datasNovas = validarDatasPlantaoJuridico(datas);
-			$('#datepicker').datepicker('option', {
-				minDate: datasNovas[0],
-				maxDate: datasNovas[1]
-			});
+			if(datasNovas == null)
+				$('#datepicker')
+				.prop('disabled', true)
+				.prop('placeholder', 'Sem datas disponíveis')
+				.val('');
+			else
+				$('#datepicker').prop('placeholder', 'dd/mm/aaaaa').datepicker('option', {
+					minDate: datasNovas[0],
+					maxDate: datasNovas[1]
+				});
 		},
 		error: function() {
-			$('#datepicker').val('');
-			$('#datepicker').prop('disabled', true);
-			$('#datepicker').prop('placeholder', 'Falha ao recuperar calendário');
+			$('#datepicker').val('')
+			.prop('disabled', true)
+			.prop('placeholder', 'Falha ao recuperar calendário');
 
 			$('#horarios')
 				.find('option')
@@ -463,7 +470,12 @@ function getDatasPorRegionalPlantaJuridico()
 			if($(this).val() == "Plantão Jurídico")
 				getRegionaisExcluidasPlantaJuridico();
 			else
+			{
 				$('#idregional option').show();
+				$('#datepicker')
+				.prop('placeholder', 'dd/mm/aaaaa')
+				.val('');
+			}
 		});	
 
 		// Datepicker Agendamentos
@@ -507,11 +519,13 @@ function getDatasPorRegionalPlantaJuridico()
 				alert('Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: Av. Brigadeiro Luís Antônio, 613, Térreo, CEP:01317-000, São Paulo/SP.');
 			}
 
-			$('#datepicker').val('');
-			$('#datepicker').prop('disabled', true);
-			if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
+			$('#datepicker')
+			.val('')
+			.prop('disabled', true);
+			
+			if($("#selectServicos option:selected").val() == "Plantão Jurídico")
 				getDatasPorRegionalPlantaJuridico();
-			}else
+			else
 				$('#datepicker').datepicker('option', {
 					maxDate: '+1m',
 					minDate: +1
@@ -543,13 +557,16 @@ function getDatasPorRegionalPlantaJuridico()
 				},
 				success: function(response) {
 					lotados = response;
-					$('#datepicker').prop('disabled', false);
-					$('#datepicker').prop('placeholder', 'dd/mm/aaaaa');
+					if($('#datepicker').prop('placeholder') != 'Sem datas disponíveis')
+						$('#datepicker')
+						.prop('disabled', false)
+						.prop('placeholder', 'dd/mm/aaaaa');
 				},
 				error: function() {
-					$('#datepicker').val('');
-					$('#datepicker').prop('disabled', true);
-					$('#datepicker').prop('placeholder', 'Falha ao recuperar calendário');
+					$('#datepicker')
+					.val('')
+					.prop('disabled', true)
+					.prop('placeholder', 'Falha ao recuperar calendário');
 
 					$('#horarios')
 						.find('option')

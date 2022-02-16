@@ -15,7 +15,7 @@ class PlantaoJuridicoRequest extends FormRequest
             'dataFinal' => request('qtd_advogados') == 0 ? '' : 'required|after_or_equal:dataInicial',
             'plantaoBloqueio' => 'sometimes|required',
             'horariosBloqueio' => 'sometimes|required|array',
-            'dataInicialBloqueio' => 'sometimes|required|after_or_equal:'.date('Y-m-d'),
+            'dataInicialBloqueio' => 'sometimes|required|after:'.date('Y-m-d'),
             'dataFinalBloqueio' => 'sometimes|required|after_or_equal:dataInicialBloqueio',
         ];
     }
@@ -28,7 +28,7 @@ class PlantaoJuridicoRequest extends FormRequest
             'required' => 'É obrigatório o preenchimento do campo',
             'qtd_advogados.regex' => 'Permitido somente um número de 0 a 9',
             'dataFinalBloqueio.after_or_equal' => 'Deve selecionar uma data igual ou depois de '.onlyDate(request('dataInicialBloqueio')),
-            'dataInicialBloqueio.after_or_equal' => 'Deve selecionar uma data igual ou depois de '.date('d/m/Y'),
+            'dataInicialBloqueio.after' => 'Deve selecionar uma data depois de '.date('d/m/Y'),
         ];
     }
 }

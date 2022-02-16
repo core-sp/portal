@@ -27,6 +27,6 @@ class PlantaoJuridico extends Model
 
     public function expirou()
     {
-        return Carbon::parse($this->dataFinal)->lt(date('Y-m-d')) && $this->ativado() ? true : false;
+        return Carbon::parse($this->dataFinal)->lt(Carbon::today()) && $this->ativado() ? true : false;
     }
 }

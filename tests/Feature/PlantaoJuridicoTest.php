@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Permissao;
+use Carbon\Carbon;
 
 class PlantaoJuridicoTest extends TestCase
 {
@@ -531,8 +532,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => '',
-            'dataInicialBloqueio' => date('Y-m-d'),
-            'dataFinalBloqueio' => date('Y-m-d'),
+            'dataInicialBloqueio' => Carbon::tomorrow()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::tomorrow()->format('Y-m-d'),
             'horariosBloqueio' => ['11:00', '11:30']
         ];
 
@@ -651,7 +652,7 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $plantao->id,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('-1 day', strtotime($plantao->dataInicial))),
+            'dataInicialBloqueio' => Carbon::parse($plantao->dataInicial)->subDay()->format('Y-m-d'),
             'dataFinalBloqueio' => $plantao->dataInicial,
             'horariosBloqueio' => ['11:00', '11:30']
         ];
@@ -678,8 +679,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $plantao->id,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('+1 day', strtotime($plantao->dataFinal))),
-            'dataFinalBloqueio' => date('Y-m-d', strtotime('+1 day', strtotime($plantao->dataFinal))),
+            'dataInicialBloqueio' => Carbon::parse($plantao->dataFinal)->addDay()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::parse($plantao->dataFinal)->addDay()->format('Y-m-d'),
             'horariosBloqueio' => ['11:00', '11:30']
         ];
 
@@ -695,7 +696,7 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
-    public function bloqueio_cannot_be_created_with_data_inicial_before_today()
+    public function bloqueio_cannot_be_created_with_data_inicial_before_or_equal_today()
     {
         $this->signInAsAdmin();
         $plantao = factory('App\PlantaoJuridico')->create();
@@ -705,7 +706,7 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $plantao->id,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('-1 day')),
+            'dataInicialBloqueio' => date('Y-m-d'),
             'dataFinalBloqueio' => $plantao->dataFinal,
             'horariosBloqueio' => ['11:00', '11:30']
         ];
@@ -729,8 +730,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $plantao->id,
-            'dataInicialBloqueio' => date('Y-m-d'),
-            'dataFinalBloqueio' => date('Y-m-d', strtotime('-1 day')),
+            'dataInicialBloqueio' => Carbon::tomorrow()->addDay()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::tomorrow()->format('Y-m-d'),
             'horariosBloqueio' => ['11:00', '11:30']
         ];
 
@@ -753,8 +754,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $plantao->id,
-            'dataInicialBloqueio' => date('Y-m-d'),
-            'dataFinalBloqueio' => date('Y-m-d', strtotime('+1 day', strtotime($plantao->dataFinal))),
+            'dataInicialBloqueio' => $plantao->dataInicial,
+            'dataFinalBloqueio' => Carbon::parse($plantao->dataFinal)->addDay()->format('Y-m-d'),
             'horariosBloqueio' => ['11:00', '11:30']
         ];
 
@@ -780,8 +781,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $plantao->id,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('-1 day', strtotime($plantao->dataInicial))),
-            'dataFinalBloqueio' => date('Y-m-d', strtotime('-1 day', strtotime($plantao->dataInicial))),
+            'dataInicialBloqueio' => Carbon::parse($plantao->dataInicial)->subDay()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::parse($plantao->dataInicial)->subDay()->format('Y-m-d'),
             'horariosBloqueio' => ['11:00', '11:30']
         ];
 
@@ -807,8 +808,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $plantao->id,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('+1 day')),
-            'dataFinalBloqueio' => date('Y-m-d'),
+            'dataInicialBloqueio' => Carbon::tomorrow()->addDay()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::tomorrow()->format('Y-m-d'),
             'horariosBloqueio' => ['11:00', '11:30']
         ];
 
@@ -1023,7 +1024,7 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $bloqueio->idplantaojuridico,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('-1 day', strtotime($bloqueio->plantaoJuridico->dataInicial))),
+            'dataInicialBloqueio' => Carbon::parse($bloqueio->plantaoJuridico->dataInicial)->subDay()->format('Y-m-d'),
             'dataFinalBloqueio' => $bloqueio->dataInicial,
             'horariosBloqueio' => ['11:30', '12:00']
         ];
@@ -1050,8 +1051,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $bloqueio->idplantaojuridico,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('+1 day', strtotime($bloqueio->plantaoJuridico->dataFinal))),
-            'dataFinalBloqueio' => date('Y-m-d', strtotime('+1 day', strtotime($bloqueio->plantaoJuridico->dataFinal))),
+            'dataInicialBloqueio' => Carbon::parse($bloqueio->plantaoJuridico->dataFinal)->addDay()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::parse($bloqueio->plantaoJuridico->dataFinal)->addDay()->format('Y-m-d'),
             'horariosBloqueio' => ['11:30', '12:00']
         ];
 
@@ -1067,7 +1068,7 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
-    public function bloqueio_cannot_be_edited_with_data_inicial_before_today()
+    public function bloqueio_cannot_be_edited_with_data_inicial_before_or_equal_today()
     {
         $this->signInAsAdmin();
         $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
@@ -1077,7 +1078,7 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $bloqueio->idplantaojuridico,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('-1 day')),
+            'dataInicialBloqueio' => date('Y-m-d'),
             'dataFinalBloqueio' => $bloqueio->dataFinal,
             'horariosBloqueio' => ['11:30', '12:00']
         ];
@@ -1101,8 +1102,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $bloqueio->idplantaojuridico,
-            'dataInicialBloqueio' => date('Y-m-d'),
-            'dataFinalBloqueio' => date('Y-m-d', strtotime('-1 day')),
+            'dataInicialBloqueio' => Carbon::tomorrow()->addDay()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::tomorrow()->format('Y-m-d'),
             'horariosBloqueio' => ['11:30', '12:00']
         ];
 
@@ -1125,8 +1126,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $bloqueio->idplantaojuridico,
-            'dataInicialBloqueio' => date('Y-m-d'),
-            'dataFinalBloqueio' => date('Y-m-d', strtotime('+1 day', strtotime($bloqueio->plantaoJuridico->dataFinal))),
+            'dataInicialBloqueio' => $bloqueio->dataInicial,
+            'dataFinalBloqueio' => Carbon::parse($bloqueio->plantaoJuridico->dataFinal)->addDay()->format('Y-m-d'),
             'horariosBloqueio' => ['11:30', '12:00']
         ];
 
@@ -1152,8 +1153,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $bloqueio->idplantaojuridico,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('-1 day', strtotime($bloqueio->plantaoJuridico->dataInicial))),
-            'dataFinalBloqueio' => date('Y-m-d', strtotime('-1 day', strtotime($bloqueio->plantaoJuridico->dataInicial))),
+            'dataInicialBloqueio' => Carbon::parse($bloqueio->plantaoJuridico->dataInicial)->subDay()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::parse($bloqueio->plantaoJuridico->dataInicial)->subDay()->format('Y-m-d'),
             'horariosBloqueio' => ['11:30', '12:00']
         ];
 
@@ -1179,8 +1180,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $bloqueio->idplantaojuridico,
-            'dataInicialBloqueio' => date('Y-m-d', strtotime('+1 day')),
-            'dataFinalBloqueio' => date('Y-m-d'),
+            'dataInicialBloqueio' => Carbon::tomorrow()->addDay()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::tomorrow()->format('Y-m-d'),
             'horariosBloqueio' => ['11:30', '12:00']
         ];
 
@@ -1224,8 +1225,8 @@ class PlantaoJuridicoTest extends TestCase
     {
         $this->signInAsAdmin();
         $plantao = factory('App\PlantaoJuridico')->create([
-            'dataInicial' => date('Y-m-d', strtotime('-1 day')),
-            'dataFinal' => date('Y-m-d', strtotime('-1 day'))
+            'dataInicial' => date('Y-m-d'),
+            'dataFinal' => date('Y-m-d')
         ]);
         $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
             'idplantaojuridico' => $plantao->id,
@@ -1244,8 +1245,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $bloqueio->idplantaojuridico,
-            'dataInicialBloqueio' => date('Y-m-d'),
-            'dataFinalBloqueio' => date('Y-m-d'),
+            'dataInicialBloqueio' => Carbon::tomorrow()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::tomorrow()->format('Y-m-d'),
             'horariosBloqueio' => ['09:30']
         ];
 

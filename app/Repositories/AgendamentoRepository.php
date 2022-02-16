@@ -247,14 +247,14 @@ class AgendamentoRepository
             ->count();
     }
 
-    public function getPlantaoJuridicoPorPeriodo($regional, $plantao)
+    public function getPlantaoJuridicoPorPeriodo($regional, $dataInicial, $dataFinal)
     {
         $agendados = array();
-        $inicial = Carbon::parse($plantao->dataInicial);
-        $final = Carbon::parse($plantao->dataFinal);
+        $inicial = Carbon::parse($dataInicial);
+        $final = Carbon::parse($dataFinal);
 
-        for($dia = $inicial, $i = 0; $dia->lte($final); $dia->addDay(), $i++)
-            $agendados[$i] = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia);
+        for($dia = $inicial; $dia->lte($final); $dia->addDay())
+            $agendados[$dia->format('Y-m-d')] = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia->format('Y-m-d'));
         
         return $agendados;
     }

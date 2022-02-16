@@ -93,7 +93,7 @@ class AgendamentoSiteController extends Controller
 
         if(stristr($request->toModel()['tiposervico'], Agendamento::SERVICOS_PLANTAO_JURIDICO))
         {
-        $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoPorRegional($request->idregional);
+            $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($request->idregional);
 
             // se existe a regional
             abort_if(!isset($plantao), 500, 'A regional escolhida não é válida para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
@@ -102,15 +102,15 @@ class AgendamentoSiteController extends Controller
             $diaValido = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia);
             abort_if(!$diaValido, 500, 'A data para a regional escolhida não é válida para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
 
+            // se está lotado
+            $agendados = $this->agendamentoRepository->getPlantaoJuridicoPorPeriodo($request->idregional, $dia, $dia);
+            $estaLivre = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia, $agendados);
+            abort_if(!$estaLivre, 500, 'A data escolhida para a regional está indiponível atualmente para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
+
             // se existe o horário
             $agendados = $this->agendamentoRepository->getPlantaoJuridicoByRegionalAndDia($request->idregional, $dia);
             $horaValida = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia, $agendados, $request->hora);
             abort_if(!$horaValida, 500, 'A hora para a regional escolhida não é válida para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
-
-            // se está lotado
-            $agendados = $this->agendamentoRepository->getPlantaoJuridicoPorPeriodo($request->idregional, $plantao);
-            $estaLivre = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia, $agendados);
-            abort_if(!$estaLivre, 500, 'A data escolhida para a regional está indiponível atualmente para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
 
             // se já possui um agendamento no periodo do plantao
             $total = $this->agendamentoRepository->countPlantaoJuridicoByCPF($request->cpf, $request->idregional, $plantao);
@@ -273,7 +273,7 @@ class AgendamentoSiteController extends Controller
 
         if($servico == Agendamento::SERVICOS_PLANTAO_JURIDICO)
         {
-            $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoPorRegional($idregional);
+            $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($idregional);
             if(isset($plantao))
             {
                 $agendados = $this->agendamentoRepository->getPlantaoJuridicoByRegionalAndDia($idregional, $dia);
@@ -319,10 +319,11 @@ class AgendamentoSiteController extends Controller
 
         if($servico == Agendamento::SERVICOS_PLANTAO_JURIDICO)
         {
-            $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoPorRegional($idregional);
+            $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($idregional);
             if(isset($plantao))
             {
-                $agendados = $this->agendamentoRepository->getPlantaoJuridicoPorPeriodo($idregional, $plantao);
+                $inicial = Carbon::parse($plantao->dataInicial)->lte(Carbon::today()) ? date('Y-m-d', strtotime('+1 day')) : $plantao->dataInicial;
+                $agendados = $this->agendamentoRepository->getPlantaoJuridicoPorPeriodo($idregional, $inicial, $plantao->dataFinal);
                 $diasLotados = $this->service->getService('PlantaoJuridico')->getDiasSeLotado($agendados, $plantao); 
             }
         }else
@@ -403,14 +404,14 @@ class AgendamentoSiteController extends Controller
     public function datasPlantaoJuridico(Request $request)
     {
         $idregional = $request->idregional;
-        $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoPorRegional($idregional);
+        $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($idregional);
         $datas = array();
 
         if(isset($plantao))
         {
             $inicial = Carbon::parse($plantao->dataInicial);
             $final = Carbon::parse($plantao->dataFinal);
-            $hoje = Carbon::parse(date('Y-m-d'));
+            $hoje = Carbon::today();
 
             $datas = [
                 $inicial->gt($hoje) ? $plantao->dataInicial : null, 

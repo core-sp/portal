@@ -165,10 +165,8 @@ $(document).ready(function(){
 // Funcionalidade Plantão Jurídico
 function setCamposDatas(plantao)
 {
-    $("#dataInicialBloqueio").prop('min', plantao['datas'][0]);
-    $("#dataInicialBloqueio").prop('max', plantao['datas'][1]);
-    $("#dataFinalBloqueio").prop('min', plantao['datas'][0]);
-    $("#dataFinalBloqueio").prop('max', plantao['datas'][1]);
+    $("#dataInicialBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
+    $("#dataFinalBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
 }
 
 function setCampoHorarios(plantao)
