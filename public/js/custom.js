@@ -167,6 +167,13 @@ function setCamposDatas(plantao)
 {
     $("#dataInicialBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
     $("#dataFinalBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
+
+    var inicial = new Date(plantao['datas'][0] + ' 00:00:00');
+    var final = new Date(plantao['datas'][1] + ' 00:00:00');
+    var inicialFormatada = inicial.getDate() + '/' + (inicial.getMonth() + 1) + '/' + inicial.getFullYear(); 
+    var finalFormatada = final.getDate() + '/' + (final.getMonth() + 1) + '/' + final.getFullYear(); 
+
+    $("#bloqueioPeriodoPlantao").text(inicialFormatada + ' - ' + finalFormatada);
 }
 
 function setCampoHorarios(plantao)
@@ -198,7 +205,7 @@ $('#plantaoBloqueio').ready(function(){
           setCampoHorarios(plantao);
         },
         error: function() {
-          alert('Erro ao carregar as datas e/ou os horários. Tente novamente mais tarde.');
+          alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
         }
       });
 });
@@ -222,7 +229,7 @@ $('#plantaoBloqueio').change(function(){
         setCampoHorarios(plantao);
       },
       error: function() {
-        alert('Erro ao carregar as datas e/ou os horários. Tente novamente mais tarde.');
+        alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
       }
     });
 });

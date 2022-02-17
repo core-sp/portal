@@ -22,6 +22,6 @@ class PlantaoJuridicoBloqueio extends Model
 
     public function podeEditar()
     {
-        return Carbon::parse($this->dataFinal)->gt(Carbon::today()) ? true : false;
+        return Carbon::parse($this->plantaoJuridico->dataFinal)->gt(Carbon::today()) ? true : false;
     }
 }

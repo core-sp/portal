@@ -475,7 +475,11 @@ class PlantaoJuridicoTest extends TestCase
         ->assertSeeText($plantao->horarios);
     }
 
-    /* PLANTÃO JURÍDICO BLOQUEIOS */
+    /** 
+     * =======================================================================================================
+     * BLOQUEIOS
+     * =======================================================================================================
+     */
 
     /** @test */
     public function bloqueio_can_be_created()
@@ -498,6 +502,45 @@ class PlantaoJuridicoTest extends TestCase
             'dataInicial' => $dados['dataInicialBloqueio'],
             'dataFinal' => $dados['dataFinalBloqueio'],
             'horarios' => '11:00,11:30',
+            'idplantaojuridico' => $plantao->id
+        ]);
+    }
+
+    /** @test */
+    public function two_or_more_bloqueios_with_same_plantao_can_be_created()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+
+        $dados = [
+            'plantaoBloqueio' => $plantao->id,
+            'dataInicialBloqueio' => $plantao->dataInicial,
+            'dataFinalBloqueio' => $plantao->dataInicial,
+            'horariosBloqueio' => ['11:00', '11:30']
+        ];
+
+        $this->post(route('plantao.juridico.bloqueios.criar'), $dados)->assertRedirect(route('plantao.juridico.bloqueios.index'));
+        $this->assertDatabaseHas('plantoes_juridicos_bloqueios', [
+            'id' => 1,
+            'dataInicial' => $dados['dataInicialBloqueio'],
+            'dataFinal' => $dados['dataFinalBloqueio'],
+            'horarios' => '11:00,11:30',
+            'idplantaojuridico' => $plantao->id
+        ]);
+
+        $dados = [
+            'plantaoBloqueio' => $plantao->id,
+            'dataInicialBloqueio' => Carbon::parse($plantao->dataInicial)->addDay()->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::parse($plantao->dataInicial)->addDay()->format('Y-m-d'),
+            'horariosBloqueio' => ['11:00']
+        ];
+
+        $this->post(route('plantao.juridico.bloqueios.criar'), $dados)->assertRedirect(route('plantao.juridico.bloqueios.index'));
+        $this->assertDatabaseHas('plantoes_juridicos_bloqueios', [
+            'id' => 2,
+            'dataInicial' => $dados['dataInicialBloqueio'],
+            'dataFinal' => $dados['dataFinalBloqueio'],
+            'horarios' => '11:00',
             'idplantaojuridico' => $plantao->id
         ]);
     }
@@ -1288,6 +1331,31 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
+    public function get_datas_horas_plantao_ajax_bloqueio()
+    {
+        $this->signInAsAdmin();
+
+        $plantao = factory('App\PlantaoJuridico')->create();
+
+        $this->get(route('plantao.juridico.bloqueios.ajax', ['id' => $plantao->id]))
+        ->assertSeeInOrder(explode(',', $plantao->horarios))
+        ->assertSeeInOrder([$plantao->dataInicial, $plantao->dataFinal]);
+    }
+
+    /** @test */
+    public function data_inicial_tomorrow_when_before_tomorrow_and_horas_plantao_ajax_bloqueio()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'dataInicial' => Carbon::today()->format('Y-m-d')
+        ]);
+
+        $this->get(route('plantao.juridico.bloqueios.ajax', ['id' => $plantao->id]))
+        ->assertSeeInOrder(explode(',', $plantao->horarios))
+        ->assertSeeInOrder([Carbon::tomorrow()->format('Y-m-d'), $plantao->dataFinal]);
+    }
+
+    /** @test */
     public function show_periodo_bloqueio()
     {
         $this->signInAsAdmin();
@@ -1305,5 +1373,28 @@ class PlantaoJuridicoTest extends TestCase
 
         $this->get(route('plantao.juridico.bloqueios.index'))
         ->assertSeeText($bloqueio->horarios);
+    }
+
+    /** @test */
+    public function show_periodo_plantao_or_expired_bloqueio()
+    {
+        $this->signInAsAdmin();
+        $plantaoExpirado = factory('App\PlantaoJuridico')->create([
+            'dataInicial' => Carbon::today()->format('Y-m-d'),
+            'dataFinal' => Carbon::today()->format('Y-m-d')
+        ]);
+
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+        $bloqueio2 = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantaoExpirado->id,
+            'dataInicial' => $plantaoExpirado->dataInicial,
+            'dataFinal' => $plantaoExpirado->dataInicial,
+        ]);
+
+        $this->get(route('plantao.juridico.bloqueios.index'))
+        ->assertSeeText(onlyDate($bloqueio->plantaoJuridico->dataInicial).' - '.onlyDate($bloqueio->plantaoJuridico->dataFinal))
+        ->assertSeeText('Expirado');
+
+
     }
 }

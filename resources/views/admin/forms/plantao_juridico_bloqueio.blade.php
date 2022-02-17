@@ -22,6 +22,7 @@
                     <option value="{{ $resultado->idplantaojuridico }}" selected>{{ $resultado->plantaoJuridico->regional->regional }}</option>
                 @endif
                 </select>
+                <p class="mt-2"><i><b>Período do plantão selecionado: </b></i><span id="bloqueioPeriodoPlantao"></span></p>
                 @if($errors->has('plantaoBloqueio'))
                 <div class="invalid-feedback">
                     {{ $errors->first('plantaoBloqueio') }}

@@ -82,6 +82,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
             'Id',
             'Regional',
             'Período',
+            'Período do Plantão',
             'Horas Bloqueadas',
             'Ações'
         ];
@@ -105,6 +106,9 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
                 $resultado->id,
                 $resultado->plantaoJuridico->regional->regional,
                 onlyDate($resultado->dataInicial).' - '.onlyDate($resultado->dataFinal),
+                $resultado->podeEditar() ? 
+                    onlyDate($resultado->plantaoJuridico->dataInicial).' - '.onlyDate($resultado->plantaoJuridico->dataFinal) : 
+                   '<p class="text-danger"><strong>Expirado</strong></p>',
                 $resultado->horarios,
                 $acoes
             ];
@@ -251,7 +255,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
             
             return [
                 'horarios' => explode(',', $plantao->horarios),
-                'datas' => [$inicial->lte($hoje) ? date('Y-m-d') : $plantao->dataInicial, $plantao->dataFinal]
+                'datas' => [$inicial->lte($hoje) ? Carbon::tomorrow()->format('Y-m-d') : $plantao->dataInicial, $plantao->dataFinal]
             ];
         }
     }
@@ -365,14 +369,14 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         if($dia->lt($inicial) || $dia->gt($final) || $dia->lte($hoje))
             return false;
 
-        if(isset($agendados) && (gettype($agendados) == 'array') && !isset($horaEscolhida))
+        if(isset($agendados) && !isset($horaEscolhida))
         {
             $diasLotados = $this->getDiasSeLotado($agendados, $plantao);
             if(in_array([$dia->month, $dia->day, 'lotado'], $diasLotados))
                 return false;
         }
 
-        if(isset($agendados) && (gettype($agendados) == 'object') && isset($horaEscolhida))
+        if(isset($agendados) && isset($horaEscolhida))
         {
             $horarios = $this->removeHorariosSeLotado($agendados, $plantao, $dia);
             if(!in_array($horaEscolhida, $horarios))

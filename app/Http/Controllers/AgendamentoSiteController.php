@@ -322,7 +322,7 @@ class AgendamentoSiteController extends Controller
             $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($idregional);
             if(isset($plantao))
             {
-                $inicial = Carbon::parse($plantao->dataInicial)->lte(Carbon::today()) ? date('Y-m-d', strtotime('+1 day')) : $plantao->dataInicial;
+                $inicial = Carbon::parse($plantao->dataInicial)->lte(Carbon::today()) ? Carbon::tomorrow()->format('Y-m-d') : $plantao->dataInicial;
                 $agendados = $this->agendamentoRepository->getPlantaoJuridicoPorPeriodo($idregional, $inicial, $plantao->dataFinal);
                 $diasLotados = $this->service->getService('PlantaoJuridico')->getDiasSeLotado($agendados, $plantao); 
             }
