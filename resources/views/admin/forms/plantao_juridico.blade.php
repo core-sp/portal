@@ -87,6 +87,38 @@
                 @endif
             </div>
         </div>
+
+    @if(isset($resultado) && $resultado->ativado())
+        @if(empty($agendamentos))
+        <p class="mt-5"><strong>Ainda não há agendados</strong></p>
+        @else
+        <div class="col mt-5">
+            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">Agendados</button>
+            <div id="demo" class="collapse mt-2">
+                <p><strong>Total de agendamentos deste plantão ativo já cadastrados</strong></p>            
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Total p/ cada hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($agendamentos as $key => $value)
+                        @foreach($value as $agendamento)
+                        <tr>
+                            <td>{{ onlyDate($key) }}</td>
+                            <td>{{ $agendamento->total.' agendado(s) às '.$agendamento->hora }}</td>
+                        </tr>
+                        @endforeach
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+    @endif
+
     </div>
     <div class="card-footer">
         <div class="float-right">

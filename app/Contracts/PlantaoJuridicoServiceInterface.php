@@ -2,11 +2,14 @@
 
 namespace App\Contracts;
 
+// Temporário até refatorar o Agendamento no Service
+use App\Repositories\AgendamentoRepository;
+
 interface PlantaoJuridicoServiceInterface {
 
     public function listar();
 
-    public function visualizar($id);
+    public function visualizar($id, AgendamentoRepository $agendamento);
 
     public function save($request, $id);
 

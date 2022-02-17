@@ -4,6 +4,11 @@
         @method('PUT')
     @endif
     <div class="card-body">
+        @if(isset($resultado) && $resultado->plantaoJuridico->ativado())
+        <p><strong>
+            Confira <a href="{{ route('plantao.juridico.editar.view', $resultado->plantaoJuridico->id) }}">aqui</a> se existem agendados no horário a ser bloqueado para realizar o cancelamento.</i>
+        </strong></p>
+        @endif
         <div class="form-row">
             <div class="col-3">
                 <label for="plantaoBloqueio">Plantões Jurídicos</label>

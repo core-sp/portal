@@ -258,7 +258,12 @@ class AgendamentoRepository
         $final = Carbon::parse($dataFinal);
 
         for($dia = $inicial; $dia->lte($final); $dia->addDay())
-            $agendados[$dia->format('Y-m-d')] = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia->format('Y-m-d'));
+        {
+            $agendado = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia->format('Y-m-d'));
+            if($agendado->isNotEmpty())
+                $agendados[$dia->format('Y-m-d')] = $agendado;
+        }
+            
         
         return $agendados;
     }

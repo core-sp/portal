@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PlantaoJuridicoRequest;
+// Temporário até refatorar o Agendamento no Service
+use App\Repositories\AgendamentoRepository;
 
 class PlantaoJuridicoController extends Controller
 {
@@ -32,19 +34,20 @@ class PlantaoJuridicoController extends Controller
         return view('admin.crud.home', compact('tabela', 'resultados', 'variaveis'));
     }
 
-    public function edit($id)
+    public function edit($id, AgendamentoRepository $agendamento)
     {
         $this->authorize('updateOther', auth()->user());
         try{
-            $dados = $this->service->getService('PlantaoJuridico')->visualizar($id);
+            $dados = $this->service->getService('PlantaoJuridico')->visualizar($id, $agendamento);
             $variaveis = $dados['variaveis'];
             $resultado = $dados['resultado'];
+            $agendamentos = $dados['agendamentos'];
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao visualizar o plantão jurídico.");
         }
 
-        return view('admin.crud.editar', compact('variaveis', 'resultado'));
+        return view('admin.crud.editar', compact('variaveis', 'resultado', 'agendamentos'));
     }
 
     public function update(PlantaoJuridicoRequest $request, $id)

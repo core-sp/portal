@@ -7,6 +7,8 @@ use App\PlantaoJuridico;
 use App\PlantaoJuridicoBloqueio;
 use Carbon\Carbon;
 use App\Events\CrudEvent;
+// Temporário até refatorar o Agendamento no Service
+use App\Repositories\AgendamentoRepository;
 
 class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
@@ -193,11 +195,14 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         ];
     }
 
-    public function visualizar($id)
+    public function visualizar($id, AgendamentoRepository $agendamento)
     {
+        $plantao = $this->getById($id);
+
         return [
-            'resultado' => $this->getById($id),
-            'variaveis' => (object) $this->variaveis
+            'resultado' => $plantao,
+            'variaveis' => (object) $this->variaveis,
+            'agendamentos' => $plantao->expirou() ? null : $agendamento->getPlantaoJuridicoPorPeriodo($plantao->idregional, $plantao->dataInicial, $plantao->dataFinal) 
         ];
     }
 
