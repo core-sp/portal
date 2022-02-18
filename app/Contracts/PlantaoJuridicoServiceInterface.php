@@ -17,7 +17,7 @@ interface PlantaoJuridicoServiceInterface {
 
     public function visualizarBloqueio($id = null);
 
-    public function getDatasHorasPlantaoAjax($id);
+    public function getDatasHorasLinkPlantaoAjax($id);
 
     public function saveBloqueio($request, $id = null);
 

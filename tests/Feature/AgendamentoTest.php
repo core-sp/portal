@@ -1688,7 +1688,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->get(route('agendamentosite.regionaisExcluidasPlantaoJuridico'))
-        ->assertSee($plantao2->idregional);
+        ->assertJson([$plantao2->idregional]);
     }
 
     /** @test */
@@ -1703,7 +1703,7 @@ class AgendamentoTest extends TestCase
             'dia' => $plantao->dataInicial,
             'servico' => 'Plantão Jurídico'
         ]))
-        ->assertSeeInOrder(explode(',', $plantao->horarios));
+        ->assertJson(explode(',', $plantao->horarios));
     }
 
     /** @test */
@@ -1716,7 +1716,7 @@ class AgendamentoTest extends TestCase
             'dia' => $plantao->dataInicial,
             'servico' => 'Plantão Jurídico'
         ]))
-        ->assertSeeInOrder([]);
+        ->assertJson([]);
     }
 
     /** @test */
@@ -1742,7 +1742,7 @@ class AgendamentoTest extends TestCase
             'dia' => $plantao->dataFinal,
             'servico' => 'Plantão Jurídico'
         ]))
-        ->assertSeeInOrder($horarios);
+        ->assertJson($horarios);
     }
 
     /** @test */
@@ -1762,12 +1762,13 @@ class AgendamentoTest extends TestCase
         ]);
 
         $dia = Carbon::parse($plantao->dataFinal);
+        $lotado = [$dia->month, $dia->day, 'lotado'];
 
         $this->get(route('agendamentosite.checaMes', [
             'idregional' => $plantao->idregional,
             'servico' => 'Plantão Jurídico'
         ]))
-        ->assertSeeInOrder([$dia->month, $dia->day, 'lotado']);
+        ->assertJson([$lotado]);
     }
 
     /** @test */
@@ -1779,7 +1780,7 @@ class AgendamentoTest extends TestCase
             'idregional' => $plantao->idregional,
             'servico' => 'Plantão Jurídico'
         ]))
-        ->assertSeeInOrder([]);
+        ->assertJson([]);
     }
 
     /** @test */
@@ -1792,7 +1793,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentosite.datasPlantaoJuridico', [
             'idregional' => $plantao->idregional
         ]))
-        ->assertSeeInOrder([$plantao->dataInicial, $plantao->dataFinal]);
+        ->assertJson([$plantao->dataInicial, $plantao->dataFinal]);
     }
 
     /** @test */
@@ -1806,7 +1807,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentosite.datasPlantaoJuridico', [
             'idregional' => $plantao->idregional
         ]))
-        ->assertSeeInOrder([null, $plantao->dataFinal]);
+        ->assertJson([null, $plantao->dataFinal]);
     }
 
     /** @test */
@@ -1821,7 +1822,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentosite.datasPlantaoJuridico', [
             'idregional' => $plantao->idregional
         ]))
-        ->assertSeeInOrder([null, null]);
+        ->assertJson([null, null]);
     }
 
     /** @test */
@@ -1832,6 +1833,6 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentosite.datasPlantaoJuridico', [
             'idregional' => $plantao->idregional
         ]))
-        ->assertSeeInOrder([]);
+        ->assertJson([]);
     }
 }

@@ -92,9 +92,7 @@ class PlantaoJuridicoTest extends TestCase
         $this->assertAuthenticated('web');
         
         $plantao = factory('App\PlantaoJuridico')->create();
-        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
-            'idplantaojuridico' => $plantao->id
-        ]);
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
         
         $this->get(route('plantao.juridico.index'))->assertOk();
         $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertOk();
@@ -108,7 +106,7 @@ class PlantaoJuridicoTest extends TestCase
             'dataFinalBloqueio' => $plantao->dataInicial,
             'horariosBloqueio' => ['12:00']
         ];
-
+        
         $this->post(route('plantao.juridico.bloqueios.criar'), $dados)->assertStatus(302);
         $this->get(route('plantao.juridico.bloqueios.editar.view', $bloqueio->id))->assertOk();
         $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)->assertStatus(302);
@@ -473,6 +471,78 @@ class PlantaoJuridicoTest extends TestCase
 
         $this->get(route('plantao.juridico.index'))
         ->assertSeeText($plantao->horarios);
+    }
+
+    /** @test */
+    public function show_agendados_text_when_active_plantao_without_agendados()
+    {
+        $this->signInAsAdmin();
+
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))
+        ->assertSeeText('Ainda não há agendados');
+    }
+
+    /** @test */
+    public function not_show_agendados_text_when_disabled_plantao_without_agendados()
+    {
+        $this->signInAsAdmin();
+
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 0
+        ]);
+
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))
+        ->assertDontSeeText('Ainda não há agendados');
+    }
+
+    /** @test */
+    public function show_agendados_table_when_active_plantao_with_agendados()
+    {
+        $this->signInAsAdmin();
+
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $agendados = factory('App\Agendamento')->create([
+            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCD',
+            'dia' => $plantao->dataFinal,
+            'hora' => '10:00'
+        ]);
+
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))
+        ->assertSeeText('Total de agendamentos deste plantão ativo já cadastrados')
+        ->assertSee('<td>'.onlyDate($agendados->dia).'</td>')
+        ->assertSee('<td>1 agendado(s) às '.$agendados->hora.'</td>');
+    }
+
+    /** @test */
+    public function not_show_agendados_table_when_disabled_plantao_with_agendados()
+    {
+        $this->signInAsAdmin();
+
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 0
+        ]);
+
+        $agendados = factory('App\Agendamento')->create([
+            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCD',
+            'dia' => $plantao->dataFinal,
+            'hora' => '10:00'
+        ]);
+
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))
+        ->assertDontSeeText('Total de agendamentos deste plantão ativo já cadastrados')
+        ->assertDontSee('<td>'.onlyDate($agendados->dia).'</td>')
+        ->assertDontSee('<td>1 agendado(s) às '.$agendados->hora.'</td>');
     }
 
     /** 
@@ -1331,19 +1401,24 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
-    public function get_datas_horas_plantao_ajax_bloqueio()
+    public function get_datas_horas_link_agendados_plantao_ajax_bloqueio()
     {
         $this->signInAsAdmin();
 
-        $plantao = factory('App\PlantaoJuridico')->create();
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
 
         $this->get(route('plantao.juridico.bloqueios.ajax', ['id' => $plantao->id]))
-        ->assertSeeInOrder(explode(',', $plantao->horarios))
-        ->assertSeeInOrder([$plantao->dataInicial, $plantao->dataFinal]);
+        ->assertJson([
+            'horarios' => explode(',', $plantao->horarios),
+            'datas' => [$plantao->dataInicial, $plantao->dataFinal],
+            'link-agendados' => route('plantao.juridico.editar.view', $plantao->id)
+        ]);
     }
 
     /** @test */
-    public function data_inicial_tomorrow_when_before_tomorrow_and_horas_plantao_ajax_bloqueio()
+    public function data_inicial_tomorrow_when_before_tomorrow_and_horas_link_plantao_ajax_bloqueio()
     {
         $this->signInAsAdmin();
         $plantao = factory('App\PlantaoJuridico')->create([
@@ -1351,8 +1426,11 @@ class PlantaoJuridicoTest extends TestCase
         ]);
 
         $this->get(route('plantao.juridico.bloqueios.ajax', ['id' => $plantao->id]))
-        ->assertSeeInOrder(explode(',', $plantao->horarios))
-        ->assertSeeInOrder([Carbon::tomorrow()->format('Y-m-d'), $plantao->dataFinal]);
+        ->assertJson([
+            'horarios' => explode(',', $plantao->horarios),
+            'datas' => [Carbon::tomorrow()->format('Y-m-d'), $plantao->dataFinal],
+            'link-agendados' => null
+        ]);
     }
 
     /** @test */
@@ -1394,7 +1472,23 @@ class PlantaoJuridicoTest extends TestCase
         $this->get(route('plantao.juridico.bloqueios.index'))
         ->assertSeeText(onlyDate($bloqueio->plantaoJuridico->dataInicial).' - '.onlyDate($bloqueio->plantaoJuridico->dataFinal))
         ->assertSeeText('Expirado');
+    }
 
+    /** @test */
+    public function show_link_agendados_when_to_edit_and_actived_plantao_bloqueio()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id
+        ]);
 
+        $this->get(route('plantao.juridico.bloqueios.editar', $bloqueio->id))
+        ->assertSeeText('Ativado!')
+        ->assertSee('Confira <a id="linkAgendadosPlantao" href="'
+        .route('plantao.juridico.editar.view', $bloqueio->plantaoJuridico->id).
+        '">aqui</a> se existem agendados no horário a ser bloqueado para realizar o cancelamento.');
     }
 }

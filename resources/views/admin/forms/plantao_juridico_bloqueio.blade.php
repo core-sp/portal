@@ -4,10 +4,10 @@
         @method('PUT')
     @endif
     <div class="card-body">
-        @if(isset($resultado) && $resultado->plantaoJuridico->ativado())
-        <p><strong>
-            Confira <a href="{{ route('plantao.juridico.editar.view', $resultado->plantaoJuridico->id) }}">aqui</a> se existem agendados no horário a ser bloqueado para realizar o cancelamento.</i>
-        </strong></p>
+        @if(!isset($resultado) || (isset($resultado) && $resultado->plantaoJuridico->ativado()))
+        <div id="{{ !isset($resultado) ? 'textoAgendados' : '' }}" class="{{ !isset($resultado) ? 'text-hide' : 'mb-3' }}"><strong>
+            <span class="text-success">Ativado!</span> Confira <a id="linkAgendadosPlantao" href="{{ isset($resultado) ? route('plantao.juridico.editar.view', $resultado->plantaoJuridico->id) : '' }}">aqui</a> se existem agendados no horário a ser bloqueado para realizar o cancelamento.</i>
+        </strong></div>
         @endif
         <div class="form-row">
             <div class="col-3">
@@ -15,7 +15,7 @@
                 <select 
                     name="plantaoBloqueio" 
                     class="form-control {{ $errors->has('plantaoBloqueio') ? 'is-invalid' : '' }}"
-                    id="plantaoBloqueio"
+                    id="{{ !isset($resultado) ? 'plantaoBloqueio' : '' }}"
                     required
                 >
                 @if(isset($plantoes))
@@ -27,7 +27,13 @@
                     <option value="{{ $resultado->idplantaojuridico }}" selected>{{ $resultado->plantaoJuridico->regional->regional }}</option>
                 @endif
                 </select>
-                <p class="mt-2"><i><b>Período do plantão selecionado: </b></i><span id="bloqueioPeriodoPlantao"></span></p>
+                <p class="mt-2">
+                    <i><b>Período do plantão selecionado: </b></i>
+                    <span id="bloqueioPeriodoPlantao">
+                        {{ isset($resultado->plantaoJuridico->dataInicial) && isset($resultado->plantaoJuridico->dataInicial) ? 
+                            onlyDate($resultado->plantaoJuridico->dataInicial).' - '.onlyDate($resultado->plantaoJuridico->dataFinal) : '' }}
+                    </span>
+                </p>
                 @if($errors->has('plantaoBloqueio'))
                 <div class="invalid-feedback">
                     {{ $errors->first('plantaoBloqueio') }}
@@ -41,8 +47,8 @@
                     name="dataInicialBloqueio" 
                     class="form-control {{ $errors->has('dataInicialBloqueio') ? 'is-invalid' : '' }}" 
                     id="dataInicialBloqueio" 
-                    min=""
-                    max=""
+                    min="{{ isset($resultado->plantaoJuridico->dataInicial) ? $resultado->plantaoJuridico->dataInicial : '' }}"
+                    max="{{ isset($resultado->plantaoJuridico->dataFinal) ? $resultado->plantaoJuridico->dataFinal : '' }}"
                     value="{{ isset($resultado->dataInicial) ? $resultado->dataInicial : old('dataInicialBloqueio') }}"
                     required
                 />
@@ -60,8 +66,8 @@
                     name="dataFinalBloqueio" 
                     class="form-control {{ $errors->has('dataFinalBloqueio') ? 'is-invalid' : '' }}" 
                     id="dataFinalBloqueio"
-                    min=""
-                    max=""
+                    min="{{ isset($resultado->plantaoJuridico->dataInicial) ? $resultado->plantaoJuridico->dataInicial : '' }}"
+                    max="{{ isset($resultado->plantaoJuridico->dataFinal) ? $resultado->plantaoJuridico->dataFinal : '' }}"
                     value="{{ isset($resultado->dataFinal) ? $resultado->dataFinal : old('dataFinalBloqueio') }}" 
                     required
                 />
@@ -81,12 +87,20 @@
                     multiple
                     required
                 >
-                    @php
-                        $horarios = isset($resultado->horarios) ? explode(',', $resultado->horarios) : null;
-                    @endphp
-                    @foreach (todasHoras() as $hora)
-                        <option value="{{ $hora }}" {{ isset($horarios) && in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
+                @php
+                    $horarios = isset($resultado->horarios) ? explode(',', $resultado->horarios) : null;
+                    $horariosPlantao = isset($resultado->plantaoJuridico->horarios) ? explode(',', $resultado->plantaoJuridico->horarios) : null;
+                @endphp
+
+                @if(isset($resultado) && isset($horariosPlantao))
+                    @foreach($horariosPlantao as $hora)
+                    <option value="{{ $hora }}" {{ isset($horarios) && in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
                     @endforeach
+                @else
+                    @foreach(todasHoras() as $hora)
+                    <option value="{{ $hora }}">{{ $hora }}</option>
+                    @endforeach
+                @endif
                 </select>
 
                 @if($errors->has('horariosBloqueio'))

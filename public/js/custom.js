@@ -188,6 +188,16 @@ function setCampoHorarios(plantao)
   });
 }
 
+function setCampoAgendados(plantao)
+{
+  if(plantao['link-agendados'] != null)
+  {
+    $('#textoAgendados').prop('class', 'mb-3');
+    $('#linkAgendadosPlantao').prop('href', plantao['link-agendados']);
+  }else
+    $('#textoAgendados').prop('class', 'text-hide');
+}
+
 $('#plantaoBloqueio').ready(function(){
   var valor = $('#plantaoBloqueio').val();
     if(valor > 0)
@@ -201,6 +211,7 @@ $('#plantaoBloqueio').ready(function(){
         url: "/admin/plantao-juridico/ajax",
         success: function(response) {
           plantao = response;
+          setCampoAgendados(plantao);
           setCamposDatas(plantao);
           setCampoHorarios(plantao);
         },
@@ -223,6 +234,7 @@ $('#plantaoBloqueio').change(function(){
       url: "/admin/plantao-juridico/ajax",
       success: function(response) {
         plantao = response;
+        setCampoAgendados(plantao);
         $("#dataInicialBloqueio").val('');
         $("#dataFinalBloqueio").val('');
         setCamposDatas(plantao);

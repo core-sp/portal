@@ -245,12 +245,12 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
         return [
             'plantoes' => PlantaoJuridico::with('regional')
-            ->whereDate('dataFinal', '>=', date('Y-m-d'))->get(),
+            ->whereDate('dataFinal', '>', date('Y-m-d'))->get(),
             'variaveis' => (object) $this->variaveisBloqueios
         ];
     }
 
-    public function getDatasHorasPlantaoAjax($id)
+    public function getDatasHorasLinkPlantaoAjax($id)
     {
         $plantao = $this->getById($id);
         if(isset($plantao))
@@ -260,7 +260,8 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
             
             return [
                 'horarios' => explode(',', $plantao->horarios),
-                'datas' => [$inicial->lte($hoje) ? Carbon::tomorrow()->format('Y-m-d') : $plantao->dataInicial, $plantao->dataFinal]
+                'datas' => [$inicial->lte($hoje) ? Carbon::tomorrow()->format('Y-m-d') : $plantao->dataInicial, $plantao->dataFinal],
+                'link-agendados' => $plantao->ativado() ? route('plantao.juridico.editar.view', $plantao->id) : null
             ];
         }
     }

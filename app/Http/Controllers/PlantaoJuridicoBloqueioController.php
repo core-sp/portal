@@ -68,7 +68,7 @@ class PlantaoJuridicoBloqueioController extends Controller
     {
         $this->authorize('updateOther', auth()->user());
         try{
-            $plantao = $this->service->getService('PlantaoJuridico')->getDatasHorasPlantaoAjax($request->id);
+            $plantao = $this->service->getService('PlantaoJuridico')->getDatasHorasLinkPlantaoAjax($request->id);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao buscar o plantao.");
