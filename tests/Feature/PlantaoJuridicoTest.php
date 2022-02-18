@@ -106,7 +106,7 @@ class PlantaoJuridicoTest extends TestCase
             'dataFinalBloqueio' => $plantao->dataInicial,
             'horariosBloqueio' => ['12:00']
         ];
-        
+
         $this->post(route('plantao.juridico.bloqueios.criar'), $dados)->assertStatus(302);
         $this->get(route('plantao.juridico.bloqueios.editar.view', $bloqueio->id))->assertOk();
         $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)->assertStatus(302);
@@ -519,7 +519,7 @@ class PlantaoJuridicoTest extends TestCase
         $this->get(route('plantao.juridico.editar.view', $plantao->id))
         ->assertSeeText('Total de agendamentos deste plantão ativo já cadastrados')
         ->assertSee('<td>'.onlyDate($agendados->dia).'</td>')
-        ->assertSee('<td>1 agendado(s) às '.$agendados->hora.'</td>');
+        ->assertSee('1 agendado(s) às '.$agendados->hora.' <i class="fas fa-grip-lines-vertical" style="font-size:16px;color:red"></i>');
     }
 
     /** @test */

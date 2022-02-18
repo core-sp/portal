@@ -238,6 +238,7 @@ class AgendamentoRepository
             ->whereNull('status')
             ->where('dia', $dia)
             ->groupBy('hora')
+            ->orderby('hora')
             ->get();
     }
 

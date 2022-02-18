@@ -105,12 +105,16 @@
                     </thead>
                     <tbody>
                     @foreach($agendamentos as $key => $value)
-                        @foreach($value as $agendamento)
+                        
                         <tr>
                             <td>{{ onlyDate($key) }}</td>
-                            <td>{{ $agendamento->total.' agendado(s) às '.$agendamento->hora }}</td>
+                            <td>
+                            @foreach($value as $agendamento)
+                                {{ $agendamento->total.' agendado(s) às '.$agendamento->hora }} <i class="fas fa-grip-lines-vertical" style="font-size:16px;color:red"></i>
+                            @endforeach
+                            </td>
                         </tr>
-                        @endforeach
+                        
                     @endforeach
                     </tbody>
                 </table>
