@@ -339,7 +339,7 @@
                   <img src="{{ asset('img/icone-telegram.png') }}" class="inside-img" alt="Telegram | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
-                  <h5 class="normal">Entre em contato<br class="hide-992" /> pelo Telegram</h5>
+                  <h5 class="normal">Faça parte do nosso grupo no Telegram<br class="hide-992" /></h5>
                 </div>
               </div>
             </a>
