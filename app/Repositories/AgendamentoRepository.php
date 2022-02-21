@@ -223,124 +223,124 @@ class AgendamentoRepository
         return Agendamento::all()->count();
     }
 
-    private function countPlantaoJuridicoByRegionalAndDia($regional, $dia)
-    {
-        return Agendamento::where('idregional', $regional)
-            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-            ->whereNull('status')
-            ->where('dia', $dia)
-            ->count();
-    }
+    // private function countPlantaoJuridicoByRegionalAndDia($regional, $dia)
+    // {
+    //     return Agendamento::where('idregional', $regional)
+    //         ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+    //         ->whereNull('status')
+    //         ->where('dia', $dia)
+    //         ->count();
+    // }
 
-    private function getPlantaoJuridicoByRegionalAndDia($regional, $dia)
-    {
-        return Agendamento::select('hora')
-            ->where('idregional', $regional)
-            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-            ->whereNull('status')
-            ->where('dia', $dia)
-            ->get();
-    }
+    // private function getPlantaoJuridicoByRegionalAndDia($regional, $dia)
+    // {
+    //     return Agendamento::select('hora')
+    //         ->where('idregional', $regional)
+    //         ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+    //         ->whereNull('status')
+    //         ->where('dia', $dia)
+    //         ->get();
+    // }
 
-    private function getMesRegionalPlantaoJuridico($regional)
-    {
-        $rodadaPJ = [
-            4 => '02',
-            5 => '02',
-            8 => '02',
-            10 => '02',
-            12 => '02'
-        ];
+    // private function getMesRegionalPlantaoJuridico($regional)
+    // {
+    //     $rodadaPJ = [
+    //         4 => '02',
+    //         5 => '02',
+    //         8 => '02',
+    //         10 => '02',
+    //         12 => '02'
+    //     ];
 
-        return $rodadaPJ[$regional];
-    }
+    //     return $rodadaPJ[$regional];
+    // }
 
-    public function getPlantaoJuridicoByCPF($cpf, $regional)
-    {
-        $mes = $this->getMesRegionalPlantaoJuridico($regional);
+    // public function getPlantaoJuridicoByCPF($cpf, $regional)
+    // {
+    //     $mes = $this->getMesRegionalPlantaoJuridico($regional);
 
-        return Agendamento::where('cpf', $cpf)
-            ->where('idregional', $regional)
-            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-            ->whereNull('status')
-            ->where('dia', 'LIKE', date('Y').'-'.$mes.'-%')
-            ->count();
-    }
+    //     return Agendamento::where('cpf', $cpf)
+    //         ->where('idregional', $regional)
+    //         ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+    //         ->whereNull('status')
+    //         ->where('dia', 'LIKE', date('Y').'-'.$mes.'-%')
+    //         ->count();
+    // }
 
-    public function estaLotadoPlantaoJuridico($regional, $dia)
-    {
-        $total = $this->countPlantaoJuridicoByRegionalAndDia($regional, $dia);
+    // public function estaLotadoPlantaoJuridico($regional, $dia)
+    // {
+    //     $total = $this->countPlantaoJuridicoByRegionalAndDia($regional, $dia);
 
-        // Em Janeiro de 2022
-        $regionaisTotalRCs = [
-            4 => [
-                '2022-02-09' => 10,
-                '2022-02-10' => 12,
-                '2022-02-11' => 12,
-            ],
-            5 => [
-                '2022-02-07' => 10,
-                '2022-02-08' => 12,
-            ],
-            8 => [
-                '2022-02-07' => 6,
-                '2022-02-08' => 12,
-            ],
-            10 => [
-                '2022-02-10' => 12,
-                '2022-02-11' => 4,
-            ],
-            12 => [
-                '2022-02-09' => 12,
-                '2022-02-10' => 12,
-            ]
-        ];
+    //     // Em Janeiro de 2022
+    //     $regionaisTotalRCs = [
+    //         4 => [
+    //             '2022-02-09' => 10,
+    //             '2022-02-10' => 12,
+    //             '2022-02-11' => 12,
+    //         ],
+    //         5 => [
+    //             '2022-02-07' => 10,
+    //             '2022-02-08' => 12,
+    //         ],
+    //         8 => [
+    //             '2022-02-07' => 6,
+    //             '2022-02-08' => 12,
+    //         ],
+    //         10 => [
+    //             '2022-02-10' => 12,
+    //             '2022-02-11' => 4,
+    //         ],
+    //         12 => [
+    //             '2022-02-09' => 12,
+    //             '2022-02-10' => 12,
+    //         ]
+    //     ];
 
-        if(!isset($regionaisTotalRCs[$regional][$dia]))
-            return null;
+    //     if(!isset($regionaisTotalRCs[$regional][$dia]))
+    //         return null;
 
-        return $regionaisTotalRCs[$regional][$dia] == $total ? true : false;
-    }
+    //     return $regionaisTotalRCs[$regional][$dia] == $total ? true : false;
+    // }
 
-    public function getHorasPlantaoJuridicoByRegionalAndDia($regional, $dia)
-    {
-        $horasCheias = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia);
-        $horasTotais = explode(';', $this->diasHorasPlantaoJuridico()[$regional][$dia]);
+    // public function getHorasPlantaoJuridicoByRegionalAndDia($regional, $dia)
+    // {
+    //     $horasCheias = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia);
+    //     $horasTotais = explode(';', $this->diasHorasPlantaoJuridico()[$regional][$dia]);
 
-        foreach($horasCheias as $hora)
-        {
-            if(isset($horasTotais[array_search($hora->hora, $horasTotais)]))
-                unset($horasTotais[array_search($hora->hora, $horasTotais)]);
-        }
+    //     foreach($horasCheias as $hora)
+    //     {
+    //         if(isset($horasTotais[array_search($hora->hora, $horasTotais)]))
+    //             unset($horasTotais[array_search($hora->hora, $horasTotais)]);
+    //     }
 
-        return $horasTotais;
-    }
+    //     return $horasTotais;
+    // }
 
-    public function diasHorasPlantaoJuridico()
-    {
-        // Em Janeiro de 2022
-        return $regionaisDiasHoras = [
-            4 => [
-                '2022-02-09' => '11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
-                '2022-02-10' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
-                '2022-02-11' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30'
-            ],
-            5 => [
-                '2022-02-07' => '11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
-                '2022-02-08' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30'
-            ],
-            8 => [
-                '2022-02-07' => '14:00;14:30;15:00;15:30;16:00;16:30',
-                '2022-02-08' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30'
-            ],
-            10 => [
-                '2022-02-10' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
-                '2022-02-11' => '10:00;10:30;11:00;11:30'
-            ],
-            12 => [
-                '2022-02-09' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
-                '2022-02-10' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30'
-            ]
-        ];
-    }
+    // public function diasHorasPlantaoJuridico()
+    // {
+    //     // Em Janeiro de 2022
+    //     return $regionaisDiasHoras = [
+    //         4 => [
+    //             '2022-02-09' => '11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
+    //             '2022-02-10' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
+    //             '2022-02-11' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30'
+    //         ],
+    //         5 => [
+    //             '2022-02-07' => '11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
+    //             '2022-02-08' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30'
+    //         ],
+    //         8 => [
+    //             '2022-02-07' => '14:00;14:30;15:00;15:30;16:00;16:30',
+    //             '2022-02-08' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30'
+    //         ],
+    //         10 => [
+    //             '2022-02-10' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
+    //             '2022-02-11' => '10:00;10:30;11:00;11:30'
+    //         ],
+    //         12 => [
+    //             '2022-02-09' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30',
+    //             '2022-02-10' => '10:00;10:30;11:00;11:30;12:00;12:30;14:00;14:30;15:00;15:30;16:00;16:30'
+    //         ]
+    //     ];
+    // }
 }

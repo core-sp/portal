@@ -125,8 +125,8 @@
                     <a href="/" class="nav-link">Home</a>
                   </li>
                   <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">CORE-SP</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownCore" role="button" data-toggle="dropdown">CORE-SP</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownCore">
                       <a href="/concursos" class="dropdown-item">Concursos</a>
                       <a href="/conselho" class="dropdown-item">Conselho</a>
                       <a href="/institucional" class="dropdown-item">Institucional</a>
@@ -142,8 +142,8 @@
                     <a href="/prestacao-de-contas-do-core-sp" class="nav-link">Prestação de Contas</a>
                   </li>
                   <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Fiscalização</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownFiscal" role="button" data-toggle="dropdown">Fiscalização</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownFiscal">
                       <a href="{{ route('fiscalizacao.mapa') }}" class="dropdown-item">Mapa da fiscalização</a>
                       <a href="{{ route('fiscalizacao.acoesfiscalizacao') }}" class="dropdown-item">Ações da fiscalização</a>
                       <a href="{{ route('fiscalizacao.espacoContador') }}" class="dropdown-item">Espaço do Contador</a>
@@ -155,8 +155,8 @@
                     <a href="/licitacoes" class="nav-link">Licitações e Aquisições</a>
                   </li>
                   <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Serviços</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownServ" role="button" data-toggle="dropdown">Serviços</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownServ">
                       <div class="sub-dropdown">
                         <div class="dropdown-item">
                           Agendamento <i class="fas fa-angle-right hide-768"></i><i class="fas fa-angle-down show-inline-768"></i>
@@ -188,8 +188,15 @@
                   <li class="nav-item">
                     <a href="/seccionais" class="nav-link">Seccionais</a>
                   </li>
-                  <li class="nav-item">
-                    <a href="/blog" class="nav-link">Imprensa</a>
+                  <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownImprensa" role="button" data-toggle="dropdown">Imprensa</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownImprensa">
+                      <a href="{{ route('noticias.siteGrid') }}" class="dropdown-item">Notícias</a>
+                      <a href="/informativos" class="dropdown-item">Informativos</a>
+                      <a href="/blog" class="dropdown-item">Blog</a>
+                      <a href="https://www.confere.org.br/revista.php" target="_blank" class="dropdown-item bb-0">Revistas</a>
+                      {{--<a href="#" class="dropdown-item bb-0">Artigos</a>--}}
+                    </div>
                   </li>
                 </ul>
               </nav>

@@ -324,22 +324,22 @@ $('#ano-mapa').on({
 	},
 });
 
-function regionaisExcluidasPlantaoJuridico()
-{
-	return regionaisExcluidas = ["1", "2", "3", "6", "7", "9", "11", "13", "14"];
-}
+// function regionaisExcluidasPlantaoJuridico()
+// {
+// 	return regionaisExcluidas = ["1", "2", "3", "6", "7", "9", "11", "13", "14"];
+// }
 
-function datasPorRegionalPlantaoJuridico(regional)
-{
-	var datas = []
-	datas[4] = ['02-09','02-11'],
-	datas[5] = ['02-07','02-08'],
-	datas[8] = ['02-07','02-08'],
-	datas[10] = ['02-10','02-11'],
-	datas[12] = ['02-09','02-10']
+// function datasPorRegionalPlantaoJuridico(regional)
+// {
+// 	var datas = []
+// 	datas[4] = ['02-09','02-11'],
+// 	datas[5] = ['02-07','02-08'],
+// 	datas[8] = ['02-07','02-08'],
+// 	datas[10] = ['02-10','02-11'],
+// 	datas[12] = ['02-09','02-10']
 	
-	return datas[regional];
-}
+// 	return datas[regional];
+// }
 
 (function($){
 	$(function(){
@@ -356,18 +356,18 @@ function datasPorRegionalPlantaoJuridico(regional)
 			});
 		});
 
-		// Para quando houver Plantão Jurídico
-		$('#selectServicos').change(function(){
-			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
-			$("#idregional").val("");
+		// // Para quando houver Plantão Jurídico
+		// $('#selectServicos').change(function(){
+		// 	var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
+		// 	$("#idregional").val("");
 
-			if($(this).val() == "Plantão Jurídico")
-				for(var regional of regionaisExcluidas)
-					$('#idregional option[value="' + regional + '"]').hide();
-			else
-				for(var regional of regionaisExcluidas)
-					$('#idregional option[value="' + regional + '"]').show();
-		});	
+		// 	if($(this).val() == "Plantão Jurídico")
+		// 		for(var regional of regionaisExcluidas)
+		// 			$('#idregional option[value="' + regional + '"]').hide();
+		// 	else
+		// 		for(var regional of regionaisExcluidas)
+		// 			$('#idregional option[value="' + regional + '"]').show();
+		// });	
 
 		// Datepicker Agendamentos
 		$('#datepicker').datepicker({
@@ -384,17 +384,17 @@ function datasPorRegionalPlantaoJuridico(regional)
 			beforeShowDay: noWeekendsOrHolidays
 		});
 
-		if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
-			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
-			$("#idregional").val("");
-			for(var regional of regionaisExcluidas)
-				$('#idregional option[value="' + regional + '"]').hide();
-		}else{
-			var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
-			$("#idregional").val("");
-			for(var regional of regionaisExcluidas)
-				$('#idregional option[value="' + regional + '"]').show();
-		}
+		// if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
+		// 	var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
+		// 	$("#idregional").val("");
+		// 	for(var regional of regionaisExcluidas)
+		// 		$('#idregional option[value="' + regional + '"]').hide();
+		// }else{
+		// 	var regionaisExcluidas = regionaisExcluidasPlantaoJuridico();
+		// 	$("#idregional").val("");
+		// 	for(var regional of regionaisExcluidas)
+		// 		$('#idregional option[value="' + regional + '"]').show();
+		// }
 
 
 		$("#agenda-institucional").datepicker({
@@ -416,17 +416,17 @@ function datasPorRegionalPlantaoJuridico(regional)
 
 			$('#datepicker').val('');
 			$('#datepicker').prop('disabled', true);
-			if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
-				var datas = datasPorRegionalPlantaoJuridico($('#idregional').val());
-				$('#datepicker').datepicker('option', {
-					maxDate: new Date("2022-" + datas[1] + " 00:00:00"),
-					minDate: new Date("2022-" + datas[0] + " 00:00:00")
-				});
-			}else
-				$('#datepicker').datepicker('option', {
-					maxDate: '+1m',
-					minDate: +1
-				});
+			// if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
+			// 	var datas = datasPorRegionalPlantaoJuridico($('#idregional').val());
+			// 	$('#datepicker').datepicker('option', {
+			// 		maxDate: new Date("2022-" + datas[1] + " 00:00:00"),
+			// 		minDate: new Date("2022-" + datas[0] + " 00:00:00")
+			// 	});
+			// }else
+			// 	$('#datepicker').datepicker('option', {
+			// 		maxDate: '+1m',
+			// 		minDate: +1
+			// 	});
 
 			$('#horarios')
 				.find('option')

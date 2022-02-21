@@ -84,19 +84,19 @@ class AgendamentoSiteController extends Controller
             abort(500, 'É permitido apenas 1 agendamentos por CPF por dia/horário!');
         } 
 
-        if(stristr($request->toModel()['tiposervico'], Agendamento::SERVICOS_PLANTAO_JURIDICO))
-        {
-            $lotadoOrNull = $this->agendamentoRepository->estaLotadoPlantaoJuridico($request->idregional, $dia);
-            abort_if(!isset($lotadoOrNull) || $lotadoOrNull, 
-            500, 'Esta regional não existe ou não possui o serviço de '.Agendamento::SERVICOS_PLANTAO_JURIDICO. ' ou está lotado o dia');     
+        // if(stristr($request->toModel()['tiposervico'], Agendamento::SERVICOS_PLANTAO_JURIDICO))
+        // {
+        //     $lotadoOrNull = $this->agendamentoRepository->estaLotadoPlantaoJuridico($request->idregional, $dia);
+        //     abort_if(!isset($lotadoOrNull) || $lotadoOrNull, 
+        //     500, 'Esta regional não existe ou não possui o serviço de '.Agendamento::SERVICOS_PLANTAO_JURIDICO. ' ou está lotado o dia');     
 
-            $horasTotais = $this->agendamentoRepository->getHorasPlantaoJuridicoByRegionalAndDia($request->idregional, $dia);
-            abort_if(!isset($horasTotais[array_search($request->hora, $horasTotais)]), 500, 'Esse horário não foi encontrado para o serviço de '.Agendamento::SERVICOS_PLANTAO_JURIDICO.' na mesma regional');
+        //     $horasTotais = $this->agendamentoRepository->getHorasPlantaoJuridicoByRegionalAndDia($request->idregional, $dia);
+        //     abort_if(!isset($horasTotais[array_search($request->hora, $horasTotais)]), 500, 'Esse horário não foi encontrado para o serviço de '.Agendamento::SERVICOS_PLANTAO_JURIDICO.' na mesma regional');
 
-            $total = $this->agendamentoRepository->getPlantaoJuridicoByCPF($request->cpf, $request->idregional);
-            abort_if($total > 0, 500, 'É permitido apenas 1 agendamento por cpf para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
-        }else
-        {
+        //     $total = $this->agendamentoRepository->getPlantaoJuridicoByCPF($request->cpf, $request->idregional);
+        //     abort_if($total > 0, 500, 'É permitido apenas 1 agendamento por cpf para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
+        // }else
+        // {
             // Validação se regional está aceitando agendamentos
             if(!$this->permiteAgendamento($dia, $request->hora, $request->idregional)) {
                 abort(500);
@@ -111,7 +111,7 @@ class AgendamentoSiteController extends Controller
             if($this->bloqueioPorFalta($request->cpf)) {
                 abort(405, 'Agendamento bloqueado por excesso de falta nos últimos 90 dias. Favor entrar em contato com o Core-SP para regularizar o agendamento.');
             }
-        }
+        // }
         
         // Gera a HASH (protocolo) aleatória
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
@@ -251,10 +251,10 @@ class AgendamentoSiteController extends Controller
         $servico = $request->servico;
         $horarios = [];
 
-        if($servico == Agendamento::SERVICOS_PLANTAO_JURIDICO)
-            $horarios = $this->agendamentoRepository->getHorasPlantaoJuridicoByRegionalAndDia($idregional, $dia); 
-        else
-        {
+        // if($servico == Agendamento::SERVICOS_PLANTAO_JURIDICO)
+        //     $horarios = $this->agendamentoRepository->getHorasPlantaoJuridicoByRegionalAndDia($idregional, $dia); 
+        // else
+        // {
             // Recupera quantos agendamentos podem ser criados por horário de acordo com a regional
             $agedamentoPorHorario = $this->regionalRepository->getAgeporhorarioById($idregional);
 
@@ -273,7 +273,7 @@ class AgendamentoSiteController extends Controller
                     }
                 }
             }
-        }
+        // }
 
         return response()->json($horarios);
     }
@@ -290,14 +290,14 @@ class AgendamentoSiteController extends Controller
         // Variável retornada pela função
         $diasLotados = [];
 
-        if($servico == Agendamento::SERVICOS_PLANTAO_JURIDICO)
-        {
-            $dias = $this->agendamentoRepository->diasHorasPlantaoJuridico()[$idregional];
-            foreach($dias as $key => $dia)
-                if($this->agendamentoRepository->estaLotadoPlantaoJuridico($idregional, $key)) 
-                    array_push($diasLotados, array(date('m', strtotime($key)), date('d', strtotime($key)), 'lotado'));
-        }else
-        {
+        // if($servico == Agendamento::SERVICOS_PLANTAO_JURIDICO)
+        // {
+        //     $dias = $this->agendamentoRepository->diasHorasPlantaoJuridico()[$idregional];
+        //     foreach($dias as $key => $dia)
+        //         if($this->agendamentoRepository->estaLotadoPlantaoJuridico($idregional, $key)) 
+        //             array_push($diasLotados, array(date('m', strtotime($key)), date('d', strtotime($key)), 'lotado'));
+        // }else
+        // {
             // Recupera o número de agendamentos para cada dia entre d+1 d+m
             $contagemAgendamentos = $this->agendamentoRepository->getAgendamentoPendenteByMesRegional($idregional);
 
@@ -359,7 +359,7 @@ class AgendamentoSiteController extends Controller
 
                 $date = date('Y-m-d', strtotime("+1 day", strtotime($date)));
             }
-        }
+        // }
 
         return response()->json($diasLotados);
     }
