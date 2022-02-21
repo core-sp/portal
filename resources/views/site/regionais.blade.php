@@ -7,8 +7,8 @@
 @section('content')
 
 <section id="pagina-cabecalho">
-  <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
-    <img src="{{ asset('img/seccionais.png') }}" />
+  <div class="container-fluid text-center nopadding position-relative">
+    <img src="{{ asset('img/banner-interno-seccionais.png') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
