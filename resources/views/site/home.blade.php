@@ -332,18 +332,18 @@
           </blockquote>
         </div>
         <div class="row">
-          {{--<div class="col-lg-6 faleSingle">
-            <a href="https://api.whatsapp.com/send?phone=551132435516&text=Quero%20receber%20as%20últimas%20notícias%20do%20CORE-SP%20pelo%20WhatsApp!" target="_blank">
+          <div class="col-lg-6 faleSingle">
+            <a href="https://t.me/+xrSNaf5S10oxZGE5" target="_blank">
               <div class="row nomargin">
                 <div class="align-self-center">
-                  <img src="{{ asset('img/the-whatsapp-icon.png') }}" class="inside-img" alt="WhatsApp | Core-SP">
+                  <img src="{{ asset('img/icone-telegram.png') }}" class="inside-img" alt="Telegram | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
-                  <h5 class="normal">Entre em contato<br class="hide-992" /> pelo WhatsApp</h5>
+                  <h5 class="normal">Entre em contato<br class="hide-992" /> pelo Telegram</h5>
                 </div>
               </div>
             </a>
-          </div>--}}
+          </div>
           <div class="col-lg-6 faleSingle">
             <a href="https://www.youtube.com/channel/UCOT_xwrQrpl_uu8MFl_EzWQ" target="_blank">
               <div class="row nomargin">
@@ -368,19 +368,18 @@
               </div>
             </a>
           </div>
-          {{--<div class="col-lg-6 faleSingle">
-            <a href="#">
+          <div class="col-lg-6 faleSingle">
+            <a href="https://www.linkedin.com/company/core-saopaulo">
               <div class="row nomargin">
                 <div class="align-self-center">
-                  <img src="{{ asset('img/the-linkedin-logo.png') }}" class="inside-img" alt="Instagram | Core-SP">
+                  <img src="{{ asset('img/the-linkedin-logo.png') }}" class="inside-img" alt="LinkedIn | Core-SP">
                 </div>
                 <div class="flex-one fale-txt align-self-center">
                   <h5 class="normal">Siga-nos no<br class="hide-992" /> LinkedIn</h5>
-                  <h6><i>(Em breve)</i></h6>
                 </div>
               </div>
             </a>
-          </div>--}}
+          </div>
         </div>
       </div>
     </div>
