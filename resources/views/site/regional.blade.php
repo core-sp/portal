@@ -8,11 +8,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          @if(isset($resultado))
-          {{ $resultado->regional }}
-          @else
-          erro
-          @endif
+          {{ isset($resultado) ? $resultado->regional : 'erro' }}
         </h1>
       </div>
     </div>
@@ -21,7 +17,7 @@
 
 <section id="pagina-noticias">
   <div class="container">
-    @if(isset($resultado))
+  @if(isset($resultado))
     <div class="row" id="conteudo-principal">
       <div class="col">
         <div class="row nomargin">
@@ -29,7 +25,7 @@
             <h2 class="stronger">{{ $resultado->regional }}</h2>
           </div>
           <div class="align-self-center">
-            <a href="/seccionais" class="btn-voltar">Voltar</a>
+            <a href="{{ route('regionais.siteGrid') }}" class="btn-voltar">Voltar</a>
           </div>
         </div>
       </div>
@@ -70,16 +66,14 @@
     </div>
     <div class="linha-lg"></div>
     <div class="row mb-3">
-      @php $i = 0; @endphp
       @foreach($noticias as $noticia)
-        @php $i++; @endphp
         @include('site.inc.noticia-grid')
       @endforeach
     </div>
     @endif
-    @else
-      @include('site.inc.content-error')
-    @endif
+  @else
+    @include('site.inc.content-error')
+  @endif
   </div>
 </section>
 

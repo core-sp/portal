@@ -30,11 +30,17 @@ Route::prefix('admin')->group(function() {
     Route::get('/concluidos', 'ChamadoController@lixeira');
     Route::get('/restore/{id}', 'ChamadoController@restore');
   });
+
+  // Regionais
+  Route::prefix('regionais')->group(function() {
+    Route::get('/', 'RegionalController@index')->name('regionais.index');
+    Route::get('/busca', 'RegionalController@busca')->name('regionais.busca');
+    Route::get('/editar/{id}', 'RegionalController@edit')->name('regionais.edit');
+    Route::patch('/editar/{id}', 'RegionalController@update')->name('regionais.update');
+  });
   
   // Rotas de páginas
   require('admin/paginas.php');
-  // Rotas de regionais
-  require('admin/regionais.php');
   // Rotas de notícias
   require('admin/noticias.php');
   // Rotas de licitações
@@ -184,7 +190,9 @@ Route::prefix('/')->group(function() {
   Route::get('admin/logout', 'Auth\LoginController@logout')->name('logout');
 
   // Regionais
-  require('site/regionais.php');
+  Route::get('seccionais', 'RegionalController@siteGrid')->name('regionais.siteGrid');
+  Route::get('seccionais/{id}', 'RegionalController@show')->name('regionais.show');
+
   // Notícias
   require('site/noticias.php');  
   // Licitações
