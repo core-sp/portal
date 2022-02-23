@@ -162,6 +162,91 @@ $(document).ready(function(){
   });
 });
 
+// Funcionalidade Plantão Jurídico
+function setCamposDatas(plantao)
+{
+    $("#dataInicialBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
+    $("#dataFinalBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
+
+    var inicial = new Date(plantao['datas'][0] + ' 00:00:00');
+    var final = new Date(plantao['datas'][1] + ' 00:00:00');
+    var inicialFormatada = inicial.getDate() + '/' + (inicial.getMonth() + 1) + '/' + inicial.getFullYear(); 
+    var finalFormatada = final.getDate() + '/' + (final.getMonth() + 1) + '/' + final.getFullYear(); 
+
+    $("#bloqueioPeriodoPlantao").text(inicialFormatada + ' - ' + finalFormatada);
+}
+
+function setCampoHorarios(plantao)
+{
+  $('#horariosBloqueio option').show();
+  $('#horariosBloqueio option').each(function(){
+    var valor = $(this).val();
+    if(jQuery.inArray(valor, plantao['horarios']) != -1)
+      $(this).show();
+    else
+      $(this).hide();
+  });
+}
+
+function setCampoAgendados(plantao)
+{
+  if(plantao['link-agendados'] != null)
+  {
+    $('#textoAgendados').prop('class', 'mb-3');
+    $('#linkAgendadosPlantao').prop('href', plantao['link-agendados']);
+  }else
+    $('#textoAgendados').prop('class', 'text-hide');
+}
+
+$('#plantaoBloqueio').ready(function(){
+  var valor = $('#plantaoBloqueio').val();
+    if(valor > 0)
+      $.ajax({
+        method: "GET",
+        data: {
+          "_token": $('#token').val(),
+          "id": valor,
+        },
+        dataType: 'json',
+        url: "/admin/plantao-juridico/ajax",
+        success: function(response) {
+          plantao = response;
+          setCampoAgendados(plantao);
+          setCamposDatas(plantao);
+          setCampoHorarios(plantao);
+        },
+        error: function() {
+          alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
+        }
+      });
+});
+
+$('#plantaoBloqueio').change(function(){
+  var valor = $('#plantaoBloqueio').val();
+  if(valor > 0)
+    $.ajax({
+      method: "GET",
+      data: {
+        "_token": $('#token').val(),
+        "id": valor,
+      },
+      dataType: 'json',
+      url: "/admin/plantao-juridico/ajax",
+      success: function(response) {
+        plantao = response;
+        setCampoAgendados(plantao);
+        $("#dataInicialBloqueio").val('');
+        $("#dataFinalBloqueio").val('');
+        setCamposDatas(plantao);
+        setCampoHorarios(plantao);
+      },
+      error: function() {
+        alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
+      }
+    });
+});
+// Fim da Funcionalidade Plantão Jurídico
+
 (function($){
   // Função para tornar menu ativo dinâmico
   $(function(){

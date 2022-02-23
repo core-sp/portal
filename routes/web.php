@@ -179,6 +179,20 @@ Route::prefix('admin')->group(function() {
     Route::get('/erros/file', 'SuporteController@getErrosFile')->name('suporte.erros.file.get');
   });
 
+  // Plantão Jurídico
+  Route::prefix('plantao-juridico')->group(function(){
+    Route::get('/', 'PlantaoJuridicoController@index')->name('plantao.juridico.index');
+    Route::get('/editar/{id}', 'PlantaoJuridicoController@edit')->name('plantao.juridico.editar.view');
+    Route::put('/editar/{id}', 'PlantaoJuridicoController@update')->name('plantao.juridico.editar');
+    Route::get('/bloqueios', 'PlantaoJuridicoBloqueioController@index')->name('plantao.juridico.bloqueios.index');
+    Route::get('/bloqueios/criar', 'PlantaoJuridicoBloqueioController@create')->name('plantao.juridico.bloqueios.criar.view');
+    Route::post('/bloqueios/criar', 'PlantaoJuridicoBloqueioController@store')->name('plantao.juridico.bloqueios.criar');
+    Route::get('/bloqueios/editar/{id}', 'PlantaoJuridicoBloqueioController@edit')->name('plantao.juridico.bloqueios.editar.view');
+    Route::put('/bloqueios/editar/{id}', 'PlantaoJuridicoBloqueioController@update')->name('plantao.juridico.bloqueios.editar');
+    Route::delete('/bloqueios/apagar/{id}', 'PlantaoJuridicoBloqueioController@destroy')->name('plantao.juridico.bloqueios.excluir');
+    Route::get('/ajax', 'PlantaoJuridicoBloqueioController@getPlantaoAjax')->name('plantao.juridico.bloqueios.ajax');
+  });
+
 });
 
 /*
@@ -222,6 +236,8 @@ Route::prefix('/')->group(function() {
   Route::get('agendamento-consulta', 'AgendamentoSiteController@consultaView')->name('agendamentosite.consultaView');
   Route::get('agendamento-consulta/busca', 'AgendamentoSiteController@consulta')->name('agendamentosite.consulta');
   Route::put('agendamento-consulta/busca', 'AgendamentoSiteController@cancelamento')->name('agendamentosite.cancelamento');
+  Route::get('regionais-excluidas-plantao-juridico', 'AgendamentoSiteController@regionaisExcluidasPlantaoJuridico')->name('agendamentosite.regionaisExcluidasPlantaoJuridico');
+  Route::get('datas-plantao-juridico', 'AgendamentoSiteController@datasPlantaoJuridico')->name('agendamentosite.datasPlantaoJuridico');
 
   // Newsletter
   Route::post('newsletter', 'NewsletterController@store');

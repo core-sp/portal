@@ -27,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
         
         $this->app->bind('App\Contracts\MediadorServiceInterface', 'App\Services\MediadorService');
         $this->app->bind('App\Contracts\SuporteServiceInterface', 'App\Services\SuporteService');
+        $this->app->bind('App\Contracts\PlantaoJuridicoServiceInterface', 'App\Services\PlantaoJuridicoService');
         $this->app->bind('App\Contracts\RegionalServiceInterface', 'App\Services\RegionalService');
     }
 
