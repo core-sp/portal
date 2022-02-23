@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Helper;
 use App\Mail\AgendamentoMailGuest;
 use Illuminate\Support\Facades\Mail;
-use App\Repositories\RegionalRepository;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoSiteRequest;
@@ -25,14 +24,12 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 class AgendamentoSiteController extends Controller
 {
     private $agendamentoRepository;
-    private $regionalRepository;
     private $agendamentoBloqueioRepository;
     private $termoConsentimentoRepository;
     private $service;
 
-    public function __construct(AgendamentoRepository $agendamentoRepository, RegionalRepository $regionalRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository, TermoConsentimentoRepository $termoConsentimentoRepository, MediadorServiceInterface $service) {
+    public function __construct(AgendamentoRepository $agendamentoRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository, TermoConsentimentoRepository $termoConsentimentoRepository, MediadorServiceInterface $service) {
         $this->agendamentoRepository = $agendamentoRepository;
-        $this->regionalRepository = $regionalRepository;
         $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
         $this->termoConsentimentoRepository = $termoConsentimentoRepository;
         $this->service = $service;
@@ -40,7 +37,7 @@ class AgendamentoSiteController extends Controller
 
     public function formView()
     {
-        $regionais = $this->regionalRepository->getRegionaisAgendamento();
+        $regionais = $this->service->getService('Regional')->getRegionaisAgendamento();
         $pessoas = Agendamento::TIPOS_PESSOA;
         $servicos = Agendamento::servicos();
 
@@ -225,7 +222,7 @@ class AgendamentoSiteController extends Controller
 
             // Não tendo nenhum agendamento, é necessário realizar uma query para verificar o número de agendamentos por horário da regional
             // Se o número de agendamentos por horário da regional for maior que zero, um agendamento pode ser criado, caso contrário não
-            return $this->regionalRepository->getAgeporhorarioById($idregional) > 0;
+            return $this->service->getService('Regional')->getAgeporhorarioById($idregional) > 0;
         }
         else {
 
@@ -283,11 +280,11 @@ class AgendamentoSiteController extends Controller
         else
         {
             // Recupera quantos agendamentos podem ser criados por horário de acordo com a regional
-            $agedamentoPorHorario = $this->regionalRepository->getAgeporhorarioById($idregional);
+            $agedamentoPorHorario = $this->service->getService('Regional')->getAgeporhorarioById($idregional);
 
             // Se podemos criar agendamentos, contamos quantos agendamentos já estão marcados por horário.
             if($agedamentoPorHorario > 0) {
-                $horarios = $this->regionalRepository->getHorariosAgendamento($idregional, $dia);
+                $horarios = $this->service->getService('Regional')->getHorariosAgendamento($idregional, $dia);
                 $horariosMarcados = $this->checaHorariosMarcados($dia,$idregional);
                 $contagemAgendamentosMarcados = array_count_values($horariosMarcados);
 
@@ -332,7 +329,7 @@ class AgendamentoSiteController extends Controller
             $contagemAgendamentos = $this->agendamentoRepository->getAgendamentoPendenteByMesRegional($idregional);
 
             // Recupera dados da regional
-            $regional = $this->regionalRepository->getById($idregional);
+            $regional = $this->service->getService('Regional')->getById($idregional);
             $agedamentoPorHorario = $regional->ageporhorario;
 
             // Recupera bloqueios ativos para a regional

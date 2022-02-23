@@ -8,9 +8,9 @@ use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Repositories\RegionalRepository;
 use App\Repositories\FiscalizacaoRepository;
 use App\Http\Requests\PeriodoFiscalizacaoRequest;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class FiscalizacaoController extends Controller
@@ -18,18 +18,18 @@ class FiscalizacaoController extends Controller
     use TabelaAdmin;
 
     private $class = 'FiscalizacaoController';
-    private $regionalRepository;
+    private $service;
     private $fiscalizacaoRepository;
     
     // Variáveis para páginas no Admin
     private $periodoFiscalizacaoVariaveis;
     private $dadosFiscalizacaoVariaveis;
 
-    public function __construct(RegionalRepository $regionalRepository, FiscalizacaoRepository $fiscalizacaoRepository)
+    public function __construct(MediadorServiceInterface $service, FiscalizacaoRepository $fiscalizacaoRepository)
     {
         $this->middleware('auth', ['except' => ['mostrarMapa', 'mostrarMapaPeriodo']]);
 
-        $this->regionalRepository = $regionalRepository;
+        $this->service = $service;
         $this->fiscalizacaoRepository = $fiscalizacaoRepository;
 
         $this->periodoFiscalizacaoVariaveis = [
@@ -67,7 +67,7 @@ class FiscalizacaoController extends Controller
     {   
         $this->authorize('create', auth()->user());
 
-        $regionais = $this->regionalRepository->getRegionais();
+        $regionais = $this->service->getService('Regional')->getRegionais();
         $variaveis = $this->periodoFiscalizacaoVariaveis;
         $variaveis['form'] = 'periodofiscalizacaocreate';
         $variaveis = (object) $variaveis;
@@ -82,7 +82,7 @@ class FiscalizacaoController extends Controller
         DB::transaction(function () use ($request) {
             $periodo = $this->fiscalizacaoRepository->storePeriodo($request->toModel());
 
-            $regionais = $this->regionalRepository->getRegionais();
+            $regionais = $this->service->getService('Regional')->getRegionais();
 
             foreach($regionais as $regional) {
                 $this->fiscalizacaoRepository->storeDadoFiscalizacao($regional->idregional, $periodo->id);

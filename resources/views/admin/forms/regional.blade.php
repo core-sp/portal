@@ -11,7 +11,7 @@
                     class="form-control {{ $errors->has('regional') ? 'is-invalid' : '' }}"
                     placeholder="Regional"
                     name="regional"
-                    value="{{ isset($resultado->regional) ? $resultado->regional : old('regional') }}"
+                    value="{{ empty(old('regional')) && isset($resultado->regional) ? $resultado->regional : old('regional') }}"
                     required
                 />
                 @if($errors->has('regional'))
@@ -26,7 +26,7 @@
                     class="form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
                     placeholder="Bairro"
                     name="bairro"
-                    value="{{ isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
+                    value="{{ empty(old('bairro')) && isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
                     required
                 />
                 @if($errors->has('bairro'))
@@ -41,7 +41,7 @@
                     class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                     placeholder="Email"
                     name="email"
-                    value="{{ isset($resultado->email) ? $resultado->email : old('email') }}"
+                    value="{{ empty(old('email')) && isset($resultado->email) ? $resultado->email : old('email') }}"
                     required
                 />
                 @if($errors->has('email'))
@@ -58,7 +58,7 @@
                     class="form-control {{ $errors->has('endereco') ? 'is-invalid' : '' }}"
                     placeholder="Endereço"
                     name="endereco"
-                    value="{{ isset($resultado->endereco) ? $resultado->endereco : old('endereco') }}"
+                    value="{{ empty(old('endereco')) && isset($resultado->endereco) ? $resultado->endereco : old('endereco') }}"
                     required
                 />
                 @if($errors->has('endereco'))
@@ -73,7 +73,7 @@
                     class="form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
                     placeholder="Número"
                     name="numero"
-                    value="{{ isset($resultado->numero) ? $resultado->numero : old('numero') }}"
+                    value="{{ empty(old('numero')) && isset($resultado->numero) ? $resultado->numero : old('numero') }}"
                     required
                 />
                 @if($errors->has('numero'))
@@ -88,7 +88,7 @@
                     class="form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
                     placeholder="Complemento"
                     name="complemento"
-                    value="{{ isset($resultado->complemento) ? $resultado->complemento : old('complemento') }}"
+                    value="{{ empty(old('complemento')) && isset($resultado->complemento) ? $resultado->complemento : old('complemento') }}"
                 />
                 @if($errors->has('complemento'))
                 <div class="invalid-feedback">
@@ -104,7 +104,7 @@
                     class="form-control cepInput {{ $errors->has('cep') ? 'is-invalid' : '' }}"
                     placeholder="CEP"
                     name="cep"
-                    value="{{ isset($resultado->cep) ? $resultado->cep : old('cep') }}"
+                    value="{{ empty(old('cep')) && isset($resultado->cep) ? $resultado->cep : old('cep') }}"
                     required
                 />
                 @if($errors->has('cep'))
@@ -119,7 +119,7 @@
                     class="form-control fixoInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                     placeholder="Telefone"
                     name="telefone"
-                    value="{{ isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"
+                    value="{{ empty(old('telefone')) && isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"
                     required
                 />
                 @if($errors->has('telefone'))
@@ -134,7 +134,7 @@
                     class="form-control fixoInput {{ $errors->has('fax') ? 'is-invalid' : '' }}"
                     placeholder="Fax"
                     name="fax"
-                    value="{{ isset($resultado->fax) ? $resultado->fax : old('fax') }}"
+                    value="{{ empty(old('fax')) && isset($resultado->fax) ? $resultado->fax : old('fax') }}"
                 />
                 @if($errors->has('fax'))
                 <div class="invalid-feedback">
@@ -150,7 +150,7 @@
                     class="form-control {{ $errors->has('funcionamento') ? 'is-invalid' : '' }}"
                     placeholder="Descrição do horário de funcionamento"
                     name="funcionamento"
-                    value="{{ isset($resultado->funcionamento) ? $resultado->funcionamento : old('funcionamento') }}"
+                    value="{{ empty(old('funcionamento')) && isset($resultado->funcionamento) ? $resultado->funcionamento : old('funcionamento') }}"
                     required
                 />
                 @if($errors->has('funcionamento'))
@@ -165,7 +165,7 @@
                     class="form-control {{ $errors->has('responsavel') ? 'is-invalid' : '' }}"
                     placeholder="Responsável"
                     name="responsavel"
-                    value="{{ isset($resultado->responsavel) ? $resultado->responsavel : old('responsavel') }}"
+                    value="{{ empty(old('responsavel')) && isset($resultado->responsavel) ? $resultado->responsavel : old('responsavel') }}"
                 />
                 @if($errors->has('responsavel'))
                 <div class="invalid-feedback">
@@ -182,7 +182,7 @@
                     placeholder="Nº de agendamentos permitidos por horário"
                     name="ageporhorario"
                     id="ageporhorario"
-                    value="{{ isset($resultado->ageporhorario) ? $resultado->ageporhorario : old('ageporhorario') }}"
+                    value="{{ empty(old('ageporhorario')) && isset($resultado->ageporhorario) ? $resultado->ageporhorario : old('ageporhorario') }}"
                     required
                 />
                 @if($errors->has('ageporhorario'))

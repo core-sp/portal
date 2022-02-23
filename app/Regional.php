@@ -17,12 +17,12 @@ class Regional extends Model
 
     public function users()
     {
-        return $this->hasMany('App\User', 'idusuario');
+        return $this->hasMany('App\User', 'idregional');
     }
 
     public function noticias()
     {
-        return $this->hasMany('App\Noticia', 'idnoticia');
+        return $this->hasMany('App\Noticia', 'idregional');
     }
 
     public function horariosAge()

@@ -8,9 +8,9 @@ use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
 use App\AgendamentoBloqueio;
 use Illuminate\Http\Request;
-use App\Repositories\RegionalRepository;
 use App\Http\Requests\AgendamentoBloqueioRequest;
 use App\Repositories\AgendamentoBloqueioRepository;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoBloqueioController extends Controller
@@ -18,7 +18,7 @@ class AgendamentoBloqueioController extends Controller
     use TabelaAdmin;
 
     private $class = 'AgendamentoBloqueioController';
-    private $regionalRepository;
+    private $service;
     private $agendamentoBloqueioRepository;
 
     // Variáveis extras da página
@@ -34,10 +34,10 @@ class AgendamentoBloqueioController extends Controller
         'busca' => 'agendamentos/bloqueios',
     ];
 
-    public function __construct(RegionalRepository $regionalRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository)
+    public function __construct(MediadorServiceInterface $service, AgendamentoBloqueioRepository $agendamentoBloqueioRepository)
     {
         $this->middleware('auth');
-        $this->regionalRepository = $regionalRepository;
+        $this->service = $service;
         $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
     }
 
@@ -62,7 +62,7 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('create', auth()->user());
 
         $variaveis = (object) $this->variaveis;
-        $regionais = $this->regionalRepository->getRegionaisAgendamento();
+        $regionais = $this->service->getService('Regional')->getRegionaisAgendamento();
 
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
@@ -95,7 +95,7 @@ class AgendamentoBloqueioController extends Controller
 
         $resultado = $this->agendamentoBloqueioRepository->getById($id);
         $variaveis = (object) $this->variaveis;
-        $regionais = $this->regionalRepository->getRegionaisAgendamento();
+        $regionais = $this->service->getService('Regional')->getRegionaisAgendamento();
 
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
     }

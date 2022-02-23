@@ -79,6 +79,7 @@ class RegionalService implements RegionalServiceInterface {
     public function save($validated, $id)
     {
         Regional::findOrFail($id)->update([
+            'regional' => $validated->regional,
             'endereco' => $validated->endereco,
             'bairro' => $validated->bairro,
             'numero' => $validated->numero,
@@ -98,16 +99,14 @@ class RegionalService implements RegionalServiceInterface {
 
     public function viewSite($id)
     {
-        // $regional = Regional::with('noticias')
-        //     ->where('idregional', $id)
-        //     ->limit(3)
-        //     ->get();
-        //     dd($regional);
+        $regional = Regional::findOrFail($id);
 
-        // return [
-        //     'resultado' => Regional::findOrFail($id),
-        //     'noticias' => $regional->noticias->sortDesc('created_at')
-        // ];
+        return [
+            'resultado' => $regional,
+            'noticias' => $regional->noticias->isNotEmpty() ? 
+                $regional->noticias()->select('slug', 'img', 'created_at', 'titulo', 'idregional')->orderBy('created_at', 'DESC')->limit(3)->get() : 
+                $regional->noticias
+        ];
     }
 
     public function buscar($busca)
@@ -127,5 +126,64 @@ class RegionalService implements RegionalServiceInterface {
     public function all()
     {
         return Regional::get();
+    }
+
+    /**
+     * 
+     * Métodos abaixo temporários até refatorar suas respectivas classes
+     * Apenas copia e cola do repositório
+     * 
+    */
+
+    /**
+     * Método retorna regionais para atendimento, incluindo unidade da Alameda Santos. Ordenando por regionais e 
+     * renomeando "São Paulo" para facilitar vizualização do Representante Comercial.
+     */
+    public function getRegionaisAgendamento()
+    {
+        $regionaisAtendimento = Regional::select('idregional', 'regional', 'prefixo')
+            ->orderByRaw('case prefixo WHEN "SEDE" THEN 0 ELSE 1 END, idregional ASC')
+            ->get();
+
+        $regionaisAtendimento[0]->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
+
+        return $regionaisAtendimento;
+    }
+
+    public function getAgeporhorarioById($id)
+    {
+        return Regional::findOrFail($id)->ageporhorario;
+    }
+
+    public function getHorariosAgendamento($id, $dia)
+    {
+        return Regional::find($id)->horariosDisponiveis($dia);
+    }
+
+    public function getById($id)
+    {
+        return Regional::findOrFail($id);
+    }
+
+    public function getToList()
+    {
+        return Regional::select('idregional', 'regional')->get();
+    }
+
+    public function getByName($regional)
+    {
+        return Regional::where('regional','LIKE','%'.$regional.'%')
+            ->get()
+            ->first();
+    }
+
+    /**
+     * Método retorna apenas regionais. Retorna apenas SEDE, ES01 ~ ES12 (exclui Alameda Santos).
+     */
+    public function getRegionais()
+    {
+        $regionaisFiscalizacao = Regional::select('idregional', 'regional', 'prefixo')->where('idregional', '<=', 13)->get();
+
+        return $regionaisFiscalizacao;
     }
 }

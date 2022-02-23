@@ -15,4 +15,23 @@ interface RegionalServiceInterface {
     public function buscar($busca);
 
     public function all();
+
+    /**
+     * 
+     * Métodos abaixo temporários até refatorar suas respectivas classes
+     * Apenas copia e cola do repositório
+     * 
+    */
+
+    public function getRegionaisAgendamento();
+
+    public function getAgeporhorarioById($id);
+
+    public function getHorariosAgendamento($id, $dia);
+
+    public function getById($id);
+
+    public function getToList();
+
+    public function getByName($regional);
 }

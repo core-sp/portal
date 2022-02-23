@@ -35,7 +35,8 @@ class RegionalRequest extends FormRequest
     {
         return [
             'required' => 'O campo :attribute é obrigatório',
-            'max' => 'O campo :attribute excedeu o limite de caracteres permitido',
+            'email' => 'Formato de email inválido',
+            'max' => 'O campo :attribute deve ter no máximo :max caracteres',
             'ageporhorario.regex' => 'O valor deve ser maior que 0',
             'array' => 'Os horários não vieram da forma correta'
         ];

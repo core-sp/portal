@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Repositories\BdoEmpresaRepository;
 use App\Repositories\BdoOportunidadeRepository;
-use App\Repositories\RegionalRepository;
 use App\Http\Requests\AnunciarVagaRequest;
 use App\BdoOportunidade;
 use App\Rules\Cnpj;
@@ -13,27 +12,28 @@ use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AnunciarVagaMail;
 use App\Repositories\TermoConsentimentoRepository;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoSiteController extends Controller
 {
     private $bdoEmpresaRepository;
     private $bdoOportunidadeRepository;
-    private $regionalRepository;
+    private $service;
     private $termoConsentimentoRepository;
 
-    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository, TermoConsentimentoRepository $termoConsentimentoRepository) 
+    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, MediadorServiceInterface $service, TermoConsentimentoRepository $termoConsentimentoRepository) 
     {
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
-        $this->regionalRepository = $regionalRepository;
+        $this->service = $service;
         $this->termoConsentimentoRepository = $termoConsentimentoRepository;
     }
 
     public function index()
     {
         $oportunidades = $this->bdoOportunidadeRepository->getToBalcaoSite();
-        $regionais = $this->regionalRepository->getRegionais();
+        $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
 
         foreach($oportunidades as $o) {
@@ -50,7 +50,7 @@ class BdoSiteController extends Controller
         $buscaRegional = IlluminateRequest::input('regional') === 'todas' ?  $buscaRegional = '' : ','. IlluminateRequest::input('regional').',';
 
         $oportunidades = $this->bdoOportunidadeRepository->buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave);
-        $regionais = $this->regionalRepository->getRegionais();
+        $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
         
         if (count($oportunidades) > 0) {
@@ -67,7 +67,7 @@ class BdoSiteController extends Controller
 
     public function anunciarVagaView()
     {
-        $regionais = $this->regionalRepository->getRegionais();
+        $regionais = $this->service->getService('Regional')->getRegionais();
 
         return view('site.anunciar-vaga', compact('regionais'));
     }

@@ -6,10 +6,10 @@ use App\BdoEmpresa;
 use App\BdoOportunidade;
 use App\Events\CrudEvent;
 use App\Traits\TabelaAdmin;
-use App\Repositories\RegionalRepository;
 use App\Repositories\BdoEmpresaRepository;
 use App\Http\Requests\BdoOportunidadeRequest;
 use App\Repositories\BdoOportunidadeRepository;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoOportunidadeController extends Controller
@@ -20,7 +20,7 @@ class BdoOportunidadeController extends Controller
     private $class = 'BdoOportunidadeController';
     private $bdoOportunidadeRepository;
     private $bdoEmpresaRepository;
-    private $regionalRepository;
+    private $service;
 
     private $bdoOportunidadeVariaveis = [
         'singular' => 'oportunidade',
@@ -33,13 +33,13 @@ class BdoOportunidadeController extends Controller
         'slug' => 'bdo'
     ];
 
-    public function __construct(BdoOportunidadeRepository $bdoOportunidadeRepository, BdoEmpresaRepository $bdoEmpresaRepository, RegionalRepository $regionalRepository)
+    public function __construct(BdoOportunidadeRepository $bdoOportunidadeRepository, BdoEmpresaRepository $bdoEmpresaRepository, MediadorServiceInterface $service)
     {
         $this->middleware('auth', ['except' => 'show']);
 
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
-        $this->regionalRepository = $regionalRepository;
+        $this->service = $service;
     }
     
     public function index()
@@ -59,7 +59,7 @@ class BdoOportunidadeController extends Controller
 
         $empresa = $this->bdoEmpresaRepository->getToOportunidade($id);
 
-        $regioes = $this->regionalRepository->getRegionais();
+        $regioes = $this->service->getService('Regional')->getRegionais();
         
         if (isset($empresa)) {
             $variaveis = (object) $this->bdoOportunidadeVariaveis;
@@ -97,7 +97,7 @@ class BdoOportunidadeController extends Controller
         $this->authorize('updateOther', auth()->user());
 
         $resultado = $this->bdoOportunidadeRepository->findOrFail($id);
-        $regioes = $this->regionalRepository->getRegionais();
+        $regioes = $this->service->getService('Regional')->getRegionais();
         $regioesEdit = explode(',', $resultado->regiaoatuacao);
         $variaveis = (object) $this->bdoOportunidadeVariaveis;
         $status = BdoOportunidade::status();
