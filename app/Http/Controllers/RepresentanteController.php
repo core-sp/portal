@@ -193,7 +193,7 @@ class RepresentanteController extends Controller
     public function listarCertidao($assId) 
     {
         try {
-            $responseGetCertidao = $this->gerentiApiRepository->gerentiGetCertidao(($assId));
+            $responseGetCertidao = $this->gerentiApiRepository->gerentiGetCertidao($assId);
         }
         catch (Exception $e) {
             Log::error($e->getTraceAsString());
