@@ -148,7 +148,7 @@ class AgendamentoSiteController extends Controller
         // Gera evento de agendamento
         $string = $save->nome . " (CPF: " . $save->cpf . ")";
         $string .= " *agendou* atendimento em *" . $save->regional->regional;
-        $string .= "* no dia " . onlyDate($save->dia) . "  e foi criado um novo registro no termo de consentimento, com a id: " . $termo->id;
+        $string .= "* no dia " . onlyDate($save->dia) . " e " .$termo;
         event(new ExternoEvent($string));
         
         // Enviando email de agendamento

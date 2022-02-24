@@ -20,6 +20,11 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
         ]);
     }
 
+    private function message($id)
+    {
+        return 'foi criado um novo registro no termo de consentimento, com a id: '.$id;
+    }
+
     public function save($ip, $object)
     {
         if(class_basename($object) == 'stdClass')
@@ -32,12 +37,14 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
                     'class' => 'alert-warning'
                 ]; 
 
-            $termo = $this->create($ip, $object->email);
-            event(new ExternoEvent("foi criado um novo registro no termo de consentimento, com a id: " . $termo->id));
+            $termo = $this->create($ip, $object);
+            event(new ExternoEvent($this->message($termo->id)));
 
             return $termo;
         }
-        return $this->create($ip, $object);
+        
+        $termo = $this->create($ip, $object);
+        return $this->message($termo->id);
     }
 
     public function caminhoFile()

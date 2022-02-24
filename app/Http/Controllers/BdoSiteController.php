@@ -108,7 +108,7 @@ class BdoSiteController extends Controller
 
         $termo = $this->service->getService('TermoConsentimento')->save(request()->ip(), $oportunidade);
 
-        event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e foi criado um novo registro no termo de consentimento, com a id: ' . $termo->id));
+        event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e '.$termo));
 
         Mail::to(['assessoria.presidencia@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
 

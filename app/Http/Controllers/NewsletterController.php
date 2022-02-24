@@ -58,7 +58,7 @@ class NewsletterController extends Controller
 
         // Gera evento de inscrição na Newsletter
         $string = "*".$newsletter->nome."* (".$newsletter->email.")";
-        $string .= " *registrou-se* na newsletter e foi criado um novo registro no termo de consentimento, com a id: " . $termo->id;
+        $string .= " *registrou-se* na newsletter e ".$termo;
         event(new ExternoEvent($string));
 
         // Gera mensagem de agradecimento
