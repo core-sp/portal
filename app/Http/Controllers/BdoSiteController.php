@@ -11,7 +11,6 @@ use App\BdoEmpresa;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AnunciarVagaMail;
-use App\Repositories\TermoConsentimentoRepository;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
@@ -20,14 +19,12 @@ class BdoSiteController extends Controller
     private $bdoEmpresaRepository;
     private $bdoOportunidadeRepository;
     private $service;
-    private $termoConsentimentoRepository;
 
-    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, MediadorServiceInterface $service, TermoConsentimentoRepository $termoConsentimentoRepository) 
+    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, MediadorServiceInterface $service) 
     {
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->service = $service;
-        $this->termoConsentimentoRepository = $termoConsentimentoRepository;
     }
 
     public function index()
@@ -109,7 +106,7 @@ class BdoSiteController extends Controller
             abort(403);
         }
 
-        $termo = $this->termoConsentimentoRepository->create(request()->ip(), null, null, null, null, $oportunidade->idoportunidade);
+        $termo = $this->service->getService('TermoConsentimento')->save(request()->ip(), $oportunidade);
 
         event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e foi criado um novo registro no termo de consentimento, com a id: ' . $termo->id));
 

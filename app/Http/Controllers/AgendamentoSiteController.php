@@ -16,7 +16,6 @@ use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoSiteRequest;
 use App\Repositories\AgendamentoBloqueioRepository;
 use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
-use App\Repositories\TermoConsentimentoRepository;
 use App\Contracts\MediadorServiceInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
@@ -25,13 +24,11 @@ class AgendamentoSiteController extends Controller
 {
     private $agendamentoRepository;
     private $agendamentoBloqueioRepository;
-    private $termoConsentimentoRepository;
     private $service;
 
-    public function __construct(AgendamentoRepository $agendamentoRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository, TermoConsentimentoRepository $termoConsentimentoRepository, MediadorServiceInterface $service) {
+    public function __construct(AgendamentoRepository $agendamentoRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository, MediadorServiceInterface $service) {
         $this->agendamentoRepository = $agendamentoRepository;
         $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
-        $this->termoConsentimentoRepository = $termoConsentimentoRepository;
         $this->service = $service;
     }
 
@@ -146,7 +143,7 @@ class AgendamentoSiteController extends Controller
             abort(500);
         }
 
-        $termo = $this->termoConsentimentoRepository->create(request()->ip(), null, null, null, $save->idagendamento, null);
+        $termo = $this->service->getService('TermoConsentimento')->save(request()->ip(), $save);
             
         // Gera evento de agendamento
         $string = $save->nome . " (CPF: " . $save->cpf . ")";

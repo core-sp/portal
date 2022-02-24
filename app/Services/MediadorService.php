@@ -6,6 +6,7 @@ use App\Contracts\MediadorServiceInterface;
 use App\Contracts\SuporteServiceInterface;
 use App\Contracts\PlantaoJuridicoServiceInterface;
 use App\Contracts\RegionalServiceInterface;
+use App\Contracts\TermoConsentimentoServiceInterface;
 
 class MediadorService implements MediadorServiceInterface {
 
@@ -15,13 +16,15 @@ class MediadorService implements MediadorServiceInterface {
     public function __construct(
         SuporteServiceInterface $suporteService,
         PlantaoJuridicoServiceInterface $plantaoJuridicoService,
-        RegionalServiceInterface $regionalService
+        RegionalServiceInterface $regionalService,
+        TermoConsentimentoServiceInterface $termoConsentimentoService
     )
     {
         $this->service = [
             'Suporte' => $suporteService,
             'PlantaoJuridico' => $plantaoJuridicoService,
             'Regional' => $regionalService,
+            'TermoConsentimento' => $termoConsentimentoService,
         ];
     }
 

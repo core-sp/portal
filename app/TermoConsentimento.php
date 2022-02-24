@@ -8,7 +8,6 @@ class TermoConsentimento extends Model
 {
     protected $table = 'termos_consentimentos';
     protected $guarded = [];
-    protected $with = ['representante', 'newsletter', 'agendamento', 'bdo'];
 
     public function representante()
     {
