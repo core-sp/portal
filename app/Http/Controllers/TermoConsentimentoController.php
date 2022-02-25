@@ -50,7 +50,7 @@ class TermoConsentimentoController extends Controller
 
     public function download()
     {
-        abort_if(!in_array(auth()->user()->idperfil, ['1', '3']), 403);
+        abort_if(!in_array(auth()->user()->idperfil, [1, 3]), 403);
         
         try {
             $file = $this->service->getService('TermoConsentimento')->download();

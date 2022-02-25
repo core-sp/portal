@@ -5,8 +5,6 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class TermoConsentimentoTest extends TestCase
 {
@@ -67,17 +65,13 @@ class TermoConsentimentoTest extends TestCase
         ->assertSee(route('termo.consentimento.pdf'));
     }
 
-    // /** @test */
-    // public function view_pdf_termo()
-    // {
-    //     Storage::fake('public');
-
-    //     $file = UploadedFile::fake()->create('CORE-SP_Termo_de_consentimento.pdf', 1000);
-    //     Storage::disk('public')->put('arquivos/'.$file->name, $file);
-    //     Storage::disk('public')->assertExists('arquivos/'.$file->name);
-
-    //     $this->get(route('termo.consentimento.pdf'));
-    // }
+    /** @test */
+    public function view_pdf_termo()
+    {
+        $this->get(route('termo.consentimento.pdf'))
+        ->assertHeader('content-type', 'application/pdf')
+        ->assertOk();
+    }
 
     /** @test */
     public function created_new_record_when_new_agendamento()
@@ -220,7 +214,10 @@ class TermoConsentimentoTest extends TestCase
         
         $this->post(route('termo.consentimento.post', ['email' => 'teste@teste.com']));
 
-        $this->get(route('termo.consentimento.download'))->assertOk();
+        $this->get(route('termo.consentimento.download'))
+        ->assertHeader('content-disposition', 'attachment; filename=emails-termo_consentimento-'.date('Ymd').'.csv')
+        ->assertHeader('content-type', 'text/csv; charset=UTF-8')
+        ->assertOk();
     }
 
     /** @test */

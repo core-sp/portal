@@ -49,7 +49,7 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
     public function caminhoFile()
     {
-        return 'arquivos/CORE-SP_Termo_de_consentimento.pdf';
+        return 'public/arquivos/CORE-SP_Termo_de_consentimento.pdf';
     }
 
     public function download()
@@ -60,7 +60,7 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
         {
             $headers = [
                 'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                'Content-type' => 'text/csv',
+                'Content-type' => 'text/csv; charset=UTF-8',
                 'Content-Disposition' => 'attachment; filename=emails-termo_consentimento-'.date('Ymd').'.csv',
                 'Expires' => '0',
                 'Pragma' => 'public',
