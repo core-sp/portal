@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
 
 class TermoConsentimentoTest extends TestCase
 {
@@ -65,12 +66,20 @@ class TermoConsentimentoTest extends TestCase
         ->assertSee(route('termo.consentimento.pdf'));
     }
 
+    // /** @test */
+    // public function view_pdf_termo()
+    // {
+    //     $file = UploadedFile::fake()->create('CORE-SP_Termo_de_consentimento.pdf');
+
+    //     $this->get(route('termo.consentimento.pdf'))
+    //     ->assertHeader('content-type', 'application/pdf')
+    // }
+
     /** @test */
-    public function view_pdf_termo()
+    public function redirect_back_if_not_find_pdf_termo()
     {
         $this->get(route('termo.consentimento.pdf'))
-        ->assertHeader('content-type', 'application/pdf')
-        ->assertOk();
+        ->assertStatus(302);
     }
 
     /** @test */

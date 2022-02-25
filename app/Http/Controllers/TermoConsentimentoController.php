@@ -45,7 +45,7 @@ class TermoConsentimentoController extends Controller
             abort(500, "Erro ao carregar o arquivo do Termo de Consentimento.");
         }
 
-        return response()->file($file);
+        return isset($file) ? response()->file($file, ['Cache-Control' => 'no-cache, no-store, must-revalidate']) : redirect()->back();
     }
 
     public function download()

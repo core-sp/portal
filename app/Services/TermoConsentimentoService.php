@@ -5,6 +5,7 @@ namespace App\Services;
 use App\TermoConsentimento;
 use App\Contracts\TermoConsentimentoServiceInterface;
 use App\Events\ExternoEvent;
+use Illuminate\Support\Facades\File;
 
 class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
@@ -49,7 +50,9 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
     public function caminhoFile()
     {
-        return 'public/arquivos/CORE-SP_Termo_de_consentimento.pdf';
+        $pdf = 'arquivos/CORE-SP_Termo_de_consentimento.pdf';
+
+        return File::exists($pdf) ? $pdf : null;
     }
 
     public function download()
