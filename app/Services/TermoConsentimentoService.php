@@ -7,30 +7,15 @@ use App\Contracts\TermoConsentimentoServiceInterface;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\File;
 
+
+
 class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
 
-    private function create($ip, $object)
+    public function save($ip, $email)
     {
-        return TermoConsentimento::create([
-            'ip' => $ip,
-            'email' => class_basename($object) == 'stdClass' ? $object->email : null,
-            'idrepresentante' => class_basename($object) == 'Representante' ? $object->id : null,
-            'idnewsletter' => class_basename($object) == 'Newsletter' ? $object->idnewsletter : null,
-            'idagendamento' => class_basename($object) == 'Agendamento' ? $object->idagendamento : null,
-            'idbdo' => class_basename($object) == 'BdoOportunidade' ? $object->idoportunidade : null
-        ]);
-    }
-
-    private function message($id)
-    {
-        return 'foi criado um novo registro no termo de consentimento, com a id: '.$id;
-    }
-
-    public function save($ip, $object)
-    {
-        if(class_basename($object) == 'stdClass')
+        if(isset($email))
         {
-            $existe = TermoConsentimento::where('email', $object->email)->first();
+            $existe = TermoConsentimento::where('email', $email)->first();
 
             if(isset($existe))
                 return [
@@ -38,14 +23,14 @@ class TermoConsentimentoService implements TermoConsentimentoServiceInterface {
                     'class' => 'alert-warning'
                 ]; 
 
-            $termo = $this->create($ip, $object);
-            event(new ExternoEvent($this->message($termo->id)));
+            $termo = TermoConsentimento::create([
+                'ip' => $ip, 
+                'email' => $email
+            ]);
+            event(new ExternoEvent($termo->message()));
 
-            return $termo;
+            return null;
         }
-        
-        $termo = $this->create($ip, $object);
-        return $this->message($termo->id);
     }
 
     public function caminhoFile()

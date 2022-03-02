@@ -143,12 +143,14 @@ class AgendamentoSiteController extends Controller
             abort(500);
         }
 
-        $termo = $this->service->getService('TermoConsentimento')->save(request()->ip(), $save);
+        $termo = $save->termos()->create([
+            'ip' => request()->ip()
+        ]);
             
         // Gera evento de agendamento
         $string = $save->nome . " (CPF: " . $save->cpf . ")";
         $string .= " *agendou* atendimento em *" . $save->regional->regional;
-        $string .= "* no dia " . onlyDate($save->dia) . " e " .$termo;
+        $string .= "* no dia " . onlyDate($save->dia) . " e " .$termo->message();
         event(new ExternoEvent($string));
         
         // Enviando email de agendamento

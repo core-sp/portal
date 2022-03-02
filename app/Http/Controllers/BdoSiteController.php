@@ -106,9 +106,11 @@ class BdoSiteController extends Controller
             abort(403);
         }
 
-        $termo = $this->service->getService('TermoConsentimento')->save(request()->ip(), $oportunidade);
+        $termo = $oportunidade->termos()->create([
+            'ip' => request()->ip()
+        ]);
 
-        event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e '.$termo));
+        event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e '.$termo->message()));
 
         Mail::to(['assessoria.presidencia@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
 

@@ -24,7 +24,7 @@ class TermoConsentimentoController extends Controller
     {
         try {
             $validated = (object) $request->validated();
-            $message = $this->service->getService('TermoConsentimento')->save(request()->ip(), $validated);
+            $message = $this->service->getService('TermoConsentimento')->save(request()->ip(), $validated->email);
         } catch(\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao salvar os dados no Termo de Consentimento.");

@@ -4,7 +4,7 @@ namespace App\Contracts;
 
 interface TermoConsentimentoServiceInterface {
 
-    public function save($ip, $object);
+    public function save($ip, $email);
 
     public function caminhoFile();
 

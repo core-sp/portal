@@ -38,7 +38,7 @@ class TermoConsentimentoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
 
-        $this->assertStringContainsString('foi criado um novo registro no termo de consentimento, com a id: 1', $log);
+        $this->assertStringContainsString('Novo email e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
     }
 
     /** @test */
@@ -107,8 +107,9 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function id_termo_in_log_when_new_agendamento()
     {
+        $regional = factory('App\Regional')->create();
         $agendamento = factory('App\Agendamento')->raw([
-            'idregional' => factory('App\Regional')->create(),
+            'idregional' => $regional->idregional,
             'dia' => date('Y-m-d', strtotime('+1 day')),
             'hora' => '10:00',
             'termo' => 'on'
@@ -118,7 +119,8 @@ class TermoConsentimentoTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogExterno()));
 
         $this->assertStringContainsString(' *agendou* atendimento em *', $log);
-        $this->assertStringContainsString(' e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
+        $this->assertStringContainsString($agendamento['nome'].' (CPF: '.$agendamento['cpf'].') *agendou* atendimento em *'
+        .$regional->regional.'* no dia '.onlyDate($agendamento['dia']).' e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
     }
 
     /** @test */
@@ -156,7 +158,7 @@ class TermoConsentimentoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
 
-        $this->assertStringContainsString(' *registrou-se* na newsletter e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
+        $this->assertStringContainsString('*'.$newsletter['nomeNl'].'* ('.$newsletter['emailNl'].') *registrou-se* na newsletter e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
     }
 
     /** @test */
@@ -204,7 +206,7 @@ class TermoConsentimentoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
 
-        $this->assertStringContainsString(' solicitou inclusão de oportunidade no Balcão de Oportunidades e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
+        $this->assertStringContainsString('*'.$bdoEmpresa->razaosocial.'* ('.$bdoEmpresa->email.') solicitou inclusão de oportunidade no Balcão de Oportunidades e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
     }
 
     /** @test */

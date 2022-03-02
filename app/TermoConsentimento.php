@@ -28,4 +28,11 @@ class TermoConsentimento extends Model
     {
     	return $this->belongsTo('App\BdoOportunidade', 'idbdo');
     }
+
+    public function message()
+    {
+        $message = 'foi criado um novo registro no termo de consentimento, com a id: '.$this->id;
+
+        return isset($this->email) ? 'Novo email e '.$message : $message;
+    }
 }
