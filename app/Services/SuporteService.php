@@ -48,6 +48,7 @@ class SuporteService implements SuporteServiceInterface {
     private function editarConteudoLog($log)
     {
         $array = explode(PHP_EOL, $log);
+        unset($log);
         foreach($array as $key => $value)
         {
             // Ocultar o IP
