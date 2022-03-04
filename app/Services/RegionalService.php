@@ -59,7 +59,9 @@ class RegionalService implements RegionalServiceInterface {
 
     public function index()
     {
-        $resultados = Regional::orderBy('regional')->get();
+        $resultados = Regional::select('idregional', 'prefixo', 'regional', 'telefone', 'fax', 'email')
+            ->orderBy('regional')
+            ->get();
 
         return [
             'resultados' => $resultados, 
@@ -78,22 +80,10 @@ class RegionalService implements RegionalServiceInterface {
 
     public function save($validated, $id)
     {
-        Regional::findOrFail($id)->update([
-            'regional' => $validated->regional,
-            'endereco' => $validated->endereco,
-            'bairro' => $validated->bairro,
-            'numero' => $validated->numero,
-            'complemento' => $validated->complemento,
-            'cep' => $validated->cep,
-            'telefone' => $validated->telefone,
-            'fax' => $validated->fax,
-            'email' => $validated->email,
-            'funcionamento' => $validated->funcionamento,
-            'ageporhorario' => $validated->ageporhorario,
-            'horariosage' => implode(',', $validated->horariosage),
-            'responsavel' => $validated->responsavel,
-            'descricao' => $validated->descricao
-        ]);
+        $validated['horariosage'] = implode(',', $validated['horariosage']);
+
+        Regional::findOrFail($id)->update($validated);
+
         event(new CrudEvent('regional', 'editou', $id));
     }
 

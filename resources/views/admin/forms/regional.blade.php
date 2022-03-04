@@ -37,7 +37,7 @@
             </div>
             <div class="col">
                 <label for="email">Email</label>
-                <input type="text"
+                <input type="email"
                     class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                     placeholder="Email"
                     name="email"

@@ -52,7 +52,7 @@ class RegionalController extends Controller
         $this->authorize('updateOther', auth()->user());
 
         try{
-            $validated = (object) $request->validated();
+            $validated = $request->validated();
             $this->service->getService('Regional')->save($validated, $id);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
