@@ -28,8 +28,8 @@ use App\Repositories\RepresentanteEnderecoRepository;
 use App\Repositories\SolicitaCedulaRepository;
 use App\Repositories\BdoOportunidadeRepository;
 use App\Repositories\AvisoRepository;
-use App\Repositories\RegionalRepository;
 use Illuminate\Support\Facades\View;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
@@ -39,17 +39,17 @@ class RepresentanteSiteController extends Controller
     private $gerentiApiRepository;
     protected $idendereco;
     private $bdoOportunidadeRepository;
-    private $regionalRepository;
+    private $service;
     private $solicitaCedulaRepository;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository, AvisoRepository $avisoRepository, SolicitaCedulaRepository $solicitaCedulaRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, MediadorServiceInterface $service, AvisoRepository $avisoRepository, SolicitaCedulaRepository $solicitaCedulaRepository)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->gerentiRepository = $gerentiRepository;
         $this->representanteEnderecoRepository = $representanteEnderecoRepository;
         $this->gerentiApiRepository = $gerentiApiRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
-        $this->regionalRepository = $regionalRepository;
+        $this->service = $service;
         $this->solicitaCedulaRepository = $solicitaCedulaRepository;
 
         if($avisoRepository->avisoAtivado('Representante'))
@@ -493,7 +493,7 @@ class RepresentanteSiteController extends Controller
         $rep = Auth::guard('representante')->user();
         try{
             $seccional = $this->gerentiRepository->gerentiDadosGerais($rep->tipoPessoa(), $rep->ass_id)["Regional"];
-            $idregional = $this->regionalRepository->getByName($seccional)->idregional;
+            $idregional = $this->service->getService('Regional')->getByName($seccional)->idregional;
             $segmentoGerenti = $this->gerentiRepository->gerentiGetSegmentosByAssId($rep->ass_id);
             $segmento = !empty($segmentoGerenti) ? $segmentoGerenti[0]["SEGMENTO"] : $segmentoGerenti;
             $bdo = !empty($segmento) ? $this->bdoOportunidadeRepository->buscaBySegmentoEmAndamento($segmento, $idregional) : collect();
@@ -554,7 +554,7 @@ class RepresentanteSiteController extends Controller
         try {
             $tipoPessoa = $representante->tipoPessoa();
             $regional = $this->gerentiRepository->gerentiDadosGerais($tipoPessoa, $representante->ass_id)['Regional'];
-            $idregional = $this->regionalRepository->getByName($regional)->idregional;
+            $idregional = $this->service->getService('Regional')->getByName($regional)->idregional;
             if($tipoPessoa == 'PF')
             {
                 $validate->nome = null;

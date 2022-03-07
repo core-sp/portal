@@ -35,6 +35,11 @@ class BdoOportunidade extends Model
     	return $this->belongsTo('App\Regional', 'idregional');
     }
 
+    public function termos()
+    {
+        return $this->hasMany('App\TermoConsentimento', 'idbdo');
+    }
+
     public static function status()
     {
     	$status = [

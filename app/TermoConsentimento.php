@@ -8,7 +8,6 @@ class TermoConsentimento extends Model
 {
     protected $table = 'termos_consentimentos';
     protected $guarded = [];
-    protected $with = ['representante', 'newsletter', 'agendamento', 'bdo'];
 
     public function representante()
     {
@@ -28,5 +27,12 @@ class TermoConsentimento extends Model
     public function bdo()
     {
     	return $this->belongsTo('App\BdoOportunidade', 'idbdo');
+    }
+
+    public function message()
+    {
+        $message = 'foi criado um novo registro no termo de consentimento, com a id: '.$this->id;
+
+        return isset($this->email) ? 'Novo email e '.$message : $message;
     }
 }

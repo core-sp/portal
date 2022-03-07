@@ -33,13 +33,17 @@
     <div class="row mt-2" id="conteudo-principal">
       <div class="col-lg-8 consulta-linha">
         <div class="row nomargin mb-3">
-          <p class="mb-2 light">Para garantir a transparência e a responsabilidade do <strong>CORE-SP</strong>, para que você continue  recebendo os boletins informativos e as oportunidades que só o <strong>CORE-SP</strong> oferece a você, precisamos do seu consentimento.</p>
-          <p class="light">Li e estou de acordo com o <a href="/termo-consentimento-pdf" target="_blank"><u><strong>TERMO DE CONSENTIMENTO</strong></u></a></p>
+          <p class="mb-2 light">
+            Para garantir a transparência e a responsabilidade do <strong>CORE-SP</strong>, para que você continue  recebendo os boletins informativos e as oportunidades que só o <strong>CORE-SP</strong> oferece a você, precisamos do seu consentimento.
+          </p>
+          <p class="light">
+            Li e estou de acordo com o <a href="{{ route('termo.consentimento.pdf') }}" target="_blank"><u><strong>TERMO DE CONSENTIMENTO</strong></u></a>
+          </p>
         </div>
         <div class="row nomargin consulta">
           @if(session('message'))
           <div class="d-block w-100">
-            <p class="alert {{ Session::get('class') }}">{{session('message')}}</p>
+            <p class="alert {{ session('class') }}">{{ session('message') }}</p>
           </div>
           @else
           <form method="post" class="w-100 simulador">

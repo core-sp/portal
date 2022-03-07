@@ -3,7 +3,6 @@
     @if(isset($resultado))
         @method('PATCH')
     @endif
-    <input type="hidden" name="idusuario" value="{{ Auth::id() }}" />
     <div class="card-body">
         <div class="form-row">
             <div class="col">
@@ -12,14 +11,9 @@
                     class="form-control {{ $errors->has('regional') ? 'is-invalid' : '' }}"
                     placeholder="Regional"
                     name="regional"
-                    @if(!empty(old('regional')))
-                        value="{{ old('regional') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->regional }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('regional')) && isset($resultado->regional) ? $resultado->regional : old('regional') }}"
+                    required
+                />
                 @if($errors->has('regional'))
                 <div class="invalid-feedback">
                 {{ $errors->first('regional') }}
@@ -32,14 +26,9 @@
                     class="form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
                     placeholder="Bairro"
                     name="bairro"
-                    @if(!empty(old('bairro')))
-                        value="{{ old('bairro') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->bairro }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('bairro')) && isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
+                    required
+                />
                 @if($errors->has('bairro'))
                 <div class="invalid-feedback">
                 {{ $errors->first('bairro') }}
@@ -48,18 +37,13 @@
             </div>
             <div class="col">
                 <label for="email">Email</label>
-                <input type="text"
+                <input type="email"
                     class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                     placeholder="Email"
                     name="email"
-                    @if(!empty(old('email')))
-                        value="{{ old('email') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->email }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('email')) && isset($resultado->email) ? $resultado->email : old('email') }}"
+                    required
+                />
                 @if($errors->has('email'))
                 <div class="invalid-feedback">
                 {{ $errors->first('email') }}
@@ -74,14 +58,9 @@
                     class="form-control {{ $errors->has('endereco') ? 'is-invalid' : '' }}"
                     placeholder="Endereço"
                     name="endereco"
-                    @if(!empty(old('endereco')))
-                        value="{{ old('endereco') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->endereco }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('endereco')) && isset($resultado->endereco) ? $resultado->endereco : old('endereco') }}"
+                    required
+                />
                 @if($errors->has('endereco'))
                 <div class="invalid-feedback">
                 {{ $errors->first('endereco') }}
@@ -94,14 +73,9 @@
                     class="form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
                     placeholder="Número"
                     name="numero"
-                    @if(!empty(old('numero')))
-                        value="{{ old('numero') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->numero }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('numero')) && isset($resultado->numero) ? $resultado->numero : old('numero') }}"
+                    required
+                />
                 @if($errors->has('numero'))
                 <div class="invalid-feedback">
                 {{ $errors->first('numero') }}
@@ -114,14 +88,8 @@
                     class="form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
                     placeholder="Complemento"
                     name="complemento"
-                    @if(!empty(old('complemento')))
-                        value="{{ old('complemento') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->complemento }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('complemento')) && isset($resultado->complemento) ? $resultado->complemento : old('complemento') }}"
+                />
                 @if($errors->has('complemento'))
                 <div class="invalid-feedback">
                 {{ $errors->first('complemento') }}
@@ -136,14 +104,9 @@
                     class="form-control cepInput {{ $errors->has('cep') ? 'is-invalid' : '' }}"
                     placeholder="CEP"
                     name="cep"
-                    @if(!empty(old('cep')))
-                        value="{{ old('cep') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->cep }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('cep')) && isset($resultado->cep) ? $resultado->cep : old('cep') }}"
+                    required
+                />
                 @if($errors->has('cep'))
                 <div class="invalid-feedback">
                 {{ $errors->first('cep') }}
@@ -156,14 +119,9 @@
                     class="form-control fixoInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                     placeholder="Telefone"
                     name="telefone"
-                    @if(!empty(old('telefone')))
-                        value="{{ old('telefone') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->telefone }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('telefone')) && isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"
+                    required
+                />
                 @if($errors->has('telefone'))
                 <div class="invalid-feedback">
                 {{ $errors->first('telefone') }}
@@ -176,14 +134,8 @@
                     class="form-control fixoInput {{ $errors->has('fax') ? 'is-invalid' : '' }}"
                     placeholder="Fax"
                     name="fax"
-                    @if(!empty(old('fax')))
-                        value="{{ old('fax') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->fax }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('fax')) && isset($resultado->fax) ? $resultado->fax : old('fax') }}"
+                />
                 @if($errors->has('fax'))
                 <div class="invalid-feedback">
                 {{ $errors->first('fax') }}
@@ -198,14 +150,9 @@
                     class="form-control {{ $errors->has('funcionamento') ? 'is-invalid' : '' }}"
                     placeholder="Descrição do horário de funcionamento"
                     name="funcionamento"
-                    @if(!empty(old('funcionamento')))
-                        value="{{ old('funcionamento') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->funcionamento }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('funcionamento')) && isset($resultado->funcionamento) ? $resultado->funcionamento : old('funcionamento') }}"
+                    required
+                />
                 @if($errors->has('funcionamento'))
                 <div class="invalid-feedback">
                 {{ $errors->first('funcionamento') }}
@@ -218,14 +165,8 @@
                     class="form-control {{ $errors->has('responsavel') ? 'is-invalid' : '' }}"
                     placeholder="Responsável"
                     name="responsavel"
-                    @if(!empty(old('responsavel')))
-                        value="{{ old('responsavel') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->responsavel }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('responsavel')) && isset($resultado->responsavel) ? $resultado->responsavel : old('responsavel') }}"
+                />
                 @if($errors->has('responsavel'))
                 <div class="invalid-feedback">
                 {{ $errors->first('responsavel') }}
@@ -241,14 +182,9 @@
                     placeholder="Nº de agendamentos permitidos por horário"
                     name="ageporhorario"
                     id="ageporhorario"
-                    @if(!empty(old('ageporhorario')))
-                        value="{{ old('ageporhorario') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->ageporhorario }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('ageporhorario')) && isset($resultado->ageporhorario) ? $resultado->ageporhorario : old('ageporhorario') }}"
+                    required
+                />
                 @if($errors->has('ageporhorario'))
                 <div class="invalid-feedback">
                 {{ $errors->first('ageporhorario') }}
@@ -257,13 +193,14 @@
             </div>
             <div class="col">
                 <label for="horariosage">Horários p/ agendamento</label>
-                <select name="horariosage[]" class="form-control" size="4" multiple>
-                    @foreach (todasHoras() as $hora)
-                        @if ($resultado->horariosAge() && in_array($hora, $resultado->horariosAge()))
-                            <option value="{{ $hora }}" selected>{{ $hora }}</option>
-                        @else
-                            <option value="{{ $hora }}">{{ $hora }}</option>
-                        @endif
+                <select 
+                    name="horariosage[]" 
+                    class="form-control" 
+                    size="4" 
+                    multiple
+                >
+                    @foreach(todasHoras() as $hora)
+                    <option value="{{ $hora }}" {{ in_array($hora, $resultado->horariosAge()) ? 'selected' : '' }}>{{ $hora }}</option>
                     @endforeach
                 </select>
                 <small class="form-text text-muted">
@@ -273,10 +210,19 @@
         </div>
         <div class="form-group mt-2">
             <label for="descricao">Descrição da regional</label>
-            <textarea name="descricao"
+            <textarea 
+                name="descricao"
                 class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }} my-editor"
                 id="descricao"
-                rows="10">@if(!empty(old('descricao'))){{ old('descricao') }}@else @if(isset($resultado)){!! $resultado->descricao !!}@endif @endif</textarea>
+                rows="10"
+                required
+            >
+                @if(!empty(old('descricao')))
+                    {{ old('descricao') }}
+                @elseif(isset($resultado->descricao))
+                    {!! $resultado->descricao !!}
+                @endif
+            </textarea>
             @if($errors->has('descricao'))
             <div class="invalid-feedback">
                 {{ $errors->first('descricao') }}
@@ -286,13 +232,9 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            <a href="/admin/regionais" class="btn btn-default">Cancelar</a>
+            <a href="{{ route('regionais.index') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">
-            @if(isset($resultado))
                 Salvar
-            @else
-                Publicar
-            @endif
             </button>
         </div>
     </div>

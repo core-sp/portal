@@ -48,6 +48,7 @@ class SuporteService implements SuporteServiceInterface {
     private function editarConteudoLog($log)
     {
         $array = explode(PHP_EOL, $log);
+        unset($log);
         foreach($array as $key => $value)
         {
             // Ocultar o IP
@@ -131,8 +132,12 @@ class SuporteService implements SuporteServiceInterface {
 
     public function logPorData($data)
     {
+        $headers = [
+            'Content-Type' => 'text/plain; charset=UTF-8',
+            'Content-Disposition' => 'inline; filename="laravel-'.$data.'.log"'
+        ];
         $log = $this->getLog($data);
-        return $this->getLogForBrowser($log);
+        return isset($log) ? response()->stream($this->getLogForBrowser($log), 200, $headers) : null;
     }
 
     public function indexErros()

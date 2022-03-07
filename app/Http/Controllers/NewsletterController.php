@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Repositories\TermoConsentimentoRepository;
 use App\Newsletter;
 use App\Events\ExternoEvent;
 use Response;
 use Redirect;
 use Illuminate\Support\Facades\Validator;
+use App\Contracts\MediadorServiceInterface;
 
 class NewsletterController extends Controller
 {
-    private $termoConsentimentoRepository;
+    private $service;
 
-    public function __construct(TermoConsentimentoRepository $termoConsentimentoRepository)
+    public function __construct(MediadorServiceInterface $service)
     {
-        $this->termoConsentimentoRepository = $termoConsentimentoRepository;
+        $this->service = $service;
     }
 
     public function store(Request $request)
@@ -54,11 +54,13 @@ class NewsletterController extends Controller
         if(!$save)
             abort(500);
 
-        $termo = $this->termoConsentimentoRepository->create(request()->ip(), null, null, $newsletter->idnewsletter, null, null);
+        $termo = $newsletter->termos()->create([
+            'ip' => request()->ip()        
+        ]);
 
         // Gera evento de inscrição na Newsletter
         $string = "*".$newsletter->nome."* (".$newsletter->email.")";
-        $string .= " *registrou-se* na newsletter e foi criado um novo registro no termo de consentimento, com a id: " . $termo->id;
+        $string .= " *registrou-se* na newsletter e ".$termo->message();
         event(new ExternoEvent($string));
 
         // Gera mensagem de agradecimento

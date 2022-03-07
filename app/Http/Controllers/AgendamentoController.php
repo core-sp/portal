@@ -13,9 +13,9 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
-use App\Repositories\RegionalRepository;
 use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoUpdateRequest;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoController extends Controller
@@ -25,7 +25,7 @@ class AgendamentoController extends Controller
     // Nome da classe
     private $class = 'AgendamentoController';
     private $agendamentoRepository;
-    private $regionalRepository;
+    private $service;
     private $userRepository;
 
     // Variáveis para páginas no Admin
@@ -36,11 +36,11 @@ class AgendamentoController extends Controller
         'pluraliza' => 'agendamentos'
     ];
 
-    public function __construct(AgendamentoRepository $agendamentoRepository, RegionalRepository $regionalRepository, UserRepository $userRepository)
+    public function __construct(AgendamentoRepository $agendamentoRepository, MediadorServiceInterface $service, UserRepository $userRepository)
     {
         $this->middleware('auth');
         $this->agendamentoRepository = $agendamentoRepository;
-        $this->regionalRepository = $regionalRepository;
+        $this->service = $service;
         $this->userRepository = $userRepository;
     }
 
@@ -65,7 +65,7 @@ class AgendamentoController extends Controller
         else {
             $temFiltro = null;
             $diaFormatado = date('d\/m\/Y');
-            $regional = $this->regionalRepository->getById(Auth::user()->idregional);
+            $regional = $this->service->getService('Regional')->getById(Auth::user()->idregional);
             $variaveis['continuacao_titulo'] = 'em <strong>' . $regional->regional . ' - ' . $diaFormatado . '</strong>';
 
             $resultados = $this->agendamentoRepository->getToTable($regional->idregional);
@@ -315,7 +315,7 @@ class AgendamentoController extends Controller
 
     public function montaFiltros()
     {
-        $regionais = $this->regionalRepository->getToList();
+        $regionais = $this->service->getService('Regional')->getToList();
 
         $filtro = '<form method="GET" action="/admin/agendamentos/filtro" id="filtroAgendamento" class="mb-0">';
         $filtro .= '<div class="form-row filtroAge">';

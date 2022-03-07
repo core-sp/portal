@@ -2,21 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\TermoConsentimento;
-use App\Repositories\TermoConsentimentoRepository;
-use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
-use Response;
-use Exception;
-use Illuminate\Support\Facades\Request as IlluminateRequest;
+use App\Http\Requests\TermoConsentimentoRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class TermoConsentimentoController extends Controller
 {
-    private $termoConsentimentoRepository;
+    private $service;
 
-    public function __construct(TermoConsentimentoRepository $termoConsentimentoRepository)
+    public function __construct(MediadorServiceInterface $service)
     {
-        $this->termoConsentimentoRepository = $termoConsentimentoRepository;
+        $this->service = $service;
     }
 
     public function termoConsentimentoView()
@@ -24,85 +20,48 @@ class TermoConsentimentoController extends Controller
         return view('site.termo-consentimento');
     }
 
-    public function termoConsentimento(Request $request)
+    public function termoConsentimento(TermoConsentimentoRequest $request)
     {
-        $regras = [
-            'email' => 'required|email|max:191'
-        ];
-        $mensagens = [
-            'required' => 'O campo :attribute é obrigatório',
-            'max' => 'Excedido limite de caracteres',
-            'email' => 'Email inválido'
-        ];
-
-        $errors = $request->validate($regras, $mensagens);
-
-        $ja_existe = $this->termoConsentimentoRepository->getByEmail($request->email);
-
-        if($ja_existe)
-        {
-            return redirect('/termo-de-consentimento')
-                ->with('message', 'E-mail já cadastrado para continuar recebendo nossos informativos.')
-                ->with('class', 'alert-warning');
-        }
-
         try {
-            $save = $this->termoConsentimentoRepository->create(request()->ip(), $request->email, null, null, null, null);
+            $validated = (object) $request->validated();
+            $message = $this->service->getService('TermoConsentimento')->save(request()->ip(), $validated->email);
         } catch(\Exception $e) {
-            abort(500);
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao salvar os dados no Termo de Consentimento.");
         }
-        
-        event(new ExternoEvent("foi criado um novo registro no termo de consentimento, com a id: " . $save->id));
 
-        return redirect('/termo-de-consentimento')
-                ->with('message', 'E-mail cadastrado com sucesso para continuar recebendo nossos informativos.')
-                ->with('class', 'alert-success');
+        return redirect(route('termo.consentimento.view'))->with([
+            'message' => isset($message['message']) ? $message['message'] : 'E-mail cadastrado com sucesso para continuar recebendo nossos informativos.',
+            'class' => isset($message['class']) ? $message['class'] : 'alert-success'
+        ]);
     }
 
     public function termoConsentimentoPdf()
     {
-        return response()->file('arquivos/CORE-SP_Termo_de_consentimento.pdf');
+        try {
+            $file = $this->service->getService('TermoConsentimento')->caminhoFile();
+        } catch(\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar o arquivo do Termo de Consentimento.");
+        }
+
+        return isset($file) ? response()->file($file, ['Cache-Control' => 'no-cache, no-store, must-revalidate']) : redirect()->back();
     }
 
     public function download()
     {
-        if(in_array(auth()->user()->idperfil, ['1', '3']))
-        {
-            $now = date('Ymd');
-            $headers = [
-                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                'Content-type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename=emails-termo_consentimento-'.$now.'.csv',
-                'Expires' => '0',
-                'Pragma' => 'public',
-            ];
-    
-            $lista1 = $this->termoConsentimentoRepository->getListaTermosAceitos();
-            $array;
-    
-            if(!$lista1->isEmpty())
-            {
-                foreach($lista1 as $temp) {
-                    $array[] = $temp->attributesToArray();
-                }
+        abort_if(!in_array(auth()->user()->idperfil, [1, 3]), 403);
         
-                array_unshift($array, array_keys($array[0]));
-                $callback = function() use($array) {
-                    $fh = fopen('php://output','w');
-                    fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
-                    foreach($array as $linha) {
-                        fputcsv($fh,$linha,';');
-                    }
-                    fclose($fh);
-                };
-    
-                return Response::stream($callback, 200, $headers);
-            }
-    
-            return redirect('/admin')
-                ->with('message', 'Não há emails cadastrados na tabela de Termo de Consentimento.')
-                ->with('class', 'alert-warning');
-        }else
-            abort(403);
+        try {
+            $file = $this->service->getService('TermoConsentimento')->download();
+        } catch(\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar a lista do Termo de Consentimento");
+        }
+
+        return isset($file) ? $file : redirect(route('admin'))->with([
+            'message' => 'Não há emails cadastrados na tabela de Termo de Consentimento.',
+            'class' => 'alert-warning'
+        ]);
     }
 }

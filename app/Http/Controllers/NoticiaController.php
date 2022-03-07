@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use App\Events\CrudEvent;
 use App\Http\Requests\NoticiaRequest;
 use App\Repositories\NoticiaRepository;
-use App\Repositories\RegionalRepository;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class NoticiaController extends Controller
@@ -15,15 +15,15 @@ class NoticiaController extends Controller
     private $class = 'NoticiaController';
     private $noticiaModel;
     private $noticiaRepository;
-    private $regionalRepository;
+    private $service;
     private $variaveis;
 
-    public function __construct(Noticia $noticia, NoticiaRepository $noticiaRepository, RegionalRepository $regionalRepository)
+    public function __construct(Noticia $noticia, NoticiaRepository $noticiaRepository, MediadorServiceInterface $service)
     {
         $this->middleware('auth', ['except' => ['show', 'siteGrid']]);
         $this->noticiaModel = $noticia;
         $this->noticiaRepository = $noticiaRepository;
-        $this->regionalRepository = $regionalRepository;
+        $this->service = $service;
         $this->variaveis = $noticia->variaveis();
     }
 
@@ -41,7 +41,7 @@ class NoticiaController extends Controller
     public function create()
     {
         $this->authorize('create', auth()->user());
-        $regionais = $this->regionalRepository->getAsc();
+        $regionais = $this->service->getService('Regional')->all()->sortBy('regional');
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
@@ -75,7 +75,7 @@ class NoticiaController extends Controller
     {
         $this->authorize('updateOther', auth()->user());
         $resultado = Noticia::findOrFail($id);
-        $regionais = $this->regionalRepository->getAsc();
+        $regionais = $this->service->getService('Regional')->all()->sortBy('regional');
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'regionais'));
     }

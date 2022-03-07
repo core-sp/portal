@@ -14,6 +14,7 @@ class RegionalTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         Permissao::insert([
             'controller' => 'RegionalController',
             'metodo' => 'edit',
@@ -43,7 +44,11 @@ class RegionalTest extends TestCase
         $regional = factory('App\Regional')->create();
 
         $this->get(route('regionais.edit', $regional->idregional))->assertForbidden();
-        $this->patch(route('regionais.update', $regional->idregional), $regional->toArray())->assertForbidden();
+
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00'];
+
+        $this->patch(route('regionais.update', $regional->idregional), $dados)->assertForbidden();
     }
 
     /** @test */
@@ -117,8 +122,11 @@ class RegionalTest extends TestCase
         $this->signInAsAdmin();
 
         $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00'];
+        $dados['regional'] = '';
 
-        $this->patch(route('regionais.update', $regional->idregional), ['regional' => ''])
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
             ->assertSessionHasErrors('regional');
         $this->assertEquals(Regional::find($regional->idregional)->regional, $regional->regional);
     }
@@ -129,8 +137,26 @@ class RegionalTest extends TestCase
         $this->signInAsAdmin();
 
         $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00'];
+        $dados['email'] = '';
 
-        $this->patch(route('regionais.update', $regional->idregional), ['email' => ''])
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
+            ->assertSessionHasErrors('email');
+        $this->assertEquals(Regional::find($regional->idregional)->email, $regional->email);
+    }
+
+    /** @test */
+    public function cannot_update_regionais_with_wrong_email()
+    {
+        $this->signInAsAdmin();
+
+        $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00'];
+        $dados['email'] = 'abc@teste;';
+
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
             ->assertSessionHasErrors('email');
         $this->assertEquals(Regional::find($regional->idregional)->email, $regional->email);
     }
@@ -141,8 +167,11 @@ class RegionalTest extends TestCase
         $this->signInAsAdmin();
 
         $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00'];
+        $dados['endereco'] = '';
 
-        $this->patch(route('regionais.update', $regional->idregional), ['endereco' => ''])
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
             ->assertSessionHasErrors('endereco');
         $this->assertEquals(Regional::find($regional->idregional)->endereco, $regional->endereco);
     }
@@ -153,8 +182,11 @@ class RegionalTest extends TestCase
         $this->signInAsAdmin();
 
         $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00'];
+        $dados['bairro'] = '';
 
-        $this->patch(route('regionais.update', $regional->idregional), ['bairro' => ''])
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
             ->assertSessionHasErrors('bairro');
         $this->assertEquals(Regional::find($regional->idregional)->bairro, $regional->bairro);
     }
@@ -165,8 +197,11 @@ class RegionalTest extends TestCase
         $this->signInAsAdmin();
 
         $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00'];
+        $dados['numero'] = '';
 
-        $this->patch(route('regionais.update', $regional->idregional), ['numero' => ''])
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
             ->assertSessionHasErrors('numero');
         $this->assertEquals(Regional::find($regional->idregional)->numero, $regional->numero);
     }
@@ -177,8 +212,11 @@ class RegionalTest extends TestCase
         $this->signInAsAdmin();
 
         $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00'];
+        $dados['cep'] = '';
 
-        $this->patch(route('regionais.update', $regional->idregional), ['cep' => ''])
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
             ->assertSessionHasErrors('cep');
         $this->assertEquals(Regional::find($regional->idregional)->cep, $regional->cep);
     }
@@ -189,10 +227,27 @@ class RegionalTest extends TestCase
         $this->signInAsAdmin();
 
         $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00'];
+        $dados['telefone'] = '';
 
-        $this->patch(route('regionais.update', $regional->idregional), ['telefone' => ''])
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
             ->assertSessionHasErrors('telefone');
         $this->assertEquals(Regional::find($regional->idregional)->telefone, $regional->telefone);
+    }
+
+    /** @test */
+    public function cannot_update_regionais_with_horariosage_not_array()
+    {
+        $this->signInAsAdmin();
+
+        $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = '10:00';
+
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
+            ->assertSessionHasErrors('horariosage');
+        $this->assertEquals(Regional::find($regional->idregional)->horariosage, $regional->horariosage);
     }
 
     /** @test */
@@ -209,7 +264,6 @@ class RegionalTest extends TestCase
     /** @test */
     public function regional_is_shown_on_the_website()
     {
-        $this->withoutExceptionHandling();
         $regional = factory('App\Regional')->create();
 
         $this->get(route('regionais.show', $regional->idregional))
@@ -217,6 +271,16 @@ class RegionalTest extends TestCase
             ->assertSee($regional->regional)
             ->assertSee($regional->endereco)
             ->assertSee($regional->bairro);
+    }
+
+    /** @test */
+    public function link_return_regionais_list_when_regional_is_shown_on_the_website()
+    {
+        $regional = factory('App\Regional')->create();
+
+        $this->get(route('regionais.show', $regional->idregional))
+            ->assertOk()
+            ->assertSee(route('regionais.siteGrid'));
     }
 
     /** @test */
