@@ -219,7 +219,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function listarBloqueios()
     {
-        $bloqueios = PlantaoJuridicoBloqueio::with('plantaoJuridico', 'user')->get();
+        $bloqueios = PlantaoJuridicoBloqueio::with('plantaoJuridico')->paginate(15);
 
         if(auth()->user()->cannot('create', auth()->user()))
             unset($this->variaveis['btn_criar']);
@@ -272,6 +272,13 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
         if(!isset($valid))
         {
+            $dados = [
+                'dataInicial' => $request->dataInicialBloqueio,
+                'dataFinal' => $request->dataFinalBloqueio,
+                'horarios' => implode(',', $request->horariosBloqueio),
+                'idusuario' => auth()->user()->idusuario
+            ];
+
             if(isset($id))
             {
                 $bloqueio = PlantaoJuridicoBloqueio::findOrFail($id);
@@ -282,22 +289,12 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
                         'class' => 'alert-danger'
                     ];
 
-                $bloqueio->update([
-                    'dataInicial' => $request->dataInicialBloqueio,
-                    'dataFinal' => $request->dataFinalBloqueio,
-                    'horarios' => implode(',', $request->horariosBloqueio),
-                    'idusuario' => auth()->user()->idusuario
-                ]);
+                $bloqueio->update($dados);
                 event(new CrudEvent('plantão juridico bloqueio', 'editou', $id));
             }else  
             {
-                $id = PlantaoJuridicoBloqueio::create([
-                    'idplantaojuridico' => $request->plantaoBloqueio,
-                    'dataInicial' => $request->dataInicialBloqueio,
-                    'dataFinal' => $request->dataFinalBloqueio,
-                    'horarios' => implode(',', $request->horariosBloqueio),
-                    'idusuario' => auth()->user()->idusuario
-                ]);
+                $dados['idplantaojuridico'] = $request->plantaoBloqueio;
+                $id = PlantaoJuridicoBloqueio::create($dados);
                 event(new CrudEvent('plantão juridico bloqueio', 'criou', $id));
             }    
         }
@@ -307,7 +304,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function destroy($id)
     {
-        PlantaoJuridicoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('plantão juridico bloqueio', 'excluiu', $id)) : null;
+        return PlantaoJuridicoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('plantão juridico bloqueio', 'excluiu', $id)) : null;
     }
 
     public function plantaoJuridicoAtivo()

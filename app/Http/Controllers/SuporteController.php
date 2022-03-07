@@ -40,16 +40,12 @@ class SuporteController extends Controller
         $this->authorize('onlyAdmin', auth()->user());
         try{
             $log = $this->service->getService('Suporte')->logPorData(date('Y-m-d'));
-            $headers = [
-                'Content-Type' => 'text/plain; charset=UTF-8',
-                'Content-Disposition' => 'inline; filename="laravel-'.date('Y-m-d').'.log"'
-            ];
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao carregar o log do dia de hoje.");
         }
 
-        return isset($log) ? response()->stream($log, 200, $headers) : redirect()->back()->with([
+        return isset($log) ? $log : redirect()->back()->with([
             'message' => '<i class="icon fa fa-ban"></i>Ainda não há log do dia de hoje: '.date('d/m/Y'),
             'class' => 'alert-warning'
         ]);
@@ -78,18 +74,13 @@ class SuporteController extends Controller
         $this->authorize('onlyAdmin', auth()->user());
         try{
             $log = $this->service->getService('Suporte')->logPorData($data);
-            $headers = [
-                'Content-Type' => 'text/plain; charset=UTF-8',
-                'Content-Disposition' => 'inline; filename="laravel-'.$data.'.log"'
-            ];
-            $dataFormatada = onlyDate($data);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao carregar o log da data escolhida.");
         }
 
-        return isset($log) ? response()->stream($log, 200, $headers) : redirect()->back()->with([
-            'message' => '<i class="icon fa fa-ban"></i>Não há log do dia: '.$dataFormatada,
+        return isset($log) ? $log : redirect()->back()->with([
+            'message' => '<i class="icon fa fa-ban"></i>Não há log do dia: '.onlyDate($data),
             'class' => 'alert-warning'
         ]);
     }

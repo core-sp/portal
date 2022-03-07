@@ -73,4 +73,9 @@ class Agendamento extends Model
     {
     	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
+
+    public function termos()
+    {
+        return $this->hasMany('App\TermoConsentimento', 'idagendamento');
+    }
 }

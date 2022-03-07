@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Repositories\BdoEmpresaRepository;
 use App\Repositories\BdoOportunidadeRepository;
-use App\Repositories\RegionalRepository;
 use App\Http\Requests\AnunciarVagaRequest;
 use App\BdoOportunidade;
 use App\Rules\Cnpj;
@@ -12,28 +11,26 @@ use App\BdoEmpresa;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AnunciarVagaMail;
-use App\Repositories\TermoConsentimentoRepository;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class BdoSiteController extends Controller
 {
     private $bdoEmpresaRepository;
     private $bdoOportunidadeRepository;
-    private $regionalRepository;
-    private $termoConsentimentoRepository;
+    private $service;
 
-    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, RegionalRepository $regionalRepository, TermoConsentimentoRepository $termoConsentimentoRepository) 
+    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, MediadorServiceInterface $service) 
     {
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
-        $this->regionalRepository = $regionalRepository;
-        $this->termoConsentimentoRepository = $termoConsentimentoRepository;
+        $this->service = $service;
     }
 
     public function index()
     {
         $oportunidades = $this->bdoOportunidadeRepository->getToBalcaoSite();
-        $regionais = $this->regionalRepository->getRegionais();
+        $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
 
         foreach($oportunidades as $o) {
@@ -50,7 +47,7 @@ class BdoSiteController extends Controller
         $buscaRegional = IlluminateRequest::input('regional') === 'todas' ?  $buscaRegional = '' : ','. IlluminateRequest::input('regional').',';
 
         $oportunidades = $this->bdoOportunidadeRepository->buscagetToBalcaoSite($buscaSegmento, $buscaRegional, $buscaPalavraChave);
-        $regionais = $this->regionalRepository->getRegionais();
+        $regionais = $this->service->getService('Regional')->getRegionais();
         $segmentos = BdoEmpresa::segmentos();
         
         if (count($oportunidades) > 0) {
@@ -67,7 +64,7 @@ class BdoSiteController extends Controller
 
     public function anunciarVagaView()
     {
-        $regionais = $this->regionalRepository->getRegionais();
+        $regionais = $this->service->getService('Regional')->getRegionais();
 
         return view('site.anunciar-vaga', compact('regionais'));
     }
@@ -109,9 +106,11 @@ class BdoSiteController extends Controller
             abort(403);
         }
 
-        $termo = $this->termoConsentimentoRepository->create(request()->ip(), null, null, null, null, $oportunidade->idoportunidade);
+        $termo = $oportunidade->termos()->create([
+            'ip' => request()->ip()
+        ]);
 
-        event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e foi criado um novo registro no termo de consentimento, com a id: ' . $termo->id));
+        event(new ExternoEvent('*' . $empresa->razaosocial . '* (' . $empresa->email . ') solicitou inclusão de oportunidade no Balcão de Oportunidades e '.$termo->message()));
 
         Mail::to(['assessoria.presidencia@core-sp.org.br', 'desenvolvimento@core-sp.org.br'])->queue(new AnunciarVagaMail($oportunidade->idoportunidade));
 

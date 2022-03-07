@@ -12,59 +12,22 @@ class Regional extends Model
 
     protected $table = 'regionais';
     protected $primaryKey = 'idregional';
-    protected $fillable = ['prefixo', 'regional', 'endereco', 'bairro',
-    'numero', 'complemento', 'cep', 'telefone', 'fax', 'email',
-    'funcionamento', 'ageporhorario', 'horariosage', 'responsavel', 'descricao'];
+    protected $guarded = [];
     public $timestamps = false;
 
-    public function user()
+    public function users()
     {
-        return $this->hasMany('App\User', 'idusuario');
+        return $this->hasMany('App\User', 'idregional');
     }
 
-    public function variaveis()
+    public function noticias()
     {
-        return [
-            'singular' => 'regional',
-            'singulariza' => 'a regional',
-            'plural' => 'regionais',
-            'pluraliza' => 'regionais'
-        ];
-    }
-
-    protected function tabelaHeaders()
-    {
-        return ['Código', 'Regional', 'Telefone', 'Email', 'Ações'];
-    }
-
-    protected function tabelaContents($query)
-    {
-        return $query->map(function($row){
-            $acoes = '<a href="'.route('regionais.show', $row->idregional).'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
-            if(auth()->user()->can('updateOther', auth()->user()))
-                $acoes .= '<a href="'.route('regionais.edit', $row->idregional).'" class="btn btn-sm btn-primary">Editar</a>';
-            return [
-                $row->idregional,
-                $row->prefixo.' - '.$row->regional,
-                $row->telefone,
-                $row->email,
-                $acoes
-            ];
-        })->toArray();
-    }
-
-    public function tabelaCompleta($query)
-    {
-        return $this->montaTabela(
-            $this->tabelaHeaders(), 
-            $this->tabelaContents($query),
-            [ 'table', 'table-hover' ]
-        );
+        return $this->hasMany('App\Noticia', 'idregional');
     }
 
     public function horariosAge()
     {
-        if($this->horariosage)
+        if(isset($this->horariosage))
             return explode(',', $this->horariosage);
 
         return [];

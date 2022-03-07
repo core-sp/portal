@@ -11,7 +11,7 @@ use App\Http\Controllers\CursoInscritoController;
 use App\Events\CrudEvent;
 use App\Http\Requests\CursoRequest;
 use App\Repositories\CursoRepository;
-use App\Repositories\RegionalRepository;
+use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class CursoController extends Controller
@@ -19,15 +19,15 @@ class CursoController extends Controller
     private $class = 'CursoController';
     private $cursoModel;
     private $cursoRepository;
-    private $regionalRepository;
+    private $service;
     private $variaveis;
 
-    public function __construct(Curso $curso, CursoRepository $cursoRepository, RegionalRepository $regionalRepository)
+    public function __construct(Curso $curso, CursoRepository $cursoRepository, MediadorServiceInterface $service)
     {
         $this->middleware('auth', ['except' => ['show', 'cursosView']]);
         $this->cursoModel = $curso;
         $this->cursoRepository = $cursoRepository;
-        $this->regionalRepository = $regionalRepository;
+        $this->service = $service;
         $this->variaveis = $curso->variaveis();
     }
 
@@ -46,7 +46,7 @@ class CursoController extends Controller
     {
         $this->authorize('create', auth()->user());
         $variaveis = (object) $this->variaveis;
-        $regionais = $this->regionalRepository->getRegionais();
+        $regionais = $this->service->getService('Regional')->getRegionais();
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
 
@@ -70,7 +70,7 @@ class CursoController extends Controller
     {
         $this->authorize('updateOther', auth()->user());
         $resultado = Curso::with('regional','user')->findOrFail($id);
-        $regionais = $this->regionalRepository->getRegionais();
+        $regionais = $this->service->getService('Regional')->getRegionais();
         $variaveis = (object) $this->variaveis;
         return view('admin.crud.editar', compact('resultado', 'regionais', 'variaveis'));
     }

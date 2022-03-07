@@ -119,7 +119,7 @@
         <div class="float-right">
             <a href="{{ route('plantao.juridico.bloqueios.index') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">
-                {{ isset($resultado) ? 'Editar' : 'Criar' }}
+                {{ isset($resultado) ? 'Salvar' : 'Criar' }}
             </button>
         </div>
     </div>

@@ -193,7 +193,7 @@ class RepresentanteController extends Controller
     public function listarCertidao($assId) 
     {
         try {
-            $responseGetCertidao = $this->gerentiApiRepository->gerentiGetCertidao(($assId));
+            $responseGetCertidao = $this->gerentiApiRepository->gerentiGetCertidao($assId);
         }
         catch (Exception $e) {
             Log::error($e->getTraceAsString());
@@ -201,7 +201,7 @@ class RepresentanteController extends Controller
             abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
         }
 
-        $certidoes = $responseGetCertidao['data'];
+        $certidoes = isset($responseGetCertidao['data']) ? $responseGetCertidao['data'] : [];
 
         array_multisort(array_column($certidoes, 'dataEmissao'), SORT_DESC, array_column($certidoes, 'horaEmissao'), SORT_DESC, $certidoes);
 

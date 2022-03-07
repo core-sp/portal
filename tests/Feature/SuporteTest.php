@@ -67,9 +67,29 @@ class SuporteTest extends TestCase
         $this->signInAsAdmin();
 
         $this->get(route('suporte.log.externo.index'))->assertOk()->assertSeeText('Última atualização');
-        $this->get(route('suporte.log.externo.hoje.view'))->assertOk();
+        $this->get(route('suporte.log.externo.hoje.view'))
+        ->assertHeader('content-disposition', 'inline; filename="laravel-'.date('Y-m-d').'.log"')
+        ->assertHeader('content-type', 'text/plain; charset=UTF-8')
+        ->assertOk();
+
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString('conectou-se à Área do Representante.', $log);
+    }
+
+    /** @test */
+    public function admin_can_view_log_externo_de_other_date()
+    {
+        $this->signInAsAdmin();
+
+        $data = '2022-01-19';
+
+        $this->get(route('suporte.log.externo.busca', ['data' => $data]))->assertOk()
+        ->assertSeeText('Log do dia '.onlyDate($data));
+
+        $this->get(route('suporte.log.externo.view', $data))
+        ->assertHeader('content-disposition', 'inline; filename="laravel-'.$data.'.log"')
+        ->assertHeader('content-type', 'text/plain; charset=UTF-8')
+        ->assertOk();
     }
 
     /** @test */
