@@ -54,4 +54,9 @@ class UserPolicy
     {
         return $user->isAdmin();
     }
+
+    public function atendenteOrGerSeccionais(User $user)
+    {
+        return $user->idperfil == 8 || $user->idperfil == 21;
+    }
 }

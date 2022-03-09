@@ -8,14 +8,14 @@ use Carbon\Carbon;
 
 class AgendamentoRepository 
 {
-    public function getToTable($idregional)
-    {
-        return Agendamento::where('dia','=', date('Y-m-d'))
-            ->where('idregional', $idregional)
-            ->orderBy('dia', 'ASC')
-            ->orderBy('hora', 'ASC')
-            ->paginate(25);
-    }
+    // public function getToTable($idregional)
+    // {
+    //     return Agendamento::where('dia','=', date('Y-m-d'))
+    //         ->where('idregional', $idregional)
+    //         ->orderBy('dia', 'ASC')
+    //         ->orderBy('hora', 'ASC')
+    //         ->paginate(25);
+    // }
 
     public function store($dados)
     {

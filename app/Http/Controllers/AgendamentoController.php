@@ -44,37 +44,48 @@ class AgendamentoController extends Controller
         $this->userRepository = $userRepository;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', auth()->user());
 
-        $variaveis = $this->agendamentoVariaveis;
-
-        // Checa se tem filtro
-        if(IlluminateRequest::input('filtro') === 'sim') {
-            $temFiltro = true;
-
-            $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
-
-            $resultados = $this->checaAplicaFiltros();
-
-            if($resultados instanceof RedirectResponse) {
-                return $resultados;
-            }
-        } 
-        else {
-            $temFiltro = null;
-            $diaFormatado = date('d\/m\/Y');
-            $regional = $this->service->getService('Regional')->getById(Auth::user()->idregional);
-            $variaveis['continuacao_titulo'] = 'em <strong>' . $regional->regional . ' - ' . $diaFormatado . '</strong>';
-
-            $resultados = $this->agendamentoRepository->getToTable($regional->idregional);
+        try{
+            $dados = $this->service->getService('Agendamento')->index($request, $this->service);
+            $temFiltro = $dados['temFiltro'];
+            $variaveis = $dados['variaveis'];
+            $tabela = $dados['tabela'];
+            $resultados = $dados['resultados'];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar os agendamentos.");
         }
-        // Monta tabela com resultados
-        $tabela = $this->tabelaCompleta($resultados);
-        $variaveis['filtro'] = $this->montaFiltros();
-        $variaveis['mostraFiltros'] = true;
-        $variaveis = (object) $variaveis;
+
+        // $variaveis = $this->agendamentoVariaveis;
+
+        // // Checa se tem filtro
+        // if(IlluminateRequest::input('filtro') === 'sim') {
+        //     $temFiltro = true;
+
+        //     $variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
+
+        //     $resultados = $this->checaAplicaFiltros();
+
+        //     if($resultados instanceof RedirectResponse) {
+        //         return $resultados;
+        //     }
+        // } 
+        // else {
+        //     $temFiltro = null;
+        //     $diaFormatado = date('d\/m\/Y');
+        //     $regional = $this->service->getService('Regional')->getById(Auth::user()->idregional);
+        //     $variaveis['continuacao_titulo'] = 'em <strong>' . $regional->regional . ' - ' . $diaFormatado . '</strong>';
+
+        //     $resultados = $this->agendamentoRepository->getToTable($regional->idregional);
+        // }
+        // // Monta tabela com resultados
+        // $tabela = $this->tabelaCompleta($resultados);
+        // $variaveis['filtro'] = $this->montaFiltros();
+        // $variaveis['mostraFiltros'] = true;
+        // $variaveis = (object) $variaveis;
 
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
@@ -245,210 +256,210 @@ class AgendamentoController extends Controller
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
-    public function checaAplicaFiltros()
-    {
-        $this->authorize('viewAny', auth()->user());
+    // public function checaAplicaFiltros()
+    // {
+    //     $this->authorize('viewAny', auth()->user());
 
-        // Valores default dos filtros
-        $mindia = date('Y-m-d');
-        $maxdia = date('Y-m-d');
-        $regional = '';
-        $status = '';
-        $servico = '';
+    //     // Valores default dos filtros
+    //     $mindia = date('Y-m-d');
+    //     $maxdia = date('Y-m-d');
+    //     $regional = '';
+    //     $status = '';
+    //     $servico = '';
 
-        // Valida e prepara filtro de data mínima
-        if(IlluminateRequest::has('mindia')) {
-            if(!empty(IlluminateRequest::input('mindia'))) {
-                $mindiaArray = explode('/', IlluminateRequest::input('mindia'));
-                $checaMindia = (count($mindiaArray) != 3 || $mindiaArray[2] == null)  ? false : checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
+    //     // Valida e prepara filtro de data mínima
+    //     if(IlluminateRequest::has('mindia')) {
+    //         if(!empty(IlluminateRequest::input('mindia'))) {
+    //             $mindiaArray = explode('/', IlluminateRequest::input('mindia'));
+    //             $checaMindia = (count($mindiaArray) != 3 || $mindiaArray[2] == null)  ? false : checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
 
-                if($checaMindia === false) {
-                    return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
-                        ->with('class', 'alert-danger');
-                }
+    //             if($checaMindia === false) {
+    //                 return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de início do filtro inválida')
+    //                     ->with('class', 'alert-danger');
+    //             }
 
-                $mindia = date('Y-m-d', strtotime(str_replace('/', '-', IlluminateRequest::input('mindia'))));
-            }
-        } 
+    //             $mindia = date('Y-m-d', strtotime(str_replace('/', '-', IlluminateRequest::input('mindia'))));
+    //         }
+    //     } 
 
-        // Valida e prepara filtro de data máxima
-        if(IlluminateRequest::has('maxdia')) {
-            if(!empty(IlluminateRequest::input('maxdia'))) {
-                $maxdiaArray = explode('/', IlluminateRequest::input('maxdia'));
-                $checaMaxdia = (count($maxdiaArray) != 3 || $maxdiaArray[2] == null)  ? false : checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
+    //     // Valida e prepara filtro de data máxima
+    //     if(IlluminateRequest::has('maxdia')) {
+    //         if(!empty(IlluminateRequest::input('maxdia'))) {
+    //             $maxdiaArray = explode('/', IlluminateRequest::input('maxdia'));
+    //             $checaMaxdia = (count($maxdiaArray) != 3 || $maxdiaArray[2] == null)  ? false : checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
 
-                if($checaMaxdia === false) {
-                    return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
-                        ->with('class', 'alert-danger');
-                }
+    //             if($checaMaxdia === false) {
+    //                 return redirect()->back()->with('message', '<i class="icon fa fa-ban"></i>Data de término do filtro inválida')
+    //                     ->with('class', 'alert-danger');
+    //             }
 
-                $maxdia = date('Y-m-d', strtotime(str_replace('/', '-', IlluminateRequest::input('maxdia'))));
-            }         
-        } 
+    //             $maxdia = date('Y-m-d', strtotime(str_replace('/', '-', IlluminateRequest::input('maxdia'))));
+    //         }         
+    //     } 
 
-        // Valida e prepara filtro de regional
-        if(IlluminateRequest::has('regional')) {
-            if(!empty(IlluminateRequest::input('regional'))) {
-                $regional = IlluminateRequest::input('regional');
-            }
-        }
-        else {
-            $regional = Auth::user()->idregional;
-        }
+    //     // Valida e prepara filtro de regional
+    //     if(IlluminateRequest::has('regional')) {
+    //         if(!empty(IlluminateRequest::input('regional'))) {
+    //             $regional = IlluminateRequest::input('regional');
+    //         }
+    //     }
+    //     else {
+    //         $regional = Auth::user()->idregional;
+    //     }
 
-        // Valida e prepara filtro de status
-        if(IlluminateRequest::has('status')) {
-            if(!empty(IlluminateRequest::input('status')) && IlluminateRequest::input('status') !== 'Qualquer') {
-                $status = IlluminateRequest::input('status');
-            }
-        } 
+    //     // Valida e prepara filtro de status
+    //     if(IlluminateRequest::has('status')) {
+    //         if(!empty(IlluminateRequest::input('status')) && IlluminateRequest::input('status') !== 'Qualquer') {
+    //             $status = IlluminateRequest::input('status');
+    //         }
+    //     } 
 
-        // Valida e prepara filtro de serviço
-        if(IlluminateRequest::has('servico')) {
-            if(!empty(IlluminateRequest::input('servico')) && IlluminateRequest::input('servico') !== 'Qualquer') {
-                $servico = IlluminateRequest::input('servico');
-            }
-        } 
+    //     // Valida e prepara filtro de serviço
+    //     if(IlluminateRequest::has('servico')) {
+    //         if(!empty(IlluminateRequest::input('servico')) && IlluminateRequest::input('servico') !== 'Qualquer') {
+    //             $servico = IlluminateRequest::input('servico');
+    //         }
+    //     } 
 
-        return $this->agendamentoRepository->getToTableFilter($mindia, $maxdia, $regional, $status, $servico);
-    }
+    //     return $this->agendamentoRepository->getToTableFilter($mindia, $maxdia, $regional, $status, $servico);
+    // }
 
-    public function montaFiltros()
-    {
-        $regionais = $this->service->getService('Regional')->getToList();
+    // public function montaFiltros()
+    // {
+    //     $regionais = $this->service->getService('Regional')->getToList();
 
-        $filtro = '<form method="GET" action="/admin/agendamentos/filtro" id="filtroAgendamento" class="mb-0">';
-        $filtro .= '<div class="form-row filtroAge">';
-        $filtro .= '<input type="hidden" name="filtro" value="sim" />';
+    //     $filtro = '<form method="GET" action="/admin/agendamentos/filtro" id="filtroAgendamento" class="mb-0">';
+    //     $filtro .= '<div class="form-row filtroAge">';
+    //     $filtro .= '<input type="hidden" name="filtro" value="sim" />';
 
-        // Montando filtro de regional. "Atendente" e "Gerente Seccionais" não podem usar este filtro.
-        if(!$this->limitaPorRegional()) {
-            $filtro .= '<div class="form-group mb-0 col">';
-            $filtro .= '<label>Seccional</label>';
-            $filtro .= '<select class="custom-select custom-select-sm mr-2" id="regional" name="regional">';
+    //     // Montando filtro de regional. "Atendente" e "Gerente Seccionais" não podem usar este filtro.
+    //     if(!$this->limitaPorRegional()) {
+    //         $filtro .= '<div class="form-group mb-0 col">';
+    //         $filtro .= '<label>Seccional</label>';
+    //         $filtro .= '<select class="custom-select custom-select-sm mr-2" id="regional" name="regional">';
             
-            if(IlluminateRequest::input('regional') === '') {
-                $select .= '<option value="" selected>Todas</option>';
-            } 
-            else {
-                $filtro .= '<option value="">Todas</option>';
-            }
+    //         if(IlluminateRequest::input('regional') === '') {
+    //             $select .= '<option value="" selected>Todas</option>';
+    //         } 
+    //         else {
+    //             $filtro .= '<option value="">Todas</option>';
+    //         }
 
-            foreach($regionais as $regional) {
-                if(IlluminateRequest::has('regional')) {
-                    if($regional->idregional == IlluminateRequest::input('regional')) {
-                        $filtro .= '<option value="' . $regional->idregional . '" selected>' . $regional->regional . '</option>';
-                    } 
-                    else {
-                        $filtro .= '<option value="' . $regional->idregional . '">' . $regional->regional . '</option>';
-                    }
-                } 
-                else {
-                    $filtro .= '<option value="' . $regional->idregional . '">' . $regional->regional . '</option>';
-                }
-            }
+    //         foreach($regionais as $regional) {
+    //             if(IlluminateRequest::has('regional')) {
+    //                 if($regional->idregional == IlluminateRequest::input('regional')) {
+    //                     $filtro .= '<option value="' . $regional->idregional . '" selected>' . $regional->regional . '</option>';
+    //                 } 
+    //                 else {
+    //                     $filtro .= '<option value="' . $regional->idregional . '">' . $regional->regional . '</option>';
+    //                 }
+    //             } 
+    //             else {
+    //                 $filtro .= '<option value="' . $regional->idregional . '">' . $regional->regional . '</option>';
+    //             }
+    //         }
 
-            $filtro .= '</select>';
-            $filtro .= '</div>';
-        }
+    //         $filtro .= '</select>';
+    //         $filtro .= '</div>';
+    //     }
 
-        $filtro .= '<div class="form-group mb-0 col">';
-        $filtro .= '<label>Status</label>';
-        $filtro .= '<select class="custom-select custom-select-sm" name="status">';
+    //     $filtro .= '<div class="form-group mb-0 col">';
+    //     $filtro .= '<label>Status</label>';
+    //     $filtro .= '<select class="custom-select custom-select-sm" name="status">';
         
-        // Montando filtro de status
-        if(IlluminateRequest::input('status') === 'Qualquer') {
-            $filtro .= '<option value="Qualquer" selected>Qualquer</option>';
-        }
+    //     // Montando filtro de status
+    //     if(IlluminateRequest::input('status') === 'Qualquer') {
+    //         $filtro .= '<option value="Qualquer" selected>Qualquer</option>';
+    //     }
            
-        else {
-            $filtro .= '<option value="Qualquer">Qualquer</option>';
-        }
+    //     else {
+    //         $filtro .= '<option value="Qualquer">Qualquer</option>';
+    //     }
         
-        $status = Agendamento::status();
+    //     $status = Agendamento::status();
 
-        foreach($status as $s) {
-            if(IlluminateRequest::has('status')) {
-                if(IlluminateRequest::input('status') === $s) {
-                    $filtro .= '<option value="' . $s . '" selected>' . $s . '</option>';
-                } else {
-                    $filtro .= '<option value="' . $s . '">' . $s . '</option>';
-                }
-            } else {
-                $filtro .= '<option value="' . $s . '">' . $s . '</option>';
-            }
-        }
+    //     foreach($status as $s) {
+    //         if(IlluminateRequest::has('status')) {
+    //             if(IlluminateRequest::input('status') === $s) {
+    //                 $filtro .= '<option value="' . $s . '" selected>' . $s . '</option>';
+    //             } else {
+    //                 $filtro .= '<option value="' . $s . '">' . $s . '</option>';
+    //             }
+    //         } else {
+    //             $filtro .= '<option value="' . $s . '">' . $s . '</option>';
+    //         }
+    //     }
 
-        $filtro .= '</select>';
-        $filtro .= '</div>';
+    //     $filtro .= '</select>';
+    //     $filtro .= '</div>';
 
-        // Montando filtro de serviço
-        $filtro .= '<div class="form-group mb-0 col">';
-        $filtro .= '<label>Serviço</label>';
-        $filtro .= '<select class="custom-select custom-select-sm" name="servico">';
+    //     // Montando filtro de serviço
+    //     $filtro .= '<div class="form-group mb-0 col">';
+    //     $filtro .= '<label>Serviço</label>';
+    //     $filtro .= '<select class="custom-select custom-select-sm" name="servico">';
         
-        if(IlluminateRequest::input('servico') === 'Qualquer') {
-            $filtro .= '<option value="Qualquer" selected>Qualquer</option>';
-        }
+    //     if(IlluminateRequest::input('servico') === 'Qualquer') {
+    //         $filtro .= '<option value="Qualquer" selected>Qualquer</option>';
+    //     }
            
-        else {
-            $filtro .= '<option value="Qualquer">Qualquer</option>';
-        }
+    //     else {
+    //         $filtro .= '<option value="Qualquer">Qualquer</option>';
+    //     }
         
-        $servicos = Agendamento::servicosCompletos();
+    //     $servicos = Agendamento::servicosCompletos();
 
-        foreach($servicos as $s) {
-            if(IlluminateRequest::has('servico')) {
-                if(IlluminateRequest::input('servico') === $s) {
-                    $filtro .= '<option value="' . $s . '" selected>' . $s . '</option>';
-                } else {
-                    $filtro .= '<option value="' . $s . '">' . $s . '</option>';
-                }
-            } else {
-                $filtro .= '<option value="' . $s . '">' . $s . '</option>';
-            }
-        }
+    //     foreach($servicos as $s) {
+    //         if(IlluminateRequest::has('servico')) {
+    //             if(IlluminateRequest::input('servico') === $s) {
+    //                 $filtro .= '<option value="' . $s . '" selected>' . $s . '</option>';
+    //             } else {
+    //                 $filtro .= '<option value="' . $s . '">' . $s . '</option>';
+    //             }
+    //         } else {
+    //             $filtro .= '<option value="' . $s . '">' . $s . '</option>';
+    //         }
+    //     }
 
-        $filtro .= '</select>';
-        $filtro .= '</div>';
+    //     $filtro .= '</select>';
+    //     $filtro .= '</div>';
 
-        $filtro .= '<div class="form-group mb-0 col">';
+    //     $filtro .= '<div class="form-group mb-0 col">';
 
-        $hoje = date('d\/m\/Y');
+    //     $hoje = date('d\/m\/Y');
 
-        $filtro .= '<label>De</label>';
+    //     $filtro .= '<label>De</label>';
        
-        // Montando filtro de data mínima
-        if(IlluminateRequest::has('mindia')) {
-            $mindia = IlluminateRequest::input('mindia');
-            $filtro .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="' . $mindia . '" />';
-        } 
-        else {
-            $filtro .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="' . $hoje . '" />';
-        }
+    //     // Montando filtro de data mínima
+    //     if(IlluminateRequest::has('mindia')) {
+    //         $mindia = IlluminateRequest::input('mindia');
+    //         $filtro .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="' . $mindia . '" />';
+    //     } 
+    //     else {
+    //         $filtro .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" placeholder="dd/mm/aaaa" value="' . $hoje . '" />';
+    //     }
 
-        $filtro .= '</div>';
-        $filtro .= '<div class="form-group mb-0 col">';
-        $filtro .= '<label>Até</label>';
+    //     $filtro .= '</div>';
+    //     $filtro .= '<div class="form-group mb-0 col">';
+    //     $filtro .= '<label>Até</label>';
         
-        // Montando filtro de data máxima
-        if(IlluminateRequest::has('maxdia')) {
-            $maxdia = IlluminateRequest::input('maxdia');
-            $filtro .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="' . $maxdia . '" />';
-        } 
-        else {
-            $filtro .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="' . $hoje . '" />';
-        }
+    //     // Montando filtro de data máxima
+    //     if(IlluminateRequest::has('maxdia')) {
+    //         $maxdia = IlluminateRequest::input('maxdia');
+    //         $filtro .= '<input type="text" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="' . $maxdia . '" />';
+    //     } 
+    //     else {
+    //         $filtro .= '<input type="test" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" placeholder="dd/mm/aaaa" value="' . $hoje . '" />';
+    //     }
 
-        $filtro .= '</div>';
-        $filtro .= '<div class="form-group mb-0 col-auto align-self-end">';
-        $filtro .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
-        $filtro .= '</div>';
-        $filtro .= '</div>';
-        $filtro .= '</form>';
+    //     $filtro .= '</div>';
+    //     $filtro .= '<div class="form-group mb-0 col-auto align-self-end">';
+    //     $filtro .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
+    //     $filtro .= '</div>';
+    //     $filtro .= '</div>';
+    //     $filtro .= '</form>';
 
-        return $filtro;
-    }
+    //     return $filtro;
+    // }
 
     public function mensagemAgendamento($dia, $hora, $status, $protocolo, $id)
     {

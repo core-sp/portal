@@ -11,23 +11,19 @@ class Agendamento extends Model
 
     protected $primaryKey = 'idagendamento';
     protected $table = 'agendamentos';
-    protected $fillable = ['nome', 'cpf', 'email', 'celular', 'dia', 'hora', 'protocolo', 'tiposervico', 'idregional', 'idusuario', 'status'];
-    protected $with = ['user', 'regional'];
+    protected $guarded = [];
 
-    // Status de agendamento
     const STATUS_COMPARECEU = "Compareceu";
     const STATUS_NAO_COMPARECEU = "Não Compareceu";
     const STATUS_CANCELADO = "Cancelado";
 
-    // Serviços no agendamento
     const SERVICOS_ATUALIZACAO_DE_CADASTRO = "Atualização de Cadastro";
     const SERVICOS_CANCELAMENTO_DE_REGISTRO = "Cancelamento de Registro";
     const SERVICOS_PLANTAO_JURIDICO = "Plantão Jurídico";
-    // const SERVICOS_REFIS = "Refis";
+    const SERVICOS_REFIS = "Refis";
     const SERVICOS_REGISTRO_INICIAL = "Registro Inicial";
     const SERVICOS_OUTROS = "Outros";
 
-    // Array de tipos de pessoas
     const TIPOS_PESSOA = ['Pessoa Física' => 'PF', 'Pessoa Jurídica' => 'PJ', 'Ambas' => 'PF e PJ'];
 
     public static function status()
