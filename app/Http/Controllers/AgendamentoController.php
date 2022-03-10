@@ -44,6 +44,7 @@ class AgendamentoController extends Controller
         $this->userRepository = $userRepository;
     }
 
+    // OK
     public function index(Request $request)
     {
         $this->authorize('viewAny', auth()->user());
@@ -87,7 +88,7 @@ class AgendamentoController extends Controller
         // $variaveis['mostraFiltros'] = true;
         // $variaveis = (object) $variaveis;
 
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
+        return !isset($dados['erro']['message']) ? view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro')) : redirect()->back()->with($dados['erro']);
     }
 
     public function updateStatus(Request $request)
@@ -132,22 +133,34 @@ class AgendamentoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function busca()
+    // OK
+    public function busca(Request $request)
     {
         $this->authorize('viewAny', auth()->user());
 
-        $busca = IlluminateRequest::input('q');
+        try{
+            $busca = $request->q;
+            $dados = $this->service->getService('Agendamento')->buscar($busca);
+            $resultados = $dados['resultados'];
+            $tabela = $dados['tabela'];
+            $variaveis = $dados['variaveis'];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao buscar o texto em agendamentos.");
+        }
+
+        // $busca = IlluminateRequest::input('q');
     
-        // "Atendente" e "Gerente Seccionais" devem visualizar apenas agendamentos de sua respectiva regional.
-        if(!$this->limitaPorRegional()) {
-            $resultados = $this->agendamentoRepository->getToBusca($busca);
-        }
-        else {
-            $resultados = $this->agendamentoRepository->getToBuscaByRegional($busca, Auth::user()->idregional);
-        }
+        // // "Atendente" e "Gerente Seccionais" devem visualizar apenas agendamentos de sua respectiva regional.
+        // if(!$this->limitaPorRegional()) {
+        //     $resultados = $this->agendamentoRepository->getToBusca($busca);
+        // }
+        // else {
+        //     $resultados = $this->agendamentoRepository->getToBuscaByRegional($busca, Auth::user()->idregional);
+        // }
         
-        $tabela = $this->tabelaCompleta($resultados);
-        $variaveis = (object) $this->agendamentoVariaveis;
+        // $tabela = $this->tabelaCompleta($resultados);
+        // $variaveis = (object) $this->agendamentoVariaveis;
 
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
@@ -155,6 +168,17 @@ class AgendamentoController extends Controller
     public function edit($id)
     {
         $this->authorize('updateOther', auth()->user());
+        $this->service->getService('Agendamento')->view($id);
+        // try{
+        //     $busca = $request->q;
+        //     $dados = $this->service->getService('Agendamento')->buscar($busca);
+        //     $resultados = $dados['resultados'];
+        //     $tabela = $dados['tabela'];
+        //     $variaveis = $dados['variaveis'];
+        // } catch (\Exception $e) {
+        //     \Log::error($e->getMessage());
+        //     abort(500, "Erro ao buscar o texto em agendamentos.");
+        // }
 
         $resultado = $this->agendamentoRepository->getById($id);
 

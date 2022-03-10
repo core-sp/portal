@@ -658,28 +658,7 @@ function getDatasPorRegionalPlantaJuridico()
 				$(this).css('background-color','#FFFFFF');
 			}
 		});
-		// Muda Status agendamento no ADMIN
-		// $('#btnSubmit').on('click', function(e){
-		// 	e.preventDefault();
-		// 	e.stopImmediatePropagation();
-		// 	$.ajax({
-		// 		url: $(this).attr('action'),
-		// 		method: "POST",
-		// 		data: {
-		// 			"_method": $('#method').val(),
-		// 			"_token": $('#tokenStatusAgendamento').val(),
-		// 			"idagendamento": $('#idagendamento').val(),
-		// 			"status": $('#status').val()
-		// 		},
-		// 		dataType: "html",
-		// 		success: function(response) {
-		// 			console.log(response);
-		// 		},
-		// 		error: function (jXHR, textStatus, errorThrown) {
-		// 			alert(errorThrown);
-		// 		}
-		// 	});
-		// });
+	
 		// Switch para máscaras de contato Gerenti
 		function switchMascaras(conteudo, id)
 		{

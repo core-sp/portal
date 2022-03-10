@@ -40,6 +40,58 @@ function montaTabela($headers, $contents, $classes = null)
     return $table;
 }
 
+function getFiltroOptions($value, $texto, $selected = false)
+{
+    $opcao = $selected ? 'selected' : '';
+    return '<option value="'.$value.'" '.$opcao.'>'.$texto.'</option>';
+}
+
+function getFiltroCamposSelect($label, $atributoNameId, $options)
+{
+    $filtro = '<div class="form-group mb-0 col">';
+    $filtro .= '<label>'.$label.'</label>';
+    $filtro .= '<select class="custom-select custom-select-sm" id="'.$atributoNameId.'" name="'.$atributoNameId.'">';
+    $filtro .= $options;
+    $filtro .= '</select>';
+    $filtro .= '</div>';
+
+    return $filtro;
+}
+
+function getFiltroCamposDate($mindia, $maxdia)
+{
+    $filtro = '<div class="form-group mb-0 col">';
+    $filtro .= '<label>De</label>';
+    $textoData = '<input type="date" class="form-control d-inline-block form-control-sm" name="datemin" id="datemin" value="';
+    $filtro .= isset($mindia) ? $textoData.$mindia.'" />' : $textoData.date('Y-m-d').'" />';
+    $filtro .= '</div>';
+
+    $filtro .= '<div class="form-group mb-0 col">';
+    $filtro .= '<label>Até</label>';
+    $textoData = '<input type="date" class="form-control d-inline-block form-control-sm" name="datemax" id="datemax" value="';
+    $filtro .= isset($maxdia) ? $textoData.$maxdia.'" />' : $textoData.date('Y-m-d').'" />';
+    $filtro .= '</div>';
+
+    return $filtro;
+}
+
+function getFiltro($action, $filtrosCampos, $idform = 'filtroDate')
+{
+    $filtro = '<form method="GET" action="'.$action.'" id="'.$idform.'" class="mb-0">';
+    $filtro .= '<div class="form-row filtroAge">';
+    $filtro .= '<input type="hidden" name="filtro" value="sim" />';
+
+    $filtro .= $filtrosCampos;
+
+    $filtro .= '<div class="form-group mb-0 col-auto align-self-end">';
+    $filtro .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
+    $filtro .= '</div>';
+    $filtro .= '</div>';
+    $filtro .= '</form>';
+
+    return $filtro;
+}
+
 function badgeConsulta($situacao)
 {
     switch ($situacao) {

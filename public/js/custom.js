@@ -125,7 +125,8 @@ $(document).ready(function(){
   // Draggable
   $("#sortable").sortable();
   $( "#sortable" ).disableSelection();
-  // Regra de data no filtro de agendamento
+
+  // Regra de data no filtro de agendamento +++ Será removido depois de refatorar todos que o utilizam 
   $('#filtroAgendamento').submit(function(e){
     var maxDataFiltro = $('#maxdiaFiltro').val().split('/');
     var maxdiaFiltro = new Date(maxDataFiltro[2], maxDataFiltro[1] - 1, maxDataFiltro[0]);
@@ -148,6 +149,7 @@ $(document).ready(function(){
     });
   });
 
+  // Será removido após refatorar a Cédula
   $('#filtroCedula').submit(function(e){
     var maxDataFiltro = $('#datemax').val();
     var minDataFiltro = $('#datemin').val();
@@ -157,6 +159,16 @@ $(document).ready(function(){
     }
     if(!minDataFiltro || !maxDataFiltro) {
       alert('Selecione data de início e término.');
+      e.preventDefault();
+    }
+  });
+
+  $('#filtroDate').submit(function(e){
+    var maxDataFiltro = $('#datemax').val();
+    var minDataFiltro = $('#datemin').val();
+    if(new Date(minDataFiltro) > new Date(maxDataFiltro)) {
+      alert('Data inválida. A data inicial deve ser menor ou igual a data de término.');
+      $('#datemin').focus();
       e.preventDefault();
     }
   });

@@ -57,7 +57,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
     private function getBtnByStatus($resultado)
     {
         $default = '<form method="POST" id="statusAgendamento" action="'.route('agendamentos.updateStatus').'" class="d-inline">';
-        $default .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="'.csrf_token().'" />';
+        $default .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
         $default .= '<input type="hidden" name="_method" value="PUT" id="method" />';
         $default .= '<input type="hidden" name="idagendamento" value="'.$resultado->idagendamento.'" />';
         $default .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="'.Agendamento::STATUS_COMPARECEU.'">Confirmar</button>';
@@ -73,150 +73,89 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return isset($tiposStatus[$resultado->status]) ? $tiposStatus[$resultado->status] : $default;
     }
 
-    private function confereFiltroAtivo($request)
+    private function validacaoFiltroAtivo($request)
     {
-        $mindia = Carbon::today();
-        $maxdia = Carbon::today();
+        $canFiltroRegional = auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user());
+        $datemin = $request->filled('datemin') ? Carbon::parse($request->datemin) : Carbon::today();
+        $datemax = $request->filled('datemax') ? Carbon::parse($request->datemax) : Carbon::today();
 
-        $mindiaArray = explode('/', $request->mindia);
-        $checaMindia = (count($mindiaArray) != 3 || $mindiaArray[2] == null)  ? false : checkdate($mindiaArray[1], $mindiaArray[0], $mindiaArray[2]);
-        if(!$checaMindia) 
+        if($datemax->lt($datemin))
             return [
-                'message' => '<i class="icon fa fa-ban"></i>Data de início do filtro inválida',
+                'message' => '<i class="icon fa fa-ban"></i>Data final deve ser maior ou igual a data inicial',
                 'class' => 'alert-danger'
             ];
-
-        $mindia = date('Y-m-d', strtotime(str_replace('/', '-', $request->mindia)));
-
-        $maxdiaArray = explode('/', $request->maxdia);
-        $checaMaxdia = (count($maxdiaArray) != 3 || $maxdiaArray[2] == null)  ? false : checkdate($maxdiaArray[1], $maxdiaArray[0], $maxdiaArray[2]);
-        if(!$checaMaxdia) 
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Data de término do filtro inválida',
-                'class' => 'alert-danger'
-            ];
-
-        $maxdia = date('Y-m-d', strtotime(str_replace('/', '-', $request->maxdia)));
-
-        $regional = isset($request->regional) ? $request->regional : auth()->user()->idregional;
-        $status = isset($request->status) && ($request->status != 'Qualquer') ? $request->status : null;
-        $servico = isset($request->servico) && ($request->servico != 'Qualquer') ? $request->servico : null;
 
         return [
-            'mindia' => $mindia,
-            'maxdia' => $maxdia,
-            'regional' => $regional,
-            'status' => $status,
-            'servico' => $servico 
+            'datemin' => $datemin->format('Y-m-d'),
+            'datemax' => $datemax->format('Y-m-d'),
+            'regional' => $request->has('regional') && $canFiltroRegional ? $request->regional : auth()->user()->idregional,
+            'status' => $request->filled('status') && ($request->status != 'Qualquer') ? $request->status : null,
+            'servico' => $request->filled('servico') && ($request->servico != 'Qualquer') ? $request->servico : null
         ];
     }
 
     private function filtro($request, MediadorServiceInterface $service)
     {
+        $filtro = '';
+        $temFiltro = null;
+        $this->variaveis['continuacao_titulo'] = 'em <strong>'.auth()->user()->regional->regional.' - '.date('d\/m\/Y').'</strong>';
+
         if($request->filled('filtro') && ($request->filtro == 'sim'))
         {
             $temFiltro = true;
             $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
-        } else
-        {
-            $temFiltro = null;
-            $this->variaveis['continuacao_titulo'] = 'em <strong>'.auth()->user()->regional->regional.' - '.date('d\/m\/Y').'</strong>';
         }
-
-        $filtro = '<form method="GET" action="'.route('agendamentos.filtro').'" id="filtroAgendamento" class="mb-0">';
-        $filtro .= '<div class="form-row filtroAge">';
-        $filtro .= '<input type="hidden" name="filtro" value="sim" />';
 
         if(auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user()))
         {
             $regionais = $service->getService('Regional')->all();
-
-            $filtro .= '<div class="form-group mb-0 col">';
-            $filtro .= '<label>Seccional</label>';
-            $filtro .= '<select class="custom-select custom-select-sm mr-2" id="regional" name="regional">';
-            $filtro .= !isset($request->regional) ? '<option value="" selected>Todas</option>' : '<option value="">Todas</option>';
+            $options = !isset($request->regional) ? 
+            getFiltroOptions('', 'Todas', true) : getFiltroOptions('', 'Todas');
 
             foreach($regionais as $regional)
-                $filtro .= isset($request->regional) && ($request->regional == $regional->idregional) ? 
-                '<option value="'.$regional->idregional.'" selected>'.$regional->regional.'</option>' :
-                '<option value="'.$regional->idregional.'">'.$regional->regional.'</option>';
+                $options .= isset($request->regional) && ($request->regional == $regional->idregional) ? 
+                getFiltroOptions($regional->idregional, $regional->regional, true) : 
+                getFiltroOptions($regional->idregional, $regional->regional);
 
-            $filtro .= '</select>';
-            $filtro .= '</div>';
+            $filtro .= getFiltroCamposSelect('Seccional', 'regional', $options);
         }
 
-        $filtro .= '<div class="form-group mb-0 col">';
-        $filtro .= '<label>Status</label>';
-        $filtro .= '<select class="custom-select custom-select-sm" name="status">';
-        $filtro .= isset($request->status) && ($request->status == 'Qualquer') ? 
-        '<option value="Qualquer" selected>Qualquer</option>' : 
-        '<option value="Qualquer">Qualquer</option>';
+        $options = isset($request->status) && ($request->status == 'Qualquer') ? 
+        getFiltroOptions('', 'Qualquer', true) : getFiltroOptions('', 'Qualquer');
 
-        $status = $this->status();
+        foreach($this->status() as $s)
+            $options .= isset($request->status) && ($request->status == $s) ? 
+            getFiltroOptions($s, $s, true) : getFiltroOptions($s, $s);
 
-        foreach($status as $s)
-            $filtro .= isset($request->status) && ($request->status == $s) ? 
-            '<option value="'.$s.'" selected>'.$s.'</option>' :
-            '<option value="'.$s.'">'.$s.'</option>';
-
-        $filtro .= '</select>';
-        $filtro .= '</div>';
-
-        $filtro .= '<div class="form-group mb-0 col">';
-        $filtro .= '<label>Serviço</label>';
-        $filtro .= '<select class="custom-select custom-select-sm" name="servico">';
-        $filtro .= isset($request->servico) && ($request->servico == 'Qualquer') ? 
-        '<option value="Qualquer" selected>Qualquer</option>' : 
-        '<option value="Qualquer">Qualquer</option>';
-
-        $servicos = $this->servicosCompletos();
-
-        foreach($servicos as $servico)
-            $filtro .= isset($request->servico) && ($request->servico == $servico) ? 
-            '<option value="'.$servico.'" selected>'.$servico.'</option>' :
-            '<option value="'.$servico.'">'.$servico.'</option>';
-
-        $filtro .= '</select>';
-        $filtro .= '</div>';
+        $filtro .= getFiltroCamposSelect('Status', 'status', $options);
     
-        $filtro .= '<div class="form-group mb-0 col">';
-        $filtro .= '<label>De</label>';
+        $options = isset($request->servico) && ($request->servico == 'Qualquer') ? 
+        getFiltroOptions('Qualquer', 'Qualquer', true) : getFiltroOptions('Qualquer', 'Qualquer');
 
-        $textoData = '<input type="date" class="form-control d-inline-block dataInput form-control-sm" name="mindia" id="mindiaFiltro" value="';
-        $filtro .= isset($request->mindia) ? $textoData.$request->mindia.'" />' : $textoData.date('Y-m-d').'" />';
+        foreach($this->servicosCompletos() as $servico)
+            $options .= isset($request->servico) && ($request->servico == $servico) ? 
+            getFiltroOptions($servico, $servico, true) : getFiltroOptions($servico, $servico);
 
-        $filtro .= '</div>';
-        $filtro .= '<div class="form-group mb-0 col">';
-        $filtro .= '<label>Até</label>';
-
-        $textoData = '<input type="date" class="form-control d-inline-block dataInput form-control-sm" name="maxdia" id="maxdiaFiltro" value="';
-        $filtro .= isset($request->maxdia) ? $textoData.$request->maxdia.'" />' : $textoData.date('Y-m-d').'" />';
-
-        $filtro .= '</div>';
-        $filtro .= '<div class="form-group mb-0 col-auto align-self-end">';
-        $filtro .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
-        $filtro .= '</div>';
-        $filtro .= '</div>';
-        $filtro .= '</form>';
+        $filtro .= getFiltroCamposSelect('Serviço', 'servico', $options);
+        $filtro .= getFiltroCamposDate($request->datemin, $request->datemax);
+        $filtro = getFiltro(route('agendamentos.filtro'), $filtro);
 
         $this->variaveis['filtro'] = $filtro;
 
         return $temFiltro;
     }
 
-    private function getResultadosToFiltro($request)
+    private function getResultadosFiltro($dados = null)
     {
-        if($request->filled('filtro') && ($request->filtro == 'sim'))
+        if(isset($dados) && !isset($dados['message']))
         {
-            $dados = $this->confereFiltroAtivo($request);
-
             $regional = $dados['regional'];
             $status = $dados['status'];
             $servico = $dados['servico'];
 
             return Agendamento::with(['user', 'regional'])
                 ->whereBetween('dia', [
-                    $dados['mindia'], $dados['maxdia']
+                    $dados['datemin'], $dados['datemax']
                 ])->when($regional, function ($query, $regional) {
                     $query->where('idregional', $regional);
                 })->when($status, function ($query, $status) {
@@ -279,14 +218,51 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     public function index($request, MediadorServiceInterface $service)
     {
-        $resultados = $this->getResultadosToFiltro($request);
+        $dados = $this->validacaoFiltroAtivo($request);
+        $resultados = $this->getResultadosFiltro($dados);
         $this->variaveis['mostraFiltros'] = true;
 
         return [
+            'erro' => isset($dados['message']) ? $dados : null,
             'resultados' => $resultados, 
             'tabela' => $this->tabelaCompleta($resultados), 
             'temFiltro' => $this->filtro($request, $service),
             'variaveis' => (object) $this->variaveis,
+        ];
+    }
+
+    public function view($id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+        $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
+        $sameRegional = auth()->user()->can('sameRegional', $agendamento);
+        abort_if($atendOrGere && !$sameRegional, 403);
+
+        dd('teste');
+    }
+
+    public function buscar($busca)
+    {
+        $regional = auth()->user()->can('atendenteOrGerSeccionais', auth()->user()) ? auth()->user()->idregional : null;
+
+        $resultados = Agendamento::when($regional, function ($query, $regional) use ($busca) {
+                return $query->where('idregional', $regional)
+                    ->where(function($q) use ($busca) {
+                        $q->where('cpf', 'LIKE', '%'.$busca.'%')
+                        ->orWhere('email', 'LIKE', '%'.$busca.'%')
+                        ->orWhere('protocolo', 'LIKE', '%'.$busca.'%');
+                });
+            }, function ($query) use ($busca) {
+                return $query->where('nome', 'LIKE', '%'.$busca.'%')
+                ->orWhere('cpf', 'LIKE', '%'.$busca.'%')
+                ->orWhere('email', 'LIKE', '%'.$busca.'%')
+                ->orWhere('protocolo', 'LIKE', '%'.$busca.'%');
+            })->paginate(25);
+
+        return [
+            'resultados' => $resultados,
+            'tabela' => $this->tabelaCompleta($resultados), 
+            'variaveis' => (object) $this->variaveis
         ];
     }
 }

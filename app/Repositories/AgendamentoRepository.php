@@ -27,25 +27,25 @@ class AgendamentoRepository
         return Agendamento::findOrFail($id);
     }
 
-    public function getToBusca($criterio) 
-    {
-        return Agendamento::where('nome','LIKE','%' . $criterio . '%')
-            ->orWhere('idagendamento','LIKE', $criterio)
-            ->orWhere('cpf','LIKE','%' . $criterio . '%')
-            ->orWhere('email','LIKE','%' . $criterio . '%')
-            ->orWhere('protocolo','LIKE','%' . $criterio . '%')
-            ->paginate(25);
-    }
+    // public function getToBusca($criterio) 
+    // {
+    //     return Agendamento::where('nome','LIKE','%' . $criterio . '%')
+    //         ->orWhere('idagendamento','LIKE', $criterio)
+    //         ->orWhere('cpf','LIKE','%' . $criterio . '%')
+    //         ->orWhere('email','LIKE','%' . $criterio . '%')
+    //         ->orWhere('protocolo','LIKE','%' . $criterio . '%')
+    //         ->paginate(25);
+    // }
 
-    public function getToBuscaByRegional($criterio, $idRegional) 
-    {
-        return Agendamento::where('idregional', $idRegional)
-            ->where(function($query) use ($criterio) {
-                $query->where('cpf','LIKE','%' . $criterio . '%')
-                    ->orWhere('email','LIKE','%' . $criterio . '%')
-                    ->orWhere('protocolo','LIKE','%' . $criterio . '%');
-        })->paginate(25);
-    }
+    // public function getToBuscaByRegional($criterio, $idRegional) 
+    // {
+    //     return Agendamento::where('idregional', $idRegional)
+    //         ->where(function($query) use ($criterio) {
+    //             $query->where('cpf','LIKE','%' . $criterio . '%')
+    //                 ->orWhere('email','LIKE','%' . $criterio . '%')
+    //                 ->orWhere('protocolo','LIKE','%' . $criterio . '%');
+    //     })->paginate(25);
+    // }
 
     public function update($id, $data, $agendamento = null) 
     {
