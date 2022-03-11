@@ -168,36 +168,38 @@ class AgendamentoController extends Controller
     public function edit($id)
     {
         $this->authorize('updateOther', auth()->user());
-        $this->service->getService('Agendamento')->view($id);
-        // try{
-        //     $busca = $request->q;
-        //     $dados = $this->service->getService('Agendamento')->buscar($busca);
-        //     $resultados = $dados['resultados'];
-        //     $tabela = $dados['tabela'];
-        //     $variaveis = $dados['variaveis'];
-        // } catch (\Exception $e) {
-        //     \Log::error($e->getMessage());
-        //     abort(500, "Erro ao buscar o texto em agendamentos.");
-        // }
-
-        $resultado = $this->agendamentoRepository->getById($id);
-
-        // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
-        // de sua regional, aborta com erro de permissão.
-        if($this->limitaPorRegional()) {
-            if($resultado->idregional != Auth::user()->idregional) {
-                abort(403);
-            }
+        
+        try{
+            $dados = $this->service->getService('Agendamento')->view($id);
+            $resultado = $dados['resultado'];
+            $variaveis = $dados['variaveis'];
+            $atendentes = $dados['atendentes'];
+            $servicos = $dados['servicos'];
+            $status = $dados['status'];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode()) : 
+            abort(500, "Erro ao carregar o agendamento.");
         }
 
-        $atendentes = $this->userRepository->getAtendentesByRegional($resultado->idregional);
+        // $resultado = $this->agendamentoRepository->getById($id);
 
-        $servicos = Agendamento::servicosCompletos();
-        $status = Agendamento::status();
-        $variaveis = $this->agendamentoVariaveis;
-        $variaveis['mensagem_agendamento'] = $this->mensagemAgendamento($resultado->dia, $resultado->hora, $resultado->status, $resultado->protocolo, $id);
-        $variaveis['cancela_idusuario'] = true;
-        $variaveis = (object) $variaveis;
+        // // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
+        // // de sua regional, aborta com erro de permissão.
+        // if($this->limitaPorRegional()) {
+        //     if($resultado->idregional != Auth::user()->idregional) {
+        //         abort(403);
+        //     }
+        // }
+
+        // $atendentes = $this->userRepository->getAtendentesByRegional($resultado->idregional);
+
+        // $servicos = Agendamento::servicosCompletos();
+        // $status = Agendamento::status();
+        // $variaveis = $this->agendamentoVariaveis;
+        // $variaveis['mensagem_agendamento'] = $this->mensagemAgendamento($resultado->dia, $resultado->hora, $resultado->status, $resultado->protocolo, $id);
+        // $variaveis['cancela_idusuario'] = true;
+        // $variaveis = (object) $variaveis;
 
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'atendentes', 'servicos', 'status'));
     }
@@ -206,26 +208,36 @@ class AgendamentoController extends Controller
     {
         $this->authorize('updateOther', auth()->user());
 
-        // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
-        // de sua regional, aborta com erro de permissão.
-        // Neste caso, é usado o nome da regional ao invés do ID.
-        if($this->limitaPorRegional()) {
-            if($request->idregional != Auth::user()->regional->regional) {
-                abort(403);
-            }
+        try{
+            $validated = $request->validated();
+            $erro = $this->service->getService('Agendamento')->save($validated, $id);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode()) : 
+            abort(500, "Erro ao atualizar o agendamento.");
         }
 
-        $update = $this->agendamentoRepository->update($id, $request->toModel());
+        // // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
+        // // de sua regional, aborta com erro de permissão.
+        // // Neste caso, é usado o nome da regional ao invés do ID.
+        // if($this->limitaPorRegional()) {
+        //     if($request->idregional != Auth::user()->regional->regional) {
+        //         abort(403);
+        //     }
+        // }
 
-        if(!$update) {
-            abort(500);
-        }
+        // $update = $this->agendamentoRepository->update($id, $request->toModel());
 
-        event(new CrudEvent('agendamento', 'editou', $id));
+        // if(!$update) {
+        //     abort(500);
+        // }
 
-        return redirect('/admin/agendamentos')
-            ->with('message', '<i class="icon fa fa-check"></i>Agendamento editado com sucesso!')
-            ->with('class', 'alert-success');
+        // event(new CrudEvent('agendamento', 'editou', $id));
+
+        return redirect(route('agendamentos.lista'))->with([
+            'message' => isset($erro['message']) ? $erro['message'] : '<i class="icon fa fa-check"></i>Agendamento com a ID '.$id.' foi editado com sucesso!',
+            'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
+        ]);
     }
 
     public function reenviarEmail($id)
@@ -485,37 +497,37 @@ class AgendamentoController extends Controller
     //     return $filtro;
     // }
 
-    public function mensagemAgendamento($dia, $hora, $status, $protocolo, $id)
-    {
-        if(date('Y-m-d') >= $dia) {
-            if($status === Agendamento::STATUS_CANCELADO) {
-                $mensagem =  "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i>&nbsp;&nbsp;Atendimento cancelado</strong></p>";
-            } 
-            elseif($status === Agendamento::STATUS_NAO_COMPARECEU) {
-                $mensagem = "<p class='mb-0 text-warning'><strong><i class='fas fa-user-alt-slash'></i>&nbsp;&nbsp;Não compareceu</strong></p>";
-            } 
-            elseif($status === Agendamento::STATUS_COMPARECEU) {
-                $mensagem = "<p class='mb-0 text-success'><strong><i class='fas fa-check-circle'></i>&nbsp;&nbsp;Atendimento realizado com sucesso no dia " . onlyDate($dia) . ", às " . $hora . "</strong></p>";
-            } 
-            else {
-                $mensagem = "<p class='mb-0 text-danger'><strong><i class='fas fa-exclamation-triangle'></i>&nbsp;&nbsp;Validação pendente</strong></p>";
-            }
-        } 
-        else {
-            if($status === Agendamento::STATUS_CANCELADO) {
-                $mensagem = "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i> Atendimento cancelado</strong></p>";
-            } 
-            else {
-                // Botão de reenviar email
-                $mensagem = '<form method="POST" action="/admin/agendamentos/reenviar-email/' . $id . '" class="d-inline">';
-                $mensagem .= '<input type="hidden" name="_token" value="' . csrf_token() . '" />';
-                $mensagem .= '<input type="submit" class="btn btn-sm btn-default" value="Reenviar email de confirmação"></input>';
-                $mensagem .= '</form>';
-            }
-        }
+    // public function mensagemAgendamento($dia, $hora, $status, $protocolo, $id)
+    // {
+    //     if(date('Y-m-d') >= $dia) {
+    //         if($status === Agendamento::STATUS_CANCELADO) {
+    //             $mensagem =  "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i>&nbsp;&nbsp;Atendimento cancelado</strong></p>";
+    //         } 
+    //         elseif($status === Agendamento::STATUS_NAO_COMPARECEU) {
+    //             $mensagem = "<p class='mb-0 text-warning'><strong><i class='fas fa-user-alt-slash'></i>&nbsp;&nbsp;Não compareceu</strong></p>";
+    //         } 
+    //         elseif($status === Agendamento::STATUS_COMPARECEU) {
+    //             $mensagem = "<p class='mb-0 text-success'><strong><i class='fas fa-check-circle'></i>&nbsp;&nbsp;Atendimento realizado com sucesso no dia " . onlyDate($dia) . ", às " . $hora . "</strong></p>";
+    //         } 
+    //         else {
+    //             $mensagem = "<p class='mb-0 text-danger'><strong><i class='fas fa-exclamation-triangle'></i>&nbsp;&nbsp;Validação pendente</strong></p>";
+    //         }
+    //     } 
+    //     else {
+    //         if($status === Agendamento::STATUS_CANCELADO) {
+    //             $mensagem = "<p class='mb-0 text-muted'><strong><i class='fas fa-ban'></i> Atendimento cancelado</strong></p>";
+    //         } 
+    //         else {
+    //             // Botão de reenviar email
+    //             $mensagem = '<form method="POST" action="/admin/agendamentos/reenviar-email/' . $id . '" class="d-inline">';
+    //             $mensagem .= '<input type="hidden" name="_token" value="' . csrf_token() . '" />';
+    //             $mensagem .= '<input type="submit" class="btn btn-sm btn-default" value="Reenviar email de confirmação"></input>';
+    //             $mensagem .= '</form>';
+    //         }
+    //     }
 
-        return $mensagem;
-    }
+    //     return $mensagem;
+    // }
 
     /**
      * Método usado para checar se o perfil do usuário exige limitação de visualização de agendamentos

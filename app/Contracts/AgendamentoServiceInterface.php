@@ -8,7 +8,9 @@ interface AgendamentoServiceInterface {
 
     public function index($request, MediadorServiceInterface $service);
 
-    public function buscar($busca);
-
     public function view($id);
+
+    public function save($dados, $id);
+
+    public function buscar($busca);
 }

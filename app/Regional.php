@@ -17,7 +17,7 @@ class Regional extends Model
 
     public function users()
     {
-        return $this->hasMany('App\User', 'idregional');
+        return $this->hasMany('App\User', 'idregional')->withTrashed();
     }
 
     public function noticias()

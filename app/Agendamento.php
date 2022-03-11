@@ -26,6 +26,17 @@ class Agendamento extends Model
 
     const TIPOS_PESSOA = ['Pessoa Física' => 'PF', 'Pessoa Jurídica' => 'PJ', 'Ambas' => 'PF e PJ'];
 
+    private function btnReenviarEmail()
+    {
+        $mensagem = '<form method="POST" action="'.route('agendamentos.reenviarEmail', $this->idagendamento).'" class="d-inline">';
+        $mensagem .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+        $mensagem .= '<input type="submit" class="btn btn-sm btn-default" value="Reenviar email de confirmação"></input>';
+        $mensagem .= '</form>';
+
+        return $mensagem;
+    }
+
+    // vai ser removido
     public static function status()
     { 
         return [
@@ -35,6 +46,7 @@ class Agendamento extends Model
         ];
     }
 
+    // vai ser removido
     public static function servicos()
     {
         return [
@@ -47,6 +59,7 @@ class Agendamento extends Model
         ];
     }
 
+    // vai ser removido
     public static function servicosCompletos()
     {
         $resultado = array();
@@ -73,5 +86,23 @@ class Agendamento extends Model
     public function termos()
     {
         return $this->hasMany('App\TermoConsentimento', 'idagendamento');
+    }
+
+    public function getMsgByStatus()
+    {
+        $pendente = '<p class="mb-0 text-danger"><strong><i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Validação pendente</strong></p>';
+        $msg = [
+            Agendamento::STATUS_CANCELADO => '<p class="mb-0 text-muted"><strong><i class="fas fa-ban"></i>&nbsp;&nbsp;Atendimento cancelado</strong></p>',
+            Agendamento::STATUS_NAO_COMPARECEU => '<p class="mb-0 text-warning"><strong><i class="fas fa-user-alt-slash"></i>&nbsp;&nbsp;Não compareceu</strong></p>',
+            Agendamento::STATUS_COMPARECEU => '<p class="mb-0 text-success"><strong><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Atendimento realizado com sucesso no dia '.onlyDate($this->dia).', às '.$this->hora.'</strong></p>'
+        ];
+
+        if(date('Y-m-d') >= $this->dia)
+            return isset($msg[$this->status]) ? $msg[$this->status] : $pendente;
+
+        if($this->status == Agendamento::STATUS_CANCELADO)
+            return $msg[$this->status];
+
+        return $this->btnReenviarEmail();
     }
 }

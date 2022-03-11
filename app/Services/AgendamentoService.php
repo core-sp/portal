@@ -175,6 +175,26 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ->orderBy('hora')
             ->paginate(25);
     }
+    private function validarUpdate($dados)
+    {
+        $statusInvalido = isset($dados['status']) && !in_array($dados['status'], $this->status());
+        $servicoInvalido = !in_array($dados['tiposervico'], $this->servicosCompletos());
+        if($statusInvalido || $servicoInvalido)
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>Status ou Tipo de Serviço não encontrado',
+                'class' => 'alert-danger'
+            ];
+        
+        if(!isset($dados['status']) && isset($dados['idusuario']))
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>Agendamento sem status não pode ter atendente',
+                'class' => 'alert-danger'
+            ];
+
+        $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE);
+
+        return $dados;
+    }
 
     private function tabelaCompleta($resultados)
     {
@@ -234,11 +254,42 @@ class AgendamentoService implements AgendamentoServiceInterface {
     public function view($id)
     {
         $agendamento = Agendamento::findOrFail($id);
+
         $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
         $sameRegional = auth()->user()->can('sameRegional', $agendamento);
         abort_if($atendOrGere && !$sameRegional, 403);
 
-        dd('teste');
+        $atendentes = date('Y-m-d') >= $agendamento->dia ? 
+        $agendamento->regional->users()->select('idusuario', 'nome')->where('idperfil', 8)->withoutTrashed()->get() : null;
+
+        $msg = $agendamento->getMsgByStatus();
+        $this->variaveis['cancela_idusuario'] = true;
+
+        return [
+            'servicos' => $this->servicosCompletos(),
+            'status' => $this->status(),
+            'variaveis' => (object) $this->variaveis,
+            'atendentes' => $atendentes,
+            'resultado' => $agendamento
+        ];
+    }
+
+    public function save($dados, $id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+
+        $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
+        $sameRegional = auth()->user()->can('sameRegional', $agendamento);
+        abort_if($atendOrGere && !$sameRegional, 403);
+        
+        $valido = $this->validarUpdate($dados);
+
+        if(isset($valido['message']))
+            return $valido;
+
+        $agendamento->update($valido);
+
+        event(new CrudEvent('agendamento', 'editou', $id));
     }
 
     public function buscar($busca)

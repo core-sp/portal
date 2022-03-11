@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Agendamento;
+use App\Rules\Cpf;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AgendamentoUpdateRequest extends FormRequest
@@ -12,10 +13,10 @@ class AgendamentoUpdateRequest extends FormRequest
         return [
             'nome' => 'required|max:191',
             'email' => 'required|email|max:191',
-            'cpf' => 'required|max:191',
+            'cpf' => ['required', 'max:191', new Cpf],
             'celular' => 'required|max:191',
             'tiposervico' => 'required|max:191',
-            'idusuario' => 'max:191|required_if:status,==,' . Agendamento::STATUS_COMPARECEU,
+            'idusuario' => 'max:191|required_if:status,==,'.Agendamento::STATUS_COMPARECEU,
             'status' => 'max:191',
         ];
     }
@@ -35,20 +36,6 @@ class AgendamentoUpdateRequest extends FormRequest
             'idusuario.required_if' => 'Informe o atendente que realizou o atendimento',
             'idusuario.max' => 'O ID do usuário excedeu o limite de caracteres permitido',
             'status.max' => 'O Status excedeu o limite de caracteres permitido'
-        ];
-    }
-
-    public function toModel()
-    {
-        return [
-            'nome' => mb_convert_case(mb_strtolower($this->nome), MB_CASE_TITLE),
-            'cpf' => $this->cpf,
-            'email' => $this->email,
-            'celular' => $this->celular,
-            'tiposervico' => $this->tiposervico,
-            'idusuario' => $this->idusuario,
-            'status' => $this->status
-
         ];
     }
 }
