@@ -12,5 +12,9 @@ interface AgendamentoServiceInterface {
 
     public function save($dados, $id);
 
+    public function updateStatus($dados);
+
+    public function pendentes();
+
     public function buscar($busca);
 }

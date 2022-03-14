@@ -45,7 +45,7 @@ $(document).ready(function(){
 		}
 	}
 	$('.cpfOuCnpj').length > 11 ? $('.cpfOuCnpj').mask('00.000.000/0000-00', options) : $('.cpfOuCnpj').mask('000.000.000-00#', options);
-  $('#ageporhorario').mask('0');
+  
   // Máscaras para datas
   $('#dataTermino').mask('00/00/0000', {
     onComplete: function() {
@@ -259,6 +259,34 @@ $('#plantaoBloqueio').change(function(){
 });
 // Fim da Funcionalidade Plantão Jurídico
 
+// Funcionalidade Agendamento
+function selectAtendenteByStatus(valor)
+{
+  $('#idusuarioAgendamento option').show();
+  $('#idusuarioAgendamento option').each(function(){
+    var idUser = $(this).val();
+    if((valor == '') && (idUser != ''))
+      $(this).hide();
+    if((valor == 'Compareceu') && (idUser == ''))
+      $(this).hide();
+  });
+  if(valor == '')
+    $('#idusuarioAgendamento')[0].selectedIndex = 0;
+  if(valor == 'Compareceu')
+    $('#idusuarioAgendamento')[0].selectedIndex = 1;
+}
+
+$('#statusAgendamentoAdmin').change(function(){
+  var valor = $('#statusAgendamentoAdmin').val();
+  selectAtendenteByStatus(valor);
+});
+
+$('#statusAgendamentoAdmin').ready(function(){
+  var valor = $('#statusAgendamentoAdmin').val();
+  selectAtendenteByStatus(valor);
+});
+// Fim da Funcionalidade Agendamento
+
 (function($){
   // Função para tornar menu ativo dinâmico
   $(function(){
@@ -273,6 +301,7 @@ $('#plantaoBloqueio').change(function(){
     }).parentsUntil(".nav-sidebar > .nav-treeview").addClass('menu-open')
     .prev('a').addClass('active');
   });
+
   // Botão standalone LFM
   $.fn.filemanager = function(type, options) {
     type = type || 'file';
@@ -293,6 +322,7 @@ $('#plantaoBloqueio').change(function(){
       return false;
     });
   }
+
   // Recusar endereço
   $('#recusar-trigger').on('click', function(){
     $('#recusar-form').toggle();

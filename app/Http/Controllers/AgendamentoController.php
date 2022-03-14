@@ -44,7 +44,6 @@ class AgendamentoController extends Controller
         $this->userRepository = $userRepository;
     }
 
-    // OK
     public function index(Request $request)
     {
         $this->authorize('viewAny', auth()->user());
@@ -88,52 +87,65 @@ class AgendamentoController extends Controller
         // $variaveis['mostraFiltros'] = true;
         // $variaveis = (object) $variaveis;
 
-        return !isset($dados['erro']['message']) ? view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro')) : redirect()->back()->with($dados['erro']);
+        return !isset($dados['erro']['message']) ? 
+            view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro')) : 
+            redirect()->back()->with($dados['erro']);
     }
 
-    public function updateStatus(Request $request)
+    public function updateStatus(AgendamentoUpdateRequest $request)
     {
-        $idusuario = Auth::user()->idusuario;
-        $idagendamento = $request->idagendamento;
-        $status = $request->status;
-
-        $agendamento = $this->agendamentoRepository->getById($idagendamento);
-
-        // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
-        // de sua regional, aborta com erro de permissão.
-        if($this->limitaPorRegional()) {
-            if($agendamento->idregional != Auth::user()->idregional) {
-                abort(403);
-            }
+        try{
+            $validated = $request->validated();
+            $erro = $this->service->getService('Agendamento')->updateStatus($validated);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao atualizar o status do agendamento.");
         }
 
-        if($agendamento) {
-            if($agendamento->dia > date('Y-m-d')) {
-                return redirect()->back()
-                    ->with('message', '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado antes da data agendada')
-                    ->with('class', 'alert-danger');
-            }
-        }
+        // $idusuario = Auth::user()->idusuario;
+        // $idagendamento = $request->idagendamento;
+        // $status = $request->status;
 
-        $update = $this->agendamentoRepository->update($idagendamento, ['status' => $status, 'idusuario' => $idusuario], $agendamento);
+        // $agendamento = $this->agendamentoRepository->getById($idagendamento);
 
-        if(!$update) {
-            abort(500);
-        }
+        // // Checa se o usuário pode editar apenas agendamentos de sua regional. Caso tente  editar agendamento fora
+        // // de sua regional, aborta com erro de permissão.
+        // if($this->limitaPorRegional()) {
+        //     if($agendamento->idregional != Auth::user()->idregional) {
+        //         abort(403);
+        //     }
+        // }
 
-        if($status === Agendamento::STATUS_COMPARECEU) {
-            event(new CrudEvent('agendamento', 'confirmou presença', $idagendamento));
-        } 
-        else {
-            event(new CrudEvent('agendamento', 'confirmou falta', $idagendamento));
-        }
+        // if($agendamento) {
+        //     if($agendamento->dia > date('Y-m-d')) {
+        //         return redirect()->back()
+        //             ->with('message', '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado antes da data agendada')
+        //             ->with('class', 'alert-danger');
+        //     }
+        // }
+
+        // $update = $this->agendamentoRepository->update($idagendamento, ['status' => $status, 'idusuario' => $idusuario], $agendamento);
+
+        // if(!$update) {
+        //     abort(500);
+        // }
+
+        // if($status === Agendamento::STATUS_COMPARECEU) {
+        //     event(new CrudEvent('agendamento', 'confirmou presença', $idagendamento));
+        // } 
+        // else {
+        //     event(new CrudEvent('agendamento', 'confirmou falta', $idagendamento));
+        // }
         
-        return redirect()->back()
-            ->with('message', '<i class="icon fa fa-check"></i>Status editado com sucesso!')
-            ->with('class', 'alert-success');
+        $id = $validated['idagendamento'];
+
+        return redirect()->back()->with([
+            'message' => isset($erro['message']) ? $erro['message'] : 
+                '<i class="icon fa fa-check"></i>Status do agendamento com ID '.$id.' foi editado com sucesso!',
+            'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
+        ]);
     }
 
-    // OK
     public function busca(Request $request)
     {
         $this->authorize('viewAny', auth()->user());
@@ -234,7 +246,7 @@ class AgendamentoController extends Controller
 
         // event(new CrudEvent('agendamento', 'editou', $id));
 
-        return redirect(route('agendamentos.lista'))->with([
+        return redirect()->back()->with([
             'message' => isset($erro['message']) ? $erro['message'] : '<i class="icon fa fa-check"></i>Agendamento com a ID '.$id.' foi editado com sucesso!',
             'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
         ]);
@@ -256,38 +268,45 @@ class AgendamentoController extends Controller
     {
         $this->authorize('viewAny', auth()->user());
 
-        $idPerfil = Auth::user()->perfil->idperfil;
-
-        // "Coordenadoria de Atendimento" e "Admin" podem ver todos os agendamentos pendentes
-        if($idPerfil === 6 || $idPerfil === 1) {
-            $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendente();
-        } 
-        // "Gestão de Atendimento - Sede" pode ver apenas agendamentos pendentes da Sede (São Paulo, id=1)
-        elseif($idPerfil === 12 ) {
-            $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendenteSede();
-        }
-        // "Gestão de Atendimento - Seccionais" pode ver apenas agendamentos pendentes das seccionais (id!=1)
-        elseif($idPerfil === 13) {
-            $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendenteSeccionais();
-        } 
-        // "Atendente" e "Gerente Seccionais" podem ver apenas agendamentos pendentes da sua regional
-        elseif($idPerfil === 8 || $idPerfil === 21) {
-            $resultados = $this->agendamentoRepository->getPastAgendamentoPendenteByRegional(Auth::user()->idregional);
-        } 
-        else {
-            abort(401);
+        try{
+            $dados = $this->service->getService('Agendamento')->pendentes();
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar os agendamentos pendentes.");
         }
 
-        if($resultados->isEmpty()) {
-            $resultados = [];
-        }
+        // $idPerfil = Auth::user()->perfil->idperfil;
 
-        $tabela = $this->tabelaCompleta($resultados);
-        $variaveis = $this->agendamentoVariaveis;
-        $variaveis['continuacao_titulo'] = 'pendentes de validação';
-        $variaveis['plural'] = 'agendamentos pendentes';
-        $variaveis['btn_criar'] = '<a class="btn btn-primary" href="/admin/agendamentos">Lista de Agendamentos</a>';
-        $variaveis = (object) $variaveis;
+        // // "Coordenadoria de Atendimento" e "Admin" podem ver todos os agendamentos pendentes
+        // if($idPerfil === 6 || $idPerfil === 1) {
+        //     $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendente();
+        // } 
+        // // "Gestão de Atendimento - Sede" pode ver apenas agendamentos pendentes da Sede (São Paulo, id=1)
+        // elseif($idPerfil === 12 ) {
+        //     $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendenteSede();
+        // }
+        // // "Gestão de Atendimento - Seccionais" pode ver apenas agendamentos pendentes das seccionais (id!=1)
+        // elseif($idPerfil === 13) {
+        //     $resultados = $this->agendamentoRepository->getAllPastAgendamentoPendenteSeccionais();
+        // } 
+        // // "Atendente" e "Gerente Seccionais" podem ver apenas agendamentos pendentes da sua regional
+        // elseif($idPerfil === 8 || $idPerfil === 21) {
+        //     $resultados = $this->agendamentoRepository->getPastAgendamentoPendenteByRegional(Auth::user()->idregional);
+        // } 
+        // else {
+        //     abort(401);
+        // }
+
+        // if($resultados->isEmpty()) {
+        //     $resultados = [];
+        // }
+
+        // $tabela = $this->tabelaCompleta($resultados);
+        // $variaveis = $this->agendamentoVariaveis;
+        // $variaveis['continuacao_titulo'] = 'pendentes de validação';
+        // $variaveis['plural'] = 'agendamentos pendentes';
+        // $variaveis['btn_criar'] = '<a class="btn btn-primary" href="/admin/agendamentos">Lista de Agendamentos</a>';
+        // $variaveis = (object) $variaveis;
 
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }

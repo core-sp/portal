@@ -56,13 +56,18 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     private function getBtnByStatus($resultado)
     {
-        $default = '<form method="POST" id="statusAgendamento" action="'.route('agendamentos.updateStatus').'" class="d-inline">';
-        $default .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-        $default .= '<input type="hidden" name="_method" value="PUT" id="method" />';
-        $default .= '<input type="hidden" name="idagendamento" value="'.$resultado->idagendamento.'" />';
-        $default .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="'.Agendamento::STATUS_COMPARECEU.'">Confirmar</button>';
-        $default .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="'.Agendamento::STATUS_NAO_COMPARECEU.'">'.Agendamento::STATUS_NAO_COMPARECEU.'</button>';
-        $default .= '</form>';
+        if($resultado->dia > date('Y-m-d'))
+            $default = null;
+        else
+        {
+            $default = '<form method="POST" action="'.route('agendamentos.updateStatus').'" class="d-inline">';
+            $default .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
+            $default .= '<input type="hidden" name="_method" value="PUT" id="method" />';
+            $default .= '<input type="hidden" name="idagendamento" value="'.$resultado->idagendamento.'" />';
+            $default .= '<button type="submit" name="status" class="btn btn-sm btn-primary" value="'.Agendamento::STATUS_COMPARECEU.'">Confirmar</button>';
+            $default .= '<button type="submit" name="status" class="btn btn-sm btn-danger ml-1" value="'.Agendamento::STATUS_NAO_COMPARECEU.'">'.Agendamento::STATUS_NAO_COMPARECEU.'</button>';
+            $default .= '</form>';
+        }
         
         $tiposStatus = [
             Agendamento::STATUS_CANCELADO => '<strong>'.Agendamento::STATUS_CANCELADO.'</strong>',
@@ -175,6 +180,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ->orderBy('hora')
             ->paginate(25);
     }
+
     private function validarUpdate($dados)
     {
         $statusInvalido = isset($dados['status']) && !in_array($dados['status'], $this->status());
@@ -192,6 +198,24 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ];
 
         $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE);
+
+        return $dados;
+    }
+
+    private function validarUpdateStatus($dados, $dia)
+    {
+        $statusInvalido = isset($dados['status']) && !in_array($dados['status'], $this->status());
+        if($statusInvalido)
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>Status não encontrado',
+                'class' => 'alert-danger'
+            ];
+        
+        if($dia > date('Y-m-d'))
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado antes da data agendada',
+                'class' => 'alert-danger'
+            ];
 
         return $dados;
     }
@@ -290,6 +314,45 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $agendamento->update($valido);
 
         event(new CrudEvent('agendamento', 'editou', $id));
+    }
+
+    public function updateStatus($dados)
+    {
+        $agendamento = Agendamento::findOrFail($dados['idagendamento']);
+        $dados['idusuario'] = auth()->user()->idusuario;
+
+        $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
+        $sameRegional = auth()->user()->can('sameRegional', $agendamento);
+        abort_if($atendOrGere && !$sameRegional, 403);
+        
+        $valido = $this->validarUpdateStatus($dados, $agendamento->dia);
+
+        if(isset($valido['message']))
+            return $valido;
+
+        $agendamento->update($dados);
+        $status = $dados['status'] == Agendamento::STATUS_COMPARECEU ? 'presença' : 'falta';
+
+        event(new CrudEvent('agendamento', 'confirmou '.$status, $agendamento->idagendamento));
+    }
+
+    public function pendentes()
+    {
+        $perfil = auth()->user()->idperfil;
+        $idregional = auth()->user()->idregional;
+        
+        $agendamentos = Agendamento::where('dia', '<', date('Y-m-d'))
+            ->whereNull('status')
+            ->when($perfil == 12, function ($query) {
+                $query->where('idregional', 1);
+            })->when($perfil == 13, function ($query) {
+                $query->where('idregional', '!=', 1);
+            })->when(($perfil == 8) || ($perfil == 21), function ($query) use($idregional) {
+                $query->where('idregional', $idregional);
+            })->orderBy('dia', 'DESC')
+            ->paginate(10);
+            
+        dd($agendamentos);
     }
 
     public function buscar($busca)

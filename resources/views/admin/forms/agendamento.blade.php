@@ -19,6 +19,7 @@
                     placeholder="Nome"
                     name="nome"
                     value="{{ old('nome') ? old('nome') : $resultado->nome }}"
+                    required
                     {{ ($resultado->status === 'Cancelado') || ($now >= $resultado->dia) ? 'readonly' : '' }}
                 />
                 @if($errors->has('nome'))
@@ -34,6 +35,7 @@
                     placeholder="Email"
                     name="email"
                     value="{{ old('email') ? old('email') : $resultado->email }}"
+                    required
                     {{ ($resultado->status === 'Cancelado') || ($now >= $resultado->dia) ? 'readonly' : '' }}
                 />
                 @if($errors->has('email'))
@@ -51,6 +53,7 @@
                     placeholder="CPF"
                     name="cpf"
                     value="{{ old('cpf') ? old('cpf') : $resultado->cpf }}"
+                    required
                     {{ ($resultado->status === 'Cancelado') || ($now >= $resultado->dia) ? 'readonly' : '' }}
                 />
                 @if($errors->has('cpf'))
@@ -66,6 +69,7 @@
                     placeholder="Celular"
                     name="celular"
                     value="{{ old('celular') ? old('celular') : $resultado->celular }}"
+                    required
                     {{ ($resultado->status === 'Cancelado') || ($now >= $resultado->dia) ? 'readonly' : '' }}
                 />
                 @if($errors->has('celular'))
@@ -78,7 +82,10 @@
         <div class="form-row mt-2">
             <div class="col">
                 <label for="tiposervico">Tipo de serviço</label>
-                <select name="tiposervico" class="form-control">
+                <select name="tiposervico" 
+                    class="form-control {{ $errors->has('tiposervico') ? 'is-invalid' : '' }}" 
+                    required
+                >
                 @foreach($servicos as $servico)
                     @if(old('tiposervico'))
                     <option value="{{ $servico }}" {{ old('tiposervico') === $servico ? 'selected' : '' }}>{{ $servico }}</option>
@@ -87,10 +94,18 @@
                     @endif
                 @endforeach
                 </select>
+                @if($errors->has('tiposervico'))
+                <div class="invalid-feedback">
+                {{ $errors->first('tiposervico') }}
+                </div>
+                @endif
             </div>
             <div class="col">
                 <label for="status">Status</label>
-                <select name="status" class="form-control">
+                <select name="status" 
+                    class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}" 
+                    id="statusAgendamentoAdmin"
+                >
                 <option value="">Sem Status</option>
                 @foreach($status as $s)
                     @if(old('status'))
@@ -100,6 +115,11 @@
                     @endif
                 @endforeach
                 </select>
+                @if($errors->has('status'))
+                <div class="invalid-feedback">
+                {{ $errors->first('status') }}
+                </div>
+                @endif
             </div>
         </div>
         <div class="form-row mt-2">
@@ -114,6 +134,7 @@
             <div class="col">
                 <label for="atendente">Atendimento realizado por:</label>
                 <select name="idusuario"
+                    id="idusuarioAgendamento"
                     class="form-control {{ $errors->has('idusuario') ? 'is-invalid' : '' }}"
                     {{ $now < $resultado->dia ? 'disabled' : '' }}
                 />
