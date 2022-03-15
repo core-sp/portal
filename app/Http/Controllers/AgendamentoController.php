@@ -2,46 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Regional;
-use App\Agendamento;
-use App\Events\CrudEvent;
-use App\Traits\TabelaAdmin;
+// use App\User;
+// use App\Regional;
+// use App\Agendamento;
+// use App\Events\CrudEvent;
+// use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
-use App\Mail\AgendamentoMailGuest;
-use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Http\RedirectResponse;
-use App\Repositories\AgendamentoRepository;
+// use App\Mail\AgendamentoMailGuest;
+// use App\Repositories\UserRepository;
+// use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Mail;
+// use Illuminate\Http\RedirectResponse;
+// use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoUpdateRequest;
 use App\Contracts\MediadorServiceInterface;
-use Illuminate\Support\Facades\Request as IlluminateRequest;
+// use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoController extends Controller
 {
-    use TabelaAdmin;
+    // use TabelaAdmin;
 
-    // Nome da classe
-    private $class = 'AgendamentoController';
-    private $agendamentoRepository;
+    // // Nome da classe
+    // private $class = 'AgendamentoController';
+    // private $agendamentoRepository;
     private $service;
-    private $userRepository;
+    // private $userRepository;
 
-    // Variáveis para páginas no Admin
-    private $agendamentoVariaveis = [
-        'singular' => 'agendamento',
-        'singulariza' => 'o agendamento',
-        'plural' => 'agendamentos',
-        'pluraliza' => 'agendamentos'
-    ];
+    // // Variáveis para páginas no Admin
+    // private $agendamentoVariaveis = [
+    //     'singular' => 'agendamento',
+    //     'singulariza' => 'o agendamento',
+    //     'plural' => 'agendamentos',
+    //     'pluraliza' => 'agendamentos'
+    // ];
 
-    public function __construct(AgendamentoRepository $agendamentoRepository, MediadorServiceInterface $service, UserRepository $userRepository)
+    public function __construct(/*AgendamentoRepository $agendamentoRepository, */MediadorServiceInterface $service/*, UserRepository $userRepository*/)
     {
         $this->middleware('auth');
-        $this->agendamentoRepository = $agendamentoRepository;
+        // $this->agendamentoRepository = $agendamentoRepository;
         $this->service = $service;
-        $this->userRepository = $userRepository;
+        // $this->userRepository = $userRepository;
     }
 
     public function index(Request $request)
@@ -49,7 +49,7 @@ class AgendamentoController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->index($request, $this->service);
+            $dados = $this->service->getService('Agendamento')->listar($request, $this->service);
             $temFiltro = $dados['temFiltro'];
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
@@ -87,6 +87,7 @@ class AgendamentoController extends Controller
         // $variaveis['mostraFiltros'] = true;
         // $variaveis = (object) $variaveis;
 
+        // Ajustar retorno com filtro
         return !isset($dados['erro']['message']) ? 
             view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro')) : 
             redirect()->back()->with($dados['erro']);
@@ -96,7 +97,7 @@ class AgendamentoController extends Controller
     {
         try{
             $validated = $request->validated();
-            $erro = $this->service->getService('Agendamento')->updateStatus($validated);
+            $erro = $this->service->getService('Agendamento')->save($validated);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao atualizar o status do agendamento.");
@@ -139,6 +140,7 @@ class AgendamentoController extends Controller
         
         $id = $validated['idagendamento'];
 
+        // Ajustar retorno com filtro
         return redirect()->back()->with([
             'message' => isset($erro['message']) ? $erro['message'] : 
                 '<i class="icon fa fa-check"></i>Status do agendamento com ID '.$id.' foi editado com sucesso!',
@@ -246,6 +248,7 @@ class AgendamentoController extends Controller
 
         // event(new CrudEvent('agendamento', 'editou', $id));
 
+        // Ajustar retorno com filtro
         return redirect()->back()->with([
             'message' => isset($erro['message']) ? $erro['message'] : '<i class="icon fa fa-check"></i>Agendamento com a ID '.$id.' foi editado com sucesso!',
             'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
@@ -254,22 +257,34 @@ class AgendamentoController extends Controller
 
     public function reenviarEmail($id)
     {
-        $agendamento = $this->agendamentoRepository->getById($id);
+        try{
+            $this->service->getService('Agendamento')->enviarEmail($id);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao reenviar email do agendamento.");
+        }
+
+        // $agendamento = $this->agendamentoRepository->getById($id);
        
-        // Reenvia o email
-        Mail::to($agendamento->email)->send(new AgendamentoMailGuest($agendamento));
+        // // Reenvia o email
+        // Mail::to($agendamento->email)->send(new AgendamentoMailGuest($agendamento));
         
-        return redirect('/admin/agendamentos')
-            ->with('message', '<i class="icon fa fa-check"></i>Email enviado com sucesso!')
-            ->with('class', 'alert-success');
+        return redirect(route('agendamentos.lista'))->with([
+            'message' => '<i class="icon fa fa-check"></i>Email enviado com sucesso!',
+            'class' => 'alert-success'
+        ]);
     }
 
     public function pendentes()
     {
         $this->authorize('viewAny', auth()->user());
+        $this->authorize('viewPendentes', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->pendentes();
+            $dados = $this->service->getService('Agendamento')->listar();
+            $resultados = $dados['resultados'];
+            $variaveis = $dados['variaveis'];
+            $tabela = $dados['tabela'];
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao carregar os agendamentos pendentes.");
@@ -548,114 +563,114 @@ class AgendamentoController extends Controller
     //     return $mensagem;
     // }
 
-    /**
-     * Método usado para checar se o perfil do usuário exige limitação de visualização de agendamentos
-     * de sua própria regional. Retorna true se for necessário limitar, do contrário, retorna false.
-     * 
-     * Perfis limitados por regional são "Atendente" (8) e "Gerente Seccionais" (21).
-     */
-    protected function limitaPorRegional() 
-    {
-        return Auth::user()->perfil->idperfil == 8 || Auth::user()->perfil->idperfil == 21;
-    }
+    // /**
+    //  * Método usado para checar se o perfil do usuário exige limitação de visualização de agendamentos
+    //  * de sua própria regional. Retorna true se for necessário limitar, do contrário, retorna false.
+    //  * 
+    //  * Perfis limitados por regional são "Atendente" (8) e "Gerente Seccionais" (21).
+    //  */
+    // protected function limitaPorRegional() 
+    // {
+    //     return Auth::user()->perfil->idperfil == 8 || Auth::user()->perfil->idperfil == 21;
+    // }
 
-    public function status($status, $id, $usuario = null)
-    {
-        // Caso o usário seja do perfil "Atendente" (id=8) ele poderá apenas filtrar com sua respectiva regional
-        if(IlluminateRequest::has('regional') && Auth::user()->perfil->idperfil === 8) {
-            if(IlluminateRequest::input('regional') !== Auth::user()->idregional) {
-                abort(401);
-            }
-        }
-        switch ($status) {
-            case Agendamento::STATUS_CANCELADO:
-                $btn = "<strong>" . Agendamento::STATUS_CANCELADO . "</strong>";
-                if(auth()->user()->can('updateOther', auth()->user())) {
-                    $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
-                }
+    // public function status($status, $id, $usuario = null)
+    // {
+    //     // Caso o usário seja do perfil "Atendente" (id=8) ele poderá apenas filtrar com sua respectiva regional
+    //     if(IlluminateRequest::has('regional') && Auth::user()->perfil->idperfil === 8) {
+    //         if(IlluminateRequest::input('regional') !== Auth::user()->idregional) {
+    //             abort(401);
+    //         }
+    //     }
+    //     switch ($status) {
+    //         case Agendamento::STATUS_CANCELADO:
+    //             $btn = "<strong>" . Agendamento::STATUS_CANCELADO . "</strong>";
+    //             if(auth()->user()->can('updateOther', auth()->user())) {
+    //                 $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
+    //             }
                     
-                return $btn;
-            break;
+    //             return $btn;
+    //         break;
 
-            case Agendamento::STATUS_COMPARECEU:
-                $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;" . Agendamento::STATUS_COMPARECEU . "&nbsp;&nbsp;</p>";
-                if(auth()->user()->can('updateOther', auth()->user())) {
-                    $string .= "<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
-                }
-                if(isset($usuario)) {
-                    $string .= "<small class='d-block'>Atendido por: <strong>" . $usuario . "</strong></small>";
-                }
+    //         case Agendamento::STATUS_COMPARECEU:
+    //             $string = "<p class='d-inline'><i class='fas fa-check checkIcone'></i>&nbsp;&nbsp;" . Agendamento::STATUS_COMPARECEU . "&nbsp;&nbsp;</p>";
+    //             if(auth()->user()->can('updateOther', auth()->user())) {
+    //                 $string .= "<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
+    //             }
+    //             if(isset($usuario)) {
+    //                 $string .= "<small class='d-block'>Atendido por: <strong>" . $usuario . "</strong></small>";
+    //             }
 
-                return $string;
-            break;
+    //             return $string;
+    //         break;
 
-            case Agendamento::STATUS_NAO_COMPARECEU:
-                $btn = "<strong>" . Agendamento::STATUS_NAO_COMPARECEU . "</strong>";
-                if(auth()->user()->can('updateOther', auth()->user())) {
-                    $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
-                }
+    //         case Agendamento::STATUS_NAO_COMPARECEU:
+    //             $btn = "<strong>" . Agendamento::STATUS_NAO_COMPARECEU . "</strong>";
+    //             if(auth()->user()->can('updateOther', auth()->user())) {
+    //                 $btn .= "&nbsp;&nbsp;<a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
+    //             }
 
-                return $btn;
-            break;
+    //             return $btn;
+    //         break;
 
-            default:
-                $acoes = '<form method="POST" id="statusAgendamento" action="/admin/agendamentos/status" class="d-inline">';
-                $acoes .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="' . csrf_token() . '" />';
-                $acoes .= '<input type="hidden" name="_method" value="PUT" id="method" />';
-                $acoes .= '<input type="hidden" name="idagendamento" value="' . $id . '" />';
-                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="' . Agendamento::STATUS_COMPARECEU . '">Confirmar</button>';
-                $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="' . Agendamento::STATUS_NAO_COMPARECEU . '">' . Agendamento::STATUS_NAO_COMPARECEU . '</button>';
-                $acoes .= '</form>';
+    //         default:
+    //             $acoes = '<form method="POST" id="statusAgendamento" action="/admin/agendamentos/status" class="d-inline">';
+    //             $acoes .= '<input type="hidden" name="_token" id="tokenStatusAgendamento" value="' . csrf_token() . '" />';
+    //             $acoes .= '<input type="hidden" name="_method" value="PUT" id="method" />';
+    //             $acoes .= '<input type="hidden" name="idagendamento" value="' . $id . '" />';
+    //             $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-primary" value="' . Agendamento::STATUS_COMPARECEU . '">Confirmar</button>';
+    //             $acoes .= '<button type="submit" name="status" id="btnSubmit" class="btn btn-sm btn-danger ml-1" value="' . Agendamento::STATUS_NAO_COMPARECEU . '">' . Agendamento::STATUS_NAO_COMPARECEU . '</button>';
+    //             $acoes .= '</form>';
 
-                if(auth()->user()->can('updateOther', auth()->user())) {
-                    $acoes .= " <a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
-                }
+    //             if(auth()->user()->can('updateOther', auth()->user())) {
+    //                 $acoes .= " <a href='/admin/agendamentos/editar/" . $id . "' class='btn btn-sm btn-default'>Editar</a>";
+    //             }
 
-                return $acoes;
-            break;
-        }
-    }
+    //             return $acoes;
+    //         break;
+    //     }
+    // }
 
-    public function tabelaCompleta($resultados)
-    {
-        // Opções de cabeçalho da tabela
-        $headers = [
-            'Protocolo',
-            'Nome/CPF',
-            'Horário/Dia',
-            'Serviço',
-            'Status'
-        ];
-        // Opções de conteúdo da tabela
-        $contents = [];
-        foreach($resultados as $resultado) {
-            // Ações possíveis com cada resultado
-            if(isset($resultado->user->nome)) {
-                $nomeusuario = $resultado->user->nome;
-            }  
-            else {
-                $nomeusuario = null;
-            }
+    // public function tabelaCompleta($resultados)
+    // {
+    //     // Opções de cabeçalho da tabela
+    //     $headers = [
+    //         'Protocolo',
+    //         'Nome/CPF',
+    //         'Horário/Dia',
+    //         'Serviço',
+    //         'Status'
+    //     ];
+    //     // Opções de conteúdo da tabela
+    //     $contents = [];
+    //     foreach($resultados as $resultado) {
+    //         // Ações possíveis com cada resultado
+    //         if(isset($resultado->user->nome)) {
+    //             $nomeusuario = $resultado->user->nome;
+    //         }  
+    //         else {
+    //             $nomeusuario = null;
+    //         }
                 
-            $acoes = $this->status($resultado->status, $resultado->idagendamento, $nomeusuario);
-            // Mostra dados na tabela
-            $conteudo = [
-                $resultado->protocolo.'<br><small>Código: ' . $resultado->idagendamento . '</small>',
-                $resultado->nome . '<br>' . $resultado->cpf,
-                $resultado->hora . '<br><small><strong>' . onlyDate($resultado->dia) . '</strong></small>',
-                $resultado->tiposervico . '<br><small>(' . $resultado->regional->regional . ')',
-                $acoes
-            ];
-            array_push($contents, $conteudo);
-        }
-        // Classes da tabela
-        $classes = [
-            'table',
-            'table-bordered',
-            'table-striped'
-        ];
-        $tabela = $this->montaTabela($headers, $contents, $classes);
+    //         $acoes = $this->status($resultado->status, $resultado->idagendamento, $nomeusuario);
+    //         // Mostra dados na tabela
+    //         $conteudo = [
+    //             $resultado->protocolo.'<br><small>Código: ' . $resultado->idagendamento . '</small>',
+    //             $resultado->nome . '<br>' . $resultado->cpf,
+    //             $resultado->hora . '<br><small><strong>' . onlyDate($resultado->dia) . '</strong></small>',
+    //             $resultado->tiposervico . '<br><small>(' . $resultado->regional->regional . ')',
+    //             $acoes
+    //         ];
+    //         array_push($contents, $conteudo);
+    //     }
+    //     // Classes da tabela
+    //     $classes = [
+    //         'table',
+    //         'table-bordered',
+    //         'table-striped'
+    //     ];
+    //     $tabela = $this->montaTabela($headers, $contents, $classes);
         
-        return $tabela;
-    }
+    //     return $tabela;
+    // }
 }

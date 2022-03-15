@@ -59,4 +59,9 @@ class UserPolicy
     {
         return $user->idperfil == 8 || $user->idperfil == 21;
     }
+
+    public function viewPendentes(User $user)
+    {
+        return in_array($user->idperfil, [1, 6, 8, 12, 13, 21]);
+    }
 }

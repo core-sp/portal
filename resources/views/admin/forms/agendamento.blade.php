@@ -136,8 +136,7 @@
                 <select name="idusuario"
                     id="idusuarioAgendamento"
                     class="form-control {{ $errors->has('idusuario') ? 'is-invalid' : '' }}"
-                    {{ $now < $resultado->dia ? 'disabled' : '' }}
-                />
+                >
                     <option value="">Ninguém</option>
                 @if(isset($atendentes))
                     @foreach($atendentes as $atendente)

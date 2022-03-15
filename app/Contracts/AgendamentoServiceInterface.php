@@ -6,15 +6,13 @@ use App\Contracts\MediadorServiceInterface;
 
 interface AgendamentoServiceInterface {
 
-    public function index($request, MediadorServiceInterface $service);
+    public function listar($request = null, MediadorServiceInterface $service = null);
 
     public function view($id);
 
-    public function save($dados, $id);
+    public function save($dados, $id = null);
 
-    public function updateStatus($dados);
-
-    public function pendentes();
+    public function enviarEmail($id);
 
     public function buscar($busca);
 }

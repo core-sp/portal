@@ -7,6 +7,8 @@ use App\Contracts\MediadorServiceInterface;
 use App\Agendamento;
 use App\Events\CrudEvent;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AgendamentoMailGuest;
 
 class AgendamentoService implements AgendamentoServiceInterface {
 
@@ -181,37 +183,27 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ->paginate(25);
     }
 
-    private function validarUpdate($dados)
+    private function validarUpdate($dados, $agendamento)
     {
-        $statusInvalido = isset($dados['status']) && !in_array($dados['status'], $this->status());
-        $servicoInvalido = !in_array($dados['tiposervico'], $this->servicosCompletos());
-        if($statusInvalido || $servicoInvalido)
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Status ou Tipo de Serviço não encontrado',
-                'class' => 'alert-danger'
-            ];
-        
-        if(!isset($dados['status']) && isset($dados['idusuario']))
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Agendamento sem status não pode ter atendente',
-                'class' => 'alert-danger'
-            ];
+        if(isset($dados['tiposervico']) && isset($dados['idusuario']))
+        {
+            $servicoInvalido = isset($dados['tiposervico']) && !in_array($dados['tiposervico'], $this->servicosCompletos());
+            if($servicoInvalido)
+                return [
+                    'message' => '<i class="icon fa fa-ban"></i>Tipo de Serviço não encontrado',
+                    'class' => 'alert-danger'
+                ];
+            
+            if(!isset($dados['status']) && isset($dados['idusuario']))
+                return [
+                    'message' => '<i class="icon fa fa-ban"></i>Agendamento sem status não pode ter atendente',
+                    'class' => 'alert-danger'
+                ];
+    
+            $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE);
+        } 
 
-        $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE);
-
-        return $dados;
-    }
-
-    private function validarUpdateStatus($dados, $dia)
-    {
-        $statusInvalido = isset($dados['status']) && !in_array($dados['status'], $this->status());
-        if($statusInvalido)
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Status não encontrado',
-                'class' => 'alert-danger'
-            ];
-        
-        if($dia > date('Y-m-d'))
+        if(($agendamento->dia > date('Y-m-d')) && (isset($dados['status']) && $dados['status'] != Agendamento::STATUS_CANCELADO))
             return [
                 'message' => '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado antes da data agendada',
                 'class' => 'alert-danger'
@@ -260,17 +252,45 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return $tabela;
     }
 
-    public function index($request, MediadorServiceInterface $service)
+    public function listar($request = null, MediadorServiceInterface $service = null)
     {
-        $dados = $this->validacaoFiltroAtivo($request);
-        $resultados = $this->getResultadosFiltro($dados);
-        $this->variaveis['mostraFiltros'] = true;
+        if(isset($request) && isset($service))
+        {
+            $dados = $this->validacaoFiltroAtivo($request);
+            $resultados = $this->getResultadosFiltro($dados);
+            $this->variaveis['mostraFiltros'] = true;
+    
+            return [
+                'erro' => isset($dados['message']) ? $dados : null,
+                'resultados' => $resultados, 
+                'tabela' => $this->tabelaCompleta($resultados), 
+                'temFiltro' => $this->filtro($request, $service),
+                'variaveis' => (object) $this->variaveis,
+            ];
+        }
+
+        $perfil = auth()->user()->idperfil;
+        $idregional = auth()->user()->idregional;
+        
+        $resultados = Agendamento::with(['user', 'regional'])
+            ->where('dia', '<', date('Y-m-d'))
+            ->whereNull('status')
+            ->when($perfil == 12, function ($query) {
+                $query->where('idregional', 1);
+            })->when($perfil == 13, function ($query) {
+                $query->where('idregional', '!=', 1);
+            })->when(($perfil == 8) || ($perfil == 21), function ($query) use ($idregional) {
+                $query->where('idregional', $idregional);
+            })->orderBy('dia', 'DESC')
+            ->paginate(10);
+        
+        $this->variaveis['continuacao_titulo'] = 'pendentes de validação';
+        $this->variaveis['plural'] = 'agendamentos pendentes';
+        $this->variaveis['btn_criar'] = '<a class="btn btn-primary" href="'.route('agendamentos.lista').'">Lista de Agendamentos</a>';
 
         return [
-            'erro' => isset($dados['message']) ? $dados : null,
-            'resultados' => $resultados, 
-            'tabela' => $this->tabelaCompleta($resultados), 
-            'temFiltro' => $this->filtro($request, $service),
+            'tabela' => $this->tabelaCompleta($resultados),
+            'resultados' => $resultados,
             'variaveis' => (object) $this->variaveis,
         ];
     }
@@ -283,83 +303,66 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $sameRegional = auth()->user()->can('sameRegional', $agendamento);
         abort_if($atendOrGere && !$sameRegional, 403);
 
-        $atendentes = date('Y-m-d') >= $agendamento->dia ? 
-        $agendamento->regional->users()->select('idusuario', 'nome')->where('idperfil', 8)->withoutTrashed()->get() : null;
+        $status = $this->status();
+    
+        if($agendamento->dia > date('Y-m-d'))
+        {
+            unset($status[0]);
+            unset($status[1]);
+            $atendentes = null;
+        } else
+            $atendentes = $agendamento->regional->users()->select('idusuario', 'nome')->where('idperfil', 8)->withoutTrashed()->get();
 
-        $msg = $agendamento->getMsgByStatus();
         $this->variaveis['cancela_idusuario'] = true;
-
+    
         return [
             'servicos' => $this->servicosCompletos(),
-            'status' => $this->status(),
+            'status' => $status,
             'variaveis' => (object) $this->variaveis,
             'atendentes' => $atendentes,
             'resultado' => $agendamento
         ];
     }
 
-    public function save($dados, $id)
+    public function enviarEmail($id)
     {
         $agendamento = Agendamento::findOrFail($id);
+        Mail::to($agendamento->email)->send(new AgendamentoMailGuest($agendamento));
+    }
+
+    public function save($dados, $id = null)
+    {
+        $codigo = isset($id) ? $id : $dados['idagendamento'];
+        $agendamento = Agendamento::findOrFail($codigo);
 
         $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
         $sameRegional = auth()->user()->can('sameRegional', $agendamento);
         abort_if($atendOrGere && !$sameRegional, 403);
-        
-        $valido = $this->validarUpdate($dados);
 
+        $valido = $this->validarUpdate($dados, $agendamento);
         if(isset($valido['message']))
             return $valido;
+
+        if(isset($dados['idagendamento']))
+            $valido['idusuario'] = auth()->user()->idusuario;
 
         $agendamento->update($valido);
 
-        event(new CrudEvent('agendamento', 'editou', $id));
-    }
-
-    public function updateStatus($dados)
-    {
-        $agendamento = Agendamento::findOrFail($dados['idagendamento']);
-        $dados['idusuario'] = auth()->user()->idusuario;
-
-        $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
-        $sameRegional = auth()->user()->can('sameRegional', $agendamento);
-        abort_if($atendOrGere && !$sameRegional, 403);
-        
-        $valido = $this->validarUpdateStatus($dados, $agendamento->dia);
-
-        if(isset($valido['message']))
-            return $valido;
-
-        $agendamento->update($dados);
-        $status = $dados['status'] == Agendamento::STATUS_COMPARECEU ? 'presença' : 'falta';
-
-        event(new CrudEvent('agendamento', 'confirmou '.$status, $agendamento->idagendamento));
-    }
-
-    public function pendentes()
-    {
-        $perfil = auth()->user()->idperfil;
-        $idregional = auth()->user()->idregional;
-        
-        $agendamentos = Agendamento::where('dia', '<', date('Y-m-d'))
-            ->whereNull('status')
-            ->when($perfil == 12, function ($query) {
-                $query->where('idregional', 1);
-            })->when($perfil == 13, function ($query) {
-                $query->where('idregional', '!=', 1);
-            })->when(($perfil == 8) || ($perfil == 21), function ($query) use($idregional) {
-                $query->where('idregional', $idregional);
-            })->orderBy('dia', 'DESC')
-            ->paginate(10);
-            
-        dd($agendamentos);
+        if(isset($id))
+            event(new CrudEvent('agendamento', 'editou', $id));
+        else
+        {
+            $status = $dados['status'] == Agendamento::STATUS_COMPARECEU ? 'presença' : 'falta';
+            event(new CrudEvent('agendamento', 'confirmou '.$status, $agendamento->idagendamento));
+        }
     }
 
     public function buscar($busca)
     {
         $regional = auth()->user()->can('atendenteOrGerSeccionais', auth()->user()) ? auth()->user()->idregional : null;
 
-        $resultados = Agendamento::when($regional, function ($query, $regional) use ($busca) {
+        $resultados = Agendamento::with(['user', 'regional'])
+            ->when($regional, function ($query, $regional) use ($busca) {
                 return $query->where('idregional', $regional)
                     ->where(function($q) use ($busca) {
                         $q->where('cpf', 'LIKE', '%'.$busca.'%')
