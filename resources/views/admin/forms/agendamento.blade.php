@@ -11,6 +11,7 @@
     @csrf
     @method('PUT')
     <div class="card-body">
+        <input type="hidden" name="antigo" value="{{ $now >= $resultado->dia }}" />
         <div class="form-row">
             <div class="col">
                 <label for="nome">Nome</label>
@@ -123,12 +124,28 @@
             </div>
         </div>
         <div class="form-row mt-2">
-            <div class="col">
+            <div class="col-4">
                 <label for="idregional">Regional</label>
                 <input type="text" name="idregional"
                     class="form-control"
                     readonly
                     value="{{ isset($resultado->idregional) ? $resultado->regional->regional : '' }}"
+                />
+            </div>
+            <div class="col-1">
+                <label for="dia">Dia</label>
+                <input type="text" name="dia"
+                    class="form-control"
+                    readonly
+                    value="{{ isset($resultado->dia) ? onlyDate($resultado->dia) : '' }}"
+                />
+            </div>
+            <div class="col-1">
+                <label for="hora">Hora</label>
+                <input type="text" name="hora"
+                    class="form-control"
+                    readonly
+                    value="{{ isset($resultado->hora) ? $resultado->hora : '' }}"
                 />
             </div>
             <div class="col">
@@ -166,7 +183,7 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            <a href="{{ route('agendamentos.lista') }}" class="btn btn-default">Cancelar</a>
+            <a href="{{ session('url') ?? route('agendamentos.lista') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">Salvar</button>
         </div>
     </div>

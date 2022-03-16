@@ -15,4 +15,6 @@ interface AgendamentoServiceInterface {
     public function enviarEmail($id);
 
     public function buscar($busca);
+
+    public function getServicosOrStatusOrCompletos($tipo);
 }

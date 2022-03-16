@@ -56,13 +56,13 @@ class AgendamentoRepository
         return Agendamento::findOrFail($id)->update($data);
     }
 
-    public function getAllPastAgendamentoPendente()
-    {
-        return Agendamento::where('dia', '<', date('Y-m-d'))
-            ->whereNull('status')
-            ->orderBy('dia', 'DESC')
-            ->paginate(10);
-    }
+    // public function getAllPastAgendamentoPendente()
+    // {
+    //     return Agendamento::where('dia', '<', date('Y-m-d'))
+    //         ->whereNull('status')
+    //         ->orderBy('dia', 'DESC')
+    //         ->paginate(10);
+    // }
 
     public function getCountPastAgendamentoPendente()
     {
@@ -71,14 +71,14 @@ class AgendamentoRepository
             ->count();
     }
 
-    public function getAllPastAgendamentoPendenteSede()
-    {
-        return Agendamento::where('dia', '<', date('Y-m-d'))
-            ->where('idregional', 1)
-            ->whereNull('status')
-            ->orderBy('dia', 'DESC')
-            ->paginate(10);
-    }
+    // public function getAllPastAgendamentoPendenteSede()
+    // {
+    //     return Agendamento::where('dia', '<', date('Y-m-d'))
+    //         ->where('idregional', 1)
+    //         ->whereNull('status')
+    //         ->orderBy('dia', 'DESC')
+    //         ->paginate(10);
+    // }
 
     public function getCountPastAgendamentoPendenteSede()
     {
@@ -88,14 +88,14 @@ class AgendamentoRepository
             ->count();
     }
 
-    public function getAllPastAgendamentoPendenteSeccionais()
-    {
-        return Agendamento::where('dia', '<', date('Y-m-d'))
-            ->where('idregional', '!=', 1)
-            ->whereNull('status')
-            ->orderBy('dia', 'DESC')
-            ->paginate(10);
-    }
+    // public function getAllPastAgendamentoPendenteSeccionais()
+    // {
+    //     return Agendamento::where('dia', '<', date('Y-m-d'))
+    //         ->where('idregional', '!=', 1)
+    //         ->whereNull('status')
+    //         ->orderBy('dia', 'DESC')
+    //         ->paginate(10);
+    // }
 
     public function getCountPastAgendamentoPendenteSeccionais()
     {
@@ -105,14 +105,14 @@ class AgendamentoRepository
             ->count();
     }
 
-    public function getPastAgendamentoPendenteByRegional($idRegional)
-    {
-        return Agendamento::where('dia', '<', date('Y-m-d'))
-            ->where('idregional', '=', $idRegional)
-            ->whereNull('status')
-            ->orderBy('dia', 'DESC')
-            ->paginate(10);
-    }
+    // public function getPastAgendamentoPendenteByRegional($idRegional)
+    // {
+    //     return Agendamento::where('dia', '<', date('Y-m-d'))
+    //         ->where('idregional', '=', $idRegional)
+    //         ->whereNull('status')
+    //         ->orderBy('dia', 'DESC')
+    //         ->paginate(10);
+    // }
 
     public function getCountPastAgendamentoPendenteByRegional($idRegional)
     {
@@ -186,28 +186,28 @@ class AgendamentoRepository
         return  Agendamento::where('protocolo', $protocolo)->count();
     }
    
-    public function getToTableFilter($mindia, $maxdia, $regional, $status, $servico)
-    {
-        $resultados = Agendamento::whereBetween('dia',[$mindia,$maxdia]);
+    // public function getToTableFilter($mindia, $maxdia, $regional, $status, $servico)
+    // {
+    //     $resultados = Agendamento::whereBetween('dia',[$mindia,$maxdia]);
 
-        if(!empty($regional)) {
-            $resultados->where('idregional', $regional);
-        }
+    //     if(!empty($regional)) {
+    //         $resultados->where('idregional', $regional);
+    //     }
 
-        if(!empty($status)) {
-            $resultados->where('status', $status);
-        }
+    //     if(!empty($status)) {
+    //         $resultados->where('status', $status);
+    //     }
 
-        if(!empty($servico)) {
-            $resultados->where('tiposervico', $servico);
-        }
+    //     if(!empty($servico)) {
+    //         $resultados->where('tiposervico', $servico);
+    //     }
 
-        return $resultados->orderBy('idregional','ASC')
-            ->orderBy('dia','DESC')
-            ->orderBy('hora','ASC')
-            ->limit(50)
-            ->paginate(25);
-    }
+    //     return $resultados->orderBy('idregional','ASC')
+    //         ->orderBy('dia','DESC')
+    //         ->orderBy('hora','ASC')
+    //         ->limit(50)
+    //         ->paginate(25);
+    // }
 
     public function getAgendamentoConcluidoCountByRegional($idregional) 
     {

@@ -2,23 +2,34 @@
 
 namespace App\Http\Requests;
 
-use App\Agendamento;
+use App\Contracts\MediadorServiceInterface;
 use App\Rules\Cpf;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AgendamentoUpdateRequest extends FormRequest
 {
+    private $service;
+
+    public function __construct(MediadorServiceInterface $service)
+    {
+        $this->service = $service->getService('Agendamento');
+    }
+
     public function rules()
     {
+        $completos = $this->service->getServicosOrStatusOrCompletos('completos');
+        $status = $this->service->getServicosOrStatusOrCompletos('status');
+
         return [
-            'nome' => 'sometimes|required|max:191',
-            'email' => 'sometimes|required|email|max:191',
-            'cpf' => ['sometimes', 'required', 'max:14', new Cpf],
-            'celular' => 'sometimes|required|max:17',
-            'tiposervico' => 'sometimes|required|max:191',
-            'idusuario' => 'sometimes|required_if:status,==,'.Agendamento::STATUS_COMPARECEU,
-            'status' => 'sometimes|nullable|in:'.Agendamento::STATUS_COMPARECEU.','.Agendamento::STATUS_NAO_COMPARECEU.','.Agendamento::STATUS_CANCELADO,
-            'idagendamento' => 'sometimes|required_without_all:nome,email,cpf,celular,tiposervico,idusuario'
+            'antigo' => 'sometimes|boolean',
+            'nome' => 'sometimes|exclude_if:antigo,1|required|max:191',
+            'email' => 'sometimes|exclude_if:antigo,1|required|email|max:191',
+            'cpf' => ['sometimes', 'exclude_if:antigo,1', 'required', 'max:14', new Cpf],
+            'celular' => 'sometimes|exclude_if:antigo,1|required|max:17',
+            'tiposervico' => 'sometimes|required|in:'.implode(',', $completos),
+            'idusuario' => 'sometimes|required_if:status,==,'.$status[0],
+            'status' => 'sometimes|nullable|in:'.implode(',', $status),
+            'idagendamento' => 'sometimes|required_without_all:nome,email,cpf,celular,tiposervico,idusuario,antigo'
         ];
     }
 
@@ -29,7 +40,8 @@ class AgendamentoUpdateRequest extends FormRequest
             'required' => 'O campo :attribute é obrigatório',
             'email' => 'Email inválido',
             'idusuario.required_if' => 'Informe o atendente que realizou o atendimento',
-            'status.in' => 'Opção inválida de status'
+            'status.in' => 'Opção inválida de status',
+            'tiposervico.in' => 'Opção inválida de tipo de serviço',
         ];
     }
 }

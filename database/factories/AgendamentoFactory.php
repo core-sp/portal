@@ -12,10 +12,12 @@ $factory->define(Agendamento::class, function (Faker $faker) {
         'cpf' => '100.449.380-04',
         'email' => $faker->email,
         'celular' => '(11) 98765-4321',
-        'tiposervico' => 'Teste',
-        'idregional' => null,
-        'protocolo' => null,
-        'dia' => null,
-        'hora' => null
+        'tiposervico' => 'Atualização de Cadastro para PF',
+        'idregional' => factory('App\Regional'),
+        'protocolo' => 'AGE-XXXXXX',
+        'dia' => date('Y-m-d', strtotime('+1 day')),
+        'hora' => '10:00',
+        'status' => null,
+        'idusuario' => null
     ];
 });

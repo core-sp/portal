@@ -87,10 +87,9 @@ class AgendamentoController extends Controller
         // $variaveis['mostraFiltros'] = true;
         // $variaveis = (object) $variaveis;
 
-        // Ajustar retorno com filtro
         return !isset($dados['erro']['message']) ? 
             view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro')) : 
-            redirect()->back()->with($dados['erro']);
+            redirect(session('url'))->with($dados['erro']);
     }
 
     public function updateStatus(AgendamentoUpdateRequest $request)
@@ -140,8 +139,7 @@ class AgendamentoController extends Controller
         
         $id = $validated['idagendamento'];
 
-        // Ajustar retorno com filtro
-        return redirect()->back()->with([
+        return redirect(session('url') ?? route('agendamentos.lista'))->with([
             'message' => isset($erro['message']) ? $erro['message'] : 
                 '<i class="icon fa fa-check"></i>Status do agendamento com ID '.$id.' foi editado com sucesso!',
             'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
@@ -248,8 +246,7 @@ class AgendamentoController extends Controller
 
         // event(new CrudEvent('agendamento', 'editou', $id));
 
-        // Ajustar retorno com filtro
-        return redirect()->back()->with([
+        return redirect(session('url') ?? route('agendamentos.lista'))->with([
             'message' => isset($erro['message']) ? $erro['message'] : '<i class="icon fa fa-check"></i>Agendamento com a ID '.$id.' foi editado com sucesso!',
             'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
         ]);
@@ -257,10 +254,13 @@ class AgendamentoController extends Controller
 
     public function reenviarEmail($id)
     {
+        $this->authorize('updateOther', auth()->user());
+
         try{
             $this->service->getService('Agendamento')->enviarEmail($id);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
+            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode()) : 
             abort(500, "Erro ao reenviar email do agendamento.");
         }
 
@@ -269,8 +269,8 @@ class AgendamentoController extends Controller
         // // Reenvia o email
         // Mail::to($agendamento->email)->send(new AgendamentoMailGuest($agendamento));
         
-        return redirect(route('agendamentos.lista'))->with([
-            'message' => '<i class="icon fa fa-check"></i>Email enviado com sucesso!',
+        return redirect(session('url') ?? route('agendamentos.lista'))->with([
+            'message' => '<i class="icon fa fa-check"></i>Email do agendamento com ID '.$id.' foi enviado com sucesso!',
             'class' => 'alert-success'
         ]);
     }

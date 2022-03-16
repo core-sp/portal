@@ -184,28 +184,29 @@ class AgendamentoService implements AgendamentoServiceInterface {
     }
 
     private function validarUpdate($dados, $agendamento)
-    {
-        if(isset($dados['tiposervico']) && isset($dados['idusuario']))
-        {
-            $servicoInvalido = isset($dados['tiposervico']) && !in_array($dados['tiposervico'], $this->servicosCompletos());
-            if($servicoInvalido)
-                return [
-                    'message' => '<i class="icon fa fa-ban"></i>Tipo de Serviço não encontrado',
-                    'class' => 'alert-danger'
-                ];
-            
-            if(!isset($dados['status']) && isset($dados['idusuario']))
-                return [
-                    'message' => '<i class="icon fa fa-ban"></i>Agendamento sem status não pode ter atendente',
-                    'class' => 'alert-danger'
-                ];
-    
-            $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE);
-        } 
+    {   
+        $updateStatus = str_contains('@updateStatus', \Route::currentRouteAction());
 
-        if(($agendamento->dia > date('Y-m-d')) && (isset($dados['status']) && $dados['status'] != Agendamento::STATUS_CANCELADO))
+        if(!$updateStatus && !isset($dados['antigo']))
+            abort(500);
+        elseif(isset($dados['antigo']))
+            unset($dados['antigo']);
+
+        if(isset($dados['nome']))
+            $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE); 
+
+        if(!isset($dados['status']) && isset($dados['idusuario']))
             return [
-                'message' => '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado antes da data agendada',
+                'message' => '<i class="icon fa fa-ban"></i>Agendamento sem status não pode ter atendente',
+                'class' => 'alert-danger'
+            ];
+
+        $depoisDeHj = $agendamento->dia > date('Y-m-d');
+        $cancelado = isset($dados['status']) && ($dados['status'] != Agendamento::STATUS_CANCELADO);
+        if($depoisDeHj && $cancelado)
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado para '
+                .Agendamento::STATUS_COMPARECEU.' ou '.Agendamento::STATUS_NAO_COMPARECEU.' antes da data agendada',
                 'class' => 'alert-danger'
             ];
 
@@ -254,6 +255,8 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     public function listar($request = null, MediadorServiceInterface $service = null)
     {
+        session(['url' => url()->full()]);
+
         if(isset($request) && isset($service))
         {
             $dados = $this->validacaoFiltroAtivo($request);
@@ -304,14 +307,11 @@ class AgendamentoService implements AgendamentoServiceInterface {
         abort_if($atendOrGere && !$sameRegional, 403);
 
         $status = $this->status();
-    
         if($agendamento->dia > date('Y-m-d'))
         {
             unset($status[0]);
             unset($status[1]);
-            $atendentes = null;
-        } else
-            $atendentes = $agendamento->regional->users()->select('idusuario', 'nome')->where('idperfil', 8)->withoutTrashed()->get();
+        } 
 
         $this->variaveis['cancela_idusuario'] = true;
     
@@ -319,7 +319,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'servicos' => $this->servicosCompletos(),
             'status' => $status,
             'variaveis' => (object) $this->variaveis,
-            'atendentes' => $atendentes,
+            'atendentes' => $agendamento->regional->users()->select('idusuario', 'nome')->where('idperfil', 8)->withoutTrashed()->get(),
             'resultado' => $agendamento
         ];
     }
@@ -327,6 +327,11 @@ class AgendamentoService implements AgendamentoServiceInterface {
     public function enviarEmail($id)
     {
         $agendamento = Agendamento::findOrFail($id);
+
+        $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
+        $sameRegional = auth()->user()->can('sameRegional', $agendamento);
+        abort_if($atendOrGere && !$sameRegional, 403);
+
         Mail::to($agendamento->email)->send(new AgendamentoMailGuest($agendamento));
     }
 
@@ -343,7 +348,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         if(isset($valido['message']))
             return $valido;
 
-        if(isset($dados['idagendamento']))
+        if(!isset($dados['idusuario']) && !isset($dados['tiposervico']))
             $valido['idusuario'] = auth()->user()->idusuario;
 
         $agendamento->update($valido);
@@ -381,5 +386,16 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'tabela' => $this->tabelaCompleta($resultados), 
             'variaveis' => (object) $this->variaveis
         ];
+    }
+
+    public function getServicosOrStatusOrCompletos($tipo)
+    {
+        $array = [
+            'servicos' => $this->servicos(),
+            'status' => $this->status(),
+            'completos' => $this->servicosCompletos()
+        ];
+
+        return isset($array[$tipo]) ? $array[$tipo] : null;
     }
 }

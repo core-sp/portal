@@ -61,12 +61,7 @@ class AgendamentoTest extends TestCase
     {
         $this->assertGuest();
         
-        $agendamento = factory('App\Agendamento')->create([
-            'idregional' => factory('App\Regional')->create(),
-            'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00',
-            'protocolo' => 'AGE-XXXXXX'
-        ]);
+        $agendamento = factory('App\Agendamento')->create();
 
         $bloqueio = factory('App\AgendamentoBloqueio')->create();
 
@@ -93,12 +88,7 @@ class AgendamentoTest extends TestCase
         $this->signIn();
         $this->assertAuthenticated('web');
         
-        $agendamento = factory('App\Agendamento')->create([
-            'idregional' => factory('App\Regional')->create(),
-            'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00',
-            'protocolo' => 'AGE-XXXXXX'
-        ]);
+        $agendamento = factory('App\Agendamento')->create();
 
         $bloqueio = factory('App\AgendamentoBloqueio')->create();
 
@@ -108,6 +98,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentos.pendentes'))->assertForbidden();
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertForbidden();
         $this->put(route('agendamentos.edit', $agendamento->idagendamento), $agendamento->toArray())->assertForbidden();
+        $this->post(route('agendamentos.reenviarEmail', $agendamento->idagendamento))->assertForbidden();
 
         $this->get(route('agendamentobloqueios.lista'))->assertForbidden();
         $this->get('/admin/agendamentos/bloqueios/busca')->assertForbidden();
@@ -128,11 +119,8 @@ class AgendamentoTest extends TestCase
         $this->signIn();
 
         $this->get(route('agendamentos.lista'))->assertForbidden();
-
         $this->get(route('agendamentos.busca'))->assertForbidden();
-
         $this->get(route('agendamentos.filtro'))->assertForbidden();
-
         $this->get(route('agendamentos.pendentes'))->assertForbidden();   
     }
 
@@ -146,16 +134,11 @@ class AgendamentoTest extends TestCase
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional,
-            'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00',
-            'protocolo' => 'AGE-XXXXXX'
+            'status' => Agendamento::STATUS_CANCELADO
         ]);
-        $agendamento->status = Agendamento::STATUS_NAO_COMPARECEU;
 
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertForbidden();
-
         $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())->assertForbidden();
-
         $this->assertNotEquals(Agendamento::find($agendamento->idagendamento)->status, $agendamento->status);
     }
 
@@ -169,37 +152,292 @@ class AgendamentoTest extends TestCase
         $this->signInAsAdmin();
 
         $this->get(route('agendamentos.lista'))->assertOk();
-
         $this->get(route('agendamentos.busca'))->assertOk();
-
         $this->get(route('agendamentos.filtro'))->assertOk();
-
         $this->get(route('agendamentos.pendentes'))->assertOk();   
     }
 
-    /** @test 
-     * 
-     * Usuário com autorização pode editar Agendamentos.
-    */
-    public function authorized_users_can_edit_agendamento()
+    /** @test */
+    public function cannot_edit_status_to_nao_compareceu_tomorrow_agendamento()
     {
         $user = $this->signInAsAdmin();
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional,
-            'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00',
-            'protocolo' => 'AGE-XXXXXX'
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
-        $agendamento->status = Agendamento::STATUS_NAO_COMPARECEU;
 
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
-
         $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())->assertStatus(302);
-
-        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, $agendamento->status);
+        $this->get(route('agendamentos.lista'))
+        ->assertSeeText('Status do agendamento não pode ser modificado para Compareceu ou Não Compareceu antes da data agendada');
     }
 
+    /** @test */
+    public function cannot_edit_status_to_compareceu_tomorrow_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'status' => Agendamento::STATUS_COMPARECEU
+        ]);
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())->assertStatus(302);
+        $this->get(route('agendamentos.lista'))
+        ->assertSeeText('Status do agendamento não pode ser modificado para Compareceu ou Não Compareceu antes da data agendada');
+    }
+
+    /** @test */
+    public function cannot_edit_atendente_if_status_sem_status_in_tomorrow_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional
+        ]);
+
+        $agendamento->idusuario = $user->idusuario;
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())->assertStatus(302);
+        $this->get(route('agendamentos.lista'))
+        ->assertSeeText('Agendamento sem status não pode ter atendente');
+    }
+
+    /** @test */
+    public function cannot_edit_atendente_if_status_sem_status()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => Carbon::today()->subDay()
+        ]);
+
+        $agendamento->idusuario = $user->idusuario;
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())->assertStatus(302);
+        $this->get(route('agendamentos.lista'))
+        ->assertSeeText('Agendamento sem status não pode ter atendente');
+    }
+
+    /** @test */
+    public function cannot_edit_without_atendente_if_status_compareceu()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => Carbon::today()->subDay()
+        ]);
+
+        $agendamento->status = Agendamento::STATUS_COMPARECEU;
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
+        ->assertSessionHasErrors(['idusuario']);
+    }
+
+    /** @test */
+    public function cannot_edit_without_atendente_if_status_compareceu_in_tomorrow_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional
+        ]);
+
+        $agendamento->status = Agendamento::STATUS_COMPARECEU;
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
+        ->assertSessionHasErrors(['idusuario']);
+    }
+
+    /** @test */
+    public function cannot_edit_wrong_tiposervico_tomorrow_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional
+        ]);
+
+        $agendamento->tiposervico = 'Qualquer coisa';
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
+        ->assertSessionHasErrors(['tiposervico']);
+    }
+
+    /** @test */
+    public function cannot_edit_wrong_tiposervico()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => Carbon::today()->subDay()
+        ]);
+
+        $agendamento->tiposervico = 'Qualquer coisa';
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
+        ->assertSessionHasErrors(['tiposervico']);
+    }
+
+    /** @test */
+    public function cannot_edit_wrong_status_in_tomorrow_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional
+        ]);
+
+        $agendamento->status = 'Qualquer coisa';
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
+        ->assertSessionHasErrors(['status']);
+    }
+
+    /** @test */
+    public function cannot_edit_wrong_status()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => Carbon::today()->subDay()
+        ]);
+
+        $agendamento->status = 'Qualquer coisa';
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
+        ->assertSessionHasErrors(['status']);
+    }
+
+    /** @test */
+    public function cannot_edit_wrong_cpf_in_tomorrow_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional
+        ]);
+
+        $agendamento->cpf = '123.456.789-00';
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
+        ->assertSessionHasErrors(['cpf']);
+    }
+
+    /** @test */
+    public function cannot_edit_without_requireds_inputs_in_tomorrow_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional
+        ]);
+
+        $agendamento->nome = '';
+        $agendamento->email = '';
+        $agendamento->cpf = '';
+        $agendamento->celular = '';
+        $agendamento->tiposervico = '';
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
+        ->assertSessionHasErrors(['nome', 'email', 'cpf', 'celular', 'tiposervico']);
+    }
+
+    /** @test */
+    public function cannot_edit_nome_email_cpf_celular_in_past_or_today_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => Carbon::today()->subDay()
+        ]);
+
+        $dados = [
+            'antigo' => 1,
+            'nome' => 'Teste',
+            'email' => 'teste@teste.com',
+            'cpf' => '267.239.070-35',
+            'celular' => '(11) 99999-9999',
+        ];
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)
+        ->assertRedirect(route('agendamentos.lista'));
+
+        $this->assertDatabaseHas('agendamentos', [
+            'idagendamento' => $agendamento->idagendamento,
+            'nome' => $agendamento->nome,
+            'email' => $agendamento->email,
+            'cpf' => $agendamento->cpf,
+            'celular' => $agendamento->celular
+        ]);
+    }
+
+    /** @test */
+    public function cannot_edit_without_tiposervico_in_past_or_today_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => Carbon::today()->subDay()
+        ]);
+
+        $dados = $agendamento->toArray();
+        $dados['antigo'] = 1;
+        $dados['tiposervico'] = null;
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)
+        ->assertSessionHasErrors(['tiposervico']);
+
+    }
+
+    /** @test */
+    public function can_edit_with_status_sem_status_in_past_or_today_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => Carbon::today()->subDay(),
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
+        ]);
+
+        $dados = $agendamento->toArray();
+        $dados['antigo'] = 1;
+        $dados['status'] = null;
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)
+        ->assertRedirect(route('agendamentos.lista'));
+
+        $this->assertDatabaseHas('agendamentos', [
+            'idagendamento' => $agendamento->idagendamento,
+            'nome' => $agendamento->nome,
+            'email' => $agendamento->email,
+            'cpf' => $agendamento->cpf,
+            'celular' => $agendamento->celular,
+            'status' => null
+        ]);
+    }
 
     /** 
      * =======================================================================================================
@@ -207,34 +445,7 @@ class AgendamentoTest extends TestCase
      * =======================================================================================================
      */
 
-    /** @test 
-     * 
-     * Atualizando Agendamento com o status "Compareceu" exige informação sobre o atendente.
-    */
-    public function agendamento_updated_to_compareceu_requires_agent()
-    {
-        $user = $this->signInAsAdmin();
-
-        $agendamento = factory('App\Agendamento')->create([
-            'idregional' => $user->idregional,
-            'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00',
-            'protocolo' => 'AGE-XXXXXX'
-        ]);
-        $agendamento->status = Agendamento::STATUS_COMPARECEU;
-
-        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
-
-        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())->assertSessionHasErrors(['idusuario']);
-
-        $this->assertNotEquals(Agendamento::find($agendamento->idagendamento)->status, $agendamento->status);
-
-        $agendamento->idusuario = $user->idusuario;
-
-        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())->assertStatus(302);
-
-        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, $agendamento->status);
-    }
+    
 
     /** @test 
      * 
