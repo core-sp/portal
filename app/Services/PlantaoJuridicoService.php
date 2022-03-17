@@ -309,7 +309,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function plantaoJuridicoAtivo()
     {
-        return PlantaoJuridico::where('qtd_advogados', '>', 0)->count() > 0 ? true : false;
+        return PlantaoJuridico::where('qtd_advogados', '>', 0)->count() > 0;
     }
 
     public function getRegionaisDesativadas()

@@ -2,46 +2,18 @@
 
 namespace App\Http\Controllers;
 
-// use App\User;
-// use App\Regional;
-// use App\Agendamento;
-// use App\Events\CrudEvent;
-// use App\Traits\TabelaAdmin;
 use Illuminate\Http\Request;
-// use App\Mail\AgendamentoMailGuest;
-// use App\Repositories\UserRepository;
-// use Illuminate\Support\Facades\Auth;
-// use Illuminate\Support\Facades\Mail;
-// use Illuminate\Http\RedirectResponse;
-// use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoUpdateRequest;
 use App\Contracts\MediadorServiceInterface;
-// use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoController extends Controller
 {
-    // use TabelaAdmin;
-
-    // // Nome da classe
-    // private $class = 'AgendamentoController';
-    // private $agendamentoRepository;
     private $service;
-    // private $userRepository;
 
-    // // Variáveis para páginas no Admin
-    // private $agendamentoVariaveis = [
-    //     'singular' => 'agendamento',
-    //     'singulariza' => 'o agendamento',
-    //     'plural' => 'agendamentos',
-    //     'pluraliza' => 'agendamentos'
-    // ];
-
-    public function __construct(/*AgendamentoRepository $agendamentoRepository, */MediadorServiceInterface $service/*, UserRepository $userRepository*/)
+    public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('auth');
-        // $this->agendamentoRepository = $agendamentoRepository;
         $this->service = $service;
-        // $this->userRepository = $userRepository;
     }
 
     public function index(Request $request)
@@ -99,6 +71,7 @@ class AgendamentoController extends Controller
             $erro = $this->service->getService('Agendamento')->save($validated);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
+            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode()) : 
             abort(500, "Erro ao atualizar o status do agendamento.");
         }
 
@@ -257,7 +230,7 @@ class AgendamentoController extends Controller
         $this->authorize('updateOther', auth()->user());
 
         try{
-            $this->service->getService('Agendamento')->enviarEmail($id);
+            $erro = $this->service->getService('Agendamento')->enviarEmail($id);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             method_exists($e, 'getStatusCode') ? abort($e->getStatusCode()) : 
@@ -270,8 +243,8 @@ class AgendamentoController extends Controller
         // Mail::to($agendamento->email)->send(new AgendamentoMailGuest($agendamento));
         
         return redirect(session('url') ?? route('agendamentos.lista'))->with([
-            'message' => '<i class="icon fa fa-check"></i>Email do agendamento com ID '.$id.' foi enviado com sucesso!',
-            'class' => 'alert-success'
+            'message' => isset($erro['message']) ? $erro['message'] : '<i class="icon fa fa-check"></i>Email do agendamento com ID '.$id.' foi enviado com sucesso!',
+            'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
         ]);
     }
 

@@ -22,11 +22,11 @@ class PlantaoJuridico extends Model
 
     public function ativado()
     {
-        return $this->qtd_advogados > 0 ? true : false;
+        return $this->qtd_advogados > 0;
     }
 
     public function expirou()
     {
-        return Carbon::parse($this->dataFinal)->lt(Carbon::today()) && $this->ativado() ? true : false;
+        return Carbon::parse($this->dataFinal)->lt(Carbon::today()) && $this->ativado();
     }
 }

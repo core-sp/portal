@@ -58,7 +58,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     private function getBtnByStatus($resultado)
     {
-        if($resultado->dia > date('Y-m-d'))
+        if($resultado->isAfter())
             $default = null;
         else
         {
@@ -185,11 +185,15 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     private function validarUpdate($dados, $agendamento)
     {   
-        $updateStatus = str_contains('@updateStatus', \Route::currentRouteAction());
+        $updateStatus = str_contains(\Route::currentRouteAction(), "@updateStatus");
 
-        if(!$updateStatus && !isset($dados['antigo']))
-            abort(500);
-        elseif(isset($dados['antigo']))
+        if(!$updateStatus && !isset($dados['antigo'])) 
+            abort(500, 'Erro por falta de campo no request');
+
+        if(isset($dados['antigo']) && ($dados['antigo'] == 0) && !$agendamento->isAfter())
+            abort(500, 'Erro na validação de campo no request');
+
+        if(isset($dados['antigo']))
             unset($dados['antigo']);
 
         if(isset($dados['nome']))
@@ -201,9 +205,8 @@ class AgendamentoService implements AgendamentoServiceInterface {
                 'class' => 'alert-danger'
             ];
 
-        $depoisDeHj = $agendamento->dia > date('Y-m-d');
         $cancelado = isset($dados['status']) && ($dados['status'] != Agendamento::STATUS_CANCELADO);
-        if($depoisDeHj && $cancelado)
+        if($agendamento->isAfter() && $cancelado)
             return [
                 'message' => '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado para '
                 .Agendamento::STATUS_COMPARECEU.' ou '.Agendamento::STATUS_NAO_COMPARECEU.' antes da data agendada',
@@ -307,7 +310,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         abort_if($atendOrGere && !$sameRegional, 403);
 
         $status = $this->status();
-        if($agendamento->dia > date('Y-m-d'))
+        if($agendamento->isAfter())
         {
             unset($status[0]);
             unset($status[1]);
@@ -327,6 +330,12 @@ class AgendamentoService implements AgendamentoServiceInterface {
     public function enviarEmail($id)
     {
         $agendamento = Agendamento::findOrFail($id);
+
+        if(!$agendamento->isAfter())
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>Não pode reenviar email para agendamento de hoje para trás',
+                'class' => 'alert-danger'
+            ];
 
         $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
         $sameRegional = auth()->user()->can('sameRegional', $agendamento);

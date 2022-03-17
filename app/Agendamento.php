@@ -105,4 +105,9 @@ class Agendamento extends Model
 
         return $this->btnReenviarEmail();
     }
+
+    public function isAfter()
+    {
+        return $this->dia > date('Y-m-d');
+    }
 }

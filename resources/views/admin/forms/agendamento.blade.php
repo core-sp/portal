@@ -1,6 +1,3 @@
-@php
-    $now = date('Y-m-d');
-@endphp
 <div class="card-body pt-3 pl-3">
     <div class="col">
         {!! $resultado->getMsgByStatus() !!}
@@ -11,7 +8,7 @@
     @csrf
     @method('PUT')
     <div class="card-body">
-        <input type="hidden" name="antigo" value="{{ $now >= $resultado->dia }}" />
+        <input type="hidden" name="antigo" value="{{ $resultado->isAfter() ? '0' : '1' }}" />
         <div class="form-row">
             <div class="col">
                 <label for="nome">Nome</label>
@@ -21,7 +18,7 @@
                     name="nome"
                     value="{{ old('nome') ? old('nome') : $resultado->nome }}"
                     required
-                    {{ ($resultado->status === 'Cancelado') || ($now >= $resultado->dia) ? 'readonly' : '' }}
+                    {{ ($resultado->status === 'Cancelado') || (!$resultado->isAfter()) ? 'readonly' : '' }}
                 />
                 @if($errors->has('nome'))
                 <div class="invalid-feedback">
@@ -37,7 +34,7 @@
                     name="email"
                     value="{{ old('email') ? old('email') : $resultado->email }}"
                     required
-                    {{ ($resultado->status === 'Cancelado') || ($now >= $resultado->dia) ? 'readonly' : '' }}
+                    {{ ($resultado->status === 'Cancelado') || (!$resultado->isAfter()) ? 'readonly' : '' }}
                 />
                 @if($errors->has('email'))
                 <div class="invalid-feedback">
@@ -55,7 +52,7 @@
                     name="cpf"
                     value="{{ old('cpf') ? old('cpf') : $resultado->cpf }}"
                     required
-                    {{ ($resultado->status === 'Cancelado') || ($now >= $resultado->dia) ? 'readonly' : '' }}
+                    {{ ($resultado->status === 'Cancelado') || (!$resultado->isAfter()) ? 'readonly' : '' }}
                 />
                 @if($errors->has('cpf'))
                 <div class="invalid-feedback">
@@ -71,7 +68,7 @@
                     name="celular"
                     value="{{ old('celular') ? old('celular') : $resultado->celular }}"
                     required
-                    {{ ($resultado->status === 'Cancelado') || ($now >= $resultado->dia) ? 'readonly' : '' }}
+                    {{ ($resultado->status === 'Cancelado') || (!$resultado->isAfter()) ? 'readonly' : '' }}
                 />
                 @if($errors->has('celular'))
                 <div class="invalid-feedback">
@@ -175,7 +172,7 @@
         <div class="form-row mt-4">
             <i>* Atendimento agendado pelo usuário no dia {{ onlyDate($resultado->created_at) }}.</i>
         </div>
-        @if($now < $resultado->dia || $resultado->status !== 'Cancelado')
+        @if($resultado->isAfter() || $resultado->status !== 'Cancelado')
         <div class="form-row mb-2">
             <i>** Para alteração de horário, é necessário cancelar o agendamento e cadastrar um novo horário pelo site.</i>
         </div>
