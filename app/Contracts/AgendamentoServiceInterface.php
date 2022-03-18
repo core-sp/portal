@@ -17,4 +17,8 @@ interface AgendamentoServiceInterface {
     public function buscar($busca);
 
     public function getServicosOrStatusOrCompletos($tipo);
+
+    public function countAll();
+
+    public function pendentesByPerfil($count = true);
 }

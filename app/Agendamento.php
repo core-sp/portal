@@ -97,7 +97,7 @@ class Agendamento extends Model
             Agendamento::STATUS_COMPARECEU => '<p class="mb-0 text-success"><strong><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Atendimento realizado com sucesso no dia '.onlyDate($this->dia).', às '.$this->hora.'</strong></p>'
         ];
 
-        if(date('Y-m-d') >= $this->dia)
+        if(!$this->isAfter())
             return isset($msg[$this->status]) ? $msg[$this->status] : $pendente;
 
         if($this->status == Agendamento::STATUS_CANCELADO)

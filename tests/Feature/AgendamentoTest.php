@@ -145,29 +145,86 @@ class AgendamentoTest extends TestCase
         $this->assertNotEquals(Agendamento::find($agendamento->idagendamento)->status, $dados['status']);
     }
 
-    // /** @test */
-    // public function authorized_users_can_edit_agendamento()
-    // {
-    //     $user = $this->signInAsAdmin();
+    /** @test */
+    public function authorized_users_can_edit_agendamento()
+    {
+        $user = $this->signInAsAdmin();
 
-    //     $agendamento = factory('App\Agendamento')->create();
+        $agendamento = factory('App\Agendamento')->create();
 
-    //     $agendamento->nome = 'Novo nome';
-    //     $agendamento->email = 'novoemail@teste.com';
-    //     $dados = $agendamento->toArray();
-    //     $dados['antigo'] = 0;
+        $agendamento->nome = 'Novo Nome';
+        $agendamento->email = 'novoemail@teste.com';
+        $dados = $agendamento->toArray();
+        $dados['antigo'] = 0;
 
-    //     $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
-    //     $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)->assertStatus(302);
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)->assertStatus(302);
 
-    //     $this->assertDatabaseHas('agendamentos', [
-    //         'idagendamento' => $agendamento->idagendamento,
-    //         'nome' => $agendamento->nome,
-    //         'email' => $agendamento->email,
-    //         'cpf' => $agendamento->cpf,
-    //         'celular' => $agendamento->celular,
-    //     ]);
-    // }
+        $this->assertDatabaseHas('agendamentos', [
+            'idagendamento' => $agendamento->idagendamento,
+            'nome' => $agendamento->nome,
+            'email' => $agendamento->email,
+            'cpf' => $agendamento->cpf,
+            'celular' => $agendamento->celular,
+        ]);
+    }
+
+    /** @test */
+    public function cannot_edit_agendamento_without_input_hidden_antigo()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create();
+
+        $agendamento->email = 'novoemail@teste.com';
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
+        ->assertStatus(500)
+        ->assertSee('Erro por falta de campo no request');
+
+        $this->assertDatabaseMissing('agendamentos', [
+            'email' => $agendamento->email,
+        ]);
+    }
+
+    /** @test */
+    public function cannot_edit_agendamento_with_input_hidden_antigo_wrong_value()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create();
+
+        $agendamento->email = 'novoemail@teste.com';
+        $dados = $agendamento->toArray();
+        $dados['antigo'] = 1;
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)
+        ->assertStatus(500)
+        ->assertSee('Erro na validação de campo no request');
+
+        $this->assertDatabaseMissing('agendamentos', [
+            'email' => $agendamento->email,
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'dia' => date('Y-m-d')
+        ]);
+
+        $agendamento->email = 'novoemail@teste.com';
+        $dados = $agendamento->toArray();
+        $dados['antigo'] = 0;
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)
+        ->assertStatus(500)
+        ->assertSee('Erro na validação de campo no request');
+
+        $this->assertDatabaseMissing('agendamentos', [
+            'email' => $agendamento->email,
+        ]);
+    }
 
     /** @test */
     public function perfil_gerente_seccional_can_edit_tomorrow_agendamento_if_same_regional()
@@ -444,6 +501,24 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_edit_wrong_email_in_tomorrow_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional
+        ]);
+
+        $agendamento->email = 'teste.com';
+        $dados = $agendamento->toArray();
+        $dados['antigo'] = 0;
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)
+        ->assertSessionHasErrors(['email']);
+    }
+
+    /** @test */
     public function cannot_edit_without_requireds_inputs_in_tomorrow_agendamento()
     {
         $user = $this->signInAsAdmin();
@@ -691,6 +766,35 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function can_view_only_atendentes_by_regional()
+    {
+        $user = $this->signInAsAdmin();
+
+        $perfilAtendente = factory('App\Perfil')->create([
+            'idperfil' => 8,
+            'nome' => 'Atendimento',
+        ]);
+
+        $atendente = factory('App\User')->create([
+            'idperfil' => $perfilAtendente->idperfil,
+        ]);
+
+        $atendente2 = factory('App\User')->create([
+            'idperfil' => $perfilAtendente->idperfil,
+            'nome' => 'Usuário 2'
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+        ]);
+
+        $this->get(route('agendamentos.edit', $agendamento->idagendamento))
+        ->assertSee('Ninguém')
+        ->assertSee($atendente->nome)
+        ->assertDontSee($atendente2->nome);
+    }
+
+    /** @test */
     public function can_view_messages_status_agendamento()
     {
         $user = $this->signInAsAdmin();
@@ -787,7 +891,6 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim',
             'regional' => '',
             'status' => 'Qualquer',
             'datemin' => $agendamento->dia, 
@@ -1452,7 +1555,6 @@ class AgendamentoTest extends TestCase
 
         // Listando todos os agendamentos (qualquer regional, status e datas cobrindos todos os agendamentos)
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim', 
             'regional' => '', 
             'status' => 'Qualquer', 
             'datemin' => date('Y-m-d', strtotime('-1 day')), 
@@ -1466,7 +1568,6 @@ class AgendamentoTest extends TestCase
 
         // Listando todos os agendamentos da Sede (qualquer status e datas cobrindos todos os agendamentos)
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim', 
             'regional' => 1, 
             'status' => 'Qualquer', 
             'datemin' => date('Y-m-d', strtotime('-1 day')), 
@@ -1481,7 +1582,6 @@ class AgendamentoTest extends TestCase
 
         // Listando apenas os agendamentos com status "Compareceu" da Sede (datas cobrindos todos os agendamentos)
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim', 
             'regional' => 1, 
             'status' => Agendamento::STATUS_COMPARECEU, 
             'datemin' => date('Y-m-d', strtotime('-1 day')), 
@@ -1496,7 +1596,6 @@ class AgendamentoTest extends TestCase
 
         // Listando apenas agendamentos da Sede do dia -1
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim', 
             'regional' => 1, 
             'status' => 'Qualquer', 
             'datemin' => date('Y-m-d', strtotime('-1 day')), 
@@ -1511,7 +1610,6 @@ class AgendamentoTest extends TestCase
 
         // Listando nenhum o agendamentos da Sede por causa de data sem agendamento
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim', 
             'regional' => 1, 
             'status' => Agendamento::STATUS_COMPARECEU, 
             'datemin' => date('Y-m-d'), 
@@ -1527,7 +1625,6 @@ class AgendamentoTest extends TestCase
 
         // Listando todos os agendamentos da Seccional (qualquer status e datas cobrindos todos os agendamentos)
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim', 
             'regional' => $regional_seccional->idregional, 
             'status' => 'Qualquer', 
             'datemin' => date('Y-m-d', strtotime('-1 day')), 
@@ -1542,7 +1639,6 @@ class AgendamentoTest extends TestCase
 
         // Listando apenas os agendamentos com status "Não Compareceu" da Seccional (datas cobrindos todos os agendamentos)
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim', 
             'regional' => $regional_seccional->idregional,
             'status' => Agendamento::STATUS_NAO_COMPARECEU, 
             'datemin' => date('Y-m-d', strtotime('-1 day')), 
@@ -1557,7 +1653,6 @@ class AgendamentoTest extends TestCase
 
         // Listando apenas agendamentos da Seccional do dia +1
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim', 
             'regional' => $regional_seccional->idregional,
             'status' => 'Qualquer', 
             'datemin' => date('Y-m-d', strtotime('+1 day')), 
@@ -1572,7 +1667,6 @@ class AgendamentoTest extends TestCase
 
         // Listando nenhum o agendamentos da Seccional por causa de data sem agendamento
         $this->get(route('agendamentos.filtro', [
-            'filtro' => 'sim', 
             'regional' => $regional_seccional->idregional,
             'status' => Agendamento::STATUS_COMPARECEU, 
             'datemin' => date('Y-m-d'), 

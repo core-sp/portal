@@ -25,6 +25,11 @@ class Regional extends Model
         return $this->hasMany('App\Noticia', 'idregional');
     }
 
+    public function agendamentos()
+    {
+        return $this->hasMany('App\Agendamento', 'idregional');
+    }
+
     public function horariosAge()
     {
         if(isset($this->horariosage))

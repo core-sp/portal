@@ -79,7 +79,6 @@ function getFiltro($action, $filtrosCampos, $idform = 'filtroDate')
 {
     $filtro = '<form method="GET" action="'.$action.'" id="'.$idform.'" class="mb-0">';
     $filtro .= '<div class="form-row filtroAge">';
-    $filtro .= '<input type="hidden" name="filtro" value="sim" />';
 
     $filtro .= $filtrosCampos;
 

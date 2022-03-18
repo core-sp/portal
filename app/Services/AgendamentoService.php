@@ -107,7 +107,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $temFiltro = null;
         $this->variaveis['continuacao_titulo'] = 'em <strong>'.auth()->user()->regional->regional.' - '.date('d\/m\/Y').'</strong>';
 
-        if($request->filled('filtro') && ($request->filtro == 'sim'))
+        if(\Route::is('agendamentos.filtro'))
         {
             $temFiltro = true;
             $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
@@ -185,12 +185,13 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     private function validarUpdate($dados, $agendamento)
     {   
-        $updateStatus = str_contains(\Route::currentRouteAction(), "@updateStatus");
+        $updateStatus = \Route::is('agendamentos.updateStatus');
 
         if(!$updateStatus && !isset($dados['antigo'])) 
             abort(500, 'Erro por falta de campo no request');
 
-        if(isset($dados['antigo']) && ($dados['antigo'] == 0) && !$agendamento->isAfter())
+        if(isset($dados['antigo']) && 
+        (($dados['antigo'] == 0 && !$agendamento->isAfter()) || ($dados['antigo'] == 1 && $agendamento->isAfter())))
             abort(500, 'Erro na validação de campo no request');
 
         if(isset($dados['antigo']))
@@ -211,6 +212,13 @@ class AgendamentoService implements AgendamentoServiceInterface {
                 'message' => '<i class="icon fa fa-ban"></i>Status do agendamento não pode ser modificado para '
                 .Agendamento::STATUS_COMPARECEU.' ou '.Agendamento::STATUS_NAO_COMPARECEU.' antes da data agendada',
                 'class' => 'alert-danger'
+            ];
+        
+        if($updateStatus)
+            $dados = [
+                'idagendamento' => $dados['idagendamento'],
+                'status' => $dados['status'],
+                'idusuario' => auth()->user()->idusuario
             ];
 
         return $dados;
@@ -275,24 +283,11 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ];
         }
 
-        $perfil = auth()->user()->idperfil;
-        $idregional = auth()->user()->idregional;
-        
-        $resultados = Agendamento::with(['user', 'regional'])
-            ->where('dia', '<', date('Y-m-d'))
-            ->whereNull('status')
-            ->when($perfil == 12, function ($query) {
-                $query->where('idregional', 1);
-            })->when($perfil == 13, function ($query) {
-                $query->where('idregional', '!=', 1);
-            })->when(($perfil == 8) || ($perfil == 21), function ($query) use ($idregional) {
-                $query->where('idregional', $idregional);
-            })->orderBy('dia', 'DESC')
-            ->paginate(10);
+        $resultados = $this->pendentesByPerfil(false);
         
         $this->variaveis['continuacao_titulo'] = 'pendentes de validação';
         $this->variaveis['plural'] = 'agendamentos pendentes';
-        $this->variaveis['btn_criar'] = '<a class="btn btn-primary" href="'.route('agendamentos.lista').'">Lista de Agendamentos</a>';
+        $this->variaveis['btn_criar'] = '<a class="btn btn-primary" href="'.route('agendamentos.lista').'"><i class="fas fa-list"></i> Lista de Agendamentos</a>';
 
         return [
             'tabela' => $this->tabelaCompleta($resultados),
@@ -357,9 +352,6 @@ class AgendamentoService implements AgendamentoServiceInterface {
         if(isset($valido['message']))
             return $valido;
 
-        if(!isset($dados['idusuario']) && !isset($dados['tiposervico']))
-            $valido['idusuario'] = auth()->user()->idusuario;
-
         $agendamento->update($valido);
 
         if(isset($id))
@@ -385,9 +377,10 @@ class AgendamentoService implements AgendamentoServiceInterface {
                 });
             }, function ($query) use ($busca) {
                 return $query->where('nome', 'LIKE', '%'.$busca.'%')
-                ->orWhere('cpf', 'LIKE', '%'.$busca.'%')
-                ->orWhere('email', 'LIKE', '%'.$busca.'%')
-                ->orWhere('protocolo', 'LIKE', '%'.$busca.'%');
+                    ->orWhere('idagendamento', 'LIKE', $busca)
+                    ->orWhere('cpf', 'LIKE', '%'.$busca.'%')
+                    ->orWhere('email', 'LIKE', '%'.$busca.'%')
+                    ->orWhere('protocolo', 'LIKE', '%'.$busca.'%');
             })->paginate(25);
 
         return [
@@ -406,5 +399,30 @@ class AgendamentoService implements AgendamentoServiceInterface {
         ];
 
         return isset($array[$tipo]) ? $array[$tipo] : null;
+    }
+
+    public function countAll()
+    {
+        return Agendamento::count();
+    }
+
+    public function pendentesByPerfil($count = true)
+    {
+        $perfil = auth()->user()->idperfil;
+        $idregional = auth()->user()->idregional;
+
+        $resultados = Agendamento::with(['user', 'regional'])
+            ->where('dia', '<', date('Y-m-d'))
+            ->whereNull('status')
+            ->when($perfil == 12, function ($query) {
+                $query->where('idregional', 1);
+            })->when($perfil == 13, function ($query) {
+                $query->where('idregional', '!=', 1);
+            })->when(($perfil == 8) || ($perfil == 21), function ($query) use ($idregional) {
+                $query->where('idregional', $idregional);
+            })->orderBy('dia', 'DESC')
+            ->paginate(10);
+
+        return $count ? $resultados->total() : $resultados;
     }
 }
