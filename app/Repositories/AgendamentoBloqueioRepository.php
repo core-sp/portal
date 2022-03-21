@@ -21,12 +21,12 @@ class AgendamentoBloqueioRepository
             ->get();
     }
 
-    public function getAll()
-    {
-        return AgendamentoBloqueio::orderBy('idagendamentobloqueio', 'DESC')
-            ->where('diatermino','>=', date('Y-m-d'))
-            ->paginate(10);
-    }
+    // public function getAll()
+    // {
+    //     return AgendamentoBloqueio::orderBy('idagendamentobloqueio', 'DESC')
+    //         ->where('diatermino','>=', date('Y-m-d'))
+    //         ->paginate(10);
+    // }
 
     public function getById($id) 
     {

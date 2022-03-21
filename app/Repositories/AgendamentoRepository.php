@@ -265,7 +265,6 @@ class AgendamentoRepository
                 $agendados[$dia->format('Y-m-d')] = $agendado;
         }
             
-        
         return $agendados;
     }
 }

@@ -8,7 +8,11 @@ interface AgendamentoServiceInterface {
 
     public function listar($request = null, MediadorServiceInterface $service = null);
 
+    public function listarBloqueio();
+
     public function view($id);
+
+    public function viewBloqueio(MediadorServiceInterface $service);
 
     public function save($dados, $id = null);
 

@@ -110,12 +110,12 @@ Route::prefix('admin')->group(function() {
     Route::post('/reenviar-email/{id}', 'AgendamentoController@reenviarEmail')->name('agendamentos.reenviarEmail');
     // Lida com bloqueios
     Route::get('/bloqueios', 'AgendamentoBloqueioController@index')->name('agendamentobloqueios.lista');
-    Route::get('/bloqueios/busca', 'AgendamentoBloqueioController@busca');
-    Route::get('/bloqueios/criar', 'AgendamentoBloqueioController@create');
-    Route::post('/bloqueios/criar', 'AgendamentoBloqueioController@store');
-    Route::get('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@edit');
-    Route::put('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@update');
-    Route::delete('/bloqueios/apagar/{id}', 'AgendamentoBloqueioController@destroy');
+    Route::get('/bloqueios/busca', 'AgendamentoBloqueioController@busca')->name('agendamentobloqueios.busca');
+    Route::get('/bloqueios/criar', 'AgendamentoBloqueioController@create')->name('agendamentobloqueios.criar');
+    Route::post('/bloqueios/criar', 'AgendamentoBloqueioController@store')->name('agendamentobloqueios.store');
+    Route::get('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@edit')->name('agendamentobloqueios.edit');
+    Route::put('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@update')->name('agendamentobloqueios.update');
+    Route::delete('/bloqueios/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('agendamentobloqueios.delete');
   });
 
   // Rota para Newsletter

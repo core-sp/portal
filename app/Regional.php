@@ -3,13 +3,10 @@
 namespace App;
 
 use App\Repositories\AgendamentoBloqueioRepository;
-use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 
 class Regional extends Model
 {
-    use TabelaAdmin;
-
     protected $table = 'regionais';
     protected $primaryKey = 'idregional';
     protected $guarded = [];
@@ -34,6 +31,23 @@ class Regional extends Model
     {
         if(isset($this->horariosage))
             return explode(',', $this->horariosage);
+
+        return [];
+    }
+
+    public function horariosAgeACadaMeiaHora()
+    {
+        if(isset($this->horariosage))
+        {
+            $todasHoras = todasHoras();
+            $horasRegional = explode(',', $this->horariosage);
+            $ultima = $horasRegional[sizeof($horasRegional) - 1];
+            foreach(todasHoras() as $key => $hora)
+                if(($hora < $horasRegional[0]) || ($hora > $ultima))
+                    unset($todasHoras[$key]);
+            
+            return $todasHoras;
+        }
 
         return [];
     }

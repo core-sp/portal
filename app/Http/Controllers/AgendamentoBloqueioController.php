@@ -45,14 +45,24 @@ class AgendamentoBloqueioController extends Controller
     {
         $this->authorize('viewAny', auth()->user());
 
-        $resultados = $this->resultados();
-        $tabela = $this->tabelaCompleta($resultados);
-
-        if(auth()->user()->cannot('create', auth()->user())) {
-            unset($this->variaveis['btn_criar']);
+        try{
+            $dados = $this->service->getService('Agendamento')->listarBloqueio();
+            $variaveis = $dados['variaveis'];
+            $tabela = $dados['tabela'];
+            $resultados = $dados['resultados'];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar os bloqueios dos agendamentos.");
         }
+
+        // $resultados = $this->resultados();
+        // $tabela = $this->tabelaCompleta($resultados);
+
+        // if(auth()->user()->cannot('create', auth()->user())) {
+        //     unset($this->variaveis['btn_criar']);
+        // }
             
-        $variaveis = (object) $this->variaveis;
+        // $variaveis = (object) $this->variaveis;
 
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
@@ -61,8 +71,17 @@ class AgendamentoBloqueioController extends Controller
     {
         $this->authorize('create', auth()->user());
 
-        $variaveis = (object) $this->variaveis;
-        $regionais = $this->service->getService('Regional')->getRegionaisAgendamento();
+        try{
+            $dados = $this->service->getService('Agendamento')->viewBloqueio($this->service);
+            $variaveis = $dados['variaveis'];
+            $regionais = $dados['regionais'];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar os dados para criar o bloqueio do agendamento.");
+        }
+
+        // $variaveis = (object) $this->variaveis;
+        // $regionais = $this->service->getService('Regional')->getRegionaisAgendamento();
 
         return view('admin.crud.criar', compact('variaveis', 'regionais'));
     }
@@ -154,12 +173,12 @@ class AgendamentoBloqueioController extends Controller
         return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 
-    public function resultados()
-    {
-        $resultados = $this->agendamentoBloqueioRepository->getAll();
+    // public function resultados()
+    // {
+    //     $resultados = $this->agendamentoBloqueioRepository->getAll();
 
-        return $resultados;
-    }
+    //     return $resultados;
+    // }
 
     public function tabelaCompleta($resultados)
     {

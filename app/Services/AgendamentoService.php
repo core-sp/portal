@@ -5,14 +5,17 @@ namespace App\Services;
 use App\Contracts\AgendamentoServiceInterface;
 use App\Contracts\MediadorServiceInterface;
 use App\Agendamento;
+use App\AgendamentoBloqueio;
 use App\Events\CrudEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
+use Illuminate\Support\Facades\DB;
 
 class AgendamentoService implements AgendamentoServiceInterface {
 
     private $variaveis;
+    private $variaveisBloqueio;
 
     public function __construct()
     {
@@ -21,6 +24,18 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'singulariza' => 'o agendamento',
             'plural' => 'agendamentos',
             'pluraliza' => 'agendamentos'
+        ];
+
+        $this->variaveisBloqueio = [
+            'singular' => 'bloqueio',
+            'singulariza' => 'o bloqueio',
+            'plural' => 'bloqueios de agendamento',
+            'pluraliza' => 'bloqueios',
+            'form' => 'agendamentobloqueio',
+            'cancelar' => 'agendamentos/bloqueios',
+            'titulo_criar' => 'Cadastrar novo bloqueio',
+            'btn_criar' => '<a href="'.route('agendamentobloqueios.criar').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Novo Bloqueio</a>',
+            'busca' => 'agendamentos/bloqueios',
         ];
     }
 
@@ -264,6 +279,76 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return $tabela;
     }
 
+    private function tabelaCompletaBloqueio($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'Código',
+            'Regional',
+            'Duração',
+            'Horas Bloqueadas',
+            'Ações',
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
+        $userPodeExcluir = auth()->user()->can('delete', auth()->user());
+        foreach($resultados as $resultado) 
+        {
+            if($resultado->diainicio == '2000-01-01') {
+                $duracao = 'Início: Indefinido<br />';
+            } else {
+                $duracao = 'Início: ' . onlyDate($resultado->diainicio) . '<br />';
+            }
+
+            if($resultado->diatermino == '2100-01-01') {
+                $duracao .= 'Término: Indefinido';
+            } else {
+                $duracao .= 'Término: ' . onlyDate($resultado->diatermino);
+            }
+
+            if($userPodeEditar) {
+                $acoes = '<a href="/admin/agendamentos/bloqueios/editar/' . $resultado->idagendamentobloqueio . '" class="btn btn-sm btn-primary">Editar</a> ';
+            }
+                
+            else {
+                $acoes = '';
+            }
+               
+            if($userPodeExcluir) {
+                $acoes .= '<form method="POST" action="/admin/agendamentos/bloqueios/apagar/' . $resultado->idagendamentobloqueio . '" class="d-inline-block">';
+                $acoes .= '<input type="hidden" name="_token" value="' . csrf_token() . '" />';
+                $acoes .= '<input type="hidden" name="_method" value="delete" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o bloqueio?\')" />';
+                $acoes .= '</form>';
+            }
+
+            if(empty($acoes)) {
+                $acoes = '<i class="fas fa-lock text-muted"></i>';
+            }
+                
+            $conteudo = [
+                $resultado->idagendamentobloqueio,
+                $resultado->regional->regional,
+                $duracao,
+                'Das ' . $resultado->horainicio . ' às ' . $resultado->horatermino,
+                $acoes
+            ];
+
+            array_push($contents, $conteudo);
+        }
+        
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hover'
+        ];
+
+        // Monta e retorna tabela        
+        $tabela = montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
     public function listar($request = null, MediadorServiceInterface $service = null)
     {
         session(['url' => url()->full()]);
@@ -296,6 +381,22 @@ class AgendamentoService implements AgendamentoServiceInterface {
         ];
     }
 
+    public function listarBloqueio()
+    {
+        $resultados = AgendamentoBloqueio::orderBy('idagendamentobloqueio', 'DESC')
+            ->where('diatermino','>=', date('Y-m-d'))
+            ->paginate(10);
+
+        if(auth()->user()->cannot('create', auth()->user()))
+            unset($this->variaveisBloqueio['btn_criar']);
+        
+        return [
+            'tabela' => $this->tabelaCompletaBloqueio($resultados),
+            'resultados' => $resultados,
+            'variaveis' => (object) $this->variaveisBloqueio,
+        ];
+    }
+
     public function view($id)
     {
         $agendamento = Agendamento::findOrFail($id);
@@ -319,6 +420,17 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'variaveis' => (object) $this->variaveis,
             'atendentes' => $agendamento->regional->users()->select('idusuario', 'nome')->where('idperfil', 8)->withoutTrashed()->get(),
             'resultado' => $agendamento
+        ];
+    }
+
+    public function viewBloqueio(MediadorServiceInterface $service)
+    {
+        $regionais = $service->getService('Regional')->all();
+        $regionais->find(1)->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
+
+        return [
+            'variaveis' => (object) $this->variaveisBloqueio,
+            'regionais' => $regionais->sortBy('regional'),
         ];
     }
 
@@ -424,5 +536,49 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ->paginate(10);
 
         return $count ? $resultados->total() : $resultados;
+    }
+
+    /** 
+     * =======================================================================================================
+     * PLANTÃO JURÍDICO
+     * =======================================================================================================
+     */
+
+    public function getPlantaoJuridicoByRegionalAndDia($regional, $dia)
+    {
+        return Agendamento::select('hora', DB::raw('count(*) as total'))
+            ->where('idregional', $regional)
+            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+            ->whereNull('status')
+            ->where('dia', $dia)
+            ->groupBy('hora')
+            ->orderby('hora')
+            ->get();
+    }
+
+    public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao)
+    {
+        return Agendamento::where('cpf', $cpf)
+            ->where('idregional', $regional)
+            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+            ->whereNull('status')
+            ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
+            ->count();
+    }
+
+    public function getPlantaoJuridicoPorPeriodo($regional, $dataInicial, $dataFinal)
+    {
+        $agendados = array();
+        $inicial = Carbon::parse($dataInicial);
+        $final = Carbon::parse($dataFinal);
+
+        for($dia = $inicial; $dia->lte($final); $dia->addDay())
+        {
+            $agendado = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia->format('Y-m-d'));
+            if($agendado->isNotEmpty())
+                $agendados[$dia->format('Y-m-d')] = $agendado;
+        }
+            
+        return $agendados;
     }
 }

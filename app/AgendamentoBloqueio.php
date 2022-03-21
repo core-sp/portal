@@ -11,7 +11,7 @@ class AgendamentoBloqueio extends Model
 
     protected $primaryKey = 'idagendamentobloqueio';
     protected $table = 'agendamento_bloqueios';
-    protected $fillable = ['diainicio', 'diatermino', 'horainicio', 'horatermino', 'idregional', 'idusuario'];
+    protected $guarded = [];
 
     public function regional()
     {
