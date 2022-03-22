@@ -116,6 +116,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@edit')->name('agendamentobloqueios.edit');
     Route::put('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@update')->name('agendamentobloqueios.update');
     Route::delete('/bloqueios/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('agendamentobloqueios.delete');
+    Route::get('/bloqueios/horarios-ajax', 'AgendamentoBloqueioController@getHorasAjax')->name('agendamentobloqueios.horariosAjax');
   });
 
   // Rota para Newsletter

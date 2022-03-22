@@ -16,6 +16,8 @@ interface RegionalServiceInterface {
 
     public function all();
 
+    public function getById($id);
+
     /**
      * 
      * Métodos abaixo temporários até refatorar suas respectivas classes
@@ -28,8 +30,6 @@ interface RegionalServiceInterface {
     public function getAgeporhorarioById($id);
 
     public function getHorariosAgendamento($id, $dia);
-
-    public function getById($id);
 
     public function getToList();
 

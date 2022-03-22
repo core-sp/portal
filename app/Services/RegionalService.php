@@ -118,6 +118,11 @@ class RegionalService implements RegionalServiceInterface {
         return Regional::get();
     }
 
+    public function getById($id)
+    {
+        return Regional::findOrFail($id);
+    }
+
     /**
      * 
      * Métodos abaixo temporários até refatorar suas respectivas classes
@@ -148,11 +153,6 @@ class RegionalService implements RegionalServiceInterface {
     public function getHorariosAgendamento($id, $dia)
     {
         return Regional::find($id)->horariosDisponiveis($dia);
-    }
-
-    public function getById($id)
-    {
-        return Regional::findOrFail($id);
     }
 
     public function getToList()

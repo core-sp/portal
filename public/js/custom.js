@@ -99,27 +99,7 @@ $(document).ready(function(){
       }
     }
   });
-  // Máscara para horário bloqueio
-  $('#horaTerminoBloqueio').change(function(){
-    var horaTerminoBloqueio = $(this).val();
-    var horaInicioBloqueio = $('#horaInicioBloqueio').val();
-    if(horaInicioBloqueio) {
-      if(horaTerminoBloqueio < horaInicioBloqueio) {
-        alert('O horário de término do bloqueio não pode ser menor que o horário de início do bloqueio.');
-        $(this).val($("#horaTerminoBloqueio option:first").val());
-      }
-    }
-  });
-  $('#horaInicioBloqueio').change(function(){
-    var horaInicioBloqueio = $(this).val();
-    var horaTerminoBloqueio = $('#horaTerminoBloqueio').val();
-    if(horaTerminoBloqueio) {
-      if(horaInicioBloqueio > horaTerminoBloqueio) {
-        alert('O horário de início do bloqueio não pode ser maior que o horário de término do bloqueio.');
-        $(this).val($("#horaInicioBloqueio option:first").val());
-      }
-    }
-  });
+
   $('.timeInput').mask('00:00');
   $('.vagasInput').mask('000');
   // Draggable
@@ -173,6 +153,81 @@ $(document).ready(function(){
     }
   });
 });
+
+// Funcionalidade Agendamento Bloqueio
+$('#horaTerminoBloqueio').change(function(){
+  var horaTerminoBloqueio = $(this).val();
+  var horaInicioBloqueio = $('#horaInicioBloqueio').val();
+  if(horaInicioBloqueio) {
+    if(horaTerminoBloqueio < horaInicioBloqueio) {
+      alert('O horário de término do bloqueio não pode ser menor que o horário de início do bloqueio.');
+      $(this).val($("#horaTerminoBloqueio option:first").val());
+    }
+  }
+});
+
+$('#horaInicioBloqueio').change(function(){
+  var horaInicioBloqueio = $(this).val();
+  var horaTerminoBloqueio = $('#horaTerminoBloqueio').val();
+  if(horaTerminoBloqueio) {
+    if(horaInicioBloqueio > horaTerminoBloqueio) {
+      alert('O horário de início do bloqueio não pode ser maior que o horário de término do bloqueio.');
+      $(this).val($("#horaInicioBloqueio option:first").val());
+    }
+  }
+});
+
+function ajaxAgendamentoBloqueio(valor, e)
+{
+  $.ajax({
+    method: "GET",
+    data: {
+      "idregional": valor,
+    },
+    dataType: 'json',
+    url: "/admin/agendamentos/bloqueios/horarios-ajax",
+    success: function(response) {
+      horarios = response;
+      setCampoHoras(horarios, e.type);
+    },
+    error: function() {
+      alert('Erro ao carregar os horários. Recarregue a página.');
+    }
+  });
+}
+
+function setCampoHoras(horarios, tipo)
+{
+  if(tipo == 'change')
+  {
+    $("#horaInicioBloqueio").val('');
+    $("#horaTerminoBloqueio").val('');
+  }
+
+  $('#horaInicioBloqueio option').show();
+  $('#horaInicioBloqueio option').each(function(){
+    var valor = $(this).val();
+    jQuery.inArray(valor, horarios) != -1 ? $(this).show() : $(this).hide();
+  });
+  $('#horaTerminoBloqueio option').show();
+  $('#horaTerminoBloqueio option').each(function(){
+    var valor = $(this).val();
+    jQuery.inArray(valor, horarios) != -1 ? $(this).show() : $(this).hide();
+  });
+}
+
+$('#idregionalBloqueio').ready(function(e){
+  var valor = $('#idregionalBloqueio').val();
+  if(valor > 0)
+    ajaxAgendamentoBloqueio(valor, e);
+});
+
+$('#idregionalBloqueio').change(function(e){
+  var valor = $('#idregionalBloqueio').val();
+  if(valor > 0)
+    ajaxAgendamentoBloqueio(valor, e);
+});
+// Fim da Funcionalidade Agendamento Bloqueio
 
 // Funcionalidade Plantão Jurídico
 function setCamposDatas(plantao)

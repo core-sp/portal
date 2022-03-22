@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoSiteRequest;
-use App\Repositories\AgendamentoBloqueioRepository;
+// use App\Repositories\AgendamentoBloqueioRepository;
 use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
 use App\Contracts\MediadorServiceInterface;
 use Carbon\Carbon;
@@ -23,12 +23,12 @@ use Illuminate\Support\Facades\Request as IlluminateRequest;
 class AgendamentoSiteController extends Controller
 {
     private $agendamentoRepository;
-    private $agendamentoBloqueioRepository;
+    // private $agendamentoBloqueioRepository;
     private $service;
 
-    public function __construct(AgendamentoRepository $agendamentoRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository, MediadorServiceInterface $service) {
+    public function __construct(AgendamentoRepository $agendamentoRepository, /*AgendamentoBloqueioRepository $agendamentoBloqueioRepository, */MediadorServiceInterface $service) {
         $this->agendamentoRepository = $agendamentoRepository;
-        $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
+        // $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
         $this->service = $service;
     }
 
@@ -332,7 +332,7 @@ class AgendamentoSiteController extends Controller
             $agedamentoPorHorario = $regional->ageporhorario;
 
             // Recupera bloqueios ativos para a regional
-            $bloqueios = $this->agendamentoBloqueioRepository->getByRegional($idregional);
+            $bloqueios = $this->service->getService('Agendamento')->getByRegional($idregional);
 
             $date = date('Y-m-d', strtotime('+1 day'));
             $endDate = date('Y-m-d', strtotime('+1 month'));

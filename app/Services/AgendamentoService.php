@@ -295,46 +295,25 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $userPodeExcluir = auth()->user()->can('delete', auth()->user());
         foreach($resultados as $resultado) 
         {
-            if($resultado->diainicio == '2000-01-01') {
-                $duracao = 'Início: Indefinido<br />';
-            } else {
-                $duracao = 'Início: ' . onlyDate($resultado->diainicio) . '<br />';
-            }
-
-            if($resultado->diatermino == '2100-01-01') {
-                $duracao .= 'Término: Indefinido';
-            } else {
-                $duracao .= 'Término: ' . onlyDate($resultado->diatermino);
-            }
-
-            if($userPodeEditar) {
-                $acoes = '<a href="/admin/agendamentos/bloqueios/editar/' . $resultado->idagendamentobloqueio . '" class="btn btn-sm btn-primary">Editar</a> ';
-            }
-                
-            else {
-                $acoes = '';
-            }
-               
+            $acoes = '';
+            $duracao = 'Início: '.onlyDate($resultado->diainicio).'<br />';
+            $duracao .= 'Término: '.$resultado->getMsgDiaTermino();
+            if($userPodeEditar) 
+                $acoes .= '<a href="'.route('agendamentobloqueios.edit', $resultado->idagendamentobloqueio).'" class="btn btn-sm btn-primary">Editar</a> ';
             if($userPodeExcluir) {
-                $acoes .= '<form method="POST" action="/admin/agendamentos/bloqueios/apagar/' . $resultado->idagendamentobloqueio . '" class="d-inline-block">';
-                $acoes .= '<input type="hidden" name="_token" value="' . csrf_token() . '" />';
+                $acoes .= '<form method="POST" action="'.route('agendamentobloqueios.delete', $resultado->idagendamentobloqueio).'" class="d-inline-block">';
+                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o bloqueio?\')" />';
                 $acoes .= '</form>';
             }
-
-            if(empty($acoes)) {
-                $acoes = '<i class="fas fa-lock text-muted"></i>';
-            }
-                
             $conteudo = [
                 $resultado->idagendamentobloqueio,
                 $resultado->regional->regional,
                 $duracao,
-                'Das ' . $resultado->horainicio . ' às ' . $resultado->horatermino,
+                'Das '.$resultado->horainicio.' às '.$resultado->horatermino,
                 $acoes
             ];
-
             array_push($contents, $conteudo);
         }
         
@@ -383,8 +362,10 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     public function listarBloqueio()
     {
-        $resultados = AgendamentoBloqueio::orderBy('idagendamentobloqueio', 'DESC')
-            ->where('diatermino','>=', date('Y-m-d'))
+        $resultados = AgendamentoBloqueio::with('regional')
+            ->orderBy('idagendamentobloqueio', 'DESC')
+            ->where('diatermino', '>=', date('Y-m-d'))
+            ->orWhereNull('diatermino')
             ->paginate(10);
 
         if(auth()->user()->cannot('create', auth()->user()))
@@ -423,14 +404,27 @@ class AgendamentoService implements AgendamentoServiceInterface {
         ];
     }
 
-    public function viewBloqueio(MediadorServiceInterface $service)
+    public function viewBloqueio($id = null, MediadorServiceInterface $service = null)
     {
-        $regionais = $service->getService('Regional')->all();
-        $regionais->find(1)->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
+        if(isset($service) && !isset($id))
+        {
+            $regionais = $service->getService('Regional')->all();
+            $regionais->find(1)->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
+    
+            return [
+                'variaveis' => (object) $this->variaveisBloqueio,
+                'regionais' => $regionais->sortBy('regional'),
+            ];
+        }
+        
+        $bloqueio = AgendamentoBloqueio::findOrFail($id);
+
+        if($bloqueio->regional->idregional == 1)
+            $bloqueio->regional->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
 
         return [
             'variaveis' => (object) $this->variaveisBloqueio,
-            'regionais' => $regionais->sortBy('regional'),
+            'resultado' => $bloqueio,
         ];
     }
 
@@ -475,6 +469,30 @@ class AgendamentoService implements AgendamentoServiceInterface {
         }
     }
 
+    public function saveBloqueio($dados, $id = null)
+    {
+        $dados['idusuario'] = auth()->user()->idusuario;
+
+        if(isset($id))
+        {
+            unset($dados['idregional']);
+            $bloqueio = AgendamentoBloqueio::findOrFail($id);
+            $bloqueio->update($dados);
+
+            event(new CrudEvent('bloqueio de agendamento', 'editou', $id));
+            return null;
+        }
+
+        $bloqueio = AgendamentoBloqueio::create($dados);
+        event(new CrudEvent('bloqueio de agendamento', 'criou', $bloqueio->idagendamentobloqueio));
+        return null;
+    }
+
+    public function delete($id)
+    {
+        return AgendamentoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('bloqueio de agendamento', 'cancelou', $id)) : null;
+    }
+
     public function buscar($busca)
     {
         $regional = auth()->user()->can('atendenteOrGerSeccionais', auth()->user()) ? auth()->user()->idregional : null;
@@ -499,6 +517,22 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'resultados' => $resultados,
             'tabela' => $this->tabelaCompleta($resultados), 
             'variaveis' => (object) $this->variaveis
+        ];
+    }
+
+    public function buscarBloqueio($busca)
+    {
+        $resultados = AgendamentoBloqueio::with('regional')
+            ->whereHas('regional', function($q) use($busca){
+                $q->where('regional', 'LIKE', '%'.$busca.'%');
+            })->paginate(10);
+
+        $this->variaveisBloqueio['slug'] = 'agendamentos/bloqueios';
+
+        return [
+            'resultados' => $resultados,
+            'tabela' => $this->tabelaCompletaBloqueio($resultados), 
+            'variaveis' => (object) $this->variaveisBloqueio
         ];
     }
 
@@ -580,5 +614,13 @@ class AgendamentoService implements AgendamentoServiceInterface {
         }
             
         return $agendados;
+    }
+
+    // Momentaneo até refatorar o AgendamentoSite
+    public function getByRegional($idregional)
+    {
+        return AgendamentoBloqueio::where('idregional', $idregional)
+            ->where('diatermino','>=', date('Y-m-d'))
+            ->get();
     }
 }

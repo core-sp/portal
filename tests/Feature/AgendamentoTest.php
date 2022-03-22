@@ -74,12 +74,13 @@ class AgendamentoTest extends TestCase
         $this->post(route('agendamentos.reenviarEmail', $agendamento->idagendamento))->assertRedirect(route('login'));
 
         $this->get(route('agendamentobloqueios.lista'))->assertRedirect(route('login'));
-        $this->get('/admin/agendamentos/bloqueios/busca')->assertRedirect(route('login'));
-        $this->get('/admin/agendamentos/bloqueios/criar')->assertRedirect(route('login'));
-        $this->get('/admin/agendamentos/bloqueios/editar/'.$bloqueio->idagendamentobloqueio)->assertRedirect(route('login'));
-        $this->post('/admin/agendamentos/bloqueios/criar')->assertRedirect(route('login'));
-        $this->put('/admin/agendamentos/bloqueios/editar/'.$bloqueio->idagendamentobloqueio)->assertRedirect(route('login'));
-        $this->delete('/admin/agendamentos/bloqueios/apagar/'.$bloqueio->idagendamentobloqueio)->assertRedirect(route('login'));
+        $this->get(route('agendamentobloqueios.busca'))->assertRedirect(route('login'));
+        $this->get(route('agendamentobloqueios.criar'))->assertRedirect(route('login'));
+        $this->get(route('agendamentobloqueios.edit', $bloqueio->idagendamentobloqueio))->assertRedirect(route('login'));
+        $this->post(route('agendamentobloqueios.store'))->assertRedirect(route('login'));
+        $this->put(route('agendamentobloqueios.update', $bloqueio->idagendamentobloqueio))->assertRedirect(route('login'));
+        $this->delete(route('agendamentobloqueios.delete', $bloqueio->idagendamentobloqueio))->assertRedirect(route('login'));
+        $this->get(route('agendamentobloqueios.horariosAjax'), ['idregional' => $bloqueio->idregional])->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -101,12 +102,13 @@ class AgendamentoTest extends TestCase
         $this->post(route('agendamentos.reenviarEmail', $agendamento->idagendamento))->assertForbidden();
 
         $this->get(route('agendamentobloqueios.lista'))->assertForbidden();
-        $this->get('/admin/agendamentos/bloqueios/busca')->assertForbidden();
-        $this->get('/admin/agendamentos/bloqueios/criar')->assertForbidden();
-        $this->get('/admin/agendamentos/bloqueios/editar/'.$bloqueio->idagendamentobloqueio)->assertForbidden();
-        $this->post('/admin/agendamentos/bloqueios/criar', $bloqueio->toArray())->assertForbidden();
-        $this->put('/admin/agendamentos/bloqueios/editar/'.$bloqueio->idagendamentobloqueio, $bloqueio->toArray())->assertForbidden();
-        $this->delete('/admin/agendamentos/bloqueios/apagar/'.$bloqueio->idagendamentobloqueio)->assertForbidden();
+        $this->get(route('agendamentobloqueios.busca'))->assertForbidden();
+        $this->get(route('agendamentobloqueios.criar'))->assertForbidden();
+        $this->get(route('agendamentobloqueios.edit', $bloqueio->idagendamentobloqueio))->assertForbidden();
+        $this->post(route('agendamentobloqueios.store'), $bloqueio->toArray())->assertForbidden();
+        $this->put(route('agendamentobloqueios.update', $bloqueio->idagendamentobloqueio), $bloqueio->toArray())->assertForbidden();
+        $this->delete(route('agendamentobloqueios.delete', $bloqueio->idagendamentobloqueio))->assertForbidden();
+        $this->get(route('agendamentobloqueios.horariosAjax'), ['idregional' => $bloqueio->idregional])->assertForbidden();
     }
 
     /** @test 

@@ -22,4 +22,9 @@ class AgendamentoBloqueio extends Model
     {
     	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
+
+    public function getMsgDiaTermino()
+    {
+        return isset($this->diatermino) ? onlyDate($this->diatermino) : 'Tempo Indeterminado';
+    }
 }

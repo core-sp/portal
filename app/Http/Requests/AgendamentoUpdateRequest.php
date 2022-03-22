@@ -27,7 +27,7 @@ class AgendamentoUpdateRequest extends FormRequest
             'cpf' => ['sometimes', 'exclude_if:antigo,1', 'required', 'max:14', new Cpf],
             'celular' => 'sometimes|exclude_if:antigo,1|required|max:17',
             'tiposervico' => 'sometimes|required|in:'.implode(',', $completos),
-            'idusuario' => 'sometimes|required_if:status,==,'.$status[0],
+            'idusuario' => 'sometimes|nullable|exists:users,idusuario|required_if:status,==,'.$status[0],
             'status' => 'sometimes|nullable|in:'.implode(',', $status),
             'idagendamento' => 'sometimes|required_without_all:nome,email,cpf,celular,tiposervico,idusuario,antigo'
         ];
@@ -36,12 +36,13 @@ class AgendamentoUpdateRequest extends FormRequest
     public function messages() 
     {
         return [
-            'max' => 'O campo :attribute excedeu o limite de :max caracteres',
-            'required' => 'O campo :attribute é obrigatório',
+            'max' => 'O campo excedeu o limite de :max caracteres',
+            'required' => 'O campo é obrigatório',
             'email' => 'Email inválido',
             'idusuario.required_if' => 'Informe o atendente que realizou o atendimento',
             'status.in' => 'Opção inválida de status',
             'tiposervico.in' => 'Opção inválida de tipo de serviço',
+            'exists' => 'Usuário não existe'
         ];
     }
 }

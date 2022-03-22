@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\Repositories\AgendamentoBloqueioRepository;
+// use App\Repositories\AgendamentoBloqueioRepository;
 use Illuminate\Database\Eloquent\Model;
 
 class Regional extends Model
@@ -35,36 +35,19 @@ class Regional extends Model
         return [];
     }
 
-    public function horariosAgeACadaMeiaHora()
-    {
-        if(isset($this->horariosage))
-        {
-            $todasHoras = todasHoras();
-            $horasRegional = explode(',', $this->horariosage);
-            $ultima = $horasRegional[sizeof($horasRegional) - 1];
-            foreach(todasHoras() as $key => $hora)
-                if(($hora < $horasRegional[0]) || ($hora > $ultima))
-                    unset($todasHoras[$key]);
-            
-            return $todasHoras;
-        }
-
-        return [];
-    }
-
-    public function horariosDisponiveis($dia)
-    {
-        $horas = $this->horariosAge();
-        $bloqueios = (new AgendamentoBloqueioRepository)->getByRegionalAndDay($this->idregional, $dia);
-        if($bloqueios && $horas) {
-            foreach($bloqueios as $bloqueio) {
-                foreach($horas as $key => $hora) {
-                    if($hora >= $bloqueio->horainicio && $hora <= $bloqueio->horatermino) {
-                        unset($horas[$key]);
-                    }
-                }
-            }
-        }
-        return $horas;
-    }
+    // public function horariosDisponiveis($dia)
+    // {
+    //     $horas = $this->horariosAge();
+    //     $bloqueios = (new AgendamentoBloqueioRepository)->getByRegionalAndDay($this->idregional, $dia);
+    //     if($bloqueios && $horas) {
+    //         foreach($bloqueios as $bloqueio) {
+    //             foreach($horas as $key => $hora) {
+    //                 if($hora >= $bloqueio->horainicio && $hora <= $bloqueio->horatermino) {
+    //                     unset($horas[$key]);
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return $horas;
+    // }
 }

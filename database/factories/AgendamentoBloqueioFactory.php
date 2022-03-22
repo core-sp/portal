@@ -8,8 +8,8 @@ use Faker\Generator as Faker;
 
 $factory->define(AgendamentoBloqueio::class, function (Faker $faker) {
     return [
-        'diainicio' => '2022-01-22',
-        'diatermino' => '2022-01-28',
+        'diainicio' => date('Y-m-d'),
+        'diatermino' => date('Y-m-d'),
         'horainicio' => '10:00',
         'horatermino' => '11:00',
         'idregional' => factory('App\Regional'),

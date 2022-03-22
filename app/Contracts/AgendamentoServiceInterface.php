@@ -12,9 +12,13 @@ interface AgendamentoServiceInterface {
 
     public function view($id);
 
-    public function viewBloqueio(MediadorServiceInterface $service);
+    public function viewBloqueio($id = null, MediadorServiceInterface $service = null);
 
     public function save($dados, $id = null);
+
+    public function saveBloqueio($dados, $id = null);
+
+    public function delete($id);
 
     public function enviarEmail($id);
 
@@ -25,4 +29,17 @@ interface AgendamentoServiceInterface {
     public function countAll();
 
     public function pendentesByPerfil($count = true);
+
+    // PLANTÃO JURÍDICO - melhorar quando refatorar AgendamentoSite
+
+    public function getPlantaoJuridicoByRegionalAndDia($regional, $dia);
+
+    public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao);
+
+    public function getPlantaoJuridicoPorPeriodo($regional, $dataInicial, $dataFinal);
+
+    // -----------------------------------------------------------------
+
+    // Momentaneo até refatorar AgendamentoSite
+    public function getByRegional($idregional);
 }

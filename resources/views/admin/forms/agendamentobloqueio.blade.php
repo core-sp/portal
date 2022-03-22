@@ -10,15 +10,16 @@
                 <select 
                     name="idregional" 
                     class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}"
+                    id="{{ isset($resultado->idregional) ? '' : 'idregionalBloqueio' }}"
                     required
                 >
+            @if(isset($resultado->idregional))
+                <option value="{{ $resultado->idregional }}">{{ $resultado->regional->regional }}</option>
+            @else
                 @foreach($regionais as $regional)
-                    @if(old('idregional'))
-                    <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
-                    @else
-                    <option value="{{ $regional->idregional }}" {{ isset($resultado->idregional) && ($resultado->idregional == $regional->idregional) ? 'selected' : '' }}>{{ $regional->regional }}</option>
-                    @endif
+                <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
                 @endforeach
+            @endif
                 </select>
                 @if($errors->has('idregional'))
                 <div class="invalid-feedback">
@@ -80,12 +81,16 @@
                     id="horaInicioBloqueio"
                     required
                 >
-                <option selected disabled>Selecione o horário</option>
-                @if(isset($resultado))
-                    @foreach($resultado->regional->horariosAgeACadaMeiaHora() as $hora)
-                    <option value="{{ $hora }}" {{ (old('horainicio') == $hora) || ($resultado->horainicio == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
-                    @endforeach
-                @endif
+            @if(isset($resultado))
+                @foreach($resultado->regional->horariosAge() as $hora)
+                <option value="{{ $hora }}" {{ (old('horainicio') == $hora) || ($resultado->horainicio == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
+                @endforeach
+            @else
+                <option value="">Selecione o horário de início</option>
+                @foreach(todasHoras() as $hora)
+                <option value="{{ $hora }}" {{ (old('horainicio') == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
+                @endforeach
+            @endif
                 </select>
                 @if($errors->has('horainicio'))
                 <div class="invalid-feedback">
@@ -99,14 +104,18 @@
                     name="horatermino" 
                     class="form-control {{ $errors->has('horatermino') ? 'is-invalid' : '' }}" 
                     id="horaTerminoBloqueio"
+                    required
                 >
-                <option selected disabled>Selecione o horário</option>
-                @if(isset($resultado))
-                    @foreach($resultado->regional->horariosAgeACadaMeiaHora() as $hora)
-                    <option value="{{ $hora }}" {{ (old('horatermino') == $hora) || ($resultado->horatermino == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
-                    @endforeach
-                @endif
-                </select>
+            @if(isset($resultado))
+                 @foreach($resultado->regional->horariosAge() as $hora)
+                <option value="{{ $hora }}" {{ (old('horatermino') == $hora) || ($resultado->horatermino == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
+                @endforeach
+            @else
+                <option value="">Selecione o horário de término</option>
+                @foreach(todasHoras() as $hora)
+                <option value="{{ $hora }}" {{ (old('horatermino') == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
+                @endforeach
+            @endif
                 </select>
                 @if($errors->has('horatermino'))
                 <div class="invalid-feedback">
