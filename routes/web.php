@@ -109,14 +109,16 @@ Route::prefix('admin')->group(function() {
     Route::put('/editar/{id}', 'AgendamentoController@update')->name('agendamentos.update');
     Route::post('/reenviar-email/{id}', 'AgendamentoController@reenviarEmail')->name('agendamentos.reenviarEmail');
     // Lida com bloqueios
-    Route::get('/bloqueios', 'AgendamentoBloqueioController@index')->name('agendamentobloqueios.lista');
-    Route::get('/bloqueios/busca', 'AgendamentoBloqueioController@busca')->name('agendamentobloqueios.busca');
-    Route::get('/bloqueios/criar', 'AgendamentoBloqueioController@create')->name('agendamentobloqueios.criar');
-    Route::post('/bloqueios/criar', 'AgendamentoBloqueioController@store')->name('agendamentobloqueios.store');
-    Route::get('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@edit')->name('agendamentobloqueios.edit');
-    Route::put('/bloqueios/editar/{id}', 'AgendamentoBloqueioController@update')->name('agendamentobloqueios.update');
-    Route::delete('/bloqueios/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('agendamentobloqueios.delete');
-    Route::get('/bloqueios/horarios-ajax', 'AgendamentoBloqueioController@getHorasAjax')->name('agendamentobloqueios.horariosAjax');
+    Route::prefix('bloqueios')->group(function(){
+      Route::get('/', 'AgendamentoBloqueioController@index')->name('agendamentobloqueios.lista');
+      Route::get('/busca', 'AgendamentoBloqueioController@busca')->name('agendamentobloqueios.busca');
+      Route::get('/criar', 'AgendamentoBloqueioController@create')->name('agendamentobloqueios.criar');
+      Route::post('/criar', 'AgendamentoBloqueioController@store')->name('agendamentobloqueios.store');
+      Route::get('/editar/{id}', 'AgendamentoBloqueioController@edit')->name('agendamentobloqueios.edit');
+      Route::put('/editar/{id}', 'AgendamentoBloqueioController@update')->name('agendamentobloqueios.update');
+      Route::delete('/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('agendamentobloqueios.delete');
+      Route::get('/horarios-ajax', 'AgendamentoBloqueioController@getHorasAjax')->name('agendamentobloqueios.horariosAjax');
+    });
   });
 
   // Rota para Newsletter
@@ -185,12 +187,15 @@ Route::prefix('admin')->group(function() {
     Route::get('/', 'PlantaoJuridicoController@index')->name('plantao.juridico.index');
     Route::get('/editar/{id}', 'PlantaoJuridicoController@edit')->name('plantao.juridico.editar.view');
     Route::put('/editar/{id}', 'PlantaoJuridicoController@update')->name('plantao.juridico.editar');
-    Route::get('/bloqueios', 'PlantaoJuridicoBloqueioController@index')->name('plantao.juridico.bloqueios.index');
-    Route::get('/bloqueios/criar', 'PlantaoJuridicoBloqueioController@create')->name('plantao.juridico.bloqueios.criar.view');
-    Route::post('/bloqueios/criar', 'PlantaoJuridicoBloqueioController@store')->name('plantao.juridico.bloqueios.criar');
-    Route::get('/bloqueios/editar/{id}', 'PlantaoJuridicoBloqueioController@edit')->name('plantao.juridico.bloqueios.editar.view');
-    Route::put('/bloqueios/editar/{id}', 'PlantaoJuridicoBloqueioController@update')->name('plantao.juridico.bloqueios.editar');
-    Route::delete('/bloqueios/apagar/{id}', 'PlantaoJuridicoBloqueioController@destroy')->name('plantao.juridico.bloqueios.excluir');
+    // Lida com bloqueios
+    Route::prefix('bloqueios')->group(function(){
+      Route::get('/', 'PlantaoJuridicoBloqueioController@index')->name('plantao.juridico.bloqueios.index');
+      Route::get('/criar', 'PlantaoJuridicoBloqueioController@create')->name('plantao.juridico.bloqueios.criar.view');
+      Route::post('/criar', 'PlantaoJuridicoBloqueioController@store')->name('plantao.juridico.bloqueios.criar');
+      Route::get('/editar/{id}', 'PlantaoJuridicoBloqueioController@edit')->name('plantao.juridico.bloqueios.editar.view');
+      Route::put('/editar/{id}', 'PlantaoJuridicoBloqueioController@update')->name('plantao.juridico.bloqueios.editar');
+      Route::delete('/apagar/{id}', 'PlantaoJuridicoBloqueioController@destroy')->name('plantao.juridico.bloqueios.excluir');
+    });
     Route::get('/ajax', 'PlantaoJuridicoBloqueioController@getPlantaoAjax')->name('plantao.juridico.bloqueios.ajax');
   });
 

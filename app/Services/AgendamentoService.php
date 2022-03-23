@@ -205,12 +205,12 @@ class AgendamentoService implements AgendamentoServiceInterface {
         if(!$updateStatus && !isset($dados['antigo'])) 
             abort(500, 'Erro por falta de campo no request');
 
-        if(isset($dados['antigo']) && 
-        (($dados['antigo'] == 0 && !$agendamento->isAfter()) || ($dados['antigo'] == 1 && $agendamento->isAfter())))
-            abort(500, 'Erro na validação de campo no request');
-
         if(isset($dados['antigo']))
+        {
+            if(($dados['antigo'] == 0 && !$agendamento->isAfter()) || ($dados['antigo'] == 1 && $agendamento->isAfter()))
+                abort(500, 'Erro na validação de campo no request');
             unset($dados['antigo']);
+        }            
 
         if(isset($dados['nome']))
             $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE); 
@@ -307,11 +307,12 @@ class AgendamentoService implements AgendamentoServiceInterface {
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o bloqueio?\')" />';
                 $acoes .= '</form>';
             }
+            $horaFinal = Carbon::createFromFormat('H:i', $resultado->horatermino)->addHour()->format('H:i');
             $conteudo = [
                 $resultado->idagendamentobloqueio,
                 $resultado->regional->regional,
                 $duracao,
-                'Das '.$resultado->horainicio.' às '.$resultado->horatermino,
+                'Das '.$resultado->horainicio.' até '.$horaFinal,
                 $acoes
             ];
             array_push($contents, $conteudo);

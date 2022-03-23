@@ -8,17 +8,17 @@ interface PlantaoJuridicoServiceInterface {
 
     public function listar();
 
-    public function visualizar($id, MediadorServiceInterface $service);
-
-    public function save($request, $id);
-
     public function listarBloqueios();
+
+    public function visualizar($id, MediadorServiceInterface $service);
 
     public function visualizarBloqueio($id = null);
 
-    public function getDatasHorasLinkPlantaoAjax($id);
+    public function save($request, $id);
 
     public function saveBloqueio($request, $id = null);
+
+    public function getDatasHorasLinkPlantaoAjax($id);
 
     public function destroy($id);
 

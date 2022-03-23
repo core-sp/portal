@@ -74,7 +74,7 @@
         </div>
         <div class="form-row mt-2">
             <div class="col">
-                <label for="horainicio">Hora de início</label>
+                <label for="horainicio">Hora inicial a ser bloqueada</label>
                 <select 
                     name="horainicio" 
                     class="form-control {{ $errors->has('horainicio') ? 'is-invalid' : '' }}" 
@@ -99,7 +99,7 @@
                 @endif
             </div>
             <div class="col">
-            <label for="horatermino">Hora de término</label>
+            <label for="horatermino">Hora final a ser bloqueada</label>
                 <select 
                     name="horatermino" 
                     class="form-control {{ $errors->has('horatermino') ? 'is-invalid' : '' }}" 

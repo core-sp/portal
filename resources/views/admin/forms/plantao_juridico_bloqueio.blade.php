@@ -30,7 +30,7 @@
                 <p class="mt-2">
                     <i><b>Período do plantão selecionado: </b></i>
                     <span id="bloqueioPeriodoPlantao">
-                        {{ isset($resultado->plantaoJuridico->dataInicial) && isset($resultado->plantaoJuridico->dataInicial) ? 
+                        {{ isset($resultado->plantaoJuridico->dataInicial) && isset($resultado->plantaoJuridico->dataFinal) ? 
                             onlyDate($resultado->plantaoJuridico->dataInicial).' - '.onlyDate($resultado->plantaoJuridico->dataFinal) : '' }}
                     </span>
                 </p>
@@ -47,7 +47,7 @@
                     name="dataInicialBloqueio" 
                     class="form-control {{ $errors->has('dataInicialBloqueio') ? 'is-invalid' : '' }}" 
                     id="dataInicialBloqueio" 
-                    min="{{ isset($resultado->plantaoJuridico->dataInicial) ? $resultado->plantaoJuridico->dataInicial : '' }}"
+                    min="{{ isset($resultado->plantaoJuridico->dataInicial) ? $resultado->plantaoJuridico->dataInicial : Carbon\Carbon::tomorrow()->format('Y-m-d') }}"
                     max="{{ isset($resultado->plantaoJuridico->dataFinal) ? $resultado->plantaoJuridico->dataFinal : '' }}"
                     value="{{ isset($resultado->dataInicial) ? $resultado->dataInicial : old('dataInicialBloqueio') }}"
                     required
@@ -66,7 +66,7 @@
                     name="dataFinalBloqueio" 
                     class="form-control {{ $errors->has('dataFinalBloqueio') ? 'is-invalid' : '' }}" 
                     id="dataFinalBloqueio"
-                    min="{{ isset($resultado->plantaoJuridico->dataInicial) ? $resultado->plantaoJuridico->dataInicial : '' }}"
+                    min="{{ isset($resultado->plantaoJuridico->dataInicial) ? $resultado->plantaoJuridico->dataInicial : Carbon\Carbon::tomorrow()->format('Y-m-d') }}"
                     max="{{ isset($resultado->plantaoJuridico->dataFinal) ? $resultado->plantaoJuridico->dataFinal : '' }}"
                     value="{{ isset($resultado->dataFinal) ? $resultado->dataFinal : old('dataFinalBloqueio') }}" 
                     required
@@ -94,11 +94,11 @@
 
                 @if(isset($resultado) && isset($horariosPlantao))
                     @foreach($horariosPlantao as $hora)
-                    <option value="{{ $hora }}" {{ isset($horarios) && in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
+                    <option value="{{ $hora }}" {{ (!empty(old('horariosBloqueio')) && in_array($hora, old('horariosBloqueio'))) || (isset($horarios) && in_array($hora, $horarios)) ? 'selected' : '' }}>{{ $hora }}</option>
                     @endforeach
                 @else
                     @foreach(todasHoras() as $hora)
-                    <option value="{{ $hora }}">{{ $hora }}</option>
+                    <option value="{{ $hora }}" {{ !empty(old('horariosBloqueio')) && in_array($hora, old('horariosBloqueio')) ? 'selected' : '' }}>{{ $hora }}</option>
                     @endforeach
                 @endif
                 </select>
@@ -119,7 +119,7 @@
         <div class="float-right">
             <a href="{{ route('plantao.juridico.bloqueios.index') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">
-                {{ isset($resultado) ? 'Salvar' : 'Criar' }}
+                {{ isset($resultado->id) ? 'Salvar' : 'Criar' }}
             </button>
         </div>
     </div>

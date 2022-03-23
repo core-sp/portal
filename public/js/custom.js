@@ -230,17 +230,22 @@ $('#idregionalBloqueio').change(function(e){
 // Fim da Funcionalidade Agendamento Bloqueio
 
 // Funcionalidade Plantão Jurídico
-function setCamposDatas(plantao)
+function setCamposDatas(plantao, tipo)
 {
-    $("#dataInicialBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
-    $("#dataFinalBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
+  if(tipo == 'change'){
+    $("#dataInicialBloqueio").val('');
+    $("#dataFinalBloqueio").val('');
+  }
 
-    var inicial = new Date(plantao['datas'][0] + ' 00:00:00');
-    var final = new Date(plantao['datas'][1] + ' 00:00:00');
-    var inicialFormatada = inicial.getDate() + '/' + (inicial.getMonth() + 1) + '/' + inicial.getFullYear(); 
-    var finalFormatada = final.getDate() + '/' + (final.getMonth() + 1) + '/' + final.getFullYear(); 
+  $("#dataInicialBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
+  $("#dataFinalBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
 
-    $("#bloqueioPeriodoPlantao").text(inicialFormatada + ' - ' + finalFormatada);
+  var inicial = new Date(plantao['datas'][0] + ' 00:00:00');
+  var final = new Date(plantao['datas'][1] + ' 00:00:00');
+  var inicialFormatada = inicial.getDate() + '/' + (inicial.getMonth() + 1) + '/' + inicial.getFullYear(); 
+  var finalFormatada = final.getDate() + '/' + (final.getMonth() + 1) + '/' + final.getFullYear(); 
+
+  $("#bloqueioPeriodoPlantao").text(inicialFormatada + ' - ' + finalFormatada);
 }
 
 function setCampoHorarios(plantao)
@@ -265,52 +270,37 @@ function setCampoAgendados(plantao)
     $('#textoAgendados').prop('class', 'text-hide');
 }
 
-$('#plantaoBloqueio').ready(function(){
+function ajaxPlantaoJuridico(valor, e)
+{
+  $.ajax({
+    method: "GET",
+    data: {
+      "id": valor,
+    },
+    dataType: 'json',
+    url: "/admin/plantao-juridico/ajax",
+    success: function(response) {
+      plantao = response;
+      setCampoAgendados(plantao);
+      setCamposDatas(plantao, e.type);
+      setCampoHorarios(plantao);
+    },
+    error: function() {
+      alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
+    }
+  });
+}
+
+$('#plantaoBloqueio').ready(function(e){
   var valor = $('#plantaoBloqueio').val();
     if(valor > 0)
-      $.ajax({
-        method: "GET",
-        data: {
-          "_token": $('#token').val(),
-          "id": valor,
-        },
-        dataType: 'json',
-        url: "/admin/plantao-juridico/ajax",
-        success: function(response) {
-          plantao = response;
-          setCampoAgendados(plantao);
-          setCamposDatas(plantao);
-          setCampoHorarios(plantao);
-        },
-        error: function() {
-          alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
-        }
-      });
+      ajaxPlantaoJuridico(valor, e);
 });
 
-$('#plantaoBloqueio').change(function(){
+$('#plantaoBloqueio').change(function(e){
   var valor = $('#plantaoBloqueio').val();
   if(valor > 0)
-    $.ajax({
-      method: "GET",
-      data: {
-        "_token": $('#token').val(),
-        "id": valor,
-      },
-      dataType: 'json',
-      url: "/admin/plantao-juridico/ajax",
-      success: function(response) {
-        plantao = response;
-        setCampoAgendados(plantao);
-        $("#dataInicialBloqueio").val('');
-        $("#dataFinalBloqueio").val('');
-        setCamposDatas(plantao);
-        setCampoHorarios(plantao);
-      },
-      error: function() {
-        alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
-      }
-    });
+    ajaxPlantaoJuridico(valor, e);
 });
 // Fim da Funcionalidade Plantão Jurídico
 

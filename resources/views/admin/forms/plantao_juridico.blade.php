@@ -35,12 +35,12 @@
                     id="horarios" 
                     multiple
                 >
-                    @php
-                        $horarios = explode(',', $resultado->horarios);
-                    @endphp
-                    @foreach (todasHoras() as $hora)
-                        <option value="{{ $hora }}" {{ in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
-                    @endforeach
+                @php
+                    $horarios = explode(',', $resultado->horarios);
+                @endphp
+                @foreach(todasHoras() as $hora)
+                    <option value="{{ $hora }}" {{ (!empty(old('horarios')) && in_array($hora, old('horarios'))) || in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
+                @endforeach
                 </select>
 
                 @if($errors->has('horarios'))

@@ -30,7 +30,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
             'plural' => 'bloqueios dos plantões jurídicos',
             'pluraliza' => 'bloqueios plantão jurídico',
             'form' => 'plantao_juridico_bloqueio',
-            'btn_criar' => '<a href="'.route('plantao.juridico.bloqueios.criar.view').'" class="btn btn-primary mr-1">Novo Bloqueio</a>',
+            'btn_criar' => '<a href="'.route('plantao.juridico.bloqueios.criar.view').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Novo Bloqueio</a>',
             'titulo_criar' => 'Criar bloqueio',
         ];
     }
@@ -82,7 +82,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         $headers = [
             'Id',
             'Regional',
-            'Período',
+            'Período do Bloqueio',
             'Período do Plantão',
             'Horas Bloqueadas',
             'Ações'
@@ -126,37 +126,6 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         return $tabela;
     }
 
-    private function getById($id)
-    {
-        return PlantaoJuridico::findOrFail($id);
-    }
-
-    private function validacaoBloqueio($request)
-    {
-        $plantao = $this->getById($request->plantaoBloqueio);
-        $horarios = explode(',', $plantao->horarios);
-        $inicial = Carbon::parse($plantao->dataInicial);
-        $final = Carbon::parse($plantao->dataFinal);
-
-        if(Carbon::parse($request->dataInicialBloqueio)->lt($inicial) ||
-        Carbon::parse($request->dataInicialBloqueio)->gt($final) ||
-        Carbon::parse($request->dataFinalBloqueio)->lt($inicial) ||
-        Carbon::parse($request->dataFinalBloqueio)->gt($final))
-            return $erro = [
-                'message' => '<i class="icon fa fa-ban"></i>A(s) data(s) escolhida(s) fora das datas do plantão',
-                'class' => 'alert-danger'
-            ];
-
-        foreach($request->horariosBloqueio as $hora)
-            if(!in_array($hora, $horarios))
-                return $erro = [
-                    'message' => '<i class="icon fa fa-ban"></i>A(s) hora(s) escolhida(s) não inclusa(s) nas horas do plantão',
-                    'class' => 'alert-danger'
-                ];
-
-        return null;
-    }
-
     private function getHorariosComBloqueio($plantao, $dia)
     {
         $horarios = explode(',', $plantao->horarios);
@@ -194,28 +163,6 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         ];
     }
 
-    public function visualizar($id, MediadorServiceInterface $service)
-    {
-        $plantao = $this->getById($id);
-
-        return [
-            'resultado' => $plantao,
-            'variaveis' => (object) $this->variaveis,
-            'agendamentos' => $plantao->expirou() ? null : $service->getService('Agendamento')->getPlantaoJuridicoPorPeriodo($plantao->idregional, $plantao->dataInicial, $plantao->dataFinal) 
-        ];
-    }
-
-    public function save($request, $id)
-    {
-        $this->getById($id)->update([
-            'qtd_advogados' => $request->qtd_advogados,
-            'horarios' => isset($request->horarios) ? implode(',', $request->horarios) : null,
-            'dataInicial' => isset($request->dataInicial) ? $request->dataInicial : null,
-            'dataFinal' => isset($request->dataFinal) ? $request->dataFinal : null
-        ]);
-        event(new CrudEvent('plantão juridico', 'editou', $id));
-    }
-
     public function listarBloqueios()
     {
         $bloqueios = PlantaoJuridicoBloqueio::with('plantaoJuridico')->paginate(15);
@@ -227,6 +174,17 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
             'tabela' => $this->tabelaCompletaBloqueios($bloqueios),
             'resultados' => $bloqueios,
             'variaveis' => (object) $this->variaveisBloqueios
+        ];
+    }
+
+    public function visualizar($id, MediadorServiceInterface $service)
+    {
+        $plantao = PlantaoJuridico::findOrFail($id);
+
+        return [
+            'resultado' => $plantao,
+            'variaveis' => (object) $this->variaveis,
+            'agendamentos' => $plantao->expirou() ? null : $service->getService('Agendamento')->getPlantaoJuridicoPorPeriodo($plantao->idregional, $plantao->dataInicial, $plantao->dataFinal) 
         ];
     }
 
@@ -249,9 +207,49 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         ];
     }
 
+    public function save($request, $id)
+    {
+        PlantaoJuridico::findOrFail($id)->update([
+            'qtd_advogados' => $request->qtd_advogados,
+            'horarios' => isset($request->horarios) ? implode(',', $request->horarios) : null,
+            'dataInicial' => $request->dataInicial,
+            'dataFinal' => $request->dataFinal
+        ]);
+        event(new CrudEvent('plantão juridico', 'editou', $id));
+    }
+
+    public function saveBloqueio($request, $id = null)
+    {
+        $dados = [
+            'dataInicial' => $request->dataInicialBloqueio,
+            'dataFinal' => $request->dataFinalBloqueio,
+            'horarios' => implode(',', $request->horariosBloqueio),
+            'idusuario' => auth()->user()->idusuario
+        ];
+
+        if(isset($id))
+        {
+            $bloqueio = PlantaoJuridicoBloqueio::findOrFail($id);
+
+            if(!$bloqueio->podeEditar()) 
+                return [
+                    'message' => '<i class="icon fa fa-ban"></i>O bloqueio não pode mais ser editado devido o período do plantão ter expirado',
+                    'class' => 'alert-danger'
+                ];
+
+            $bloqueio->update($dados);
+            event(new CrudEvent('plantão juridico bloqueio', 'editou', $id));
+        }else  
+        {
+            $dados['idplantaojuridico'] = $request->plantaoBloqueio;
+            $id = PlantaoJuridicoBloqueio::create($dados);
+            event(new CrudEvent('plantão juridico bloqueio', 'criou', $id));
+        }    
+    }
+
     public function getDatasHorasLinkPlantaoAjax($id)
     {
-        $plantao = $this->getById($id);
+        $plantao = PlantaoJuridico::findOrFail($id);
         if(isset($plantao))
         {
             $inicial = Carbon::parse($plantao->dataInicial);
@@ -263,42 +261,6 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
                 'link-agendados' => $plantao->ativado() ? route('plantao.juridico.editar.view', $plantao->id) : null
             ];
         }
-    }
-
-    public function saveBloqueio($request, $id = null)
-    {
-        $valid = $this->validacaoBloqueio($request);
-
-        if(!isset($valid))
-        {
-            $dados = [
-                'dataInicial' => $request->dataInicialBloqueio,
-                'dataFinal' => $request->dataFinalBloqueio,
-                'horarios' => implode(',', $request->horariosBloqueio),
-                'idusuario' => auth()->user()->idusuario
-            ];
-
-            if(isset($id))
-            {
-                $bloqueio = PlantaoJuridicoBloqueio::findOrFail($id);
-
-                if(!$bloqueio->podeEditar()) 
-                    return [
-                        'message' => '<i class="icon fa fa-ban"></i>O bloqueio não pode mais ser editado devido o período do plantão ter expirado',
-                        'class' => 'alert-danger'
-                    ];
-
-                $bloqueio->update($dados);
-                event(new CrudEvent('plantão juridico bloqueio', 'editou', $id));
-            }else  
-            {
-                $dados['idplantaojuridico'] = $request->plantaoBloqueio;
-                $id = PlantaoJuridicoBloqueio::create($dados);
-                event(new CrudEvent('plantão juridico bloqueio', 'criou', $id));
-            }    
-        }
-
-        return $valid;
     }
 
     public function destroy($id)
