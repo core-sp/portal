@@ -117,7 +117,7 @@ Route::prefix('admin')->group(function() {
       Route::get('/editar/{id}', 'AgendamentoBloqueioController@edit')->name('agendamentobloqueios.edit');
       Route::put('/editar/{id}', 'AgendamentoBloqueioController@update')->name('agendamentobloqueios.update');
       Route::delete('/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('agendamentobloqueios.delete');
-      Route::get('/horarios-ajax', 'AgendamentoBloqueioController@getHorasAjax')->name('agendamentobloqueios.horariosAjax');
+      Route::get('/dados-ajax', 'AgendamentoBloqueioController@getDadosAjax')->name('agendamentobloqueios.dadosAjax');
     });
   });
 

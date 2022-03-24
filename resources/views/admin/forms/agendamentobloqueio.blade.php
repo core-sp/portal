@@ -73,55 +73,56 @@
             </div>
         </div>
         <div class="form-row mt-2">
-            <div class="col">
-                <label for="horainicio">Hora inicial a ser bloqueada</label>
+            <div class="col-6">
+                <label for="horarios">Horários a serem bloqueados</label>
                 <select 
-                    name="horainicio" 
-                    class="form-control {{ $errors->has('horainicio') ? 'is-invalid' : '' }}" 
-                    id="horaInicioBloqueio"
+                    name="horarios[]" 
+                    class="form-control {{ $errors->has('horarios') ? 'is-invalid' : '' }}" 
+                    id="horarios" 
+                    multiple
                     required
                 >
-            @if(isset($resultado))
-                @foreach($resultado->regional->horariosAge() as $hora)
-                <option value="{{ $hora }}" {{ (old('horainicio') == $hora) || ($resultado->horainicio == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
-                @endforeach
-            @else
-                <option value="">Selecione o horário de início</option>
-                @foreach(todasHoras() as $hora)
-                <option value="{{ $hora }}" {{ (old('horainicio') == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
-                @endforeach
-            @endif
+                @php
+                    $horarios = isset($resultado->horarios) ? explode(',', $resultado->horarios) : null;
+                @endphp
+
+                @if(isset($resultado))
+                    @foreach($resultado->regional->horariosAge() as $hora)
+                    <option value="{{ $hora }}" {{ (!empty(old('horarios')) && in_array($hora, old('horarios'))) || (isset($horarios) && in_array($hora, $horarios)) ? 'selected' : '' }}>{{ $hora }}</option>
+                    @endforeach
+                @else
+                    @foreach(todasHoras() as $hora)
+                    <option value="{{ $hora }}" {{ !empty(old('horarios')) && in_array($hora, old('horarios')) ? 'selected' : '' }}>{{ $hora }}</option>
+                    @endforeach
+                @endif
                 </select>
-                @if($errors->has('horainicio'))
+                @if($errors->has('horarios'))
                 <div class="invalid-feedback">
-                {{ $errors->first('horainicio') }}
+                    {{ $errors->first('horarios') }}
                 </div>
                 @endif
+                <small class="form-text text-muted">
+                    <em>* Segure Ctrl para selecionar mais de um horário ou Shift para selecionar um grupo de horários</em>
+                </small>
             </div>
             <div class="col">
-            <label for="horatermino">Hora final a ser bloqueada</label>
-                <select 
-                    name="horatermino" 
-                    class="form-control {{ $errors->has('horatermino') ? 'is-invalid' : '' }}" 
-                    id="horaTerminoBloqueio"
+                <label for="qtd_atendentes">Quantidade de atendentes</label>
+                <input type="text"
+                    class="form-control {{ $errors->has('qtd_atendentes') ? 'is-invalid' : '' }}"
+                    name="qtd_atendentes"
+                    id="qtd_atendentes"
+                    value="{{ empty(old('qtd_atendentes')) && isset($resultado->qtd_atendentes) ? $resultado->qtd_atendentes : old('qtd_atendentes') }}"
+                    maxlength="1"
                     required
-                >
-            @if(isset($resultado))
-                 @foreach($resultado->regional->horariosAge() as $hora)
-                <option value="{{ $hora }}" {{ (old('horatermino') == $hora) || ($resultado->horatermino == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
-                @endforeach
-            @else
-                <option value="">Selecione o horário de término</option>
-                @foreach(todasHoras() as $hora)
-                <option value="{{ $hora }}" {{ (old('horatermino') == $hora) ? 'selected' : '' }}>{{ $hora }}</option>
-                @endforeach
-            @endif
-                </select>
-                @if($errors->has('horatermino'))
+                />
+                @if($errors->has('qtd_atendentes'))
                 <div class="invalid-feedback">
-                {{ $errors->first('horatermino') }}
+                    {{ $errors->first('qtd_atendentes') }}
                 </div>
                 @endif
+                <small class="form-text text-muted">
+                    <em>* Nesta regional pode ter, no máximo, <span id="totalAtendentes">{{ isset($resultado->regional->ageporhorario) ? $resultado->regional->ageporhorario : '' }}</span> atendente(s)</em>
+                </small>
             </div>
         </div>
     </div>

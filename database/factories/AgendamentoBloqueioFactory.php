@@ -7,12 +7,13 @@ use App\AgendamentoBloqueio;
 use Faker\Generator as Faker;
 
 $factory->define(AgendamentoBloqueio::class, function (Faker $faker) {
+    $regional = factory('App\Regional')->create();
     return [
         'diainicio' => date('Y-m-d'),
         'diatermino' => date('Y-m-d'),
-        'horainicio' => '10:00',
-        'horatermino' => '11:00',
-        'idregional' => factory('App\Regional'),
+        'horarios' => '10:00',
+        'qtd_atendentes' => $regional->ageporhorario,
+        'idregional' => $regional->idregional,
         'idusuario' => factory('App\User')
     ];
 });

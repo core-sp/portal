@@ -16,14 +16,16 @@ class AgendamentoBloqueioRequest extends FormRequest
 
     public function rules()
     {
-        $horarios = $this->service->getById(request()->idregional)->horariosage;
+        $regional = isset(request()->idregional) ? $this->service->getById(request()->idregional) : null;
+        $horarios = isset($regional->horariosage) ? $regional->horariosage : null;
+        $ageporhorario = isset($regional->ageporhorario) ? $regional->ageporhorario : null;
         
         return [
             'idregional' => 'required|exists:regionais,idregional',
             'diainicio' => 'required|date|after_or_equal:'.date('Y-m-d'),
             'diatermino' => 'date|nullable|after_or_equal:diainicio',
-            'horainicio' => 'required|size:5|in:'.$horarios,
-            'horatermino' => 'required|size:5|in:'.$horarios,
+            'horarios' => 'required|array|in:'.$horarios,
+            'qtd_atendentes' => 'required|numeric|min:1|max:'.$ageporhorario
         ];
     }
 
@@ -34,9 +36,12 @@ class AgendamentoBloqueioRequest extends FormRequest
             'date' => 'Deve ser uma data válida',
             'diatermino.after_or_equal' => 'Deve ser uma data igual ou maior que a data inicial',
             'diainicio.after_or_equal' => 'Deve ser uma data igual ou maior que hoje',
-            'size' => 'Formato de horas inválido',
             'exists' => 'Não existe esse valor',
-            'in' => 'Essa hora não existe'
+            'in' => 'Essa hora não existe',
+            'array' => 'Hora inválida',
+            'numeric' => 'Deve ser um número',
+            'min' => 'Valor mínimo é :min',
+            'max' => 'Valor máximo é :max'
         ];
     }
 }

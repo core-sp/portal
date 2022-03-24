@@ -287,6 +287,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'Regional',
             'Duração',
             'Horas Bloqueadas',
+            'Qtd de Atendentes',
             'Ações',
         ];
         // Opções de conteúdo da tabela
@@ -307,12 +308,12 @@ class AgendamentoService implements AgendamentoServiceInterface {
                 $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o bloqueio?\')" />';
                 $acoes .= '</form>';
             }
-            $horaFinal = Carbon::createFromFormat('H:i', $resultado->horatermino)->addHour()->format('H:i');
             $conteudo = [
                 $resultado->idagendamentobloqueio,
                 $resultado->regional->regional,
                 $duracao,
-                'Das '.$resultado->horainicio.' até '.$horaFinal,
+                $resultado->horarios,
+                $resultado->qtd_atendentes,
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -420,7 +421,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         
         $bloqueio = AgendamentoBloqueio::findOrFail($id);
 
-        if($bloqueio->regional->idregional == 1)
+        if($bloqueio->idregional == 1)
             $bloqueio->regional->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
 
         return [
@@ -473,6 +474,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
     public function saveBloqueio($dados, $id = null)
     {
         $dados['idusuario'] = auth()->user()->idusuario;
+        $dados['horarios'] = implode(',', $dados['horarios']);
 
         if(isset($id))
         {

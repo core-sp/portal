@@ -177,7 +177,7 @@ $('#horaInicioBloqueio').change(function(){
   }
 });
 
-function ajaxAgendamentoBloqueio(valor, e)
+function ajaxAgendamentoBloqueio(valor)
 {
   $.ajax({
     method: "GET",
@@ -185,10 +185,10 @@ function ajaxAgendamentoBloqueio(valor, e)
       "idregional": valor,
     },
     dataType: 'json',
-    url: "/admin/agendamentos/bloqueios/horarios-ajax",
+    url: "/admin/agendamentos/bloqueios/dados-ajax",
     success: function(response) {
-      horarios = response;
-      setCampoHoras(horarios, e.type);
+      horas_atendentes = response;
+      setCamposAgeBloqueio(horas_atendentes);
     },
     error: function() {
       alert('Erro ao carregar os horários. Recarregue a página.');
@@ -196,36 +196,28 @@ function ajaxAgendamentoBloqueio(valor, e)
   });
 }
 
-function setCampoHoras(horarios, tipo)
+function setCamposAgeBloqueio(horas_atendentes)
 {
-  if(tipo == 'change')
-  {
-    $("#horaInicioBloqueio").val('');
-    $("#horaTerminoBloqueio").val('');
-  }
+  $('#horarios option').show();
+  $('#horarios option').each(function(){
+    var valor = $(this).val();
+    jQuery.inArray(valor, horas_atendentes['horarios']) != -1 ? $(this).show() : $(this).hide();
+  });
 
-  $('#horaInicioBloqueio option').show();
-  $('#horaInicioBloqueio option').each(function(){
-    var valor = $(this).val();
-    jQuery.inArray(valor, horarios) != -1 ? $(this).show() : $(this).hide();
-  });
-  $('#horaTerminoBloqueio option').show();
-  $('#horaTerminoBloqueio option').each(function(){
-    var valor = $(this).val();
-    jQuery.inArray(valor, horarios) != -1 ? $(this).show() : $(this).hide();
-  });
+  $('#qtd_atendentes').val(horas_atendentes['atendentes']);
+  $('#totalAtendentes').text(horas_atendentes['atendentes']);
 }
 
-$('#idregionalBloqueio').ready(function(e){
+$('#idregionalBloqueio').ready(function(){
   var valor = $('#idregionalBloqueio').val();
   if(valor > 0)
-    ajaxAgendamentoBloqueio(valor, e);
+    ajaxAgendamentoBloqueio(valor);
 });
 
-$('#idregionalBloqueio').change(function(e){
+$('#idregionalBloqueio').change(function(){
   var valor = $('#idregionalBloqueio').val();
   if(valor > 0)
-    ajaxAgendamentoBloqueio(valor, e);
+    ajaxAgendamentoBloqueio(valor);
 });
 // Fim da Funcionalidade Agendamento Bloqueio
 

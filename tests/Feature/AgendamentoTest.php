@@ -80,7 +80,7 @@ class AgendamentoTest extends TestCase
         $this->post(route('agendamentobloqueios.store'))->assertRedirect(route('login'));
         $this->put(route('agendamentobloqueios.update', $bloqueio->idagendamentobloqueio))->assertRedirect(route('login'));
         $this->delete(route('agendamentobloqueios.delete', $bloqueio->idagendamentobloqueio))->assertRedirect(route('login'));
-        $this->get(route('agendamentobloqueios.horariosAjax'), ['idregional' => $bloqueio->idregional])->assertRedirect(route('login'));
+        $this->get(route('agendamentobloqueios.dadosAjax'), ['idregional' => $bloqueio->idregional])->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -91,7 +91,11 @@ class AgendamentoTest extends TestCase
         
         $agendamento = factory('App\Agendamento')->create();
 
-        $bloqueio = factory('App\AgendamentoBloqueio')->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'horarios' => ['10:00']
+        ]);
+
+        $bloqueioSalvo = factory('App\AgendamentoBloqueio')->create();
 
         $this->get(route('agendamentos.lista'))->assertForbidden();
         $this->get(route('agendamentos.busca'))->assertForbidden();
@@ -104,11 +108,13 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentobloqueios.lista'))->assertForbidden();
         $this->get(route('agendamentobloqueios.busca'))->assertForbidden();
         $this->get(route('agendamentobloqueios.criar'))->assertForbidden();
-        $this->get(route('agendamentobloqueios.edit', $bloqueio->idagendamentobloqueio))->assertForbidden();
-        $this->post(route('agendamentobloqueios.store'), $bloqueio->toArray())->assertForbidden();
-        $this->put(route('agendamentobloqueios.update', $bloqueio->idagendamentobloqueio), $bloqueio->toArray())->assertForbidden();
-        $this->delete(route('agendamentobloqueios.delete', $bloqueio->idagendamentobloqueio))->assertForbidden();
-        $this->get(route('agendamentobloqueios.horariosAjax'), ['idregional' => $bloqueio->idregional])->assertForbidden();
+        $this->get(route('agendamentobloqueios.edit', $bloqueioSalvo->idagendamentobloqueio))->assertForbidden();
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)->assertForbidden();
+
+        $bloqueioSalvo->horarios = ['10:00'];
+        $this->put(route('agendamentobloqueios.update', $bloqueioSalvo->idagendamentobloqueio), $bloqueioSalvo->toArray())->assertForbidden();
+        $this->delete(route('agendamentobloqueios.delete', $bloqueioSalvo->idagendamentobloqueio))->assertForbidden();
+        $this->get(route('agendamentobloqueios.dadosAjax'), ['idregional' => $bloqueioSalvo->idregional])->assertForbidden();
     }
 
     /** @test 
@@ -1688,7 +1694,158 @@ class AgendamentoTest extends TestCase
      * =======================================================================================================
      */
 
+    /** @test */
+    public function can_create_bloqueio()
+    {
+        $user = $this->signInAsAdmin();
 
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'horarios' => ['10:00', '11:00'],
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)->assertRedirect(route('agendamentobloqueios.lista'));
+        $this->assertDatabaseHas('agendamento_bloqueios', [
+            'idagendamentobloqueio' => 1,
+            'diainicio' => $bloqueio['diainicio'],
+            'diatermino' => $bloqueio['diatermino'],
+            'horarios' => implode(',', $bloqueio['horarios']),
+            'qtd_atendentes' => $bloqueio['qtd_atendentes'],
+            'idregional' => $bloqueio['idregional']
+        ]);
+    }
+
+    /** @test */
+    public function can_create_bloqueio_without_dia_termino()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'horarios' => ['10:00', '11:00'],
+            'diatermino' => null
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)->assertRedirect(route('agendamentobloqueios.lista'));
+        $this->assertDatabaseHas('agendamento_bloqueios', [
+            'idagendamentobloqueio' => 1,
+            'diainicio' => $bloqueio['diainicio'],
+            'diatermino' => $bloqueio['diatermino'],
+            'horarios' => implode(',', $bloqueio['horarios']),
+            'qtd_atendentes' => $bloqueio['qtd_atendentes'],
+            'idregional' => $bloqueio['idregional']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_without_requireds_inputs()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = [
+            'diainicio' => null,
+            'diatermino' => null,
+            'horarios' => '',
+            'qtd_atendentes' => '',
+            'idregional' => ''
+        ];
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'diainicio',
+            'horarios',
+            'qtd_atendentes',
+            'idregional'
+        ]);
+
+        $this->assertDatabaseMissing('agendamento_bloqueios', [
+            'idagendamentobloqueio' => 1
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_diainicio_before_today()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'diainicio' => Carbon::today()->subDay()->format('Y-m-d')
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'diainicio'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_diainicio_and_diatermino_before_today()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'horarios' => ['10:00'],
+            'diainicio' => Carbon::today()->subDay()->format('Y-m-d'),
+            'diatermino' => Carbon::today()->subDay()->format('Y-m-d')
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'diainicio',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_dia_termino_before_dia_inicio()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'diainicio' => Carbon::today()->addDay()->format('Y-m-d'),
+            'diatermino' => Carbon::today()->format('Y-m-d')
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'diatermino'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_invalid_horarios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'horarios' => ['18:00'],
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_invalid_horarios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'horarios' => ['18:00'],
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios'
+        ]);
+    }
 
     // /** 
     //  * =======================================================================================================
