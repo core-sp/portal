@@ -74,7 +74,7 @@
         </div>
         <div class="form-row mt-2">
             <div class="col-6">
-                <label for="horarios">Horários a serem bloqueados</label>
+                <label for="horarios">Horários a serem bloqueados / qtd de agendamentos alterado</label>
                 <select 
                     name="horarios[]" 
                     class="form-control {{ $errors->has('horarios') ? 'is-invalid' : '' }}" 
@@ -106,7 +106,7 @@
                 </small>
             </div>
             <div class="col">
-                <label for="qtd_atendentes">Quantidade de atendentes</label>
+                <label for="qtd_atendentes">Quantidade de agendamentos por horário</label>
                 <input type="text"
                     class="form-control {{ $errors->has('qtd_atendentes') ? 'is-invalid' : '' }}"
                     name="qtd_atendentes"
@@ -121,7 +121,9 @@
                 </div>
                 @endif
                 <small class="form-text text-muted">
-                    <em>* Nesta regional pode ter, no máximo, <span id="totalAtendentes">{{ isset($resultado->regional->ageporhorario) ? $resultado->regional->ageporhorario : '' }}</span> atendente(s)</em>
+                    <em>* Nesta regional pode ter, no máximo, <span id="totalAtendentes">{{ isset($resultado->regional->ageporhorario) ? $resultado->regional->ageporhorario : '' }}</span> agendamento(s) por horário</em>
+                    <br />
+                    <em>** Coloque 0 (zero) para bloquear o(s) horário(s) ou coloque mais de 0 (zero) para alterar a quantidade de agendamentos por horário</em>
                 </small>
             </div>
         </div>

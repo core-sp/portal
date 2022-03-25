@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\AgendamentoRepository;
 use App\Http\Requests\AgendamentoSiteRequest;
+use App\Http\Requests\AgendamentoUpdateRequest;
 // use App\Repositories\AgendamentoBloqueioRepository;
 use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
 use App\Contracts\MediadorServiceInterface;
@@ -34,12 +35,22 @@ class AgendamentoSiteController extends Controller
 
     public function formView()
     {
-        $regionais = $this->service->getService('Regional')->getRegionaisAgendamento();
-        $pessoas = Agendamento::TIPOS_PESSOA;
-        $servicos = Agendamento::servicos();
+        try{
+            $dados = $this->service->getService('Agendamento')->viewSite($this->service);
+            $regionais = $dados['regionais'];
+            $pessoas = $dados['pessoas'];
+            $servicos = $dados['servicos'];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar os dados para o agendamento.");
+        }
 
-        if(!$this->service->getService('PlantaoJuridico')->plantaoJuridicoAtivo())
-            unset($servicos[array_search(Agendamento::SERVICOS_PLANTAO_JURIDICO, $servicos)]);        
+        // $regionais = $this->service->getService('Regional')->getRegionaisAgendamento();
+        // $pessoas = Agendamento::TIPOS_PESSOA;
+        // $servicos = Agendamento::servicos();
+
+        // if(!$this->service->getService('PlantaoJuridico')->plantaoJuridicoAtivo())
+        //     unset($servicos[array_search(Agendamento::SERVICOS_PLANTAO_JURIDICO, $servicos)]);        
 
         return view('site.agendamento', compact('regionais', 'pessoas', 'servicos'));
     }
@@ -67,8 +78,18 @@ class AgendamentoSiteController extends Controller
         return view('site.agendamento-consulta', compact('resultado', 'busca'));
     }
 
-    public function store(AgendamentoSiteRequest $request)
+    public function store(/*AgendamentoSiteRequest*/AgendamentoUpdateRequest $request)
     {
+        // try{
+        //     $dados = $this->service->getService('Agendamento')->viewSite($this->service);
+        //     $regionais = $dados['regionais'];
+        //     $pessoas = $dados['pessoas'];
+        //     $servicos = $dados['servicos'];
+        // } catch (\Exception $e) {
+        //     \Log::error($e->getMessage());
+        //     abort(500, "Erro ao carregar os dados para o agendamento.");
+        // }
+
         $request->validated();
 
         // Trabalhando com o formato de data Y-m-d por questões de padronização no banco de dados
@@ -307,6 +328,14 @@ class AgendamentoSiteController extends Controller
      */
     public function checaMes(Request $request)
     {
+        // try{
+        //     $validate = $request->only('idregional', 'servico', 'dia');
+        //     $dados = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate, $this->service);
+        // } catch (\Exception $e) {
+        //     \Log::error($e->getMessage());
+        //     abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
+        // }
+
         $idregional = $request->idregional;
         $servico = $request->servico;
 

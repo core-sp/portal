@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Contracts\PlantaoJuridicoServiceInterface;
-use App\Contracts\MediadorServiceInterface;
 use App\PlantaoJuridico;
 use App\PlantaoJuridicoBloqueio;
 use Carbon\Carbon;
@@ -177,14 +176,14 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         ];
     }
 
-    public function visualizar($id, MediadorServiceInterface $service)
+    public function visualizar($id)
     {
         $plantao = PlantaoJuridico::findOrFail($id);
 
         return [
             'resultado' => $plantao,
             'variaveis' => (object) $this->variaveis,
-            'agendamentos' => $plantao->expirou() ? null : $service->getService('Agendamento')->getPlantaoJuridicoPorPeriodo($plantao->idregional, $plantao->dataInicial, $plantao->dataFinal) 
+            'agendamentos' => $plantao->expirou() ? null : $plantao->getAgendadosPorPeriodo($plantao->dataInicial, $plantao->dataFinal)
         ];
     }
 

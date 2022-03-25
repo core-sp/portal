@@ -14,6 +14,8 @@ interface AgendamentoServiceInterface {
 
     public function viewBloqueio($id = null, MediadorServiceInterface $service = null);
 
+    public function viewSite(MediadorServiceInterface $service);
+
     public function save($dados, $id = null);
 
     public function saveBloqueio($dados, $id = null);
@@ -30,13 +32,11 @@ interface AgendamentoServiceInterface {
 
     public function pendentesByPerfil($count = true);
 
+    public function getDiasHorasAjaxSite($dados, MediadorServiceInterface $service);
+
     // PLANTÃO JURÍDICO - melhorar quando refatorar AgendamentoSite
 
-    public function getPlantaoJuridicoByRegionalAndDia($regional, $dia);
-
     public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao);
-
-    public function getPlantaoJuridicoPorPeriodo($regional, $dataInicial, $dataFinal);
 
     // -----------------------------------------------------------------
 

@@ -25,7 +25,7 @@ class AgendamentoBloqueioRequest extends FormRequest
             'diainicio' => 'required|date|after_or_equal:'.date('Y-m-d'),
             'diatermino' => 'date|nullable|after_or_equal:diainicio',
             'horarios' => 'required|array|in:'.$horarios,
-            'qtd_atendentes' => 'required|numeric|min:1|max:'.$ageporhorario
+            'qtd_atendentes' => 'required|numeric|min:0|max:'.$ageporhorario
         ];
     }
 
@@ -38,7 +38,7 @@ class AgendamentoBloqueioRequest extends FormRequest
             'diainicio.after_or_equal' => 'Deve ser uma data igual ou maior que hoje',
             'exists' => 'Não existe esse valor',
             'in' => 'Essa hora não existe',
-            'array' => 'Hora inválida',
+            'array' => 'Formato inválido',
             'numeric' => 'Deve ser um número',
             'min' => 'Valor mínimo é :min',
             'max' => 'Valor máximo é :max'

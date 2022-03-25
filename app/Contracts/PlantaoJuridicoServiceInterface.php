@@ -2,15 +2,13 @@
 
 namespace App\Contracts;
 
-use App\Contracts\MediadorServiceInterface;
-
 interface PlantaoJuridicoServiceInterface {
 
     public function listar();
 
     public function listarBloqueios();
 
-    public function visualizar($id, MediadorServiceInterface $service);
+    public function visualizar($id);
 
     public function visualizarBloqueio($id = null);
 

@@ -32,9 +32,9 @@ class Regional extends Model
         return $this->hasMany('App\AgendamentoBloqueio', 'idregional');
     }
 
-    public function plantoesJuridicos()
+    public function plantaoJuridico()
     {
-        return $this->hasMany('App\PlantaoJuridico', 'idregional');
+        return $this->hasOne('App\PlantaoJuridico', 'idregional');
     }
 
     public function horariosAge()

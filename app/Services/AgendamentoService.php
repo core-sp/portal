@@ -10,12 +10,12 @@ use App\Events\CrudEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
-use Illuminate\Support\Facades\DB;
 
 class AgendamentoService implements AgendamentoServiceInterface {
 
     private $variaveis;
     private $variaveisBloqueio;
+    private $renameSede;
 
     public function __construct()
     {
@@ -37,6 +37,8 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'btn_criar' => '<a href="'.route('agendamentobloqueios.criar').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Novo Bloqueio</a>',
             'busca' => 'agendamentos/bloqueios',
         ];
+
+        $this->renameSede = 'São Paulo - Avenida Brigadeiro Luís Antônio';
     }
 
     private function status()
@@ -286,8 +288,8 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'Código',
             'Regional',
             'Duração',
-            'Horas Bloqueadas',
-            'Qtd de Atendentes',
+            'Horas bloqueadas/qtd de agend. alterada',
+            'Qtd. de agend. por horário',
             'Ações',
         ];
         // Opções de conteúdo da tabela
@@ -411,7 +413,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         if(isset($service) && !isset($id))
         {
             $regionais = $service->getService('Regional')->all();
-            $regionais->find(1)->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
+            $regionais->find(1)->regional = $this->renameSede;
     
             return [
                 'variaveis' => (object) $this->variaveisBloqueio,
@@ -422,11 +424,28 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $bloqueio = AgendamentoBloqueio::findOrFail($id);
 
         if($bloqueio->idregional == 1)
-            $bloqueio->regional->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
+            $bloqueio->regional->regional = $this->renameSede;
 
         return [
             'variaveis' => (object) $this->variaveisBloqueio,
             'resultado' => $bloqueio,
+        ];
+    }
+
+    public function viewSite(MediadorServiceInterface $service)
+    {
+        $regionais = $service->getService('Regional')->all();
+        $regionais->find(1)->regional = $this->renameSede;
+
+        $servicos = $this->servicos();
+
+        if(!$service->getService('PlantaoJuridico')->plantaoJuridicoAtivo()) 
+            unset($servicos[array_search(Agendamento::SERVICOS_PLANTAO_JURIDICO, $servicos)]);      
+
+        return [
+            'regionais' => $regionais->sortBy('regional'),
+            'pessoas' => Agendamento::TIPOS_PESSOA,
+            'servicos' => $servicos
         ];
     }
 
@@ -575,23 +594,24 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return $count ? $resultados->total() : $resultados;
     }
 
+    public function getDiasHorasAjaxSite($dados, MediadorServiceInterface $service)
+    {
+        $regional = $service->getService('Regional')->getById($dados['idregional']);
+
+        if($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO)
+        {
+            $plantao = $regional->plantaoJuridico()->where('qtd_advogados', '>', 0)->first();
+            $inicial = Carbon::parse($plantao->dataInicial)->lte(Carbon::today()) ? Carbon::tomorrow()->format('Y-m-d') : $plantao->dataInicial;
+
+            return $diasLotados = $plantao->getAgendadosPorPeriodo($inicial, $plantao->dataFinal);
+        }
+    }
+
     /** 
      * =======================================================================================================
      * PLANTÃO JURÍDICO
      * =======================================================================================================
      */
-
-    public function getPlantaoJuridicoByRegionalAndDia($regional, $dia)
-    {
-        return Agendamento::select('hora', DB::raw('count(*) as total'))
-            ->where('idregional', $regional)
-            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-            ->whereNull('status')
-            ->where('dia', $dia)
-            ->groupBy('hora')
-            ->orderby('hora')
-            ->get();
-    }
 
     public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao)
     {
@@ -601,22 +621,6 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ->whereNull('status')
             ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
             ->count();
-    }
-
-    public function getPlantaoJuridicoPorPeriodo($regional, $dataInicial, $dataFinal)
-    {
-        $agendados = array();
-        $inicial = Carbon::parse($dataInicial);
-        $final = Carbon::parse($dataFinal);
-
-        for($dia = $inicial; $dia->lte($final); $dia->addDay())
-        {
-            $agendado = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia->format('Y-m-d'));
-            if($agendado->isNotEmpty())
-                $agendados[$dia->format('Y-m-d')] = $agendado;
-        }
-            
-        return $agendados;
     }
 
     // Momentaneo até refatorar o AgendamentoSite
