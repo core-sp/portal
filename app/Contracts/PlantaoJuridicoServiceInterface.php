@@ -26,9 +26,5 @@ interface PlantaoJuridicoServiceInterface {
 
     public function getPlantaoAtivoComBloqueioPorRegional($idregional);
 
-    public function removeHorariosSeLotado($agendados, $plantao, $dia);
-
-    public function getDiasSeLotado($agendados, $plantao);
-
     public function validacaoAgendarPlantao($plantao, $diaEscolhido, $agendados = null, $horaEscolhida = null);
 }

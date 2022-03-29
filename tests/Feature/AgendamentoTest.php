@@ -178,6 +178,24 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_agendamento_is_edited()
+    {
+        $user = $this->signInAsAdmin();
+        $agendamento = factory('App\Agendamento')->create();
+
+        $agendamento->nome = 'Novo Nome';
+        $agendamento->email = 'novoemail@teste.com';
+        $dados = $agendamento->toArray();
+        $dados['antigo'] = 0;
+
+        $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('agendamento', $log);
+        $this->assertStringContainsString('editou', $log);
+    }
+
+    /** @test */
     public function cannot_edit_agendamento_without_input_hidden_antigo()
     {
         $user = $this->signInAsAdmin();
@@ -1035,6 +1053,25 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_agendamento_is_status_edited_to_compareceu()
+    {
+        $user = $this->signInAsAdmin();
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => date('Y-m-d'),
+        ]);
+
+        $dados['idagendamento'] = $agendamento->idagendamento;
+        $dados['status'] = Agendamento::STATUS_COMPARECEU;
+
+        $this->put(route('agendamentos.updateStatus'), $dados);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('agendamento', $log);
+        $this->assertStringContainsString('confirmou presença', $log);
+    }
+
+    /** @test */
     public function can_update_status_to_nao_compareceu()
     {
         $user = $this->signInAsAdmin();
@@ -1058,6 +1095,25 @@ class AgendamentoTest extends TestCase
             'celular' => $agendamento->celular,
             'status' => $dados['status']
         ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_agendamento_is_status_edited_to_nao_compareceu()
+    {
+        $user = $this->signInAsAdmin();
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+            'dia' => date('Y-m-d'),
+        ]);
+
+        $dados['idagendamento'] = $agendamento->idagendamento;
+        $dados['status'] = Agendamento::STATUS_NAO_COMPARECEU;
+
+        $this->put(route('agendamentos.updateStatus'), $dados);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('agendamento', $log);
+        $this->assertStringContainsString('confirmou falta', $log);
     }
 
     /** @test */
@@ -1762,6 +1818,21 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_bloqueio_is_created()
+    {
+        $user = $this->signInAsAdmin();
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'horarios' => ['10:00', '11:00'],
+        ]);
+
+        $this->post(route('agendamentobloqueios.store'), $bloqueio);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('bloqueio de agendamento', $log);
+        $this->assertStringContainsString('criou', $log);
+    }
+
+    /** @test */
     public function cannot_create_bloqueio_without_requireds_inputs()
     {
         $user = $this->signInAsAdmin();
@@ -1956,6 +2027,20 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_bloqueio_is_edited()
+    {
+        $user = $this->signInAsAdmin();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create();
+        $bloqueio->horarios = ['11:00', '12:00'];
+
+        $this->put(route('agendamentobloqueios.update', $bloqueio->idagendamentobloqueio), $bloqueio->toArray());
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('bloqueio de agendamento', $log);
+        $this->assertStringContainsString('editou', $log);
+    }
+
+    /** @test */
     public function cannot_edit_bloqueio_without_requireds_inputs()
     {
         $user = $this->signInAsAdmin();
@@ -2088,6 +2173,19 @@ class AgendamentoTest extends TestCase
             'diainicio' => $bloqueio->diainicio,
             'deleted_at' => Carbon::now()
         ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_bloqueio_is_deleted()
+    {
+        $user = $this->signInAsAdmin();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create();
+
+        $this->delete(route('agendamentobloqueios.delete', $bloqueio->idagendamentobloqueio));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString('bloqueio de agendamento', $log);
+        $this->assertStringContainsString('cancelou', $log);
     }
 
     /** @test */

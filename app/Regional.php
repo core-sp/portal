@@ -4,6 +4,7 @@ namespace App;
 
 use App\Repositories\AgendamentoBloqueioRepository;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Regional extends Model
 {
@@ -59,5 +60,91 @@ class Regional extends Model
             }
         }
         return $horas;
+    }
+
+    // tentar ajustar para o periodo mensal
+    private function getHorariosComBloqueio($dia)
+    {
+        $agendamentosBloqueios = $this->agendamentosBloqueios()
+        ->where('diatermino', '>=', $dia)
+        ->orWhere(function($query) {
+            $query->where('idregional', $this->idregional)
+            ->whereNull('diatermino');
+        })
+        ->get();
+
+        $resultado = [
+            'horarios' => $this->horariosAge(),
+            'atendentes' => null
+        ];
+
+        if($agendamentosBloqueios->isNotEmpty())
+            foreach($agendamentosBloqueios as $bloqueio)
+            {
+                $inicialBloqueio = Carbon::parse($bloqueio->diainicio);
+                $finalBloqueio = isset($bloqueio->diatermino) ? Carbon::parse($bloqueio->diatermino) : null;
+                $dia = Carbon::parse($dia);
+
+                if($inicialBloqueio->lte($dia) && (!isset($finalBloqueio) || $finalBloqueio->gte($dia)))
+                {
+                    $horariosBloqueios = explode(',', $bloqueio->horarios);
+                    foreach($horariosBloqueios as $horario)
+                        if($bloqueio->qtd_atendentes == 0)
+                            unset($resultado['horarios'][array_search($horario, $resultado['horarios'])]);
+                        else
+                            $resultado['atendentes'] = [
+                                $horario => $bloqueio->qtd_atendentes
+                            ];
+                }
+            }
+
+        return $resultado;
+    }
+
+    public function getAgendadosPorPeriodo($inicio, $final)
+    {
+        return $this->agendamentos()
+            ->select('dia', 'hora')
+            ->where('tiposervico', 'NOT LIKE', 'Plantão Jurídico%')
+            ->whereNull('status')
+            ->whereBetween('dia', [$inicio, $final])
+            ->orderby('dia')
+            ->orderby('hora')
+            ->get()
+            ->groupBy([
+                'dia',
+                function ($item) {
+                    return $item['hora'];
+                },
+            ], $preserveKeys = false);
+    }
+
+    public function getDiasSeLotado($agendados)
+    {
+        $diasLotados = array();
+
+        foreach($agendados as $key => $agendado)
+        {
+            $dia = Carbon::parse($key);
+            $horarios = $this->removeHorariosSeLotado($agendados[$dia->format('Y-m-d')], $dia->format('Y-m-d'));
+            if(empty($horarios))
+                array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+        }
+
+        return $diasLotados;
+    }
+
+    public function removeHorariosSeLotado($agendado, $dia)
+    {
+        $resultado = $this->getHorariosComBloqueio($dia);
+        $horarios = $resultado['horarios'];
+        $atendentes = isset($resultado['atendentes']) ? $resultado['atendentes'] : null;
+
+        if($agendado->isNotEmpty())
+            foreach($agendado as $hora => $value)
+                if(isset($atendentes[$hora]) && ($atendentes[$hora] == $value->count()))
+                    unset($horarios[array_search($hora, $horarios)]);
+        
+        return $horarios;
     }
 }

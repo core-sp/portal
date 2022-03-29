@@ -1004,6 +1004,22 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
+    public function bloqueio_cannot_be_created_when_nonexistent_regional()
+    {
+        $user = $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+                
+        $dados = [
+            'plantaoBloqueio' => 55,
+            'dataInicialBloqueio' => $plantao->dataInicial,
+            'dataFinalBloqueio' => $plantao->dataInicial,
+            'horariosBloqueio' => ['10:00', '10:30']
+        ];
+
+        $this->post(route('plantao.juridico.bloqueios.criar'), $dados)->assertStatus(404);
+    }
+
+    /** @test */
     public function bloqueio_can_be_edited()
     {
         $this->signInAsAdmin();
@@ -1427,6 +1443,22 @@ class PlantaoJuridicoTest extends TestCase
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'horarios' => '09:30'
         ]);
+    }
+
+    /** @test */
+    public function bloqueio_cannot_be_edited_when_nonexistent_regional()
+    {
+        $user = $this->signInAsAdmin();
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+
+        $dados = [
+            'plantaoBloqueio' => 55,
+            'dataInicialBloqueio' => $bloqueio->dataInicial,
+            'dataFinalBloqueio' => $bloqueio->dataInicial,
+            'horariosBloqueio' => ['10:30']
+        ];
+
+        $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)->assertStatus(404);
     }
 
     /** @test */

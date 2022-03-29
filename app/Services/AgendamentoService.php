@@ -597,14 +597,36 @@ class AgendamentoService implements AgendamentoServiceInterface {
     public function getDiasHorasAjaxSite($dados, MediadorServiceInterface $service)
     {
         $regional = $service->getService('Regional')->getById($dados['idregional']);
+        if(isset($dados['dia']))
+            $dados['dia'] = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
 
         if($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO)
         {
-            $plantao = $regional->plantaoJuridico()->where('qtd_advogados', '>', 0)->first();
-            $inicial = Carbon::parse($plantao->dataInicial)->lte(Carbon::today()) ? Carbon::tomorrow()->format('Y-m-d') : $plantao->dataInicial;
+            $plantao = $regional->plantaoJuridico()
+            ->with('bloqueios')
+            ->where('qtd_advogados', '>', 0)
+            ->first();
 
-            return $diasLotados = $plantao->getAgendadosPorPeriodo($inicial, $plantao->dataFinal);
+            if(isset($dados['dia']))
+            {
+                $dia = $dados['dia'];
+                $agendados = $plantao->getAgendadosPorPeriodo($dia, $dia);
+                $agendadosFinal = $agendados->isNotEmpty() ? $agendados[$dia] : $agendados;
+                $horarios = $plantao->removeHorariosSeLotado($agendadosFinal , $dia);
+
+                return $horarios;
+            }
+            
+            $agendados = $plantao->getAgendadosPorPeriodo($plantao->dataInicial, $plantao->dataFinal);
+            $diasLotados = $plantao->getDiasSeLotado($agendados);
+
+            return $diasLotados;
         }
+
+        $agendados = $regional->getAgendadosPorPeriodo(Carbon::tomorrow()->format('Y-m-d'), Carbon::tomorrow()->addDays(30)->format('Y-m-d'));
+        $diasLotados = $regional->getDiasSeLotado($agendados);
+
+        return $diasLotados;
     }
 
     /** 

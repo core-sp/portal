@@ -125,30 +125,6 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         return $tabela;
     }
 
-    private function getHorariosComBloqueio($plantao, $dia)
-    {
-        $horarios = explode(',', $plantao->horarios);
-
-        if($plantao->bloqueios->count() > 0)
-        {
-            foreach($plantao->bloqueios as $bloqueio)
-            {
-                $inicialBloqueio = Carbon::parse($bloqueio->dataInicial);
-                $finalBloqueio = Carbon::parse($bloqueio->dataFinal);
-                $dia = Carbon::parse($dia);
-
-                if($inicialBloqueio->lte($dia) && $finalBloqueio->gte($dia))
-                {
-                    $horariosBloqueios = explode(',', $bloqueio->horarios);
-                    foreach($horariosBloqueios as $horario)
-                        unset($horarios[array_search($horario, $horarios)]);
-                }
-            }
-        }
-
-        return $horarios;
-    }
-
     public function listar()
     {
         $plantoes = PlantaoJuridico::with('regional')
@@ -178,7 +154,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function visualizar($id)
     {
-        $plantao = PlantaoJuridico::findOrFail($id);
+        $plantao = PlantaoJuridico::with(['regional.agendamentos', 'bloqueios'])->findOrFail($id);
 
         return [
             'resultado' => $plantao,
@@ -288,38 +264,6 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         ->where('idregional', $idregional)
         ->where('qtd_advogados', '>', 0)
         ->first();
-    }
-
-    public function removeHorariosSeLotado($agendados, $plantao, $dia)
-    {
-        $horarios = $this->getHorariosComBloqueio($plantao, $dia);
-
-        foreach($agendados as $agendado)
-            if(isset($agendado->total) && ($plantao->qtd_advogados == $agendado->total))
-                unset($horarios[array_search($agendado->hora, $horarios)]);
-        
-        return $horarios;
-    }
-
-    public function getDiasSeLotado($agendados, $plantao)
-    {
-        $dtI = Carbon::parse($plantao->dataInicial);
-        $inicial = $dtI->lte(Carbon::today()) ? Carbon::tomorrow() : $dtI;
-        $final = Carbon::parse($plantao->dataFinal);
-        $diasLotados = array();
-
-        for($dia = $inicial; $dia->lte($final); $dia->addDay())
-        {
-            $agendado = isset($agendados[$dia->format('Y-m-d')]) ? $agendados[$dia->format('Y-m-d')] : null;
-            if(isset($agendado))
-            {
-                $horarios = $this->removeHorariosSeLotado($agendado, $plantao, $dia);
-                if(empty($horarios))
-                    array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
-            }
-        }
-
-        return $diasLotados;
     }
 
     public function validacaoAgendarPlantao($plantao, $diaEscolhido, $agendados = null, $horaEscolhida = null)

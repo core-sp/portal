@@ -391,63 +391,63 @@ function getRegionaisExcluidasPlantaJuridico()
 	});
 }
 
-function getDatasPorRegionalPlantaJuridico()
-{
-	$.ajax({
-		method: "GET",
-		data: {
-			"_token": $('#token').val(),
-			"idregional": $('#idregional').val(),
-		},
-		dataType: 'json',
-		url: "/datas-plantao-juridico",
-		beforeSend: function(){
-			$('#loadCalendario').show();
-		},
-		complete: function(){
-			$('#loadCalendario').hide();
-		},
-		success: function(response) {
-			datas = response;
-			datasNovas = validarDatasPlantaoJuridico(datas);
-			if(datasNovas == null)
-				$('#datepicker')
-				.prop('disabled', true)
-				.prop('placeholder', 'Sem datas disponíveis')
-				.val('');
-			else
-				$('#datepicker').prop('placeholder', 'dd/mm/aaaaa').datepicker('option', {
-					minDate: datasNovas[0],
-					maxDate: datasNovas[1]
-				});
-		},
-		error: function() {
-			$('#datepicker').val('')
-			.prop('disabled', true)
-			.prop('placeholder', 'Falha ao recuperar calendário');
+// function getDatasPorRegionalPlantaJuridico()
+// {
+// 	$.ajax({
+// 		method: "GET",
+// 		data: {
+// 			"_token": $('#token').val(),
+// 			"idregional": $('#idregional').val(),
+// 		},
+// 		dataType: 'json',
+// 		url: "/datas-plantao-juridico",
+// 		beforeSend: function(){
+// 			$('#loadCalendario').show();
+// 		},
+// 		complete: function(){
+// 			$('#loadCalendario').hide();
+// 		},
+// 		success: function(response) {
+// 			console.log(datas = response);
+// 			datasNovas = validarDatasPlantaoJuridico(datas);
+// 			if(datasNovas == null)
+// 				$('#datepicker')
+// 				.prop('disabled', true)
+// 				.prop('placeholder', 'Sem datas disponíveis')
+// 				.val('');
+// 			else
+// 				$('#datepicker').prop('placeholder', 'dd/mm/aaaaa').datepicker('option', {
+// 					minDate: datasNovas[0],
+// 					maxDate: datasNovas[1]
+// 				});
+// 		},
+// 		error: function() {
+// 			$('#datepicker').val('')
+// 			.prop('disabled', true)
+// 			.prop('placeholder', 'Falha ao recuperar calendário');
 
-			$('#horarios')
-				.find('option')
-				.remove()
-				.end()
-				.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
+// 			$('#horarios')
+// 				.find('option')
+// 				.remove()
+// 				.end()
+// 				.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
 
-			$("#dialog_agendamento")
-				.empty()
-				.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
+// 			$("#dialog_agendamento")
+// 				.empty()
+// 				.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
 				
-			$("#dialog_agendamento").dialog({
-				draggable: false,
-				buttons: [{
-					text: "Recarregar",
-					click: function() {
-						location.reload(true);
-					}
-				}]	
-			});
-		}
-	});
-}
+// 			$("#dialog_agendamento").dialog({
+// 				draggable: false,
+// 				buttons: [{
+// 					text: "Recarregar",
+// 					click: function() {
+// 						location.reload(true);
+// 					}
+// 				}]	
+// 			});
+// 		}
+// 	});
+// }
 
 (function($){
 	$(function(){
@@ -523,13 +523,13 @@ function getDatasPorRegionalPlantaJuridico()
 			.val('')
 			.prop('disabled', true);
 			
-			if($("#selectServicos option:selected").val() == "Plantão Jurídico")
-				getDatasPorRegionalPlantaJuridico();
-			else
-				$('#datepicker').datepicker('option', {
-					maxDate: '+1m',
-					minDate: +1
-				});
+			// if($("#selectServicos option:selected").val() == "Plantão Jurídico")
+			// 	getDatasPorRegionalPlantaJuridico();
+			// else
+			// 	$('#datepicker').datepicker('option', {
+			// 		maxDate: '+1m',
+			// 		minDate: +1
+			// 	});
 
 			$('#horarios')
 				.find('option')
@@ -556,7 +556,7 @@ function getDatasPorRegionalPlantaJuridico()
 					$('#loadCalendario').hide();
 				},
 				success: function(response) {
-					lotados = response;
+					console.log(lotados = response);
 					if($('#datepicker').prop('placeholder') != 'Sem datas disponíveis')
 						$('#datepicker')
 						.prop('disabled', false)
@@ -610,6 +610,7 @@ function getDatasPorRegionalPlantaJuridico()
 					$('#loadHorario').hide();
 				},
 				success: function(response) {
+					console.log(response);
 					if (!jQuery.isEmptyObject(response)) {
 						$('#horarios').empty();
 
