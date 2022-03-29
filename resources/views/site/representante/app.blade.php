@@ -80,10 +80,7 @@
 
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'representante.bdo')  ? 'mr-item-selected' : '' }}">  
               <a href="{{ route('representante.bdo') }}" onclick="showLoading()">
-                <h6 class="brancar"><i class="fas fa-briefcase"></i>&nbsp;&nbsp;Oportunidades&nbsp;&nbsp;&nbsp;
-                <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
-                </span>
-              </h6>
+                <h6 class="brancar"><i class="fas fa-briefcase"></i>&nbsp;&nbsp;Oportunidades&nbsp;&nbsp;&nbsp;</h6>
               </a>
             </div>
 
@@ -98,8 +95,8 @@
               <a href="{{ route('representante.solicitarCedulaView') }}" onclick="showLoading()">
                 <h6 class="brancar">
                   <i class="fas fa-id-card"></i>&nbsp;&nbsp;Solicitação de Cédula&nbsp;&nbsp;&nbsp;
-                    <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
-                  </span>
+                  {{-- <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
+                  </span> --}}
                 </h6>
               </a>
             </div>
