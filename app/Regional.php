@@ -62,42 +62,36 @@ class Regional extends Model
         return $horas;
     }
 
-    // tentar ajustar para o periodo mensal
-    private function getHorariosComBloqueio($dia)
+    public function getHorariosComBloqueio()
     {
-        $agendamentosBloqueios = $this->agendamentosBloqueios()
-        ->where('diatermino', '>=', $dia)
+        $bloqueios = $this->agendamentosBloqueios()
+        ->where('diatermino', '>=', date('Y-m-d'))
         ->orWhere(function($query) {
             $query->where('idregional', $this->idregional)
             ->whereNull('diatermino');
-        })
-        ->get();
+        })->get();
 
         $resultado = [
-            'horarios' => $this->horariosAge(),
-            'atendentes' => null
+            'horarios' => $this->horariosAge()
         ];
 
-        if($agendamentosBloqueios->isNotEmpty())
-            foreach($agendamentosBloqueios as $bloqueio)
+        if($bloqueios->isNotEmpty())
+            foreach($bloqueios as $bloqueio)
             {
                 $inicialBloqueio = Carbon::parse($bloqueio->diainicio);
-                $finalBloqueio = isset($bloqueio->diatermino) ? Carbon::parse($bloqueio->diatermino) : null;
-                $dia = Carbon::parse($dia);
-
-                if($inicialBloqueio->lte($dia) && (!isset($finalBloqueio) || $finalBloqueio->gte($dia)))
+                $finalBloqueio = isset($this->diatermino) ? Carbon::parse($bloqueio->diatermino) : null;
+        
+                if($inicialBloqueio->lte(Carbon::today()) && (!isset($finalBloqueio) || $finalBloqueio->gte(Carbon::today())))
                 {
                     $horariosBloqueios = explode(',', $bloqueio->horarios);
                     foreach($horariosBloqueios as $horario)
                         if($bloqueio->qtd_atendentes == 0)
                             unset($resultado['horarios'][array_search($horario, $resultado['horarios'])]);
                         else
-                            $resultado['atendentes'] = [
-                                $horario => $bloqueio->qtd_atendentes
-                            ];
+                            $resultado['atendentes'][$horario] = $bloqueio->qtd_atendentes;
                 }
             }
-
+        
         return $resultado;
     }
 
@@ -122,11 +116,12 @@ class Regional extends Model
     public function getDiasSeLotado($agendados)
     {
         $diasLotados = array();
+        $horariosTotal = $this->getHorariosComBloqueio();
 
         foreach($agendados as $key => $agendado)
         {
             $dia = Carbon::parse($key);
-            $horarios = $this->removeHorariosSeLotado($agendados[$dia->format('Y-m-d')], $dia->format('Y-m-d'));
+            $horarios = $this->removeHorariosSeLotado($agendados[$dia->format('Y-m-d')], $dia->format('Y-m-d'), $horariosTotal);
             if(empty($horarios))
                 array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
         }
@@ -134,17 +129,17 @@ class Regional extends Model
         return $diasLotados;
     }
 
-    public function removeHorariosSeLotado($agendado, $dia)
+    public function removeHorariosSeLotado($agendado, $dia, $horarios)
     {
-        $resultado = $this->getHorariosComBloqueio($dia);
-        $horarios = $resultado['horarios'];
-        $atendentes = isset($resultado['atendentes']) ? $resultado['atendentes'] : null;
-
         if($agendado->isNotEmpty())
             foreach($agendado as $hora => $value)
-                if(isset($atendentes[$hora]) && ($atendentes[$hora] == $value->count()))
-                    unset($horarios[array_search($hora, $horarios)]);
+            {
+                $limiteBloqueio = isset($horarios['atendentes'][$hora]) && ($horarios['atendentes'][$hora] == $value->count());
+                $limiteRegional = $this->ageporhorario == $value->count();
+                if($limiteBloqueio || $limiteRegional)
+                    unset($horarios['horarios'][array_search($hora, $horarios['horarios'])]);
+            }
         
-        return $horarios;
+        return $horarios['horarios'];
     }
 }

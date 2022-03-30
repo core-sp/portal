@@ -597,34 +597,25 @@ class AgendamentoService implements AgendamentoServiceInterface {
     public function getDiasHorasAjaxSite($dados, MediadorServiceInterface $service)
     {
         $regional = $service->getService('Regional')->getById($dados['idregional']);
+
+        $resultado = $dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO ? 
+            $regional->plantaoJuridico()->with('bloqueios')->where('qtd_advogados', '>', 0)->first() : $regional;
+
         if(isset($dados['dia']))
-            $dados['dia'] = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
-
-        if($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO)
         {
-            $plantao = $regional->plantaoJuridico()
-            ->with('bloqueios')
-            ->where('qtd_advogados', '>', 0)
-            ->first();
+            $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
+            $agendados = $resultado->getAgendadosPorPeriodo($dia, $dia);
+            $agendadosFinal = $agendados->isNotEmpty() ? $agendados[$dia] : $agendados;
+            $horarios = $resultado->removeHorariosSeLotado($agendadosFinal , $dia, $resultado->getHorariosComBloqueio());
 
-            if(isset($dados['dia']))
-            {
-                $dia = $dados['dia'];
-                $agendados = $plantao->getAgendadosPorPeriodo($dia, $dia);
-                $agendadosFinal = $agendados->isNotEmpty() ? $agendados[$dia] : $agendados;
-                $horarios = $plantao->removeHorariosSeLotado($agendadosFinal , $dia);
-
-                return $horarios;
-            }
-            
-            $agendados = $plantao->getAgendadosPorPeriodo($plantao->dataInicial, $plantao->dataFinal);
-            $diasLotados = $plantao->getDiasSeLotado($agendados);
-
-            return $diasLotados;
+            return $horarios;
         }
-
-        $agendados = $regional->getAgendadosPorPeriodo(Carbon::tomorrow()->format('Y-m-d'), Carbon::tomorrow()->addDays(30)->format('Y-m-d'));
-        $diasLotados = $regional->getDiasSeLotado($agendados);
+    
+        if($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO)
+            $agendados = $resultado->getAgendadosPorPeriodo($resultado->dataInicial, $resultado->dataFinal);
+        else
+            $agendados = $resultado->getAgendadosPorPeriodo(Carbon::tomorrow()->format('Y-m-d'), Carbon::tomorrow()->addDays(30)->format('Y-m-d'));
+        $diasLotados = $resultado->getDiasSeLotado($agendados);
 
         return $diasLotados;
     }

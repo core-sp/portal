@@ -11,28 +11,6 @@ class PlantaoJuridico extends Model
     protected $table = 'plantoes_juridicos';
     protected $guarded = [];
 
-    private function getHorariosComBloqueio($dia)
-    {
-        $horarios = explode(',', $this->horarios);
-
-        if($this->bloqueios->count() > 0)
-            foreach($this->bloqueios as $bloqueio)
-            {
-                $inicialBloqueio = Carbon::parse($bloqueio->dataInicial);
-                $finalBloqueio = Carbon::parse($bloqueio->dataFinal);
-                $dia = Carbon::parse($dia);
-
-                if($inicialBloqueio->lte($dia) && $finalBloqueio->gte($dia))
-                {
-                    $horariosBloqueios = explode(',', $bloqueio->horarios);
-                    foreach($horariosBloqueios as $horario)
-                        unset($horarios[array_search($horario, $horarios)]);
-                }
-            }
-
-        return $horarios;
-    }
-
     public function regional()
     {
     	return $this->belongsTo('App\Regional', 'idregional');
@@ -51,6 +29,27 @@ class PlantaoJuridico extends Model
     public function expirou()
     {
         return Carbon::parse($this->dataFinal)->lt(Carbon::today()) && $this->ativado();
+    }
+
+    public function getHorariosComBloqueio()
+    {
+        $horarios = explode(',', $this->horarios);
+
+        if($this->bloqueios->count() > 0)
+            foreach($this->bloqueios as $bloqueio)
+            {
+                $inicialBloqueio = Carbon::parse($bloqueio->dataInicial);
+                $finalBloqueio = Carbon::parse($bloqueio->dataFinal);
+
+                if($inicialBloqueio->lte(Carbon::today()) && $finalBloqueio->gte(Carbon::today()))
+                {
+                    $horariosBloqueios = explode(',', $bloqueio->horarios);
+                    foreach($horariosBloqueios as $horario)
+                        unset($horarios[array_search($horario, $horarios)]);
+                }
+            }
+
+        return $horarios;
     }
 
     public function getAgendadosPorPeriodo($inicio, $final)
@@ -74,11 +73,12 @@ class PlantaoJuridico extends Model
     public function getDiasSeLotado($agendados)
     {
         $diasLotados = array();
+        $horarios = $this->getHorariosComBloqueio();
 
         foreach($agendados as $key => $agendado)
         {
             $dia = Carbon::parse($key);
-            $horarios = $this->removeHorariosSeLotado($agendados[$dia->format('Y-m-d')], $dia->format('Y-m-d'));
+            $horarios = $this->removeHorariosSeLotado($agendados[$dia->format('Y-m-d')], $dia->format('Y-m-d'), $horarios);
             if(empty($horarios))
                 array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
         }
@@ -86,10 +86,8 @@ class PlantaoJuridico extends Model
         return $diasLotados;
     }
 
-    public function removeHorariosSeLotado($agendado, $dia)
+    public function removeHorariosSeLotado($agendado, $dia, $horarios)
     {
-        $horarios = $this->getHorariosComBloqueio($dia);
-
         if($agendado->isNotEmpty())
             foreach($agendado as $hora => $value)
                 if($this->qtd_advogados == $value->count())
