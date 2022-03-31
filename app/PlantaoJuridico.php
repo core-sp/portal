@@ -31,23 +31,13 @@ class PlantaoJuridico extends Model
         return Carbon::parse($this->dataFinal)->lt(Carbon::today()) && $this->ativado();
     }
 
-    public function getHorariosComBloqueio()
+    private function getHorariosComBloqueio($bloqueios, $dia)
     {
         $horarios = explode(',', $this->horarios);
 
-        if($this->bloqueios->count() > 0)
-            foreach($this->bloqueios as $bloqueio)
-            {
-                $inicialBloqueio = Carbon::parse($bloqueio->dataInicial);
-                $finalBloqueio = Carbon::parse($bloqueio->dataFinal);
-
-                if($inicialBloqueio->lte(Carbon::today()) && $finalBloqueio->gte(Carbon::today()))
-                {
-                    $horariosBloqueios = explode(',', $bloqueio->horarios);
-                    foreach($horariosBloqueios as $horario)
-                        unset($horarios[array_search($horario, $horarios)]);
-                }
-            }
+        if($bloqueios->isNotEmpty())
+            foreach($bloqueios as $bloqueio)
+                $horarios = $bloqueio->getHorarios($horarios, $dia);
 
         return $horarios;
     }
@@ -70,27 +60,53 @@ class PlantaoJuridico extends Model
             ], $preserveKeys = false);
     }
 
-    public function getDiasSeLotado($agendados)
+    public function getDiasSeLotado()
     {
         $diasLotados = array();
-        $horarios = $this->getHorariosComBloqueio();
+        $bloqueios = $this->bloqueios;
+        $agendados = $this->regional->agendamentos()
+            ->select('dia', DB::raw('count(*) as total'))
+            ->where('tiposervico', 'LIKE', 'Plantão Jurídico%')
+            ->whereNull('status')
+            ->whereBetween('dia', [$this->dataInicial, $this->dataFinal])
+            ->groupBy('dia')
+            ->orderBy('dia')
+            ->get();
 
-        foreach($agendados as $key => $agendado)
+        foreach($agendados as $agendado)
         {
-            $dia = Carbon::parse($key);
-            $horarios = $this->removeHorariosSeLotado($agendados[$dia->format('Y-m-d')], $dia->format('Y-m-d'), $horarios);
-            if(empty($horarios))
+            $dia = Carbon::parse($agendado->dia);
+            $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
+            $total = sizeof($horariosTotal) * $this->qtd_advogados;
+            if($agendado->total >= $total)
                 array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
         }
 
         return $diasLotados;
     }
 
-    public function removeHorariosSeLotado($agendado, $dia, $horarios)
+    public function removeHorariosSeLotado($dia)
     {
+        $bloqueios = $this->bloqueios;
+        $horarios = $this->getHorariosComBloqueio($bloqueios, $dia);
+        $agendado = $this->regional->agendamentos()
+            ->select('dia', 'hora')
+            ->where('tiposervico', 'LIKE', 'Plantão Jurídico%')
+            ->whereNull('status')
+            ->whereDate('dia', $dia)
+            ->orderBy('dia')
+            ->orderBy('hora')
+            ->get()
+            ->groupBy([
+                'dia',
+                function ($item) {
+                    return $item['hora'];
+                },
+            ], $preserveKeys = false);
+
         if($agendado->isNotEmpty())
             foreach($agendado as $hora => $value)
-                if($this->qtd_advogados == $value->count())
+                if($value->count() >= $this->qtd_advogados)
                     unset($horarios[array_search($hora, $horarios)]);
         
         return $horarios;

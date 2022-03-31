@@ -22,7 +22,7 @@ interface PlantaoJuridicoServiceInterface {
 
     public function plantaoJuridicoAtivo();
 
-    public function getRegionaisDesativadas();
+    public function getRegionaisAtivas();
 
     public function getPlantaoAtivoComBloqueioPorRegional($idregional);
 

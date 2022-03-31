@@ -237,12 +237,12 @@ Route::prefix('/')->group(function() {
   // Agendamentos
   Route::get('agendamento', 'AgendamentoSiteController@formView')->name('agendamentosite.formview');
   Route::post('agendamento', 'AgendamentoSiteController@store')->name('agendamentosite.store');
-  Route::get('checa-horarios', 'AgendamentoSiteController@checaHorarios')->name('agendamentosite.checaHorarios');
-  Route::get('checa-mes', 'AgendamentoSiteController@checaMes')->name('agendamentosite.checaMes');
+  Route::get('dias-horas', 'AgendamentoSiteController@getDiasHorasAjax')->name('agendamentosite.diasHorasAjax');
+  // Route::get('checa-mes', 'AgendamentoSiteController@checaMes')->name('agendamentosite.checaMes');
   Route::get('agendamento-consulta', 'AgendamentoSiteController@consultaView')->name('agendamentosite.consultaView');
   Route::get('agendamento-consulta/busca', 'AgendamentoSiteController@consulta')->name('agendamentosite.consulta');
   Route::put('agendamento-consulta/busca', 'AgendamentoSiteController@cancelamento')->name('agendamentosite.cancelamento');
-  Route::get('regionais-excluidas-plantao-juridico', 'AgendamentoSiteController@regionaisExcluidasPlantaoJuridico')->name('agendamentosite.regionaisExcluidasPlantaoJuridico');
+  Route::get('regionais-plantao-juridico', 'AgendamentoSiteController@regionaisPlantaoJuridico')->name('agendamentosite.regionaisPlantaoJuridico');
   // Route::get('datas-plantao-juridico', 'AgendamentoSiteController@datasPlantaoJuridico')->name('agendamentosite.datasPlantaoJuridico');
 
   // Newsletter

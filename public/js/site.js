@@ -324,33 +324,61 @@ $('#ano-mapa').on({
 	},
 });
 
-function validarDatasPlantaoJuridico(datas)
+// function validarDatasPlantaoJuridico(datas)
+// {
+// 	var datasNovas = [];
+
+// 	if((datas[0] != null) && (datas[1] != null))
+// 	{
+// 		datasNovas[0] = new Date(datas[0] + " 00:00:00");
+// 		datasNovas[1] = new Date(datas[1] + " 00:00:00");
+// 		return datasNovas;
+// 	}
+
+// 	if((datas[0] == null) && (datas[1] != null))
+// 	{
+// 		datasNovas[0] = '+1';
+// 		datasNovas[1] = new Date(datas[1] + " 00:00:00");
+// 		return datasNovas;
+// 	}
+
+// 	return null;
+// }
+
+function errorAjaxAgendamento()
 {
-	var datasNovas = [];
+	$('#datepicker')
+		.val('')
+		.prop('disabled', true)
+		.prop('placeholder', 'Falha ao recuperar calendário');
 
-	if((datas[0] != null) && (datas[1] != null))
-	{
-		datasNovas[0] = new Date(datas[0] + " 00:00:00");
-		datasNovas[1] = new Date(datas[1] + " 00:00:00");
-		return datasNovas;
-	}
+	$('#horarios')
+		.find('option')
+		.remove()
+		.end()
+		.append('<option value="" disabled selected>Falha ao recuperar os dados para o agendamento</option>');
 
-	if((datas[0] == null) && (datas[1] != null))
-	{
-		datasNovas[0] = '+1';
-		datasNovas[1] = new Date(datas[1] + " 00:00:00");
-		return datasNovas;
-	}
-
-	return null;
+	$("#dialog_agendamento")
+		.empty()
+		.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
+				
+	$("#dialog_agendamento").dialog({
+		draggable: false,
+		buttons: [{
+			text: "Recarregar",
+			click: function() {
+				location.reload(true);
+			}
+		}]	
+	});
 }
 
-function getRegionaisExcluidasPlantaJuridico()
+function getRegionaisPlantaJuridico()
 {
 	$.ajax({
 		method: "GET",
 		dataType: 'json',
-		url: "/regionais-excluidas-plantao-juridico",
+		url: "/regionais-plantao-juridico",
 		beforeSend: function(){
 			$('#loadCalendario').show();
 		},
@@ -358,35 +386,14 @@ function getRegionaisExcluidasPlantaJuridico()
 			$('#loadCalendario').hide();
 		},
 		success: function(response) {
-			regionaisExcluidas = response;
-			for(var regional of regionaisExcluidas)
-				$('#idregional option[value="' + regional + '"]').hide();
+			regionaisAtivas = response;
+			$('#idregional option').each(function(){
+				var valor = parseInt($(this).val());
+				jQuery.inArray(valor, regionaisAtivas) != -1 ? $(this).show() : $(this).hide();
+			});
 		},
 		error: function() {
-			$('#datepicker')
-			.val('')
-			.prop('disabled', true)
-			.prop('placeholder', 'Falha ao recuperar calendário');
-
-			$('#horarios')
-				.find('option')
-				.remove()
-				.end()
-				.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
-
-			$("#dialog_agendamento")
-				.empty()
-				.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
-				
-			$("#dialog_agendamento").dialog({
-				draggable: false,
-				buttons: [{
-					text: "Recarregar",
-					click: function() {
-						location.reload(true);
-					}
-				}]	
-			});
+			errorAjaxAgendamento();
 		}
 	});
 }
@@ -468,7 +475,7 @@ function getRegionaisExcluidasPlantaJuridico()
 		$('#selectServicos').change(function(){
 			$("#idregional").val("");
 			if($(this).val() == "Plantão Jurídico")
-				getRegionaisExcluidasPlantaJuridico();
+				getRegionaisPlantaJuridico();
 			else
 			{
 				$('#idregional option').show();
@@ -495,7 +502,7 @@ function getRegionaisExcluidasPlantaJuridico()
 
 		if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
 			$("#idregional").val("");
-			getRegionaisExcluidasPlantaJuridico();
+			getRegionaisPlantaJuridico();
 		}else{
 			$("#idregional").val("");
 			$('#idregional option').show();
@@ -548,7 +555,7 @@ function getRegionaisExcluidasPlantaJuridico()
 					"servico": $('#selectServicos').val()
 				},
 				dataType: 'json',
-				url: "/checa-mes",
+				url: "/dias-horas",
 				beforeSend: function(){
 					$('#loadCalendario').show();
 				},
@@ -602,7 +609,7 @@ function getRegionaisExcluidasPlantaJuridico()
 					"servico": $('#selectServicos').val()
 				},
 				dataType: 'json',
-				url: "/checa-horarios",
+				url: "/dias-horas",
 				beforeSend: function(){
 					$('#loadHorario').show();
 				},

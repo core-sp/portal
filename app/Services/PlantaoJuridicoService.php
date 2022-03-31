@@ -154,8 +154,8 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function visualizar($id)
     {
-        $plantao = PlantaoJuridico::with(['regional.agendamentos', 'bloqueios'])->findOrFail($id);
-
+        $plantao = PlantaoJuridico::findOrFail($id);
+        
         return [
             'resultado' => $plantao,
             'variaveis' => (object) $this->variaveis,
@@ -248,9 +248,9 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         return PlantaoJuridico::where('qtd_advogados', '>', 0)->count() > 0;
     }
 
-    public function getRegionaisDesativadas()
+    public function getRegionaisAtivas()
     {
-        $plantoes = PlantaoJuridico::select('idregional')->where('qtd_advogados', 0)->get();
+        $plantoes = PlantaoJuridico::select('idregional')->where('qtd_advogados', '>', 0)->get();
         $resultado = array();
         foreach($plantoes as $plantao)
             array_push($resultado, $plantao->idregional);

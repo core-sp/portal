@@ -281,64 +281,64 @@ class AgendamentoSiteController extends Controller
         return $horariosMarcados;
     }
 
-    public function checaHorarios(Request $request)
-    {
-        try{
-            $validate = $request->only('idregional', 'servico', 'dia');
-            $horarios = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate, $this->service);
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
-        }
+    // public function checaHorarios(Request $request)
+    // {
+    //     try{
+    //         $validate = $request->only('idregional', 'servico', 'dia');
+    //         $horarios = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate, $this->service);
+    //     } catch (\Exception $e) {
+    //         \Log::error($e->getMessage());
+    //         abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
+    //     }
 
-        // $idregional = $request->idregional;
-        // $dia = date('Y-m-d', strtotime(str_replace('/', '-', $request->dia)));
-        // $servico = $request->servico;
-        // $horarios = [];
+    //     // $idregional = $request->idregional;
+    //     // $dia = date('Y-m-d', strtotime(str_replace('/', '-', $request->dia)));
+    //     // $servico = $request->servico;
+    //     // $horarios = [];
 
-        // if($servico == Agendamento::SERVICOS_PLANTAO_JURIDICO)
-        // {
-        //     $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($idregional);
-        //     if(isset($plantao))
-        //     {
-        //         $agendados = $this->agendamentoRepository->getPlantaoJuridicoByRegionalAndDia($idregional, $dia);
-        //         $horarios = $this->service->getService('PlantaoJuridico')->removeHorariosSeLotado($agendados, $plantao, $dia); 
-        //     }
-        // }
-        // else
-        // {
-        //     // Recupera quantos agendamentos podem ser criados por horário de acordo com a regional
-        //     $agedamentoPorHorario = $this->service->getService('Regional')->getAgeporhorarioById($idregional);
+    //     // if($servico == Agendamento::SERVICOS_PLANTAO_JURIDICO)
+    //     // {
+    //     //     $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($idregional);
+    //     //     if(isset($plantao))
+    //     //     {
+    //     //         $agendados = $this->agendamentoRepository->getPlantaoJuridicoByRegionalAndDia($idregional, $dia);
+    //     //         $horarios = $this->service->getService('PlantaoJuridico')->removeHorariosSeLotado($agendados, $plantao, $dia); 
+    //     //     }
+    //     // }
+    //     // else
+    //     // {
+    //     //     // Recupera quantos agendamentos podem ser criados por horário de acordo com a regional
+    //     //     $agedamentoPorHorario = $this->service->getService('Regional')->getAgeporhorarioById($idregional);
 
-        //     // Se podemos criar agendamentos, contamos quantos agendamentos já estão marcados por horário.
-        //     if($agedamentoPorHorario > 0) {
-        //         $horarios = $this->service->getService('Regional')->getHorariosAgendamento($idregional, $dia);
-        //         $horariosMarcados = $this->checaHorariosMarcados($dia,$idregional);
-        //         $contagemAgendamentosMarcados = array_count_values($horariosMarcados);
+    //     //     // Se podemos criar agendamentos, contamos quantos agendamentos já estão marcados por horário.
+    //     //     if($agedamentoPorHorario > 0) {
+    //     //         $horarios = $this->service->getService('Regional')->getHorariosAgendamento($idregional, $dia);
+    //     //         $horariosMarcados = $this->checaHorariosMarcados($dia,$idregional);
+    //     //         $contagemAgendamentosMarcados = array_count_values($horariosMarcados);
 
-        //         foreach($contagemAgendamentosMarcados as $hora => $contagem) {
+    //     //         foreach($contagemAgendamentosMarcados as $hora => $contagem) {
                     
-        //             // Caso a contagem de agendamentos marcados por horário seja maior ou igual ao agendamento por horário da regional
-        //             // o horário em questão deve ser removido da lista de horários disponíveis
-        //             if($contagem >= $agedamentoPorHorario) {
-        //                 unset($horarios[array_search($hora, $horarios)]);
-        //             }
-        //         }
-        //     }
-        // }
+    //     //             // Caso a contagem de agendamentos marcados por horário seja maior ou igual ao agendamento por horário da regional
+    //     //             // o horário em questão deve ser removido da lista de horários disponíveis
+    //     //             if($contagem >= $agedamentoPorHorario) {
+    //     //                 unset($horarios[array_search($hora, $horarios)]);
+    //     //             }
+    //     //         }
+    //     //     }
+    //     // }
 
-        return response()->json($horarios);
-    }
+    //     return response()->json($horarios);
+    // }
 
     /**
      * Função usada para auxiliar o calendário de agendamento no Portal. Verifica quais dias entre d+1 ~ d+m
      * não possuem horários disponíveis. Retorna um array de dias lotados para interface gráfica.
      */
-    public function checaMes(Request $request)
+    public function getDiasHorasAjax(Request $request)
     {
         try{
             $validate = $request->only('idregional', 'servico', 'dia');
-            $diasLotados = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate, $this->service);
+            $dados = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate, $this->service);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
@@ -425,14 +425,19 @@ class AgendamentoSiteController extends Controller
         //     }
         // }
 
-        return response()->json($diasLotados);
+        return response()->json($dados);
     }
 
-    public function regionaisExcluidasPlantaoJuridico()
+    public function regionaisPlantaoJuridico()
     {
-        $regionaisExcluidas = $this->service->getService('PlantaoJuridico')->getRegionaisDesativadas();
+        try{
+            $dados = $this->service->getService('PlantaoJuridico')->getRegionaisAtivas();
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
+        }
 
-        return response()->json($regionaisExcluidas);
+        return response()->json($dados);
     }
 
     // public function datasPlantaoJuridico(Request $request)
