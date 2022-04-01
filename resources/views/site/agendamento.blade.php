@@ -46,7 +46,7 @@
           </div>
         </div>
         <div class="mt-2">
-          <form method="POST" autocomplete="off" class="inscricaoCurso">
+          <form method="POST" class="inscricaoCurso" id="agendamentoStore">
             @csrf
             <h5>Informações de contato</h5>
             <div class="form-row mt-2">
@@ -174,7 +174,7 @@
                 @endif
               </div>
               <div class="col-md-4 mt-2-768">
-                <label for="dia">Dia * <span>(datas em vermelho não possuem horário disponível)</span></label>
+                <label for="dia">Dia * <span>( <i class="fa fa-square" style="color:red"></i> = sem horário disponível )</span></label>
                 <div class="input-group">
                   <input type="text" 
                     class="form-control {{ $errors->has('dia') ? 'is-invalid' : '' }}"

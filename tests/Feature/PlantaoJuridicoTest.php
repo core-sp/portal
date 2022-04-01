@@ -552,9 +552,7 @@ class PlantaoJuridicoTest extends TestCase
     {
         $this->signInAsAdmin();
 
-        $plantao = factory('App\PlantaoJuridico')->create([
-            'qtd_advogados' => 0
-        ]);
+        $plantao = factory('App\PlantaoJuridico')->create();
 
         $agendados = factory('App\Agendamento')->create([
             'tiposervico' => 'Plantão Jurídico para Ambas',
@@ -567,7 +565,41 @@ class PlantaoJuridicoTest extends TestCase
         $this->get(route('plantao.juridico.editar.view', $plantao->id))
         ->assertDontSeeText('Total de agendamentos deste plantão ativo já cadastrados')
         ->assertDontSee('<td>'.onlyDate($agendados->dia).'</td>')
-        ->assertDontSee('<td>1 agendado(s) às '.$agendados->hora.'</td>');
+        ->assertDontSeeText('1 agendado(s) às '.$agendados->hora);
+    }
+
+    /** @test */
+    public function not_show_past_days_agendados_table_when_disabled_plantao_with_agendados()
+    {
+        $this->signInAsAdmin();
+
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1,
+            'dataInicial' => Carbon::today()->subDay()->format('Y-m-d')
+        ]);
+
+        $agendadoAntigo = factory('App\Agendamento')->create([
+            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCF',
+            'dia' => $plantao->dataInicial,
+            'hora' => '11:00'
+        ]);
+
+        $agendadoAtual = factory('App\Agendamento')->create([
+            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCD',
+            'dia' => $plantao->dataFinal,
+            'hora' => '10:00'
+        ]);
+
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))
+        ->assertSeeText('Total de agendamentos deste plantão ativo já cadastrados')
+        ->assertDontSee('<td>'.onlyDate($plantao->dataInicial).'</td>')
+        ->assertSee('<td>'.onlyDate($plantao->dataFinal).'</td>')
+        ->assertSeeText('1 agendado(s) às '.$agendadoAtual->hora)
+        ->assertDontSeeText('1 agendado(s) às '.$agendadoAntigo->hora);
     }
 
     /** 

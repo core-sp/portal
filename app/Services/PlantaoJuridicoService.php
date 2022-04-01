@@ -154,12 +154,31 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function visualizar($id)
     {
-        $plantao = PlantaoJuridico::findOrFail($id);
+        $plantao = PlantaoJuridico::with('regional')->findOrFail($id);
+        $dataInicial = Carbon::parse($plantao->dataInicial);
+        $inicial = $dataInicial->gte(Carbon::today()) ? $plantao->dataInicial : Carbon::today()->format('Y-m-d');
+        
+        $agendados = $plantao->expirou() ? null :
+             $plantao->regional
+                ->agendamentos()
+                ->select('dia', 'hora')
+                ->where('tiposervico', 'LIKE', 'Plantão Jurídico%')
+                ->whereNull('status')
+                ->whereBetween('dia', [$inicial, $plantao->dataFinal])
+                ->orderby('dia')
+                ->orderby('hora')
+                ->get()
+                ->groupBy([
+                    'dia',
+                    function ($item) {
+                        return $item['hora'];
+                    },
+                ], $preserveKeys = false);
         
         return [
             'resultado' => $plantao,
             'variaveis' => (object) $this->variaveis,
-            'agendamentos' => $plantao->expirou() ? null : $plantao->getAgendadosPorPeriodo($plantao->dataInicial, $plantao->dataFinal)
+            'agendamentos' => $agendados
         ];
     }
 

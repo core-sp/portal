@@ -58,35 +58,45 @@ class AdminController extends Controller
 
     public function contagemAtendimentos()
     {
-        if(in_array(auth()->user()->idperfil, [1, 6, 12]))
-        {
-            $listaContagem = auth()->user()->regional->users()->select('nome')->withCount(['agendamentos' => function ($query) {
-                    $query->where('status', 'Compareceu');
-                }])->where('idperfil', 8)
-                ->withoutTrashed()
-                ->orderBy('agendamentos_count', 'DESC')
-                ->get();
+        $listaContagem = auth()->user()
+            ->regional
+            ->users()
+            ->select('nome')
+            ->withCount(['agendamentos' => function ($query) {
+                $query->where('status', 'Compareceu');
+            }])
+            ->where('idperfil', 8)
+            ->orWhere(function($query) {
+                $query->where('idregional', auth()->user()->idregional)
+                ->where('idperfil', 18);
+            })
+            ->orWhere(function($query) {
+                $query->where('idregional', auth()->user()->idregional)
+                ->where('idperfil', 21);
+            })
+            ->withoutTrashed()
+            ->orderBy('agendamentos_count', 'DESC')
+            ->get();
 
-            $tabela = '<table class="table table-bordered table-striped">';
-            $tabela .= '<thead>';
+        $tabela = '<table class="table table-bordered table-striped">';
+        $tabela .= '<thead>';
+        $tabela .= '<tr>';
+        $tabela .= '<th>Atendente</th>';
+        $tabela .= '<th>Atendimentos</th>';
+        $tabela .= '</tr>';
+        $tabela .= '</thead>';
+        $tabela .= '<tbody>';
+    
+        foreach($listaContagem as $contagem) {
             $tabela .= '<tr>';
-            $tabela .= '<th>Atendente</th>';
-            $tabela .= '<th>Atendimentos</th>';
+            $tabela .= '<td>' . $contagem->nome . '</td>';
+            $tabela .= '<td>' . $contagem->agendamentos_count . '</td>';
             $tabela .= '</tr>';
-            $tabela .= '</thead>';
-            $tabela .= '<tbody>';
-    
-            foreach($listaContagem as $contagem) {
-                $tabela .= '<tr>';
-                $tabela .= '<td>' . $contagem->nome . '</td>';
-                $tabela .= '<td>' . $contagem->agendamentos_count . '</td>';
-                $tabela .= '</tr>';
-            }
-    
-            $tabela .= '</tbody>';
-            $tabela .= '</table>';
-    
-            return $tabela;
         }
+    
+        $tabela .= '</tbody>';
+        $tabela .= '</table>';
+    
+        return $tabela;
     }
 }

@@ -598,8 +598,28 @@ class AgendamentoService implements AgendamentoServiceInterface {
     {
         $regional = $service->getService('Regional')->getById($dados['idregional']);
 
-        $resultado = $dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO ? 
+        $resultado = isset($dados['servico']) && ($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO) ? 
             $regional->plantaoJuridico()->with('bloqueios')->first() : $regional;
+
+        if(!isset($dados['servico']) && !isset($dados['dia']))
+        {
+            $datas = array();
+            $plantao = $resultado->plantaoJuridico()->with('bloqueios')->where('qtd_advogados', '>', 0)->first();
+
+            if(isset($plantao))
+            {
+                $inicial = Carbon::parse($plantao->dataInicial);
+                $final = Carbon::parse($plantao->dataFinal);
+                $hoje = Carbon::today();
+    
+                $datas = [
+                    $inicial->gt($hoje) ? $plantao->dataInicial : null, 
+                    $final->gt($hoje) ? $plantao->dataFinal : null
+                ];
+            }
+
+            return $datas;
+        }
 
         if(isset($dados['dia']))
         {

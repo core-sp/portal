@@ -104,23 +104,7 @@
 		  </div>
   	  	</div>
   	  </div>
-	  @if(auth()->user()->idperfil == 6 || auth()->user()->idperfil == 1 || auth()->user()->idperfil == 12)
-	  <div class="col">
-		<div class="card card-info">
-		  <div class="card-header">
-		  	<h3 class="card-title">Atendimentos realizados</h3>
-		  </div>
-		  <div class="card-body">
-		  	<div class="row">
-			  <div class="col">
-				{!! $contagem !!}
-			  </div>
-			</div>
-		  </div>
-		</div>
-	  </div>
-	  @else
-	  <div class="col">
+		<div class="col">
 		<div class="card card-info">
 			<div class="card-header">
 				<div class="card-title">
@@ -133,7 +117,20 @@
 			</div>
 		</div>
 	  </div>
-	  @endif
+	  <div class="col">
+		<div class="card card-info">
+		  <div class="card-header">
+		  	<h3 class="card-title">Atendimentos realizados em <strong>{{ auth()->user()->regional->regional }}</strong></h3>
+		  </div>
+		  <div class="card-body">
+		  	<div class="row">
+			  <div class="col">
+				{!! $contagem !!}
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
   	</div>
 	  @if($chamados->count())
 		@include('admin.inc.chamadohome')

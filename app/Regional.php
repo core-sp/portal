@@ -47,6 +47,7 @@ class Regional extends Model
         return [];
     }
 
+    // Será removido
     public function horariosDisponiveis($dia)
     {
         $horas = $this->horariosAge();
@@ -131,27 +132,21 @@ class Regional extends Model
         $bloqueios = $this->getAllBloqueios();
         $horarios = $this->getHorariosComBloqueio($bloqueios, $dia);
         $agendado = $this->agendamentos()
-            ->select('dia', 'hora')
+            ->select('hora', DB::raw('count(*) as total'))
             ->where('tiposervico', 'NOT LIKE', 'Plantão Jurídico%')
             ->whereNull('status')
             ->whereDate('dia', $dia)
-            ->orderBy('dia')
+            ->groupBy('hora')
             ->orderBy('hora')
-            ->get()
-            ->groupBy([
-                'dia',
-                function ($item) {
-                    return $item['hora'];
-                },
-            ], $preserveKeys = false);
+            ->get();
 
         if($agendado->isNotEmpty())
-            foreach($agendado as $hora => $value)
+            foreach($agendado as $value)
             {
-                $limiteBloqueio = isset($horarios['atendentes'][$hora]) && ($value->count() >= $horarios['atendentes'][$hora]);
-                $limiteRegional = $value->count() >= $this->ageporhorario;
+                $limiteBloqueio = isset($horarios['atendentes'][$value->hora]) && ($value->total >= $horarios['atendentes'][$value->hora]);
+                $limiteRegional = $value->total >= $this->ageporhorario;
                 if($limiteBloqueio || $limiteRegional)
-                    unset($horarios['horarios'][array_search($hora, $horarios['horarios'])]);
+                    unset($horarios['horarios'][array_search($value->hora, $horarios['horarios'])]);
             }
         
         return $horarios['horarios'];

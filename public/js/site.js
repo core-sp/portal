@@ -324,26 +324,26 @@ $('#ano-mapa').on({
 	},
 });
 
-// function validarDatasPlantaoJuridico(datas)
-// {
-// 	var datasNovas = [];
+function validarDatasPlantaoJuridico(datas)
+{
+	var datasNovas = [];
 
-// 	if((datas[0] != null) && (datas[1] != null))
-// 	{
-// 		datasNovas[0] = new Date(datas[0] + " 00:00:00");
-// 		datasNovas[1] = new Date(datas[1] + " 00:00:00");
-// 		return datasNovas;
-// 	}
+	if((datas[0] != null) && (datas[1] != null))
+	{
+		datasNovas[0] = new Date(datas[0] + " 00:00:00");
+		datasNovas[1] = new Date(datas[1] + " 00:00:00");
+		return datasNovas;
+	}
 
-// 	if((datas[0] == null) && (datas[1] != null))
-// 	{
-// 		datasNovas[0] = '+1';
-// 		datasNovas[1] = new Date(datas[1] + " 00:00:00");
-// 		return datasNovas;
-// 	}
+	if((datas[0] == null) && (datas[1] != null))
+	{
+		datasNovas[0] = '+1';
+		datasNovas[1] = new Date(datas[1] + " 00:00:00");
+		return datasNovas;
+	}
 
-// 	return null;
-// }
+	return null;
+}
 
 function errorAjaxAgendamento()
 {
@@ -373,7 +373,7 @@ function errorAjaxAgendamento()
 	});
 }
 
-function getRegionaisPlantaJuridico()
+function getRegionaisPlantaoJuridico()
 {
 	$.ajax({
 		method: "GET",
@@ -388,7 +388,7 @@ function getRegionaisPlantaJuridico()
 		success: function(response) {
 			regionaisAtivas = response;
 			$('#idregional option').each(function(){
-				var valor = parseInt($(this).val());
+				var valor = parseInt($(this).val())
 				jQuery.inArray(valor, regionaisAtivas) != -1 ? $(this).show() : $(this).hide();
 			});
 		},
@@ -398,92 +398,45 @@ function getRegionaisPlantaJuridico()
 	});
 }
 
-// function getDatasPorRegionalPlantaJuridico()
-// {
-// 	$.ajax({
-// 		method: "GET",
-// 		data: {
-// 			"_token": $('#token').val(),
-// 			"idregional": $('#idregional').val(),
-// 		},
-// 		dataType: 'json',
-// 		url: "/datas-plantao-juridico",
-// 		beforeSend: function(){
-// 			$('#loadCalendario').show();
-// 		},
-// 		complete: function(){
-// 			$('#loadCalendario').hide();
-// 		},
-// 		success: function(response) {
-// 			console.log(datas = response);
-// 			datasNovas = validarDatasPlantaoJuridico(datas);
-// 			if(datasNovas == null)
-// 				$('#datepicker')
-// 				.prop('disabled', true)
-// 				.prop('placeholder', 'Sem datas disponíveis')
-// 				.val('');
-// 			else
-// 				$('#datepicker').prop('placeholder', 'dd/mm/aaaaa').datepicker('option', {
-// 					minDate: datasNovas[0],
-// 					maxDate: datasNovas[1]
-// 				});
-// 		},
-// 		error: function() {
-// 			$('#datepicker').val('')
-// 			.prop('disabled', true)
-// 			.prop('placeholder', 'Falha ao recuperar calendário');
-
-// 			$('#horarios')
-// 				.find('option')
-// 				.remove()
-// 				.end()
-// 				.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
-
-// 			$("#dialog_agendamento")
-// 				.empty()
-// 				.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
-				
-// 			$("#dialog_agendamento").dialog({
-// 				draggable: false,
-// 				buttons: [{
-// 					text: "Recarregar",
-// 					click: function() {
-// 						location.reload(true);
-// 					}
-// 				}]	
-// 			});
-// 		}
-// 	});
-// }
+function getDatasPorRegionalPlantaoJuridico()
+{
+	$.ajax({
+		method: "GET",
+		data: {
+			"idregional": $('#idregional').val(),
+		},
+		dataType: 'json',
+		url: "/dias-horas",
+		beforeSend: function(){
+			$('#loadCalendario').show();
+		},
+		complete: function(){
+			$('#loadCalendario').hide();
+		},
+		success: function(response) {
+			datas = response;
+			datasNovas = validarDatasPlantaoJuridico(datas);
+			if(datasNovas == null)
+				$('#datepicker')
+				.prop('disabled', true)
+				.prop('placeholder', 'Sem datas disponíveis')
+				.val('');
+			else
+				$('#datepicker').prop('placeholder', 'dd/mm/aaaa').datepicker('option', {
+					minDate: datasNovas[0],
+					maxDate: datasNovas[1]
+				});
+		},
+		error: function() {
+			errorAjaxAgendamento();
+		}
+	});
+}
 
 (function($){
 	$(function(){
-		// Botão Saiba Mais do Banco de Oportunidades
-		$('.saiba-mais').on('click', function(){
-			var saibamais = $(this);
-			var bdoinfo = saibamais.prev('.bdo-info');
-			bdoinfo.slideToggle(function(){
-				if(bdoinfo.is(':visible')) {
-					saibamais.html('<i class="fas fa-angle-double-up"></i>&nbsp;&nbsp;Menos Detalhes');
-				} else {
-					saibamais.html('<i class="fas fa-angle-double-down"></i>&nbsp;&nbsp;Mais Detalhes');
-				}
-			});
-		});
 
-		// Para quando houver Plantão Jurídico
-		$('#selectServicos').change(function(){
-			$("#idregional").val("");
-			if($(this).val() == "Plantão Jurídico")
-				getRegionaisPlantaJuridico();
-			else
-			{
-				$('#idregional option').show();
-				$('#datepicker')
-				.prop('placeholder', 'dd/mm/aaaaa')
-				.val('');
-			}
-		});	
+		// Funcionalidade Agendamentos ++++++++++++++++++++++++++++++++++++++++
 
 		// Datepicker Agendamentos
 		$('#datepicker').datepicker({
@@ -500,43 +453,36 @@ function getRegionaisPlantaJuridico()
 			beforeShowDay: noWeekendsOrHolidays
 		});
 
+		// Para quando houver Plantão Jurídico
+		$('#selectServicos').change(function(){
+			$("#idregional").val("");
+			if($(this).val() == "Plantão Jurídico")
+				getRegionaisPlantaoJuridico();
+			else
+			{
+				$('#idregional option').show();
+				$('#datepicker')
+				.prop('placeholder', 'dd/mm/aaaa')
+				.val('');
+			}
+		});	
+
 		if($("#selectServicos option:selected").val() == "Plantão Jurídico"){
 			$("#idregional").val("");
-			getRegionaisPlantaJuridico();
+			getRegionaisPlantaoJuridico();
 		}else{
 			$("#idregional").val("");
 			$('#idregional option').show();
 		}
 
-
-		$("#agenda-institucional").datepicker({
-			dateFormat: 'dd-mm-yy',
-			todayHighlight: false,
-			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-			dayNamesMin: ['D','S','T','Q','Q','S','S'],
-			dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
-			monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-			monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
-		})
-		.datepicker('setDate', $('#data').text());
-
 		// Zera o valor do dia, ao selecionar a regional
 		$('#idregional').change(function(){
-			if($('#idregional').val() == 14) {
+			if($('#idregional').val() == 14) 
 				alert('Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: Av. Brigadeiro Luís Antônio, 613, Térreo, CEP:01317-000, São Paulo/SP.');
-			}
 
 			$('#datepicker')
 			.val('')
 			.prop('disabled', true);
-			
-			// if($("#selectServicos option:selected").val() == "Plantão Jurídico")
-			// 	getDatasPorRegionalPlantaJuridico();
-			// else
-			// 	$('#datepicker').datepicker('option', {
-			// 		maxDate: '+1m',
-			// 		minDate: +1
-			// 	});
 
 			$('#horarios')
 				.find('option')
@@ -544,13 +490,20 @@ function getRegionaisPlantaJuridico()
 				.end()
 				.append('<option value="" disabled selected>Selecione o dia do atendimento</option>');
 			$('#horarios').prop('disabled', true);
+			
+			if($("#selectServicos option:selected").val() == "Plantão Jurídico")
+				getDatasPorRegionalPlantaoJuridico();
+			else
+				$('#datepicker').datepicker('option', {
+					maxDate: '+1m',
+					minDate: +1
+				});
 
 			$('#idregional option[value=""]').hide();
 
 			$.ajax({
 				method: "GET",
 				data: {
-					"_token": $('#token').val(),
 					"idregional": $('#idregional').val(),
 					"servico": $('#selectServicos').val()
 				},
@@ -563,37 +516,14 @@ function getRegionaisPlantaJuridico()
 					$('#loadCalendario').hide();
 				},
 				success: function(response) {
-					console.log(lotados = response);
+					lotados = response;
 					if($('#datepicker').prop('placeholder') != 'Sem datas disponíveis')
 						$('#datepicker')
 						.prop('disabled', false)
-						.prop('placeholder', 'dd/mm/aaaaa');
+						.prop('placeholder', 'dd/mm/aaaa');
 				},
 				error: function() {
-					$('#datepicker')
-					.val('')
-					.prop('disabled', true)
-					.prop('placeholder', 'Falha ao recuperar calendário');
-
-					$('#horarios')
-						.find('option')
-						.remove()
-						.end()
-						.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
-
-					$("#dialog_agendamento")
-						.empty()
-						.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
-						
-					$("#dialog_agendamento").dialog({
-						draggable: false,
-						buttons: [{
-							text: "Recarregar",
-							click: function() {
-								location.reload(true);
-							}
-						}]	
-					});
+					errorAjaxAgendamento();
 				}
 			});
 		});
@@ -603,7 +533,6 @@ function getRegionaisPlantaJuridico()
 			$.ajax({
 				method: "GET",
 				data: {
-					"_token": $('#token').val(),
 					"idregional": $('#idregional').val(),
 					"dia": $('#datepicker').val(),
 					"servico": $('#selectServicos').val()
@@ -617,54 +546,73 @@ function getRegionaisPlantaJuridico()
 					$('#loadHorario').hide();
 				},
 				success: function(response) {
-					console.log(response);
+					response;
 					if (!jQuery.isEmptyObject(response)) {
 						$('#horarios').empty();
-
 						$.each(response, function(i, horario) {
 							$('#horarios').append($('<option>', { 
 								value: horario,
 								text : horario 
 							}));
 						});
-
 						$('#horarios').prop('disabled', false);
 					} 
-					else {
+					else 
 						$('#horarios')
 							.find('option')
 							.remove()
 							.end()
 							.append('<option value="" disabled selected>Nenhum horário disponível</option>');
-					}
 				},
 				error: function() {
-					$('#horarios')
-						.find('option')
-						.remove()
-						.end()
-						.append('<option value="" disabled selected>Falha ao recuperar horários</option>');
-
-					$("#dialog_agendamento")
-						.empty()
-						.append("Falha ao recuperar horários disponíveis. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
-						
-					$("#dialog_agendamento").dialog({
-						draggable: false,
-						buttons: [{
-							text: "Recarregar",
-							click: function() {
-								location.reload(true);
-							}
-						}]	
-					});
+					errorAjaxAgendamento();
 				}
 			});
 		});
 		$('#datepicker').blur(function(){
-			if(!$(this).val()){
+			if(!$(this).val())
 				$(this).css('background-color','#FFFFFF');
+		});
+
+		$("#agendamentoStore").submit(function(e){
+			if($("#datepicker").val().length < 10)
+			{
+				$("#datepicker").focus();
+				e.preventDefault();
 			}
+
+			if($("#horarios").val().length < 5)
+			{
+				$("#horarios").focus();
+				e.preventDefault();
+			}
+		});
+
+		// FIM Funcionalidade Agendamentos ++++++++++++++++++++++++++++++++++++++++
+
+		// Agenda Institucional
+		$("#agenda-institucional").datepicker({
+			dateFormat: 'dd-mm-yy',
+			todayHighlight: false,
+			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+			dayNamesMin: ['D','S','T','Q','Q','S','S'],
+			dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+			monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+			monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+		})
+		.datepicker('setDate', $('#data').text());
+
+		// Botão Saiba Mais do Banco de Oportunidades
+		$('.saiba-mais').on('click', function(){
+			var saibamais = $(this);
+			var bdoinfo = saibamais.prev('.bdo-info');
+			bdoinfo.slideToggle(function(){
+				if(bdoinfo.is(':visible')) {
+					saibamais.html('<i class="fas fa-angle-double-up"></i>&nbsp;&nbsp;Menos Detalhes');
+				} else {
+					saibamais.html('<i class="fas fa-angle-double-down"></i>&nbsp;&nbsp;Mais Detalhes');
+				}
+			});
 		});
 	
 		// Switch para máscaras de contato Gerenti

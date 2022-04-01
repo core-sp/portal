@@ -144,7 +144,7 @@ class AgendamentoBloqueioController extends Controller
             $regional = $this->service->getService('Regional')->getById($request->idregional);
             $dados = [
                 'horarios' => $regional->horariosAge(),
-                'atendentes' => $regional->ageporhorario
+                'atendentes' => $regional->ageporhorario - 1
             ];
             
         } catch (\Exception $e) {

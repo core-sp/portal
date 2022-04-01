@@ -88,7 +88,7 @@
             </div>
         </div>
 
-    @if(isset($resultado) && $resultado->ativado())
+    @if(isset($resultado) && $resultado->ativado() && isset($agendamentos))
         @if($agendamentos->isEmpty())
         <p class="mt-5"><strong>Ainda não há agendados</strong></p>
         @else

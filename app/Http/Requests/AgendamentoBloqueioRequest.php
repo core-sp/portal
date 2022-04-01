@@ -18,7 +18,7 @@ class AgendamentoBloqueioRequest extends FormRequest
     {
         $regional = isset(request()->idregional) ? $this->service->getById(request()->idregional) : null;
         $horarios = isset($regional->horariosage) ? $regional->horariosage : null;
-        $ageporhorario = isset($regional->ageporhorario) ? $regional->ageporhorario : null;
+        $ageporhorario = isset($regional->ageporhorario) ? $regional->ageporhorario - 1 : null;
         
         return [
             'idregional' => 'required|exists:regionais,idregional',
@@ -41,7 +41,7 @@ class AgendamentoBloqueioRequest extends FormRequest
             'array' => 'Formato inválido',
             'numeric' => 'Deve ser um número',
             'min' => 'Valor mínimo é :min',
-            'max' => 'Valor máximo é :max'
+            'qtd_atendentes.max' => 'Deve ser um valor máximo de total de atendentes atual - 1'
         ];
     }
 }

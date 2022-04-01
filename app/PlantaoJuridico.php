@@ -42,24 +42,6 @@ class PlantaoJuridico extends Model
         return $horarios;
     }
 
-    public function getAgendadosPorPeriodo($inicio, $final)
-    {
-        return $this->regional->agendamentos()
-            ->select('dia', 'hora')
-            ->where('tiposervico', 'LIKE', 'Plantão Jurídico%')
-            ->whereNull('status')
-            ->whereBetween('dia', [$inicio, $final])
-            ->orderby('dia')
-            ->orderby('hora')
-            ->get()
-            ->groupBy([
-                'dia',
-                function ($item) {
-                    return $item['hora'];
-                },
-            ], $preserveKeys = false);
-    }
-
     public function getDiasSeLotado()
     {
         $diasLotados = array();
@@ -90,24 +72,18 @@ class PlantaoJuridico extends Model
         $bloqueios = $this->bloqueios;
         $horarios = $this->getHorariosComBloqueio($bloqueios, $dia);
         $agendado = $this->regional->agendamentos()
-            ->select('dia', 'hora')
+            ->select('hora', DB::raw('count(*) as total'))
             ->where('tiposervico', 'LIKE', 'Plantão Jurídico%')
             ->whereNull('status')
             ->whereDate('dia', $dia)
-            ->orderBy('dia')
+            ->groupBy('hora')
             ->orderBy('hora')
-            ->get()
-            ->groupBy([
-                'dia',
-                function ($item) {
-                    return $item['hora'];
-                },
-            ], $preserveKeys = false);
+            ->get();
 
         if($agendado->isNotEmpty())
-            foreach($agendado as $hora => $value)
-                if($value->count() >= $this->qtd_advogados)
-                    unset($horarios[array_search($hora, $horarios)]);
+            foreach($agendado as $value)
+                if($value->total >= $this->qtd_advogados)
+                    unset($horarios[array_search($value->hora, $horarios)]);
         
         return $horarios;
     }

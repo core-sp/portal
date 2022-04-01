@@ -13,20 +13,32 @@ class AgendamentoUpdateRequest extends FormRequest
 
     public function __construct(MediadorServiceInterface $service)
     {
-        $this->service = $service->getService('Agendamento');
+        $this->service = $service;
     }
 
     public function rules()
     {
-        $completos = $this->service->getServicosOrStatusOrCompletos('completos');
-        $status = $this->service->getServicosOrStatusOrCompletos('status');
-        $servicos = $this->service->getServicosOrStatusOrCompletos('servicos');
-        $horariosComBloqueio = null;
+        $service = $this->service->getService('Agendamento');
+        $completos = $service->getServicosOrStatusOrCompletos('completos');
+        $status = $service->getServicosOrStatusOrCompletos('status');
+        $servicos = $service->getServicosOrStatusOrCompletos('servicos');
+        $horariosComBloqueio = '';
+        $dateFormat = '';
+        if(\Route::is('agendamentosite.store'))
+        {
+            $horariosComBloqueio = '|in:'.implode(',', $service->getDiasHorasAjaxSite([
+                'idregional' => request()->idregional, 
+                'dia' => request()->dia,
+                'servico' => request()->servico
+            ], $this->service));
+
+            $dateFormat = '|date_format:d/m/Y|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::tomorrow()->addDays(30)->format('d\/m\/Y');
+        }
 
         return [
             'antigo' => 'sometimes|boolean',
             'idregional' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|exists:regionais,idregional',
-            'nome' => 'sometimes|exclude_if:antigo,1|required|max:191|string',
+            'nome' => 'sometimes|exclude_if:antigo,1|required|min:5|max:191|string',
             'email' => 'sometimes|exclude_if:antigo,1|required|email|max:191',
             'cpf' => ['sometimes', 'exclude_if:antigo,1', 'required', 'max:14', new Cpf],
             'celular' => 'sometimes|exclude_if:antigo,1|required|max:17',
@@ -35,8 +47,8 @@ class AgendamentoUpdateRequest extends FormRequest
             'pessoa' => 'sometimes|required|in:PF,PJ,PF e PJ',
             'idusuario' => 'sometimes|nullable|exists:users,idusuario|required_if:status,==,'.$status[0],
             'status' => 'sometimes|nullable|in:'.implode(',', $status),
-            'dia' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required|date_format:d/m/Y|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::tomorrow()->addDays(30)->format('d\/m\/Y'),
-            'hora' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required|in:'.$horariosComBloqueio,
+            'dia' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$dateFormat,
+            'hora' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$horariosComBloqueio,
             'termo' => 'sometimes|required|accepted',
             'idagendamento' => 'sometimes|required_without_all:nome,email,cpf,celular,servico,tiposervico,idusuario,antigo,dia,hora,pessoa,termo'
         ];
@@ -45,6 +57,7 @@ class AgendamentoUpdateRequest extends FormRequest
     public function messages() 
     {
         return [
+            'min' => 'O campo possui menos que :min caracteres',
             'max' => 'O campo excedeu o limite de :max caracteres',
             'required' => 'O campo é obrigatório',
             'email' => 'Email inválido',

@@ -92,101 +92,101 @@ class AgendamentoSiteController extends Controller
 
         $request->validated();
 
-        // Trabalhando com o formato de data Y-m-d por questões de padronização no banco de dados
-        $dia = date('Y-m-d', strtotime(str_replace('/', '-', $request->dia)));
-        $diaAtual = date('Y-m-d');
+        // // Trabalhando com o formato de data Y-m-d por questões de padronização no banco de dados
+        // $dia = date('Y-m-d', strtotime(str_replace('/', '-', $request->dia)));
+        // $diaAtual = date('Y-m-d');
         
-        // Validação para evitar agendamento no passado
-        if($dia <= $diaAtual) {
-            abort(500, 'Não é permitido criar agendamento no passado.');
-        }
+        // // Validação para evitar agendamento no passado
+        // if($dia <= $diaAtual) {
+        //     abort(500, 'Não é permitido criar agendamento no passado.');
+        // }
 
-        // Limita em até um agendamento por CPF por dia/horário
-        if($this->agendamentoRepository->getCountAgendamentoPendenteByCpfDayHour($dia, $request->hora, $request->cpf) > 0) {
-            abort(500, 'É permitido apenas 1 agendamentos por CPF por dia/horário!');
-        } 
+        // // Limita em até um agendamento por CPF por dia/horário
+        // if($this->agendamentoRepository->getCountAgendamentoPendenteByCpfDayHour($dia, $request->hora, $request->cpf) > 0) {
+        //     abort(500, 'É permitido apenas 1 agendamentos por CPF por dia/horário!');
+        // } 
 
-        if(stristr($request->toModel()['tiposervico'], Agendamento::SERVICOS_PLANTAO_JURIDICO))
-        {
-            $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($request->idregional);
+        // if(stristr($request->toModel()['tiposervico'], Agendamento::SERVICOS_PLANTAO_JURIDICO))
+        // {
+        //     $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($request->idregional);
 
-            // se existe a regional
-            abort_if(!isset($plantao), 500, 'A regional escolhida não é válida para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
+        //     // se existe a regional
+        //     abort_if(!isset($plantao), 500, 'A regional escolhida não é válida para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
             
-            // se existe a data
-            $diaValido = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia);
-            abort_if(!$diaValido, 500, 'A data para a regional escolhida não é válida para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
+        //     // se existe a data
+        //     $diaValido = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia);
+        //     abort_if(!$diaValido, 500, 'A data para a regional escolhida não é válida para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
 
-            // se está lotado
-            $agendados = $this->agendamentoRepository->getPlantaoJuridicoPorPeriodo($request->idregional, $dia, $dia);
-            $estaLivre = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia, $agendados);
-            abort_if(!$estaLivre, 500, 'A data escolhida para a regional está indiponível atualmente para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
+        //     // se está lotado
+        //     $agendados = $this->agendamentoRepository->getPlantaoJuridicoPorPeriodo($request->idregional, $dia, $dia);
+        //     $estaLivre = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia, $agendados);
+        //     abort_if(!$estaLivre, 500, 'A data escolhida para a regional está indiponível atualmente para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
 
-            // se existe o horário
-            $agendados = $this->agendamentoRepository->getPlantaoJuridicoByRegionalAndDia($request->idregional, $dia);
-            $horaValida = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia, $agendados, $request->hora);
-            abort_if(!$horaValida, 500, 'A hora para a regional escolhida não é válida para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
+        //     // se existe o horário
+        //     $agendados = $this->agendamentoRepository->getPlantaoJuridicoByRegionalAndDia($request->idregional, $dia);
+        //     $horaValida = $this->service->getService('PlantaoJuridico')->validacaoAgendarPlantao($plantao, $dia, $agendados, $request->hora);
+        //     abort_if(!$horaValida, 500, 'A hora para a regional escolhida não é válida para o serviço '.Agendamento::SERVICOS_PLANTAO_JURIDICO);
 
-            // se já possui um agendamento no periodo do plantao
-            $total = $this->agendamentoRepository->countPlantaoJuridicoByCPF($request->cpf, $request->idregional, $plantao);
-            abort_if($total > 0, 500, 'Durante o período deste plantão jurídico é permitido apenas 1 agendamento por cpf');
-        }else
-        {
-            // Validação se regional está aceitando agendamentos
-            if(!$this->permiteAgendamento($dia, $request->hora, $request->idregional)) {
-                abort(500);
-            }
+        //     // se já possui um agendamento no periodo do plantao
+        //     $total = $this->agendamentoRepository->countPlantaoJuridicoByCPF($request->cpf, $request->idregional, $plantao);
+        //     abort_if($total > 0, 500, 'Durante o período deste plantão jurídico é permitido apenas 1 agendamento por cpf');
+        // }else
+        // {
+        //     // Validação se regional está aceitando agendamentos
+        //     if(!$this->permiteAgendamento($dia, $request->hora, $request->idregional)) {
+        //         abort(500);
+        //     }
             
-            // Limita em até dois agendamentos por CPF por dia
-            if($this->limiteCpf($dia, $request->cpf)) {
-                abort(500, 'É permitido apenas 2 agendamentos por CPF por dia!');
-            }
+        //     // Limita em até dois agendamentos por CPF por dia
+        //     if($this->limiteCpf($dia, $request->cpf)) {
+        //         abort(500, 'É permitido apenas 2 agendamentos por CPF por dia!');
+        //     }
             
-            // Cria bloqueio caso o usuário tenha faltado 3 vezes nos últimos 90 dias
-            if($this->bloqueioPorFalta($request->cpf)) {
-                abort(405, 'Agendamento bloqueado por excesso de falta nos últimos 90 dias. Favor entrar em contato com o Core-SP para regularizar o agendamento.');
-            }
-        }
+        //     // Cria bloqueio caso o usuário tenha faltado 3 vezes nos últimos 90 dias
+        //     if($this->bloqueioPorFalta($request->cpf)) {
+        //         abort(405, 'Agendamento bloqueado por excesso de falta nos últimos 90 dias. Favor entrar em contato com o Core-SP para regularizar o agendamento.');
+        //     }
+        // }
         
-        // Gera a HASH (protocolo) aleatória
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
-        do {
-            $protocoloGerado = substr(str_shuffle($characters), 0, 6);
-            $protocoloGerado = 'AGE-'.$protocoloGerado;
-            $countProtocolo = $this->agendamentoRepository->checkProtocol($protocoloGerado);
-        } while($countProtocolo != 0);
+        // // Gera a HASH (protocolo) aleatória
+        // $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
+        // do {
+        //     $protocoloGerado = substr(str_shuffle($characters), 0, 6);
+        //     $protocoloGerado = 'AGE-'.$protocoloGerado;
+        //     $countProtocolo = $this->agendamentoRepository->checkProtocol($protocoloGerado);
+        // } while($countProtocolo != 0);
 
-        $request->protocolo = $protocoloGerado;
+        // $request->protocolo = $protocoloGerado;
 
-        $save = $this->agendamentoRepository->store($request->toModel());
+        // $save = $this->agendamentoRepository->store($request->toModel());
         
-        if(!$save) {
-            abort(500);
-        }
+        // if(!$save) {
+        //     abort(500);
+        // }
 
-        $termo = $save->termos()->create([
-            'ip' => request()->ip()
-        ]);
+        // $termo = $save->termos()->create([
+        //     'ip' => request()->ip()
+        // ]);
             
-        // Gera evento de agendamento
-        $string = $save->nome . " (CPF: " . $save->cpf . ")";
-        $string .= " *agendou* atendimento em *" . $save->regional->regional;
-        $string .= "* no dia " . onlyDate($save->dia) . " e " .$termo->message();
-        event(new ExternoEvent($string));
+        // // Gera evento de agendamento
+        // $string = $save->nome . " (CPF: " . $save->cpf . ")";
+        // $string .= " *agendou* atendimento em *" . $save->regional->regional;
+        // $string .= "* no dia " . onlyDate($save->dia) . " e " .$termo->message();
+        // event(new ExternoEvent($string));
         
-        // Enviando email de agendamento
-        $email = new AgendamentoMailGuest($save);
-        Mail::to($save->email)->queue($email);
+        // // Enviando email de agendamento
+        // $email = new AgendamentoMailGuest($save);
+        // Mail::to($save->email)->queue($email);
 
-        // Reaproveita o corpo do email para mostrar na tela de agradecimento
-        $agradece = $email->body;
-        $adendo = '<i>* As informações serão enviadas ao email cadastrado no formulário</i>';
+        // // Reaproveita o corpo do email para mostrar na tela de agradecimento
+        // $agradece = $email->body;
+        // $adendo = '<i>* As informações serão enviadas ao email cadastrado no formulário</i>';
 
         // Retorna view de agradecimento
-        return view('site.agradecimento')->with([
+        return view('site.agradecimento')/*->with([
             'agradece' => $agradece,
             'adendo' => $adendo
-        ]);
+        ])*/;
     }
 
     public function cancelamento(AgendamentoSiteCancelamentoRequest $request)
@@ -262,24 +262,24 @@ class AgendamentoSiteController extends Controller
         return $this->agendamentoRepository->getCountAgendamentoPendenteByCpfDay($dia, $cpf) >= 2;
     }
 
-    public function checaHorariosMarcados($dia, $idregional)
-    {
-        $agendamentos = $this->agendamentoRepository->getAgendamentoPendenteByDiaRegional($dia, $idregional);
-        $horariosMarcados = [];
+    // public function checaHorariosMarcados($dia, $idregional)
+    // {
+    //     $agendamentos = $this->agendamentoRepository->getAgendamentoPendenteByDiaRegional($dia, $idregional);
+    //     $horariosMarcados = [];
 
-        // Caso exista algum horário já agendado no dia e a regional permita agendamentos, montamos um array com todos os horários marcados
-        if($agendamentos->count() > 0) {
-            $agedamentoPorHorario = $agendamentos->first()->regional->ageporhorario;
+    //     // Caso exista algum horário já agendado no dia e a regional permita agendamentos, montamos um array com todos os horários marcados
+    //     if($agendamentos->count() > 0) {
+    //         $agedamentoPorHorario = $agendamentos->first()->regional->ageporhorario;
 
-            if($agedamentoPorHorario >= 1) {
-                foreach($agendamentos as $agendamento) {
-                    array_push($horariosMarcados,$agendamento->hora);
-                }
-            }
-        }
+    //         if($agedamentoPorHorario >= 1) {
+    //             foreach($agendamentos as $agendamento) {
+    //                 array_push($horariosMarcados,$agendamento->hora);
+    //             }
+    //         }
+    //     }
  
-        return $horariosMarcados;
-    }
+    //     return $horariosMarcados;
+    // }
 
     // public function checaHorarios(Request $request)
     // {
@@ -442,6 +442,12 @@ class AgendamentoSiteController extends Controller
 
     // public function datasPlantaoJuridico(Request $request)
     // {
+    //     try{
+    //         $dados = $this->service->getService('PlantaoJuridico')->getRegionaisAtivas();
+    //     } catch (\Exception $e) {
+    //         \Log::error($e->getMessage());
+    //         abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
+    //     }
     //     $idregional = $request->idregional;
     //     $plantao = $this->service->getService('PlantaoJuridico')->getPlantaoAtivoComBloqueioPorRegional($idregional);
     //     $datas = array();
