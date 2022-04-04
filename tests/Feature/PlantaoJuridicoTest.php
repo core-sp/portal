@@ -1048,7 +1048,8 @@ class PlantaoJuridicoTest extends TestCase
             'horariosBloqueio' => ['10:00', '10:30']
         ];
 
-        $this->post(route('plantao.juridico.bloqueios.criar'), $dados)->assertStatus(404);
+        $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
+        ->assertSessionHasErrors('plantaoBloqueio');
     }
 
     /** @test */
@@ -1490,7 +1491,8 @@ class PlantaoJuridicoTest extends TestCase
             'horariosBloqueio' => ['10:30']
         ];
 
-        $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)->assertStatus(404);
+        $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)
+        ->assertSessionHasErrors('plantaoBloqueio');
     }
 
     /** @test */

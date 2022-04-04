@@ -7,6 +7,7 @@ use App\Contracts\MediadorServiceInterface;
 use App\Agendamento;
 use App\AgendamentoBloqueio;
 use App\Events\CrudEvent;
+use App\Events\ExternoEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
@@ -332,6 +333,75 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return $tabela;
     }
 
+    private function validarStore($dados)
+    {
+        $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
+        $total = Agendamento::where('dia', $dia)
+            ->where('hora', $dados['hora'])
+            ->where('cpf', $dados['cpf'])
+            ->whereNull('status')
+            ->count();
+        if($total == 1)
+            return [
+                'message' => 'Este CPF já possui um agendamento neste dia e horário',
+                'class' => 'alert-danger'
+            ];
+
+        $total = Agendamento::where('dia', $dia)
+            ->where('cpf', $dados['cpf'])
+            ->whereNull('status')
+            ->count();
+        if($total >= 2)
+            return [
+                'message' => 'É permitido apenas 2 agendamentos por cpf por dia',
+                'class' => 'alert-danger'
+            ];
+
+        $total = Agendamento::where('cpf', $dados['cpf'])
+            ->where('status', Agendamento::STATUS_NAO_COMPARECEU)
+            ->whereBetween('dia',[Carbon::today()->subDays(90), date('Y-m-d')])
+            ->count();
+        if($total >= 3)
+            return [
+                'message' => 'Agendamento bloqueado por excesso de falta nos últimos 90 dias. 
+                    <br>Favor entrar em contato com o Core-SP para regularizar o agendamento.',
+                'class' => 'alert-danger'
+            ];
+
+        // if($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO)
+        // {
+        //     $total = Agendamento::where('cpf', $dados['cpf'])
+        //         ->where('idregional', $dados['idregional'])
+        //         ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+        //         ->whereNull('status')
+        //         ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
+        //         ->count();
+        // }
+
+        $dados['dia'] = $dia;
+        $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE);
+        $dados['protocolo'] = $this->getProtocolo();
+        $dados['tiposervico'] = $dados['servico'].' para '.$dados['pessoa'];
+        unset($dados['servico']);
+        unset($dados['pessoa']);
+        unset($dados['termo']);
+
+        return $dados;
+    }
+
+    private function getProtocolo()
+    {
+        // Gera a HASH (protocolo) aleatória
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
+        do {
+            $protocoloGerado = substr(str_shuffle($characters), 0, 6);
+            $protocoloGerado = 'AGE-'.$protocoloGerado;
+            $countProtocolo = Agendamento::where('protocolo', $protocoloGerado)->count();
+        } while($countProtocolo != 0);
+
+        return $protocoloGerado;
+    }
+
     public function listar($request = null, MediadorServiceInterface $service = null)
     {
         session(['url' => url()->full()]);
@@ -463,7 +533,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $sameRegional = auth()->user()->can('sameRegional', $agendamento);
         abort_if($atendOrGere && !$sameRegional, 403);
 
-        Mail::to($agendamento->email)->send(new AgendamentoMailGuest($agendamento));
+        Mail::to($agendamento->email)->queue(new AgendamentoMailGuest($agendamento));
     }
 
     public function save($dados, $id = null)
@@ -508,6 +578,30 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $bloqueio = AgendamentoBloqueio::create($dados);
         event(new CrudEvent('bloqueio de agendamento', 'criou', $bloqueio->idagendamentobloqueio));
         return null;
+    }
+
+    public function saveSite($dados)
+    {
+        $valid = $this->validarStore($dados);
+        if(isset($valid['message']))
+            return $valid;
+
+        $agendamento = Agendamento::create($valid);
+        $termo = $agendamento->termos()->create([
+            'ip' => request()->ip()
+        ]);
+
+        $string = $agendamento->nome.' (CPF: '.$agendamento->cpf.') *agendou* atendimento em *'.$agendamento->regional->regional;
+        $string .= '* no dia '.onlyDate($agendamento->dia).' para o serviço '.$agendamento->tiposervico.' e ' .$termo->message();
+        event(new ExternoEvent($string));
+
+        $email = new AgendamentoMailGuest($agendamento);
+        Mail::to($agendamento->email)->queue($email);
+
+        return [
+            'agradece' => $email->body,
+            'adendo' => '<i>* As informações serão enviadas ao email cadastrado no formulário</i>'
+        ];
     }
 
     public function delete($id)
@@ -596,38 +690,42 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     public function getDiasHorasAjaxSite($dados, MediadorServiceInterface $service)
     {
-        $regional = $service->getService('Regional')->getById($dados['idregional']);
-
-        $resultado = isset($dados['servico']) && ($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO) ? 
-            $regional->plantaoJuridico()->with('bloqueios')->first() : $regional;
-
-        if(!isset($dados['servico']) && !isset($dados['dia']))
+        if(isset($dados['idregional']))
         {
-            $datas = array();
-            $plantao = $resultado->plantaoJuridico()->with('bloqueios')->where('qtd_advogados', '>', 0)->first();
+            $regional = $service->getService('Regional')->getById($dados['idregional']);
 
-            if(isset($plantao))
+            if(isset($regional))
             {
-                $inicial = Carbon::parse($plantao->dataInicial);
-                $final = Carbon::parse($plantao->dataFinal);
-                $hoje = Carbon::today();
+                $resultado = isset($dados['servico']) && ($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO) ? 
+                $regional->plantaoJuridico()->with('bloqueios')->first() : $regional;
     
-                $datas = [
-                    $inicial->gt($hoje) ? $plantao->dataInicial : null, 
-                    $final->gt($hoje) ? $plantao->dataFinal : null
-                ];
+                if(!isset($dados['servico']) && !isset($dados['dia']))
+                {
+                    $plantao = $resultado->plantaoJuridico()->with('bloqueios')->where('qtd_advogados', '>', 0)->first();
+        
+                    if(isset($plantao))
+                    {
+                        $inicial = Carbon::parse($plantao->dataInicial);
+                        $final = Carbon::parse($plantao->dataFinal);
+
+                        return [
+                            $inicial->gt(Carbon::today()) ? $plantao->dataInicial : null, 
+                            $final->gt(Carbon::today()) ? $plantao->dataFinal : null
+                        ];
+                    }
+        
+                    return [];
+                }
+        
+                if(isset($dados['dia']))
+                {
+                    $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
+                    return $resultado->removeHorariosSeLotado($dia);
+                }
+            
+                return $resultado->getDiasSeLotado();
             }
-
-            return $datas;
         }
-
-        if(isset($dados['dia']))
-        {
-            $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
-            return $resultado->removeHorariosSeLotado($dia);
-        }
-    
-        return $resultado->getDiasSeLotado();
     }
 
     /** 

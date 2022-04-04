@@ -46,6 +46,11 @@
           </div>
         </div>
         <div class="mt-2">
+        @if(session('message'))
+          <div class="d-block w-100">
+            <p class="alert {{ session('class') }}">{!! session('message') !!}</p>
+          </div>
+        @endif
           <form method="POST" class="inscricaoCurso" id="agendamentoStore">
             @csrf
             <h5>Informações de contato</h5>
@@ -162,9 +167,9 @@
                   class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}"
                   required
                 >
-                  <option value="" selected>Selecione a regional</option>
+                  <option value="">Selecione a regional</option>
                   @foreach($regionais as $regional)
-                    <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional ? 'selected' : '' }}>{{ $regional->regional }}</option>
+                    <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
                   @endforeach 
                 </select>
                 @if($errors->has('idregional'))
@@ -181,7 +186,6 @@
                     id="datepicker"
                     name="dia"
                     placeholder="Selecione a regional"
-                    value="{{ old('dia') }}"
                     readonly
                     disabled
                     required

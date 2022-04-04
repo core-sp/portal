@@ -243,7 +243,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
 
     public function getDatasHorasLinkPlantaoAjax($id)
     {
-        $plantao = PlantaoJuridico::findOrFail($id);
+        $plantao = PlantaoJuridico::find($id);
         if(isset($plantao))
         {
             $inicial = Carbon::parse($plantao->dataInicial);

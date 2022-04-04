@@ -18,7 +18,7 @@ class AgendamentoBloqueioRequest extends FormRequest
     {
         $regional = isset(request()->idregional) ? $this->service->getById(request()->idregional) : null;
         $horarios = isset($regional->horariosage) ? $regional->horariosage : null;
-        $ageporhorario = isset($regional->ageporhorario) ? $regional->ageporhorario - 1 : null;
+        $ageporhorario = isset($regional->ageporhorario) ? $regional->ageporhorario - 1 : 1;
         
         return [
             'idregional' => 'required|exists:regionais,idregional',

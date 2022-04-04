@@ -80,17 +80,15 @@ class AgendamentoSiteController extends Controller
 
     public function store(/*AgendamentoSiteRequest*/AgendamentoUpdateRequest $request)
     {
-        // try{
-        //     $dados = $this->service->getService('Agendamento')->viewSite($this->service);
-        //     $regionais = $dados['regionais'];
-        //     $pessoas = $dados['pessoas'];
-        //     $servicos = $dados['servicos'];
-        // } catch (\Exception $e) {
-        //     \Log::error($e->getMessage());
-        //     abort(500, "Erro ao carregar os dados para o agendamento.");
-        // }
+        try{
+            $validated = $request->validated();
+            $message = $this->service->getService('Agendamento')->saveSite($validated);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao salvar os dados para criar o agendamento.");
+        }
 
-        $request->validated();
+        // $request->validated();
 
         // // Trabalhando com o formato de data Y-m-d por questões de padronização no banco de dados
         // $dia = date('Y-m-d', strtotime(str_replace('/', '-', $request->dia)));
@@ -99,7 +97,7 @@ class AgendamentoSiteController extends Controller
         // // Validação para evitar agendamento no passado
         // if($dia <= $diaAtual) {
         //     abort(500, 'Não é permitido criar agendamento no passado.');
-        // }
+    // }
 
         // // Limita em até um agendamento por CPF por dia/horário
         // if($this->agendamentoRepository->getCountAgendamentoPendenteByCpfDayHour($dia, $request->hora, $request->cpf) > 0) {
@@ -183,10 +181,8 @@ class AgendamentoSiteController extends Controller
         // $adendo = '<i>* As informações serão enviadas ao email cadastrado no formulário</i>';
 
         // Retorna view de agradecimento
-        return view('site.agradecimento')/*->with([
-            'agradece' => $agradece,
-            'adendo' => $adendo
-        ])*/;
+
+        return isset($message['message']) ? redirect(route('agendamentosite.formview'))->with($message) : view('site.agradecimento')->with($message);
     }
 
     public function cancelamento(AgendamentoSiteCancelamentoRequest $request)

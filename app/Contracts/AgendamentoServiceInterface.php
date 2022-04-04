@@ -20,6 +20,8 @@ interface AgendamentoServiceInterface {
 
     public function saveBloqueio($dados, $id = null);
 
+    public function saveSite($dados);
+
     public function delete($id);
 
     public function enviarEmail($id);

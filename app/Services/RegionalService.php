@@ -120,7 +120,7 @@ class RegionalService implements RegionalServiceInterface {
 
     public function getById($id)
     {
-        return Regional::findOrFail($id);
+        return Regional::find($id);
     }
 
     /**

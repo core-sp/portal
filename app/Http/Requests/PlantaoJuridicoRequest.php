@@ -17,8 +17,9 @@ class PlantaoJuridicoRequest extends FormRequest
     public function rules()
     {       
         $arrayHorasDatas = isset(request()->plantaoBloqueio) ? $this->service->getDatasHorasLinkPlantaoAjax(request()->plantaoBloqueio) : null;
-        $horarios = isset($arrayHorasDatas) ? implode(',', $arrayHorasDatas['horarios']) : null;
+        $horarios = isset($arrayHorasDatas) ? '|in:'.implode(',', $arrayHorasDatas['horarios']) : '';
         $datas = isset($arrayHorasDatas) ? $arrayHorasDatas['datas'] : [date('Y-m-d'), date('Y-m-d')];
+        unset($this->service);
 
         return [
             'qtd_advogados' => 'sometimes|required|regex:/^[0-9]{1}$/',
@@ -26,7 +27,7 @@ class PlantaoJuridicoRequest extends FormRequest
             'dataInicial' => request('qtd_advogados') == 0 ? '' : 'required|nullable|date|after:'.date('Y-m-d'),
             'dataFinal' => request('qtd_advogados') == 0 ? '' : 'required|nullable|date|after_or_equal:dataInicial',
             'plantaoBloqueio' => 'sometimes|required|exists:plantoes_juridicos,id',
-            'horariosBloqueio' => 'sometimes|required|array|in:'.$horarios,
+            'horariosBloqueio' => 'sometimes|required|array'.$horarios,
             'dataInicialBloqueio' => 'sometimes|required|date|after_or_equal:'.$datas[0].'|before_or_equal:'.$datas[1],
             'dataFinalBloqueio' => 'sometimes|required|date|after_or_equal:dataInicialBloqueio|before_or_equal:'.$datas[1],
         ];

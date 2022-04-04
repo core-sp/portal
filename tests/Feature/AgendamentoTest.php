@@ -1977,7 +1977,10 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
-        $this->post(route('agendamentobloqueios.store'), $bloqueio)->assertStatus(404);
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'idregional'
+        ]);
     }
 
     /** @test */
@@ -2192,7 +2195,10 @@ class AgendamentoTest extends TestCase
         $bloqueio->idregional = 5;
 
         $this->get(route('agendamentobloqueios.edit', $bloqueio->idagendamentobloqueio))->assertOk(); 
-        $this->put(route('agendamentobloqueios.update', $bloqueio->idagendamentobloqueio), $bloqueio->toArray())->assertStatus(404);
+        $this->put(route('agendamentobloqueios.update', $bloqueio->idagendamentobloqueio), $bloqueio->toArray())
+        ->assertSessionHasErrors([
+            'idregional'
+        ]);
     }
 
     /** @test */
