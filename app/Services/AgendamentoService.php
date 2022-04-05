@@ -333,24 +333,22 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return $tabela;
     }
 
-    private function validarStore($dados)
+    private function validarStore($dados, MediadorServiceInterface $service)
     {
         $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
-        $total = Agendamento::where('dia', $dia)
-            ->where('hora', $dados['hora'])
+        $agendamentos = Agendamento::where('dia', $dia)
             ->where('cpf', $dados['cpf'])
             ->whereNull('status')
-            ->count();
+            ->get();
+
+        $total = $agendamentos->where('hora', $dados['hora'])->count();
         if($total == 1)
             return [
                 'message' => 'Este CPF já possui um agendamento neste dia e horário',
                 'class' => 'alert-danger'
             ];
 
-        $total = Agendamento::where('dia', $dia)
-            ->where('cpf', $dados['cpf'])
-            ->whereNull('status')
-            ->count();
+        $total = $agendamentos->count();
         if($total >= 2)
             return [
                 'message' => 'É permitido apenas 2 agendamentos por cpf por dia',
@@ -359,7 +357,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         $total = Agendamento::where('cpf', $dados['cpf'])
             ->where('status', Agendamento::STATUS_NAO_COMPARECEU)
-            ->whereBetween('dia',[Carbon::today()->subDays(90), date('Y-m-d')])
+            ->whereBetween('dia',[Carbon::today()->subDays(90)->format('Y-m-d'), date('Y-m-d')])
             ->count();
         if($total >= 3)
             return [
@@ -368,15 +366,22 @@ class AgendamentoService implements AgendamentoServiceInterface {
                 'class' => 'alert-danger'
             ];
 
-        // if($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO)
-        // {
-        //     $total = Agendamento::where('cpf', $dados['cpf'])
-        //         ->where('idregional', $dados['idregional'])
-        //         ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-        //         ->whereNull('status')
-        //         ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
-        //         ->count();
-        // }
+        if($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO)
+        {
+            $regional = $service->getService('Regional')->getById($dados['idregional']);
+            $plantao = $regional->plantaoJuridico;
+            $total = $regional->agendamentos()
+                ->where('cpf', $dados['cpf'])
+                ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+                ->whereNull('status')
+                ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
+                ->count();
+            if($total == 1)
+                return [
+                    'message' => 'Durante o período deste plantão jurídico é permitido apenas 1 agendamento por cpf',
+                    'class' => 'alert-danger'
+                ];
+        }
 
         $dados['dia'] = $dia;
         $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE);
@@ -580,9 +585,9 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return null;
     }
 
-    public function saveSite($dados)
+    public function saveSite($dados, MediadorServiceInterface $service)
     {
-        $valid = $this->validarStore($dados);
+        $valid = $this->validarStore($dados, $service);
         if(isset($valid['message']))
             return $valid;
 

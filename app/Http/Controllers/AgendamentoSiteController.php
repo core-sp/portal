@@ -82,7 +82,7 @@ class AgendamentoSiteController extends Controller
     {
         try{
             $validated = $request->validated();
-            $message = $this->service->getService('Agendamento')->saveSite($validated);
+            $message = $this->service->getService('Agendamento')->saveSite($validated, $this->service);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao salvar os dados para criar o agendamento.");
@@ -182,7 +182,9 @@ class AgendamentoSiteController extends Controller
 
         // Retorna view de agradecimento
 
-        return isset($message['message']) ? redirect(route('agendamentosite.formview'))->with($message) : view('site.agradecimento')->with($message);
+        return isset($message['message']) ? 
+            redirect(route('agendamentosite.formview'))->with($message)->withInput($request->all()) : 
+            view('site.agradecimento')->with($message);
     }
 
     public function cancelamento(AgendamentoSiteCancelamentoRequest $request)
@@ -228,35 +230,35 @@ class AgendamentoSiteController extends Controller
         }
     }
 
-    public function permiteAgendamento($dia, $hora, $idregional)
-    {
-        // Recupera os agendamentos de acordo com dia/horário/regional
-        $agendamentos = $this->agendamentoRepository->getAgendamentoPendeteByDiaHoraRegional($dia, $hora, $idregional);
+    // public function permiteAgendamento($dia, $hora, $idregional)
+    // {
+    //     // Recupera os agendamentos de acordo com dia/horário/regional
+    //     $agendamentos = $this->agendamentoRepository->getAgendamentoPendeteByDiaHoraRegional($dia, $hora, $idregional);
 
-        // Se contagem for zero, não há nenhum agendamento no dado dia/horário/regional
-        if($agendamentos->count() == 0) {
+    //     // Se contagem for zero, não há nenhum agendamento no dado dia/horário/regional
+    //     if($agendamentos->count() == 0) {
 
-            // Não tendo nenhum agendamento, é necessário realizar uma query para verificar o número de agendamentos por horário da regional
-            // Se o número de agendamentos por horário da regional for maior que zero, um agendamento pode ser criado, caso contrário não
-            return $this->service->getService('Regional')->getAgeporhorarioById($idregional) > 0;
-        }
-        else {
+    //         // Não tendo nenhum agendamento, é necessário realizar uma query para verificar o número de agendamentos por horário da regional
+    //         // Se o número de agendamentos por horário da regional for maior que zero, um agendamento pode ser criado, caso contrário não
+    //         return $this->service->getService('Regional')->getAgeporhorarioById($idregional) > 0;
+    //     }
+    //     else {
 
-            // A query do agendamento traz junto informação de sua região. Com isso verificamos se a contagem de agendamento no dado dia/horário/regional
-            // é menor que o número de agendamentos por horário da regional, se sim o agendamento pode ser criado, caso contrário não       
-            return $agendamentos->count() < $agendamentos->first()->regional->ageporhorario;
-        }
-    }
+    //         // A query do agendamento traz junto informação de sua região. Com isso verificamos se a contagem de agendamento no dado dia/horário/regional
+    //         // é menor que o número de agendamentos por horário da regional, se sim o agendamento pode ser criado, caso contrário não       
+    //         return $agendamentos->count() < $agendamentos->first()->regional->ageporhorario;
+    //     }
+    // }
 
-    protected function bloqueioPorFalta($cpf)
-    {
-        return $this->agendamentoRepository->getCountAgendamentoNaoCompareceuByCpf($cpf) >= 3;
-    }
+    // protected function bloqueioPorFalta($cpf)
+    // {
+    //     return $this->agendamentoRepository->getCountAgendamentoNaoCompareceuByCpf($cpf) >= 3;
+    // }
 
-    public function limiteCPF($dia, $cpf)
-    {
-        return $this->agendamentoRepository->getCountAgendamentoPendenteByCpfDay($dia, $cpf) >= 2;
-    }
+    // public function limiteCPF($dia, $cpf)
+    // {
+    //     return $this->agendamentoRepository->getCountAgendamentoPendenteByCpfDay($dia, $cpf) >= 2;
+    // }
 
     // public function checaHorariosMarcados($dia, $idregional)
     // {
