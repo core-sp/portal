@@ -209,15 +209,16 @@ $(document).ready(function(){
 	// 		$('#popup-campanha').modal('show');
 	// 	});
 	// }
-	$(window).on('load', function(){
-		$('#popup-campanha').modal('show');
-	});
-	$('#popup-campanha').on('hidden.bs.modal', function(){
-		$('#video-campanha').get(0).pause();
-	});
-	$('#video-campanha').on('ended', function(){
-		$('#popup-campanha').modal('hide');
-	});
+
+	// $(window).on('load', function(){
+	// 	$('#popup-campanha').modal('show');
+	// });
+	// $('#popup-campanha').on('hidden.bs.modal', function(){
+	// 	$('#video-campanha').get(0).pause();
+	// });
+	// $('#video-campanha').on('ended', function(){
+	// 	$('#popup-campanha').modal('hide');
+	// });
 });
 
 // Lightbox
