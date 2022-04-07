@@ -25,13 +25,15 @@ interface RegionalServiceInterface {
      * 
     */
 
-    public function getRegionaisAgendamento();
+    // public function getRegionaisAgendamento();
 
-    public function getAgeporhorarioById($id);
+    // public function getAgeporhorarioById($id);
 
-    public function getHorariosAgendamento($id, $dia);
+    // public function getHorariosAgendamento($id, $dia);
 
-    public function getToList();
+    // public function getToList();
 
     public function getByName($regional);
+
+    public function getRegionais();
 }

@@ -277,38 +277,38 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         return $resultado;
     }
 
-    public function getPlantaoAtivoComBloqueioPorRegional($idregional)
-    {
-        return PlantaoJuridico::with('bloqueios')
-        ->where('idregional', $idregional)
-        ->where('qtd_advogados', '>', 0)
-        ->first();
-    }
+    // public function getPlantaoAtivoComBloqueioPorRegional($idregional)
+    // {
+    //     return PlantaoJuridico::with('bloqueios')
+    //     ->where('idregional', $idregional)
+    //     ->where('qtd_advogados', '>', 0)
+    //     ->first();
+    // }
 
-    public function validacaoAgendarPlantao($plantao, $diaEscolhido, $agendados = null, $horaEscolhida = null)
-    {
-        $inicial = Carbon::parse($plantao->dataInicial);
-        $final = Carbon::parse($plantao->dataFinal);
-        $dia = Carbon::parse($diaEscolhido);
-        $hoje = Carbon::today();
+    // public function validacaoAgendarPlantao($plantao, $diaEscolhido, $agendados = null, $horaEscolhida = null)
+    // {
+    //     $inicial = Carbon::parse($plantao->dataInicial);
+    //     $final = Carbon::parse($plantao->dataFinal);
+    //     $dia = Carbon::parse($diaEscolhido);
+    //     $hoje = Carbon::today();
 
-        if($dia->lt($inicial) || $dia->gt($final) || $dia->lte($hoje))
-            return false;
+    //     if($dia->lt($inicial) || $dia->gt($final) || $dia->lte($hoje))
+    //         return false;
 
-        if(isset($agendados) && !isset($horaEscolhida))
-        {
-            $diasLotados = $this->getDiasSeLotado($agendados, $plantao);
-            if(in_array([$dia->month, $dia->day, 'lotado'], $diasLotados))
-                return false;
-        }
+    //     if(isset($agendados) && !isset($horaEscolhida))
+    //     {
+    //         $diasLotados = $this->getDiasSeLotado($agendados, $plantao);
+    //         if(in_array([$dia->month, $dia->day, 'lotado'], $diasLotados))
+    //             return false;
+    //     }
 
-        if(isset($agendados) && isset($horaEscolhida))
-        {
-            $horarios = $this->removeHorariosSeLotado($agendados, $plantao, $dia);
-            if(!in_array($horaEscolhida, $horarios))
-                return false;
-        }
+    //     if(isset($agendados) && isset($horaEscolhida))
+    //     {
+    //         $horarios = $this->removeHorariosSeLotado($agendados, $plantao, $dia);
+    //         if(!in_array($horaEscolhida, $horarios))
+    //             return false;
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 }

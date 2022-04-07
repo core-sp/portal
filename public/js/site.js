@@ -20,13 +20,13 @@ $(document).ready(function(){
 			}
 		}
 	});
-	$('.protocoloInput').mask('ZZZZZZ', {
-	  translation: {
-		  'Z': {
-			pattern: /[A-Za-z0-9]/
-		  }
-	  }
-	});
+	// $('.protocoloInput').mask('ZZZZZZ', {
+	//   translation: {
+	// 	  'Z': {
+	// 		pattern: /[A-Za-z0-9]/
+	// 	  }
+	//   }
+	// });
 	$('.telefoneInput').mask('(00) 0000-00009').focusout(function (event) {  
 		var target, phone, element;
 		target = (event.currentTarget) ? event.currentTarget : event.srcElement;

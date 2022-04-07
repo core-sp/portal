@@ -47,7 +47,7 @@
           <p>Insira o protocolo para conferir as informações de seu agendamento.</p>  
         </div>
         <div class="mt-2">
-          <form method="GET" action="/agendamento-consulta/busca" class="consultaAgendamento">
+          <form method="GET" action="{{ route('agendamentosite.consulta') }}" class="consultaAgendamento">
             <div class="form-row">
               <div class="col-md-6">
                 <label for="protocolo">Protocolo</label>
@@ -56,16 +56,25 @@
                     <span class="input-group-text">AGE-</span>
                   </div>
                   <input type="text"
-                    class="form-control protocoloInput {{ $errors->has('protocolo') ? 'is-invalid' : '' }}"
+                    class="form-control {{-- protocoloInput --}} {{ $errors->has('protocolo') ? 'is-invalid' : '' }}"
                     name="protocolo"
                     id="protocolo"
                     minlength="6"
+                    maxlength="6"
                     size="6"
-                    placeholder="XXXXXX" />
-                  <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary">Consultar</button>
+                    pattern="[A-Za-z0-9]{6}" title="Somente letras não acentuadas e números"
+                    required
+                    placeholder="XXXXXX" 
+                  />
+                  @if($errors->has('protocolo'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('protocolo') }}
                   </div>
+                  @endif
                 </div> 
+                <div class="float-left mt-3">
+                  <button type="submit" class="btn btn-primary">Consultar</button>
+                </div>
               </div>
             </div>
           </form>
@@ -73,7 +82,7 @@
 	  </div>
     </div>
   </div>
-  @if(isset($busca))
+  @if(request()->query('protocolo'))
   <div class="container">
     @if(isset($resultado))
     <div class="row mt-4 mb-2">
@@ -86,7 +95,7 @@
         <strong>Cidade:</strong> {{ $resultado->regional->regional }}<br />
         <strong>Endereço:</strong> {{ $resultado->regional->endereco }}, {{ $resultado->regional->numero }} - {{ $resultado->regional->complemento }}<br />
         <strong>Serviço:</strong> {{ $resultado->tiposervico }}<br /><br />
-        --<br />
+        <br />
         @if($resultado->status != 'Cancelado')
         Para cancelar o agendamento, confirme o CPF abaixo e clique em Cancelar:
         @else
@@ -99,25 +108,24 @@
       <div class="col-md-6">
         <form method="POST" class="mt-2">
         @csrf
-        {{ method_field('PUT') }}
-        <input type="hidden" value="{{ $resultado->protocolo }}" name="protocolo" />
-        <input type="hidden" value="{{ $resultado->idagendamento }}" name="idagendamento" />
-        <div class="input-group">
+        @method('PUT')
+          <div class="input-group">
             <input type="text"
               class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"  
               name="cpf"
               id="cpf"
+              required
               placeholder="000.000.000-00"
-              />
-            <div class="input-group-append">
-              <button type="submit" class="btn btn-danger">Cancelar</button>
-            </div>
+            />
             @if($errors->has('cpf'))
             <div class="invalid-feedback">
               {{ $errors->first('cpf') }}
             </div>
             @endif
-        </div>
+          </div>
+          <div class="float-left mt-3">
+            <button type="submit" class="btn btn-danger">Cancelar</button>
+          </div>
         </form>
       </div>
     </div>

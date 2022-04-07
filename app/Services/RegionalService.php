@@ -134,31 +134,31 @@ class RegionalService implements RegionalServiceInterface {
      * Método retorna regionais para atendimento, incluindo unidade da Alameda Santos. Ordenando por regionais e 
      * renomeando "São Paulo" para facilitar vizualização do Representante Comercial.
      */
-    public function getRegionaisAgendamento()
-    {
-        $regionaisAtendimento = Regional::select('idregional', 'regional', 'prefixo')
-            ->orderByRaw('case prefixo WHEN "SEDE" THEN 0 ELSE 1 END, idregional ASC')
-            ->get();
+    // public function getRegionaisAgendamento()
+    // {
+    //     $regionaisAtendimento = Regional::select('idregional', 'regional', 'prefixo')
+    //         ->orderByRaw('case prefixo WHEN "SEDE" THEN 0 ELSE 1 END, idregional ASC')
+    //         ->get();
 
-        $regionaisAtendimento[0]->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
+    //     $regionaisAtendimento[0]->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
 
-        return $regionaisAtendimento;
-    }
+    //     return $regionaisAtendimento;
+    // }
 
-    public function getAgeporhorarioById($id)
-    {
-        return Regional::findOrFail($id)->ageporhorario;
-    }
+    // public function getAgeporhorarioById($id)
+    // {
+    //     return Regional::findOrFail($id)->ageporhorario;
+    // }
 
-    public function getHorariosAgendamento($id, $dia)
-    {
-        return Regional::find($id)->horariosDisponiveis($dia);
-    }
+    // public function getHorariosAgendamento($id, $dia)
+    // {
+    //     return Regional::find($id)->horariosDisponiveis($dia);
+    // }
 
-    public function getToList()
-    {
-        return Regional::select('idregional', 'regional')->get();
-    }
+    // public function getToList()
+    // {
+    //     return Regional::select('idregional', 'regional')->get();
+    // }
 
     public function getByName($regional)
     {

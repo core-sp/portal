@@ -2,33 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use Redirect;
-use App\Regional;
-use App\Rules\Cpf;
-use App\Agendamento;
-use App\Events\ExternoEvent;
+// use Redirect;
+// use App\Regional;
+// use App\Rules\Cpf;
+// use App\Agendamento;
+// use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Helper;
-use App\Mail\AgendamentoMailGuest;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
-use App\Repositories\AgendamentoRepository;
-use App\Http\Requests\AgendamentoSiteRequest;
+// use App\Http\Controllers\Helper;
+// use App\Mail\AgendamentoMailGuest;
+// use Illuminate\Support\Facades\Mail;
+// use Illuminate\Support\Facades\Validator;
+// use App\Repositories\AgendamentoRepository;
+// use App\Http\Requests\AgendamentoSiteRequest;
 use App\Http\Requests\AgendamentoUpdateRequest;
 // use App\Repositories\AgendamentoBloqueioRepository;
-use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
+// use App\Http\Requests\AgendamentoSiteCancelamentoRequest;
 use App\Contracts\MediadorServiceInterface;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Request as IlluminateRequest;
+// use Carbon\Carbon;
+// use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class AgendamentoSiteController extends Controller
 {
-    private $agendamentoRepository;
+    // private $agendamentoRepository;
     // private $agendamentoBloqueioRepository;
     private $service;
 
-    public function __construct(AgendamentoRepository $agendamentoRepository, /*AgendamentoBloqueioRepository $agendamentoBloqueioRepository, */MediadorServiceInterface $service) {
-        $this->agendamentoRepository = $agendamentoRepository;
+    public function __construct(/*AgendamentoRepository $agendamentoRepository, AgendamentoBloqueioRepository $agendamentoBloqueioRepository, */MediadorServiceInterface $service) {
+        // $this->agendamentoRepository = $agendamentoRepository;
         // $this->agendamentoBloqueioRepository = $agendamentoBloqueioRepository;
         $this->service = $service;
     }
@@ -60,22 +60,29 @@ class AgendamentoSiteController extends Controller
         return view('site.agendamento-consulta');
     }
 
-    public function consulta()
+    public function consulta(AgendamentoUpdateRequest $request)
     {
-        $protocolo = IlluminateRequest::input('protocolo');
-
-        if (!empty($protocolo)) {
-            $busca = true;
-        } 
-        else {
-            $busca = false;
+        try{
+            $validated = $request->validated();
+            $resultado = $this->service->getService('Agendamento')->consultaSite($validated);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao consultar o protocolo do agendamento.");
         }
+        // $protocolo = IlluminateRequest::input('protocolo');
 
-        $protocolo = 'AGE-'.$protocolo;
+        // if (!empty($protocolo)) {
+        //     $busca = true;
+        // } 
+        // else {
+        //     $busca = false;
+        // }
+
+        // $protocolo = 'AGE-'.$protocolo;
         
-        $resultado = $this->agendamentoRepository->getToConsulta($protocolo);
+        // $resultado = $this->agendamentoRepository->getToConsulta($protocolo);
 
-        return view('site.agendamento-consulta', compact('resultado', 'busca'));
+        return view('site.agendamento-consulta', compact('resultado'));
     }
 
     public function store(/*AgendamentoSiteRequest*/AgendamentoUpdateRequest $request)
@@ -187,47 +194,57 @@ class AgendamentoSiteController extends Controller
             view('site.agradecimento')->with($message);
     }
 
-    public function cancelamento(AgendamentoSiteCancelamentoRequest $request)
+    public function cancelamento(/*AgendamentoSiteCancelamentoRequest*/AgendamentoUpdateRequest $request)
     {
-        $request->validated();
-
-        $agendamento = $this->agendamentoRepository->getById($request->idagendamento);
-
-        // Checagem se o CPF do Agendamentoé o mesmo fornecido, caso não seja, é retornada uma mensagem de erro
-        if($agendamento->cpf != $request->cpf) {
-            return redirect('/agendamento-consulta')
-                ->with('message', '<i class="icon fa fa-ban"></i>O CPF informado não corresponde ao protocolo. Por favor, pesquise novamente o agendamento')
-                ->with('class', 'alert-danger');
-        } 
-        else {
-            $now = date('Y-m-d');
-
-            // Agendamento deve ser cancelado com antecedência, não é permitido cancelar no mesmo dia do Agendamento
-            if($now < $agendamento->dia) {
-                $update = $this->agendamentoRepository->update($agendamento->idagendamento, ['status' => Agendamento::STATUS_CANCELADO], $agendamento);
-
-                if(!$update) {
-                    abort(500);
-                }
-                    
-                // Gera evento de agendamento
-                $string = $agendamento->nome . " (CPF: " . $agendamento->cpf . ")";
-                $string .= " *cancelou* atendimento em *" . $agendamento->regional->regional;
-                $string .= "* no dia " . onlyDate($agendamento->dia);
-                event(new ExternoEvent($string));
-
-                // Gera mensagem de agradecimento
-                $agradece = "Agendamento cancelado com sucesso!";
-
-                return view('site.agradecimento')->with('agradece', $agradece);
-            } 
-            // Caso cancelamento seja no mesmo dia, uma mensagem de erro é retornada
-            else {
-                return redirect('/agendamento-consulta')
-                    ->with('message', '<i class="icon fa fa-ban"></i>Não é possível cancelar o agendamento no dia do atendimento')
-                    ->with('class', 'alert-danger');
-            }
+        try{
+            $validated = $request->validated();
+            $message = $this->service->getService('Agendamento')->cancelamentoSite($validated);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao cancelar o agendamento.");
         }
+        // $request->validated();
+
+        // $agendamento = $this->agendamentoRepository->getById($request->idagendamento);
+
+        // // Checagem se o CPF do Agendamentoé o mesmo fornecido, caso não seja, é retornada uma mensagem de erro
+        // if($agendamento->cpf != $request->cpf) {
+        //     return redirect('/agendamento-consulta')
+        //         ->with('message', '<i class="icon fa fa-ban"></i>O CPF informado não corresponde ao protocolo. Por favor, pesquise novamente o agendamento')
+        //         ->with('class', 'alert-danger');
+        // } 
+        // else {
+        //     $now = date('Y-m-d');
+
+        //     // Agendamento deve ser cancelado com antecedência, não é permitido cancelar no mesmo dia do Agendamento
+        //     if($now < $agendamento->dia) {
+        //         $update = $this->agendamentoRepository->update($agendamento->idagendamento, ['status' => Agendamento::STATUS_CANCELADO], $agendamento);
+
+        //         if(!$update) {
+        //             abort(500);
+        //         }
+                    
+        //         // Gera evento de agendamento
+        //         $string = $agendamento->nome . " (CPF: " . $agendamento->cpf . ")";
+        //         $string .= " *cancelou* atendimento em *" . $agendamento->regional->regional;
+        //         $string .= "* no dia " . onlyDate($agendamento->dia);
+        //         event(new ExternoEvent($string));
+
+        //         // Gera mensagem de agradecimento
+        //         $agradece = "Agendamento cancelado com sucesso!";
+
+        //         return view('site.agradecimento')->with('agradece', $agradece);
+        //     } 
+        //     // Caso cancelamento seja no mesmo dia, uma mensagem de erro é retornada
+        //     else {
+                // return redirect('/agendamento-consulta')
+                //     ->with('message', '<i class="icon fa fa-ban"></i>Não é possível cancelar o agendamento no dia do atendimento')
+                //     ->with('class', 'alert-danger');
+            // }
+        // }
+        return isset($message['message']) ? 
+            redirect(route('agendamentosite.consulta'))->with($message)->withInput($request->all()) : 
+            view('site.agradecimento')->with('agradece', $message);
     }
 
     // public function permiteAgendamento($dia, $hora, $idregional)

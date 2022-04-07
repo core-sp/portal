@@ -122,57 +122,57 @@ class AgendamentoRepository
     //         ->count();
     // }
 
-    public function getCountAgendamentoNaoCompareceuByCpf($cpf)
-    {
-        return Agendamento::where('cpf', $cpf)
-            ->where('status', Agendamento::STATUS_NAO_COMPARECEU)
-            ->whereBetween('dia',[date('Y-m-d', strtotime('-90 days')), date('Y-m-d')])
-            ->count();
-    }
+    // public function getCountAgendamentoNaoCompareceuByCpf($cpf)
+    // {
+    //     return Agendamento::where('cpf', $cpf)
+    //         ->where('status', Agendamento::STATUS_NAO_COMPARECEU)
+    //         ->whereBetween('dia',[date('Y-m-d', strtotime('-90 days')), date('Y-m-d')])
+    //         ->count();
+    // }
 
-    public function getCountAgendamentoPendenteByCpfDay($dia, $cpf)
-    {
-        return Agendamento::where('dia', $dia)
-            ->where('cpf', $cpf)
-            ->whereNull('status')
-            ->count();
-    }
+    // public function getCountAgendamentoPendenteByCpfDay($dia, $cpf)
+    // {
+    //     return Agendamento::where('dia', $dia)
+    //         ->where('cpf', $cpf)
+    //         ->whereNull('status')
+    //         ->count();
+    // }
 
-    public function getCountAgendamentoPendenteByCpfDayHour($dia, $hora, $cpf)
-    {
-        return Agendamento::where('dia', $dia)
-            ->where('hora', $hora)
-            ->where('cpf', $cpf)
-            ->whereNull('status')
-            ->count();
-    }
+    // public function getCountAgendamentoPendenteByCpfDayHour($dia, $hora, $cpf)
+    // {
+    //     return Agendamento::where('dia', $dia)
+    //         ->where('hora', $hora)
+    //         ->where('cpf', $cpf)
+    //         ->whereNull('status')
+    //         ->count();
+    // }
     
-    public function getAgendamentoPendeteByDiaHoraRegional($dia, $hora, $idregional)
-    {
-        return Agendamento::where('dia', $dia)
-            ->where('hora', $hora)
-            ->where('idregional', $idregional)
-            ->whereNull('status')
-            ->get();
-    }
+    // public function getAgendamentoPendeteByDiaHoraRegional($dia, $hora, $idregional)
+    // {
+    //     return Agendamento::where('dia', $dia)
+    //         ->where('hora', $hora)
+    //         ->where('idregional', $idregional)
+    //         ->whereNull('status')
+    //         ->get();
+    // }
 
-    public function getAgendamentoPendenteByDiaRegional($dia, $idregional)
-    {
-        return Agendamento::where('dia', $dia)
-            ->where('idregional', $idregional)
-            ->whereNull('status')
-            ->get();
-    }
+    // public function getAgendamentoPendenteByDiaRegional($dia, $idregional)
+    // {
+    //     return Agendamento::where('dia', $dia)
+    //         ->where('idregional', $idregional)
+    //         ->whereNull('status')
+    //         ->get();
+    // }
 
-    public function getAgendamentoPendenteByMesRegional($idregional)
-    {
-        return Agendamento::select('dia', DB::raw('count(1) as total'))        
-            ->whereBetween('dia',[date('Y-m-d', strtotime('+1 day')), date('Y-m-d', strtotime('+1 month'))])
-            ->where('idregional', $idregional)
-            ->whereNull('status')
-            ->groupBy('dia')
-            ->get();
-    }
+    // public function getAgendamentoPendenteByMesRegional($idregional)
+    // {
+    //     return Agendamento::select('dia', DB::raw('count(1) as total'))        
+    //         ->whereBetween('dia',[date('Y-m-d', strtotime('+1 day')), date('Y-m-d', strtotime('+1 month'))])
+    //         ->where('idregional', $idregional)
+    //         ->whereNull('status')
+    //         ->groupBy('dia')
+    //         ->get();
+    // }
 
     public function getToConsulta($protocolo)
     {
@@ -181,10 +181,10 @@ class AgendamentoRepository
             ->first();
     }
 
-    public function checkProtocol($protocolo)
-    {
-        return  Agendamento::where('protocolo', $protocolo)->count();
-    }
+    // public function checkProtocol($protocolo)
+    // {
+    //     return  Agendamento::where('protocolo', $protocolo)->count();
+    // }
    
     // public function getToTableFilter($mindia, $maxdia, $regional, $status, $servico)
     // {
@@ -230,41 +230,41 @@ class AgendamentoRepository
      * =======================================================================================================
      */
 
-    public function getPlantaoJuridicoByRegionalAndDia($regional, $dia)
-    {
-        return Agendamento::select('hora', DB::raw('count(*) as total'))
-            ->where('idregional', $regional)
-            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-            ->whereNull('status')
-            ->where('dia', $dia)
-            ->groupBy('hora')
-            ->orderby('hora')
-            ->get();
-    }
+    // public function getPlantaoJuridicoByRegionalAndDia($regional, $dia)
+    // {
+    //     return Agendamento::select('hora', DB::raw('count(*) as total'))
+    //         ->where('idregional', $regional)
+    //         ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+    //         ->whereNull('status')
+    //         ->where('dia', $dia)
+    //         ->groupBy('hora')
+    //         ->orderby('hora')
+    //         ->get();
+    // }
 
-    public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao)
-    {
-        return Agendamento::where('cpf', $cpf)
-            ->where('idregional', $regional)
-            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-            ->whereNull('status')
-            ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
-            ->count();
-    }
+    // public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao)
+    // {
+    //     return Agendamento::where('cpf', $cpf)
+    //         ->where('idregional', $regional)
+    //         ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+    //         ->whereNull('status')
+    //         ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
+    //         ->count();
+    // }
 
-    public function getPlantaoJuridicoPorPeriodo($regional, $dataInicial, $dataFinal)
-    {
-        $agendados = array();
-        $inicial = Carbon::parse($dataInicial);
-        $final = Carbon::parse($dataFinal);
+    // public function getPlantaoJuridicoPorPeriodo($regional, $dataInicial, $dataFinal)
+    // {
+    //     $agendados = array();
+    //     $inicial = Carbon::parse($dataInicial);
+    //     $final = Carbon::parse($dataFinal);
 
-        for($dia = $inicial; $dia->lte($final); $dia->addDay())
-        {
-            $agendado = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia->format('Y-m-d'));
-            if($agendado->isNotEmpty())
-                $agendados[$dia->format('Y-m-d')] = $agendado;
-        }
+    //     for($dia = $inicial; $dia->lte($final); $dia->addDay())
+    //     {
+    //         $agendado = $this->getPlantaoJuridicoByRegionalAndDia($regional, $dia->format('Y-m-d'));
+    //         if($agendado->isNotEmpty())
+    //             $agendados[$dia->format('Y-m-d')] = $agendado;
+    //     }
             
-        return $agendados;
-    }
+    //     return $agendados;
+    // }
 }

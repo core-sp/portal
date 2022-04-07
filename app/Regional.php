@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\Repositories\AgendamentoBloqueioRepository;
+// use App\Repositories\AgendamentoBloqueioRepository;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -47,22 +47,22 @@ class Regional extends Model
         return [];
     }
 
-    // Será removido
-    public function horariosDisponiveis($dia)
-    {
-        $horas = $this->horariosAge();
-        $bloqueios = (new AgendamentoBloqueioRepository)->getByRegionalAndDay($this->idregional, $dia);
-        if($bloqueios && $horas) {
-            foreach($bloqueios as $bloqueio) {
-                foreach($horas as $key => $hora) {
-                    if($hora >= $bloqueio->horainicio && $hora <= $bloqueio->horatermino) {
-                        unset($horas[$key]);
-                    }
-                }
-            }
-        }
-        return $horas;
-    }
+    // // Será removido
+    // public function horariosDisponiveis($dia)
+    // {
+    //     $horas = $this->horariosAge();
+    //     $bloqueios = (new AgendamentoBloqueioRepository)->getByRegionalAndDay($this->idregional, $dia);
+    //     if($bloqueios && $horas) {
+    //         foreach($bloqueios as $bloqueio) {
+    //             foreach($horas as $key => $hora) {
+    //                 if($hora >= $bloqueio->horainicio && $hora <= $bloqueio->horatermino) {
+    //                     unset($horas[$key]);
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return $horas;
+    // }
 
     private function getAllBloqueios()
     {

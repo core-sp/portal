@@ -36,42 +36,42 @@ class Agendamento extends Model
         return $mensagem;
     }
 
-    // vai ser removido
-    public static function status()
-    { 
-        return [
-            Agendamento::STATUS_COMPARECEU,
-            Agendamento::STATUS_NAO_COMPARECEU,
-            Agendamento::STATUS_CANCELADO
-        ];
-    }
+    // // vai ser removido
+    // public static function status()
+    // { 
+    //     return [
+    //         Agendamento::STATUS_COMPARECEU,
+    //         Agendamento::STATUS_NAO_COMPARECEU,
+    //         Agendamento::STATUS_CANCELADO
+    //     ];
+    // }
 
-    // vai ser removido
-    public static function servicos()
-    {
-        return [
-            Agendamento::SERVICOS_ATUALIZACAO_DE_CADASTRO,
-            Agendamento::SERVICOS_CANCELAMENTO_DE_REGISTRO,
-            Agendamento::SERVICOS_PLANTAO_JURIDICO,
-            // Agendamento::SERVICOS_REFIS,
-            Agendamento::SERVICOS_REGISTRO_INICIAL,
-            Agendamento::SERVICOS_OUTROS
-        ];
-    }
+    // // vai ser removido
+    // public static function servicos()
+    // {
+    //     return [
+    //         Agendamento::SERVICOS_ATUALIZACAO_DE_CADASTRO,
+    //         Agendamento::SERVICOS_CANCELAMENTO_DE_REGISTRO,
+    //         Agendamento::SERVICOS_PLANTAO_JURIDICO,
+    //         // Agendamento::SERVICOS_REFIS,
+    //         Agendamento::SERVICOS_REGISTRO_INICIAL,
+    //         Agendamento::SERVICOS_OUTROS
+    //     ];
+    // }
 
-    // vai ser removido
-    public static function servicosCompletos()
-    {
-        $resultado = array();
+    // // vai ser removido
+    // public static function servicosCompletos()
+    // {
+    //     $resultado = array();
 
-        foreach(Agendamento::servicos() as $servico) {
-            foreach(Agendamento::TIPOS_PESSOA as $tipoPessoa) {
-                array_push($resultado, $servico . " para " . $tipoPessoa);
-            }
-        }
+    //     foreach(Agendamento::servicos() as $servico) {
+    //         foreach(Agendamento::TIPOS_PESSOA as $tipoPessoa) {
+    //             array_push($resultado, $servico . " para " . $tipoPessoa);
+    //         }
+    //     }
 
-        return $resultado;
-    }
+    //     return $resultado;
+    // }
 
     public function regional()
     {

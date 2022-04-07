@@ -22,6 +22,10 @@ interface AgendamentoServiceInterface {
 
     public function saveSite($dados, MediadorServiceInterface $service);
 
+    public function consultaSite($dados);
+
+    public function cancelamentoSite($dados);
+
     public function delete($id);
 
     public function enviarEmail($id);
@@ -38,10 +42,10 @@ interface AgendamentoServiceInterface {
 
     // PLANTÃO JURÍDICO - melhorar quando refatorar AgendamentoSite
 
-    public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao);
+    // public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao);
 
     // -----------------------------------------------------------------
 
     // Momentaneo até refatorar AgendamentoSite
-    public function getByRegional($idregional);
+    // public function getByRegional($idregional);
 }

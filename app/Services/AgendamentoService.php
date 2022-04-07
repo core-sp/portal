@@ -344,14 +344,14 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $total = $agendamentos->where('hora', $dados['hora'])->count();
         if($total == 1)
             return [
-                'message' => 'Este CPF já possui um agendamento neste dia e horário',
+                'message' => '<i class="icon fa fa-ban"></i>Este CPF já possui um agendamento neste dia e horário',
                 'class' => 'alert-danger'
             ];
 
         $total = $agendamentos->count();
         if($total >= 2)
             return [
-                'message' => 'É permitido apenas 2 agendamentos por cpf por dia',
+                'message' => '<i class="icon fa fa-ban"></i>É permitido apenas 2 agendamentos por cpf por dia',
                 'class' => 'alert-danger'
             ];
 
@@ -361,7 +361,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ->count();
         if($total >= 3)
             return [
-                'message' => 'Agendamento bloqueado por excesso de falta nos últimos 90 dias. 
+                'message' => '<i class="icon fa fa-ban"></i>Agendamento bloqueado por excesso de falta nos últimos 90 dias. 
                     <br>Favor entrar em contato com o Core-SP para regularizar o agendamento.',
                 'class' => 'alert-danger'
             ];
@@ -378,7 +378,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
                 ->count();
             if($total == 1)
                 return [
-                    'message' => 'Durante o período deste plantão jurídico é permitido apenas 1 agendamento por cpf',
+                    'message' => '<i class="icon fa fa-ban"></i>Durante o período deste plantão jurídico é permitido apenas 1 agendamento por cpf',
                     'class' => 'alert-danger'
                 ];
         }
@@ -609,6 +609,45 @@ class AgendamentoService implements AgendamentoServiceInterface {
         ];
     }
 
+    public function consultaSite($dados)
+    {
+        $protocolo = 'AGE-'.strtoupper($dados['protocolo']);
+
+        return Agendamento::with('regional')
+            ->where('protocolo', $protocolo)
+            ->where('dia', '>=', date('Y-m-d'))
+            ->first();
+    }
+
+    public function cancelamentoSite($dados)
+    {
+        $protocolo = 'AGE-'.strtoupper($dados['protocolo']);
+        $agendamento = Agendamento::where('protocolo', $protocolo)->first();
+
+        if($agendamento->cpf != $dados['cpf'])
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>O CPF informado não corresponde ao protocolo. Por favor, pesquise novamente o agendamento',
+                'class' => 'alert-danger'
+            ];
+
+        $dia = Carbon::parse($agendamento->dia);
+        if($dia->lte(Carbon::today()))
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>Cancelamento do agendamento deve ser antes do dia do atendimento',
+                'class' => 'alert-danger'
+            ];
+        
+        if($agendamento->update(['status' => Agendamento::STATUS_CANCELADO]))
+        {
+            $string = $agendamento->nome.' (CPF: '.$agendamento->cpf.') *cancelou* atendimento em *'.$agendamento->regional->regional;
+            $string .= '* no dia '.onlyDate($agendamento->dia);
+            event(new ExternoEvent($string));
+                
+            return 'Agendamento cancelado com sucesso!';
+        }else
+            abort(500);
+    }
+
     public function delete($id)
     {
         return AgendamentoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('bloqueio de agendamento', 'cancelou', $id)) : null;
@@ -724,12 +763,15 @@ class AgendamentoService implements AgendamentoServiceInterface {
         
                 if(isset($dados['dia']))
                 {
-                    $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
+                    $dt = new Carbon($dados['dia']);
+                    $dia = Carbon::parse($dt)->format('Y-m-d');
                     return $resultado->removeHorariosSeLotado($dia);
                 }
             
                 return $resultado->getDiasSeLotado();
             }
+
+            return null;
         }
     }
 
@@ -739,21 +781,21 @@ class AgendamentoService implements AgendamentoServiceInterface {
      * =======================================================================================================
      */
 
-    public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao)
-    {
-        return Agendamento::where('cpf', $cpf)
-            ->where('idregional', $regional)
-            ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-            ->whereNull('status')
-            ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
-            ->count();
-    }
+    // public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao)
+    // {
+    //     return Agendamento::where('cpf', $cpf)
+    //         ->where('idregional', $regional)
+    //         ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
+    //         ->whereNull('status')
+    //         ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
+    //         ->count();
+    // }
 
     // Momentaneo até refatorar o AgendamentoSite
-    public function getByRegional($idregional)
-    {
-        return AgendamentoBloqueio::where('idregional', $idregional)
-            ->where('diatermino','>=', date('Y-m-d'))
-            ->get();
-    }
+    // public function getByRegional($idregional)
+    // {
+    //     return AgendamentoBloqueio::where('idregional', $idregional)
+    //         ->where('diatermino','>=', date('Y-m-d'))
+    //         ->get();
+    // }
 }

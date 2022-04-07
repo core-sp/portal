@@ -271,4 +271,89 @@ class AdminTest extends TestCase
 
         $this->get('/horizon')->assertRedirect(route('login'));
     }
+
+    /** @test */
+    public function authorized_users_can_view_calls_list_with_same_regional()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $user = factory('App\User')->create([
+            'idperfil' => factory('App\Perfil')->create(['idperfil' => 8]),
+            'idregional' => $admin->idregional
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'hora' => '10:00',
+            'status' => 'Compareceu',
+            'idregional' => $admin->idregional,
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->get('/admin')
+        ->assertSee('<th>Atendente</th>')
+        ->assertSee('<th>Atendimentos</th>')
+        ->assertSee('<td>'.$user->nome.'</td>')
+        ->assertSee('<td>1</td>');
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_view_calls_list_with_same_regional()
+    {
+        $non_admin = $this->signIn();
+
+        $user = factory('App\User')->create([
+            'idregional' => $non_admin->idregional
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'hora' => '10:00',
+            'status' => 'Compareceu',
+            'idregional' => $non_admin->idregional,
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->get('/admin')
+        ->assertDontSee('<th>Atendente</th>')
+        ->assertDontSee('<th>Atendimentos</th>')
+        ->assertDontSee('<td>'.$user->nome.'</td>')
+        ->assertDontSee('<td>1</td>');
+    }
+
+    /** @test */
+    public function authorized_users_can_view_empty_calls_list_with_different_regional()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $user = factory('App\User')->create([
+            'idperfil' => factory('App\Perfil')->create(['idperfil' => 8]),
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'hora' => '10:00',
+            'status' => 'Compareceu',
+            'idregional' => $user->idregional,
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->get('/admin')
+        ->assertSee('<th>Atendente</th>')
+        ->assertSee('<th>Atendimentos</th>')
+        ->assertDontSee('<td>'.$user->nome.'</td>')
+        ->assertDontSee('<td>1</td>');
+    }
+
+    /** @test */
+    public function authorized_users_can_view_password_info()
+    {
+        $this->signInAsAdmin();
+
+        $this->get('/admin')
+        ->assertSeeText('Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois selecione "Alterar Senha";');
+    }
 }

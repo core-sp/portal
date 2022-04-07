@@ -12,76 +12,84 @@ class AgendamentoUpdateRequest extends FormRequest
     private $service;
     private $horariosComBloqueio;
     private $dateFormat;
+    private $completos;
+    private $status;
+    private $servicos;
+    private $protocolo;
 
     public function __construct(MediadorServiceInterface $service)
     {
         $this->service = $service;
     }
 
-    private function fillArrayRules($service)
-    {
-        if(\Route::is('agendamentosite.store'))
-        {
-            $this->dateFormat = '|date_format:d/m/Y|after:'.date('d\/m\/Y');
-            if(request()->filled('idregional') && request()->has('servico') && (request()->servico == 'Plantão Jurídico'))
-            {
-                $datasPJ = $service->getDiasHorasAjaxSite(['idregional' => request()->idregional], $this->service);
-                if(!isset($datasPJ[0]) && !isset($datasPJ[1]))
-                    request()->dia = Carbon::today()->subDay()->format('d\/m\/Y');
-                else{
-                    if(isset($datasPJ[0]))
-                        $this->dateFormat = $this->dateFormat.'|after_or_equal:'.onlyDate($datasPJ[0]);
-                    if(isset($datasPJ[1]))
-                        $this->dateFormat = $this->dateFormat.'|before_or_equal:'.onlyDate($datasPJ[1]);
-                }
-            }else
-                $this->dateFormat = $this->dateFormat.'|before_or_equal:'.Carbon::tomorrow()->addDays(30)->format('d\/m\/Y');
-
-            $this->horariosComBloqueio = request()->filled('idregional') && request()->filled('dia') && request()->filled('servico') ? 
-            '|in:'.implode(',', $service->getDiasHorasAjaxSite([
-                    'idregional' => request()->idregional, 
-                    'dia' => request()->dia,
-                    'servico' => request()->servico
-                ], $this->service)) : $this->horariosComBloqueio.'|in:';
-        }
-    }
-
     protected function prepareForValidation()
     {
+        $service = $this->service->getService('Agendamento');
+        $this->completos = $service->getServicosOrStatusOrCompletos('completos');
+        $this->status = $service->getServicosOrStatusOrCompletos('status');
+        $this->servicos = $service->getServicosOrStatusOrCompletos('servicos');
+
+        if(\Route::is('agendamentosite.cancelamento'))
+        {
+            $this->protocolo = '|size:6|regex:/[A-Za-z0-9]/i';
+            if(request()->missing('protocolo') || !request()->filled('protocolo'))
+                $this->merge(['protocolo' => null]);
+        }
+            
+
         if(\Route::is('agendamentosite.store'))
         {
             if(request()->missing('dia'))
                 $this->merge(['dia' => null]);
             if(request()->missing('hora'))
                 $this->merge(['hora' => null]);
+            
+            $this->dateFormat = '|date_format:d/m/Y';
+
+            if(request()->filled('idregional') && request()->filled('dia') && request()->filled('servico'))
+            {
+                if(request()->servico == 'Plantão Jurídico')
+                {
+                    $datasPJ = $service->getDiasHorasAjaxSite(['idregional' => request()->idregional], $this->service);
+                    if(empty($datasPJ) || (!isset($datasPJ[0]) && !isset($datasPJ[1])))
+                        $this->merge(['idregional' => 0]);
+                    if(isset($datasPJ[0]))
+                        $this->dateFormat = $this->dateFormat.'|after_or_equal:'.onlyDate($datasPJ[0]);
+                    if(isset($datasPJ[1]))
+                        $this->dateFormat = $this->dateFormat.'|before_or_equal:'.onlyDate($datasPJ[1]);
+                }else
+                    $this->dateFormat = $this->dateFormat.'|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::tomorrow()->addDays(30)->format('d\/m\/Y');
+
+                $horarios = $service->getDiasHorasAjaxSite([
+                    'idregional' => request()->idregional, 
+                    'dia' => request()->dia,
+                    'servico' => request()->servico
+                ], $this->service);
+                $this->horariosComBloqueio = isset($horarios) ? '|in:'.implode(',', $horarios) : $this->horariosComBloqueio.'|in:';
+            }
         }
     }
 
     public function rules()
     {
-        $service = $this->service->getService('Agendamento');
-        $completos = $service->getServicosOrStatusOrCompletos('completos');
-        $status = $service->getServicosOrStatusOrCompletos('status');
-        $servicos = $service->getServicosOrStatusOrCompletos('servicos');
-        $this->fillArrayRules($service);
         unset($this->service);
-        unset($service);
-
+        
         return [
             'antigo' => 'sometimes|boolean',
             'idregional' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo|exists:regionais,idregional',
-            'nome' => 'sometimes|exclude_if:antigo,1|required|min:5|max:191|string',
+            'nome' => 'sometimes|exclude_if:antigo,1|required|min:5|max:191|string|regex:/^\D*$/',
             'email' => 'sometimes|exclude_if:antigo,1|required|email|max:191',
             'cpf' => ['sometimes', 'exclude_if:antigo,1', 'required', 'max:14', new Cpf],
             'celular' => 'sometimes|exclude_if:antigo,1|required|max:17',
-            'servico' => 'sometimes|required_without_all:tiposervico,antigo,idusuario,status,idagendamento|in:'.implode(',', $servicos),
-            'tiposervico' => 'sometimes|required|in:'.implode(',', $completos),
+            'servico' => 'sometimes|required_without_all:tiposervico,antigo,idusuario,status,idagendamento|in:'.implode(',', $this->servicos),
+            'tiposervico' => 'sometimes|required|in:'.implode(',', $this->completos),
             'pessoa' => 'sometimes|required|in:PF,PJ,PF e PJ',
-            'idusuario' => 'sometimes|nullable|exists:users,idusuario|required_if:status,==,'.$status[0],
-            'status' => 'sometimes|nullable|in:'.implode(',', $status),
+            'idusuario' => 'sometimes|nullable|exists:users,idusuario|required_if:status,==,'.$this->status[0],
+            'status' => 'sometimes|nullable|in:'.implode(',', $this->status),
             'dia' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$this->dateFormat,
             'hora' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$this->horariosComBloqueio,
             'termo' => 'sometimes|required|accepted',
+            'protocolo' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo,idregional,nome,email,cpf,celular,servico,tiposervico,pessoa,idusuario,status,dia,hora,termo,idagendamento'.$this->protocolo,
             'idagendamento' => 'sometimes|required_without_all:nome,email,cpf,celular,servico,tiposervico,idusuario,antigo,dia,hora,pessoa,termo'
         ];
     }
@@ -100,14 +108,18 @@ class AgendamentoUpdateRequest extends FormRequest
             'idusuario.exists' => 'Usuário não existe',
             'string' => 'Deve ser um texto sem números',
             'accepted' => 'Você deve concordar com o Termo de Consentimento',
-            'idregional.exists' => 'Regional não existe',
+            'idregional.exists' => 'Regional não existe ou não está disponível',
             'hora.in' => 'Essa hora não está disponível',
             'pessoa.in' => 'Esse tipo de pessoa não está disponível',
             'date_format' => 'Formato de data inválido',
             'after' => 'Data fora do período permitido',
             'before_or_equal' => 'Data fora do período permitido',
             'after_or_equal' => 'Data fora do período permitido',
-            'required_without_all' => 'Campo obrigatório'
+            'required_without_all' => 'Campo obrigatório',
+            'protocolo.regex' => 'Formato inválido',
+            'size' => 'Deve conter :size caracteres',
+            'nome.regex' => 'Não é permitido números',
+            'celular.regex' => 'Somente neste formato (00) 00000-0000',
         ];
     }
 }

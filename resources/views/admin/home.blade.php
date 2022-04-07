@@ -113,10 +113,11 @@
 			</div>
 			<div class="card-body">
 				<p>- Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois selecione "Alterar Senha";</p>
-				<p class="mb-0">- Para dúvidas, sugestões, reclamações ou solicitações, envie sua mensagem para o CTI através <a href="/admin/chamados/criar">deste link</a>;</p>
+				{{-- <p class="mb-0">- Para dúvidas, sugestões, reclamações ou solicitações, envie sua mensagem para o CTI através <a href="/admin/chamados/criar">deste link</a>;</p> --}}
 			</div>
 		</div>
 	  </div>
+	  @if(in_array(auth()->user()->idperfil, [1, 6, 8, 10, 12, 13, 18, 21]))
 	  <div class="col">
 		<div class="card card-info">
 		  <div class="card-header">
@@ -131,6 +132,7 @@
 		  </div>
 		</div>
 	  </div>
+	  @endif
   	</div>
 	  @if($chamados->count())
 		@include('admin.inc.chamadohome')
