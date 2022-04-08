@@ -657,8 +657,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $plantao->id,
-            'dataInicialBloqueio' => Carbon::parse($plantao->dataInicial)->addDay()->format('Y-m-d'),
-            'dataFinalBloqueio' => Carbon::parse($plantao->dataInicial)->addDay()->format('Y-m-d'),
+            'dataInicialBloqueio' => Carbon::parse($plantao->dataInicial)->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::parse($plantao->dataFinal)->format('Y-m-d'),
             'horariosBloqueio' => ['11:00']
         ];
 

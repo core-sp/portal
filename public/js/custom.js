@@ -204,7 +204,6 @@ function setCamposAgeBloqueio(horas_atendentes)
     jQuery.inArray(valor, horas_atendentes['horarios']) != -1 ? $(this).show() : $(this).hide();
   });
 
-  $('#qtd_atendentes').val(horas_atendentes['atendentes'] - 1);
   $('#totalAtendentes').text(horas_atendentes['atendentes']);
 }
 

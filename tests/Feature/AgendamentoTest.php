@@ -2345,11 +2345,12 @@ class AgendamentoTest extends TestCase
     public function agendamento_can_be_created_on_portal()
     {
         Mail::fake();
+        $pegarDia = factory('App\Agendamento')->raw();
 
         $agendamento = factory('App\Agendamento')->raw([
             'nome' => 'Teste Ão Açaí',
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'dia' => onlyDate($pegarDia['dia']),
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2367,8 +2368,8 @@ class AgendamentoTest extends TestCase
         $agendamento1 = factory('App\Agendamento')->create();
         $agendamento2 = factory('App\Agendamento')->raw([
             'hora' => '11:00',
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'dia' => onlyDate($agendamento1->dia),
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2383,7 +2384,7 @@ class AgendamentoTest extends TestCase
         ]);
         $this->assertDatabaseHas('agendamentos', [
             'idagendamento' => 2,
-            'dia' => Carbon::tomorrow()->format('Y-m-d'),
+            'dia' => $agendamento1->dia,
             'cpf' => $agendamento2['cpf']
         ]);
     }
@@ -2425,7 +2426,7 @@ class AgendamentoTest extends TestCase
         $agendamento = factory('App\Agendamento')->raw([
             'nome' => 'Ana',
             'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2441,9 +2442,9 @@ class AgendamentoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         $agendamento = factory('App\Agendamento')->raw([
-            'nome' => $faker->text(400),
+            'nome' => $faker->sentence(400),
             'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2460,7 +2461,7 @@ class AgendamentoTest extends TestCase
         $agendamento = factory('App\Agendamento')->raw([
             'nome' => 'An4 Teste',
             'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2477,7 +2478,7 @@ class AgendamentoTest extends TestCase
         $agendamento = factory('App\Agendamento')->raw([
             'cpf' => '123.456.789-00',
             'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2494,7 +2495,7 @@ class AgendamentoTest extends TestCase
         $agendamento = factory('App\Agendamento')->raw([
             'email' => 'teste.com',
             'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2511,7 +2512,7 @@ class AgendamentoTest extends TestCase
     //     $agendamento = factory('App\Agendamento')->raw([
     //         'celular' => '(11) A9999-9999',
     //         'dia' => Carbon::tomorrow()->format('d/m/Y'),
-    //         'servico' => 'Outros',
+    //         'servico' => Agendamento::SERVICOS_OUTROS,
     //         'pessoa' => 'PF',
     //         'termo' => 'on'
     //     ]);
@@ -2543,7 +2544,7 @@ class AgendamentoTest extends TestCase
     {
         $agendamento = factory('App\Agendamento')->raw([
             'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PFJ',
             'termo' => 'on'
         ]);
@@ -2560,7 +2561,7 @@ class AgendamentoTest extends TestCase
         $agendamento = factory('App\Agendamento')->raw([
             'idregional' => 55,
             'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2576,7 +2577,7 @@ class AgendamentoTest extends TestCase
     {
         $agendamento = factory('App\Agendamento')->raw([
             'dia' => Carbon::today()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2592,7 +2593,7 @@ class AgendamentoTest extends TestCase
     {
         $agendamento = factory('App\Agendamento')->raw([
             'dia' => Carbon::today()->subDay()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2608,7 +2609,7 @@ class AgendamentoTest extends TestCase
     {
         $agendamento = factory('App\Agendamento')->raw([
             'dia' => Carbon::tomorrow()->addDays(31)->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2624,7 +2625,7 @@ class AgendamentoTest extends TestCase
     {
         $agendamento = factory('App\Agendamento')->raw([
             'dia' => Carbon::tomorrow()->format('Y-m-d'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2641,7 +2642,7 @@ class AgendamentoTest extends TestCase
         $agendamento = factory('App\Agendamento')->raw([
             'hora' => '18:00',
             'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2655,15 +2656,15 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function agendamento_cannot_be_created_with_same_cpf_same_dia_same_hora()
     {
-        factory('App\Agendamento')->create();
-        $agendamento = factory('App\Agendamento')->raw([
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+        $agendamento = factory('App\Agendamento')->create();
+        $agendamento2 = factory('App\Agendamento')->raw([
+            'dia' => onlyDate($agendamento->dia),
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
 
-        $this->post(route('agendamentosite.store'), $agendamento)->assertStatus(302);
+        $this->post(route('agendamentosite.store'), $agendamento2)->assertStatus(302);
 
         $this->get(route('agendamentosite.formview'))
         ->assertSee('<i class="icon fa fa-ban"></i>Este CPF já possui um agendamento neste dia e horário');
@@ -2672,14 +2673,15 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function three_or_more_agendamentos_cannot_be_created_with_same_cpf_same_dia()
     {
-        factory('App\Agendamento')->create();
+        $agendado = factory('App\Agendamento')->create();
         factory('App\Agendamento')->create([
+            'dia' => $agendado->dia,
             'hora' => '11:00',
         ]);
         $agendamento = factory('App\Agendamento')->raw([
             'hora' => '12:00',
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
-            'servico' => 'Outros',
+            'dia' => onlyDate($agendado->dia),
+            'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
         ]);
@@ -2688,6 +2690,295 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentosite.formview'))
         ->assertSee('<i class="icon fa fa-ban"></i>É permitido apenas 2 agendamentos por cpf por dia');
+    }
+
+    /** @test */
+    public function agendamento_can_be_created_with_cpf_that_didnt_show_up_three_times_in_more_90_days()
+    {
+        $subday = Carbon::tomorrow()->subDays(55);
+        while($subday->isWeekend())
+            $subday->subDay();
+
+        $agendamento_1 = factory('App\Agendamento')->create([
+            'dia' => $subday->format('Y-m-d'),
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
+        ]);
+
+        $subday = Carbon::tomorrow()->subDays(65);
+        while($subday->isWeekend())
+            $subday->subDay();
+
+        $agendamento_2 = factory('App\Agendamento')->create([
+            'dia' => $subday->format('Y-m-d'),
+            'protocolo' => 'AGE-YYYYYY',
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
+        ]);
+
+        $subday = Carbon::tomorrow()->subDays(91);
+        while($subday->isWeekend())
+            $subday->subDay();
+
+        $agendamento_3 = factory('App\Agendamento')->create([
+            'dia' => $subday->format('Y-m-d'),
+            'hora' => '12:00',
+            'protocolo' => 'AGE-WWWWWW',
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
+        ]);
+
+        $day = Carbon::tomorrow();
+        while($day->isWeekend())
+            $day->addDay();
+
+        $agendamento_4 = factory('App\Agendamento')->raw([
+            'dia' => $day->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'hora' => '11:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $agendamento_4)->assertOk();
+
+        $this->assertEquals(Agendamento::count(), 4);
+    }
+
+    /** @test */
+    public function agendamento_cannot_be_created_with_cpf_that_didnt_show_up_three_times_in_90_days()
+    {
+        $subday = Carbon::tomorrow()->subDays(35);
+        while($subday->isWeekend())
+            $subday->subDay();
+
+        $agendamento_1 = factory('App\Agendamento')->create([
+            'dia' => $subday->format('Y-m-d'),
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
+        ]);
+
+        $subday = Carbon::tomorrow()->subDays(45);
+        while($subday->isWeekend())
+            $subday->subDay();
+
+        $agendamento_2 = factory('App\Agendamento')->create([
+            'dia' => $subday->format('Y-m-d'),
+            'protocolo' => 'AGE-YYYYYY',
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
+        ]);
+
+        $subday = Carbon::tomorrow()->subDays(55);
+        while($subday->isWeekend())
+            $subday->subDay();
+
+        $agendamento_3 = factory('App\Agendamento')->create([
+            'dia' => $subday->format('Y-m-d'),
+            'hora' => '12:00',
+            'protocolo' => 'AGE-WWWWWW',
+            'status' => Agendamento::STATUS_NAO_COMPARECEU
+        ]);
+
+        $day = Carbon::tomorrow();
+        while($day->isWeekend())
+            $day->addDay();
+
+        $agendamento_4 = factory('App\Agendamento')->raw([
+            'dia' => $day->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'hora' => '11:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $agendamento_4)->assertStatus(302);
+
+        $this->get(route('agendamentosite.formview'))
+        ->assertSee('<i class="icon fa fa-ban"></i>Agendamento bloqueado por excesso de falta nos últimos 90 dias.')
+        ->assertSee('<br>Favor entrar em contato com o Core-SP para regularizar o agendamento.');
+
+        $this->assertEquals(Agendamento::count(), 3);
+    }
+
+    /** @test */
+    public function get_full_days()
+    {
+        $regional = factory('App\Regional')->create([
+            'horariosage' => '10:00'
+        ]);
+        $agendamentos = factory('App\Agendamento', 2)->create([
+            'idregional' => $regional->idregional,
+        ]);
+
+        $dia = Carbon::tomorrow();
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJson([$lotado]);
+    }
+
+    /** @test */
+    public function get_full_days_with_0_atendentes_bloqueio()
+    {
+        $regional = factory('App\Regional')->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => $regional->horariosage,
+        ]);
+
+        $dia = Carbon::tomorrow();
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJson([$lotado]);
+    }
+
+    /** @test */
+    public function get_empty_full_days()
+    {
+        $regional = factory('App\Regional')->create();
+        $agendamentos = factory('App\Agendamento', 2)->create([
+            'idregional' => $regional->idregional,
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJson([]);
+    }
+
+    /** @test */
+    public function get_hours()
+    {
+        $regional = factory('App\Regional')->create();
+        $agendamento = factory('App\Agendamento')->raw();
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => onlyDate($agendamento['dia']),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJson($regional->horariosAge());
+    }
+
+    /** @test */
+    public function remove_full_hour()
+    {
+        $regional = factory('App\Regional')->create();
+        $agendamentos = factory('App\Agendamento', $regional->ageporhorario)->create([
+            'idregional' => $regional->idregional,
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => Carbon::tomorrow()->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJsonMissing(['10:00']);
+    }
+
+    /** @test */
+    public function remove_full_hour_with_0_atendentes_bloqueio()
+    {
+        $regional = factory('App\Regional')->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => '10:00,12:00',
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => Carbon::tomorrow()->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJsonMissing(explode(',', $bloqueio->horarios));
+    }
+
+    /** @test */
+    public function remove_full_hour_with_more_than_0_atendentes_bloqueio()
+    {
+        $regional = factory('App\Regional')->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => '10:00,12:00',
+            'qtd_atendentes' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $regional->idregional,
+            'hora' => '10:00'
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $regional->idregional,
+            'hora' => '11:00'
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => Carbon::tomorrow()->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJsonMissing(['10:00']);
+    }
+
+    /** @test */
+    public function remove_full_hour_with_more_than_0_atendentes_and_diatermino_null_bloqueio()
+    {
+        $regional = factory('App\Regional')->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => '10:00,12:00',
+            'qtd_atendentes' => 1,
+            'diatermino' => null
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $regional->idregional,
+            'hora' => '10:00',
+            'dia' => Carbon::tomorrow()->format('Y-m-d')
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $regional->idregional,
+            'hora' => '11:00',
+            'dia' => Carbon::tomorrow()->format('Y-m-d')
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => Carbon::tomorrow()->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJsonMissing(['10:00']);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => Carbon::tomorrow()->addDays(12)->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJson($regional->horariosAge());
+    }
+
+    /** @test */
+    public function remove_full_hour_with_0_atendentes_and_diatermino_null_bloqueio()
+    {
+        $regional = factory('App\Regional')->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => '10:00,12:00',
+            'diatermino' => null
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => Carbon::tomorrow()->addDays(60)->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJsonMissing(explode(',', $bloqueio->horarios));
     }
 
     // /** @test 
@@ -2815,49 +3106,6 @@ class AgendamentoTest extends TestCase
 
     // /** @test 
     //  * 
-    //  * Testando validação que permite que um CPF possa ser usado apenas em dois Agendamentos no mesmo dia.
-    // */
-    // public function agendamento_with_same_cpf_can_be_created_two_time_on_same_day()
-    // {
-    //     $regional = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
-
-    //     // Primeiro Agendamento do dia com o CPF
-    //     $agendamento_1 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX'
-    //     ]);
-
-    //     // Segundo Agendamento do dia com o mesmo CPF
-    //     $agendamento_2 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '11:00',
-    //         'protocolo' => 'AGE-YYYYYY'
-    //     ]);
-
-    //     // Terceiro Agendamento do dia com o mesmo CPF
-    //     $agendamento_3 = factory('App\Agendamento')->raw([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '12:00',
-    //         'termo' => 'on'
-    //     ]);
-
-    //     $this->post(route('agendamentosite.store'), $agendamento_3)->assertStatus(500);
-
-    //     // Apenas os dois primeiros devem estar no banco de dados
-    //     $this->assertEquals(Agendamento::count(), 2);
-    // }
-
-    // /** @test 
-    //  * 
     //  * Testando validação que bloqueia Agendamento com CPF que deixou de comparecer três vezes em Agendamentos anteriores
     //  * nos últimos 90 dias.
     // */
@@ -2909,61 +3157,6 @@ class AgendamentoTest extends TestCase
 
     //     // Apenas os três primeiros Agendamentos devem estar no banco de dados
     //     $this->assertEquals(Agendamento::count(), 3);
-    // }
-
-    // /** @test 
-    //  * 
-    //  * Testando validação que permite Agendamento com CPF que deixou de comparecer três vezes em Agendamentos anteriores
-    //  * com mais de 90 dias.
-    // */
-    // public function agendamento_with_cpf_that_didnt_show_up_three_times_in_more_than_90_days()
-    // {
-    //     $regional = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
-
-    //     // Primeiro Agendamento em que a pessoa com o CPF não compareceu (91 dias atrás)
-    //     $agendamento_1 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('-91 days')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX',
-    //         'status' => Agendamento::STATUS_NAO_COMPARECEU
-    //     ]);
-
-    //     // Segundo Agendamento em que a pessoa com o CPF não compareceu (91 dias atrás)
-    //     $agendamento_2 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('-91 days')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-YYYYYY',
-    //         'status' => Agendamento::STATUS_NAO_COMPARECEU
-    //     ]);
-
-    //     // Terceiro Agendamento em que a pessoa com o CPF não compareceu (91 dias atrás)
-    //     $agendamento_3 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('-91 days')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-WWWWWW',
-    //         'status' => Agendamento::STATUS_NAO_COMPARECEU
-    //     ]);
-
-    //     // Quarto Agendamento com o CPF da pessoa que não compareceu três vezes
-    //     $agendamento_4 = factory('App\Agendamento')->raw([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'termo' => 'on'
-    //     ]);
-
-    //     $this->post(route('agendamentosite.store'), $agendamento_4)->assertOk();
-
-    //     // Todos os agendamentos devem estar presentes
-    //     $this->assertEquals(Agendamento::count(), 4);
     // }
 
     // /** @test 
@@ -3052,38 +3245,6 @@ class AgendamentoTest extends TestCase
     //     $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, null);
     // }
 
-    // /** @test 
-    //  * 
-    //  * Agendamento não pode ser criado no memso horário com mesmo CPF/CNPJ.
-    // */
-    // public function cannot_create_agendamento_on_same_schedule_with_same_cpf_cnpj()
-    // {
-    //     $regional = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
-
-    //     // Criando Agendamento no dia atual para tentar cancelar no mesmo dia
-    //     $agendamento = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX'
-    //     ]);
-
-    //     $dados = factory('App\Agendamento')->raw([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'termo' => 'on'
-    //     ]);
-
-    //     // Checa se ao tentar salvar o agendamento com mesmo horário e CPF retorna erro 500
-    //     $this->post(route('agendamentosite.store'), $dados)->assertStatus(500);
-    // }
-
     /** 
      * =======================================================================================================
      * SERVIÇO DO PLANTÃO JURÍDICO
@@ -3097,7 +3258,7 @@ class AgendamentoTest extends TestCase
             'qtd_advogados' => 1
         ]);
 
-        $this->get(route('agendamentosite.formview'))->assertSee('Plantão Jurídico');
+        $this->get(route('agendamentosite.formview'))->assertSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
     }
 
     /** @test */
@@ -3107,7 +3268,7 @@ class AgendamentoTest extends TestCase
             'qtd_advogados' => 0
         ]);
 
-        $this->get(route('agendamentosite.formview'))->assertDontSee('Plantão Jurídico');
+        $this->get(route('agendamentosite.formview'))->assertDontSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
     }
 
     /** @test */
@@ -3118,14 +3279,14 @@ class AgendamentoTest extends TestCase
         ]);
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF e PJ',
             'dia' => onlyDate($plantao->dataInicial),
             'hora' => '10:00',
             'termo' => 'on'
         ]);
 
-        $this->get(route('agendamentosite.formview'))->assertSee('Plantão Jurídico');
+        $this->get(route('agendamentosite.formview'))->assertSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
 
         $this->post(route('agendamentosite.store'), $dados)->assertOk();
         $this->assertDatabaseHas('agendamentos', [
@@ -3143,7 +3304,7 @@ class AgendamentoTest extends TestCase
         ]);
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF e PJ',
             'dia' => onlyDate($plantao->dataInicial),
             'hora' => '10:00',
@@ -3161,7 +3322,7 @@ class AgendamentoTest extends TestCase
         $dados = factory('App\Agendamento')->raw([
             'cpf' => '515.056.080-40',
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF e PJ',
             'dia' => onlyDate($plantao->dataInicial),
             'hora' => '10:00',
@@ -3185,7 +3346,7 @@ class AgendamentoTest extends TestCase
         ]);
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF e PJ',
             'dia' => onlyDate($plantao->dataInicial),
             'hora' => '10:00',
@@ -3203,14 +3364,14 @@ class AgendamentoTest extends TestCase
         $dados = factory('App\Agendamento')->raw([
             'cpf' => '515.056.080-40',
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF e PJ',
             'dia' => onlyDate($plantao->dataInicial),
             'hora' => '10:00',
             'termo' => 'on'
         ]);
 
-        $this->post(route('agendamentosite.store'), $dados)
+       $this->post(route('agendamentosite.store'), $dados)
         ->assertSessionHasErrors(['hora']);
 
         $this->assertDatabaseMissing('agendamentos', [
@@ -3227,14 +3388,14 @@ class AgendamentoTest extends TestCase
         $plantao = factory('App\PlantaoJuridico')->create();
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF',
             'dia' => onlyDate($plantao->dataInicial),
             'hora' => '10:00',
             'termo' => 'on'
         ]);
 
-        $this->get(route('agendamentosite.formview'))->assertDontSee('Plantão Jurídico');
+        $this->get(route('agendamentosite.formview'))->assertDontSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
 
         $this->post(route('agendamentosite.store'), $dados)
         ->assertSessionHasErrors(['idregional']);
@@ -3256,7 +3417,7 @@ class AgendamentoTest extends TestCase
         ]);
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF',
             'dia' => onlyDate($plantao->dataInicial),
             'hora' => '10:00',
@@ -3281,7 +3442,7 @@ class AgendamentoTest extends TestCase
         ]);
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF',
             'dia' => Carbon::parse($plantao->dataFinal)->addDay()->format('d\/m\/Y'),
             'hora' => '10:00',
@@ -3306,7 +3467,7 @@ class AgendamentoTest extends TestCase
         ]);
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF',
             'dia' => onlyDate($plantao->dataFinal),
             'hora' => '09:00',
@@ -3331,7 +3492,7 @@ class AgendamentoTest extends TestCase
             'qtd_advogados' => 1
         ]);
         $agendamento = factory('App\Agendamento')->create([
-            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
             'idregional' => $plantao->idregional,
             'protocolo' => 'AGE-ABCD',
             'dia' => $plantao->dataFinal,
@@ -3341,7 +3502,7 @@ class AgendamentoTest extends TestCase
         $dados = factory('App\Agendamento')->raw([
             'cpf' => '274.461.700-85',
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF e PJ',
             'dia' => onlyDate($plantao->dataFinal),
             'hora' => '10:00',
@@ -3366,7 +3527,7 @@ class AgendamentoTest extends TestCase
             'qtd_advogados' => 1
         ]);
         $agendamento = factory('App\Agendamento')->create([
-            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
             'idregional' => $plantao->idregional,
             'protocolo' => 'AGE-ABCD',
             'dia' => $plantao->dataFinal,
@@ -3375,7 +3536,7 @@ class AgendamentoTest extends TestCase
 
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PF',
             'dia' => onlyDate($plantao->dataInicial),
             'hora' => '11:00',
@@ -3406,7 +3567,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $agendamento = factory('App\Agendamento')->create([
-            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
             'idregional' => $plantao->idregional,
             'protocolo' => 'AGE-ABCD',
             'dia' => $plantao->dataFinal,
@@ -3415,7 +3576,7 @@ class AgendamentoTest extends TestCase
 
         $dados = factory('App\Agendamento')->raw([
             'idregional' => $plantao2->idregional,
-            'servico' => 'Plantão Jurídico',
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
             'pessoa' => 'PJ',
             'dia' => onlyDate($plantao->dataInicial),
             'hora' => '11:00',
@@ -3464,7 +3625,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $plantao->idregional,
             'dia' => onlyDate($plantao->dataInicial),
-            'servico' => 'Plantão Jurídico'
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
         ]))
         ->assertJson(explode(',', $plantao->horarios));
     }
@@ -3477,7 +3638,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $plantao->idregional,
             'dia' => onlyDate($plantao->dataInicial),
-            'servico' => 'Plantão Jurídico'
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
         ]))
         ->assertJson([]);
     }
@@ -3490,7 +3651,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $agendamento = factory('App\Agendamento')->create([
-            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
             'idregional' => $plantao->idregional,
             'protocolo' => 'AGE-ABCD',
             'dia' => $plantao->dataFinal,
@@ -3503,7 +3664,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $plantao->idregional,
             'dia' => onlyDate($plantao->dataFinal),
-            'servico' => 'Plantão Jurídico'
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
         ]))
         ->assertJson($horarios);
     }
@@ -3517,7 +3678,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $agendamento = factory('App\Agendamento')->create([
-            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
             'idregional' => $plantao->idregional,
             'protocolo' => 'AGE-ABCD',
             'dia' => $plantao->dataFinal,
@@ -3529,7 +3690,7 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico'
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
         ]))
         ->assertJson([$lotado]);
     }
@@ -3541,7 +3702,7 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $plantao->idregional,
-            'servico' => 'Plantão Jurídico'
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
         ]))
         ->assertJson([]);
     }

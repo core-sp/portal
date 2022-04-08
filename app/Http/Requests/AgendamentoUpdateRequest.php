@@ -39,12 +39,17 @@ class AgendamentoUpdateRequest extends FormRequest
 
         if(\Route::is('agendamentosite.store'))
         {
+            $this->dateFormat = '|date_format:d/m/Y';
+            if(request()->filled('dia') && substr_count(request()->dia, "/") != 2)
+            {
+                $this->merge(['dia' => Carbon::tomorrow()->format('Y-m-d')]);
+                return;
+            }
+
             if(request()->missing('dia'))
                 $this->merge(['dia' => null]);
             if(request()->missing('hora'))
                 $this->merge(['hora' => null]);
-            
-            $this->dateFormat = '|date_format:d/m/Y';
 
             if(request()->filled('idregional') && request()->filled('dia') && request()->filled('servico'))
             {
@@ -65,7 +70,7 @@ class AgendamentoUpdateRequest extends FormRequest
                     'dia' => request()->dia,
                     'servico' => request()->servico
                 ], $this->service);
-                $this->horariosComBloqueio = isset($horarios) ? '|in:'.implode(',', $horarios) : $this->horariosComBloqueio.'|in:';
+                $this->horariosComBloqueio = isset($horarios) ? '|in:'.implode(',', $horarios) : '|in:';
             }
         }
     }

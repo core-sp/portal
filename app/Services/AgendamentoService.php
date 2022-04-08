@@ -763,8 +763,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         
                 if(isset($dados['dia']))
                 {
-                    $dt = new Carbon($dados['dia']);
-                    $dia = Carbon::parse($dt)->format('Y-m-d');
+                    $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
                     return $resultado->removeHorariosSeLotado($dia);
                 }
             

@@ -85,8 +85,9 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function created_new_record_when_new_agendamento()
     {
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
-            'dia' => date('d\/m\/Y', strtotime('+1 day')),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => 'Outros',
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -108,10 +109,11 @@ class TermoConsentimentoTest extends TestCase
     public function id_termo_in_log_when_new_agendamento()
     {
         $regional = factory('App\Regional')->create();
+        $pegarDia = factory('App\Agendamento')->raw();
 
         $agendamento = factory('App\Agendamento')->raw([
             'idregional' => $regional->idregional,
-            'dia' => date('d\/m\/Y', strtotime('+1 day')),
+            'dia' => onlyDate($pegarDia['dia']),
             'hora' => '10:00',
             'servico' => 'Outros',
             'pessoa' => 'PJ',

@@ -91,6 +91,9 @@ class Regional extends Model
     {
         $total = 0;
 
+        if(Carbon::parse($dia)->isWeekend())
+            return $total;
+
         if(isset($horariosTotal['atendentes']))
             foreach($horariosTotal['atendentes'] as $hora => $value)
             {
@@ -105,6 +108,7 @@ class Regional extends Model
     public function getDiasSeLotado()
     {
         $diasLotados = array();
+        $diaslotadosBloqueio = array();
         $bloqueios = $this->getAllBloqueios();
         $agendados = $this->agendamentos()
             ->select('dia', DB::raw('count(*) as total'))
@@ -115,13 +119,28 @@ class Regional extends Model
             ->orderBy('dia')
             ->get();
 
+        $dia = Carbon::tomorrow();
+        for($dia; $dia->lte(Carbon::tomorrow()->addDays(30)); $dia->addDay())
+        {
+            $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
+            $total = $this->getTotalAtendimentos($horariosTotal, $dia->format('Y-m-d'));
+            if($total == 0)
+            {
+                array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+                array_push($diaslotadosBloqueio, $dia->format('Y-m-d'));
+            }
+        }
+
         foreach($agendados as $agendado)
         {
             $dia = Carbon::parse($agendado->dia);
-            $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
-            $total = $this->getTotalAtendimentos($horariosTotal, $dia->format('Y-m-d'));
-            if($agendado->total >= $total)
-                array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+            if(!isset($diaslotadosBloqueio[array_search($dia->format('Y-m-d'), $diaslotadosBloqueio)]))
+            {
+                $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
+                $total = $this->getTotalAtendimentos($horariosTotal, $dia->format('Y-m-d'));
+                if($agendado->total >= $total)
+                    array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+            }
         }
 
         return $diasLotados;
@@ -131,6 +150,10 @@ class Regional extends Model
     {
         $bloqueios = $this->getAllBloqueios();
         $horarios = $this->getHorariosComBloqueio($bloqueios, $dia);
+
+        if($this->getTotalAtendimentos($horarios, $dia) == 0)
+            return $horarios['horarios'] = [];
+
         $agendado = $this->agendamentos()
             ->select('hora', DB::raw('count(*) as total'))
             ->where('tiposervico', 'NOT LIKE', 'Plantão Jurídico%')
@@ -139,15 +162,14 @@ class Regional extends Model
             ->groupBy('hora')
             ->orderBy('hora')
             ->get();
-
-        if($agendado->isNotEmpty())
-            foreach($agendado as $value)
-            {
-                $limiteBloqueio = isset($horarios['atendentes'][$value->hora]) && ($value->total >= $horarios['atendentes'][$value->hora]);
-                $limiteRegional = $value->total >= $this->ageporhorario;
-                if($limiteBloqueio || $limiteRegional)
-                    unset($horarios['horarios'][array_search($value->hora, $horarios['horarios'])]);
-            }
+             
+        foreach($agendado as $value)
+        {
+            $limiteBloqueio = isset($horarios['atendentes'][$value->hora]) && ($value->total >= $horarios['atendentes'][$value->hora]);
+            $limiteRegional = $value->total >= $this->ageporhorario;
+            if($limiteBloqueio || $limiteRegional)
+                unset($horarios['horarios'][array_search($value->hora, $horarios['horarios'])]);
+        }
         
         return $horarios['horarios'];
     }

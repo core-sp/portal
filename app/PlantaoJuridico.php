@@ -33,6 +33,9 @@ class PlantaoJuridico extends Model
 
     private function getHorariosComBloqueio($bloqueios, $dia)
     {
+        if(Carbon::parse($dia)->isWeekend())
+            return [];
+
         $horarios = explode(',', $this->horarios);
 
         if($bloqueios->isNotEmpty())
@@ -45,6 +48,7 @@ class PlantaoJuridico extends Model
     public function getDiasSeLotado()
     {
         $diasLotados = array();
+        $diaslotadosBloqueio = array();
         $bloqueios = $this->bloqueios;
         $agendados = $this->regional->agendamentos()
             ->select('dia', DB::raw('count(*) as total'))
@@ -55,13 +59,28 @@ class PlantaoJuridico extends Model
             ->orderBy('dia')
             ->get();
 
+        $inicial = Carbon::parse($this->dataInicial);
+        $final = Carbon::parse($this->dataFinal);
+        for($dia = $inicial; $inicial->lte($final); $dia->addDay())
+        {
+            $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
+            if(sizeof($horariosTotal) == 0)
+            {
+                array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+                array_push($diaslotadosBloqueio, $dia->format('Y-m-d'));
+            }
+        }
+
         foreach($agendados as $agendado)
         {
             $dia = Carbon::parse($agendado->dia);
-            $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
-            $total = sizeof($horariosTotal) * $this->qtd_advogados;
-            if($agendado->total >= $total)
-                array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+            if(!isset($diaslotadosBloqueio[array_search($dia->format('Y-m-d'), $diaslotadosBloqueio)]))
+            {
+                $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
+                $total = sizeof($horariosTotal) * $this->qtd_advogados;
+                if($agendado->total >= $total)
+                    array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+            }
         }
 
         return $diasLotados;
@@ -71,6 +90,10 @@ class PlantaoJuridico extends Model
     {
         $bloqueios = $this->bloqueios;
         $horarios = $this->getHorariosComBloqueio($bloqueios, $dia);
+
+        if(sizeof($horarios) == 0)
+            return $horarios;
+
         $agendado = $this->regional->agendamentos()
             ->select('hora', DB::raw('count(*) as total'))
             ->where('tiposervico', 'LIKE', 'Plantão Jurídico%')
