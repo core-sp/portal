@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\PreRepresentante;
-use App\Http\Requests\PreRepresentanteRequest;
+use App\UserExterno;
+use App\Http\Requests\UserExternoRequest;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 
-class PreRepresentanteForgotPasswordController extends Controller
+class UserExternoForgotPasswordController extends Controller
 {
     use SendsPasswordResetEmails;
 
     public function __construct()
     {
-        $this->middleware('guest:pre_representante');
+        $this->middleware('guest:user_externo');
     }
 
     public function showLinkRequestForm()
     {
-        return view('auth.passwords.email-prerepresentante');
+        return view('auth.passwords.email-user-externo');
     }
 
     public function sendResetLinkEmail(Request $request)
@@ -42,7 +42,7 @@ class PreRepresentanteForgotPasswordController extends Controller
         
         if($response == Password::RESET_LINK_SENT)
         {
-            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' solicitou o envio de link para alterar a senha no Pré-registro.'));
+            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' solicitou o envio de link para alterar a senha no Login Externo.'));
             return $this->sendResetLinkResponse($request, 'O link de reconfiguração de senha foi enviado ao email ' . $email . '<br>Esse link é válido por 60 minutos');
         }
 
@@ -51,24 +51,23 @@ class PreRepresentanteForgotPasswordController extends Controller
 
     protected function validateEmail(Request $request)
     {
-        $pre = new PreRepresentanteRequest();
-        $requestRules = new Request($pre->rules());
-        $requestMessages = new Request($pre->messages());
+        $user_externo = new UserExternoRequest();
+        $requestUser = Request::createFrom($request, $user_externo);
         $this->validate(
-            $request,
-            $requestRules->all(),
-            $requestMessages->all()
+            $requestUser,
+            $requestUser->rules(),
+            $requestUser->messages()
         );
     }
 
     protected function broker()
     {
-        return Password::broker('pre_representantes');
+        return Password::broker('users_externo');
     }
 
     protected function getEmail($cpfCnpj)
     {
-        $first = PreRepresentante::where('cpf_cnpj', $cpfCnpj)->first();
+        $first = UserExterno::where('cpf_cnpj', $cpfCnpj)->first();
         
         if(isset($first))
             return $first->email;

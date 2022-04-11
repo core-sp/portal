@@ -58,14 +58,14 @@ return [
             'hash' => false,
         ],
 
-        'pre_representante' => [
+        'user_externo' => [
             'driver' => 'session',
-            'provider' => 'pre_representantes',
+            'provider' => 'users_externo',
         ],
 
-        'pre_representante-api' => [
+        'user_externo-api' => [
             'driver' => 'token',
-            'provider' => 'pre_representantes',
+            'provider' => 'users_externo',
             'hash' => false,
         ],
     ],
@@ -98,9 +98,9 @@ return [
             'model' => App\Representante::class,
         ],
 
-        'pre_representantes' => [
+        'users_externo' => [
             'driver' => 'eloquent',
-            'model' => App\PreRepresentante::class,
+            'model' => App\UserExterno::class,
         ],
 
         // 'users' => [
@@ -137,9 +137,9 @@ return [
             'expire' => 60,
         ],
 
-        'pre_representantes' => [
-            'provider' => 'pre_representantes',
-            'table' => 'password_resets',
+        'users_externo' => [
+            'provider' => 'users_externo',
+            'table' => 'password_resets_externo',
             'expire' => 60,
         ],
     ],

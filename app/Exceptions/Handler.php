@@ -32,8 +32,8 @@ class Handler extends ExceptionHandler
                 case 'representante':
                     return redirect(route('representante.login'));
                 break;
-                case 'pre_representante':
-                    return redirect(route('prerepresentante.login'));
+                case 'user_externo':
+                    return redirect(route('externo.login'));
                 break;
                 default:
                     return redirect(route('login'));

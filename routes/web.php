@@ -218,28 +218,28 @@ Route::prefix('/')->group(function() {
   // Representantes
   require('site/representantes.php');
 
-  Route::prefix('pre-representante')->group(function(){
+  Route::prefix('externo')->group(function(){
     // Login e Cadastro
-    Route::get('/login', 'Auth\PreRepresentanteLoginController@showLoginForm')->name('prerepresentante.login');
-    Route::post('/login', 'Auth\PreRepresentanteLoginController@login')->name('prerepresentante.login.submit');
-    Route::post('/logout', 'Auth\PreRepresentanteLoginController@logout')->name('prerepresentante.logout');
-    Route::get('/cadastro', 'PreRepresentanteSiteController@cadastroView')->name('prerepresentante.cadastro');
-    Route::post('/cadastro', 'PreRepresentanteSiteController@cadastro')->name('prerepresentante.cadastro.submit');
-    Route::get('/verifica-email/{token}', 'PreRepresentanteSiteController@verificaEmail')->name('prerepresentante.verifica-email');
+    Route::get('/login', 'Auth\UserExternoLoginController@showLoginForm')->name('externo.login');
+    Route::post('/login', 'Auth\UserExternoLoginController@login')->name('externo.login.submit');
+    Route::post('/logout', 'Auth\UserExternoLoginController@logout')->name('externo.logout');
+    Route::get('/cadastro', 'UserExternoSiteController@cadastroView')->name('externo.cadastro');
+    Route::post('/cadastro', 'UserExternoSiteController@cadastro')->name('externo.cadastro.submit');
+    Route::get('/verifica-email/{token}', 'UserExternoSiteController@verificaEmail')->name('externo.verifica-email');
     // Reset password routes
-    Route::get('/password/reset', 'Auth\PreRepresentanteForgotPasswordController@showLinkRequestForm')->name('prerepresentante.password.request');
-    Route::post('/password/email', 'Auth\PreRepresentanteForgotPasswordController@sendResetLinkEmail')->name('prerepresentante.password.email');
-    Route::get('/password/reset/{token}', 'Auth\PreRepresentanteResetPasswordController@showResetForm')->name('prerepresentante.password.reset');
-    Route::post('/password/reset', 'Auth\PreRepresentanteResetPasswordController@reset')->name('prerepresentante.password.update');
+    Route::get('/password/reset', 'Auth\UserExternoForgotPasswordController@showLinkRequestForm')->name('externo.password.request');
+    Route::post('/password/email', 'Auth\UserExternoForgotPasswordController@sendResetLinkEmail')->name('externo.password.email');
+    Route::get('/password/reset/{token}', 'Auth\UserExternoResetPasswordController@showResetForm')->name('externo.password.reset');
+    Route::post('/password/reset', 'Auth\UserExternoResetPasswordController@reset')->name('externo.password.update');
     // Home
-    Route::get('/home', 'PreRepresentanteSiteController@index')->name('prerepresentante.dashboard');
+    Route::get('/home', 'UserExternoSiteController@index')->name('externo.dashboard');
     // Editar dados do cadastro
-    Route::get('/editar', 'PreRepresentanteSiteController@editarView')->name('prerepresentante.editar.view');
-    Route::get('/editar/senha', 'PreRepresentanteSiteController@editarSenhaView')->name('prerepresentante.editar.senha.view');
-    Route::put('/editar', 'PreRepresentanteSiteController@editar')->name('prerepresentante.editar');
+    Route::get('/editar', 'UserExternoSiteController@editarView')->name('externo.editar.view');
+    Route::get('/editar/senha', 'UserExternoSiteController@editarSenhaView')->name('externo.editar.senha.view');
+    Route::put('/editar', 'UserExternoSiteController@editar')->name('externo.editar');
     // Pré-registro
-    Route::get('/pre-registro', 'PreRepresentanteSiteController@preRegistroView')->name('prerepresentante.preregistro.view');
-    Route::get('/inserir-pre-registro', 'PreRepresentanteSiteController@inserirPreRegistroView')->name('prerepresentante.inserir.preregistro.view');
+    Route::get('/pre-registro', 'UserExternoSiteController@preRegistroView')->name('externo.preregistro.view');
+    Route::get('/inserir-pre-registro', 'UserExternoSiteController@inserirPreRegistroView')->name('externo.inserir.preregistro.view');
   });
   
   //Balcão de Oportunidades

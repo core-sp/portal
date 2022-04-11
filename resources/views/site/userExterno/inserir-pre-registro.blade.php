@@ -1,6 +1,6 @@
-@extends('site.prerepresentante.app')
+@extends('site.userExterno.app')
 
-@section('content-prerepresentante')
+@section('content-user-externo')
 
 @if(Session::has('message'))
     <div class="d-block w-100">
@@ -36,7 +36,7 @@
         @endif
     </ul>
 
-    <form action="{{-- route('prerepresentante.editar') --}}" method="POST" class="cadastroRepresentante">
+    <form action="{{-- route('externo.editar') --}}" method="POST" class="cadastroRepresentante">
         @csrf
 
         <!-- Tab panes -->
@@ -370,7 +370,7 @@
                 </div>
                 <div class="mt-3 float-right">
                     <button class="btn btn-primary" type="button">Salvar</button>
-                    <a href="{{ route('prerepresentante.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
+                    <a href="{{ route('externo.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
                         Cancelar
                     </a>
                 </div>
@@ -689,7 +689,7 @@
 
                 <div class="mt-3 float-right">
                     <button class="btn btn-primary" type="button">Salvar</button>
-                    <a href="{{ route('prerepresentante.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
+                    <a href="{{ route('externo.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
                         Cancelar
                     </a>
                 </div>
@@ -1163,7 +1163,7 @@
 
                 <div class="mt-3 float-right">
                     <button class="btn btn-primary" type="button">Salvar</button>
-                    <a href="{{ route('prerepresentante.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
+                    <a href="{{ route('externo.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
                         Cancelar
                     </a>
                 </div>
@@ -1278,7 +1278,7 @@
 
                 <div class="mt-3 float-right">
                     <button class="btn btn-primary" type="button">Salvar</button>
-                    <a href="{{ route('prerepresentante.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
+                    <a href="{{ route('externo.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
                         Cancelar
                     </a>
                 </div>

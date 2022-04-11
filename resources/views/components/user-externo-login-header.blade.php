@@ -1,13 +1,13 @@
 <div class="row nomargin mb-3 login-header">
-    @if(auth()->guard('pre_representante')->check())
+    @if(auth()->guard('user_externo')->check())
         <p class="cinza-claro p-restrita m-auto-992">
             <small>
-                <a href="{{ route('prerepresentante.dashboard') }}">
+                <a href="{{ route('externo.dashboard') }}">
                     <i class="fas fa-user"></i>&nbsp;
-                   {{ limitRepresentanteName(auth()->guard('pre_representante')->user()->nome) }}
+                   {{ limitRepresentanteName(auth()->guard('user_externo')->user()->nome) }}
                 </a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
-                <a id="logout" href="#">
+                <a id="logout-externo" href="#">
                     Logout
                 </a>
             </small>
@@ -16,12 +16,12 @@
         <a href="#">
             <p class="cinza-claro p-restrita m-auto-992">
                 <small>
-                    <a href="{{ route('prerepresentante.login') }}">
+                    <a href="{{ route('externo.login') }}">
                         <i class="fas fa-lock"></i>&nbsp;
-                        Área restrita do Pré-registro
+                        Área restrita do Login Externo
                     </a>
                     &nbsp;&nbsp;|&nbsp;&nbsp;
-                    <a href="{{ route('prerepresentante.cadastro') }}">
+                    <a href="{{ route('externo.cadastro') }}">
                         Cadastre-se
                     </a>
                 </small>

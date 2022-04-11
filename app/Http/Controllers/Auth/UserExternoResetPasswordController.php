@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Events\ExternoEvent;
-use App\Http\Requests\PreRepresentanteRequest;
+use App\Http\Requests\UserExternoRequest;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -11,20 +11,20 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Support\Str;
 
-class PreRepresentanteResetPasswordController extends Controller
+class UserExternoResetPasswordController extends Controller
 {
     use ResetsPasswords;
 
-    protected $redirectTo = '/pre-representante/home';
+    protected $redirectTo = '/externo/home';
 
     public function __construct()
     {
-        $this->middleware('guest:pre_representante');
+        $this->middleware('guest:user_externo');
     }
 
     public function showResetForm(Request $request, $token = null)
     {
-        return view('auth.passwords.reset-prerepresentante')->with([
+        return view('auth.passwords.reset-user-externo')->with([
             'token' => $token, 
             'cpf_cnpj' => $request->cpf_cnpj
         ]);
@@ -32,15 +32,15 @@ class PreRepresentanteResetPasswordController extends Controller
 
     protected function rules()
     {
-        $pre = new PreRepresentanteRequest();
-        $request = new Request($pre->rules());
+        $user_externo = new UserExternoRequest();
+        $request = new Request($user_externo->rules());
         return $request->all();
     }
 
     protected function validationErrorMessages()
     {
-        $pre = new PreRepresentanteRequest();
-        $request = new Request($pre->messages());
+        $user_externo = new UserExternoRequest();
+        $request = new Request($user_externo->messages());
         return $request->all();
     }
 
@@ -54,22 +54,22 @@ class PreRepresentanteResetPasswordController extends Controller
         ];
     }
 
-    protected function resetPassword($prerep, $password)
+    protected function resetPassword($user_externo, $password)
     {
-        $pre = $prerep->forceFill([
+        $externo = $user_externo->forceFill([
             'password' => bcrypt($password),
             'remember_token' => Str::random(60),
         ])->save();
 
-        if(!$pre)
-            event(new ExternoEvent('Usuário do Pré-registro ' . $prerep->id . ' não conseguiu alterar a senha.'));
+        if(!$externo)
+            event(new ExternoEvent('Usuário do Login Externo ' . $user_externo->id . ' não conseguiu alterar a senha.'));
     }
 
     protected function sendResetResponse(Request $request, $response)
     {
-        event(new ExternoEvent('Usuário do Pré-registro com o cpf/cnpj ' .$request->cpf_cnpj. ' alterou a senha com sucesso.'));
+        event(new ExternoEvent('Usuário do Login Externo com o cpf/cnpj ' .$request->cpf_cnpj. ' alterou a senha com sucesso.'));
 
-        return redirect(route('prerepresentante.login'))->with([
+        return redirect(route('externo.login'))->with([
                 'message' => 'Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.',
                 'class' => 'alert-success'
             ]);
@@ -85,11 +85,11 @@ class PreRepresentanteResetPasswordController extends Controller
 
     protected function broker()
     {
-        return Password::broker('pre_representantes');
+        return Password::broker('users_externo');
     }
 
     protected function guard()
     {
-        return Auth::guard('pre_representante');
+        return Auth::guard('user_externo');
     }
 }

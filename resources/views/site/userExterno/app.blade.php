@@ -19,7 +19,7 @@
   <div class="container">
     <div class="row nomargin" id="conteudo-principal">
       <div class="flex-one pr-4 align-self-center">
-        {{--<h2 class="stronger">Logado como Representante Comercial</h2>--}}
+        <h2 class="stronger">Logado como Usuário Externo</h2>
       </div>
       <div class="align-self-center">
         <a href="/" class="btn-voltar">Voltar</a>
@@ -30,28 +30,28 @@
       <div class="col-xl-3 pb-15-992">
         <div class="menu-representante">
           <div class="p-3 border-one-mr azul-escuro-bg">
-            <h6 class="branco"><strong>{{ auth()->guard('pre_representante')->user()->nome }}</strong></h6>
+            <h6 class="branco"><strong>{{ auth()->guard('user_externo')->user()->nome }}</strong></h6>
             <i class="fas fa-bars show-992" id="bars-representante"></i>
           </div>
           <div id="mobile-menu-representante" class="hide-992">
 
-            <div class="mr-item bt-unset {{ Route::currentRouteName() === 'prerepresentante.dashboard' ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('prerepresentante.dashboard') }}" onclick="showLoading()">
+            <div class="mr-item bt-unset {{ Route::currentRouteName() === 'externo.dashboard' ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('externo.dashboard') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-home"></i>&nbsp;&nbsp;Home</h6>
               </a>
             </div>
 
-            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'prerepresentante.editar.view') || 
-              (Route::currentRouteName() === 'prerepresentante.editar.senha.view') ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('prerepresentante.editar.view') }}" onclick="showLoading()">
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'externo.editar.view') || 
+              (Route::currentRouteName() === 'externo.editar.senha.view') ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('externo.editar.view') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-edit"></i>&nbsp;&nbsp;Alterar dados</h6>
               </a>
             </div>
 
-            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'prerepresentante.preregistro.view') || 
-              (Route::currentRouteName() === 'prerepresentante.inserir.preregistro.view') ? 'mr-item-selected' : '' }}">
-              <a href="{{ route('prerepresentante.preregistro.view') }}" onclick="showLoading()">
-                <h6 class="brancar"><i class="fas fa-file-alt"></i>&nbsp;&nbsp;Pré-registro</h6>
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'externo.preregistro.view') || 
+              (Route::currentRouteName() === 'externo.inserir.preregistro.view') ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('externo.preregistro.view') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-file-alt"></i>&nbsp;&nbsp;Solicitar Registro</h6>
               </a>
             </div>
 
@@ -65,7 +65,7 @@
           </div>
         </div>
         <div class="row nomargin" id="rc-main">
-          @yield('content-prerepresentante')
+          @yield('content-user-externo')
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
-@extends('site.prerepresentante.app')
+@extends('site.userExterno.app')
 
-@section('content-prerepresentante')
+@section('content-user-externo')
 
 @if(Session::has('message'))
     <div class="d-block w-100">
@@ -20,7 +20,7 @@
                     <p>Aqui mesmo o resultado será atualizado e seus dados estarão disponíveis para as correções, se forem necessárias.</p>
                     <p>As informações sobre os documentos exigidos, podem ser conferidas <a href="/registro-inicial">aqui</a>.</p>
 
-                    <a href="{{ route('prerepresentante.inserir.preregistro.view') }}" class="btn btn-secondary link-nostyle branco mt-3">
+                    <a href="{{ route('externo.inserir.preregistro.view') }}" class="btn btn-secondary link-nostyle branco mt-3">
                         {{ isset($resultado->id) ? 'Continuar' : 'Iniciar' }} o pré-registro
                     </a>
                 </div>      

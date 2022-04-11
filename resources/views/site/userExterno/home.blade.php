@@ -1,6 +1,6 @@
-@extends('site.prerepresentante.app')
+@extends('site.userExterno.app')
 
-@section('content-prerepresentante')
+@section('content-user-externo')
  
 <div class="representante-content">
     <div class="conteudo-txt-mini light">

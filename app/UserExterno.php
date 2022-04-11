@@ -6,20 +6,20 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Notifications\PreRepresentanteResetPasswordNotification;
+use App\Notifications\UserExternoResetPasswordNotification;
 
-class PreRepresentante extends Authenticatable
+class UserExterno extends Authenticatable
 {
     use Notifiable;
     use SoftDeletes;
 
-    protected $guard = 'pre_representante';
-    protected $table = 'pre_representantes';
+    protected $guard = 'user_externo';
+    protected $table = 'users_externo';
     protected $guarded = [];
     protected $hidden = ['password', 'remember_token'];
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new PreRepresentanteResetPasswordNotification($token));
+        $this->notify(new UserExternoResetPasswordNotification($token));
     }
 }

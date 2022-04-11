@@ -7,7 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class CadastroPreRepresentanteMail extends Mailable
+class CadastroUserExternoMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -20,7 +20,7 @@ class CadastroPreRepresentanteMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Cadastro no Pré-registro do Portal Core-SP')
+        return $this->subject('Cadastro no Login Externo do Portal Core-SP')
             ->view('emails.default');
     }
 }

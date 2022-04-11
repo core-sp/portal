@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Login no Pré-registro'])
+@extends('site.layout.app', ['title' => 'Solicitar alteração de senha no Login Externo'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Recuperar senha do Pré-registro
+          Recuperar senha do Login Externo
         </h1>
       </div>
     </div>
@@ -21,7 +21,7 @@
             <div class="col">
                 <div class="row nomargin">
                     <div class="flex-one pr-4 align-self-center">
-                        <h2 class="stronger">Reconfigurar senha no Pré-registro</h2>
+                        <h2 class="stronger">Reconfigurar senha no Login Externo</h2>
                     </div>
                     <div class="align-self-center">
                         <a href="/" class="btn-voltar">Voltar</a>
@@ -31,8 +31,8 @@
         </div>        
         <div class="row mt-2">
           <div class="col-lg-8 conteudo-txt">
-            <p>Preencha as informações abaixo para reconfigurar sua senha no Pré-registro.</p>
-            <form method="POST" action="{{ route('prerepresentante.password.update') }}" class="cadastroRepresentante">
+            <p>Preencha as informações abaixo para reconfigurar sua senha no Login Externo.</p>
+            <form method="POST" action="{{ route('externo.password.update') }}" class="cadastroRepresentante">
               @csrf
               <input type="hidden" name="token" value="{{ $token }}">
               <div class="form-group">
@@ -42,7 +42,7 @@
                   type="text"
                   class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
                   name="cpf_cnpj"
-                  value="{{ old('cpf_cnpj') }}"
+                  value="{{ apenasNumeros(old('cpf_cnpj')) }}"
                   placeholder="CPF ou CNPJ"
                   required
                 >
@@ -74,7 +74,7 @@
                   <input
                     id="password_confirmation"
                     type="password"
-                    class="form-control"
+                    class="form-control {{ $errors->has('password_confirmation') ? ' is-invalid' : '' }}"
                     name="password_confirmation"
                     placeholder="Confirmar senha"
                     required

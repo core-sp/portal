@@ -960,22 +960,13 @@ $('#cedula').ready(function() {
   }
 });
 
-// Logout
-$("#logout").click(function(){
+// Logout Externo
+$("#logout-externo").click(function(){
 	var token = $('meta[name="csrf-token"]').attr('content');
-	var link = "/pre-representante/logout";
+	var link = "/externo/logout";
 	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
 	$('body').append(form);
 	$(form).submit();
-});
-
-// Remove a mascara do cpfOuCnpj para qualquer form que for enviado
-$('form').submit(function() {
-	if($('.cpfOuCnpj').index() > -1)
-	{
-		var valor = $('.cpfOuCnpj').cleanVal();
-		$('.cpfOuCnpj').val(valor);
-	}
 });
 
 $('[name="tipo"]').change(function() {

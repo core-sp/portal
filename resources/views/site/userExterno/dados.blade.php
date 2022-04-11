@@ -1,6 +1,6 @@
-@extends('site.prerepresentante.app')
+@extends('site.userExterno.app')
 
-@section('content-prerepresentante')
+@section('content-user-externo')
 
 @if(Session::has('message'))
     <div class="d-block w-100">
@@ -10,9 +10,9 @@
 
 <div class="representante-content w-100">
     <div class="conteudo-txt-mini light">
-        <h4 class="pt-1 pb-1">Dados do Cadastro</h4>
+        <h4 class="pt-1 pb-1">Dados Cadastrais</h4>
         <div class="linha-lg-mini"></div>
-        <form action="{{ route('prerepresentante.editar') }}" method="POST" class="cadastroRepresentante">
+        <form action="{{ route('externo.editar') }}" method="POST" class="cadastroRepresentante">
             @csrf
             @method('PUT')
             @if(!isset($alterarSenha))
@@ -22,9 +22,11 @@
                     <input
                         type="text"
                         name="nome"
-                        class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
-                        value="{{ isset($resultado->nome) ? $resultado->nome : old('nome') }}"
+                        class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }} upperCase"
+                        value="{{ empty(old('nome')) && isset($resultado->nome) ? $resultado->nome : old('nome') }}"
                         placeholder="Nome Completo"
+                        maxlength="191"
+                        minlength="5"
                         required
                     >
                     @if($errors->has('nome'))
@@ -41,10 +43,11 @@
                         type="text"
                         class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
                         id="cpf_cnpj"
-                        value="{{ auth()->guard('pre_representante')->user()->cpf_cnpj }}"
+                        value="{{ $resultado->cpf_cnpj }}"
                         placeholder="CPF ou CNPJ"
                         required
                         readonly
+                        disabled
                     >
                 </div>
                 <div class="col-sm mb-2-576">
@@ -54,7 +57,7 @@
                         name="email"
                         class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                         id="email"
-                        value="{{ isset($resultado->email) ? $resultado->email : old('email') }}"
+                        value="{{ empty(old('email')) && isset($resultado->email) ? $resultado->email : old('email') }}"
                         placeholder="Email"
                         required
                     >
@@ -66,24 +69,24 @@
                 </div>
             </div>
             <div class="form-group mt-3">
-                <a href="{{ route('prerepresentante.editar.senha.view') }}" class="btn btn-danger text-decoration-none text-white">
+                <a href="{{ route('externo.editar.senha.view') }}" class="btn btn-danger text-decoration-none text-white">
                     Alterar Senha
                 </a>
             </div>
             @else
             <div class="form-row">
                 <div class="col-sm mb-2-576">
-                    <label for="password_login">Senha atual *</label>
+                    <label for="password_atual">Senha atual *</label>
                     <input
                         type="password"
-                        name="password_login"
-                        class="form-control {{ $errors->has('password_login') ? 'is-invalid' : '' }}"
+                        name="password_atual"
+                        class="form-control {{ $errors->has('password_atual') ? 'is-invalid' : '' }}"
                         placeholder="Senha Atual"
                         required
                     >
-                    @if($errors->has('password_login'))
+                    @if($errors->has('password_atual'))
                     <div class="invalid-feedback">
-                        {{ $errors->first('password_login') }}
+                        {{ $errors->first('password_atual') }}
                     </div>
                     @endif
                 </div>
@@ -110,7 +113,7 @@
                     <input
                         type="password"
                         name="password_confirmation"
-                        class="form-control"
+                        class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}"
                         id="password_confirmation"
                         placeholder="Confirme a senha"
                         required
@@ -128,7 +131,7 @@
             @endif
             <div class="form-group mt-3 float-right">
                 <a
-                    href="{{ route('prerepresentante.dashboard') }}"
+                    href="{{ route('externo.dashboard') }}"
                     class="btn btn-default text-dark text-decoration-none mr-2"
                 >
                     Cancelar

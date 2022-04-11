@@ -66,7 +66,7 @@
                 @component('components.login-header')
                 @endcomponent
                 <!-- para teste -->
-                @component('components.preRC-login-header')
+                @component('components.user-externo-login-header')
                 @endcomponent
                 <div class="acessibilidade center-992 text-right hide-768">
                   <button type="button" class="btn btn-sm btn-light btn-acessibilidade" id="increase-font">

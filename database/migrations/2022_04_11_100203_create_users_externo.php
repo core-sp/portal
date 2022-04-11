@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePreRepresentantesTable extends Migration
+class CreateUsersExterno extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreatePreRepresentantesTable extends Migration
      */
     public function up()
     {
-        Schema::create('pre_representantes', function (Blueprint $table) {
+        Schema::create('users_externo', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('cpf_cnpj')->unique();
             $table->string('nome');
@@ -21,6 +21,7 @@ class CreatePreRepresentantesTable extends Migration
             $table->string('verify_token')->nullable();
             $table->string('password');
             $table->boolean('ativo')->default(0);
+            $table->boolean('aceite')->default(0);
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
@@ -34,6 +35,6 @@ class CreatePreRepresentantesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pre_representantes');
+        Schema::dropIfExists('users_externo');
     }
 }

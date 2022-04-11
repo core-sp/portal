@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => 'Login no Pré-registro'])
+@extends('site.layout.app', ['title' => 'Login Externo'])
 
 @section('content')
 
@@ -8,7 +8,7 @@
         <div class="row position-absolute pagina-titulo">
             <div class="container text-center">
                 <h1 class="branco text-uppercase">
-                    Login no Pré-registro
+                    Login Externo
                 </h1>
             </div>
         </div>
@@ -21,7 +21,7 @@
             <div class="col">
                 <div class="row nomargin">
                     <div class="flex-one pr-4 align-self-center">
-                        <h2 class="stronger">Login - Área do Pré-registro</h2>
+                        <h2 class="stronger">Login</h2>
                     </div>
                     <div class="align-self-center">
                         <a href="/" class="btn-voltar">Voltar</a>
@@ -37,9 +37,9 @@
                         {{ Session::get('message') }}
                     </p>
                 @endif
-                <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área restrita do Pré-registro.</strong></p>
-                <p>Ou então, <a href="{{ route('prerepresentante.cadastro') }}">realize o cadastro</a> e depois efetue o login.</p>
-                <form action="{{ route('prerepresentante.login.submit') }}" method="POST" class="cadastroRepresentante">
+                <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área restrita do Login Externo.</strong></p>
+                <p>Ou então, <a href="{{ route('externo.cadastro') }}">realize o cadastro</a> e depois efetue o login.</p>
+                <form action="{{ route('externo.login.submit') }}" method="POST" class="cadastroRepresentante">
                     @csrf
                     <div class="form-group">
                         <label for="cpf_cnpj">CPF ou CNPJ</label>
@@ -47,7 +47,7 @@
                             type="text"
                             class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
                             name="cpf_cnpj"
-                            value="{{ Session::get('cpf_cnpj') ?? old('cpf_cnpj') }}"
+                            value="{{ Session::get('cpf_cnpj') ? apenasNumeros(Session::get('cpf_cnpj')) : apenasNumeros(old('cpf_cnpj')) }}"
                             placeholder="CPF ou CNPJ"
                             required
                         >
@@ -58,18 +58,18 @@
                         @endif
                     </div>
                     <div class="form-group mt-2">
-                        <label for="password_login">Senha</label>
+                        <label for="password">Senha</label>
                         <input
                             id="password_login"
                             type="password"
                             class="form-control {{ $errors->has('password_login') ? ' is-invalid' : '' }}"
-                            name="password_login"
+                            name="password"
                             placeholder="Senha"
                             required
                         >
-                        @if($errors->has('password_login'))
+                        @if($errors->has('password'))
                         <div class="invalid-feedback">
-                            {{ $errors->first('password_login') }}
+                            {{ $errors->first('password') }}
                         </div>
                         @endif
                     </div>
@@ -78,7 +78,7 @@
                     </div>
                     <div class="form-group mt-2">
                         <p>
-                            Esqueceu sua senha? <a href="{{ route('prerepresentante.password.request') }}">Clique aqui</a> para alterá-la.
+                            Esqueceu sua senha? <a href="{{ route('externo.password.request') }}">Clique aqui</a> para alterá-la.
                         </p>
                     </div>
                 </form>

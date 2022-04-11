@@ -30,8 +30,8 @@ class Authenticate extends Middleware
             if(\Route::is('representante.*'))
                 return route('representante.login');
 
-            if(\Route::is('prerepresentante.*'))
-                return route('prerepresentante.login');   
+            if(\Route::is('externo.*'))
+                return route('externo.login');   
                  
             return route('login');
         }

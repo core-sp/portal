@@ -15,8 +15,8 @@ class RedirectIfAuthenticated
                     return redirect()->route('representante.dashboard');
                 break;
 
-                case 'pre_representante':
-                    return redirect()->route('prerepresentante.dashboard');
+                case 'user_externo':
+                    return redirect()->route('externo.dashboard');
                 break;
                 
                 default:

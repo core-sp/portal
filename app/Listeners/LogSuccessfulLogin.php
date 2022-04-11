@@ -17,7 +17,7 @@ class LogSuccessfulLogin
 
     public function handle(Login $event)
     {
-        if(!Auth::guard('representante')->check() && !Auth::guard('pre_representante')->check())
+        if(!Auth::guard('representante')->check() && !Auth::guard('user_externo')->check())
             Log::channel('interno')->info($event->user->nome.' (usuário '.$event->user->idusuario.') conectou-se ao painel de administrador.');
     }
 }

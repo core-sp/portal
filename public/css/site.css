@@ -3043,3 +3043,7 @@ h5 {
 .link-bdo a:hover {
 	color: #15AAE2;
 }
+
+.upperCase {
+	text-transform: uppercase;
+}
