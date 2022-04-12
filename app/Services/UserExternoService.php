@@ -13,8 +13,6 @@ class UserExternoService implements UserExternoServiceInterface {
 
     public function save($dados)
     {
-        $token = str_random(32);
-        $dados['verify_token'] = $token;
         $dados['password'] = Hash::make($dados['password']);
         $dados['aceite'] = true;
         unset($dados['password_confirmation']);
@@ -31,7 +29,7 @@ class UserExternoService implements UserExternoServiceInterface {
 
         $body = '<strong>Cadastro no Login Externo do Portal Core-SP realizado com sucesso!</strong>';
         $body .= '<br /><br />';
-        $body .= 'Para concluir o processo, basta clicar <a href="'. route('externo.verifica-email', $token) .'">NESTE LINK</a>.';
+        $body .= 'Para concluir o processo, basta clicar <a href="'. route('externo.verifica-email', $dados['verify_token']) .'">NESTE LINK</a>.';
 
         Mail::to($externo->email)->queue(new CadastroUserExternoMail($body));
         event(new ExternoEvent('"' . $externo->cpf_cnpj . '" ("' . $externo->email . '") cadastrou-se na Área do Login Externo.'));
@@ -58,7 +56,6 @@ class UserExternoService implements UserExternoServiceInterface {
         $user_externo = auth()->guard('user_externo')->user();
 
         if(!isset($dados['nome']) && !isset($dados['email']))
-        {
             if(Hash::check($dados['password_atual'], $user_externo->password)) 
             {
                 $user_externo->update(['password' => Hash::make($dados['password'])]);
@@ -68,7 +65,6 @@ class UserExternoService implements UserExternoServiceInterface {
                     'message' => 'A senha atual digitada está incorreta!',
                     'class' => 'alert-danger',
                 ];
-        }
         else
         {
             $user_externo->update([

@@ -99,10 +99,9 @@ class UserExternoSiteController extends Controller
     {
         // temporário
         $prerep = auth()->guard('user_externo')->user();
-        $tipos = ['PF' => 'Pessoa Física', 'RT' => 'Responsável Técnico', 'PJ' => 'Pessoa Jurídica'];
         $estados_civil = ['Casado(a)', 'Solteiro(a)', 'Viúvo(a)'];
         $nacionalidades = ['Brasileira', 'Portuguesa'];
         $totalFiles = 5;
-        return view('site.userExterno.inserir-pre-registro', compact('tipos', 'prerep', 'estados_civil', 'nacionalidades', 'totalFiles'));
+        return view('site.userExterno.inserir-pre-registro', compact('prerep', 'estados_civil', 'nacionalidades', 'totalFiles'));
     }
 }

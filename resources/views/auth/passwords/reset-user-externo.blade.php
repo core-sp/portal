@@ -61,6 +61,10 @@
                     class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}"
                     name="password"
                     placeholder="Nova senha"
+                    minlength="8"
+                    maxlength="191"
+                    pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
+                    title="A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número"
                     required
                   >
                   @if($errors->has('password'))
@@ -77,6 +81,10 @@
                     class="form-control {{ $errors->has('password_confirmation') ? ' is-invalid' : '' }}"
                     name="password_confirmation"
                     placeholder="Confirmar senha"
+                    minlength="8"
+                    maxlength="191"
+                    pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
+                    title="A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número"
                     required
                   >
                   @if($errors->has('password_confirmation'))

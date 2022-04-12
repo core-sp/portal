@@ -47,7 +47,7 @@
                             <input
                                 type="text"
                                 name="nome"
-                                class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
+                                class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }} upperCase"
                                 value="{{ old('nome') }}"
                                 placeholder="Nome Completo"
                                 maxlength="191"
@@ -69,7 +69,7 @@
                                 name="cpf_cnpj"
                                 class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
                                 id="cpf_cnpj"
-                                value="{{ old('cpf_cnpj') }}"
+                                value="{{ apenasNumeros(old('cpf_cnpj')) }}"
                                 placeholder="CPF ou CNPJ"
                                 required
                             >
@@ -107,6 +107,10 @@
                                 class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
                                 id="password"
                                 placeholder="Senha"
+                                minlength="8"
+                                maxlength="191"
+                                pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
+                                title="A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número"
                                 required
                             >
                             @if($errors->has('password'))
@@ -123,6 +127,10 @@
                                 class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}"
                                 id="password_confirmation"
                                 placeholder="Confirme a senha"
+                                minlength="8"
+                                maxlength="191"
+                                pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
+                                title="A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número"
                                 required
                             >
                             @if($errors->has('password_confirmation'))

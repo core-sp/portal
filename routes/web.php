@@ -237,9 +237,9 @@ Route::prefix('/')->group(function() {
     Route::get('/editar', 'UserExternoSiteController@editarView')->name('externo.editar.view');
     Route::get('/editar/senha', 'UserExternoSiteController@editarSenhaView')->name('externo.editar.senha.view');
     Route::put('/editar', 'UserExternoSiteController@editar')->name('externo.editar');
-    // Pré-registro
-    Route::get('/pre-registro', 'UserExternoSiteController@preRegistroView')->name('externo.preregistro.view');
-    Route::get('/inserir-pre-registro', 'UserExternoSiteController@inserirPreRegistroView')->name('externo.inserir.preregistro.view');
+    // Solicitar Registro
+    Route::get('/solicitar-registro', 'UserExternoSiteController@preRegistroView')->name('externo.preregistro.view');
+    Route::get('/inserir-registro', 'UserExternoSiteController@inserirPreRegistroView')->name('externo.inserir.preregistro.view');
   });
   
   //Balcão de Oportunidades

@@ -266,7 +266,6 @@ class UserExternoTest extends TestCase
             'aceite' => 'on'
         ]);
 
-        // Checa se o e-mail para confirmação do e-mail foi enviado
         Mail::assertQueued(CadastroUserExternoMail::class);
 
         $this->assertDatabaseHas('users_externo', [
@@ -304,7 +303,6 @@ class UserExternoTest extends TestCase
             'aceite' => 'on',
         ]);
 
-        // Checa se o e-mail para confirmação do e-mail foi enviado
         Mail::assertQueued(CadastroUserExternoMail::class);
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
@@ -366,7 +364,7 @@ class UserExternoTest extends TestCase
      * 
      * Usuário Externo  pode logar na área restrita do Portal.
     */
-    public function login_on_pre_registro()
+    public function login_on_externo()
     {
         $user_externo = factory('App\UserExterno')->create();
         $dados = [
@@ -433,7 +431,7 @@ class UserExternoTest extends TestCase
      * 
      * Usuário Externo  não pode logar se não está cadastrado.
     */
-    public function cannot_login_on_pre_registro_without_registration()
+    public function cannot_login_on_externo_without_registration()
     {
         $user_externo = factory('App\UserExterno')->raw();
         $dados = [
@@ -449,7 +447,7 @@ class UserExternoTest extends TestCase
      * 
      * Usuário Externo  não pode logar se não está ativo.
     */
-    public function cannot_login_on_pre_registro_with_ativo_0()
+    public function cannot_login_on_externo_with_ativo_0()
     {
         $user_externo = factory('App\UserExterno')->create([
             'ativo' => 0
@@ -467,7 +465,7 @@ class UserExternoTest extends TestCase
      * 
      * Usuário Externo  não pode logar se senha está errada.
     */
-    public function cannot_login_on_pre_registro_whit_password_wrong()
+    public function cannot_login_on_externo_whit_password_wrong()
     {
         $user_externo = factory('App\UserExterno')->create();
         $dados = [
@@ -666,6 +664,24 @@ class UserExternoTest extends TestCase
 
     /** @test 
      * 
+    */
+    public function cannot_reset_password_with_wrong_token()
+    {
+        $user_externo = factory('App\UserExterno')->create();
+        $token = Password::broker('users_externo')->createToken($user_externo);
+        $this->get(route('externo.password.reset', $token.'abc'))->assertSuccessful();
+        $this->post(route('externo.password.update'), [
+            'cpf_cnpj' => $user_externo->cpf_cnpj,
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'token' => $token.'abc'
+        ])->assertSessionHasErrors([
+            'cpf_cnpj',
+        ]);
+    }
+
+    /** @test 
+     * 
      * Pode resetar senha com tudo certo.
     */
     public function reset_password_after_verificar_email()
@@ -693,7 +709,7 @@ class UserExternoTest extends TestCase
     {
         $user_externo = factory('App\UserExterno')->create();
         $token = Password::broker('users_externo')->createToken($user_externo);
-        $this->get(route('externo.password.reset', $token));
+        $this->get(route('externo.password.reset', $token))->assertSuccessful();
         $this->post(route('externo.password.update'), [
             'token' => $token,
             'cpf_cnpj' => $user_externo->cpf_cnpj,
@@ -1023,7 +1039,8 @@ class UserExternoTest extends TestCase
             'password' => 'Teste10203040',
             'password_confirmation' => 'teste10203040'
         ]))->assertSessionHasErrors([
-            'password'
+            'password',
+            'password_confirmation'
         ]);
     }
 
@@ -1047,7 +1064,8 @@ class UserExternoTest extends TestCase
             'password' => 'Teste10203040',
             'password_confirmation' => 'Teste1020304050'
         ]))->assertSessionHasErrors([
-            'password'
+            'password',
+            'password_confirmation'
         ]);
     }
 
@@ -1105,7 +1123,7 @@ class UserExternoTest extends TestCase
      * 
      * Pode acessar todas as abas na área restrita do Portal.
     */
-    public function after_login_can_access_tabs_on_restrict_area_pre_registro()
+    public function after_login_can_access_tabs_on_restrict()
     {
         $user_externo = factory('App\UserExterno')->create();
         $this->post(route('externo.login.submit'), [

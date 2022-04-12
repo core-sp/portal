@@ -969,16 +969,6 @@ $("#logout-externo").click(function(){
 	$(form).submit();
 });
 
-$('[name="tipo"]').change(function() {
-	var valor = $(this).val();
-	var display = $("#campo_anexo_indica_rt").css("display");
-	var isHide = display == "none" || display == undefined ? true : false;
-	if((valor == 'RT') && (isHide))
-		$("#campo_anexo_indica_rt").show();
-	else
-		$("#campo_anexo_indica_rt").hide();
-});
-
 // --------------------------------------------------------------------------------------------------------
 // gerencia os arquivos, cria os inputs, remove os inputs, controla as quantidades de inputs e files vindo do bd
 

@@ -9,66 +9,43 @@
 @endif
 
 <div class="representante-content w-100">
-        <p>Nomes de abas temporários</p>
+
     <!-- Nav tabs -->
-    <ul class="nav nav-tabs nav-justified" role="tablist">
-        <li class="nav-item text-primary">
-            <a class="nav-link active" data-toggle="tab" href="#parte1">
-                Parte 1 - PF e PJ
+    <ul class="nav nav-pills flex-column">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="pill" href="#parte1">
+                Temporário 1
             </a>
         </li>
-        <li class="nav-item text-primary">
-            <a class="nav-link" data-toggle="tab" href="#parte2">
-                Parte 2 - PF e PJ
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#parte2">
+                Temporário 2
             </a>
         </li>
-        <li class="nav-item text-primary">
-            <a class="nav-link" data-toggle="tab" href="#parte3">
-                Parte 3 - PF ou PJ
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#parte3">
+                Temporário 3
             </a>
         </li>
         @if(strlen($prerep->cpf_cnpj) == 14)
-        <li class="nav-item text-primary">
-            <a class="nav-link" data-toggle="tab" href="#parte4">
-                Parte 4 - PJ
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#parte4">
+                Temporário 4
             </a>
         </li>
         @endif
     </ul>
-
+    
     <form action="{{-- route('externo.editar') --}}" method="POST" class="cadastroRepresentante">
         @csrf
+        @if(isset($resultado->id))
+            @method('PUT')
+        @endif
 
         <!-- Tab panes -->
         <div class="tab-content">
             <!-- Tab 1 -->
-            <div id="parte1" class="container tab-pane active"><br>
-                <label>Tipo de registro *</label><br>
-                @foreach($tipos as $key => $tipo)
-                    @if(strlen($prerep->cpf_cnpj) == 14)
-                    <div class="form-check-inline {{ (isset($resultado->tipo) && $resultado->tipo == $key) || (!isset($resultado->tipo) && ($key == 'PJ')) ? 'checked' : 'disabled' }}">
-                        <label class="form-check-label">
-                            <input type="radio" class="form-check-input" value="{{ $key }}" name="tipo" {{ (isset($resultado->tipo) && $resultado->tipo == $key) || (!isset($resultado->tipo) && ($key == 'PJ')) ? 'checked' : 'disabled' }}>{{ $tipo }}
-                        </label>
-                    </div>
-                    @else
-                        @if(isset($resultado->tipo) && $key != 'PJ')
-                        <div class="form-check-inline {{ $resultado->tipo == $key ? 'checked' : '' }}">
-                            <label class="form-check-label">
-                                <input type="radio" class="form-check-input" value="{{ $key }}" name="tipo" {{ $resultado->tipo == $key ? 'checked' : '' }}>{{ $tipo }}
-                            </label>
-                        </div>
-                        @else
-                        <div class="form-check-inline {{ $key == 'PJ' ? 'disabled' : '' }}">
-                            <label class="form-check-label">
-                                <input type="radio" class="form-check-input" value="{{ $key }}" name="tipo" {{ $key == 'PJ' ? 'disabled' : '' }}>{{ $tipo }}
-                            </label>
-                        </div>
-                        @endif
-                    @endif
-                @endforeach
-
-                <div class="linha-lg-mini"></div>
+            <div id="parte1" class="tab-pane container active"><br>
 
                 <div class="form-row mb-2">
                     <div class="col-sm mb-2-576">
@@ -353,31 +330,10 @@
                         @endif
                     </div>
                 </div>
-                <div class="form-row mb-2">
-                    <div class="col-sm mb-2-576">
-                        <label for="email2">E-mail<small> (opcional)</small></label>
-                        <input
-                            type="email"
-                            class="form-control {{ $errors->has('email2') ? 'is-invalid' : '' }}"
-                            value="{{ isset($resultado->email) ? $resultado->email : old('email2') }}"
-                        >
-                        @if($errors->has('email2'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('email2') }}
-                        </div>
-                        @endif
-                    </div>
-                </div>
-                <div class="mt-3 float-right">
-                    <button class="btn btn-primary" type="button">Salvar</button>
-                    <a href="{{ route('externo.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
-                        Cancelar
-                    </a>
-                </div>
             </div>
 
             <!-- Tab 2 -->
-            <div id="parte2" class="container tab-pane fade"><br>
+            <div id="parte2" class="tab-pane container fade"><br>
                 <h5 class="bold mb-2">Endereço da empresa</h5>
                 <div class="form-row mb-2">
                     <div class="col-sm-4 mb-2-576">
@@ -686,17 +642,10 @@
                         @endif
                     </div>
                 </div>
-
-                <div class="mt-3 float-right">
-                    <button class="btn btn-primary" type="button">Salvar</button>
-                    <a href="{{ route('externo.preregistro.view') }}" class="btn btn-default text-dark text-decoration-none ml-2">
-                        Cancelar
-                    </a>
-                </div>
             </div>
 
             <!-- Tab 3 -->
-            <div id="parte3" class="container tab-pane fade"><br>
+            <div id="parte3" class="tab-pane container fade"><br>
                 @if(strlen($prerep->cpf_cnpj) == 11)
                 <label>Gênero *</label><br>
                 <div class="form-check-inline {{ isset($resultado->genero) && $resultado->genero == 'F' ? 'selected' : '' }}">
@@ -1177,7 +1126,7 @@
 
             <!-- Tab 4 -->
             @if(strlen($prerep->cpf_cnpj) == 14)
-            <div id="parte4" class="container tab-pane fade"><br>
+            <div id="parte4" class="tab-pane container fade"><br>
                 <p class="text-dark mb-3"><i class="fas fa-info-circle"></i> Limite de até {{ $totalFiles }} anexos para cada</p>
 
                 <h5 class="bold mb-2">Documento de identidade de todos os sócios</h5>
@@ -1288,7 +1237,6 @@
             @endif
         </div>
     </form>
-
 </div>
 
 @endsection
