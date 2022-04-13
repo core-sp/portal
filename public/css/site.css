@@ -3047,3 +3047,16 @@ h5 {
 .upperCase {
 	text-transform: uppercase;
 }
+
+/* not active */
+/* .menu-registro.nav-pills .nav-link:not(.active) {
+    background-color: #fff;
+    color: black;
+} */
+
+/* active*/
+.menu-registro.nav-pills .nav-link.active {
+    border: none;
+	background-color: #d6d6d6;
+	color: #444444;
+}

@@ -98,10 +98,10 @@ class UserExternoSiteController extends Controller
     public function inserirPreRegistroView()
     {
         // temporário
-        $prerep = auth()->guard('user_externo')->user();
-        $estados_civil = ['Casado(a)', 'Solteiro(a)', 'Viúvo(a)'];
-        $nacionalidades = ['Brasileira', 'Portuguesa'];
+        $user = auth()->guard('user_externo')->user();
         $totalFiles = 5;
-        return view('site.userExterno.inserir-pre-registro', compact('prerep', 'estados_civil', 'nacionalidades', 'totalFiles'));
+        $regionais = $this->service->getService('Regional')->all()->splice(0, 13)->sortBy('regional');
+        
+        return view('site.userExterno.inserir-pre-registro', compact('user', 'regionais', 'totalFiles'));
     }
 }

@@ -960,6 +960,17 @@ $('#cedula').ready(function() {
   }
 });
 
+// Funcionalidade Solicitação de Registro
+
+// Carrega a máscara quando já possui um rg
+$('#inserirRegistro').ready(function() {
+	if($(".rgInput").index($('#rg')) > -1){
+		var texto = $('#rg').val().replace(/[^a-zA-Z0-9]/g,'');
+		if(texto.length > 3)
+			$('#rg').val(mascaraRG(texto));
+	}
+  });
+
 // Logout Externo
 $("#logout-externo").click(function(){
 	var token = $('meta[name="csrf-token"]').attr('content');
@@ -967,6 +978,16 @@ $("#logout-externo").click(function(){
 	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
 	$('body').append(form);
 	$(form).submit();
+});
+
+// Habilitar Endereço da Empresa no Registro
+if($("#checkEndEmpresa:checked"))
+	$("#habilitarEndEmpresa").hide();
+else
+	$("#habilitarEndEmpresa").show();
+
+$("#checkEndEmpresa").change(function(){
+	this.checked ? $("#habilitarEndEmpresa").hide() : $("#habilitarEndEmpresa").show();
 });
 
 // --------------------------------------------------------------------------------------------------------
@@ -1078,3 +1099,4 @@ function addArquivo(nome){
 	}
 }
 //	--------------------------------------------------------------------------------------------------------
+// FIM da Funcionalidade Solicitação de Registro
