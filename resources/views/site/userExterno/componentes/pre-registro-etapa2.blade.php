@@ -1,12 +1,20 @@
+@php
+$justificativas = 'Teste para mostrar as justificativas do Atendimento após análise';
+@endphp
+
+@if(isset($justificativas))
+    <div class="d-block w-100">
+        <p class="alert alert-warning">{{ $justificativas }}</p>
+    </div>
+@endif
+
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cpf_cnpj">{{ strlen($user->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ' }} *</label>
+        <label for="cpf_cnpj">R07 - {{ strlen($user->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ' }} *</label>
         <input
             type="text"
             class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
-            id="cpf_cnpj"
             value="{{ $user->cpf_cnpj }}"
-            required
             readonly
             disabled
         />
@@ -16,14 +24,12 @@
 @if(strlen($user->cpf_cnpj) == 11)
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome">Nome Completo *</label>
+        <label for="nome">R08 - Nome Completo *</label>
         <input
             type="text"
-            id="nome"
             class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
             value="{{ $user->nome }}"
             placeholder="Nome Completo"
-            required
             readonly
             disabled
         />
@@ -33,11 +39,14 @@
         </div>
         @endif
     </div>
+</div>
+
+<div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_social">Nome Social</label>
+        <label for="nome_social">R09 - Nome Social</label>
         <input
+            name="nome_social"
             type="text"
-            id="nome_social"
             class="form-control {{ $errors->has('nome_social') ? 'is-invalid' : '' }}"
             value="{{-- $user->nome --}}"
             placeholder="Nome Social"
@@ -49,17 +58,28 @@
         @endif
     </div>
 </div>
+
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="sexo">Sexo *</label><br>
+        <label for="sexo">R10 - Sexo *</label><br>
         <div class="form-check-inline">
             <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="sexo" value="F" {{ isset($resultado->sexo) && $resultado->sexo == 'F' ? 'checked' : '' }}>Feminino
+                <input type="radio" 
+                    class="form-check-input" 
+                    name="sexo" 
+                    value="F" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->sexo) && $resultado->sexo == 'F') ? 'checked' : '' }}
+                />
+                Feminino
             </label>
         </div>
         <div class="form-check-inline">
             <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="sexo" value="M" {{ isset($resultado->sexo) && $resultado->sexo == 'M' ? 'checked' : '' }}>Masculino
+                <input type="radio" 
+                    class="form-check-input" 
+                    name="sexo" 
+                    value="M" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->sexo) && $resultado->sexo == 'M') ? 'checked' : '' }}
+                />
+                Masculino
             </label>
         </div>
         @if($errors->has('sexo'))
@@ -69,13 +89,12 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_nasc">Data de Nascimento *</label>
+        <label for="dt_nasc">R11 - Data de Nascimento *</label>
         <input
+            name="dt_nasc"
             type="date"
-            id="dt_nasc"
             class="form-control {{ $errors->has('dt_nasc') ? 'is-invalid' : '' }}"
             value="{{-- $user->nome --}}"
-            required
         />
         @if($errors->has('dt_nasc'))
         <div class="invalid-feedback">
@@ -84,12 +103,10 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="estado_civil">Estado Civil *</label>
+        <label for="estado_civil">R12 - Estado Civil *</label>
         <select 
             name="estado_civil" 
             class="form-control {{ $errors->has('estado_civil') ? 'is-invalid' : '' }}" 
-            id="estado_civil"
-            required
         >
         @foreach(estados_civis() as $estado_civil)
             @if(!empty(old('estado_civil')))
@@ -111,12 +128,10 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nacionalidade">Nacionalidade *</label>
+        <label for="nacionalidade">R13 - Nacionalidade *</label>
         <select 
             name="nacionalidade" 
             class="form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }}" 
-            id="nacionalidade"
-            required
         >
         @foreach(nacionalidades() as $nacionalidade)
             @if(!empty(old('nacionalidade')))
@@ -135,12 +150,10 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="naturalidade">Naturalidade *</label>
+        <label for="naturalidade">R14 - Naturalidade *</label>
         <select 
             name="naturalidade" 
             class="form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }}" 
-            id="naturalidade"
-            required
         >
         @foreach(estados() as $key => $naturalidade)
             @if(!empty(old('naturalidade')))
@@ -162,16 +175,15 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_mae">Nome da Mãe *</label>
+        <label for="nome_mae">R15 - Nome da Mãe *</label>
         <input
+            name="nome_mae"
             type="text"
-            id="nome_mae"
             class="form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }}"
             value="{{-- $user->nome --}}"
             placeholder="Nome da Mãe"
             minlength="5"
             maxlength="191"
-            required
         />
         @if($errors->has('nome_mae'))
         <div class="invalid-feedback">
@@ -180,16 +192,15 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nome_pai">Nome do Pai *</label>
+        <label for="nome_pai">R16 - Nome do Pai *</label>
         <input
+            name="nome_pai"
             type="text"
-            id="nome_pai"
             class="form-control {{ $errors->has('nome_pai') ? 'is-invalid' : '' }}"
             value="{{-- $user->nome --}}"
             placeholder="Nome do Pai"
             minlength="5"
             maxlength="191"
-            required
         />
         @if($errors->has('nome_pai'))
         <div class="invalid-feedback">
@@ -201,15 +212,15 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_mae">N° RG *</label>
+        <label for="rg">R17 - N° RG *</label>
         <input
+            name="rg"
             type="text"
             id="rg"
             class="form-control rgInput {{ $errors->has('rg') ? 'is-invalid' : '' }}"
             value="{{-- $user->nome --}}"
             placeholder="RG"
             maxlength="20"
-            required
         />
         @if($errors->has('rg'))
         <div class="invalid-feedback">
@@ -218,15 +229,14 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="emissor">Órgão Emissor *</label>
+        <label for="emissor">R18 - Órgão Emissor *</label>
         <input
+            name="emissor"
             type="text"
-            id="emissor"
             class="form-control {{ $errors->has('emissor') ? 'is-invalid' : '' }}"
             value="{{-- $user->nome --}}"
             placeholder="Emissor"
             maxlength="10"
-            required
         />
         @if($errors->has('emissor'))
         <div class="invalid-feedback">
@@ -235,13 +245,12 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_expedicao">Data de Expedição *</label>
+        <label for="dt_expedicao">R19 - Data de Expedição *</label>
         <input
+            name="dt_expedicao"
             type="date"
-            id="dt_expedicao"
             class="form-control {{ $errors->has('dt_expedicao') ? 'is-invalid' : '' }}"
             value="{{-- $user->nome --}}"
-            required
         />
         @if($errors->has('dt_expedicao'))
         <div class="invalid-feedback">
@@ -250,20 +259,20 @@
         @endif
     </div>
 </div>
+
 @elseif(strlen($user->cpf_cnpj) == 14)
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="razao_social">Razão Social *</label>
+        <label for="razao_social">R20 - Razão Social *</label>
         <input
+            name="razao_social"
             type="text"
-            id="razao_social"
             class="form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }}"
             value="{{-- $user->nome --}}"
             placeholder="Razão Social"
             minlength="5"
             maxlength="191"
-            required
         />
         @if($errors->has('razao_social'))
         <div class="invalid-feedback">
@@ -275,15 +284,13 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="capital_social">Capital Social em R$ *</label>
+        <label for="capital_social">R21 - Capital Social em R$ *</label>
         <input
             type="text"
             name="capital_social"
             class="form-control capitalSocial {{ $errors->has('capital_social') ? 'is-invalid' : '' }}"
-            id="capital_social"
             placeholder="1.000,00"
             value="{{ isset($resultado->capital_social) ? $resultado->capital_social : old('capital_social') }}"
-            required
         />
         @if($errors->has('capital_social'))
         <div class="invalid-feedback">
@@ -292,16 +299,14 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nire">NIRE *</label>
+        <label for="nire">R22 - NIRE *</label>
         <input
             type="text"
             name="nire"
             class="form-control {{ $errors->has('nire') ? 'is-invalid' : '' }}"
-            id="nire"
             placeholder="NIRE"
             value="{{ isset($resultado->nire) ? $resultado->nire : old('nire') }}"
             maxlength="20"
-            required
         />
         @if($errors->has('nire'))
         <div class="invalid-feedback">
@@ -313,27 +318,20 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_empresa">Tipo da Empresa *</label><br>
+        <label for="tipo_empresa">R23 - Tipo da Empresa *</label><br>
+        @foreach(tipos_empresa() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="tipo_empresa" value="LTDA" {{ isset($resultado->tipo_empresa) && $resultado->tipo_empresa == 'LTDA' ? 'checked' : '' }}>LTDA
+                @if(!empty(old('tipo_empresa')))
+                <input type="radio" class="form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ old('tipo_empresa') == $tipo ? 'checked' : '' }} />{{ $tipo }}
+                @elseif(isset($resultado->tipo_empresa))
+                <input type="radio" class="form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ $tipo == $resultado->tipo ? 'checked' : '' }} />{{ $tipo }}
+                @else
+                <input type="radio" class="form-check-input" name="tipo_empresa" value="{{ $tipo }}" />{{ $tipo }}
+                @endif
             </label>
         </div>
-        <div class="form-check-inline">
-            <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="tipo_empresa" value="UNIPESSOAL" {{ isset($resultado->tipo_empresa) && $resultado->tipo_empresa == 'UNIPESSOAL' ? 'checked' : '' }}>UNIPESSOAL
-            </label>
-        </div>
-        <div class="form-check-inline">
-            <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="tipo_empresa" value="INDIVIDUAL" {{ isset($resultado->tipo_empresa) && $resultado->tipo_empresa == 'INDIVIDUAL' ? 'checked' : '' }}>INDIVIDUAL 
-            </label>
-        </div>
-        <div class="form-check-inline">
-            <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="tipo_empresa" value="FILIAL" {{ isset($resultado->tipo_empresa) && $resultado->tipo_empresa == 'FILIAL' ? 'checked' : '' }}>FILIAL 
-            </label>
-        </div>
+        @endforeach
         @if($errors->has('tipo_empresa'))
         <div class="invalid-feedback">
             {{ $errors->first('tipo_empresa') }}
@@ -341,14 +339,12 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_inicio_atividade">Data início da atividade *</label>
+        <label for="dt_inicio_atividade">R24 - Data início da atividade *</label>
         <input
             type="date"
             name="dt_inicio_atividade"
             class="form-control {{ $errors->has('dt_inicio_atividade') ? 'is-invalid' : '' }}"
-            id="dt_inicio_atividade"
             value="{{ isset($resultado->dt_inicio_atividade) ? $resultado->dt_inicio_atividade : old('dt_inicio_atividade') }}"
-            required
         />
         @if($errors->has('dt_inicio_atividade'))
         <div class="invalid-feedback">
@@ -361,15 +357,13 @@
 <!-- Verificar validação das Inscrições -->
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="insc_estadual">Inscrição Estadual *</label>
+        <label for="insc_estadual">R25 - Inscrição Estadual *</label>
         <input
             type="text"
             name="insc_estadual"
             class="form-control {{ $errors->has('insc_estadual') ? 'is-invalid' : '' }}"
-            id="insc_estadual"
             placeholder=""
             value="{{ isset($resultado->insc_estadual) ? $resultado->insc_estadual : old('insc_estadual') }}"
-            required
         />
         @if($errors->has('insc_estadual'))
         <div class="invalid-feedback">
@@ -378,15 +372,13 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="insc_municipal">Inscrição Municipal *</label>
+        <label for="insc_municipal">R26 - Inscrição Municipal *</label>
         <input
             type="text"
             name="insc_municipal"
             class="form-control {{ $errors->has('insc_municipal') ? 'is-invalid' : '' }}"
-            id="insc_municipal"
             placeholder=""
             value="{{ isset($resultado->insc_municipal) ? $resultado->insc_municipal : old('insc_municipal') }}"
-            required
         />
         @if($errors->has('insc_municipal'))
         <div class="invalid-feedback">
@@ -397,18 +389,19 @@
 </div>
 @endif
 
+<div class="linha-lg-mini"></div>
+
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="ramo_atividade">Ramo de Atividade *</label>
+        <label for="ramo_atividade">R27 - Ramo de Atividade *</label>
         <input
+            name="ramo_atividade"
             type="text"
-            id="ramo_atividade"
-            class="form-control {{ $errors->has('ramo_atividade') ? 'is-invalid' : '' }}"
+            class="form-control {{ $errors->has('ramo_atividade') || isset($justificativas) ? 'is-invalid' : '' }}"
             value="{{-- $user->nome --}}"
             placeholder="Ramo de Atividade"
             minlength="5"
             maxlength="191"
-            required
         />
         @if($errors->has('ramo_atividade'))
         <div class="invalid-feedback">
@@ -420,12 +413,10 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="segmento">Segmento *</label>
+        <label for="segmento">R28 - Segmento *</label>
         <select 
             name="segmento" 
-            class="form-control {{ $errors->has('segmento') ? 'is-invalid' : '' }}" 
-            id="segmento"
-            required
+            class="form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }}" 
         >
         @foreach(segmentos() as $segmento)
             @if(!empty(old('segmento')))
@@ -444,16 +435,14 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="regional">Região de Atuação *</label>
+        <label for="idregional">R29 - Região de Atuação *</label>
         <select 
-            name="regional" 
-            class="form-control {{ $errors->has('regional') ? 'is-invalid' : '' }}" 
-            id="regional"
-            required
+            name="idregional" 
+            class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}" 
         >
         @foreach($regionais as $regional)
-            @if(!empty(old('regional')))
-            <option value="{{ $regional->idregional }}" {{ old('regional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
+            @if(!empty(old('idregional')))
+            <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
             @elseif(isset($resultado->idregional))
             <option value="{{ $regional->idregional }}" {{ $regional->idregional == $resultado->regional ? 'selected' : '' }}>{{ $regional->regional }}</option>
             @else
@@ -461,9 +450,9 @@
             @endif
         @endforeach
         </select>
-        @if($errors->has('regional'))
+        @if($errors->has('idregional'))
         <div class="invalid-feedback">
-            {{ $errors->first('regional') }}
+            {{ $errors->first('idregional') }}
         </div>
         @endif
     </div>

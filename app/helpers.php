@@ -466,6 +466,25 @@ function estados_civis()
     ];
 }
 
+function tipos_empresa()
+{
+    return [
+        'LTDA',
+        'UNIPESSOAL',
+        'INDIVIDUAL',
+        'FILIAL',
+    ];
+}
+
+function tipos_contatos()
+{
+    return [
+        'WhatsApp / Telegram',
+        'Comercial',
+        'Residencial',
+    ];
+}
+
 function formataDataGerenti($date)
 {
     $array = explode('-', $date);

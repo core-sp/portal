@@ -996,6 +996,7 @@ $("#checkEndEmpresa").change(function(){
 var pre_registro_total_files = 5;
 
 // ao carregar a pagina, verifica se possui o limite maximo de arquivos permitidos, caso sim, ele impede de adicionar mais
+// Será refatorado
 $('form').ready(function(){
 	if($(".ArquivoBD_resid").length == 1)
 		$(".Arquivo_resid").hide();
@@ -1024,8 +1025,17 @@ $('form').ready(function(){
 	if($(".ArquivoBD_contrato_social").length == 1)
 		$(".Arquivo_contrato_social").hide();
 
-	if($(".ArquivoBD_doc").length == pre_registro_total_files)
-		$(".Arquivo_doc").hide();
+	if($(".ArquivoBD_rg").length == pre_registro_total_files)
+		$(".Arquivo_rg").hide();
+
+	if($(".ArquivoBD_cpf").length == pre_registro_total_files)
+		$(".Arquivo_cpf").hide();
+	
+	if($(".ArquivoBD_tse_socios").length == pre_registro_total_files)
+		$(".Arquivo_tse_socios").hide();
+
+	if($(".ArquivoBD_reserv").length == pre_registro_total_files)
+		$(".Arquivo_reserv").hide();
 
 	if($(".ArquivoBD_resid_socios").length == pre_registro_total_files)
 		$(".Arquivo_resid_socios").hide();
