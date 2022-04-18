@@ -62,7 +62,7 @@
                     minlength="6"
                     maxlength="6"
                     size="6"
-                    pattern="[A-Za-z0-9]{6}" title="Somente letras não acentuadas e números"
+                    pattern="[A-Za-z0-9]{6}" title="Somente letras não acentuadas, números e 6 caracteres"
                     required
                     placeholder="XXXXXX" 
                   />
@@ -107,8 +107,8 @@
     <div class="row">
       <div class="col-md-6">
         <form method="POST" class="mt-2">
-        @csrf
-        @method('PUT')
+          @csrf
+          @method('PUT')
           <div class="input-group">
             <input type="text"
               class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"  

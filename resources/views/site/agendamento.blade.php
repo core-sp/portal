@@ -62,7 +62,7 @@
                   name="nome"
                   value="{{ old('nome') }}"
                   maxlength="191"
-                  pattern="/[^0-9]/g" title="Não é permitido números"
+                  pattern="[^0-9]{5,191}" title="Não é permitido números"
                   placeholder="Nome" 
                   required
                 />

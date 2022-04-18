@@ -357,7 +357,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         $total = Agendamento::where('cpf', $dados['cpf'])
             ->where('status', Agendamento::STATUS_NAO_COMPARECEU)
-            ->whereBetween('dia',[Carbon::today()->subDays(90)->format('Y-m-d'), date('Y-m-d')])
+            ->whereBetween('dia',[Carbon::tomorrow()->subDays(90)->format('Y-m-d'), date('Y-m-d')])
             ->count();
         if($total >= 3)
             return [

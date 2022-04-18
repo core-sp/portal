@@ -2421,11 +2421,12 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function agendamento_cannot_be_created_with_nome_length_less_5()
+    public function agendamento_cannot_be_created_with_nome_length_less_than_5()
     {
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
             'nome' => 'Ana',
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2438,12 +2439,13 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function agendamento_cannot_be_created_with_nome_length_greather_191()
+    public function agendamento_cannot_be_created_with_nome_length_greater_than_191()
     {
         $faker = \Faker\Factory::create();
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
             'nome' => $faker->sentence(400),
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2458,9 +2460,10 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function agendamento_cannot_be_created_with_number_in_nome()
     {
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
             'nome' => 'An4 Teste',
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2475,9 +2478,10 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function agendamento_cannot_be_created_with_invalid_cpf()
     {
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
             'cpf' => '123.456.789-00',
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2492,9 +2496,10 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function agendamento_cannot_be_created_with_invalid_email()
     {
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
             'email' => 'teste.com',
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2506,28 +2511,82 @@ class AgendamentoTest extends TestCase
         ]);
     }
 
-    // /** @test */
-    // public function agendamento_cannot_be_created_with_invalid_celular()
-    // {
-    //     $agendamento = factory('App\Agendamento')->raw([
-    //         'celular' => '(11) A9999-9999',
-    //         'dia' => Carbon::tomorrow()->format('d/m/Y'),
-    //         'servico' => Agendamento::SERVICOS_OUTROS,
-    //         'pessoa' => 'PF',
-    //         'termo' => 'on'
-    //     ]);
+    /** @test */
+    public function agendamento_cannot_be_created_with_invalid_celular()
+    {
+        $pegarDia = factory('App\Agendamento')->raw();
+        $agendamento = factory('App\Agendamento')->raw([
+            'celular' => '(11) A9999-9999',
+            'dia' => onlyDate($pegarDia['dia']),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'termo' => 'on'
+        ]);
 
-    //     dd($this->post(route('agendamentosite.store'), $agendamento))
-    //     ->assertSessionHasErrors([
-    //         'celular'
-    //     ]);
-    // }
+        $this->post(route('agendamentosite.store'), $agendamento)
+        ->assertSessionHasErrors([
+            'celular'
+        ]);
+
+        $agendamento = factory('App\Agendamento')->raw([
+            'celular' => '(1) 99999-9999',
+            'dia' => onlyDate($pegarDia['dia']),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $agendamento)
+        ->assertSessionHasErrors([
+            'celular'
+        ]);
+
+        $agendamento = factory('App\Agendamento')->raw([
+            'celular' => '(11) 999999999',
+            'dia' => onlyDate($pegarDia['dia']),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $agendamento)
+        ->assertSessionHasErrors([
+            'celular'
+        ]);
+
+        $agendamento = factory('App\Agendamento')->raw([
+            'celular' => '11 99999-9999',
+            'dia' => onlyDate($pegarDia['dia']),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $agendamento)
+        ->assertSessionHasErrors([
+            'celular'
+        ]);
+
+        $agendamento = factory('App\Agendamento')->raw([
+            'celular' => '(11) 9999-9999',
+            'dia' => onlyDate($pegarDia['dia']),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $agendamento)
+        ->assertSessionHasErrors([
+            'celular'
+        ]);
+    }
 
     /** @test */
     public function agendamento_cannot_be_created_with_invalid_servico()
     {
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => 'Teste',
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2542,8 +2601,9 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function agendamento_cannot_be_created_with_invalid_pessoa()
     {
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PFJ',
             'termo' => 'on'
@@ -2558,9 +2618,10 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function agendamento_cannot_be_created_with_invalid_regional()
     {
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
             'idregional' => 55,
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2605,10 +2666,10 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function agendamento_cannot_be_created_with_dia_after_31_days()
+    public function agendamento_cannot_be_created_with_dia_after_30_days()
     {
         $agendamento = factory('App\Agendamento')->raw([
-            'dia' => Carbon::tomorrow()->addDays(31)->format('d/m/Y'),
+            'dia' => Carbon::today()->addDays(31)->format('d/m/Y'),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2637,11 +2698,26 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function agendamento_cannot_be_created_with_inexistent_hora()
+    public function agendamento_cannot_be_created_with_dia_without_format_date()
     {
         $agendamento = factory('App\Agendamento')->raw([
+            'dia' => '55//',
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $agendamento)
+        ->assertStatus(500);
+    }
+
+    /** @test */
+    public function agendamento_cannot_be_created_with_inexistent_hora()
+    {
+        $pegarDia = factory('App\Agendamento')->raw();
+        $agendamento = factory('App\Agendamento')->raw([
             'hora' => '18:00',
-            'dia' => Carbon::tomorrow()->format('d/m/Y'),
+            'dia' => onlyDate($pegarDia['dia']),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2800,20 +2876,50 @@ class AgendamentoTest extends TestCase
     public function get_full_days()
     {
         $regional = factory('App\Regional')->create([
-            'horariosage' => '10:00'
+            'horariosage' => '10:00',
+            'ageporhorario' => 1
         ]);
-        $agendamentos = factory('App\Agendamento', 2)->create([
+        $agendamento = factory('App\Agendamento')->create([
             'idregional' => $regional->idregional,
+            'hora' => '10:00'
         ]);
 
-        $dia = Carbon::tomorrow();
+        $dia = Carbon::parse($agendamento->dia);
         $lotado = [$dia->month, $dia->day, 'lotado'];
 
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $regional->idregional,
             'servico' => Agendamento::SERVICOS_OUTROS
         ]))
-        ->assertJson([$lotado]);
+        ->assertJsonFragment([$lotado]);
+    }
+
+    /** @test */
+    public function get_full_days_if_weekends()
+    {
+        $regional = factory('App\Regional')->create();
+
+        $sabado = Carbon::tomorrow();
+        while(!$sabado->isSaturday())
+            $sabado->addDay();
+        $lotado = [$sabado->month, $sabado->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJsonFragment([$lotado]);
+
+        $domingo = Carbon::tomorrow();
+        while(!$domingo->isSunday())
+            $domingo->addDay();
+        $lotado = [$domingo->month, $domingo->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJsonFragment([$lotado]);
     }
 
     /** @test */
@@ -2826,28 +2932,126 @@ class AgendamentoTest extends TestCase
         ]);
 
         $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+        $dia->addDays(7);
+        $nao_lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJsonFragment([$lotado])
+        ->assertJsonMissingExact([$nao_lotado]);
+    }
+
+    /** @test */
+    public function get_full_days_with_0_atendentes_and_diatermino_null_bloqueio()
+    {
+        $regional = factory('App\Regional')->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => $regional->horariosage,
+            'diatermino' => null
+        ]);
+
+        $lotados = array();
+        $dia = Carbon::tomorrow();
+        while($dia->lte(Carbon::tomorrow()->addDays(30)))
+        {
+            array_push($lotados, [$dia->month, $dia->day, 'lotado']);
+            $dia->addDay();
+        }
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJson($lotados);
+    }
+
+    /** @test */
+    public function get_full_days_with_1_or_more_atendentes_and_diatermino_null_bloqueio()
+    {
+        $regional = factory('App\Regional')->create([
+            'horariosage' => '10:00'
+        ]);
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => $regional->horariosage,
+            'qtd_atendentes' => 1,
+            'diatermino' => null
+        ]);
+
+        $dia = Carbon::tomorrow()->addDays(10);
+        while($dia->isWeekend())
+            $dia->addDay();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $regional->idregional,
+            'hora' => '10:00',
+            'dia' => $dia->format('Y-m-d')
+        ]);
+
         $lotado = [$dia->month, $dia->day, 'lotado'];
 
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $regional->idregional,
             'servico' => Agendamento::SERVICOS_OUTROS
         ]))
-        ->assertJson([$lotado]);
+        ->assertJsonFragment([$lotado]);
     }
 
     /** @test */
-    public function get_empty_full_days()
+    public function get_empty_full_days_with_1_or_more_atendentes_bloqueio()
+    {
+        $regional = factory('App\Regional')->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => $regional->horariosage,
+            'qtd_atendentes' => 1
+        ]);
+
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJsonMissing([$lotado]);
+    }
+
+    /** @test */
+    public function get_only_weekends_and_empty_full_days()
     {
         $regional = factory('App\Regional')->create();
         $agendamentos = factory('App\Agendamento', 2)->create([
             'idregional' => $regional->idregional,
         ]);
 
+        $diaAge = Carbon::parse($agendamentos->get(0)->dia);
+        $lotados = array();
+        $dia = Carbon::tomorrow();
+        while($dia->lt(Carbon::tomorrow()->addDays(30)))
+        {
+            if($dia->isWeekend())
+                array_push($lotados, [$dia->month, $dia->day, 'lotado']);
+            $dia->addDay();
+        }
+
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $regional->idregional,
             'servico' => Agendamento::SERVICOS_OUTROS
         ]))
-        ->assertJson([]);
+        ->assertJson($lotados)
+        ->assertJsonMissing([
+            [$diaAge->month, $diaAge->day, 'lotado']
+        ]);
     }
 
     /** @test */
@@ -2874,10 +3078,40 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $regional->idregional,
-            'dia' => Carbon::tomorrow()->format('d\/m\/Y'),
+            'dia' => onlyDate($agendamentos->get(0)->dia),
             'servico' => Agendamento::SERVICOS_OUTROS,
         ]))
         ->assertJsonMissing(['10:00']);
+    }
+
+    /** @test */
+    public function remove_full_hour_if_weekend()
+    {
+        $regional = factory('App\Regional')->create();
+
+        $sabado = Carbon::tomorrow();
+        while(!$sabado->isSaturday())
+            $sabado->addDay();
+        $lotado = [$sabado->month, $sabado->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => $sabado->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJsonMissing($regional->horariosAge());
+
+        $domingo = Carbon::tomorrow();
+        while(!$domingo->isSaturday())
+            $domingo->addDay();
+        $lotado = [$domingo->month, $domingo->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => $domingo->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJsonMissing($regional->horariosAge());
     }
 
     /** @test */
@@ -2889,16 +3123,42 @@ class AgendamentoTest extends TestCase
             'horarios' => '10:00,12:00',
         ]);
 
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+            
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $regional->idregional,
-            'dia' => Carbon::tomorrow()->format('d\/m\/Y'),
+            'dia' => $dia->format('d\/m\/Y'),
             'servico' => Agendamento::SERVICOS_OUTROS,
         ]))
         ->assertJsonMissing(explode(',', $bloqueio->horarios));
     }
 
     /** @test */
-    public function remove_full_hour_with_more_than_0_atendentes_bloqueio()
+    public function remove_full_hour_with_0_atendentes_and_diatermino_null_bloqueio()
+    {
+        $regional = factory('App\Regional')->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => '10:00,12:00',
+            'diatermino' => null
+        ]);
+
+        $dia = Carbon::tomorrow()->addDays(7);
+        while($dia->isWeekend())
+            $dia->addDay();
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => $dia->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertJsonMissing(explode(',', $bloqueio->horarios));
+    }
+
+    /** @test */
+    public function remove_full_hour_with_1_or_more_atendentes_bloqueio()
     {
         $regional = factory('App\Regional')->create();
         $bloqueio = factory('App\AgendamentoBloqueio')->create([
@@ -2917,16 +3177,20 @@ class AgendamentoTest extends TestCase
             'hora' => '11:00'
         ]);
 
+        $horarios = $regional->horariosAge();
+        unset($horarios[array_search('10:00', $horarios)]);
+
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $regional->idregional,
             'dia' => Carbon::tomorrow()->format('d\/m\/Y'),
             'servico' => Agendamento::SERVICOS_OUTROS,
         ]))
-        ->assertJsonMissing(['10:00']);
+        ->assertJsonMissing(['10:00'])
+        ->assertJson($horarios);
     }
 
     /** @test */
-    public function remove_full_hour_with_more_than_0_atendentes_and_diatermino_null_bloqueio()
+    public function remove_full_hour_with_1_or_more_atendentes_and_diatermino_null_bloqueio()
     {
         $regional = factory('App\Regional')->create();
         $bloqueio = factory('App\AgendamentoBloqueio')->create([
@@ -2936,82 +3200,116 @@ class AgendamentoTest extends TestCase
             'diatermino' => null
         ]);
 
+        $dia = Carbon::tomorrow()->addDays(7);
+        while($dia->isWeekend())
+            $dia->addDay();
+
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $regional->idregional,
             'hora' => '10:00',
-            'dia' => Carbon::tomorrow()->format('Y-m-d')
+            'dia' => $dia->format('Y-m-d')
         ]);
 
-        $agendamento = factory('App\Agendamento')->create([
+        $agendamento2 = factory('App\Agendamento')->create([
             'idregional' => $regional->idregional,
             'hora' => '11:00',
-            'dia' => Carbon::tomorrow()->format('Y-m-d')
+            'dia' => $dia->format('Y-m-d')
         ]);
 
-        $this->get(route('agendamentosite.diasHorasAjax', [
-            'idregional' => $regional->idregional,
-            'dia' => Carbon::tomorrow()->format('d\/m\/Y'),
-            'servico' => Agendamento::SERVICOS_OUTROS,
-        ]))
-        ->assertJsonMissing(['10:00']);
+        $horarios = $regional->horariosAge();
+        unset($horarios[array_search('10:00', $horarios)]);
 
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $regional->idregional,
-            'dia' => Carbon::tomorrow()->addDays(12)->format('d\/m\/Y'),
+            'dia' => $dia->format('d\/m\/Y'),
             'servico' => Agendamento::SERVICOS_OUTROS,
         ]))
-        ->assertJson($regional->horariosAge());
+        ->assertJsonMissing(['10:00'])
+        ->assertJson($horarios);
+    }
+
+    /** @test 
+     * 
+     * Testando acesso a página de consulta de Agendamentos.
+    */
+    public function access_search_agendamentos_from_portal()
+    {
+        $this->get(route('agendamentosite.consultaView'))->assertOk();
+    }
+
+    /** @test 
+     * 
+     * Testando consulta de Agendamento pelo protocolo no Portal.
+    */
+    public function search_agendamento_on_portal()
+    {
+        $agendamento = factory('App\Agendamento')->create();
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
+
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSee('Agendamento encontrado!')
+        ->assertSee($agendamento->protocolo)
+        ->assertSee($agendamento->nome)
+        ->assertSee(onlyDate($agendamento->dia))
+        ->assertSee($agendamento->hora)
+        ->assertSee($agendamento->regional->regional)
+        ->assertSee($agendamento->regional->endereco)
+        ->assertSee($agendamento->tiposervico);
     }
 
     /** @test */
-    public function remove_full_hour_with_0_atendentes_and_diatermino_null_bloqueio()
+    public function not_find_agendamento_when_search_on_portal()
     {
-        $regional = factory('App\Regional')->create();
-        $bloqueio = factory('App\AgendamentoBloqueio')->create([
-            'idregional' => $regional->idregional,
-            'horarios' => '10:00,12:00',
-            'diatermino' => null
-        ]);
+        $protocolo = 'XXXXXX';
 
-        $this->get(route('agendamentosite.diasHorasAjax', [
-            'idregional' => $regional->idregional,
-            'dia' => Carbon::tomorrow()->addDays(60)->format('d\/m\/Y'),
-            'servico' => Agendamento::SERVICOS_OUTROS,
-        ]))
-        ->assertJsonMissing(explode(',', $bloqueio->horarios));
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSee('Nenhum agendamento encontrado!');
     }
 
-    // /** @test 
-    //  * 
-    //  * Testando acesso a página de consulta de Agendamentos.
-    // */
-    // public function access_search_agendamentos_from_portal()
-    // {
-    //     $this->get(route('agendamentosite.consultaView'))->assertOk();
-    // }
+    /** @test */
+    public function not_search_agendamento_on_portal_with_size_less_than_6_protocolo()
+    {
+        $protocolo = 'XXXXX';
 
-    // /** @test 
-    //  * 
-    //  * Testando consulta de Agendamento pelo protocolo no Portal.
-    // */
-    // public function search_agendamento_on_portal()
-    // {
-    //     $regional = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSessionHasErrors([
+            'protocolo'
+        ]);
+    }
 
-    //     $agendamento = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX'
-    //     ]);
+    /** @test */
+    public function not_search_agendamento_on_portal_with_size_greater_than_6_protocolo()
+    {
+        $protocolo = 'XXXXXXX';
 
-    //     $this->get(route('agendamentosite.consulta', ['protocolo' => 'XXXXXX']))->assertSee($agendamento->protocolo);
-    // }
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSessionHasErrors([
+            'protocolo'
+        ]);
+    }
+
+    /** @test */
+    public function not_search_agendamento_on_portal_with_invalid_format_protocolo()
+    {
+        $protocolo = '/.XXXXXX';
+
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSessionHasErrors([
+            'protocolo'
+        ]);
+    }
+
+    /** @test */
+    public function not_find_agendamento_when_search_on_portal_if_dia_is_past()
+    {
+        $agendamento = factory('App\Agendamento')->create([
+            'dia' => Carbon::today()->subDay()->format('Y-m-d')
+        ]);
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
+
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSee('Nenhum agendamento encontrado!');
+    }
 
     // /** @test 
     //  * 
@@ -3019,25 +3317,14 @@ class AgendamentoTest extends TestCase
     // */
     // public function cancel_agendamento_on_portal()
     // {
-    //     $regional = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
+    //     $agendamento = factory('App\Agendamento')->create();
+    //     $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
 
-    //     $agendamento = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX'
-    //     ]);
+    //     $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]));
 
-    //     $this->put(route('agendamentosite.cancelamento'), [
-    //         'idagendamento' => $agendamento->idagendamento,
-    //         'protocolo' => $agendamento->protocolo, 
+    //     dd($this->put(route('agendamentosite.cancelamento'), [
     //         'cpf' => $agendamento->cpf
-    //     ]);
+    //     ]));
 
     //     $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, 'Cancelado');
     // }
@@ -3721,7 +4008,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function get_datas_when_data_inicial_less_then_tomorrow_active_plantao_juridico()
+    public function get_datas_when_data_inicial_less_than_tomorrow_active_plantao_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create([
             'dataInicial' => date('Y-m-d'),
@@ -3735,7 +4022,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function get_datas_when_data_final_less_then_tomorrow_active_plantao_juridico()
+    public function get_datas_when_data_final_less_than_tomorrow_active_plantao_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create([
             'dataInicial' => date('Y-m-d'),

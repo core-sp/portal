@@ -29,7 +29,7 @@ class AgendamentoUpdateRequest extends FormRequest
         $this->status = $service->getServicosOrStatusOrCompletos('status');
         $this->servicos = $service->getServicosOrStatusOrCompletos('servicos');
 
-        if(\Route::is('agendamentosite.cancelamento'))
+        if(\Route::is('agendamentosite.consulta'))
         {
             $this->protocolo = '|size:6|regex:/[A-Za-z0-9]/i';
             if(request()->missing('protocolo') || !request()->filled('protocolo'))
@@ -63,7 +63,7 @@ class AgendamentoUpdateRequest extends FormRequest
                     if(isset($datasPJ[1]))
                         $this->dateFormat = $this->dateFormat.'|before_or_equal:'.onlyDate($datasPJ[1]);
                 }else
-                    $this->dateFormat = $this->dateFormat.'|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::tomorrow()->addDays(30)->format('d\/m\/Y');
+                    $this->dateFormat = $this->dateFormat.'|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addDays(30)->format('d\/m\/Y');
 
                 $horarios = $service->getDiasHorasAjaxSite([
                     'idregional' => request()->idregional, 
@@ -85,7 +85,7 @@ class AgendamentoUpdateRequest extends FormRequest
             'nome' => 'sometimes|exclude_if:antigo,1|required|min:5|max:191|string|regex:/^\D*$/',
             'email' => 'sometimes|exclude_if:antigo,1|required|email|max:191',
             'cpf' => ['sometimes', 'exclude_if:antigo,1', 'required', 'max:14', new Cpf],
-            'celular' => 'sometimes|exclude_if:antigo,1|required|max:17',
+            'celular' => 'sometimes|exclude_if:antigo,1|required|max:17|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{4})/',
             'servico' => 'sometimes|required_without_all:tiposervico,antigo,idusuario,status,idagendamento|in:'.implode(',', $this->servicos),
             'tiposervico' => 'sometimes|required|in:'.implode(',', $this->completos),
             'pessoa' => 'sometimes|required|in:PF,PJ,PF e PJ',

@@ -134,7 +134,7 @@ class Regional extends Model
         foreach($agendados as $agendado)
         {
             $dia = Carbon::parse($agendado->dia);
-            if(!isset($diaslotadosBloqueio[array_search($dia->format('Y-m-d'), $diaslotadosBloqueio)]))
+            if(!array_search($dia->format('Y-m-d'), $diaslotadosBloqueio))
             {
                 $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
                 $total = $this->getTotalAtendimentos($horariosTotal, $dia->format('Y-m-d'));
