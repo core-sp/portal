@@ -29,9 +29,9 @@ class AgendamentoUpdateRequest extends FormRequest
         $this->status = $service->getServicosOrStatusOrCompletos('status');
         $this->servicos = $service->getServicosOrStatusOrCompletos('servicos');
 
-        if(\Route::is('agendamentosite.consulta'))
+        if(\Route::is('agendamentosite.consulta') || \Route::is('agendamentosite.cancelamento'))
         {
-            $this->protocolo = '|size:6|regex:/[A-Za-z0-9]/i';
+            $this->protocolo = '|size:6|not_regex:/[^A-Za-z0-9]/';
             if(request()->missing('protocolo') || !request()->filled('protocolo'))
                 $this->merge(['protocolo' => null]);
         }
@@ -121,7 +121,7 @@ class AgendamentoUpdateRequest extends FormRequest
             'before_or_equal' => 'Data fora do período permitido',
             'after_or_equal' => 'Data fora do período permitido',
             'required_without_all' => 'Campo obrigatório',
-            'protocolo.regex' => 'Formato inválido',
+            'protocolo.not_regex' => 'Formato inválido',
             'size' => 'Deve conter :size caracteres',
             'nome.regex' => 'Não é permitido números',
             'celular.regex' => 'Somente neste formato (00) 00000-0000',

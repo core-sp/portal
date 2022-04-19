@@ -16,6 +16,7 @@
             @if(isset($resultado->idregional))
                 <option value="{{ $resultado->idregional }}">{{ $resultado->regional->regional }}</option>
             @else
+                <option value="Todas">Todas</option>
                 @foreach($regionais as $regional)
                 <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
                 @endforeach
@@ -25,6 +26,11 @@
                 <div class="invalid-feedback">
                 {{ $errors->first('idregional') }}
                 </div>
+                @endif
+                @if(!isset($resultado->idregional))
+                <small class="form-text text-muted">
+                    <em>* A opção 'Todas' somente permite criar bloqueio para o dia todo com 0 atendentes em todas as regionais. Ex: feriados</em>
+                </small>
                 @endif
             </div>
         </div>

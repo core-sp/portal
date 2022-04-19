@@ -198,6 +198,7 @@ class AgendamentoSiteController extends Controller
     {
         try{
             $validated = $request->validated();
+            $validated['protocolo'] = request()->query('protocolo');
             $message = $this->service->getService('Agendamento')->cancelamentoSite($validated);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());

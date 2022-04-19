@@ -2301,7 +2301,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentobloqueios.dadosAjax', ['idregional' => $regional->idregional]))
         ->assertJson([
             'horarios' => $regional->horariosAge(),
-            'atendentes' => $regional->ageporhorario - 1
+            'atendentes' => $regional->ageporhorario
         ]);
     }
 
@@ -2360,6 +2360,26 @@ class AgendamentoTest extends TestCase
         $this->assertEquals(Agendamento::count(), 1);
 
         Mail::assertQueued(AgendamentoMailGuest::class);
+    }
+
+    /** @test */
+    public function log_is_generated_when_create_on_portal()
+    {
+        $pegarDia = factory('App\Agendamento')->raw();
+        $agendamento = factory('App\Agendamento')->raw([
+            'nome' => 'Teste Ão Açaí',
+            'dia' => onlyDate($pegarDia['dia']),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $agendamento);
+        $agendamento = Agendamento::find(1);
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString($agendamento->nome.' (CPF: '.$agendamento->cpf.') *agendou* atendimento em *'.$agendamento->regional->regional, $log);
+        $this->assertStringContainsString('* no dia '.onlyDate($agendamento->dia).' para o serviço '.$agendamento->tiposervico.' e ', $log);
     }
 
     /** @test */
@@ -3291,7 +3311,7 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function not_search_agendamento_on_portal_with_invalid_format_protocolo()
     {
-        $protocolo = '/.XXXXXX';
+        $protocolo = '/XXXXX';
 
         $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
         ->assertSessionHasErrors([
@@ -3311,226 +3331,331 @@ class AgendamentoTest extends TestCase
         ->assertSee('Nenhum agendamento encontrado!');
     }
 
-    // /** @test 
-    //  * 
-    //  * Testando cancelamento de Agendamento no Portal.
-    // */
-    // public function cancel_agendamento_on_portal()
-    // {
-    //     $agendamento = factory('App\Agendamento')->create();
-    //     $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
+    /** @test */
+    public function find_agendamento_when_search_on_portal_if_dia_is_today()
+    {
+        $agendamento = factory('App\Agendamento')->create([
+            'dia' => Carbon::today()->format('Y-m-d')
+        ]);
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
 
-    //     $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]));
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSee('Agendamento encontrado!')
+        ->assertSee($agendamento->protocolo)
+        ->assertSee($agendamento->nome)
+        ->assertSee(onlyDate($agendamento->dia))
+        ->assertSee($agendamento->hora)
+        ->assertSee($agendamento->regional->regional)
+        ->assertSee($agendamento->regional->endereco)
+        ->assertSee($agendamento->tiposervico);
+    }
 
-    //     dd($this->put(route('agendamentosite.cancelamento'), [
-    //         'cpf' => $agendamento->cpf
-    //     ]));
+    /** @test */
+    public function find_agendamento_when_search_on_portal_with_status_cancelado()
+    {
+        $agendamento = factory('App\Agendamento')->create([
+            'status' => Agendamento::STATUS_CANCELADO
+        ]);
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
 
-    //     $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, 'Cancelado');
-    // }
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSee('Agendamento cancelado');
+    }
 
-    // /** @test 
-    //  * 
-    //  * Testando a API que retorna os horários de acordo com regional e dia.
-    // */
-    // public function retrieve_agendamentos_by_api()
-    // {
-    //     // regional_1 permite 2 agendamentos por horário
-    //     $regional_1 = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
+    /** @test 
+     * 
+     * Testando cancelamento de Agendamento no Portal.
+    */
+    public function cancel_agendamento_on_portal()
+    {
+        $agendamento = factory('App\Agendamento')->create();
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
 
-    //     $regional_2 = factory('App\Regional')->create([
-    //         'idregional' => 2,
-    //         'regional' => 'Campinas', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ]);
 
-    //     // Registrando um agendamento na regional_1 às 10:00
-    //     $agendamento_1 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional_1->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX'
-    //     ]);
+        $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, Agendamento::STATUS_CANCELADO);
+    }
 
-    //     // Verificando que ainda é possível agendar na regional_1 às 10:00 e em todos os outros horários
-    //     $this->get(route('agendamentosite.checaHorarios', ['idregional' => 1, 'dia' => date('d/m/Y', strtotime('+1 day'))]))
-    //         ->assertSee('10:00')
-    //         ->assertSee('11:00')
-    //         ->assertSee('12:00')
-    //         ->assertSee('13:00')
-    //         ->assertSee('14:00');
+    /** @test */
+    public function log_is_generated_when_cancel()
+    {
+        $agendamento = factory('App\Agendamento')->create();
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
 
-    //     // Registrando mais um agendamento na regional_1 às 10:00
-    //     $agendamento_2 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional_1->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-YYYYYY'
-    //     ]);
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ]);
 
-    //     // Verificando que não é mais possível agendar na regional_1 às 10:00, mas ainda é possível em todos os outros horários
-    //     $this->get(route('agendamentosite.checaHorarios', ['idregional' => 1, 'dia' => date('d/m/Y', strtotime('+1 day'))]))
-    //         ->assertDontSee('10:00')
-    //         ->assertSee('11:00')
-    //         ->assertSee('12:00')
-    //         ->assertSee('13:00')
-    //         ->assertSee('14:00');
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString($agendamento->nome.' (CPF: '.$agendamento->cpf.') *cancelou* atendimento em *'.$agendamento->regional->regional, $log);
+        $this->assertStringContainsString('* no dia '.onlyDate($agendamento->dia), $log);
+    }
 
-    //     // Verificando que o horário as 10:00 está disponível na outra regional "regional_2"
-    //     $this->get(route('agendamentosite.checaHorarios', ['idregional' => 2, 'dia' => date('d/m/Y', strtotime('+1 day'))]))
-    //         ->assertSee('10:00')
-    //         ->assertSee('11:00')
-    //         ->assertSee('12:00')
-    //         ->assertSee('13:00')
-    //         ->assertSee('14:00');
-    // }
+    /** @test */
+    public function cannot_cancel_agendamento_on_portal_without_protocolo()
+    {
+        $agendamento = factory('App\Agendamento')->create();
 
-    // /** @test 
-    //  * 
-    //  * Testando validação que bloqueia Agendamento com CPF que deixou de comparecer três vezes em Agendamentos anteriores
-    //  * nos últimos 90 dias.
-    // */
-    // public function agendamento_with_cpf_that_didnt_show_up_three_times_in_90_days()
-    // {
-    //     $regional = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
+        $this->put(route('agendamentosite.cancelamento'), [
+            'cpf' => $agendamento->cpf
+        ])->assertSessionHasErrors([
+            'protocolo'
+        ]);
+    }
 
-    //     // Primeiro Agendamento em que a pessoa com o CPF não compareceu
-    //     $agendamento_1 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d'),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX',
-    //         'status' => Agendamento::STATUS_NAO_COMPARECEU
-    //     ]);
+    /** @test */
+    public function cannot_cancel_agendamento_on_portal_with_invalid_format_protocolo()
+    {
+        $agendamento = factory('App\Agendamento')->create();
+        $protocolo = 'XXXXX';
 
-    //     // Segundo Agendamento em que a pessoa com o CPF não compareceu
-    //     $agendamento_2 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d'),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-YYYYYY',
-    //         'status' => Agendamento::STATUS_NAO_COMPARECEU
-    //     ]);
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ])->assertSessionHasErrors([
+            'protocolo'
+        ]);
 
-    //     // Terceiro Agendamento em que a pessoa com o CPF não compareceu
-    //     $agendamento_3 = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d'),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-WWWWWW',
-    //         'status' => Agendamento::STATUS_NAO_COMPARECEU
-    //     ]);
+        $protocolo = 'XXXXXXX';
 
-    //     // Quarto Agendamento com o CPF da pessoa que não compareceu três vezes
-    //     $agendamento_4 = factory('App\Agendamento')->raw([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'termo' => 'on'
-    //     ]);
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ])->assertSessionHasErrors([
+            'protocolo'
+        ]);
 
-    //     $this->post(route('agendamentosite.store'), $agendamento_4)->assertStatus(405);
+        $protocolo = ';XXXXX';
 
-    //     // Apenas os três primeiros Agendamentos devem estar no banco de dados
-    //     $this->assertEquals(Agendamento::count(), 3);
-    // }
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ])->assertSessionHasErrors([
+            'protocolo'
+        ]);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Testando consulta de Agendamento com protocolo errado no Portal.
-    // */
-    // public function wrong_protocol_search_agendamento_on_portal()
-    // {
-    //     $regional = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
+    /** @test */
+    public function cannot_cancel_agendamento_on_portal_without_cpf()
+    {
+        $agendamento = factory('App\Agendamento')->create();
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
 
-    //     $agendamento = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX'
-    //     ]);
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => ''
+        ])->assertSessionHasErrors([
+            'cpf'
+        ]);
+    }
 
-    //     // Usando protocolo diferente do usado na criação do Agendamento
-    //     $this->get(route('agendamentosite.consulta', ['protocolo' => 'YYYYYY']))->assertDontSee($agendamento->protocolo);
-    // }
+    /** @test */
+    public function cannot_cancel_agendamento_on_portal_with_invalid_cpf()
+    {
+        $agendamento = factory('App\Agendamento')->create();
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
 
-    // /** @test 
-    //  * 
-    //  * Testando bloqueio de cancelamento de Agendamento no Portal quando CPF fornecido não bate com protocolo.
-    // */
-    // public function cancel_agendamento_with_wrong_cpf_on_portal()
-    // {
-    //     $regional = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => '123.456.789-00'
+        ])->assertSessionHasErrors([
+            'cpf'
+        ]);
+    }
 
-    //     $agendamento = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d', strtotime('+1 day')),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX'
-    //     ]);
+    /** @test */
+    public function cannot_cancel_agendamento_on_portal_with_inexistent_protocolo()
+    {
+        $agendamento = factory('App\Agendamento')->create();
+        $protocolo = 'ABC123';
 
-    //     // Usando CPF diferente na consulta
-    //     $this->put(route('agendamentosite.cancelamento'), [
-    //         'idagendamento' => $agendamento->idagendamento,
-    //         'protocolo' => $agendamento->protocolo, 
-    //         'cpf' => '000.000.000-00'
-    //     ]);
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ])->assertStatus(302);
 
-    //     // Garantir que o status do Agendamento é nulo e não "Cancelado"
-    //     $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, null);
-    // }
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSeeText('O protocolo não existe para agendamentos de hoje em diante');
+    }
 
-    // /** @test 
-    //  * 
-    //  * Testando bloqueio de cancelamento de Agendamento no Portal quando cancelamento é feito no mesmo dia do agendamento.
-    // */
-    // public function cancel_agendamento_on_agendamento_day_on_portal()
-    // {
-    //     $regional = factory('App\Regional')->create([
-    //         'idregional' => 1,
-    //         'regional' => 'São Paulo', 
-    //         'ageporhorario' => 2, 
-    //         'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-    //     ]);
+    /** @test */
+    public function cannot_cancel_agendamento_on_portal_with_different_cpf()
+    {
+        $agendamento = factory('App\Agendamento')->create();
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
 
-    //     // Criando Agendamento no dia atual para tentar cancelar no mesmo dia
-    //     $agendamento = factory('App\Agendamento')->create([
-    //         'idregional' => $regional->idregional,
-    //         'dia' => date('Y-m-d'),
-    //         'hora' => '10:00',
-    //         'protocolo' => 'AGE-XXXXXX'
-    //     ]);
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => '710.634.520-23'
+        ])->assertStatus(302);
 
-    //     $this->put(route('agendamentosite.cancelamento'), [
-    //         'idagendamento' => $agendamento->idagendamento,
-    //         'protocolo' => $agendamento->protocolo, 
-    //         'cpf' => $agendamento->cpf
-    //     ])->assertStatus(302);
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSeeText('O CPF informado não corresponde ao protocolo. Por favor, pesquise novamente o agendamento');
+    }
 
-    //     // Garantir que o status do Agendamento é nulo e não "Cancelado"
-    //     $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, null);
-    // }
+    /** @test */
+    public function cannot_cancel_agendamento_on_portal_if_dia_is_past_or_today()
+    {
+        $agendamento = factory('App\Agendamento')->create([
+            'dia' => Carbon::today()->format('Y-m-d')
+        ]);
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
+
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ])->assertStatus(302);
+
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSeeText('Cancelamento do agendamento deve ser antes do dia do atendimento');
+
+        $agendamento->dia = Carbon::today()->subDays(5)->format('Y-m-d');
+
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ])->assertStatus(302);
+
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSeeText('Cancelamento do agendamento deve ser antes do dia do atendimento');
+    }
+
+    /** @test */
+    public function cannot_cancel_agendamento_on_portal_with_status_not_null()
+    {
+        $agendamento = factory('App\Agendamento')->create([
+            'status' => Agendamento::STATUS_COMPARECEU
+        ]);
+        $protocolo = str_replace('AGE-', null, $agendamento->protocolo);
+
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ])->assertStatus(302);
+
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSeeText('O protocolo não existe para agendamentos de hoje em diante');
+
+        $agendamento->status = Agendamento::STATUS_NAO_COMPARECEU;
+
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ])->assertStatus(302);
+
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSeeText('O protocolo não existe para agendamentos de hoje em diante');
+
+        $agendamento->status = Agendamento::STATUS_CANCELADO;
+
+        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
+            'cpf' => $agendamento->cpf
+        ])->assertStatus(302);
+
+        $this->get(route('agendamentosite.consulta', ['protocolo' => $protocolo]))
+        ->assertSeeText('O protocolo não existe para agendamentos de hoje em diante');
+    }
+
+    /** @test 
+     * 
+     * Testando a API que retorna os horários de acordo com regional e dia.
+    */
+    public function retrieve_agendamentos_by_api()
+    {
+        // regional_1 permite 2 agendamentos por horário
+        $regional_1 = factory('App\Regional')->create([
+            'idregional' => 1,
+            'regional' => 'São Paulo', 
+            'ageporhorario' => 2, 
+            'horariosage' => '10:00,11:00,12:00,13:00,14:00'
+        ]);
+
+        $regional_2 = factory('App\Regional')->create([
+            'idregional' => 2,
+            'regional' => 'Campinas', 
+            'ageporhorario' => 2, 
+            'horariosage' => '10:00,11:00,12:00,13:00,14:00'
+        ]);
+
+        // Registrando um agendamento na regional_1 às 10:00
+        $agendamento_1 = factory('App\Agendamento')->create([
+            'idregional' => $regional_1->idregional,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00',
+            'protocolo' => 'AGE-XXXXXX'
+        ]);
+
+        // Verificando que ainda é possível agendar na regional_1 às 10:00 e em todos os outros horários
+        $this->get(route('agendamentosite.diasHorasAjax', ['idregional' => 1, 'dia' => date('d/m/Y', strtotime('+1 day'))]))
+            ->assertSee('10:00')
+            ->assertSee('11:00')
+            ->assertSee('12:00')
+            ->assertSee('13:00')
+            ->assertSee('14:00');
+
+        // Registrando mais um agendamento na regional_1 às 10:00
+        $agendamento_2 = factory('App\Agendamento')->create([
+            'idregional' => $regional_1->idregional,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'hora' => '10:00',
+            'protocolo' => 'AGE-YYYYYY'
+        ]);
+
+        // Verificando que não é mais possível agendar na regional_1 às 10:00, mas ainda é possível em todos os outros horários
+        $this->get(route('agendamentosite.diasHorasAjax', ['idregional' => 1, 'dia' => date('d/m/Y', strtotime('+1 day'))]))
+            ->assertDontSee('10:00')
+            ->assertSee('11:00')
+            ->assertSee('12:00')
+            ->assertSee('13:00')
+            ->assertSee('14:00');
+
+        // Verificando que o horário as 10:00 está disponível na outra regional "regional_2"
+        $this->get(route('agendamentosite.diasHorasAjax', ['idregional' => 2, 'dia' => date('d/m/Y', strtotime('+1 day'))]))
+            ->assertSee('10:00')
+            ->assertSee('11:00')
+            ->assertSee('12:00')
+            ->assertSee('13:00')
+            ->assertSee('14:00');
+    }
+
+    /** @test */
+    public function view_regionais_on_portal()
+    {
+        $regionais = factory('App\Regional', 3)->create();
+        $regionais->get(0)->regional = 'São Paulo - Avenida Brigadeiro Luís Antônio';
+
+        $this->get(route('agendamentosite.formview'))
+        ->assertSeeText('Selecione a regional')
+        ->assertSeeText($regionais->get(0)->regional)
+        ->assertSeeText($regionais->get(1)->regional)
+        ->assertSeeText($regionais->get(2)->regional);
+    }
+
+    /** @test */
+    public function view_tipo_pessoas_on_portal()
+    {
+        factory('App\Regional')->create();
+
+        $this->get(route('agendamentosite.formview'))
+        ->assertSeeText('Para:')
+        ->assertSeeText('Pessoa Física')
+        ->assertSeeText('Pessoa Jurídica')
+        ->assertSeeText('Ambas');
+    }
+
+    /** @test */
+    public function view_tipos_servicos_on_portal()
+    {
+        factory('App\Regional')->create();
+        
+        $this->get(route('agendamentosite.formview'))
+        ->assertSeeText('Tipo de Serviço')
+        ->assertSeeText(Agendamento::SERVICOS_ATUALIZACAO_DE_CADASTRO)
+        ->assertSeeText(Agendamento::SERVICOS_CANCELAMENTO_DE_REGISTRO)
+        ->assertDontSeeText(Agendamento::SERVICOS_REFIS)
+        ->assertSeeText(Agendamento::SERVICOS_REGISTRO_INICIAL)
+        ->assertSeeText(Agendamento::SERVICOS_OUTROS);
+    }
+
+    /** @test */
+    public function view_termo_on_portal()
+    {
+        factory('App\Regional')->create();
+        
+        $this->get(route('agendamentosite.formview'))
+        ->assertSee(route('termo.consentimento.pdf'));
+    }
 
     /** 
      * =======================================================================================================
@@ -3626,7 +3751,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function cannot_create_different_qtd_agendamento_and_advogados_in_same_hour_with_active_plantao_juridico()
+    public function cannot_create_agendamentos_greater_than_qtd_advogados_in_same_hour_with_active_plantao_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create([
             'qtd_advogados' => 1
@@ -3772,7 +3897,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function cannot_create_agendamento_with_full_date_plantao_juridico()
+    public function cannot_create_agendamento_with_full_day_plantao_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create([
             'horarios' => '10:00',
@@ -3844,7 +3969,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function can_create_two_or_more_agendamentos_with_same_cpf_and_differents_regional_plantao_juridico()
+    public function can_create_two_or_more_agendamentos_with_same_cpf_and_differents_regionais_plantao_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create([
             'qtd_advogados' => 1
@@ -3918,7 +4043,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function get_empty_array_horarios_when_disabled_plantao_juridico()
+    public function get_empty_horarios_when_disabled_plantao_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create();
 
@@ -3983,7 +4108,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function get_empty_array_lotado_when_disabled_plantao_juridico()
+    public function get_empty_lotado_when_disabled_plantao_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create();
 
@@ -3995,7 +4120,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function get_datas_active_plantao_juridico()
+    public function get_dates_active_plantao_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create([
             'qtd_advogados' => 1
@@ -4008,7 +4133,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function get_datas_when_data_inicial_less_than_tomorrow_active_plantao_juridico()
+    public function get_dates_when_data_inicial_less_than_tomorrow_active_plantao_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create([
             'dataInicial' => date('Y-m-d'),
@@ -4037,7 +4162,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function get_empty_array_datas_when_disabled_planta_juridico()
+    public function get_empty_dates_when_disabled_planta_juridico()
     {
         $plantao = factory('App\PlantaoJuridico')->create();
 

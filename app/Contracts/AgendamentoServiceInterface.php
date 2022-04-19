@@ -18,7 +18,7 @@ interface AgendamentoServiceInterface {
 
     public function save($dados, $id = null);
 
-    public function saveBloqueio($dados, $id = null);
+    public function saveBloqueio($dados, MediadorServiceInterface $service, $id = null);
 
     public function saveSite($dados, MediadorServiceInterface $service);
 

@@ -82,9 +82,9 @@
 	  </div>
     </div>
   </div>
-  @if(request()->query('protocolo'))
+@if(request()->query('protocolo'))
   <div class="container">
-    @if(isset($resultado))
+  @if(isset($resultado))
     <div class="row mt-4 mb-2">
       <div class="col mt-2">
         <strong>Agendamento encontrado!</strong><br /><br/>
@@ -96,14 +96,13 @@
         <strong>Endereço:</strong> {{ $resultado->regional->endereco }}, {{ $resultado->regional->numero }} - {{ $resultado->regional->complemento }}<br />
         <strong>Serviço:</strong> {{ $resultado->tiposervico }}<br /><br />
         <br />
-        @if($resultado->status != 'Cancelado')
-        Para cancelar o agendamento, confirme o CPF abaixo e clique em Cancelar:
-        @else
-        <strong>Agendamento cancelado pelo usuário</strong>
+        @if($resultado->status == 'Cancelado')
+        <p><strong>Agendamento cancelado</strong></p>
         @endif
       </div>
     </div>
-    @if($resultado->status != 'Cancelado')
+    @if($resultado->isAfter() && !isset($resultado->status))
+    <p>Para cancelar o agendamento, confirme o CPF abaixo e clique em Cancelar:</p>
     <div class="row">
       <div class="col-md-6">
         <form method="POST" class="mt-2">
@@ -130,15 +129,15 @@
       </div>
     </div>
     @endif
-    @else
+  @else
     <div class="row mt-4 mb-2">
       <div class="col">
-      Nenhum agendamento encontrado!
+      <p>Nenhum agendamento encontrado!</p>
       </div>
     </div>
-    @endif
-  </div>
   @endif
+  </div>
+@endif
 </section>
 
 @endsection

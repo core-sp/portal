@@ -196,6 +196,17 @@ function ajaxAgendamentoBloqueio(valor)
   });
 }
 
+function optionTodas(valor)
+{
+  if(valor == 'Todas'){
+    $('#horarios').prop("disabled", true);
+    $('#qtd_atendentes').val(0);
+    $('#qtd_atendentes').text("0");
+  }
+  else
+    $('#horarios').prop("disabled", false);
+}
+
 function setCamposAgeBloqueio(horas_atendentes)
 {
   $('#horarios option').show();
@@ -209,12 +220,14 @@ function setCamposAgeBloqueio(horas_atendentes)
 
 $('#idregionalBloqueio').ready(function(){
   var valor = $('#idregionalBloqueio').val();
+    optionTodas(valor);
   if(valor > 0)
     ajaxAgendamentoBloqueio(valor);
 });
 
 $('#idregionalBloqueio').change(function(){
   var valor = $('#idregionalBloqueio').val();
+    optionTodas(valor);
   if(valor > 0)
     ajaxAgendamentoBloqueio(valor);
 });

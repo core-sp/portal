@@ -55,7 +55,7 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $validated = $request->validated();
-            $this->service->getService('Agendamento')->saveBloqueio($validated);
+            $this->service->getService('Agendamento')->saveBloqueio($validated, $this->service);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao criar o bloqueio do agendamento.");
@@ -89,7 +89,7 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $validated = $request->validated();
-            $this->service->getService('Agendamento')->saveBloqueio($validated, $id);
+            $this->service->getService('Agendamento')->saveBloqueio($validated, $this->service, $id);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao atualizar o bloqueio do agendamento.");
@@ -144,7 +144,7 @@ class AgendamentoBloqueioController extends Controller
             $regional = $this->service->getService('Regional')->getById($request->idregional);
             $dados = [
                 'horarios' => $regional->horariosAge(),
-                'atendentes' => $regional->ageporhorario - 1
+                'atendentes' => $regional->ageporhorario
             ];
             
         } catch (\Exception $e) {

@@ -133,7 +133,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         if(auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user()))
         {
-            $regionais = $service->getService('Regional')->all();
+            $regionais = $service->getService('Regional')->all()->sortBy('regional');
             $options = !isset($request->regional) ? 
             getFiltroOptions('', 'Todas', true) : getFiltroOptions('', 'Todas');
 
@@ -478,7 +478,13 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'servicos' => $this->servicosCompletos(),
             'status' => $status,
             'variaveis' => (object) $this->variaveis,
-            'atendentes' => $agendamento->regional->users()->select('idusuario', 'nome')->where('idperfil', 8)->withoutTrashed()->get(),
+            'atendentes' => $agendamento->regional
+            ->users()
+            ->select('idusuario', 'nome')
+            ->where('idperfil', 8)
+            ->withoutTrashed()
+            ->orderBy('nome')
+            ->get(),
             'resultado' => $agendamento
         ];
     }
@@ -565,10 +571,10 @@ class AgendamentoService implements AgendamentoServiceInterface {
         }
     }
 
-    public function saveBloqueio($dados, $id = null)
+    public function saveBloqueio($dados, MediadorServiceInterface $service, $id = null)
     {
         $dados['idusuario'] = auth()->user()->idusuario;
-        $dados['horarios'] = implode(',', $dados['horarios']);
+        $dados['horarios'] = $dados['idregional'] != 'Todas' ? implode(',', $dados['horarios']) : null;
 
         if(isset($id))
         {
@@ -577,6 +583,20 @@ class AgendamentoService implements AgendamentoServiceInterface {
             $bloqueio->update($dados);
 
             event(new CrudEvent('bloqueio de agendamento', 'editou', $id));
+            return null;
+        }
+
+        if($dados['idregional'] == 'Todas')
+        {
+            $regionais = $service->getService('Regional')->all();
+            foreach($regionais as $regional)
+            {
+                $dados['idregional'] = $regional->idregional;
+                $dados['horarios'] = $regional->horariosage;
+                $bloqueio = AgendamentoBloqueio::create($dados);
+                event(new CrudEvent('bloqueio de agendamento', 'criou', $bloqueio->idagendamentobloqueio));
+            }
+
             return null;
         }
 
@@ -622,30 +642,36 @@ class AgendamentoService implements AgendamentoServiceInterface {
     public function cancelamentoSite($dados)
     {
         $protocolo = 'AGE-'.strtoupper($dados['protocolo']);
-        $agendamento = Agendamento::where('protocolo', $protocolo)->first();
+        $agendamento = Agendamento::where('protocolo', $protocolo)
+            ->where('dia', '>=', date('Y-m-d'))
+            ->whereNull('status')
+            ->first();
 
+        if(!isset($agendamento))
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>O protocolo não existe para agendamentos de hoje em diante',
+                'class' => 'alert-danger'
+            ];
         if($agendamento->cpf != $dados['cpf'])
             return [
                 'message' => '<i class="icon fa fa-ban"></i>O CPF informado não corresponde ao protocolo. Por favor, pesquise novamente o agendamento',
                 'class' => 'alert-danger'
             ];
 
-        $dia = Carbon::parse($agendamento->dia);
-        if($dia->lte(Carbon::today()))
+        if(!$agendamento->isAfter())
             return [
                 'message' => '<i class="icon fa fa-ban"></i>Cancelamento do agendamento deve ser antes do dia do atendimento',
                 'class' => 'alert-danger'
             ];
-        
-        if($agendamento->update(['status' => Agendamento::STATUS_CANCELADO]))
-        {
-            $string = $agendamento->nome.' (CPF: '.$agendamento->cpf.') *cancelou* atendimento em *'.$agendamento->regional->regional;
-            $string .= '* no dia '.onlyDate($agendamento->dia);
-            event(new ExternoEvent($string));
+            
+        $update = $agendamento->update(['status' => Agendamento::STATUS_CANCELADO]);
+        abort_if(!$update, 500);
+
+        $string = $agendamento->nome.' (CPF: '.$agendamento->cpf.') *cancelou* atendimento em *'.$agendamento->regional->regional;
+        $string .= '* no dia '.onlyDate($agendamento->dia);
+        event(new ExternoEvent($string));
                 
-            return 'Agendamento cancelado com sucesso!';
-        }else
-            abort(500);
+        return 'Agendamento cancelado com sucesso!';            
     }
 
     public function delete($id)

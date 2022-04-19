@@ -353,12 +353,12 @@ $('#ano-mapa').on({
 		
 		function errorAjaxAgendamento()
 		{
-			$('#datepicker')
+			$('#agendamentoStore #datepicker')
 				.val('')
 				.prop('disabled', true)
 				.prop('placeholder', 'Falha ao recuperar calendário');
 
-			$('#horarios')
+			$('#agendamentoStore #horarios')
 				.find('option')
 				.remove()
 				.end()
@@ -386,14 +386,14 @@ $('#ano-mapa').on({
 				dataType: 'json',
 				url: "/regionais-plantao-juridico",
 				beforeSend: function(){
-					$('#loadCalendario').show();
+					$('#agendamentoStore #loadCalendario').show();
 				},
 				complete: function(){
-					$('#loadCalendario').hide();
+					$('#agendamentoStore #loadCalendario').hide();
 				},
 				success: function(response) {
 					regionaisAtivas = response;
-					$('#idregional option').each(function(){
+					$('#agendamentoStore #idregional option').each(function(){
 						var valor = parseInt($(this).val())
 						jQuery.inArray(valor, regionaisAtivas) != -1 ? $(this).show() : $(this).hide();
 					});
@@ -414,21 +414,21 @@ $('#ano-mapa').on({
 				dataType: 'json',
 				url: "/dias-horas",
 				beforeSend: function(){
-					$('#loadCalendario').show();
+					$('#agendamentoStore #loadCalendario').show();
 				},
 				complete: function(){
-					$('#loadCalendario').hide();
+					$('#agendamentoStore #loadCalendario').hide();
 				},
 				success: function(response) {
 					datas = response;
 					datasNovas = validarDatasPlantaoJuridico(datas);
 					if(datasNovas == null)
-						$('#datepicker')
+						$('#agendamentoStore #datepicker')
 						.prop('disabled', true)
 						.prop('placeholder', 'Sem datas disponíveis')
 						.val('');
 					else
-						$('#datepicker').prop('placeholder', 'dd/mm/aaaa').datepicker('option', {
+						$('#agendamentoStore #datepicker').prop('placeholder', 'dd/mm/aaaa').datepicker('option', {
 							minDate: datasNovas[0],
 							maxDate: datasNovas[1]
 						});
@@ -441,15 +441,15 @@ $('#ano-mapa').on({
 
 		function getDatasAgendamento()
 		{
-			if($("#selectServicos option:selected").val() == "Plantão Jurídico")
+			if($("#agendamentoStore #selectServicos option:selected").val() == "Plantão Jurídico")
 				getDatasPorRegionalPlantaoJuridico();
 			else
-				$('#datepicker').datepicker('option', {
+				$('#agendamentoStore #datepicker').datepicker('option', {
 					maxDate: '+1m',
 					minDate: +1,
 				});
 
-			$('#idregional option[value=""]').hide();
+			$('#agendamentoStore #idregional option[value=""]').hide();
 
 			$.ajax({
 				method: "GET",
@@ -460,15 +460,15 @@ $('#ano-mapa').on({
 				dataType: 'json',
 				url: "/dias-horas",
 				beforeSend: function(){
-					$('#loadCalendario').show();
+					$('#agendamentoStore #loadCalendario').show();
 				},
 				complete: function(){
-					$('#loadCalendario').hide();
+					$('#agendamentoStore #loadCalendario').hide();
 				},
 				success: function(response) {
 					lotados = response;
-					if($('#datepicker').prop('placeholder') != 'Sem datas disponíveis')
-						$('#datepicker')
+					if($('#agendamentoStore #datepicker').prop('placeholder') != 'Sem datas disponíveis')
+						$('#agendamentoStore #datepicker')
 						.prop('disabled', false)
 						.prop('placeholder', 'dd/mm/aaaa');
 				},
@@ -490,26 +490,26 @@ $('#ano-mapa').on({
 				dataType: 'json',
 				url: "/dias-horas",
 				beforeSend: function(){
-					$('#loadHorario').show();
+					$('#agendamentoStore #loadHorario').show();
 				},
 				complete: function(){
-					$('#loadHorario').hide();
+					$('#agendamentoStore #loadHorario').hide();
 				},
 				success: function(response) {
 					response;
 					if (!jQuery.isEmptyObject(response)) {
-						$('#horarios').empty();
+						$('#agendamentoStore #horarios').empty();
 						$.each(response, function(i, horario) {
-							$('#horarios').append($('<option>', { 
+							$('#agendamentoStore #horarios').append($('<option>', { 
 								value: horario,
 								text : horario 
 							}));
 						});
-						$('#horarios').prop('disabled', false);
-						$('#datepicker').css('background-color','#FFFFFF');
+						$('#agendamentoStore #horarios').prop('disabled', false);
+						$('#agendamentoStore #datepicker').css('background-color','#FFFFFF');
 					} 
 					else 
-						$('#horarios')
+						$('#agendamentoStore #horarios')
 							.find('option')
 							.remove()
 							.end()
@@ -523,21 +523,21 @@ $('#ano-mapa').on({
 
 		function limpaDiasHorariosAgendamento()
 		{
-			$('#datepicker')
+			$('#agendamentoStore #datepicker')
 				.val('')
 				.prop('disabled', true)
 				.prop('placeholder', 'dd/mm/aaaa')
 				.css('background-color','#e9ecef');
-			$('#horarios')
+			$('#agendamentoStore #horarios')
 				.find('option')
 				.remove()
 				.end()
 				.append('<option value="" disabled selected>Selecione o dia do atendimento</option>');
-			$('#horarios').prop('disabled', true);
+			$('#agendamentoStore #horarios').prop('disabled', true);
 		}
 
 		// Datepicker Agendamentos
-		$('#datepicker').datepicker({
+		$('#agendamentoStore #datepicker').datepicker({
 			dateFormat: 'dd/mm/yy',
 			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
 			dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
@@ -552,30 +552,30 @@ $('#ano-mapa').on({
 		});
 
 		// Para quando houver Plantão Jurídico
-		$('#selectServicos').change(function(){
+		$('#agendamentoStore #selectServicos').change(function(){
 			$("#idregional").val("");
 			limpaDiasHorariosAgendamento();
-			$(this).val() == "Plantão Jurídico" ? getRegionaisPlantaoJuridico() : $('#idregional option').show();
+			$(this).val() == "Plantão Jurídico" ? getRegionaisPlantaoJuridico() : $('#agendamentoStore #idregional option').show();
 		});	
 
-		if($("#selectServicos option:selected").val() == "Plantão Jurídico")
+		if($("#agendamentoStore #selectServicos option:selected").val() == "Plantão Jurídico")
 			getRegionaisPlantaoJuridico();
 		else
-			$('#idregional option').show();
+			$('#agendamentoStore #idregional option').show();
 		
-		if($("#idregional option:selected").val() > 0)
+		if($("#agendamentoStore #idregional option:selected").val() > 0)
 			getDatasAgendamento();
 
 		// Zera o valor do dia, ao selecionar a regional
-		$('#idregional').change(function(){
+		$('#agendamentoStore #idregional').change(function(){
 			limpaDiasHorariosAgendamento();
-			if($('#idregional').val() == 14) 
+			if($('#agendamentoStore #idregional').val() == 14) 
 				alert('Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: Av. Brigadeiro Luís Antônio, 613, Térreo, CEP:01317-000, São Paulo/SP.');
 			getDatasAgendamento();
 		});
 
 		// Ajax após change no datepicker
-		$('#datepicker').change(function(){
+		$('#agendamentoStore #datepicker').change(function(){
 			getHorariosAgendamento();
 		});
 
@@ -585,24 +585,36 @@ $('#ano-mapa').on({
 			var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
 			var yyyy = today.getFullYear();
 			today = dd + '/' + mm + '/' + yyyy;
-			$dataNula = $("#datepicker").val() == "";
-			$dataAntiga = $.datepicker.parseDate("dd/mm/yy", $("#datepicker").val()) <= $.datepicker.parseDate("dd/mm/yy", today);
-			$semData = $('#datepicker').prop('placeholder') == 'Sem datas disponíveis';
+			$dataNula = $("#agendamentoStore #datepicker").val() == "";
+			$dataAntiga = $.datepicker.parseDate("dd/mm/yy", $("#agendamentoStore #datepicker").val()) <= $.datepicker.parseDate("dd/mm/yy", today);
+			$semData = $('#agendamentoStore #datepicker').prop('placeholder') == 'Sem datas disponíveis';
+			
 			if($semData)
 			{
-				$("#idregional").focus();
+				$("#agendamentoStore #idregional").focus();
 				e.preventDefault();
+				return;
 			}
 			if(!$semData && ($dataNula || $dataAntiga))
 			{
-				$("#datepicker").focus();
+				$("#agendamentoStore #datepicker").focus();
 				e.preventDefault();
+				return;
 			}
 
-			if($("#horarios").val().length < 5)
+			var valor = $("#agendamentoStore #horarios").val();
+			if(valor == "")
 			{
-				$("#horarios").focus();
+				$("#agendamentoStore #horarios").focus();
 				e.preventDefault();
+				return;
+			}
+
+			if(valor.length < 5)
+			{
+				$("#agendamentoStore #horarios").focus();
+				e.preventDefault();
+				return;
 			}
 		});
 

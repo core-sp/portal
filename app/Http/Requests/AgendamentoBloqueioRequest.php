@@ -8,24 +8,43 @@ use App\Contracts\MediadorServiceInterface;
 class AgendamentoBloqueioRequest extends FormRequest
 {
     private $service;
+    private $chaveRegional;
+    private $chaveHorarios;
+    private $ageporhorario;
 
     public function __construct(MediadorServiceInterface $service)
     {
         $this->service = $service->getService('Regional');
     }
 
+    protected function prepareForValidation()
+    {
+        $this->chaveRegional = 'required|exists:regionais,idregional';
+        $this->chaveHorarios = 'required|array|in:';
+
+        $regional = isset(request()->idregional) && (request()->idregional != 'Todas') ? $this->service->getById(request()->idregional) : null;
+        $this->chaveHorarios .= isset($regional->horariosage) ? $regional->horariosage : '';
+        $this->ageporhorario = isset($regional->ageporhorario) ? $regional->ageporhorario - 1 : 1;
+
+        if(\Route::is('agendamentobloqueios.store'))
+            if(request()->filled('idregional') && (request()->idregional == 'Todas'))
+            {
+                $this->chaveRegional = 'required|in:Todas';
+                $this->chaveHorarios = '';
+                $this->ageporhorario = 0;
+            }
+    }
+
     public function rules()
     {
-        $regional = isset(request()->idregional) ? $this->service->getById(request()->idregional) : null;
-        $horarios = isset($regional->horariosage) ? $regional->horariosage : null;
-        $ageporhorario = isset($regional->ageporhorario) ? $regional->ageporhorario - 1 : 1;
-        
+        unset($this->service);
+
         return [
-            'idregional' => 'required|exists:regionais,idregional',
+            'idregional' => $this->chaveRegional,
             'diainicio' => 'required|date|after_or_equal:'.date('Y-m-d'),
             'diatermino' => 'date|nullable|after_or_equal:diainicio',
-            'horarios' => 'required|array|in:'.$horarios,
-            'qtd_atendentes' => 'required|numeric|min:0|max:'.$ageporhorario
+            'horarios' => $this->chaveHorarios,
+            'qtd_atendentes' => 'required|numeric|min:0|max:'.$this->ageporhorario
         ];
     }
 
