@@ -15,29 +15,29 @@ class BdoOportunidadeTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Permissao::insert([
-            [
-                'controller' => 'BdoOportunidadeController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'BdoOportunidadeController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'BdoOportunidadeController',
-                'metodo' => 'edit',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'BdoOportunidadeController',
-                'metodo' => 'destroy',
-                'perfis' => '1,'
-            ]
-        ]);
-    }
+    // protected function setUp(): void
+    // {
+    //     parent::setUp();
+    //     Permissao::insert([
+    //         [
+    //             'controller' => 'BdoOportunidadeController',
+    //             'metodo' => 'index',
+    //             'perfis' => '1,'
+    //         ], [
+    //             'controller' => 'BdoOportunidadeController',
+    //             'metodo' => 'create',
+    //             'perfis' => '1,'
+    //         ], [
+    //             'controller' => 'BdoOportunidadeController',
+    //             'metodo' => 'edit',
+    //             'perfis' => '1,'
+    //         ], [
+    //             'controller' => 'BdoOportunidadeController',
+    //             'metodo' => 'destroy',
+    //             'perfis' => '1,'
+    //         ]
+    //     ]);
+    // }
 
     /** 
      * =======================================================================================================

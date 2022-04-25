@@ -17,10 +17,10 @@ class RepresentanteTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
+    // protected function setUp(): void
+    // {
+    //     parent::setUp();
+    // }
 
     /** @test 
      * 

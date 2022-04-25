@@ -11,16 +11,16 @@ class RegionalTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    // protected function setUp(): void
+    // {
+    //     parent::setUp();
 
-        Permissao::insert([
-            'controller' => 'RegionalController',
-            'metodo' => 'edit',
-            'perfis' => '1,'
-        ]);
-    }
+    //     Permissao::insert([
+    //         'controller' => 'RegionalController',
+    //         'metodo' => 'edit',
+    //         'perfis' => '1,'
+    //     ]);
+    // }
 
     /** @test */
     public function non_authenticated_users_cannot_access_links()

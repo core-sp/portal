@@ -15,38 +15,38 @@ class AgendamentoTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    // protected function setUp(): void
+    // {
+    //     parent::setUp();
 
-        Permissao::insert([
-            [
-                'controller' => 'AgendamentoController',
-                'metodo' => 'index',
-                'perfis' => '1,6,12,13,8,21'
-            ], [
-                'controller' => 'AgendamentoController',
-                'metodo' => 'edit',
-                'perfis' => '1,21'
-            ], [
-                'controller' => 'AgendamentoBloqueioController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'AgendamentoBloqueioController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'AgendamentoBloqueioController',
-                'metodo' => 'edit',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'AgendamentoBloqueioController',
-                'metodo' => 'destroy',
-                'perfis' => '1,'
-            ]
-        ]);
-    }
+    //     Permissao::insert([
+    //         [
+    //             'controller' => 'AgendamentoController',
+    //             'metodo' => 'index',
+    //             'perfis' => '1,6,12,13,8,21'
+    //         ], [
+    //             'controller' => 'AgendamentoController',
+    //             'metodo' => 'edit',
+    //             'perfis' => '1,21'
+    //         ], [
+    //             'controller' => 'AgendamentoBloqueioController',
+    //             'metodo' => 'index',
+    //             'perfis' => '1,'
+    //         ], [
+    //             'controller' => 'AgendamentoBloqueioController',
+    //             'metodo' => 'create',
+    //             'perfis' => '1,'
+    //         ], [
+    //             'controller' => 'AgendamentoBloqueioController',
+    //             'metodo' => 'edit',
+    //             'perfis' => '1,'
+    //         ], [
+    //             'controller' => 'AgendamentoBloqueioController',
+    //             'metodo' => 'destroy',
+    //             'perfis' => '1,'
+    //         ]
+    //     ]);
+    // }
 
     /** 
      * =======================================================================================================
@@ -263,6 +263,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
+        Permissao::find(28)->update(['perfis' => '1,21']);
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional
@@ -290,6 +291,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
+        Permissao::find(28)->update(['perfis' => '1,21']);
 
         $agendamento = factory('App\Agendamento')->create();
 
@@ -997,6 +999,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
+        Permissao::find(27)->update(['perfis' => '1,8']);
 
         $this->get(route('agendamentos.lista'))
         ->assertDontSeeText('Seccional')
@@ -1015,6 +1018,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user2);
+        Permissao::find(27)->update(['perfis' => '1,21']);
 
         $this->get(route('agendamentos.lista'))
         ->assertDontSeeText('Seccional')
@@ -1183,6 +1187,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
+        Permissao::find(27)->update(['perfis' => '1,21']);
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional,
@@ -1220,6 +1225,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
+        Permissao::find(28)->update(['perfis' => '1,21']);
 
         $agendamento = factory('App\Agendamento')->create([
             'dia' => date('Y-m-d')
@@ -1271,6 +1277,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
+        Permissao::find(28)->update(['perfis' => '1,21']);
 
         $agendamento = factory('App\Agendamento')->create([
             'idregional' => $user->idregional
@@ -1292,6 +1299,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->signIn($user);
+        Permissao::find(28)->update(['perfis' => '1,21']);
 
         $agendamento = factory('App\Agendamento')->create();
 
@@ -1770,6 +1778,59 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function can_create_bloqueio_all_day_for_all_regionais_with_0_atendentes()
+    {
+        $user = $this->signInAsAdmin();
+        $regionais = factory('App\Regional', 13)->create();
+        
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'idregional' => 'Todas',
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)->assertRedirect(route('agendamentobloqueios.lista'));
+        $this->assertEquals(\App\AgendamentoBloqueio::count(), \App\Regional::count());
+        $this->assertEquals(\App\AgendamentoBloqueio::find(1)->diatermino, $bloqueio['diatermino']);
+    }
+
+    /** @test */
+    public function can_create_bloqueio_all_day_for_all_regionais_with_0_atendentes_and_diatermino_null()
+    {
+        $user = $this->signInAsAdmin();
+        $regionais = factory('App\Regional', 13)->create();
+        
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'idregional' => 'Todas',
+            'diatermino' => null
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)->assertRedirect(route('agendamentobloqueios.lista'));
+        $this->assertEquals(\App\AgendamentoBloqueio::count(), \App\Regional::count());
+        $this->assertEquals(\App\AgendamentoBloqueio::find(1)->diatermino, $bloqueio['diatermino']);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_all_day_for_all_regionais_with_qtd_atendentes_greater_than_0()
+    {
+        $user = $this->signInAsAdmin();
+        $regionais = factory('App\Regional', 13)->create();
+        
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'idregional' => 'Todas',
+            'qtd_atendentes' => 1
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'qtd_atendentes',
+        ]);
+
+        $this->assertNotEquals(\App\AgendamentoBloqueio::count(), \App\Regional::count());
+    }
+
+    /** @test */
     public function can_create_bloqueio_with_qtd_atendentes_greater_than_0()
     {
         $user = $this->signInAsAdmin();
@@ -1828,6 +1889,24 @@ class AgendamentoTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString('bloqueio de agendamento', $log);
         $this->assertStringContainsString('criou', $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_bloqueio_is_created_with_option_todas()
+    {
+        $user = $this->signInAsAdmin();
+        $regionais = factory('App\Regional', 5)->create();
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'idregional' => 'Todas',
+        ]);
+
+        $this->post(route('agendamentobloqueios.store'), $bloqueio);
+
+        $all = \App\Regional::all();
+        $log = tailCustom(storage_path($this->pathLogInterno()), $all->count());
+
+        foreach($all as $regional)
+            $this->assertStringContainsString('criou *bloqueio de agendamento* (id: '.$regional->idregional.')', $log);
     }
 
     /** @test */

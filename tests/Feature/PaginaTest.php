@@ -12,29 +12,29 @@ class PaginaTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Permissao::insert([
-            [
-                'controller' => 'PaginaController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'PaginaController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'PaginaController',
-                'metodo' => 'edit',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'PaginaController',
-                'metodo' => 'destroy',
-                'perfis' => '1,'
-            ]
-        ]);
-    }
+    // protected function setUp(): void
+    // {
+    //     parent::setUp();
+    //     Permissao::insert([
+    //         [
+    //             'controller' => 'PaginaController',
+    //             'metodo' => 'index',
+    //             'perfis' => '1,'
+    //         ], [
+    //             'controller' => 'PaginaController',
+    //             'metodo' => 'create',
+    //             'perfis' => '1,'
+    //         ], [
+    //             'controller' => 'PaginaController',
+    //             'metodo' => 'edit',
+    //             'perfis' => '1,'
+    //         ], [
+    //             'controller' => 'PaginaController',
+    //             'metodo' => 'destroy',
+    //             'perfis' => '1,'
+    //         ]
+    //     ]);
+    // }
 
     /** @test */
     public function non_authenticated_users_cannot_access_links()

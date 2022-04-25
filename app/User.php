@@ -100,4 +100,41 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Agendamento', 'idusuario');
     }
+
+    public function getRelatorioAgendadosPorPerfil($todos_agendados)
+    {
+        $subject = 'em '.$this->regional->regional;
+        $agendados = $todos_agendados;
+        $empty = $agendados->isEmpty();
+
+        switch($this->idperfil)
+        {
+            case 1:
+            case 6:
+                $subject = 'em São Paulo e Seccionais';
+                break;
+            case 8:
+                $agendados = $todos_agendados->where('idregional', $this->idregional)->count();
+                $empty = $agendados == 0;
+                break;
+            case 12:
+                $agendados = $todos_agendados->where('idregional', 1);
+                $empty = $agendados->isEmpty();
+                break;
+            case 13:
+                $agendados = $todos_agendados->where('idregional', '!=', 1);
+                $empty = $agendados->isEmpty();
+                $subject = 'nas Seccionais';
+                break;
+            case 21:
+                $agendados = $todos_agendados->where('idregional', $this->idregional);
+                $empty = $agendados->isEmpty();
+                break;
+        }
+
+        return $empty ? null : [
+            'agendados' => $agendados,
+            'subject' => $subject
+        ];
+    }
 }

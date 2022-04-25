@@ -12,22 +12,26 @@ class SolicitaCedulaTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    // Temp
+    // Permissao::find(59)->update(['perfis' => '1,2']);
+    // Permissao::find(60)->update(['perfis' => '1,2']);
 
-        Permissao::insert([
-            [
-                'controller' => 'SolicitaCedulaController',
-                'metodo' => 'index',
-                'perfis' => '1,2,'
-            ], [
-                'controller' => 'SolicitaCedulaController',
-                'metodo' => 'show',
-                'perfis' => '1,2,'
-            ]
-        ]);
-    }
+    // protected function setUp(): void
+    // {
+    //     parent::setUp();
+
+    //     Permissao::insert([
+    //         [
+    //             'controller' => 'SolicitaCedulaController',
+    //             'metodo' => 'index',
+    //             'perfis' => '1,2,'
+    //         ], [
+    //             'controller' => 'SolicitaCedulaController',
+    //             'metodo' => 'show',
+    //             'perfis' => '1,2,'
+    //         ]
+    //     ]);
+    // }
 
     /** @test */
     public function non_authenticated_users_cannot_access_links()
@@ -50,6 +54,9 @@ class SolicitaCedulaTest extends TestCase
     {
         factory('App\User')->create();
         $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $this->assertAuthenticated('web');
         
         $repCedula = factory('App\SolicitaCedula')->create();
@@ -73,6 +80,9 @@ class SolicitaCedulaTest extends TestCase
         // para criar mais perfis e ser diferente do "Permissao::insert()"
         factory('App\Perfil', 5)->create();
         $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $this->get(route('solicita-cedula.index'))->assertForbidden();
         $this->get(route('solicita-cedula.busca'))->assertForbidden();
         $this->get(route('solicita-cedula.filtro'))->assertForbidden();
@@ -86,6 +96,9 @@ class SolicitaCedulaTest extends TestCase
     public function authorized_users_can_list_solicitacoes_cedulas()
     {
         $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $this->get(route('solicita-cedula.index'))->assertOk();
         $this->get(route('solicita-cedula.busca'))->assertOk();
         $this->get(route('solicita-cedula.filtro'))->assertOk();
@@ -100,6 +113,9 @@ class SolicitaCedulaTest extends TestCase
         // para criar mais perfis e ser diferente do "Permissao::insert()"
         factory('App\Perfil', 5)->create();
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertForbidden();
         $this->post(route('admin.representante-solicita-cedula.post'), [
@@ -116,6 +132,9 @@ class SolicitaCedulaTest extends TestCase
     public function authorized_users_can_accept_solicitacao_cedula()
     {
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertOk();
         $this->post(route('admin.representante-solicita-cedula.post'), [
@@ -134,6 +153,9 @@ class SolicitaCedulaTest extends TestCase
         // para criar mais perfis e ser diferente do "Permissao::insert()"
         factory('App\Perfil', 5)->create();
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertForbidden();
         $this->post(route('admin.representante-solicita-cedula-reprovada.post'), [
@@ -151,6 +173,9 @@ class SolicitaCedulaTest extends TestCase
     public function authorized_users_can_refuse_solicitacao_cedula()
     {
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertOk();
         $this->post(route('admin.representante-solicita-cedula-reprovada.post'), [
@@ -168,6 +193,9 @@ class SolicitaCedulaTest extends TestCase
     public function authorized_users_cannot_refuse_solicitacao_cedula_without_justificativa()
     {
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertOk();
         $this->post(route('admin.representante-solicita-cedula-reprovada.post'), [
@@ -186,6 +214,9 @@ class SolicitaCedulaTest extends TestCase
     public function search_criteria_for_solicita_cedula()
     {
         $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
 
         $this->get(route('solicita-cedula.busca', ['q' => $cedula->id]))
@@ -215,6 +246,9 @@ class SolicitaCedulaTest extends TestCase
     public function solicitacao_cedula_filter()
     {
         $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('solicita-cedula.filtro', [
             'filtro' => 'sim', 
@@ -271,6 +305,9 @@ class SolicitaCedulaTest extends TestCase
     public function authorized_users_can_to_view_pdf_button()
     {
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertOk();
         $this->post(route('admin.representante-solicita-cedula.post'), [
@@ -289,6 +326,9 @@ class SolicitaCedulaTest extends TestCase
         // para criar mais perfis e ser diferente do "Permissao::insert()"
         factory('App\Perfil', 5)->create();
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('admin.solicita-cedula.show', $cedula->id))->assertForbidden();
         $this->post(route('admin.representante-solicita-cedula.post'), [
@@ -307,6 +347,9 @@ class SolicitaCedulaTest extends TestCase
         // para criar mais perfis e ser diferente do "Permissao::insert()"
         factory('App\Perfil', 5)->create();
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create([
             'status' => 'Aceito',
             'idusuario' => $user->idusuario
@@ -322,6 +365,9 @@ class SolicitaCedulaTest extends TestCase
     public function authorized_users_can_access_route_pdf()
     {
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create([
             'status' => 'Aceito',
             'idusuario' => $user->idusuario
@@ -337,6 +383,9 @@ class SolicitaCedulaTest extends TestCase
     public function authorized_users_cannot_to_view_pdf_with_status_different_aceito()
     {
         $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->get(route('solicita-cedula.index'))->assertDontSeeText('PDF');
         $this->get(route('admin.solicita-cedula.pdf', $cedula->id))->assertStatus(302);
@@ -350,6 +399,9 @@ class SolicitaCedulaTest extends TestCase
     public function log_is_generated_when_cedula_is_accepted()
     {
         $user = $this->signInAsAdmin();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->post(route('admin.representante-solicita-cedula.post'), [
             'idusuario' => $user->idusuario,
@@ -368,6 +420,9 @@ class SolicitaCedulaTest extends TestCase
     public function log_is_generated_when_cedula_is_refuse()
     {
         $user = $this->signInAsAdmin();
+        Permissao::find(59)->update(['perfis' => '1,2']);
+        Permissao::find(60)->update(['perfis' => '1,2']);
+
         $cedula = factory('App\SolicitaCedula')->create();
         $this->post(route('admin.representante-solicita-cedula-reprovada.post'), [
             'idusuario' => $user->idusuario,

@@ -15,7 +15,7 @@ class AgendamentoUpdateRequest extends FormRequest
     private $completos;
     private $status;
     private $servicos;
-    private $protocolo;
+    private $chaveProtocolo;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -31,7 +31,7 @@ class AgendamentoUpdateRequest extends FormRequest
 
         if(\Route::is('agendamentosite.consulta') || \Route::is('agendamentosite.cancelamento'))
         {
-            $this->protocolo = '|size:6|not_regex:/[^A-Za-z0-9]/';
+            $this->chaveProtocolo = '|size:6|not_regex:/[^A-Za-z0-9]/';
             if(request()->missing('protocolo') || !request()->filled('protocolo'))
                 $this->merge(['protocolo' => null]);
         }
@@ -76,9 +76,7 @@ class AgendamentoUpdateRequest extends FormRequest
     }
 
     public function rules()
-    {
-        unset($this->service);
-        
+    {        
         return [
             'antigo' => 'sometimes|boolean',
             'idregional' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo|exists:regionais,idregional',
@@ -94,7 +92,7 @@ class AgendamentoUpdateRequest extends FormRequest
             'dia' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$this->dateFormat,
             'hora' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$this->horariosComBloqueio,
             'termo' => 'sometimes|required|accepted',
-            'protocolo' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo,idregional,nome,email,cpf,celular,servico,tiposervico,pessoa,idusuario,status,dia,hora,termo,idagendamento'.$this->protocolo,
+            'protocolo' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo,idregional,nome,email,cpf,celular,servico,tiposervico,pessoa,idusuario,status,dia,hora,termo,idagendamento'.$this->chaveProtocolo,
             'idagendamento' => 'sometimes|required_without_all:nome,email,cpf,celular,servico,tiposervico,idusuario,antigo,dia,hora,pessoa,termo'
         ];
     }

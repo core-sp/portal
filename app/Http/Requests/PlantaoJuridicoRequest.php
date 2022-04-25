@@ -19,7 +19,6 @@ class PlantaoJuridicoRequest extends FormRequest
         $arrayHorasDatas = isset(request()->plantaoBloqueio) ? $this->service->getDatasHorasLinkPlantaoAjax(request()->plantaoBloqueio) : null;
         $horarios = isset($arrayHorasDatas) ? '|in:'.implode(',', $arrayHorasDatas['horarios']) : '';
         $datas = isset($arrayHorasDatas) ? $arrayHorasDatas['datas'] : [date('Y-m-d'), date('Y-m-d')];
-        unset($this->service);
 
         return [
             'qtd_advogados' => 'sometimes|required|regex:/^[0-9]{1}$/',
