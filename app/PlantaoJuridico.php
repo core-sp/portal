@@ -77,6 +77,9 @@ class PlantaoJuridico extends Model
             if(!array_search($dia->format('Y-m-d'), $diaslotadosBloqueio))
             {
                 $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
+                // Obs: está sendo considerado o total de atendimentos, 
+                // então se após criar o bloqueio houver agendados não cancelados nos horários bloqueados
+                // pode ocorrer de lotar o dia sem preencher todo os horários livres
                 $total = sizeof($horariosTotal) * $this->qtd_advogados;
                 if($agendado->total >= $total)
                     array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);

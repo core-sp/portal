@@ -134,7 +134,7 @@ class AgendamentoController extends Controller
 
     public function pendentes()
     {
-        $this->authorize('viewPendentes', auth()->user());
+        $this->authorize('viewAny', auth()->user());
 
         try{
             $dados = $this->service->getService('Agendamento')->listar();

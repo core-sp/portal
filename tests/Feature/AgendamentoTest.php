@@ -1507,6 +1507,7 @@ class AgendamentoTest extends TestCase
 
         // Testando listagem com usuário 'Coordenadoria de Atendimento'
         $this->signIn($user_coordenadoria_atendimento);
+        Permissao::find(27)->update(['perfis' => '1,6']);
 
         // Usuário deve ver todos os Agendamentos pendentes do passado (tanto sede como seccional)
         $this->get(route('agendamentos.pendentes'))
@@ -1520,6 +1521,7 @@ class AgendamentoTest extends TestCase
 
         // Testando listagem com usuário 'Gestão Atendimento Sede' 
         $this->signIn($user_gestao_atendimento_sede);
+        Permissao::find(27)->update(['perfis' => '1,12']);
 
         // Usuário deve ver apenas os Agendamentos pendentes do passado da sede
         $this->get(route('agendamentos.pendentes'))
@@ -1533,6 +1535,7 @@ class AgendamentoTest extends TestCase
 
         // Testando listagem com usuário 'Gestão Atendimento Seccionais'
         $this->signIn($user_gestao_atendimento_seccional);
+        Permissao::find(27)->update(['perfis' => '1,13']);
 
         // Usuário deve ver apenas os Agendamentos pendentes do passado de todas as seccionais
         $this->get(route('agendamentos.pendentes'))
@@ -1546,6 +1549,7 @@ class AgendamentoTest extends TestCase
 
         // Testando listagem com usuário 'Atendimento'
         $this->signIn($user_atendimento);
+        Permissao::find(27)->update(['perfis' => '1,8']);
 
         // Usuário deve ver apenas os Agendamentos pendentes do passado da sua regional
         $this->get(route('agendamentos.pendentes'))

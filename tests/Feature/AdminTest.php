@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Carbon\Carbon;
 
 class AdminTest extends TestCase
 {
@@ -219,6 +220,65 @@ class AdminTest extends TestCase
         ->assertSee('<th>Atendimentos</th>')
         ->assertDontSee('<td>'.$user->nome.'</td>')
         ->assertDontSee('<td>1</td>');
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_view_agendamentos_pendentes_alerts()
+    {
+        $non_admin = $this->signIn();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'dia' => Carbon::today()->subDay()->format('Y-m-d'),
+            'hora' => '10:00',
+            'status' => null,
+            'idregional' => $non_admin->idregional,
+            'idusuario' => null
+        ]);
+
+        $this->get('/admin')
+        ->assertOk()
+        ->assertDontSee('Existe <strong>1</strong> atendimento pendente de validação!');
+    }
+
+    /** @test */
+    public function authorized_users_can_view_agendamentos_pendentes_alerts()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'dia' => Carbon::today()->subDay()->format('Y-m-d'),
+            'hora' => '10:00',
+            'status' => null,
+            'idregional' => $admin->idregional,
+            'idusuario' => null
+        ]);
+
+        $this->get('/admin')
+        ->assertOk()
+        ->assertSee('Existe <strong>1</strong> atendimento pendente de validação!');
+    }
+
+    /** @test */
+    public function view_agendamentos_pendentes_alerts()
+    {
+        $admin = $this->signInAsAdmin();
+
+        factory('App\Agendamento', 2)->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'dia' => Carbon::today()->subDay()->format('Y-m-d'),
+            'hora' => '10:00',
+            'status' => null,
+            'idregional' => $admin->idregional,
+            'idusuario' => null
+        ]);
+
+        $this->get('/admin')
+        ->assertSee('Existem <strong>2</strong> atendimentos pendentes de validação!');
     }
 
     /** @test */
