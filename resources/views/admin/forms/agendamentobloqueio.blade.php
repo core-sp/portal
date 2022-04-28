@@ -68,14 +68,14 @@
                     value="{{ old('diatermino') }}"
                 @endif
                 />
-                <small class="form-text text-muted">
-                    <em>* Deixe o campo vazio para aplicar a regra por tempo indeterminado</em>
-                </small>
                 @if($errors->has('diatermino'))
                 <div class="invalid-feedback">
                 {{ $errors->first('diatermino') }}
                 </div>
                 @endif
+                <small class="form-text text-muted">
+                    <em>* Deixe o campo vazio para aplicar a regra por tempo indeterminado</em>
+                </small>
             </div>
         </div>
         <div class="form-row mt-2">

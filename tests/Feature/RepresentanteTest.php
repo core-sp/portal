@@ -17,11 +17,6 @@ class RepresentanteTest extends TestCase
 {
     use RefreshDatabase;
 
-    // protected function setUp(): void
-    // {
-    //     parent::setUp();
-    // }
-
     /** @test 
      * 
      * Representante Comercial pode se cadastrar no Portal.

@@ -25,30 +25,6 @@ class BdoEmpresaTest extends TestCase
         $this->cnpjInvalido = '00.000.000/0000-01';
 
         parent::setUp();
-        // Permissao::insert([
-        //     [
-        //         'controller' => 'BdoEmpresaController',
-        //         'metodo' => 'index',
-        //         'perfis' => '1,'
-        //     ], [
-        //         'controller' => 'BdoEmpresaController',
-        //         'metodo' => 'create',
-        //         'perfis' => '1,'
-        //     ], [
-        //         'controller' => 'BdoEmpresaController',
-        //         'metodo' => 'edit',
-        //         'perfis' => '1,'
-        //     ], [
-        //         'controller' => 'BdoEmpresaController',
-        //         'metodo' => 'destroy',
-        //         'perfis' => '1,'
-        //     ],
-        //     [
-        //         'controller' => 'BdoOportunidadeController',
-        //         'metodo' => 'create',
-        //         'perfis' => '1,'
-        //     ]
-        // ]);
     }
 
     /** 

@@ -16,23 +16,6 @@ class SolicitaCedulaTest extends TestCase
     // Permissao::find(59)->update(['perfis' => '1,2']);
     // Permissao::find(60)->update(['perfis' => '1,2']);
 
-    // protected function setUp(): void
-    // {
-    //     parent::setUp();
-
-    //     Permissao::insert([
-    //         [
-    //             'controller' => 'SolicitaCedulaController',
-    //             'metodo' => 'index',
-    //             'perfis' => '1,2,'
-    //         ], [
-    //             'controller' => 'SolicitaCedulaController',
-    //             'metodo' => 'show',
-    //             'perfis' => '1,2,'
-    //         ]
-    //     ]);
-    // }
-
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {

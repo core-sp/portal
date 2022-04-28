@@ -56,7 +56,7 @@
                     <span class="input-group-text">AGE-</span>
                   </div>
                   <input type="text"
-                    class="form-control {{-- protocoloInput --}} {{ $errors->has('protocolo') ? 'is-invalid' : '' }}"
+                    class="form-control text-uppercase {{ $errors->has('protocolo') ? 'is-invalid' : '' }}"
                     name="protocolo"
                     id="protocolo"
                     minlength="6"

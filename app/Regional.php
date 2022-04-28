@@ -2,7 +2,6 @@
 
 namespace App;
 
-// use App\Repositories\AgendamentoBloqueioRepository;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -46,23 +45,6 @@ class Regional extends Model
 
         return [];
     }
-
-    // // Será removido
-    // public function horariosDisponiveis($dia)
-    // {
-    //     $horas = $this->horariosAge();
-    //     $bloqueios = (new AgendamentoBloqueioRepository)->getByRegionalAndDay($this->idregional, $dia);
-    //     if($bloqueios && $horas) {
-    //         foreach($bloqueios as $bloqueio) {
-    //             foreach($horas as $key => $hora) {
-    //                 if($hora >= $bloqueio->horainicio && $hora <= $bloqueio->horatermino) {
-    //                     unset($horas[$key]);
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return $horas;
-    // }
 
     private function getAllBloqueios()
     {
@@ -123,6 +105,9 @@ class Regional extends Model
         for($dia; $dia->lte(Carbon::tomorrow()->addDays(30)); $dia->addDay())
         {
             $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
+            // Obs: está sendo considerado o total de atendimentos, 
+            // então se após criar o bloqueio com 0 atendentes e houver agendados não cancelados nos horários bloqueados
+            // pode ocorrer de lotar o dia sem preencher todo os horários livres
             $total = $this->getTotalAtendimentos($horariosTotal, $dia->format('Y-m-d'));
             if($total == 0)
             {

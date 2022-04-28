@@ -238,12 +238,10 @@ Route::prefix('/')->group(function() {
   Route::get('agendamento', 'AgendamentoSiteController@formView')->name('agendamentosite.formview');
   Route::post('agendamento', 'AgendamentoSiteController@store')->name('agendamentosite.store');
   Route::get('dias-horas', 'AgendamentoSiteController@getDiasHorasAjax')->name('agendamentosite.diasHorasAjax');
-  // Route::get('checa-mes', 'AgendamentoSiteController@checaMes')->name('agendamentosite.checaMes');
   Route::get('agendamento-consulta', 'AgendamentoSiteController@consultaView')->name('agendamentosite.consultaView');
   Route::get('agendamento-consulta/busca', 'AgendamentoSiteController@consulta')->name('agendamentosite.consulta');
   Route::put('agendamento-consulta/busca', 'AgendamentoSiteController@cancelamento')->name('agendamentosite.cancelamento');
   Route::get('regionais-plantao-juridico', 'AgendamentoSiteController@regionaisPlantaoJuridico')->name('agendamentosite.regionaisPlantaoJuridico');
-  // Route::get('datas-plantao-juridico', 'AgendamentoSiteController@datasPlantaoJuridico')->name('agendamentosite.datasPlantaoJuridico');
 
   // Newsletter
   Route::post('newsletter', 'NewsletterController@store');

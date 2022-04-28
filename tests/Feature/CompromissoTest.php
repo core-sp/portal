@@ -12,31 +12,6 @@ class CompromissoTest extends TestCase
 {
     use RefreshDatabase;
 
-    // protected function setUp(): void
-    // {
-    //     parent::setUp();
-
-    //     Permissao::insert([
-    //         [
-    //             "controller" => "CompromissoController",
-    //             "metodo" => "index",
-    //             "perfis" => "1,"
-    //         ], [
-    //             "controller" => "CompromissoController",
-    //             "metodo" => "create",
-    //             "perfis" => "1,"
-    //         ], [
-    //             "controller" => "CompromissoController",
-    //             "metodo" => "edit",
-    //             "perfis" => "1,"
-    //         ], [
-    //             "controller" => "CompromissoController",
-    //             "metodo" => "destroy",
-    //             "perfis" => "1,"
-    //         ]
-    //     ]);
-    // }
-
     /** 
      * =======================================================================================================
      * TESTES DE AUTORIZAÇÃO NO ADMIN

@@ -11,30 +11,6 @@ class LicitacaoTest extends TestCase
 {
     use RefreshDatabase;
 
-    // protected function setUp(): void
-    // {
-    //     parent::setUp();
-    //     Permissao::insert([
-    //         [
-    //             'controller' => 'LicitacaoController',
-    //             'metodo' => 'index',
-    //             'perfis' => '1,'
-    //         ], [
-    //             'controller' => 'LicitacaoController',
-    //             'metodo' => 'create',
-    //             'perfis' => '1,'
-    //         ], [
-    //             'controller' => 'LicitacaoController',
-    //             'metodo' => 'edit',
-    //             'perfis' => '1,'
-    //         ], [
-    //             'controller' => 'LicitacaoController',
-    //             'metodo' => 'destroy',
-    //             'perfis' => '1,'
-    //         ]
-    //     ]);
-    // }
-
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {

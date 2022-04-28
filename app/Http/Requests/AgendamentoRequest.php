@@ -7,13 +7,13 @@ use App\Rules\Cpf;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
-class AgendamentoUpdateRequest extends FormRequest
+class AgendamentoRequest extends FormRequest
 {
     private $service;
     private $horariosComBloqueio;
     private $dateFormat;
     private $completos;
-    private $status;
+    private $chaveStatus;
     private $servicos;
     private $chaveProtocolo;
 
@@ -26,17 +26,16 @@ class AgendamentoUpdateRequest extends FormRequest
     {
         $service = $this->service->getService('Agendamento');
         $this->completos = $service->getServicosOrStatusOrCompletos('completos');
-        $this->status = $service->getServicosOrStatusOrCompletos('status');
+        $this->chaveStatus = $service->getServicosOrStatusOrCompletos('status');
         $this->servicos = $service->getServicosOrStatusOrCompletos('servicos');
 
-        if(\Route::is('agendamentosite.consulta') || \Route::is('agendamentosite.cancelamento'))
+        if(\Route::is('agendamentosite.consulta'))
         {
             $this->chaveProtocolo = '|size:6|not_regex:/[^A-Za-z0-9]/';
             if(request()->missing('protocolo') || !request()->filled('protocolo'))
                 $this->merge(['protocolo' => null]);
         }
             
-
         if(\Route::is('agendamentosite.store'))
         {
             $this->dateFormat = '|date_format:d/m/Y';
@@ -87,8 +86,8 @@ class AgendamentoUpdateRequest extends FormRequest
             'servico' => 'sometimes|required_without_all:tiposervico,antigo,idusuario,status,idagendamento|in:'.implode(',', $this->servicos),
             'tiposervico' => 'sometimes|required|in:'.implode(',', $this->completos),
             'pessoa' => 'sometimes|required|in:PF,PJ,PF e PJ',
-            'idusuario' => 'sometimes|nullable|exists:users,idusuario|required_if:status,==,'.$this->status[0],
-            'status' => 'sometimes|nullable|in:'.implode(',', $this->status),
+            'idusuario' => 'sometimes|nullable|exists:users,idusuario|required_if:status,==,'.$this->chaveStatus[0],
+            'status' => 'sometimes|nullable|in:'.implode(',', $this->chaveStatus),
             'dia' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$this->dateFormat,
             'hora' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$this->horariosComBloqueio,
             'termo' => 'sometimes|required|accepted',

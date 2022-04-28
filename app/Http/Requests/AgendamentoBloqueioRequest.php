@@ -37,8 +37,6 @@ class AgendamentoBloqueioRequest extends FormRequest
 
     public function rules()
     {
-        unset($this->service);
-
         return [
             'idregional' => $this->chaveRegional,
             'diainicio' => 'required|date|after_or_equal:'.date('Y-m-d'),
@@ -53,14 +51,14 @@ class AgendamentoBloqueioRequest extends FormRequest
         return [
             'required' => 'O campo é obrigatório',
             'date' => 'Deve ser uma data válida',
-            'diatermino.after_or_equal' => 'Deve ser uma data igual ou maior que a data inicial',
+            'diatermino.after_or_equal' => 'Deve ser uma data igual ou maior que a data de início',
             'diainicio.after_or_equal' => 'Deve ser uma data igual ou maior que hoje',
             'exists' => 'Não existe esse valor',
             'in' => 'Essa hora não existe',
             'array' => 'Formato inválido',
             'numeric' => 'Deve ser um número',
             'min' => 'Valor mínimo é :min',
-            'qtd_atendentes.max' => 'Deve ser um valor máximo de total de atendentes atual - 1'
+            'qtd_atendentes.max' => 'Deve ser um valor máximo de: total de atendentes atual - 1'
         ];
     }
 }

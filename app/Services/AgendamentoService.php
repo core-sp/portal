@@ -113,9 +113,9 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return [
             'datemin' => $datemin->format('Y-m-d'),
             'datemax' => $datemax->format('Y-m-d'),
-            'regional' => $request->has('regional') && $canFiltroRegional ? $request->regional : auth()->user()->idregional,
-            'status' => $request->filled('status') && ($request->status != 'Qualquer') ? $request->status : null,
-            'servico' => $request->filled('servico') && ($request->servico != 'Qualquer') ? $request->servico : null
+            'regional' => $request->filled('regional') && $canFiltroRegional ? $request->regional : auth()->user()->idregional,
+            'status' => $request->filled('status') ? $request->status : 'Qualquer',
+            'servico' => $request->filled('servico') ? $request->servico : 'Qualquer'
         ];
     }
 
@@ -135,7 +135,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         {
             $regionais = $service->getService('Regional')->all()->sortBy('regional');
             $options = !isset($request->regional) ? 
-            getFiltroOptions('', 'Todas', true) : getFiltroOptions('', 'Todas');
+            getFiltroOptions('Todas', 'Todas', true) : getFiltroOptions('Todas', 'Todas');
 
             foreach($regionais as $regional)
                 $options .= isset($request->regional) && ($request->regional == $regional->idregional) ? 
@@ -146,7 +146,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         }
 
         $options = isset($request->status) && ($request->status == 'Qualquer') ? 
-        getFiltroOptions('', 'Qualquer', true) : getFiltroOptions('', 'Qualquer');
+        getFiltroOptions('Qualquer', 'Qualquer', true) : getFiltroOptions('Qualquer', 'Qualquer');
 
         foreach($this->status() as $s)
             $options .= isset($request->status) && ($request->status == $s) ? 
@@ -170,7 +170,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return $temFiltro;
     }
 
-    private function getResultadosFiltro($dados = null)
+    private function getResultadosFiltro($dados)
     {
         if(isset($dados) && !isset($dados['message']))
         {
@@ -181,24 +181,17 @@ class AgendamentoService implements AgendamentoServiceInterface {
             return Agendamento::with(['user', 'regional'])
                 ->whereBetween('dia', [
                     $dados['datemin'], $dados['datemax']
-                ])->when($regional, function ($query, $regional) {
+                ])->when($regional != 'Todas', function ($query) use($regional) {
                     $query->where('idregional', $regional);
-                })->when($status, function ($query, $status) {
+                })->when($status != 'Qualquer', function ($query) use($status) {
                     $query->where('status', $status);
-                })->when($servico, function ($query, $servico) {
+                })->when($servico != 'Qualquer', function ($query) use($servico) {
                     $query->where('tiposervico', $servico);
                 })->orderBy('idregional')
                 ->orderBy('dia','DESC')
                 ->orderBy('hora')
                 ->paginate(25);
         }
-
-        return Agendamento::with(['user', 'regional'])
-            ->where('dia', date('Y-m-d'))
-            ->where('idregional', auth()->user()->idregional)
-            ->orderBy('dia')
-            ->orderBy('hora')
-            ->paginate(25);
     }
 
     private function validarUpdate($dados, $agendamento)
@@ -357,12 +350,12 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         $total = Agendamento::where('cpf', $dados['cpf'])
             ->where('status', Agendamento::STATUS_NAO_COMPARECEU)
-            ->whereBetween('dia',[Carbon::tomorrow()->subDays(90)->format('Y-m-d'), date('Y-m-d')])
+            ->whereBetween('dia', [Carbon::today()->subDays(90)->format('Y-m-d'), date('Y-m-d')])
             ->count();
         if($total >= 3)
             return [
                 'message' => '<i class="icon fa fa-ban"></i>Agendamento bloqueado por excesso de falta nos últimos 90 dias. 
-                    <br>Favor entrar em contato com o Core-SP para regularizar o agendamento.',
+                Favor entrar em contato com o Core-SP para regularizar o agendamento.',
                 'class' => 'alert-danger'
             ];
 
@@ -479,12 +472,12 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'status' => $status,
             'variaveis' => (object) $this->variaveis,
             'atendentes' => $agendamento->regional
-            ->users()
-            ->select('idusuario', 'nome')
-            ->where('idperfil', 8)
-            ->withoutTrashed()
-            ->orderBy('nome')
-            ->get(),
+                ->users()
+                ->select('idusuario', 'nome')
+                ->where('idperfil', 8)
+                ->withoutTrashed()
+                ->orderBy('nome')
+                ->get(),
             'resultado' => $agendamento
         ];
     }
@@ -641,6 +634,12 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     public function cancelamentoSite($dados)
     {
+        if(!isset($dados['protocolo']))
+            return [
+                'message' => '<i class="icon fa fa-ban"></i>Protocolo não recebido. Faça a consulta do agendamento novamente.',
+                'class' => 'alert-danger'
+            ];
+
         $protocolo = 'AGE-'.strtoupper($dados['protocolo']);
         $agendamento = Agendamento::where('protocolo', $protocolo)
             ->where('dia', '>=', date('Y-m-d'))
@@ -684,7 +683,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $regional = auth()->user()->can('atendenteOrGerSeccionais', auth()->user()) ? auth()->user()->idregional : null;
 
         $resultados = Agendamento::with(['user', 'regional'])
-            ->when($regional, function ($query, $regional) use ($busca) {
+            ->when($regional, function ($query) use ($regional, $busca) {
                 return $query->where('idregional', $regional)
                     ->where(function($q) use ($busca) {
                         $q->where('cpf', 'LIKE', '%'.$busca.'%')
@@ -753,6 +752,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
             })->when(($perfil == 8) || ($perfil == 21), function ($query) use ($idregional) {
                 $query->where('idregional', $idregional);
             })->orderBy('dia', 'DESC')
+            ->orderBy('hora')
             ->paginate(10);
 
         return $count ? $resultados->total() : $resultados;
@@ -799,28 +799,4 @@ class AgendamentoService implements AgendamentoServiceInterface {
             return null;
         }
     }
-
-    /** 
-     * =======================================================================================================
-     * PLANTÃO JURÍDICO
-     * =======================================================================================================
-     */
-
-    // public function countPlantaoJuridicoByCPF($cpf, $regional, $plantao)
-    // {
-    //     return Agendamento::where('cpf', $cpf)
-    //         ->where('idregional', $regional)
-    //         ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-    //         ->whereNull('status')
-    //         ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
-    //         ->count();
-    // }
-
-    // Momentaneo até refatorar o AgendamentoSite
-    // public function getByRegional($idregional)
-    // {
-    //     return AgendamentoBloqueio::where('idregional', $idregional)
-    //         ->where('diatermino','>=', date('Y-m-d'))
-    //         ->get();
-    // }
 }

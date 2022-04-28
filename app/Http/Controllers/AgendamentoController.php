@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\AgendamentoUpdateRequest;
+use App\Http\Requests\AgendamentoRequest;
 use App\Contracts\MediadorServiceInterface;
 
 class AgendamentoController extends Controller
@@ -36,7 +36,7 @@ class AgendamentoController extends Controller
             redirect(session('url'))->with($dados['erro']);
     }
 
-    public function updateStatus(AgendamentoUpdateRequest $request)
+    public function updateStatus(AgendamentoRequest $request)
     {
         $this->authorize('viewAny', auth()->user());
 
@@ -52,7 +52,7 @@ class AgendamentoController extends Controller
 
         return redirect(session('url') ?? route('agendamentos.lista'))->with([
             'message' => isset($erro['message']) ? $erro['message'] : 
-                '<i class="icon fa fa-check"></i>Status do agendamento com ID '.$id.' foi editado com sucesso!',
+                '<i class="icon fa fa-check"></i>Status do agendamento com o código '.$id.' foi editado com sucesso!',
             'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
         ]);
     }
@@ -95,7 +95,7 @@ class AgendamentoController extends Controller
         return view('admin.crud.editar', compact('resultado', 'variaveis', 'atendentes', 'servicos', 'status'));
     }
 
-    public function update(AgendamentoUpdateRequest $request, $id)
+    public function update(AgendamentoRequest $request, $id)
     {
         $this->authorize('updateOther', auth()->user());
 
@@ -109,7 +109,7 @@ class AgendamentoController extends Controller
         }
 
         return redirect(session('url') ?? route('agendamentos.lista'))->with([
-            'message' => isset($erro['message']) ? $erro['message'] : '<i class="icon fa fa-check"></i>Agendamento com a ID '.$id.' foi editado com sucesso!',
+            'message' => isset($erro['message']) ? $erro['message'] : '<i class="icon fa fa-check"></i>Agendamento com o código '.$id.' foi editado com sucesso!',
             'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
         ]);
     }
@@ -127,7 +127,7 @@ class AgendamentoController extends Controller
         }
         
         return redirect(session('url') ?? route('agendamentos.lista'))->with([
-            'message' => isset($erro['message']) ? $erro['message'] : '<i class="icon fa fa-check"></i>Email do agendamento com ID '.$id.' foi enviado com sucesso!',
+            'message' => isset($erro['message']) ? $erro['message'] : '<i class="icon fa fa-check"></i>Email do agendamento com o código '.$id.' foi enviado com sucesso!',
             'class' => isset($erro['class']) ? $erro['class'] : 'alert-success'
         ]);
     }

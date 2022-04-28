@@ -23,8 +23,4 @@ interface PlantaoJuridicoServiceInterface {
     public function plantaoJuridicoAtivo();
 
     public function getRegionaisAtivas();
-
-    // public function getPlantaoAtivoComBloqueioPorRegional($idregional);
-
-    // public function validacaoAgendarPlantao($plantao, $diaEscolhido, $agendados = null, $horaEscolhida = null);
 }

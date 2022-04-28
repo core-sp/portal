@@ -15,39 +15,6 @@ class AgendamentoTest extends TestCase
 {
     use RefreshDatabase;
 
-    // protected function setUp(): void
-    // {
-    //     parent::setUp();
-
-    //     Permissao::insert([
-    //         [
-    //             'controller' => 'AgendamentoController',
-    //             'metodo' => 'index',
-    //             'perfis' => '1,6,12,13,8,21'
-    //         ], [
-    //             'controller' => 'AgendamentoController',
-    //             'metodo' => 'edit',
-    //             'perfis' => '1,21'
-    //         ], [
-    //             'controller' => 'AgendamentoBloqueioController',
-    //             'metodo' => 'index',
-    //             'perfis' => '1,'
-    //         ], [
-    //             'controller' => 'AgendamentoBloqueioController',
-    //             'metodo' => 'create',
-    //             'perfis' => '1,'
-    //         ], [
-    //             'controller' => 'AgendamentoBloqueioController',
-    //             'metodo' => 'edit',
-    //             'perfis' => '1,'
-    //         ], [
-    //             'controller' => 'AgendamentoBloqueioController',
-    //             'metodo' => 'destroy',
-    //             'perfis' => '1,'
-    //         ]
-    //     ]);
-    // }
-
     /** 
      * =======================================================================================================
      * TESTES AGENDAMENTO NO ADMIN
@@ -1629,7 +1596,7 @@ class AgendamentoTest extends TestCase
 
         // Listando todos os agendamentos (qualquer regional, status e datas cobrindos todos os agendamentos)
         $this->get(route('agendamentos.filtro', [
-            'regional' => '', 
+            'regional' => 'Todas', 
             'status' => 'Qualquer', 
             'datemin' => date('Y-m-d', strtotime('-1 day')), 
             'datemax' => date('Y-m-d', strtotime('+1 day'))
@@ -2874,7 +2841,7 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function agendamento_can_be_created_with_cpf_that_didnt_show_up_three_times_in_more_90_days()
     {
-        $subday = Carbon::tomorrow()->subDays(55);
+        $subday = Carbon::today()->subDays(55);
         while($subday->isWeekend())
             $subday->subDay();
 
@@ -2883,7 +2850,7 @@ class AgendamentoTest extends TestCase
             'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
 
-        $subday = Carbon::tomorrow()->subDays(65);
+        $subday = Carbon::today()->subDays(65);
         while($subday->isWeekend())
             $subday->subDay();
 
@@ -2893,7 +2860,7 @@ class AgendamentoTest extends TestCase
             'status' => Agendamento::STATUS_NAO_COMPARECEU
         ]);
 
-        $subday = Carbon::tomorrow()->subDays(91);
+        $subday = Carbon::today()->subDays(91);
         while($subday->isWeekend())
             $subday->subDay();
 
@@ -2970,7 +2937,7 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentosite.formview'))
         ->assertSee('<i class="icon fa fa-ban"></i>Agendamento bloqueado por excesso de falta nos últimos 90 dias.')
-        ->assertSee('<br>Favor entrar em contato com o Core-SP para regularizar o agendamento.');
+        ->assertSee(' Favor entrar em contato com o Core-SP para regularizar o agendamento.');
 
         $this->assertEquals(Agendamento::count(), 3);
     }
@@ -3047,6 +3014,81 @@ class AgendamentoTest extends TestCase
         ]))
         ->assertJsonFragment([$lotado])
         ->assertJsonMissingExact([$nao_lotado]);
+    }
+
+    /** @test */
+    // Situação em que o bloqueio é criado para algumas horas e não cancela o agendamento já existente no horário bloqueado.
+    // Então mesmo com a hora disponível, a quantidade de agendados já foi preenchida, a não ser que ocorra o cancelamento.
+    public function get_full_days_with_0_atendentes_bloqueio_and_created_agendado()
+    {
+        $regional = factory('App\Regional')->create([
+            'horariosage' => '10:00,11:00',
+            'ageporhorario' => 1
+        ]);
+        
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+            
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $regional->idregional,
+            'hora' => '10:00',
+            'dia' => $dia->format('Y-m-d')
+        ]);
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => '10:00',
+        ]);
+
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJsonFragment([$lotado]);
+    }
+
+    /** @test */
+    // Situação em que o bloqueio é criado para algumas horas e cancela o agendamento já existente no horário bloqueado.
+    public function get_empty_days_with_0_atendentes_bloqueio_and_after_cancel_created_agendado()
+    {
+        $regional = factory('App\Regional')->create([
+            'horariosage' => '10:00,11:00',
+            'ageporhorario' => 1
+        ]);
+        
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+            
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $regional->idregional,
+            'hora' => '10:00',
+            'dia' => $dia->format('Y-m-d')
+        ]);
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->create([
+            'idregional' => $regional->idregional,
+            'horarios' => '10:00',
+        ]);
+
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJsonFragment([$lotado]);
+
+        $agendamento->update(['status' => AGENDAMENTO::STATUS_CANCELADO]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertJsonFragment([]);
     }
 
     /** @test */
@@ -3130,7 +3172,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function get_only_weekends_and_empty_full_days()
+    public function get_full_days_when_weekends_and_empty_days_for_agendamentos()
     {
         $regional = factory('App\Regional')->create();
         $agendamentos = factory('App\Agendamento', 2)->create([
@@ -3483,9 +3525,10 @@ class AgendamentoTest extends TestCase
 
         $this->put(route('agendamentosite.cancelamento'), [
             'cpf' => $agendamento->cpf
-        ])->assertSessionHasErrors([
-            'protocolo'
-        ]);
+        ])->assertRedirect(route('agendamentosite.consultaView'));
+
+        $this->get(route('agendamentosite.consultaView'))
+        ->assertSee('Protocolo não recebido. Faça a consulta do agendamento novamente.');
     }
 
     /** @test */
@@ -3496,25 +3539,10 @@ class AgendamentoTest extends TestCase
 
         $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
             'cpf' => $agendamento->cpf
-        ])->assertSessionHasErrors([
-            'protocolo'
-        ]);
+        ])->assertRedirect(route('agendamentosite.consultaView'));
 
-        $protocolo = 'XXXXXXX';
-
-        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
-            'cpf' => $agendamento->cpf
-        ])->assertSessionHasErrors([
-            'protocolo'
-        ]);
-
-        $protocolo = ';XXXXX';
-
-        $this->put(route('agendamentosite.cancelamento', ['protocolo' => $protocolo]), [
-            'cpf' => $agendamento->cpf
-        ])->assertSessionHasErrors([
-            'protocolo'
-        ]);
+        $this->get(route('agendamentosite.consultaView'))
+        ->assertSeeText('O protocolo não existe para agendamentos de hoje em diante');
     }
 
     /** @test */
@@ -4253,5 +4281,196 @@ class AgendamentoTest extends TestCase
             'idregional' => $plantao->idregional
         ]))
         ->assertJson([]);
+    }
+
+    /** @test */
+    public function get_full_days_with_bloqueio_pj()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'horarios' => '10:00,11:00',
+            'qtd_advogados' => 1
+        ]);
+
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id,
+            'horarios' => $plantao->horarios,
+            'dataFinal' => $plantao->dataInicial
+        ]);
+
+        $dia = Carbon::parse($plantao->dataInicial);
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $dia = Carbon::parse($plantao->dataFinal);
+        $nao_lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJsonFragment([$lotado])
+        ->assertJsonMissingExact([$nao_lotado]);
+    }
+
+    /** @test */
+    // Situação em que o bloqueio é criado para algumas horas e não cancela o agendamento já existente no horário bloqueado.
+    // Então mesmo com a hora disponível, a quantidade de agendados já foi preenchida, a não ser que ocorra o cancelamento.
+    public function get_full_days_with_bloqueio_pj_and_created_agendado()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'horarios' => '10:00,11:00',
+            'qtd_advogados' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $plantao->idregional,
+            'hora' => '10:00',
+            'dia' => $plantao->dataInicial,
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para PF'
+        ]);
+
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id,
+            'horarios' => '10:00'
+        ]);
+
+        $dia = Carbon::parse($plantao->dataInicial);
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJsonFragment([$lotado]);
+    }
+
+    /** @test */
+    // Situação em que o bloqueio é criado para algumas horas e cancela o agendamento já existente no horário bloqueado.
+    public function get_empty_days_with_bloqueio_pj_and_after_cancel_created_agendado()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'horarios' => '10:00,11:00',
+            'qtd_advogados' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $plantao->idregional,
+            'hora' => '10:00',
+            'dia' => $plantao->dataInicial,
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para PF'
+        ]);
+
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id,
+            'horarios' => '10:00'
+        ]);
+
+        $dia = Carbon::parse($plantao->dataInicial);
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJsonFragment([$lotado]);
+
+        $agendamento->update(['status' => AGENDAMENTO::STATUS_CANCELADO]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJsonFragment([]);
+    }
+
+    /** @test */
+    public function get_full_days_when_weekends_and_empty_days_for_agendamentos_pj()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $plantao->idregional,
+            'hora' => '10:00',
+            'dia' => $plantao->dataInicial,
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para PF'
+        ]);
+
+        $diaAge = Carbon::parse($agendamento->dia);
+        $lotados = array();
+        $dia = Carbon::parse($plantao->dataInicial);
+        while($dia->lte(Carbon::parse($plantao->dataFinal)))
+        {
+            if($dia->isWeekend())
+                array_push($lotados, [$dia->month, $dia->day, 'lotado']);
+            $dia->addDay();
+        }
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJson($lotados)
+        ->assertJsonMissing([
+            [$diaAge->month, $diaAge->day, 'lotado']
+        ]);
+    }
+
+    /** @test */
+    public function remove_full_hour_if_weekend_pj()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $sabado = Carbon::parse($plantao->dataInicial);
+        while(!$sabado->isSaturday())
+            $sabado->addDay();
+
+        $plantao->dataFinal = $sabado->format('Y-m-d');
+        $lotado = [$sabado->month, $sabado->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'dia' => $sabado->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+        ]))
+        ->assertJsonMissing([$plantao->horarios]);
+
+        $domingo = Carbon::parse($plantao->dataInicial);
+        while(!$domingo->isSaturday())
+            $domingo->addDay();
+
+        $plantao->dataFinal = $domingo->format('Y-m-d');
+        $lotado = [$domingo->month, $domingo->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'dia' => $domingo->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+        ]))
+        ->assertJsonMissing([$plantao->horarios]);
+    }
+
+    /** @test */
+    public function remove_full_hour_with_bloqueio_pj()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id,
+            'horarios' => '10:00,11:30'
+        ]);
+            
+        $dia = Carbon::parse($plantao->dataInicial);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'dia' => $dia->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+        ]))
+        ->assertJsonMissing(explode(',', $bloqueio->horarios));
     }
 }

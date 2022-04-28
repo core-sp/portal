@@ -62,7 +62,7 @@
                   name="nome"
                   value="{{ old('nome') }}"
                   maxlength="191"
-                  pattern="[^0-9]{5,191}" title="Não é permitido números"
+                  pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
                   placeholder="Nome" 
                   required
                 />
@@ -244,6 +244,22 @@
               <button type="submit" class="btn btn-primary">Agendar</button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- The Modal -->
+  <div class="modal fade" id="avisoCarteirinha">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Atenção!</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: Av. Brigadeiro Luís Antônio, 613, Térreo, CEP: 01317-000, São Paulo/SP.
         </div>
       </div>
     </div>
