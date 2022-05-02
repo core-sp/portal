@@ -369,7 +369,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
                 ->whereNull('status')
                 ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
                 ->count();
-            if($total == 1)
+            if($total >= 1)
                 return [
                     'message' => '<i class="icon fa fa-ban"></i>Durante o período deste plantão jurídico é permitido apenas 1 agendamento por cpf',
                     'class' => 'alert-danger'

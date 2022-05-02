@@ -38,7 +38,7 @@ class AgendamentoRequest extends FormRequest
             
         if(\Route::is('agendamentosite.store'))
         {
-            $this->dateFormat = '|date_format:d/m/Y';
+            $this->dateFormat = '|date_format:d/m/Y|after:'.date('d\/m\/Y');
             if(request()->filled('dia') && substr_count(request()->dia, "/") != 2)
             {
                 $this->merge(['dia' => Carbon::tomorrow()->format('Y-m-d')]);
@@ -58,17 +58,9 @@ class AgendamentoRequest extends FormRequest
                     'dia' => request()->dia,
                     'servico' => request()->servico
                 ];
-                if(request()->servico == 'Plantão Jurídico')
-                {
-                    $datasPJ = $service->getDiasHorasAjaxSite(['regional' => $regional]);
-                    if(empty($datasPJ) || (!isset($datasPJ[0]) && !isset($datasPJ[1])))
-                        $this->merge(['idregional' => 0]);
-                    if(isset($datasPJ[0]))
-                        $this->dateFormat = $this->dateFormat.'|after_or_equal:'.onlyDate($datasPJ[0]);
-                    if(isset($datasPJ[1]))
-                        $this->dateFormat = $this->dateFormat.'|before_or_equal:'.onlyDate($datasPJ[1]);
-                }else
-                    $this->dateFormat = $this->dateFormat.'|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addMonth()->format('d\/m\/Y');
+                
+                if(request()->servico != 'Plantão Jurídico')
+                    $this->dateFormat = $this->dateFormat.'|before_or_equal:'.Carbon::today()->addMonth()->format('d\/m\/Y');
 
                 $horarios = $service->getDiasHorasAjaxSite($dados);
                 $this->horariosComBloqueio = isset($horarios) ? '|in:'.implode(',', $horarios) : '|in:';

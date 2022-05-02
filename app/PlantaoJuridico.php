@@ -33,7 +33,11 @@ class PlantaoJuridico extends Model
 
     private function getHorariosComBloqueio($bloqueios, $dia)
     {
-        if(Carbon::parse($dia)->isWeekend())
+        $inicial = Carbon::parse($this->dataInicial);
+        $final = Carbon::parse($this->dataFinal);
+        $dia = Carbon::parse($dia);
+
+        if($dia->isWeekend() || !($inicial->lte($dia) && $final->gte($dia)))
             return [];
 
         $horarios = explode(',', $this->horarios);
@@ -47,6 +51,9 @@ class PlantaoJuridico extends Model
 
     public function getDiasSeLotado()
     {
+        if($this->qtd_advogados == 0)
+            return null;
+
         $diasLotados = array();
         $diaslotadosBloqueio = array();
         $bloqueios = $this->bloqueios;
@@ -91,6 +98,9 @@ class PlantaoJuridico extends Model
 
     public function removeHorariosSeLotado($dia)
     {
+        if($this->qtd_advogados == 0)
+            return [];
+
         $bloqueios = $this->bloqueios;
         $horarios = $this->getHorariosComBloqueio($bloqueios, $dia);
 

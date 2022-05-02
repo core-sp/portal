@@ -3921,7 +3921,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentosite.formview'))->assertDontSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
 
         $this->post(route('agendamentosite.store'), $dados)
-        ->assertSessionHasErrors(['idregional']);
+        ->assertSessionHasErrors(['hora']);
 
         $this->assertDatabaseMissing('agendamentos', [
             'cpf' => $dados['cpf'],
@@ -3948,7 +3948,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->post(route('agendamentosite.store'), $dados)
-        ->assertSessionHasErrors(['idregional']);
+        ->assertSessionHasErrors(['dia']);
         
         $this->assertDatabaseMissing('agendamentos', [
             'cpf' => $dados['cpf'],
@@ -3973,7 +3973,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $this->post(route('agendamentosite.store'), $dados)
-        ->assertSessionHasErrors(['dia']);
+        ->assertSessionHasErrors(['hora']);
         
         $this->assertDatabaseMissing('agendamentos', [
             'cpf' => $dados['cpf'],
