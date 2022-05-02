@@ -62,7 +62,7 @@ class AgendamentoRequest extends FormRequest
                     if(isset($datasPJ[1]))
                         $this->dateFormat = $this->dateFormat.'|before_or_equal:'.onlyDate($datasPJ[1]);
                 }else
-                    $this->dateFormat = $this->dateFormat.'|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addDays(30)->format('d\/m\/Y');
+                    $this->dateFormat = $this->dateFormat.'|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addMonth()->format('d\/m\/Y');
 
                 $horarios = $service->getDiasHorasAjaxSite([
                     'idregional' => request()->idregional, 

@@ -96,13 +96,13 @@ class Regional extends Model
             ->select('dia', DB::raw('count(*) as total'))
             ->where('tiposervico', 'NOT LIKE', 'Plantão Jurídico%')
             ->whereNull('status')
-            ->whereBetween('dia', [Carbon::tomorrow()->format('Y-m-d'), Carbon::tomorrow()->addDays(30)->format('Y-m-d')])
+            ->whereBetween('dia', [Carbon::today()->format('Y-m-d'), Carbon::today()->addMonth()->format('Y-m-d')])
             ->groupBy('dia')
             ->orderBy('dia')
             ->get();
 
-        $dia = Carbon::tomorrow();
-        for($dia; $dia->lte(Carbon::tomorrow()->addDays(30)); $dia->addDay())
+        $dia = Carbon::today();
+        for($dia; $dia->lte(Carbon::today()->addMonth()); $dia->addDay())
         {
             $horariosTotal = $this->getHorariosComBloqueio($bloqueios, $dia->format('Y-m-d'));
             // Obs: está sendo considerado o total de atendimentos, 

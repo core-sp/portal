@@ -2736,10 +2736,10 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function agendamento_cannot_be_created_with_dia_after_30_days()
+    public function agendamento_cannot_be_created_with_dia_after_1_month()
     {
         $agendamento = factory('App\Agendamento')->raw([
-            'dia' => Carbon::today()->addDays(31)->format('d/m/Y'),
+            'dia' => Carbon::today()->addMonth()->addDay()->format('d/m/Y'),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -3102,8 +3102,8 @@ class AgendamentoTest extends TestCase
         ]);
 
         $lotados = array();
-        $dia = Carbon::tomorrow();
-        while($dia->lte(Carbon::tomorrow()->addDays(30)))
+        $dia = Carbon::today();
+        while($dia->lte(Carbon::today()->addMonth()))
         {
             array_push($lotados, [$dia->month, $dia->day, 'lotado']);
             $dia->addDay();
@@ -3181,8 +3181,8 @@ class AgendamentoTest extends TestCase
 
         $diaAge = Carbon::parse($agendamentos->get(0)->dia);
         $lotados = array();
-        $dia = Carbon::tomorrow();
-        while($dia->lt(Carbon::tomorrow()->addDays(30)))
+        $dia = Carbon::today();
+        while($dia->lt(Carbon::today()->addMonth()))
         {
             if($dia->isWeekend())
                 array_push($lotados, [$dia->month, $dia->day, 'lotado']);
