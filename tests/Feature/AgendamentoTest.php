@@ -3102,7 +3102,7 @@ class AgendamentoTest extends TestCase
         ]);
 
         $lotados = array();
-        $dia = Carbon::today();
+        $dia = Carbon::tomorrow();
         while($dia->lte(Carbon::today()->addMonth()))
         {
             array_push($lotados, [$dia->month, $dia->day, 'lotado']);
@@ -3181,7 +3181,7 @@ class AgendamentoTest extends TestCase
 
         $diaAge = Carbon::parse($agendamentos->get(0)->dia);
         $lotados = array();
-        $dia = Carbon::today();
+        $dia = Carbon::tomorrow();
         while($dia->lt(Carbon::today()->addMonth()))
         {
             if($dia->isWeekend())
