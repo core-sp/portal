@@ -758,45 +758,41 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return $count ? $resultados->total() : $resultados;
     }
 
-    public function getDiasHorasAjaxSite($dados, MediadorServiceInterface $service)
+    public function getDiasHorasAjaxSite($dados)
     {
-        if(isset($dados['idregional']))
+        $regional = $dados['regional'];
+        if(isset($regional))
         {
-            $regional = $service->getService('Regional')->getById($dados['idregional']);
-
-            if(isset($regional))
-            {
-                $resultado = isset($dados['servico']) && ($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO) ? 
-                $regional->plantaoJuridico()->with('bloqueios')->first() : $regional;
+            $resultado = !isset($dados['servico']) || ($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO) ? 
+            $regional->plantaoJuridico()->with('bloqueios')->first() : $regional;
     
-                if(!isset($dados['servico']) && !isset($dados['dia']))
-                {
-                    $plantao = $resultado->plantaoJuridico()->with('bloqueios')->where('qtd_advogados', '>', 0)->first();
+            if(!isset($dados['servico']) && !isset($dados['dia']))
+            {
+                $plantao = $resultado->qtd_advogados > 0 ? $resultado : null;
         
-                    if(isset($plantao))
-                    {
-                        $inicial = Carbon::parse($plantao->dataInicial);
-                        $final = Carbon::parse($plantao->dataFinal);
+                if(isset($plantao))
+                {
+                    $inicial = Carbon::parse($plantao->dataInicial);
+                    $final = Carbon::parse($plantao->dataFinal);
 
-                        return [
-                            $inicial->gt(Carbon::today()) ? $plantao->dataInicial : null, 
-                            $final->gt(Carbon::today()) ? $plantao->dataFinal : null
-                        ];
-                    }
-        
-                    return [];
+                    return [
+                        $inicial->gt(Carbon::today()) ? $plantao->dataInicial : null,
+                        $final->gt(Carbon::today()) ? $plantao->dataFinal : null
+                    ];
                 }
         
-                if(isset($dados['dia']))
-                {
-                    $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
-                    return $resultado->removeHorariosSeLotado($dia);
-                }
-            
-                return $resultado->getDiasSeLotado();
+                return [];
             }
-
-            return null;
+        
+            if(isset($dados['dia']))
+            {
+                $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
+                return $resultado->removeHorariosSeLotado($dia);
+            }
+            
+            return $resultado->getDiasSeLotado();
         }
+
+        return null;
     }
 }

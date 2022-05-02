@@ -40,5 +40,5 @@ interface AgendamentoServiceInterface {
 
     public function pendentesByPerfil($count = true);
 
-    public function getDiasHorasAjaxSite($dados, MediadorServiceInterface $service);
+    public function getDiasHorasAjaxSite($dados);
 }

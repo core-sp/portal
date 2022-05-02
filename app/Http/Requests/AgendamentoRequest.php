@@ -52,9 +52,15 @@ class AgendamentoRequest extends FormRequest
 
             if(request()->filled('idregional') && request()->filled('dia') && request()->filled('servico'))
             {
+                $regional = $this->service->getService('Regional')->getById(request()->idregional);
+                $dados = [
+                    'regional' => $regional,
+                    'dia' => request()->dia,
+                    'servico' => request()->servico
+                ];
                 if(request()->servico == 'Plantão Jurídico')
                 {
-                    $datasPJ = $service->getDiasHorasAjaxSite(['idregional' => request()->idregional], $this->service);
+                    $datasPJ = $service->getDiasHorasAjaxSite(['regional' => $regional]);
                     if(empty($datasPJ) || (!isset($datasPJ[0]) && !isset($datasPJ[1])))
                         $this->merge(['idregional' => 0]);
                     if(isset($datasPJ[0]))
@@ -64,11 +70,7 @@ class AgendamentoRequest extends FormRequest
                 }else
                     $this->dateFormat = $this->dateFormat.'|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addMonth()->format('d\/m\/Y');
 
-                $horarios = $service->getDiasHorasAjaxSite([
-                    'idregional' => request()->idregional, 
-                    'dia' => request()->dia,
-                    'servico' => request()->servico
-                ], $this->service);
+                $horarios = $service->getDiasHorasAjaxSite($dados);
                 $this->horariosComBloqueio = isset($horarios) ? '|in:'.implode(',', $horarios) : '|in:';
             }
         }

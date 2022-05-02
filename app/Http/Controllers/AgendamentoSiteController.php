@@ -83,7 +83,8 @@ class AgendamentoSiteController extends Controller
     {
         try{
             $validate = $request->only('idregional', 'servico', 'dia');
-            $dados = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate, $this->service);
+            $validate['regional'] = $this->service->getService('Regional')->getById($validate['idregional']);
+            $dados = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
