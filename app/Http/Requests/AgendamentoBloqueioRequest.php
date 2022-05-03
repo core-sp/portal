@@ -58,7 +58,7 @@ class AgendamentoBloqueioRequest extends FormRequest
             'array' => 'Formato inválido',
             'numeric' => 'Deve ser um número',
             'min' => 'Valor mínimo é :min',
-            'qtd_atendentes.max' => 'Deve ser um valor máximo de: total de atendentes atual - 1'
+            'qtd_atendentes.max' => 'Deve ser um valor máximo de: total de atendentes atual - 1. Se opção selecionada é "Todas", deve ser 0'
         ];
     }
 }

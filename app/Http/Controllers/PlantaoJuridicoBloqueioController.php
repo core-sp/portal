@@ -123,7 +123,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         }
 
         return redirect(route('plantao.juridico.bloqueios.index'))->with([
-            'message' => '<i class="icon fa fa-check"></i>Bloqueio excluído com sucesso!',
+            'message' => '<i class="icon fa fa-check"></i>Bloqueio com a ID '.$id.' foi excluído com sucesso!',
             'class' => 'alert-success'
         ]);
     }

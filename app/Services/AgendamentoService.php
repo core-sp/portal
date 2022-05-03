@@ -690,7 +690,9 @@ class AgendamentoService implements AgendamentoServiceInterface {
                     ->where(function($q) use ($busca) {
                         $q->where('cpf', 'LIKE', '%'.$busca.'%')
                         ->orWhere('email', 'LIKE', '%'.$busca.'%')
-                        ->orWhere('protocolo', 'LIKE', '%'.$busca.'%');
+                        ->orWhere('protocolo', 'LIKE', '%'.$busca.'%')
+                        ->orWhere('idagendamento', 'LIKE', $busca)
+                        ->orWhere('nome', 'LIKE', '%'.$busca.'%');
                 });
             }, function ($query) use ($busca) {
                 return $query->where('nome', 'LIKE', '%'.$busca.'%')

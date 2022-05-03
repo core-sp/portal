@@ -80,7 +80,7 @@
         </div>
         <div class="form-row mt-2">
             <div class="col-6">
-                <label for="horarios">Horários a serem bloqueados / qtd de agendamentos alterado</label>
+                <label for="horarios">Horários a serem bloqueados / qtd de agendamentos alterada</label>
                 <select 
                     name="horarios[]" 
                     class="form-control {{ $errors->has('horarios') ? 'is-invalid' : '' }}" 

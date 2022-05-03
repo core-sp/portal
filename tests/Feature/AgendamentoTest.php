@@ -1301,7 +1301,7 @@ class AgendamentoTest extends TestCase
     }
     
     /** @test */
-    public function search_criteria_for_agendamento()
+    public function search_criteria_for_agendamento_for_profiles_other_than_atendente_and_gerSeccional()
     {
         $user = $this->signInAsAdmin();
 
@@ -1323,6 +1323,98 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentos.busca', ['q' => $agendamento->protocolo]))
             ->assertSeeText($agendamento->protocolo); 
+            
+        $this->get(route('agendamentos.busca', ['q' => 'Critério de busca sem resultado']))
+            ->assertDontSeeText($agendamento->protocolo);
+    }
+
+    /** @test */
+    public function search_criteria_for_agendamento_atendente()
+    {
+        $perfil = factory('App\Perfil')->create([
+            'idperfil' => 8
+        ]);
+        $user = factory('App\User')->create([
+            'idperfil' => $perfil->idperfil
+        ]);
+
+        $user = $this->signIn($user);
+        Permissao::find(27)->update(['perfis' => '1,8']);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+        ]);
+
+        $agendamento2 = factory('App\Agendamento')->create([
+            'hora' => '11:00',
+            'protocolo' => 'AGE-YYYYYY'
+        ]);
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->nome]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo); 
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->idagendamento]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo);
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->cpf]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo); 
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->email]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo); 
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->protocolo]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo);
+            
+        $this->get(route('agendamentos.busca', ['q' => 'Critério de busca sem resultado']))
+            ->assertDontSeeText($agendamento->protocolo);
+    }
+
+    /** @test */
+    public function search_criteria_for_agendamento_gerente_seccional()
+    {
+        $perfil = factory('App\Perfil')->create([
+            'idperfil' => 21
+        ]);
+        $user = factory('App\User')->create([
+            'idperfil' => $perfil->idperfil
+        ]);
+
+        $user = $this->signIn($user);
+        Permissao::find(27)->update(['perfis' => '1,21']);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $user->idregional,
+        ]);
+
+        $agendamento2 = factory('App\Agendamento')->create([
+            'hora' => '11:00',
+            'protocolo' => 'AGE-YYYYYY'
+        ]);
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->nome]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo); 
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->idagendamento]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo);
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->cpf]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo); 
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->email]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo); 
+
+        $this->get(route('agendamentos.busca', ['q' => $agendamento->protocolo]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo);
             
         $this->get(route('agendamentos.busca', ['q' => 'Critério de busca sem resultado']))
             ->assertDontSeeText($agendamento->protocolo);

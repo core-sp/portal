@@ -113,7 +113,7 @@ class AgendamentoBloqueioController extends Controller
         }
 
         return redirect(route('agendamentobloqueios.lista'))->with([
-            'message' => '<i class="icon fa fa-check"></i>Bloqueio cancelado com sucesso!',
+            'message' => '<i class="icon fa fa-check"></i>Bloqueio com a ID: '.$id.' foi cancelado com sucesso!',
             'class' => 'alert-success'
         ]);
     }
