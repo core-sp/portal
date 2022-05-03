@@ -16,6 +16,7 @@ class AgendamentoRequest extends FormRequest
     private $chaveStatus;
     private $servicos;
     private $chaveProtocolo;
+    private $regional;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -28,6 +29,7 @@ class AgendamentoRequest extends FormRequest
         $this->completos = $service->getServicosOrStatusOrCompletos('completos');
         $this->chaveStatus = $service->getServicosOrStatusOrCompletos('status');
         $this->servicos = $service->getServicosOrStatusOrCompletos('servicos');
+        $this->regional = '|exists:regionais,idregional';
 
         if(\Route::is('agendamentosite.consulta'))
         {
@@ -38,6 +40,7 @@ class AgendamentoRequest extends FormRequest
             
         if(\Route::is('agendamentosite.store'))
         {
+            $this->regional = '';
             $this->dateFormat = '|date_format:d/m/Y|after:'.date('d\/m\/Y');
             if(request()->filled('dia') && substr_count(request()->dia, "/") != 2)
             {
@@ -53,6 +56,11 @@ class AgendamentoRequest extends FormRequest
             if(request()->filled('idregional') && request()->filled('dia') && request()->filled('servico'))
             {
                 $regional = $this->service->getService('Regional')->getById(request()->idregional);
+                if(!isset($regional))
+                    $this->merge(['idregional' => null]);
+                else
+                    $this->merge(['object_regional' => $regional]);
+
                 $dados = [
                     'regional' => $regional,
                     'dia' => request()->dia,
@@ -72,7 +80,7 @@ class AgendamentoRequest extends FormRequest
     {        
         return [
             'antigo' => 'sometimes|boolean',
-            'idregional' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo|exists:regionais,idregional',
+            'idregional' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$this->regional,
             'nome' => 'sometimes|exclude_if:antigo,1|required|min:5|max:191|string|regex:/^\D*$/',
             'email' => 'sometimes|exclude_if:antigo,1|required|email|max:191',
             'cpf' => ['sometimes', 'exclude_if:antigo,1', 'required', 'max:14', new Cpf],
@@ -86,7 +94,8 @@ class AgendamentoRequest extends FormRequest
             'hora' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo'.$this->horariosComBloqueio,
             'termo' => 'sometimes|required|accepted',
             'protocolo' => 'sometimes|exclude_if:antigo,0|exclude_if:antigo,1|required_without_all:antigo,idregional,nome,email,cpf,celular,servico,tiposervico,pessoa,idusuario,status,dia,hora,termo,idagendamento'.$this->chaveProtocolo,
-            'idagendamento' => 'sometimes|required_without_all:nome,email,cpf,celular,servico,tiposervico,idusuario,antigo,dia,hora,pessoa,termo'
+            'idagendamento' => 'sometimes|required_without_all:nome,email,cpf,celular,servico,tiposervico,idusuario,antigo,dia,hora,pessoa,termo',
+            'object_regional' => 'exclude_if:antigo,0|exclude_if:antigo,1'
         ];
     }
 
@@ -105,6 +114,7 @@ class AgendamentoRequest extends FormRequest
             'string' => 'Deve ser um texto sem números',
             'accepted' => 'Você deve concordar com o Termo de Consentimento',
             'idregional.exists' => 'Regional não existe ou não está disponível',
+            'idregional.required_without_all' => 'Regional não existe ou não está disponível',
             'hora.in' => 'Essa hora não está disponível',
             'pessoa.in' => 'Esse tipo de pessoa não está disponível',
             'date_format' => 'Formato de data inválido',

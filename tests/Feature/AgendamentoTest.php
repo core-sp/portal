@@ -2722,8 +2722,12 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function agendamento_cannot_be_created_with_dia_before_today()
     {
+        $dia = Carbon::today()->subDay();
+        while($dia->isWeekend())
+            $dia->subDay();
+
         $agendamento = factory('App\Agendamento')->raw([
-            'dia' => Carbon::today()->subDay()->format('d/m/Y'),
+            'dia' => $dia->format('d/m/Y'),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'
@@ -2738,8 +2742,12 @@ class AgendamentoTest extends TestCase
     /** @test */
     public function agendamento_cannot_be_created_with_dia_after_1_month()
     {
+        $dia = Carbon::today()->addMonth()->addDay();
+        while($dia->isWeekend())
+            $dia->addDay();
+
         $agendamento = factory('App\Agendamento')->raw([
-            'dia' => Carbon::today()->addMonth()->addDay()->format('d/m/Y'),
+            'dia' => $dia->format('d/m/Y'),
             'servico' => Agendamento::SERVICOS_OUTROS,
             'pessoa' => 'PF',
             'termo' => 'on'

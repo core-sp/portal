@@ -361,7 +361,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         if($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO)
         {
-            $regional = $service->getService('Regional')->getById($dados['idregional']);
+            $regional = $dados['object_regional'];
             $plantao = $regional->plantaoJuridico;
             $total = $regional->agendamentos()
                 ->where('cpf', $dados['cpf'])
@@ -383,6 +383,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         unset($dados['servico']);
         unset($dados['pessoa']);
         unset($dados['termo']);
+        unset($dados['object_regional']);
 
         return $dados;
     }
@@ -608,6 +609,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $termo = $agendamento->termos()->create([
             'ip' => request()->ip()
         ]);
+        $agendamento->regional = $dados['object_regional'];
 
         $string = $agendamento->nome.' (CPF: '.$agendamento->cpf.') *agendou* atendimento em *'.$agendamento->regional->regional;
         $string .= '* no dia '.onlyDate($agendamento->dia).' para o serviço '.$agendamento->tiposervico.' e ' .$termo->message();
