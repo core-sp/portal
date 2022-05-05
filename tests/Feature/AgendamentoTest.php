@@ -3250,7 +3250,7 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
-    public function get_empty_full_days_with_1_or_more_atendentes_bloqueio()
+    public function get_empty_days_with_1_or_more_atendentes_bloqueio()
     {
         $regional = factory('App\Regional')->create();
         $bloqueio = factory('App\AgendamentoBloqueio')->create([
@@ -3259,16 +3259,20 @@ class AgendamentoTest extends TestCase
             'qtd_atendentes' => 1
         ]);
 
+        $lotados = array();
         $dia = Carbon::tomorrow();
-        while($dia->isWeekend())
+        while($dia->lte(Carbon::today()->addMonth()))
+        {
+            if($dia->isWeekend())
+                array_push($lotados, [$dia->month, $dia->day, 'lotado']);
             $dia->addDay();
-        $lotado = [$dia->month, $dia->day, 'lotado'];
+        }
 
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $regional->idregional,
             'servico' => Agendamento::SERVICOS_OUTROS
         ]))
-        ->assertJsonMissing([$lotado]);
+        ->assertJson($lotados);
     }
 
     /** @test */
@@ -3282,7 +3286,7 @@ class AgendamentoTest extends TestCase
         $diaAge = Carbon::parse($agendamentos->get(0)->dia);
         $lotados = array();
         $dia = Carbon::tomorrow();
-        while($dia->lt(Carbon::today()->addMonth()))
+        while($dia->lte(Carbon::today()->addMonth()))
         {
             if($dia->isWeekend())
                 array_push($lotados, [$dia->month, $dia->day, 'lotado']);
@@ -3294,9 +3298,9 @@ class AgendamentoTest extends TestCase
             'servico' => Agendamento::SERVICOS_OUTROS
         ]))
         ->assertJson($lotados)
-        ->assertJsonMissing([
+        ->assertJsonMissingExact(
             [$diaAge->month, $diaAge->day, 'lotado']
-        ]);
+        );
     }
 
     /** @test */

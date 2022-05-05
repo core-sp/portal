@@ -778,7 +778,9 @@ function perfisPermitidosMenu()
     ->get()
     ->each(function ($item, $key) {
         $item->perfis = explode(',', $item->perfis);
-        $item->perfis = array_filter($item->perfis, fn($value) => !is_null($value) && $value !== '');
+        $item->perfis = array_filter($item->perfis, function($value) {
+            return isset($value) && ($value != '');
+        });
     });
 }
 
