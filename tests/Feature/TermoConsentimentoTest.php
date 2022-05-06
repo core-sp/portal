@@ -85,10 +85,11 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function created_new_record_when_new_agendamento()
     {
+        $pegarDia = factory('App\Agendamento')->raw();
         $agendamento = factory('App\Agendamento')->raw([
-            'idregional' => factory('App\Regional')->create(),
-            'dia' => date('Y-m-d', strtotime('+1 day')),
-            'hora' => '10:00',
+            'dia' => onlyDate($pegarDia['dia']),
+            'servico' => 'Outros',
+            'pessoa' => 'PF',
             'termo' => 'on'
         ]);
         $this->post(route('agendamentosite.store'), $agendamento);
@@ -108,10 +109,14 @@ class TermoConsentimentoTest extends TestCase
     public function id_termo_in_log_when_new_agendamento()
     {
         $regional = factory('App\Regional')->create();
+        $pegarDia = factory('App\Agendamento')->raw();
+
         $agendamento = factory('App\Agendamento')->raw([
             'idregional' => $regional->idregional,
-            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'dia' => onlyDate($pegarDia['dia']),
             'hora' => '10:00',
+            'servico' => 'Outros',
+            'pessoa' => 'PJ',
             'termo' => 'on'
         ]);
         $this->post(route('agendamentosite.store'), $agendamento);
@@ -120,7 +125,7 @@ class TermoConsentimentoTest extends TestCase
 
         $this->assertStringContainsString(' *agendou* atendimento em *', $log);
         $this->assertStringContainsString($agendamento['nome'].' (CPF: '.$agendamento['cpf'].') *agendou* atendimento em *'
-        .$regional->regional.'* no dia '.onlyDate($agendamento['dia']).' e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
+        .$regional->regional.'* no dia '.$agendamento['dia'].' para o serviço '.$agendamento['servico'].' para '.$agendamento['pessoa'].' e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
     }
 
     /** @test */

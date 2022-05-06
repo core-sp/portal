@@ -11,39 +11,6 @@ class PlantaoJuridicoTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Permissao::insert([
-            [
-                'controller' => 'PlantaoJuridicoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ],[
-                'controller' => 'PlantaoJuridicoController',
-                'metodo' => 'edit',
-                'perfis' => '1,'
-            ],[
-                'controller' => 'PlantaoJuridicoBloqueioController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ],[
-                'controller' => 'PlantaoJuridicoBloqueioController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ],[
-                'controller' => 'PlantaoJuridicoBloqueioController',
-                'metodo' => 'edit',
-                'perfis' => '1,'
-            ],[
-                'controller' => 'PlantaoJuridicoBloqueioController',
-                'metodo' => 'destroy',
-                'perfis' => '1,'
-            ]
-        ]);
-    }
-
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
@@ -92,11 +59,14 @@ class PlantaoJuridicoTest extends TestCase
         $this->assertAuthenticated('web');
         
         $plantao = factory('App\PlantaoJuridico')->create();
+        $dados = $plantao->toArray();
+        $dados['horarios'] = ['12:00', '13:00'];
+
         $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
         
         $this->get(route('plantao.juridico.index'))->assertOk();
         $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertOk();
-        $this->put(route('plantao.juridico.editar', $plantao->id), ['qtd_advogados' => 0])->assertStatus(302);
+        $this->put(route('plantao.juridico.editar', $plantao->id), $dados)->assertStatus(302);
         $this->get(route('plantao.juridico.bloqueios.index'))->assertOk();
         $this->get(route('plantao.juridico.bloqueios.criar.view'))->assertOk();
 
@@ -169,6 +139,7 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'dataInicial' => '',
+            'dataFinal' => $plantao->dataFinal,
             'qtd_advogados' => 0
         ];
 
@@ -189,6 +160,7 @@ class PlantaoJuridicoTest extends TestCase
         $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertOk();
 
         $dados = [
+            'dataInicial' => $plantao->dataFinal,
             'dataFinal' => '',
             'qtd_advogados' => 0
         ];
@@ -209,10 +181,9 @@ class PlantaoJuridicoTest extends TestCase
         $this->get(route('plantao.juridico.index'))->assertOk();
         $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertOk();
 
-        $dados = [
-            'horarios' => '',
-            'qtd_advogados' => 0
-        ];
+        $dados = $plantao->toArray();
+        unset($dados['horarios']);
+        $dados['qtd_advogados'] = 0;
 
         $this->put(route('plantao.juridico.editar', $plantao->id), $dados)->assertRedirect(route('plantao.juridico.index'));
         $this->assertDatabaseHas('plantoes_juridicos', [
@@ -231,7 +202,6 @@ class PlantaoJuridicoTest extends TestCase
         $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertOk();
 
         $dados = [
-            'horarios' => '',
             'dataInicial' => '',
             'dataFinal' => '',
             'qtd_advogados' => 0
@@ -344,6 +314,28 @@ class PlantaoJuridicoTest extends TestCase
             'dataFinal' => $plantao->dataFinal,
             'horarios' => $plantao->horarios,
             'qtd_advogados' => $plantao->qtd_advogados
+        ]);
+    }
+
+    /** @test */
+    public function plantao_cannot_be_edited_with_invalid_dates()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+                
+        $this->get(route('plantao.juridico.index'))->assertOk();
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertOk();
+
+        $dados = [
+            'qtd_advogados' => 1,
+            'dataInicial' => '2022-02-31',
+            'dataFinal' => '2022-02-31'
+        ];
+
+        $this->put(route('plantao.juridico.editar', $plantao->id), $dados)
+        ->assertSessionHasErrors([
+            'dataInicial',
+            'dataFinal'
         ]);
     }
 
@@ -527,9 +519,7 @@ class PlantaoJuridicoTest extends TestCase
     {
         $this->signInAsAdmin();
 
-        $plantao = factory('App\PlantaoJuridico')->create([
-            'qtd_advogados' => 0
-        ]);
+        $plantao = factory('App\PlantaoJuridico')->create();
 
         $agendados = factory('App\Agendamento')->create([
             'tiposervico' => 'Plantão Jurídico para Ambas',
@@ -542,7 +532,41 @@ class PlantaoJuridicoTest extends TestCase
         $this->get(route('plantao.juridico.editar.view', $plantao->id))
         ->assertDontSeeText('Total de agendamentos deste plantão ativo já cadastrados')
         ->assertDontSee('<td>'.onlyDate($agendados->dia).'</td>')
-        ->assertDontSee('<td>1 agendado(s) às '.$agendados->hora.'</td>');
+        ->assertDontSeeText('1 agendado(s) às '.$agendados->hora);
+    }
+
+    /** @test */
+    public function not_show_past_days_agendados_table_when_disabled_plantao_with_agendados()
+    {
+        $this->signInAsAdmin();
+
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1,
+            'dataInicial' => Carbon::today()->subDay()->format('Y-m-d')
+        ]);
+
+        $agendadoAntigo = factory('App\Agendamento')->create([
+            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCF',
+            'dia' => $plantao->dataInicial,
+            'hora' => '11:00'
+        ]);
+
+        $agendadoAtual = factory('App\Agendamento')->create([
+            'tiposervico' => 'Plantão Jurídico para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCD',
+            'dia' => $plantao->dataFinal,
+            'hora' => '10:00'
+        ]);
+
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))
+        ->assertSeeText('Total de agendamentos deste plantão ativo já cadastrados')
+        ->assertDontSee('<td>'.onlyDate($plantao->dataInicial).'</td>')
+        ->assertSee('<td>'.onlyDate($plantao->dataFinal).'</td>')
+        ->assertSeeText('1 agendado(s) às '.$agendadoAtual->hora)
+        ->assertDontSeeText('1 agendado(s) às '.$agendadoAntigo->hora);
     }
 
     /** 
@@ -600,8 +624,8 @@ class PlantaoJuridicoTest extends TestCase
 
         $dados = [
             'plantaoBloqueio' => $plantao->id,
-            'dataInicialBloqueio' => Carbon::parse($plantao->dataInicial)->addDay()->format('Y-m-d'),
-            'dataFinalBloqueio' => Carbon::parse($plantao->dataInicial)->addDay()->format('Y-m-d'),
+            'dataInicialBloqueio' => Carbon::parse($plantao->dataInicial)->format('Y-m-d'),
+            'dataFinalBloqueio' => Carbon::parse($plantao->dataFinal)->format('Y-m-d'),
             'horariosBloqueio' => ['11:00']
         ];
 
@@ -755,6 +779,33 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
+    public function bloqueio_cannot_be_created_with_invalid_dates()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+                
+        $this->get(route('plantao.juridico.bloqueios.index'))->assertOk();
+        $this->get(route('plantao.juridico.bloqueios.criar.view'))->assertOk();
+
+        $dados = [
+            'plantaoBloqueio' => $plantao->id,
+            'dataInicialBloqueio' => '2022-02-31',
+            'dataFinalBloqueio' => '2022-02-31',
+            'horariosBloqueio' => ['11:00', '11:30']
+        ];
+
+        $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
+        ->assertSessionHasErrors([
+            'dataInicialBloqueio',
+            'dataFinalBloqueio'
+        ]);
+
+        $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
+            'id' => 1
+        ]);
+    }
+
+    /** @test */
     public function bloqueio_cannot_be_created_with_data_inicial_before_data_inicial_plantao()
     {
         $this->signInAsAdmin();
@@ -771,10 +822,9 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) data(s) escolhida(s) fora das datas do plantão');
+        ->assertSessionHasErrors([
+            'dataInicialBloqueio'
+        ]);
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'id' => 1
@@ -798,10 +848,10 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) data(s) escolhida(s) fora das datas do plantão');
+        ->assertSessionHasErrors([
+            'dataInicialBloqueio',
+            'dataFinalBloqueio'
+        ]);
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'id' => 1
@@ -873,10 +923,7 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) data(s) escolhida(s) fora das datas do plantão');
+        ->assertSessionHasErrors('dataFinalBloqueio');
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'id' => 1
@@ -900,10 +947,7 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) data(s) escolhida(s) fora das datas do plantão');
+        ->assertSessionHasErrors('dataInicialBloqueio');
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'id' => 1
@@ -951,14 +995,28 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) hora(s) escolhida(s) não inclusa(s) nas horas do plantão');
+        ->assertSessionHasErrors('horariosBloqueio');
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'id' => 1
         ]);
+    }
+
+    /** @test */
+    public function bloqueio_cannot_be_created_when_nonexistent_regional()
+    {
+        $user = $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+                
+        $dados = [
+            'plantaoBloqueio' => 55,
+            'dataInicialBloqueio' => $plantao->dataInicial,
+            'dataFinalBloqueio' => $plantao->dataInicial,
+            'horariosBloqueio' => ['10:00', '10:30']
+        ];
+
+        $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
+        ->assertSessionHasErrors('plantaoBloqueio');
     }
 
     /** @test */
@@ -1127,6 +1185,33 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
+    public function bloqueio_cannot_be_edited_with_invalid_dates()
+    {
+        $this->signInAsAdmin();
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+                
+        $this->get(route('plantao.juridico.bloqueios.index'))->assertOk();
+        $this->get(route('plantao.juridico.bloqueios.editar.view', $bloqueio->id))->assertOk();
+
+        $dados = [
+            'plantaoBloqueio' => $bloqueio->idplantaojuridico,
+            'dataInicialBloqueio' => '2022-02-31',
+            'dataFinalBloqueio' => '2022-02-31',
+            'horariosBloqueio' => ['11:30', '12:00']
+        ];
+
+        $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)
+        ->assertSessionHasErrors([
+            'dataInicialBloqueio',
+            'dataFinalBloqueio',
+        ]);
+
+        $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
+            'horarios' => '11:30,12:00'
+        ]);
+    }
+
+    /** @test */
     public function bloqueio_cannot_be_edited_with_data_inicial_before_data_inicial_plantao()
     {
         $this->signInAsAdmin();
@@ -1143,10 +1228,9 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) data(s) escolhida(s) fora das datas do plantão');
+        ->assertSessionHasErrors([
+            'dataInicialBloqueio',
+        ]);
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'horarios' => '11:30,12:00'
@@ -1170,10 +1254,9 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) data(s) escolhida(s) fora das datas do plantão');
+        ->assertSessionHasErrors([
+            'dataInicialBloqueio',
+        ]);
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'horarios' => '11:30,12:00'
@@ -1245,10 +1328,7 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) data(s) escolhida(s) fora das datas do plantão');
+        ->assertSessionHasErrors('dataFinalBloqueio');
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'horarios' => '11:30,12:00'
@@ -1272,10 +1352,7 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) data(s) escolhida(s) fora das datas do plantão');
+        ->assertSessionHasErrors('dataInicialBloqueio');
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'horarios' => '11:30,12:00'
@@ -1323,10 +1400,7 @@ class PlantaoJuridicoTest extends TestCase
         ];
 
         $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)
-        ->assertRedirect(route('plantao.juridico.bloqueios.index'));
-
-        $this->get(route('plantao.juridico.bloqueios.index'))
-        ->assertSeeText('A(s) hora(s) escolhida(s) não inclusa(s) nas horas do plantão');
+        ->assertSessionHasErrors('horariosBloqueio');
 
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'horarios' => '09:30'
@@ -1369,6 +1443,23 @@ class PlantaoJuridicoTest extends TestCase
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'horarios' => '09:30'
         ]);
+    }
+
+    /** @test */
+    public function bloqueio_cannot_be_edited_when_nonexistent_regional()
+    {
+        $user = $this->signInAsAdmin();
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+
+        $dados = [
+            'plantaoBloqueio' => 55,
+            'dataInicialBloqueio' => $bloqueio->dataInicial,
+            'dataFinalBloqueio' => $bloqueio->dataInicial,
+            'horariosBloqueio' => ['10:30']
+        ];
+
+        $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados)
+        ->assertSessionHasErrors('plantaoBloqueio');
     }
 
     /** @test */

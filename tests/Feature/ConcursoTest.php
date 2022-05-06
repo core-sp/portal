@@ -11,30 +11,6 @@ class ConcursoTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Permissao::insert([
-            [
-                'controller' => 'ConcursoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'ConcursoController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'ConcursoController',
-                'metodo' => 'edit',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'ConcursoController',
-                'metodo' => 'destroy',
-                'perfis' => '1,'
-            ]
-        ]);
-    }
-
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {

@@ -37,7 +37,7 @@
           <p><strong>Importante:</strong> O atendimento presencial está suspenso temporariamente, neste período os serviços deverão ser solicitados via email. O prazo para análise e resposta do email depende do tipo de serviço solicitado.</p>
           <p>Para mais informações, acesse <a href="/servicos-atendimento-ao-rc">este link</a>.</p>
           -->
-          <p class="pb-0">Agende seu atendimento presencial no Core-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="/agendamento-consulta" class="text-primary">informações do atendimento já agendado.</a></p></br>
+          <p class="pb-0">Agende seu atendimento presencial no Core-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="{{ route('agendamentosite.consultaView') }}" class="text-primary">informações do atendimento já agendado.</a></p></br>
           <p><strong>Atenção:</strong> Orientação jurídica – dúvidas deverão ser enviadas para o e-mail juridico@core-sp.org.br, que serão respondidas em até 5 (cinco) dias úteis, conforme PORTARIA 27/2020. Não há atendimento jurídico presencial, excepcionalmente, nesse período de pandemia.</p>
           <p>O parcelamento de anuidades em Execução Fiscal só será realizado pelo atendimento presencialmente, se houver o contato via e-mail com o setor de Dívida Ativa (<a href="mailto:juridico.dividaativa@core-sp.org.br">juridico.dividaativa@core-sp.org.br</a>) previamente para solicitação dos valores de custas processuais e honorários advocatícios, caso haja.</p>
           
@@ -46,8 +46,13 @@
           </div>
         </div>
         <div class="mt-2">
-          <form method="POST" class="inscricaoCurso">
-            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+        @if(session('message'))
+          <div class="d-block w-100">
+            <p class="alert {{ session('class') }}">{!! session('message') !!}</p>
+          </div>
+        @endif
+          <form method="POST" class="inscricaoCurso" id="agendamentoStore">
+            @csrf
             <h5>Informações de contato</h5>
             <div class="form-row mt-2">
               <div class="col-md-6">
@@ -56,11 +61,15 @@
                   class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                   name="nome"
                   value="{{ old('nome') }}"
-                  placeholder="Nome" />
+                  maxlength="191"
+                  pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
+                  placeholder="Nome" 
+                  required
+                />
                 @if($errors->has('nome'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('nome') }}
-                  </div>
+                <div class="invalid-feedback">
+                  {{ $errors->first('nome') }}
+                </div>
                 @endif
               </div>
               <div class="col-md-6 mt-2-768">
@@ -70,27 +79,30 @@
                   name="cpf"
                   placeholder="CPF"
                   value="{{ old('cpf') }}"
-                  />
+                  required
+                />
                 @if($errors->has('cpf'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('cpf') }}
-                  </div>
+                <div class="invalid-feedback">
+                  {{ $errors->first('cpf') }}
+                </div>
                 @endif
               </div>
             </div>
             <div class="form-row mt-2">
               <div class="col-md-6">
                 <label for="email">E-mail *</label>
-                <input type="text"
+                <input type="email"
                   class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                   name="email"
                   value="{{ old('email') }}"
+                  maxlength="191"
                   placeholder="E-mail"
-                  />
+                  required
+                />
                 @if($errors->has('email'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('email') }}
-                  </div>
+                <div class="invalid-feedback">
+                  {{ $errors->first('email') }}
+                </div>
                 @endif
               </div>
               <div class="col-md-6 mt-2-768">
@@ -100,11 +112,12 @@
                   name="celular"
                   value="{{ old('celular') }}"
                   placeholder="Celular"
-                  />
+                  required
+                />
                 @if($errors->has('celular'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('celular') }}
-                  </div>
+                <div class="invalid-feedback">
+                  {{ $errors->first('celular') }}
+                </div>
                 @endif
               </div>
             </div>
@@ -112,13 +125,14 @@
             <div class="form-row mt-2">
               <div class="col-md-6">
                 <label for="servico">Tipo de Serviço *</label>
-                <select name="servico" class="form-control" id="selectServicos">
+                <select 
+                  name="servico" 
+                  class="form-control {{ $errors->has('servico') ? 'is-invalid' : '' }}" 
+                  id="selectServicos" 
+                  required
+                >
                   @foreach($servicos as $servico)
-                    @if($servico == old('servico'))
-                    <option value="{{ $servico }}" selected>{{ $servico }}</option>
-                    @else
-                    <option value="{{ $servico }}">{{ $servico }}</option>
-                    @endif
+                    <option value="{{ $servico }}" {{ old('servico') == $servico ? 'selected' : '' }}>{{ $servico }}</option>
                   @endforeach 
                 </select>
                 @if($errors->has('servico'))
@@ -128,14 +142,14 @@
                 @endif
               </div>
               <div class="col-md-6 mt-2-768">
-                <label for="pessoa">Para:</label>
-                <select name="pessoa" class="form-control">
+                <label for="pessoa">Para: *</label>
+                <select 
+                  name="pessoa" 
+                  class="form-control {{ $errors->has('pessoa') ? 'is-invalid' : '' }}"
+                  required
+                >
                   @foreach($pessoas as $pessoa => $diminutivo)
-                    @if(old('pessoa') == $diminutivo)
-                    <option value="{{ $diminutivo }}" selected>{{ $pessoa }}</option>
-                    @else
-                    <option value="{{ $diminutivo }}">{{ $pessoa }}</option>
-                    @endif
+                    <option value="{{ $diminutivo }}" {{ old('pessoa') == $diminutivo ? 'selected' : '' }}>{{ $pessoa }}</option>
                   @endforeach 
                 </select>
                 @if($errors->has('pessoa'))
@@ -148,10 +162,15 @@
             <div class="form-row mt-2">
               <div class="col-md-4">
                 <label for="idregional">Regional *</label>
-                <select name="idregional" id="idregional" class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}">
-                  <option value="" selected>Selecione a regional</option>
+                <select 
+                  name="idregional" 
+                  id="idregional" 
+                  class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}"
+                  required
+                >
+                  <option value="">Selecione a regional</option>
                   @foreach($regionais as $regional)
-                    <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
+                    <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
                   @endforeach 
                 </select>
                 @if($errors->has('idregional'))
@@ -161,17 +180,17 @@
                 @endif
               </div>
               <div class="col-md-4 mt-2-768">
-                <label for="dia">Dia * <span>(datas em vermelho não possuem horário disponível)</span></label>
+                <label for="dia">Dia * <span>( <i class="fa fa-square" style="color:red"></i> = sem horário disponível )</span></label>
                 <div class="input-group">
                   <input type="text" 
                     class="form-control {{ $errors->has('dia') ? 'is-invalid' : '' }}"
                     id="datepicker"
                     name="dia"
                     placeholder="Selecione a regional"
-                    autocomplete="off"
                     readonly
                     disabled
-                    />
+                    required
+                  />
                   @if($errors->has('dia'))
                   <div class="invalid-feedback">
                     {{ $errors->first('dia') }}
@@ -184,7 +203,13 @@
               </div>
               <div class="col-md-4 mt-2-768">
                 <label for="hora">Horários disponíveis *</label>
-                <select name="hora" id="horarios" disabled class="form-control {{ $errors->has('hora') ? 'is-invalid' : '' }}">
+                <select 
+                  name="hora" 
+                  id="horarios"
+                  class="form-control {{ $errors->has('hora') ? 'is-invalid' : '' }}"
+                  disabled 
+                  required
+                >
                   <option value="" selected>Selecione o dia do atendimento</option>
                 </select>
                 @if($errors->has('hora'))
@@ -202,10 +227,11 @@
                 name="termo"
                 class="form-check-input {{ $errors->has('termo') ? 'is-invalid' : '' }}"
                 id="termo"
-                {{ old('termo') ? 'checked' : '' }}
+                {{ !empty(old('termo')) ? 'checked' : '' }}
                 required
               /> 
-              <label for="termo" class="textoTermo text-justify">Li e concordo com o <a href="{{route('termo.consentimento.pdf')}}" target="_blank"><u>Termo de Consentimento</u></a>  de uso de dados, e estou ciente de que os meus dados serão utilizados apenas para notificações por e-mail a respeito do agendamento solicitado.
+              <label for="termo" class="textoTermo text-justify">
+                Li e concordo com o <a href="{{ route('termo.consentimento.pdf') }}" target="_blank"><u>Termo de Consentimento</u></a>  de uso de dados, e estou ciente de que os meus dados serão utilizados apenas para notificações por e-mail a respeito do agendamento solicitado.
               </label>
               @if($errors->has('termo'))
               <div class="invalid-feedback">
@@ -218,6 +244,22 @@
               <button type="submit" class="btn btn-primary">Agendar</button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- The Modal -->
+  <div class="modal fade" id="avisoCarteirinha">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Atenção!</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: Av. Brigadeiro Luís Antônio, 613, Térreo, CEP: 01317-000, São Paulo/SP.
         </div>
       </div>
     </div>

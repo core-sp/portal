@@ -183,6 +183,7 @@
                     name="ageporhorario"
                     id="ageporhorario"
                     value="{{ empty(old('ageporhorario')) && isset($resultado->ageporhorario) ? $resultado->ageporhorario : old('ageporhorario') }}"
+                    maxlength="1"
                     required
                 />
                 @if($errors->has('ageporhorario'))

@@ -35,12 +35,12 @@
                     id="horarios" 
                     multiple
                 >
-                    @php
-                        $horarios = explode(',', $resultado->horarios);
-                    @endphp
-                    @foreach (todasHoras() as $hora)
-                        <option value="{{ $hora }}" {{ in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
-                    @endforeach
+                @php
+                    $horarios = explode(',', $resultado->horarios);
+                @endphp
+                @foreach(todasHoras() as $hora)
+                    <option value="{{ $hora }}" {{ (!empty(old('horarios')) && in_array($hora, old('horarios'))) || in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
+                @endforeach
                 </select>
 
                 @if($errors->has('horarios'))
@@ -88,8 +88,8 @@
             </div>
         </div>
 
-    @if(isset($resultado) && $resultado->ativado())
-        @if(empty($agendamentos))
+    @if(isset($resultado) && $resultado->ativado() && isset($agendamentos))
+        @if($agendamentos->isEmpty())
         <p class="mt-5"><strong>Ainda não há agendados</strong></p>
         @else
         <div class="col mt-5">
@@ -104,17 +104,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @foreach($agendamentos as $key => $value)
-                        
+                    @foreach($agendamentos as $dia => $value)
                         <tr>
-                            <td>{{ onlyDate($key) }}</td>
+                            <td>{{ onlyDate($dia) }}</td>
                             <td>
-                            @foreach($value as $agendamento)
-                                {{ $agendamento->total.' agendado(s) às '.$agendamento->hora }} <i class="fas fa-grip-lines-vertical" style="font-size:16px;color:red"></i>
+                            @foreach($value as $hora => $total)
+                                {{ $total->count().' agendado(s) às '.$hora }} <i class="fas fa-grip-lines-vertical" style="font-size:16px;color:red"></i>
                             @endforeach
                             </td>
                         </tr>
-                        
                     @endforeach
                     </tbody>
                 </table>

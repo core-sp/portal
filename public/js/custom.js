@@ -45,7 +45,7 @@ $(document).ready(function(){
 		}
 	}
 	$('.cpfOuCnpj').length > 11 ? $('.cpfOuCnpj').mask('00.000.000/0000-00', options) : $('.cpfOuCnpj').mask('000.000.000-00#', options);
-  $('#ageporhorario').mask('0');
+  
   // Máscaras para datas
   $('#dataTermino').mask('00/00/0000', {
     onComplete: function() {
@@ -99,33 +99,14 @@ $(document).ready(function(){
       }
     }
   });
-  // Máscara para horário bloqueio
-  $('#horaTerminoBloqueio').change(function(){
-    var horaTerminoBloqueio = $(this).val();
-    var horaInicioBloqueio = $('#horaInicioBloqueio').val();
-    if(horaInicioBloqueio) {
-      if(horaTerminoBloqueio < horaInicioBloqueio) {
-        alert('O horário de término do bloqueio não pode ser menor que o horário de início do bloqueio.');
-        $(this).val($("#horaTerminoBloqueio option:first").val());
-      }
-    }
-  });
-  $('#horaInicioBloqueio').change(function(){
-    var horaInicioBloqueio = $(this).val();
-    var horaTerminoBloqueio = $('#horaTerminoBloqueio').val();
-    if(horaTerminoBloqueio) {
-      if(horaInicioBloqueio > horaTerminoBloqueio) {
-        alert('O horário de início do bloqueio não pode ser maior que o horário de término do bloqueio.');
-        $(this).val($("#horaInicioBloqueio option:first").val());
-      }
-    }
-  });
+
   $('.timeInput').mask('00:00');
   $('.vagasInput').mask('000');
   // Draggable
   $("#sortable").sortable();
   $( "#sortable" ).disableSelection();
-  // Regra de data no filtro de agendamento
+
+  // Regra de data no filtro de agendamento +++ Será removido depois de refatorar todos que o utilizam 
   $('#filtroAgendamento').submit(function(e){
     var maxDataFiltro = $('#maxdiaFiltro').val().split('/');
     var maxdiaFiltro = new Date(maxDataFiltro[2], maxDataFiltro[1] - 1, maxDataFiltro[0]);
@@ -148,6 +129,7 @@ $(document).ready(function(){
     });
   });
 
+  // Será removido após refatorar a Cédula
   $('#filtroCedula').submit(function(e){
     var maxDataFiltro = $('#datemax').val();
     var minDataFiltro = $('#datemin').val();
@@ -160,20 +142,114 @@ $(document).ready(function(){
       e.preventDefault();
     }
   });
+
+  $('#filtroDate').submit(function(e){
+    var maxDataFiltro = $('#datemax').val();
+    var minDataFiltro = $('#datemin').val();
+    if(new Date(minDataFiltro) > new Date(maxDataFiltro)) {
+      alert('Data inválida. A data inicial deve ser menor ou igual a data de término.');
+      $('#datemin').focus();
+      e.preventDefault();
+    }
+  });
 });
 
-// Funcionalidade Plantão Jurídico
-function setCamposDatas(plantao)
+// Funcionalidade Agendamento Bloqueio
+$('#horaTerminoBloqueio').change(function(){
+  var horaTerminoBloqueio = $(this).val();
+  var horaInicioBloqueio = $('#horaInicioBloqueio').val();
+  if(horaInicioBloqueio) {
+    if(horaTerminoBloqueio < horaInicioBloqueio) {
+      alert('O horário de término do bloqueio não pode ser menor que o horário de início do bloqueio.');
+      $(this).val($("#horaTerminoBloqueio option:first").val());
+    }
+  }
+});
+
+$('#horaInicioBloqueio').change(function(){
+  var horaInicioBloqueio = $(this).val();
+  var horaTerminoBloqueio = $('#horaTerminoBloqueio').val();
+  if(horaTerminoBloqueio) {
+    if(horaInicioBloqueio > horaTerminoBloqueio) {
+      alert('O horário de início do bloqueio não pode ser maior que o horário de término do bloqueio.');
+      $(this).val($("#horaInicioBloqueio option:first").val());
+    }
+  }
+});
+
+function ajaxAgendamentoBloqueio(valor)
 {
-    $("#dataInicialBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
-    $("#dataFinalBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
+  $.ajax({
+    method: "GET",
+    data: {
+      "idregional": valor,
+    },
+    dataType: 'json',
+    url: "/admin/agendamentos/bloqueios/dados-ajax",
+    success: function(response) {
+      horas_atendentes = response;
+      setCamposAgeBloqueio(horas_atendentes);
+    },
+    error: function() {
+      alert('Erro ao carregar os horários. Recarregue a página.');
+    }
+  });
+}
 
-    var inicial = new Date(plantao['datas'][0] + ' 00:00:00');
-    var final = new Date(plantao['datas'][1] + ' 00:00:00');
-    var inicialFormatada = inicial.getDate() + '/' + (inicial.getMonth() + 1) + '/' + inicial.getFullYear(); 
-    var finalFormatada = final.getDate() + '/' + (final.getMonth() + 1) + '/' + final.getFullYear(); 
+function optionTodas(valor)
+{
+  if(valor == 'Todas'){
+    $('#horarios').prop("disabled", true);
+    $('#qtd_atendentes').val(0);
+    $('#qtd_atendentes').text("0");
+  }
+  else
+    $('#horarios').prop("disabled", false);
+}
 
-    $("#bloqueioPeriodoPlantao").text(inicialFormatada + ' - ' + finalFormatada);
+function setCamposAgeBloqueio(horas_atendentes)
+{
+  $('#horarios option').show();
+  $('#horarios option').each(function(){
+    var valor = $(this).val();
+    jQuery.inArray(valor, horas_atendentes['horarios']) != -1 ? $(this).show() : $(this).hide();
+  });
+
+  $('#totalAtendentes').text(horas_atendentes['atendentes']);
+}
+
+$('#idregionalBloqueio').ready(function(){
+  var valor = $('#idregionalBloqueio').val();
+    optionTodas(valor);
+  if(valor > 0)
+    ajaxAgendamentoBloqueio(valor);
+});
+
+$('#idregionalBloqueio').change(function(){
+  var valor = $('#idregionalBloqueio').val();
+    optionTodas(valor);
+  if(valor > 0)
+    ajaxAgendamentoBloqueio(valor);
+});
+// Fim da Funcionalidade Agendamento Bloqueio
+
+// Funcionalidade Plantão Jurídico
+function setCamposDatas(plantao, tipo)
+{
+  if(tipo == 'change'){
+    $("#dataInicialBloqueio").val('');
+    $("#dataFinalBloqueio").val('');
+  }
+
+  $("#dataInicialBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
+  $("#dataFinalBloqueio").prop('min', plantao['datas'][0]).prop('max', plantao['datas'][1]);
+
+  var inicial = new Date(plantao['datas'][0] + ' 00:00:00');
+  var final = new Date(plantao['datas'][1] + ' 00:00:00');
+  var inicialFormatada = inicial.getDate() + '/' + (inicial.getMonth() + 1) + '/' + inicial.getFullYear(); 
+  var finalFormatada = final.getDate() + '/' + (final.getMonth() + 1) + '/' + final.getFullYear(); 
+
+  $("#bloqueioPeriodoPlantao").text(inicialFormatada + ' - ' + finalFormatada);
 }
 
 function setCampoHorarios(plantao)
@@ -198,54 +274,67 @@ function setCampoAgendados(plantao)
     $('#textoAgendados').prop('class', 'text-hide');
 }
 
-$('#plantaoBloqueio').ready(function(){
+function ajaxPlantaoJuridico(valor, e)
+{
+  $.ajax({
+    method: "GET",
+    data: {
+      "id": valor,
+    },
+    dataType: 'json',
+    url: "/admin/plantao-juridico/ajax",
+    success: function(response) {
+      plantao = response;
+      setCampoAgendados(plantao);
+      setCamposDatas(plantao, e.type);
+      setCampoHorarios(plantao);
+    },
+    error: function() {
+      alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
+    }
+  });
+}
+
+$('#plantaoBloqueio').ready(function(e){
   var valor = $('#plantaoBloqueio').val();
     if(valor > 0)
-      $.ajax({
-        method: "GET",
-        data: {
-          "_token": $('#token').val(),
-          "id": valor,
-        },
-        dataType: 'json',
-        url: "/admin/plantao-juridico/ajax",
-        success: function(response) {
-          plantao = response;
-          setCampoAgendados(plantao);
-          setCamposDatas(plantao);
-          setCampoHorarios(plantao);
-        },
-        error: function() {
-          alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
-        }
-      });
+      ajaxPlantaoJuridico(valor, e);
 });
 
-$('#plantaoBloqueio').change(function(){
+$('#plantaoBloqueio').change(function(e){
   var valor = $('#plantaoBloqueio').val();
   if(valor > 0)
-    $.ajax({
-      method: "GET",
-      data: {
-        "_token": $('#token').val(),
-        "id": valor,
-      },
-      dataType: 'json',
-      url: "/admin/plantao-juridico/ajax",
-      success: function(response) {
-        plantao = response;
-        setCampoAgendados(plantao);
-        $("#dataInicialBloqueio").val('');
-        $("#dataFinalBloqueio").val('');
-        setCamposDatas(plantao);
-        setCampoHorarios(plantao);
-      },
-      error: function() {
-        alert('Erro ao carregar as datas e/ou os horários. Recarregue a página.');
-      }
-    });
+    ajaxPlantaoJuridico(valor, e);
 });
 // Fim da Funcionalidade Plantão Jurídico
+
+// Funcionalidade Agendamento
+function selectAtendenteByStatus(valor)
+{
+  $('#idusuarioAgendamento option').show();
+  $('#idusuarioAgendamento option').each(function(){
+    var idUser = $(this).val();
+    if((valor == '') && (idUser != ''))
+      $(this).hide();
+    if((valor == 'Compareceu') && (idUser == ''))
+      $(this).hide();
+  });
+  if(valor == '')
+    $('#idusuarioAgendamento')[0].selectedIndex = 0;
+  if(valor == 'Compareceu')
+    $('#idusuarioAgendamento')[0].selectedIndex = 1;
+}
+
+$('#statusAgendamentoAdmin').change(function(){
+  var valor = $('#statusAgendamentoAdmin').val();
+  selectAtendenteByStatus(valor);
+});
+
+$('#statusAgendamentoAdmin').ready(function(){
+  var valor = $('#statusAgendamentoAdmin').val();
+  selectAtendenteByStatus(valor);
+});
+// Fim da Funcionalidade Agendamento
 
 (function($){
   // Função para tornar menu ativo dinâmico
@@ -261,6 +350,7 @@ $('#plantaoBloqueio').change(function(){
     }).parentsUntil(".nav-sidebar > .nav-treeview").addClass('menu-open')
     .prev('a').addClass('active');
   });
+
   // Botão standalone LFM
   $.fn.filemanager = function(type, options) {
     type = type || 'file';
@@ -281,6 +371,7 @@ $('#plantaoBloqueio').change(function(){
       return false;
     });
   }
+
   // Recusar endereço
   $('#recusar-trigger').on('click', function(){
     $('#recusar-form').toggle();

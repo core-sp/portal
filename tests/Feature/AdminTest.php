@@ -5,137 +5,11 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use App\Permissao;
+use Carbon\Carbon;
 
 class AdminTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Ordem do menu
-        Permissao::insert([
-            [
-                'controller' => 'UserController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ],[
-                'controller' => 'UserController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'PaginaController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'PaginaController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'NoticiaController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'NoticiaController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'PostsController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'PostsController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'CursoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'CursoController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'BdoEmpresaController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'BdoOportunidadeController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'HomeImagemController',
-                'metodo' => 'edit',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'CompromissoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'CompromissoController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'AvisoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'AgendamentoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'AgendamentoBloqueioController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'RepresentanteController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'RepresentanteEnderecoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'SolicitaCedulaController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'LicitacaoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'LicitacaoController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'ConcursoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'ConcursoController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'PlantaoJuridicoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'PlantaoJuridicoBloqueioController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'FiscalizacaoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'FiscalizacaoController',
-                'metodo' => 'create',
-                'perfis' => '1,'
-            ]
-        ]);
-    }
 
     /** @test */
     public function a_logged_in_user_can_see_the_admin_panel()
@@ -270,5 +144,149 @@ class AdminTest extends TestCase
         $this->assertGuest();
 
         $this->get('/horizon')->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function authorized_users_can_view_calls_list_with_same_regional()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $user = factory('App\User')->create([
+            'idperfil' => factory('App\Perfil')->create(['idperfil' => 8]),
+            'idregional' => $admin->idregional
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'hora' => '10:00',
+            'status' => 'Compareceu',
+            'idregional' => $admin->idregional,
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->get('/admin')
+        ->assertSee('<th>Atendente</th>')
+        ->assertSee('<th>Atendimentos</th>')
+        ->assertSee('<td>'.$user->nome.'</td>')
+        ->assertSee('<td>1</td>');
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_view_calls_list_with_same_regional()
+    {
+        $non_admin = $this->signIn();
+
+        $user = factory('App\User')->create([
+            'idregional' => $non_admin->idregional
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'hora' => '10:00',
+            'status' => 'Compareceu',
+            'idregional' => $non_admin->idregional,
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->get('/admin')
+        ->assertDontSee('<th>Atendente</th>')
+        ->assertDontSee('<th>Atendimentos</th>')
+        ->assertDontSee('<td>'.$user->nome.'</td>')
+        ->assertDontSee('<td>1</td>');
+    }
+
+    /** @test */
+    public function authorized_users_can_view_empty_calls_list_with_different_regional()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $user = factory('App\User')->create([
+            'idperfil' => factory('App\Perfil')->create(['idperfil' => 8]),
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'hora' => '10:00',
+            'status' => 'Compareceu',
+            'idregional' => $user->idregional,
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->get('/admin')
+        ->assertSee('<th>Atendente</th>')
+        ->assertSee('<th>Atendimentos</th>')
+        ->assertDontSee('<td>'.$user->nome.'</td>')
+        ->assertDontSee('<td>1</td>');
+    }
+
+    /** @test */
+    public function non_authorized_users_cannot_view_agendamentos_pendentes_alerts()
+    {
+        $non_admin = $this->signIn();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'dia' => Carbon::today()->subDay()->format('Y-m-d'),
+            'hora' => '10:00',
+            'status' => null,
+            'idregional' => $non_admin->idregional,
+            'idusuario' => null
+        ]);
+
+        $this->get('/admin')
+        ->assertOk()
+        ->assertDontSee('Existe <strong>1</strong> atendimento pendente de validação!');
+    }
+
+    /** @test */
+    public function authorized_users_can_view_agendamentos_pendentes_alerts()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'dia' => Carbon::today()->subDay()->format('Y-m-d'),
+            'hora' => '10:00',
+            'status' => null,
+            'idregional' => $admin->idregional,
+            'idusuario' => null
+        ]);
+
+        $this->get('/admin')
+        ->assertOk()
+        ->assertSee('Existe <strong>1</strong> atendimento pendente de validação!');
+    }
+
+    /** @test */
+    public function view_agendamentos_pendentes_alerts()
+    {
+        $admin = $this->signInAsAdmin();
+
+        factory('App\Agendamento', 2)->create([
+            'tiposervico' => 'Outros para Ambas',
+            'protocolo' => 'AGE-ABCD',
+            'dia' => Carbon::today()->subDay()->format('Y-m-d'),
+            'hora' => '10:00',
+            'status' => null,
+            'idregional' => $admin->idregional,
+            'idusuario' => null
+        ]);
+
+        $this->get('/admin')
+        ->assertSee('Existem <strong>2</strong> atendimentos pendentes de validação!');
+    }
+
+    /** @test */
+    public function authorized_users_can_view_password_info()
+    {
+        $this->signInAsAdmin();
+
+        $this->get('/admin')
+        ->assertSeeText('Para alterar sua senha, clique em seu nome de usuário no menu da esquerda e depois selecione "Alterar Senha";');
     }
 }

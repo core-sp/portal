@@ -10,19 +10,6 @@ class UserTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Permissao::insert([
-            [
-                'controller' => 'UserController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ]
-        ]);
-    }
-
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {

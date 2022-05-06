@@ -24,4 +24,20 @@ class PlantaoJuridicoBloqueio extends Model
     {
         return Carbon::parse($this->plantaoJuridico->dataFinal)->gt(Carbon::today()) ? true : false;
     }
+
+    public function getHorarios($horarios, $dia)
+    {
+        $inicialBloqueio = Carbon::parse($this->dataInicial);
+        $finalBloqueio = Carbon::parse($this->dataFinal);
+        $dia = Carbon::parse($dia);
+
+        if($inicialBloqueio->lte($dia) && $finalBloqueio->gte($dia))
+        {
+            $horariosBloqueios = explode(',', $this->horarios);
+            foreach($horariosBloqueios as $horario)
+                unset($horarios[array_search($horario, $horarios)]);
+        }
+
+        return $horarios;
+    }
 }

@@ -52,15 +52,15 @@ class PlantaoJuridicoBloqueioController extends Controller
         $this->authorize('create', auth()->user());
         try{
             $validated = (object) $request->validated();
-            $erro = $this->service->getService('PlantaoJuridico')->saveBloqueio($validated);
+            $this->service->getService('PlantaoJuridico')->saveBloqueio($validated);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, "Erro ao criar o bloqueio do plantão jurídico.");
         }
 
         return redirect(route('plantao.juridico.bloqueios.index'))->with([
-            'message' => isset($erro) ? $erro['message'] : '<i class="icon fa fa-check"></i>Novo bloqueio criado com sucesso!',
-            'class' => isset($erro) ? $erro['class'] : 'alert-success'
+            'message' => '<i class="icon fa fa-check"></i>Novo bloqueio criado com sucesso!',
+            'class' => 'alert-success'
         ]);
     }
 
@@ -90,10 +90,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         }
 
         if(isset($dados['message']))
-            return redirect(route('plantao.juridico.bloqueios.index'))->with([
-                'message' => $dados['message'],
-                'class' => $dados['class']
-            ]);
+            return redirect(route('plantao.juridico.bloqueios.index'))->with($dados);
 
         return view('admin.crud.editar', compact('variaveis', 'resultado'));
     }
@@ -110,7 +107,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         }
 
         return redirect(route('plantao.juridico.bloqueios.index'))->with([
-            'message' => isset($erro) ? $erro['message'] : '<i class="icon fa fa-check"></i>Bloqueio atualizado com sucesso!',
+            'message' => isset($erro) ? $erro['message'] : '<i class="icon fa fa-check"></i>Bloqueio com a ID '.$id.' foi atualizado com sucesso!',
             'class' => isset($erro) ? $erro['class'] : 'alert-success'
         ]);
     }
@@ -126,7 +123,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         }
 
         return redirect(route('plantao.juridico.bloqueios.index'))->with([
-            'message' => '<i class="icon fa fa-check"></i>Bloqueio excluído com sucesso!',
+            'message' => '<i class="icon fa fa-check"></i>Bloqueio com a ID '.$id.' foi excluído com sucesso!',
             'class' => 'alert-success'
         ]);
     }

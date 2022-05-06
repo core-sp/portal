@@ -12,22 +12,6 @@ class AvisoTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Permissao::insert([
-            [
-                'controller' => 'AvisoController',
-                'metodo' => 'index',
-                'perfis' => '1,'
-            ], [
-                'controller' => 'AvisoController',
-                'metodo' => 'edit',
-                'perfis' => '1,'
-            ]
-        ]);
-    }
-
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {

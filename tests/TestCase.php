@@ -5,6 +5,7 @@ namespace Tests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use PermissoesTableSeeder;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -38,6 +39,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function signIn($user = null)
     {
+        $this->seed(PermissoesTableSeeder::class);
         factory('App\Perfil')->create([
             'nome' => 'Admin'
         ]);
@@ -51,6 +53,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function signInAsAdmin($email = null)
     {
+        $this->seed(PermissoesTableSeeder::class);
         $perfilDeAdmin = factory('App\Perfil')->create([
             'nome' => 'Admin'
         ]);

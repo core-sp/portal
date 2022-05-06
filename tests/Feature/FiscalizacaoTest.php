@@ -13,27 +13,6 @@ class FiscalizacaoTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Permissao::insert([
-            [
-                "controller" => "FiscalizacaoController",
-                "metodo" => "index",
-                "perfis" => "1,"
-            ], [
-                "controller" => "FiscalizacaoController",
-                "metodo" => "create",
-                "perfis" => "1,"
-            ], [
-                "controller" => "FiscalizacaoController",
-                "metodo" => "edit",
-                "perfis" => "1,"
-            ]
-        ]);
-    }
-
     /** 
      * =======================================================================================================
      * TESTES DE AUTORIZAÇÃO NO ADMIN

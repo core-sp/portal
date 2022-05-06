@@ -1,9 +1,6 @@
-@php
-    $now = date('Y-m-d');
-@endphp
 <div class="card-body pt-3 pl-3">
     <div class="col">
-        {!! $variaveis->mensagem_agendamento !!}
+        {!! $resultado->getMsgByStatus() !!}
     </div>
 </div>
 <hr class="mb-0 mt-0">
@@ -11,6 +8,7 @@
     @csrf
     @method('PUT')
     <div class="card-body">
+        <input type="hidden" name="antigo" value="{{ $resultado->isAfter() ? '0' : '1' }}" />
         <div class="form-row">
             <div class="col">
                 <label for="nome">Nome</label>
@@ -18,17 +16,10 @@
                     class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                     placeholder="Nome"
                     name="nome"
-                    @if(!empty(old('nome')))
-                    value="{{ old('nome') }}"
-                    @else
-                        @if(isset($resultado))
-                        value="{{ $resultado->nome }}"
-                        @endif
-                    @endif
-                    @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                        readonly
-                    @endif
-                    />
+                    value="{{ old('nome') ? old('nome') : $resultado->nome }}"
+                    required
+                    {{ ($resultado->status === 'Cancelado') || (!$resultado->isAfter()) ? 'readonly' : '' }}
+                />
                 @if($errors->has('nome'))
                 <div class="invalid-feedback">
                 {{ $errors->first('nome') }}
@@ -37,25 +28,18 @@
             </div>
             <div class="col">
                 <label for="email">Email</label>
-                <input type="text"
+                <input type="email"
                     class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                     placeholder="Email"
                     name="email"
-                    @if(!empty(old('email')))
-                        value="{{ old('email') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->email }}"
-                        @endif
-                    @endif
-                    @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                        readonly
-                    @endif
-                    />
+                    value="{{ old('email') ? old('email') : $resultado->email }}"
+                    required
+                    {{ ($resultado->status === 'Cancelado') || (!$resultado->isAfter()) ? 'readonly' : '' }}
+                />
                 @if($errors->has('email'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('email') }}
-                    </div>
+                <div class="invalid-feedback">
+                {{ $errors->first('email') }}
+                </div>
                 @endif
             </div>
         </div>
@@ -66,21 +50,14 @@
                     class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
                     placeholder="CPF"
                     name="cpf"
-                    @if(!empty(old('cpf')))
-                    value="{{ old('cpf') }}"
-                    @else
-                        @if(isset($resultado))
-                        value="{{ $resultado->cpf }}"
-                        @endif
-                    @endif
-                    @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                        readonly
-                    @endif
-                    />
+                    value="{{ old('cpf') ? old('cpf') : $resultado->cpf }}"
+                    required
+                    {{ ($resultado->status === 'Cancelado') || (!$resultado->isAfter()) ? 'readonly' : '' }}
+                />
                 @if($errors->has('cpf'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('cpf') }}
-                    </div>
+                <div class="invalid-feedback">
+                {{ $errors->first('cpf') }}
+                </div>
                 @endif
             </div>
             <div class="col">
@@ -89,17 +66,10 @@
                     class="form-control {{ $errors->has('celular') ? 'is-invalid' : '' }}"
                     placeholder="Celular"
                     name="celular"
-                    @if(!empty(old('celular')))
-                    value="{{ old('celular') }}"
-                    @else
-                        @if(isset($resultado))
-                        value="{{ $resultado->celular }}"
-                        @endif
-                    @endif
-                    @if($resultado->status === 'Cancelado' || $now >= $resultado->dia)
-                        readonly
-                    @endif
-                    />
+                    value="{{ old('celular') ? old('celular') : $resultado->celular }}"
+                    required
+                    {{ ($resultado->status === 'Cancelado') || (!$resultado->isAfter()) ? 'readonly' : '' }}
+                />
                 @if($errors->has('celular'))
                 <div class="invalid-feedback">
                 {{ $errors->first('celular') }}
@@ -110,93 +80,87 @@
         <div class="form-row mt-2">
             <div class="col">
                 <label for="tiposervico">Tipo de serviço</label>
-                <select name="tiposervico" class="form-control">
+                <select name="tiposervico" 
+                    class="form-control {{ $errors->has('tiposervico') ? 'is-invalid' : '' }}" 
+                    required
+                >
                 @foreach($servicos as $servico)
-                    @if(!empty(old('tiposervico')))
-                        @if(old('tiposervico') === $servico)
-                            <option value="{{ $servico }}" selected>{{ $servico }}</option>
-                        @else
-                            <option value="{{ $servico }}">{{ $servico }}</option>
-                        @endif
+                    @if(old('tiposervico'))
+                    <option value="{{ $servico }}" {{ old('tiposervico') === $servico ? 'selected' : '' }}>{{ $servico }}</option>
                     @else
-                        @if(isset($resultado))
-                            @if($resultado->tiposervico === $servico)
-                                <option value="{{ $servico }}" selected>{{ $servico }}</option>
-                            @else
-                                <option value="{{ $servico }}">{{ $servico }}</option>
-                            @endif
-                        @else
-                            <option value="{{ $servico }}">{{ $servico }}</option>
-                        @endif
+                    <option value="{{ $servico }}" {{ isset($resultado->tiposervico) && ($resultado->tiposervico == $servico) ? 'selected' : '' }}>{{ $servico }}</option>
                     @endif
                 @endforeach
                 </select>
+                @if($errors->has('tiposervico'))
+                <div class="invalid-feedback">
+                {{ $errors->first('tiposervico') }}
+                </div>
+                @endif
             </div>
             <div class="col">
                 <label for="status">Status</label>
-                <select name="status" class="form-control">
-                <option value="">Nulo</option>
+                <select name="status" 
+                    class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}" 
+                    id="statusAgendamentoAdmin"
+                >
+                <option value="">Sem Status</option>
                 @foreach($status as $s)
-                    @if(!empty(old('status')))
-                        @if(old('status') === $s)
-                            <option value="{{ $s }}" selected>{{ $s }}</option>
-                        @else
-                            <option value="{{ $s }}">{{ $s }}</option>
-                        @endif
+                    @if(old('status'))
+                    <option value="{{ $s }}" {{ old('status') === $s ? 'selected' : '' }}>{{ $s }}</option>
                     @else
-                        @if(isset($resultado))
-                            @if($resultado->status == $s)
-                            <option value="{{ $s }}" selected>{{ $s }}</option>
-                            @else
-                            <option value="{{ $s }}">{{ $s }}</option>
-                            @endif
-                        @else
-                        <option value="{{ $s }}">{{ $s }}</option>
-                        @endif
+                    <option value="{{ $s }}" {{ isset($resultado->status) && ($resultado->status == $s) ? 'selected' : '' }}>{{ $s }}</option>
                     @endif
                 @endforeach
                 </select>
+                @if($errors->has('status'))
+                <div class="invalid-feedback">
+                {{ $errors->first('status') }}
+                </div>
+                @endif
             </div>
         </div>
         <div class="form-row mt-2">
-            <div class="col">
+            <div class="col-4">
                 <label for="idregional">Regional</label>
                 <input type="text" name="idregional"
                     class="form-control"
                     readonly
-                    @if(isset($resultado))
-                        value="{{ $resultado->regional->regional }}"
-                    @endif
-                    />
+                    value="{{ isset($resultado->idregional) ? $resultado->regional->regional : '' }}"
+                />
+            </div>
+            <div class="col-1">
+                <label for="dia">Dia</label>
+                <input type="text" name="dia"
+                    class="form-control"
+                    readonly
+                    value="{{ isset($resultado->dia) ? onlyDate($resultado->dia) : '' }}"
+                />
+            </div>
+            <div class="col-1">
+                <label for="hora">Hora</label>
+                <input type="text" name="hora"
+                    class="form-control"
+                    readonly
+                    value="{{ isset($resultado->hora) ? $resultado->hora : '' }}"
+                />
             </div>
             <div class="col">
                 <label for="atendente">Atendimento realizado por:</label>
                 <select name="idusuario"
+                    id="idusuarioAgendamento"
                     class="form-control {{ $errors->has('idusuario') ? 'is-invalid' : '' }}"
-                    @if($now < $resultado->dia)
-                        disabled
-                    @endif
-                    />
+                >
                     <option value="">Ninguém</option>
+                @if(isset($atendentes))
                     @foreach($atendentes as $atendente)
-                        @if(!empty(old('idusuario')))
-                            @if(old('idusuario') == $atendente->idusuario)
-                                <option value="{{ $atendente->idusuario }}" selected>{{ $atendente->nome }}</option>
-                            @else
-                                <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
-                            @endif
+                        @if(old('idusuario'))
+                        <option value="{{ $atendente->idusuario }}" {{ old('idusuario') == $atendente->idusuario ? 'selected' : '' }}>{{ $atendente->nome }}</option>
                         @else
-                            @if(isset($resultado))
-                                @if($resultado->idusuario == $atendente->idusuario)
-                                <option value="{{ $atendente->idusuario }}" selected>{{ $atendente->nome }}</option>
-                                @else
-                                <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
-                                @endif
-                            @else
-                            <option value="{{ $atendente->idusuario }}">{{ $atendente->nome }}</option>
-                            @endif
+                        <option value="{{ $atendente->idusuario }}" {{ isset($resultado->idusuario) && ($resultado->idusuario == $atendente->idusuario) ? 'selected' : '' }}>{{ $atendente->nome }}</option>
                         @endif
                     @endforeach
+                @endif
                 </select>
                 @if($errors->has('idusuario'))
                 <div class="invalid-feedback">
@@ -208,7 +172,7 @@
         <div class="form-row mt-4">
             <i>* Atendimento agendado pelo usuário no dia {{ onlyDate($resultado->created_at) }}.</i>
         </div>
-        @if($now < $resultado->dia || $resultado->status !== 'Cancelado')
+        @if($resultado->isAfter() || $resultado->status !== 'Cancelado')
         <div class="form-row mb-2">
             <i>** Para alteração de horário, é necessário cancelar o agendamento e cadastrar um novo horário pelo site.</i>
         </div>
@@ -216,7 +180,7 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            <a href="/admin/agendamentos" class="btn btn-default">Cancelar</a>
+            <a href="{{ session('url') ?? route('agendamentos.lista') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">Salvar</button>
         </div>
     </div>

@@ -2,7 +2,6 @@
 
 use App\Permissao;
 use App\Representante;
-use App\Repositories\PermissaoRepository;
 
 function montaTabela($headers, $contents, $classes = null)
 {
@@ -38,6 +37,57 @@ function montaTabela($headers, $contents, $classes = null)
     $table .= "</table>";
 
     return $table;
+}
+
+function getFiltroOptions($value, $texto, $selected = false)
+{
+    $opcao = $selected ? 'selected' : '';
+    return '<option value="'.$value.'" '.$opcao.'>'.$texto.'</option>';
+}
+
+function getFiltroCamposSelect($label, $atributoNameId, $options)
+{
+    $filtro = '<div class="form-group mb-0 col">';
+    $filtro .= '<label>'.$label.'</label>';
+    $filtro .= '<select class="custom-select custom-select-sm" id="'.$atributoNameId.'" name="'.$atributoNameId.'">';
+    $filtro .= $options;
+    $filtro .= '</select>';
+    $filtro .= '</div>';
+
+    return $filtro;
+}
+
+function getFiltroCamposDate($mindia, $maxdia)
+{
+    $filtro = '<div class="form-group mb-0 col">';
+    $filtro .= '<label>De</label>';
+    $textoData = '<input type="date" class="form-control d-inline-block form-control-sm" name="datemin" id="datemin" value="';
+    $filtro .= isset($mindia) ? $textoData.$mindia.'" />' : $textoData.date('Y-m-d').'" />';
+    $filtro .= '</div>';
+
+    $filtro .= '<div class="form-group mb-0 col">';
+    $filtro .= '<label>Até</label>';
+    $textoData = '<input type="date" class="form-control d-inline-block form-control-sm" name="datemax" id="datemax" value="';
+    $filtro .= isset($maxdia) ? $textoData.$maxdia.'" />' : $textoData.date('Y-m-d').'" />';
+    $filtro .= '</div>';
+
+    return $filtro;
+}
+
+function getFiltro($action, $filtrosCampos, $idform = 'filtroDate')
+{
+    $filtro = '<form method="GET" action="'.$action.'" id="'.$idform.'" class="mb-0">';
+    $filtro .= '<div class="form-row filtroAge">';
+
+    $filtro .= $filtrosCampos;
+
+    $filtro .= '<div class="form-group mb-0 col-auto align-self-end">';
+    $filtro .= '<input type="submit" class="btn btn-sm btn-default" value="Filtrar" />';
+    $filtro .= '</div>';
+    $filtro .= '</div>';
+    $filtro .= '</form>';
+
+    return $filtro;
 }
 
 function badgeConsulta($situacao)
@@ -863,6 +913,20 @@ function perfisPermitidos($nameController, $metodo)
     $idProfile = auth()->user()->idperfil;
     $permissao = Permissao::where('controller', $nameController)->where('metodo', $metodo)->first();
     return $permissao ? in_array($idProfile, explode(',', $permissao->perfis)) : false;
+}
+
+function perfisPermitidosMenu()
+{
+    return Permissao::select('idpermissao', 'perfis')->whereIn('idpermissao', [
+        1, 3, 4, 7, 8, 11, 12, 19, 23, 27, 29, 33, 34, 37, 38, 42, 43, 45, 47, 48, 50, 51, 53, 54, 57, 59, 61, 63
+        ])
+    ->get()
+    ->each(function ($item, $key) {
+        $item->perfis = explode(',', $item->perfis);
+        $item->perfis = array_filter($item->perfis, function($value) {
+            return isset($value) && ($value != '');
+        });
+    });
 }
 
 // Máscara para quantos dígitos forem necessários no rg

@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PlantaoJuridicoRequest;
-// Temporário até refatorar o Agendamento no Service
-use App\Repositories\AgendamentoRepository;
 
 class PlantaoJuridicoController extends Controller
 {
@@ -34,11 +32,11 @@ class PlantaoJuridicoController extends Controller
         return view('admin.crud.home', compact('tabela', 'resultados', 'variaveis'));
     }
 
-    public function edit($id, AgendamentoRepository $agendamento)
+    public function edit($id)
     {
         $this->authorize('updateOther', auth()->user());
         try{
-            $dados = $this->service->getService('PlantaoJuridico')->visualizar($id, $agendamento);
+            $dados = $this->service->getService('PlantaoJuridico')->visualizar($id);
             $variaveis = $dados['variaveis'];
             $resultado = $dados['resultado'];
             $agendamentos = $dados['agendamentos'];

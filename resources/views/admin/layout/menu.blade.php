@@ -1,9 +1,13 @@
 <!-- Sidebar Menu -->
+@php
+    $permitidos = perfisPermitidosMenu();
+    $idperfil = auth()->user()->idperfil;
+@endphp
 <nav class="mt-2 mb-2">
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
         <!-- Usuários -->
-        @if(perfisPermitidos('UserController', 'index'))
+        @if(in_array($idperfil, $permitidos->find(1)['perfis']))
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fa fa-users"></i>
@@ -73,15 +77,15 @@
         <!-- Conteúdo -->
 
         @php
-            $pagina = perfisPermitidos('PaginaController', 'index');
-            $noticia = perfisPermitidos('NoticiaController', 'index');
-            $posts = perfisPermitidos('PostsController', 'index');
-            $curso = perfisPermitidos('CursoController', 'index');
-            $bdoEmpresa = perfisPermitidos('BdoEmpresaController', 'index');
-            $bdoOportunidade = perfisPermitidos('BdoOportunidadeController', 'index');
-            $home = perfisPermitidos('HomeImagemController', 'edit');
-            $compromisso = perfisPermitidos('CompromissoController', 'index');
-            $aviso = perfisPermitidos('AvisoController', 'index');
+            $pagina = in_array($idperfil, $permitidos->find(3)['perfis']);
+            $noticia = in_array($idperfil, $permitidos->find(7)['perfis']);
+            $posts = in_array($idperfil, $permitidos->find(43)['perfis']);
+            $curso = in_array($idperfil, $permitidos->find(11)['perfis']);
+            $bdoEmpresa = in_array($idperfil, $permitidos->find(19)['perfis']);
+            $bdoOportunidade = in_array($idperfil, $permitidos->find(23)['perfis']);
+            $home = in_array($idperfil, $permitidos->find(42)['perfis']);
+            $compromisso = in_array($idperfil, $permitidos->find(53)['perfis']);
+            $aviso = in_array($idperfil, $permitidos->find(57)['perfis']);
         @endphp
 
         @if($pagina || $noticia || $posts || $curso || $bdoEmpresa || $bdoOportunidade || $home || $compromisso || $aviso)
@@ -102,7 +106,7 @@
                     </a>
                 </li>
 
-                @if(perfisPermitidos('PaginaController', 'create'))
+                @if(in_array($idperfil, $permitidos->find(4)['perfis']))
                 <li class="nav-item">
                     <a href="{{ route('paginas.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -129,7 +133,7 @@
                     </a>
                 </li>
 
-                @if(perfisPermitidos('NoticiaController', 'create'))
+                @if(in_array($idperfil, $permitidos->find(8)['perfis']))
                 <li class="nav-item">
                     <a href="{{ route('noticias.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -156,7 +160,7 @@
                     </a>
                 </li>
 
-                @if(perfisPermitidos('PostsController', 'create'))
+                @if(in_array($idperfil, $permitidos->find(48)['perfis']))
                 <li class="nav-item">
                     <a href="{{ route('posts.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -182,7 +186,7 @@
                     </a>
                 </li>
 
-                @if(perfisPermitidos('CursoController', 'create'))
+                @if(in_array($idperfil, $permitidos->find(12)['perfis']))
                 <li class="nav-item">
                     <a href="{{ route('cursos.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -238,7 +242,7 @@
                     </a>
                 </li>
 
-                @if(perfisPermitidos('CompromissoController', 'create'))
+                @if(in_array($idperfil, $permitidos->find(54)['perfis']))
                 <li class="nav-item">
                     <a href="{{ route('compromisso.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -280,11 +284,11 @@
          
         <!-- Atendimento -->
         @php
-            $agendamento = perfisPermitidos('AgendamentoController', 'index');
-            $agendamentobloqueio = perfisPermitidos('AgendamentoBloqueioController', 'index');
-            $representante = perfisPermitidos('RepresentanteController', 'index');
-            $representanteEndereco = perfisPermitidos('RepresentanteEnderecoController', 'index');
-            $representanteCedula = perfisPermitidos('SolicitaCedulaController', 'index');
+            $agendamento = in_array($idperfil, $permitidos->find(27)['perfis']);
+            $agendamentobloqueio = in_array($idperfil, $permitidos->find(29)['perfis']);
+            $representante = in_array($idperfil, $permitidos->find(47)['perfis']);
+            $representanteEndereco = in_array($idperfil, $permitidos->find(45)['perfis']);
+            $representanteCedula = in_array($idperfil, $permitidos->find(59)['perfis']);
         @endphp
         
         @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula)
@@ -366,10 +370,10 @@
 
         <!-- Jurídico -->
         @php
-            $licitacao = perfisPermitidos('LicitacaoController', 'index');
-            $concurso = perfisPermitidos('ConcursoController', 'index');
-            $plantao = perfisPermitidos('PlantaoJuridicoController', 'index');
-            $plantaoBloqueio = perfisPermitidos('PlantaoJuridicoBloqueioController', 'index');
+            $licitacao = in_array($idperfil, $permitidos->find(33)['perfis']);
+            $concurso = in_array($idperfil, $permitidos->find(37)['perfis']);
+            $plantao = in_array($idperfil, $permitidos->find(61)['perfis']);
+            $plantaoBloqueio = in_array($idperfil, $permitidos->find(63)['perfis']);
         @endphp
 
         @if($licitacao || $concurso || $plantao | $plantaoBloqueio)
@@ -390,7 +394,7 @@
                     </a>
                 </li>
 
-                @if(perfisPermitidos('LicitacaoController', 'create'))
+                @if(in_array($idperfil, $permitidos->find(34)['perfis']))
                 <li class="nav-item">
                     <a href="{{ route('licitacoes.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -418,7 +422,7 @@
                     </a>
                 </li>
 
-                @if(perfisPermitidos('ConcursoController', 'create'))
+                @if(in_array($idperfil, $permitidos->find(38)['perfis']))
                 <li class="nav-item">
                     <a href="{{ route('concursos.create') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -463,7 +467,7 @@
         @endif
     
         <!-- Fiscalização -->
-        @if(perfisPermitidos('FiscalizacaoController', 'index'))
+        @if(in_array($idperfil, $permitidos->find(50)['perfis']))
         <li class="nav-header">FISCALIZAÇÃO</li>
         
         <li class="nav-item has-treeview">
@@ -479,7 +483,7 @@
                     </a>
                     </li>
 
-                @if(perfisPermitidos('FiscalizacaoController', 'create'))
+                @if(in_array($idperfil, $permitidos->find(51)['perfis']))
                 <li class="nav-item">
                     <a href="{{ route('fiscalizacao.createperiodo') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>

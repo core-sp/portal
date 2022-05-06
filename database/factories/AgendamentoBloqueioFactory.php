@@ -5,13 +5,19 @@
 use App\Model;
 use App\AgendamentoBloqueio;
 use Faker\Generator as Faker;
+use Carbon\Carbon;
 
 $factory->define(AgendamentoBloqueio::class, function (Faker $faker) {
+    $amanha = Carbon::tomorrow();
+
+    while($amanha->isWeekend())
+        $amanha->addDay();
+
     return [
-        'diainicio' => '2022-01-22',
-        'diatermino' => '2022-01-28',
-        'horainicio' => '10:00',
-        'horatermino' => '11:00',
+        'diainicio' => date('Y-m-d'),
+        'diatermino' => $amanha->format('Y-m-d'),
+        'horarios' => '10:00',
+        'qtd_atendentes' => 0,
         'idregional' => factory('App\Regional'),
         'idusuario' => factory('App\User')
     ];
