@@ -1,6 +1,6 @@
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_contabil">R01 - Nome da Contabilidade</label>
+        <label for="nome_contabil">{{ array_search('nome', $cod) }} - Nome da Contabilidade</label>
         <input
             name="nome_contabil"
             type="text"
@@ -20,7 +20,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cnpj_contabil">R02 - CNPJ</label>
+        <label for="cnpj_contabil">{{ array_search('cnpj', $cod) }} - CNPJ</label>
         <input
             name="cnpj_contabil"
             type="text"
@@ -35,7 +35,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="email_contabil">R03 - E-mail</label>
+        <label for="email_contabil">{{ array_search('email', $cod) }} - E-mail</label>
         <input
             name="email_contabil"
             type="email"
@@ -52,7 +52,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="contato_contabil">R04 - Nome de Contato</label>
+        <label for="contato_contabil">{{ array_search('nome_contato', $cod) }} - Nome de Contato</label>
         <input
             name="contato_contabil"
             type="text"
@@ -67,7 +67,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="celular_contabil">R05 - Celular</label>
+        <label for="celular_contabil">{{ array_search('telefone', $cod) }} - Celular</label>
         <input type="text"
             class="form-control celularInput {{ $errors->has('celular_contabil') ? 'is-invalid' : '' }}"
             name="celular_contabil"

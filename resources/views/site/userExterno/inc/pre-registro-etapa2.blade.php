@@ -10,7 +10,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cpf_cnpj">R07 - {{ strlen($user->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ' }} *</label>
+        <label for="cpf_cnpj">{{ array_search('cpf_cnpj', $codUser) }} - {{ strlen($user->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ' }} *</label>
         <input
             type="text"
             class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
@@ -24,7 +24,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 @if(strlen($user->cpf_cnpj) == 11)
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome">R08 - Nome Completo *</label>
+        <label for="nome">{{ array_search('nome', $codUser) }} - Nome Completo *</label>
         <input
             type="text"
             class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
@@ -43,7 +43,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_social">R09 - Nome Social</label>
+        <label for="nome_social">{{ array_search('nome_social', $codCpf) }} - Nome Social</label>
         <input
             name="nome_social"
             type="text"
@@ -61,7 +61,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="sexo">R10 - Sexo *</label><br>
+        <label for="sexo">{{ array_search('sexo', $codCpf) }} - Sexo *</label><br>
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
@@ -89,7 +89,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_nasc">R11 - Data de Nascimento *</label>
+        <label for="dt_nasc">{{ array_search('dt_nascimento', $codCpf) }} - Data de Nascimento *</label>
         <input
             name="dt_nasc"
             type="date"
@@ -103,7 +103,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="estado_civil">R12 - Estado Civil *</label>
+        <label for="estado_civil">{{ array_search('estado_civil', $codCpf) }} - Estado Civil *</label>
         <select 
             name="estado_civil" 
             class="form-control {{ $errors->has('estado_civil') ? 'is-invalid' : '' }}" 
@@ -128,7 +128,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nacionalidade">R13 - Nacionalidade *</label>
+        <label for="nacionalidade">{{ array_search('nacionalidade', $codCpf) }} - Nacionalidade *</label>
         <select 
             name="nacionalidade" 
             class="form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }}" 
@@ -150,7 +150,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="naturalidade">R14 - Naturalidade *</label>
+        <label for="naturalidade">{{ array_search('naturalidade', $codCpf) }} - Naturalidade *</label>
         <select 
             name="naturalidade" 
             class="form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }}" 
@@ -175,7 +175,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_mae">R15 - Nome da Mãe *</label>
+        <label for="nome_mae">{{ array_search('nome_mae', $codCpf) }} - Nome da Mãe *</label>
         <input
             name="nome_mae"
             type="text"
@@ -192,7 +192,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nome_pai">R16 - Nome do Pai *</label>
+        <label for="nome_pai">{{ array_search('nome_pai', $codCpf) }} - Nome do Pai *</label>
         <input
             name="nome_pai"
             type="text"
@@ -212,7 +212,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="rg">R17 - N° RG *</label>
+        <label for="rg">{{ array_search('identidade', $codCpf) }} - N° RG *</label>
         <input
             name="rg"
             type="text"
@@ -229,7 +229,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="emissor">R18 - Órgão Emissor *</label>
+        <label for="emissor">{{ array_search('orgao_emissor', $codCpf) }} - Órgão Emissor *</label>
         <input
             name="emissor"
             type="text"
@@ -245,7 +245,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_expedicao">R19 - Data de Expedição *</label>
+        <label for="dt_expedicao">{{ array_search('dt_expedicao', $codCpf) }} - Data de Expedição *</label>
         <input
             name="dt_expedicao"
             type="date"
@@ -264,7 +264,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="razao_social">R20 - Razão Social *</label>
+        <label for="razao_social">{{ array_search('razao_social', $codCnpj) }} - Razão Social *</label>
         <input
             name="razao_social"
             type="text"
@@ -284,7 +284,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="capital_social">R21 - Capital Social em R$ *</label>
+        <label for="capital_social">{{ array_search('capital_social', $codCnpj) }} - Capital Social em R$ *</label>
         <input
             type="text"
             name="capital_social"
@@ -299,7 +299,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nire">R22 - NIRE *</label>
+        <label for="nire">{{ array_search('nire', $codCnpj) }} - NIRE *</label>
         <input
             type="text"
             name="nire"
@@ -318,7 +318,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_empresa">R23 - Tipo da Empresa *</label><br>
+        <label for="tipo_empresa">{{ array_search('tipo_empresa', $codCnpj) }} - Tipo da Empresa *</label><br>
         @foreach(tipos_empresa() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
@@ -339,7 +339,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_inicio_atividade">R24 - Data início da atividade *</label>
+        <label for="dt_inicio_atividade">{{ array_search('dt_inicio_atividade', $codCnpj) }} - Data início da atividade *</label>
         <input
             type="date"
             name="dt_inicio_atividade"
@@ -357,7 +357,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 <!-- Verificar validação das Inscrições -->
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="insc_estadual">R25 - Inscrição Estadual *</label>
+        <label for="insc_estadual">{{ array_search('inscricao_estadual', $codCnpj) }} - Inscrição Estadual *</label>
         <input
             type="text"
             name="insc_estadual"
@@ -372,7 +372,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="insc_municipal">R26 - Inscrição Municipal *</label>
+        <label for="insc_municipal">{{ array_search('inscricao_municipal', $codCnpj) }} - Inscrição Municipal *</label>
         <input
             type="text"
             name="insc_municipal"
@@ -393,7 +393,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="ramo_atividade">R27 - Ramo de Atividade *</label>
+        <label for="ramo_atividade">{{ array_search('ramo_atividade', $codPre) }} - Ramo de Atividade *</label>
         <input
             name="ramo_atividade"
             type="text"
@@ -413,7 +413,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="segmento">R28 - Segmento *</label>
+        <label for="segmento">{{ array_search('segmento', $codPre) }} - Segmento *</label>
         <select 
             name="segmento" 
             class="form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }}" 
@@ -435,7 +435,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="idregional">R29 - Região de Atuação *</label>
+        <label for="idregional">Região de Atuação *</label>
         <select 
             name="idregional" 
             class="form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}" 

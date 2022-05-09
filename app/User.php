@@ -101,6 +101,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Agendamento', 'idusuario');
     }
 
+    public function preRegistros()
+    {
+        return $this->hasMany('App\PreRegistro', 'idusuario')->withTrashed();
+    }
+
     public function getRelatorioAgendadosPorPerfil($todos_agendados)
     {
         $subject = 'em '.$this->regional->regional;

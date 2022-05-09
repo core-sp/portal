@@ -90,18 +90,32 @@ class UserExternoSiteController extends Controller
     
     public function preRegistroView()
     {
-        // temporário
-        $resultado = null;
+        try{
+            $resultado = $this->service->getService('PreRegistro')->verificacao();
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, 'Erro ao verificar os dados para permitir ou não a solicitação de registro');
+        }
+
         return view('site.userExterno.pre-registro', compact('resultado'));
     }
 
     public function inserirPreRegistroView()
     {
+        try{
+            // Verificar com o metodo verificacao() para impedir de acessar o formulario
+            $dados = $this->service->getService('PreRegistro')->getPreRegistro();
+            $codigos = $dados['codigos'];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, 'Erro ao carregar os dados da solicitação de registro');
+        }
+
         // temporário
         $user = auth()->guard('user_externo')->user();
         $totalFiles = 5;
         $regionais = $this->service->getService('Regional')->all()->splice(0, 13)->sortBy('regional');
         
-        return view('site.userExterno.inserir-pre-registro', compact('user', 'regionais', 'totalFiles'));
+        return view('site.userExterno.inserir-pre-registro', compact('user', 'regionais', 'totalFiles', 'codigos'));
     }
 }

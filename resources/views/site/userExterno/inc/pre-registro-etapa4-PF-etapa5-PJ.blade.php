@@ -1,6 +1,6 @@
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_rel">R60 - Tipo *</label><br>
+        <label for="tipo_rel">{{ array_search('tipo_telefone', $codPre) }} - Tipo *</label><br>
         @foreach(tipos_contatos() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
@@ -21,7 +21,7 @@
         @endif
     </div>
     <div class="col-sm-6 mb-2-576">
-        <label for="celular_rel">R61 - Telefone *</label>
+        <label for="celular_rel">{{ array_search('telefone', $codPre) }} - Telefone *</label>
         <input type="text"
             class="form-control celularInput {{ $errors->has('celular_rel') ? 'is-invalid' : '' }}"
             name="celular_rel[]"
@@ -38,7 +38,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_rel">R62 - Tipo </label><br>
+        <label for="tipo_rel">{{ array_search('tipo_telefone', $codPre) }} - Tipo </label><br>
         @foreach(tipos_contatos() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
@@ -59,7 +59,7 @@
         @endif
     </div>
     <div class="col-sm-6 mb-2-576">
-        <label for="celular_rel">R63 - Telefone </label>
+        <label for="celular_rel">{{ array_search('telefone', $codPre) }} - Telefone </label>
         <input type="text"
             class="form-control celularInput {{ $errors->has('celular_rel') ? 'is-invalid' : '' }}"
             name="celular_rel[]"
@@ -76,28 +76,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_email_rel">R64 - Tipo *</label><br>
-        @foreach(tipos_contatos() as $tipo)
-        <div class="form-check-inline">
-            <label class="form-check-label">
-                @if(!empty(old('tipo_email_rel')))
-                <input type="radio" class="form-check-input" name="tipo_email_rel" value="{{ $tipo }}" {{ old('tipo_email_rel') == $tipo ? 'checked' : '' }} />{{ $tipo }}
-                @elseif(isset($resultado->tipo_empresa))
-                <input type="radio" class="form-check-input" name="tipo_email_rel" value="{{ $tipo }}" {{ $tipo == $resultado->tipo ? 'checked' : '' }} />{{ $tipo }}
-                @else
-                <input type="radio" class="form-check-input" name="tipo_email_rel" value="{{ $tipo }}" />{{ $tipo }}
-                @endif
-            </label>
-        </div>
-        @endforeach
-        @if($errors->has('tipo_email_rel'))
-        <div class="invalid-feedback">
-            {{ $errors->first('tipo_email_rel') }}
-        </div>
-        @endif
-    </div>
-    <div class="col-sm mb-2-576">
-        <label for="email_rel">R65 - E-mail *</label>
+        <label for="email_rel">{{ array_search('email', $codUser) }} - E-mail *</label>
         <input
             name="email_rel"
             type="email"

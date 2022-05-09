@@ -22,4 +22,19 @@ class UserExterno extends Authenticatable
     {
         $this->notify(new UserExternoResetPasswordNotification($token));
     }
+
+    // RU = registro do login do usuário
+    public static function codigosPreRegistro()
+    {
+        return [
+            'RU01' => 'cpf_cnpj',
+            'RU02' => 'nome',
+            'RU03' => 'email'
+        ];
+    }
+
+    public function preRegistro()
+    {
+        return $this->hasOne('App\PreRegistro')->withTrashed();
+    }
 }

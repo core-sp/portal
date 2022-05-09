@@ -1,7 +1,7 @@
 <h5 class="bold mb-2">Endereço de correspondência</h5>
 <div class="form-row mb-2">
     <div class="col-sm-4 mb-2-576">
-        <label for="cep">R30 - CEP *</label>
+        <label for="cep">{{ array_search('cep', $codPre) }} - CEP *</label>
         <input
             type="text"
             name="cep"
@@ -17,7 +17,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="bairro">R31 - Bairro *</label>
+        <label for="bairro">{{ array_search('bairro', $codPre) }} - Bairro *</label>
         <input
             type="text"
             name="bairro"
@@ -36,7 +36,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="rua">R32 - Logradouro *</label>
+        <label for="rua">{{ array_search('logradouro', $codPre) }} - Logradouro *</label>
         <input
             type="text"
             name="rua"
@@ -52,7 +52,7 @@
         @endif
     </div>
     <div class="col-sm-2 mb-2-576">
-        <label for="numero">R33 - Número *</label>
+        <label for="numero">{{ array_search('numero', $codPre) }} - Número *</label>
         <input
             type="text"
             name="numero"
@@ -71,7 +71,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm-3 mb-2-576">
-        <label for="complemento">R34 - Complemento</label>
+        <label for="complemento">{{ array_search('complemento', $codPre) }} - Complemento</label>
         <input
             type="text"
             name="complemento"
@@ -87,7 +87,7 @@
         @endif
     </div>
     <div class="col-sm-5 mb-2-576">
-        <label for="cidade">R35 - Município *</label>
+        <label for="cidade">{{ array_search('cidade', $codPre) }} - Município *</label>
         <input
             type="text"
             name="cidade"
@@ -103,7 +103,7 @@
         @endif
     </div>
     <div class="col-sm-4 mb-2-576">
-        <label for="uf">R36 - Estado *</label>
+        <label for="uf">{{ array_search('uf', $codPre) }} - Estado *</label>
         <select 
             name="uf" 
             id="uf" 
@@ -142,7 +142,7 @@
 <div id="habilitarEndEmpresa">
     <div class="form-row mb-2">
         <div class="col-sm-4 mb-2-576">
-            <label for="cep_empresa">R37 - CEP *</label>
+            <label for="cep_empresa">{{ array_search('cep', $codCnpj) }} - CEP *</label>
             <input
                 type="text"
                 name="cep_empresa"
@@ -158,7 +158,7 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="bairro_empresa">R38 - Bairro *</label>
+            <label for="bairro_empresa">{{ array_search('bairro', $codCnpj) }} - Bairro *</label>
             <input
                 type="text"
                 name="bairro_empresa"
@@ -177,7 +177,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="rua_empresa">R39 - Logradouro *</label>
+            <label for="rua_empresa">{{ array_search('logradouro', $codCnpj) }} - Logradouro *</label>
             <input
                 type="text"
                 name="rua_empresa"
@@ -193,7 +193,7 @@
             @endif
         </div>
         <div class="col-sm-2 mb-2-576">
-            <label for="numero_empresa">R40 - Número *</label>
+            <label for="numero_empresa">{{ array_search('numero', $codCnpj) }} - Número *</label>
             <input
                 type="text"
                 name="numero_empresa"
@@ -212,7 +212,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm-3 mb-2-576">
-            <label for="compl_empresa">R41 - Complemento</label>
+            <label for="compl_empresa">{{ array_search('complemento', $codCnpj) }} - Complemento</label>
             <input
                 type="text"
                 name="compl_empresa"
@@ -228,7 +228,7 @@
             @endif
         </div>
         <div class="col-sm-5 mb-2-576">
-            <label for="cidade_empresa">R42 - Município *</label>
+            <label for="cidade_empresa">{{ array_search('cidade', $codCnpj) }} - Município *</label>
             <input
                 type="text"
                 name="cidade_empresa"
@@ -244,7 +244,7 @@
             @endif
         </div>
         <div class="col-sm-4 mb-2-576">
-            <label for="uf_empresa">R43 - Estado *</label>
+            <label for="uf_empresa">{{ array_search('uf', $codCnpj) }} - Estado *</label>
             <select 
                 name="uf_empresa" 
                 id="uf" 

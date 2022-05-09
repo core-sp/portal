@@ -38,6 +38,11 @@ class Regional extends Model
         return $this->hasOne('App\PlantaoJuridico', 'idregional');
     }
 
+    public function preRegistros()
+    {
+        return $this->hasMany('App\PreRegistro', 'idregional')->withTrashed();
+    }
+
     public function horariosAge()
     {
         if(isset($this->horariosage))

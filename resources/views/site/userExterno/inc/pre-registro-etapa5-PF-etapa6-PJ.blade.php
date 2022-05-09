@@ -1,5 +1,5 @@
 @if(strlen($user->cpf_cnpj) == 11)
-<label for="copia_identidade">R66 - Cópia RG *</label>
+<label for="copia_identidade">{{ array_search('path', $codAnexo) }} - Cópia RG *</label>
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
 @if(isset($resultado->copia_identidade))
 <div class="ArquivoBD_cp_identidade">
@@ -46,7 +46,7 @@
     </div>
 </div>
 
-<label for="copia_cpf">R67 - Cópia do CPF / CNH *</label>
+<label for="copia_cpf">{{ array_search('path', $codAnexo) }} - Cópia do CPF / CNH *</label>
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
 @if(isset($resultado->copia_cpf))
     <div class="ArquivoBD_cp_cpf">
@@ -93,7 +93,7 @@
     </div>
 </div>
 
-<label for="compr_residencia">R68 - Comprovante de residência (dos últimos 3 meses) *</label>
+<label for="compr_residencia">{{ array_search('path', $codAnexo) }} - Comprovante de residência (dos últimos 3 meses) *</label>
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
 @if(isset($resultado->compr_residencia))
 <div class="ArquivoBD_resid">
@@ -140,7 +140,7 @@
     </div>
 </div>
 
-<label for="certidao_tse">R69 - Certidão de quitação eleitoral *</label>
+<label for="certidao_tse">{{ array_search('path', $codAnexo) }} - Certidão de quitação eleitoral *</label>
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
 @if(isset($resultado->certidao_tse))
 <div class="ArquivoBD_tse">
@@ -190,7 +190,7 @@
     @if(isset($resultado->sexo) && ($resultado->sexo == 'M'))
     <div class="linha-lg-mini"></div>
 
-    <label for="reservista">R70 - Cerificado de reservista ou dispensa *</label>
+    <label for="reservista">{{ array_search('path', $codAnexo) }} - Cerificado de reservista ou dispensa *</label>
     <!-- Carrega os arquivos do bd com seus botoes de controle -->	
     @if(isset($resultado->reservista))
     <div class="ArquivoBD_reservista">
@@ -239,7 +239,7 @@
     @endif
 
 @else
-<label for="compr_inscr_cnpj">R71 - Comprovante de inscrição CNPJ *</label>
+<label for="compr_inscr_cnpj">{{ array_search('path', $codAnexo) }} - Comprovante de inscrição CNPJ *</label>
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
 @if(isset($resultado->compr_inscr_cnpj))
 <div class="ArquivoBD_inscr_cnpj">
@@ -286,7 +286,7 @@
     </div>
 </div>
 
-<label for="contrato_social">R72 - Contrato Social *</label>
+<label for="contrato_social">{{ array_search('path', $codAnexo) }} - Contrato Social *</label>
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
 @if(isset($resultado->contrato_social))
 <div class="ArquivoBD_contrato_social">
@@ -333,7 +333,7 @@
     </div>
 </div>
 
-<label for="compr_indica_rt">R73 - Declaração Termo de indicação RT ou Procuração *</label>
+<label for="compr_indica_rt">{{ array_search('path', $codAnexo) }} - Declaração Termo de indicação RT ou Procuração *</label>
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
 @if(isset($resultado->compr_indica_rt))
 <div class="ArquivoBD_indica_rt">
@@ -408,7 +408,7 @@
 
 <!-- Inputs para anexar o arquivo -->	
 <div class="Arquivo_rg">
-    <label for="anexos_socios">R74 - Cópia RG *</label>
+    <label for="anexos_socios">{{ array_search('path', $codAnexo) }} - Cópia RG *</label>
     <div class="form-row mb-2">
         <div class="input-group col-sm mb-2-576 pl-0">
             <div class="custom-file">
@@ -456,7 +456,7 @@
 
 <!-- Inputs para anexar o arquivo -->	
 <div class="Arquivo_cpf">
-    <label for="anexos_socios">R75 - Cópia CPF / CNH *</label>
+    <label for="anexos_socios">{{ array_search('path', $codAnexo) }} - Cópia CPF / CNH *</label>
     <div class="form-row mb-2">
         <div class="input-group col-sm mb-2-576 pl-0">
             <div class="custom-file">
@@ -504,7 +504,7 @@
 
 <!-- Inputs para anexar o arquivo -->	
 <div class="Arquivo_resid_socios">
-    <label for="anexos_socios">R76 - Comprovante de Residência (dos últimos 3 meses) *</label>
+    <label for="anexos_socios">{{ array_search('path', $codAnexo) }} - Comprovante de Residência (dos últimos 3 meses) *</label>
     <div class="form-row mb-2">
         <div class="input-group col-sm mb-2-576 pl-0">
             <div class="custom-file">
@@ -552,7 +552,7 @@
 
 <!-- Inputs para anexar o arquivo -->	
 <div class="Arquivo_tse_socios">
-    <label for="anexos_socios">R77 - Certidão de quitação eleitoral *</label>
+    <label for="anexos_socios">{{ array_search('path', $codAnexo) }} - Certidão de quitação eleitoral *</label>
     <div class="form-row mb-2">
         <div class="input-group col-sm mb-2-576 pl-0">
             <div class="custom-file">
@@ -600,7 +600,7 @@
 
 <!-- Inputs para anexar o arquivo -->	
 <div class="Arquivo_reserv">
-    <label for="anexos_socios">R78 - Cerificado de reservista ou dispensa *</label>
+    <label for="anexos_socios">{{ array_search('path', $codAnexo) }} - Cerificado de reservista ou dispensa *</label>
     <div class="form-row mb-2">
         <div class="input-group col-sm mb-2-576 pl-0">
             <div class="custom-file">

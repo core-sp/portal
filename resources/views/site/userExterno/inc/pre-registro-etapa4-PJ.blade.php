@@ -1,6 +1,7 @@
+{{-- Falta campos: registro, dt_expedicao --}}
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_contato">R44 - Nome Completo *</label>
+        <label for="nome_contato">{{ array_search('nome', $codRT) }} - Nome Completo *</label>
         <input
             name="nome_contato"
             type="text"
@@ -20,7 +21,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_social_contato">R45 - Nome Social</label>
+        <label for="nome_social_contato">{{ array_search('nome_social', $codRT) }} - Nome Social</label>
         <input
             name="nome_social_contato"
             type="text"
@@ -38,7 +39,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="dt_nasc_contato">R46 - Data de Nascimento *</label>
+        <label for="dt_nasc_contato">{{ array_search('dt_nascimento', $codRT) }} - Data de Nascimento *</label>
         <input
             name="dt_nasc_contato"
             type="date"
@@ -52,7 +53,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="sexo_contato">R47 - Sexo *</label><br>
+        <label for="sexo_contato">{{ array_search('sexo', $codRT) }} - Sexo *</label><br>
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
@@ -83,13 +84,13 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cpf_cnpj_contato">R48 - CPF/CNPJ *</label>
+        <label for="cpf_cnpj_contato">{{ array_search('cpf', $codRT) }} - CPF *</label>
         <input
             type="text"
             class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj_contato') ? ' is-invalid' : '' }}"
             name="cpf_cnpj_contato"
             value="{{-- Session::get('cpf_cnpj') ? apenasNumeros(Session::get('cpf_cnpj')) : old('cpf_cnpj_contato') --}}"
-            placeholder="CPF ou CNPJ"
+            placeholder="CPF"
         />
         @if($errors->has('cpf_cnpj_contato'))
         <div class="invalid-feedback">
@@ -98,7 +99,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="rg_contato">R49 - N° RG *</label>
+        <label for="rg_contato">{{ array_search('identidade', $codRT) }} - N° RG *</label>
         <input
             name="rg_contato"
             type="text"
@@ -115,7 +116,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="emissor_contato">R50 - Órgão Emissor *</label>
+        <label for="emissor_contato">{{ array_search('orgao_emissor', $codRT) }} - Órgão Emissor *</label>
         <input
             name="emissor_contato"
             type="text"
@@ -134,7 +135,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm-4 mb-2-576">
-        <label for="cep_contato">R51 - CEP *</label>
+        <label for="cep_contato">{{ array_search('cep', $codRT) }} - CEP *</label>
         <input
             type="text"
             name="cep_contato"
@@ -150,7 +151,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="bairro_contato">R52 - Bairro *</label>
+        <label for="bairro_contato">{{ array_search('bairro', $codRT) }} - Bairro *</label>
         <input
             type="text"
             name="bairro_contato"
@@ -169,7 +170,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="rua_contato">R53 - Logradouro *</label>
+        <label for="rua_contato">{{ array_search('logradouro', $codRT) }} - Logradouro *</label>
         <input
             type="text"
             name="rua_contato"
@@ -185,7 +186,7 @@
         @endif
     </div>
     <div class="col-sm-2 mb-2-576">
-        <label for="numero_contato">R54 - Número *</label>
+        <label for="numero_contato">{{ array_search('numero', $codRT) }} - Número *</label>
         <input
             type="text"
             name="numero_contato"
@@ -204,7 +205,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm-3 mb-2-576">
-        <label for="compl_contato">R55 - Complemento</label>
+        <label for="compl_contato">{{ array_search('complemento', $codRT) }} - Complemento</label>
         <input
             type="text"
             name="compl_contato"
@@ -220,7 +221,7 @@
         @endif
     </div>
     <div class="col-sm-5 mb-2-576">
-        <label for="cidade_contato">R56 - Município *</label>
+        <label for="cidade_contato">{{ array_search('cidade', $codRT) }} - Município *</label>
         <input
             type="text"
             name="cidade_contato"
@@ -236,7 +237,7 @@
         @endif
     </div>
     <div class="col-sm-4 mb-2-576">
-        <label for="uf_contato">R57 - Estado *</label>
+        <label for="uf_contato">{{ array_search('uf', $codRT) }} - Estado *</label>
         <select 
             name="uf_contato" 
             id="uf" 
@@ -262,7 +263,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_mae_contato">R58 - Nome da Mãe *</label>
+        <label for="nome_mae_contato">{{ array_search('nome_mae', $codRT) }} - Nome da Mãe *</label>
         <input
             name="nome_mae_contato"
             type="text"
@@ -279,7 +280,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nome_pai_contato">R59 - Nome do Pai *</label>
+        <label for="nome_pai_contato">{{ array_search('nome_pai', $codRT) }} - Nome do Pai *</label>
         <input
             name="nome_pai_contato"
             type="text"
