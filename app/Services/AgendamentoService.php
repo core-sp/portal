@@ -467,18 +467,23 @@ class AgendamentoService implements AgendamentoServiceInterface {
         } 
 
         $this->variaveis['cancela_idusuario'] = true;
+
+        // Enquanto não possui o UserService
+        $idregional = auth()->user()->idregional;
+        $atendentes = \App\User::select('idusuario', 'nome', 'idperfil')
+            ->whereIn('idperfil', [4, 6, 10, 12, 13, 18])
+            ->orWhere(function($query) use($idregional) {
+                $query->whereIn('idperfil', [8, 21])
+                ->where('idregional', $idregional);
+            })
+            ->orderBy('nome')
+            ->get();
     
         return [
             'servicos' => $this->servicosCompletos(),
             'status' => $status,
             'variaveis' => (object) $this->variaveis,
-            'atendentes' => $agendamento->regional
-                ->users()
-                ->select('idusuario', 'nome')
-                ->where('idperfil', 8)
-                ->withoutTrashed()
-                ->orderBy('nome')
-                ->get(),
+            'atendentes' => $atendentes,
             'resultado' => $agendamento
         ];
     }
