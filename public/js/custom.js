@@ -319,10 +319,8 @@ function selectAtendenteByStatus(valor)
     if((valor == 'Compareceu') && (idUser == ''))
       $(this).hide();
   });
-  if(valor == '')
+  if(valor != 'Compareceu')
     $('#idusuarioAgendamento')[0].selectedIndex = 0;
-  if(valor == 'Compareceu')
-    $('#idusuarioAgendamento')[0].selectedIndex = 1;
 }
 
 $('#statusAgendamentoAdmin').change(function(){
