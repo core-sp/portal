@@ -27,7 +27,7 @@
                 Endereço
             </a>
         </li>
-        @if(strlen($user->cpf_cnpj) == 14)
+        @if(strlen($resultado->userExterno->cpf_cnpj) == 14)
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte4_PJ">
                 Contato / RT
@@ -56,13 +56,14 @@
 
         <!-- Tab panes -->
         <div class="tab-content">
+
             <!-- Tab 1 -->
             <div id="parte1_PF_PJ" class="tab-pane container active"><br>
                 @include('site.userExterno.inc.pre-registro-etapa1', [
                     'cod' => $codigos['App\Contabil']
                 ])
             </div>
-                
+     
             <!-- Tab 2 -->
             <div id="parte2_PF_PJ" class="tab-pane container fade"><br>
                 @include('site.userExterno.inc.pre-registro-etapa2', [
@@ -82,7 +83,7 @@
             </div>
 
             <!-- Tab 4 PJ -->
-            @if(strlen($user->cpf_cnpj) == 14)
+            @if(strlen($resultado->userExterno->cpf_cnpj) == 14)
             <div id="parte4_PJ" class="tab-pane container fade"><br>
                 @include('site.userExterno.inc.pre-registro-etapa4-PJ', [
                     'codRT' => $codigos['App\ResponsavelTecnico']
@@ -104,6 +105,7 @@
                     'codAnexo' => $codigos['App\Anexo'],
                 ])
             </div>
+
         </div>
 
         <br>

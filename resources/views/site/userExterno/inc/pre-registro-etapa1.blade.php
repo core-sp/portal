@@ -5,7 +5,7 @@
             name="nome_contabil"
             type="text"
             class="form-control {{ $errors->has('nome_contabil') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            value="{{ empty(old('nome_contabil')) && isset($resultado->contabil->nome) ? $resultado->contabil->nome : old('nome_contabil') }}"
             placeholder="Nome da Contabilidade"
             minlength="5"
             maxlength="191"
@@ -25,8 +25,8 @@
             name="cnpj_contabil"
             type="text"
             class="form-control cnpjInput {{ $errors->has('cnpj_contabil') ? 'is-invalid' : '' }}"
-            value="{{-- $user->cpf_cnpj --}}"
-            placeholder="CNPJ"
+            value="{{ empty(old('cnpj_contabil')) && isset($resultado->contabil->cnpj) ? $resultado->contabil->cnpj : old('cnpj_contabil') }}"
+            placeholder="00.000.000/0000-00"
         />
         @if($errors->has('cnpj_contabil'))
         <div class="invalid-feedback">
@@ -40,7 +40,7 @@
             name="email_contabil"
             type="email"
             class="form-control {{ $errors->has('email_contabil') ? 'is-invalid' : '' }}"
-            value="{{-- $user->email --}}"
+            value="{{ empty(old('email_contabil')) && isset($resultado->contabil->email) ? $resultado->contabil->email : old('email_contabil') }}"
         />
         @if($errors->has('email_contabil'))
         <div class="invalid-feedback">
@@ -57,7 +57,7 @@
             name="contato_contabil"
             type="text"
             class="form-control {{ $errors->has('contato_contabil') ? 'is-invalid' : '' }}"
-            value="{{-- $user->cpf_cnpj --}}"
+            value="{{ empty(old('contato_contabil')) && isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : old('contato_contabil') }}"
             placeholder="Nome de Contato"
         />
         @if($errors->has('contato_contabil'))
@@ -67,16 +67,16 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="celular_contabil">{{ array_search('telefone', $cod) }} - Celular</label>
+        <label for="telefone_contabil">{{ array_search('telefone', $cod) }} - Telefone</label>
         <input type="text"
-            class="form-control celularInput {{ $errors->has('celular_contabil') ? 'is-invalid' : '' }}"
-            name="celular_contabil"
-            value="{{-- isset($resultado->celular) ? $resultado->celular : old('celular_contabil') --}}"
-            placeholder="(xx) 99999-9999"
+            class="form-control telefoneInput {{ $errors->has('telefone_contabil') ? 'is-invalid' : '' }}"
+            name="telefone_contabil"
+            value="{{ empty(old('telefone_contabil')) && isset($resultado->contabil->telefone) ? $resultado->contabil->telefone : old('telefone_contabil') }}"
+            placeholder="(99) 99999-9999"
         />
-        @if($errors->has('celular_contabil'))
+        @if($errors->has('telefone_contabil'))
         <div class="invalid-feedback">
-            {{ $errors->first('celular_contabil') }}
+            {{ $errors->first('telefone_contabil') }}
         </div>
         @endif
     </div>

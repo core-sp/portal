@@ -8,7 +8,7 @@
             class="form-control cep {{ $errors->has('cep') ? 'is-invalid' : '' }}"
             id="cep"
             placeholder="CEP"
-            value="{{-- isset($resultado->cep) && explode(';', $resultado->cep)[0] ? explode(';', $resultado->cep)[0] : old('cep') --}}"
+            value="{{ empty(old('cep')) && isset($resultado->cep) ? $resultado->cep : old('cep') }}"
         />
         @if($errors->has('cep'))
         <div class="invalid-feedback">
@@ -24,7 +24,7 @@
             class="form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
             id="bairro"
             placeholder="Bairro"
-            value="{{-- isset($resultado->bairro) && explode(';', $resultado->bairro)[0] ? explode(';', $resultado->bairro)[0] : old('bairro') --}}"
+            value="{{ empty(old('bairro')) && isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
         />
         @if($errors->has('bairro'))
         <div class="invalid-feedback">
@@ -36,18 +36,18 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="rua">{{ array_search('logradouro', $codPre) }} - Logradouro *</label>
+        <label for="logradouro">{{ array_search('logradouro', $codPre) }} - Logradouro *</label>
         <input
             type="text"
-            name="rua"
-            class="form-control {{ $errors->has('rua') ? 'is-invalid' : '' }}"
+            name="logradouro"
+            class="form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }}"
             id="rua"
             placeholder="Logradouro"
-            value="{{-- isset($resultado->logradouro) && explode(';', $resultado->logradouro)[0] ? explode(';', $resultado->logradouro)[0] : old('rua') --}}"
+            value="{{ empty(old('logradouro')) && isset($resultado->logradouro) ? $resultado->logradouro : old('logradouro') }}"
         />
-        @if($errors->has('rua'))
+        @if($errors->has('logradouro'))
         <div class="invalid-feedback">
-            {{ $errors->first('rua') }}
+            {{ $errors->first('logradouro') }}
         </div>
         @endif
     </div>
@@ -59,7 +59,7 @@
             class="form-control numero {{ $errors->has('numero') ? 'is-invalid' : '' }}"
             id="numero"
             placeholder="Número"
-            value="{{-- isset($resultado->numero) && explode(';', $resultado->numero)[0] ? explode(';', $resultado->numero)[0] : old('numero') --}}"
+            value="{{ empty(old('numero')) && isset($resultado->numero) ? $resultado->numero : old('numero') }}"
         />
         @if($errors->has('numero'))
         <div class="invalid-feedback">
@@ -78,7 +78,7 @@
             class="form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
             id="complemento"
             placeholder="Complemento"
-            value="{{-- isset($resultado->complemento) && explode(';', $resultado->complemento)[0] ? explode(';', $resultado->complemento)[0] : old('complemento') --}}"
+            value="{{ empty(old('complemento')) && isset($resultado->complemento) ? $resultado->complemento : old('complemento') }}"
         />
         @if($errors->has('complemento'))
         <div class="invalid-feedback">
@@ -94,7 +94,7 @@
             id="cidade"
             class="form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }}"
             placeholder="Município"
-            value="{{-- isset($resultado->municipio) && explode(';', $resultado->municipio)[0] ? explode(';', $resultado->municipio)[0] : old('cidade') --}}"
+            value="{{ empty(old('cidade')) && isset($resultado->cidade) ? $resultado->cidade : old('cidade') }}"
         />
         @if($errors->has('cidade'))
         <div class="invalid-feedback">
@@ -112,8 +112,8 @@
         @foreach(estados() as $key => $estado)
             @if(!empty(old('uf')))
             <option value="{{ $key }}" {{ old('uf') == $key ? 'selected' : '' }}>{{ $estado }}</option>
-            @elseif(isset($resultado->estado) && explode(';', $resultado->estado)[0])
-            <option value="{{ $key }}" {{ $key == explode(';', $resultado->estado)[0] ? 'selected' : '' }}>{{ $estado }}</option>
+            @elseif(isset($resultado->uf))
+            <option value="{{ $key }}" {{ $key == $resultado->uf ? 'selected' : '' }}>{{ $estado }}</option>
             @else
             <option value="{{ $key }}">{{ $estado }}</option>
             @endif
@@ -129,7 +129,7 @@
 
 <br>
 
-@if(strlen($user->cpf_cnpj) == 14)
+@if(strlen($resultado->userExterno->cpf_cnpj) == 14)
 <h5 class="bold mb-2">Endereço da empresa</h5>
 <div class="form-row mb-2">
     <div class="form-check-inline">
@@ -149,7 +149,7 @@
                 class="form-control cep {{ $errors->has('cep_empresa') ? 'is-invalid' : '' }}"
                 id="cep"
                 placeholder="CEP"
-                value="{{-- isset($resultado->cep) && explode(';', $resultado->cep)[1] ? explode(';', $resultado->cep)[1] : old('cep_empresa') --}}"
+                value="{{ empty(old('cep_empresa')) && isset($resultado->pessoaJuridica->cep) ? $resultado->pessoaJuridica->cep : old('cep_empresa') }}"
             />
             @if($errors->has('cep_empresa'))
             <div class="invalid-feedback">
@@ -165,7 +165,7 @@
                 class="form-control {{ $errors->has('bairro_empresa') ? 'is-invalid' : '' }}"
                 id="bairro"
                 placeholder="Bairro"
-                value="{{-- isset($resultado->bairro) && explode(';', $resultado->bairro)[1] ? explode(';', $resultado->bairro)[1] : old('bairro_empresa') --}}"
+                value="{{ empty(old('bairro_empresa')) && isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : old('bairro_empresa') }}"
             />
             @if($errors->has('bairro_empresa'))
             <div class="invalid-feedback">
@@ -177,18 +177,18 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="rua_empresa">{{ array_search('logradouro', $codCnpj) }} - Logradouro *</label>
+            <label for="logradouro_empresa">{{ array_search('logradouro', $codCnpj) }} - Logradouro *</label>
             <input
                 type="text"
-                name="rua_empresa"
-                class="form-control {{ $errors->has('rua_empresa') ? 'is-invalid' : '' }}"
+                name="logradouro_empresa"
+                class="form-control {{ $errors->has('logradouro_empresa') ? 'is-invalid' : '' }}"
                 id="rua"
                 placeholder="Logradouro"
-                value="{{-- isset($resultado->logradouro) && explode(';', $resultado->logradouro)[1] ? explode(';', $resultado->logradouro)[1] : old('rua_empresa') --}}"
+                value="{{ empty(old('logradouro_empresa')) && isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : old('logradouro_empresa') }}"
             />
-            @if($errors->has('rua_empresa'))
+            @if($errors->has('logradouro_empresa'))
             <div class="invalid-feedback">
-                {{ $errors->first('rua_empresa') }}
+                {{ $errors->first('logradouro_empresa') }}
             </div>
             @endif
         </div>
@@ -200,7 +200,7 @@
                 class="form-control numero {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }}"
                 id="numero_empresa"
                 placeholder="Número"
-                value="{{-- isset($resultado->numero) && explode(';', $resultado->numero)[1] ? explode(';', $resultado->numero)[1] : old('numero_empresa') --}}"
+                value="{{ empty(old('numero_empresa')) && isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : old('numero_empresa') }}"
             />
             @if($errors->has('numero_empresa'))
             <div class="invalid-feedback">
@@ -212,18 +212,18 @@
 
     <div class="form-row mb-2">
         <div class="col-sm-3 mb-2-576">
-            <label for="compl_empresa">{{ array_search('complemento', $codCnpj) }} - Complemento</label>
+            <label for="complemento_empresa">{{ array_search('complemento', $codCnpj) }} - Complemento</label>
             <input
                 type="text"
-                name="compl_empresa"
-                class="form-control {{ $errors->has('compl_empresa') ? 'is-invalid' : '' }}"
-                id="compl_empresa"
+                name="complemento_empresa"
+                class="form-control {{ $errors->has('complemento_empresa') ? 'is-invalid' : '' }}"
+                id="complemento_empresa"
                 placeholder="Complemento"
-                value="{{-- isset($resultado->complemento) && explode(';', $resultado->complemento)[1] ? explode(';', $resultado->complemento)[1] : old('compl_empresa') --}}"
+                value="{{ empty(old('numero_empresa')) && isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : old('numero_empresa') }}"
             />
-            @if($errors->has('compl_empresa'))
+            @if($errors->has('complemento_empresa'))
             <div class="invalid-feedback">
-                {{ $errors->first('compl_empresa') }}
+                {{ $errors->first('complemento_empresa') }}
             </div>
             @endif
         </div>
@@ -235,7 +235,7 @@
                 id="cidade"
                 class="form-control {{ $errors->has('cidade_empresa') ? 'is-invalid' : '' }}"
                 placeholder="Município"
-                value="{{-- isset($resultado->municipio) && explode(';', $resultado->municipio)[1] ? explode(';', $resultado->municipio)[1] : old('cidade_empresa') --}}"
+                value="{{ empty(old('cidade_empresa')) && isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : old('cidade_empresa') }}"
             />
             @if($errors->has('cidade_empresa'))
             <div class="invalid-feedback">
@@ -253,8 +253,8 @@
             @foreach(estados() as $key => $estado)
                 @if(!empty(old('uf_empresa')))
                 <option value="{{ $key }}" {{ old('uf_empresa') == $key ? 'selected' : '' }}>{{ $estado }}</option>
-                @elseif(isset($resultado->estado) && explode(';', $resultado->estado)[1])
-                <option value="{{ $key }}" {{ $key == explode(';', $resultado->estado)[1] ? 'selected' : '' }}>{{ $estado }}</option>
+                @elseif(isset($resultado->pessoaJuridica->uf))
+                <option value="{{ $key }}" {{ $key == $resultado->pessoaJuridica->uf ? 'selected' : '' }}>{{ $estado }}</option>
                 @else
                 <option value="{{ $key }}">{{ $estado }}</option>
                 @endif

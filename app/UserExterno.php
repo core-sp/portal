@@ -33,6 +33,11 @@ class UserExterno extends Authenticatable
         ];
     }
 
+    public function isPessoaFisica()
+    {
+        return strlen($this->cpf_cnpj) == 11;
+    }
+
     public function preRegistro()
     {
         return $this->hasOne('App\PreRegistro')->withTrashed();

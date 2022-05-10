@@ -945,10 +945,7 @@ $("#logout-externo").click(function(){
 });
 
 // Habilitar Endereço da Empresa no Registro
-if($("#checkEndEmpresa:checked"))
-	$("#habilitarEndEmpresa").hide();
-else
-	$("#habilitarEndEmpresa").show();
+$("#checkEndEmpresa:checked") ? $("#habilitarEndEmpresa").hide() : $("#habilitarEndEmpresa").show();
 
 $("#checkEndEmpresa").change(function(){
 	this.checked ? $("#habilitarEndEmpresa").hide() : $("#habilitarEndEmpresa").show();
@@ -960,54 +957,14 @@ $("#checkEndEmpresa").change(function(){
 var pre_registro_total_files = 5;
 
 // ao carregar a pagina, verifica se possui o limite maximo de arquivos permitidos, caso sim, ele impede de adicionar mais
-// Será refatorado
-$('form').ready(function(){
-	if($(".ArquivoBD_resid").length == 1)
-		$(".Arquivo_resid").hide();
-
-	if($(".ArquivoBD_tse").length == 1)
-		$(".Arquivo_tse").hide();
-
-	if($(".ArquivoBD_reservista").length == 1)
-		$(".Arquivo_reservista").hide();
-
-	if($(".ArquivoBD_cp_identidade").length == 1)
-		$(".Arquivo_cp_identidade").hide();
-
-	if($(".ArquivoBD_cp_cpf").length == 1)
-		$(".Arquivo_cp_cpf").hide();
-
-	if($(".ArquivoBD_indica_rt").length == 1)
-		$(".Arquivo_indica_rt").hide();
-
-	if($(".ArquivoBD_indica_rt_pj").length == 1)
-		$(".Arquivo_indica_rt_pj").hide();
-
-	if($(".ArquivoBD_inscr_cnpj").length == 1)
-		$(".Arquivo_inscr_cnpj").hide();
-
-	if($(".ArquivoBD_contrato_social").length == 1)
-		$(".Arquivo_contrato_social").hide();
-
-	if($(".ArquivoBD_rg").length == pre_registro_total_files)
-		$(".Arquivo_rg").hide();
-
-	if($(".ArquivoBD_cpf").length == pre_registro_total_files)
-		$(".Arquivo_cpf").hide();
-	
-	if($(".ArquivoBD_tse_socios").length == pre_registro_total_files)
-		$(".Arquivo_tse_socios").hide();
-
-	if($(".ArquivoBD_reserv").length == pre_registro_total_files)
-		$(".Arquivo_reserv").hide();
-
-	if($(".ArquivoBD_resid_socios").length == pre_registro_total_files)
-		$(".Arquivo_resid_socios").hide();
+$('form #inserirRegistro').ready(function(){
+	if($(".ArquivoBD_anexo").length == pre_registro_total_files)
+		$(".Arquivo_anexo").hide();
 }); 
 
 // Faz aparecer o nome do arquivo na máscara do input estilizado, remove as mensagens de erro
 //  e adiciona, caso seja possível, um novo input
-$(".files").on("change", function() {
+$("#inserirRegistro .files").on("change", function() {
 
 	// procedimento usado no bootstrap 4 para usar um input file customizado
 	var fileName = $(this).val().split("\\").pop();
@@ -1025,7 +982,7 @@ $(".files").on("change", function() {
 });
 
 // remove a div com input file ou limpa o campo se for 1 input
-$(".limparFile").click(function(){
+$("#inserirRegistro .limparFile").click(function(){
 	var todoArquivo = $(this).parent().parent().parent().parent();
 	var classe = todoArquivo.attr('class');
 	if($('.' + classe).length > 1)
@@ -1050,15 +1007,7 @@ function addArquivo(nome){
 		
 	// somente files que exigem somente 1 arquivo
 	var array_para_um_file = [
-		'resid', 
-		'tse', 
-		'reservista', 
-		'cp_identidade', 
-		'cp_cpf', 
-		'indica_rt', 
-		'indica_rt_pj', 
-		'inscr_cnpj',
-		'contrato_social'
+		// 'resid', 
 	];
 	var total = $(".Arquivo_" + nome).length + $(".ArquivoBD_" + nome).length;
 	var total_files = array_para_um_file.indexOf(nome) == -1 ? pre_registro_total_files : 1 ;

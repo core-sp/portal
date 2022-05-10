@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\PreRegistroServiceInterface;
+use App\PreRegistro;
 
 class PreRegistroService implements PreRegistroServiceInterface {
 
@@ -27,6 +28,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
         // Verificar com o metodo verificacao() para impedir de acessar o formulario
         // Caso não, verificar se já tem o pre registro salvo no banco
 
+        $resultado = $externo->preRegistro == null ? $externo->preRegistro()->create() : $externo->preRegistro;
+
         $codigos = array();
         $models = [
             'App\UserExterno' => null,
@@ -41,7 +44,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $codigos[$key] = $key::codigosPreRegistro();
 
         return [
-            'resultado' => $externo,
+            'resultado' => $resultado,
             'codigos' => $codigos
         ];
     }

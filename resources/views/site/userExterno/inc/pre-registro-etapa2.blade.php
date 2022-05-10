@@ -10,25 +10,39 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cpf_cnpj">{{ array_search('cpf_cnpj', $codUser) }} - {{ strlen($user->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ' }} *</label>
+        <label for="cpf_cnpj">{{ array_search('cpf_cnpj', $codUser) }} - {{ strlen($resultado->userExterno->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ' }} *</label>
         <input
             type="text"
             class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
-            value="{{ $user->cpf_cnpj }}"
+            value="{{ $resultado->userExterno->cpf_cnpj }}"
             readonly
             disabled
         />
     </div>
+    <div class="col-sm mb-2-576">
+        <label for="registro_secundario">{{ array_search('registro_secundario', $codPre) }} - Registro Secundário *</label>
+        <input
+            type="text"
+            class="form-control {{ $errors->has('registro_secundario') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('registro_secundario')) && isset($resultado->registro_secundario) ? $resultado->registro_secundario : old('registro_secundario') }}"
+            placeholder=""
+        />
+        @if($errors->has('registro_secundario'))
+        <div class="invalid-feedback">
+            {{ $errors->first('registro_secundario') }}
+        </div>
+        @endif
+    </div>
 </div>
 
-@if(strlen($user->cpf_cnpj) == 11)
+@if(strlen($resultado->userExterno->cpf_cnpj) == 11)
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
         <label for="nome">{{ array_search('nome', $codUser) }} - Nome Completo *</label>
         <input
             type="text"
             class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
-            value="{{ $user->nome }}"
+            value="{{ $resultado->userExterno->nome }}"
             placeholder="Nome Completo"
             readonly
             disabled
@@ -48,7 +62,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             name="nome_social"
             type="text"
             class="form-control {{ $errors->has('nome_social') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            value="{{ empty(old('nome_social')) && isset($resultado->pessoaFisica->nome_social) ? $resultado->pessoaFisica->nome_social : old('nome_social') }}"
             placeholder="Nome Social"
         />
         @if($errors->has('nome_social'))
@@ -67,7 +81,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
                 <input type="radio" 
                     class="form-check-input" 
                     name="sexo" 
-                    value="F" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->sexo) && $resultado->sexo == 'F') ? 'checked' : '' }}
+                    value="F" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->pessoaFisica->sexo) && $resultado->pessoaFisica->sexo == 'F') ? 'checked' : '' }}
                 />
                 Feminino
             </label>
@@ -77,7 +91,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
                 <input type="radio" 
                     class="form-check-input" 
                     name="sexo" 
-                    value="M" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->sexo) && $resultado->sexo == 'M') ? 'checked' : '' }}
+                    value="M" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->pessoaFisica->sexo) && $resultado->pessoaFisica->sexo == 'M') ? 'checked' : '' }}
                 />
                 Masculino
             </label>
@@ -89,16 +103,16 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_nasc">{{ array_search('dt_nascimento', $codCpf) }} - Data de Nascimento *</label>
+        <label for="dt_nascimento">{{ array_search('dt_nascimento', $codCpf) }} - Data de Nascimento *</label>
         <input
-            name="dt_nasc"
+            name="dt_nascimento"
             type="date"
-            class="form-control {{ $errors->has('dt_nasc') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            class="form-control {{ $errors->has('dt_nascimento') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('dt_nascimento')) && isset($resultado->pessoaFisica->dt_nascimento) ? $resultado->pessoaFisica->dt_nascimento : old('dt_nascimento') }}"
         />
-        @if($errors->has('dt_nasc'))
+        @if($errors->has('dt_nascimento'))
         <div class="invalid-feedback">
-            {{ $errors->first('dt_nasc') }}
+            {{ $errors->first('dt_nascimento') }}
         </div>
         @endif
     </div>
@@ -111,8 +125,8 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @foreach(estados_civis() as $estado_civil)
             @if(!empty(old('estado_civil')))
             <option value="{{ $estado_civil }}" {{ old('estado_civil') == $estado_civil ? 'selected' : '' }}>{{ $estado_civil }}</option>
-            @elseif(isset($resultado->estado_civil))
-            <option value="{{ $estado_civil }}" {{ $estado_civil == $resultado->estado_civil ? 'selected' : '' }}>{{ $estado_civil }}</option>
+            @elseif(isset($resultado->pessoaFisica->estado_civil))
+            <option value="{{ $estado_civil }}" {{ $estado_civil == $resultado->pessoaFisica->estado_civil ? 'selected' : '' }}>{{ $estado_civil }}</option>
             @else
             <option value="{{ $estado_civil }}">{{ $estado_civil }}</option>
             @endif
@@ -136,8 +150,8 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @foreach(nacionalidades() as $nacionalidade)
             @if(!empty(old('nacionalidade')))
             <option value="{{ $nacionalidade }}" {{ old('nacionalidade') == $nacionalidade ? 'selected' : '' }}>{{ $nacionalidade }}</option>
-            @elseif(isset($resultado->nacionalidade))
-            <option value="{{ $nacionalidade }}" {{ $nacionalidade == $resultado->nacionalidade ? 'selected' : '' }}>{{ $nacionalidade }}</option>
+            @elseif(isset($resultado->pessoaFisica->nacionalidade))
+            <option value="{{ $nacionalidade }}" {{ $nacionalidade == $resultado->pessoaFisica->nacionalidade ? 'selected' : '' }}>{{ $nacionalidade }}</option>
             @else
             <option value="{{ $nacionalidade }}" {{ $nacionalidade == 'Brasileiro' ? 'selected' : '' }}>{{ $nacionalidade }}</option>
             @endif
@@ -158,8 +172,8 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @foreach(estados() as $key => $naturalidade)
             @if(!empty(old('naturalidade')))
             <option value="{{ $key }}" {{ old('naturalidade') == $naturalidade ? 'selected' : '' }}>{{ $naturalidade }}</option>
-            @elseif(isset($resultado->naturalidade))
-            <option value="{{ $key }}" {{ $key == $resultado->naturalidade ? 'selected' : '' }}>{{ $naturalidade }}</option>
+            @elseif(isset($resultado->pessoaFisica->naturalidade))
+            <option value="{{ $key }}" {{ $key == $resultado->pessoaFisica->naturalidade ? 'selected' : '' }}>{{ $naturalidade }}</option>
             @else
             <option value="{{ $key }}" {{ $key == 'SP' ? 'selected' : '' }}>{{ $naturalidade }}</option>
             @endif
@@ -180,7 +194,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             name="nome_mae"
             type="text"
             class="form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            value="{{ empty(old('nome_mae')) && isset($resultado->pessoaFisica->nome_mae) ? $resultado->pessoaFisica->nome_mae : old('nome_mae') }}"
             placeholder="Nome da Mãe"
             minlength="5"
             maxlength="191"
@@ -197,7 +211,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             name="nome_pai"
             type="text"
             class="form-control {{ $errors->has('nome_pai') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            value="{{ empty(old('nome_pai')) && isset($resultado->pessoaFisica->nome_pai) ? $resultado->pessoaFisica->nome_pai : old('nome_pai') }}"
             placeholder="Nome do Pai"
             minlength="5"
             maxlength="191"
@@ -212,35 +226,34 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="rg">{{ array_search('identidade', $codCpf) }} - N° RG *</label>
+        <label for="identidade">{{ array_search('identidade', $codCpf) }} - N° RG *</label>
         <input
-            name="rg"
+            name="identidade"
             type="text"
             id="rg"
-            class="form-control rgInput {{ $errors->has('rg') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
-            placeholder="RG"
+            class="form-control rgInput {{ $errors->has('identidade') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('identidade')) && isset($resultado->pessoaFisica->identidade) ? $resultado->pessoaFisica->identidade : old('identidade') }}"
+            placeholder=""
             maxlength="20"
         />
-        @if($errors->has('rg'))
+        @if($errors->has('identidade'))
         <div class="invalid-feedback">
-            {{ $errors->first('rg') }}
+            {{ $errors->first('identidade') }}
         </div>
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="emissor">{{ array_search('orgao_emissor', $codCpf) }} - Órgão Emissor *</label>
+        <label for="orgao_emissor">{{ array_search('orgao_emissor', $codCpf) }} - Órgão Emissor *</label>
         <input
-            name="emissor"
+            name="orgao_emissor"
             type="text"
-            class="form-control {{ $errors->has('emissor') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
-            placeholder="Emissor"
-            maxlength="10"
+            class="form-control {{ $errors->has('orgao_emissor') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('orgao_emissor')) && isset($resultado->pessoaFisica->orgao_emissor) ? $resultado->pessoaFisica->orgao_emissor : old('orgao_emissor') }}"
+            placeholder=""
         />
-        @if($errors->has('emissor'))
+        @if($errors->has('orgao_emissor'))
         <div class="invalid-feedback">
-            {{ $errors->first('emissor') }}
+            {{ $errors->first('orgao_emissor') }}
         </div>
         @endif
     </div>
@@ -250,7 +263,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             name="dt_expedicao"
             type="date"
             class="form-control {{ $errors->has('dt_expedicao') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            value="{{ empty(old('dt_expedicao')) && isset($resultado->pessoaFisica->dt_expedicao) ? $resultado->pessoaFisica->dt_expedicao : old('dt_expedicao') }}"
         />
         @if($errors->has('dt_expedicao'))
         <div class="invalid-feedback">
@@ -260,7 +273,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
     </div>
 </div>
 
-@elseif(strlen($user->cpf_cnpj) == 14)
+@elseif(strlen($resultado->userExterno->cpf_cnpj) == 14)
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
@@ -269,7 +282,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             name="razao_social"
             type="text"
             class="form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            value="{{ empty(old('razao_social')) && isset($resultado->pessoaJuridica->razao_social) ? $resultado->pessoaJuridica->razao_social : old('razao_social') }}"
             placeholder="Razão Social"
             minlength="5"
             maxlength="191"
@@ -290,7 +303,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             name="capital_social"
             class="form-control capitalSocial {{ $errors->has('capital_social') ? 'is-invalid' : '' }}"
             placeholder="1.000,00"
-            value="{{ isset($resultado->capital_social) ? $resultado->capital_social : old('capital_social') }}"
+            value="{{ empty(old('capital_social')) && isset($resultado->pessoaJuridica->capital_social) ? $resultado->pessoaJuridica->capital_social : old('capital_social') }}"
         />
         @if($errors->has('capital_social'))
         <div class="invalid-feedback">
@@ -305,7 +318,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             name="nire"
             class="form-control {{ $errors->has('nire') ? 'is-invalid' : '' }}"
             placeholder="NIRE"
-            value="{{ isset($resultado->nire) ? $resultado->nire : old('nire') }}"
+            value="{{ empty(old('nire')) && isset($resultado->pessoaJuridica->nire) ? $resultado->pessoaJuridica->nire : old('nire') }}"
             maxlength="20"
         />
         @if($errors->has('nire'))
@@ -324,8 +337,8 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             <label class="form-check-label">
                 @if(!empty(old('tipo_empresa')))
                 <input type="radio" class="form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ old('tipo_empresa') == $tipo ? 'checked' : '' }} />{{ $tipo }}
-                @elseif(isset($resultado->tipo_empresa))
-                <input type="radio" class="form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ $tipo == $resultado->tipo ? 'checked' : '' }} />{{ $tipo }}
+                @elseif(isset($resultado->pessoaJuridica->tipo_empresa))
+                <input type="radio" class="form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ $tipo == $resultado->pessoaJuridica->tipo_empresa ? 'checked' : '' }} />{{ $tipo }}
                 @else
                 <input type="radio" class="form-check-input" name="tipo_empresa" value="{{ $tipo }}" />{{ $tipo }}
                 @endif
@@ -344,7 +357,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="date"
             name="dt_inicio_atividade"
             class="form-control {{ $errors->has('dt_inicio_atividade') ? 'is-invalid' : '' }}"
-            value="{{ isset($resultado->dt_inicio_atividade) ? $resultado->dt_inicio_atividade : old('dt_inicio_atividade') }}"
+            value="{{ empty(old('dt_inicio_atividade')) && isset($resultado->pessoaJuridica->dt_inicio_atividade) ? $resultado->pessoaJuridica->dt_inicio_atividade : old('dt_inicio_atividade') }}"
         />
         @if($errors->has('dt_inicio_atividade'))
         <div class="invalid-feedback">
@@ -357,32 +370,32 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 <!-- Verificar validação das Inscrições -->
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="insc_estadual">{{ array_search('inscricao_estadual', $codCnpj) }} - Inscrição Estadual *</label>
+        <label for="inscricao_estadual">{{ array_search('inscricao_estadual', $codCnpj) }} - Inscrição Estadual *</label>
         <input
             type="text"
-            name="insc_estadual"
-            class="form-control {{ $errors->has('insc_estadual') ? 'is-invalid' : '' }}"
+            name="inscricao_estadual"
+            class="form-control {{ $errors->has('inscricao_estadual') ? 'is-invalid' : '' }}"
             placeholder=""
-            value="{{ isset($resultado->insc_estadual) ? $resultado->insc_estadual : old('insc_estadual') }}"
+            value="{{ empty(old('inscricao_estadual')) && isset($resultado->pessoaJuridica->inscricao_estadual) ? $resultado->pessoaJuridica->inscricao_estadual : old('inscricao_estadual') }}"
         />
-        @if($errors->has('insc_estadual'))
+        @if($errors->has('inscricao_estadual'))
         <div class="invalid-feedback">
-            {{ $errors->first('insc_estadual') }}
+            {{ $errors->first('inscricao_estadual') }}
         </div>
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="insc_municipal">{{ array_search('inscricao_municipal', $codCnpj) }} - Inscrição Municipal *</label>
+        <label for="inscricao_municipal">{{ array_search('inscricao_municipal', $codCnpj) }} - Inscrição Municipal *</label>
         <input
             type="text"
-            name="insc_municipal"
-            class="form-control {{ $errors->has('insc_municipal') ? 'is-invalid' : '' }}"
+            name="inscricao_municipal"
+            class="form-control {{ $errors->has('inscricao_municipal') ? 'is-invalid' : '' }}"
             placeholder=""
-            value="{{ isset($resultado->insc_municipal) ? $resultado->insc_municipal : old('insc_municipal') }}"
+            value="{{ empty(old('inscricao_municipal')) && isset($resultado->pessoaJuridica->inscricao_municipal) ? $resultado->pessoaJuridica->inscricao_municipal : old('inscricao_municipal') }}"
         />
-        @if($errors->has('insc_municipal'))
+        @if($errors->has('inscricao_municipal'))
         <div class="invalid-feedback">
-            {{ $errors->first('insc_municipal') }}
+            {{ $errors->first('inscricao_municipal') }}
         </div>
         @endif
     </div>
@@ -398,7 +411,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             name="ramo_atividade"
             type="text"
             class="form-control {{ $errors->has('ramo_atividade') || isset($justificativas) ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            value="{{ empty(old('ramo_atividade')) && isset($resultado->ramo_atividade) ? $resultado->ramo_atividade : old('ramo_atividade') }}"
             placeholder="Ramo de Atividade"
             minlength="5"
             maxlength="191"
@@ -444,7 +457,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             @if(!empty(old('idregional')))
             <option value="{{ $regional->idregional }}" {{ old('idregional') == $regional->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
             @elseif(isset($resultado->idregional))
-            <option value="{{ $regional->idregional }}" {{ $regional->idregional == $resultado->regional ? 'selected' : '' }}>{{ $regional->regional }}</option>
+            <option value="{{ $regional->idregional }}" {{ $regional->idregional == $resultado->idregional ? 'selected' : '' }}>{{ $regional->regional }}</option>
             @else
             <option value="{{ $regional->idregional }}">{{ $regional->regional }}</option>
             @endif

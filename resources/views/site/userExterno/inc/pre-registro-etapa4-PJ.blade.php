@@ -1,19 +1,18 @@
-{{-- Falta campos: registro, dt_expedicao --}}
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_contato">{{ array_search('nome', $codRT) }} - Nome Completo *</label>
+        <label for="nome_rt">{{ array_search('nome', $codRT) }} - Nome Completo *</label>
         <input
-            name="nome_contato"
+            name="nome_rt"
             type="text"
-            class="form-control {{ $errors->has('nome_contato') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            class="form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('nome_rt')) && isset($resultado->responsavelTecnico->nome) ? $resultado->responsavelTecnico->nome : old('nome_rt') }}"
             placeholder="Nome Completo"
             minlength="5"
             maxlength="191"
         />
-        @if($errors->has('nome_contato'))
+        @if($errors->has('nome_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('nome_contato') }}
+            {{ $errors->first('nome_rt') }}
         </div>
         @endif
     </div>
@@ -21,17 +20,17 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_social_contato">{{ array_search('nome_social', $codRT) }} - Nome Social</label>
+        <label for="nome_social_rt">{{ array_search('nome_social', $codRT) }} - Nome Social</label>
         <input
-            name="nome_social_contato"
+            name="nome_social_rt"
             type="text"
-            class="form-control {{ $errors->has('nome_social_contato') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            class="form-control {{ $errors->has('nome_social_rt') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('nome_social_rt')) && isset($resultado->responsavelTecnico->nome_social) ? $resultado->responsavelTecnico->nome_social : old('nome_social_rt') }}"
             placeholder="Nome Social"
         />
-        @if($errors->has('nome_social_contato'))
+        @if($errors->has('nome_social_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('nome_social_contato') }}
+            {{ $errors->first('nome_social_rt') }}
         </div>
         @endif
     </div>
@@ -39,27 +38,27 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="dt_nasc_contato">{{ array_search('dt_nascimento', $codRT) }} - Data de Nascimento *</label>
+        <label for="registro">{{ array_search('registro', $codRT) }} - Registro *</label>
         <input
-            name="dt_nasc_contato"
-            type="date"
-            class="form-control {{ $errors->has('dt_nasc_contato') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            name="registro"
+            type="text"
+            class="form-control {{ $errors->has('registro') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('registro')) && isset($resultado->responsavelTecnico->registro) ? $resultado->responsavelTecnico->registro : old('registro') }}"
         />
-        @if($errors->has('dt_nasc_contato'))
+        @if($errors->has('registro'))
         <div class="invalid-feedback">
-            {{ $errors->first('dt_nasc_contato') }}
+            {{ $errors->first('registro') }}
         </div>
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="sexo_contato">{{ array_search('sexo', $codRT) }} - Sexo *</label><br>
+        <label for="sexo_rt">{{ array_search('sexo', $codRT) }} - Sexo *</label><br>
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
                     class="form-check-input" 
-                    name="sexo_contato" 
-                    value="F" {{ (!empty(old('sexo_contato')) && (old('sexo_contato') == 'F')) || (isset($resultado->sexo) && $resultado->sexo == 'F') ? 'checked' : '' }}
+                    name="sexo_rt" 
+                    value="F" {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'F')) || (isset($resultado->responsavelTecnico->sexo) && $resultado->responsavelTecnico->sexo == 'F') ? 'checked' : '' }}
                 />
                 Feminino
             </label>
@@ -68,15 +67,15 @@
             <label class="form-check-label">
                 <input type="radio" 
                     class="form-check-input" 
-                    name="sexo_contato" 
-                    value="M" {{ (!empty(old('sexo_contato')) && (old('sexo_contato') == 'M')) || (isset($resultado->sexo) && $resultado->sexo == 'M') ? 'checked' : '' }}
+                    name="sexo_rt" 
+                    value="M" {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'M')) || (isset($resultado->responsavelTecnico->sexo) && $resultado->responsavelTecnico->sexo == 'M') ? 'checked' : '' }}
                 />
                 Masculino
             </label>
         </div>
-        @if($errors->has('sexo_contato'))
+        @if($errors->has('sexo_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('sexo_contato') }}
+            {{ $errors->first('sexo_rt') }}
         </div>
         @endif
     </div>
@@ -84,50 +83,80 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cpf_cnpj_contato">{{ array_search('cpf', $codRT) }} - CPF *</label>
+        <label for="dt_nascimento_rt">{{ array_search('dt_nascimento', $codRT) }} - Data de Nascimento *</label>
         <input
-            type="text"
-            class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj_contato') ? ' is-invalid' : '' }}"
-            name="cpf_cnpj_contato"
-            value="{{-- Session::get('cpf_cnpj') ? apenasNumeros(Session::get('cpf_cnpj')) : old('cpf_cnpj_contato') --}}"
-            placeholder="CPF"
+            name="dt_nascimento_rt"
+            type="date"
+            class="form-control {{ $errors->has('dt_nascimento_rt') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('dt_nascimento_rt')) && isset($resultado->responsavelTecnico->dt_nascimento) ? $resultado->responsavelTecnico->dt_nascimento : old('dt_nascimento_rt') }}"
         />
-        @if($errors->has('cpf_cnpj_contato'))
+        @if($errors->has('dt_nascimento_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('cpf_cnpj_contato') }}
+            {{ $errors->first('dt_nascimento_rt') }}
         </div>
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="rg_contato">{{ array_search('identidade', $codRT) }} - N° RG *</label>
+        <label for="cpf_rt">{{ array_search('cpf', $codRT) }} - CPF *</label>
         <input
-            name="rg_contato"
+            type="text"
+            class="form-control cpfInput {{ $errors->has('cpf_rt') ? ' is-invalid' : '' }}"
+            name="cpf_rt"
+            value="{{ empty(old('cpf_rt')) && isset($resultado->responsavelTecnico->cpf) ? $resultado->responsavelTecnico->cpf : old('cpf_rt') }}"
+            placeholder="999.999.999-99"
+        />
+        @if($errors->has('cpf_rt'))
+        <div class="invalid-feedback">
+            {{ $errors->first('cpf_rt') }}
+        </div>
+        @endif
+    </div>
+</div>
+
+<div class="form-row mb-2">
+    <div class="col-sm mb-2-576">
+        <label for="identidade_rt">{{ array_search('identidade', $codRT) }} - N° RG *</label>
+        <input
+            name="identidade_rt"
             type="text"
             id="rg"
-            class="form-control rgInput {{ $errors->has('rg_contato') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
-            placeholder="RG"
+            class="form-control rgInput {{ $errors->has('identidade_rt') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('identidade_rt')) && isset($resultado->responsavelTecnico->identidade) ? $resultado->responsavelTecnico->identidade : old('identidade_rt') }}"
+            placeholder=""
             maxlength="20"
         />
-        @if($errors->has('rg_contato'))
+        @if($errors->has('identidade_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('rg_contato') }}
+            {{ $errors->first('identidade_rt') }}
         </div>
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="emissor_contato">{{ array_search('orgao_emissor', $codRT) }} - Órgão Emissor *</label>
+        <label for="orgao_emissor_rt">{{ array_search('orgao_emissor', $codRT) }} - Órgão Emissor *</label>
         <input
-            name="emissor_contato"
+            name="orgao_emissor_rt"
             type="text"
-            class="form-control {{ $errors->has('emissor_contato') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            class="form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('orgao_emissor_rt')) && isset($resultado->responsavelTecnico->orgao_emissor) ? $resultado->responsavelTecnico->orgao_emissor : old('orgao_emissor_rt') }}"
             placeholder="Emissor"
-            maxlength="10"
         />
-        @if($errors->has('emissor_contato'))
+        @if($errors->has('orgao_emissor_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('emissor_contato') }}
+            {{ $errors->first('orgao_emissor_rt') }}
+        </div>
+        @endif
+    </div>
+    <div class="col-sm mb-2-576">
+        <label for="dt_expedicao_rt">{{ array_search('dt_expedicao', $codRT) }} - Data de Expedição *</label>
+        <input
+            name="dt_expedicao_rt"
+            type="date"
+            class="form-control {{ $errors->has('dt_expedicao_rt') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('dt_expedicao_rt')) && isset($resultado->responsavelTecnico->dt_expedicao) ? $resultado->responsavelTecnico->dt_expedicao : old('dt_expedicao_rt') }}"
+        />
+        @if($errors->has('dt_expedicao_rt'))
+        <div class="invalid-feedback">
+            {{ $errors->first('dt_expedicao_rt') }}
         </div>
         @endif
     </div>
@@ -135,34 +164,34 @@
 
 <div class="form-row mb-2">
     <div class="col-sm-4 mb-2-576">
-        <label for="cep_contato">{{ array_search('cep', $codRT) }} - CEP *</label>
+        <label for="cep_rt">{{ array_search('cep', $codRT) }} - CEP *</label>
         <input
             type="text"
-            name="cep_contato"
-            class="form-control cep {{ $errors->has('cep_contato') ? 'is-invalid' : '' }}"
+            name="cep_rt"
+            class="form-control cep {{ $errors->has('cep_rt') ? 'is-invalid' : '' }}"
             id="cep"
             placeholder="CEP"
-            value="{{-- isset($resultado->cep) && explode(';', $resultado->cep)[0] ? explode(';', $resultado->cep)[0] : old('cep_contato') --}}"
+            value="{{ empty(old('cep_rt')) && isset($resultado->responsavelTecnico->cep) ? $resultado->responsavelTecnico->cep : old('cep_rt') }}"
         />
-        @if($errors->has('cep_contato'))
+        @if($errors->has('cep_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('cep_contato') }}
+            {{ $errors->first('cep_rt') }}
         </div>
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="bairro_contato">{{ array_search('bairro', $codRT) }} - Bairro *</label>
+        <label for="bairro_rt">{{ array_search('bairro', $codRT) }} - Bairro *</label>
         <input
             type="text"
-            name="bairro_contato"
-            class="form-control {{ $errors->has('bairro_contato') ? 'is-invalid' : '' }}"
+            name="bairro_rt"
+            class="form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }}"
             id="bairro"
             placeholder="Bairro"
-            value="{{-- isset($resultado->bairro) && explode(';', $resultado->bairro)[0] ? explode(';', $resultado->bairro)[0] : old('bairro_contato') --}}"
+            value="{{ empty(old('bairro_rt')) && isset($resultado->responsavelTecnico->bairro) ? $resultado->responsavelTecnico->bairro : old('bairro_rt') }}"
         />
-        @if($errors->has('bairro_contato'))
+        @if($errors->has('bairro_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('bairro_contato') }}
+            {{ $errors->first('bairro_rt') }}
         </div>
         @endif
     </div>
@@ -170,34 +199,34 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="rua_contato">{{ array_search('logradouro', $codRT) }} - Logradouro *</label>
+        <label for="logradouro_rt">{{ array_search('logradouro', $codRT) }} - Logradouro *</label>
         <input
             type="text"
-            name="rua_contato"
-            class="form-control {{ $errors->has('rua_contato') ? 'is-invalid' : '' }}"
+            name="logradouro_rt"
+            class="form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }}"
             id="rua"
             placeholder="Logradouro"
-            value="{{-- isset($resultado->logradouro) && explode(';', $resultado->logradouro)[0] ? explode(';', $resultado->logradouro)[0] : old('rua_contato') --}}"
+            value="{{ empty(old('logradouro_rt')) && isset($resultado->responsavelTecnico->logradouro) ? $resultado->responsavelTecnico->logradouro : old('logradouro_rt') }}"
         />
-        @if($errors->has('rua_contato'))
+        @if($errors->has('logradouro_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('rua_contato') }}
+            {{ $errors->first('logradouro_rt') }}
         </div>
         @endif
     </div>
     <div class="col-sm-2 mb-2-576">
-        <label for="numero_contato">{{ array_search('numero', $codRT) }} - Número *</label>
+        <label for="numero_rt">{{ array_search('numero', $codRT) }} - Número *</label>
         <input
             type="text"
-            name="numero_contato"
-            class="form-control numero {{ $errors->has('numero_contato') ? 'is-invalid' : '' }}"
+            name="numero_rt"
+            class="form-control numero {{ $errors->has('numero_rt') ? 'is-invalid' : '' }}"
             id="numero"
             placeholder="Número"
-            value="{{-- isset($resultado->numero) && explode(';', $resultado->numero)[0] ? explode(';', $resultado->numero)[0] : old('numero_contato') --}}"
+            value="{{ empty(old('numero_rt')) && isset($resultado->responsavelTecnico->numero) ? $resultado->responsavelTecnico->numero : old('numero_rt') }}"
         />
-        @if($errors->has('numero_contato'))
+        @if($errors->has('numero_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('numero_contato') }}
+            {{ $errors->first('numero_rt') }}
         </div>
         @endif
     </div>
@@ -205,57 +234,57 @@
 
 <div class="form-row mb-2">
     <div class="col-sm-3 mb-2-576">
-        <label for="compl_contato">{{ array_search('complemento', $codRT) }} - Complemento</label>
+        <label for="complemento_rt">{{ array_search('complemento', $codRT) }} - Complemento</label>
         <input
             type="text"
-            name="compl_contato"
-            class="form-control {{ $errors->has('compl_contato') ? 'is-invalid' : '' }}"
+            name="complemento_rt"
+            class="form-control {{ $errors->has('complemento_rt') ? 'is-invalid' : '' }}"
             id="complemento"
             placeholder="Complemento"
-            value="{{-- isset($resultado->complemento) && explode(';', $resultado->complemento)[0] ? explode(';', $resultado->complemento)[0] : old('compl_contato') --}}"
+            value="{{ empty(old('complemento_rt')) && isset($resultado->responsavelTecnico->complemento) ? $resultado->responsavelTecnico->complemento : old('complemento_rt') }}"
         />
-        @if($errors->has('compl_contato'))
+        @if($errors->has('complemento_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('compl_contato') }}
+            {{ $errors->first('complemento_rt') }}
         </div>
         @endif
     </div>
     <div class="col-sm-5 mb-2-576">
-        <label for="cidade_contato">{{ array_search('cidade', $codRT) }} - Município *</label>
+        <label for="cidade_rt">{{ array_search('cidade', $codRT) }} - Município *</label>
         <input
             type="text"
-            name="cidade_contato"
+            name="cidade_rt"
             id="cidade"
-            class="form-control {{ $errors->has('cidade_contato') ? 'is-invalid' : '' }}"
+            class="form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }}"
             placeholder="Município"
-            value="{{-- isset($resultado->municipio) && explode(';', $resultado->municipio)[0] ? explode(';', $resultado->municipio)[0] : old('cidade_contato') --}}"
+            value="{{ empty(old('cidade_rt')) && isset($resultado->responsavelTecnico->cidade) ? $resultado->responsavelTecnico->cidade : old('cidade_rt') }}"
         />
-        @if($errors->has('cidade_contato'))
+        @if($errors->has('cidade_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('cidade_contato') }}
+            {{ $errors->first('cidade_rt') }}
         </div>
         @endif
     </div>
     <div class="col-sm-4 mb-2-576">
-        <label for="uf_contato">{{ array_search('uf', $codRT) }} - Estado *</label>
+        <label for="uf_rt">{{ array_search('uf', $codRT) }} - Estado *</label>
         <select 
-            name="uf_contato" 
+            name="uf_rt" 
             id="uf" 
-            class="form-control {{ $errors->has('uf_contato') ? 'is-invalid' : '' }}"
+            class="form-control {{ $errors->has('uf_rt') ? 'is-invalid' : '' }}"
         >
         @foreach(estados() as $key => $estado)
-            @if(!empty(old('uf_contato')))
-            <option value="{{ $key }}" {{ old('uf_contato') == $key ? 'selected' : '' }}>{{ $estado }}</option>
-            @elseif(isset($resultado->estado) && explode(';', $resultado->estado)[0])
-            <option value="{{ $key }}" {{ $key == explode(';', $resultado->estado)[0] ? 'selected' : '' }}>{{ $estado }}</option>
+            @if(!empty(old('uf_rt')))
+            <option value="{{ $key }}" {{ old('uf_rt') == $key ? 'selected' : '' }}>{{ $estado }}</option>
+            @elseif(isset($resultado->responsavelTecnico->uf))
+            <option value="{{ $key }}" {{ $key == $resultado->responsavelTecnico->uf ? 'selected' : '' }}>{{ $estado }}</option>
             @else
             <option value="{{ $key }}">{{ $estado }}</option>
             @endif
         @endforeach
         </select>
-        @if($errors->has('uf_contato'))
+        @if($errors->has('uf_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('uf_contato') }}
+            {{ $errors->first('uf_rt') }}
         </div>
         @endif
     </div>
@@ -263,36 +292,36 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_mae_contato">{{ array_search('nome_mae', $codRT) }} - Nome da Mãe *</label>
+        <label for="nome_mae_rt">{{ array_search('nome_mae', $codRT) }} - Nome da Mãe *</label>
         <input
-            name="nome_mae_contato"
+            name="nome_mae_rt"
             type="text"
-            class="form-control {{ $errors->has('nome_mae_contato') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            class="form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('nome_mae_rt')) && isset($resultado->responsavelTecnico->nome_mae) ? $resultado->responsavelTecnico->nome_mae : old('nome_mae_rt') }}"
             placeholder="Nome da Mãe"
             minlength="5"
             maxlength="191"
         />
-        @if($errors->has('nome_mae_contato'))
+        @if($errors->has('nome_mae_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('nome_mae_contato') }}
+            {{ $errors->first('nome_mae_rt') }}
         </div>
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nome_pai_contato">{{ array_search('nome_pai', $codRT) }} - Nome do Pai *</label>
+        <label for="nome_pai_rt">{{ array_search('nome_pai', $codRT) }} - Nome do Pai *</label>
         <input
-            name="nome_pai_contato"
+            name="nome_pai_rt"
             type="text"
-            class="form-control {{ $errors->has('nome_pai_contato') ? 'is-invalid' : '' }}"
-            value="{{-- $user->nome --}}"
+            class="form-control {{ $errors->has('nome_pai_rt') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('nome_pai_rt')) && isset($resultado->responsavelTecnico->nome_pai) ? $resultado->responsavelTecnico->nome_pai : old('nome_pai_rt') }}"
             placeholder="Nome do Pai"
             minlength="5"
             maxlength="191"
         />
-        @if($errors->has('nome_pai_contato'))
+        @if($errors->has('nome_pai_rt'))
         <div class="invalid-feedback">
-            {{ $errors->first('nome_pai_contato') }}
+            {{ $errors->first('nome_pai_rt') }}
         </div>
         @endif
     </div>
