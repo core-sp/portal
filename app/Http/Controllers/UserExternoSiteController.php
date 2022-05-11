@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserExternoRequest;
 use App\Contracts\MediadorServiceInterface;
+use App\Http\Requests\PreRegistroAjaxRequest;
 
 class UserExternoSiteController extends Controller
 {
@@ -104,9 +105,10 @@ class UserExternoSiteController extends Controller
     {
         try{
             // Verificar com o metodo verificacao() para impedir de acessar o formulario
-            $dados = $this->service->getService('PreRegistro')->getPreRegistro();
+            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service);
             $codigos = $dados['codigos'];
             $resultado = $dados['resultado'];
+            $regionais = $dados['regionais'];
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, 'Erro ao carregar os dados da solicitação de registro');
@@ -114,8 +116,39 @@ class UserExternoSiteController extends Controller
 
         // temporário
         $totalFiles = 5;
-        $regionais = $this->service->getService('Regional')->all()->splice(0, 13)->sortBy('regional');
         
         return view('site.userExterno.inserir-pre-registro', compact('resultado', 'regionais', 'totalFiles', 'codigos'));
+    }
+
+    // public function inserirPreRegistro(PreRegistroRequest $request)
+    // {
+    //     try{
+    //         // Verificar com o metodo verificacao() para impedir de acessar o formulario
+    //         $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service);
+    //         $codigos = $dados['codigos'];
+    //         $resultado = $dados['resultado'];
+    //         $regionais = $dados['regionais'];
+    //     } catch (\Exception $e) {
+    //         \Log::error($e->getMessage());
+    //         abort(500, 'Erro ao carregar os dados da solicitação de registro');
+    //     }
+
+    //     // temporário
+    //     $totalFiles = 5;
+        
+    //     return view('site.userExterno.inserir-pre-registro', compact('resultado', 'regionais', 'totalFiles', 'codigos'));
+    // }
+
+    public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
+    {
+        try{
+            $validatedData = $request->validated();
+            $dados = $this->service->getService('PreRegistro')->saveSiteAjax($validatedData);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, 'Erro ao salvar os dados da solicitação de registro via ajax');
+        }
+        
+        return response()->json($dados);
     }
 }

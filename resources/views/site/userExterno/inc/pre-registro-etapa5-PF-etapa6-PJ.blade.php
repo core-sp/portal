@@ -50,7 +50,7 @@
             <div class="custom-file">
                 <input 
                     type="file" 
-                    class="custom-file-input files {{ $errors->has('anexos') ? 'is-invalid' : '' }}" 
+                    class="Anexo custom-file-input files {{ $errors->has('anexos') ? 'is-invalid' : '' }}" 
                     id="anexos"
                     name="anexos[]"
                     value="{{-- isset($resultado->copia_identidade) ? $resultado->copia_identidade : old('copia_identidade') --}}"

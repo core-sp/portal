@@ -111,7 +111,17 @@
         <br>
         <div class="linha-lg-mini"></div>
 
-        <button class="btn btn-success" type="submit">Enviar para análise</button>
+        <div class="form-row">
+            <div class="col-sm mb-2-576">
+                <button class="btn btn-success float-left" type="submit">Enviar para análise</button>
+
+                <div id="divCarregando" class="float-right">
+                    <span></span>
+                    <div id="carregandoPreRegistro" class="spinner-border text-primary invisible"></div>
+                </div>
+            </div>
+        </div>
+        
     </form>
 </div>
 

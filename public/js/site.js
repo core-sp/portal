@@ -924,6 +924,7 @@ $('#cedula').ready(function() {
   }
 });
 
+//	--------------------------------------------------------------------------------------------------------
 // Funcionalidade Solicitação de Registro
 
 // Carrega a máscara quando já possui um rg
@@ -1021,5 +1022,62 @@ function addArquivo(nome){
 		$(".Arquivo_" + nome + " .custom-file-input:last").siblings(".custom-file-label").removeClass("selected").html('<span class="text-secondary">Escolher arquivo</span>');
 	}
 }
+//	--------------------------------------------------------------------------------------------------------
+
+function putDadosPreRegistro(objeto)
+{
+	var spinner = "spinner-border text-success";
+	var classe = objeto.attr("class").split(' ')[0];
+	var valor = objeto.val();
+	var campo = objeto.attr("name");
+
+	if((campo == "") || (classe == ""))
+		return;
+
+	$.ajax({
+		method: "PUT",
+		data: {
+			"_token": $('meta[name="csrf-token"]').attr('content'),
+			"classe": classe,
+			"campo": campo,
+			"valor": valor
+		},
+		dataType: 'json',
+		url: "/externo/inserir-registro-ajax",
+		beforeSend: function(){
+			if($('#carregandoPreRegistro').hasClass('invisible')){
+				$('#divCarregando').find("i").remove();
+				$('#divCarregando span').text('Salvando... ');
+				$('#carregandoPreRegistro').attr("class", spinner + " visible");
+			}
+		},
+		complete: function(){
+			if($('#carregandoPreRegistro').hasClass('visible')){
+				$('#divCarregando span').text('Salvo ');
+				$('#divCarregando span').after('<i class="icon fa fa-check text-success"></i>');
+				$('#carregandoPreRegistro').attr("class", spinner + " invisible");
+			}
+		},
+		success: function(response) {
+			// console.log(response);
+		},
+		error: function(request, status, error) {
+			var errorMessage = request.status + ': ' + request.statusText;
+			if(request.status == 422)
+				errorMessage = 'Erro de validação para salvar o campo';
+			$('#divCarregando span').html(errorMessage + '.<br>Recarregue a página, por favor.<br>Caso Persista o erro, entre em contato conosco');
+			$('#carregandoPreRegistro').attr("class", spinner + " invisible");
+		}
+	});
+}
+
+$('#inserirRegistro input').focusout(function(){
+	putDadosPreRegistro($(this));
+});
+
+$('#inserirRegistro select').change(function(){
+	putDadosPreRegistro($(this));
+});
+
 //	--------------------------------------------------------------------------------------------------------
 // FIM da Funcionalidade Solicitação de Registro
