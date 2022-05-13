@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\PreRegistroServiceInterface;
 use App\PreRegistro;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\Builder;
 
 class PreRegistroService implements PreRegistroServiceInterface {
 
@@ -46,8 +47,13 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $externo = auth()->guard('user_externo')->user();
         // Verificar com o metodo verificacao() para impedir de acessar o formulario
         // Caso não, verificar se já tem o pre registro salvo no banco
+        $resultado = $externo->preRegistro;
 
-        $resultado = $externo->preRegistro == null ? $externo->preRegistro()->create() : $externo->preRegistro;
+        if(!isset($resultado))
+        {
+            $resultado = $externo->preRegistro()->create();
+            $externo->isPessoaFisica() ? $resultado->pessoaFisica()->create() : $resultado->pessoaJuridica()->create();
+        }
 
         return [
             'resultado' => $resultado,
@@ -61,18 +67,26 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function saveSiteAjax($request)
     {
-        $classes = [
-            'Anexo',
-            'Contabil',
-            'PreRegistro',
-            'PreRegistroCpf',
-            'PreRegistroCnpj',
-            'ResponsavelTecnico'
-        ];
-
-        $externo = auth()->guard('user_externo')->user();
+        // limpar nome dos campos
+        // verificacao dos campos; se ja existe o objeto, atualiza; senao, cria
+        // anexo só cria ou remove
         // $externo->preRegistro->update(['numero' => $request['teste']]);
-        
-        return $request;
+
+        $teste = null;
+        $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
+        $resultado = null;
+
+        if($request['classe'] == 'preRegistro')
+            $resultado = $preRegistro->update([$request['campo'] => $request['valor']]);
+        else
+        {
+            $objeto = $preRegistro->whereHas($request['classe'])->get();
+            if($objeto->isNotEmpty())
+                $resultado = $preRegistro->atualizarRelacoesAjax($request['classe'], $request['campo'], $request['valor']);
+            else
+                $resultado = $preRegistro->criarRelacoesAjax($request['classe'], $request['campo'], $request['valor']);
+        }
+
+        return $resultado;
     }
 }

@@ -24,7 +24,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             type="text"
             name="registro_secundario"
-            class="PreRegistro form-control {{ $errors->has('registro_secundario') ? 'is-invalid' : '' }}"
+            class="preRegistro {{ array_search('registro_secundario', $codPre) }} form-control {{ $errors->has('registro_secundario') ? 'is-invalid' : '' }}"
             value="{{ empty(old('registro_secundario')) && isset($resultado->registro_secundario) ? $resultado->registro_secundario : old('registro_secundario') }}"
             placeholder=""
         />
@@ -62,7 +62,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             name="nome_social"
             type="text"
-            class="PreRegistroCpf form-control {{ $errors->has('nome_social') ? 'is-invalid' : '' }}"
+            class="pessoaFisica {{ array_search('nome_social', $codCpf) }} form-control {{ $errors->has('nome_social') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_social')) && isset($resultado->pessoaFisica->nome_social) ? $resultado->pessoaFisica->nome_social : old('nome_social') }}"
             placeholder="Nome Social"
         />
@@ -80,7 +80,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
-                    class="PreRegistroCpf form-check-input" 
+                    class="pessoaFisica {{ array_search('sexo', $codCpf) }} form-check-input" 
                     name="sexo" 
                     value="F" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->pessoaFisica->sexo) && $resultado->pessoaFisica->sexo == 'F') ? 'checked' : '' }}
                 />
@@ -90,7 +90,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
-                    class="PreRegistroCpf form-check-input" 
+                    class="pessoaFisica {{ array_search('sexo', $codCpf) }} form-check-input" 
                     name="sexo" 
                     value="M" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->pessoaFisica->sexo) && $resultado->pessoaFisica->sexo == 'M') ? 'checked' : '' }}
                 />
@@ -108,7 +108,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             name="dt_nascimento"
             type="date"
-            class="PreRegistroCpf form-control {{ $errors->has('dt_nascimento') ? 'is-invalid' : '' }}"
+            class="pessoaFisica {{ array_search('dt_nascimento', $codCpf) }} form-control {{ $errors->has('dt_nascimento') ? 'is-invalid' : '' }}"
             value="{{ empty(old('dt_nascimento')) && isset($resultado->pessoaFisica->dt_nascimento) ? $resultado->pessoaFisica->dt_nascimento : old('dt_nascimento') }}"
         />
         @if($errors->has('dt_nascimento'))
@@ -121,7 +121,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <label for="estado_civil">{{ array_search('estado_civil', $codCpf) }} - Estado Civil *</label>
         <select 
             name="estado_civil" 
-            class="PreRegistroCpf form-control {{ $errors->has('estado_civil') ? 'is-invalid' : '' }}" 
+            class="pessoaFisica {{ array_search('estado_civil', $codCpf) }} form-control {{ $errors->has('estado_civil') ? 'is-invalid' : '' }}" 
         >
             <option value="">Selecione a op√ß√£o...</option>
         @foreach(estados_civis() as $estado_civil)
@@ -147,7 +147,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <label for="nacionalidade">{{ array_search('nacionalidade', $codCpf) }} - Nacionalidade *</label>
         <select 
             name="nacionalidade" 
-            class="PreRegistroCpf form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }}" 
+            class="pessoaFisica {{ array_search('nacionalidade', $codCpf) }} form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }}" 
         >
             <option value="">Selecione a op√ß√£o...</option>
         @foreach(nacionalidades() as $nacionalidade)
@@ -170,7 +170,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <label for="naturalidade">{{ array_search('naturalidade', $codCpf) }} - Naturalidade *</label>
         <select 
             name="naturalidade" 
-            class="PreRegistroCpf form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }}" 
+            class="pessoaFisica {{ array_search('naturalidade', $codCpf) }} form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }}" 
         >
             <option value="">Selecione a op√ß√£o...</option>
         @foreach(estados() as $key => $naturalidade)
@@ -197,7 +197,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             name="nome_mae"
             type="text"
-            class="PreRegistroCpf form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }}"
+            class="pessoaFisica {{ array_search('nome_mae', $codCpf) }} form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_mae')) && isset($resultado->pessoaFisica->nome_mae) ? $resultado->pessoaFisica->nome_mae : old('nome_mae') }}"
             placeholder="Nome da M√£e"
             minlength="5"
@@ -214,7 +214,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             name="nome_pai"
             type="text"
-            class="PreRegistroCpf form-control {{ $errors->has('nome_pai') ? 'is-invalid' : '' }}"
+            class="pessoaFisica {{ array_search('nome_pai', $codCpf) }} form-control {{ $errors->has('nome_pai') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_pai')) && isset($resultado->pessoaFisica->nome_pai) ? $resultado->pessoaFisica->nome_pai : old('nome_pai') }}"
             placeholder="Nome do Pai"
             minlength="5"
@@ -235,7 +235,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
             name="identidade"
             type="text"
             id="rg"
-            class="PreRegistroCpf form-control rgInput {{ $errors->has('identidade') ? 'is-invalid' : '' }}"
+            class="pessoaFisica {{ array_search('identidade', $codCpf) }} form-control rgInput {{ $errors->has('identidade') ? 'is-invalid' : '' }}"
             value="{{ empty(old('identidade')) && isset($resultado->pessoaFisica->identidade) ? $resultado->pessoaFisica->identidade : old('identidade') }}"
             placeholder=""
             maxlength="20"
@@ -251,7 +251,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             name="orgao_emissor"
             type="text"
-            class="PreRegistroCpf form-control {{ $errors->has('orgao_emissor') ? 'is-invalid' : '' }}"
+            class="pessoaFisica {{ array_search('orgao_emissor', $codCpf) }} form-control {{ $errors->has('orgao_emissor') ? 'is-invalid' : '' }}"
             value="{{ empty(old('orgao_emissor')) && isset($resultado->pessoaFisica->orgao_emissor) ? $resultado->pessoaFisica->orgao_emissor : old('orgao_emissor') }}"
             placeholder=""
         />
@@ -266,7 +266,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             name="dt_expedicao"
             type="date"
-            class="PreRegistroCpf form-control {{ $errors->has('dt_expedicao') ? 'is-invalid' : '' }}"
+            class="pessoaFisica {{ array_search('dt_expedicao', $codCpf) }} form-control {{ $errors->has('dt_expedicao') ? 'is-invalid' : '' }}"
             value="{{ empty(old('dt_expedicao')) && isset($resultado->pessoaFisica->dt_expedicao) ? $resultado->pessoaFisica->dt_expedicao : old('dt_expedicao') }}"
         />
         @if($errors->has('dt_expedicao'))
@@ -285,7 +285,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             name="razao_social"
             type="text"
-            class="PreRegistroCnpj form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }}"
+            class="pessoaJuridica {{ array_search('razao_social', $codCnpj) }} form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }}"
             value="{{ empty(old('razao_social')) && isset($resultado->pessoaJuridica->razao_social) ? $resultado->pessoaJuridica->razao_social : old('razao_social') }}"
             placeholder="Raz√£o Social"
             minlength="5"
@@ -305,7 +305,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             type="text"
             name="capital_social"
-            class="PreRegistroCnpj form-control capitalSocial {{ $errors->has('capital_social') ? 'is-invalid' : '' }}"
+            class="pessoaJuridica {{ array_search('capital_social', $codCnpj) }} form-control capitalSocial {{ $errors->has('capital_social') ? 'is-invalid' : '' }}"
             placeholder="1.000,00"
             value="{{ empty(old('capital_social')) && isset($resultado->pessoaJuridica->capital_social) ? $resultado->pessoaJuridica->capital_social : old('capital_social') }}"
         />
@@ -320,7 +320,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             type="text"
             name="nire"
-            class="PreRegistroCnpj form-control {{ $errors->has('nire') ? 'is-invalid' : '' }}"
+            class="pessoaJuridica {{ array_search('nire', $codCnpj) }} form-control {{ $errors->has('nire') ? 'is-invalid' : '' }}"
             placeholder="NIRE"
             value="{{ empty(old('nire')) && isset($resultado->pessoaJuridica->nire) ? $resultado->pessoaJuridica->nire : old('nire') }}"
             maxlength="20"
@@ -340,11 +340,11 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <div class="form-check-inline">
             <label class="form-check-label">
                 @if(!empty(old('tipo_empresa')))
-                <input type="radio" class="PreRegistroCnpj form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ old('tipo_empresa') == $tipo ? 'checked' : '' }} />{{ $tipo }}
+                <input type="radio" class="pessoaJuridica {{ array_search('tipo_empresa', $codCnpj) }} form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ old('tipo_empresa') == $tipo ? 'checked' : '' }} />{{ $tipo }}
                 @elseif(isset($resultado->pessoaJuridica->tipo_empresa))
-                <input type="radio" class="PreRegistroCnpj form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ $tipo == $resultado->pessoaJuridica->tipo_empresa ? 'checked' : '' }} />{{ $tipo }}
+                <input type="radio" class="pessoaJuridica {{ array_search('tipo_empresa', $codCnpj) }} form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ $tipo == $resultado->pessoaJuridica->tipo_empresa ? 'checked' : '' }} />{{ $tipo }}
                 @else
-                <input type="radio" class="PreRegistroCnpj form-check-input" name="tipo_empresa" value="{{ $tipo }}" />{{ $tipo }}
+                <input type="radio" class="pessoaJuridica {{ array_search('tipo_empresa', $codCnpj) }} form-check-input" name="tipo_empresa" value="{{ $tipo }}" />{{ $tipo }}
                 @endif
             </label>
         </div>
@@ -360,7 +360,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             type="date"
             name="dt_inicio_atividade"
-            class="PreRegistroCnpj form-control {{ $errors->has('dt_inicio_atividade') ? 'is-invalid' : '' }}"
+            class="pessoaJuridica {{ array_search('dt_inicio_atividade', $codCnpj) }} form-control {{ $errors->has('dt_inicio_atividade') ? 'is-invalid' : '' }}"
             value="{{ empty(old('dt_inicio_atividade')) && isset($resultado->pessoaJuridica->dt_inicio_atividade) ? $resultado->pessoaJuridica->dt_inicio_atividade : old('dt_inicio_atividade') }}"
         />
         @if($errors->has('dt_inicio_atividade'))
@@ -378,7 +378,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             type="text"
             name="inscricao_estadual"
-            class="PreRegistroCnpj form-control {{ $errors->has('inscricao_estadual') ? 'is-invalid' : '' }}"
+            class="pessoaJuridica {{ array_search('inscricao_estadual', $codCnpj) }} form-control {{ $errors->has('inscricao_estadual') ? 'is-invalid' : '' }}"
             placeholder=""
             value="{{ empty(old('inscricao_estadual')) && isset($resultado->pessoaJuridica->inscricao_estadual) ? $resultado->pessoaJuridica->inscricao_estadual : old('inscricao_estadual') }}"
         />
@@ -393,7 +393,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             type="text"
             name="inscricao_municipal"
-            class="PreRegistroCnpj form-control {{ $errors->has('inscricao_municipal') ? 'is-invalid' : '' }}"
+            class="pessoaJuridica {{ array_search('inscricao_municipal', $codCnpj) }} form-control {{ $errors->has('inscricao_municipal') ? 'is-invalid' : '' }}"
             placeholder=""
             value="{{ empty(old('inscricao_municipal')) && isset($resultado->pessoaJuridica->inscricao_municipal) ? $resultado->pessoaJuridica->inscricao_municipal : old('inscricao_municipal') }}"
         />
@@ -414,7 +414,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <input
             name="ramo_atividade"
             type="text"
-            class="PreRegistro form-control {{ $errors->has('ramo_atividade') || isset($justificativas) ? 'is-invalid' : '' }}"
+            class="preRegistro {{ array_search('ramo_atividade', $codPre) }} form-control {{ $errors->has('ramo_atividade') || isset($justificativas) ? 'is-invalid' : '' }}"
             value="{{ empty(old('ramo_atividade')) && isset($resultado->ramo_atividade) ? $resultado->ramo_atividade : old('ramo_atividade') }}"
             placeholder="Ramo de Atividade"
             minlength="5"
@@ -433,7 +433,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         <label for="segmento">{{ array_search('segmento', $codPre) }} - Segmento *</label>
         <select 
             name="segmento" 
-            class="PreRegistro form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }}" 
+            class="preRegistro {{ array_search('segmento', $codPre) }} form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }}" 
         >
             <option value="">Selecione a op√ß√£o...</option>
         @foreach(segmentos() as $segmento)
@@ -453,10 +453,10 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento ap√≥s an√
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="idregional">Regi√£o de Atua√ß√£o *</label>
+        <label for="idregional">{{ array_search('idregional', $codPre) }} - Regi√£o de Atua√ß√£o *</label>
         <select 
             name="idregional" 
-            class="PreRegistro form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}" 
+            class="preRegistro {{ array_search('idregional', $codPre) }} form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}" 
         >
             <option value="">Selecione a op√ß√£o...</option>
         @foreach($regionais as $regional)

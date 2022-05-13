@@ -4,8 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-// Talvez usar esse model para todas as funcionalidades que precisarem de anexos
-// Concentra melhor as validações etc
 class Anexo extends Model
 {
     protected $table = 'anexos';

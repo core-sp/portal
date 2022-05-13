@@ -27,7 +27,8 @@ class PreRegistro extends Model
             'RG09' => 'cidade',
             'RG10' => 'uf',
             'RG11' => 'telefone',
-            'RG12' => 'tipo_telefone'
+            'RG12' => 'tipo_telefone',
+            'RG13' => 'idregional'
         ];
     }
 
@@ -64,5 +65,38 @@ class PreRegistro extends Model
     public function anexos()
     {
         return $this->hasMany('App\Anexo');
+    }
+
+    public function atualizarRelacoesAjax($classe, $campo, $valor)
+    {
+        switch ($classe) {
+            case 'pessoaFisica':
+                $this->pessoaFisica->update([$campo => $valor]);
+                break;
+            case 'pessoaJuridica':
+                $this->pessoaJuridica->update([$campo => $valor]);
+                break;
+            case 'contabil':
+            // $this->contabil->associate()->update([$campo => $valor]); ???
+            break;
+            case 'responsavelTecnico':
+                $this->pessoaJuridica->responsavelTecnico->update([$campo => $valor]);
+                break;
+        }
+    }
+
+    public function criarRelacoesAjax($classe, $campo, $valor)
+    {
+        switch ($classe) {
+            case 'responsavelTecnico':
+                $this->pessoaJuridica->responsavelTecnico()->create([$campo => $valor]);
+                break;
+            case 'contabil':
+            // $this->contabil->associate()->create([$campo => $valor]); ??
+                break;
+            case 'anexos':
+                $this->anexos()->create([$campo => $valor]);
+                break;
+        }
     }
 }
