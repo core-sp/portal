@@ -4,7 +4,7 @@
         <input
             name="nome_rt"
             type="text"
-            class="responsavelTecnico {{ array_search('nome', $codRT) }} form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('nome', $codRT) }} form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_rt')) && isset($resultado->responsavelTecnico->nome) ? $resultado->responsavelTecnico->nome : old('nome_rt') }}"
             placeholder="Nome Completo"
             minlength="5"
@@ -24,7 +24,7 @@
         <input
             name="nome_social_rt"
             type="text"
-            class="responsavelTecnico {{ array_search('nome_social', $codRT) }} form-control {{ $errors->has('nome_social_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('nome_social', $codRT) }} form-control {{ $errors->has('nome_social_rt') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_social_rt')) && isset($resultado->responsavelTecnico->nome_social) ? $resultado->responsavelTecnico->nome_social : old('nome_social_rt') }}"
             placeholder="Nome Social"
         />
@@ -42,7 +42,7 @@
         <input
             name="registro"
             type="text"
-            class="responsavelTecnico {{ array_search('registro', $codRT) }} form-control {{ $errors->has('registro') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('registro', $codRT) }} form-control {{ $errors->has('registro') ? 'is-invalid' : '' }}"
             value="{{ empty(old('registro')) && isset($resultado->responsavelTecnico->registro) ? $resultado->responsavelTecnico->registro : old('registro') }}"
         />
         @if($errors->has('registro'))
@@ -56,7 +56,7 @@
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
-                    class="responsavelTecnico {{ array_search('sexo', $codRT) }} form-check-input" 
+                    class="{{ $classes[5] }} {{ array_search('sexo', $codRT) }} form-check-input" 
                     name="sexo_rt" 
                     value="F" {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'F')) || (isset($resultado->responsavelTecnico->sexo) && $resultado->responsavelTecnico->sexo == 'F') ? 'checked' : '' }}
                 />
@@ -66,7 +66,7 @@
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
-                    class="responsavelTecnico {{ array_search('sexo', $codRT) }} form-check-input" 
+                    class="{{ $classes[5] }} {{ array_search('sexo', $codRT) }} form-check-input" 
                     name="sexo_rt" 
                     value="M" {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'M')) || (isset($resultado->responsavelTecnico->sexo) && $resultado->responsavelTecnico->sexo == 'M') ? 'checked' : '' }}
                 />
@@ -87,7 +87,7 @@
         <input
             name="dt_nascimento_rt"
             type="date"
-            class="responsavelTecnico {{ array_search('dt_nascimento', $codRT) }} form-control {{ $errors->has('dt_nascimento_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('dt_nascimento', $codRT) }} form-control {{ $errors->has('dt_nascimento_rt') ? 'is-invalid' : '' }}"
             value="{{ empty(old('dt_nascimento_rt')) && isset($resultado->responsavelTecnico->dt_nascimento) ? $resultado->responsavelTecnico->dt_nascimento : old('dt_nascimento_rt') }}"
         />
         @if($errors->has('dt_nascimento_rt'))
@@ -100,7 +100,7 @@
         <label for="cpf_rt">{{ array_search('cpf', $codRT) }} - CPF *</label>
         <input
             type="text"
-            class="responsavelTecnico {{ array_search('cpf', $codRT) }} form-control cpfInput {{ $errors->has('cpf_rt') ? ' is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('cpf', $codRT) }} form-control cpfInput {{ $errors->has('cpf_rt') ? ' is-invalid' : '' }}"
             name="cpf_rt"
             value="{{ empty(old('cpf_rt')) && isset($resultado->responsavelTecnico->cpf) ? $resultado->responsavelTecnico->cpf : old('cpf_rt') }}"
             placeholder="999.999.999-99"
@@ -120,7 +120,7 @@
             name="identidade_rt"
             type="text"
             id="rg"
-            class="responsavelTecnico {{ array_search('identidade', $codRT) }} form-control rgInput {{ $errors->has('identidade_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('identidade', $codRT) }} form-control rgInput {{ $errors->has('identidade_rt') ? 'is-invalid' : '' }}"
             value="{{ empty(old('identidade_rt')) && isset($resultado->responsavelTecnico->identidade) ? $resultado->responsavelTecnico->identidade : old('identidade_rt') }}"
             placeholder=""
             maxlength="20"
@@ -136,7 +136,7 @@
         <input
             name="orgao_emissor_rt"
             type="text"
-            class="responsavelTecnico {{ array_search('orgao_emissor', $codRT) }} form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('orgao_emissor', $codRT) }} form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }}"
             value="{{ empty(old('orgao_emissor_rt')) && isset($resultado->responsavelTecnico->orgao_emissor) ? $resultado->responsavelTecnico->orgao_emissor : old('orgao_emissor_rt') }}"
             placeholder="Emissor"
         />
@@ -151,7 +151,7 @@
         <input
             name="dt_expedicao_rt"
             type="date"
-            class="responsavelTecnico {{ array_search('dt_expedicao', $codRT) }} form-control {{ $errors->has('dt_expedicao_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('dt_expedicao', $codRT) }} form-control {{ $errors->has('dt_expedicao_rt') ? 'is-invalid' : '' }}"
             value="{{ empty(old('dt_expedicao_rt')) && isset($resultado->responsavelTecnico->dt_expedicao) ? $resultado->responsavelTecnico->dt_expedicao : old('dt_expedicao_rt') }}"
         />
         @if($errors->has('dt_expedicao_rt'))
@@ -170,7 +170,7 @@
         <input
             type="text"
             name="cep_rt"
-            class="responsavelTecnico {{ array_search('cep', $codRT) }} form-control cep {{ $errors->has('cep_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('cep', $codRT) }} form-control cep {{ $errors->has('cep_rt') ? 'is-invalid' : '' }}"
             id="cep_rt"
             placeholder="CEP"
             value="{{ empty(old('cep_rt')) && isset($resultado->responsavelTecnico->cep) ? $resultado->responsavelTecnico->cep : old('cep_rt') }}"
@@ -186,7 +186,7 @@
         <input
             type="text"
             name="bairro_rt"
-            class="responsavelTecnico {{ array_search('bairro', $codRT) }} form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('bairro', $codRT) }} form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }}"
             id="bairro_rt"
             placeholder="Bairro"
             value="{{ empty(old('bairro_rt')) && isset($resultado->responsavelTecnico->bairro) ? $resultado->responsavelTecnico->bairro : old('bairro_rt') }}"
@@ -205,7 +205,7 @@
         <input
             type="text"
             name="logradouro_rt"
-            class="responsavelTecnico {{ array_search('logradouro', $codRT) }} form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('logradouro', $codRT) }} form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }}"
             id="rua_rt"
             placeholder="Logradouro"
             value="{{ empty(old('logradouro_rt')) && isset($resultado->responsavelTecnico->logradouro) ? $resultado->responsavelTecnico->logradouro : old('logradouro_rt') }}"
@@ -221,7 +221,7 @@
         <input
             type="text"
             name="numero_rt"
-            class="responsavelTecnico {{ array_search('numero', $codRT) }} form-control numero {{ $errors->has('numero_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('numero', $codRT) }} form-control numero {{ $errors->has('numero_rt') ? 'is-invalid' : '' }}"
             id="numero_rt"
             placeholder="Número"
             value="{{ empty(old('numero_rt')) && isset($resultado->responsavelTecnico->numero) ? $resultado->responsavelTecnico->numero : old('numero_rt') }}"
@@ -240,7 +240,7 @@
         <input
             type="text"
             name="complemento_rt"
-            class="responsavelTecnico {{ array_search('complemento', $codRT) }} form-control {{ $errors->has('complemento_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('complemento', $codRT) }} form-control {{ $errors->has('complemento_rt') ? 'is-invalid' : '' }}"
             id="complemento_rt"
             placeholder="Complemento"
             value="{{ empty(old('complemento_rt')) && isset($resultado->responsavelTecnico->complemento) ? $resultado->responsavelTecnico->complemento : old('complemento_rt') }}"
@@ -257,7 +257,7 @@
             type="text"
             name="cidade_rt"
             id="cidade_rt"
-            class="responsavelTecnico {{ array_search('cidade', $codRT) }} form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('cidade', $codRT) }} form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }}"
             placeholder="Município"
             value="{{ empty(old('cidade_rt')) && isset($resultado->responsavelTecnico->cidade) ? $resultado->responsavelTecnico->cidade : old('cidade_rt') }}"
         />
@@ -272,7 +272,7 @@
         <select 
             name="uf_rt" 
             id="uf_rt" 
-            class="responsavelTecnico {{ array_search('uf', $codRT) }} form-control {{ $errors->has('uf_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('uf', $codRT) }} form-control {{ $errors->has('uf_rt') ? 'is-invalid' : '' }}"
         >
             <option value="">Selecione a opção...</option>
         @foreach(estados() as $key => $estado)
@@ -301,7 +301,7 @@
         <input
             name="nome_mae_rt"
             type="text"
-            class="responsavelTecnico {{ array_search('nome_mae', $codRT) }} form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('nome_mae', $codRT) }} form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_mae_rt')) && isset($resultado->responsavelTecnico->nome_mae) ? $resultado->responsavelTecnico->nome_mae : old('nome_mae_rt') }}"
             placeholder="Nome da Mãe"
             minlength="5"
@@ -318,7 +318,7 @@
         <input
             name="nome_pai_rt"
             type="text"
-            class="responsavelTecnico {{ array_search('nome_pai', $codRT) }} form-control {{ $errors->has('nome_pai_rt') ? 'is-invalid' : '' }}"
+            class="{{ $classes[5] }} {{ array_search('nome_pai', $codRT) }} form-control {{ $errors->has('nome_pai_rt') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_pai_rt')) && isset($resultado->responsavelTecnico->nome_pai) ? $resultado->responsavelTecnico->nome_pai : old('nome_pai_rt') }}"
             placeholder="Nome do Pai"
             minlength="5"

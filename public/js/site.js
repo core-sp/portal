@@ -924,6 +924,87 @@ $('#cedula').ready(function() {
   }
 });
 
+// ----------------------------------------------------------------------------------------------------------------------------
+// Busca endereço
+
+function preenche_formulario_cep(id, dados)
+{
+	$("#rua_" + id).val(dados.logradouro);
+	$("#bairro_" + id).val(dados.bairro);
+	$("#cidade_" + id).val(dados.localidade);
+	$("#uf_" + id).val(dados.uf);
+}
+
+function limpa_formulário_cep_by_class(id) {
+	// Limpa valores do formulário de cep.
+	$("#rua_" + id).val("");
+	$("#bairro_" + id).val("");
+	$("#cidade_" + id).val("");
+	$("#uf_" + id).val("");
+	$("#ibge_" + id).val("");
+}
+
+// Para formulários com varios endereços
+async function getEndereco(id)
+{
+	var objeto = $("#cep_" + id);
+	if(objeto.val().length === 9) {
+		var cep = objeto.val().replace(/\D/g, '');
+		if (cep != "") {
+			var validacep = /^[0-9]{8}$/;
+			if(validacep.test(cep)) {
+				$("#rua_" + id).val("...");
+				$("#bairro_" + id).val("...");
+				$("#cidade_" + id).val("...");
+				$("#uf_" + id).val("...");
+				//Consulta o webservice viacep.com.br/
+				const dados = await $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados){
+					if ("erro" in dados) {
+						alert("CEP não encontrado.");
+						limpa_formulário_cep_by_class(id);
+					}
+				});
+				return dados;
+			} 
+			else 
+				alert("Formato de CEP inválido.");
+		} 
+		limpa_formulário_cep_by_class(id);
+	}
+}
+// ----------------------------------------------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------------------------------------------------
+// Campo file dinâmico
+
+// Confere se o ultimo input file está vazio 
+function arquivoVazio(nome){
+	if($(nome + " .custom-file-input:last").val().length == 0)
+		return true;
+}
+
+function addArquivo(nome, maximoFiles){
+	if(nome == '')
+		return false;
+		
+	// somente files que exigem somente 1 arquivo
+	var array_para_um_file = [
+		// 'resid', 
+	];
+	var total = $(".Arquivo_" + nome).length + $(".ArquivoBD_" + nome).length;
+	var total_files = array_para_um_file.indexOf(nome) == -1 ? maximoFiles : 1 ;
+
+	if(($(".ArquivoBD_" + nome).length < total_files) && ($(".Arquivo_" + nome).css("display") == "none")){ //quando usa o hide
+		$(".Arquivo_" + nome).show();
+	} else if((total < total_files) && (!arquivoVazio(".Arquivo_" + nome))){
+		var novoInput = $(".Arquivo_" + nome + ":last");
+		novoInput.after(novoInput.clone(true));
+		$(".Arquivo_" + nome + " .custom-file-input:last").val("");
+		$(".Arquivo_" + nome + " .custom-file-input:last").siblings(".custom-file-label").removeClass("selected").html('<span class="text-secondary">Escolher arquivo</span>');
+	}
+}
+// ----------------------------------------------------------------------------------------------------------------------------
+
 //	--------------------------------------------------------------------------------------------------------
 // Funcionalidade Solicitação de Registro
 
@@ -955,25 +1036,25 @@ $("#checkEndEmpresa").change(function(){
 // limpar checkbox telefone.2, que não é obrigatório, se campo vazio
 function limparTipoTel(objeto)
 {
-	if((objeto.val().length == 0) && ($('input[name="tipo_telefone.2"]:checked').length > 0))
-		$('input[name="tipo_telefone.2"]:checked').prop("checked", false);
+	if((objeto.val().length == 0) && ($('input[name="tipo_telefone.1"]:checked').length > 0)){
+		$('input[name="tipo_telefone.1"]:checked').prop("checked", false);
+		putDadosPreRegistro($('input[name="tipo_telefone.1"]'));
+	}
 }
 
-$('input[name="telefone.2"]').keyup(function(){
+$('input[name="telefone.1"]').keyup(function(){
 	limparTipoTel($(this));
 });
 
-$('input[name="telefone.2"]').blur(function(){
+$('input[name="telefone.1"]').blur(function(){
 	limparTipoTel($(this));
 });
 
-$('input[name="tipo_telefone.2"]').click(function(){
-	$('input[name="telefone.2"]').focus();
+$('input[name="tipo_telefone.1"]').click(function(){
+	$('input[name="telefone.1"]').focus();
 });
 
-// --------------------------------------------------------------------------------------------------------
 // gerencia os arquivos, cria os inputs, remove os inputs, controla as quantidades de inputs e files vindo do bd
-
 var pre_registro_total_files = 5;
 
 // ao carregar a pagina, verifica se possui o limite maximo de arquivos permitidos, caso sim, ele impede de adicionar mais
@@ -998,7 +1079,7 @@ $("#inserirRegistro .files").on("change", function() {
 	// procedimento para recuperar a classe e adicionar o final do nome para o método de add input
 	var nomeClasse = $(this).parent().parent().parent().parent().attr('class');
 	var nome = nomeClasse.slice(nomeClasse.indexOf('_') + 1);
-	addArquivo(nome);
+	addArquivo(nome, pre_registro_total_files);
 });
 
 // remove a div com input file ou limpa o campo se for 1 input
@@ -1014,34 +1095,6 @@ $("#inserirRegistro .limparFile").click(function(){
 		$('.' + classe + " .invalid-feedback:last").remove();
 	}
 });
-
-// Confere se o ultimo input file está vazio 
-function arquivoVazio(nome){
-	if($(nome + " .custom-file-input:last").val().length == 0)
-		return true;
-}
-
-function addArquivo(nome){
-	if(nome == '')
-		return false;
-		
-	// somente files que exigem somente 1 arquivo
-	var array_para_um_file = [
-		// 'resid', 
-	];
-	var total = $(".Arquivo_" + nome).length + $(".ArquivoBD_" + nome).length;
-	var total_files = array_para_um_file.indexOf(nome) == -1 ? pre_registro_total_files : 1 ;
-
-	if(($(".ArquivoBD_" + nome).length < total_files) && ($(".Arquivo_" + nome).css("display") == "none")){ //quando usa o hide
-		$(".Arquivo_" + nome).show();
-	} else if((total < total_files) && (!arquivoVazio(".Arquivo_" + nome))){
-		var novoInput = $(".Arquivo_" + nome + ":last");
-		novoInput.after(novoInput.clone(true));
-		$(".Arquivo_" + nome + " .custom-file-input:last").val("");
-		$(".Arquivo_" + nome + " .custom-file-input:last").siblings(".custom-file-label").removeClass("selected").html('<span class="text-secondary">Escolher arquivo</span>');
-	}
-}
-//	--------------------------------------------------------------------------------------------------------
 
 function putDadosPreRegistro(objeto)
 {
@@ -1095,12 +1148,16 @@ function putDadosPreRegistro(objeto)
 	});
 }
 
-async function callbackEndereco(restoId)
+async function callbackEnderecoPreRegistro(restoId)
 {
-	var dados = await getEndereco(restoId);
+	var dadosAntigos = [$("#rua_" + restoId).val(), $("#bairro_" + restoId).val(), $("#cidade_" + restoId).val(), $("#uf_" + restoId).val()];
 	var array = [$("#rua_" + restoId), $("#bairro_" + restoId), $("#cidade_" + restoId), $("#uf_" + restoId)];
-	for(var objeto of array)
-		putDadosPreRegistro(objeto);
+	var dados = await getEndereco(restoId);
+	preenche_formulario_cep(restoId, dados);
+	for (let i = 0; i < array.length; i++) {
+		if(dadosAntigos[i] != array[i].val())
+			putDadosPreRegistro(array[i]); 
+	}
 }
 
 $('#inserirRegistro input[id^="cep_"]').on('keyup', function(event){
@@ -1109,13 +1166,21 @@ $('#inserirRegistro input[id^="cep_"]').on('keyup', function(event){
 	var indice = this.id.indexOf("_");
 	var restoId = this.id.slice(indice + 1, this.id.length);
 	if($(this).val().length == 9 && permitido){
-		callbackEndereco(restoId);
+		callbackEnderecoPreRegistro(restoId);
 	}
 });
 
-// ver uma forma melhor para não requisitar tanto o mesmo campo...
+var valorPreRegistro = null;
+
+$('#inserirRegistro input:not(:checkbox,:file)').focus(function(){
+	valorPreRegistro = $(this).val();
+});
+
 $('#inserirRegistro input:not(:checkbox,:file)').blur(function(){
-	putDadosPreRegistro($(this));
+	if((valorPreRegistro != $(this).val()) || (this.type == 'radio'))
+		putDadosPreRegistro($(this));
+	else
+		valorPreRegistro = null;
 });
 
 $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(function(){
@@ -1126,52 +1191,6 @@ $('#inserirRegistro input[type="checkbox"]').change(function(){
 	if(this.checked) 
 		putDadosPreRegistro($(this));
 });
-
-// CEP Correios
-function limpa_formulário_cep_by_class(id) {
-	// Limpa valores do formulário de cep.
-	$("#rua_" + id).val("");
-	$("#bairro_" + id).val("");
-	$("#cidade_" + id).val("");
-	$("#uf_" + id).val("");
-	$("#ibge_" + id).val("");
-}
-
-// Para formulários com varios endereços
-async function getEndereco(id)
-{
-	var objeto = $("#cep_" + id);
-	if(objeto.val().length === 9) {
-		var cep = objeto.val().replace(/\D/g, '');
-		if (cep != "") {
-			var validacep = /^[0-9]{8}$/;
-			if(validacep.test(cep)) {
-				$("#rua_" + id).val("...");
-				$("#bairro_" + id).val("...");
-				$("#cidade_" + id).val("...");
-				$("#uf_" + id).val("...");
-				//Consulta o webservice viacep.com.br/
-				const dados = await $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados){
-					if (!("erro" in dados)) {
-						//Atualiza os campos com os valores da consulta.
-						$("#rua_" + id).val(dados.logradouro);
-						$("#bairro_" + id).val(dados.bairro);
-						$("#cidade_" + id).val(dados.localidade);
-						$("#uf_" + id).val(dados.uf);
-					} 
-					else{
-						alert("CEP não encontrado.");
-						limpa_formulário_cep_by_class(id);
-					}
-				});
-				return dados;
-			} 
-			else 
-				alert("Formato de CEP inválido.");
-		} 
-		limpa_formulário_cep_by_class(id);
-	}
-}
 
 //	--------------------------------------------------------------------------------------------------------
 // FIM da Funcionalidade Solicitação de Registro

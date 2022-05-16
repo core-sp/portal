@@ -17,7 +17,7 @@ class CreateResponsaveisTecnicosTable extends Migration
             $table->bigIncrements('id');
             $table->string('nome')->nullable();
             $table->string('nome_social')->nullable();
-            $table->char('sexo', 2)->nullable();
+            $table->char('sexo', 1)->nullable();
             $table->date('dt_nacimento')->nullable();
             $table->string('registro')->nullable();
             $table->string('cpf', 20)->nullable();

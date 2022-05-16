@@ -5,9 +5,16 @@ namespace App\Services;
 use App\Contracts\PreRegistroServiceInterface;
 use App\PreRegistro;
 use App\Contracts\MediadorServiceInterface;
-use Illuminate\Database\Eloquent\Builder;
 
 class PreRegistroService implements PreRegistroServiceInterface {
+
+    const RELATION_ANEXOS = "anexos";
+    const RELATION_CONTABIL = "contabil";
+    const RELATION_PF = "pessoaFisica";
+    const RELATION_PJ = "pessoaJuridica";
+    const RELATION_PRE_REGISTRO = "preRegistro";
+    const RELATION_RT = "pessoaJuridica.responsavelTecnico";
+    const RELATION_USER_EXTERNO = 'userExterno';
 
     public function __construct()
     {
@@ -17,6 +24,15 @@ class PreRegistroService implements PreRegistroServiceInterface {
     private function getCodigos()
     {
         $codigos = array();
+        $relacoes = [
+            'App\Anexo' => PreRegistroService::RELATION_ANEXOS,
+            'App\Contabil' => PreRegistroService::RELATION_CONTABIL,
+            'App\PreRegistroCpf' => PreRegistroService::RELATION_PF,
+            'App\PreRegistroCnpj' => PreRegistroService::RELATION_PJ,
+            'App\PreRegistro' => PreRegistroService::RELATION_PRE_REGISTRO,
+            'App\ResponsavelTecnico' => PreRegistroService::RELATION_RT,
+            'App\UserExterno' => PreRegistroService::RELATION_USER_EXTERNO,
+        ];
         $models = [
             'App\UserExterno' => null,
             'App\PreRegistro' => null,
@@ -26,10 +42,51 @@ class PreRegistroService implements PreRegistroServiceInterface {
             'App\ResponsavelTecnico' => null,
             'App\Anexo' => null
         ];
+
         foreach($models as $key => $model)
-            $codigos[$key] = $key::codigosPreRegistro();
+            $codigos[$relacoes[$key]] = $key::codigosPreRegistro();
         
         return $codigos;
+    }
+
+    private function limparNomeCamposAjax($classe, $campo)
+    {
+        $chave = false;
+        $campos = $this->getCodigos()[$classe];
+        $siglas = [
+            'anexos' => null,
+            'preRegistro' => null,
+            'pessoaFisica' => null,
+            'pessoaJuridica' => '_empresa',
+            'contabil' => '_contabil',
+            'pessoaJuridica.responsavelTecnico' => '_rt',
+            'userExterno' => null,
+        ];
+
+        foreach($campos as $key => $cp)
+        {
+            $temp = $cp . $siglas[$classe];
+            if(($campo == $cp) || ($campo == $temp))
+            {
+                $chave = $key;
+                break;
+            }
+        }
+
+        return isset($campos[$chave]) ? $campos[$chave] : $campo;
+    }
+
+    public function getNomeClasses()
+    {
+        return [
+            PreRegistroService::RELATION_ANEXOS,
+            PreRegistroService::RELATION_CONTABIL,
+            PreRegistroService::RELATION_PF,
+            PreRegistroService::RELATION_PJ,
+            PreRegistroService::RELATION_PRE_REGISTRO,
+            PreRegistroService::RELATION_RT,
+            PreRegistroService::RELATION_USER_EXTERNO,
+        ];
     }
 
     public function verificacao()
@@ -61,32 +118,27 @@ class PreRegistroService implements PreRegistroServiceInterface {
             'regionais' => $service->getService('Regional')
                 ->all()
                 ->splice(0, 13)
-                ->sortBy('regional')
+                ->sortBy('regional'),
+            'classes' => $this->getNomeClasses()
         ];
     }
 
     public function saveSiteAjax($request)
     {
-        // limpar nome dos campos
-        // verificacao dos campos; se ja existe o objeto, atualiza; senao, cria
-        // anexo só cria ou remove
-        // $externo->preRegistro->update(['numero' => $request['teste']]);
-
-        $teste = null;
         $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
         $resultado = null;
+        $objeto = collect();
 
-        if($request['classe'] == 'preRegistro')
-            $resultado = $preRegistro->update([$request['campo'] => $request['valor']]);
-        else
-        {
+        if(($request['classe'] != PreRegistroService::RELATION_ANEXOS) && ($request['classe'] != PreRegistroService::RELATION_PRE_REGISTRO))
             $objeto = $preRegistro->whereHas($request['classe'])->get();
-            if($objeto->isNotEmpty())
-                $resultado = $preRegistro->atualizarRelacoesAjax($request['classe'], $request['campo'], $request['valor']);
-            else
-                $resultado = $preRegistro->criarRelacoesAjax($request['classe'], $request['campo'], $request['valor']);
-        }
+        
+        $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
 
-        return $resultado;
+        if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || $objeto->isNotEmpty())
+            $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor']);
+        elseif(isset($request['valor']) && strlen($request['valor']) > 0)
+            $resultado = $preRegistro->criarAjax($request['classe'], $request['campo'], $request['valor']);
+
+        return $request['campo'];
     }
 }

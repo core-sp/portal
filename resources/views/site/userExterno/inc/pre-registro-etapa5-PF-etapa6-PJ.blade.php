@@ -50,9 +50,9 @@
             <div class="custom-file">
                 <input 
                     type="file" 
-                    class="anexos {{ array_search('path', $codAnexo) }} custom-file-input files {{ $errors->has('anexos') ? 'is-invalid' : '' }}" 
+                    class="{{ $classes[0] }} {{ array_search('path', $codAnexo) }} custom-file-input files {{ $errors->has('anexos') ? 'is-invalid' : '' }}" 
                     id="anexos"
-                    name="anexos"
+                    name="path"
                     value="{{-- isset($resultado->copia_identidade) ? $resultado->copia_identidade : old('copia_identidade') --}}"
                 />
                 <label class="custom-file-label ml-0" for="customFile"><span class="text-secondary">Escolher arquivo</span></label>
