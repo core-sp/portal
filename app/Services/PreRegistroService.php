@@ -125,6 +125,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function saveSiteAjax($request)
     {
+        // Colocar regra, tanto na view quanto no server, que inserir contabil ou rt, deve ser inicialmente pelo cnpj / cpf para carregar se já existe
+
         $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
         $resultado = null;
         $objeto = collect();
@@ -136,9 +138,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || $objeto->isNotEmpty())
             $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor']);
-        elseif(isset($request['valor']) && strlen($request['valor']) > 0)
+        else
             $resultado = $preRegistro->criarAjax($request['classe'], $request['campo'], $request['valor']);
 
-        return $request['campo'];
+        return $resultado;
     }
 }

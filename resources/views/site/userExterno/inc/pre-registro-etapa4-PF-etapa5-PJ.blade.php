@@ -38,37 +38,37 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_telefone.1">{{ array_search('tipo_telefone', $codPre) }} - Tipo </label><br>
+        <label for="tipo_telefone_1">{{ array_search('tipo_telefone', $codPre) }} - Tipo </label><br>
         @foreach(tipos_contatos() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
-                @if(!empty(old('tipo_telefone.1')))
-                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone.1" value="{{ $tipo }}" {{ old('tipo_telefone.1') == $tipo ? 'checked' : '' }} />{{ $tipo }}
+                @if(!empty(old('tipo_telefone_1')))
+                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone_1" value="{{ $tipo }}" {{ old('tipo_telefone_1') == $tipo ? 'checked' : '' }} />{{ $tipo }}
                 @elseif(isset(explode(';', $resultado->tipo_telefone)[1]))
-                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone.1" value="{{ $tipo }}" {{ $tipo == explode(';', $resultado->tipo_telefone)[1] ? 'checked' : '' }} />{{ $tipo }}
+                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone_1" value="{{ $tipo }}" {{ $tipo == explode(';', $resultado->tipo_telefone)[1] ? 'checked' : '' }} />{{ $tipo }}
                 @else
-                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone.1" value="{{ $tipo }}" />{{ $tipo }}
+                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone_1" value="{{ $tipo }}" />{{ $tipo }}
                 @endif
             </label>
         </div>
         @endforeach
-        @if($errors->has('tipo_telefone.1'))
+        @if($errors->has('tipo_telefone_1'))
         <div class="invalid-feedback">
-            {{ $errors->first('tipo_telefone.1') }}
+            {{ $errors->first('tipo_telefone_1') }}
         </div>
         @endif
     </div>
     <div class="col-sm-6 mb-2-576">
-        <label for="telefone.1">{{ array_search('telefone', $codPre) }} - Telefone </label>
+        <label for="telefone_1">{{ array_search('telefone', $codPre) }} - Telefone </label>
         <input type="text"
-            class="{{ $classes[4] }} {{ array_search('telefone', $codPre) }} form-control celularInput {{ $errors->has('telefone.1') ? 'is-invalid' : '' }}"
-            name="telefone.1"
-            value="{{ empty(old('telefone.1')) && isset(explode(';', $resultado->telefone)[1]) ? explode(';', $resultado->telefone)[1] : old('telefone.1') }}"
+            class="{{ $classes[4] }} {{ array_search('telefone', $codPre) }} form-control celularInput {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
+            name="telefone_1"
+            value="{{ empty(old('telefone_1')) && isset(explode(';', $resultado->telefone)[1]) ? explode(';', $resultado->telefone)[1] : old('telefone_1') }}"
             placeholder="(xx) 99999-9999"
         />
-        @if($errors->has('telefone.1'))
+        @if($errors->has('telefone_1'))
         <div class="invalid-feedback">
-            {{ $errors->first('telefone.1') }}
+            {{ $errors->first('telefone_1') }}
         </div>
         @endif
     </div>

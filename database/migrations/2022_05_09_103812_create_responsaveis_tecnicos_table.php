@@ -18,9 +18,9 @@ class CreateResponsaveisTecnicosTable extends Migration
             $table->string('nome')->nullable();
             $table->string('nome_social')->nullable();
             $table->char('sexo', 1)->nullable();
-            $table->date('dt_nacimento')->nullable();
-            $table->string('registro')->nullable();
-            $table->string('cpf', 20)->nullable();
+            $table->date('dt_nascimento')->nullable();
+            $table->string('registro')->unique()->nullable();
+            $table->string('cpf', 11)->unique()->nullable();
             $table->string('cep', 10)->nullable();
             $table->string('logradouro')->nullable();
             $table->string('numero', 10)->nullable();

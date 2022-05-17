@@ -11,7 +11,6 @@ class Contabil extends Model
 
     protected $table = 'contabeis';
     protected $guarded = [];
-    protected $touches = ['preRegistros'];
 
     // RC = registro contábil
     public static function codigosPreRegistro()

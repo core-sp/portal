@@ -11,7 +11,6 @@ class ResponsavelTecnico extends Model
 
     protected $table = 'responsaveis_tecnicos';
     protected $guarded = [];
-    protected $touches = ['preRegistros'];
 
     // RT = registro responsavel técnico
     public static function codigosPreRegistro()
@@ -38,8 +37,27 @@ class ResponsavelTecnico extends Model
         ];
     }
 
-    public function preRegistros()
+    public function pessoasJuridicas()
     {
-        return $this->hasMany('App\PreRegistro')->withTrashed();
+        return $this->hasMany('App\PreRegistroCnpj')->withTrashed();
+    }
+
+    public static function buscarRT($cpf)
+    {
+        // Buscar no Gerenti; se existir, traz os dados
+        // e verifica se existe na tabela; se existir, atualiza
+        // ou cria e devolve os dados para view do cliente
+        $existe = ResponsavelTecnico::where('cpf', $cpf)->first();
+
+        return isset($existe) ? $existe : ResponsavelTecnico::create(['cpf' => $cpf]);
+    }
+
+    public function validarUpdateAjax($campo, $valor)
+    {
+        if($campo == 'cpf')
+            if($valor != $this->cpf) 
+                return $this->buscarRT($valor);
+
+        return null;
     }
 }

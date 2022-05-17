@@ -43,4 +43,30 @@ class PreRegistroCnpj extends Model
     {
         return $this->belongsTo('App\ResponsavelTecnico')->withTrashed();
     }
+
+    public function mesmoEndereco()
+    {
+        $preRegistro = $this->preRegistro;
+        return ($this->cep == $preRegistro->cep) && ($this->numero == $preRegistro->numero) && ($this->complemento == $preRegistro->complemento);
+    }
+
+    public function validarUpdateAjax($campo, $valor)
+    {
+        if($campo == 'checkEndEmpresa')
+            if($valor == 'on')
+            {
+                $preRegistro = $this->preRegistro;
+                return [
+                    'cep' => $preRegistro->cep, 
+                    'logradouro' => $preRegistro->logradouro, 
+                    'numero' => $preRegistro->numero, 
+                    'complemento' => $preRegistro->complemento, 
+                    'bairro' => $preRegistro->bairro, 
+                    'cidade' => $preRegistro->cidade, 
+                    'uf' => $preRegistro->uf
+                ];
+            }
+
+        return [$campo => $valor];
+    }
 }

@@ -67,36 +67,78 @@ class PreRegistro extends Model
         return $this->hasMany('App\Anexo');
     }
 
-    public function atualizarRelacoesAjax($classe, $campo, $valor)
+    private function validarUpdateAjax($campo, $valor)
     {
+        $tipo = explode(';', $this->tipo_telefone);
+        $tel = explode(';', $this->telefone);
+        $tipo[1] = isset($tipo[1]) ? $tipo[1] : '';
+        $tel[1] = isset($tel[1]) ? $tel[1] : '';
+
+        if(($campo == 'tipo_telefone') || ($campo == 'telefone'))
+        {
+            if(strpos($valor, ';') !== false)
+                $valor = $campo == 'tipo_telefone' ? $tipo[0].$valor : $tel[0].$valor;
+            else
+                $valor = $campo == 'tipo_telefone' ? $valor.';'.$tipo[1] : $valor.';'.$tel[1];
+        }
+
+        return [$campo => $valor];
+    }
+
+    public function atualizarAjax($classe, $campo, $valor)
+    {
+        $resultado = null;
+
         switch ($classe) {
+            case 'preRegistro':
+                $valido = $this->validarUpdateAjax($campo, $valor);
+                $this->update($valido);
+                break;
             case 'pessoaFisica':
                 $this->pessoaFisica->update([$campo => $valor]);
                 break;
             case 'pessoaJuridica':
-                $this->pessoaJuridica->update([$campo => $valor]);
+                $valido = $this->pessoaJuridica->validarUpdateAjax($campo, $valor);
+                $this->pessoaJuridica->update($valido);
                 break;
-            case 'contabil':
-            // $this->contabil->associate()->update([$campo => $valor]); ???
-            break;
-            case 'responsavelTecnico':
-                $this->pessoaJuridica->responsavelTecnico->update([$campo => $valor]);
+            // case 'contabil':
+            //     $this->touch();
+            //     break;
+            case 'pessoaJuridica.responsavelTecnico':
+                $valido = $this->pessoaJuridica->responsavelTecnico->validarUpdateAjax($campo, $valor);
+                if(isset($valido))
+                    $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id]);
+                else
+                {
+                    $rt = $this->pessoaJuridica->responsavelTecnico;
+                    $rt->update([$campo => $valor]);
+                    $this->touch();
+                }
+                $resultado = $valido;
                 break;
         }
+
+        return isset($resultado) ? $resultado : null;
     }
 
-    public function criarRelacoesAjax($classe, $campo, $valor)
+    public function criarAjax($classe, $campo, $valor)
     {
+        $resultado = null;
+
         switch ($classe) {
-            case 'responsavelTecnico':
-                $this->pessoaJuridica->responsavelTecnico()->create([$campo => $valor]);
+            case 'pessoaJuridica.responsavelTecnico':
+                $valido = 'App\ResponsavelTecnico'::buscarRT($valor);
+                if(isset($valido))
+                    $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id]);
+                $resultado = $valido;
                 break;
-            case 'contabil':
-            // $this->contabil->associate()->create([$campo => $valor]); ??
-                break;
+            // case 'contabil':
+            //     break;
             case 'anexos':
                 $this->anexos()->create([$campo => $valor]);
                 break;
         }
+
+        return isset($resultado) ? $resultado : null;
     }
 }

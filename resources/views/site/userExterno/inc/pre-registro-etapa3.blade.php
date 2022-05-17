@@ -144,6 +144,9 @@
                 id="checkEndEmpresa" 
                 class="{{ $classes[3] }} {{ $codigoEndereco }} form-check-input" 
                 name="checkEndEmpresa" 
+                @if(isset($resultado->pessoaJuridica) && $resultado->pessoaJuridica->mesmoEndereco())
+                    checked
+                @endif
             />
             Mesmo endereço da correspondência
         </label>
@@ -230,7 +233,7 @@
                 class="{{ $classes[3] }} {{ array_search('complemento', $codCnpj) }} form-control {{ $errors->has('complemento_empresa') ? 'is-invalid' : '' }}"
                 id="complemento_empresa"
                 placeholder="Complemento"
-                value="{{ empty(old('numero_empresa')) && isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : old('numero_empresa') }}"
+                value="{{ empty(old('complemento_empresa')) && isset($resultado->pessoaJuridica->complemento) ? $resultado->pessoaJuridica->complemento : old('complemento_empresa') }}"
             />
             @if($errors->has('complemento_empresa'))
             <div class="invalid-feedback">

@@ -1033,25 +1033,21 @@ $("#checkEndEmpresa").change(function(){
 	this.checked ? $("#habilitarEndEmpresa").hide() : $("#habilitarEndEmpresa").show();
 });
 
-// limpar checkbox telefone.2, que não é obrigatório, se campo vazio
+// limpar checkbox telefone_1, que não é obrigatório, se campo vazio
 function limparTipoTel(objeto)
 {
-	if((objeto.val().length == 0) && ($('input[name="tipo_telefone.1"]:checked').length > 0)){
-		$('input[name="tipo_telefone.1"]:checked').prop("checked", false);
-		putDadosPreRegistro($('input[name="tipo_telefone.1"]'));
+	if((objeto.val().length == 0) && ($('#inserirRegistro input[name="tipo_telefone_1"]:checked').length > 0)){
+		$('#inserirRegistro input[name="tipo_telefone_1"]:checked').prop("checked", false);
+		putDadosPreRegistro($('#inserirRegistro input[name="tipo_telefone_1"]'));
 	}
 }
 
-$('input[name="telefone.1"]').keyup(function(){
+$('#inserirRegistro input[name="telefone_1"]').on('keyup blur', function(){
 	limparTipoTel($(this));
 });
 
-$('input[name="telefone.1"]').blur(function(){
-	limparTipoTel($(this));
-});
-
-$('input[name="tipo_telefone.1"]').click(function(){
-	$('input[name="telefone.1"]').focus();
+$('input[name="tipo_telefone_1"]').click(function(){
+	$('input[name="telefone_1"]').focus();
 });
 
 // gerencia os arquivos, cria os inputs, remove os inputs, controla as quantidades de inputs e files vindo do bd
@@ -1096,6 +1092,27 @@ $("#inserirRegistro .limparFile").click(function(){
 	}
 });
 
+function preencheRT(dados)
+{
+	$('#inserirRegistro input[name="nome_rt"]').val(dados.nome);
+	$('#inserirRegistro input[name="nome_social_rt"]').val(dados.nome_social);
+	$('#inserirRegistro input[name="registro"]').val(dados.registro);
+	$('#inserirRegistro input[name="sexo_rt"][value="' + dados.sexo + '"]').prop("checked", true);
+	$('#inserirRegistro input[name="dt_nascimento_rt"]').val(dados.dt_nascimento);
+	$('#inserirRegistro input[name="identidade_rt"]').val(dados.identidade);
+	$('#inserirRegistro input[name="orgao_emissor_rt"]').val(dados.orgao_emissor);
+	$('#inserirRegistro input[name="dt_expedicao_rt"]').val(dados.dt_expedicao);
+	$('#inserirRegistro input[name="cep_rt"]').val(dados.cep);
+	$('#inserirRegistro input[name="bairro_rt"]').val(dados.bairro);
+	$('#inserirRegistro input[name="logradouro_rt"]').val(dados.logradouro);
+	$('#inserirRegistro input[name="numero_rt"]').val(dados.numero);
+	$('#inserirRegistro input[name="complemento_rt"]').val(dados.complemento);
+	$('#inserirRegistro input[name="cidade_rt"]').val(dados.cidade);
+	$('#inserirRegistro select[name="uf_rt"]').val(dados.uf);
+	$('#inserirRegistro input[name="nome_mae_rt"]').val(dados.nome_mae);
+	$('#inserirRegistro input[name="nome_pai_rt"]').val(dados.nome_pai);
+}
+
 function putDadosPreRegistro(objeto)
 {
 	var spinner = "spinner-border text-success";
@@ -1107,6 +1124,9 @@ function putDadosPreRegistro(objeto)
 
 	if((campo == "") || (classe == ""))
 		return;
+
+	if((campo == 'tipo_telefone_1') && (objeto.length > 1))
+		valor = '';
 
 	$.ajax({
 		method: "PUT",
@@ -1131,7 +1151,8 @@ function putDadosPreRegistro(objeto)
 			}
 		},
 		success: function(response) {
-			console.log(response);
+			if(campo == 'cpf_rt')
+				preencheRT(response);
 			if($('#carregandoPreRegistro').hasClass('visible')){
 				$('#divCarregando span').text(codigo + ' salvo ');
 				$('#divCarregando span').after('<i class="icon fa fa-check text-success"></i>');
@@ -1141,7 +1162,7 @@ function putDadosPreRegistro(objeto)
 		error: function(request, status, error) {
 			var errorMessage = request.status + ': ' + request.statusText;
 			if(request.status == 422)
-				errorMessage = 'Erro de validação para salvar o campo';
+				errorMessage = request.responseJSON.errors.valor[0];
 			$('#divCarregando span').html(errorMessage + '.<br>Recarregue a página, por favor.<br>Caso Persista o erro, entre em contato conosco');
 			$('#carregandoPreRegistro').attr("class", spinner + " invisible");
 		}
@@ -1172,12 +1193,12 @@ $('#inserirRegistro input[id^="cep_"]').on('keyup', function(event){
 
 var valorPreRegistro = null;
 
-$('#inserirRegistro input:not(:checkbox,:file)').focus(function(){
+$('#inserirRegistro input:not(:checkbox,:file,:radio)').focus(function(){
 	valorPreRegistro = $(this).val();
 });
 
-$('#inserirRegistro input:not(:checkbox,:file)').blur(function(){
-	if((valorPreRegistro != $(this).val()) || (this.type == 'radio'))
+$('#inserirRegistro input:not(:checkbox,:file,:radio)').blur(function(){
+	if(valorPreRegistro != $(this).val())
 		putDadosPreRegistro($(this));
 	else
 		valorPreRegistro = null;
@@ -1187,7 +1208,7 @@ $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(functio
 	putDadosPreRegistro($(this));
 });
 
-$('#inserirRegistro input[type="checkbox"]').change(function(){
+$('#inserirRegistro input:checkbox, #inserirRegistro input:radio').change(function(){
 	if(this.checked) 
 		putDadosPreRegistro($(this));
 });

@@ -15,7 +15,7 @@ class CreateUsersExterno extends Migration
     {
         Schema::create('users_externo', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('cpf_cnpj')->unique();
+            $table->string('cpf_cnpj', 14)->unique();
             $table->string('nome');
             $table->string('email');
             $table->string('verify_token')->nullable();

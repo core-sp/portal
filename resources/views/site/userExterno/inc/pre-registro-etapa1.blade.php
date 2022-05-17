@@ -1,25 +1,5 @@
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_contabil">{{ array_search('nome', $cod) }} - Nome da Contabilidade</label>
-        <input
-            name="nome_contabil"
-            type="text"
-            class="{{ $classes[1] }} {{ array_search('nome', $cod) }} form-control {{ $errors->has('nome_contabil') ? 'is-invalid' : '' }}"
-            value="{{ empty(old('nome_contabil')) && isset($resultado->contabil->nome) ? $resultado->contabil->nome : old('nome_contabil') }}"
-            placeholder="Nome da Contabilidade"
-            minlength="5"
-            maxlength="191"
-        />
-        @if($errors->has('nome_contabil'))
-        <div class="invalid-feedback">
-            {{ $errors->first('nome_contabil') }}
-        </div>
-        @endif
-    </div>
-</div>
-
-<div class="form-row mb-2">
-    <div class="col-sm mb-2-576">
         <label for="cnpj_contabil">{{ array_search('cnpj', $cod) }} - CNPJ</label>
         <input
             name="cnpj_contabil"
@@ -45,6 +25,26 @@
         @if($errors->has('email_contabil'))
         <div class="invalid-feedback">
             {{ $errors->first('email_contabil') }}
+        </div>
+        @endif
+    </div>
+</div>
+
+<div class="form-row mb-2">
+    <div class="col-sm mb-2-576">
+        <label for="nome_contabil">{{ array_search('nome', $cod) }} - Nome da Contabilidade</label>
+        <input
+            name="nome_contabil"
+            type="text"
+            class="{{ $classes[1] }} {{ array_search('nome', $cod) }} form-control {{ $errors->has('nome_contabil') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('nome_contabil')) && isset($resultado->contabil->nome) ? $resultado->contabil->nome : old('nome_contabil') }}"
+            placeholder="Nome da Contabilidade"
+            minlength="5"
+            maxlength="191"
+        />
+        @if($errors->has('nome_contabil'))
+        <div class="invalid-feedback">
+            {{ $errors->first('nome_contabil') }}
         </div>
         @endif
     </div>
