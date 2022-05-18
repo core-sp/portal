@@ -101,13 +101,22 @@ class PreRegistro extends Model
                 $valido = $this->pessoaJuridica->validarUpdateAjax($campo, $valor);
                 $this->pessoaJuridica->update($valido);
                 break;
-            // case 'contabil':
-            //     $this->touch();
-            //     break;
+            case 'contabil':
+                $valido = $this->contabil->validarUpdateAjax($campo, $valor);
+                if(isset($valido))
+                    $resultado = $this->update(['contabil_id' => $valido == 'remover' ? null : $valido->id]);
+                else
+                {
+                    $contabil = $this->contabil;
+                    $contabil->update([$campo => $valor]);
+                    $this->touch();
+                }
+                $resultado = $valido;
+                break;
             case 'pessoaJuridica.responsavelTecnico':
                 $valido = $this->pessoaJuridica->responsavelTecnico->validarUpdateAjax($campo, $valor);
                 if(isset($valido))
-                    $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id]);
+                    $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido == 'remover' ? null : $valido->id]);
                 else
                 {
                     $rt = $this->pessoaJuridica->responsavelTecnico;
@@ -118,7 +127,7 @@ class PreRegistro extends Model
                 break;
         }
 
-        return isset($resultado) ? $resultado : null;
+        return $resultado;
     }
 
     public function criarAjax($classe, $campo, $valor)
@@ -127,18 +136,22 @@ class PreRegistro extends Model
 
         switch ($classe) {
             case 'pessoaJuridica.responsavelTecnico':
-                $valido = 'App\ResponsavelTecnico'::buscarRT($valor);
+                $valido = 'App\ResponsavelTecnico'::buscar($valor);
                 if(isset($valido))
                     $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id]);
                 $resultado = $valido;
                 break;
-            // case 'contabil':
-            //     break;
+            case 'contabil':
+                $valido = 'App\Contabil'::buscar($valor);
+                if(isset($valido))
+                    $resultado = $this->update(['contabil_id' => $valido->id]);
+                $resultado = $valido;
+                break;
             case 'anexos':
                 $this->anexos()->create([$campo => $valor]);
                 break;
         }
 
-        return isset($resultado) ? $resultado : null;
+        return $resultado;
     }
 }

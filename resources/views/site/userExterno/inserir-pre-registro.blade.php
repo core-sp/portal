@@ -114,15 +114,19 @@
         <div class="form-row">
             <div class="col-sm mb-2-576">
                 <button class="btn btn-success float-left" type="submit">Enviar para análise</button>
-
-                <div id="divCarregando" class="float-right">
-                    <span></span>
-                    <div id="carregandoPreRegistro" class="spinner-border text-primary invisible"></div>
-                </div>
             </div>
         </div>
-    
     </form>
+
+    <!-- The Modal -->
+    <div class="modal hide" id="modalLoadingPreRegistro">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal body -->
+                <div id="modalLoadingBody" class="modal-body text-center"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection

@@ -42,7 +42,7 @@ class ResponsavelTecnico extends Model
         return $this->hasMany('App\PreRegistroCnpj')->withTrashed();
     }
 
-    public static function buscarRT($cpf)
+    public static function buscar($cpf)
     {
         // Buscar no Gerenti; se existir, traz os dados
         // e verifica se existe na tabela; se existir, atualiza
@@ -55,8 +55,12 @@ class ResponsavelTecnico extends Model
     public function validarUpdateAjax($campo, $valor)
     {
         if($campo == 'cpf')
-            if($valor != $this->cpf) 
-                return $this->buscarRT($valor);
+        {
+            if(isset($valor) && (strlen($valor) == 11) && ($valor != $this->cnpj)) 
+                return $this->buscar($valor);
+            if(!isset($valor))
+                return 'remover';
+        }
 
         return null;
     }

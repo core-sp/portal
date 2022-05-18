@@ -14,22 +14,9 @@
         </div>
         @endif
     </div>
-    <div class="col-sm mb-2-576">
-        <label for="email_contabil">{{ array_search('email', $cod) }} - E-mail</label>
-        <input
-            name="email_contabil"
-            type="email"
-            class="{{ $classes[1] }} {{ array_search('email', $cod) }} form-control {{ $errors->has('email_contabil') ? 'is-invalid' : '' }}"
-            value="{{ empty(old('email_contabil')) && isset($resultado->contabil->email) ? $resultado->contabil->email : old('email_contabil') }}"
-        />
-        @if($errors->has('email_contabil'))
-        <div class="invalid-feedback">
-            {{ $errors->first('email_contabil') }}
-        </div>
-        @endif
-    </div>
 </div>
 
+<fieldset id="campos_contabil" {{ isset($resultado->contabil->cnpj) ? '' : 'disabled' }}>
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
         <label for="nome_contabil">{{ array_search('nome', $cod) }} - Nome da Contabilidade</label>
@@ -52,17 +39,34 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="contato_contabil">{{ array_search('nome_contato', $cod) }} - Nome de Contato</label>
+        <label for="email_contabil">{{ array_search('email', $cod) }} - E-mail</label>
         <input
-            name="contato_contabil"
+            name="email_contabil"
+            type="email"
+            class="{{ $classes[1] }} {{ array_search('email', $cod) }} form-control {{ $errors->has('email_contabil') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('email_contabil')) && isset($resultado->contabil->email) ? $resultado->contabil->email : old('email_contabil') }}"
+        />
+        @if($errors->has('email_contabil'))
+        <div class="invalid-feedback">
+            {{ $errors->first('email_contabil') }}
+        </div>
+        @endif
+    </div>
+</div>
+
+<div class="form-row mb-2">
+    <div class="col-sm mb-2-576">
+        <label for="nome_contato_contabil">{{ array_search('nome_contato', $cod) }} - Nome de Contato</label>
+        <input
+            name="nome_contato_contabil"
             type="text"
-            class="{{ $classes[1] }} {{ array_search('nome_contato', $cod) }} form-control {{ $errors->has('contato_contabil') ? 'is-invalid' : '' }}"
-            value="{{ empty(old('contato_contabil')) && isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : old('contato_contabil') }}"
+            class="{{ $classes[1] }} {{ array_search('nome_contato', $cod) }} form-control {{ $errors->has('nome_contato_contabil') ? 'is-invalid' : '' }}"
+            value="{{ empty(old('nome_contato_contabil')) && isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : old('nome_contato_contabil') }}"
             placeholder="Nome de Contato"
         />
-        @if($errors->has('contato_contabil'))
+        @if($errors->has('nome_contato_contabil'))
         <div class="invalid-feedback">
-            {{ $errors->first('contato_contabil') }}
+            {{ $errors->first('nome_contato_contabil') }}
         </div>
         @endif
     </div>
@@ -81,3 +85,4 @@
         @endif
     </div>
 </div>
+</fieldset>

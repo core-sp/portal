@@ -28,4 +28,24 @@ class Contabil extends Model
     {
         return $this->hasMany('App\PreRegistro')->withTrashed();
     }
+
+    public static function buscar($cnpj)
+    {
+        $existe = Contabil::where('cnpj', $cnpj)->first();
+
+        return isset($existe) ? $existe : Contabil::create(['cnpj' => $cnpj]);
+    }
+
+    public function validarUpdateAjax($campo, $valor)
+    {
+        if($campo == 'cnpj')
+        {
+            if(isset($valor) && (strlen($valor) == 14) && ($valor != $this->cnpj)) 
+                return $this->buscar($valor);
+            if(!isset($valor))
+                return 'remover';
+        }
+
+        return null;
+    }
 }

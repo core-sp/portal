@@ -28,10 +28,13 @@ class PreRegistroAjaxRequest extends FormRequest
 
         if((strpos(request()->campo, 'cpf') !== false) || (strpos(request()->campo, 'cnpj') !== false))
         {
-            $this->regraCpfCnpj = new CpfCnpj;
-            $this->merge([
-                'valor' => apenasNumeros(request()->valor)
-            ]);
+            if(isset(request()->valor))
+            {
+                $this->regraCpfCnpj = new CpfCnpj;
+                $this->merge([
+                    'valor' => apenasNumeros(request()->valor)
+                ]);
+            }
         }
     }
 
@@ -42,7 +45,7 @@ class PreRegistroAjaxRequest extends FormRequest
         $todos = null;
         $campos_array = [
             $service[0] => 'path',
-            $service[1] => 'nome_contabil,cnpj_contabil,email_contabil,contato_contabil,telefone_contabil',
+            $service[1] => 'nome_contabil,cnpj_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
             $service[4] => 'registro_secundario,ramo_atividade,segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,tipo_telefone_1,telefone_1',
             $service[2] => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade,nome_mae,nome_pai,identidade,orgao_emissor,dt_expedicao',
             $service[3] => 'razao_social,capital_social,nire,tipo_empresa,dt_inicio_atividade,inscricao_estadual,inscricao_municipal,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
