@@ -31,21 +31,31 @@ class Contabil extends Model
 
     public static function buscar($cnpj)
     {
-        $existe = Contabil::where('cnpj', $cnpj)->first();
+        if(isset($cnpj) && (strlen($cnpj) == 14))
+        {
+            $existe = Contabil::where('cnpj', $cnpj)->first();
 
-        return isset($existe) ? $existe : Contabil::create(['cnpj' => $cnpj]);
+            return isset($existe) ? $existe : Contabil::create(['cnpj' => $cnpj]);
+        }
+
+        return null;
     }
 
     public function validarUpdateAjax($campo, $valor)
     {
         if($campo == 'cnpj')
         {
-            if(isset($valor) && (strlen($valor) == 14) && ($valor != $this->cnpj)) 
+            if(isset($valor) && (strlen($valor) == 14)) 
                 return $this->buscar($valor);
             if(!isset($valor))
                 return 'remover';
         }
 
         return null;
+    }
+
+    public function updateAjax($campo, $valor)
+    {
+        $this->update([$campo => $valor]);
     }
 }

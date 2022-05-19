@@ -374,21 +374,6 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 <!-- Verificar validação das Inscrições -->
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="inscricao_estadual">{{ array_search('inscricao_estadual', $codCnpj) }} - Inscrição Estadual *</label>
-        <input
-            type="text"
-            name="inscricao_estadual"
-            class="{{ $classes[3] }} {{ array_search('inscricao_estadual', $codCnpj) }} form-control {{ $errors->has('inscricao_estadual') ? 'is-invalid' : '' }}"
-            placeholder=""
-            value="{{ empty(old('inscricao_estadual')) && isset($resultado->pessoaJuridica->inscricao_estadual) ? $resultado->pessoaJuridica->inscricao_estadual : old('inscricao_estadual') }}"
-        />
-        @if($errors->has('inscricao_estadual'))
-        <div class="invalid-feedback">
-            {{ $errors->first('inscricao_estadual') }}
-        </div>
-        @endif
-    </div>
-    <div class="col-sm mb-2-576">
         <label for="inscricao_municipal">{{ array_search('inscricao_municipal', $codCnpj) }} - Inscrição Municipal *</label>
         <input
             type="text"
@@ -400,6 +385,21 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @if($errors->has('inscricao_municipal'))
         <div class="invalid-feedback">
             {{ $errors->first('inscricao_municipal') }}
+        </div>
+        @endif
+    </div>
+    <div class="col-sm mb-2-576">
+        <label for="inscricao_estadual">{{ array_search('inscricao_estadual', $codCnpj) }} - Inscrição Estadual *</label>
+        <input
+            type="text"
+            name="inscricao_estadual"
+            class="{{ $classes[3] }} {{ array_search('inscricao_estadual', $codCnpj) }} form-control {{ $errors->has('inscricao_estadual') ? 'is-invalid' : '' }}"
+            placeholder=""
+            value="{{ empty(old('inscricao_estadual')) && isset($resultado->pessoaJuridica->inscricao_estadual) ? $resultado->pessoaJuridica->inscricao_estadual : old('inscricao_estadual') }}"
+        />
+        @if($errors->has('inscricao_estadual'))
+        <div class="invalid-feedback">
+            {{ $errors->first('inscricao_estadual') }}
         </div>
         @endif
     </div>

@@ -21,10 +21,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
         
     }
 
-    private function getCodigos()
+    private function getRelacoes()
     {
-        $codigos = array();
-        $relacoes = [
+        return [
             'App\Anexo' => PreRegistroService::RELATION_ANEXOS,
             'App\Contabil' => PreRegistroService::RELATION_CONTABIL,
             'App\PreRegistroCpf' => PreRegistroService::RELATION_PF,
@@ -33,18 +32,15 @@ class PreRegistroService implements PreRegistroServiceInterface {
             'App\ResponsavelTecnico' => PreRegistroService::RELATION_RT,
             'App\UserExterno' => PreRegistroService::RELATION_USER_EXTERNO,
         ];
-        $models = [
-            'App\UserExterno' => null,
-            'App\PreRegistro' => null,
-            'App\PreRegistroCpf' => null,
-            'App\PreRegistroCnpj' => null,
-            'App\Contabil' => null,
-            'App\ResponsavelTecnico' => null,
-            'App\Anexo' => null
-        ];
+    }
 
-        foreach($models as $key => $model)
-            $codigos[$relacoes[$key]] = $key::codigosPreRegistro();
+    private function getCodigos()
+    {
+        $codigos = array();
+        $relacoes = $this->getRelacoes();
+
+        foreach($relacoes as $key => $model)
+            $codigos[$model] = $key::codigosPreRegistro();
         
         return $codigos;
     }
@@ -54,13 +50,13 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $chave = false;
         $campos = $this->getCodigos()[$classe];
         $siglas = [
-            'anexos' => null,
-            'preRegistro' => null,
-            'pessoaFisica' => null,
-            'pessoaJuridica' => '_empresa',
-            'contabil' => '_contabil',
-            'pessoaJuridica.responsavelTecnico' => '_rt',
-            'userExterno' => null,
+            PreRegistroService::RELATION_ANEXOS => null,
+            PreRegistroService::RELATION_PRE_REGISTRO => null,
+            PreRegistroService::RELATION_PF => null,
+            PreRegistroService::RELATION_PJ => '_empresa',
+            PreRegistroService::RELATION_CONTABIL => '_contabil',
+            PreRegistroService::RELATION_RT => '_rt',
+            PreRegistroService::RELATION_USER_EXTERNO => null,
         ];
 
         foreach($campos as $key => $cp)
@@ -125,11 +121,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function saveSiteAjax($request)
     {
-        // Colocar regra, tanto na view quanto no server, que inserir contabil ou rt, deve ser inicialmente pelo cnpj / cpf para carregar se já existe
-
         $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
         $resultado = null;
         $objeto = collect();
+        $classeCriar = array_search($request['classe'], $this->getRelacoes());
 
         if(($request['classe'] != PreRegistroService::RELATION_ANEXOS) && ($request['classe'] != PreRegistroService::RELATION_PRE_REGISTRO))
             $objeto = $preRegistro->whereHas($request['classe'])->get();
@@ -139,7 +134,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || $objeto->isNotEmpty())
             $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor']);
         else
-            $resultado = $preRegistro->criarAjax($request['classe'], $request['campo'], $request['valor']);
+            $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor']);
 
         return $resultado;
     }

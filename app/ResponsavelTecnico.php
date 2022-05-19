@@ -47,21 +47,31 @@ class ResponsavelTecnico extends Model
         // Buscar no Gerenti; se existir, traz os dados
         // e verifica se existe na tabela; se existir, atualiza
         // ou cria e devolve os dados para view do cliente
-        $existe = ResponsavelTecnico::where('cpf', $cpf)->first();
+        if(isset($cpf) && (strlen($cpf) == 11))
+        {
+            $existe = ResponsavelTecnico::where('cpf', $cpf)->first();
 
-        return isset($existe) ? $existe : ResponsavelTecnico::create(['cpf' => $cpf]);
+            return isset($existe) ? $existe : ResponsavelTecnico::create(['cpf' => $cpf]);
+        }
+
+        return null;
     }
 
     public function validarUpdateAjax($campo, $valor)
     {
         if($campo == 'cpf')
         {
-            if(isset($valor) && (strlen($valor) == 11) && ($valor != $this->cnpj)) 
+            if(isset($valor) && (strlen($valor) == 11)) 
                 return $this->buscar($valor);
             if(!isset($valor))
                 return 'remover';
         }
 
         return null;
+    }
+
+    public function updateAjax($campo, $valor)
+    {
+        $this->update([$campo => $valor]);
     }
 }

@@ -1,4 +1,11 @@
-<p class="text-dark mb-3"><i class="fas fa-info-circle"></i> Limite de até {{ $totalFiles }} anexos</p>
+<p class="text-dark mb-2"><i class="fas fa-info-circle text-primary"></i> <strong>Atenção!</strong>
+    <br>
+    <span class="ml-3"><strong>*</strong> Limite de até {{ $totalFiles }} anexos</span>
+    <br>
+    <span class="ml-3"><strong>*</strong> Somente arquivos com extensão: .pdf, .jpg, .jpeg, .png</span>
+</p>
+
+<div class="linha-lg-mini"></div>
 
 @if(strlen($resultado->userExterno->cpf_cnpj) == 11)
     <p>Cópia RG</p>

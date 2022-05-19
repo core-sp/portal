@@ -8,7 +8,7 @@ use App\Rules\CpfCnpj;
 
 class PreRegistroAjaxRequest extends FormRequest
 {
-    private $regraCpfCnpj;
+    private $regraValor;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -17,24 +17,31 @@ class PreRegistroAjaxRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        $this->regraValor = array();
+        $this->regraValor = ['max:191'];
+
         if((request()->campo == 'tipo_telefone_1') || (request()->campo == 'telefone_1'))
-        {
-            $conteudo = isset(request()->valor) ? request()->valor : '';
             $this->merge([
                 'campo' => request()->campo == 'tipo_telefone_1' ? 'tipo_telefone' : 'telefone',
                 'valor' => ';'.request()->valor
             ]);
-        }
 
         if((strpos(request()->campo, 'cpf') !== false) || (strpos(request()->campo, 'cnpj') !== false))
         {
             if(isset(request()->valor))
             {
-                $this->regraCpfCnpj = new CpfCnpj;
+                $this->regraValor[1] = new CpfCnpj;
                 $this->merge([
                     'valor' => apenasNumeros(request()->valor)
                 ]);
             }
+        }
+
+        if(request()->campo == 'path')
+        {
+            $this->regraValor[0] = 'file';
+            $this->regraValor[1] = 'mimes:pdf,jpeg,jpg,png';
+            $this->regraValor[2] = 'max:1000';
         }
     }
 
@@ -59,7 +66,7 @@ class PreRegistroAjaxRequest extends FormRequest
         }
 
         return [
-            'valor' => ['max:191', $this->regraCpfCnpj],
+            'valor' => $this->regraValor,
             'campo' => 'required|in:'.$todos,
             'classe' => 'required|in:'.$classes
         ];
@@ -68,7 +75,11 @@ class PreRegistroAjaxRequest extends FormRequest
     public function messages()
     {
         return [
-            'max' => 'Limite de :max caracteres',
+            'max' => request()->campo != 'path' ? 'Limite de :max caracteres' : 'Limite do tamanho do arquivo é de 1 MB',
+            'in' => 'Campo não encontrado ou não permitido alterar',
+            'required' => 'Falta dados para enviar a requisição',
+            'mimes' => 'O arquivo deve ter extensão: .pdf, .jpeg, .jpg, .png',
+            'file' => 'Deve ser um arquivo',
         ];
     }
 }

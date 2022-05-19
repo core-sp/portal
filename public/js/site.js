@@ -1008,6 +1008,135 @@ function addArquivo(nome, maximoFiles){
 //	--------------------------------------------------------------------------------------------------------
 // Funcionalidade Solicitação de Registro
 
+function putDadosPreRegistro(objeto)
+{
+	var classesObjeto = objeto.attr("class");
+	var classe = classesObjeto.split(' ')[0];
+	var codigo = classesObjeto.split(' ')[1];
+	var valor = objeto.val();
+	var campo = objeto.attr("name");
+
+	if((campo == "") || (classe == ""))
+		return;
+
+	if((campo == 'tipo_telefone_1') && (objeto.length > 1))
+		valor = '';
+
+	$.ajax({
+		method: "PUT",
+		data: {
+			"_token": $('meta[name="csrf-token"]').attr('content'),
+			"classe": classe,
+			"campo": campo,
+			"valor": valor
+		},
+		dataType: 'json',
+		url: "/externo/inserir-registro-ajax",
+		beforeSend: function(){
+			$("#modalLoadingBody").html('<div class="spinner-border text-success"></div> Salvando...');
+			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false});
+		},
+		complete: function(){
+		},
+		success: function(response) {
+			if(campo == 'cpf_rt')
+				preencheRT(response);
+			if(campo == 'cnpj_contabil')
+				preencheContabil(response);
+			$("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> <strong>' + codigo + '</strong> salvo!');
+			setTimeout(function() {
+				$("#modalLoadingPreRegistro").modal('hide');
+			}, 1500); 
+			valorPreRegistro = valor;
+		},
+		error: function(request, status, error) {
+			var errorFunction = getErrorMsg(request);
+			$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorFunction[0]);
+			setTimeout(function() {
+				$("#modalLoadingPreRegistro").modal('hide');
+			}, errorFunction[1]); 
+			valorPreRegistro = null;
+			console.clear();
+		}
+	});
+}
+
+function getErrorMsg(request)
+{
+	var time = 5000;
+	var errorMessage = request.status + ': ' + request.statusText;
+	var nomesCampo = ['classe', 'campo', 'valor'];
+	if(request.status == 422){
+		for(var nome of nomesCampo){
+			var msg = request.responseJSON.errors[nome];
+			if(msg != undefined)
+				errorMessage = msg[0];
+		}
+		time = 2000;
+	}else
+		errorMessage = errorMessage + '.<br>Recarregue a página, por favor.<br>Caso persista o erro, entre em contato conosco';
+	return [errorMessage, time];
+}
+
+// limpar checkbox telefone_1, que não é obrigatório, se campo vazio
+function limparTipoTel(objeto)
+{
+	if((objeto.val().length == 0) && ($('#inserirRegistro input[name="tipo_telefone_1"]:checked').length > 0)){
+		$('#inserirRegistro input[name="tipo_telefone_1"]:checked').prop("checked", false);
+		putDadosPreRegistro($('#inserirRegistro input[name="tipo_telefone_1"]'));
+	}
+}
+
+function preencheContabil(dados)
+{
+	if($('#inserirRegistro input[name="cnpj_contabil"]').val() == ""){
+		$('#inserirRegistro [name$="_contabil"]').each(function(){
+			$(this).val('');
+		});
+		$('#campos_contabil').prop("disabled", true);
+	}else{
+		$('#campos_contabil').prop("disabled", false);
+		$('#inserirRegistro [name$="_contabil"]').each(function(){
+			var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_contabil'));
+			if(name != 'cnpj')
+				$(this).val(dados[name]);
+		});
+	}
+}
+
+function preencheRT(dados)
+{
+	if($('#inserirRegistro input[name="cpf_rt"]').val() == ""){
+		$('#inserirRegistro [name$="_rt"]').each(function(){
+			this.checked ? $(this).prop('checked', false) : $(this).val('');
+		});
+		$('#campos_rt').prop("disabled", true);
+		$('#inserirRegistro input[name="registro"]').prop("disabled", true).val('');
+	}else{
+		$('#campos_rt').prop("disabled", false);
+		$('#inserirRegistro input[name="registro"]').prop("disabled", false).val(dados.registro);
+		$('#inserirRegistro [name$="_rt"]').each(function(){
+			var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_rt'));
+			if($(this).attr('type') == 'radio')
+				$('#inserirRegistro input[name="' + $(this).attr('name') + '"][value="' + dados[name] + '"]').prop("checked", true);
+			else if(name != 'cpf')
+				$(this).val(dados[name]);
+		});
+	}
+}
+
+async function callbackEnderecoPreRegistro(restoId)
+{
+	var dadosAntigos = [$("#rua_" + restoId).val(), $("#bairro_" + restoId).val(), $("#cidade_" + restoId).val(), $("#uf_" + restoId).val()];
+	var array = [$("#rua_" + restoId), $("#bairro_" + restoId), $("#cidade_" + restoId), $("#uf_" + restoId)];
+	var dados = await getEndereco(restoId);
+	preenche_formulario_cep(restoId, dados);
+	for (let i = 0; i < array.length; i++) {
+		if(dadosAntigos[i] != array[i].val())
+			putDadosPreRegistro(array[i]); 
+	}
+}
+
 // Carrega a máscara quando já possui um rg
 $('#inserirRegistro').ready(function() {
 	if($(".rgInput").index($('#rg')) > -1){
@@ -1032,15 +1161,6 @@ $("#checkEndEmpresa:checked").length == 1 ? $("#habilitarEndEmpresa").hide() : $
 $("#checkEndEmpresa").change(function(){
 	this.checked ? $("#habilitarEndEmpresa").hide() : $("#habilitarEndEmpresa").show();
 });
-
-// limpar checkbox telefone_1, que não é obrigatório, se campo vazio
-function limparTipoTel(objeto)
-{
-	if((objeto.val().length == 0) && ($('#inserirRegistro input[name="tipo_telefone_1"]:checked').length > 0)){
-		$('#inserirRegistro input[name="tipo_telefone_1"]:checked').prop("checked", false);
-		putDadosPreRegistro($('#inserirRegistro input[name="tipo_telefone_1"]'));
-	}
-}
 
 $('#inserirRegistro input[name="telefone_1"]').on('keyup blur', function(){
 	limparTipoTel($(this));
@@ -1086,126 +1206,13 @@ $("#inserirRegistro .limparFile").click(function(){
 		todoArquivo.remove();
 	else {
 		$('.' + classe + ' .custom-file-input:last').val("");
-		$('.' + classe + ' .custom-file-input:last').siblings(".custom-file-label").removeClass("selected").html('<span class="text-secondary">Escolher arquivo</span>');
+		$('.' + classe + ' .custom-file-input:last').siblings(".custom-file-label")
+		.removeClass("selected")
+		.html('<span class="text-secondary">Escolher arquivo</span>');
 		$('.' + classe + ' .custom-file-input:last').removeClass('is-invalid');
 		$('.' + classe + " .invalid-feedback:last").remove();
 	}
 });
-
-function preencheContabil(dados)
-{
-	if($('#inserirRegistro input[name="cnpj_contabil"]').val() == ""){
-		$('#inserirRegistro [name$="_contabil"]').each(function(){
-			$(this).val('');
-		});
-		$('#campos_contabil').prop("disabled", true);
-	}else{
-		$('#campos_contabil').prop("disabled", false);
-		$('#inserirRegistro input[name="email_contabil"]').val(dados.email);
-		$('#inserirRegistro input[name="nome_contabil"]').val(dados.nome);
-		$('#inserirRegistro input[name="nome_contato_contabil"]').val(dados.nome_contato);
-		$('#inserirRegistro input[name="telefone_contabil"]').val(dados.telefone);
-	}
-}
-
-function preencheRT(dados)
-{
-	if($('#inserirRegistro input[name="cpf_rt"]').val() == ""){
-		$('#inserirRegistro [name$="_rt"]').each(function(){
-			this.checked ? $(this).prop('checked', false) : $(this).val('');
-		});
-		$('#campos_rt').prop("disabled", true);
-		$('#inserirRegistro input[name="registro"]').prop("disabled", true).val('');
-	}else{
-		$('#campos_rt').prop("disabled", false);
-		$('#inserirRegistro input[name="registro"]').prop("disabled", false).val(dados.registro);
-		$('#inserirRegistro input[name="nome_rt"]').val(dados.nome);
-		$('#inserirRegistro input[name="nome_social_rt"]').val(dados.nome_social);
-		$('#inserirRegistro input[name="sexo_rt"][value="' + dados.sexo + '"]').prop("checked", true);
-		$('#inserirRegistro input[name="dt_nascimento_rt"]').val(dados.dt_nascimento);
-		$('#inserirRegistro input[name="identidade_rt"]').val(dados.identidade);
-		$('#inserirRegistro input[name="orgao_emissor_rt"]').val(dados.orgao_emissor);
-		$('#inserirRegistro input[name="dt_expedicao_rt"]').val(dados.dt_expedicao);
-		$('#inserirRegistro input[name="cep_rt"]').val(dados.cep);
-		$('#inserirRegistro input[name="bairro_rt"]').val(dados.bairro);
-		$('#inserirRegistro input[name="logradouro_rt"]').val(dados.logradouro);
-		$('#inserirRegistro input[name="numero_rt"]').val(dados.numero);
-		$('#inserirRegistro input[name="complemento_rt"]').val(dados.complemento);
-		$('#inserirRegistro input[name="cidade_rt"]').val(dados.cidade);
-		$('#inserirRegistro select[name="uf_rt"]').val(dados.uf);
-		$('#inserirRegistro input[name="nome_mae_rt"]').val(dados.nome_mae);
-		$('#inserirRegistro input[name="nome_pai_rt"]').val(dados.nome_pai);
-	}
-}
-
-function putDadosPreRegistro(objeto)
-{
-	var classesObjeto = objeto.attr("class");
-	var classe = classesObjeto.split(' ')[0];
-	var codigo = classesObjeto.split(' ')[1];
-	var valor = objeto.val();
-	var campo = objeto.attr("name");
-
-	if((campo == "") || (classe == ""))
-		return;
-
-	if((campo == 'tipo_telefone_1') && (objeto.length > 1))
-		valor = '';
-
-	$.ajax({
-		method: "PUT",
-		data: {
-			"_token": $('meta[name="csrf-token"]').attr('content'),
-			"classe": classe,
-			"campo": campo,
-			"valor": valor
-		},
-		dataType: 'json',
-		url: "/externo/inserir-registro-ajax",
-		beforeSend: function(){
-			$("#modalLoadingBody").html('<div class="spinner-border text-success"></div> Salvando...');
-			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false});
-		},
-		complete: function(){
-		},
-		success: function(response) {
-			if(campo == 'cpf_rt')
-				preencheRT(response);
-			if(campo == 'cnpj_contabil')
-				preencheContabil(response);
-			$("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> <strong>' + codigo + '</strong> salvo!');
-			setTimeout(function() {
-				$("#modalLoadingPreRegistro").modal('hide');
-			}, 1500); 
-			valorPreRegistro = null;
-		},
-		error: function(request, status, error) {
-			var time = 5000;
-			var errorMessage = request.status + ': ' + request.statusText;
-			if(request.status == 422){
-				errorMessage = request.responseJSON.errors.valor[0];
-				time = 2000;
-			}else
-				errorMessage = errorMessage + '.<br>Recarregue a página, por favor.<br>Caso persista o erro, entre em contato conosco';
-			$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorMessage);
-			setTimeout(function() {
-				$("#modalLoadingPreRegistro").modal('hide');
-			}, time); 
-		}
-	});
-}
-
-async function callbackEnderecoPreRegistro(restoId)
-{
-	var dadosAntigos = [$("#rua_" + restoId).val(), $("#bairro_" + restoId).val(), $("#cidade_" + restoId).val(), $("#uf_" + restoId).val()];
-	var array = [$("#rua_" + restoId), $("#bairro_" + restoId), $("#cidade_" + restoId), $("#uf_" + restoId)];
-	var dados = await getEndereco(restoId);
-	preenche_formulario_cep(restoId, dados);
-	for (let i = 0; i < array.length; i++) {
-		if(dadosAntigos[i] != array[i].val())
-			putDadosPreRegistro(array[i]); 
-	}
-}
 
 $('#inserirRegistro input[id^="cep_"]').on('keyup', function(event){
 	var tecla = event.keyCode;
@@ -1230,18 +1237,17 @@ $('#inserirRegistro input[name="cpf_rt"], #inserirRegistro input[name="cnpj_cont
 	var validaCnpj = (objeto.attr('name') == 'cnpj_contabil') && (objeto.val().length == 18);
 
 	if(validaCpf || validaCnpj || vazio){
-		if((valorPreRegistro != objeto.val()) || vazio)
+		if(valorPreRegistro != objeto.val()){
 			putDadosPreRegistro(objeto);
-		else
-			valorPreRegistro = null;
+		}
 	}
 });
 
 $('#inserirRegistro input:not(:checkbox,:file,:radio,[name="cpf_rt"],[name="cnpj_contabil"])').blur(function(){
-	if(valorPreRegistro != $(this).val())
+	if(valorPreRegistro != $(this).val()){
 		putDadosPreRegistro($(this));
-	else
 		valorPreRegistro = null;
+	}
 });
 
 $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(function(){

@@ -129,11 +129,6 @@
 </div>
 
 @if(strlen($resultado->userExterno->cpf_cnpj) == 14)
-@php
-    $codigoEndereco = array_search('cep', $codCnpj).'-'.array_search('bairro', $codCnpj).'-'.array_search('logradouro', $codCnpj).'-'.
-    array_search('numero', $codCnpj).'-'.array_search('complemento', $codCnpj).'-'.array_search('cidade', $codCnpj).'-'.array_search('uf', $codCnpj);
-@endphp
-
 <br>
 
 <h5 class="bold mb-2">Endereço da empresa</h5>
@@ -142,7 +137,7 @@
         <label class="form-check-label">
             <input type="checkbox" 
                 id="checkEndEmpresa" 
-                class="{{ $classes[3] }} {{ $codigoEndereco }} form-check-input" 
+                class="{{ $classes[3] }} {{ array_search('bairro', $codCnpj).'-'.array_search('uf', $codCnpj) }} form-check-input" 
                 name="checkEndEmpresa" 
                 @if(isset($resultado->pessoaJuridica) && $resultado->pessoaJuridica->mesmoEndereco())
                     checked

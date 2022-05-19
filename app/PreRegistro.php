@@ -107,8 +107,7 @@ class PreRegistro extends Model
                     $resultado = $this->update(['contabil_id' => $valido == 'remover' ? null : $valido->id]);
                 else
                 {
-                    $contabil = $this->contabil;
-                    $contabil->update([$campo => $valor]);
+                    $this->contabil->updateAjax($campo, $valor);
                     $this->touch();
                 }
                 $resultado = $valido;
@@ -119,8 +118,7 @@ class PreRegistro extends Model
                     $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido == 'remover' ? null : $valido->id]);
                 else
                 {
-                    $rt = $this->pessoaJuridica->responsavelTecnico;
-                    $rt->update([$campo => $valor]);
+                    $this->pessoaJuridica->responsavelTecnico->updateAjax($campo, $valor);
                     $this->touch();
                 }
                 $resultado = $valido;
@@ -130,25 +128,25 @@ class PreRegistro extends Model
         return $resultado;
     }
 
-    public function criarAjax($classe, $campo, $valor)
+    public function criarAjax($classe, $relacao, $campo, $valor)
     {
         $resultado = null;
 
-        switch ($classe) {
+        switch ($relacao) {
             case 'pessoaJuridica.responsavelTecnico':
-                $valido = 'App\ResponsavelTecnico'::buscar($valor);
+                $valido = $classe::buscar($valor);
                 if(isset($valido))
                     $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id]);
                 $resultado = $valido;
                 break;
             case 'contabil':
-                $valido = 'App\Contabil'::buscar($valor);
+                $valido = $classe::buscar($valor);
                 if(isset($valido))
                     $resultado = $this->update(['contabil_id' => $valido->id]);
                 $resultado = $valido;
                 break;
             case 'anexos':
-                $this->anexos()->create([$campo => $valor]);
+                // $this->anexos()->create([$campo => $valor]);
                 break;
         }
 
