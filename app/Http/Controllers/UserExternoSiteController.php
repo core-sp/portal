@@ -110,14 +110,12 @@ class UserExternoSiteController extends Controller
             $resultado = $dados['resultado'];
             $regionais = $dados['regionais'];
             $classes = $dados['classes'];
+            $totalFiles = $dados['totalFiles'];
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, 'Erro ao carregar os dados da solicitação de registro');
         }
 
-        // temporário
-        $totalFiles = 5;
-        
         return view('site.userExterno.inserir-pre-registro', compact('resultado', 'regionais', 'totalFiles', 'codigos', 'classes'));
     }
 

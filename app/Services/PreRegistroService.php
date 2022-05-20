@@ -16,6 +16,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
     const RELATION_RT = "pessoaJuridica.responsavelTecnico";
     const RELATION_USER_EXTERNO = 'userExterno';
 
+    private $totalFiles = 'App\Anexo'::TOTAL_PRE_REGISTRO;
+
     public function __construct()
     {
         
@@ -115,7 +117,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 ->all()
                 ->splice(0, 13)
                 ->sortBy('regional'),
-            'classes' => $this->getNomeClasses()
+            'classes' => $this->getNomeClasses(),
+            'totalFiles' => $this->totalFiles,
         ];
     }
 

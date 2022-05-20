@@ -17,7 +17,6 @@ class PreRegistroAjaxRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->regraValor = array();
         $this->regraValor = ['max:191'];
 
         if((request()->campo == 'tipo_telefone_1') || (request()->campo == 'telefone_1'))
@@ -40,8 +39,8 @@ class PreRegistroAjaxRequest extends FormRequest
         if(request()->campo == 'path')
         {
             $this->regraValor[0] = 'file';
-            $this->regraValor[1] = 'mimes:pdf,jpeg,jpg,png';
-            $this->regraValor[2] = 'max:1000';
+            $this->regraValor[1] = 'mimetypes:application/pdf,image/jpeg,image/png';
+            $this->regraValor[2] = 'max:5120';
         }
     }
 
@@ -75,10 +74,10 @@ class PreRegistroAjaxRequest extends FormRequest
     public function messages()
     {
         return [
-            'max' => request()->campo != 'path' ? 'Limite de :max caracteres' : 'Limite do tamanho do arquivo é de 1 MB',
+            'max' => request()->campo != 'path' ? 'Limite de :max caracteres' : 'Limite do tamanho do arquivo é de 5 MB',
             'in' => 'Campo não encontrado ou não permitido alterar',
             'required' => 'Falta dados para enviar a requisição',
-            'mimes' => 'O arquivo deve ter extensão: .pdf, .jpeg, .jpg, .png',
+            'mimetypes' => 'O arquivo não possue extensão permitida ou está com erro',
             'file' => 'Deve ser um arquivo',
         ];
     }

@@ -31,14 +31,15 @@
 
 <label class="mt-3" for="anexos">{{ array_search('path', $codAnexo) }} - Anexo *</label>
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
-@if(isset($resultado->anexos))
+@if($resultado->anexos->count() > 0)
+@foreach($resultado->anexos as $anexo)
 <div class="ArquivoBD_anexo">
     <div class="form-row mb-2">
         <div class="input-group col-sm mb-2-576">
             <input 
                 type="text" 
                 class="form-control" 
-                value="{{-- $resultado->copia_identidade --}}"
+                value="{{ $anexo->nome_original }}"
                 readonly
             />
             <div class="input-group-append">
@@ -48,6 +49,7 @@
         </div>
     </div>
 </div>
+@endforeach
 @endif
 
 <!-- Input do arquivo -->

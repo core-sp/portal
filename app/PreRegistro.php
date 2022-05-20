@@ -146,10 +146,13 @@ class PreRegistro extends Model
                 $resultado = $valido;
                 break;
             case 'anexos':
-                // $this->anexos()->create([$campo => $valor]);
+                $anexos = $this->anexos();
+                $valido = $classe::armazenar($anexos->count(), $valor);
+                if(isset($valido))
+                    $resultado = $anexos->create([$campo => $valido, 'nome_original' => $valor->getClientOriginalName()]);
                 break;
         }
 
-        return $resultado;
+        return $valido;
     }
 }

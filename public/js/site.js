@@ -1013,8 +1013,15 @@ function putDadosPreRegistro(objeto)
 	var classesObjeto = objeto.attr("class");
 	var classe = classesObjeto.split(' ')[0];
 	var codigo = classesObjeto.split(' ')[1];
-	var valor = objeto.val();
 	var campo = objeto.attr("name");
+	var valor = campo == 'path' ? objeto[0].files[0] : objeto.val();
+	var cT = campo == 'path' ? false : 'application/x-www-form-urlencoded';
+	var pD = campo == 'path' ? false : true;
+	var frmData = new FormData();
+
+    frmData.append('valor', valor);
+	frmData.append('campo', campo);
+	frmData.append('classe', classe);
 
 	if((campo == "") || (classe == ""))
 		return;
@@ -1023,15 +1030,22 @@ function putDadosPreRegistro(objeto)
 		valor = '';
 
 	$.ajax({
-		method: "PUT",
-		data: {
-			"_token": $('meta[name="csrf-token"]').attr('content'),
-			"classe": classe,
-			"campo": campo,
-			"valor": valor
+		method: 'POST',
+		enctype: 'multipart/form-data',
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		},
+		data: campo == 'path' ? frmData : {
+			'classe': classe,
+			'campo': campo,
+			'valor': valor
 		},
 		dataType: 'json',
-		url: "/externo/inserir-registro-ajax",
+		url: '/externo/inserir-registro-ajax',
+		processData: pD,
+        contentType: cT,
+		cache: false,
+		timeout: 30000,
 		beforeSend: function(){
 			$("#modalLoadingBody").html('<div class="spinner-border text-success"></div> Salvando...');
 			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false});
@@ -1043,6 +1057,8 @@ function putDadosPreRegistro(objeto)
 				preencheRT(response);
 			if(campo == 'cnpj_contabil')
 				preencheContabil(response);
+			if(campo == 'path')
+				preencheFile(response);
 			$("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> <strong>' + codigo + '</strong> salvo!');
 			setTimeout(function() {
 				$("#modalLoadingPreRegistro").modal('hide');
@@ -1123,6 +1139,11 @@ function preencheRT(dados)
 				$(this).val(dados[name]);
 		});
 	}
+}
+
+function preencheFile(dados)
+{
+	console.log(dados);
 }
 
 async function callbackEnderecoPreRegistro(restoId)
@@ -1251,7 +1272,8 @@ $('#inserirRegistro input:not(:checkbox,:file,:radio,[name="cpf_rt"],[name="cnpj
 });
 
 $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(function(){
-	putDadosPreRegistro($(this));
+	if($(this).val() != "")
+		putDadosPreRegistro($(this));
 });
 
 $('#inserirRegistro input:checkbox, #inserirRegistro input:radio').change(function(){

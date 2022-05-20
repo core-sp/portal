@@ -247,7 +247,7 @@ Route::prefix('/')->group(function() {
     Route::get('/solicitar-registro', 'UserExternoSiteController@preRegistroView')->name('externo.preregistro.view');
     Route::get('/inserir-registro', 'UserExternoSiteController@inserirPreRegistroView')->name('externo.inserir.preregistro.view');
     Route::put('/inserir-registro', 'UserExternoSiteController@inserirPreRegistro')->name('externo.inserir.preregistro');
-    Route::put('/inserir-registro-ajax', 'UserExternoSiteController@inserirPreRegistroAjax')->name('externo.inserir.preregistro.ajax');
+    Route::post('/inserir-registro-ajax', 'UserExternoSiteController@inserirPreRegistroAjax')->name('externo.inserir.preregistro.ajax');
   });
   
   //Balcão de Oportunidades

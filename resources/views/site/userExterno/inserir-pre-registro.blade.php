@@ -48,7 +48,7 @@
 
     <hr class="mb-0">
 
-    <form method="POST" id="inserirRegistro" class="cadastroRepresentante">
+    <form method="POST" enctype="multipart/form-data" id="inserirRegistro" class="cadastroRepresentante">
         @csrf
         @if(isset($resultado->id))
             @method('PUT')

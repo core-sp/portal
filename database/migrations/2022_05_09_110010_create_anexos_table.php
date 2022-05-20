@@ -16,6 +16,7 @@ class CreateAnexosTable extends Migration
         Schema::create('anexos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('path');
+            $table->string('nome_original');
             $table->bigInteger('pre_registro_id')->unsigned()->nullable();
             $table->foreign('pre_registro_id')->references('id')->on('pre_registros');
             $table->timestamps();
