@@ -1050,13 +1050,14 @@ function putDadosPreRegistro(objeto)
 {
 	var classesObjeto = objeto.attr("class");
 	var classe = classesObjeto.split(' ')[0];
-	var codigo = classesObjeto.split(' ')[1];
+	var codigo = classe == 'Arquivo-Excluir' ? 'Arquivo' : classesObjeto.split(' ')[1];
 	var campo = objeto.attr("name");
 	var valor = campo == 'path' ? objeto[0].files[0] : objeto.val();
 	var cT = campo == 'path' ? false : 'application/x-www-form-urlencoded';
 	var pD = campo == 'path' ? false : true;
 	var frmData = new FormData();
 	var dados = null;
+	var status = classe == 'Arquivo-Excluir' ? ' excluído' : ' salvo';
 
     frmData.append('valor', valor);
 	frmData.append('campo', campo);
@@ -1108,7 +1109,7 @@ function putDadosPreRegistro(objeto)
 				preencheFile(response, objeto);
 			if(classe == 'Arquivo-Excluir')
 				removeFile(response);
-			$("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> <strong>' + codigo + '</strong> salvo!');
+			$("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> <strong>' + codigo + '</strong>' + status + '!');
 			setTimeout(function() {
 				$("#modalLoadingPreRegistro").modal('hide');
 			}, 1500); 
