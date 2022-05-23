@@ -1003,6 +1003,44 @@ function addArquivo(nome, maximoFiles){
 		$(".Arquivo_" + nome + " .custom-file-input:last").siblings(".custom-file-label").removeClass("selected").html('<span class="text-secondary">Escolher arquivo</span>');
 	}
 }
+
+function getArquivoBD(objetoAfter, finalLink, nome, valor, id)
+{
+	var total = $(".ArquivoBD_" + nome).length;
+	var link = window.location.href.slice(0, window.location.href.lastIndexOf("/") + 1) + finalLink + '/';
+	if(total == 0){
+		var elemento = '<div class="ArquivoBD_anexo"><div class="form-row mb-2"><div class="input-group col-sm mb-2-576">';
+		elemento += '<input type="text" class="form-control" value="' + valor + '" readonly /> <div class="input-group-append">';
+		elemento += '<a href="' + link + 'download/' + id + '" class="btn btn-primary Arquivo-Download" value="" target="_blank"><i class="fas fa-download"></i></a>';
+		elemento += '<button class="btn btn-danger modalExcluir" value="' + id + '" type="button" data-toggle="modal" data-target="#modalExcluirFile" data-backdrop="static">';
+		elemento += '<i class="fas fa-trash-alt"></i></button></div></div></div></div>';
+		objetoAfter.after(elemento);
+	}
+	var cloneBD = total == 0 ? $(".ArquivoBD_" + nome + ":last") : $(".ArquivoBD_" + nome + ":last").clone(true);
+	if(total > 0){
+		cloneBD.find("input").val(valor);
+		cloneBD.find(".Arquivo-Download").attr("href", link + 'download/' + id);
+		cloneBD.find(".modalExcluir").val(id);
+	}
+	return cloneBD;
+}
+
+function limparFile(objeto, nomeBD, totalFiles)
+{
+	var todoArquivo = objeto.parent().parent().parent().parent();
+	var classe = todoArquivo.attr('class');
+	if($('.' + classe).length > 1)
+		todoArquivo.remove();
+	else if($(".ArquivoBD_" + nomeBD).length < totalFiles){
+		$('.' + classe + ' .custom-file-input:last').val("");
+		$('.' + classe + ' .custom-file-input:last').siblings(".custom-file-label")
+		.removeClass("selected")
+		.html('<span class="text-secondary">Escolher arquivo</span>');
+		$('.' + classe + ' .custom-file-input:last').removeClass('is-invalid');
+		$('.' + classe + " .invalid-feedback:last").remove();
+	}else
+		todoArquivo.hide();
+}
 // ----------------------------------------------------------------------------------------------------------------------------
 
 //	--------------------------------------------------------------------------------------------------------
@@ -1018,6 +1056,7 @@ function putDadosPreRegistro(objeto)
 	var cT = campo == 'path' ? false : 'application/x-www-form-urlencoded';
 	var pD = campo == 'path' ? false : true;
 	var frmData = new FormData();
+	var dados = null;
 
     frmData.append('valor', valor);
 	frmData.append('campo', campo);
@@ -1029,23 +1068,31 @@ function putDadosPreRegistro(objeto)
 	if((campo == 'tipo_telefone_1') && (objeto.length > 1))
 		valor = '';
 
+	if(classe == 'Arquivo-Excluir')
+		dados = {
+			'_method': 'delete',
+			'id': valor
+		};
+	else
+		dados = {
+			'classe': classe,
+			'campo': campo,
+			'valor': valor
+		};
+
 	$.ajax({
 		method: 'POST',
 		enctype: 'multipart/form-data',
 		headers: {
 			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 		},
-		data: campo == 'path' ? frmData : {
-			'classe': classe,
-			'campo': campo,
-			'valor': valor
-		},
+		data: campo == 'path' ? frmData : dados,
 		dataType: 'json',
-		url: '/externo/inserir-registro-ajax',
+		url: classe == 'Arquivo-Excluir' ? '/externo/pre-registro-anexo/excluir/' + dados.id : '/externo/inserir-registro-ajax',
 		processData: pD,
         contentType: cT,
 		cache: false,
-		timeout: 30000,
+		timeout: 60000,
 		beforeSend: function(){
 			$("#modalLoadingBody").html('<div class="spinner-border text-success"></div> Salvando...');
 			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false});
@@ -1058,7 +1105,9 @@ function putDadosPreRegistro(objeto)
 			if(campo == 'cnpj_contabil')
 				preencheContabil(response);
 			if(campo == 'path')
-				preencheFile(response);
+				preencheFile(response, objeto);
+			if(classe == 'Arquivo-Excluir')
+				removeFile(response);
 			$("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> <strong>' + codigo + '</strong> salvo!');
 			setTimeout(function() {
 				$("#modalLoadingPreRegistro").modal('hide');
@@ -1141,9 +1190,28 @@ function preencheRT(dados)
 	}
 }
 
-function preencheFile(dados)
+function preencheFile(dados, objeto)
 {
-	console.log(dados);
+	if(dados.id && dados.nome_original){
+		var label = $('#inserirRegistro [for="anexos"]');
+		var limpar = objeto.parent().parent().find(".limparFile");
+		label.after(getArquivoBD(label, 'pre-registro-anexo', "anexo", dados.nome_original, dados.id));
+		limparFile(limpar, "anexo", pre_registro_total_files);
+	}
+}
+
+function removeFile(dados)
+{
+	if(dados != null){
+		var total = $('#inserirRegistro .ArquivoBD_anexo').length;
+		$('#inserirRegistro .ArquivoBD_anexo').each(function(){
+			if($(this).find("button").val() == dados){
+				$(this).remove();
+				if(total == pre_registro_total_files)
+					$('#inserirRegistro .Arquivo_anexo').show().parent().find("label").text("Escolher Arquivo");
+			}
+		});
+	}
 }
 
 async function callbackEnderecoPreRegistro(restoId)
@@ -1187,6 +1255,18 @@ $('#inserirRegistro input[name="telefone_1"]').on('keyup blur', function(){
 	limparTipoTel($(this));
 });
 
+$('#inserirRegistro .modalExcluir').click(function(){
+	var id = $(this).val();
+	var texto = $(this).parent().parent().find("input").val();
+	$('#inserirRegistro .Arquivo-Excluir').val(id);
+	$('#inserirRegistro #textoExcluir').text(texto);
+});
+
+$('#inserirRegistro .Arquivo-Excluir').click(function(){
+	putDadosPreRegistro($(this));
+	$('#inserirRegistro #modalExcluirFile').modal('hide');
+});
+
 $('input[name="tipo_telefone_1"]').click(function(){
 	$('input[name="telefone_1"]').focus();
 });
@@ -1221,18 +1301,7 @@ $("#inserirRegistro .files").on("change", function() {
 
 // remove a div com input file ou limpa o campo se for 1 input
 $("#inserirRegistro .limparFile").click(function(){
-	var todoArquivo = $(this).parent().parent().parent().parent();
-	var classe = todoArquivo.attr('class');
-	if($('.' + classe).length > 1)
-		todoArquivo.remove();
-	else {
-		$('.' + classe + ' .custom-file-input:last').val("");
-		$('.' + classe + ' .custom-file-input:last').siblings(".custom-file-label")
-		.removeClass("selected")
-		.html('<span class="text-secondary">Escolher arquivo</span>');
-		$('.' + classe + ' .custom-file-input:last').removeClass('is-invalid');
-		$('.' + classe + " .invalid-feedback:last").remove();
-	}
+	limparFile($(this));
 });
 
 $('#inserirRegistro input[id^="cep_"]').on('keyup', function(event){

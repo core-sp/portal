@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\PreRegistroServiceInterface;
 use App\PreRegistro;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Support\Facades\Storage;
 
 class PreRegistroService implements PreRegistroServiceInterface {
 
@@ -16,11 +17,13 @@ class PreRegistroService implements PreRegistroServiceInterface {
     const RELATION_RT = "pessoaJuridica.responsavelTecnico";
     const RELATION_USER_EXTERNO = 'userExterno';
 
-    private $totalFiles = 'App\Anexo'::TOTAL_PRE_REGISTRO;
+    private $totalFiles;
+    private $pathStorage;
 
     public function __construct()
     {
-        
+        $this->totalFiles = 'App\Anexo'::TOTAL_PRE_REGISTRO;
+        $this->pathStorage = 'App\Anexo'::PATH_PRE_REGISTRO;
     }
 
     private function getRelacoes()
@@ -140,5 +143,25 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor']);
 
         return $resultado;
+    }
+
+    public function downloadAnexo($id)
+    {
+        $anexo = auth()->guard('user_externo')->user()->preRegistro->anexos()->where('id', $id)->first();
+        if(isset($anexo) && Storage::exists($anexo->path))
+            return response()->file(Storage::path($anexo->path), ["Cache-Control" => "no-cache"]);
+    }
+
+    public function excluirAnexo($id)
+    {
+        $anexo = auth()->guard('user_externo')->user()->preRegistro->anexos()->where('id', $id)->first();
+        if(isset($anexo) && Storage::exists($anexo->path))
+        {
+            if(Storage::delete($anexo->path));
+                $anexo->delete();
+            return $id;
+        }
+
+        return null;
     }
 }

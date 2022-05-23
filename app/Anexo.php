@@ -12,6 +12,7 @@ class Anexo extends Model
     protected $touches = ['preRegistros'];
 
     const TOTAL_PRE_REGISTRO = 5;
+    const PATH_PRE_REGISTRO = 'userExterno/pre_registros';
 
     // RA = registro anexo
     public static function codigosPreRegistro()
@@ -31,7 +32,7 @@ class Anexo extends Model
         if($total < Anexo::TOTAL_PRE_REGISTRO)
         {
             $nome = (string) Str::uuid() . '.' . $valor->extension();
-            return $valor->storeAs('userExterno/pre_registros', $nome);
+            return $valor->storeAs(Anexo::PATH_PRE_REGISTRO, $nome);
         }
 
         return null;

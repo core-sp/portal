@@ -13,4 +13,8 @@ interface PreRegistroServiceInterface {
     public function getPreRegistro(MediadorServiceInterface $service);
 
     public function saveSiteAjax($request);
+
+    public function downloadAnexo($id);
+
+    public function excluirAnexo($id);
 }

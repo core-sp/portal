@@ -150,4 +150,28 @@ class UserExternoSiteController extends Controller
         
         return response()->json($dados);
     }
+
+    public function preRegistroAnexoDownload($id)
+    {
+        try{
+            $file = $this->service->getService('PreRegistro')->downloadAnexo($id);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, 'Erro ao solicitar download do arquivo');
+        }
+        
+        return $file;
+    }
+
+    public function preRegistroAnexoExcluir($id)
+    {
+        try{
+            $dados = $this->service->getService('PreRegistro')->excluirAnexo($id);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, 'Erro ao solicitar exclusão do arquivo');
+        }
+        
+        return response()->json($dados);
+    }
 }

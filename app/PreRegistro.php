@@ -153,6 +153,6 @@ class PreRegistro extends Model
                 break;
         }
 
-        return $valido;
+        return $resultado;
     }
 }

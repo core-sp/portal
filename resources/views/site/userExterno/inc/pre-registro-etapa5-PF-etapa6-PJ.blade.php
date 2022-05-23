@@ -29,9 +29,8 @@
 
 @endif
 
-<label class="mt-3" for="anexos">{{ array_search('path', $codAnexo) }} - Anexo *</label>
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
-@if($resultado->anexos->count() > 0)
+<label class="mt-3" for="anexos">{{ array_search('path', $codAnexo) }} - Anexo *</label>
 @foreach($resultado->anexos as $anexo)
 <div class="ArquivoBD_anexo">
     <div class="form-row mb-2">
@@ -43,14 +42,27 @@
                 readonly
             />
             <div class="input-group-append">
-                <a href="/downloadFile/" class="btn btn-primary Arquivo-Download" value="" ><i class="fas fa-download"></i></a>
-                <a href="/excluirFile/" class="btn btn-danger Arquivo-Excluir" type="button" data-target=".myModal"><i class="fas fa-trash-alt"></i></a>
+                <a href="{{ route('externo.preregistro.anexo.download', $anexo->id) }}" 
+                    class="btn btn-primary Arquivo-Download" 
+                    value="" 
+                    target="_blank" 
+                >
+                    <i class="fas fa-download"></i>
+                </a>
+                <button class="btn btn-danger modalExcluir"
+                    value="{{ $anexo->id }}"
+                    type="button" 
+                    data-toggle="modal"
+                    data-target="#modalExcluirFile"
+                    data-backdrop="static"
+                >
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             </div>
         </div>
     </div>
 </div>
 @endforeach
-@endif
 
 <!-- Input do arquivo -->
 <div class="Arquivo_anexo">
@@ -62,7 +74,7 @@
                     class="{{ $classes[0] }} {{ array_search('path', $codAnexo) }} custom-file-input files {{ $errors->has('anexos') ? 'is-invalid' : '' }}" 
                     id="anexos"
                     name="path"
-                    value="{{-- isset($resultado->copia_identidade) ? $resultado->copia_identidade : old('copia_identidade') --}}"
+                    value=""
                 />
                 <label class="custom-file-label ml-0" for="customFile"><span class="text-secondary">Escolher arquivo</span></label>
             </div>
@@ -75,5 +87,29 @@
             {{ $errors->first('anexos') }}
         </div>
         @endif
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="modalExcluirFile">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+            <h4 class="modal-title"><i class="fas fa-trash-alt text-danger"></i> Excluir Arquivo</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+            Tem certeza que deseja excluir o anexo: <strong><span id="textoExcluir"></span></strong>?
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+            <button type="button" class="Arquivo-Excluir btn btn-danger" value="">Sim</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
     </div>
 </div>
