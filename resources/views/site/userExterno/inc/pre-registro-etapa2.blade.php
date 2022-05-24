@@ -173,13 +173,13 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             class="{{ $classes[2] }} {{ array_search('naturalidade', $codCpf) }} form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }}" 
         >
             <option value="">Selecione a opção...</option>
-        @foreach(estados() as $key => $naturalidade)
+        @foreach(estados() as $naturalidade)
             @if(!empty(old('naturalidade')))
-            <option value="{{ $key }}" {{ old('naturalidade') == $naturalidade ? 'selected' : '' }}>{{ $naturalidade }}</option>
+            <option value="{{ $naturalidade }}" {{ old('naturalidade') == $naturalidade ? 'selected' : '' }}>{{ $naturalidade }}</option>
             @elseif(isset($resultado->pessoaFisica->naturalidade))
-            <option value="{{ $key }}" {{ $key == $resultado->pessoaFisica->naturalidade ? 'selected' : '' }}>{{ $naturalidade }}</option>
+            <option value="{{ $naturalidade }}" {{ $naturalidade == $resultado->pessoaFisica->naturalidade ? 'selected' : '' }}>{{ $naturalidade }}</option>
             @else
-            <option value="{{ $key }}">{{ $naturalidade }}</option>
+            <option value="{{ $naturalidade }}">{{ $naturalidade }}</option>
             @endif
         @endforeach
         </select>

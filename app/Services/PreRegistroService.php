@@ -145,6 +145,26 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return $resultado;
     }
 
+    public function saveSite($request)
+    {
+        // $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
+        // $resultado = null;
+        // $objeto = collect();
+        // $classeCriar = array_search($request['classe'], $this->getRelacoes());
+
+        // if(($request['classe'] != PreRegistroService::RELATION_ANEXOS) && ($request['classe'] != PreRegistroService::RELATION_PRE_REGISTRO))
+        //     $objeto = $preRegistro->whereHas($request['classe'])->get();
+        
+        // $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
+
+        // if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || $objeto->isNotEmpty())
+        //     $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor']);
+        // else
+        //     $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor']);
+
+        // return $resultado;
+    }
+
     public function downloadAnexo($id)
     {
         $anexo = auth()->guard('user_externo')->user()->preRegistro->anexos()->where('id', $id)->first();

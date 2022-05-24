@@ -14,6 +14,8 @@ interface PreRegistroServiceInterface {
 
     public function saveSiteAjax($request);
 
+    public function saveSite($request);
+
     public function downloadAnexo($id);
 
     public function excluirAnexo($id);

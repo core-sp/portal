@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\UserExternoRequest;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PreRegistroAjaxRequest;
+use App\Http\Requests\PreRegistroRequest;
 
 class UserExternoSiteController extends Controller
 {
@@ -119,24 +120,21 @@ class UserExternoSiteController extends Controller
         return view('site.userExterno.inserir-pre-registro', compact('resultado', 'regionais', 'totalFiles', 'codigos', 'classes'));
     }
 
-    // public function inserirPreRegistro(PreRegistroRequest $request)
-    // {
-    //     try{
-    //         // Verificar com o metodo verificacao() para impedir de acessar o formulario
-    //         $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service);
-    //         $codigos = $dados['codigos'];
-    //         $resultado = $dados['resultado'];
-    //         $regionais = $dados['regionais'];
-    //     } catch (\Exception $e) {
-    //         \Log::error($e->getMessage());
-    //         abort(500, 'Erro ao carregar os dados da solicitação de registro');
-    //     }
-
-    //     // temporário
-    //     $totalFiles = 5;
+    public function inserirPreRegistro(PreRegistroRequest $request)
+    {
+        try{
+            $validatedData = $request->validated();
+            $dados = $this->service->getService('PreRegistro')->saveSite($validatedData);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, 'Erro ao enviar os dados da solicitação de registro para análise');
+        }
         
-    //     return view('site.userExterno.inserir-pre-registro', compact('resultado', 'regionais', 'totalFiles', 'codigos'));
-    // }
+        return redirect(route('externo.preregistro.view'))->with([
+            'message' => 'Teste',
+            'class' => 'success'
+        ]);
+    }
 
     public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
     {
