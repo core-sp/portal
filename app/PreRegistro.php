@@ -12,6 +12,14 @@ class PreRegistro extends Model
     protected $table = 'pre_registros';
     protected $guarded = [];
 
+    // Ideias de status. A verificar
+    const STATUS_ANALISE_INICIAL = 'Em análise inicial';
+    const STATUS_CORRECAO = 'Aguardando correção';
+    const STATUS_ANALISE_CORRECAO = 'Em análise da correção';
+    const STATUS_APROVADO = 'Aprovado';
+    const STATUS_NEGADO = 'Negado';
+    const STATUS_PENDENTE_PGTO = 'Pendente de pagamento';
+
     // RG = registro geral
     public static function codigosPreRegistro()
     {
@@ -85,6 +93,21 @@ class PreRegistro extends Model
         return [$campo => $valor];
     }
 
+    private function validarUpdate($arrayCampos)
+    {
+        $tipo = explode(';', $this->tipo_telefone);
+        $tel = explode(';', $this->telefone);
+        $tipo[1] = isset($tipo[1]) ? $tipo[1] : '';
+        $tel[1] = isset($tel[1]) ? $tel[1] : '';
+
+        $arrayCampos['tipo_telefone'] .= isset($arrayCampos['tipo_telefone_1']) ? ';' . $arrayCampos['tipo_telefone_1'] : ';';
+        $arrayCampos['telefone'] .= isset($arrayCampos['telefone_1']) ? ';' . $arrayCampos['telefone_1'] : ';';
+        unset($arrayCampos['tipo_telefone_1']);
+        unset($arrayCampos['telefone_1']);
+
+        return $arrayCampos;
+    }
+
     public function atualizarAjax($classe, $campo, $valor)
     {
         $resultado = null;
@@ -150,6 +173,42 @@ class PreRegistro extends Model
                 $valido = $classe::armazenar($anexos->count(), $valor);
                 if(isset($valido))
                     $resultado = $anexos->create([$campo => $valido, 'nome_original' => $valor->getClientOriginalName()]);
+                break;
+        }
+
+        return $resultado;
+    }
+
+    public function salvar($classe, $arrayCampos, $criar = null)
+    {
+        $resultado = null;
+        $valido = null;
+        if(isset($criar))
+            $valido = $criar::atualizar($arrayCampos);
+        
+        switch ($classe) {
+            case 'preRegistro':
+                $valido = $this->validarUpdate($arrayCampos);
+                $this->update($valido);
+                break;
+            case 'pessoaFisica':
+                $this->pessoaFisica->update($arrayCampos);
+                break;
+            case 'pessoaJuridica':
+                $valido = $this->pessoaJuridica->validarUpdate($arrayCampos);
+                $resultado = $this->pessoaJuridica->update($valido);
+                break;
+            case 'contabil':
+                if(!isset($valido))
+                    $valido = $this->contabil::atualizar($arrayCampos);
+                $resultado = $this->update(['contabil_id' => $valido == 'remover' ? null : $valido->id]);
+                $this->touch();
+                break;
+            case 'pessoaJuridica.responsavelTecnico':
+                if(!isset($valido))
+                    $valido = $this->pessoaJuridica->responsavelTecnico::atualizar($arrayCampos);
+                $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido == 'remover' ? null : $valido->id]);
+                $this->touch();
                 break;
         }
 

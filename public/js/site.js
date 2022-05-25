@@ -940,7 +940,7 @@ function limpa_formulário_cep_by_class(id) {
 	$("#rua_" + id).val("");
 	$("#bairro_" + id).val("");
 	$("#cidade_" + id).val("");
-	$("#uf_" + id).val("");
+	$("#uf_" + id)[0].selectedIndex = 0;
 	$("#ibge_" + id).val("");
 }
 
@@ -1004,25 +1004,29 @@ function addArquivo(nome, maximoFiles){
 	}
 }
 
-function getArquivoBD(objetoAfter, finalLink, nome, valor, id)
+function appendArquivoBD(finalLink, nome, valor, id, totalFiles, objeto)
 {
 	var total = $(".ArquivoBD_" + nome).length;
 	var link = window.location.href.slice(0, window.location.href.lastIndexOf("/") + 1) + finalLink + '/';
-	if(total == 0){
-		var elemento = '<div class="ArquivoBD_anexo"><div class="form-row mb-2"><div class="input-group col-sm mb-2-576">';
-		elemento += '<input type="text" class="form-control" value="' + valor + '" readonly /> <div class="input-group-append">';
-		elemento += '<a href="' + link + 'download/' + id + '" class="btn btn-primary Arquivo-Download" value="" target="_blank"><i class="fas fa-download"></i></a>';
-		elemento += '<button class="btn btn-danger modalExcluir" value="' + id + '" type="button" data-toggle="modal" data-target="#modalExcluirFile" data-backdrop="static">';
-		elemento += '<i class="fas fa-trash-alt"></i></button></div></div></div></div>';
-		objetoAfter.after(elemento);
-	}
-	var cloneBD = total == 0 ? $(".ArquivoBD_" + nome + ":last") : $(".ArquivoBD_" + nome + ":last").clone(true);
-	if(total > 0){
-		cloneBD.find("input").val(valor);
-		cloneBD.find(".Arquivo-Download").attr("href", link + 'download/' + id);
-		cloneBD.find(".modalExcluir").val(id);
-	}
-	return cloneBD;
+	var cloneBD = null;
+
+	if((total == 1) && ($(".ArquivoBD_" + nome).css("display") == "none"))
+		cloneBD = $(".ArquivoBD_" + nome);
+	
+	if((total >= 1) && (total < totalFiles) && !($(".ArquivoBD_" + nome).css("display") == "none"))
+		cloneBD = $(".ArquivoBD_" + nome + ":last").clone(true);
+	
+	cloneBD.find("input").val(valor);
+	cloneBD.find(".Arquivo-Download").attr("href", link + 'download/' + id);
+	cloneBD.find(".modalExcluir").val(id);
+
+	if((total == 1) && (cloneBD.css("display") == "none"))
+		cloneBD.show();
+	else
+		$(".ArquivoBD_" + nome + ':last').after(cloneBD);
+	
+	var limpar = objeto.parent().parent().find(".limparFile");
+	limparFile(limpar, nome, totalFiles);
 }
 
 function limparFile(objeto, nomeBD, totalFiles)
@@ -1040,6 +1044,18 @@ function limparFile(objeto, nomeBD, totalFiles)
 		$('.' + classe + " .invalid-feedback:last").remove();
 	}else
 		todoArquivo.hide();
+}
+
+function limparFileBD(nome, dados, totalFiles)
+{
+	var total = $('.ArquivoBD_' + nome).length;
+	$('.ArquivoBD_' + nome).each(function(){
+		if($(this).find("button").val() == dados){
+			total == 1 ? $(this).hide() : $(this).remove();
+			if(total == totalFiles)
+				$('.Arquivo_' + nome).show().parent().find("label").text("Escolher Arquivo");
+		}
+	});
 }
 // ----------------------------------------------------------------------------------------------------------------------------
 
@@ -1139,8 +1155,8 @@ function getErrorMsg(request)
 				errorMessage = msg[0];
 		}
 		time = 2000;
-	}else
-		errorMessage = errorMessage + '.<br>Recarregue a página, por favor.<br>Caso persista o erro, entre em contato conosco';
+	}
+	
 	return [errorMessage, time];
 }
 
@@ -1150,6 +1166,7 @@ function limparTipoTel(objeto)
 	if((objeto.val().length == 0) && ($('#inserirRegistro input[name="tipo_telefone_1"]:checked').length > 0)){
 		$('#inserirRegistro input[name="tipo_telefone_1"]:checked').prop("checked", false);
 		putDadosPreRegistro($('#inserirRegistro input[name="tipo_telefone_1"]'));
+		putDadosPreRegistro($('#inserirRegistro input[name="telefone_1"]'));
 	}
 }
 
@@ -1193,26 +1210,14 @@ function preencheRT(dados)
 
 function preencheFile(dados, objeto)
 {
-	if(dados.id && dados.nome_original){
-		var label = $('#inserirRegistro [for="anexos"]');
-		var limpar = objeto.parent().parent().find(".limparFile");
-		label.after(getArquivoBD(label, 'pre-registro-anexo', "anexo", dados.nome_original, dados.id));
-		limparFile(limpar, "anexo", pre_registro_total_files);
-	}
+	if(dados.id && dados.nome_original)
+		appendArquivoBD('pre-registro-anexo', "anexo", dados.nome_original, dados.id, pre_registro_total_files, objeto);
 }
 
 function removeFile(dados)
 {
-	if(dados != null){
-		var total = $('#inserirRegistro .ArquivoBD_anexo').length;
-		$('#inserirRegistro .ArquivoBD_anexo').each(function(){
-			if($(this).find("button").val() == dados){
-				$(this).remove();
-				if(total == pre_registro_total_files)
-					$('#inserirRegistro .Arquivo_anexo').show().parent().find("label").text("Escolher Arquivo");
-			}
-		});
-	}
+	if(dados != null)
+		limparFileBD('anexo', dados, pre_registro_total_files);
 }
 
 async function callbackEnderecoPreRegistro(restoId)
@@ -1225,6 +1230,13 @@ async function callbackEnderecoPreRegistro(restoId)
 		if(dadosAntigos[i] != array[i].val())
 			putDadosPreRegistro(array[i]); 
 	}
+	putDadosPreRegistro($("#cep_" + restoId));
+
+	if(($('#checkEndEmpresa:checked').length == 1) && (restoId != 'empresa'))
+		if($('input[id="cep_' + restoId + '"]').val() != $('input[name="cep_empresa"]').val()){
+			$('#checkEndEmpresa').prop('checked', false);
+			$('#habilitarEndEmpresa').show();
+		}
 }
 
 // Carrega a máscara quando já possui um rg
@@ -1310,9 +1322,9 @@ $('#inserirRegistro input[id^="cep_"]').on('keyup', function(event){
 	var permitido = (tecla > 47 && tecla < 58) || (tecla > 95 && tecla < 106);
 	var indice = this.id.indexOf("_");
 	var restoId = this.id.slice(indice + 1, this.id.length);
-	if($(this).val().length == 9 && permitido){
+	var diferente = valorPreRegistro != $(this).val();
+	if($(this).val().length == 9 && permitido && diferente)
 		callbackEnderecoPreRegistro(restoId);
-	}
 });
 
 var valorPreRegistro = null;
@@ -1334,7 +1346,7 @@ $('#inserirRegistro input[name="cpf_rt"], #inserirRegistro input[name="cnpj_cont
 	}
 });
 
-$('#inserirRegistro input:not(:checkbox,:file,:radio,[name="cpf_rt"],[name="cnpj_contabil"])').blur(function(){
+$('#inserirRegistro input:not(:checkbox,:file,:radio,[name="cpf_rt"],[name="cnpj_contabil"],[id^="cep_"])').blur(function(){
 	if(valorPreRegistro != $(this).val()){
 		putDadosPreRegistro($(this));
 		valorPreRegistro = null;

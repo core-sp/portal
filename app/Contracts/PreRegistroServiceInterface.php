@@ -6,7 +6,7 @@ use App\Contracts\MediadorServiceInterface;
 
 interface PreRegistroServiceInterface {
 
-    public function getNomeClasses();
+    public function getNomesCampos();
     
     public function verificacao();
     

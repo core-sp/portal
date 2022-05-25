@@ -18,12 +18,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
     const RELATION_USER_EXTERNO = 'userExterno';
 
     private $totalFiles;
-    private $pathStorage;
 
     public function __construct()
     {
         $this->totalFiles = 'App\Anexo'::TOTAL_PRE_REGISTRO;
-        $this->pathStorage = 'App\Anexo'::PATH_PRE_REGISTRO;
     }
 
     private function getRelacoes()
@@ -77,7 +75,39 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return isset($campos[$chave]) ? $campos[$chave] : $campo;
     }
 
-    public function getNomeClasses()
+    private function limparNomeCampos($externo, $request)
+    {
+        $camposLimpos = array();
+        $classe = null;
+        $camposView = $this->getNomesCampos();
+        $array = $externo->isPessoaFisica() ? [
+            PreRegistroService::RELATION_PRE_REGISTRO => explode(',', $camposView[PreRegistroService::RELATION_PRE_REGISTRO]),
+            PreRegistroService::RELATION_CONTABIL => explode(',', $camposView[PreRegistroService::RELATION_CONTABIL]),
+            PreRegistroService::RELATION_PF => explode(',', $camposView[PreRegistroService::RELATION_PF]),
+        ] : [
+            PreRegistroService::RELATION_PRE_REGISTRO => explode(',', $camposView[PreRegistroService::RELATION_PRE_REGISTRO]),
+            PreRegistroService::RELATION_CONTABIL => explode(',', $camposView[PreRegistroService::RELATION_CONTABIL]),
+            PreRegistroService::RELATION_PJ => explode(',', $camposView[PreRegistroService::RELATION_PJ]),
+            PreRegistroService::RELATION_RT => explode(',', $camposView[PreRegistroService::RELATION_RT]),
+        ];
+
+        foreach($request as $key => $value)
+        {
+            foreach($array as $relacao => $campos)
+                if(in_array($key, $campos))
+                {
+                    $classe = $relacao;
+                    break;
+                }
+
+            if($classe)
+                $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = $value;
+        }
+
+        return $camposLimpos;
+    }
+
+    private function getNomeClasses()
     {
         return [
             PreRegistroService::RELATION_ANEXOS,
@@ -87,6 +117,20 @@ class PreRegistroService implements PreRegistroServiceInterface {
             PreRegistroService::RELATION_PRE_REGISTRO,
             PreRegistroService::RELATION_RT,
             PreRegistroService::RELATION_USER_EXTERNO,
+        ];
+    }
+
+    public function getNomesCampos()
+    {
+        $classes = $this->getNomeClasses();
+
+        return [
+            $classes[0] => 'path',
+            $classes[1] => 'nome_contabil,cnpj_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
+            $classes[4] => 'registro_secundario,ramo_atividade,segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,tipo_telefone_1,telefone_1',
+            $classes[2] => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade,nome_mae,nome_pai,identidade,orgao_emissor,dt_expedicao',
+            $classes[3] => 'razao_social,capital_social,nire,tipo_empresa,dt_inicio_atividade,inscricao_estadual,inscricao_municipal,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
+            $classes[5] => 'nome_rt,nome_social_rt,registro,sexo_rt,dt_nascimento_rt,cpf_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt'
         ];
     }
 
@@ -147,22 +191,27 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function saveSite($request)
     {
-        // $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
-        // $resultado = null;
-        // $objeto = collect();
-        // $classeCriar = array_search($request['classe'], $this->getRelacoes());
+        $externo = auth()->guard('user_externo')->user();
+        $preRegistro = $externo->preRegistro;
+        $camposLimpos = $this->limparNomeCampos($externo, $request);
 
-        // if(($request['classe'] != PreRegistroService::RELATION_ANEXOS) && ($request['classe'] != PreRegistroService::RELATION_PRE_REGISTRO))
-        //     $objeto = $preRegistro->whereHas($request['classe'])->get();
-        
-        // $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
+        foreach($camposLimpos as $key => $arrayCampos)
+        {
+            $objeto = null;
+            if($key != PreRegistroService::RELATION_PRE_REGISTRO)
+            {
+                $objeto = $preRegistro->whereHas($key)->get();
+                if($objeto->isNotEmpty())
+                    $resultado = $preRegistro->salvar($key, $arrayCampos);
+                else
+                    $resultado = $preRegistro->salvar($key, $arrayCampos, array_search($key, $this->getRelacoes()));
+            } else
+                $resultado = $preRegistro->salvar($key, $arrayCampos);
+            
+            // se falhar o update
+        }
 
-        // if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || $objeto->isNotEmpty())
-        //     $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor']);
-        // else
-        //     $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor']);
-
-        // return $resultado;
+        $preRegistro->update(['status' => $preRegistro::STATUS_ANALISE_INICIAL]);
     }
 
     public function downloadAnexo($id)

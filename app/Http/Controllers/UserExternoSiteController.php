@@ -130,10 +130,7 @@ class UserExternoSiteController extends Controller
             abort(500, 'Erro ao enviar os dados da solicitação de registro para análise');
         }
         
-        return redirect(route('externo.preregistro.view'))->with([
-            'message' => 'Teste',
-            'class' => 'success'
-        ]);
+        return redirect(route('externo.preregistro.view'));
     }
 
     public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)

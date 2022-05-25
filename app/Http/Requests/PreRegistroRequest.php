@@ -9,20 +9,18 @@ use Carbon\Carbon;
 class PreRegistroRequest extends FormRequest
 {
     private $regraDtNasc;
+    private $regraPath;
     private $externo;
 
     private function getRules($externo)
     {
         $rules = [
-            // anexo
-            'path' => 'required',
-            // contábil
+            'path' => $this->regraPath,
             'nome_contabil' => 'max:191',
-            'cnpj_contabil' => ['size:14', new CpfCnpj],
+            'cnpj_contabil' => ['nullable', new CpfCnpj],
             'email_contabil' => 'max:191|email',
             'nome_contato_contabil' => 'max:191',
             'telefone_contabil' => '',
-            // pre-registro
             'registro_secundario' => '',
             'ramo_atividade' => 'max:191',
             'segmento' => 'in:'.implode(',', segmentos()),
@@ -41,7 +39,6 @@ class PreRegistroRequest extends FormRequest
         ];
 
         $pessoaFisica = [
-            // pessoa física
             'nome_social' => 'max:191',
             'sexo' => 'size:1|in:M,F',
             'dt_nascimento' => 'date|before_or_equal:'.$this->regraDtNasc,
@@ -56,7 +53,6 @@ class PreRegistroRequest extends FormRequest
         ];
 
         $pessoaJuridica = [
-            // pessoa jurídica
             'razao_social' => 'max:191',
             'capital_social' => '',
             'nire' => 'max:20',
@@ -72,7 +68,6 @@ class PreRegistroRequest extends FormRequest
             'complemento_empresa' => 'max:191',
             'cidade_empresa' => 'max:191',
             'uf_empresa' => 'size:2|in:'.implode(',', array_keys(estados())),
-            // responsável técnico
             'nome_rt' => 'max:191',
             'nome_social_rt' => 'max:191',
             'registro' => '',
@@ -93,32 +88,41 @@ class PreRegistroRequest extends FormRequest
             'nome_pai_rt' => 'max:191',
         ];
 
-        if($externo->isPessoaFisica())
-            return array_merge($rules, $pessoaFisica);
-        else
-            return array_merge($rules, $pessoaJuridica);
+        $outrasRules = $externo->isPessoaFisica() ? $pessoaFisica : $pessoaJuridica;
+
+        return array_merge($rules, $outrasRules);
     }
 
     protected function prepareForValidation()
     {
         $this->externo = auth()->guard('user_externo')->user();
         // Obrigatório salvar os anexos via rota ajax
-        $anexos = $this->externo->preRegistro->anexos;
+        $anexosCount = $this->externo->preRegistro->anexos->count();
+
+        $this->regraPath = '';
         $this->regraDtNasc = Carbon::today()->subYears(18)->format('Y-m-d');
 
-        if($anexos->count() == 0)
+        if($anexosCount == 0)
+        {
+            $this->regraPath = 'required';
             $this->merge([
                 'path' => ''
             ]);
+        }else
+            $this->merge([
+                'path' => $anexosCount
+            ]);
         
-        if(!$this->externo->pessoaFisica())
+        
+        if(!$this->externo->isPessoaFisica())
             $this->merge([
                 'cpf_rt' => apenasNumeros(request()->cpf_rt)
             ]);
 
-        $this->merge([
-            'cnpj_contabil' => apenasNumeros(request()->cnpj_contabil),
-        ]);
+        if(isset(request()->cnpj_contabil))
+            $this->merge([
+                'cnpj_contabil' => apenasNumeros(request()->cnpj_contabil),
+            ]);
     }
 
     public function rules()
@@ -129,7 +133,6 @@ class PreRegistroRequest extends FormRequest
     public function messages()
     {
         return [
-            'path.max' => 'Limite do tamanho do arquivo é de 5 MB',
             'max' => 'Limite de :max caracteres',
             'in' => 'Valor não é aceito',
             'required' => 'Campo obrigatório',
@@ -142,7 +145,7 @@ class PreRegistroRequest extends FormRequest
             'dt_expedicao.before_or_equal' => 'Data deve ser igual ou anterior a hoje',
             'dt_nascimento.before_or_equal' => 'Deve ter 18 anos completos ou mais',
             'dt_nascimento_rt.before_or_equal' => 'Deve ter 18 anos completos ou mais',
-            'email' => 'Deve ser noformato de email teste@teste.com',
+            'email' => 'Deve ser no formato de email teste@teste.com',
         ];
     }
 }

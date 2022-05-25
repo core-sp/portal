@@ -46,7 +46,7 @@ class Contabil extends Model
         if($campo == 'cnpj')
         {
             if(isset($valor) && (strlen($valor) == 14)) 
-                return $this->buscar($valor);
+                return Contabil::buscar($valor);
             if(!isset($valor))
                 return 'remover';
         }
@@ -57,5 +57,17 @@ class Contabil extends Model
     public function updateAjax($campo, $valor)
     {
         $this->update([$campo => $valor]);
+    }
+
+    public static function atualizar($arrayCampos)
+    {
+        if(isset($arrayCampos['cnpj']))
+        {
+            $contabil = Contabil::buscar($arrayCampos['cnpj']);
+            $contabil->update($arrayCampos);
+            return $contabil;
+        }
+
+        return 'remover';
     }
 }
