@@ -61,7 +61,7 @@ class Contabil extends Model
 
     public static function atualizar($arrayCampos)
     {
-        if(isset($arrayCampos['cnpj']))
+        if(isset($arrayCampos['cnpj']) && (strlen($arrayCampos['cnpj']) == 14))
         {
             $contabil = Contabil::buscar($arrayCampos['cnpj']);
             $contabil->update($arrayCampos);

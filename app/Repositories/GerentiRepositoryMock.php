@@ -324,47 +324,52 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
      */
     public function gerentiBusca($registro, $nome, $cpfCnpj)
     {
-        $resultado[0] = [
-            "ASS_ID" => "000001",
-            "ASS_ATIVO" => "T",
-            "ASS_ENTIDADE" => 0,
-            "ASS_TP_ASSOC" => 2,
-            "ASS_REGISTRO" => "0000000001",
-            "ASS_NOME" => "RC Teste 1",
-            "ASS_CPF_CGC" => "86294373085",
-            "ASS_DT_ADMISSAO" => "2006-04-12",
-            "ASS_DT_REG_SOCIAL" => "2006-04-12",
-            "ASS_TP_PESSOA" => "F",
-            "ASS_USU_CADASTRO" => 0,
-            "ASS_TP_REGIAO" => " ",
-            "ASS_DT_UPDATE" => "1899-12-30",
-            "USU_CODIGO" => 121,
-            "SYS_LAST_UPDATE" => "2019-05-15 12:26:32",
-            "TIPO" => "Física RT",
-            "CANCELADO" => "F",
-            "EXCORE" => 0
-        ];
+        $resultado = array();
 
-        $resultado[1] = [
-            "ASS_ID" => "000002",
-            "ASS_ATIVO" => "T",
-            "ASS_ENTIDADE" => 0,
-            "ASS_TP_ASSOC" => 1,
-            "ASS_REGISTRO" => "0000000002",
-            "ASS_NOME" => "RC Teste 2",
-            "ASS_CPF_CGC" => "11748345000144",
-            "ASS_DT_ADMISSAO" => "2006-04-12",
-            "ASS_DT_REG_SOCIAL" => "2006-04-12",
-            "ASS_TP_PESSOA" => "J",
-            "ASS_USU_CADASTRO" => 0,
-            "ASS_TP_REGIAO" => " ",
-            "ASS_DT_UPDATE" => "1899-12-30",
-            "USU_CODIGO" => 121,
-            "SYS_LAST_UPDATE" => "2019-05-15 12:26:32",
-            "TIPO" => "Jurídica (Jurídica Ltda)",
-            "CANCELADO" => "F",
-            "EXCORE" => 0
-        ];
+        if(($cpfCnpj == '86294373085') || ($cpfCnpj == '11748345000144'))
+        {
+            $resultado[0] = [
+                "ASS_ID" => "000001",
+                "ASS_ATIVO" => "T",
+                "ASS_ENTIDADE" => 0,
+                "ASS_TP_ASSOC" => 2,
+                "ASS_REGISTRO" => "0000000001",
+                "ASS_NOME" => "RC Teste 1",
+                "ASS_CPF_CGC" => "86294373085",
+                "ASS_DT_ADMISSAO" => "2006-04-12",
+                "ASS_DT_REG_SOCIAL" => "2006-04-12",
+                "ASS_TP_PESSOA" => "F",
+                "ASS_USU_CADASTRO" => 0,
+                "ASS_TP_REGIAO" => " ",
+                "ASS_DT_UPDATE" => "1899-12-30",
+                "USU_CODIGO" => 121,
+                "SYS_LAST_UPDATE" => "2019-05-15 12:26:32",
+                "TIPO" => "Física RT",
+                "CANCELADO" => "F",
+                "EXCORE" => 0
+            ];
+
+            $resultado[1] = [
+                "ASS_ID" => "000002",
+                "ASS_ATIVO" => "T",
+                "ASS_ENTIDADE" => 0,
+                "ASS_TP_ASSOC" => 1,
+                "ASS_REGISTRO" => "0000000002",
+                "ASS_NOME" => "RC Teste 2",
+                "ASS_CPF_CGC" => "11748345000144",
+                "ASS_DT_ADMISSAO" => "2006-04-12",
+                "ASS_DT_REG_SOCIAL" => "2006-04-12",
+                "ASS_TP_PESSOA" => "J",
+                "ASS_USU_CADASTRO" => 0,
+                "ASS_TP_REGIAO" => " ",
+                "ASS_DT_UPDATE" => "1899-12-30",
+                "USU_CODIGO" => 121,
+                "SYS_LAST_UPDATE" => "2019-05-15 12:26:32",
+                "TIPO" => "Jurídica (Jurídica Ltda)",
+                "CANCELADO" => "F",
+                "EXCORE" => 0
+            ];
+        }
 
         return $resultado;
     }

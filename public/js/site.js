@@ -1191,7 +1191,8 @@ function preencheRT(dados)
 {
 	if($('#inserirRegistro input[name="cpf_rt"]').val() == ""){
 		$('#inserirRegistro [name$="_rt"]').each(function(){
-			this.checked ? $(this).prop('checked', false) : $(this).val('');
+			if(this.checked) 
+				$(this).prop('checked', false);
 		});
 		$('#campos_rt').prop("disabled", true);
 		$('#inserirRegistro input[name="registro"]').prop("disabled", true).val('');

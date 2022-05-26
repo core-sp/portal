@@ -73,7 +73,7 @@ class PreRegistroRequest extends FormRequest
             'registro' => '',
             'sexo_rt' => 'size:1|in:M,F',
             'dt_nascimento_rt' => 'date|before_or_equal:'.$this->regraDtNasc,
-            'cpf_rt' => ['size:11', new CpfCnpj],
+            'cpf_rt' => ['required', new CpfCnpj],
             'identidade_rt' => 'max:20',
             'orgao_emissor_rt' => 'max:191',
             'dt_expedicao_rt' => 'date|before_or_equal:today',

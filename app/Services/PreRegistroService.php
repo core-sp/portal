@@ -6,6 +6,7 @@ use App\Contracts\PreRegistroServiceInterface;
 use App\PreRegistro;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Storage;
+use App\Repositories\GerentiRepositoryInterface;
 
 class PreRegistroService implements PreRegistroServiceInterface {
 
@@ -100,7 +101,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                     break;
                 }
 
-            if($classe)
+            if(isset($classe))
                 $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = $value;
         }
 
@@ -120,6 +121,54 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
+    private function abortar($preRegistro)
+    {
+        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
+        if(!isset($preRegistro)/* || ()*/)
+            abort(401, 'Não autorizado a acessar a solicitação de registro');
+    }
+
+    private function getRTGerenti(GerentiRepositoryInterface $gerentiRepository, $cpf)
+    {
+        $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $cpf);
+        $ass_id = null;
+        $nome = null;
+        $gerenti = array();
+
+        // Para testar colocar 5 em "ASS_TP_ASSOC" ao buscar em GerentiRepositoryMock
+        if(count($resultadosGerenti) > 0)
+            foreach($resultadosGerenti as $resultado)
+            {
+                $naoCancelado = $resultado['CANCELADO'] == "F";
+                $ativo = $resultado['ASS_ATIVO'] == "T";
+                $tipo = $resultado["ASS_TP_ASSOC"] == 5;
+
+                if($naoCancelado && $ativo && $tipo)
+                {
+                    $ass_id = $resultado["ASS_ID"];
+                    $gerenti['nome'] = $resultado["ASS_NOME"];
+                    $gerenti['registro'] = $resultado["ASS_REGISTRO"];
+                }
+            }
+        
+        if(isset($ass_id))
+        {
+            // Confirmar se necessita de mais dados para o RT
+            $resultadosGerenti = utf8_converter($gerentiRepository->gerentiDadosGeraisPF($ass_id));
+
+            $gerenti['nome_mae'] = $resultadosGerenti['Nome da mãe'];
+            $gerenti['nome_pai'] = $resultadosGerenti['Nome do pai'];
+            $gerenti['identidade'] = $resultadosGerenti['identidade'];
+            $gerenti['orgao_emissor'] = $resultadosGerenti['emissor'];
+            $gerenti['dt_expedicao'] = $resultadosGerenti['expedicao'];
+            $gerenti['dt_nascimento'] = $resultadosGerenti['Data de nascimento'];
+            $gerenti['sexo'] = $resultadosGerenti['Sexo'];
+            $gerenti['cpf'] = $cpf;
+        }
+
+        return $gerenti;
+    }
+
     public function getNomesCampos()
     {
         $classes = $this->getNomeClasses();
@@ -134,23 +183,35 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function verificacao()
+    public function verificacao(GerentiRepositoryInterface $gerentiRepository)
     {
         $externo = auth()->guard('user_externo')->user();
-        // Verificar via Gerenti se já existe o cpf ou cnpj como representante
-        // Caso sim, dar uma mensagem mostrando o registro dele e a atual situação (em dia, bloqueado etc)
-        // Caso não, permitr a solicitação de registro
+        $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $externo->cpf_cnpj);
+        $gerenti = null;
 
-        return 'dados caso possua registro ou mensagem que pode iniciar a solicitação de registro';
+        // Registro não pode estar cancelado, deve estar ativo e se for pf busca pelo codigo de pf, rt e pj
+        if(count($resultadosGerenti) > 0)
+            foreach($resultadosGerenti as $resultado)
+            {
+                $naoCancelado = $resultado['CANCELADO'] == "F";
+                $ativo = $resultado['ASS_ATIVO'] == "T";
+                $pf = $externo->isPessoaFisica() && (($resultado["ASS_TP_ASSOC"] == 2) || ($resultado["ASS_TP_ASSOC"] == 5));
+                $pj = !$externo->isPessoaFisica() && ($resultado["ASS_TP_ASSOC"] == 1);
+                if($naoCancelado && $ativo && ($pf || $pj))
+                    $gerenti = $resultado['ASS_REGISTRO'];
+            }
+
+        $preRegistro = isset($gerenti) ? null : $externo->preRegistro;
+
+        return [
+            'gerenti' => $gerenti,
+            'resultado' => $preRegistro,
+        ];
     }
 
-    public function getPreRegistro(MediadorServiceInterface $service)
+    public function getPreRegistro(MediadorServiceInterface $service, $resultado)
     {
-        $externo = auth()->guard('user_externo')->user();
-        // Verificar com o metodo verificacao() para impedir de acessar o formulario
-        // Caso não, verificar se já tem o pre registro salvo no banco
-        $resultado = $externo->preRegistro;
-
+        // Falta logExterno
         if(!isset($resultado))
         {
             $resultado = $externo->preRegistro()->create();
@@ -169,9 +230,13 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function saveSiteAjax($request)
+    public function saveSiteAjax($request, GerentiRepositoryInterface $gerentiRepository)
     {
         $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
+
+        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
+        $this->abortar($preRegistro);
+
         $resultado = null;
         $objeto = collect();
         $classeCriar = array_search($request['classe'], $this->getRelacoes());
@@ -180,19 +245,26 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $objeto = $preRegistro->whereHas($request['classe'])->get();
         
         $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
+        $gerenti = ($request['classe'] == PreRegistroService::RELATION_RT) && ($request['campo'] == 'cpf') ? 
+            $this->getRTGerenti($gerentiRepository, $request['valor']) : null;
 
         if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || $objeto->isNotEmpty())
-            $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor']);
+            $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor'], $gerenti);
         else
-            $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor']);
+            $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor'], $gerenti);
 
         return $resultado;
     }
 
     public function saveSite($request)
     {
+        // Falta logExterno
         $externo = auth()->guard('user_externo')->user();
         $preRegistro = $externo->preRegistro;
+
+        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
+        $this->abortar($preRegistro);
+
         $camposLimpos = $this->limparNomeCampos($externo, $request);
 
         foreach($camposLimpos as $key => $arrayCampos)
@@ -201,29 +273,51 @@ class PreRegistroService implements PreRegistroServiceInterface {
             if($key != PreRegistroService::RELATION_PRE_REGISTRO)
             {
                 $objeto = $preRegistro->whereHas($key)->get();
-                if($objeto->isNotEmpty())
-                    $resultado = $preRegistro->salvar($key, $arrayCampos);
-                else
-                    $resultado = $preRegistro->salvar($key, $arrayCampos, array_search($key, $this->getRelacoes()));
+                $resultado = $objeto->isNotEmpty() ? $preRegistro->salvar($key, $arrayCampos) : 
+                    $preRegistro->salvar($key, $arrayCampos, array_search($key, $this->getRelacoes()));
             } else
                 $resultado = $preRegistro->salvar($key, $arrayCampos);
             
-            // se falhar o update
+            if(!isset($resultado))
+                abort(500);
         }
 
-        $preRegistro->update(['status' => $preRegistro::STATUS_ANALISE_INICIAL]);
+        $resultado = $preRegistro->update(['status' => $preRegistro::STATUS_ANALISE_INICIAL]);
+
+        if(!isset($resultado))
+            abort(500);
+        
+        return [
+            'message' => '<i class="icon fa fa-check"></i> Solicitação de registro enviada para análise!',
+            'class' => 'alert-success'
+        ];
     }
 
     public function downloadAnexo($id)
     {
-        $anexo = auth()->guard('user_externo')->user()->preRegistro->anexos()->where('id', $id)->first();
+        $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
+
+        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
+        $this->abortar($preRegistro);
+
+        $anexo = $preRegistro->anexos()->where('id', $id)->first();
+
         if(isset($anexo) && Storage::exists($anexo->path))
             return response()->file(Storage::path($anexo->path), ["Cache-Control" => "no-cache"]);
+        
+        return null;
     }
 
     public function excluirAnexo($id)
     {
-        $anexo = auth()->guard('user_externo')->user()->preRegistro->anexos()->where('id', $id)->first();
+        // Falta logExterno
+        $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
+
+        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
+        $this->abortar($preRegistro);
+
+        $anexo = $preRegistro->anexos()->where('id', $id)->first();
+
         if(isset($anexo) && Storage::exists($anexo->path))
         {
             if(Storage::delete($anexo->path));

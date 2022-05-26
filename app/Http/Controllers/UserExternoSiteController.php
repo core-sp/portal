@@ -7,15 +7,18 @@ use App\Http\Requests\UserExternoRequest;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PreRegistroAjaxRequest;
 use App\Http\Requests\PreRegistroRequest;
+use App\Repositories\GerentiRepositoryInterface;
 
 class UserExternoSiteController extends Controller
 {
     private $service;
+    private $gerentiRepository;
 
-    public function __construct(MediadorServiceInterface $service)
+    public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
     {
         $this->middleware('auth:user_externo')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->service = $service;
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public function cadastroView()
@@ -93,20 +96,25 @@ class UserExternoSiteController extends Controller
     public function preRegistroView()
     {
         try{
-            $resultado = $this->service->getService('PreRegistro')->verificacao();
+            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository);
+            $resultado = $dados['resultado'];
+            $gerenti = $dados['gerenti'];
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, 'Erro ao verificar os dados para permitir ou não a solicitação de registro');
         }
 
-        return view('site.userExterno.pre-registro', compact('resultado'));
+        return view('site.userExterno.pre-registro', compact('resultado', 'gerenti'));
     }
 
     public function inserirPreRegistroView()
     {
         try{
-            // Verificar com o metodo verificacao() para impedir de acessar o formulario
-            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service);
+            $verificacao = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository);
+            if(isset($verificacao['gerenti']))
+                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $verificacao['gerenti']]);
+                
+            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $verificacao['resultado']);
             $codigos = $dados['codigos'];
             $resultado = $dados['resultado'];
             $regionais = $dados['regionais'];
@@ -120,6 +128,20 @@ class UserExternoSiteController extends Controller
         return view('site.userExterno.inserir-pre-registro', compact('resultado', 'regionais', 'totalFiles', 'codigos', 'classes'));
     }
 
+    public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
+    {
+        try{
+            $validatedData = $request->validated();
+            $dados = $this->service->getService('PreRegistro')->saveSiteAjax($validatedData, $this->gerentiRepository);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode(), $e->getMessage()) : 
+            abort(500, 'Erro ao salvar os dados da solicitação de registro via ajax');
+        }
+        
+        return response()->json($dados);
+    }
+
     public function inserirPreRegistro(PreRegistroRequest $request)
     {
         try{
@@ -127,23 +149,11 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->saveSite($validatedData);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
+            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode(), $e->getMessage()) : 
             abort(500, 'Erro ao enviar os dados da solicitação de registro para análise');
         }
         
-        return redirect(route('externo.preregistro.view'));
-    }
-
-    public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
-    {
-        try{
-            $validatedData = $request->validated();
-            $dados = $this->service->getService('PreRegistro')->saveSiteAjax($validatedData);
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            abort(500, 'Erro ao salvar os dados da solicitação de registro via ajax');
-        }
-        
-        return response()->json($dados);
+        return redirect(route('externo.preregistro.view'))->with($dados);
     }
 
     public function preRegistroAnexoDownload($id)
@@ -152,6 +162,7 @@ class UserExternoSiteController extends Controller
             $file = $this->service->getService('PreRegistro')->downloadAnexo($id);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
+            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode(), $e->getMessage()) : 
             abort(500, 'Erro ao solicitar download do arquivo');
         }
         
@@ -164,6 +175,7 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->excluirAnexo($id);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
+            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode(), $e->getMessage()) : 
             abort(500, 'Erro ao solicitar exclusão do arquivo');
         }
         

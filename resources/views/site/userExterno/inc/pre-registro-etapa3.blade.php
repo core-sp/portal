@@ -56,7 +56,7 @@
         <input
             type="text"
             name="numero"
-            class="{{ $classes[4] }} {{ array_search('numero', $codPre) }} form-control numero {{ $errors->has('numero') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} {{ array_search('numero', $codPre) }} form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
             id="numero_pre"
             placeholder="Número"
             value="{{ empty(old('numero')) && isset($resultado->numero) ? $resultado->numero : old('numero') }}"
@@ -206,7 +206,7 @@
             <input
                 type="text"
                 name="numero_empresa"
-                class="{{ $classes[3] }} {{ array_search('numero', $codCnpj) }} form-control numero {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} {{ array_search('numero', $codCnpj) }} form-control {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }}"
                 id="numero_empresa"
                 placeholder="Número"
                 value="{{ empty(old('numero_empresa')) && isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : old('numero_empresa') }}"

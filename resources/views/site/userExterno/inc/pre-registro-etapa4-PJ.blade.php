@@ -93,7 +93,8 @@
                     <input type="radio" 
                         class="{{ $classes[5] }} {{ array_search('sexo', $codRT) }} form-check-input" 
                         name="sexo_rt" 
-                        value="F" {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'F')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && $resultado->pessoaJuridica->responsavelTecnico->sexo == 'F') ? 'checked' : '' }}
+                        value="F" 
+                        {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'F')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && $resultado->pessoaJuridica->responsavelTecnico->sexo == 'F') ? 'checked' : '' }}
                     />
                     Feminino
                 </label>
@@ -103,7 +104,8 @@
                     <input type="radio" 
                         class="{{ $classes[5] }} {{ array_search('sexo', $codRT) }} form-check-input" 
                         name="sexo_rt" 
-                        value="M" {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'M')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && $resultado->pessoaJuridica->responsavelTecnico->sexo == 'M') ? 'checked' : '' }}
+                        value="M" 
+                        {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'M')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && $resultado->pessoaJuridica->responsavelTecnico->sexo == 'M') ? 'checked' : '' }}
                     />
                     Masculino
                 </label>
@@ -224,7 +226,7 @@
             <input
                 type="text"
                 name="numero_rt"
-                class="{{ $classes[5] }} {{ array_search('numero', $codRT) }} form-control numero {{ $errors->has('numero_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} {{ array_search('numero', $codRT) }} form-control {{ $errors->has('numero_rt') ? 'is-invalid' : '' }}"
                 id="numero_rt"
                 placeholder="Número"
                 value="{{ empty(old('numero_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->numero) ? $resultado->pessoaJuridica->responsavelTecnico->numero : old('numero_rt') }}"
