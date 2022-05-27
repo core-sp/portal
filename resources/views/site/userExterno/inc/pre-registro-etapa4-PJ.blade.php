@@ -18,6 +18,7 @@
     <div class="col-sm mb-2-576">
         <label for="registro">{{ array_search('registro', $codRT) }} - Registro *</label>
         <input
+            id="registro_core"
             name="registro"
             type="text"
             class="{{ $classes[5] }} {{ array_search('registro', $codRT) }} form-control {{ $errors->has('registro') ? 'is-invalid' : '' }}"
@@ -41,9 +42,7 @@
                 type="text"
                 class="{{ $classes[5] }} {{ array_search('nome', $codRT) }} form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome) ? $resultado->pessoaJuridica->responsavelTecnico->nome : old('nome_rt') }}"
-                placeholder="Nome Completo"
-                minlength="5"
-                maxlength="191"
+                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_rt'))
             <div class="invalid-feedback">
@@ -61,7 +60,7 @@
                 type="text"
                 class="{{ $classes[5] }} {{ array_search('nome_social', $codRT) }} form-control {{ $errors->has('nome_social_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_social_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_social) ? $resultado->pessoaJuridica->responsavelTecnico->nome_social : old('nome_social_rt') }}"
-                placeholder="Nome Social"
+                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_social_rt'))
             <div class="invalid-feedback">
@@ -79,6 +78,7 @@
                 type="date"
                 class="{{ $classes[5] }} {{ array_search('dt_nascimento', $codRT) }} form-control {{ $errors->has('dt_nascimento_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('dt_nascimento_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->dt_nascimento) ? $resultado->pessoaJuridica->responsavelTecnico->dt_nascimento : old('dt_nascimento_rt') }}"
+                max="{{ Carbon\Carbon::today()->subYears(18)->format('Y-m-d') }}"
             />
             @if($errors->has('dt_nascimento_rt'))
             <div class="invalid-feedback">
@@ -127,7 +127,6 @@
                 id="rg"
                 class="{{ $classes[5] }} {{ array_search('identidade', $codRT) }} form-control rgInput {{ $errors->has('identidade_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('identidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->identidade) ? $resultado->pessoaJuridica->responsavelTecnico->identidade : old('identidade_rt') }}"
-                placeholder=""
                 maxlength="20"
             />
             @if($errors->has('identidade_rt'))
@@ -143,7 +142,6 @@
                 type="text"
                 class="{{ $classes[5] }} {{ array_search('orgao_emissor', $codRT) }} form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('orgao_emissor_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->orgao_emissor) ? $resultado->pessoaJuridica->responsavelTecnico->orgao_emissor : old('orgao_emissor_rt') }}"
-                placeholder="Emissor"
             />
             @if($errors->has('orgao_emissor_rt'))
             <div class="invalid-feedback">
@@ -158,6 +156,7 @@
                 type="date"
                 class="{{ $classes[5] }} {{ array_search('dt_expedicao', $codRT) }} form-control {{ $errors->has('dt_expedicao_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('dt_expedicao_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->dt_expedicao) ? $resultado->pessoaJuridica->responsavelTecnico->dt_expedicao : old('dt_expedicao_rt') }}"
+                max="{{ date('Y-m-d') }}"
             />
             @if($errors->has('dt_expedicao_rt'))
             <div class="invalid-feedback">
@@ -177,7 +176,6 @@
                 name="cep_rt"
                 class="{{ $classes[5] }} {{ array_search('cep', $codRT) }} form-control cep {{ $errors->has('cep_rt') ? 'is-invalid' : '' }}"
                 id="cep_rt"
-                placeholder="CEP"
                 value="{{ empty(old('cep_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cep) ? $resultado->pessoaJuridica->responsavelTecnico->cep : old('cep_rt') }}"
             />
             @if($errors->has('cep_rt'))
@@ -193,8 +191,8 @@
                 name="bairro_rt"
                 class="{{ $classes[5] }} {{ array_search('bairro', $codRT) }} form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }}"
                 id="bairro_rt"
-                placeholder="Bairro"
                 value="{{ empty(old('bairro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->bairro) ? $resultado->pessoaJuridica->responsavelTecnico->bairro : old('bairro_rt') }}"
+                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('bairro_rt'))
             <div class="invalid-feedback">
@@ -212,7 +210,6 @@
                 name="logradouro_rt"
                 class="{{ $classes[5] }} {{ array_search('logradouro', $codRT) }} form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }}"
                 id="rua_rt"
-                placeholder="Logradouro"
                 value="{{ empty(old('logradouro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->logradouro) ? $resultado->pessoaJuridica->responsavelTecnico->logradouro : old('logradouro_rt') }}"
             />
             @if($errors->has('logradouro_rt'))
@@ -228,7 +225,6 @@
                 name="numero_rt"
                 class="{{ $classes[5] }} {{ array_search('numero', $codRT) }} form-control {{ $errors->has('numero_rt') ? 'is-invalid' : '' }}"
                 id="numero_rt"
-                placeholder="Número"
                 value="{{ empty(old('numero_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->numero) ? $resultado->pessoaJuridica->responsavelTecnico->numero : old('numero_rt') }}"
             />
             @if($errors->has('numero_rt'))
@@ -247,7 +243,6 @@
                 name="complemento_rt"
                 class="{{ $classes[5] }} {{ array_search('complemento', $codRT) }} form-control {{ $errors->has('complemento_rt') ? 'is-invalid' : '' }}"
                 id="complemento_rt"
-                placeholder="Complemento"
                 value="{{ empty(old('complemento_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->complemento) ? $resultado->pessoaJuridica->responsavelTecnico->complemento : old('complemento_rt') }}"
             />
             @if($errors->has('complemento_rt'))
@@ -263,8 +258,8 @@
                 name="cidade_rt"
                 id="cidade_rt"
                 class="{{ $classes[5] }} {{ array_search('cidade', $codRT) }} form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }}"
-                placeholder="Município"
                 value="{{ empty(old('cidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cidade) ? $resultado->pessoaJuridica->responsavelTecnico->cidade : old('cidade_rt') }}"
+                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('cidade_rt'))
             <div class="invalid-feedback">
@@ -308,9 +303,7 @@
                 type="text"
                 class="{{ $classes[5] }} {{ array_search('nome_mae', $codRT) }} form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_mae_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_mae) ? $resultado->pessoaJuridica->responsavelTecnico->nome_mae : old('nome_mae_rt') }}"
-                placeholder="Nome da Mãe"
-                minlength="5"
-                maxlength="191"
+                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_mae_rt'))
             <div class="invalid-feedback">
@@ -319,15 +312,13 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="nome_pai_rt">{{ array_search('nome_pai', $codRT) }} - Nome do Pai *</label>
+            <label for="nome_pai_rt">{{ array_search('nome_pai', $codRT) }} - Nome do Pai</label>
             <input
                 name="nome_pai_rt"
                 type="text"
                 class="{{ $classes[5] }} {{ array_search('nome_pai', $codRT) }} form-control {{ $errors->has('nome_pai_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_pai_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_pai) ? $resultado->pessoaJuridica->responsavelTecnico->nome_pai : old('nome_pai_rt') }}"
-                placeholder="Nome do Pai"
-                minlength="5"
-                maxlength="191"
+                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_pai_rt'))
             <div class="invalid-feedback">

@@ -50,9 +50,7 @@
 
     <form method="POST" enctype="multipart/form-data" id="inserirRegistro" class="cadastroRepresentante" autocomplete="off">
         @csrf
-        @if(isset($resultado->id))
-            @method('PUT')
-        @endif
+        @method('PUT')
 
         <!-- Tab panes -->
         <div class="tab-content">

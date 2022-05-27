@@ -15,7 +15,7 @@ interface PreRegistroServiceInterface {
 
     public function saveSiteAjax($request, GerentiRepositoryInterface $gerentiRepository);
 
-    public function saveSite($request);
+    public function saveSite($request, GerentiRepositoryInterface $gerentiRepository);
 
     public function downloadAnexo($id);
 

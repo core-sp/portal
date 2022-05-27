@@ -15,12 +15,12 @@ class CreateResponsaveisTecnicosTable extends Migration
     {
         Schema::create('responsaveis_tecnicos', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('cpf', 11)->unique()->nullable();
+            $table->string('registro')->unique()->nullable();
             $table->string('nome')->nullable();
             $table->string('nome_social')->nullable();
             $table->char('sexo', 1)->nullable();
             $table->date('dt_nascimento')->nullable();
-            $table->string('registro')->unique()->nullable();
-            $table->string('cpf', 11)->unique()->nullable();
             $table->string('cep', 10)->nullable();
             $table->string('logradouro')->nullable();
             $table->string('numero', 10)->nullable();

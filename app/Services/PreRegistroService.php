@@ -7,6 +7,8 @@ use App\PreRegistro;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\GerentiRepositoryInterface;
+use Carbon\Carbon;
+use App\Events\ExternoEvent;
 
 class PreRegistroService implements PreRegistroServiceInterface {
 
@@ -130,6 +132,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     private function getRTGerenti(GerentiRepositoryInterface $gerentiRepository, $cpf)
     {
+        if(!isset($cpf) || (strlen($cpf) != 11))
+            return null;
+
         $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $cpf);
         $ass_id = null;
         $nome = null;
@@ -160,9 +165,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $gerenti['nome_pai'] = $resultadosGerenti['Nome do pai'];
             $gerenti['identidade'] = $resultadosGerenti['identidade'];
             $gerenti['orgao_emissor'] = $resultadosGerenti['emissor'];
-            $gerenti['dt_expedicao'] = $resultadosGerenti['expedicao'];
-            $gerenti['dt_nascimento'] = $resultadosGerenti['Data de nascimento'];
-            $gerenti['sexo'] = $resultadosGerenti['Sexo'];
+            $gerenti['dt_expedicao'] = Carbon::createFromFormat('d/m/Y', $resultadosGerenti['expedicao'])->format('Y-m-d');
+            $gerenti['dt_nascimento'] = Carbon::createFromFormat('d/m/Y', $resultadosGerenti['Data de nascimento'])->format('Y-m-d');
+            $gerenti['sexo'] = $resultadosGerenti['Sexo'] == "MASCULINO" ? "M" : "F";
             $gerenti['cpf'] = $cpf;
         }
 
@@ -198,7 +203,15 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 $pf = $externo->isPessoaFisica() && (($resultado["ASS_TP_ASSOC"] == 2) || ($resultado["ASS_TP_ASSOC"] == 5));
                 $pj = !$externo->isPessoaFisica() && ($resultado["ASS_TP_ASSOC"] == 1);
                 if($naoCancelado && $ativo && ($pf || $pj))
+                {
                     $gerenti = $resultado['ASS_REGISTRO'];
+                    
+                    $string = 'Usuário Externo com ';
+                    $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
+                    $string .= $externo->cpf_cnpj . ', não pode realizar a solicitação de registro ';
+                    $string .= 'devido constar no GERENTI um registro ativo : ' . formataRegistro($resultado['ASS_REGISTRO']);
+                    event(new ExternoEvent($string));
+                }
             }
 
         $preRegistro = isset($gerenti) ? null : $externo->preRegistro;
@@ -211,11 +224,15 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function getPreRegistro(MediadorServiceInterface $service, $resultado)
     {
-        // Falta logExterno
         if(!isset($resultado))
         {
             $resultado = $externo->preRegistro()->create();
             $externo->isPessoaFisica() ? $resultado->pessoaFisica()->create() : $resultado->pessoaJuridica()->create();
+
+            $string = 'Usuário Externo com ';
+            $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
+            $string .= $externo->cpf_cnpj . ', iniciou o processo de solicitação de registro com a id: ' . $resultado->id;
+            event(new ExternoEvent($string));
         }
 
         return [
@@ -242,13 +259,13 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $classeCriar = array_search($request['classe'], $this->getRelacoes());
 
         if(($request['classe'] != PreRegistroService::RELATION_ANEXOS) && ($request['classe'] != PreRegistroService::RELATION_PRE_REGISTRO))
-            $objeto = $preRegistro->whereHas($request['classe'])->get();
+            $objeto = $preRegistro->has($request['classe'])->where('id', $preRegistro->id)->first();
         
         $request['campo'] = $this->limparNomeCamposAjax($request['classe'], $request['campo']);
         $gerenti = ($request['classe'] == PreRegistroService::RELATION_RT) && ($request['campo'] == 'cpf') ? 
             $this->getRTGerenti($gerentiRepository, $request['valor']) : null;
 
-        if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || $objeto->isNotEmpty())
+        if(($request['classe'] == PreRegistroService::RELATION_PRE_REGISTRO) || isset($objeto))
             $resultado = $preRegistro->atualizarAjax($request['classe'], $request['campo'], $request['valor'], $gerenti);
         else
             $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor'], $gerenti);
@@ -256,9 +273,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return $resultado;
     }
 
-    public function saveSite($request)
+    public function saveSite($request, GerentiRepositoryInterface $gerentiRepository)
     {
-        // Falta logExterno
         $externo = auth()->guard('user_externo')->user();
         $preRegistro = $externo->preRegistro;
 
@@ -272,11 +288,12 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $objeto = null;
             if($key != PreRegistroService::RELATION_PRE_REGISTRO)
             {
-                $objeto = $preRegistro->whereHas($key)->get();
-                $resultado = $objeto->isNotEmpty() ? $preRegistro->salvar($key, $arrayCampos) : 
-                    $preRegistro->salvar($key, $arrayCampos, array_search($key, $this->getRelacoes()));
+                $gerenti = $key == PreRegistroService::RELATION_RT ? $this->getRTGerenti($gerentiRepository, $arrayCampos['cpf']) : null;
+                $objeto = $preRegistro->has($key)->where('id', $preRegistro->id)->first();
+                $resultado = isset($objeto) ? $preRegistro->salvar($key, $arrayCampos, $gerenti) : 
+                    $preRegistro->salvar($key, $arrayCampos, $gerenti, array_search($key, $this->getRelacoes()));
             } else
-                $resultado = $preRegistro->salvar($key, $arrayCampos);
+                $resultado = $preRegistro->salvar($key, $arrayCampos, $gerenti);
             
             if(!isset($resultado))
                 abort(500);
@@ -286,6 +303,13 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         if(!isset($resultado))
             abort(500);
+        
+        // falta envio de email
+
+        $string = 'Usuário Externo com ';
+        $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
+        $string .= $externo->cpf_cnpj . ', enviou para análise incial a solicitação de registro com a id: ' . $preRegistro->id;
+        event(new ExternoEvent($string));
         
         return [
             'message' => '<i class="icon fa fa-check"></i> Solicitação de registro enviada para análise!',
@@ -310,7 +334,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function excluirAnexo($id)
     {
-        // Falta logExterno
         $preRegistro = auth()->guard('user_externo')->user()->preRegistro;
 
         // Inserir para não aceitar se já esta num status que não pode mais editar o formulario

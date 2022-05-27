@@ -179,12 +179,12 @@ class PreRegistro extends Model
         return $resultado;
     }
 
-    public function salvar($classe, $arrayCampos, $criar = null)
+    public function salvar($classe, $arrayCampos, $gerenti, $criar = null)
     {
         $resultado = null;
         $valido = null;
         if(isset($criar))
-            $valido = $criar::atualizar($arrayCampos);
+            $valido = $criar::atualizar($arrayCampos, $gerenti);
         
         switch ($classe) {
             case 'preRegistro':
@@ -206,7 +206,7 @@ class PreRegistro extends Model
                 break;
             case 'pessoaJuridica.responsavelTecnico':
                 if(!isset($valido))
-                    $valido = $this->pessoaJuridica->responsavelTecnico->atualizar($arrayCampos);
+                    $valido = $this->pessoaJuridica->responsavelTecnico->atualizar($arrayCampos, $gerenti);
                 $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido == 'remover' ? null : $valido->id]);
                 $this->touch();
                 break;

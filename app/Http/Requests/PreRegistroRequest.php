@@ -11,81 +11,82 @@ class PreRegistroRequest extends FormRequest
     private $regraDtNasc;
     private $regraPath;
     private $externo;
+    private $regraRegexTel;
 
     private function getRules($externo)
     {
         $rules = [
             'path' => $this->regraPath,
-            'nome_contabil' => 'max:191',
             'cnpj_contabil' => ['nullable', new CpfCnpj],
-            'email_contabil' => 'max:191|email',
-            'nome_contato_contabil' => 'max:191',
-            'telefone_contabil' => '',
-            'registro_secundario' => '',
-            'ramo_atividade' => 'max:191',
-            'segmento' => 'in:'.implode(',', segmentos()),
-            'idregional' => 'exists:regionais,idregional',
-            'cep' => 'max:9',
-            'bairro' => 'max:191',
-            'logradouro' => 'max:191',
-            'numero' => 'max:10',
-            'complemento' => 'max:191',
-            'cidade' => 'max:191',
-            'uf' => 'size:2|in:'.implode(',', array_keys(estados())),
-            'tipo_telefone' => 'in:'.implode(',', tipos_contatos()),
-            'telefone' => '',
-            'tipo_telefone_1' => 'in:'.implode(',', tipos_contatos()),
-            'telefone_1' => '',
+            'nome_contabil' => 'required_with:cnpj_contabil|max:191',
+            'email_contabil' => 'required_with:cnpj_contabil|max:191|email',
+            'nome_contato_contabil' => 'required_with:cnpj_contabil|max:191',
+            'telefone_contabil' => 'required_with:cnpj_contabil|max:20|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})/',
+            'registro_secundario' => 'nullable',
+            'ramo_atividade' => 'required|max:191',
+            'segmento' => 'nullable|in:'.implode(',', segmentos()),
+            'idregional' => 'required|exists:regionais,idregional',
+            'cep' => 'required|max:9',
+            'bairro' => 'required|max:191',
+            'logradouro' => 'required|max:191',
+            'numero' => 'required|max:10',
+            'complemento' => 'nullable|max:191',
+            'cidade' => 'required|max:191',
+            'uf' => 'required|size:2|in:'.implode(',', array_keys(estados())),
+            'tipo_telefone' => 'required|in:'.implode(',', tipos_contatos()),
+            'telefone' => 'required|max:20|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})/',
+            'tipo_telefone_1' => 'nullable|in:'.implode(',', tipos_contatos()),
+            'telefone_1' => 'required_with:tipo_telefone_1|max:20'.$this->regraRegexTel,
         ];
 
         $pessoaFisica = [
-            'nome_social' => 'max:191',
-            'sexo' => 'size:1|in:M,F',
-            'dt_nascimento' => 'date|before_or_equal:'.$this->regraDtNasc,
-            'estado_civil' => 'in:'.implode(',', estados_civis()),
-            'nacionalidade' => 'in:'.implode(',', nacionalidades()),
-            'naturalidade' => 'in:'.implode(',', estados()),
-            'nome_mae' => 'max:191',
-            'nome_pai' => 'max:191',
-            'identidade' => 'max:20',
-            'orgao_emissor' => 'max:191',
-            'dt_expedicao' => 'date|before_or_equal:today',
+            'nome_social' => 'nullable|max:191',
+            'sexo' => 'required|size:1|in:M,F',
+            'dt_nascimento' => 'required|date|before_or_equal:'.$this->regraDtNasc,
+            'estado_civil' => 'nullable|in:'.implode(',', estados_civis()),
+            'nacionalidade' => 'required|in:'.implode(',', nacionalidades()),
+            'naturalidade' => 'required|in:'.implode(',', estados()),
+            'nome_mae' => 'required|max:191',
+            'nome_pai' => 'nullable|max:191',
+            'identidade' => 'required|max:20',
+            'orgao_emissor' => 'required|max:191',
+            'dt_expedicao' => 'required|date|before_or_equal:today',
         ];
 
         $pessoaJuridica = [
-            'razao_social' => 'max:191',
-            'capital_social' => '',
-            'nire' => 'max:20',
-            'tipo_empresa' => 'in:'.implode(',', tipos_empresa()),
-            'dt_inicio_atividade' => 'date|before_or_equal:today',
-            'inscricao_municipal' => '',
-            'inscricao_estadual' => '',
-            'checkEndEmpresa' => '',
-            'cep_empresa' => 'max:9',
-            'bairro_empresa' => 'max:191',
-            'logradouro_empresa' => 'max:191',
-            'numero_empresa' => 'max:10',
-            'complemento_empresa' => 'max:191',
-            'cidade_empresa' => 'max:191',
-            'uf_empresa' => 'size:2|in:'.implode(',', array_keys(estados())),
-            'nome_rt' => 'max:191',
-            'nome_social_rt' => 'max:191',
-            'registro' => '',
-            'sexo_rt' => 'size:1|in:M,F',
-            'dt_nascimento_rt' => 'date|before_or_equal:'.$this->regraDtNasc,
+            'razao_social' => 'required|max:191',
+            'capital_social' => 'required|max:16|regex:/([0-9.]{1,13}),([0-9]{2})/',
+            'nire' => 'required|max:20',
+            'tipo_empresa' => 'required|in:'.implode(',', tipos_empresa()),
+            'dt_inicio_atividade' => 'required|date|before_or_equal:today',
+            'inscricao_municipal' => 'required',
+            'inscricao_estadual' => 'required',
+            'checkEndEmpresa' => 'present',
+            'cep_empresa' => 'required_unless:checkEndEmpresa,off|max:9',
+            'bairro_empresa' => 'required_unless:checkEndEmpresa,off|max:191',
+            'logradouro_empresa' => 'required_unless:checkEndEmpresa,off|max:191',
+            'numero_empresa' => 'required_unless:checkEndEmpresa,off|max:10',
+            'complemento_empresa' => 'nullable|max:191',
+            'cidade_empresa' => 'required_unless:checkEndEmpresa,off|max:191',
+            'uf_empresa' => 'required_unless:checkEndEmpresa,off|size:2|in:'.implode(',', array_keys(estados())),
+            'nome_rt' => 'required|max:191',
+            'nome_social_rt' => 'nullable|max:191',
+            'registro' => 'required|max:20',
+            'sexo_rt' => 'required|size:1|in:M,F',
+            'dt_nascimento_rt' => 'required|date|before_or_equal:'.$this->regraDtNasc,
             'cpf_rt' => ['required', new CpfCnpj],
-            'identidade_rt' => 'max:20',
-            'orgao_emissor_rt' => 'max:191',
-            'dt_expedicao_rt' => 'date|before_or_equal:today',
-            'cep_rt' => 'max:9',
-            'bairro_rt' => 'max:191',
-            'logradouro_rt' => 'max:191',
-            'numero_rt' => 'max:10',
-            'complemento_rt' => 'max:191',
-            'cidade_rt' => 'max:191',
-            'uf_rt' => 'size:2|in:'.implode(',', array_keys(estados())),
-            'nome_mae_rt' => 'max:191',
-            'nome_pai_rt' => 'max:191',
+            'identidade_rt' => 'required|max:20',
+            'orgao_emissor_rt' => 'required|max:191',
+            'dt_expedicao_rt' => 'required|date|before_or_equal:today',
+            'cep_rt' => 'required|max:9',
+            'bairro_rt' => 'required|max:191',
+            'logradouro_rt' => 'required|max:191',
+            'numero_rt' => 'required|max:10',
+            'complemento_rt' => 'nullable|max:191',
+            'cidade_rt' => 'required|max:191',
+            'uf_rt' => 'required|size:2|in:'.implode(',', array_keys(estados())),
+            'nome_mae_rt' => 'required|max:191',
+            'nome_pai_rt' => 'nullable|max:191',
         ];
 
         $outrasRules = $externo->isPessoaFisica() ? $pessoaFisica : $pessoaJuridica;
@@ -101,6 +102,7 @@ class PreRegistroRequest extends FormRequest
 
         $this->regraPath = '';
         $this->regraDtNasc = Carbon::today()->subYears(18)->format('Y-m-d');
+        $this->regraRegexTel = isset(request()->tipo_telefone_1) ? '|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})/' : '';
 
         if($anexosCount == 0)
         {
@@ -123,6 +125,11 @@ class PreRegistroRequest extends FormRequest
             $this->merge([
                 'cnpj_contabil' => apenasNumeros(request()->cnpj_contabil),
             ]);
+
+        if(isset(request()->registro))
+            $this->merge([
+                'registro' => str_replace("/", "", request()->registro),
+            ]);
     }
 
     public function rules()
@@ -136,6 +143,7 @@ class PreRegistroRequest extends FormRequest
             'max' => 'Limite de :max caracteres',
             'in' => 'Valor não é aceito',
             'required' => 'Campo obrigatório',
+            'required_unless' => 'Campo obrigatório',
             'mimetypes' => 'O arquivo não possue extensão permitida ou está com erro',
             'file' => 'Deve ser um arquivo',
             'size' => 'Deve ter :size caracteres',
@@ -146,6 +154,12 @@ class PreRegistroRequest extends FormRequest
             'dt_nascimento.before_or_equal' => 'Deve ter 18 anos completos ou mais',
             'dt_nascimento_rt.before_or_equal' => 'Deve ter 18 anos completos ou mais',
             'email' => 'Deve ser no formato de email teste@teste.com',
+            'present' => 'Campo deve estar presente',
+            'nome_contabil.required_with' => 'Campo obrigatório se possui o CNPJ',
+            'nome_contato_contabil.required_with' => 'Campo obrigatório se possui o CNPJ',
+            'telefone_contabil.required_with' => 'Campo obrigatório se possui o CNPJ',
+            'email_contabil.required_with' => 'Campo obrigatório se possui o CNPJ',
+            'regex' => 'Formato inválido',
         ];
     }
 }

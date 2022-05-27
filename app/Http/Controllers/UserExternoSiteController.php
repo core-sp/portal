@@ -146,7 +146,7 @@ class UserExternoSiteController extends Controller
     {
         try{
             $validatedData = $request->validated();
-            $dados = $this->service->getService('PreRegistro')->saveSite($validatedData);
+            $dados = $this->service->getService('PreRegistro')->saveSite($validatedData, $this->gerentiRepository);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             method_exists($e, 'getStatusCode') ? abort($e->getStatusCode(), $e->getMessage()) : 

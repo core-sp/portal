@@ -1106,6 +1106,7 @@ function putDadosPreRegistro(objeto)
 		data: campo == 'path' ? frmData : dados,
 		dataType: 'json',
 		url: classe == 'Arquivo-Excluir' ? '/externo/pre-registro-anexo/excluir/' + dados.id : '/externo/inserir-registro-ajax',
+		async: false,
 		processData: pD,
         contentType: cT,
 		cache: false,

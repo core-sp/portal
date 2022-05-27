@@ -20,13 +20,12 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         />
     </div>
     <div class="col-sm mb-2-576">
-        <label for="registro_secundario">{{ array_search('registro_secundario', $codPre) }} - Registro Secundário *</label>
+        <label for="registro_secundario">{{ array_search('registro_secundario', $codPre) }} - Registro Secundário</label>
         <input
             type="text"
             name="registro_secundario"
             class="{{ $classes[4] }} {{ array_search('registro_secundario', $codPre) }} form-control {{ $errors->has('registro_secundario') ? 'is-invalid' : '' }}"
             value="{{ empty(old('registro_secundario')) && isset($resultado->registro_secundario) ? $resultado->registro_secundario : old('registro_secundario') }}"
-            placeholder=""
         />
         @if($errors->has('registro_secundario'))
         <div class="invalid-feedback">
@@ -44,7 +43,6 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
             value="{{ $resultado->userExterno->nome }}"
-            placeholder="Nome Completo"
             readonly
             disabled
         />
@@ -64,7 +62,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="{{ $classes[2] }} {{ array_search('nome_social', $codCpf) }} form-control {{ $errors->has('nome_social') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_social')) && isset($resultado->pessoaFisica->nome_social) ? $resultado->pessoaFisica->nome_social : old('nome_social') }}"
-            placeholder="Nome Social"
+            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('nome_social'))
         <div class="invalid-feedback">
@@ -110,6 +108,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="date"
             class="{{ $classes[2] }} {{ array_search('dt_nascimento', $codCpf) }} form-control {{ $errors->has('dt_nascimento') ? 'is-invalid' : '' }}"
             value="{{ empty(old('dt_nascimento')) && isset($resultado->pessoaFisica->dt_nascimento) ? $resultado->pessoaFisica->dt_nascimento : old('dt_nascimento') }}"
+            max="{{ Carbon\Carbon::today()->subYears(18)->format('Y-m-d') }}"
         />
         @if($errors->has('dt_nascimento'))
         <div class="invalid-feedback">
@@ -118,7 +117,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="estado_civil">{{ array_search('estado_civil', $codCpf) }} - Estado Civil *</label>
+        <label for="estado_civil">{{ array_search('estado_civil', $codCpf) }} - Estado Civil</label>
         <select 
             name="estado_civil" 
             class="{{ $classes[2] }} {{ array_search('estado_civil', $codCpf) }} form-control {{ $errors->has('estado_civil') ? 'is-invalid' : '' }}" 
@@ -199,9 +198,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="{{ $classes[2] }} {{ array_search('nome_mae', $codCpf) }} form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_mae')) && isset($resultado->pessoaFisica->nome_mae) ? $resultado->pessoaFisica->nome_mae : old('nome_mae') }}"
-            placeholder="Nome da Mãe"
-            minlength="5"
-            maxlength="191"
+            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('nome_mae'))
         <div class="invalid-feedback">
@@ -210,15 +207,13 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nome_pai">{{ array_search('nome_pai', $codCpf) }} - Nome do Pai *</label>
+        <label for="nome_pai">{{ array_search('nome_pai', $codCpf) }} - Nome do Pai</label>
         <input
             name="nome_pai"
             type="text"
             class="{{ $classes[2] }} {{ array_search('nome_pai', $codCpf) }} form-control {{ $errors->has('nome_pai') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_pai')) && isset($resultado->pessoaFisica->nome_pai) ? $resultado->pessoaFisica->nome_pai : old('nome_pai') }}"
-            placeholder="Nome do Pai"
-            minlength="5"
-            maxlength="191"
+            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('nome_pai'))
         <div class="invalid-feedback">
@@ -237,7 +232,6 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             id="rg"
             class="{{ $classes[2] }} {{ array_search('identidade', $codCpf) }} form-control rgInput {{ $errors->has('identidade') ? 'is-invalid' : '' }}"
             value="{{ empty(old('identidade')) && isset($resultado->pessoaFisica->identidade) ? $resultado->pessoaFisica->identidade : old('identidade') }}"
-            placeholder=""
             maxlength="20"
         />
         @if($errors->has('identidade'))
@@ -253,7 +247,6 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="{{ $classes[2] }} {{ array_search('orgao_emissor', $codCpf) }} form-control {{ $errors->has('orgao_emissor') ? 'is-invalid' : '' }}"
             value="{{ empty(old('orgao_emissor')) && isset($resultado->pessoaFisica->orgao_emissor) ? $resultado->pessoaFisica->orgao_emissor : old('orgao_emissor') }}"
-            placeholder=""
         />
         @if($errors->has('orgao_emissor'))
         <div class="invalid-feedback">
@@ -268,6 +261,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="date"
             class="{{ $classes[2] }} {{ array_search('dt_expedicao', $codCpf) }} form-control {{ $errors->has('dt_expedicao') ? 'is-invalid' : '' }}"
             value="{{ empty(old('dt_expedicao')) && isset($resultado->pessoaFisica->dt_expedicao) ? $resultado->pessoaFisica->dt_expedicao : old('dt_expedicao') }}"
+            max="{{ date('Y-m-d') }}"
         />
         @if($errors->has('dt_expedicao'))
         <div class="invalid-feedback">
@@ -287,9 +281,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="{{ $classes[3] }} {{ array_search('razao_social', $codCnpj) }} form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }}"
             value="{{ empty(old('razao_social')) && isset($resultado->pessoaJuridica->razao_social) ? $resultado->pessoaJuridica->razao_social : old('razao_social') }}"
-            placeholder="Razão Social"
-            minlength="5"
-            maxlength="191"
+            c
         />
         @if($errors->has('razao_social'))
         <div class="invalid-feedback">
@@ -362,6 +354,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             name="dt_inicio_atividade"
             class="{{ $classes[3] }} {{ array_search('dt_inicio_atividade', $codCnpj) }} form-control {{ $errors->has('dt_inicio_atividade') ? 'is-invalid' : '' }}"
             value="{{ empty(old('dt_inicio_atividade')) && isset($resultado->pessoaJuridica->dt_inicio_atividade) ? $resultado->pessoaJuridica->dt_inicio_atividade : old('dt_inicio_atividade') }}"
+            max="{{ date('Y-m-d') }}"
         />
         @if($errors->has('dt_inicio_atividade'))
         <div class="invalid-feedback">
@@ -416,9 +409,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="{{ $classes[4] }} {{ array_search('ramo_atividade', $codPre) }} form-control {{ $errors->has('ramo_atividade') || isset($justificativas) ? 'is-invalid' : '' }}"
             value="{{ empty(old('ramo_atividade')) && isset($resultado->ramo_atividade) ? $resultado->ramo_atividade : old('ramo_atividade') }}"
-            placeholder="Ramo de Atividade"
-            minlength="5"
-            maxlength="191"
+            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('ramo_atividade'))
         <div class="invalid-feedback">
@@ -430,7 +421,7 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="segmento">{{ array_search('segmento', $codPre) }} - Segmento *</label>
+        <label for="segmento">{{ array_search('segmento', $codPre) }} - Segmento</label>
         <select 
             name="segmento" 
             class="{{ $classes[4] }} {{ array_search('segmento', $codPre) }} form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }}" 

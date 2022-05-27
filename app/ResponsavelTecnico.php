@@ -4,7 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Carbon\Carbon;
 
 class ResponsavelTecnico extends Model
 {
@@ -12,20 +11,6 @@ class ResponsavelTecnico extends Model
 
     protected $table = 'responsaveis_tecnicos';
     protected $guarded = [];
-
-    private static function formataDadosGerenti($gerenti)
-    {
-        if(isset($gerenti['sexo']))
-            $gerenti['sexo'] = $gerenti['sexo'] == "MASCULINO" ? "M" : "F";
-        if(isset($gerenti['dt_nascimento']))
-            $gerenti['dt_nascimento'] = Carbon::createFromFormat('d/m/Y', $gerenti['dt_nascimento'])->format('Y-m-d');
-        if(isset($gerenti['dt_expedicao']))
-            $gerenti['dt_expedicao'] = Carbon::createFromFormat('d/m/Y', $gerenti['dt_expedicao'])->format('Y-m-d');
-        if(isset($gerenti['identidade']))
-            $gerenti['identidade'] = str_replace("-", "", str_replace(".", "", $gerenti['identidade']));
-
-        return $gerenti;
-    }
 
     // RT = registro responsavel técnico
     public static function codigosPreRegistro()
@@ -62,10 +47,9 @@ class ResponsavelTecnico extends Model
         if(isset($cpf) && (strlen($cpf) == 11))
         {   
             $existe = ResponsavelTecnico::where('cpf', $cpf)->first();
-            $gerenti = ResponsavelTecnico::formataDadosGerenti($gerenti);
 
-            // if(!isset($existe))
-            //     $existe = isset($gerenti["registro"]) ? ResponsavelTecnico::create($gerenti) : ResponsavelTecnico::create(['cpf' => $cpf]);
+            if(!isset($existe))
+                $existe = isset($gerenti["registro"]) ? ResponsavelTecnico::create($gerenti) : ResponsavelTecnico::create(['cpf' => $cpf]);
 
             return $existe;
         }
@@ -91,11 +75,11 @@ class ResponsavelTecnico extends Model
         $this->update([$campo => $valor]);
     }
 
-    public static function atualizar($arrayCampos)
+    public static function atualizar($arrayCampos, $gerenti)
     {
         if(isset($arrayCampos['cpf']) && (strlen($arrayCampos['cpf']) == 11))
         {
-            $rt = ResponsavelTecnico::buscar($arrayCampos['cpf']);
+            $rt = ResponsavelTecnico::buscar($arrayCampos['cpf'], $gerenti);
             $rt->update($arrayCampos);
             return $rt;
         }

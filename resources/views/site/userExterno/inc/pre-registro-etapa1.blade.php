@@ -25,7 +25,6 @@
                 type="text"
                 class="{{ $classes[1] }} {{ array_search('nome', $cod) }} form-control {{ $errors->has('nome_contabil') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_contabil')) && isset($resultado->contabil->nome) ? $resultado->contabil->nome : old('nome_contabil') }}"
-                placeholder="Nome da Contabilidade"
                 minlength="5"
                 maxlength="191"
             />
@@ -62,7 +61,7 @@
                 type="text"
                 class="{{ $classes[1] }} {{ array_search('nome_contato', $cod) }} form-control {{ $errors->has('nome_contato_contabil') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_contato_contabil')) && isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : old('nome_contato_contabil') }}"
-                placeholder="Nome de Contato"
+                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_contato_contabil'))
             <div class="invalid-feedback">

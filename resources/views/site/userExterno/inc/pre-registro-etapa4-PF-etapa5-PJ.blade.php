@@ -61,7 +61,7 @@
     <div class="col-sm-6 mb-2-576">
         <label for="telefone_1">{{ array_search('telefone', $codPre) }} - Telefone </label>
         <input type="text"
-            class="{{ $classes[4] }} {{ array_search('telefone', $codPre) }} form-control celularInput {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} {{ array_search('telefone', $codPre) }} form-control telefoneInput {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
             name="telefone_1"
             value="{{ empty(old('telefone_1')) && isset(explode(';', $resultado->telefone)[1]) ? explode(';', $resultado->telefone)[1] : old('telefone_1') }}"
             placeholder="(xx) 99999-9999"

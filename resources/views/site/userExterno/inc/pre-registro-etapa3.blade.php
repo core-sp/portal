@@ -7,7 +7,6 @@
             name="cep"
             class="{{ $classes[4] }} {{ array_search('cep', $codPre) }} form-control cep {{ $errors->has('cep') ? 'is-invalid' : '' }}"
             id="cep_pre"
-            placeholder="CEP"
             value="{{ empty(old('cep')) && isset($resultado->cep) ? $resultado->cep : old('cep') }}"
         />
         @if($errors->has('cep'))
@@ -23,8 +22,8 @@
             name="bairro"
             class="{{ $classes[4] }} {{ array_search('bairro', $codPre) }} form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
             id="bairro_pre"
-            placeholder="Bairro"
             value="{{ empty(old('bairro')) && isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
+            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('bairro'))
         <div class="invalid-feedback">
@@ -42,7 +41,6 @@
             name="logradouro"
             class="{{ $classes[4] }} {{ array_search('logradouro', $codPre) }} form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }}"
             id="rua_pre"
-            placeholder="Logradouro"
             value="{{ empty(old('logradouro')) && isset($resultado->logradouro) ? $resultado->logradouro : old('logradouro') }}"
         />
         @if($errors->has('logradouro'))
@@ -58,7 +56,6 @@
             name="numero"
             class="{{ $classes[4] }} {{ array_search('numero', $codPre) }} form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
             id="numero_pre"
-            placeholder="Número"
             value="{{ empty(old('numero')) && isset($resultado->numero) ? $resultado->numero : old('numero') }}"
         />
         @if($errors->has('numero'))
@@ -77,7 +74,6 @@
             name="complemento"
             class="{{ $classes[4] }} {{ array_search('complemento', $codPre) }} form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
             id="complemento_pre"
-            placeholder="Complemento"
             value="{{ empty(old('complemento')) && isset($resultado->complemento) ? $resultado->complemento : old('complemento') }}"
         />
         @if($errors->has('complemento'))
@@ -93,8 +89,8 @@
             name="cidade"
             id="cidade_pre"
             class="{{ $classes[4] }} {{ array_search('cidade', $codPre) }} form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }}"
-            placeholder="Município"
             value="{{ empty(old('cidade')) && isset($resultado->cidade) ? $resultado->cidade : old('cidade') }}"
+            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('cidade'))
         <div class="invalid-feedback">
@@ -173,8 +169,8 @@
                 name="bairro_empresa"
                 class="{{ $classes[3] }} {{ array_search('bairro', $codCnpj) }} form-control {{ $errors->has('bairro_empresa') ? 'is-invalid' : '' }}"
                 id="bairro_empresa"
-                placeholder="Bairro"
                 value="{{ empty(old('bairro_empresa')) && isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : old('bairro_empresa') }}"
+                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('bairro_empresa'))
             <div class="invalid-feedback">
@@ -192,7 +188,6 @@
                 name="logradouro_empresa"
                 class="{{ $classes[3] }} {{ array_search('logradouro', $codCnpj) }} form-control {{ $errors->has('logradouro_empresa') ? 'is-invalid' : '' }}"
                 id="rua_empresa"
-                placeholder="Logradouro"
                 value="{{ empty(old('logradouro_empresa')) && isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : old('logradouro_empresa') }}"
             />
             @if($errors->has('logradouro_empresa'))
@@ -208,7 +203,6 @@
                 name="numero_empresa"
                 class="{{ $classes[3] }} {{ array_search('numero', $codCnpj) }} form-control {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }}"
                 id="numero_empresa"
-                placeholder="Número"
                 value="{{ empty(old('numero_empresa')) && isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : old('numero_empresa') }}"
             />
             @if($errors->has('numero_empresa'))
@@ -227,7 +221,6 @@
                 name="complemento_empresa"
                 class="{{ $classes[3] }} {{ array_search('complemento', $codCnpj) }} form-control {{ $errors->has('complemento_empresa') ? 'is-invalid' : '' }}"
                 id="complemento_empresa"
-                placeholder="Complemento"
                 value="{{ empty(old('complemento_empresa')) && isset($resultado->pessoaJuridica->complemento) ? $resultado->pessoaJuridica->complemento : old('complemento_empresa') }}"
             />
             @if($errors->has('complemento_empresa'))
@@ -243,8 +236,8 @@
                 name="cidade_empresa"
                 id="cidade_empresa"
                 class="{{ $classes[3] }} {{ array_search('cidade', $codCnpj) }} form-control {{ $errors->has('cidade_empresa') ? 'is-invalid' : '' }}"
-                placeholder="Município"
                 value="{{ empty(old('cidade_empresa')) && isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : old('cidade_empresa') }}"
+                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('cidade_empresa'))
             <div class="invalid-feedback">
