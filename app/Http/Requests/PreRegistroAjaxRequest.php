@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Contracts\MediadorServiceInterface;
 use App\Rules\CpfCnpj;
+use Carbon\Carbon;
 
 class PreRegistroAjaxRequest extends FormRequest
 {
@@ -29,7 +30,7 @@ class PreRegistroAjaxRequest extends FormRequest
         {
             if(isset(request()->valor))
             {
-                $this->regraValor[1] = new CpfCnpj;
+                $this->regraValor = [new CpfCnpj];
                 $this->merge([
                     'valor' => apenasNumeros(request()->valor)
                 ]);
@@ -37,11 +38,23 @@ class PreRegistroAjaxRequest extends FormRequest
         }
 
         if(request()->campo == 'path')
-        {
-            $this->regraValor[0] = 'file';
-            $this->regraValor[1] = 'mimetypes:application/pdf,image/jpeg,image/png';
-            $this->regraValor[2] = 'max:5120';
-        }
+            $this->regraValor = [
+                'file',
+                'mimetypes:application/pdf,image/jpeg,image/png',
+                'max:5120',
+            ];
+
+        if(strpos(request()->campo, 'dt_nascimento') !== false)
+            $this->regraValor = [
+                'date',
+                'before_or_equal:' . Carbon::today()->subYears(18)->format('Y-m-d'),
+            ];
+
+        if((strpos(request()->campo, 'dt_expedicao') !== false) || (request()->campo == 'dt_inicio_atividade'))
+            $this->regraValor = [
+                'date',
+                'before_or_equal:today',
+            ];
     }
 
     public function rules()
@@ -71,6 +84,8 @@ class PreRegistroAjaxRequest extends FormRequest
             'required' => 'Falta dados para enviar a requisição',
             'mimetypes' => 'O arquivo não possue extensão permitida ou está com erro',
             'file' => 'Deve ser um arquivo',
+            'date' => 'Deve ser tipo data',
+            'before_or_equal' => strpos(request()->campo, 'dt_nascimento') !== false ? 'Deve ter 18 anos completos ou mais' : 'Data deve ser igual ou anterior a hoje',
         ];
     }
 }

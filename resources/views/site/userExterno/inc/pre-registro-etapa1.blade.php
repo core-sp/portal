@@ -61,7 +61,6 @@
                 type="text"
                 class="{{ $classes[1] }} {{ array_search('nome_contato', $cod) }} form-control {{ $errors->has('nome_contato_contabil') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_contato_contabil')) && isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : old('nome_contato_contabil') }}"
-                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_contato_contabil'))
             <div class="invalid-feedback">

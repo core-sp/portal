@@ -96,7 +96,7 @@ class UserExternoSiteController extends Controller
     public function preRegistroView()
     {
         try{
-            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository);
+            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, auth()->guard('user_externo')->user());
             $resultado = $dados['resultado'];
             $gerenti = $dados['gerenti'];
         } catch (\Exception $e) {
@@ -110,11 +110,12 @@ class UserExternoSiteController extends Controller
     public function inserirPreRegistroView()
     {
         try{
-            $verificacao = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository);
+            $externo = auth()->guard('user_externo')->user();
+            $verificacao = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
             if(isset($verificacao['gerenti']))
                 return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $verificacao['gerenti']]);
                 
-            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $verificacao['resultado']);
+            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $verificacao['resultado'], $externo);
             $codigos = $dados['codigos'];
             $resultado = $dados['resultado'];
             $regionais = $dados['regionais'];
@@ -131,11 +132,12 @@ class UserExternoSiteController extends Controller
     public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
     {
         try{
+            $externo = auth()->guard('user_externo')->user();
             $validatedData = $request->validated();
-            $dados = $this->service->getService('PreRegistro')->saveSiteAjax($validatedData, $this->gerentiRepository);
+            $dados = $this->service->getService('PreRegistro')->saveSiteAjax($validatedData, $this->gerentiRepository, $externo);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode(), $e->getMessage()) : 
+            $e->getCode() != 500 ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao salvar os dados da solicitação de registro via ajax');
         }
         
@@ -145,11 +147,12 @@ class UserExternoSiteController extends Controller
     public function inserirPreRegistro(PreRegistroRequest $request)
     {
         try{
+            $externo = auth()->guard('user_externo')->user();
             $validatedData = $request->validated();
-            $dados = $this->service->getService('PreRegistro')->saveSite($validatedData, $this->gerentiRepository);
+            $dados = $this->service->getService('PreRegistro')->saveSite($validatedData, $this->gerentiRepository, $externo);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode(), $e->getMessage()) : 
+            $e->getCode() != 500 ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao enviar os dados da solicitação de registro para análise');
         }
         
@@ -159,10 +162,11 @@ class UserExternoSiteController extends Controller
     public function preRegistroAnexoDownload($id)
     {
         try{
-            $file = $this->service->getService('PreRegistro')->downloadAnexo($id);
+            $externo = auth()->guard('user_externo')->user();
+            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $externo);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode(), $e->getMessage()) : 
+            $e->getCode() != 500 ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao solicitar download do arquivo');
         }
         
@@ -172,10 +176,11 @@ class UserExternoSiteController extends Controller
     public function preRegistroAnexoExcluir($id)
     {
         try{
-            $dados = $this->service->getService('PreRegistro')->excluirAnexo($id);
+            $externo = auth()->guard('user_externo')->user();
+            $dados = $this->service->getService('PreRegistro')->excluirAnexo($id, $externo);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            method_exists($e, 'getStatusCode') ? abort($e->getStatusCode(), $e->getMessage()) : 
+            $e->getCode() != 500 ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao solicitar exclusão do arquivo');
         }
         

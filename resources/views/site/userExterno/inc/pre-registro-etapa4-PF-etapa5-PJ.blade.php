@@ -4,21 +4,22 @@
         @foreach(tipos_contatos() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
-                @if(!empty(old('tipo_telefone')))
-                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone" value="{{ $tipo }}" {{ old('tipo_telefone') == $tipo ? 'checked' : '' }} />{{ $tipo }}
-                @elseif(isset(explode(',', $resultado->tipo_telefone)[0]))
-                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone" value="{{ $tipo }}" {{ $tipo == explode(';', $resultado->tipo_telefone)[0] ? 'checked' : '' }} />{{ $tipo }}
-                @else
-                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone" value="{{ $tipo }}" />{{ $tipo }}
+                <input type="radio" 
+                    class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input {{ $errors->has('tipo_telefone') ? 'is-invalid' : '' }}" 
+                    name="tipo_telefone" 
+                    value="{{ $tipo }}" 
+                    {{ (old('tipo_telefone') == $tipo) || (isset(explode(';', $resultado->tipo_telefone)[0]) && ($tipo == explode(';', $resultado->tipo_telefone)[0])) ? 'checked' : '' }} 
+                />
+                {{ $tipo }}
+
+                @if($errors->has('tipo_telefone'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('tipo_telefone') }}
+                </div>
                 @endif
             </label>
         </div>
         @endforeach
-        @if($errors->has('tipo_telefone'))
-        <div class="invalid-feedback">
-            {{ $errors->first('tipo_telefone') }}
-        </div>
-        @endif
     </div>
     <div class="col-sm mb-2-576">
         <label for="telefone">{{ array_search('telefone', $codPre) }} - Telefone *</label>
@@ -42,21 +43,22 @@
         @foreach(tipos_contatos() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
-                @if(!empty(old('tipo_telefone_1')))
-                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone_1" value="{{ $tipo }}" {{ old('tipo_telefone_1') == $tipo ? 'checked' : '' }} />{{ $tipo }}
-                @elseif(isset(explode(';', $resultado->tipo_telefone)[1]))
-                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone_1" value="{{ $tipo }}" {{ $tipo == explode(';', $resultado->tipo_telefone)[1] ? 'checked' : '' }} />{{ $tipo }}
-                @else
-                <input type="radio" class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input" name="tipo_telefone_1" value="{{ $tipo }}" />{{ $tipo }}
+                <input type="radio" 
+                    class="{{ $classes[4] }} {{ array_search('tipo_telefone', $codPre) }} form-check-input {{ $errors->has('tipo_telefone_1') ? 'is-invalid' : '' }}" 
+                    name="tipo_telefone_1" 
+                    value="{{ $tipo }}" 
+                    {{ (old('tipo_telefone_1') == $tipo) || (isset(explode(';', $resultado->tipo_telefone)[1]) && ($tipo == explode(';', $resultado->tipo_telefone)[1])) ? 'checked' : '' }} 
+                />
+                {{ $tipo }}
+
+                @if($errors->has('tipo_telefone_1'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('tipo_telefone_1') }}
+                </div>
                 @endif
             </label>
         </div>
         @endforeach
-        @if($errors->has('tipo_telefone_1'))
-        <div class="invalid-feedback">
-            {{ $errors->first('tipo_telefone_1') }}
-        </div>
-        @endif
     </div>
     <div class="col-sm-6 mb-2-576">
         <label for="telefone_1">{{ array_search('telefone', $codPre) }} - Telefone </label>

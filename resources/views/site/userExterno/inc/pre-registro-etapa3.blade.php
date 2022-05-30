@@ -23,7 +23,6 @@
             class="{{ $classes[4] }} {{ array_search('bairro', $codPre) }} form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
             id="bairro_pre"
             value="{{ empty(old('bairro')) && isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
-            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('bairro'))
         <div class="invalid-feedback">
@@ -90,7 +89,6 @@
             id="cidade_pre"
             class="{{ $classes[4] }} {{ array_search('cidade', $codPre) }} form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }}"
             value="{{ empty(old('cidade')) && isset($resultado->cidade) ? $resultado->cidade : old('cidade') }}"
-            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('cidade'))
         <div class="invalid-feedback">
@@ -133,14 +131,21 @@
         <label class="form-check-label">
             <input type="checkbox" 
                 id="checkEndEmpresa" 
-                class="{{ $classes[3] }} {{ array_search('bairro', $codCnpj).'-'.array_search('uf', $codCnpj) }} form-check-input" 
+                class="{{ $classes[3] }} {{ array_search('bairro', $codCnpj).'-'.array_search('uf', $codCnpj) }} form-check-input {{ $errors->has('checkEndEmpresa') ? 'is-invalid' : '' }}" 
                 name="checkEndEmpresa" 
                 @if(isset($resultado->pessoaJuridica) && $resultado->pessoaJuridica->mesmoEndereco())
                     checked
                 @endif
             />
             Mesmo endereço da correspondência
+            
+            @if($errors->has('checkEndEmpresa'))
+            <div class="invalid-feedback">
+                {{ $errors->first('checkEndEmpresa') }}
+            </div>
+            @endif
         </label>
+        
     </div>
 </div>
 
@@ -170,7 +175,6 @@
                 class="{{ $classes[3] }} {{ array_search('bairro', $codCnpj) }} form-control {{ $errors->has('bairro_empresa') ? 'is-invalid' : '' }}"
                 id="bairro_empresa"
                 value="{{ empty(old('bairro_empresa')) && isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : old('bairro_empresa') }}"
-                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('bairro_empresa'))
             <div class="invalid-feedback">
@@ -237,7 +241,6 @@
                 id="cidade_empresa"
                 class="{{ $classes[3] }} {{ array_search('cidade', $codCnpj) }} form-control {{ $errors->has('cidade_empresa') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('cidade_empresa')) && isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : old('cidade_empresa') }}"
-                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('cidade_empresa'))
             <div class="invalid-feedback">

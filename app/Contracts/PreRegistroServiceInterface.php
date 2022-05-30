@@ -9,15 +9,15 @@ interface PreRegistroServiceInterface {
 
     public function getNomesCampos();
     
-    public function verificacao(GerentiRepositoryInterface $gerentiRepository);
+    public function verificacao(GerentiRepositoryInterface $gerentiRepository, $externo);
     
-    public function getPreRegistro(MediadorServiceInterface $service, $resultado);
+    public function getPreRegistro(MediadorServiceInterface $service, $resultado, $externo);
 
-    public function saveSiteAjax($request, GerentiRepositoryInterface $gerentiRepository);
+    public function saveSiteAjax($request, GerentiRepositoryInterface $gerentiRepository, $externo);
 
-    public function saveSite($request, GerentiRepositoryInterface $gerentiRepository);
+    public function saveSite($request, GerentiRepositoryInterface $gerentiRepository, $externo);
 
-    public function downloadAnexo($id);
+    public function downloadAnexo($id, $externo);
 
-    public function excluirAnexo($id);
+    public function excluirAnexo($id, $externo);
 }

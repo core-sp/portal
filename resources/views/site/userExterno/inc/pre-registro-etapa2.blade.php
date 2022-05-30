@@ -62,7 +62,6 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="{{ $classes[2] }} {{ array_search('nome_social', $codCpf) }} form-control {{ $errors->has('nome_social') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_social')) && isset($resultado->pessoaFisica->nome_social) ? $resultado->pessoaFisica->nome_social : old('nome_social') }}"
-            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('nome_social'))
         <div class="invalid-feedback">
@@ -78,28 +77,31 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
-                    class="{{ $classes[2] }} {{ array_search('sexo', $codCpf) }} form-check-input" 
+                    class="{{ $classes[2] }} {{ array_search('sexo', $codCpf) }} form-check-input {{ $errors->has('sexo') ? 'is-invalid' : '' }}" 
                     name="sexo" 
-                    value="F" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->pessoaFisica->sexo) && $resultado->pessoaFisica->sexo == 'F') ? 'checked' : '' }}
+                    value="F" 
+                    {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->pessoaFisica->sexo) && ($resultado->pessoaFisica->sexo == 'F')) ? 'checked' : '' }}
                 />
                 Feminino
+                
+                @if($errors->has('sexo'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('sexo') }}
+                </div>
+                @endif
             </label>
         </div>
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
-                    class="{{ $classes[2] }} {{ array_search('sexo', $codCpf) }} form-check-input" 
+                    class="{{ $classes[2] }} {{ array_search('sexo', $codCpf) }} form-check-input {{ $errors->has('sexo') ? 'is-invalid' : '' }}" 
                     name="sexo" 
-                    value="M" {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->pessoaFisica->sexo) && $resultado->pessoaFisica->sexo == 'M') ? 'checked' : '' }}
+                    value="M" 
+                    {{ (!empty(old('sexo')) && (old('sexo') == 'F')) || (isset($resultado->pessoaFisica->sexo) && ($resultado->pessoaFisica->sexo == 'M')) ? 'checked' : '' }}
                 />
                 Masculino
             </label>
         </div>
-        @if($errors->has('sexo'))
-        <div class="invalid-feedback">
-            {{ $errors->first('sexo') }}
-        </div>
-        @endif
     </div>
     <div class="col-sm mb-2-576">
         <label for="dt_nascimento">{{ array_search('dt_nascimento', $codCpf) }} - Data de Nascimento *</label>
@@ -198,7 +200,6 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="{{ $classes[2] }} {{ array_search('nome_mae', $codCpf) }} form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_mae')) && isset($resultado->pessoaFisica->nome_mae) ? $resultado->pessoaFisica->nome_mae : old('nome_mae') }}"
-            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('nome_mae'))
         <div class="invalid-feedback">
@@ -213,7 +214,6 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="{{ $classes[2] }} {{ array_search('nome_pai', $codCpf) }} form-control {{ $errors->has('nome_pai') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_pai')) && isset($resultado->pessoaFisica->nome_pai) ? $resultado->pessoaFisica->nome_pai : old('nome_pai') }}"
-            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('nome_pai'))
         <div class="invalid-feedback">
@@ -331,21 +331,22 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
         @foreach(tipos_empresa() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
-                @if(!empty(old('tipo_empresa')))
-                <input type="radio" class="{{ $classes[3] }} {{ array_search('tipo_empresa', $codCnpj) }} form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ old('tipo_empresa') == $tipo ? 'checked' : '' }} />{{ $tipo }}
-                @elseif(isset($resultado->pessoaJuridica->tipo_empresa))
-                <input type="radio" class="{{ $classes[3] }} {{ array_search('tipo_empresa', $codCnpj) }} form-check-input" name="tipo_empresa" value="{{ $tipo }}" {{ $tipo == $resultado->pessoaJuridica->tipo_empresa ? 'checked' : '' }} />{{ $tipo }}
-                @else
-                <input type="radio" class="{{ $classes[3] }} {{ array_search('tipo_empresa', $codCnpj) }} form-check-input" name="tipo_empresa" value="{{ $tipo }}" />{{ $tipo }}
+                <input type="radio" 
+                    class="{{ $classes[3] }} {{ array_search('tipo_empresa', $codCnpj) }} form-check-input" 
+                    name="tipo_empresa" 
+                    value="{{ $tipo }}" 
+                    {{ (old('tipo_empresa') == $tipo) || (isset($resultado->pessoaJuridica->tipo_empresa) && ($tipo == $resultado->pessoaJuridica->tipo_empresa)) ? 'checked' : '' }} 
+                />
+                {{ $tipo }}
+
+                @if($errors->has('tipo_empresa'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('tipo_empresa') }}
+                </div>
                 @endif
             </label>
         </div>
         @endforeach
-        @if($errors->has('tipo_empresa'))
-        <div class="invalid-feedback">
-            {{ $errors->first('tipo_empresa') }}
-        </div>
-        @endif
     </div>
     <div class="col-sm mb-2-576">
         <label for="dt_inicio_atividade">{{ array_search('dt_inicio_atividade', $codCnpj) }} - Data início da atividade *</label>
@@ -409,7 +410,6 @@ $justificativas = 'Teste para mostrar as justificativas do Atendimento após an�
             type="text"
             class="{{ $classes[4] }} {{ array_search('ramo_atividade', $codPre) }} form-control {{ $errors->has('ramo_atividade') || isset($justificativas) ? 'is-invalid' : '' }}"
             value="{{ empty(old('ramo_atividade')) && isset($resultado->ramo_atividade) ? $resultado->ramo_atividade : old('ramo_atividade') }}"
-            pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
         />
         @if($errors->has('ramo_atividade'))
         <div class="invalid-feedback">

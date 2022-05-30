@@ -73,6 +73,7 @@ class PreRegistroCnpj extends Model
     public function validarUpdate($arrayCampos)
     {
         if(isset($arrayCampos['checkEndEmpresa']))
+        {
             if($arrayCampos['checkEndEmpresa'] == 'on')
             {
                 $preRegistro = $this->preRegistro;
@@ -83,8 +84,9 @@ class PreRegistroCnpj extends Model
                 $arrayCampos['bairro'] = $preRegistro->bairro;
                 $arrayCampos['cidade'] = $preRegistro->cidade; 
                 $arrayCampos['uf'] = $preRegistro->uf;
-                unset($arrayCampos['checkEndEmpresa']);
             }
+            unset($arrayCampos['checkEndEmpresa']);
+        }
 
         return $arrayCampos;
     }

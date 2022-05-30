@@ -42,7 +42,6 @@
                 type="text"
                 class="{{ $classes[5] }} {{ array_search('nome', $codRT) }} form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome) ? $resultado->pessoaJuridica->responsavelTecnico->nome : old('nome_rt') }}"
-                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_rt'))
             <div class="invalid-feedback">
@@ -60,7 +59,6 @@
                 type="text"
                 class="{{ $classes[5] }} {{ array_search('nome_social', $codRT) }} form-control {{ $errors->has('nome_social_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_social_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_social) ? $resultado->pessoaJuridica->responsavelTecnico->nome_social : old('nome_social_rt') }}"
-                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_social_rt'))
             <div class="invalid-feedback">
@@ -91,30 +89,31 @@
             <div class="form-check-inline">
                 <label class="form-check-label">
                     <input type="radio" 
-                        class="{{ $classes[5] }} {{ array_search('sexo', $codRT) }} form-check-input" 
+                        class="{{ $classes[5] }} {{ array_search('sexo', $codRT) }} form-check-input {{ $errors->has('sexo_rt') ? 'is-invalid' : '' }}" 
                         name="sexo_rt" 
                         value="F" 
-                        {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'F')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && $resultado->pessoaJuridica->responsavelTecnico->sexo == 'F') ? 'checked' : '' }}
+                        {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'F')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && ($resultado->pessoaJuridica->responsavelTecnico->sexo == 'F')) ? 'checked' : '' }}
                     />
                     Feminino
+                    
+                    @if($errors->has('sexo_rt'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('sexo_rt') }}
+                    </div>
+                    @endif
                 </label>
             </div>
             <div class="form-check-inline">
                 <label class="form-check-label">
                     <input type="radio" 
-                        class="{{ $classes[5] }} {{ array_search('sexo', $codRT) }} form-check-input" 
+                        class="{{ $classes[5] }} {{ array_search('sexo', $codRT) }} form-check-input {{ $errors->has('sexo_rt') ? 'is-invalid' : '' }}" 
                         name="sexo_rt" 
                         value="M" 
-                        {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'M')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && $resultado->pessoaJuridica->responsavelTecnico->sexo == 'M') ? 'checked' : '' }}
+                        {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'M')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && ($resultado->pessoaJuridica->responsavelTecnico->sexo == 'M')) ? 'checked' : '' }}
                     />
                     Masculino
                 </label>
             </div>
-            @if($errors->has('sexo_rt'))
-            <div class="invalid-feedback">
-                {{ $errors->first('sexo_rt') }}
-            </div>
-            @endif
         </div>
     </div>
 
@@ -192,7 +191,6 @@
                 class="{{ $classes[5] }} {{ array_search('bairro', $codRT) }} form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }}"
                 id="bairro_rt"
                 value="{{ empty(old('bairro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->bairro) ? $resultado->pessoaJuridica->responsavelTecnico->bairro : old('bairro_rt') }}"
-                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('bairro_rt'))
             <div class="invalid-feedback">
@@ -259,7 +257,6 @@
                 id="cidade_rt"
                 class="{{ $classes[5] }} {{ array_search('cidade', $codRT) }} form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('cidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cidade) ? $resultado->pessoaJuridica->responsavelTecnico->cidade : old('cidade_rt') }}"
-                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('cidade_rt'))
             <div class="invalid-feedback">
@@ -303,7 +300,6 @@
                 type="text"
                 class="{{ $classes[5] }} {{ array_search('nome_mae', $codRT) }} form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_mae_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_mae) ? $resultado->pessoaJuridica->responsavelTecnico->nome_mae : old('nome_mae_rt') }}"
-                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_mae_rt'))
             <div class="invalid-feedback">
@@ -318,7 +314,6 @@
                 type="text"
                 class="{{ $classes[5] }} {{ array_search('nome_pai', $codRT) }} form-control {{ $errors->has('nome_pai_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_pai_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_pai) ? $resultado->pessoaJuridica->responsavelTecnico->nome_pai : old('nome_pai_rt') }}"
-                pattern="[^0-9]{5,191}" title="Não é permitido números, e deve conter de 5 a 191 caracteres"
             />
             @if($errors->has('nome_pai_rt'))
             <div class="invalid-feedback">
