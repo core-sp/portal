@@ -97,8 +97,9 @@ class PreRegistroRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->externo = auth()->guard('user_externo')->user();
+        $preRegistro = $this->externo->preRegistro;
         // Obrigatório salvar os anexos via rota ajax
-        $anexosCount = $this->externo->preRegistro->anexos->count();
+        $anexosCount = isset($preRegistro) ? $preRegistro->anexos->count() : 0;
 
         $this->regraPath = '';
         $this->regraDtNasc = Carbon::today()->subYears(18)->format('Y-m-d');

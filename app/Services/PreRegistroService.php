@@ -11,8 +11,11 @@ use Carbon\Carbon;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
+use App\Traits\Gerenti;
 
 class PreRegistroService implements PreRegistroServiceInterface {
+
+    use Gerenti;
 
     const RELATION_ANEXOS = "anexos";
     const RELATION_CONTABIL = "contabil";
@@ -148,7 +151,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             {
                 $naoCancelado = $resultado['CANCELADO'] == "F";
                 $ativo = $resultado['ASS_ATIVO'] == "T";
-                $tipo = $resultado["ASS_TP_ASSOC"] == 5;
+                $tipo = $resultado["ASS_TP_ASSOC"] == $this->getCodigoRT();
 
                 if($naoCancelado && $ativo && $tipo)
                 {
@@ -205,8 +208,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
             {
                 $naoCancelado = $resultado['CANCELADO'] == "F";
                 $ativo = $resultado['ASS_ATIVO'] == "T";
-                $pf = $externo->isPessoaFisica() && (($resultado["ASS_TP_ASSOC"] == 2) || ($resultado["ASS_TP_ASSOC"] == 5));
-                $pj = !$externo->isPessoaFisica() && ($resultado["ASS_TP_ASSOC"] == 1);
+                $pf = $externo->isPessoaFisica() && (($resultado["ASS_TP_ASSOC"] == $this->getCodigoPF()) || ($resultado["ASS_TP_ASSOC"] == $this->getCodigoRT()));
+                $pj = !$externo->isPessoaFisica() && ($resultado["ASS_TP_ASSOC"] == $this->getCodigoPJ());
                 if($naoCancelado && $ativo && ($pf || $pj))
                 {
                     $gerenti = $resultado['ASS_REGISTRO'];

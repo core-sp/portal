@@ -137,7 +137,7 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->saveSiteAjax($validatedData, $this->gerentiRepository, $externo);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            $e->getCode() != 500 ? abort($e->getCode(), $e->getMessage()) : 
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao salvar os dados da solicitação de registro via ajax');
         }
         
@@ -152,7 +152,7 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->saveSite($validatedData, $this->gerentiRepository, $externo);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            $e->getCode() != 500 ? abort($e->getCode(), $e->getMessage()) : 
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao enviar os dados da solicitação de registro para análise');
         }
         
@@ -166,7 +166,7 @@ class UserExternoSiteController extends Controller
             $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $externo);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            $e->getCode() != 500 ? abort($e->getCode(), $e->getMessage()) : 
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao solicitar download do arquivo');
         }
         
@@ -180,7 +180,7 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->excluirAnexo($id, $externo);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            $e->getCode() != 500 ? abort($e->getCode(), $e->getMessage()) : 
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao solicitar exclusão do arquivo');
         }
         
