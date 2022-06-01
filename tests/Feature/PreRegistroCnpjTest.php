@@ -132,36 +132,6 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
-    public function can_create_anexos_pj_by_ajax()
-    {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
-
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
-
-        $anexos = [
-            UploadedFile::fake()->image('random.jpg'),
-            UploadedFile::fake()->image('random1.png'),
-            UploadedFile::fake()->image('random2.jpeg'),
-        ];
-        
-        foreach($anexos as $value)
-            $this->post(route('externo.inserir.preregistro.ajax'), [
-                'classe' => 'anexos',
-                'campo' => 'path',
-                'valor' => $value
-            ])->assertStatus(200);
-
-        $this->assertDatabaseHas('anexos', [
-            'nome_original' => 'random.jpg',
-            'nome_original' => 'random1.png',
-            'nome_original' => 'random2.jpeg',
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
-        ]);
-    }
-
-    /** @test */
     public function cannot_update_table_pre_registros_cnpj_by_ajax_wrong_input_name()
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
@@ -247,7 +217,7 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
-    public function cannot_create_anexos_by_ajax_wrong_input_name()
+    public function cannot_update_table_pre_registros_cnpj_by_ajax_without_classe()
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
@@ -255,24 +225,269 @@ class PreRegistroCnpjTest extends TestCase
 
         $this->get(route('externo.inserir.preregistro.view'))->assertOk();
 
-        $anexos = [
-            UploadedFile::fake()->image('random.jpg'),
-            UploadedFile::fake()->image('random1.png'),
-            UploadedFile::fake()->image('random2.jpeg'),
-        ];
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+        ]);
+
+        $endereco = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
+
+        unset($preRegistroCnpj['pre_registro_id']);
+        unset($preRegistroCnpj['responsavel_tecnico_id']);
         
-        foreach($anexos as $value)
+        foreach($preRegistroCnpj as $key => $value)
+        {
+            $temp = in_array($key, $endereco);
             $this->post(route('externo.inserir.preregistro.ajax'), [
-                'classe' => 'anexos',
-                'campo' => 'path_erro',
+                'classe' => '',
+                'campo' => $temp !== false ? $key.'_empresa' : $key,
+                'valor' => $value
+            ])->assertSessionHasErrors('classe');
+        }
+        
+        $this->assertDatabaseMissing('pre_registros_cnpj', [
+            'razao_social' => $preRegistroCnpj['razao_social'],
+            'nire' => $preRegistroCnpj['nire'],
+            'tipo_empresa' => $preRegistroCnpj['tipo_empresa'],
+            'dt_inicio_atividade' => $preRegistroCnpj['dt_inicio_atividade'],
+            'inscricao_municipal' => $preRegistroCnpj['inscricao_municipal'],
+            'inscricao_estadual' => $preRegistroCnpj['inscricao_estadual'],
+            'capital_social' => $preRegistroCnpj['capital_social'],
+            'cep' => $preRegistroCnpj['cep'],
+            'logradouro' => $preRegistroCnpj['logradouro'],
+            'numero' => $preRegistroCnpj['numero'],
+            'complemento' => $preRegistroCnpj['complemento'],
+            'bairro' => $preRegistroCnpj['bairro'],
+            'cidade' => $preRegistroCnpj['cidade'],
+            'uf' => $preRegistroCnpj['uf'],
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_classe()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $rt = factory('App\ResponsavelTecnico')->raw();
+        
+        $campos = ['registro'];
+        
+        foreach($rt as $key => $value)
+        {
+            $temp = in_array($key, $campos);
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => '',
+                'campo' => $temp !== false ? $key : $key.'_rt',
+                'valor' => $value
+            ])->assertSessionHasErrors('classe');
+        }
+        
+        $this->assertDatabaseMissing('responsaveis_tecnicos', [
+            'cpf' => $rt['cpf'],
+            'registro' => $rt['registro'],
+            'nome' => $rt['nome'],
+            'nome_social' => $rt['nome_social'],
+            'sexo' => $rt['sexo'],
+            'dt_nascimento' => $rt['dt_nascimento'],
+            'cep' => $rt['cep'],
+            'logradouro' => $rt['logradouro'],
+            'numero' => $rt['numero'],
+            'complemento' => $rt['complemento'],
+            'bairro' => $rt['bairro'],
+            'cidade' => $rt['cidade'],
+            'uf' => $rt['uf'],
+            'nome_mae' => $rt['nome_mae'],
+            'nome_pai' => $rt['nome_pai'],
+            'identidade' => $rt['identidade'],
+            'orgao_emissor' => $rt['orgao_emissor'],
+            'dt_expedicao' => $rt['dt_expedicao'],
+        ]);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_cnpj_by_ajax_wrong_classe()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+        ]);
+
+        $endereco = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
+
+        unset($preRegistroCnpj['pre_registro_id']);
+        unset($preRegistroCnpj['responsavel_tecnico_id']);
+        
+        foreach($preRegistroCnpj as $key => $value)
+        {
+            $temp = in_array($key, $endereco);
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridicaErro',
+                'campo' => $temp !== false ? $key.'_empresa' : $key,
+                'valor' => $value
+            ])->assertSessionHasErrors('classe');
+        }
+        
+        $this->assertDatabaseMissing('pre_registros_cnpj', [
+            'razao_social' => $preRegistroCnpj['razao_social'],
+            'nire' => $preRegistroCnpj['nire'],
+            'tipo_empresa' => $preRegistroCnpj['tipo_empresa'],
+            'dt_inicio_atividade' => $preRegistroCnpj['dt_inicio_atividade'],
+            'inscricao_municipal' => $preRegistroCnpj['inscricao_municipal'],
+            'inscricao_estadual' => $preRegistroCnpj['inscricao_estadual'],
+            'capital_social' => $preRegistroCnpj['capital_social'],
+            'cep' => $preRegistroCnpj['cep'],
+            'logradouro' => $preRegistroCnpj['logradouro'],
+            'numero' => $preRegistroCnpj['numero'],
+            'complemento' => $preRegistroCnpj['complemento'],
+            'bairro' => $preRegistroCnpj['bairro'],
+            'cidade' => $preRegistroCnpj['cidade'],
+            'uf' => $preRegistroCnpj['uf'],
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_wrong_classe()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $rt = factory('App\ResponsavelTecnico')->raw();
+        
+        $campos = ['registro'];
+        
+        foreach($rt as $key => $value)
+        {
+            $temp = in_array($key, $campos);
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica.responsavelTecnicoErro',
+                'campo' => $temp !== false ? $key : $key.'_rt',
+                'valor' => $value
+            ])->assertSessionHasErrors('classe');
+        }
+        
+        $this->assertDatabaseMissing('responsaveis_tecnicos', [
+            'cpf' => $rt['cpf'],
+            'registro' => $rt['registro'],
+            'nome' => $rt['nome'],
+            'nome_social' => $rt['nome_social'],
+            'sexo' => $rt['sexo'],
+            'dt_nascimento' => $rt['dt_nascimento'],
+            'cep' => $rt['cep'],
+            'logradouro' => $rt['logradouro'],
+            'numero' => $rt['numero'],
+            'complemento' => $rt['complemento'],
+            'bairro' => $rt['bairro'],
+            'cidade' => $rt['cidade'],
+            'uf' => $rt['uf'],
+            'nome_mae' => $rt['nome_mae'],
+            'nome_pai' => $rt['nome_pai'],
+            'identidade' => $rt['identidade'],
+            'orgao_emissor' => $rt['orgao_emissor'],
+            'dt_expedicao' => $rt['dt_expedicao'],
+        ]);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_cnpj_by_ajax_without_campo()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+        ]);
+
+        unset($preRegistroCnpj['pre_registro_id']);
+        unset($preRegistroCnpj['responsavel_tecnico_id']);
+        
+        foreach($preRegistroCnpj as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica',
+                'campo' => '',
                 'valor' => $value
             ])->assertSessionHasErrors('campo');
         
-        $this->assertDatabaseMissing('anexos', [
-            'nome_original' => 'random.jpg',
-            'nome_original' => 'random1.png',
-            'nome_original' => 'random2.jpeg',
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+        $this->assertDatabaseMissing('pre_registros_cnpj', [
+            'razao_social' => $preRegistroCnpj['razao_social'],
+            'nire' => $preRegistroCnpj['nire'],
+            'tipo_empresa' => $preRegistroCnpj['tipo_empresa'],
+            'dt_inicio_atividade' => $preRegistroCnpj['dt_inicio_atividade'],
+            'inscricao_municipal' => $preRegistroCnpj['inscricao_municipal'],
+            'inscricao_estadual' => $preRegistroCnpj['inscricao_estadual'],
+            'capital_social' => $preRegistroCnpj['capital_social'],
+            'cep' => $preRegistroCnpj['cep'],
+            'logradouro' => $preRegistroCnpj['logradouro'],
+            'numero' => $preRegistroCnpj['numero'],
+            'complemento' => $preRegistroCnpj['complemento'],
+            'bairro' => $preRegistroCnpj['bairro'],
+            'cidade' => $preRegistroCnpj['cidade'],
+            'uf' => $preRegistroCnpj['uf'],
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_campo()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $rt = factory('App\ResponsavelTecnico')->raw();
+        
+        foreach($rt as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica.responsavelTecnico',
+                'campo' => '',
+                'valor' => $value
+            ])->assertSessionHasErrors('campo');
+        
+        $this->assertDatabaseMissing('responsaveis_tecnicos', [
+            'cpf' => $rt['cpf'],
+            'registro' => $rt['registro'],
+            'nome' => $rt['nome'],
+            'nome_social' => $rt['nome_social'],
+            'sexo' => $rt['sexo'],
+            'dt_nascimento' => $rt['dt_nascimento'],
+            'cep' => $rt['cep'],
+            'logradouro' => $rt['logradouro'],
+            'numero' => $rt['numero'],
+            'complemento' => $rt['complemento'],
+            'bairro' => $rt['bairro'],
+            'cidade' => $rt['cidade'],
+            'uf' => $rt['uf'],
+            'nome_mae' => $rt['nome_mae'],
+            'nome_pai' => $rt['nome_pai'],
+            'identidade' => $rt['identidade'],
+            'orgao_emissor' => $rt['orgao_emissor'],
+            'dt_expedicao' => $rt['dt_expedicao'],
+        ]);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
         ]);
     }
 }

@@ -55,6 +55,11 @@ class PreRegistroAjaxRequest extends FormRequest
                 'date',
                 'before_or_equal:today',
             ];
+        
+        if(request()->campo == 'idregional')
+            $this->regraValor = [
+                'exists:regionais,idregional'
+            ];
     }
 
     public function rules()
@@ -86,6 +91,7 @@ class PreRegistroAjaxRequest extends FormRequest
             'file' => 'Deve ser um arquivo',
             'date' => 'Deve ser tipo data',
             'before_or_equal' => strpos(request()->campo, 'dt_nascimento') !== false ? 'Deve ter 18 anos completos ou mais' : 'Data deve ser igual ou anterior a hoje',
+            'exists' => 'Esta regional não existe',
         ];
     }
 }
