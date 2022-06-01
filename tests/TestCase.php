@@ -67,4 +67,13 @@ abstract class TestCase extends BaseTestCase
 
         return $user;
     }
+
+    protected function signInAsUserExterno($externo = null)
+    {
+        $externo = $externo ?: factory('App\UserExterno')->create();
+
+        $this->actingAs($externo, 'user_externo');
+
+        return $externo;
+    }
 }

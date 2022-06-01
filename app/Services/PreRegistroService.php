@@ -222,7 +222,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 }
             }
 
-        $preRegistro = isset($gerenti) ? null : $externo->preRegistro;
+        $preRegistro = isset($gerenti) ? null : $externo->load('preRegistro')->preRegistro;
 
         return [
             'gerenti' => $gerenti,
@@ -257,7 +257,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function saveSiteAjax($request, GerentiRepositoryInterface $gerentiRepository, $externo)
     {
-        $preRegistro = $externo->preRegistro;
+        $preRegistro = $externo->load('preRegistro')->preRegistro;
 
         // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
         $this->abortar($preRegistro);
@@ -283,7 +283,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function saveSite($request, GerentiRepositoryInterface $gerentiRepository, $externo)
     {
-        $preRegistro = $externo->preRegistro;
+        $preRegistro = $externo->load('preRegistro')->preRegistro;
 
         // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
         $this->abortar($preRegistro);
@@ -326,7 +326,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function downloadAnexo($id, $externo)
     {
-        $preRegistro = $externo->preRegistro;
+        $preRegistro = $externo->load('preRegistro')->preRegistro;
 
         // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
         $this->abortar($preRegistro);
@@ -341,7 +341,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function excluirAnexo($id, $externo)
     {
-        $preRegistro = $externo->preRegistro;
+        $preRegistro = $externo->load('preRegistro')->preRegistro;
 
         // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
         $this->abortar($preRegistro);
