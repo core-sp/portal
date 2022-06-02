@@ -336,7 +336,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(isset($anexo) && Storage::exists($anexo->path))
             return response()->file(Storage::path($anexo->path), ["Cache-Control" => "no-cache"]);
         
-        return null;
+        throw new \Exception('Arquivo não existe / não pode acessar', 401);
     }
 
     public function excluirAnexo($id, $externo)
@@ -355,6 +355,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
             return $id;
         }
 
-        return null;
+        throw new \Exception('Arquivo não existe / não pode acessar', 401);
     }
 }

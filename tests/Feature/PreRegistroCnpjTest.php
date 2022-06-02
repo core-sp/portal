@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
 use App\PreRegistro;
+use Carbon\Carbon;
 
 class PreRegistroCnpjTest extends TestCase
 {
@@ -49,7 +50,6 @@ class PreRegistroCnpjTest extends TestCase
         ]);
 
         $endereco = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
-
         unset($preRegistroCnpj['pre_registro_id']);
         unset($preRegistroCnpj['responsavel_tecnico_id']);
         
@@ -63,23 +63,9 @@ class PreRegistroCnpjTest extends TestCase
             ])->assertStatus(200);
         }
         
-        $this->assertDatabaseHas('pre_registros_cnpj', [
-            'razao_social' => $preRegistroCnpj['razao_social'],
-            'nire' => $preRegistroCnpj['nire'],
-            'tipo_empresa' => $preRegistroCnpj['tipo_empresa'],
-            'dt_inicio_atividade' => $preRegistroCnpj['dt_inicio_atividade'],
-            'inscricao_municipal' => $preRegistroCnpj['inscricao_municipal'],
-            'inscricao_estadual' => $preRegistroCnpj['inscricao_estadual'],
-            'capital_social' => $preRegistroCnpj['capital_social'],
-            'cep' => $preRegistroCnpj['cep'],
-            'logradouro' => $preRegistroCnpj['logradouro'],
-            'numero' => $preRegistroCnpj['numero'],
-            'complemento' => $preRegistroCnpj['complemento'],
-            'bairro' => $preRegistroCnpj['bairro'],
-            'cidade' => $preRegistroCnpj['cidade'],
-            'uf' => $preRegistroCnpj['uf'],
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
-        ]);
+        $preRegistroCnpj['pre_registro_id'] = $externo->load('preRegistro')->preRegistro->id;
+
+        $this->assertDatabaseHas('pre_registros_cnpj', $preRegistroCnpj);
     }
 
     /** @test */
@@ -92,7 +78,6 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view'))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
-
         $campos = ['registro'];
         
         foreach($rt as $key => $value)
@@ -105,26 +90,7 @@ class PreRegistroCnpjTest extends TestCase
             ])->assertStatus(200);
         }
         
-        $this->assertDatabaseHas('responsaveis_tecnicos', [
-            'cpf' => $rt['cpf'],
-            'registro' => $rt['registro'],
-            'nome' => $rt['nome'],
-            'nome_social' => $rt['nome_social'],
-            'sexo' => $rt['sexo'],
-            'dt_nascimento' => $rt['dt_nascimento'],
-            'cep' => $rt['cep'],
-            'logradouro' => $rt['logradouro'],
-            'numero' => $rt['numero'],
-            'complemento' => $rt['complemento'],
-            'bairro' => $rt['bairro'],
-            'cidade' => $rt['cidade'],
-            'uf' => $rt['uf'],
-            'nome_mae' => $rt['nome_mae'],
-            'nome_pai' => $rt['nome_pai'],
-            'identidade' => $rt['identidade'],
-            'orgao_emissor' => $rt['orgao_emissor'],
-            'dt_expedicao' => $rt['dt_expedicao'],
-        ]);
+        $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
             'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
@@ -154,22 +120,7 @@ class PreRegistroCnpjTest extends TestCase
                 'valor' => $value
             ])->assertSessionHasErrors('campo');
         
-        $this->assertDatabaseMissing('pre_registros_cnpj', [
-            'razao_social' => $preRegistroCnpj['razao_social'],
-            'nire' => $preRegistroCnpj['nire'],
-            'tipo_empresa' => $preRegistroCnpj['tipo_empresa'],
-            'dt_inicio_atividade' => $preRegistroCnpj['dt_inicio_atividade'],
-            'inscricao_municipal' => $preRegistroCnpj['inscricao_municipal'],
-            'inscricao_estadual' => $preRegistroCnpj['inscricao_estadual'],
-            'capital_social' => $preRegistroCnpj['capital_social'],
-            'cep' => $preRegistroCnpj['cep'],
-            'logradouro' => $preRegistroCnpj['logradouro'],
-            'numero' => $preRegistroCnpj['numero'],
-            'complemento' => $preRegistroCnpj['complemento'],
-            'bairro' => $preRegistroCnpj['bairro'],
-            'cidade' => $preRegistroCnpj['cidade'],
-            'uf' => $preRegistroCnpj['uf'],
-        ]);
+        $this->assertDatabaseMissing('pre_registros_cnpj', $preRegistroCnpj);
     }
 
     /** @test */
@@ -190,26 +141,7 @@ class PreRegistroCnpjTest extends TestCase
                 'valor' => $value
             ])->assertSessionHasErrors('campo');
         
-        $this->assertDatabaseMissing('responsaveis_tecnicos', [
-            'cpf' => $rt['cpf'],
-            'registro' => $rt['registro'],
-            'nome' => $rt['nome'],
-            'nome_social' => $rt['nome_social'],
-            'sexo' => $rt['sexo'],
-            'dt_nascimento' => $rt['dt_nascimento'],
-            'cep' => $rt['cep'],
-            'logradouro' => $rt['logradouro'],
-            'numero' => $rt['numero'],
-            'complemento' => $rt['complemento'],
-            'bairro' => $rt['bairro'],
-            'cidade' => $rt['cidade'],
-            'uf' => $rt['uf'],
-            'nome_mae' => $rt['nome_mae'],
-            'nome_pai' => $rt['nome_pai'],
-            'identidade' => $rt['identidade'],
-            'orgao_emissor' => $rt['orgao_emissor'],
-            'dt_expedicao' => $rt['dt_expedicao'],
-        ]);
+        $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
             'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
@@ -244,22 +176,7 @@ class PreRegistroCnpjTest extends TestCase
             ])->assertSessionHasErrors('classe');
         }
         
-        $this->assertDatabaseMissing('pre_registros_cnpj', [
-            'razao_social' => $preRegistroCnpj['razao_social'],
-            'nire' => $preRegistroCnpj['nire'],
-            'tipo_empresa' => $preRegistroCnpj['tipo_empresa'],
-            'dt_inicio_atividade' => $preRegistroCnpj['dt_inicio_atividade'],
-            'inscricao_municipal' => $preRegistroCnpj['inscricao_municipal'],
-            'inscricao_estadual' => $preRegistroCnpj['inscricao_estadual'],
-            'capital_social' => $preRegistroCnpj['capital_social'],
-            'cep' => $preRegistroCnpj['cep'],
-            'logradouro' => $preRegistroCnpj['logradouro'],
-            'numero' => $preRegistroCnpj['numero'],
-            'complemento' => $preRegistroCnpj['complemento'],
-            'bairro' => $preRegistroCnpj['bairro'],
-            'cidade' => $preRegistroCnpj['cidade'],
-            'uf' => $preRegistroCnpj['uf'],
-        ]);
+        $this->assertDatabaseMissing('pre_registros_cnpj', $preRegistroCnpj);
     }
 
     /** @test */
@@ -272,7 +189,6 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view'))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
-        
         $campos = ['registro'];
         
         foreach($rt as $key => $value)
@@ -285,26 +201,7 @@ class PreRegistroCnpjTest extends TestCase
             ])->assertSessionHasErrors('classe');
         }
         
-        $this->assertDatabaseMissing('responsaveis_tecnicos', [
-            'cpf' => $rt['cpf'],
-            'registro' => $rt['registro'],
-            'nome' => $rt['nome'],
-            'nome_social' => $rt['nome_social'],
-            'sexo' => $rt['sexo'],
-            'dt_nascimento' => $rt['dt_nascimento'],
-            'cep' => $rt['cep'],
-            'logradouro' => $rt['logradouro'],
-            'numero' => $rt['numero'],
-            'complemento' => $rt['complemento'],
-            'bairro' => $rt['bairro'],
-            'cidade' => $rt['cidade'],
-            'uf' => $rt['uf'],
-            'nome_mae' => $rt['nome_mae'],
-            'nome_pai' => $rt['nome_pai'],
-            'identidade' => $rt['identidade'],
-            'orgao_emissor' => $rt['orgao_emissor'],
-            'dt_expedicao' => $rt['dt_expedicao'],
-        ]);
+        $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
             'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
@@ -325,7 +222,6 @@ class PreRegistroCnpjTest extends TestCase
         ]);
 
         $endereco = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
-
         unset($preRegistroCnpj['pre_registro_id']);
         unset($preRegistroCnpj['responsavel_tecnico_id']);
         
@@ -339,22 +235,7 @@ class PreRegistroCnpjTest extends TestCase
             ])->assertSessionHasErrors('classe');
         }
         
-        $this->assertDatabaseMissing('pre_registros_cnpj', [
-            'razao_social' => $preRegistroCnpj['razao_social'],
-            'nire' => $preRegistroCnpj['nire'],
-            'tipo_empresa' => $preRegistroCnpj['tipo_empresa'],
-            'dt_inicio_atividade' => $preRegistroCnpj['dt_inicio_atividade'],
-            'inscricao_municipal' => $preRegistroCnpj['inscricao_municipal'],
-            'inscricao_estadual' => $preRegistroCnpj['inscricao_estadual'],
-            'capital_social' => $preRegistroCnpj['capital_social'],
-            'cep' => $preRegistroCnpj['cep'],
-            'logradouro' => $preRegistroCnpj['logradouro'],
-            'numero' => $preRegistroCnpj['numero'],
-            'complemento' => $preRegistroCnpj['complemento'],
-            'bairro' => $preRegistroCnpj['bairro'],
-            'cidade' => $preRegistroCnpj['cidade'],
-            'uf' => $preRegistroCnpj['uf'],
-        ]);
+        $this->assertDatabaseMissing('pre_registros_cnpj', $preRegistroCnpj);
     }
 
     /** @test */
@@ -367,7 +248,6 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view'))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
-        
         $campos = ['registro'];
         
         foreach($rt as $key => $value)
@@ -380,26 +260,7 @@ class PreRegistroCnpjTest extends TestCase
             ])->assertSessionHasErrors('classe');
         }
         
-        $this->assertDatabaseMissing('responsaveis_tecnicos', [
-            'cpf' => $rt['cpf'],
-            'registro' => $rt['registro'],
-            'nome' => $rt['nome'],
-            'nome_social' => $rt['nome_social'],
-            'sexo' => $rt['sexo'],
-            'dt_nascimento' => $rt['dt_nascimento'],
-            'cep' => $rt['cep'],
-            'logradouro' => $rt['logradouro'],
-            'numero' => $rt['numero'],
-            'complemento' => $rt['complemento'],
-            'bairro' => $rt['bairro'],
-            'cidade' => $rt['cidade'],
-            'uf' => $rt['uf'],
-            'nome_mae' => $rt['nome_mae'],
-            'nome_pai' => $rt['nome_pai'],
-            'identidade' => $rt['identidade'],
-            'orgao_emissor' => $rt['orgao_emissor'],
-            'dt_expedicao' => $rt['dt_expedicao'],
-        ]);
+        $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
             'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
@@ -429,22 +290,7 @@ class PreRegistroCnpjTest extends TestCase
                 'valor' => $value
             ])->assertSessionHasErrors('campo');
         
-        $this->assertDatabaseMissing('pre_registros_cnpj', [
-            'razao_social' => $preRegistroCnpj['razao_social'],
-            'nire' => $preRegistroCnpj['nire'],
-            'tipo_empresa' => $preRegistroCnpj['tipo_empresa'],
-            'dt_inicio_atividade' => $preRegistroCnpj['dt_inicio_atividade'],
-            'inscricao_municipal' => $preRegistroCnpj['inscricao_municipal'],
-            'inscricao_estadual' => $preRegistroCnpj['inscricao_estadual'],
-            'capital_social' => $preRegistroCnpj['capital_social'],
-            'cep' => $preRegistroCnpj['cep'],
-            'logradouro' => $preRegistroCnpj['logradouro'],
-            'numero' => $preRegistroCnpj['numero'],
-            'complemento' => $preRegistroCnpj['complemento'],
-            'bairro' => $preRegistroCnpj['bairro'],
-            'cidade' => $preRegistroCnpj['cidade'],
-            'uf' => $preRegistroCnpj['uf'],
-        ]);
+        $this->assertDatabaseMissing('pre_registros_cnpj', $preRegistroCnpj);
     }
 
     /** @test */
@@ -465,29 +311,253 @@ class PreRegistroCnpjTest extends TestCase
                 'valor' => $value
             ])->assertSessionHasErrors('campo');
         
-        $this->assertDatabaseMissing('responsaveis_tecnicos', [
-            'cpf' => $rt['cpf'],
-            'registro' => $rt['registro'],
-            'nome' => $rt['nome'],
-            'nome_social' => $rt['nome_social'],
-            'sexo' => $rt['sexo'],
-            'dt_nascimento' => $rt['dt_nascimento'],
-            'cep' => $rt['cep'],
-            'logradouro' => $rt['logradouro'],
-            'numero' => $rt['numero'],
-            'complemento' => $rt['complemento'],
-            'bairro' => $rt['bairro'],
-            'cidade' => $rt['cidade'],
-            'uf' => $rt['uf'],
-            'nome_mae' => $rt['nome_mae'],
-            'nome_pai' => $rt['nome_pai'],
-            'identidade' => $rt['identidade'],
-            'orgao_emissor' => $rt['orgao_emissor'],
-            'dt_expedicao' => $rt['dt_expedicao'],
-        ]);
+        $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
             'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
         ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_cnpj_by_ajax_with_input_type_text_more_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $preRegistroCnpj = [
+            'razao_social' => $faker->sentence(400),
+            'tipo_empresa' => $faker->sentence(400),
+            'inscricao_municipal' => $faker->sentence(400),
+            'inscricao_estadual' => $faker->sentence(400),
+            'capital_social' => $faker->sentence(400),
+            'logradouro' => $faker->sentence(400),
+            'complemento' => $faker->sentence(400),
+            'bairro' => $faker->sentence(400),
+            'cidade' => $faker->sentence(400),
+        ];
+
+        $endereco = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
+        
+        foreach($preRegistroCnpj as $key => $value)
+        {
+            $temp = in_array($key, $endereco);
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica',
+                'campo' => $temp !== false ? $key.'_empresa' : $key,
+                'valor' => $value
+            ])->assertSessionHasErrors('valor');
+        }
+        
+        $this->assertDatabaseMissing('pre_registros_cnpj', $preRegistroCnpj);
+    }
+
+    /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_input_type_text_more_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $rt = [
+            'registro' => $faker->sentence(400),
+            'nome' => $faker->sentence(400),
+            'nome_social' => $faker->sentence(400),
+            'logradouro' => $faker->sentence(400),
+            'complemento' => $faker->sentence(400),
+            'bairro' => $faker->sentence(400),
+            'cidade' => $faker->sentence(400),
+            'nome_mae' => $faker->sentence(400),
+            'nome_pai' => $faker->sentence(400),
+            'identidade' => $faker->sentence(400),
+            'orgao_emissor' => $faker->sentence(400),
+        ];
+        
+        $campos = ['registro'];
+        
+        foreach($rt as $key => $value)
+        {
+            $temp = in_array($key, $campos);
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica.responsavelTecnico',
+                'campo' => $temp !== false ? $key : $key.'_rt',
+                'valor' => $value
+            ])->assertSessionHasErrors('valor');
+        }
+        
+        $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registro_cnpj_by_ajax_with_dt_inicio_atividade_after_today()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica',
+            'campo' => 'dt_inicio_atividade',
+            'valor' => Carbon::today()->addDay()->format('Y-m-d')
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'dt_inicio_atividade' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_cpf_wrong()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => factory('App\ResponsavelTecnico')->raw()['cpf'] . '5'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseMissing('responsaveis_tecnicos', [
+            'cpf' => Carbon::today()->subYears(17)->format('Y-m-d')
+        ]);
+
+        $this->assertDatabaseMissing('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => factory('App\ResponsavelTecnico')->raw()['cpf'] . '5'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_under_18_years_old()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'dt_nascimento_rt',
+            'valor' => Carbon::today()->subYears(17)->format('Y-m-d')
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseMissing('responsaveis_tecnicos', [
+            'dt_nascimento' => Carbon::today()->subYears(17)->format('Y-m-d')
+        ]);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_dt_expedicao_after_today()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'dt_expedicao_rt',
+            'valor' => Carbon::today()->addDay()->format('Y-m-d')
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseMissing('responsaveis_tecnicos', [
+            'dt_expedicao' => Carbon::today()->addDay()->format('Y-m-d')
+        ]);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registro_cnpj_by_ajax_without_data_type()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica',
+            'campo' => 'dt_inicio_atividade',
+            'valor' => 'texto'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'dt_inicio_atividade' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_data_type()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $datas = [
+            'dt_nascimento' => null, 
+            'dt_expedicao' => null
+        ];
+
+        foreach($datas as $key => $value) 
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica.responsavelTecnico',
+                'campo' => $key . '_rt',
+                'valor' => 'texto'
+            ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseMissing('responsaveis_tecnicos', $datas);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => null
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_cnpj_by_ajax_when_clean_inputs()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $preRegistro = factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => $externo->id,
+            ]),
+        ]);
+
+        $preRegistroCnpj = $preRegistro->toArray();
+        $pular = ['id', 'pre_registro_id', 'updated_at', 'created_at', 'responsavel_tecnico_id', 'pre_registro'];
+        
+        foreach($preRegistroCnpj as $key => $value)
+        {
+            if(!in_array($key, $pular))
+                $this->post(route('externo.inserir.preregistro.ajax'), [
+                    'classe' => 'pessoaJuridica',
+                    'campo' => $key,
+                    'valor' => ''
+                ])->assertStatus(200);
+        }
+
+        unset($preRegistroCnpj['pre_registro']);
+        
+        $this->assertDatabaseMissing('pre_registros_cnpj', $preRegistroCnpj);
     }
 }

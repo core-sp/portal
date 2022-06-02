@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
 use App\PreRegistro;
+use Carbon\Carbon;
 
 class PreRegistroCpfTest extends TestCase
 {
@@ -53,20 +54,7 @@ class PreRegistroCpfTest extends TestCase
                 'valor' => $value
             ])->assertStatus(200);
         
-        $this->assertDatabaseHas('pre_registros_cpf', [
-            'nome_social' => $preRegistroCpf['nome_social'],
-            'dt_nascimento' => $preRegistroCpf['dt_nascimento'],
-            'sexo' => $preRegistroCpf['sexo'],
-            'estado_civil' => $preRegistroCpf['estado_civil'],
-            'naturalidade' => $preRegistroCpf['naturalidade'],
-            'nacionalidade' => $preRegistroCpf['nacionalidade'],
-            'nome_mae' => $preRegistroCpf['nome_mae'],
-            'nome_pai' => $preRegistroCpf['nome_pai'],
-            'identidade' => $preRegistroCpf['identidade'],
-            'orgao_emissor' => $preRegistroCpf['orgao_emissor'],
-            'dt_expedicao' => $preRegistroCpf['dt_expedicao'],
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
-        ]);
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf);
     }
 
     /** @test */
@@ -89,19 +77,7 @@ class PreRegistroCpfTest extends TestCase
                 'valor' => $value
             ])->assertSessionHasErrors('campo');
         
-        $this->assertDatabaseMissing('pre_registros_cpf', [
-            'nome_social' => $preRegistroCpf['nome_social'],
-            'dt_nascimento' => $preRegistroCpf['dt_nascimento'],
-            'sexo' => $preRegistroCpf['sexo'],
-            'estado_civil' => $preRegistroCpf['estado_civil'],
-            'naturalidade' => $preRegistroCpf['naturalidade'],
-            'nacionalidade' => $preRegistroCpf['nacionalidade'],
-            'nome_mae' => $preRegistroCpf['nome_mae'],
-            'nome_pai' => $preRegistroCpf['nome_pai'],
-            'identidade' => $preRegistroCpf['identidade'],
-            'orgao_emissor' => $preRegistroCpf['orgao_emissor'],
-            'dt_expedicao' => $preRegistroCpf['dt_expedicao'],
-        ]);
+        $this->assertDatabaseMissing('pre_registros_cpf', $preRegistroCpf);
     }
 
     /** @test */
@@ -124,19 +100,7 @@ class PreRegistroCpfTest extends TestCase
                 'valor' => $value
             ])->assertSessionHasErrors('classe');
         
-        $this->assertDatabaseMissing('pre_registros_cpf', [
-            'nome_social' => $preRegistroCpf['nome_social'],
-            'dt_nascimento' => $preRegistroCpf['dt_nascimento'],
-            'sexo' => $preRegistroCpf['sexo'],
-            'estado_civil' => $preRegistroCpf['estado_civil'],
-            'naturalidade' => $preRegistroCpf['naturalidade'],
-            'nacionalidade' => $preRegistroCpf['nacionalidade'],
-            'nome_mae' => $preRegistroCpf['nome_mae'],
-            'nome_pai' => $preRegistroCpf['nome_pai'],
-            'identidade' => $preRegistroCpf['identidade'],
-            'orgao_emissor' => $preRegistroCpf['orgao_emissor'],
-            'dt_expedicao' => $preRegistroCpf['dt_expedicao'],
-        ]);
+        $this->assertDatabaseMissing('pre_registros_cpf', $preRegistroCpf);
     }
 
     /** @test */
@@ -159,19 +123,7 @@ class PreRegistroCpfTest extends TestCase
                 'valor' => $value
             ])->assertSessionHasErrors('classe');
         
-        $this->assertDatabaseMissing('pre_registros_cpf', [
-            'nome_social' => $preRegistroCpf['nome_social'],
-            'dt_nascimento' => $preRegistroCpf['dt_nascimento'],
-            'sexo' => $preRegistroCpf['sexo'],
-            'estado_civil' => $preRegistroCpf['estado_civil'],
-            'naturalidade' => $preRegistroCpf['naturalidade'],
-            'nacionalidade' => $preRegistroCpf['nacionalidade'],
-            'nome_mae' => $preRegistroCpf['nome_mae'],
-            'nome_pai' => $preRegistroCpf['nome_pai'],
-            'identidade' => $preRegistroCpf['identidade'],
-            'orgao_emissor' => $preRegistroCpf['orgao_emissor'],
-            'dt_expedicao' => $preRegistroCpf['dt_expedicao'],
-        ]);
+        $this->assertDatabaseMissing('pre_registros_cpf', $preRegistroCpf);
     }
 
     /** @test */
@@ -194,18 +146,118 @@ class PreRegistroCpfTest extends TestCase
                 'valor' => $value
             ])->assertSessionHasErrors('campo');
         
-        $this->assertDatabaseMissing('pre_registros_cpf', [
-            'nome_social' => $preRegistroCpf['nome_social'],
-            'dt_nascimento' => $preRegistroCpf['dt_nascimento'],
-            'sexo' => $preRegistroCpf['sexo'],
-            'estado_civil' => $preRegistroCpf['estado_civil'],
-            'naturalidade' => $preRegistroCpf['naturalidade'],
-            'nacionalidade' => $preRegistroCpf['nacionalidade'],
-            'nome_mae' => $preRegistroCpf['nome_mae'],
-            'nome_pai' => $preRegistroCpf['nome_pai'],
-            'identidade' => $preRegistroCpf['identidade'],
-            'orgao_emissor' => $preRegistroCpf['orgao_emissor'],
-            'dt_expedicao' => $preRegistroCpf['dt_expedicao'],
+        $this->assertDatabaseMissing('pre_registros_cpf', $preRegistroCpf);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_cpf_by_ajax_with_input_type_text_more_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $preRegistroCpf = [
+            'nome_social' => $faker->sentence(400),
+            'estado_civil' => $faker->sentence(400),
+            'naturalidade' => $faker->sentence(400),
+            'nacionalidade' => $faker->sentence(400),
+            'nome_mae' => $faker->sentence(400),
+            'nome_pai' => $faker->sentence(400),
+            'identidade' => $faker->sentence(400),
+            'orgao_emissor' => $faker->sentence(400),
+        ];
+        
+        foreach($preRegistroCpf as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaFisica',
+                'campo' => $key,
+                'valor' => $value
+            ])->assertSessionHasErrors('valor');
+        
+        $this->assertDatabaseMissing('pre_registros_cpf', $preRegistroCpf);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registro_cpf_by_ajax_under_18_years_old()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaFisica',
+            'campo' => 'dt_nascimento',
+            'valor' => Carbon::today()->subYears(17)->format('Y-m-d')
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros_cpf', [
+            'dt_nascimento' => null
         ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registro_cpf_by_ajax_with_dt_expedicao_after_today()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaFisica',
+            'campo' => 'dt_expedicao',
+            'valor' => Carbon::today()->addDay()->format('Y-m-d')
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros_cpf', [
+            'dt_expedicao' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registro_cpf_by_ajax_without_data_type()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $datas = [
+            'dt_nascimento' => null, 
+            'dt_expedicao' => null
+        ];
+
+        foreach($datas as $key => $value) 
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaFisica',
+                'campo' => $key,
+                'valor' => 'texto'
+            ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros_cpf', $datas);
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_cpf_by_ajax_when_clean_inputs()
+    {
+        $externo = $this->signInAsUserExterno();
+
+        $preRegistro = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => $externo->id,
+            ]),
+        ]);
+
+        $preRegistroCpf = $preRegistro->toArray();
+        $pular = ['id', 'pre_registro_id', 'updated_at', 'created_at', 'pre_registro'];
+        
+        foreach($preRegistroCpf as $key => $value)
+        {
+            if(!in_array($key, $pular))
+                $this->post(route('externo.inserir.preregistro.ajax'), [
+                    'classe' => 'pessoaFisica',
+                    'campo' => $key,
+                    'valor' => ''
+                ])->assertStatus(200);
+        }
+
+        unset($preRegistroCpf['pre_registro']);
+        
+        $this->assertDatabaseMissing('pre_registros_cpf', $preRegistroCpf);
     }
 }

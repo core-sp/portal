@@ -1139,7 +1139,7 @@ function putDadosPreRegistro(objeto)
 				$("#modalLoadingPreRegistro").modal('hide');
 			}, errorFunction[1]); 
 			valorPreRegistro = null;
-			console.clear();
+			// console.clear();
 		}
 	});
 }
@@ -1157,7 +1157,10 @@ function getErrorMsg(request)
 		}
 		time = 2000;
 	}
-	
+	if(request.status == 401){
+		errorMessage = request.responseJSON.message;
+		time = 2000;
+	}
 	return [errorMessage, time];
 }
 

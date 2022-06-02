@@ -45,18 +45,20 @@ class PreRegistroAjaxRequest extends FormRequest
             ];
 
         if(strpos(request()->campo, 'dt_nascimento') !== false)
-            $this->regraValor = [
-                'date',
-                'before_or_equal:' . Carbon::today()->subYears(18)->format('Y-m-d'),
-            ];
+            if(isset(request()->valor))
+                $this->regraValor = [
+                    'date',
+                    'before_or_equal:' . Carbon::today()->subYears(18)->format('Y-m-d'),
+                ];
 
         if((strpos(request()->campo, 'dt_expedicao') !== false) || (request()->campo == 'dt_inicio_atividade'))
-            $this->regraValor = [
-                'date',
-                'before_or_equal:today',
-            ];
+            if(isset(request()->valor))
+                $this->regraValor = [
+                    'date',
+                    'before_or_equal:today',
+                ];
         
-        if(request()->campo == 'idregional')
+        if((request()->campo == 'idregional') && isset(request()->valor))
             $this->regraValor = [
                 'exists:regionais,idregional'
             ];
