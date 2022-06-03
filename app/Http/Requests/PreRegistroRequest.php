@@ -71,7 +71,7 @@ class PreRegistroRequest extends FormRequest
             'uf_empresa' => 'required_if:checkEndEmpresa,off|size:2|in:'.implode(',', array_keys(estados())),
             'nome_rt' => 'required|max:191|regex:/^\D*$/',
             'nome_social_rt' => 'nullable|max:191|regex:/^\D*$/',
-            'registro' => 'required|max:20',
+            'registro' => 'nullable|max:20',
             'sexo_rt' => 'required|size:1|in:M,F',
             'dt_nascimento_rt' => 'required|date|before_or_equal:'.$this->regraDtNasc,
             'cpf_rt' => ['required', new CpfCnpj],

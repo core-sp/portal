@@ -16,7 +16,7 @@
     </div>
 
     <div class="col-sm mb-2-576">
-        <label for="registro">{{ array_search('registro', $codRT) }} - Registro *</label>
+        <label for="registro">{{ array_search('registro', $codRT) }} - Registro</label>
         <input
             id="registro_core"
             name="registro"

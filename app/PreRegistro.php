@@ -157,13 +157,13 @@ class PreRegistro extends Model
 
         switch ($relacao) {
             case 'pessoaJuridica.responsavelTecnico':
-                $valido = $classe::buscar($valor, $gerenti);
+                $valido = $campo == 'cpf' ? $classe::buscar($valor, $gerenti) : null;
                 if(isset($valido))
                     $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id]);
                 $resultado = $valido;
                 break;
             case 'contabil':
-                $valido = $classe::buscar($valor);
+                $valido = $campo == 'cnpj' ? $classe::buscar($valor) : null;
                 if(isset($valido))
                     $resultado = $this->update(['contabil_id' => $valido->id]);
                 $resultado = $valido;

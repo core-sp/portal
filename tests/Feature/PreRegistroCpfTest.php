@@ -34,6 +34,12 @@ class PreRegistroCpfTest extends TestCase
         ]);
     }
 
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO-CPF VIA AJAX - CLIENT
+     * =======================================================================================================
+     */
+
     /** @test */
     public function can_update_table_pre_registros_cpf_by_ajax()
     {
@@ -259,5 +265,167 @@ class PreRegistroCpfTest extends TestCase
         unset($preRegistroCpf['pre_registro']);
         
         $this->assertDatabaseMissing('pre_registros_cpf', $preRegistroCpf);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO-CPF VIA SUBMIT - CLIENT
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function can_submit_pre_registro_cpf()
+    {
+        Mail::fake();
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+
+        $preRegistro = factory('App\PreRegistro')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => 1,
+            'idusuario' => null
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+            'pre_registro_id' => $preRegistro['id']
+        ]);
+
+        $contabil = factory('App\Contabil')->raw();
+        $temp = array();
+        foreach($contabil as $key => $value)
+            $temp[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $temp);
+        
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();        
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+
+        Mail::assertQueued(PreRegistroMail::class);
+
+        $pr = $externo->load('preRegistro')->preRegistro;
+
+        $preRegistro['tipo_telefone'] = $preRegistro['tipo_telefone'] . ';';
+        $preRegistro['telefone'] = $preRegistro['telefone'] . ';';
+        $preRegistro['status'] = $pr::STATUS_ANALISE_INICIAL;
+
+        $this->assertDatabaseHas('pre_registros', $preRegistro);
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf);
+        $this->assertDatabaseHas('contabeis', $contabil);
+        $this->assertDatabaseHas('anexos', [
+            'nome_original' => 'random.pdf'
+        ]);
+
+        Storage::disk('local')->assertExists($pr->anexos->first()->path);
+    }
+
+    /** @test */
+    public function can_submit_pre_registro_cpf_without_optional_inputs()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+
+        $preRegistro = factory('App\PreRegistro')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+            'pre_registro_id' => $preRegistro['id']
+        ]);
+
+        $dados = array_merge($preRegistro, $preRegistroCpf);
+        
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();        
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+
+        $pr = $externo->load('preRegistro')->preRegistro;
+
+        $preRegistro['tipo_telefone'] = $preRegistro['tipo_telefone'] . ';';
+        $preRegistro['telefone'] = $preRegistro['telefone'] . ';';
+        $preRegistro['status'] = $pr::STATUS_ANALISE_INICIAL;
+
+        $this->assertDatabaseHas('pre_registros', $preRegistro);
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf);
+        $this->assertDatabaseHas('anexos', [
+            'nome_original' => 'random.pdf'
+        ]);
+
+        Storage::disk('local')->assertExists($pr->anexos->first()->path);
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_cpf_without_required_inputs()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+
+        $dados = [
+            'ramo_atividade' => '',
+            'idregional' => '',
+            'cep' => '',
+            'bairro' => '',
+            'logradouro' => '',
+            'numero' => '',
+            'cidade' => '',
+            'uf' => '',
+            'tipo_telefone' => '',
+            'telefone' => '',
+            'sexo' => '',
+            'dt_nascimento' => '',
+            'nacionalidade' => '',
+            'naturalidade' => '',
+            'nome_mae' => '',
+            'identidade' => '',
+            'orgao_emissor' => '',
+            'dt_expedicao' => '',
+            'path' => '',
+        ];
+        
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors([
+            'ramo_atividade',
+            'idregional',
+            'cep',
+            'bairro',
+            'logradouro',
+            'numero',
+            'cidade',
+            'uf',
+            'tipo_telefone',
+            'telefone',
+            'sexo',
+            'dt_nascimento',
+            'nacionalidade',
+            'naturalidade',
+            'nome_mae',
+            'identidade',
+            'orgao_emissor',
+            'dt_expedicao',
+            'path',
+        ]);
+
+        $pr = $externo->load('preRegistro')->preRegistro;
+
+        $this->assertDatabaseHas('pre_registros', $pr->toArray());
+        $this->assertDatabaseHas('pre_registros_cpf', $pr->pessoaFisica->toArray());
+        $this->assertDatabaseMissing('anexos', [
+            'nome_original' => 'random.pdf'
+        ]);
     }
 }

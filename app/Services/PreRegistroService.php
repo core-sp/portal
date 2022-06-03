@@ -292,7 +292,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         foreach($camposLimpos as $key => $arrayCampos)
         {
-            $objeto = null;
+            $gerenti = null;
             if($key != PreRegistroService::RELATION_PRE_REGISTRO)
             {
                 $gerenti = $key == PreRegistroService::RELATION_RT ? $this->getRTGerenti($gerentiRepository, $arrayCampos['cpf']) : null;

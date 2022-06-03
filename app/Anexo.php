@@ -32,7 +32,7 @@ class Anexo extends Model
         if($total < Anexo::TOTAL_PRE_REGISTRO)
         {
             $nome = (string) Str::uuid() . '.' . $valor->extension();
-            return $valor->storeAs(Anexo::PATH_PRE_REGISTRO, $nome);
+            return $valor->storeAs(Anexo::PATH_PRE_REGISTRO, $nome, 'local');
         }
 
         return null;
