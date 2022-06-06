@@ -98,12 +98,12 @@
     <ul class="menu-registro nav nav-pills flex-column">
         <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#parte1_PF_PJ">
-                {{ $abas[0] }} - <i class="icon fa fa-check text-success"></i>
+                {{ $abas[0] }} {{-- - <i class="icon fa fa-check text-success"></i> --}}
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte2_PF_PJ">
-                {{ $abas[1] }} - <i class="icon fa fa-times text-danger"></i> <span class="text-danger">R27, R28</span>
+                {{ $abas[1] }} {{-- - <i class="icon fa fa-times text-danger"></i> <span class="text-danger">R27, R28</span> --}}
             </a>
         </li>
         <li class="nav-item">

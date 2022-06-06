@@ -1,5 +1,5 @@
 @php
-$justificativas = 'Teste para mostrar as justificativas do Atendimento após análise';
+// $justificativas = 'Teste para mostrar as justificativas do Atendimento após análise';
 @endphp
 
 @if(isset($justificativas))

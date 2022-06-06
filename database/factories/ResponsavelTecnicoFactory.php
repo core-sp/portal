@@ -8,7 +8,7 @@ use Faker\Generator as Faker;
 $factory->define(ResponsavelTecnico::class, function (Faker $faker) {
     return [
         'cpf' => '47662011089',
-        'registro' => '000000001',
+        'registro' => null,
         'nome' => 'Nome do RT',
         'nome_social' => null,
         'sexo' => 'F',
