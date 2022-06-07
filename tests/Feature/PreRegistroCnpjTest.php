@@ -91,6 +91,66 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
+    public function can_update_table_pre_registros_cnpj_by_ajax_when_exists_others_pre_registros()
+    {
+        $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2000-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '67779004000190'
+                ])
+            ])
+        ]);
+
+        $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2010-10-15',
+            'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => $preRegistroCnpj_1->preRegistro->contabil_id,
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '56821972000100'
+                ])
+            ])
+        ]);
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id,
+            'responsavel_tecnico_id' => factory('App\ResponsavelTecnico')->create([
+                'cpf' => '60923317058'
+            ]),
+        ]);
+        
+        $endereco = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
+        unset($preRegistroCnpj['pre_registro_id']);
+        unset($preRegistroCnpj['responsavel_tecnico_id']);
+        
+        foreach($preRegistroCnpj as $key => $value)
+        {
+            $temp = in_array($key, $endereco);
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica',
+                'campo' => $temp !== false ? $key.'_empresa' : $key,
+                'valor' => $value
+            ])->assertStatus(200);
+        }
+        
+        $preRegistroCnpj['pre_registro_id'] = $externo->load('preRegistro')->preRegistro->id;
+
+        $pr_1 = $preRegistroCnpj_1->toArray();
+        unset($pr_1['pre_registro']);
+        $pr_2 = $preRegistroCnpj_2->toArray();
+        unset($pr_2['pre_registro']);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', $preRegistroCnpj);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_1);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_2);
+    }
+
+    /** @test */
     public function cannot_update_table_pre_registros_cnpj_by_ajax_wrong_input_name()
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
@@ -315,6 +375,125 @@ class PreRegistroCnpjTest extends TestCase
      */
 
     /** @test */
+    public function view_message_errors_when_submit_with_dados_gerais_without_contabil()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'));
+
+        $dados = [
+            'registro_secundario' => null,
+            'ramo_atividade' => 'Teste qualquer',
+            'segmento' => segmentos()[0],
+            'idregional' => factory('App\Regional')->create()->idregional,
+            'razao_social' => 'Teste razão',
+            'capital_social' => '1.000,00',
+            'nire' => '01236547',
+            'tipo_empresa' => tipos_empresa()[1],
+            'dt_inicio_atividade' => '2022-02-01',
+            'inscricao_municipal' => '0123654789',
+            'inscricao_estadual' => '123456789',
+        ];
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertDontSeeText('Contabilidade *')
+        ->assertDontSeeText('Dados Gerais *')
+        ->assertSeeText('Endereço *')
+        ->assertSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertSeeText('Anexos *');
+    }
+
+    /** @test */
+    public function view_message_errors_when_submit_with_endereco_without_contabil()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'));
+
+        $dados = [
+            'cep' => '04444-000',
+            'bairro' => 'Bairro Teste',
+            'logradouro' => 'Rua teste',
+            'numero' => 23,
+            'complemento' => null,
+            'cidade' => 'São Paulo',
+            'uf' => 'SP',
+            'checkEndEmpresa' => 'on',
+        ];
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertDontSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertDontSeeText('Endereço *')
+        ->assertSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertSeeText('Anexos *');
+    }
+
+    /** @test */
+    public function view_message_errors_when_submit_with_endereco_without_contabil_when_checkEndEmpresa_off()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'));
+
+        $dados = [
+            'cep' => '04444-000',
+            'bairro' => 'Bairro Teste',
+            'logradouro' => 'Rua teste',
+            'numero' => 23,
+            'complemento' => null,
+            'cidade' => 'São Paulo',
+            'uf' => 'SP',
+            'cep_empresa' => '04444-050',
+            'bairro_empresa' => 'Bairro Teste',
+            'logradouro_empresa' => 'Rua teste',
+            'numero_empresa' => 222,
+            'complemento_empresa' => null,
+            'cidade_empresa' => 'São Paulo',
+            'uf_empresa' => 'SP',
+        ];
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertDontSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertDontSeeText('Endereço *')
+        ->assertSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertSeeText('Anexos *');
+    }
+
+    /** @test */
+    public function view_message_errors_when_submit_with_canal_without_contabil()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'));
+
+        $dados = [
+            'telefone' => '(11) 99999-5555',
+            'tipo_telefone' => tipos_contatos()[1]
+        ];
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertDontSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertSeeText('Endereço *')
+        ->assertSeeText('Contato / RT *')
+        ->assertDontSeeText('Canal de Relacionamento *')
+        ->assertSeeText('Anexos *');
+    }
+
+    /** @test */
     public function can_submit_pre_registro_cnpj()
     {
         Mail::fake();
@@ -377,6 +556,162 @@ class PreRegistroCnpjTest extends TestCase
         ]);
 
         Storage::disk('local')->assertExists($pr->anexos->first()->path);
+    }
+
+    /** @test */
+    public function can_submit_pre_registros_cnpj_by_ajax_when_exists_others_pre_registros()
+    {
+        Storage::fake('local');
+        $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2000-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '67779004000190'
+                ])
+            ])
+        ]);
+
+        $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2010-10-15',
+            'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => $preRegistroCnpj_1->preRegistro->contabil_id,
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '56821972000100'
+                ])
+            ])
+        ]);
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $preRegistro = factory('App\PreRegistro')->raw([
+            'id' => $preRegistroCnpj_2->pre_registro_id + 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => $preRegistroCnpj_2->preRegistro->contabil_id + 1,
+            'idusuario' => null
+        ]);
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id + 1,
+        ]);
+
+        $contabil = factory('App\Contabil')->raw([
+            'cnpj' => '56821972000100'
+        ]);
+        $temp = array();
+        foreach($contabil as $key => $value)
+            $temp[$key . '_contabil'] = $value;
+
+        $rt = factory('App\ResponsavelTecnico')->raw([
+            'cpf' => '60923317058'
+        ]);
+        $tempRT = array();
+        foreach($rt as $key => $value)
+            $key == 'registro' ? $tempRT[$key] = $value : $tempRT[$key . '_rt'] = $value;
+        
+        $tempCnpj = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
+        foreach($preRegistroCnpj as $key => $value)
+            in_array($key, $tempCnpj) ? $tempCnpj[$key . '_empresa'] = $value : $tempCnpj[$key] = $value;
+
+        $dados = array_merge($preRegistro, $tempCnpj, $temp, $tempRT);
+        
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();        
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $preRegistroCnpj['pre_registro_id'] = $externo->load('preRegistro')->preRegistro->id;
+
+        $pr_1 = $preRegistroCnpj_1->toArray();
+        unset($pr_1['pre_registro']);
+        $pr_2 = $preRegistroCnpj_2->toArray();
+        unset($pr_2['pre_registro']);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', $preRegistroCnpj);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_1);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_2);
+        $this->assertDatabaseHas('pre_registros', $externo->load('preRegistro')->preRegistro->toArray());
+    }
+
+    /** @test */
+    public function can_submit_pre_registros_cnpj_by_ajax_when_exists_others_pre_registros_with_same_contabil_and_rt()
+    {
+        Storage::fake('local');
+        $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2000-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '67779004000190'
+                ])
+            ])
+        ]);
+
+        $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2010-10-15',
+            'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => $preRegistroCnpj_1->preRegistro->contabil_id,
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '56821972000100'
+                ])
+            ])
+        ]);
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $preRegistro = factory('App\PreRegistro')->raw([
+            'id' => $preRegistroCnpj_2->pre_registro_id + 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => $preRegistroCnpj_2->preRegistro->contabil_id,
+            'idusuario' => null
+        ]);
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
+        ]);
+
+        $contabil = factory('App\Contabil')->raw();
+        $temp = array();
+        foreach($contabil as $key => $value)
+            $temp[$key . '_contabil'] = $value;
+
+        $rt = factory('App\ResponsavelTecnico')->raw();
+        $tempRT = array();
+        foreach($rt as $key => $value)
+            $key == 'registro' ? $tempRT[$key] = $value : $tempRT[$key . '_rt'] = $value;
+        
+        $tempCnpj = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
+        foreach($preRegistroCnpj as $key => $value)
+            in_array($key, $tempCnpj) ? $tempCnpj[$key . '_empresa'] = $value : $tempCnpj[$key] = $value;
+
+        $dados = array_merge($preRegistro, $tempCnpj, $temp, $tempRT);
+        
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();        
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $preRegistroCnpj['pre_registro_id'] = $externo->load('preRegistro')->preRegistro->id;
+
+        $pr_1 = $preRegistroCnpj_1->toArray();
+        unset($pr_1['pre_registro']);
+        $pr_2 = $preRegistroCnpj_2->toArray();
+        unset($pr_2['pre_registro']);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', $preRegistroCnpj);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_1);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_2);
+        $this->assertDatabaseHas('pre_registros', $externo->load('preRegistro')->preRegistro->toArray());
     }
 
     /** @test */

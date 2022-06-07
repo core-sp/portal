@@ -1359,8 +1359,12 @@ $('#inserirRegistro input:not(:checkbox,:file,:radio,[name="cpf_rt"],[name="cnpj
 });
 
 $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(function(){
-	if($(this).val() != "")
-		putDadosPreRegistro($(this));
+	($(this).attr('type') == 'file') && ($(this).val() == "") ? null : putDadosPreRegistro($(this));
+	if($(this).attr('name') == 'nacionalidade')
+		if($(this).val() != 'Brasileiro')
+			$('#inserirRegistro select[name="naturalidade"]').prop("disabled", true);
+		else
+			$('#inserirRegistro select[name="naturalidade"]').prop("disabled", false);
 });
 
 $('#inserirRegistro input:checkbox, #inserirRegistro input:radio').change(function(){

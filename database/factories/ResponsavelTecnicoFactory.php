@@ -9,7 +9,7 @@ $factory->define(ResponsavelTecnico::class, function (Faker $faker) {
     return [
         'cpf' => '47662011089',
         'registro' => null,
-        'nome' => 'Nome do RT',
+        'nome' => $faker->name,
         'nome_social' => null,
         'sexo' => 'F',
         'dt_nascimento' => '1970-02-20',
@@ -20,9 +20,9 @@ $factory->define(ResponsavelTecnico::class, function (Faker $faker) {
         'bairro' => 'Teste Bairro',
         'cidade' => 'São Paulo',
         'uf' => 'SP',
-        'nome_mae' => 'Nome Mãe do RT',
+        'nome_mae' => $faker->name,
         'nome_pai' => null,
-        'identidade' => '22.111.111-3',
+        'identidade' => '221111113',
         'orgao_emissor' => 'SSP- SP',
         'dt_expedicao' => '2021-05-20',
     ];

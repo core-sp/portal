@@ -1,6 +1,6 @@
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_telefone">{{ array_search('tipo_telefone', $codPre) }} - Tipo *</label><br>
+        <label for="tipo_telefone">{{ array_search('tipo_telefone', $codPre) }} - Tipo <span class="text-danger">*</span></label><br>
         @foreach(tipos_contatos() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
@@ -22,7 +22,7 @@
         @endforeach
     </div>
     <div class="col-sm mb-2-576">
-        <label for="telefone">{{ array_search('telefone', $codPre) }} - Telefone *</label>
+        <label for="telefone">{{ array_search('telefone', $codPre) }} - Telefone <span class="text-danger">*</span></label>
         <input type="text"
             class="{{ $classes[4] }} {{ array_search('telefone', $codPre) }} form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
             name="telefone"
@@ -78,7 +78,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="email">{{ array_search('email', $codUser) }} - E-mail *</label>
+        <label for="email">{{ array_search('email', $codUser) }} - E-mail <span class="text-danger">*</span></label>
         <input
             type="email"
             class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"

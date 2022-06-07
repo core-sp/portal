@@ -10,7 +10,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cpf_cnpj">{{ array_search('cpf_cnpj', $codUser) }} - {{ strlen($resultado->userExterno->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ' }} *</label>
+        <label for="cpf_cnpj">{{ array_search('cpf_cnpj', $codUser) }} - {{ strlen($resultado->userExterno->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ' }} <span class="text-danger">*</span></label>
         <input
             type="text"
             class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
@@ -38,7 +38,7 @@
 @if(strlen($resultado->userExterno->cpf_cnpj) == 11)
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome">{{ array_search('nome', $codUser) }} - Nome Completo *</label>
+        <label for="nome">{{ array_search('nome', $codUser) }} - Nome Completo <span class="text-danger">*</span></label>
         <input
             type="text"
             class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
@@ -73,7 +73,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="sexo">{{ array_search('sexo', $codCpf) }} - Sexo *</label><br>
+        <label for="sexo">{{ array_search('sexo', $codCpf) }} - Sexo <span class="text-danger">*</span></label><br>
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
@@ -104,7 +104,7 @@
         </div>
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_nascimento">{{ array_search('dt_nascimento', $codCpf) }} - Data de Nascimento *</label>
+        <label for="dt_nascimento">{{ array_search('dt_nascimento', $codCpf) }} - Data de Nascimento <span class="text-danger">*</span></label>
         <input
             name="dt_nascimento"
             type="date"
@@ -145,7 +145,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nacionalidade">{{ array_search('nacionalidade', $codCpf) }} - Nacionalidade *</label>
+        <label for="nacionalidade">{{ array_search('nacionalidade', $codCpf) }} - Nacionalidade <span class="text-danger">*</span></label>
         <select 
             name="nacionalidade" 
             class="{{ $classes[2] }} {{ array_search('nacionalidade', $codCpf) }} form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }}" 
@@ -168,10 +168,11 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="naturalidade">{{ array_search('naturalidade', $codCpf) }} - Naturalidade *</label>
+        <label for="naturalidade">{{ array_search('naturalidade', $codCpf) }} - Naturalidade <span class="text-danger">*</span></label>
         <select 
             name="naturalidade" 
             class="{{ $classes[2] }} {{ array_search('naturalidade', $codCpf) }} form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }}" 
+            {{ isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade != 'Brasileiro') ? 'disabled' : '' }}
         >
             <option value="">Selecione a opção...</option>
         @foreach(estados() as $naturalidade)
@@ -194,7 +195,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_mae">{{ array_search('nome_mae', $codCpf) }} - Nome da Mãe *</label>
+        <label for="nome_mae">{{ array_search('nome_mae', $codCpf) }} - Nome da Mãe <span class="text-danger">*</span></label>
         <input
             name="nome_mae"
             type="text"
@@ -225,12 +226,12 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="identidade">{{ array_search('identidade', $codCpf) }} - N° RG *</label>
+        <label for="identidade">{{ array_search('identidade', $codCpf) }} - N° RG / RNE (para estrangeiros) <span class="text-danger">*</span></label>
         <input
             name="identidade"
             type="text"
             id="rg"
-            class="{{ $classes[2] }} {{ array_search('identidade', $codCpf) }} form-control rgInput {{ $errors->has('identidade') ? 'is-invalid' : '' }}"
+            class="{{ $classes[2] }} {{ array_search('identidade', $codCpf) }} text-uppercase form-control {{ $errors->has('identidade') ? 'is-invalid' : '' }}"
             value="{{ empty(old('identidade')) && isset($resultado->pessoaFisica->identidade) ? $resultado->pessoaFisica->identidade : old('identidade') }}"
             maxlength="20"
         />
@@ -241,7 +242,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="orgao_emissor">{{ array_search('orgao_emissor', $codCpf) }} - Órgão Emissor *</label>
+        <label for="orgao_emissor">{{ array_search('orgao_emissor', $codCpf) }} - Órgão Emissor <span class="text-danger">*</span></label>
         <input
             name="orgao_emissor"
             type="text"
@@ -255,7 +256,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_expedicao">{{ array_search('dt_expedicao', $codCpf) }} - Data de Expedição *</label>
+        <label for="dt_expedicao">{{ array_search('dt_expedicao', $codCpf) }} - Data de Expedição <span class="text-danger">*</span></label>
         <input
             name="dt_expedicao"
             type="date"
@@ -275,7 +276,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="razao_social">{{ array_search('razao_social', $codCnpj) }} - Razão Social *</label>
+        <label for="razao_social">{{ array_search('razao_social', $codCnpj) }} - Razão Social <span class="text-danger">*</span></label>
         <input
             name="razao_social"
             type="text"
@@ -293,7 +294,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="capital_social">{{ array_search('capital_social', $codCnpj) }} - Capital Social em R$ *</label>
+        <label for="capital_social">{{ array_search('capital_social', $codCnpj) }} - Capital Social em R$ <span class="text-danger">*</span></label>
         <input
             type="text"
             name="capital_social"
@@ -308,7 +309,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nire">{{ array_search('nire', $codCnpj) }} - NIRE *</label>
+        <label for="nire">{{ array_search('nire', $codCnpj) }} - NIRE <span class="text-danger">*</span></label>
         <input
             type="text"
             name="nire"
@@ -327,7 +328,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_empresa">{{ array_search('tipo_empresa', $codCnpj) }} - Tipo da Empresa *</label><br>
+        <label for="tipo_empresa">{{ array_search('tipo_empresa', $codCnpj) }} - Tipo da Empresa <span class="text-danger">*</span></label><br>
         @foreach(tipos_empresa() as $tipo)
         <div class="form-check-inline">
             <label class="form-check-label">
@@ -349,7 +350,7 @@
         @endforeach
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_inicio_atividade">{{ array_search('dt_inicio_atividade', $codCnpj) }} - Data início da atividade *</label>
+        <label for="dt_inicio_atividade">{{ array_search('dt_inicio_atividade', $codCnpj) }} - Data início da atividade <span class="text-danger">*</span></label>
         <input
             type="date"
             name="dt_inicio_atividade"
@@ -368,7 +369,7 @@
 <!-- Verificar validação das Inscrições -->
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="inscricao_municipal">{{ array_search('inscricao_municipal', $codCnpj) }} - Inscrição Municipal *</label>
+        <label for="inscricao_municipal">{{ array_search('inscricao_municipal', $codCnpj) }} - Inscrição Municipal <span class="text-danger">*</span></label>
         <input
             type="text"
             name="inscricao_municipal"
@@ -383,7 +384,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="inscricao_estadual">{{ array_search('inscricao_estadual', $codCnpj) }} - Inscrição Estadual *</label>
+        <label for="inscricao_estadual">{{ array_search('inscricao_estadual', $codCnpj) }} - Inscrição Estadual <span class="text-danger">*</span></label>
         <input
             type="text"
             name="inscricao_estadual"
@@ -404,7 +405,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="ramo_atividade">{{ array_search('ramo_atividade', $codPre) }} - Ramo de Atividade *</label>
+        <label for="ramo_atividade">{{ array_search('ramo_atividade', $codPre) }} - Ramo de Atividade <span class="text-danger">*</span></label>
         <input
             name="ramo_atividade"
             type="text"
@@ -444,7 +445,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="idregional">{{ array_search('idregional', $codPre) }} - Região de Atuação *</label>
+        <label for="idregional">{{ array_search('idregional', $codPre) }} - Região de Atuação <span class="text-danger">*</span></label>
         <select 
             name="idregional" 
             class="{{ $classes[4] }} {{ array_search('idregional', $codPre) }} form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}" 

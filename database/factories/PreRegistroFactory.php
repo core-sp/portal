@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(PreRegistro::class, function (Faker $faker) {
     return [
-        'ramo_atividade' => 'Teste Ramo de Atividade',
+        'ramo_atividade' => $faker->word,
         'segmento' => segmentos()[5],
         'registro_secundario' => null,
         'cep' => '01234-001',

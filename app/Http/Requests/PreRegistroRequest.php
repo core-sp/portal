@@ -45,14 +45,14 @@ class PreRegistroRequest extends FormRequest
             'dt_nascimento' => 'required|date|before_or_equal:'.$this->regraDtNasc,
             'estado_civil' => 'nullable|in:'.implode(',', estados_civis()),
             'nacionalidade' => 'required|in:'.implode(',', nacionalidades()),
-            'naturalidade' => 'required|in:'.implode(',', estados()),
+            'naturalidade' => 'required_if:nacionalidade,Brasileiro|nullable|in:'.implode(',', estados()),
             'nome_mae' => 'required|max:191|regex:/^\D*$/',
             'nome_pai' => 'nullable|max:191|regex:/^\D*$/',
             'identidade' => 'required|max:20',
             'orgao_emissor' => 'required|max:191',
             'dt_expedicao' => 'required|date|before_or_equal:today',
         ];
-
+        
         $pessoaJuridica = [
             'razao_social' => 'required|max:191|regex:/^\D*$/',
             'capital_social' => 'required|max:16|regex:/([0-9.]{1,13}),([0-9]{2})/',
@@ -118,9 +118,28 @@ class PreRegistroRequest extends FormRequest
         
         
         if(!$this->externo->isPessoaFisica())
+        {
+            if(!isset(request()->checkEndEmpresa))
+                $this->merge([
+                    'checkEndEmpresa' => "off",
+                ]);
+
             $this->merge([
-                'cpf_rt' => apenasNumeros(request()->cpf_rt)
+                'cpf_rt' => apenasNumeros(request()->cpf_rt),
+                'identidade_rt' => strtoupper(apenasNumerosLetras(request()->identidade_rt))
             ]);
+        }
+        
+        if($this->externo->isPessoaFisica())
+        {
+            if(request()->nacionalidade != "Brasileiro")
+                $this->merge([
+                    'naturalidade' => null
+                ]);
+            $this->merge([
+                'identidade' => strtoupper(apenasNumerosLetras(request()->identidade))
+            ]);
+        }
 
         if(isset(request()->cnpj_contabil))
             $this->merge([
@@ -130,11 +149,6 @@ class PreRegistroRequest extends FormRequest
         if(isset(request()->registro))
             $this->merge([
                 'registro' => str_replace("/", "", request()->registro),
-            ]);
-        
-        if(!isset(request()->checkEndEmpresa))
-            $this->merge([
-                'checkEndEmpresa' => "off",
             ]);
     }
 

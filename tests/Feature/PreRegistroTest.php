@@ -1018,6 +1018,80 @@ class PreRegistroTest extends TestCase
      */
 
     /** @test */
+    public function view_message_errors_when_submit()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view'));
+        $this->put(route('externo.inserir.preregistro'), ['cnpj_contabil' => '46217816000172'])->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertSeeText('Endereço *')
+        ->assertDontSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertSeeText('Anexos *');
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'));
+        $this->put(route('externo.inserir.preregistro'), ['cnpj_contabil' => '46217816000172'])->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertSeeText('Endereço *')
+        ->assertSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertSeeText('Anexos *');
+    }
+
+    /** @test */
+    public function view_message_errors_when_submit_with_anexos()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view'));
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random2.pdf')
+        ])->assertStatus(200);
+
+        $this->put(route('externo.inserir.preregistro'), [])->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertDontSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertSeeText('Endereço *')
+        ->assertDontSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertDontSeeText('Anexos *');
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'));
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random2.pdf')
+        ])->assertStatus(200);
+
+        $this->put(route('externo.inserir.preregistro'), [])->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertDontSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertSeeText('Endereço *')
+        ->assertSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertDontSeeText('Anexos *');
+    }
+
+    /** @test */
     public function cannot_submit_pre_registro_without_anexo()
     {
         Storage::fake('local');

@@ -52,6 +52,117 @@ class ResponsavelTecnicoTest extends TestCase
     }
 
     /** @test */
+    public function can_update_table_responsaveis_tecnicos_by_ajax_when_exists_others_pre_registros()
+    {
+        $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2000-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '67779004000190'
+                ])
+            ])
+        ]);
+
+        $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2010-10-15',
+            'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => $preRegistroCnpj_1->preRegistro->contabil_id,
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '56821972000100'
+                ])
+            ])
+        ]);
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $rt = factory('App\ResponsavelTecnico')->raw([
+            'cpf' => '60923317058'
+        ]);
+        $campos = ['registro'];
+        
+        foreach($rt as $key => $value)
+        {
+            $temp = in_array($key, $campos);
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica.responsavelTecnico',
+                'campo' => $temp !== false ? $key : $key.'_rt',
+                'valor' => $value
+            ])->assertStatus(200);
+        }
+        
+        $pr_1 = $preRegistroCnpj_1->toArray();
+        unset($pr_1['pre_registro']);
+        $pr_2 = $preRegistroCnpj_2->toArray();
+        unset($pr_2['pre_registro']);
+
+        $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_1);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_2);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => $externo->load('preRegistro')->preRegistro->pessoaJuridica->responsavel_tecnico_id
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_responsaveis_tecnicos_by_ajax_when_exists_others_pre_registros_with_same_rt()
+    {
+        $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2000-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '67779004000190'
+                ])
+            ])
+        ]);
+
+        $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
+            'dt_inicio_atividade' => '2010-10-15',
+            'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => $preRegistroCnpj_1->preRegistro->contabil_id,
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '56821972000100'
+                ])
+            ])
+        ]);
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $rt = factory('App\ResponsavelTecnico')->raw();
+        $campos = ['registro'];
+        
+        foreach($rt as $key => $value)
+        {
+            $temp = in_array($key, $campos);
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica.responsavelTecnico',
+                'campo' => $temp !== false ? $key : $key.'_rt',
+                'valor' => $value
+            ])->assertStatus(200);
+        }
+        
+        $pr_1 = $preRegistroCnpj_1->toArray();
+        unset($pr_1['pre_registro']);
+        unset($pr_1['responsavel_tecnico']);
+        $pr_2 = $preRegistroCnpj_2->toArray();
+        unset($pr_2['pre_registro']);
+
+        $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_1);
+        $this->assertDatabaseHas('pre_registros_cnpj', $pr_2);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => $externo->load('preRegistro')->preRegistro->pessoaJuridica->responsavel_tecnico_id
+        ]);
+    }
+
+    /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_wrong_input_name()
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
@@ -412,6 +523,30 @@ class ResponsavelTecnicoTest extends TestCase
      * TESTES PRE-REGISTRO-CNPJ VIA SUBMIT - CLIENT
      * =======================================================================================================
      */
+
+    /** @test */
+    public function view_message_errors_when_submit_with_rt_without_contabil()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'));
+
+        $dados = factory('App\ResponsavelTecnico')->raw();
+        $tempRT = array();
+        foreach($dados as $key => $value)
+            $key == 'registro' ? $tempRT[$key] = $value : $tempRT[$key . '_rt'] = $value;
+
+        $this->put(route('externo.inserir.preregistro'), $tempRT)->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertDontSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertSeeText('Endereço *')
+        ->assertDontSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertSeeText('Anexos *');
+    }
 
     /** @test */
     public function can_submit_pre_registro_cnpj_if_rt_exists_in_database()

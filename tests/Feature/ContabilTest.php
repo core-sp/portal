@@ -45,6 +45,98 @@ class ContabilTest extends TestCase
     }
 
     /** @test */
+    public function can_update_table_contabeis_by_ajax_when_exists_others_pre_registros()
+    {
+        $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1970-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '69214841063'
+                ])
+            ])
+        ]);
+
+        $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1975-10-15',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => $preRegistroCpf_1->preRegistro->contabil_id,
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '60923317058'
+                ])
+            ])
+        ]);
+
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $contabil = factory('App\Contabil')->raw([
+            'cnpj' => '46217816000172'
+        ]);
+        
+        foreach($contabil as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'contabil',
+                'campo' => $key.'_contabil',
+                'valor' => $value
+            ])->assertStatus(200);
+        
+        $pr_1 = $preRegistroCpf_1->preRegistro->toArray();
+        $pr_2 = $preRegistroCpf_2->preRegistro->toArray();
+
+        $this->assertDatabaseHas('contabeis', $contabil);
+        $this->assertDatabaseHas('pre_registros', $pr_1);
+        $this->assertDatabaseHas('pre_registros', $pr_2);
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => $externo->load('preRegistro')->preRegistro->contabil_id
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_contabeis_by_ajax_when_exists_others_pre_registros_with_same_contabil()
+    {
+        $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1970-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '69214841063'
+                ])
+            ])
+        ]);
+
+        $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1975-10-15',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => $preRegistroCpf_1->preRegistro->contabil_id,
+                'user_externo_id' => factory('App\UserExterno')->create([
+                    'cpf_cnpj' => '60923317058'
+                ])
+            ])
+        ]);
+
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $contabil = factory('App\Contabil')->raw();
+        
+        foreach($contabil as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'contabil',
+                'campo' => $key.'_contabil',
+                'valor' => $value
+            ])->assertStatus(200);
+        
+        $pr_1 = $preRegistroCpf_1->preRegistro->toArray();
+        $pr_2 = $preRegistroCpf_2->preRegistro->toArray();
+        unset($pr_1['contabil']);
+        unset($pr_2['contabil']);
+
+        $this->assertDatabaseHas('contabeis', $contabil);
+        $this->assertDatabaseHas('pre_registros', $pr_1);
+        $this->assertDatabaseHas('pre_registros', $pr_2);
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => $externo->load('preRegistro')->preRegistro->contabil_id
+        ]);
+    }
+
+    /** @test */
     public function cannot_update_table_contabeis_by_ajax_wrong_input_name()
     {
         $externo = $this->signInAsUserExterno();
@@ -269,6 +361,36 @@ class ContabilTest extends TestCase
      * =======================================================================================================
      */
 
+    /** @test */
+    public function view_message_errors_when_submit_without_contabilidade()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view'));
+        $this->put(route('externo.inserir.preregistro'), [])->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertDontSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertSeeText('Endereço *')
+        ->assertDontSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertSeeText('Anexos *');
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+        $this->get(route('externo.inserir.preregistro.view'));
+        $this->put(route('externo.inserir.preregistro'), [])->assertStatus(302);
+        $this->get(route('externo.inserir.preregistro.view'))
+        ->assertSeeText('Foi encontrado erro em: ')
+        ->assertDontSeeText('Contabilidade *')
+        ->assertSeeText('Dados Gerais *')
+        ->assertSeeText('Endereço *')
+        ->assertSeeText('Contato / RT *')
+        ->assertSeeText('Canal de Relacionamento *')
+        ->assertSeeText('Anexos *');
+    }
+    
     /** @test */
     public function can_submit_pre_registro_with_cnpj_contabil_exists()
     {
