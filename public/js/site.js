@@ -1339,7 +1339,7 @@ $("#inserirRegistro .limparFile").click(function(){
 
 $('#inserirRegistro input[id^="cep_"]').on('keyup', function(event){
 	var tecla = event.keyCode;
-	var permitido = (tecla > 47 && tecla < 58) || (tecla > 95 && tecla < 106);
+	var permitido = (tecla > 47 && tecla < 58) || (tecla > 95 && tecla < 106) || (tecla == 17) || (tecla == 86);
 	var indice = this.id.indexOf("_");
 	var restoId = this.id.slice(indice + 1, this.id.length);
 	var diferente = valorPreRegistro != $(this).val();
