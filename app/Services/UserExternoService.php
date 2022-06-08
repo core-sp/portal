@@ -69,7 +69,7 @@ class UserExternoService implements UserExternoServiceInterface {
         else
         {
             $externo->update([
-                'nome' => strtoupper($dados['nome']),
+                'nome' => mb_strtoupper($dados['nome'], 'UTF-8'),
                 'email' => $dados['email']
             ]);
             event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou os dados com sucesso na Área Restrita.'));

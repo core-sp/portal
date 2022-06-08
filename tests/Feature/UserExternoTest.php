@@ -738,7 +738,7 @@ class UserExternoTest extends TestCase
         ->assertSee('Dados alterados com sucesso.');
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
-            'nome' => strtoupper('Novo nome do Usuário Externo'),
+            'nome' => mb_strtoupper('Novo nome do Usuário Externo', 'UTF-8'),
             'email' => 'teste@email.com.br'
         ]);
     }
@@ -787,7 +787,7 @@ class UserExternoTest extends TestCase
         ]));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
-            'nome' => strtoupper('Novo nome do Usuário Externo'),
+            'nome' => mb_strtoupper('Novo nome do Usuário Externo', 'UTF-8'),
             'email' => $user_externo['email']
         ]);
     }

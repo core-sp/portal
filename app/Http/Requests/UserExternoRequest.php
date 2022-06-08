@@ -15,7 +15,7 @@ class UserExternoRequest extends FormRequest
         $all = $this->all();
         $all['cpf_cnpj'] = apenasNumeros(request()->cpf_cnpj);
         if(request()->filled('nome'))
-            $all['nome'] = strtoupper(request()->nome);
+            $all['nome'] = mb_strtoupper(request()->nome, 'UTF-8');
 
         $this->replace($all);
     }
