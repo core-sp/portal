@@ -89,7 +89,7 @@ class PreRegistroAjaxRequest extends FormRequest
             'max' => request()->campo != 'path' ? 'Limite de :max caracteres' : 'Limite do tamanho do arquivo é de 5 MB',
             'in' => 'Campo não encontrado ou não permitido alterar',
             'required' => 'Falta dados para enviar a requisição',
-            'mimetypes' => 'O arquivo não possue extensão permitida ou está com erro',
+            'mimetypes' => 'O arquivo não possui extensão permitida ou está com erro',
             'file' => 'Deve ser um arquivo',
             'date' => 'Deve ser tipo data',
             'before_or_equal' => strpos(request()->campo, 'dt_nascimento') !== false ? 'Deve ter 18 anos completos ou mais' : 'Data deve ser igual ou anterior a hoje',

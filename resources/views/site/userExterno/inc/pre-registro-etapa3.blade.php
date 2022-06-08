@@ -122,7 +122,7 @@
     </div>
 </div>
 
-@if(strlen($resultado->userExterno->cpf_cnpj) == 14)
+@if(!$resultado->userExterno->isPessoaFisica())
 <br>
 
 <h5 class="bold mb-2">Endereço da empresa</h5>

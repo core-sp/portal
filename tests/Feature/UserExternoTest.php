@@ -15,11 +15,6 @@ class UserExternoTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /** @test 
      * 
      * Não pode criar um registro com formulário em branco.
@@ -1133,6 +1128,7 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.dashboard'))->assertOk();
         $this->get(route('externo.editar.view'))->assertOk();
         $this->get(route('externo.editar.senha.view'))->assertOk();
+        $this->get(route('externo.preregistro.view'))->assertOk();
     }
 
     /** @test 
@@ -1144,5 +1140,6 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.dashboard'))->assertRedirect(route('externo.login'));
         $this->get(route('externo.editar.view'))->assertRedirect(route('externo.login'));
         $this->get(route('externo.editar.senha.view'))->assertRedirect(route('externo.login'));
+        $this->get(route('externo.preregistro.view'))->assertRedirect(route('externo.login'));
     }
 }

@@ -80,7 +80,8 @@ class UserExternoSiteController extends Controller
     {
         try{
             $validate = $request->validated();
-            $erro = $this->service->getService('UserExterno')->editDados($validate);
+            $externo = auth()->guard('user_externo')->user();
+            $erro = $this->service->getService('UserExterno')->editDados($validate, $externo);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, 'Erro ao atualizar os dados cadastrais no Login Externo');

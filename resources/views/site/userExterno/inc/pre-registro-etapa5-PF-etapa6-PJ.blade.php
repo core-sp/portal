@@ -7,7 +7,7 @@
 
 <div class="linha-lg-mini"></div>
 <p class="bold mb-2 mt-1">Documentos a serem anexados: </p>
-@if(strlen($resultado->userExterno->cpf_cnpj) == 14)
+@if(!$resultado->userExterno->isPessoaFisica())
     <p class="ml-3"><i class="icon fa fa-check"></i> Comprovante de inscrição CNPJ</p>
     <p class="ml-3"><i class="icon fa fa-check"></i> Contrato Social</p>
     <p class="ml-3"><i class="icon fa fa-check"></i> Declaração Termo de indicação RT ou Procuração</p>

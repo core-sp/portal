@@ -10,7 +10,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cpf_cnpj">{{ array_search('cpf_cnpj', $codUser) }} - {{ strlen($resultado->userExterno->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ' }} <span class="text-danger">*</span></label>
+        <label for="cpf_cnpj">{{ array_search('cpf_cnpj', $codUser) }} - {{ $resultado->userExterno->isPessoaFisica() ? 'CPF' : 'CNPJ' }} <span class="text-danger">*</span></label>
         <input
             type="text"
             class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
@@ -35,7 +35,7 @@
     </div>
 </div>
 
-@if(strlen($resultado->userExterno->cpf_cnpj) == 11)
+@if($resultado->userExterno->isPessoaFisica())
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
         <label for="nome">{{ array_search('nome', $codUser) }} - Nome Completo <span class="text-danger">*</span></label>
@@ -272,7 +272,7 @@
     </div>
 </div>
 
-@elseif(strlen($resultado->userExterno->cpf_cnpj) == 14)
+@else
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
@@ -333,7 +333,7 @@
         <div class="form-check-inline">
             <label class="form-check-label">
                 <input type="radio" 
-                    class="{{ $classes[3] }} {{ array_search('tipo_empresa', $codCnpj) }} form-check-input" 
+                    class="{{ $classes[3] }} {{ array_search('tipo_empresa', $codCnpj) }} form-check-input {{ $errors->has('tipo_empresa') ? 'is-invalid' : '' }}" 
                     name="tipo_empresa" 
                     value="{{ $tipo }}" 
                     {{ (old('tipo_empresa') == $tipo) || (isset($resultado->pessoaJuridica->tipo_empresa) && ($tipo == $resultado->pessoaJuridica->tipo_empresa)) ? 'checked' : '' }} 

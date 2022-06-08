@@ -1139,7 +1139,7 @@ function putDadosPreRegistro(objeto)
 				$("#modalLoadingPreRegistro").modal('hide');
 			}, errorFunction[1]); 
 			valorPreRegistro = null;
-			// console.clear();
+			console.clear();
 		}
 	});
 }
@@ -1161,7 +1161,22 @@ function getErrorMsg(request)
 		errorMessage = request.responseJSON.message;
 		time = 2000;
 	}
+	if(request.status == 419){
+		errorMessage = "Sua sessão expirou! Recarregue a página";
+		time = 2000;
+	}
 	return [errorMessage, time];
+}
+
+function confereEnderecoEmpresa()
+{
+	var cep = $('#inserirRegistro input[name="cep"]').val().trim() == "";
+	var logradouro = $('#inserirRegistro input[name="logradouro"]').val().trim() == "";
+	var bairro = $('#inserirRegistro input[name="bairro"]').val().trim() == "";
+	var cidade = $('#inserirRegistro input[name="cidade"]').val().trim() == "";
+	var uf = $('#inserirRegistro select[name="uf"]:selected').val() == "";
+
+	return cep || logradouro || bairro || cidade || uf;
 }
 
 // limpar checkbox telefone_1, que não é obrigatório, se campo vazio
@@ -1368,7 +1383,8 @@ $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(functio
 });
 
 $('#inserirRegistro input:checkbox, #inserirRegistro input:radio').change(function(){
-	if(this.checked) 
+	var endEmpresa = ($(this).attr('name') == 'checkEndEmpresa') && confereEnderecoEmpresa();
+	if(this.checked && !endEmpresa) 
 		putDadosPreRegistro($(this));
 });
 

@@ -46,8 +46,13 @@ class PreRegistroCnpj extends Model
 
     public function mesmoEndereco()
     {
+        $naoNulo = isset($this->cep) && isset($this->logradouro) && isset($this->numero) && isset($this->bairro) && isset($this->cidade) && isset($this->uf);
+        
         $preRegistro = $this->preRegistro;
-        return ($this->cep == $preRegistro->cep) && ($this->numero == $preRegistro->numero) && ($this->complemento == $preRegistro->complemento);
+        $cepIgual = ($this->cep == $preRegistro->cep) && ($this->logradouro == $preRegistro->logradouro) && ($this->numero == $preRegistro->numero) && 
+        ($this->bairro == $preRegistro->bairro) && ($this->cidade == $preRegistro->cidade) && ($this->uf == $preRegistro->uf);
+        
+        return $naoNulo && $cepIgual;
     }
 
     public function validarUpdateAjax($campo, $valor)

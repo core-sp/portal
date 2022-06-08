@@ -21,9 +21,12 @@ class UserExternoService implements UserExternoServiceInterface {
             ->where('ativo', 0)
             ->withTrashed()
             ->first();
-
+            
         if(isset($externo))
-            $externo->restore() ? $externo->update($dados) : abort(500);
+            if($externo->restore())
+                $externo->update($dados);
+            else
+                throw new \Exception('Não foi possível restaurar ou atualizar os novos dados do Usuário Externo', 500);
         else
             $externo = UserExterno::create($dados);
 
@@ -51,15 +54,13 @@ class UserExternoService implements UserExternoServiceInterface {
         event(new ExternoEvent('User Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") verificou o email após o cadastro.'));
     }
 
-    public function editDados($dados)
+    public function editDados($dados, $externo)
     {
-        $user_externo = auth()->guard('user_externo')->user();
-
         if(!isset($dados['nome']) && !isset($dados['email']))
-            if(Hash::check($dados['password_atual'], $user_externo->password)) 
+            if(Hash::check($dados['password_atual'], $externo->password)) 
             {
-                $user_externo->update(['password' => Hash::make($dados['password'])]);
-                event(new ExternoEvent('Usuário Externo ' . $user_externo->id . ' ("'. $user_externo->cpf_cnpj .'") alterou a senha com sucesso na Área Restrita.'));
+                $externo->update(['password' => Hash::make($dados['password'])]);
+                event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou a senha com sucesso na Área Restrita.'));
             }else
                 return [
                     'message' => 'A senha atual digitada está incorreta!',
@@ -67,11 +68,11 @@ class UserExternoService implements UserExternoServiceInterface {
                 ];
         else
         {
-            $user_externo->update([
+            $externo->update([
                 'nome' => strtoupper($dados['nome']),
                 'email' => $dados['email']
             ]);
-            event(new ExternoEvent('Usuário Externo ' . $user_externo->id . ' ("'. $user_externo->cpf_cnpj .'") alterou os dados com sucesso na Área Restrita.'));
+            event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou os dados com sucesso na Área Restrita.'));
         }
     }
 }
