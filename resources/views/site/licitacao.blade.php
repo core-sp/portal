@@ -29,7 +29,7 @@
             <h2 class="stronger">{{ $licitacao->titulo }}</h2>
           </div>
           <div class="align-self-center">
-            <a href="/licitacoes" class="btn-voltar">Voltar</a>
+            <a href="{{ route('licitacoes.siteGrid') }}" class="btn-voltar">Voltar</a>
           </div>
         </div>
       </div>
@@ -67,7 +67,7 @@
         </table>
       </div>
       <div class="col-xl-8 col-lg-7">
-        <a href="{{ $licitacao->edital }}" download />
+        <a href="{{ $licitacao->edital }}" download >
           <div class="edital-download d-flex">
             <div class="flex-one">
               <h5 class="pb-0">Edital disponível para download</h5>

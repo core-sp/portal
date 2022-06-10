@@ -3429,9 +3429,13 @@ class AgendamentoTest extends TestCase
         $horarios = $regional->horariosAge();
         unset($horarios[array_search('10:00', $horarios)]);
 
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+
         $this->get(route('agendamentosite.diasHorasAjax', [
             'idregional' => $regional->idregional,
-            'dia' => Carbon::tomorrow()->format('d\/m\/Y'),
+            'dia' => $dia->format('d\/m\/Y'),
             'servico' => Agendamento::SERVICOS_OUTROS,
         ]))
         ->assertJsonMissing(['10:00'])
@@ -3786,13 +3790,16 @@ class AgendamentoTest extends TestCase
         // Registrando um agendamento na regional_1 às 10:00
         $agendamento_1 = factory('App\Agendamento')->create([
             'idregional' => $regional_1->idregional,
-            'dia' => date('Y-m-d', strtotime('+1 day')),
             'hora' => '10:00',
             'protocolo' => 'AGE-XXXXXX'
         ]);
 
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+
         // Verificando que ainda é possível agendar na regional_1 às 10:00 e em todos os outros horários
-        $this->get(route('agendamentosite.diasHorasAjax', ['idregional' => 1, 'servico' => 'Outros', 'dia' => date('d/m/Y', strtotime('+1 day'))]))
+        $this->get(route('agendamentosite.diasHorasAjax', ['idregional' => 1, 'servico' => 'Outros', 'dia' => $dia->format('d/m/Y')]))
             ->assertSee('10:00')
             ->assertSee('11:00')
             ->assertSee('12:00')
@@ -3802,13 +3809,12 @@ class AgendamentoTest extends TestCase
         // Registrando mais um agendamento na regional_1 às 10:00
         $agendamento_2 = factory('App\Agendamento')->create([
             'idregional' => $regional_1->idregional,
-            'dia' => date('Y-m-d', strtotime('+1 day')),
             'hora' => '10:00',
             'protocolo' => 'AGE-YYYYYY'
         ]);
 
         // Verificando que não é mais possível agendar na regional_1 às 10:00, mas ainda é possível em todos os outros horários
-        $this->get(route('agendamentosite.diasHorasAjax', ['idregional' => 1, 'servico' => 'Outros', 'dia' => date('d/m/Y', strtotime('+1 day'))]))
+        $this->get(route('agendamentosite.diasHorasAjax', ['idregional' => 1, 'servico' => 'Outros', 'dia' => $dia->format('d/m/Y')]))
             ->assertDontSee('10:00')
             ->assertSee('11:00')
             ->assertSee('12:00')
@@ -3816,7 +3822,7 @@ class AgendamentoTest extends TestCase
             ->assertSee('14:00');
 
         // Verificando que o horário as 10:00 está disponível na outra regional "regional_2"
-        $this->get(route('agendamentosite.diasHorasAjax', ['idregional' => 2, 'servico' => 'Outros', 'dia' => date('d/m/Y', strtotime('+1 day'))]))
+        $this->get(route('agendamentosite.diasHorasAjax', ['idregional' => 2, 'servico' => 'Outros', 'dia' => $dia->format('d/m/Y')]))
             ->assertSee('10:00')
             ->assertSee('11:00')
             ->assertSee('12:00')

@@ -43,8 +43,20 @@ Route::prefix('admin')->group(function() {
   require('admin/paginas.php');
   // Rotas de notícias
   require('admin/noticias.php');
+
   // Rotas de licitações
-  require('admin/licitacoes.php');
+  Route::prefix('licitacoes')->group(function(){
+    Route::get('/', 'LicitacaoController@index')->name('licitacoes.index');
+    Route::get('/create', 'LicitacaoController@create')->name('licitacoes.create');
+    Route::post('/', 'LicitacaoController@store')->name('licitacoes.store');
+    Route::get('/{id}/edit', 'LicitacaoController@edit')->name('licitacoes.edit');
+    Route::patch('/{id}', 'LicitacaoController@update')->name('licitacoes.update');
+    Route::delete('/{id}', 'LicitacaoController@destroy')->name('licitacoes.destroy');
+    Route::get('/{id}/restore', 'LicitacaoController@restore')->name('licitacoes.restore');
+    Route::get('/busca', 'LicitacaoController@busca')->name('licitacoes.busca');
+    Route::get('/lixeira', 'LicitacaoController@lixeira')->name('licitacoes.trashed');
+  });
+
   // Rotas de concursos
   require('admin/concursos.php');
   // Rotas de concursos
@@ -214,9 +226,17 @@ Route::prefix('/')->group(function() {
   Route::get('seccionais/{id}', 'RegionalController@show')->name('regionais.show');
 
   // Notícias
-  require('site/noticias.php');  
+  require('site/noticias.php');
+
   // Licitações
-  require('site/licitacoes.php');
+  Route::get('/licitacoes/busca', 'LicitacaoController@siteBusca')->name('licitacoes.siteBusca');
+  Route::get('/licitacoes/{id}', 'LicitacaoController@show')->name('licitacoes.show');
+  Route::get('/licitacoes', 'LicitacaoController@siteGrid')->name('licitacoes.siteGrid');
+  // // Redirects Licitações
+  // Route::get('/licitacao/{id}', function($id){
+  //     return redirect(route('licitacoes.show', $id), 301);
+  // });
+
   // Concursos
   require('site/concursos.php');
   // Cursos
