@@ -21,7 +21,7 @@
       <div class="col">
         <div class="row nomargin">
           <div class="flex-one pr-3 align-self-center">
-            <h2 class="stronger">Marque seu atendimento no CORE-SP</h2>
+            <h2 class="stronger">Representante Comercial, marque seu atendimento no CORE-SP</h2>
           </div>
           <div class="align-self-center">
             <a href="/" class="btn-voltar">Voltar</a>
@@ -37,7 +37,7 @@
           <p><strong>Importante:</strong> O atendimento presencial está suspenso temporariamente, neste período os serviços deverão ser solicitados via email. O prazo para análise e resposta do email depende do tipo de serviço solicitado.</p>
           <p>Para mais informações, acesse <a href="/servicos-atendimento-ao-rc">este link</a>.</p>
           -->
-          <p class="pb-0">Agende seu atendimento presencial no Core-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="{{ route('agendamentosite.consultaView') }}" class="text-primary">informações do atendimento já agendado.</a></p></br>
+          <p class="pb-0"><strong>Representante Comercial</strong>, agende seu atendimento presencial no Core-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="{{ route('agendamentosite.consultaView') }}" class="text-primary">informações do atendimento já agendado.</a></p></br>
           <p><strong>Atenção:</strong> Orientação jurídica – dúvidas deverão ser enviadas para o e-mail juridico@core-sp.org.br, que serão respondidas em até 5 (cinco) dias úteis, conforme PORTARIA 27/2020. Não há atendimento jurídico presencial, excepcionalmente, nesse período de pandemia.</p>
           <p>O parcelamento de anuidades em Execução Fiscal só será realizado pelo atendimento presencialmente, se houver o contato via e-mail com o setor de Dívida Ativa (<a href="mailto:juridico.dividaativa@core-sp.org.br">juridico.dividaativa@core-sp.org.br</a>) previamente para solicitação dos valores de custas processuais e honorários advocatícios, caso haja.</p>
           
@@ -56,7 +56,7 @@
             <h5>Informações de contato</h5>
             <div class="form-row mt-2">
               <div class="col-md-6">
-                <label for="nome">Nome *</label>
+                <label for="nome">Nome do Representante Comercial *</label>
                 <input type="text"
                   class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                   name="nome"
@@ -73,7 +73,7 @@
                 @endif
               </div>
               <div class="col-md-6 mt-2-768">
-                <label for="cpf">CPF *</label>
+                <label for="cpf">CPF do Representante Comercial *</label>
                 <input type="text"
                   class="form-control cpfInput {{ $errors->has('cpf') ? 'is-invalid' : '' }}"
                   name="cpf"
