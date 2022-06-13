@@ -111,8 +111,6 @@ class LicitacaoService implements LicitacaoServiceInterface {
 
     private function buscaSite($request = null)
     {
-        // testar primeiro essa opção
-
         $inicio = Licitacao::select('nrprocesso', 'nrlicitacao', 'modalidade', 'situacao', 'titulo', 'edital', 'datarealizacao', 'objeto', 'uasg', 'idlicitacao')
         ->selectRaw("CAST(SUBSTR(nrprocesso, INSTR(nrprocesso, '/') + 1) AS DECIMAL) as anoProcesso")
         ->selectRaw("CAST(SUBSTR(nrprocesso, 1, INSTR(nrprocesso, '/') - 1) AS DECIMAL) as numeroProcesso")
@@ -121,12 +119,12 @@ class LicitacaoService implements LicitacaoServiceInterface {
 
         if(isset($request))
         {
-            $palavrachave = $request['palavrachave'];
-            $modalidade = $request['modalidade'];
-            $situacao = $request['situacao'];
-            $nrlicitacao = $request['nrlicitacao'];
-            $nrprocesso = $request['nrprocesso'];
-            $datarealizacao = $request['datarealizacao'];
+            $palavrachave = isset($request['palavrachave']) ? $request['palavrachave'] : null;
+            $modalidade = isset($request['modalidade']) ? $request['modalidade'] : null;
+            $situacao = isset($request['situacao']) ? $request['situacao'] : null;
+            $nrlicitacao = isset($request['nrlicitacao']) ? $request['nrlicitacao'] : null;
+            $nrprocesso = isset($request['nrprocesso']) ? $request['nrprocesso'] : null;
+            $datarealizacao = isset($request['datarealizacao']) ? $request['datarealizacao'] : null;
 
             return $inicio->when(isset($palavrachave), function($query) use($palavrachave){
                 $query->where('objeto', 'LIKE', '%'.$palavrachave.'%');
@@ -181,16 +179,12 @@ class LicitacaoService implements LicitacaoServiceInterface {
     public function view($id = null)
     {
         if(isset($id))
-        {
-            $resultado = Licitacao::findOrFail($id);
-
             return [
-                'resultado' => $resultado,
+                'resultado' => Licitacao::findOrFail($id),
                 'modalidades' => $this->getModalidades(),
                 'situacoes' => $this->getSituacoes(),
                 'variaveis' => (object) $this->variaveis
             ];
-        }
 
         return [
             'modalidades' => $this->getModalidades(),

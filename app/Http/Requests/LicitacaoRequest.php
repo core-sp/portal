@@ -8,29 +8,21 @@ use App\Contracts\MediadorServiceInterface;
 class LicitacaoRequest extends FormRequest
 {
     private $service;
+    private $regraRegex;
+    private $regraRegexBusca;
+    private $msgRegex;
 
     public function __construct(MediadorServiceInterface $service)
     {
         $this->service = $service->getService('Licitacao');
     }
 
-    private function getRegrasBusca()
-    {
-        if(\Route::is('licitacoes.siteBusca'))
-            return [
-                'palavrachave' => 'nullable|max:191',
-                'modalidade' => 'nullable|in:' . implode(',', $this->service->getModalidades()),
-                'nrlicitacao' => 'nullable|regex:/[0-9]{1,3}\/[0-9]{4}/',
-                'nrprocesso' => 'nullable|regex:/[0-9]{1,3}\/[0-9]{2,4}/',
-                'situacao' => 'nullable|in:' . implode(',', $this->service->getSituacoes()),
-                'datarealizacao' => 'nullable|date',
-            ];
-
-        return null;
-    }
-
     protected function prepareForValidation()
     {
+        $this->regraRegex = 'regex:/^[0-9]{1,3}\/[0-9]{4}$/';
+        $this->regraRegexBusca = 'regex:/^[0-9]{1,3}\/[0-9]{2,4}$/';
+        $this->msgRegex = 'Formato válido: 001/1900';
+
         if(!\Route::is('licitacoes.siteBusca'))
             if(isset(request()->datarealizacao))
                 $this->merge(['datarealizacao' => str_replace('T', ' ', request()->datarealizacao)]);
@@ -38,17 +30,26 @@ class LicitacaoRequest extends FormRequest
 
     public function rules()
     {
-        $regras = $this->getRegrasBusca();
-        if(isset($regras))
-            return $regras;
+        if(\Route::is('licitacoes.siteBusca'))
+        {
+            $this->msgRegex = 'Formato válido: 1/00 ou 01/000 ou 001/0000';
+            return [
+                'palavrachave' => 'nullable|max:191',
+                'modalidade' => 'nullable|in:' . implode(',', $this->service->getModalidades()),
+                'nrlicitacao' => 'nullable|' . $this->regraRegexBusca,
+                'nrprocesso' => 'nullable|' . $this->regraRegexBusca,
+                'situacao' => 'nullable|in:' . implode(',', $this->service->getSituacoes()),
+                'datarealizacao' => 'nullable|date',
+            ];
+        }
 
         return [
             'uasg' => 'max:191',
             'edital' => 'max:191',
             'modalidade' => 'required|in:' . implode(',', $this->service->getModalidades()),
             'titulo' => 'required|max:191',
-            'nrlicitacao' => 'required|regex:/[0-9]{1,3}\/[0-9]{4}/',
-            'nrprocesso' => 'required|regex:/[0-9]{1,3}\/[0-9]{2,4}/',
+            'nrlicitacao' => 'required|' . $this->regraRegex,
+            'nrprocesso' => 'required|' . $this->regraRegex,
             'situacao' => 'required|in:' . implode(',', $this->service->getSituacoes()),
             'objeto' => 'required',
             'datarealizacao' => 'required|date_format:Y-m-d H:i',
@@ -63,8 +64,7 @@ class LicitacaoRequest extends FormRequest
             'date_format' => 'Formato inválido',
             'modalidade.in' => 'Modalidade não encontrada',
             'situacao.in' => 'Situação não encontrada',
-            'nrlicitacao.regex' => 'Formato válido: 001/1900',
-            'nrprocesso.regex' => 'Formato válido: 001/00 ou 001/1900',
+            'regex' => $this->msgRegex,
             'date' => 'Deve ser uma data válida'
         ];
     }

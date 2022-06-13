@@ -232,10 +232,6 @@ Route::prefix('/')->group(function() {
   Route::get('/licitacoes/busca', 'LicitacaoController@siteBusca')->name('licitacoes.siteBusca');
   Route::get('/licitacoes/{id}', 'LicitacaoController@show')->name('licitacoes.show');
   Route::get('/licitacoes', 'LicitacaoController@siteGrid')->name('licitacoes.siteGrid');
-  // // Redirects Licitações
-  // Route::get('/licitacao/{id}', function($id){
-  //     return redirect(route('licitacoes.show', $id), 301);
-  // });
 
   // Concursos
   require('site/concursos.php');

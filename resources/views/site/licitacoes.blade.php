@@ -132,7 +132,7 @@
   <div class="container">
     <div class="row mt-4">
       <div class="col">
-        @if(isset($licitacoes))
+        @if(isset($licitacoes) && ($licitacoes->total() > 0))
           @foreach($licitacoes as $licitacao)
           <div class="licitacao-grid">
             <a href="{{ route('licitacoes.show', $licitacao->idlicitacao) }}">

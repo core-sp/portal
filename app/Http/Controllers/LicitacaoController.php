@@ -138,7 +138,7 @@ class LicitacaoController extends Controller
 
     public function update(LicitacaoRequest $request, $id)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('updateOther', auth()->user());
 
         // $request->validated();
         
