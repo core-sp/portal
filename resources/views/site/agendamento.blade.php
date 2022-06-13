@@ -37,9 +37,13 @@
           <p><strong>Importante:</strong> O atendimento presencial está suspenso temporariamente, neste período os serviços deverão ser solicitados via email. O prazo para análise e resposta do email depende do tipo de serviço solicitado.</p>
           <p>Para mais informações, acesse <a href="/servicos-atendimento-ao-rc">este link</a>.</p>
           -->
-          <p class="pb-0"><strong>Representante Comercial</strong>, agende seu atendimento presencial no Core-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="{{ route('agendamentosite.consultaView') }}" class="text-primary">informações do atendimento já agendado.</a></p></br>
-          <p><strong>Atenção:</strong> Orientação jurídica – dúvidas deverão ser enviadas para o e-mail juridico@core-sp.org.br, que serão respondidas em até 5 (cinco) dias úteis, conforme PORTARIA 27/2020. Não há atendimento jurídico presencial, excepcionalmente, nesse período de pandemia.</p>
-          <p>O parcelamento de anuidades em Execução Fiscal só será realizado pelo atendimento presencialmente, se houver o contato via e-mail com o setor de Dívida Ativa (<a href="mailto:juridico.dividaativa@core-sp.org.br">juridico.dividaativa@core-sp.org.br</a>) previamente para solicitação dos valores de custas processuais e honorários advocatícios, caso haja.</p>
+          <p class="pb-0 text-justify">
+            <strong>Representante Comercial</strong>, agende seu atendimento presencial no Core-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="{{ route('agendamentosite.consultaView') }}" class="text-primary">informações do atendimento já agendado.</a>
+            </br></br>
+            <strong>Atenção:</strong> Orientação jurídica – dúvidas deverão ser enviadas para o e-mail juridico@core-sp.org.br, que serão respondidas em até 5 (cinco) dias úteis, conforme PORTARIA 27/2020. Não há atendimento jurídico presencial, excepcionalmente, nesse período de pandemia.
+            </br></br>
+            O parcelamento de anuidades em Execução Fiscal só será realizado pelo atendimento presencialmente, se houver o contato via e-mail com o setor de Dívida Ativa (<a href="mailto:juridico.dividaativa@core-sp.org.br">juridico.dividaativa@core-sp.org.br</a>) previamente para solicitação dos valores de custas processuais e honorários advocatícios, caso haja.
+          </p>
           
           <div class="mb-3">
             <a href="https://www.saopaulo.sp.gov.br/planosp/" target="_blank"><img src="{{ asset('img/icone-mapasp.png') }}"></a>
@@ -254,12 +258,11 @@
       <div class="modal-content">
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">Atenção!</h4>
+          <h4 class="modal-title">Atenção, Representante Comercial!</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <!-- Modal body -->
-        <div class="modal-body">
-          Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: Av. Brigadeiro Luís Antônio, 613, Térreo, CEP: 01317-000, São Paulo/SP.
+        <div class="modal-body" id="textoCarteirinha">
         </div>
       </div>
     </div>

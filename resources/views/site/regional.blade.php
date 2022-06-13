@@ -34,6 +34,7 @@
     <div class="row mt-2">
       <div class="col-lg-8 pr-4">
         <div class="conteudo-txt">
+          <p class="light"><strong>Representante Comercial</strong></p>
           <p class="light"><strong>Endereço:</strong> {{ $resultado->endereco }}, {{ $resultado->numero }} - {{ $resultado->complemento }}</p>
           <p class="light"><strong>Bairro: </strong>{{ $resultado->bairro }}</p>
           <p class="light"><strong>CEP: </strong>{{ $resultado->cep }}</p>

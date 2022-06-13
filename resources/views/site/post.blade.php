@@ -94,7 +94,6 @@
             <p>Tem alguma sugestão, critica ou elogio? Algo que gostaria de comentar? Sentiu falta de algum serviço que o Core-SP pode oferecer?</p>
             <p>Nosso objetivo é de aprimorar os serviços oferecidos para que possamos lhe atender cada vez melhor. Ajude a construir um novo Conselho!</p>
             <p><strong>Email:</strong> comunicação@core-sp.org.br</p>
-            <p><strong>Whatsapp:</strong> (11) 3243 - 5516</p>
           </div>
         </div>
       </div>
