@@ -92,6 +92,10 @@
     </div>
 @endif
 
+<div class="col-sm mb-2-576 p-0 mb-3">
+    <button class="btn btn-success btn-sm float-right" type="button" id="submitPreRegistro">Enviar para análise</button>
+</div>
+
 <div class="representante-content w-100">
 
     <!-- Nav tabs -->
@@ -194,8 +198,18 @@
         <div class="linha-lg-mini"></div>
 
         <div class="form-row">
-            <div class="col-sm mb-2-576">
-                <button class="btn btn-success float-left" type="submit">Enviar para análise</button>
+            <div class="col-6">
+                <button class="btn btn-link p-0 mr-3" id="voltarPreRegistro" type="button" disabled>
+                    <i class="fas fa-angle-double-left"></i> <strong>Voltar</strong>
+                </button>
+
+                <button class="btn btn-link p-0 ml-3" id="avancarPreRegistro" type="button">
+                    <i class="fas fa-angle-double-right"></i> <strong>Avançar</strong>
+                </button>
+            </div>
+
+            <div class="col-6">
+                <button class="btn btn-success btn-sm float-right" type="submit">Enviar para análise</button>
             </div>
         </div>
     </form>

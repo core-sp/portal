@@ -1273,14 +1273,59 @@ async function callbackEnderecoPreRegistro(restoId)
 		}
 }
 
-// Carrega a máscara quando já possui um rg
-$('#inserirRegistro').ready(function() {
-	if($(".rgInput").index($('#rg')) > -1){
-		var texto = $('#rg').val().replace(/[^a-zA-Z0-9]/g,'');
-		if(texto.length > 3)
-			$('#rg').val(mascaraRG(texto));
+function avancarVoltarDisabled(ativado, ordemMenu)
+{	
+	if(ativado == 0){
+		$('#voltarPreRegistro').attr("disabled", true);
+		$('#avancarPreRegistro').attr("disabled", false);
+	}else if(ativado == (ordemMenu.length - 1)){
+		$('#voltarPreRegistro').attr("disabled", false);
+		$('#avancarPreRegistro').attr("disabled", true);
+	}else{
+		$('#voltarPreRegistro').attr("disabled", false);
+		$('#avancarPreRegistro').attr("disabled", false);
 	}
-  });
+}
+
+function avancarVoltarPreRegistro(tipo, ativado, ordemMenu)
+{	
+	if(tipo == 'voltarPreRegistro'){
+		if(ativado == 0)
+			return false;
+		var novoAtivado = ativado - 1;
+		$('.nav-pills li:eq(' + novoAtivado + ') a').tab('show');
+		return novoAtivado;
+	}
+	if(tipo == 'avancarPreRegistro'){
+		if(ativado == (ordemMenu.length - 1))
+			return false;
+		var novoAtivado = ativado + 1;
+		$('.nav-pills li:eq(' + novoAtivado + ') a').tab('show');
+		return novoAtivado;
+	}
+	
+	return ativado;
+}
+
+// Caso o botão de submit fique fora do form
+$('#submitPreRegistro').click(function() {
+	$('#inserirRegistro').submit();
+});
+
+$('#voltarPreRegistro, #avancarPreRegistro, .menu-registro .nav-link').click(function() {
+	var ordemMenu = [];
+	$('.menu-registro .nav-link').each(function(){
+		ordemMenu.push($(this).text().trim());
+	});
+	var ativoAntes = 0;
+	if($(this).hasClass('nav-link'))
+		ativoAntes = ordemMenu.indexOf($(this).text().trim());
+	else
+		ativoAntes = ordemMenu.indexOf($('.menu-registro .active').text().trim());
+	var ativoDepois = avancarVoltarPreRegistro(this.id, ativoAntes, ordemMenu);
+	avancarVoltarDisabled(ativoDepois, ordemMenu);
+	
+});
 
 // Logout Externo
 $("#logout-externo").click(function(){

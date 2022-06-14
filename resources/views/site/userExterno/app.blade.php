@@ -21,9 +21,6 @@
       <div class="flex-one pr-4 align-self-center">
         <h2 class="stronger">Logado como Usuário Externo</h2>
       </div>
-      <div class="align-self-center">
-        <a href="/" class="btn-voltar">Voltar</a>
-      </div>
     </div>
     <div class="linha-lg"></div>
     <div class="row">
