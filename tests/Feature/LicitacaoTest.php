@@ -73,6 +73,23 @@ class LicitacaoTest extends TestCase
     }
 
     /** @test */
+    public function licitacao_can_be_created_by_an_user_without_optional_inputs()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Licitacao')->raw([
+            'idusuario' => $user->idusuario,
+            'uasg' => null,
+            'edital' => null
+        ]);
+        $attributes['datarealizacao'] = Carbon::create($attributes['datarealizacao'])->format('Y-m-d H:i');
+
+        $this->get(route('licitacoes.index'))->assertOk();
+        $this->post(route('licitacoes.store'), $attributes)->assertRedirect(route('licitacoes.index'));
+        $this->assertDatabaseHas('licitacoes', $attributes);
+    }
+
+    /** @test */
     public function non_authorized_users_cannot_create_licitacoes()
     {
         $user = $this->signIn();
@@ -391,6 +408,32 @@ class LicitacaoTest extends TestCase
         $attributes->datarealizacao = '2022-05-03 10:30';
         $attributes->titulo = 'Qualquer título para edição';
         $attributes->uasg = '123456';
+        $attributes->modalidade = Licitacao::modalidadesLicitacao()[7];
+        $attributes->situacao = Licitacao::situacoesLicitacao()[5];
+        $attributes->nrlicitacao = '1/1234';
+        $attributes->nrprocesso = '1/4567';
+
+        $this->get(route('licitacoes.index'))->assertOk();
+        $this->patch(route('licitacoes.update', $attributes->idlicitacao), $attributes->toArray())->assertRedirect(route('licitacoes.index'));
+
+        $attributes->idusuario = $user->idusuario;
+        $dados = $attributes->toArray();
+        unset($dados['updated_at']);
+
+        $this->assertDatabaseHas('licitacoes', $dados);
+    }
+
+    /** @test */
+    public function licitacao_can_be_updated_by_an_user_without_optional_inputs()
+    {
+        $user = $this->signInAsAdmin();
+
+        $attributes = factory('App\Licitacao')->create();
+
+        $attributes->datarealizacao = '2022-05-03 10:30';
+        $attributes->titulo = 'Qualquer título para edição';
+        $attributes->uasg = null;
+        $attributes->edital = null;
         $attributes->modalidade = Licitacao::modalidadesLicitacao()[7];
         $attributes->situacao = Licitacao::situacoesLicitacao()[5];
         $attributes->nrlicitacao = '1/1234';
@@ -935,13 +978,12 @@ class LicitacaoTest extends TestCase
         // 2° nrlicitacao decrescente
 
         $number = 123;
-        $licitacoes = array();
         $ordem = ['127/2020', '126/2020', '125/2020', '124/2020', '123/2020'];
 
         for($i = 0; $i < 5; $i++)
-            array_push($licitacoes, factory('App\Licitacao')->create([
+            factory('App\Licitacao')->create([
                 'nrprocesso' => $number++ . '/2020'
-            ])->nrprocesso);
+            ]);
 
         $this->get(route('licitacoes.siteGrid'))
         ->assertSeeTextInOrder($ordem);
@@ -955,13 +997,12 @@ class LicitacaoTest extends TestCase
 
         $number = 123;
         $ano = 2020;
-        $licitacoes = array();
         $ordem = ['127/2024', '126/2023', '125/2022', '124/2021', '123/2020'];
 
         for($i = 0; $i < 5; $i++)
-            array_push($licitacoes, factory('App\Licitacao')->create([
+            factory('App\Licitacao')->create([
                 'nrprocesso' => $number++ . '/' . $ano++
-            ])->nrprocesso);
+            ]);
 
         $this->get(route('licitacoes.siteGrid'))
         ->assertSeeTextInOrder($ordem);
@@ -975,13 +1016,12 @@ class LicitacaoTest extends TestCase
 
         $number = 123;
         $ano = 2020;
-        $licitacoes = array();
         $ordem = ['123/2024', '123/2023', '123/2022', '123/2021', '123/2020'];
 
         for($i = 0; $i < 5; $i++)
-            array_push($licitacoes, factory('App\Licitacao')->create([
+            factory('App\Licitacao')->create([
                 'nrprocesso' => $number . '/' . $ano++
-            ])->nrprocesso);
+            ]);
 
         $this->get(route('licitacoes.siteGrid'))
         ->assertSeeTextInOrder($ordem);
@@ -995,17 +1035,17 @@ class LicitacaoTest extends TestCase
 
         $ordem = ['250/2020', '250/2019', '249/2019'];
 
-        $licitacao_1 = factory('App\Licitacao')->create([
+        factory('App\Licitacao')->create([
             'nrprocesso' => '123/2020',
             'nrlicitacao' => '250/2019'
         ]);
 
-        $licitacao_2 = factory('App\Licitacao')->create([
+        factory('App\Licitacao')->create([
             'nrprocesso' => '123/2020',
             'nrlicitacao' => '249/2019'
         ]);
 
-        $licitacao_2 = factory('App\Licitacao')->create([
+        factory('App\Licitacao')->create([
             'nrprocesso' => '122/2021',
             'nrlicitacao' => '250/2020'
         ]);
@@ -1035,6 +1075,30 @@ class LicitacaoTest extends TestCase
         
         $this->get(route('licitacoes.siteGrid', $licitacao->idlicitacao))
             ->assertSee(route('licitacoes.show', $licitacao->idlicitacao));
+    }
+
+    /** @test */
+    public function link_to_download_edital_is_shown_on_website()
+    {
+        $licitacao = factory('App\Licitacao')->create();
+        
+        $this->get(route('licitacoes.show', $licitacao->idlicitacao))
+        ->assertSeeText('Edital disponível para download')
+        ->assertSeeText('Clique aqui para baixar o edital')
+        ->assertSee('<a href="' . $licitacao->edital . '" download >');
+    }
+
+    /** @test */
+    public function without_link_to_download_edital_is_shown_on_website_when_edital_null()
+    {
+        $licitacao = factory('App\Licitacao')->create([
+            'edital' => null
+        ]);
+        
+        $this->get(route('licitacoes.show', $licitacao->idlicitacao))
+        ->assertDontSeeText('Edital disponível para download')
+        ->assertDontSeeText('Clique aqui para baixar o edital')
+        ->assertDontSee('<a href="' . $licitacao->edital . '" download >');
     }
 
     /** @test */

@@ -32,7 +32,7 @@ class LicitacaoRequest extends FormRequest
     {
         if(\Route::is('licitacoes.siteBusca'))
         {
-            $this->msgRegex = 'Formato válido: 1/00 ou 01/000 ou 001/0000';
+            $this->msgRegex = 'Formato válido: 1/00 ou 1/000 ou 1/0000';
             return [
                 'palavrachave' => 'nullable|max:191',
                 'modalidade' => 'nullable|in:' . implode(',', $this->service->getModalidades()),

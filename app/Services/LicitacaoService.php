@@ -238,6 +238,7 @@ class LicitacaoService implements LicitacaoServiceInterface {
             ->orWhere('nrprocesso','LIKE','%'.$busca.'%')
             ->orWhere('situacao','LIKE','%'.$busca.'%')
             ->orWhere('objeto','LIKE','%'.$busca.'%')
+            ->orWhere('idlicitacao', $busca)
             ->paginate(10);
 
         return [

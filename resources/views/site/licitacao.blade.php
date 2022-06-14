@@ -67,6 +67,7 @@
         </table>
       </div>
       <div class="col-xl-8 col-lg-7">
+        @if(isset($licitacao->edital))
         <a href="{{ $licitacao->edital }}" download >
           <div class="edital-download d-flex">
             <div class="flex-one">
@@ -75,8 +76,9 @@
             </div>
             <button class="btn-edital"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</button>
           </div>
-     	</a>
-        <div class="edital-download mt-3">
+     	  </a>
+        @endif
+        <div class="edital-download {{ isset($licitacao->edital) ? 'mt-3' : '' }}">
           <h4 class="azul pb-0">Objeto</h4>
           <div class="linha-lg-mini mb-3"></div>
           {!! $licitacao->objeto !!}
