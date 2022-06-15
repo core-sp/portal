@@ -13,24 +13,24 @@ class PreRegistroCnpj extends Model
     protected $guarded = [];
     protected $touches = ['preRegistro'];
 
-    // RJ = registro pessoa jurídica
+    // seguir ordem de apresentação dos campos nas blades
     public static function codigosPreRegistro()
     {
         return [
-            'RJ01' => 'razao_social',
-            'RJ02' => 'capital_social',
-            'RJ03' => 'nire',
-            'RJ04' => 'tipo_empresa',
-            'RJ05' => 'dt_inicio_atividade',
-            'RJ06' => 'inscricao_estadual',
-            'RJ07' => 'inscricao_municipal',
-            'RJ08' => 'cep',
-            'RJ09' => 'logradouro',
-            'RJ10' => 'numero',
-            'RJ11' => 'complemento',
-            'RJ12' => 'bairro',
-            'RJ13' => 'cidade',
-            'RJ14' => 'uf',
+            '2.1' => 'razao_social',
+            '2.2' => 'capital_social',
+            '2.3' => 'nire',
+            '2.4' => 'tipo_empresa',
+            '2.5' => 'dt_inicio_atividade',
+            '2.6' => 'inscricao_municipal',
+            '2.7' => 'inscricao_estadual',
+            '4.8' => 'cep',
+            '4.9' => 'bairro',
+            '4.10' => 'logradouro',
+            '4.11' => 'numero',
+            '4.12' => 'complemento',
+            '4.13' => 'cidade',
+            '4.14' => 'uf',
         ];
     }
 

@@ -153,7 +153,6 @@
             <!-- Tab 2 -->
             <div id="parte2_PF_PJ" class="tab-pane container fade"><br>
                 @include('site.userExterno.inc.pre-registro-etapa2', [
-                    'codUser' => $codigos[$classes[6]],
                     'codPre' => $codigos[$classes[4]],
                     'codCpf' => $codigos[$classes[2]],
                     'codCnpj' => $codigos[$classes[3]]
@@ -180,7 +179,6 @@
             <!-- Tab 4 PF e Tab 5 PJ -->
             <div id="parte4_PF_parte5_PJ" class="tab-pane container fade"><br>
                 @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ', [
-                    'codUser' => $codigos[$classes[6]],
                     'codPre' => $codigos[$classes[4]]
                 ])
             </div>
@@ -222,6 +220,14 @@
                 <div id="modalLoadingBody" class="modal-body text-center"></div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="col mt-2">
+    <div class="text-right">
+        <small>Atualizado em: 
+            <span id="atualizacaoPreRegistro">{{ $resultado->updated_at->format('d\/m\/Y, \à\s H:i:s') }}</span>
+        </small>
     </div>
 </div>
 

@@ -12,28 +12,28 @@ class ResponsavelTecnico extends Model
     protected $table = 'responsaveis_tecnicos';
     protected $guarded = [];
 
-    // RT = registro responsavel técnico
+    // seguir ordem de apresentação dos campos nas blades
     public static function codigosPreRegistro()
     {
         return [
-            'RT01' => 'nome',
-            'RT02' => 'nome_social',
-            'RT03' => 'registro',
-            'RT04' => 'cpf',
-            'RT05' => 'cep',
-            'RT06' => 'logradouro',
-            'RT07' => 'numero',
-            'RT08' => 'complemento',
-            'RT09' => 'bairro',
-            'RT10' => 'cidade',
-            'RT11' => 'uf',
-            'RT12' => 'nome_mae',
-            'RT13' => 'nome_pai',
-            'RT14' => 'identidade',
-            'RT15' => 'orgao_emissor',
-            'RT16' => 'dt_expedicao',
-            'RT17' => 'dt_nascimento',
-            'RT18' => 'sexo'
+            '5.1' => 'cpf',
+            '5.2' => 'registro',
+            '5.3' => 'nome',
+            '5.4' => 'nome_social',
+            '5.5' => 'dt_nascimento',
+            '5.6' => 'sexo',
+            '5.7' => 'identidade',
+            '5.8' => 'orgao_emissor',
+            '5.9' => 'dt_expedicao',
+            '5.10' => 'cep',
+            '5.11' => 'bairro',
+            '5.12' => 'logradouro',
+            '5.13' => 'numero',
+            '5.14' => 'complemento',
+            '5.15' => 'cidade',
+            '5.16' => 'uf',
+            '5.17' => 'nome_mae',
+            '5.18' => 'nome_pai',
         ];
     }
 

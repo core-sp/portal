@@ -13,21 +13,21 @@ class PreRegistroCpf extends Model
     protected $guarded = [];
     protected $touches = ['preRegistro'];
 
-    // RF = registro pessoa física
+    // seguir ordem de apresentação dos campos nas blades
     public static function codigosPreRegistro()
     {
         return [
-            'RF01' => 'nome_social',
-            'RF02' => 'sexo',
-            'RF03' => 'dt_nascimento',
-            'RF04' => 'estado_civil',
-            'RF05' => 'nacionalidade',
-            'RF06' => 'naturalidade',
-            'RF07' => 'nome_mae',
-            'RF08' => 'nome_pai',
-            'RF09' => 'identidade',
-            'RF10' => 'orgao_emissor',
-            'RF11' => 'dt_expedicao'
+            '2.1' => 'nome_social',
+            '2.2' => 'sexo',
+            '2.3' => 'dt_nascimento',
+            '2.4' => 'estado_civil',
+            '2.5' => 'nacionalidade',
+            '2.6' => 'naturalidade',
+            '2.7' => 'nome_mae',
+            '2.8' => 'nome_pai',
+            '2.9' => 'identidade',
+            '2.10' => 'orgao_emissor',
+            '2.11' => 'dt_expedicao'
         ];
     }
 

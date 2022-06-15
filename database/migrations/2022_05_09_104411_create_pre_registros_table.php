@@ -15,7 +15,6 @@ class CreatePreRegistrosTable extends Migration
     {
         Schema::create('pre_registros', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('ramo_atividade')->nullable();
             $table->string('segmento')->nullable();
             $table->string('registro_secundario')->nullable();
             $table->string('cep', 10)->nullable();

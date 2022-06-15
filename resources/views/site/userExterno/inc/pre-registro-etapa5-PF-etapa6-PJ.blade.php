@@ -55,7 +55,7 @@
 
 @component('components.arquivos_form', [
     'nome' => 'anexo', 
-    'classes' => $classes[0] . ' ' . array_search('path', $codAnexo),
+    'classes' => $classes[0],
     'errors' => $errors
 ])
 @endcomponent

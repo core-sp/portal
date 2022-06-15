@@ -23,7 +23,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
     const RELATION_PJ = "pessoaJuridica";
     const RELATION_PRE_REGISTRO = "preRegistro";
     const RELATION_RT = "pessoaJuridica.responsavelTecnico";
-    const RELATION_USER_EXTERNO = 'userExterno';
 
     private $totalFiles;
 
@@ -41,7 +40,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
             'App\PreRegistroCnpj' => PreRegistroService::RELATION_PJ,
             'App\PreRegistro' => PreRegistroService::RELATION_PRE_REGISTRO,
             'App\ResponsavelTecnico' => PreRegistroService::RELATION_RT,
-            'App\UserExterno' => PreRegistroService::RELATION_USER_EXTERNO,
         ];
     }
 
@@ -67,7 +65,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
             PreRegistroService::RELATION_PJ => '_empresa',
             PreRegistroService::RELATION_CONTABIL => '_contabil',
             PreRegistroService::RELATION_RT => '_rt',
-            PreRegistroService::RELATION_USER_EXTERNO => null,
         ];
 
         foreach($campos as $key => $cp)
@@ -124,7 +121,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
             PreRegistroService::RELATION_PJ,
             PreRegistroService::RELATION_PRE_REGISTRO,
             PreRegistroService::RELATION_RT,
-            PreRegistroService::RELATION_USER_EXTERNO,
         ];
     }
 
@@ -190,7 +186,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return [
             $classes[0] => 'path',
             $classes[1] => 'nome_contabil,cnpj_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
-            $classes[4] => 'registro_secundario,ramo_atividade,segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,tipo_telefone_1,telefone_1',
+            $classes[4] => 'segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,tipo_telefone_1,telefone_1',
             $classes[2] => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade,nome_mae,nome_pai,identidade,orgao_emissor,dt_expedicao',
             $classes[3] => 'razao_social,capital_social,nire,tipo_empresa,dt_inicio_atividade,inscricao_estadual,inscricao_municipal,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
             $classes[5] => 'nome_rt,nome_social_rt,registro,sexo_rt,dt_nascimento_rt,cpf_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt'
@@ -278,7 +274,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
         else
             $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor'], $gerenti);
 
-        return $resultado;
+        return [
+            'resultado' => $resultado,
+            'dt_atualizado' => $preRegistro->fresh()->updated_at->format('d\/m\/Y, \à\s H:i:s')
+        ];
     }
 
     public function saveSite($request, GerentiRepositoryInterface $gerentiRepository, $externo)
@@ -352,7 +351,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
         {
             if(Storage::delete($anexo->path));
                 $anexo->delete();
-            return $id;
+            return [
+                'resultado' => $id,
+                'dt_atualizado' => $preRegistro->fresh()->updated_at->format('d\/m\/Y, \à\s H:i:s')
+            ];
         }
 
         throw new \Exception('Arquivo não existe / não pode acessar', 401);

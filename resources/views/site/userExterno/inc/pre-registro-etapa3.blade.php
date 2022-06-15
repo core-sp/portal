@@ -5,7 +5,7 @@
         <input
             type="text"
             name="cep"
-            class="{{ $classes[4] }} {{ array_search('cep', $codPre) }} form-control cep {{ $errors->has('cep') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control cep {{ $errors->has('cep') ? 'is-invalid' : '' }}"
             id="cep_pre"
             value="{{ empty(old('cep')) && isset($resultado->cep) ? $resultado->cep : old('cep') }}"
         />
@@ -20,7 +20,7 @@
         <input
             type="text"
             name="bairro"
-            class="{{ $classes[4] }} {{ array_search('bairro', $codPre) }} form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
             id="bairro_pre"
             value="{{ empty(old('bairro')) && isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
         />
@@ -38,7 +38,7 @@
         <input
             type="text"
             name="logradouro"
-            class="{{ $classes[4] }} {{ array_search('logradouro', $codPre) }} form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }}"
             id="rua_pre"
             value="{{ empty(old('logradouro')) && isset($resultado->logradouro) ? $resultado->logradouro : old('logradouro') }}"
         />
@@ -53,7 +53,7 @@
         <input
             type="text"
             name="numero"
-            class="{{ $classes[4] }} {{ array_search('numero', $codPre) }} form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
             id="numero_pre"
             value="{{ empty(old('numero')) && isset($resultado->numero) ? $resultado->numero : old('numero') }}"
         />
@@ -71,7 +71,7 @@
         <input
             type="text"
             name="complemento"
-            class="{{ $classes[4] }} {{ array_search('complemento', $codPre) }} form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
             id="complemento_pre"
             value="{{ empty(old('complemento')) && isset($resultado->complemento) ? $resultado->complemento : old('complemento') }}"
         />
@@ -87,7 +87,7 @@
             type="text"
             name="cidade"
             id="cidade_pre"
-            class="{{ $classes[4] }} {{ array_search('cidade', $codPre) }} form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }}"
             value="{{ empty(old('cidade')) && isset($resultado->cidade) ? $resultado->cidade : old('cidade') }}"
         />
         @if($errors->has('cidade'))
@@ -101,7 +101,7 @@
         <select 
             name="uf" 
             id="uf_pre" 
-            class="{{ $classes[4] }} {{ array_search('uf', $codPre) }} form-control {{ $errors->has('uf') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control {{ $errors->has('uf') ? 'is-invalid' : '' }}"
         >
             <option value="">Selecione a opção...</option>
         @foreach(estados() as $key => $estado)
@@ -131,7 +131,7 @@
         <label class="form-check-label">
             <input type="checkbox" 
                 id="checkEndEmpresa" 
-                class="{{ $classes[3] }} {{ array_search('bairro', $codCnpj).'-'.array_search('uf', $codCnpj) }} form-check-input {{ $errors->has('checkEndEmpresa') ? 'is-invalid' : '' }}" 
+                class="{{ $classes[3] }} form-check-input {{ $errors->has('checkEndEmpresa') ? 'is-invalid' : '' }}" 
                 name="checkEndEmpresa" 
                 @if(isset($resultado->pessoaJuridica) && $resultado->pessoaJuridica->mesmoEndereco())
                     checked
@@ -156,7 +156,7 @@
             <input
                 type="text"
                 name="cep_empresa"
-                class="{{ $classes[3] }} {{ array_search('cep', $codCnpj) }} form-control cep {{ $errors->has('cep_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} form-control cep {{ $errors->has('cep_empresa') ? 'is-invalid' : '' }}"
                 id="cep_empresa"
                 placeholder="CEP"
                 value="{{ empty(old('cep_empresa')) && isset($resultado->pessoaJuridica->cep) ? $resultado->pessoaJuridica->cep : old('cep_empresa') }}"
@@ -172,7 +172,7 @@
             <input
                 type="text"
                 name="bairro_empresa"
-                class="{{ $classes[3] }} {{ array_search('bairro', $codCnpj) }} form-control {{ $errors->has('bairro_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} form-control {{ $errors->has('bairro_empresa') ? 'is-invalid' : '' }}"
                 id="bairro_empresa"
                 value="{{ empty(old('bairro_empresa')) && isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : old('bairro_empresa') }}"
             />
@@ -190,7 +190,7 @@
             <input
                 type="text"
                 name="logradouro_empresa"
-                class="{{ $classes[3] }} {{ array_search('logradouro', $codCnpj) }} form-control {{ $errors->has('logradouro_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} form-control {{ $errors->has('logradouro_empresa') ? 'is-invalid' : '' }}"
                 id="rua_empresa"
                 value="{{ empty(old('logradouro_empresa')) && isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : old('logradouro_empresa') }}"
             />
@@ -205,7 +205,7 @@
             <input
                 type="text"
                 name="numero_empresa"
-                class="{{ $classes[3] }} {{ array_search('numero', $codCnpj) }} form-control {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} form-control {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }}"
                 id="numero_empresa"
                 value="{{ empty(old('numero_empresa')) && isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : old('numero_empresa') }}"
             />
@@ -223,7 +223,7 @@
             <input
                 type="text"
                 name="complemento_empresa"
-                class="{{ $classes[3] }} {{ array_search('complemento', $codCnpj) }} form-control {{ $errors->has('complemento_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} form-control {{ $errors->has('complemento_empresa') ? 'is-invalid' : '' }}"
                 id="complemento_empresa"
                 value="{{ empty(old('complemento_empresa')) && isset($resultado->pessoaJuridica->complemento) ? $resultado->pessoaJuridica->complemento : old('complemento_empresa') }}"
             />
@@ -239,7 +239,7 @@
                 type="text"
                 name="cidade_empresa"
                 id="cidade_empresa"
-                class="{{ $classes[3] }} {{ array_search('cidade', $codCnpj) }} form-control {{ $errors->has('cidade_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} form-control {{ $errors->has('cidade_empresa') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('cidade_empresa')) && isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : old('cidade_empresa') }}"
             />
             @if($errors->has('cidade_empresa'))
@@ -253,7 +253,7 @@
             <select 
                 name="uf_empresa" 
                 id="uf_empresa" 
-                class="{{ $classes[3] }} {{ array_search('uf', $codCnpj) }} form-control {{ $errors->has('uf_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} form-control {{ $errors->has('uf_empresa') ? 'is-invalid' : '' }}"
             >
                 <option value="">Selecione a opção...</option>
             @foreach(estados() as $key => $estado)

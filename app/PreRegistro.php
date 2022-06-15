@@ -20,23 +20,21 @@ class PreRegistro extends Model
     const STATUS_NEGADO = 'Negado';
     const STATUS_PENDENTE_PGTO = 'Pendente de pagamento';
 
-    // RG = registro geral
+    // seguir ordem de apresentação dos campos nas blades
     public static function codigosPreRegistro()
     {
         return [
-            'RG01' => 'ramo_atividade',
-            'RG02' => 'segmento',
-            'RG03' => 'registro_secundario',
-            'RG04' => 'cep',
-            'RG05' => 'logradouro',
-            'RG06' => 'numero',
-            'RG07' => 'complemento',
-            'RG08' => 'bairro',
-            'RG09' => 'cidade',
-            'RG10' => 'uf',
-            'RG11' => 'telefone',
-            'RG12' => 'tipo_telefone',
-            'RG13' => 'idregional'
+            '3.1' => 'segmento',
+            '3.2' => 'idregional',
+            '6.1' => 'tipo_telefone',
+            '6.2' => 'telefone',
+            '4.1' => 'cep',
+            '4.2' => 'bairro',
+            '4.3' => 'logradouro',
+            '4.4' => 'numero',
+            '4.5' => 'complemento',
+            '4.6' => 'cidade',
+            '4.7' => 'uf',
         ];
     }
 
