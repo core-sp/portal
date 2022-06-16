@@ -997,55 +997,30 @@ function arquivoVazio(nome){
 		return true;
 }
 
-function addArquivo(nome, maximoFiles){
+function addArquivo(nome){
 	if(nome == '')
 		return false;
 		
-	// somente files que exigem somente 1 arquivo
-	var array_para_um_file = [
-		// 'resid', 
-	];
 	var total = $(".Arquivo_" + nome).length + $(".ArquivoBD_" + nome).length;
-	var total_files = array_para_um_file.indexOf(nome) == -1 ? maximoFiles : 1 ;
+	var total_files = 1 ;
 
 	if(($(".ArquivoBD_" + nome).length < total_files) && ($(".Arquivo_" + nome).css("display") == "none")){ //quando usa o hide
 		$(".Arquivo_" + nome).show();
 	} else if((total < total_files) && (!arquivoVazio(".Arquivo_" + nome))){
 		var novoInput = $(".Arquivo_" + nome + ":last");
-		novoInput.after(novoInput.clone(true));
+		novoInput.after(novoInput.clone());
 		$(".Arquivo_" + nome + " .custom-file-input:last").val("");
-		$(".Arquivo_" + nome + " .custom-file-input:last").siblings(".custom-file-label").removeClass("selected").html('<span class="text-secondary">Escolher arquivo</span>');
+		$(".Arquivo_" + nome + " .custom-file-input:last")
+		.siblings(".custom-file-label")
+		.removeClass("selected")
+		.html('<span class="text-secondary">Escolher arquivo</span>');
+		$(".Arquivo_" + nome + " .invalid-feedback:last").remove();
 	}
 }
 
-function appendArquivoBD(finalLink, nome, valor, id, totalFiles, objeto)
+function limparFile(nomeBD, totalFiles)
 {
-	var total = $(".ArquivoBD_" + nome).length;
-	var link = window.location.href.slice(0, window.location.href.lastIndexOf("/") + 1) + finalLink + '/';
-	var cloneBD = null;
-
-	if((total == 1) && ($(".ArquivoBD_" + nome).css("display") == "none"))
-		cloneBD = $(".ArquivoBD_" + nome);
-	
-	if((total >= 1) && (total < totalFiles) && !($(".ArquivoBD_" + nome).css("display") == "none"))
-		cloneBD = $(".ArquivoBD_" + nome + ":last").clone(true);
-	
-	cloneBD.find("input").val(valor);
-	cloneBD.find(".Arquivo-Download").attr("href", link + 'download/' + id);
-	cloneBD.find(".modalExcluir").val(id);
-
-	if((total == 1) && (cloneBD.css("display") == "none"))
-		cloneBD.show();
-	else
-		$(".ArquivoBD_" + nome + ':last').after(cloneBD);
-	
-	var limpar = objeto.parent().parent().find(".limparFile");
-	limparFile(limpar, nome, totalFiles);
-}
-
-function limparFile(objeto, nomeBD, totalFiles)
-{
-	var todoArquivo = objeto.parent().parent().parent().parent();
+	var todoArquivo = $('.Arquivo_' + nomeBD + ':last');
 	var classe = todoArquivo.attr('class');
 	if($('.' + classe).length > 1)
 		todoArquivo.remove();
@@ -1071,6 +1046,30 @@ function limparFileBD(nome, dados, totalFiles)
 		}
 	});
 }
+
+function appendArquivoBD(finalLink, nome, valor, id, totalFiles)
+{
+	var total = $(".ArquivoBD_" + nome).length;
+	var link = window.location.href.slice(0, window.location.href.lastIndexOf("/") + 1) + finalLink + '/';
+	var cloneBD = null;
+
+	if((total == 1) && ($(".ArquivoBD_" + nome).css("display") == "none"))
+		cloneBD = $(".ArquivoBD_" + nome);
+	
+	if((total >= 1) && (total < totalFiles) && !($(".ArquivoBD_" + nome).css("display") == "none"))
+		cloneBD = $(".ArquivoBD_" + nome + ":last").clone(true);
+	
+	cloneBD.find("input").val(valor);
+	cloneBD.find(".Arquivo-Download").attr("href", link + 'download/' + id);
+	cloneBD.find(".modalExcluir").val(id);
+
+	if((total == 1) && (cloneBD.css("display") == "none"))
+		cloneBD.show();
+	else
+		$(".ArquivoBD_" + nome + ':last').after(cloneBD);
+
+	limparFile(nome, totalFiles);
+}
 // ----------------------------------------------------------------------------------------------------------------------------
 
 //	--------------------------------------------------------------------------------------------------------
@@ -1080,14 +1079,14 @@ function putDadosPreRegistro(objeto)
 {
 	var classesObjeto = objeto.attr("class");
 	var classe = classesObjeto.split(' ')[0];
-	var codigo = classe == 'Arquivo-Excluir' ? 'Arquivo' : classesObjeto.split(' ')[1];
+	// var codigo = classe == 'Arquivo-Excluir' ? 'Arquivo' : classesObjeto.split(' ')[1];
 	var campo = objeto.attr("name");
 	var valor = campo == 'path' ? objeto[0].files[0] : objeto.val();
 	var cT = campo == 'path' ? false : 'application/x-www-form-urlencoded';
 	var pD = campo == 'path' ? false : true;
 	var frmData = new FormData();
 	var dados = null;
-	var status = classe == 'Arquivo-Excluir' ? ' excluído' : ' salvo';
+	// var status = classe == 'Arquivo-Excluir' ? ' excluído' : ' salvo';
 
     frmData.append('valor', valor);
 	frmData.append('campo', campo);
@@ -1133,17 +1132,21 @@ function putDadosPreRegistro(objeto)
 		},
 		success: function(response) {
 			if(campo == 'cpf_rt')
-				preencheRT(response);
+				preencheRT(response['resultado']);
 			if(campo == 'cnpj_contabil')
-				preencheContabil(response);
+				preencheContabil(response['resultado']);
 			if(campo == 'path')
-				preencheFile(response, objeto);
+				preencheFile(response['resultado']);
 			if(classe == 'Arquivo-Excluir')
-				removeFile(response);
-			$("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> <strong>' + codigo + '</strong>' + status + '!');
-			setTimeout(function() {
+				removeFile(response['resultado']);
+			// $("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> <strong>' + codigo + '</strong>' + status + '!');
+			// setTimeout(function() {
 				$("#modalLoadingPreRegistro").modal('hide');
-			}, 1500); 
+			// }, 1500); 
+			// remove mensagem de validação d servidor
+			if(objeto.next().hasClass('invalid-feedback'))
+				objeto.removeClass('is-invalid').next().remove();
+			$('#atualizacaoPreRegistro').text(response['dt_atualizado']);
 			valorPreRegistro = valor;
 		},
 		error: function(request, status, error) {
@@ -1242,10 +1245,10 @@ function preencheRT(dados)
 	}
 }
 
-function preencheFile(dados, objeto)
+function preencheFile(dados)
 {
 	if(dados.id && dados.nome_original)
-		appendArquivoBD('pre-registro-anexo', "anexo", dados.nome_original, dados.id, pre_registro_total_files, objeto);
+		appendArquivoBD('pre-registro-anexo', "anexo", dados.nome_original, dados.id, pre_registro_total_files);
 }
 
 function removeFile(dados)
@@ -1289,20 +1292,18 @@ function avancarVoltarDisabled(ativado, ordemMenu)
 
 function avancarVoltarPreRegistro(tipo, ativado, ordemMenu)
 {	
-	if(tipo == 'voltarPreRegistro'){
-		if(ativado == 0)
-			return false;
-		var novoAtivado = ativado - 1;
-		$('.nav-pills li:eq(' + novoAtivado + ') a').tab('show');
-		return novoAtivado;
-	}
-	if(tipo == 'avancarPreRegistro'){
-		if(ativado == (ordemMenu.length - 1))
-			return false;
-		var novoAtivado = ativado + 1;
-		$('.nav-pills li:eq(' + novoAtivado + ') a').tab('show');
-		return novoAtivado;
-	}
+	if(tipo == 'voltarPreRegistro')
+		if(ativado != 0){
+			var novoAtivado = ativado - 1;
+			$('.menu-registro.nav-pills li:eq(' + novoAtivado + ') a').tab('show').focus();
+			return novoAtivado;
+		}
+	if(tipo == 'avancarPreRegistro')
+		if(ativado != (ordemMenu.length - 1)){
+			var novoAtivado = ativado + 1;
+			$('.menu-registro.nav-pills li:eq(' + novoAtivado + ') a').tab('show').focus();
+			return novoAtivado;
+		}
 	
 	return ativado;
 }
@@ -1388,12 +1389,12 @@ $("#inserirRegistro .files").on("change", function() {
 	// procedimento para recuperar a classe e adicionar o final do nome para o método de add input
 	var nomeClasse = $(this).parent().parent().parent().parent().attr('class');
 	var nome = nomeClasse.slice(nomeClasse.indexOf('_') + 1);
-	addArquivo(nome, pre_registro_total_files);
+	addArquivo(nome);
 });
 
 // remove a div com input file ou limpa o campo se for 1 input
 $("#inserirRegistro .limparFile").click(function(){
-	limparFile($(this));
+	limparFile('anexo', pre_registro_total_files);
 });
 
 $('#inserirRegistro input[id^="cep_"]').on('keyup', function(event){
@@ -1445,6 +1446,14 @@ $('#inserirRegistro input:checkbox, #inserirRegistro input:radio').change(functi
 	var endEmpresa = ($(this).attr('name') == 'checkEndEmpresa') && confereEnderecoEmpresa();
 	if(this.checked && !endEmpresa) 
 		putDadosPreRegistro($(this));
+});
+
+// No primeiro click vai direto pro input, porém nos próximos deve clicar 2x
+$('.erroPreRegistro').click(function(){
+	var campo = $(this).val();
+	var hrefMenu = $('[name="' + campo + '"]').parents('.tab-pane').attr('id');
+	$('.menu-registro.nav-pills [href="#' + hrefMenu + '"]').tab('show').focus();
+	// $('[name="' + campo + '"]').focus();
 });
 
 //	--------------------------------------------------------------------------------------------------------

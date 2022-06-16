@@ -349,11 +349,14 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         if(isset($anexo) && Storage::exists($anexo->path))
         {
-            if(Storage::delete($anexo->path));
+            if(Storage::delete($anexo->path))
+            {
                 $anexo->delete();
+                $preRegistro->touch();
+            }
             return [
                 'resultado' => $id,
-                'dt_atualizado' => $preRegistro->fresh()->updated_at->format('d\/m\/Y, \à\s H:i:s')
+                'dt_atualizado' => $preRegistro->updated_at->format('d\/m\/Y, \à\s H:i:s')
             ];
         }
 

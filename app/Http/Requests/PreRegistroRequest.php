@@ -157,29 +157,115 @@ class PreRegistroRequest extends FormRequest
 
     public function messages()
     {
+        $attr = ' no item :attribute';
+
         return [
-            'max' => 'Limite de :max caracteres',
-            'in' => 'Valor não é aceito',
-            'required' => 'Campo obrigatório',
-            'required_if' => 'Campo obrigatório',
-            'mimetypes' => 'O arquivo não possue extensão permitida ou está com erro',
-            'file' => 'Deve ser um arquivo',
-            'size' => 'Deve ter :size caracteres',
-            'exists' => 'Esta regional não existe',
-            'date' => 'Deve ser tipo data',
-            'dt_expedicao_rt.before_or_equal' => 'Data deve ser igual ou anterior a hoje',
-            'dt_expedicao.before_or_equal' => 'Data deve ser igual ou anterior a hoje',
-            'dt_nascimento.before_or_equal' => 'Deve ter 18 anos completos ou mais',
-            'dt_nascimento_rt.before_or_equal' => 'Deve ter 18 anos completos ou mais',
-            'email' => 'Deve ser no formato de email teste@teste.com',
-            'checkEndEmpresa.present' => 'Campo opção "Mesmo Endereço" deve estar presente',
-            'nome_contabil.required_with' => 'Campo obrigatório se possui o CNPJ',
-            'nome_contato_contabil.required_with' => 'Campo obrigatório se possui o CNPJ',
-            'telefone_contabil.required_with' => 'Campo obrigatório se possui o CNPJ',
-            'email_contabil.required_with' => 'Campo obrigatório se possui o CNPJ',
-            'telefone_1.required_with' => 'Campo obrigatório se possui o tipo de telefone opcional',
-            'tipo_telefone_1.required_with' => 'Campo obrigatório se possui o telefone opcional',
-            'regex' => 'Formato inválido',
+            'max' => 'Limite de :max caracteres' . $attr,
+            'in' => 'Valor não é aceito' . $attr,
+            'required' => 'Campo obrigatório' . $attr,
+            'required_if' => 'Campo obrigatório' . $attr,
+            'mimetypes' => 'O arquivo não possue extensão permitida ou está com erro' . $attr,
+            'file' => 'Deve ser um arquivo' . $attr,
+            'size' => 'Deve ter :size caracteres' . $attr,
+            'exists' => 'Esta regional não existe' . $attr,
+            'date' => 'Deve ser tipo data' . $attr,
+            'dt_expedicao_rt.before_or_equal' => 'Data deve ser igual ou anterior a hoje' . $attr,
+            'dt_expedicao.before_or_equal' => 'Data deve ser igual ou anterior a hoje' . $attr,
+            'dt_nascimento.before_or_equal' => 'Deve ter 18 anos completos ou mais' . $attr,
+            'dt_nascimento_rt.before_or_equal' => 'Deve ter 18 anos completos ou mais' . $attr,
+            'email' => 'Deve ser no formato de email teste@teste.com' . $attr,
+            'checkEndEmpresa.present' => 'Campo opção "Mesmo Endereço" deve estar presente' . $attr,
+            'nome_contabil.required_with' => 'Campo obrigatório se possui o CNPJ' . $attr,
+            'nome_contato_contabil.required_with' => 'Campo obrigatório se possui o CNPJ' . $attr,
+            'telefone_contabil.required_with' => 'Campo obrigatório se possui o CNPJ' . $attr,
+            'email_contabil.required_with' => 'Campo obrigatório se possui o CNPJ' . $attr,
+            'telefone_1.required_with' => 'Campo obrigatório se possui o tipo de telefone opcional' . $attr,
+            'tipo_telefone_1.required_with' => 'Campo obrigatório se possui o telefone opcional' . $attr,
+            'regex' => 'Formato inválido' . $attr,
         ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        $rules = [
+            'path' => '"Anexo"',
+            'cnpj_contabil' => '"CNPJ da contabilidade"',
+            'nome_contabil' => '"Nome da contabilidade"',
+            'email_contabil' => '"E-mail da contabilidade"',
+            'nome_contato_contabil' => '"Nome de contato da contabilidade"',
+            'telefone_contabil' => '"Telefone da contabilidade"',
+            'segmento' => '"Segmento"',
+            'idregional' => '"Regional"',
+            'cep' => '"Cep de correspondência"',
+            'bairro' => '"Bairro de correspondência"',
+            'logradouro' => '"Logradouro de correspondência"',
+            'numero' => '"Número de correspondência"',
+            'complemento' => '"Complemento de correspondência"',
+            'cidade' => '"Município de correspondência"',
+            'uf' => '"Estado de correspondência"',
+            'tipo_telefone' => '"Tipo do telefone"',
+            'telefone' => '"Número de telefone"',
+            'tipo_telefone_1' => '"Tipo de telefone opcional"',
+            'telefone_1' => '"Número de telefone opcional"',
+        ];
+
+        $pessoaFisica = [
+            'nome_social' => '"Nome social"',
+            'sexo' => '"Sexo"',
+            'dt_nascimento' => '"Data de nascimento"',
+            'estado_civil' => '"Estado civil"',
+            'nacionalidade' => '"Nacionalidade"',
+            'naturalidade' => '"Naturalidade"',
+            'nome_mae' => '"Nome da mãe"',
+            'nome_pai' => '"Nome do pai"',
+            'identidade' => '"Número de identidade"',
+            'orgao_emissor' => '"Órgão emissor"',
+            'dt_expedicao' => '"Data de expedição"',
+        ];
+
+        $pessoaJuridica = [
+            'razao_social' => '"Razão social"',
+            'capital_social' => '"Capital social"',
+            'nire' => '"Nire"',
+            'tipo_empresa' => '"Tipo da empresa"',
+            'dt_inicio_atividade' => '"Data de início das atividades"',
+            'inscricao_municipal' => '"Inscrição municipal"',
+            'inscricao_estadual' => '"Inscrição estadual"',
+            'checkEndEmpresa' => '"Opção Mesmo endereço"',
+            'cep_empresa' => '"Cep da empresa"',
+            'bairro_empresa' => '"Bairro da empresa"',
+            'logradouro_empresa' => '"Logradouro da empresa"',
+            'numero_empresa' => '"Número da empresa"',
+            'complemento_empresa' => '"Complemento da empresa"',
+            'cidade_empresa' => '"Município da empresa"',
+            'uf_empresa' => '"Estado da empresa"',
+            'nome_rt' => '"Nome do responsável técnico"',
+            'nome_social_rt' => '"Nome social do responsável técnico"',
+            'registro' => '"Registro do responsável técnico"',
+            'sexo_rt' => '"Sexo do responsável técnico"',
+            'dt_nascimento_rt' => '"Data de nascimento do responsável técnico"',
+            'cpf_rt' => '"CPF do responsável técnico"',
+            'identidade_rt' => '"Número de identidade do responsável técnico"',
+            'orgao_emissor_rt' => '"Órgão emissor do responsável técnico"',
+            'dt_expedicao_rt' => '"Data de expedição do responsável técnico"',
+            'cep_rt' => '"Cep do responsável técnico"',
+            'bairro_rt' => '"Bairro do responsável técnico"',
+            'logradouro_rt' => '"Logradouro do responsável técnico"',
+            'numero_rt' => '"Número do responsável técnico"',
+            'complemento_rt' => '"Complemento do responsável técnico"',
+            'cidade_rt' => '"Município do responsável técnico"',
+            'uf_rt' => '"Estado do responsável técnico"',
+            'nome_mae_rt' => '"Nome da mãe do responsável técnico"',
+            'nome_pai_rt' => '"Nome do pai do responsável técnico"',
+        ];
+
+        $outrasRules = $this->externo->isPessoaFisica() ? $pessoaFisica : $pessoaJuridica;
+
+        return array_merge($rules, $outrasRules);
     }
 }
