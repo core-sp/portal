@@ -46,7 +46,8 @@ class PreRegistroRequest extends FormRequest
             'naturalidade' => 'required_if:nacionalidade,Brasileiro|nullable|in:'.implode(',', estados()),
             'nome_mae' => 'required|max:191|regex:/^\D*$/',
             'nome_pai' => 'nullable|max:191|regex:/^\D*$/',
-            'identidade' => 'required|max:20',
+            'tipo_identidade' => 'required|in:'.implode(',', tipos_identidade()),
+            'identidade' => 'required|max:30',
             'orgao_emissor' => 'required|max:191',
             'dt_expedicao' => 'required|date|before_or_equal:today',
         ];
@@ -54,7 +55,7 @@ class PreRegistroRequest extends FormRequest
         $pessoaJuridica = [
             'razao_social' => 'required|max:191|regex:/^\D*$/',
             'capital_social' => 'required|max:16|regex:/([0-9.]{1,13}),([0-9]{2})/',
-            'nire' => 'required|max:20',
+            'nire' => 'nullable|max:20',
             'tipo_empresa' => 'required|in:'.implode(',', tipos_empresa()),
             'dt_inicio_atividade' => 'required|date|before_or_equal:today',
             'inscricao_municipal' => 'required|max:30',
@@ -69,11 +70,11 @@ class PreRegistroRequest extends FormRequest
             'uf_empresa' => 'required_if:checkEndEmpresa,off|size:2|in:'.implode(',', array_keys(estados())),
             'nome_rt' => 'required|max:191|regex:/^\D*$/',
             'nome_social_rt' => 'nullable|max:191|regex:/^\D*$/',
-            'registro' => 'nullable|max:20',
             'sexo_rt' => 'required|size:1|in:M,F',
             'dt_nascimento_rt' => 'required|date|before_or_equal:'.$this->regraDtNasc,
             'cpf_rt' => ['required', new CpfCnpj],
-            'identidade_rt' => 'required|max:20',
+            'tipo_identidade_rt' => 'required|in:'.implode(',', tipos_identidade()),
+            'identidade_rt' => 'required|max:30',
             'orgao_emissor_rt' => 'required|max:191',
             'dt_expedicao_rt' => 'required|date|before_or_equal:today',
             'cep_rt' => 'required|max:9',
@@ -142,11 +143,6 @@ class PreRegistroRequest extends FormRequest
         if(isset(request()->cnpj_contabil))
             $this->merge([
                 'cnpj_contabil' => apenasNumeros(request()->cnpj_contabil),
-            ]);
-
-        if(isset(request()->registro))
-            $this->merge([
-                'registro' => str_replace("/", "", request()->registro),
             ]);
     }
 
@@ -223,6 +219,7 @@ class PreRegistroRequest extends FormRequest
             'naturalidade' => '"Naturalidade"',
             'nome_mae' => '"Nome da mãe"',
             'nome_pai' => '"Nome do pai"',
+            'tipo_identidade' => '"Tipo do documento de identidade"',
             'identidade' => '"Número de identidade"',
             'orgao_emissor' => '"Órgão emissor"',
             'dt_expedicao' => '"Data de expedição"',
@@ -246,10 +243,10 @@ class PreRegistroRequest extends FormRequest
             'uf_empresa' => '"Estado da empresa"',
             'nome_rt' => '"Nome do responsável técnico"',
             'nome_social_rt' => '"Nome social do responsável técnico"',
-            'registro' => '"Registro do responsável técnico"',
             'sexo_rt' => '"Sexo do responsável técnico"',
             'dt_nascimento_rt' => '"Data de nascimento do responsável técnico"',
             'cpf_rt' => '"CPF do responsável técnico"',
+            'tipo_identidade_rt' => '"Tipo do documento de identidade do responsável técnico"',
             'identidade_rt' => '"Número de identidade do responsável técnico"',
             'orgao_emissor_rt' => '"Órgão emissor do responsável técnico"',
             'dt_expedicao_rt' => '"Data de expedição do responsável técnico"',

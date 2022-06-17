@@ -18,12 +18,11 @@
     <div class="col-sm mb-2-576">
         <label for="registro">{{ array_search('registro', $codRT) }} - Registro</label>
         <input
-            id="registro_core"
-            name="registro"
             type="text"
             class="{{ $classes[5] }} form-control {{ $errors->has('registro') ? 'is-invalid' : '' }}"
             value="{{ empty(old('registro')) && isset($resultado->pessoaJuridica->responsavelTecnico->registro) ? $resultado->pessoaJuridica->responsavelTecnico->registro : old('registro') }}"
-            {{ isset($resultado->pessoaJuridica->responsavelTecnico->cpf) ? '' : 'disabled' }}
+            disabled
+            readonly
         />
         @if($errors->has('registro'))
         <div class="invalid-feedback">
@@ -40,7 +39,7 @@
             <input
                 name="nome_rt"
                 type="text"
-                class="{{ $classes[5] }} form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome) ? $resultado->pessoaJuridica->responsavelTecnico->nome : old('nome_rt') }}"
             />
             @if($errors->has('nome_rt'))
@@ -57,7 +56,7 @@
             <input
                 name="nome_social_rt"
                 type="text"
-                class="{{ $classes[5] }} form-control {{ $errors->has('nome_social_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_social_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_social_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_social) ? $resultado->pessoaJuridica->responsavelTecnico->nome_social : old('nome_social_rt') }}"
             />
             @if($errors->has('nome_social_rt'))
@@ -85,41 +84,56 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="sexo_rt">{{ array_search('sexo', $codRT) }} - Sexo <span class="text-danger">*</span></label><br>
-            <div class="form-check-inline">
-                <label class="form-check-label">
-                    <input type="radio" 
-                        class="{{ $classes[5] }} form-check-input {{ $errors->has('sexo_rt') ? 'is-invalid' : '' }}" 
-                        name="sexo_rt" 
-                        value="F" 
-                        {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'F')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && ($resultado->pessoaJuridica->responsavelTecnico->sexo == 'F')) ? 'checked' : '' }}
-                    />
-                    Feminino
-                    
-                    @if($errors->has('sexo_rt'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('sexo_rt') }}
-                    </div>
-                    @endif
-                </label>
+            <label for="sexo_rt">{{ array_search('sexo', $codRT) }} - Gênero <span class="text-danger">*</span></label><br>
+            <select 
+                name="sexo_rt" 
+                class="{{ $classes[5] }} form-control {{ $errors->has('sexo_rt') ? 'is-invalid' : '' }}"
+            >
+                <option value="">Selecione a opção...</option>
+            @foreach(generos() as $key => $genero)
+                @if(!empty(old('sexo_rt')))
+                <option value="{{ $key }}" {{ old('sexo_rt') == $key ? 'selected' : '' }}>{{ $genero }}</option>
+                @elseif(isset($resultado->pessoaJuridica->responsavelTecnico->sexo))
+                <option value="{{ $key }}" {{ $key == $resultado->pessoaJuridica->responsavelTecnico->sexo ? 'selected' : '' }}>{{ $genero }}</option>
+                @else
+                <option value="{{ $key }}">{{ $genero }}</option>
+                @endif
+            @endforeach
+            </select>
+            @if($errors->has('sexo_rt'))
+            <div class="invalid-feedback">
+                {{ $errors->first('sexo_rt') }}
             </div>
-            <div class="form-check-inline">
-                <label class="form-check-label">
-                    <input type="radio" 
-                        class="{{ $classes[5] }} form-check-input {{ $errors->has('sexo_rt') ? 'is-invalid' : '' }}" 
-                        name="sexo_rt" 
-                        value="M" 
-                        {{ (!empty(old('sexo_rt')) && (old('sexo_rt') == 'M')) || (isset($resultado->pessoaJuridica->responsavelTecnico->sexo) && ($resultado->pessoaJuridica->responsavelTecnico->sexo == 'M')) ? 'checked' : '' }}
-                    />
-                    Masculino
-                </label>
-            </div>
+            @endif
         </div>
     </div>
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="identidade_rt">{{ array_search('identidade', $codRT) }} - N° RG / RNE (para estrangeiros) <span class="text-danger">*</span></label>
+            <label for="tipo_identidade_rt">{{ array_search('tipo_identidade', $codRT) }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
+            <select 
+                name="tipo_identidade_rt" 
+                class="{{ $classes[5] }} form-control {{ $errors->has('tipo_identidade_rt') ? 'is-invalid' : '' }}"
+            >
+                <option value="">Selecione a opção...</option>
+            @foreach(tipos_identidade() as $tipo)
+                @if(!empty(old('tipo_identidade_rt')))
+                <option value="{{ $tipo }}" {{ old('tipo_identidade_rt') == $tipo ? 'selected' : '' }}>{{ $tipo }}</option>
+                @elseif(isset($resultado->pessoaJuridica->responsavelTecnico->tipo_identidade))
+                <option value="{{ $tipo }}" {{ mb_strtoupper($tipo, 'UTF-8') == $resultado->pessoaJuridica->responsavelTecnico->tipo_identidade ? 'selected' : '' }}>{{ $tipo }}</option>
+                @else
+                <option value="{{ $tipo }}">{{ $tipo }}</option>
+                @endif
+            @endforeach
+            </select>
+            @if($errors->has('tipo_identidade_rt'))
+            <div class="invalid-feedback">
+                {{ $errors->first('tipo_identidade_rt') }}
+            </div>
+            @endif
+        </div>
+        <div class="col-sm mb-2-576">
+            <label for="identidade_rt">{{ array_search('identidade', $codRT) }} - N° do documento de identidade <span class="text-danger">*</span></label>
             <input
                 name="identidade_rt"
                 type="text"
@@ -134,12 +148,15 @@
             </div>
             @endif
         </div>
+    </div>
+
+    <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
             <label for="orgao_emissor_rt">{{ array_search('orgao_emissor', $codRT) }} - Órgão Emissor <span class="text-danger">*</span></label>
             <input
                 name="orgao_emissor_rt"
                 type="text"
-                class="{{ $classes[5] }} form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('orgao_emissor_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->orgao_emissor) ? $resultado->pessoaJuridica->responsavelTecnico->orgao_emissor : old('orgao_emissor_rt') }}"
             />
             @if($errors->has('orgao_emissor_rt'))
@@ -188,7 +205,7 @@
             <input
                 type="text"
                 name="bairro_rt"
-                class="{{ $classes[5] }} form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }}"
                 id="bairro_rt"
                 value="{{ empty(old('bairro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->bairro) ? $resultado->pessoaJuridica->responsavelTecnico->bairro : old('bairro_rt') }}"
             />
@@ -206,7 +223,7 @@
             <input
                 type="text"
                 name="logradouro_rt"
-                class="{{ $classes[5] }} form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }}"
                 id="rua_rt"
                 value="{{ empty(old('logradouro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->logradouro) ? $resultado->pessoaJuridica->responsavelTecnico->logradouro : old('logradouro_rt') }}"
             />
@@ -221,7 +238,7 @@
             <input
                 type="text"
                 name="numero_rt"
-                class="{{ $classes[5] }} form-control {{ $errors->has('numero_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('numero_rt') ? 'is-invalid' : '' }}"
                 id="numero_rt"
                 value="{{ empty(old('numero_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->numero) ? $resultado->pessoaJuridica->responsavelTecnico->numero : old('numero_rt') }}"
             />
@@ -239,7 +256,7 @@
             <input
                 type="text"
                 name="complemento_rt"
-                class="{{ $classes[5] }} form-control {{ $errors->has('complemento_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('complemento_rt') ? 'is-invalid' : '' }}"
                 id="complemento_rt"
                 value="{{ empty(old('complemento_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->complemento) ? $resultado->pessoaJuridica->responsavelTecnico->complemento : old('complemento_rt') }}"
             />
@@ -255,7 +272,7 @@
                 type="text"
                 name="cidade_rt"
                 id="cidade_rt"
-                class="{{ $classes[5] }} form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('cidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cidade) ? $resultado->pessoaJuridica->responsavelTecnico->cidade : old('cidade_rt') }}"
             />
             @if($errors->has('cidade_rt'))
@@ -298,7 +315,7 @@
             <input
                 name="nome_mae_rt"
                 type="text"
-                class="{{ $classes[5] }} form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_mae_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_mae) ? $resultado->pessoaJuridica->responsavelTecnico->nome_mae : old('nome_mae_rt') }}"
             />
             @if($errors->has('nome_mae_rt'))
@@ -312,7 +329,7 @@
             <input
                 name="nome_pai_rt"
                 type="text"
-                class="{{ $classes[5] }} form-control {{ $errors->has('nome_pai_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_pai_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_pai_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_pai) ? $resultado->pessoaJuridica->responsavelTecnico->nome_pai : old('nome_pai_rt') }}"
             />
             @if($errors->has('nome_pai_rt'))

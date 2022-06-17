@@ -10,6 +10,7 @@ use Carbon\Carbon;
 class PreRegistroAjaxRequest extends FormRequest
 {
     private $regraValor;
+    private $service;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -62,6 +63,10 @@ class PreRegistroAjaxRequest extends FormRequest
             $this->regraValor = [
                 'exists:regionais,idregional'
             ];
+
+        $this->merge([
+            'valor' => mb_strtoupper(request()->valor, 'UTF-8')
+        ]);
     }
 
     public function rules()

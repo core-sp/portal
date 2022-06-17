@@ -108,9 +108,12 @@ class UserExternoSiteController extends Controller
         return view('site.userExterno.pre-registro', compact('resultado', 'gerenti'));
     }
 
-    public function inserirPreRegistroView()
+    public function inserirPreRegistroView(Request $request)
     {
         try{
+            if($request->checkPreRegistro != 'on')
+                return redirect(route('externo.preregistro.view'));
+
             $externo = auth()->guard('user_externo')->user();
             $verificacao = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
             if(isset($verificacao['gerenti']))

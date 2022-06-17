@@ -1143,9 +1143,7 @@ function putDadosPreRegistro(objeto)
 			// setTimeout(function() {
 				$("#modalLoadingPreRegistro").modal('hide');
 			// }, 1500); 
-			// remove mensagem de validação d servidor
-			if(objeto.next().hasClass('invalid-feedback'))
-				objeto.removeClass('is-invalid').next().remove();
+			removerMsgErroServer(objeto, campo);
 			$('#atualizacaoPreRegistro').text(response['dt_atualizado']);
 			valorPreRegistro = valor;
 		},
@@ -1159,6 +1157,15 @@ function putDadosPreRegistro(objeto)
 			console.clear();
 		}
 	});
+}
+
+function removerMsgErroServer(objeto, campo)
+{
+	// remove mensagem de validação do servidor
+	if(objeto.next().hasClass('invalid-feedback'))
+		objeto.removeClass('is-invalid').next().remove();
+	if($('.erroPreRegistro[value="' + campo + '"]').length > 0)
+		$('.erroPreRegistro[value="' + campo + '"]').parent().remove();
 }
 
 function getErrorMsg(request)
@@ -1226,10 +1233,6 @@ function preencheContabil(dados)
 function preencheRT(dados)
 {
 	if($('#inserirRegistro input[name="cpf_rt"]').val() == ""){
-		$('#inserirRegistro [name$="_rt"]').each(function(){
-			if(this.checked) 
-				$(this).prop('checked', false);
-		});
 		$('#campos_rt').prop("disabled", true);
 		$('#inserirRegistro input[name="registro"]').prop("disabled", true).val('');
 	}else{
@@ -1237,9 +1240,7 @@ function preencheRT(dados)
 		$('#inserirRegistro input[name="registro"]').prop("disabled", false).val(dados.registro);
 		$('#inserirRegistro [name$="_rt"]').each(function(){
 			var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_rt'));
-			if($(this).attr('type') == 'radio')
-				$('#inserirRegistro input[name="' + $(this).attr('name') + '"][value="' + dados[name] + '"]').prop("checked", true);
-			else if(name != 'cpf')
+			if(name != 'cpf')
 				$(this).val(dados[name]);
 		});
 	}
@@ -1308,10 +1309,11 @@ function avancarVoltarPreRegistro(tipo, ativado, ordemMenu)
 	return ativado;
 }
 
-// Caso o botão de submit fique fora do form
-$('#submitPreRegistro').click(function() {
-	$('#inserirRegistro').submit();
-});
+function confereObrigatorios()
+{
+	// Conferir campos obrigatorios se estao preenchidos para liberar o botão 
+	// e abrir um modal caso esteja sem pendencias
+}
 
 $('#voltarPreRegistro, #avancarPreRegistro, .menu-registro .nav-link').click(function() {
 	var ordemMenu = [];
@@ -1448,12 +1450,10 @@ $('#inserirRegistro input:checkbox, #inserirRegistro input:radio').change(functi
 		putDadosPreRegistro($(this));
 });
 
-// No primeiro click vai direto pro input, porém nos próximos deve clicar 2x
 $('.erroPreRegistro').click(function(){
 	var campo = $(this).val();
 	var hrefMenu = $('[name="' + campo + '"]').parents('.tab-pane').attr('id');
 	$('.menu-registro.nav-pills [href="#' + hrefMenu + '"]').tab('show').focus();
-	// $('[name="' + campo + '"]').focus();
 });
 
 //	--------------------------------------------------------------------------------------------------------

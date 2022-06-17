@@ -23,7 +23,7 @@
             <input
                 name="nome_contabil"
                 type="text"
-                class="{{ $classes[1] }} form-control {{ $errors->has('nome_contabil') ? 'is-invalid' : '' }}"
+                class="{{ $classes[1] }} text-uppercase form-control {{ $errors->has('nome_contabil') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_contabil')) && isset($resultado->contabil->nome) ? $resultado->contabil->nome : old('nome_contabil') }}"
                 minlength="5"
                 maxlength="191"
@@ -59,7 +59,7 @@
             <input
                 name="nome_contato_contabil"
                 type="text"
-                class="{{ $classes[1] }} form-control {{ $errors->has('nome_contato_contabil') ? 'is-invalid' : '' }}"
+                class="{{ $classes[1] }} text-uppercase form-control {{ $errors->has('nome_contato_contabil') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_contato_contabil')) && isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : old('nome_contato_contabil') }}"
             />
             @if($errors->has('nome_contato_contabil'))

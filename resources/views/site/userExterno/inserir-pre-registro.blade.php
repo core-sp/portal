@@ -9,22 +9,20 @@
 @if($errors->count() > 0)
 <div class="d-block w-100 border border-warning mb-2">
     <p class="bg-warning font-weight-bolder pl-1">
-        Foram encontrados erros:
+        {{ $errors->count() > 1 ? 'Foram encontrados ' . $errors->count() . ' erros:' : 'Foi encontrado 1 erro:' }}
     <p>
     <div class="alert alert-light pl-0 pb-0">
     @foreach($errors->messages() as $key => $message)
-        <button class="btn btn-sm btn-link erroPreRegistro" value="{{ $key }}">
-            <i class="fas fa-exclamation-triangle text-danger"></i>  {{ $message[0] }}
-        </button>
-        <br>
+        <span>
+            <button class="btn btn-sm btn-link erroPreRegistro" value="{{ $key }}">
+                <i class="fas fa-exclamation-triangle text-danger"></i>  {{ $message[0] }}
+            </button>
+            <br>
+        </span>
     @endforeach
     </div>
 </div>
 @endif
-
-<div class="col-sm mb-2-576 p-0 mb-3">
-    <button class="btn btn-success btn-sm float-right" type="button" id="submitPreRegistro">Enviar para análise</button>
-</div>
 
 <div class="representante-content w-100">
 
@@ -137,7 +135,9 @@
             </div>
 
             <div class="col-6">
-                <button class="btn btn-success btn-sm float-right" type="submit">Enviar para análise</button>
+                <button class="btn btn-success btn-sm float-right" type="submit">
+                    Verificar Pendências
+                </button>
             </div>
         </div>
     </form>
@@ -153,12 +153,13 @@
     </div>
 </div>
 
-<div class="col mt-2">
-    <div class="text-right">
-        <small>Atualizado em: 
-            <span id="atualizacaoPreRegistro">{{ $resultado->updated_at->format('d\/m\/Y, \à\s H:i:s') }}</span>
-        </small>
-    </div>
+<div class="col d-flex justify-content-between mt-2 pl-0 pr-0">
+    <small class="text-muted text-left">
+        <em><span class="text-danger font-weight-bolder">*</span> Preencha todos os campos obrigatórios</em>
+    </small>
+    <small class="text-right">Atualizado em: 
+        <span id="atualizacaoPreRegistro">{{ $resultado->updated_at->format('d\/m\/Y, \à\s H:i:s') }}</span>
+    </small>
 </div>
 
 @endsection

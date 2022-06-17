@@ -949,3 +949,27 @@ function apenasNumerosLetras($string)
 {
     return preg_replace('/[^a-zA-Z0-9]/', '', $string);
 }
+
+function generos()
+{
+    return [
+        'F' => 'Feminino',
+        'M' => 'Masculino',
+        'O' => 'Outro'
+    ];
+}
+
+function tipos_identidade()
+{
+    return [
+        'Carteira de Conselho Profissional',
+        'Carteira de identidade Marinha, Exercito ou Aeronautica',
+        'Carteira de Trabalho',
+        'Certificado Reservista',
+        'CNH',
+        'Passaporte',
+        'Previdencia Social',
+        'RG',
+        'RNE'
+    ];
+}

@@ -25,9 +25,10 @@ class PreRegistroCpf extends Model
             '2.6' => 'naturalidade',
             '2.7' => 'nome_mae',
             '2.8' => 'nome_pai',
-            '2.9' => 'identidade',
-            '2.10' => 'orgao_emissor',
-            '2.11' => 'dt_expedicao'
+            '2.9' => 'tipo_identidade',
+            '2.10' => 'identidade',
+            '2.11' => 'orgao_emissor',
+            '2.12' => 'dt_expedicao'
         ];
     }
 

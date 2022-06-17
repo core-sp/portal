@@ -20,9 +20,21 @@
                     @if(isset($gerenti))
                     <p>Você já possui registro ativo no Core-SP: <strong>{{ formataRegistro($gerenti) }}</strong></p>
                     @else
-                    <a href="{{ route('externo.inserir.preregistro.view') }}" class="btn {{ isset($resultado->id) ? 'btn-secondary' : 'btn-success' }} link-nostyle branco mt-3">
-                        {{ isset($resultado->id) ? 'Continuar' : 'Iniciar' }} a solicitação do registro
-                    </a>
+                    <form action="{{ route('externo.inserir.preregistro.view') }}" autocomplete="off">
+                        <div class="form-check mt-3">
+                            <input type="checkbox"
+                                name="checkPreRegistro"
+                                class="form-check-input"
+                                required
+                            /> 
+                            <label for="termo" class="text-justify">
+                                Estou ciente que iniciarei o processo de solicitação de registro para ser <strong>REPRESENTANTE COMERCIAL</strong>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-link {{ isset($resultado->id) ? 'btn-secondary' : 'btn-success' }} link-nostyle branco mt-3">
+                            {{ isset($resultado->id) ? 'Continuar' : 'Iniciar' }} a solicitação do registro
+                        </button>
+                    </form>
                     @endif
 
                 </div>      

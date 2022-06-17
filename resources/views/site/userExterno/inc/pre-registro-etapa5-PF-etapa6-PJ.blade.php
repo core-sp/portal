@@ -1,6 +1,6 @@
 <p class="text-dark mb-2"><i class="fas fa-info-circle text-primary"></i> <strong>Atenção!</strong>
     <br>
-    <span class="ml-3"><strong>*</strong> Limite de até {{ $totalFiles }} anexos</span>
+    <span class="ml-3"><strong>*</strong> Limite de até {{ $totalFiles }} anexos com, no máximo, 5MB de tamanho</span>
     <br>
     <span class="ml-3"><strong>*</strong> Somente arquivos com extensão: .pdf, .jpg, .jpeg, .png</span>
 </p>
@@ -14,8 +14,8 @@
     <p class="bold mb-2 mt-3 ml-3">Documentos de todos os sócios: </p>
 @endif
 
-<p class="ml-3"><i class="icon fa fa-check"></i> RG / RNE (para estrangeiros)</p>
-<p class="ml-3"><i class="icon fa fa-check"></i> CNH (data de expedição máxima: 10 anos)</p>
+<p class="ml-3"><i class="icon fa fa-check"></i> Comprovante de identidade pode ser:</p>
+<p class="ml-5"> RG; Carteira de Trabalho; Previdência Social; Passaporte, Certificado de Reservista; CNH (data de expedição máxima: 10 anos); Carteira de identidade Aeronáutica, Exército ou Marinha; Carteira de Conselho Profissional ou RNE (para estrangeiros)</p>
 <p class="ml-3"><i class="icon fa fa-check"></i> CPF</p>
 <p class="ml-3"><i class="icon fa fa-check"></i> Comprovante de Residência dos últimos 3 meses em nome do solicitante. 
     Em caso de comprovante em nome de terceiros, o solicitante deve anexar uma declaração de próprio punho, 
