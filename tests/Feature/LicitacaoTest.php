@@ -1115,10 +1115,19 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function licitacao_can_be_searched_by_palavrachave_on_website()
     {
-        $licitacao = factory('App\Licitacao')->create();
+        $licitacao = factory('App\Licitacao')->create([
+            'objeto' => htmlentities('teste com acentuação, comparação, à disposição, referência', ENT_NOQUOTES, 'UTF-8')
+        ]);
         $array_titulo = explode($licitacao->titulo, ' ');
         $first_word = $array_titulo[0];
 
+        $this->get(route('licitacoes.siteBusca', [
+            'palavrachave' => $first_word
+        ]))->assertOk()
+            ->assertSee($licitacao->titulo);
+        
+        $first_word = 'comparação';
+    
         $this->get(route('licitacoes.siteBusca', [
             'palavrachave' => $first_word
         ]))->assertOk()

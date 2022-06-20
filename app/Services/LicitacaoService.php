@@ -127,7 +127,8 @@ class LicitacaoService implements LicitacaoServiceInterface {
             $datarealizacao = isset($request['datarealizacao']) ? $request['datarealizacao'] : null;
 
             return $inicio->when(isset($palavrachave), function($query) use($palavrachave){
-                $query->where('objeto', 'LIKE', '%'.$palavrachave.'%');
+                $query->where('objeto', 'LIKE', '%' . htmlentities($palavrachave, ENT_NOQUOTES, 'UTF-8') . '%')
+                ->orWhere('titulo', 'LIKE', '%'.$palavrachave.'%');
             })->when(isset($modalidade), function($query) use($modalidade){
                 $query->where('modalidade', $modalidade);
             })->when(isset($situacao), function($query) use($situacao){
@@ -237,7 +238,7 @@ class LicitacaoService implements LicitacaoServiceInterface {
             ->orWhere('nrlicitacao','LIKE','%'.$busca.'%')
             ->orWhere('nrprocesso','LIKE','%'.$busca.'%')
             ->orWhere('situacao','LIKE','%'.$busca.'%')
-            ->orWhere('objeto','LIKE','%'.$busca.'%')
+            ->orWhere('objeto','LIKE','%' . htmlentities($busca, ENT_NOQUOTES, 'UTF-8') . '%')
             ->orWhere('idlicitacao', $busca)
             ->paginate(10);
 

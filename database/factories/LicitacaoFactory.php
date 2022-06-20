@@ -15,7 +15,7 @@ $factory->define(Licitacao::class, function (Faker $faker) {
         'nrlicitacao' => $faker->numberBetween(1, 999) . '/' . date('Y'),
         'nrprocesso' => $faker->numberBetween(1, 999) . '/' . date('Y'),
         'datarealizacao' => $faker->dateTime()->format('Y-m-d H:i:s'),
-        'objeto' => $faker->text,
+        'objeto' => htmlentities($faker->text, ENT_NOQUOTES, 'UTF-8'),
         'idusuario' => factory('App\User')
     ];
 });
