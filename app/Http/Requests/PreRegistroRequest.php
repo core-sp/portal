@@ -33,8 +33,10 @@ class PreRegistroRequest extends FormRequest
             'uf' => 'required|size:2|in:'.implode(',', array_keys(estados())),
             'tipo_telefone' => 'required|in:'.implode(',', tipos_contatos()),
             'telefone' => 'required|max:20|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})/',
+            'opcional_celular' => 'nullable|array|in:'.implode(',', opcoes_celular()),
             'tipo_telefone_1' => 'required_with:telefone_1|nullable|in:'.implode(',', tipos_contatos()),
             'telefone_1' => 'required_with:tipo_telefone_1|max:20'.$this->regraRegexTel,
+            'opcional_celular_1' => 'nullable|array|in:'.implode(',', opcoes_celular()),
         ];
 
         $pessoaFisica = [
@@ -208,6 +210,8 @@ class PreRegistroRequest extends FormRequest
             'telefone' => '"Número de telefone"',
             'tipo_telefone_1' => '"Tipo de telefone opcional"',
             'telefone_1' => '"Número de telefone opcional"',
+            'opcional_celular' => '"Opcional Tipo Celular"',
+            'opcional_celular_1' => '"Opcional Tipo Celular opcional"',
         ];
 
         $pessoaFisica = [

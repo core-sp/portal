@@ -21,9 +21,15 @@ class PreRegistroAjaxRequest extends FormRequest
     {
         $this->regraValor = ['max:191'];
 
-        if((request()->campo == 'tipo_telefone_1') || (request()->campo == 'telefone_1'))
+        if(in_array(request()->campo, ['opcional_celular[]', 'opcional_celular_1[]']))
             $this->merge([
-                'campo' => request()->campo == 'tipo_telefone_1' ? 'tipo_telefone' : 'telefone',
+                'campo' => str_replace('[]', '', request()->campo),
+            ]);
+
+        $telefoneOptions = ['tipo_telefone_1', 'telefone_1', 'opcional_celular_1'];
+        if(in_array($this->campo, $telefoneOptions))
+            $this->merge([
+                'campo' => str_replace('_1', '', $this->campo),
                 'valor' => ';'.request()->valor
             ]);
 
@@ -64,9 +70,11 @@ class PreRegistroAjaxRequest extends FormRequest
                 'exists:regionais,idregional'
             ];
 
-        $this->merge([
-            'valor' => mb_strtoupper(request()->valor, 'UTF-8')
-        ]);
+        $notUpper = ['path', 'checkEndEmpresa'];
+        if(!in_array($this->campo, $notUpper) && isset($this->valor))
+            $this->merge([
+                'valor' => mb_strtoupper($this->valor, 'UTF-8')
+            ]);
     }
 
     public function rules()

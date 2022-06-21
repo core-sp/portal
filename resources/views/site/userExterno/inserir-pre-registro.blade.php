@@ -7,12 +7,16 @@
 @endphp
 
 @if($errors->count() > 0)
-<div class="d-block w-100 border border-warning mb-2">
+<div class="d-block w-100 border border-warning mb-2" id="erroPreRegistro">
     <p class="bg-warning font-weight-bolder pl-1">
         {{ $errors->count() > 1 ? 'Foram encontrados ' . $errors->count() . ' erros:' : 'Foi encontrado 1 erro:' }}
     <p>
     <div class="alert alert-light pl-0 pb-0">
     @foreach($errors->messages() as $key => $message)
+        @php
+            if(in_array($key, ['opcional_celular', 'opcional_celular_1']))
+                $key .= '[]';
+        @endphp
         <span>
             <button class="btn btn-sm btn-link erroPreRegistro" value="{{ $key }}">
                 <i class="fas fa-exclamation-triangle text-danger"></i>  {{ $message[0] }}
@@ -64,7 +68,13 @@
 
     <hr class="mb-0">
 
-    <form method="POST" enctype="multipart/form-data" id="inserirRegistro" class="cadastroRepresentante" autocomplete="off">
+    <form method="POST" 
+        action="{{ isset($semPendencia) && $semPendencia ? route('externo.inserir.preregistro') : route('externo.verifica.inserir.preregistro') }}" 
+        enctype="multipart/form-data" 
+        id="inserirRegistro" 
+        class="cadastroRepresentante" 
+        autocomplete="off"
+    >
         @csrf
         @method('PUT')
 
@@ -123,6 +133,7 @@
         <br>
         <div class="linha-lg-mini"></div>
 
+        <!-- Menu voltar e avançar no formulário -->
         <div class="form-row">
             <div class="col-6">
                 <button class="btn btn-link p-0 mr-3" id="voltarPreRegistro" type="button" disabled>
@@ -135,19 +146,48 @@
             </div>
 
             <div class="col-6">
-                <button class="btn btn-success btn-sm float-right" type="submit">
+                <button 
+                    class="btn btn-primary btn-sm float-right" 
+                    type="submit" 
+                    id="btnVerificaPend"
+                    disabled
+                >
                     Verificar Pendências
                 </button>
             </div>
         </div>
     </form>
 
-    <!-- The Modal -->
+    <!-- The Modal Loading acionado via ajax -->
     <div class="modal hide" id="modalLoadingPreRegistro">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <!-- Modal body -->
                 <div id="modalLoadingBody" class="modal-body text-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal que aparece quando não há pendências -->
+    <div class="modal {{ isset($semPendencia) && $semPendencia ? 'show' : 'hide' }}" id="modalSubmitPreRegistro">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fas fa-info-circle text-primary"></i> Atenção!</h4>
+                </div>
+                
+                <!-- Modal body -->
+                <div class="modal-body">
+                    Texto....
+                    Sua solicitação de registro para ser <strong>REPRESENTANTE COMERCIAL</strong>
+                </div>
+                
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <a href="{{ route('externo.inserir.preregistro.view') }}" class="btn btn-secondary">Cancelar</a>
+                    <button type="button" class="btn btn-success" id="submitPreRegistro" value="">Enviar</button>
+                </div>
             </div>
         </div>
     </div>

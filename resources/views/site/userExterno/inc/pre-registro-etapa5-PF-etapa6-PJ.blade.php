@@ -15,7 +15,7 @@
 @endif
 
 <p class="ml-3"><i class="icon fa fa-check"></i> Comprovante de identidade pode ser:</p>
-<p class="ml-5"> RG; Carteira de Trabalho; Previdência Social; Passaporte, Certificado de Reservista; CNH (data de expedição máxima: 10 anos); Carteira de identidade Aeronáutica, Exército ou Marinha; Carteira de Conselho Profissional ou RNE (para estrangeiros)</p>
+<p class="ml-5"> RG; Carteira de Trabalho; Previdência Social; Passaporte, Certificado de Reservista; CNH (data de expedição máxima: 10 anos); Carteira de identidade Aeronáutica, Exército ou Marinha; Carteira de Conselho Profissional; RNE (para estrangeiros)</p>
 <p class="ml-3"><i class="icon fa fa-check"></i> CPF</p>
 <p class="ml-3"><i class="icon fa fa-check"></i> Comprovante de Residência dos últimos 3 meses em nome do solicitante. 
     Em caso de comprovante em nome de terceiros, o solicitante deve anexar uma declaração de próprio punho, 
@@ -52,6 +52,8 @@
 @endforeach
 
 @endif
+
+<input type="hidden" id="fileObrigatorio" class="obrigatorio" value="{{ $resultado->anexos->count() > 0 ? 'existeAnexo' : '' }}">
 
 @component('components.arquivos_form', [
     'nome' => 'anexo', 

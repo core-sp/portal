@@ -3,7 +3,7 @@
         <label for="cpf_rt">{{ array_search('cpf', $codRT) }} - CPF <span class="text-danger">*</span></label>
         <input
             type="text"
-            class="{{ $classes[5] }} form-control cpfInput {{ $errors->has('cpf_rt') ? ' is-invalid' : '' }}"
+            class="{{ $classes[5] }} form-control cpfInput {{ $errors->has('cpf_rt') ? ' is-invalid' : '' }} obrigatorio"
             name="cpf_rt"
             value="{{ empty(old('cpf_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cpf) ? $resultado->pessoaJuridica->responsavelTecnico->cpf : old('cpf_rt') }}"
             placeholder="999.999.999-99"
@@ -19,16 +19,11 @@
         <label for="registro">{{ array_search('registro', $codRT) }} - Registro</label>
         <input
             type="text"
-            class="{{ $classes[5] }} form-control {{ $errors->has('registro') ? 'is-invalid' : '' }}"
-            value="{{ empty(old('registro')) && isset($resultado->pessoaJuridica->responsavelTecnico->registro) ? $resultado->pessoaJuridica->responsavelTecnico->registro : old('registro') }}"
+            class="{{ $classes[5] }} form-control"
+            value="{{ isset($resultado->pessoaJuridica->responsavelTecnico->registro) ? $resultado->pessoaJuridica->responsavelTecnico->registro : '' }}"
             disabled
             readonly
         />
-        @if($errors->has('registro'))
-        <div class="invalid-feedback">
-            {{ $errors->first('registro') }}
-        </div>
-        @endif
     </div>
 </div>
 
@@ -39,7 +34,7 @@
             <input
                 name="nome_rt"
                 type="text"
-                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome) ? $resultado->pessoaJuridica->responsavelTecnico->nome : old('nome_rt') }}"
             />
             @if($errors->has('nome_rt'))
@@ -73,7 +68,7 @@
             <input
                 name="dt_nascimento_rt"
                 type="date"
-                class="{{ $classes[5] }} form-control {{ $errors->has('dt_nascimento_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} form-control {{ $errors->has('dt_nascimento_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('dt_nascimento_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->dt_nascimento) ? $resultado->pessoaJuridica->responsavelTecnico->dt_nascimento : old('dt_nascimento_rt') }}"
                 max="{{ Carbon\Carbon::today()->subYears(18)->format('Y-m-d') }}"
             />
@@ -87,7 +82,7 @@
             <label for="sexo_rt">{{ array_search('sexo', $codRT) }} - Gênero <span class="text-danger">*</span></label><br>
             <select 
                 name="sexo_rt" 
-                class="{{ $classes[5] }} form-control {{ $errors->has('sexo_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} form-control {{ $errors->has('sexo_rt') ? 'is-invalid' : '' }} obrigatorio"
             >
                 <option value="">Selecione a opção...</option>
             @foreach(generos() as $key => $genero)
@@ -113,7 +108,7 @@
             <label for="tipo_identidade_rt">{{ array_search('tipo_identidade', $codRT) }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
             <select 
                 name="tipo_identidade_rt" 
-                class="{{ $classes[5] }} form-control {{ $errors->has('tipo_identidade_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} form-control {{ $errors->has('tipo_identidade_rt') ? 'is-invalid' : '' }} obrigatorio"
             >
                 <option value="">Selecione a opção...</option>
             @foreach(tipos_identidade() as $tipo)
@@ -138,9 +133,9 @@
                 name="identidade_rt"
                 type="text"
                 id="rg"
-                class="{{ $classes[5] }} form-control text-uppercase {{ $errors->has('identidade_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} form-control text-uppercase {{ $errors->has('identidade_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('identidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->identidade) ? $resultado->pessoaJuridica->responsavelTecnico->identidade : old('identidade_rt') }}"
-                maxlength="20"
+                maxlength="30"
             />
             @if($errors->has('identidade_rt'))
             <div class="invalid-feedback">
@@ -156,7 +151,7 @@
             <input
                 name="orgao_emissor_rt"
                 type="text"
-                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('orgao_emissor_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->orgao_emissor) ? $resultado->pessoaJuridica->responsavelTecnico->orgao_emissor : old('orgao_emissor_rt') }}"
             />
             @if($errors->has('orgao_emissor_rt'))
@@ -170,7 +165,7 @@
             <input
                 name="dt_expedicao_rt"
                 type="date"
-                class="{{ $classes[5] }} form-control {{ $errors->has('dt_expedicao_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} form-control {{ $errors->has('dt_expedicao_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('dt_expedicao_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->dt_expedicao) ? $resultado->pessoaJuridica->responsavelTecnico->dt_expedicao : old('dt_expedicao_rt') }}"
                 max="{{ date('Y-m-d') }}"
             />
@@ -190,7 +185,7 @@
             <input
                 type="text"
                 name="cep_rt"
-                class="{{ $classes[5] }} form-control cep {{ $errors->has('cep_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} form-control cep {{ $errors->has('cep_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="cep_rt"
                 value="{{ empty(old('cep_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cep) ? $resultado->pessoaJuridica->responsavelTecnico->cep : old('cep_rt') }}"
             />
@@ -205,7 +200,7 @@
             <input
                 type="text"
                 name="bairro_rt"
-                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="bairro_rt"
                 value="{{ empty(old('bairro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->bairro) ? $resultado->pessoaJuridica->responsavelTecnico->bairro : old('bairro_rt') }}"
             />
@@ -223,7 +218,7 @@
             <input
                 type="text"
                 name="logradouro_rt"
-                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="rua_rt"
                 value="{{ empty(old('logradouro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->logradouro) ? $resultado->pessoaJuridica->responsavelTecnico->logradouro : old('logradouro_rt') }}"
             />
@@ -238,7 +233,7 @@
             <input
                 type="text"
                 name="numero_rt"
-                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('numero_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('numero_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="numero_rt"
                 value="{{ empty(old('numero_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->numero) ? $resultado->pessoaJuridica->responsavelTecnico->numero : old('numero_rt') }}"
             />
@@ -272,7 +267,7 @@
                 type="text"
                 name="cidade_rt"
                 id="cidade_rt"
-                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('cidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cidade) ? $resultado->pessoaJuridica->responsavelTecnico->cidade : old('cidade_rt') }}"
             />
             @if($errors->has('cidade_rt'))
@@ -286,7 +281,7 @@
             <select 
                 name="uf_rt" 
                 id="uf_rt" 
-                class="{{ $classes[5] }} form-control {{ $errors->has('uf_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} form-control {{ $errors->has('uf_rt') ? 'is-invalid' : '' }} obrigatorio"
             >
                 <option value="">Selecione a opção...</option>
             @foreach(estados() as $key => $estado)
@@ -315,7 +310,7 @@
             <input
                 name="nome_mae_rt"
                 type="text"
-                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }}"
+                class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_mae_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_mae) ? $resultado->pessoaJuridica->responsavelTecnico->nome_mae : old('nome_mae_rt') }}"
             />
             @if($errors->has('nome_mae_rt'))

@@ -5,7 +5,7 @@
         <input
             type="text"
             name="cep"
-            class="{{ $classes[4] }} form-control cep {{ $errors->has('cep') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control cep {{ $errors->has('cep') ? 'is-invalid' : '' }} obrigatorio"
             id="cep_pre"
             value="{{ empty(old('cep')) && isset($resultado->cep) ? $resultado->cep : old('cep') }}"
         />
@@ -20,7 +20,7 @@
         <input
             type="text"
             name="bairro"
-            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }} obrigatorio"
             id="bairro_pre"
             value="{{ empty(old('bairro')) && isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
         />
@@ -38,7 +38,7 @@
         <input
             type="text"
             name="logradouro"
-            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }} obrigatorio"
             id="rua_pre"
             value="{{ empty(old('logradouro')) && isset($resultado->logradouro) ? $resultado->logradouro : old('logradouro') }}"
         />
@@ -53,7 +53,7 @@
         <input
             type="text"
             name="numero"
-            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('numero') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('numero') ? 'is-invalid' : '' }} obrigatorio"
             id="numero_pre"
             value="{{ empty(old('numero')) && isset($resultado->numero) ? $resultado->numero : old('numero') }}"
         />
@@ -87,7 +87,7 @@
             type="text"
             name="cidade"
             id="cidade_pre"
-            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('cidade')) && isset($resultado->cidade) ? $resultado->cidade : old('cidade') }}"
         />
         @if($errors->has('cidade'))
@@ -101,7 +101,7 @@
         <select 
             name="uf" 
             id="uf_pre" 
-            class="{{ $classes[4] }} form-control {{ $errors->has('uf') ? 'is-invalid' : '' }}"
+            class="{{ $classes[4] }} form-control {{ $errors->has('uf') ? 'is-invalid' : '' }} obrigatorio"
         >
             <option value="">Selecione a opção...</option>
         @foreach(estados() as $key => $estado)
@@ -133,9 +133,7 @@
                 id="checkEndEmpresa" 
                 class="{{ $classes[3] }} form-check-input {{ $errors->has('checkEndEmpresa') ? 'is-invalid' : '' }}" 
                 name="checkEndEmpresa" 
-                @if(isset($resultado->pessoaJuridica) && $resultado->pessoaJuridica->mesmoEndereco())
-                    checked
-                @endif
+                {{ isset($resultado->pessoaJuridica->id) && $resultado->pessoaJuridica->mesmoEndereco() ? 'checked' : '' }}
             />
             Mesmo endereço da correspondência
             
@@ -149,14 +147,14 @@
     </div>
 </div>
 
-<div id="habilitarEndEmpresa">
+<fieldset id="habilitarEndEmpresa" {{ isset($resultado->pessoaJuridica->id) && $resultado->pessoaJuridica->mesmoEndereco() ? 'disabled' : '' }}>
     <div class="form-row mb-2">
         <div class="col-sm-4 mb-2-576">
             <label for="cep_empresa">{{ array_search('cep', $codCnpj) }} - CEP <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="cep_empresa"
-                class="{{ $classes[3] }} form-control cep {{ $errors->has('cep_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} form-control cep {{ $errors->has('cep_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="cep_empresa"
                 placeholder="CEP"
                 value="{{ empty(old('cep_empresa')) && isset($resultado->pessoaJuridica->cep) ? $resultado->pessoaJuridica->cep : old('cep_empresa') }}"
@@ -172,7 +170,7 @@
             <input
                 type="text"
                 name="bairro_empresa"
-                class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('bairro_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('bairro_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="bairro_empresa"
                 value="{{ empty(old('bairro_empresa')) && isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : old('bairro_empresa') }}"
             />
@@ -190,7 +188,7 @@
             <input
                 type="text"
                 name="logradouro_empresa"
-                class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('logradouro_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('logradouro_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="rua_empresa"
                 value="{{ empty(old('logradouro_empresa')) && isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : old('logradouro_empresa') }}"
             />
@@ -205,7 +203,7 @@
             <input
                 type="text"
                 name="numero_empresa"
-                class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="numero_empresa"
                 value="{{ empty(old('numero_empresa')) && isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : old('numero_empresa') }}"
             />
@@ -239,7 +237,7 @@
                 type="text"
                 name="cidade_empresa"
                 id="cidade_empresa"
-                class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('cidade_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('cidade_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('cidade_empresa')) && isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : old('cidade_empresa') }}"
             />
             @if($errors->has('cidade_empresa'))
@@ -253,7 +251,7 @@
             <select 
                 name="uf_empresa" 
                 id="uf_empresa" 
-                class="{{ $classes[3] }} form-control {{ $errors->has('uf_empresa') ? 'is-invalid' : '' }}"
+                class="{{ $classes[3] }} form-control {{ $errors->has('uf_empresa') ? 'is-invalid' : '' }} obrigatorio"
             >
                 <option value="">Selecione a opção...</option>
             @foreach(estados() as $key => $estado)
@@ -273,5 +271,5 @@
             @endif
         </div>
     </div>
-</div>
+</fieldset>
 @endif

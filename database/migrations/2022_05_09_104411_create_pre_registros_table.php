@@ -26,6 +26,7 @@ class CreatePreRegistrosTable extends Migration
             $table->char('uf', 2)->nullable();
             $table->string('telefone')->nullable();
             $table->string('tipo_telefone')->nullable();
+            $table->string('opcional_celular')->nullable();
             $table->bigInteger('user_externo_id')->unsigned();
             $table->foreign('user_externo_id')->references('id')->on('users_externo');
             $table->bigInteger('contabil_id')->unsigned()->nullable();

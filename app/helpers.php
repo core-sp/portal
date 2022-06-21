@@ -529,9 +529,18 @@ function tipos_empresa()
 function tipos_contatos()
 {
     return [
-        'WhatsApp / Telegram',
-        'Comercial',
-        'Residencial',
+        'Celular',
+        'Fixo - Comercial',
+        'Fixo - Residencial',
+    ];
+}
+
+function opcoes_celular()
+{
+    return [
+        'SMS',
+        'Telegram',
+        'WhatsApp',
     ];
 }
 

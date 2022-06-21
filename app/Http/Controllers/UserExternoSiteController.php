@@ -119,7 +119,7 @@ class UserExternoSiteController extends Controller
             if(isset($verificacao['gerenti']))
                 return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $verificacao['gerenti']]);
                 
-            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $verificacao['resultado'], $externo);
+            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo, $verificacao['resultado']);
             $codigos = $dados['codigos'];
             $resultado = $dados['resultado'];
             $regionais = $dados['regionais'];
@@ -146,6 +146,25 @@ class UserExternoSiteController extends Controller
         }
         
         return response()->json($dados);
+    }
+
+    public function verificaPendenciaPreRegistro(PreRegistroRequest $request)
+    {
+        try{
+            $externo = auth()->guard('user_externo')->user();
+            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
+            $codigos = $dados['codigos'];
+            $resultado = $dados['resultado'];
+            $regionais = $dados['regionais'];
+            $classes = $dados['classes'];
+            $totalFiles = $dados['totalFiles'];
+            $semPendencia = true;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, 'Erro ao verificar pendências da solicitação de registro');
+        }
+        
+        return view('site.userExterno.inserir-pre-registro', compact('semPendencia', 'resultado', 'regionais', 'totalFiles', 'codigos', 'classes'));
     }
 
     public function inserirPreRegistro(PreRegistroRequest $request)

@@ -63,7 +63,7 @@
         <br>
         <select 
             name="sexo" 
-            class="{{ $classes[2] }} form-control {{ $errors->has('sexo') ? 'is-invalid' : '' }}"
+            class="{{ $classes[2] }} form-control {{ $errors->has('sexo') ? 'is-invalid' : '' }} obrigatorio"
         >
             <option value="">Selecione a opção...</option>
         @foreach(generos() as $key => $genero)
@@ -87,7 +87,7 @@
         <input
             name="dt_nascimento"
             type="date"
-            class="{{ $classes[2] }} form-control {{ $errors->has('dt_nascimento') ? 'is-invalid' : '' }}"
+            class="{{ $classes[2] }} form-control {{ $errors->has('dt_nascimento') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('dt_nascimento')) && isset($resultado->pessoaFisica->dt_nascimento) ? $resultado->pessoaFisica->dt_nascimento : old('dt_nascimento') }}"
             max="{{ Carbon\Carbon::today()->subYears(18)->format('Y-m-d') }}"
         />
@@ -127,7 +127,7 @@
         <label for="nacionalidade">{{ array_search('nacionalidade', $codCpf) }} - Nacionalidade <span class="text-danger">*</span></label>
         <select 
             name="nacionalidade" 
-            class="{{ $classes[2] }} form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }}" 
+            class="{{ $classes[2] }} form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }} obrigatorio" 
         >
             <option value="">Selecione a opção...</option>
         @foreach(nacionalidades() as $nacionalidade)
@@ -150,7 +150,7 @@
         <label for="naturalidade">{{ array_search('naturalidade', $codCpf) }} - Naturalidade <span class="text-danger">*</span></label>
         <select 
             name="naturalidade" 
-            class="{{ $classes[2] }} form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }}" 
+            class="{{ $classes[2] }} form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }} obrigatorio" 
             {{ isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade != 'Brasileiro') ? 'disabled' : '' }}
         >
             <option value="">Selecione a opção...</option>
@@ -178,7 +178,7 @@
         <input
             name="nome_mae"
             type="text"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }}"
+            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('nome_mae')) && isset($resultado->pessoaFisica->nome_mae) ? $resultado->pessoaFisica->nome_mae : old('nome_mae') }}"
         />
         @if($errors->has('nome_mae'))
@@ -208,7 +208,7 @@
         <label for="tipo_identidade">{{ array_search('tipo_identidade', $codCpf) }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
         <select 
             name="tipo_identidade" 
-            class="{{ $classes[2] }} form-control {{ $errors->has('tipo_identidade') ? 'is-invalid' : '' }}"
+            class="{{ $classes[2] }} form-control {{ $errors->has('tipo_identidade') ? 'is-invalid' : '' }} obrigatorio"
         >
             <option value="">Selecione a opção...</option>
         @foreach(tipos_identidade() as $tipo)
@@ -233,9 +233,9 @@
             name="identidade"
             type="text"
             id="rg"
-            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('identidade') ? 'is-invalid' : '' }}"
+            class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('identidade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('identidade')) && isset($resultado->pessoaFisica->identidade) ? $resultado->pessoaFisica->identidade : old('identidade') }}"
-            maxlength="20"
+            maxlength="30"
         />
         @if($errors->has('identidade'))
         <div class="invalid-feedback">
@@ -251,7 +251,7 @@
         <input
             name="orgao_emissor"
             type="text"
-            class="{{ $classes[2] }} form-control {{ $errors->has('orgao_emissor') ? 'is-invalid' : '' }}"
+            class="{{ $classes[2] }} form-control text-uppercase {{ $errors->has('orgao_emissor') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('orgao_emissor')) && isset($resultado->pessoaFisica->orgao_emissor) ? $resultado->pessoaFisica->orgao_emissor : old('orgao_emissor') }}"
         />
         @if($errors->has('orgao_emissor'))
@@ -265,7 +265,7 @@
         <input
             name="dt_expedicao"
             type="date"
-            class="{{ $classes[2] }} form-control {{ $errors->has('dt_expedicao') ? 'is-invalid' : '' }}"
+            class="{{ $classes[2] }} form-control {{ $errors->has('dt_expedicao') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('dt_expedicao')) && isset($resultado->pessoaFisica->dt_expedicao) ? $resultado->pessoaFisica->dt_expedicao : old('dt_expedicao') }}"
             max="{{ date('Y-m-d') }}"
         />
@@ -285,7 +285,7 @@
         <input
             name="razao_social"
             type="text"
-            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }}"
+            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('razao_social')) && isset($resultado->pessoaJuridica->razao_social) ? $resultado->pessoaJuridica->razao_social : old('razao_social') }}"
             c
         />
@@ -303,7 +303,7 @@
         <input
             type="text"
             name="capital_social"
-            class="{{ $classes[3] }} form-control capitalSocial {{ $errors->has('capital_social') ? 'is-invalid' : '' }}"
+            class="{{ $classes[3] }} form-control capitalSocial {{ $errors->has('capital_social') ? 'is-invalid' : '' }} obrigatorio"
             placeholder="1.000,00"
             value="{{ empty(old('capital_social')) && isset($resultado->pessoaJuridica->capital_social) ? $resultado->pessoaJuridica->capital_social : old('capital_social') }}"
         />
@@ -337,7 +337,7 @@
         <br>
         <select 
             name="tipo_empresa" 
-            class="{{ $classes[3] }} form-control {{ $errors->has('tipo_empresa') ? 'is-invalid' : '' }}"
+            class="{{ $classes[3] }} form-control {{ $errors->has('tipo_empresa') ? 'is-invalid' : '' }} obrigatorio"
         >
             <option value="">Selecione a opção...</option>
         @foreach(tipos_empresa() as $tipo)
@@ -361,7 +361,7 @@
         <input
             type="date"
             name="dt_inicio_atividade"
-            class="{{ $classes[3] }} form-control {{ $errors->has('dt_inicio_atividade') ? 'is-invalid' : '' }}"
+            class="{{ $classes[3] }} form-control {{ $errors->has('dt_inicio_atividade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('dt_inicio_atividade')) && isset($resultado->pessoaJuridica->dt_inicio_atividade) ? $resultado->pessoaJuridica->dt_inicio_atividade : old('dt_inicio_atividade') }}"
             max="{{ date('Y-m-d') }}"
         />
@@ -379,7 +379,7 @@
         <input
             type="text"
             name="inscricao_municipal"
-            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('inscricao_municipal') ? 'is-invalid' : '' }}"
+            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('inscricao_municipal') ? 'is-invalid' : '' }} obrigatorio"
             placeholder=""
             value="{{ empty(old('inscricao_municipal')) && isset($resultado->pessoaJuridica->inscricao_municipal) ? $resultado->pessoaJuridica->inscricao_municipal : old('inscricao_municipal') }}"
         />
@@ -394,7 +394,7 @@
         <input
             type="text"
             name="inscricao_estadual"
-            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('inscricao_estadual') ? 'is-invalid' : '' }}"
+            class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('inscricao_estadual') ? 'is-invalid' : '' }} obrigatorio"
             placeholder=""
             value="{{ empty(old('inscricao_estadual')) && isset($resultado->pessoaJuridica->inscricao_estadual) ? $resultado->pessoaJuridica->inscricao_estadual : old('inscricao_estadual') }}"
         />
@@ -414,7 +414,7 @@
         <label for="segmento">{{ array_search('segmento', $codPre) }} - Segmento <span class="text-danger">*</span></label>
         <select 
             name="segmento" 
-            class="{{ $classes[4] }} form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }}" 
+            class="{{ $classes[4] }} form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }} obrigatorio" 
         >
             <option value="">Selecione a opção...</option>
         @foreach(segmentos() as $segmento)
@@ -437,7 +437,7 @@
         <label for="idregional">{{ array_search('idregional', $codPre) }} - Região de Atuação <span class="text-danger">*</span></label>
         <select 
             name="idregional" 
-            class="{{ $classes[4] }} form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }}" 
+            class="{{ $classes[4] }} form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }} obrigatorio" 
         >
             <option value="">Selecione a opção...</option>
         @foreach($regionais as $regional)

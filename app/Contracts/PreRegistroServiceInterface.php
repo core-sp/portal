@@ -11,7 +11,7 @@ interface PreRegistroServiceInterface {
     
     public function verificacao(GerentiRepositoryInterface $gerentiRepository, $externo);
     
-    public function getPreRegistro(MediadorServiceInterface $service, $resultado, $externo);
+    public function getPreRegistro(MediadorServiceInterface $service, $externo, $resultado = null);
 
     public function saveSiteAjax($request, GerentiRepositoryInterface $gerentiRepository, $externo);
 

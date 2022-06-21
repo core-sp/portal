@@ -28,6 +28,7 @@ class PreRegistro extends Model
             '3.2' => 'idregional',
             '6.1' => 'tipo_telefone',
             '6.2' => 'telefone',
+            '6.3' => 'opcional_celular',
             '4.1' => 'cep',
             '4.2' => 'bairro',
             '4.3' => 'logradouro',
@@ -73,19 +74,74 @@ class PreRegistro extends Model
         return $this->hasMany('App\Anexo');
     }
 
+    public function getTipoTelefone()
+    {
+        $tipo = explode(';', $this->tipo_telefone);
+
+        return [
+            isset($tipo[0]) ? $tipo[0] : null,
+            isset($tipo[1]) ? $tipo[1] : null
+        ];
+    }
+
+    public function getTelefone()
+    {
+        $tel = explode(';', $this->telefone);
+
+        return [
+            isset($tel[0]) ? $tel[0] : null,
+            isset($tel[1]) ? $tel[1] : null
+        ];
+    }
+
+    public function getOpcionalCelular()
+    {
+        $options = explode(';', $this->opcional_celular);
+
+        return [
+            isset($options[0]) ? explode(',', $options[0]) : null,
+            isset($options[1]) ? explode(',', $options[1]) : null,
+        ];
+    }
+
+    private function setOpcionalCelular($opcionais, $valor)
+    {
+        $valor = strpos($valor, ';') !== false ? str_replace(';', '', $valor) : $valor;
+        
+        // remover do explode os valores vazios
+        foreach($opcionais as $key => $value)         
+            if(empty($value))
+                unset($opcionais[$key]);
+
+        if(isset($opcionais) && in_array($valor, $opcionais))
+            unset($opcionais[array_search($valor, $opcionais)]);
+        else
+            array_push($opcionais, $valor);
+
+        return implode(',', $opcionais);
+    }
+
     private function validarUpdateAjax($campo, $valor)
     {
         $tipo = explode(';', $this->tipo_telefone);
         $tel = explode(';', $this->telefone);
+        $opcional = explode(';', $this->opcional_celular);
         $tipo[1] = isset($tipo[1]) ? $tipo[1] : '';
         $tel[1] = isset($tel[1]) ? $tel[1] : '';
+        $opcional[1] = isset($opcional[1]) ? $opcional[1] : '';
 
-        if(($campo == 'tipo_telefone') || ($campo == 'telefone'))
-        {
-            if(strpos($valor, ';') !== false)
-                $valor = $campo == 'tipo_telefone' ? $tipo[0].$valor : $tel[0].$valor;
-            else
-                $valor = $campo == 'tipo_telefone' ? $valor.';'.$tipo[1] : $valor.';'.$tel[1];
+        switch ($campo) {
+            case 'tipo_telefone':
+                $valor = strpos($valor, ';') !== false ? $tipo[0].$valor : $valor.';'.$tipo[1];
+                break;
+            case 'telefone':
+                $valor = strpos($valor, ';') !== false ? $tel[0].$valor : $valor.';'.$tel[1];
+                break;
+            case 'opcional_celular':
+                $valor = strpos($valor, ';') !== false ? 
+                $opcional[0] . ';' . $this->setOpcionalCelular(explode(',', $opcional[1]), $valor) : 
+                $this->setOpcionalCelular(explode(',', $opcional[0]), $valor) . ';' . $opcional[1]; 
+                break;
         }
 
         return [$campo => $valor];
@@ -95,13 +151,17 @@ class PreRegistro extends Model
     {
         $tipo = explode(';', $this->tipo_telefone);
         $tel = explode(';', $this->telefone);
+        $opcional = explode(';', $this->opcional_celular);
         $tipo[1] = isset($tipo[1]) ? $tipo[1] : '';
         $tel[1] = isset($tel[1]) ? $tel[1] : '';
+        $opcional[1] = isset($opcional[1]) ? $opcional[1] : '';
 
         $arrayCampos['tipo_telefone'] .= isset($arrayCampos['tipo_telefone_1']) ? ';' . $arrayCampos['tipo_telefone_1'] : ';';
         $arrayCampos['telefone'] .= isset($arrayCampos['telefone_1']) ? ';' . $arrayCampos['telefone_1'] : ';';
+        $arrayCampos['opcional_celular'] .= isset($arrayCampos['opcional_celular_1']) ? ';' . $arrayCampos['opcional_celular_1'] : ';';
         unset($arrayCampos['tipo_telefone_1']);
         unset($arrayCampos['telefone_1']);
+        unset($arrayCampos['opcional_celular_1']);
 
         return $arrayCampos;
     }

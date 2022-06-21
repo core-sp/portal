@@ -246,6 +246,7 @@ Route::prefix('/')->group(function() {
     // Solicitar Registro
     Route::get('/solicitar-registro', 'UserExternoSiteController@preRegistroView')->name('externo.preregistro.view');
     Route::get('/inserir-registro', 'UserExternoSiteController@inserirPreRegistroView')->name('externo.inserir.preregistro.view');
+    Route::put('/verifica-pendencia', 'UserExternoSiteController@verificaPendenciaPreRegistro')->name('externo.verifica.inserir.preregistro');
     Route::put('/inserir-registro', 'UserExternoSiteController@inserirPreRegistro')->name('externo.inserir.preregistro');
     Route::post('/inserir-registro-ajax', 'UserExternoSiteController@inserirPreRegistroAjax')->name('externo.inserir.preregistro.ajax');
     Route::get('/pre-registro-anexo/download/{id}', 'UserExternoSiteController@preRegistroAnexoDownload')->name('externo.preregistro.anexo.download');

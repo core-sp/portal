@@ -80,8 +80,21 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return isset($campos[$chave]) ? $campos[$chave] : $campo;
     }
 
+    private function formatCampos($request)
+    {
+        if(isset($request['opcional_celular']))
+            $request['opcional_celular'] = implode(',', $request['opcional_celular']);
+        else
+            $request['opcional_celular'] = null;
+        if(isset($request['opcional_celular_1']))
+            $request['opcional_celular_1'] = implode(',', $request['opcional_celular_1']);
+        
+        return $request;
+    }
+
     private function limparNomeCampos($externo, $request)
     {
+        $request = $this->formatCampos($request);
         $camposLimpos = array();
         $classe = null;
         $camposView = $this->getNomesCampos();
@@ -186,7 +199,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return [
             $classes[0] => 'path',
             $classes[1] => 'nome_contabil,cnpj_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
-            $classes[4] => 'segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,tipo_telefone_1,telefone_1',
+            $classes[4] => 'segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,tipo_telefone_1,telefone_1,opcional_celular,opcional_celular_1',
             $classes[2] => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao',
             $classes[3] => 'razao_social,capital_social,nire,tipo_empresa,dt_inicio_atividade,inscricao_estadual,inscricao_municipal,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
             $classes[5] => 'nome_rt,nome_social_rt,sexo_rt,dt_nascimento_rt,cpf_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt'
@@ -226,19 +239,23 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function getPreRegistro(MediadorServiceInterface $service, $resultado, $externo)
+    public function getPreRegistro(MediadorServiceInterface $service, $externo, $resultado = null)
     {
-        if(!isset($resultado))
-        {
-            $resultado = $externo->preRegistro()->create();
-            $externo->isPessoaFisica() ? $resultado->pessoaFisica()->create() : $resultado->pessoaJuridica()->create();
+        if(\Route::is('externo.inserir.preregistro.view'))
+            if(!isset($resultado))
+            {
+                $resultado = $externo->preRegistro()->create();
+                $externo->isPessoaFisica() ? $resultado->pessoaFisica()->create() : $resultado->pessoaJuridica()->create();
 
-            $string = 'Usuário Externo com ';
-            $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
-            $string .= $externo->cpf_cnpj . ', iniciou o processo de solicitação de registro com a id: ' . $resultado->id;
-            event(new ExternoEvent($string));
-        }
+                $string = 'Usuário Externo com ';
+                $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
+                $string .= $externo->cpf_cnpj . ', iniciou o processo de solicitação de registro com a id: ' . $resultado->id;
+                event(new ExternoEvent($string));
+            }
 
+        if(\Route::is('externo.verifica.inserir.preregistro'))
+            $resultado = $externo->load('preRegistro')->preRegistro;
+            
         return [
             'resultado' => $resultado,
             'codigos' => $this->getCodigos(),
