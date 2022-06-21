@@ -4,11 +4,11 @@
 
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative">
-    <img src="{{ asset('img/banner-interno-agendamento.png') }}" />
+    <img src="{{ asset('img/banner-interno-agendamento002.2.jpg') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Agendamento
+          Agendamento<br>Representante Comercial
         </h1>
       </div>
     </div>
