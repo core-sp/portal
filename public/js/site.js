@@ -1224,10 +1224,10 @@ function preencheRT(dados)
 {
 	if($('#inserirRegistro input[name="cpf_rt"]').val() == ""){
 		$('#campos_rt').prop("disabled", true);
-		$('#inserirRegistro input[name="registro"]').prop("disabled", true).val('');
+		$('#inserirRegistro #registro_preRegistro').prop("disabled", true).val('');
 	}else{
 		$('#campos_rt').prop("disabled", false);
-		$('#inserirRegistro input[name="registro"]').prop("disabled", false).val(dados.registro);
+		$('#inserirRegistro #registro_preRegistro').prop("disabled", false).val(dados.registro);
 		$('#inserirRegistro [name$="_rt"]').each(function(){
 			var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_rt'));
 			if(name != 'cpf')

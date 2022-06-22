@@ -20,6 +20,7 @@
         <input
             type="text"
             class="{{ $classes[5] }} form-control"
+            id="registro_preRegistro"
             value="{{ isset($resultado->pessoaJuridica->responsavelTecnico->registro) ? $resultado->pessoaJuridica->responsavelTecnico->registro : '' }}"
             disabled
             readonly
