@@ -9,7 +9,7 @@
 @if($errors->count() > 0)
 <div class="d-block w-100 border border-warning mb-2" id="erroPreRegistro">
     <p class="bg-warning font-weight-bolder pl-1">
-        {{ $errors->count() > 1 ? 'Foram encontrados ' . $errors->count() . ' erros:' : 'Foi encontrado 1 erro:' }}
+        {{ $errors->count() > 1 ? 'Foram encontrados ' . count($errors->messages()) . ' erros:' : 'Foi encontrado 1 erro:' }}
     <p>
     <div class="alert alert-light pl-0 pb-0">
     @foreach($errors->messages() as $key => $message)

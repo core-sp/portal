@@ -151,7 +151,7 @@
         <select 
             name="naturalidade" 
             class="{{ $classes[2] }} form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }} obrigatorio" 
-            {{ isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade != 'Brasileiro') ? 'disabled' : '' }}
+            {{ isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade != 'BRASILEIRO') ? 'disabled' : '' }}
         >
             <option value="">Selecione a opção...</option>
         @foreach(estados() as $naturalidade)
@@ -408,6 +408,25 @@
 @endif
 
 <div class="linha-lg-mini"></div>
+
+<div class="form-row mb-2">
+    <div class="col-sm mb-2-576">
+        <label for="pergunta">{{ array_search('pergunta', $codPre) }} - Quanto tempo possui de experiência no ramo de vendas? <span class="text-danger">*</span></label>
+        <input
+            type="text"
+            name="pergunta"
+            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('pergunta') ? 'is-invalid' : '' }} obrigatorio"
+            placeholder=""
+            {{-- por não salvar no bd, para não passar nula para o próximo request de envio --}}
+            value="{{ empty(old('pergunta')) ? request()->pergunta : old('pergunta') }}"
+        />
+        @if($errors->has('pergunta'))
+        <div class="invalid-feedback">
+            {{ $errors->first('pergunta') }}
+        </div>
+        @endif
+    </div>
+</div>
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">

@@ -1304,10 +1304,6 @@ function avancarVoltarPreRegistro(tipo, ativado, ordemMenu)
 	return ativado;
 }
 
-$('#inserirPreRegistro').ready(function(){
-	confereObrigatorios();
-})
-
 function confereObrigatorios()
 {
 	var obrigatorios = $('.obrigatorio:enabled');
@@ -1339,6 +1335,10 @@ function disabledOptionsSelect(name, valor)
 		valor != 'Celular' ? $('#inserirRegistro #opcoesCelular_1').prop("disabled", true) : 
 		$('#inserirRegistro #opcoesCelular_1').prop("disabled", false);
 }
+
+$('#inserirPreRegistro').ready(function(){
+	confereObrigatorios();
+})
 
 $('#voltarPreRegistro, #avancarPreRegistro, .menu-registro .nav-link').click(function() {
 	var ordemMenu = [];
@@ -1453,8 +1453,8 @@ $('#inserirRegistro input:not(:checkbox,:file,[name="cpf_rt"],[name="cnpj_contab
 });
 
 $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(function(){
-	($(this).attr('type') == 'file') && ($(this).val() == "") ? null : putDadosPreRegistro($(this));
 	disabledOptionsSelect($(this).attr('name'), $(this).val());
+	($(this).attr('type') == 'file') && ($(this).val() == "") ? null : putDadosPreRegistro($(this));
 });
 
 $('#inserirRegistro input:checkbox').change(function(){
@@ -1463,11 +1463,24 @@ $('#inserirRegistro input:checkbox').change(function(){
 		putDadosPreRegistro($(this));
 });
 
+// --------------------------------------------------------------------------------------
+// 2 métodos em Jquery para focar no campo que está o erro pelo link na tabela de erros
+// No primeiro click vai direto para o input, no segundo necessita do método abaixo:
+// $('.nav-pills a').on('shown.bs.tab', function(){
+var teste;
 $('.erroPreRegistro').click(function(){
 	var campo = $(this).val();
 	var hrefMenu = $('[name="' + campo + '"]').parents('.tab-pane').attr('id');
-	$('.menu-registro.nav-pills [href="#' + hrefMenu + '"]').tab('show').focus();
+	$('.menu-registro.nav-pills [href="#' + hrefMenu + '"]').tab('show');
+	teste = campo;
+	$('[name="' + teste + '"]').focus();
 });
+
+$('.menu-registro.nav-pills a').on('shown.bs.tab', function(){
+    if($('.erroPreRegistro').length > 0)
+		$('[name="' + teste + '"]').focus();
+});
+// --------------------------------------------------------------------------------------
 
 $(window).on('load', function() {
 	if($('#modalSubmitPreRegistro').hasClass('show'))

@@ -167,6 +167,9 @@ class UserExternoSiteController extends Controller
         return view('site.userExterno.inserir-pre-registro', compact('semPendencia', 'resultado', 'regionais', 'totalFiles', 'codigos', 'classes'));
     }
 
+    // Esse request não devolve a página para correção.
+    // Apenas valida os dados já salvos no bd que foram carregados no form novamente ou via request direto
+    // Apenas rota de confirmação do envio e onde é realizado os processos
     public function inserirPreRegistro(PreRegistroRequest $request)
     {
         try{

@@ -29,6 +29,7 @@ class PreRegistro extends Model
             '6.1' => 'tipo_telefone',
             '6.2' => 'telefone',
             '6.3' => 'opcional_celular',
+            '6.4' => 'pergunta',
             '4.1' => 'cep',
             '4.2' => 'bairro',
             '4.3' => 'logradouro',
@@ -144,6 +145,10 @@ class PreRegistro extends Model
                 break;
         }
 
+        // Pergunta não será salva, apenas para reforçar a mensagem sobre ser Representante Comercial
+        if($campo == 'pergunta')
+            return null;
+
         return [$campo => $valor];
     }
 
@@ -173,7 +178,8 @@ class PreRegistro extends Model
         switch ($classe) {
             case 'preRegistro':
                 $valido = $this->validarUpdateAjax($campo, $valor);
-                $this->update($valido);
+                if(isset($valido))
+                    $this->update($valido);
                 break;
             case 'pessoaFisica':
                 $this->pessoaFisica->update([$campo => $valor]);

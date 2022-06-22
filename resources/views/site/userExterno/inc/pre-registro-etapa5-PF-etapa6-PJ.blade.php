@@ -26,38 +26,41 @@
 <br>
 
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
-<label class="mt-3" for="anexos">{{ array_search('path', $codAnexo) }} - Anexo <span class="text-danger">*</span></label>
-@if($resultado->anexos->count() == 0)
+@if(!\Route::is('externo.verifica.inserir.preregistro'))
+    <label class="mt-3" for="anexos">{{ array_search('path', $codAnexo) }} - Anexo <span class="text-danger">*</span></label>
+    @if($resultado->anexos->count() == 0)
 
-    @component('components.arquivosBD', [
+        @component('components.arquivosBD', [
+            'nome' => 'anexo', 
+            'nome_file' => '', 
+            'rota_download' => '',
+            'id' => '',
+            'display' => 'display:none'
+            ])
+        @endcomponent
+
+    @else
+
+        @foreach($resultado->anexos as $anexo)
+            @component('components.arquivosBD', [
+                'nome' => 'anexo', 
+                'nome_file' => $anexo->nome_original, 
+                'rota_download' => route('externo.preregistro.anexo.download', $anexo->id),
+                'id' => $anexo->id,
+                'display' => ''
+            ])
+            @endcomponent
+        @endforeach
+
+    @endif
+
+    <input type="hidden" id="fileObrigatorio" class="obrigatorio" value="{{ $resultado->anexos->count() > 0 ? 'existeAnexo' : '' }}">
+
+    @component('components.arquivos_form', [
         'nome' => 'anexo', 
-        'nome_file' => '', 
-        'rota_download' => '',
-        'id' => '',
-        'display' => 'display:none'
-        ])
-    @endcomponent
-
-@else
-
-@foreach($resultado->anexos as $anexo)
-    @component('components.arquivosBD', [
-        'nome' => 'anexo', 
-        'nome_file' => $anexo->nome_original, 
-        'rota_download' => route('externo.preregistro.anexo.download', $anexo->id),
-        'id' => $anexo->id,
-        'display' => ''
+        'classes' => $classes[0],
+        'errors' => $errors
     ])
     @endcomponent
-@endforeach
 
 @endif
-
-<input type="hidden" id="fileObrigatorio" class="obrigatorio" value="{{ $resultado->anexos->count() > 0 ? 'existeAnexo' : '' }}">
-
-@component('components.arquivos_form', [
-    'nome' => 'anexo', 
-    'classes' => $classes[0],
-    'errors' => $errors
-])
-@endcomponent
