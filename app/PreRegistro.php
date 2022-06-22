@@ -24,12 +24,12 @@ class PreRegistro extends Model
     public static function codigosPreRegistro()
     {
         return [
-            '3.1' => 'segmento',
-            '3.2' => 'idregional',
+            '3.1' => 'pergunta',
+            '3.2' => 'segmento',
+            '3.3' => 'idregional',
             '6.1' => 'tipo_telefone',
             '6.2' => 'telefone',
             '6.3' => 'opcional_celular',
-            '6.4' => 'pergunta',
             '4.1' => 'cep',
             '4.2' => 'bairro',
             '4.3' => 'logradouro',
