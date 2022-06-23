@@ -972,12 +972,12 @@ function tipos_identidade()
 {
     return [
         'Carteira de Conselho Profissional',
-        'Carteira de identidade Marinha, Exercito ou Aeronautica',
+        'Carteira de identidade Marinha, Exército ou Aeronáutica',
         'Carteira de Trabalho',
         'Certificado Reservista',
         'CNH',
         'Passaporte',
-        'Previdencia Social',
+        'Previdência Social',
         'RG',
         'RNE'
     ];

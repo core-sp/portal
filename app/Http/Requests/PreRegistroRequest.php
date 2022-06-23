@@ -12,7 +12,6 @@ class PreRegistroRequest extends FormRequest
     private $regraPath;
     private $externo;
     private $regraRegexTel;
-    private $valuesGenero;
 
     private function getRules($externo)
     {
@@ -43,7 +42,7 @@ class PreRegistroRequest extends FormRequest
 
         $pessoaFisica = [
             'nome_social' => 'nullable|max:191|regex:/^\D*$/',
-            'sexo' => 'required|size:1|in:'.implode(',', $this->valuesGenero),
+            'sexo' => 'required|size:1|in:'.implode(',', array_keys(generos())),
             'dt_nascimento' => 'required|date|before_or_equal:'.$this->regraDtNasc,
             'estado_civil' => 'nullable|in:'.implode(',', estados_civis()),
             'nacionalidade' => 'required|in:'.implode(',', nacionalidades()),
@@ -74,7 +73,7 @@ class PreRegistroRequest extends FormRequest
             'uf_empresa' => 'required_if:checkEndEmpresa,off|size:2|in:'.implode(',', array_keys(estados())),
             'nome_rt' => 'required|max:191|regex:/^\D*$/',
             'nome_social_rt' => 'nullable|max:191|regex:/^\D*$/',
-            'sexo_rt' => 'required|size:1|in:'.implode(',', $this->valuesGenero),
+            'sexo_rt' => 'required|size:1|in:'.implode(',', array_keys(generos())),
             'dt_nascimento_rt' => 'required|date|before_or_equal:'.$this->regraDtNasc,
             'cpf_rt' => ['required', new CpfCnpj],
             'tipo_identidade_rt' => 'required|in:'.implode(',', tipos_identidade()),
@@ -101,10 +100,6 @@ class PreRegistroRequest extends FormRequest
     {
         $this->externo = auth()->guard('user_externo')->user();
         $preRegistro = $this->externo->preRegistro;
-        
-        $this->valuesGenero = array();
-        foreach(generos() as $key => $value)
-            array_push($this->valuesGenero, $key); 
 
         // Obrigatório salvar os anexos via rota ajax
         $anexosCount = isset($preRegistro) ? $preRegistro->anexos->count() : 0;
@@ -224,7 +219,7 @@ class PreRegistroRequest extends FormRequest
 
         $pessoaFisica = [
             'nome_social' => '"Nome social"',
-            'sexo' => '"Sexo"',
+            'sexo' => '"Gênero"',
             'dt_nascimento' => '"Data de nascimento"',
             'estado_civil' => '"Estado civil"',
             'nacionalidade' => '"Nacionalidade"',
@@ -255,7 +250,7 @@ class PreRegistroRequest extends FormRequest
             'uf_empresa' => '"Estado da empresa"',
             'nome_rt' => '"Nome do responsável técnico"',
             'nome_social_rt' => '"Nome social do responsável técnico"',
-            'sexo_rt' => '"Sexo do responsável técnico"',
+            'sexo_rt' => '"Gênero do responsável técnico"',
             'dt_nascimento_rt' => '"Data de nascimento do responsável técnico"',
             'cpf_rt' => '"CPF do responsável técnico"',
             'tipo_identidade_rt' => '"Tipo do documento de identidade do responsável técnico"',

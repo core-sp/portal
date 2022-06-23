@@ -123,7 +123,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 }
 
             if(isset($classe))
-                $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = mb_strtoupper($value, 'UTF-8');
+                $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
         }
 
         return $camposLimpos;

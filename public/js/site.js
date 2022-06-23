@@ -1107,6 +1107,9 @@ function putDadosPreRegistro(objeto)
 			'valor': valor
 		};
 
+	$("#modalLoadingBody").html('<div class="spinner-border text-success"></div> Salvando...');
+	$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
+
 	$.ajax({
 		method: 'POST',
 		enctype: 'multipart/form-data',
@@ -1121,12 +1124,6 @@ function putDadosPreRegistro(objeto)
         contentType: cT,
 		cache: false,
 		timeout: 60000,
-		beforeSend: function(){
-			$("#modalLoadingBody").html('<div class="spinner-border text-success"></div> Salvando...');
-			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false});
-		},
-		complete: function(){
-		},
 		success: function(response) {
 			if(campo == 'cpf_rt')
 				preencheRT(response['resultado']);

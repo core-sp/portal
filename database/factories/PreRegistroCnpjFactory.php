@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(PreRegistroCnpj::class, function (Faker $faker) {
     return [
-        'razao_social' => $faker->company,
+        'razao_social' => mb_strtoupper($faker->company, 'UTF-8'),
         'nire' => '123456789',
         'tipo_empresa' => tipos_empresa()[0],
         'dt_inicio_atividade' => '2020-12-21',
@@ -15,11 +15,11 @@ $factory->define(PreRegistroCnpj::class, function (Faker $faker) {
         'inscricao_estadual' => '987654321',
         'capital_social' => '1.000,00',
         'cep' => '01234-050',
-        'logradouro' => 'Rua Teste da rua',
+        'logradouro' => 'RUA TESTE DA RUA',
         'numero' => '25A',
         'complemento' => null,
-        'bairro' => 'Teste Bairro',
-        'cidade' => 'São Paulo',
+        'bairro' => 'TESTE BAIRRO',
+        'cidade' => 'SÃO PAULO',
         'uf' => 'SP',
         'responsavel_tecnico_id' => factory('App\ResponsavelTecnico'),
         'pre_registro_id' => factory('App\PreRegistro'),
