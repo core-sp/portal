@@ -159,7 +159,7 @@
     </form>
 
     <!-- The Modal Loading acionado via ajax -->
-    <div class="modal hide" id="modalLoadingPreRegistro">
+    <div class="modal" id="modalLoadingPreRegistro">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <!-- Modal body -->
