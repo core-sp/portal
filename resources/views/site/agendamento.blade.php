@@ -267,6 +267,29 @@
       </div>
     </div>
   </div>
+
+  <!-- The Modal -->
+  <div class="modal fade" id="tipo-outros">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Atenção</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body" id="textoOutros">
+          Você é Representante Comercial?
+        </div>
+         <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-dismiss="modal">Sim</button>
+          <button type="button" class="btn btn-secondary" id="notRC-agendamento">Não</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="dialog_agendamento" title="Atenção"></div>
 </section>
 

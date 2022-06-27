@@ -536,6 +536,20 @@ $('#ano-mapa').on({
 			$('#agendamentoStore #horarios').prop('disabled', true);
 		}
 
+		function openAviso()
+		{
+			$('#tipo-outros').modal({backdrop: 'static', keyboard: false, show: true});
+			$('#tipo-outros .modal-body')
+			.html('Você é <strong>Representante Comercial</strong>?');
+			$('#tipo-outros .modal-footer').show();
+		}
+
+		$('#notRC-agendamento').click(function(){
+			$('#tipo-outros .modal-body')
+			.html('Você está no Portal dos Representantes Comerciais, este agendamento é para uso exclusivo a categoria de Representante Comercial');
+			$('#tipo-outros .modal-footer').hide();
+		});
+
 		// Datepicker Agendamentos
 		$('#agendamentoStore #datepicker').datepicker({
 			dateFormat: 'dd/mm/yy',
@@ -551,11 +565,16 @@ $('#ano-mapa').on({
 			beforeShowDay: noWeekendsOrHolidays
 		});
 
-		// Para quando houver Plantão Jurídico
+		// Para quando houver Plantão Jurídico ou selecionar 'Outros'
 		$('#agendamentoStore #selectServicos').change(function(){
 			$("#idregional").val("");
 			limpaDiasHorariosAgendamento();
-			$(this).val() == "Plantão Jurídico" ? getRegionaisPlantaoJuridico() : $('#agendamentoStore #idregional option').show();
+			if($(this).val() == "Plantão Jurídico")
+				getRegionaisPlantaoJuridico();
+			else if($(this).val() == "Outros")
+				openAviso();
+			else
+				$('#agendamentoStore #idregional option').show();
 		});	
 
 		if($("#agendamentoStore #selectServicos option:selected").val() == "Plantão Jurídico")
