@@ -123,7 +123,13 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 }
 
             if(isset($classe))
-                $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
+            {
+                if(isset($value))
+                    $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = in_array($key, ['checkEndEmpresa']) ? $value : mb_strtoupper($value, 'UTF-8');
+                else
+                    $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = null;
+            }
+                
         }
 
         return $camposLimpos;

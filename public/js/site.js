@@ -1079,14 +1079,12 @@ function putDadosPreRegistro(objeto)
 {
 	var classesObjeto = objeto.attr("class");
 	var classe = classesObjeto.split(' ')[0];
-	// var codigo = classe == 'Arquivo-Excluir' ? 'Arquivo' : classesObjeto.split(' ')[1];
 	var campo = objeto.attr("name");
 	var valor = campo == 'path' ? objeto[0].files[0] : objeto.val();
 	var cT = campo == 'path' ? false : 'application/x-www-form-urlencoded';
 	var pD = campo == 'path' ? false : true;
 	var frmData = new FormData();
 	var dados = null;
-	// var status = classe == 'Arquivo-Excluir' ? ' excluído' : ' salvo';
 
     frmData.append('valor', valor);
 	frmData.append('campo', campo);
@@ -1107,8 +1105,8 @@ function putDadosPreRegistro(objeto)
 			'valor': valor
 		};
 
-	$("#modalLoadingBody").html('<div class="spinner-border text-success"></div> Salvando...');
-	$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
+	$('.loaderPreRegistro').addClass('active');
+	$('#loaderPreRegistro').addClass('active');
 
 	$.ajax({
 		method: 'POST',
@@ -1125,6 +1123,8 @@ function putDadosPreRegistro(objeto)
 		cache: false,
 		timeout: 60000,
 		success: function(response) {
+			$('.loaderPreRegistro').removeClass('active');
+			$('#loaderPreRegistro').removeClass('active');
 			if(campo == 'cpf_rt')
 				preencheRT(response['resultado']);
 			if(campo == 'cnpj_contabil')
@@ -1133,18 +1133,17 @@ function putDadosPreRegistro(objeto)
 				preencheFile(response['resultado']);
 			if(classe == 'Arquivo-Excluir')
 				removeFile(response['resultado']);
-			// $("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> <strong>' + codigo + '</strong>' + status + '!');
-			// setTimeout(function() {
-				$("#modalLoadingPreRegistro").modal('hide');
-			// }, 1500); 
 			removerMsgErroServer(objeto, campo);
 			$('#atualizacaoPreRegistro').text(response['dt_atualizado']);
 			valorPreRegistro = valor;
 			confereObrigatorios();
 		},
 		error: function(request, status, error) {
+			$('.loaderPreRegistro').removeClass('active');
+			$('#loaderPreRegistro').removeClass('active');
 			var errorFunction = getErrorMsg(request);
 			$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorFunction[0]);
+			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
 			setTimeout(function() {
 				$("#modalLoadingPreRegistro").modal('hide');
 			}, errorFunction[1]); 

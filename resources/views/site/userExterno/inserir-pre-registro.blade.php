@@ -158,6 +158,10 @@
         </div>
     </form>
 
+    <div id="loaderPreRegistro" class="">
+        <div class="spinner-border text-white loaderPreRegistro"></div>
+    </div>
+
     <!-- The Modal Loading acionado via ajax -->
     <div class="modal" id="modalLoadingPreRegistro">
         <div class="modal-dialog modal-dialog-centered">

@@ -378,6 +378,7 @@ class PreRegistroCpfTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $dados = [
+            'idregional' => null,
             'segmento' => null,
             'cep' => null,
             'logradouro' => null,
@@ -389,15 +390,14 @@ class PreRegistroCpfTest extends TestCase
             'tipo_telefone' => null,
             'dt_nascimento' => null,
             'sexo' => null,
-            'estado_civil' => null,
-            'naturalidade' => null,
             'nacionalidade' => null,
             'nome_mae' => null,
             'tipo_identidade' => null,
             'identidade' => null,
             'orgao_emissor' => null,
             'dt_expedicao' => null,
-            'path' => null
+            'path' => null,
+            'pergunta' => null
         ];
 
         $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(302);
@@ -1262,350 +1262,438 @@ class PreRegistroCpfTest extends TestCase
         ->assertSessionHasErrors('nome_mae');
     }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_nome_mae_with_numbers()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_with_nome_mae_with_numbers()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'nome_mae' => 'N0me Mãe'
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'nome_mae' => 'N0me Mãe'
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('nome_mae');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('nome_mae');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_nome_pai_more_than_191_chars()
-    // {
-    //     $faker = \Faker\Factory::create();
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_with_nome_pai_more_than_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'nome_pai' => $faker->sentence(400)
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'nome_pai' => $faker->sentence(400)
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('nome_pai');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('nome_pai');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_nome_pai_with_numbers()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_with_nome_pai_with_numbers()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'nome_pai' => 'N0me Pai'
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'nome_pai' => 'N0me Pai'
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('nome_pai');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('nome_pai');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_without_identidade()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_without_tipo_identidade()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'identidade' => ''
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'tipo_identidade' => ''
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('identidade');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('tipo_identidade');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_identidade_more_than_20_chars()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_with_tipo_identidade_with_wrong_value()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'identidade' => '012345678901234567890'
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'tipo_identidade' => 'Teste'
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('identidade');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('tipo_identidade');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_without_orgao_emissor()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_without_identidade()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'orgao_emissor' => ''
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'identidade' => ''
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('orgao_emissor');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('identidade');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_orgao_emissor_more_than_191_chars()
-    // {
-    //     $faker = \Faker\Factory::create();
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_with_identidade_more_than_30_chars()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'orgao_emissor' => $faker->sentence(400)
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'identidade' => '0123456789012345678901023-8pl9644'
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('orgao_emissor');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('identidade');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_without_dt_expedicao()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_without_orgao_emissor()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'dt_expedicao' => ''
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'orgao_emissor' => ''
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('dt_expedicao');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('orgao_emissor');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_dt_expedicao_without_date_type()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_with_orgao_emissor_more_than_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'dt_expedicao' => 'texto'
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'orgao_emissor' => $faker->sentence(400)
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('dt_expedicao');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('orgao_emissor');
+    }
 
-    // /** @test */
-    // public function cannot_submit_pre_registro_with_dt_expedicao_after_today()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_without_dt_expedicao()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id'],
-    //         'dt_expedicao' => Carbon::today()->addDay()->format('Y-m-d')
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'dt_expedicao' => ''
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados)
-    //     ->assertSessionHasErrors('dt_expedicao');
-    // }
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('dt_expedicao');
+    }
 
-    // /** @test */
-    // public function log_is_generated_when_form_cpf_is_submitted()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
+    /** @test */
+    public function cannot_submit_pre_registro_with_dt_expedicao_without_date_type()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $preRegistro = factory('App\PreRegistro')->raw([
-    //         'id' => 1,
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null,
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
-    //         'pre_registro_id' => $preRegistro['id']
-    //     ]);
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'dt_expedicao' => 'texto'
+        ]);
 
-    //     $dados = array_merge($preRegistro, $preRegistroCpf);
+        $dados = array_merge($preRegistro, $preRegistroCpf);
         
-    //     $this->get(route('externo.inserir.preregistro.view'));     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ]);
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
         
-    //     $this->put(route('externo.inserir.preregistro'), $dados);
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('dt_expedicao');
+    }
 
-    //     $pr = PreRegistro::first();
+    /** @test */
+    public function cannot_submit_pre_registro_with_dt_expedicao_after_today()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
 
-    //     $log = tailCustom(storage_path($this->pathLogExterno()));
-    //     $this->assertStringContainsString('Usuário Externo com cpf: ' . $pr->userExterno->cpf_cnpj, $log);
-    //     $this->assertStringContainsString(', enviou para análise incial a solicitação de registro com a id: ' . $pr->id, $log);
-    // }
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'dt_expedicao' => Carbon::today()->addDay()->format('Y-m-d')
+        ]);
+
+        $dados = array_merge($preRegistro, $preRegistroCpf);
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('dt_expedicao');
+    }
+
+    /** @test */
+    public function log_is_generated_when_form_cpf_is_submitted()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null,
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id']
+        ]);
+
+        $dados = array_merge($preRegistro, $preRegistroCpf);
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));     
+        
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ]);
+        
+        $this->put(route('externo.inserir.preregistro'), $dados);
+
+        $pr = PreRegistro::first();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString('Usuário Externo com cpf: ' . $pr->userExterno->cpf_cnpj, $log);
+        $this->assertStringContainsString(', enviou para análise incial a solicitação de registro com a id: ' . $pr->id, $log);
+    }
 }
