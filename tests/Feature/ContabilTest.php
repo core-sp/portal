@@ -26,7 +26,7 @@ class ContabilTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $contabil = factory('App\Contabil')->raw();
         
@@ -37,6 +37,33 @@ class ContabilTest extends TestCase
                 'valor' => $value
             ])->assertStatus(200);
         
+        $this->assertDatabaseHas('contabeis', $contabil);
+
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => PreRegistro::first()->contabil_id
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_contabeis_by_ajax_with_upperCase()
+    {
+        $externo = $this->signInAsUserExterno();
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $contabil = factory('App\Contabil')->state('low')->raw();
+        
+        foreach($contabil as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'contabil',
+                'campo' => $key.'_contabil',
+                'valor' => $value
+            ])->assertStatus(200);
+        
+        foreach($contabil as $key => $value)
+            if(isset($value))
+                $contabil[$key] = mb_strtoupper($value, 'UTF-8');
+
         $this->assertDatabaseHas('contabeis', $contabil);
 
         $this->assertDatabaseHas('pre_registros', [
@@ -67,7 +94,7 @@ class ContabilTest extends TestCase
         ]);
 
         $externo = $this->signInAsUserExterno();
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $contabil = factory('App\Contabil')->raw([
             'cnpj' => '46217816000172'
         ]);
@@ -113,7 +140,7 @@ class ContabilTest extends TestCase
         ]);
 
         $externo = $this->signInAsUserExterno();
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $contabil = factory('App\Contabil')->raw();
         
         foreach($contabil as $key => $value)
@@ -141,7 +168,7 @@ class ContabilTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $contabil = factory('App\Contabil')->raw();
         
@@ -164,7 +191,7 @@ class ContabilTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $contabil = factory('App\Contabil')->raw();
         
@@ -187,7 +214,7 @@ class ContabilTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $contabil = factory('App\Contabil')->raw();
         
@@ -210,7 +237,7 @@ class ContabilTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $contabil = factory('App\Contabil')->raw();
         
@@ -233,7 +260,7 @@ class ContabilTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         $externo = $this->signInAsUserExterno();
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
@@ -266,7 +293,7 @@ class ContabilTest extends TestCase
     public function cannot_update_table_contabeis_by_ajax_with_cnpj_wrong()
     {
         $externo = $this->signInAsUserExterno();
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
@@ -287,7 +314,7 @@ class ContabilTest extends TestCase
     public function cannot_update_table_contabeis_by_ajax_without_relationship()
     {
         $externo = $this->signInAsUserExterno();
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $contabil = factory('App\Contabil')->raw();
         
@@ -312,7 +339,7 @@ class ContabilTest extends TestCase
     public function cannot_update_table_contabeis_by_ajax_when_remove_relationship()
     {
         $externo = $this->signInAsUserExterno();
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $contabil = factory('App\Contabil')->raw();
         
@@ -344,7 +371,7 @@ class ContabilTest extends TestCase
     public function get_contabil_by_ajax_when_exists()
     {
         $externo = $this->signInAsUserExterno();
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $contabil = factory('App\Contabil')->create();
 
@@ -355,6 +382,43 @@ class ContabilTest extends TestCase
         ])->assertJsonFragment($contabil->toArray());
     }
 
+    /** @test */
+    public function cannot_update_table_contabeis_by_ajax_when_clean_inputs()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $contabil = factory('App\Contabil')->create();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => $contabil->cnpj
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => $contabil->id
+        ]);
+
+        $dados = $contabil->toArray();
+        unset($dados['created_at']);
+        unset($dados['updated_at']);
+        unset($dados['deleted_at']);
+        unset($dados['id']);
+
+        foreach($dados as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'contabil',
+                'campo' => $key . '_contabil',
+                'valor' => ''
+            ])->assertOk();
+
+        $this->assertDatabaseHas('contabeis', $contabil->toArray());
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => null
+        ]);
+    }
+
     /** 
      * =======================================================================================================
      * TESTES PRE-REGISTRO CONTABIL VIA SUBMIT - CLIENT
@@ -362,33 +426,40 @@ class ContabilTest extends TestCase
      */
 
     /** @test */
-    public function view_message_errors_when_submit_without_contabilidade()
+    public function view_message_errors_when_submit_with_cnpj()
     {
         $externo = $this->signInAsUserExterno();
-        $this->get(route('externo.inserir.preregistro.view'));
-        $this->put(route('externo.inserir.preregistro'), [])->assertStatus(302);
-        $this->get(route('externo.inserir.preregistro.view'))
-        ->assertSeeText('Foi encontrado erro em: ')
-        ->assertDontSeeText('Contabilidade *')
-        ->assertSeeText('Dados Gerais *')
-        ->assertSeeText('Endereço *')
-        ->assertDontSeeText('Contato / RT *')
-        ->assertSeeText('Canal de Relacionamento *')
-        ->assertSeeText('Anexos *');
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->state('low')->create([
+                'user_externo_id' => $externo->id,
+                'opcional_celular' => null
+            ]),
+        ]);
+        $preRegistro = $preRegistroCpf->preRegistro->toArray();
 
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
-        $this->get(route('externo.inserir.preregistro.view'));
-        $this->put(route('externo.inserir.preregistro'), [])->assertStatus(302);
-        $this->get(route('externo.inserir.preregistro.view'))
-        ->assertSeeText('Foi encontrado erro em: ')
-        ->assertDontSeeText('Contabilidade *')
-        ->assertSeeText('Dados Gerais *')
-        ->assertSeeText('Endereço *')
-        ->assertSeeText('Contato / RT *')
-        ->assertSeeText('Canal de Relacionamento *')
-        ->assertSeeText('Anexos *');
+        $dados = [
+            'cnpj_contabil' => '78087976000130',
+            'nome_contabil' => null,
+            'email_contabil' => null,
+            'nome_contato_contabil' => null,
+            'telefone_contabil' => null,
+            'path' => null,
+            'pergunta' => 'teste'
+        ];
+
+        $final = array_merge($dados, $preRegistro, $preRegistroCpf->toArray());
+        $this->put(route('externo.verifica.inserir.preregistro'), $final)->assertStatus(302);
+
+        $errors = session('errors');
+        $keys = array();
+        foreach($errors->messages() as $key => $value)
+            array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
+        ->assertSeeInOrder($keys);
+
+        $this->assertEquals(count($keys), count($dados) - 2);
     }
     
     /** @test */
@@ -399,13 +470,15 @@ class ContabilTest extends TestCase
         
         $contabil = factory('App\Contabil')->create();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
 
@@ -414,7 +487,7 @@ class ContabilTest extends TestCase
 
         $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -422,6 +495,8 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertOk();
+
         $this->put(route('externo.inserir.preregistro'), $dados)
         ->assertRedirect(route('externo.preregistro.view'));
 
@@ -435,26 +510,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '01234567891023',
-            'nome_contabil' => 'Teste Contabil',
-            'email_contabil' => 'teste@contabil.com',
-            'nome_contato_contabil' => 'Dono da Contabil',
-            'telefone_contabil' => '(11) 99878-8969'
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'cnpj' => '01234567891023',
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -462,7 +538,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cnpj_contabil');
     }
 
@@ -472,26 +548,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => '',
-            'email_contabil' => 'teste@contabil.com',
-            'nome_contato_contabil' => 'Dono da Contabil',
-            'telefone_contabil' => '(11) 99878-8969'
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'nome' => '',
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -499,7 +576,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contabil');
     }
 
@@ -510,26 +587,28 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => $faker->sentence(400),
-            'email_contabil' => 'teste@contabil.com',
-            'nome_contato_contabil' => 'Dono da Contabil',
-            'telefone_contabil' => '(11) 99878-8969'
-        ];
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        $contabil = factory('App\Contabil')->raw([
+            'nome' => $faker->sentence(400),
+        ]);
+
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -537,7 +616,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contabil');
     }
 
@@ -547,26 +626,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => 'Teste Contabil',
-            'email_contabil' => '',
-            'nome_contato_contabil' => 'Dono da Contabil',
-            'telefone_contabil' => '(11) 99878-8969'
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'email' => '',
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -574,7 +654,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('email_contabil');
     }
 
@@ -585,26 +665,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => 'Teste Contabil',
-            'email_contabil' => $faker->sentence(400),
-            'nome_contato_contabil' => 'Dono da Contabil',
-            'telefone_contabil' => '(11) 99878-8969'
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'email' => $faker->sentence(400),
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -612,7 +693,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('email_contabil');
     }
 
@@ -622,26 +703,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => 'Teste Contabil',
-            'email_contabil' => 'qualquercoisa.com',
-            'nome_contato_contabil' => 'Dono da Contabil',
-            'telefone_contabil' => '(11) 99878-8969'
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'email' => 'qualquercoisa.com',
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -649,7 +731,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('email_contabil');
     }
 
@@ -659,26 +741,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => 'Dono da Contabil',
-            'email_contabil' => 'teste@contabil.com',
-            'nome_contato_contabil' => '',
-            'telefone_contabil' => '(11) 99878-8969'
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'nome_contato' => '',
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -686,7 +769,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contato_contabil');
     }
 
@@ -697,26 +780,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => 'Dono da Contabil',
-            'email_contabil' => 'teste@contabil.com',
-            'nome_contato_contabil' => $faker->sentence(400),
-            'telefone_contabil' => '(11) 99878-8969'
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'nome_contato' => $faker->sentence(400),
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -724,7 +808,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contato_contabil');
     }
 
@@ -734,26 +818,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => 'Dono da Contabil',
-            'email_contabil' => 'teste@contabil.com',
-            'nome_contato_contabil' => 'Teste do n0me com números',
-            'telefone_contabil' => '(11) 99878-8969'
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'nome_contato' => 'Teste do n0me com números',
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -761,7 +846,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contato_contabil');
     }
 
@@ -771,26 +856,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => 'Dono da Contabil',
-            'email_contabil' => 'teste@contabil.com',
-            'nome_contato_contabil' => 'Teste do n0me com números',
-            'telefone_contabil' => ''
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'telefone' => '',
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -798,7 +884,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_contabil');
     }
 
@@ -808,26 +894,27 @@ class ContabilTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->raw([
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id']
         ]);
-        $dados = [
-            'cnpj_contabil' => '78087976000130',
-            'nome_contabil' => 'Dono da Contabil',
-            'email_contabil' => 'teste@contabil.com',
-            'nome_contato_contabil' => 'Teste do n0me com números',
-            'telefone_contabil' => '(112) 988886-2233'
-        ];
+        $contabil = factory('App\Contabil')->raw([
+            'telefone' => '(112) 988886-2233'
+        ]);
 
-        $dados = array_merge($preRegistro, $preRegistroCpf, $dados);
+        foreach($contabil as $key => $value)
+            $contabil[$key . '_contabil'] = $value;
+
+        $dados = array_merge($preRegistro, $preRegistroCpf, $contabil);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -835,7 +922,7 @@ class ContabilTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_contabil');
     }
 }

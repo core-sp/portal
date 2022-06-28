@@ -485,7 +485,7 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
-    public function view_message_errors_when_submit_with_endereco_without_contabil_when_checkEndEmpresa_on()
+    public function view_message_errors_when_submit_when_checkEndEmpresa_on()
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'

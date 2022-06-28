@@ -29,21 +29,48 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
-        $campos = ['registro'];
-        
+        unset($rt['registro']);
+
         foreach($rt as $key => $value)
-        {
-            $temp = in_array($key, $campos);
             $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'pessoaJuridica.responsavelTecnico',
-                'campo' => $temp !== false ? $key : $key.'_rt',
+                'campo' => $key.'_rt',
                 'valor' => $value
             ])->assertStatus(200);
-        }
         
+        $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => PreRegistro::first()->pessoaJuridica->responsavel_tecnico_id
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_responsaveis_tecnicos_by_ajax_with_upperCase()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw();
+        unset($rt['registro']);
+
+        foreach($rt as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica.responsavelTecnico',
+                'campo' => $key.'_rt',
+                'valor' => $value
+            ])->assertStatus(200);
+        
+        foreach($rt as $key => $value)
+            if(isset($value))
+                $rt[$key] = mb_strtoupper($value, 'UTF-8');
+
         $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
 
         $this->assertDatabaseHas('pre_registros_cnpj', [
@@ -77,21 +104,20 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
         $rt = factory('App\ResponsavelTecnico')->raw([
             'cpf' => '60923317058'
         ]);
-        $campos = ['registro'];
+        unset($rt['registro']);
         
         foreach($rt as $key => $value)
-        {
-            $temp = in_array($key, $campos);
             $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'pessoaJuridica.responsavelTecnico',
-                'campo' => $temp !== false ? $key : $key.'_rt',
+                'campo' => $key.'_rt',
                 'valor' => $value
             ])->assertStatus(200);
-        }
         
         $pr_1 = $preRegistroCnpj_1->toArray();
         unset($pr_1['pre_registro']);
@@ -133,19 +159,17 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $rt = factory('App\ResponsavelTecnico')->raw();
-        $campos = ['registro'];
+        unset($rt['registro']);
         
         foreach($rt as $key => $value)
-        {
-            $temp = in_array($key, $campos);
             $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'pessoaJuridica.responsavelTecnico',
-                'campo' => $temp !== false ? $key : $key.'_rt',
+                'campo' => $key.'_rt',
                 'valor' => $value
             ])->assertStatus(200);
-        }
         
         $pr_1 = $preRegistroCnpj_1->toArray();
         unset($pr_1['pre_registro']);
@@ -169,7 +193,7 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
         
@@ -194,20 +218,17 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
-        $campos = ['registro'];
+        unset($rt['registro']);
         
         foreach($rt as $key => $value)
-        {
-            $temp = in_array($key, $campos);
             $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => '',
-                'campo' => $temp !== false ? $key : $key.'_rt',
+                'campo' => $key.'_rt',
                 'valor' => $value
             ])->assertSessionHasErrors('classe');
-        }
         
         $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
 
@@ -223,20 +244,17 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
-        $campos = ['registro'];
+        unset($rt['registro']);
         
         foreach($rt as $key => $value)
-        {
-            $temp = in_array($key, $campos);
             $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'pessoaJuridica.responsavelTecnicoErro',
-                'campo' => $temp !== false ? $key : $key.'_rt',
+                'campo' => $key.'_rt',
                 'valor' => $value
             ])->assertSessionHasErrors('classe');
-        }
         
         $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
 
@@ -252,7 +270,7 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
         
@@ -277,10 +295,9 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = [
-            'registro' => $faker->sentence(400),
             'nome' => $faker->sentence(400),
             'nome_social' => $faker->sentence(400),
             'logradouro' => $faker->sentence(400),
@@ -289,21 +306,17 @@ class ResponsavelTecnicoTest extends TestCase
             'cidade' => $faker->sentence(400),
             'nome_mae' => $faker->sentence(400),
             'nome_pai' => $faker->sentence(400),
+            'tipo_identidade' => $faker->sentence(400),
             'identidade' => $faker->sentence(400),
             'orgao_emissor' => $faker->sentence(400),
         ];
-        
-        $campos = ['registro'];
-        
+                
         foreach($rt as $key => $value)
-        {
-            $temp = in_array($key, $campos);
             $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'pessoaJuridica.responsavelTecnico',
-                'campo' => $temp !== false ? $key : $key.'_rt',
+                'campo' => $key.'_rt',
                 'valor' => $value
             ])->assertSessionHasErrors('valor');
-        }
         
         $this->assertDatabaseMissing('responsaveis_tecnicos', $rt);
 
@@ -318,7 +331,7 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
@@ -341,7 +354,7 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
@@ -364,7 +377,7 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'pessoaJuridica.responsavelTecnico',
@@ -387,7 +400,7 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $datas = [
             'dt_nascimento' => null, 
@@ -415,16 +428,17 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
-        
+        unset($rt['registro']);
+
         foreach($rt as $key => $value)
         {
             if($key != 'cpf')
                 $this->post(route('externo.inserir.preregistro.ajax'), [
                     'classe' => 'pessoaJuridica.responsavelTecnico',
-                    'campo' => $key == 'registro' ? $key : $key . '_rt',
+                    'campo' => $key . '_rt',
                     'valor' => $value
                 ])->assertOk();
         }
@@ -443,14 +457,15 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->raw();
+        unset($rt['registro']);
         
         foreach($rt as $key => $value)
             $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'pessoaJuridica.responsavelTecnico',
-                'campo' => $key == 'registro' ? $key : $key . '_rt',
+                'campo' => $key . '_rt',
                 'valor' => $value
             ])->assertOk();
         
@@ -477,7 +492,7 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->create();
 
@@ -495,7 +510,7 @@ class ResponsavelTecnicoTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = [
             'registro' => '0000000001', 
@@ -518,35 +533,53 @@ class ResponsavelTecnicoTest extends TestCase
         $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
     }
 
+    /** @test */
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_when_clean_inputs()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $rt = factory('App\ResponsavelTecnico')->create();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'pessoaJuridica.responsavelTecnico',
+            'campo' => 'cpf_rt',
+            'valor' => $rt->cpf
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => $rt->id
+        ]);
+
+        $dados = $rt->toArray();
+        unset($dados['registro']);
+        unset($dados['created_at']);
+        unset($dados['updated_at']);
+        unset($dados['deleted_at']);
+        unset($dados['id']);
+
+        foreach($dados as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaJuridica.responsavelTecnico',
+                'campo' => $key . '_rt',
+                'valor' => ''
+            ])->assertOk();
+        
+        $this->assertDatabaseHas('responsaveis_tecnicos', $rt->toArray());
+
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'responsavel_tecnico_id' => null
+        ]);
+    }
+
     /** 
      * =======================================================================================================
      * TESTES PRE-REGISTRO-CNPJ VIA SUBMIT - CLIENT
      * =======================================================================================================
      */
-
-    /** @test */
-    public function view_message_errors_when_submit_with_rt_without_contabil()
-    {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
-        $this->get(route('externo.inserir.preregistro.view'));
-
-        $dados = factory('App\ResponsavelTecnico')->raw();
-        $tempRT = array();
-        foreach($dados as $key => $value)
-            $key == 'registro' ? $tempRT[$key] = $value : $tempRT[$key . '_rt'] = $value;
-
-        $this->put(route('externo.inserir.preregistro'), $tempRT)->assertStatus(302);
-        $this->get(route('externo.inserir.preregistro.view'))
-        ->assertSeeText('Foi encontrado erro em: ')
-        ->assertDontSeeText('Contabilidade *')
-        ->assertSeeText('Dados Gerais *')
-        ->assertSeeText('Endereço *')
-        ->assertDontSeeText('Contato / RT *')
-        ->assertSeeText('Canal de Relacionamento *')
-        ->assertSeeText('Anexos *');
-    }
 
     /** @test */
     public function can_submit_pre_registro_cnpj_if_rt_exists_in_database()
@@ -556,21 +589,23 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $rt = factory('App\ResponsavelTecnico')->create();
+        $rt = factory('App\ResponsavelTecnico')->state('low')->create();
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
         $tempRT = array();
         foreach($rt->toArray() as $key => $value)
-            $key == 'registro' ? $tempRT[$key] = $value : $tempRT[$key . '_rt'] = $value;
+            $key == 'registro' ? null : $tempRT[$key . '_rt'] = $value;
         
         $tempCnpj = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
         foreach($preRegistroCnpj as $key => $value)
@@ -578,7 +613,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -586,10 +621,21 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertOk();
+        $rt->update([
+            'nome' => mb_strtoupper($dados['nome_rt'], 'UTF-8'), 
+            'nome_mae' => mb_strtoupper($dados['nome_mae_rt'], 'UTF-8'), 
+            'tipo_identidade' => mb_strtoupper($dados['tipo_identidade_rt'], 'UTF-8')
+        ]);
+
         $this->put(route('externo.inserir.preregistro'), $dados)
         ->assertRedirect(route('externo.preregistro.view'));
 
-        $this->assertDatabaseHas('responsaveis_tecnicos', $rt->toArray());
+        $rt = $rt->toArray();
+        foreach($rt as $key => $value)
+            $rt[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
+
+        $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
         $this->assertEquals(ResponsavelTecnico::count(), 1);
     }
 
@@ -601,17 +647,20 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $rt = factory('App\ResponsavelTecnico')->raw([
-            'cpf' => '86294373085'
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
+            'cpf' => '86294373085',
+            'registro' => '0000000001'
         ]);
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
@@ -625,7 +674,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -633,8 +682,13 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)->assertOk();
+
         $this->put(route('externo.inserir.preregistro'), $dados)
         ->assertRedirect(route('externo.preregistro.view'));
+
+        foreach($rt as $key => $value)
+            $rt[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
 
         $this->assertDatabaseHas('responsaveis_tecnicos', $rt);
         $this->assertEquals(ResponsavelTecnico::count(), 1);
@@ -648,17 +702,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'cpf' => null
         ]);
         $tempRT = array();
@@ -671,7 +727,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -679,7 +735,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cpf_rt');
     }
 
@@ -691,17 +747,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'cpf' => '012.012.456-88'
         ]);
         $tempRT = array();
@@ -714,7 +772,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -722,7 +780,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cpf_rt');
     }
 
@@ -734,17 +792,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome' => null
         ]);
         $tempRT = array();
@@ -757,7 +817,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -765,7 +825,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_rt');
     }
 
@@ -778,17 +838,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome' => $faker->sentence(400)
         ]);
         $tempRT = array();
@@ -801,7 +863,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -809,7 +871,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_rt');
     }
 
@@ -822,17 +884,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome' => 'Nome do RT com núm3ero5'
         ]);
         $tempRT = array();
@@ -845,7 +909,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -853,7 +917,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_rt');
     }
 
@@ -866,17 +930,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome_social' => $faker->sentence(400)
         ]);
         $tempRT = array();
@@ -889,7 +955,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -897,7 +963,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_social_rt');
     }
 
@@ -910,17 +976,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome_social' => 'Nome do RT com núm3ero5'
         ]);
         $tempRT = array();
@@ -933,7 +1001,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -941,51 +1009,8 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_social_rt');
-    }
-
-    /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_registro_more_than_20_chars()
-    {
-        Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
-
-        $preRegistro = factory('App\PreRegistro')->raw([
-            'id' => 1,
-            'user_externo_id' => $externo->id,
-            'contabil_id' => null,
-            'idusuario' => null
-        ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
-            'pre_registro_id' => $preRegistro['id'],
-            'responsavel_tecnico_id' => null,
-        ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
-            'registro' => '012345678998745632107'
-        ]);
-        $tempRT = array();
-        foreach($rt as $key => $value)
-            $key == 'registro' ? $tempRT[$key] = $value : $tempRT[$key . '_rt'] = $value;
-        
-        $tempCnpj = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
-        foreach($preRegistroCnpj as $key => $value)
-            in_array($key, $tempCnpj) ? $tempCnpj[$key . '_empresa'] = $value : $tempCnpj[$key] = $value;
-
-        $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
-        
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
-        
-        $this->post(route('externo.inserir.preregistro.ajax'), [
-            'classe' => 'anexos',
-            'campo' => 'path',
-            'valor' => UploadedFile::fake()->create('random.pdf')
-        ])->assertOk();
-        
-        $this->put(route('externo.inserir.preregistro'), $dados)
-        ->assertSessionHasErrors('registro');
     }
 
     /** @test */
@@ -996,17 +1021,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'sexo' => ''
         ]);
         $tempRT = array();
@@ -1019,7 +1046,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1027,7 +1054,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('sexo_rt');
     }
 
@@ -1039,17 +1066,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'sexo' => 'N'
         ]);
         $tempRT = array();
@@ -1062,7 +1091,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1070,7 +1099,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('sexo_rt');
     }
 
@@ -1082,17 +1111,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'dt_nascimento' => ''
         ]);
         $tempRT = array();
@@ -1105,7 +1136,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1113,7 +1144,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_nascimento_rt');
     }
 
@@ -1125,17 +1156,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'dt_nascimento' => 'teste'
         ]);
         $tempRT = array();
@@ -1148,7 +1181,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1156,7 +1189,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_nascimento_rt');
     }
 
@@ -1168,17 +1201,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'dt_nascimento' => Carbon::today()->subYears(17)->format('Y-m-d')
         ]);
         $tempRT = array();
@@ -1191,7 +1226,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1199,8 +1234,98 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_nascimento_rt');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_cnpj_without_tipo_identidade_rt()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
+        ]);
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'responsavel_tecnico_id' => null,
+        ]);
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
+            'tipo_identidade' => ''
+        ]);
+        $tempRT = array();
+        foreach($rt as $key => $value)
+            $key == 'registro' ? $tempRT[$key] = $value : $tempRT[$key . '_rt'] = $value;
+        
+        $tempCnpj = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
+        foreach($preRegistroCnpj as $key => $value)
+            in_array($key, $tempCnpj) ? $tempCnpj[$key . '_empresa'] = $value : $tempCnpj[$key] = $value;
+
+        $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('tipo_identidade_rt');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_cnpj_with_tipo_identidade_rt_with_wrong_value()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]));
+
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
+            'id' => 1,
+            'user_externo_id' => $externo->id,
+            'contabil_id' => null,
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
+        ]);
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
+            'pre_registro_id' => $preRegistro['id'],
+            'responsavel_tecnico_id' => null,
+        ]);
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
+            'tipo_identidade' => 'Teste'
+        ]);
+        $tempRT = array();
+        foreach($rt as $key => $value)
+            $key == 'registro' ? $tempRT[$key] = $value : $tempRT[$key . '_rt'] = $value;
+        
+        $tempCnpj = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
+        foreach($preRegistroCnpj as $key => $value)
+            in_array($key, $tempCnpj) ? $tempCnpj[$key . '_empresa'] = $value : $tempCnpj[$key] = $value;
+
+        $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')
+        ])->assertOk();
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('tipo_identidade_rt');
     }
 
     /** @test */
@@ -1211,17 +1336,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'identidade' => ''
         ]);
         $tempRT = array();
@@ -1234,7 +1361,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1242,30 +1369,32 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('identidade_rt');
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_cnpj_with_identidade_rt_more_than_20_chars()
+    public function cannot_submit_pre_registro_cnpj_with_identidade_rt_more_than_30_chars()
     {
         Storage::fake('local');
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
-            'identidade' => '987654321098765432101'
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
+            'identidade' => '987654321098765432101-9856j47y-hj'
         ]);
         $tempRT = array();
         foreach($rt as $key => $value)
@@ -1277,7 +1406,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1285,7 +1414,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('identidade_rt');
     }
 
@@ -1297,17 +1426,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'orgao_emissor' => null
         ]);
         $tempRT = array();
@@ -1320,7 +1451,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1328,7 +1459,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('orgao_emissor_rt');
     }
 
@@ -1341,17 +1472,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'orgao_emissor' => $faker->sentence(400)
         ]);
         $tempRT = array();
@@ -1364,7 +1497,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1372,7 +1505,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('orgao_emissor_rt');
     }
 
@@ -1384,17 +1517,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'dt_expedicao' => ''
         ]);
         $tempRT = array();
@@ -1407,7 +1542,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1415,7 +1550,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao_rt');
     }
 
@@ -1427,17 +1562,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'dt_expedicao' => 'teste'
         ]);
         $tempRT = array();
@@ -1450,7 +1587,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1458,7 +1595,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao_rt');
     }
 
@@ -1470,17 +1607,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'dt_expedicao' => Carbon::today()->addDay()->format('Y-m-d')
         ]);
         $tempRT = array();
@@ -1493,7 +1632,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1501,7 +1640,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('dt_expedicao_rt');
     }
 
@@ -1513,17 +1652,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'cep' => ''
         ]);
         $tempRT = array();
@@ -1536,7 +1677,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1544,7 +1685,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cep_rt');
     }
 
@@ -1556,17 +1697,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'cep' => '01234-7890'
         ]);
         $tempRT = array();
@@ -1579,7 +1722,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1587,7 +1730,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cep_rt');
     }
 
@@ -1599,17 +1742,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'bairro' => ''
         ]);
         $tempRT = array();
@@ -1622,7 +1767,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1630,7 +1775,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('bairro_rt');
     }
 
@@ -1643,17 +1788,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'bairro' => $faker->sentence(400)
         ]);
         $tempRT = array();
@@ -1666,7 +1813,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1674,7 +1821,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('bairro_rt');
     }
 
@@ -1686,17 +1833,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'logradouro' => ''
         ]);
         $tempRT = array();
@@ -1709,7 +1858,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1717,7 +1866,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('logradouro_rt');
     }
 
@@ -1730,17 +1879,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'logradouro' => $faker->sentence(400)
         ]);
         $tempRT = array();
@@ -1753,7 +1904,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1761,7 +1912,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('logradouro_rt');
     }
 
@@ -1773,17 +1924,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'numero' => ''
         ]);
         $tempRT = array();
@@ -1796,7 +1949,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1804,7 +1957,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('numero_rt');
     }
 
@@ -1816,17 +1969,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'numero' => '012345678a9'
         ]);
         $tempRT = array();
@@ -1839,7 +1994,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1847,7 +2002,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('numero_rt');
     }
 
@@ -1860,17 +2015,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'complemento' => $faker->sentence(400)
         ]);
         $tempRT = array();
@@ -1883,7 +2040,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1891,7 +2048,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('complemento_rt');
     }
 
@@ -1903,17 +2060,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'cidade' => ''
         ]);
         $tempRT = array();
@@ -1926,7 +2085,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1934,7 +2093,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cidade_rt');
     }
 
@@ -1947,17 +2106,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'cidade' => $faker->sentence(400)
         ]);
         $tempRT = array();
@@ -1970,7 +2131,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -1978,7 +2139,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cidade_rt');
     }
 
@@ -1990,17 +2151,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'uf' => ''
         ]);
         $tempRT = array();
@@ -2013,7 +2176,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -2021,7 +2184,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('uf_rt');
     }
 
@@ -2033,17 +2196,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'uf' => 'SSP'
         ]);
         $tempRT = array();
@@ -2056,7 +2221,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -2064,7 +2229,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('uf_rt');
     }
 
@@ -2076,17 +2241,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome_mae' => null
         ]);
         $tempRT = array();
@@ -2099,7 +2266,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -2107,7 +2274,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_mae_rt');
     }
 
@@ -2120,17 +2287,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome_mae' => $faker->sentence(400)
         ]);
         $tempRT = array();
@@ -2143,7 +2312,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -2151,7 +2320,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_mae_rt');
     }
 
@@ -2164,17 +2333,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome_mae' => 'Nome do RT com núm3ero5'
         ]);
         $tempRT = array();
@@ -2187,7 +2358,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -2195,7 +2366,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_mae_rt');
     }
 
@@ -2208,17 +2379,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome_pai' => $faker->sentence(400)
         ]);
         $tempRT = array();
@@ -2231,7 +2404,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -2239,7 +2412,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_pai_rt');
     }
 
@@ -2252,17 +2425,19 @@ class ResponsavelTecnicoTest extends TestCase
             'cpf_cnpj' => '06985713000138'
         ]));
 
-        $preRegistro = factory('App\PreRegistro')->raw([
+        $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
-            'idusuario' => null
+            'idusuario' => null,
+            'pergunta' => 'teste da pergunta',
+            'opcional_celular' => null
         ]);
-        $preRegistroCnpj = factory('App\PreRegistroCnpj')->raw([
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('low')->raw([
             'pre_registro_id' => $preRegistro['id'],
             'responsavel_tecnico_id' => null,
         ]);
-        $rt = factory('App\ResponsavelTecnico')->raw([
+        $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'nome_pai' => 'Nome do RT com núm3ero5'
         ]);
         $tempRT = array();
@@ -2275,7 +2450,7 @@ class ResponsavelTecnicoTest extends TestCase
 
         $dados = array_merge($preRegistro, $tempCnpj, $tempRT);
         
-        $this->get(route('externo.inserir.preregistro.view'))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',
@@ -2283,7 +2458,7 @@ class ResponsavelTecnicoTest extends TestCase
             'valor' => UploadedFile::fake()->create('random.pdf')
         ])->assertOk();
         
-        $this->put(route('externo.inserir.preregistro'), $dados)
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_pai_rt');
     }
 }
