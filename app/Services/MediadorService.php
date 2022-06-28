@@ -8,6 +8,7 @@ use App\Contracts\PlantaoJuridicoServiceInterface;
 use App\Contracts\RegionalServiceInterface;
 use App\Contracts\TermoConsentimentoServiceInterface;
 use App\Contracts\AgendamentoServiceInterface;
+use App\Contracts\LicitacaoServiceInterface;
 use App\Contracts\UserExternoServiceInterface;
 use App\Contracts\PreRegistroServiceInterface;
 
@@ -22,6 +23,7 @@ class MediadorService implements MediadorServiceInterface {
         RegionalServiceInterface $regionalService,
         TermoConsentimentoServiceInterface $termoConsentimentoService,
         AgendamentoServiceInterface $agendamentoService,
+        LicitacaoServiceInterface $licitacaoService,
         UserExternoServiceInterface $userExternoService,
         PreRegistroServiceInterface $preRegistroService
     )
@@ -32,6 +34,7 @@ class MediadorService implements MediadorServiceInterface {
             'Regional' => $regionalService,
             'TermoConsentimento' => $termoConsentimentoService,
             'Agendamento' => $agendamentoService,
+            'Licitacao' => $licitacaoService,
             'UserExterno' => $userExternoService,
             'PreRegistro' => $preRegistroService
         ];

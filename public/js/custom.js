@@ -329,8 +329,10 @@ $('#statusAgendamentoAdmin').change(function(){
 });
 
 $('#statusAgendamentoAdmin').ready(function(){
-  var valor = $('#statusAgendamentoAdmin').val();
-  selectAtendenteByStatus(valor);
+  if($('#statusAgendamentoAdmin').length > 0){
+    var valor = $('#statusAgendamentoAdmin').val();
+    selectAtendenteByStatus(valor);
+  }
 });
 // Fim da Funcionalidade Agendamento
 

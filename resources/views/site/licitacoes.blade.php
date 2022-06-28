@@ -31,79 +31,93 @@
               <label for="palavrachave">Palavra-chave</label>
               <input type="text"
                 name="palavrachave"
-                class="form-control {{ !empty(Request::input('palavrachave')) ? 'bg-focus border-info' : '' }}"
+                class="form-control {{ !empty(request()->query('palavrachave')) ? 'bg-focus border-info' : '' }}"
                 placeholder="Insira uma palavra-chave"
-                @if(!empty(Request::input('palavrachave')))
-                value="{{ Request::input('palavrachave') }}"
-                @endif
-                />
+                value="{{ !empty(request()->query('palavrachave')) ? request()->query('palavrachave') : '' }}"
+              />
             </div>
           	<div class="col-md-4">
           	  <label for="modalidade">Modalidade</label>
-          	  <select name="modalidade" class="form-control {{ !empty(Request::input('modalidade')) && in_array(Request::input('modalidade'), $modalidades) ? 'bg-focus border-info' : '' }}" id="modalidade">
+          	  <select name="modalidade" 
+                class="form-control {{ !empty(request()->query('modalidade')) && in_array(request()->query('modalidade'), $modalidades) ? 'bg-focus border-info' : '' }} {{ $errors->has('modalidade') ? 'is-invalid' : '' }}" 
+                id="modalidade"
+              >
           	  	<option value="">Todas</option>
 	         	    @foreach($modalidades as $modalidade)
-                  @if($modalidade === Request::input('modalidade'))
-                  <option value="{{ $modalidade }}" selected>{{ $modalidade }}</option>
-                  @else
-	         	      <option value="{{ $modalidade }}">{{ $modalidade }}</option>
-                  @endif
+                  <option value="{{ $modalidade }}" {{ $modalidade == request()->query('modalidade') ? 'selected' : '' }}>{{ $modalidade }}</option>
 	          	  @endforeach
 	            </select>
+              @if($errors->has('modalidade'))
+              <div class="invalid-feedback">
+                  {{ $errors->first('modalidade') }}
+              </div>
+              @endif
           	</div>
           	<div class="col-md-2 col-sm-6 mt-2-768">
           	  <label for="nrprocesso">Nº do Processo Adm.</label>
           	  <input type="text"
                 name="nrprocesso"
-                class="form-control nrprocessoInput {{ !empty(Request::input('nrprocesso')) ? 'bg-focus border-info' : '' }}"
+                class="form-control nrprocessoInput {{ !empty(request()->query('nrprocesso')) ? 'bg-focus border-info' : '' }} {{ $errors->has('nrprocesso') ? 'is-invalid' : '' }}"
                 placeholder="Nº do Processo Adm."
                 id="nrprocesso"
-                @if(!empty(Request::input('nrprocesso')))
-                value="{{ Request::input('nrprocesso') }}"
-                @endif
-                />
+                value="{{ !empty(request()->query('nrprocesso')) ? request()->query('nrprocesso') : '' }}"
+              />
+              @if($errors->has('nrprocesso'))
+              <div class="invalid-feedback">
+                {{ $errors->first('nrprocesso') }}
+              </div>
+              @endif
           	</div>
           	<div class="col-md-2 col-sm-6 mt-2-768">
           	  <label for="nrlicitacao">Nº da Licitação</label>
           	  <input type="text"
                 name="nrlicitacao"
-                class="form-control nrlicitacaoInput {{ !empty(Request::input('nrlicitacao')) ? 'bg-focus border-info' : '' }}"
+                class="form-control nrlicitacaoInput {{ !empty(request()->query('nrlicitacao')) ? 'bg-focus border-info' : '' }} {{ $errors->has('nrlicitacao') ? 'is-invalid' : '' }}"
                 placeholder="Nº da Licitação"
                 id="nrlicitacao"
-                @if(!empty(Request::input('nrlicitacao')))
-                value="{{ Request::input('nrlicitacao') }}"
-                @endif
-                />
+                value="{{ !empty(request()->query('nrlicitacao')) ? request()->query('nrlicitacao') : '' }}"
+              />
+              @if($errors->has('nrlicitacao'))
+              <div class="invalid-feedback">
+                {{ $errors->first('nrlicitacao') }}
+              </div>
+              @endif
           	</div>
           </div>
           <div class="form-row">
           	<div class="col-lg-4 col-md-6">
           	  <label for="situacao">Situação</label>
-          	  <select name="situacao" class="form-control {{ !empty(Request::input('situacao')) && in_array(Request::input('situacao'), $situacoes) ? 'bg-focus border-info' : '' }}" id="situacao">
+          	  <select name="situacao" 
+                class="form-control {{ !empty(request()->query('situacao')) && in_array(request()->query('situacao'), $situacoes) ? 'bg-focus border-info' : '' }} {{ $errors->has('situacao') ? 'is-invalid' : '' }}" 
+                id="situacao"
+              >
           	  	<option value="">Qualquer</option>
 	         	    @foreach($situacoes as $situacao)
-                  @if($situacao === Request::input('situacao'))
-                  <option value="{{ $situacao }}" selected>{{ $situacao }}</option>
-                  @else
-   	         	    <option value="{{ $situacao }}">{{ $situacao }}</option>
-                  @endif
+                 <option value="{{ $situacao }}" {{ $situacao == request()->query('situacao') ? 'selected' : '' }}>{{ $situacao }}</option>
 	          	  @endforeach
 	            </select>
+              @if($errors->has('situacao'))
+              <div class="invalid-feedback">
+                {{ $errors->first('situacao') }}
+              </div>
+            @endif
           	</div>
           	<div class="col-lg-4 col-md-6 mt-2-768">
           	  <label for="datarealizacao">Data de Realização</label>
-          	  <input type="text"
-                class="form-control dataInput {{ !empty(Request::input('datarealizacao')) ? 'bg-focus border-info' : '' }}"
-                placeholder="dd/mm/aaaa"
+          	  <input type="date"
+                class="form-control {{ !empty(request()->query('datarealizacao')) ? 'bg-focus border-info' : '' }} {{ $errors->has('datarealizacao') ? 'is-invalid' : '' }}"
                 name="datarealizacao"
-                @if(!empty(Request::input('datarealizacao')))
-                value="{{ Request::input('datarealizacao') }}"
-                @endif
-                />
+                value="{{ !empty(request()->query('datarealizacao')) ? request()->query('datarealizacao') : '' }}"
+              />
+              @if($errors->has('datarealizacao'))
+              <div class="invalid-feedback">
+                {{ $errors->first('datarealizacao') }}
+              </div>
+              @endif
           	</div>
             <div class="col-lg-4 col-md-12 align-self-end pesquisaLicitacao-btn">
               <button type="submit" class="btn-buscaavancada"><i class="fas fa-search"></i>&nbsp;&nbsp;Pesquisar</button>
-              <a href="/licitacoes" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
+              <a href="{{ route('licitacoes.siteGrid') }}" class="btn btn-limpar"><i class="fas fa-times"></i>&nbsp;&nbsp;Limpar</a>
             </div>
           </div>
         </form>
@@ -118,7 +132,7 @@
   <div class="container">
     <div class="row mt-4">
       <div class="col">
-        @if(isset($licitacoes))
+        @if(isset($licitacoes) && ($licitacoes->total() > 0))
           @foreach($licitacoes as $licitacao)
           <div class="licitacao-grid">
             <a href="{{ route('licitacoes.show', $licitacao->idlicitacao) }}">
@@ -173,11 +187,7 @@
           </div>
           @endforeach
         @else
-        @if(isset($erro))
-        <p>{{ $erro }}</p>  
-        @else
         <p>Nenhuma licitação encontrada!</p>
-        @endif
         @endif
       </div>
     </div>

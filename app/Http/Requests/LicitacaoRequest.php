@@ -3,35 +3,69 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class LicitacaoRequest extends FormRequest
 {
-    // public function authorize()
-    // {
-    //     return false;
-    // }
+    private $service;
+    private $regraRegex;
+    private $regraRegexBusca;
+    private $msgRegex;
+
+    public function __construct(MediadorServiceInterface $service)
+    {
+        $this->service = $service->getService('Licitacao');
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->regraRegex = 'regex:/^[0-9]{1,3}\/[0-9]{4}$/';
+        $this->regraRegexBusca = 'regex:/^[0-9]{1,3}\/[0-9]{2,4}$/';
+        $this->msgRegex = 'Formato válido: 001/1900';
+
+        if(!\Route::is('licitacoes.siteBusca'))
+            if(isset(request()->datarealizacao))
+                $this->merge(['datarealizacao' => str_replace('T', ' ', request()->datarealizacao)]);
+    }
 
     public function rules()
     {
+        if(\Route::is('licitacoes.siteBusca'))
+        {
+            $this->msgRegex = 'Formato válido: 1/00 ou 1/000 ou 1/0000';
+            return [
+                'palavrachave' => 'nullable|max:191',
+                'modalidade' => 'nullable|in:' . implode(',', $this->service->getModalidades()),
+                'nrlicitacao' => 'nullable|' . $this->regraRegexBusca,
+                'nrprocesso' => 'nullable|' . $this->regraRegexBusca,
+                'situacao' => 'nullable|in:' . implode(',', $this->service->getSituacoes()),
+                'datarealizacao' => 'nullable|date',
+            ];
+        }
+
         return [
-            'modalidade' => 'required|max:191',
+            'uasg' => 'max:191',
+            'edital' => 'max:191',
+            'modalidade' => 'required|in:' . implode(',', $this->service->getModalidades()),
             'titulo' => 'required|max:191',
-            'nrlicitacao' => 'required|max:191',
-            'nrprocesso' => 'required|max:191',
-            'situacao' => 'required|max:191',
+            'nrlicitacao' => 'required|' . $this->regraRegex,
+            'nrprocesso' => 'required|' . $this->regraRegex,
+            'situacao' => 'required|in:' . implode(',', $this->service->getSituacoes()),
             'objeto' => 'required',
-            'datarealizacao' => 'required',
+            'datarealizacao' => 'required|date_format:Y-m-d H:i',
         ];
     }
 
     public function messages()
     {
         return [
-            'required' => 'O :attribute é obrigatório',
-            'nrlicitacao.required' => 'O nº da licitação é obrigatório',
-            'nrprocesso.required' => 'O nº do processo é obrigatório',
-            'datarealizacao.required' => 'Informe a data de realização da Licitação',
-            'max' => 'O :attribute excedeu o limite de caracteres permitido'
+            'required' => 'Campo é obrigatório',
+            'max' => 'O campo excedeu o limite de :max caracteres',
+            'date_format' => 'Formato inválido',
+            'modalidade.in' => 'Modalidade não encontrada',
+            'situacao.in' => 'Situação não encontrada',
+            'regex' => $this->msgRegex,
+            'date' => 'Deve ser uma data válida'
         ];
     }
 }

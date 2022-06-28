@@ -29,7 +29,7 @@
             <h2 class="stronger">{{ $licitacao->titulo }}</h2>
           </div>
           <div class="align-self-center">
-            <a href="/licitacoes" class="btn-voltar">Voltar</a>
+            <a href="{{ route('licitacoes.siteGrid') }}" class="btn-voltar">Voltar</a>
           </div>
         </div>
       </div>
@@ -67,7 +67,8 @@
         </table>
       </div>
       <div class="col-xl-8 col-lg-7">
-        <a href="{{ $licitacao->edital }}" download />
+        @if(isset($licitacao->edital))
+        <a href="{{ $licitacao->edital }}" download >
           <div class="edital-download d-flex">
             <div class="flex-one">
               <h5 class="pb-0">Edital disponível para download</h5>
@@ -75,8 +76,9 @@
             </div>
             <button class="btn-edital"><i class="fas fa-download"></i>&nbsp;&nbsp;Download</button>
           </div>
-     	</a>
-        <div class="edital-download mt-3">
+     	  </a>
+        @endif
+        <div class="edital-download {{ isset($licitacao->edital) ? 'mt-3' : '' }}">
           <h4 class="azul pb-0">Objeto</h4>
           <div class="linha-lg-mini mb-3"></div>
           {!! $licitacao->objeto !!}

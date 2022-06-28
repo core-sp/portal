@@ -2,9 +2,9 @@
 
 namespace App;
 
-use App\Traits\TabelaAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class Licitacao extends Model
 {
@@ -12,7 +12,7 @@ class Licitacao extends Model
 
     protected $primaryKey = 'idlicitacao';
     protected $table = 'licitacoes';
-    protected $fillable = ['modalidade', 'situacao', 'uasg', 'titulo', 'edital', 'nrlicitacao', 'nrprocesso', 'datarealizacao', 'objeto', 'idusuario'];
+    protected $guarded = [];
 
     // Modalidades de licitação
     const MOD_CARTA_CONVITE = 'Carta Convite';
@@ -99,5 +99,10 @@ class Licitacao extends Model
             Licitacao::SIT_PREPARATORIA,
             Licitacao::SIT_SUSPENSO
         ];
+    }
+
+    public function formatDtRealizacaoToInput()
+    {
+        return str_replace(' ', 'T', Carbon::create($this->datarealizacao)->format('Y-m-d H:i'));
     }
 }
