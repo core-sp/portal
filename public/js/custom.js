@@ -402,3 +402,54 @@ $('#statusAgendamentoAdmin').ready(function(){
 	});
 
 })(jQuery);
+
+// Funcionalidade Pre-Registro
+function putDadosPreRegistro(campo, valor)
+{
+    var id = $('[name="idPreRegistro"]').val();
+
+    $('#modalJustificativaPreRegistro').modal('hide');
+
+    $.ajax({
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      data: {
+        'campo': campo,
+        'valor': valor
+      },
+      dataType: 'json',
+      url: '/admin/pre-registros/update-ajax/' + id,
+      async: false,
+      cache: false,
+      timeout: 60000,
+      success: function(response) {
+        if(valor != ""){
+          $('#' + campo).append('<span class="badge badge-warning ml-2">Justificado</span>');
+          $('#' + campo + ' button[value="' + campo + '"]').html('<i class="fas fa-edit"></i>');
+        }else{
+          $('#' + campo + ' span.badge').remove();
+          $('#' + campo + ' button[value="' + campo + '"]').html('<i class="fas fa-times"></i>');
+        }
+      },
+      error: function(request, status, error) {
+        console.clear();
+      }
+    });
+}
+
+$('.justificativaPreRegistro').click(function() {
+    var campo = this.value;
+    $('#modalJustificativaPreRegistro .modal-body textarea').val('');
+    $('#submitJustificativaPreRegistro').val(campo);
+    $('#modalJustificativaPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
+});
+
+$('#submitJustificativaPreRegistro').click(function() {
+    var campo = this.value;
+    var value = $('#modalJustificativaPreRegistro .modal-body textarea').val();
+    putDadosPreRegistro(campo, value);
+});
+
+// Fim da Funcionalidade Pre-Registro

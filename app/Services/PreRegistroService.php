@@ -25,10 +25,66 @@ class PreRegistroService implements PreRegistroServiceInterface {
     const RELATION_RT = "pessoaJuridica.responsavelTecnico";
 
     private $totalFiles;
+    private $variaveis;
 
     public function __construct()
     {
         $this->totalFiles = 'App\Anexo'::TOTAL_PRE_REGISTRO;
+        $this->variaveis = [
+            'singular' => 'pré-registro',
+            'singulariza' => 'o pré-registro',
+            'pluraliza' => 'pré-registros',
+            'plural' => 'pre-registros',
+            'busca' => 'pre-registros',
+            'slug' => 'pre-registros',
+            'mostra' => 'pre-registro'
+        ];
+    }
+
+    private function tabelaCompleta($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'ID',
+            'CPF / CNPJ',
+            'Nome',
+            'Regional',
+            'Atualizado em:',
+            'Status',
+            'Ações'
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        // $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
+        foreach($resultados as $resultado) 
+        {
+            $acoes = '<a href="'.route('preregistro.view', $resultado->id).'" class="btn btn-sm btn-default">Analisar</a> ';
+            // if($userPodeEditar)
+            //     $acoes .= '<a href="'.route('regionais.edit', $resultado->idregional).'" class="btn btn-sm btn-primary">Editar</a> ';
+            $conteudo = [
+                $resultado->id,
+                formataCpfCnpj($resultado->userExterno->cpf_cnpj),
+                $resultado->userExterno->nome,
+                $resultado->regional->regional,
+                formataData($resultado->updated_at),
+                $resultado->status,
+                $acoes
+            ];
+            array_push($contents, $conteudo);
+        }
+        // Classes da tabela
+        $classes = [
+            'table',
+            'table-hover'
+        ];
+
+        $tabela = montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
+    private function getMenu()
+    {
+        return ['Contabilidade', 'Dados Gerais', 'Endereço', 'Contato / RT', 'Canal de Relacionamento', 'Anexos'];
     }
 
     private function getRelacoes()
@@ -275,6 +331,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 ->sortBy('regional'),
             'classes' => $this->getNomeClasses(),
             'totalFiles' => $this->totalFiles,
+            'abas' => $this->getMenu()
         ];
     }
 
@@ -388,5 +445,36 @@ class PreRegistroService implements PreRegistroServiceInterface {
         }
 
         throw new \Exception('Arquivo não existe / não pode acessar', 401);
+    }
+
+    public function listar()
+    {
+        // ordenar depois por solicitações em estagio inicial, seguido de correçoes, etc
+        $resultados = PreRegistro::with(['userExterno' => function ($query) {
+            $query->select('id', 'cpf_cnpj', 'nome');
+        }, 'regional' => function ($query2) {
+            $query2->select('idregional', 'regional');
+        }])
+        ->select('id', 'updated_at', 'status', 'user_externo_id', 'idregional')
+        ->whereNotNull('status')
+        ->orderBy('id')
+        ->get();
+
+        return [
+            'resultados' => $resultados, 
+            'tabela' => $this->tabelaCompleta($resultados), 
+            'variaveis' => (object) $this->variaveis
+        ];
+    }
+
+    public function view($id)
+    {
+        return [
+            'resultado' => PreRegistro::findOrFail($id), 
+            'variaveis' => (object) $this->variaveis,
+            'abas' => $this->getMenu(),
+            'codigos' => $this->getCodigos(),
+            'classes' => $this->getNomeClasses(),
+        ];
     }
 }

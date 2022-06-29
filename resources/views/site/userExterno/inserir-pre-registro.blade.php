@@ -2,10 +2,6 @@
 
 @section('content-user-externo')
 
-@php
-    $abas = ['Contabilidade', 'Dados Gerais', 'Endereço', 'Contato / RT', 'Canal de Relacionamento', 'Anexos'];
-@endphp
-
 @if($errors->count() > 0)
 <div class="d-block w-100 border border-warning mb-2" id="erroPreRegistro">
     <p class="bg-warning font-weight-bolder pl-1">

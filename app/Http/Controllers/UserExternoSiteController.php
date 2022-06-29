@@ -125,12 +125,13 @@ class UserExternoSiteController extends Controller
             $regionais = $dados['regionais'];
             $classes = $dados['classes'];
             $totalFiles = $dados['totalFiles'];
+            $abas = $dados['abas'];
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, 'Erro ao carregar os dados da solicitação de registro');
         }
 
-        return view('site.userExterno.inserir-pre-registro', compact('resultado', 'regionais', 'totalFiles', 'codigos', 'classes'));
+        return view('site.userExterno.inserir-pre-registro', compact('resultado', 'regionais', 'totalFiles', 'codigos', 'classes', 'abas'));
     }
 
     public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
@@ -158,13 +159,14 @@ class UserExternoSiteController extends Controller
             $regionais = $dados['regionais'];
             $classes = $dados['classes'];
             $totalFiles = $dados['totalFiles'];
+            $abas = $dados['abas'];
             $semPendencia = true;
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             abort(500, 'Erro ao verificar pendências da solicitação de registro');
         }
         
-        return view('site.userExterno.inserir-pre-registro', compact('semPendencia', 'resultado', 'regionais', 'totalFiles', 'codigos', 'classes'));
+        return view('site.userExterno.inserir-pre-registro', compact('semPendencia', 'resultado', 'regionais', 'totalFiles', 'codigos', 'classes', 'abas'));
     }
 
     // Esse request não devolve a página para correção.

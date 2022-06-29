@@ -20,4 +20,9 @@ interface PreRegistroServiceInterface {
     public function downloadAnexo($id, $externo);
 
     public function excluirAnexo($id, $externo);
+
+    // ADMIN
+    public function listar();
+
+    public function view($id);
 }
