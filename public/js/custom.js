@@ -404,52 +404,131 @@ $('#statusAgendamentoAdmin').ready(function(){
 })(jQuery);
 
 // Funcionalidade Pre-Registro
-function putDadosPreRegistro(campo, valor)
+function putDadosPreRegistro(campo, valor, acao)
 {
     var id = $('[name="idPreRegistro"]').val();
 
     $('#modalJustificativaPreRegistro').modal('hide');
 
+    if(acao == 'justificar'){
+        // evitar de fazer request quando não há justificativa escrita e nem salva
+        if((valor == "") && ($('#' + campo + ' i.fa-times').length > 0))
+            return false;
+
+        // evitar de fazer request quando não há alteração do valor com o texto salvo
+        if(valor == $('#' + campo + ' .valorJustificativaPR').text())
+            return false;
+    }
+
     $.ajax({
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      data: {
-        'campo': campo,
-        'valor': valor
-      },
-      dataType: 'json',
-      url: '/admin/pre-registros/update-ajax/' + id,
-      async: false,
-      cache: false,
-      timeout: 60000,
-      success: function(response) {
-        if(valor != ""){
-          $('#' + campo).append('<span class="badge badge-warning ml-2">Justificado</span>');
-          $('#' + campo + ' button[value="' + campo + '"]').html('<i class="fas fa-edit"></i>');
-        }else{
-          $('#' + campo + ' span.badge').remove();
-          $('#' + campo + ' button[value="' + campo + '"]').html('<i class="fas fa-times"></i>');
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        data: {
+          'acao': acao,
+          'campo': campo,
+          'valor': valor
+        },
+        dataType: 'json',
+        url: '/admin/pre-registros/update-ajax/' + id,
+        async: false,
+        cache: false,
+        timeout: 60000,
+        success: function(response) {
+          if(acao == 'justificar')
+              addJustificado(campo, valor);
+          else{
+              $("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> Salvo');
+              $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
+              setTimeout(function() {
+                $("#modalLoadingPreRegistro").modal('hide');
+              }, 1200); 
+          }
+        },
+        error: function(request, status, error) {
+            var errorFunction = getErrorMsg(request);
+            $("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorFunction[0]);
+            $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
+            setTimeout(function() {
+              $("#modalLoadingPreRegistro").modal('hide');
+            }, errorFunction[1]); 
+            console.clear();
         }
-      },
-      error: function(request, status, error) {
-        console.clear();
-      }
     });
+}
+
+function getErrorMsg(request)
+{
+    var time = 5000;
+    var errorMessage = request.status + ': ' + request.statusText;
+    var nomesCampo = ['campo', 'valor'];
+    if(request.status == 422){
+        for(var nome of nomesCampo){
+          var msg = request.responseJSON.errors[nome];
+          if(msg != undefined)
+            errorMessage = msg[0];
+        }
+        time = 2000;
+    }
+    if(request.status == 401){
+        errorMessage = request.responseJSON.message;
+        time = 2000;
+    }
+    if(request.status == 419){
+        errorMessage = "Sua sessão expirou! Recarregue a página";
+        time = 2000;
+    }
+    return [errorMessage, time];
+}
+
+function contJustificativaPR(obj)
+{
+    var total = 500 - obj.val().length;
+    if(total == -1)
+        return;
+    $('#contChar').text(total);
+}
+
+function addJustificado(campo, valor)
+{
+    if(valor != ""){
+        if($('#' + campo + ' span.badge').length == 0){
+            $('#' + campo).append('<span class="badge badge-warning ml-2">Justificado</span>');
+            $('#' + campo + ' button.justificativaPreRegistro').html('<i class="fas fa-edit"></i>');
+        }
+    }else{
+        $('#' + campo + ' span.badge').remove();
+        $('#' + campo + ' button.justificativaPreRegistro').html('<i class="fas fa-times"></i>');
+    }
+
+    $('#' + campo + ' span.valorJustificativaPR').text(valor);
 }
 
 $('.justificativaPreRegistro').click(function() {
     var campo = this.value;
-    $('#modalJustificativaPreRegistro .modal-body textarea').val('');
+    var texto = $('#' + campo + ' span.valorJustificativaPR').text();
+    var input = $('#modalJustificativaPreRegistro .modal-body textarea');
+    input.val(texto);
+    contJustificativaPR(input);
     $('#submitJustificativaPreRegistro').val(campo);
     $('#modalJustificativaPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
+});
+
+$('#modalJustificativaPreRegistro .modal-body textarea').keyup(function() {
+    contJustificativaPR($(this));
 });
 
 $('#submitJustificativaPreRegistro').click(function() {
     var campo = this.value;
     var value = $('#modalJustificativaPreRegistro .modal-body textarea').val();
-    putDadosPreRegistro(campo, value);
+    putDadosPreRegistro(campo, value, 'justificar');
+});
+
+$('.addValorPreRegistro').click(function() {
+    var campo = this.value;
+    var valor = $(this).parent().find('input').val();
+    putDadosPreRegistro(campo, valor, 'editar');
 });
 
 // Fim da Funcionalidade Pre-Registro

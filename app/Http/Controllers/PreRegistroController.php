@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Contracts\MediadorServiceInterface;
-use App\Http\Requests\PreRegistroRequest;
+use App\Http\Requests\PreRegistroAjaxAdminRequest;
 
 class PreRegistroController extends Controller
 {
@@ -52,19 +52,19 @@ class PreRegistroController extends Controller
         return view('admin.crud.mostra', compact('resultado', 'variaveis', 'abas', 'codigos', 'classes'));
     }
 
-    public function updateAjax(Request $request)
+    public function updateAjax(PreRegistroAjaxAdminRequest $request, $id)
     {
         // $this->authorize('updateOther', auth()->user());
 
-        // try{
-        //     $dados = $this->service->getService('PreRegistro')->view($id);
-        //     $resultado = $dados['resultado'];
-        //     $variaveis = $dados['variaveis'];
-        // } catch (\Exception $e) {
-        //     \Log::error($e->getMessage());
-        //     abort(500, "Erro ao carregar o pré-registro.");
-        // }
+        try{
+            $user = auth()->user();
+            $validatedData = $request->validated();
+            $dados = $this->service->getService('PreRegistro')->saveAjaxAdmin($validatedData, $id, $user);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            abort(500, "Erro ao salvar a justificativa do pré-registro.");
+        }
 
-        return response()->json();
+        return response()->json($dados);
     }
 }

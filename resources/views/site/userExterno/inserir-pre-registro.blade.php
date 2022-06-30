@@ -102,7 +102,7 @@
             </div>
 
             <!-- Tab 4 PJ -->
-            @if(strlen($resultado->userExterno->cpf_cnpj) == 14)
+            @if(!$resultado->userExterno->isPessoaFisica())
             <div id="parte4_PJ" class="tab-pane container fade"><br>
                 @include('site.userExterno.inc.pre-registro-etapa4-PJ', [
                     'codRT' => $codigos[$classes[5]]

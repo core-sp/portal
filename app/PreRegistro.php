@@ -105,6 +105,11 @@ class PreRegistro extends Model
         ];
     }
 
+    public function getJustificativaArray()
+    {
+        return json_decode($this->justificativa, true);
+    }
+
     private function setOpcionalCelular($opcionais, $valor)
     {
         $valor = strpos($valor, ';') !== false ? str_replace(';', '', $valor) : $valor;

@@ -477,4 +477,46 @@ class PreRegistroService implements PreRegistroServiceInterface {
             'classes' => $this->getNomeClasses(),
         ];
     }
+
+    public function saveAjaxAdmin($request, $id, $user)
+    {
+        $texto = null;
+        $preRegistro = PreRegistro::findOrFail($id);
+        $justificativa = $preRegistro->justificativa;
+
+        if($request['acao'] == 'editar')
+        {
+            $camposCanEdit = [
+                'preRegistro' => 'registro_secundario',
+                'pessoaJuridica.responsavelTecnico' => 'registro'
+            ];
+            $chave = array_search($request['campo'], $camposCanEdit);
+            $preRegistro->atualizarAjax($chave, $request['campo'], $request['valor'], null);
+
+            return null;
+        }
+
+        if(isset($justificativa))
+        {
+            $texto = json_decode($justificativa, true);
+                
+            if(isset($request['valor']) && (strlen($request['valor']) > 0))
+                $texto[$request['campo']] = $request['valor'];
+            elseif(isset($texto[$request['campo']]))
+                unset($texto[$request['campo']]);
+    
+            $texto = count($texto) == 0 ? null : json_encode($texto);
+        }
+        elseif(isset($request['valor']) && (strlen($request['valor']) > 0))
+            $texto = json_encode([
+                $request['campo'] => $request['valor']
+            ]);
+    
+        $preRegistro->update([
+            'idusuario' => $user->idusuario,
+            'justificativa' => $texto
+        ]);
+    
+        return $request['valor'];
+    }
 }

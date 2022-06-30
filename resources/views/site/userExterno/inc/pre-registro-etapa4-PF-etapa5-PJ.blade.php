@@ -59,7 +59,7 @@
 <fieldset id="opcoesCelular" {{ isset($resultado->getTelefone()[0]) && ($resultado->getTipoTelefone()[0] == 'CELULAR') ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="opcional_celular[]">{{ array_search('opcional_celular', $codPre) }} - Opcional </label><br>
+            <label for="opcional_celular[]">{{ array_search('opcional_celular', $codPre) }} - Opcões de comunicação </label><br>
             @foreach(opcoes_celular() as $tipo)
             <div class="form-check-inline">
                 <label class="form-check-label">
@@ -90,7 +90,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_telefone_1">{{ array_search('tipo_telefone', $codPre) }} - Tipo de telefone </label><br>
+        <label for="tipo_telefone_1">{{ array_search('tipo_telefone', $codPre) }} <small class="bold">(opcional)</small> - Tipo de telefone </label><br>
         <select 
             name="tipo_telefone_1" 
             class="{{ $classes[4] }} form-control {{ $errors->has('tipo_telefone_1') ? 'is-invalid' : '' }}"
@@ -113,7 +113,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="telefone_1">{{ array_search('telefone', $codPre) }} - Nº de telefone </span></label>
+        <label for="telefone_1">{{ array_search('telefone', $codPre) }} <small class="bold">(opcional)</small> - Nº de telefone </span></label>
         <input type="text"
             class="{{ $classes[4] }} form-control telefoneInput {{ $errors->has('telefone_1') ? 'is-invalid' : '' }}"
             name="telefone_1"
@@ -131,7 +131,7 @@
 <fieldset id="opcoesCelular_1" {{ isset($resultado->getTelefone()[1]) && ($resultado->getTipoTelefone()[1] == 'CELULAR') ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="opcional_celular_1[]">{{ array_search('opcional_celular', $codPre) }} - Opcional </label><br>
+            <label for="opcional_celular_1[]">{{ array_search('opcional_celular', $codPre) }} <small class="bold">(opcional)</small> - Opcões de comunicação </label><br>
             @foreach(opcoes_celular() as $tipo)
             <div class="form-check-inline">
                 <label class="form-check-label">

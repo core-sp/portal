@@ -25,4 +25,6 @@ interface PreRegistroServiceInterface {
     public function listar();
 
     public function view($id);
+
+    public function saveAjaxAdmin($request, $id, $user);
 }
