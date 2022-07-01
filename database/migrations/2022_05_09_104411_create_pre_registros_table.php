@@ -37,6 +37,7 @@ class CreatePreRegistrosTable extends Migration
             $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->string('status')->nullable();
             $table->text('justificativa')->nullable();
+            $table->text('confere_anexos')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

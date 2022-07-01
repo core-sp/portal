@@ -61,7 +61,7 @@ class ContabilTest extends TestCase
             ])->assertStatus(200);
         
         foreach($contabil as $key => $value)
-            if(isset($value))
+            if(isset($value) && ($key != 'email'))
                 $contabil[$key] = mb_strtoupper($value, 'UTF-8');
 
         $this->assertDatabaseHas('contabeis', $contabil);

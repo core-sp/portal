@@ -350,7 +350,7 @@ class PreRegistroTest extends TestCase
         $preRegistro['telefone_1'] = '(11) 99999-8888';
         $preRegistro['opcional_celular_1[]'] = mb_strtoupper(opcoes_celular()[1], 'UTF-8');
 
-        $pular = ['registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa'];
+        $pular = ['registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos'];
         
         foreach($preRegistro as $key => $value)
         {
@@ -385,7 +385,7 @@ class PreRegistroTest extends TestCase
             'idusuario' => null,
         ]);
 
-        $pular = ['registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa'];
+        $pular = ['registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos'];
         
         foreach($preRegistro as $key => $value)
         {
@@ -1182,7 +1182,7 @@ class PreRegistroTest extends TestCase
         $preRegistro['tipo_telefone_1'] = '';
         $preRegistro['telefone_1'] = '';
 
-        $pular = ['registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'updated_at', 'created_at', 'id'];
+        $pular = ['registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'updated_at', 'created_at', 'id', 'confere_anexos'];
         
         foreach($preRegistro as $key => $value)
         {

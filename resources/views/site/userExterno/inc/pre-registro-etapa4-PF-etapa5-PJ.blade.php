@@ -59,7 +59,7 @@
 <fieldset id="opcoesCelular" {{ isset($resultado->getTelefone()[0]) && ($resultado->getTipoTelefone()[0] == 'CELULAR') ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="opcional_celular[]">{{ array_search('opcional_celular', $codPre) }} - Opcões de comunicação </label><br>
+            <label for="opcional_celular[]">{{ array_search('opcional_celular', $codPre) }} - Opções de comunicação </label><br>
             @foreach(opcoes_celular() as $tipo)
             <div class="form-check-inline">
                 <label class="form-check-label">
@@ -131,7 +131,7 @@
 <fieldset id="opcoesCelular_1" {{ isset($resultado->getTelefone()[1]) && ($resultado->getTipoTelefone()[1] == 'CELULAR') ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="opcional_celular_1[]">{{ array_search('opcional_celular', $codPre) }} <small class="bold">(opcional)</small> - Opcões de comunicação </label><br>
+            <label for="opcional_celular_1[]">{{ array_search('opcional_celular', $codPre) }} <small class="bold">(opcional)</small> - Opções de comunicação </label><br>
             @foreach(opcoes_celular() as $tipo)
             <div class="form-check-inline">
                 <label class="form-check-label">

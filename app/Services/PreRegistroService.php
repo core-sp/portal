@@ -181,7 +181,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             if(isset($classe))
             {
                 if(isset($value))
-                    $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = in_array($key, ['checkEndEmpresa']) ? $value : mb_strtoupper($value, 'UTF-8');
+                    $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = in_array($key, ['checkEndEmpresa', 'email_contabil']) ? $value : mb_strtoupper($value, 'UTF-8');
                 else
                     $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = null;
             }
@@ -256,6 +256,37 @@ class PreRegistroService implements PreRegistroServiceInterface {
         }
 
         return $gerenti;
+    }
+
+    private function formatTextoCorrecaoAdmin($campo, $valor, $original)
+    {
+        if(isset($original))
+        {
+            $texto = json_decode($original, true);
+        
+            if($campo != 'confere_anexos')
+            {                
+                if(isset($valor) && (strlen($valor) > 0))
+                    $texto[$campo] = $valor;
+                elseif(isset($texto[$campo]))
+                    unset($texto[$campo]);
+        
+                $texto = count($texto) == 0 ? null : json_encode($texto);
+            }
+            else
+            {
+                if(!isset($texto[$valor]))
+                    $texto[$valor] = "OK";
+                else
+                    unset($texto[$valor]);
+        
+                $texto = count($texto) == 0 ? null : json_encode($texto);
+            }
+        }
+        elseif(isset($valor) && (strlen($valor) > 0))
+            $texto = $campo != 'confere_anexos' ? json_encode([$campo => $valor], JSON_FORCE_OBJECT) : json_encode([$valor => "OK"], JSON_FORCE_OBJECT);
+        
+        return $texto;
     }
 
     public function getNomesCampos()
@@ -409,7 +440,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function downloadAnexo($id, $externo)
     {
-        $preRegistro = $externo->load('preRegistro')->preRegistro;
+        if(\Route::is('preregistro.anexo.download'))
+            $preRegistro = PreRegistro::find($externo);
+        else
+            $preRegistro = $externo->load('preRegistro')->preRegistro;
 
         // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
         $this->abortar($preRegistro);
@@ -482,39 +516,27 @@ class PreRegistroService implements PreRegistroServiceInterface {
     {
         $texto = null;
         $preRegistro = PreRegistro::findOrFail($id);
-        $justificativa = $preRegistro->justificativa;
+        $original = $request['campo'] == 'confere_anexos' ? $preRegistro->confere_anexos : $preRegistro->justificativa;
+        $campoBD = $request['campo'] == 'confere_anexos' ? 'confere_anexos' : 'justificativa';
+
 
         if($request['acao'] == 'editar')
         {
             $camposCanEdit = [
-                'preRegistro' => 'registro_secundario',
-                'pessoaJuridica.responsavelTecnico' => 'registro'
+                'registro_secundario' => 'preRegistro',
+                'registro' => 'pessoaJuridica.responsavelTecnico',
             ];
-            $chave = array_search($request['campo'], $camposCanEdit);
-            $preRegistro->atualizarAjax($chave, $request['campo'], $request['valor'], null);
+            
+            $preRegistro->atualizarAjax($camposCanEdit[$request['campo']], $request['campo'], $request['valor'], null);
 
             return null;
         }
 
-        if(isset($justificativa))
-        {
-            $texto = json_decode($justificativa, true);
-                
-            if(isset($request['valor']) && (strlen($request['valor']) > 0))
-                $texto[$request['campo']] = $request['valor'];
-            elseif(isset($texto[$request['campo']]))
-                unset($texto[$request['campo']]);
-    
-            $texto = count($texto) == 0 ? null : json_encode($texto);
-        }
-        elseif(isset($request['valor']) && (strlen($request['valor']) > 0))
-            $texto = json_encode([
-                $request['campo'] => $request['valor']
-            ]);
+        $texto = $this->formatTextoCorrecaoAdmin($request['campo'], $request['valor'], $original);
     
         $preRegistro->update([
             'idusuario' => $user->idusuario,
-            'justificativa' => $texto
+            $campoBD => $texto
         ]);
     
         return $request['valor'];

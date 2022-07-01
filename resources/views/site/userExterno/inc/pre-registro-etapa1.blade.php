@@ -50,7 +50,7 @@
             <input
                 name="email_contabil"
                 type="email"
-                class="{{ $classes[1] }} text-uppercase form-control {{ $errors->has('email_contabil') ? 'is-invalid' : '' }} obrigatorio"
+                class="{{ $classes[1] }} form-control {{ $errors->has('email_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('email_contabil')) && isset($resultado->contabil->email) ? $resultado->contabil->email : old('email_contabil') }}"
             />
             @if($errors->has('email_contabil'))

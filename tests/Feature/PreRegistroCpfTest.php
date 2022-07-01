@@ -474,7 +474,8 @@ class PreRegistroCpfTest extends TestCase
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf);
 
         foreach($contabil as $key => $value)
-            $contabil[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
+            if($key != 'email')
+                $contabil[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
         $this->assertDatabaseHas('contabeis', $contabil);
 
         $this->assertDatabaseHas('anexos', [

@@ -80,8 +80,8 @@ class PreRegistro extends Model
         $tipo = explode(';', $this->tipo_telefone);
 
         return [
-            isset($tipo[0]) ? $tipo[0] : null,
-            isset($tipo[1]) ? $tipo[1] : null
+            isset($tipo[0]) && (strlen($tipo[0]) > 0) ? $tipo[0] : null,
+            isset($tipo[1]) && (strlen($tipo[1]) > 0) ? $tipo[1] : null
         ];
     }
 
@@ -90,8 +90,8 @@ class PreRegistro extends Model
         $tel = explode(';', $this->telefone);
 
         return [
-            isset($tel[0]) ? $tel[0] : null,
-            isset($tel[1]) ? $tel[1] : null
+            isset($tel[0]) && (strlen($tel[0]) > 0) ? $tel[0] : null,
+            isset($tel[1]) && (strlen($tel[1]) > 0) ? $tel[1] : null
         ];
     }
 
@@ -100,14 +100,19 @@ class PreRegistro extends Model
         $options = explode(';', $this->opcional_celular);
 
         return [
-            isset($options[0]) ? explode(',', $options[0]) : null,
-            isset($options[1]) ? explode(',', $options[1]) : null,
+            isset($options[0]) && (strlen($options[0]) > 0) ? explode(',', $options[0]) : null,
+            isset($options[1]) && (strlen($options[1]) > 0) ? explode(',', $options[1]) : null,
         ];
     }
 
     public function getJustificativaArray()
     {
         return json_decode($this->justificativa, true);
+    }
+
+    public function getConfereAnexosArray()
+    {
+        return json_decode($this->confere_anexos, true);
     }
 
     private function setOpcionalCelular($opcionais, $valor)

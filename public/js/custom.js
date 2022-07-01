@@ -438,7 +438,7 @@ function putDadosPreRegistro(campo, valor, acao)
         success: function(response) {
           if(acao == 'justificar')
               addJustificado(campo, valor);
-          else{
+          else if(acao == 'editar'){
               $("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> Salvo');
               $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
               setTimeout(function() {
@@ -505,13 +505,26 @@ function addJustificado(campo, valor)
     $('#' + campo + ' span.valorJustificativaPR').text(valor);
 }
 
+function verificaJustificados()
+{
+    $('#accordionPreRegistro .card-body span.badge-warning').each(function() {
+        console.log();
+    })
+}
+
+$('#accordionPreRegistro').ready(function() {
+    verificaJustificados();
+});
+
 $('.justificativaPreRegistro').click(function() {
     var campo = this.value;
     var texto = $('#' + campo + ' span.valorJustificativaPR').text();
     var input = $('#modalJustificativaPreRegistro .modal-body textarea');
+    var titleModal = texto.length > 0 ? ' Editar justificativa' : ' Adicionar justificativa';
     input.val(texto);
     contJustificativaPR(input);
     $('#submitJustificativaPreRegistro').val(campo);
+    $('#modalJustificativaPreRegistro .modal-title #titulo').text(titleModal);
     $('#modalJustificativaPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
 });
 
@@ -529,6 +542,12 @@ $('.addValorPreRegistro').click(function() {
     var campo = this.value;
     var valor = $(this).parent().find('input').val();
     putDadosPreRegistro(campo, valor, 'editar');
+});
+
+$('.confirmaAnexoPreRegistro').change(function() {
+    var campo = $(this).attr('name');
+    var valor = $(this).val();
+    putDadosPreRegistro(campo, valor, 'conferir');
 });
 
 // Fim da Funcionalidade Pre-Registro

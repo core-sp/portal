@@ -24,7 +24,8 @@ $factory->define(PreRegistro::class, function (Faker $faker) {
         'idregional' => factory('App\Regional'),
         'idusuario' => factory('App\User'),
         'status' => null,
-        'justificativa' => null
+        'justificativa' => null,
+        'confere_anexos' => null
     ];
 });
 

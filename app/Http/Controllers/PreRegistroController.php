@@ -67,4 +67,19 @@ class PreRegistroController extends Controller
 
         return response()->json($dados);
     }
+
+    public function downloadAnexo($idPreRegistro, $id)
+    {
+        // $this->authorize('updateOther', auth()->user());
+
+        try{
+            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $idPreRegistro);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
+            abort(500, "Erro ao fazer download do anexo do pré-registro.");
+        }
+
+        return $file;
+    }
 }

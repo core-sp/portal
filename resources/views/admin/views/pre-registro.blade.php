@@ -1,4 +1,4 @@
-<div id="accordion" class="mt-3">
+<div id="accordionPreRegistro" class="mt-3">
     <input type="hidden" name="idPreRegistro" value="{{ $resultado->id }}" />
 
     <div class="card">
@@ -7,7 +7,7 @@
                 {{ $abas[0] }}
             </div>
         </a>
-        <div id="parte1_PF_PJ" class="collapse show" data-parent="#accordion">
+        <div id="parte1_PF_PJ" class="collapse show" data-parent="#accordionPreRegistro">
             @include('admin.inc.pre-registro-parte1_PF_PJ', [
                 'cod' => $codigos[$classes[1]]
             ])
@@ -20,14 +20,12 @@
                 {{ $abas[1] }}
             </div>
         </a>
-        <div id="parte2_PF_PJ" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-                @include('admin.inc.pre-registro-parte2_PF_PJ', [
-                    'codPre' => $codigos[$classes[4]],
-                    'codCpf' => $codigos[$classes[2]],
-                    'codCnpj' => $codigos[$classes[3]]
-                ])
-            </div>
+        <div id="parte2_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
+            @include('admin.inc.pre-registro-parte2_PF_PJ', [
+                'codPre' => $codigos[$classes[4]],
+                'codCpf' => $codigos[$classes[2]],
+                'codCnpj' => $codigos[$classes[3]]
+            ])
         </div>
     </div>
 
@@ -37,13 +35,11 @@
                 {{ $abas[2] }}
             </div>
         </a>
-        <div id="parte3_PF_PJ" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-                @include('admin.inc.pre-registro-parte3_PF_PJ', [
-                    'codPre' => $codigos[$classes[4]],
-                    'codCnpj' => $codigos[$classes[3]]
-                ])
-            </div>
+        <div id="parte3_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
+            @include('admin.inc.pre-registro-parte3_PF_PJ', [
+                'codPre' => $codigos[$classes[4]],
+                'codCnpj' => $codigos[$classes[3]]
+            ])
         </div>
     </div>
 
@@ -54,12 +50,10 @@
                 {{ $abas[3] }}
             </div>
         </a>
-        <div id="parte4_PJ" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-                @include('admin.inc.pre-registro-parte4_PJ', [
-                    'codRT' => $codigos[$classes[5]]
-                ])
-            </div>
+        <div id="parte4_PJ" class="collapse" data-parent="#accordionPreRegistro">
+            @include('admin.inc.pre-registro-parte4_PJ', [
+                'codRT' => $codigos[$classes[5]]
+            ])
         </div>
     </div>
     @endif
@@ -70,12 +64,24 @@
                 {{ $abas[4] }}
             </div>
         </a>
-        <div id="parte4_PF_parte5_PJ" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-                @include('admin.inc.pre-registro-parte4_PF_parte5_PJ', [
-                    'codPre' => $codigos[$classes[4]]
-                ])
+        <div id="parte4_PF_parte5_PJ" class="collapse" data-parent="#accordionPreRegistro">
+            @include('admin.inc.pre-registro-parte4_PF_parte5_PJ', [
+                'codPre' => $codigos[$classes[4]]
+            ])
             </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <a class="card-link" data-toggle="collapse" href="#parte5_PF_parte6_PJ">
+            <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder">
+                {{ $abas[5] }}
+            </div>
+        </a>
+        <div id="parte5_PF_parte6_PJ" class="collapse" data-parent="#accordionPreRegistro">
+            @include('admin.inc.pre-registro-parte5_PF_parte6_PJ', [
+                'codAnexo' => $codigos[$classes[0]],
+            ])
         </div>
     </div>
 
@@ -86,15 +92,15 @@
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
-                <h4 class="modal-title"><i class="fas fa-edit"></i> {{-- verifica se existe justificativa ? 'Adicionar' : 'Editar' --}} justificativa</h4>
+                <h4 class="modal-title"><i class="fas fa-edit"></i><span id="titulo"></span></h4>
             </div>
                 
             <!-- Modal body -->
             <div class="modal-body">
                 <div class="form-group">
-                    <textarea class="form-control" rows="5" maxlength="500" value="">{{-- carrega se existe justificativa --}}</textarea>
-                    <small>
-                        <span class="text-muted" id="contChar"></span>
+                    <textarea class="form-control" rows="5" maxlength="500" value=""></textarea>
+                    <small class="text-muted">
+                        <span id="contChar"></span> caracteres restantes
                     </small>
                 </div>
             </div>
@@ -102,7 +108,7 @@
             <!-- Modal footer -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" id="submitJustificativaPreRegistro" value="">Salvar</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>

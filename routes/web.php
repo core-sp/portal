@@ -217,6 +217,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/view/{id}', 'PreRegistroController@view')->name('preregistro.view');
     // Via ajax somente as justificativas e update em alguns campos como registro secundario
     Route::post('/update-ajax/{id}', 'PreRegistroController@updateAjax')->name('preregistro.update.ajax');
+    Route::get('/{idPreRegistro}/anexo-download/{id}', 'PreRegistroController@downloadAnexo')->name('preregistro.anexo.download');
     Route::put('/update/{id}', 'PreRegistroController@update')->name('preregistro.update');
     Route::get('/busca', 'PreRegistroController@busca')->name('preregistro.busca');
   });

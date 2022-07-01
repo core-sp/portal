@@ -43,7 +43,7 @@
                 {{ $abas[2] }}
             </a>
         </li>
-        @if(strlen($resultado->userExterno->cpf_cnpj) == 14)
+        @if(!$resultado->userExterno->isPessoaFisica())
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte4_PJ">
                 {{ $abas[3] }}

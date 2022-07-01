@@ -70,7 +70,7 @@ class PreRegistroAjaxRequest extends FormRequest
                 'exists:regionais,idregional'
             ];
 
-        $notUpper = ['path', 'checkEndEmpresa'];
+        $notUpper = ['path', 'checkEndEmpresa', 'email_contabil'];
         if(!in_array($this->campo, $notUpper) && isset($this->valor))
             $this->merge([
                 'valor' => mb_strtoupper($this->valor, 'UTF-8')

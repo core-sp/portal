@@ -18,6 +18,11 @@ class PreRegistroAjaxAdminRequest extends FormRequest
     {
         $this->regraValor = ['max:500'];
 
+        if(in_array(request()->campo, ['confere_anexos[]']))
+            $this->merge([
+                'campo' => str_replace('[]', '', request()->campo),
+            ]);
+
         if(in_array(request()->campo, ['registro', 'registro_secundario']) && (request()->acao == 'editar'))
         {
             $this->regraValor = ['max:20'];
@@ -25,6 +30,20 @@ class PreRegistroAjaxAdminRequest extends FormRequest
                 'valor' => apenasNumeros(request()->valor),
             ]);
         }
+
+        $tipos_anexos = [
+            'Comprovante de identidade',
+            'CPF',
+            'Comprovante de Residência',
+            'Certidão de quitação eleitoral',
+            'Cerificado de reservista ou dispensa',
+            'Comprovante de inscrição CNPJ',
+            'Contrato Social',
+            'Declaração Termo de indicação RT ou Procuração'
+        ];
+
+        if($this->campo == 'confere_anexos')
+            $this->regraValor = ['in:' . implode(',', $tipos_anexos)];
     }
 
     public function rules()
@@ -35,10 +54,10 @@ class PreRegistroAjaxAdminRequest extends FormRequest
         foreach($campos_array as $key => $campos)
             $todos .= isset($todos) ? ','.$campos : $campos;
 
-        $todos .= ',registro,registro_secundario';
+        $todos .= ',registro,registro_secundario,confere_anexos';
         
         return [
-            'acao' => 'required|in:justificar,editar',
+            'acao' => 'required|in:justificar,editar,conferir',
             'valor' => $this->regraValor,
             'campo' => 'required|in:'.$todos,
         ];

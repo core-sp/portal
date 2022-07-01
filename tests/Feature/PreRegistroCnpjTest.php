@@ -615,7 +615,8 @@ class PreRegistroCnpjTest extends TestCase
         $this->assertDatabaseHas('pre_registros_cnpj', $preRegistroCnpj);
 
         foreach($contabil as $key => $value)
-            $contabil[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
+            if($key != 'email')
+                $contabil[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
         $this->assertDatabaseHas('contabeis', $contabil);
 
         foreach($rt as $key => $value)
@@ -708,7 +709,8 @@ class PreRegistroCnpjTest extends TestCase
         $this->assertDatabaseHas('pre_registros_cnpj', $preRegistroCnpj);
 
         foreach($contabil as $key => $value)
-            $contabil[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
+            if($key != 'email')
+                $contabil[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : null;
         $this->assertDatabaseHas('contabeis', $contabil);
 
         foreach($rt as $key => $value)

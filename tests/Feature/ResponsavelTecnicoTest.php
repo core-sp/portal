@@ -642,6 +642,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function can_submit_pre_registro_cnpj_if_rt_exists_in_gerenti()
     {
+        // Caso dê erro, analisar o GerentiMock para editar em gerentiBusca(), em pessoa física, no campo ASS_TP_ASSOC para 5
         Storage::fake('local');
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
