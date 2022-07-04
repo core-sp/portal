@@ -28,10 +28,18 @@ class PreRegistroAjaxRequest extends FormRequest
 
         $telefoneOptions = ['tipo_telefone_1', 'telefone_1', 'opcional_celular_1'];
         if(in_array($this->campo, $telefoneOptions))
+        {
+            // a quantidade de ';' define qual a chave do valor no campo
+            // lembrar de alterar a quantidade de campos no model do PreRegistro em: getChaveValorTotal($valor = null)
+            $flag = '';
+            $total = intval(substr($this->campo, strripos($this->campo, '_') + 1));
+            for($i = 0; $i  < $total; $i++)
+                $flag .= ';';
             $this->merge([
-                'campo' => str_replace('_1', '', $this->campo),
-                'valor' => ';'.request()->valor
+                'campo' => str_replace(substr($this->campo, strripos($this->campo, '_')), '', $this->campo),
+                'valor' => request()->valor . $flag
             ]);
+        }
 
         if((strpos(request()->campo, 'cpf') !== false) || (strpos(request()->campo, 'cnpj') !== false))
         {

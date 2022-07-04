@@ -141,7 +141,7 @@
                         class="{{ $classes[4] }} form-check-input {{ $errors->has('opcional_celular_1') ? 'is-invalid' : '' }}" 
                         value="{{ $tipo }}" 
                         @if(!empty(old('opcional_celular_1')))
-                        {{ old('opcional_celular_1') == $tipo ? 'checked' : '' }}
+                        {{ in_array($tipo, old('opcional_celular_1')) == $tipo ? 'checked' : '' }}
                         @elseif(isset($resultado->getOpcionalCelular()[1]))
                         {{ in_array(mb_strtoupper($tipo, 'UTF-8'), $resultado->getOpcionalCelular()[1]) ? 'checked' : '' }}
                         @endif

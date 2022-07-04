@@ -445,6 +445,9 @@ function putDadosPreRegistro(campo, valor, acao)
                 $("#modalLoadingPreRegistro").modal('hide');
               }, 1200); 
           }
+          $('#userPreRegistro').text(response['user']);
+          $('#atualizacaoPreRegistro').text(response['atualizacao']);
+          verificaJustificados();
         },
         error: function(request, status, error) {
             var errorFunction = getErrorMsg(request);
@@ -503,13 +506,24 @@ function addJustificado(campo, valor)
     }
 
     $('#' + campo + ' span.valorJustificativaPR').text(valor);
+    console.log($('#' + campo).parent());
 }
 
 function verificaJustificados()
 {
-    $('#accordionPreRegistro .card-body span.badge-warning').each(function() {
-        console.log();
-    })
+    $('#accordionPreRegistro div.card-body').each(function() {
+        var menu = $(this).parentsUntil('#accordionPreRegistro').find('.menuPR');
+        if($(this).find('.valorJustificativaPR').text().length > 0){
+            $('button[value="aprovado"], button[value="negado"]').prop('disabled', true);
+            $('button[value="correcao"]').prop('disabled', false);
+            if(menu.find('span').length == 0)
+              menu.append('<span class="badge badge-sm badge-warning ml-3">Justificado</span>');
+        }else{
+            menu.find('span').remove();
+            $('button[value="aprovado"], button[value="negado"]').prop('disabled', false);
+            $('button[value="correcao"]').prop('disabled', true);
+        }
+    });
 }
 
 $('#accordionPreRegistro').ready(function() {

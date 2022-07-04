@@ -19,6 +19,119 @@ class PreRegistro extends Model
     const STATUS_APROVADO = 'Aprovado';
     const STATUS_NEGADO = 'Negado';
     const STATUS_PENDENTE_PGTO = 'Pendente de pagamento';
+    const MENU = 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Canal de Relacionamento,Anexos';
+
+    private function getChaveValorTotal($valor = null)
+    {
+        // total é a quantidade de campos que deve armazenar
+        $total = 2;
+
+        return [
+            'chave' => substr_count($valor, ';'),
+            'valor' => str_replace(';', '', $valor),
+            'total' => $total
+        ];
+    }
+
+    private function setUmCampo($arrayValor, $arrayOpcoes)
+    {
+
+        for($i = 0; $i < $arrayOpcoes['total']; $i++)
+            if($arrayOpcoes['chave'] == $i)
+                $arrayValor[$i] = $arrayOpcoes['valor'];
+            else
+                $arrayValor[$i] = isset($arrayValor[$i]) && (strlen($arrayValor[$i]) > 0) ? $arrayValor[$i] : '';
+
+        return implode(';', $arrayValor);
+    }
+
+    private function setCheckbox($arrayValor, $arrayOpcoes)
+    {
+        for($i = 0; $i < $arrayOpcoes['total']; $i++)
+        {
+            if($arrayOpcoes['chave'] == $i)
+            {
+                $temp = array();
+                if(isset($arrayValor[$i]))
+                {
+                    $temp = explode(',', $arrayValor[$i]);
+                    // remover do explode os valores vazios
+                    foreach($temp as $key => $value)         
+                        if(empty($value))
+                            unset($temp[$key]);
+                }
+
+                if(isset($temp) && in_array($arrayOpcoes['valor'], $temp))
+                    unset($temp[array_search($arrayOpcoes['valor'], $temp)]);
+                else
+                    array_push($temp, $arrayOpcoes['valor']);
+                $arrayValor[$i] = implode(',', $temp);
+            }
+            else
+                $arrayValor[$i] = isset($arrayValor[$i]) && (strlen($arrayValor[$i]) > 0) ? $arrayValor[$i] : '';
+        }
+
+        return implode(';', $arrayValor);
+    }
+
+    private function validarUpdateAjax($campo, $valor)
+    {
+        switch ($campo) {
+            case 'tipo_telefone':
+                $tipos = explode(';', $this->tipo_telefone);
+                $array = $this->getChaveValorTotal($valor);
+                $valor = $this->setUmCampo($tipos, $array);
+                break;
+            case 'telefone':
+                $tels = explode(';', $this->telefone);
+                $array = $this->getChaveValorTotal($valor);
+                $valor = $this->setUmCampo($tels, $array);
+                break;
+            case 'opcional_celular':
+                $options = explode(';', $this->opcional_celular);
+                $array = $this->getChaveValorTotal($valor);
+                $valor = $this->setCheckbox($options, $array);
+                break;
+        }
+
+        // Pergunta não será salva, apenas para reforçar a mensagem sobre ser Representante Comercial
+        if($campo == 'pergunta')
+            return null;
+
+        return [$campo => $valor];
+    }
+
+    private function validarUpdate($arrayCampos)
+    {
+        $camposObrig = [
+            'tipo_telefone' => [
+                0 => $arrayCampos['tipo_telefone']
+            ],
+            'telefone' => [
+                0 => $arrayCampos['telefone']
+            ],
+            'opcional_celular' => [
+                0 => isset($arrayCampos['opcional_celular']) ? $arrayCampos['opcional_celular'] : ''
+            ]
+        ];
+
+        foreach($camposObrig as $key => $valor)
+        {
+            $total = $this->getChaveValorTotal()['total'];
+            for($i = 1; $i < $total; $i++)
+            {
+                $chave = $key . '_' . $i;
+                if(isset($arrayCampos[$chave]))
+                    $camposObrig[$key][$i] = $arrayCampos[$chave];
+                else
+                    $camposObrig[$key][$i] = '';
+                unset($arrayCampos[$chave]);
+            }
+            $arrayCampos[$key] = implode(';', $camposObrig[$key]);
+        }
+
+        return $arrayCampos;
+    }
 
     // seguir ordem de apresentação dos campos nas blades
     public static function codigosPreRegistro()
@@ -77,32 +190,32 @@ class PreRegistro extends Model
 
     public function getTipoTelefone()
     {
-        $tipo = explode(';', $this->tipo_telefone);
+        $tipos = explode(';', $this->tipo_telefone);
 
-        return [
-            isset($tipo[0]) && (strlen($tipo[0]) > 0) ? $tipo[0] : null,
-            isset($tipo[1]) && (strlen($tipo[1]) > 0) ? $tipo[1] : null
-        ];
+        foreach($tipos as $key => $valor)
+            $tipos[$key] = isset($valor) && (strlen($valor) > 0) ? $valor : null;
+
+        return $tipos;
     }
 
     public function getTelefone()
     {
-        $tel = explode(';', $this->telefone);
+        $tels = explode(';', $this->telefone);
 
-        return [
-            isset($tel[0]) && (strlen($tel[0]) > 0) ? $tel[0] : null,
-            isset($tel[1]) && (strlen($tel[1]) > 0) ? $tel[1] : null
-        ];
+        foreach($tels as $key => $valor)
+            $tels[$key] = isset($valor) && (strlen($valor) > 0) ? $valor : null;
+
+        return $tels;
     }
 
     public function getOpcionalCelular()
     {
         $options = explode(';', $this->opcional_celular);
 
-        return [
-            isset($options[0]) && (strlen($options[0]) > 0) ? explode(',', $options[0]) : null,
-            isset($options[1]) && (strlen($options[1]) > 0) ? explode(',', $options[1]) : null,
-        ];
+        foreach($options as $key => $valor)
+            $options[$key] = isset($valor) && (strlen($valor) > 0) ? explode(',', $valor) : null;
+
+        return $options;
     }
 
     public function getJustificativaArray()
@@ -113,72 +226,6 @@ class PreRegistro extends Model
     public function getConfereAnexosArray()
     {
         return json_decode($this->confere_anexos, true);
-    }
-
-    private function setOpcionalCelular($opcionais, $valor)
-    {
-        $valor = strpos($valor, ';') !== false ? str_replace(';', '', $valor) : $valor;
-        
-        // remover do explode os valores vazios
-        foreach($opcionais as $key => $value)         
-            if(empty($value))
-                unset($opcionais[$key]);
-
-        if(isset($opcionais) && in_array($valor, $opcionais))
-            unset($opcionais[array_search($valor, $opcionais)]);
-        else
-            array_push($opcionais, $valor);
-
-        return implode(',', $opcionais);
-    }
-
-    private function validarUpdateAjax($campo, $valor)
-    {
-        $tipo = explode(';', $this->tipo_telefone);
-        $tel = explode(';', $this->telefone);
-        $opcional = explode(';', $this->opcional_celular);
-        $tipo[1] = isset($tipo[1]) ? $tipo[1] : '';
-        $tel[1] = isset($tel[1]) ? $tel[1] : '';
-        $opcional[1] = isset($opcional[1]) ? $opcional[1] : '';
-
-        switch ($campo) {
-            case 'tipo_telefone':
-                $valor = strpos($valor, ';') !== false ? $tipo[0].$valor : $valor.';'.$tipo[1];
-                break;
-            case 'telefone':
-                $valor = strpos($valor, ';') !== false ? $tel[0].$valor : $valor.';'.$tel[1];
-                break;
-            case 'opcional_celular':
-                $valor = strpos($valor, ';') !== false ? 
-                $opcional[0] . ';' . $this->setOpcionalCelular(explode(',', $opcional[1]), $valor) : 
-                $this->setOpcionalCelular(explode(',', $opcional[0]), $valor) . ';' . $opcional[1]; 
-                break;
-        }
-
-        // Pergunta não será salva, apenas para reforçar a mensagem sobre ser Representante Comercial
-        if($campo == 'pergunta')
-            return null;
-
-        return [$campo => $valor];
-    }
-
-    private function validarUpdate($arrayCampos)
-    {
-        $tipo = explode(';', $this->tipo_telefone);
-        $tel = explode(';', $this->telefone);
-        $opcional = explode(';', $this->opcional_celular);
-        $tipo[1] = isset($tipo[1]) ? $tipo[1] : '';
-        $tel[1] = isset($tel[1]) ? $tel[1] : '';
-        $opcional[1] = isset($opcional[1]) ? $opcional[1] : '';
-
-        $arrayCampos['tipo_telefone'] .= isset($arrayCampos['tipo_telefone_1']) ? ';' . $arrayCampos['tipo_telefone_1'] : ';';
-        $arrayCampos['telefone'] .= isset($arrayCampos['telefone_1']) ? ';' . $arrayCampos['telefone_1'] : ';';
-        $arrayCampos['opcional_celular'] .= isset($arrayCampos['opcional_celular_1']) ? ';' . $arrayCampos['opcional_celular_1'] : ';';
-        unset($arrayCampos['tipo_telefone_1']);
-        unset($arrayCampos['telefone_1']);
-        unset($arrayCampos['opcional_celular_1']);
-
-        return $arrayCampos;
     }
 
     public function atualizarAjax($classe, $campo, $valor, $gerenti)
