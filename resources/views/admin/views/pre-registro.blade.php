@@ -87,27 +87,40 @@
 
     </div>
 
-    <div class="col pl-0 mt-4">
-        <button type="button"
-            class="btn btn-success"
-            value="aprovado"
-        >
-            <i class="fas fa-check"></i> Aprovado
-        </button>
+    <div class="row ml-0">
+        <form method="POST" action="{{ route('preregistro.update.aprovado', $resultado->id) }}" class="">
+            @csrf
+            @method('PUT')
+            <button type="submit"
+                class="btn btn-success {{ isset($resultado->justificativa) ? '' : 'disabled' }}"
+                value="aprovado"
+            >
+                <i class="fas fa-check"></i> Aprovar
+            </button>
+        </form>
 
-        <button type="button"
-            class="btn btn-warning ml-3"
-            value="correcao"
-        >
-            <i class="fas fa-times"></i> Enviar para correção
-        </button>
+        <form method="POST" action="{{ route('preregistro.update.enviar.correcao', $resultado->id) }}" class="ml-3">
+            @csrf
+            @method('PUT')
+            <button type="submit"
+                class="btn btn-warning"
+                value="correcao"
+            >
+                <i class="fas fa-times"></i> Enviar para correção
+            </button>
+        </form>
 
-        <button type="button"
-            class="btn btn-danger ml-3"
-            value="negado"
-        >
-            <i class="fas fa-ban"></i> Negado
-        </button>
+        <form method="POST" action="{{ route('preregistro.update.negado', $resultado->id) }}" class="ml-3" id="submitNegarPR">
+            @csrf
+            @method('PUT')
+            <button type="submit"
+                class="btn btn-danger justificativaPreRegistro"
+                value="negado"
+            >
+                <i class="fas fa-ban"></i> Negar
+            </button>
+        </form>
+
     </div>
 
     <div class="col mt-4 pl-0">

@@ -124,7 +124,7 @@
     </div>
     @endif
 
-    @if((isset($resultado->pessoaFisica->sexo) && ($resultado->pessoaFisica->sexo == 'M')) ||
+    @if((isset($resultado->pessoaFisica->sexo) && ($resultado->pessoaFisica->sexo == 'M') && !$resultado->pessoaFisica->maisDe45Anos()) ||
     !$resultado->userExterno->isPessoaFisica())
     <div class="form-check">
         <label class="form-check-label">

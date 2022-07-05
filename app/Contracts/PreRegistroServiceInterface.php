@@ -22,9 +22,13 @@ interface PreRegistroServiceInterface {
     public function excluirAnexo($id, $externo);
 
     // ADMIN
+    public function getTiposAnexos();
+
     public function listar();
 
     public function view($id);
 
     public function saveAjaxAdmin($request, $id, $user);
+
+    public function updateStatus($id, $user, $situacao);
 }

@@ -436,18 +436,20 @@ function putDadosPreRegistro(campo, valor, acao)
         cache: false,
         timeout: 60000,
         success: function(response) {
-          if(acao == 'justificar')
-              addJustificado(campo, valor);
-          else if(acao == 'editar'){
-              $("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> Salvo');
-              $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
-              setTimeout(function() {
-                $("#modalLoadingPreRegistro").modal('hide');
-              }, 1200); 
-          }
-          $('#userPreRegistro').text(response['user']);
-          $('#atualizacaoPreRegistro').text(response['atualizacao']);
-          verificaJustificados();
+            if(campo == 'negado')
+                $('#submitNegarPR').submit();
+            if(acao == 'justificar')
+                addJustificado(campo, valor);
+            else if(acao == 'editar'){
+                $("#modalLoadingBody").html('<i class="icon fa fa-check text-success"></i> Salvo');
+                $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
+                setTimeout(function() {
+                  $("#modalLoadingPreRegistro").modal('hide');
+                }, 1200); 
+            }
+            $('#userPreRegistro').text(response['user']);
+            $('#atualizacaoPreRegistro').text(response['atualizacao']);
+            verificaJustificados();
         },
         error: function(request, status, error) {
             var errorFunction = getErrorMsg(request);
@@ -511,17 +513,18 @@ function addJustificado(campo, valor)
 
 function verificaJustificados()
 {
+  // conferir anexos também para liberar botões
     $('#accordionPreRegistro div.card-body').each(function() {
         var menu = $(this).parentsUntil('#accordionPreRegistro').find('.menuPR');
         if($(this).find('.valorJustificativaPR').text().length > 0){
-            $('button[value="aprovado"], button[value="negado"]').prop('disabled', true);
-            $('button[value="correcao"]').prop('disabled', false);
+            $('button[value="aprovado"], #submitNegarPR button[value="negado"]').addClass('disabled').attr('type', 'button');
+            $('button[value="correcao"]').removeClass('disabled').attr('type', 'submit');
             if(menu.find('span').length == 0)
               menu.append('<span class="badge badge-sm badge-warning ml-3">Justificado</span>');
         }else{
             menu.find('span').remove();
-            $('button[value="aprovado"], button[value="negado"]').prop('disabled', false);
-            $('button[value="correcao"]').prop('disabled', true);
+            $('button[value="aprovado"], #submitNegarPR button[value="negado"]').removeClass('disabled').attr('type', 'submit');
+            $('button[value="correcao"]').addClass('disabled').attr('type', 'button');
         }
     });
 }
@@ -532,7 +535,11 @@ $('#accordionPreRegistro').ready(function() {
 
 $('.justificativaPreRegistro').click(function() {
     var campo = this.value;
-    var texto = $('#' + campo + ' span.valorJustificativaPR').text();
+    var texto = campo == 'negado' ? '' : $('#' + campo + ' span.valorJustificativaPR').text();
+
+    if((campo == 'negado') && $('#submitNegarPR button[value="negado"]').hasClass('disabled'))
+        return false;
+
     var input = $('#modalJustificativaPreRegistro .modal-body textarea');
     var titleModal = texto.length > 0 ? ' Editar justificativa' : ' Adicionar justificativa';
     input.val(texto);
@@ -562,6 +569,10 @@ $('.confirmaAnexoPreRegistro').change(function() {
     var campo = $(this).attr('name');
     var valor = $(this).val();
     putDadosPreRegistro(campo, valor, 'conferir');
+});
+
+$('#submitNegarPR button[value="negado"]').click(function(e) {
+    e.preventDefault();
 });
 
 // Fim da Funcionalidade Pre-Registro

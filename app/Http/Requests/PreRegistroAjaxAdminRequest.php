@@ -31,17 +31,7 @@ class PreRegistroAjaxAdminRequest extends FormRequest
             ]);
         }
 
-        $tipos_anexos = [
-            'Comprovante de identidade',
-            'CPF',
-            'Comprovante de Residência',
-            'Certidão de quitação eleitoral',
-            'Cerificado de reservista ou dispensa',
-            'Comprovante de inscrição CNPJ',
-            'Contrato Social',
-            'Declaração Termo de indicação RT ou Procuração'
-        ];
-
+        $tipos_anexos = $this->service->getService('PreRegistro')->getTiposAnexos();
         if($this->campo == 'confere_anexos')
             $this->regraValor = ['in:' . implode(',', $tipos_anexos)];
     }
@@ -54,7 +44,7 @@ class PreRegistroAjaxAdminRequest extends FormRequest
         foreach($campos_array as $key => $campos)
             $todos .= isset($todos) ? ','.$campos : $campos;
 
-        $todos .= ',registro,registro_secundario,confere_anexos';
+        $todos .= ',registro,registro_secundario,confere_anexos,negado';
         
         return [
             'acao' => 'required|in:justificar,editar,conferir',

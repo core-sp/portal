@@ -82,4 +82,49 @@ class PreRegistroController extends Controller
 
         return $file;
     }
+
+    public function updateEnviarCorrecao($id)
+    {
+        // $this->authorize('updateOther', auth()->user());
+
+        try{
+            $user = auth()->user();
+            $dados = $this->service->getService('PreRegistro')->updateStatus($id, $user, 'corrigir');
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao enviar para correção o pré-registro.");
+        }
+
+        return redirect(route('preregistro.index'))->with($dados);
+    }
+
+    public function updateAprovado($id)
+    {
+        // $this->authorize('updateOther', auth()->user());
+
+        try{
+            $user = auth()->user();
+            $dados = $this->service->getService('PreRegistro')->updateStatus($id, $user, 'aprovar');
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao aprovar o pré-registro.");
+        }
+
+        return redirect(route('preregistro.index'))->with($dados);
+    }
+
+    public function updateNegado($id)
+    {
+        // $this->authorize('updateOther', auth()->user());
+
+        try{
+            $user = auth()->user();
+            $dados = $this->service->getService('PreRegistro')->updateStatus($id, $user, 'negar');
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao negar o pré-registro.");
+        }
+
+        return redirect(route('preregistro.index'))->with($dados);
+    }
 }

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class PreRegistroCpf extends Model
 {
@@ -35,5 +36,10 @@ class PreRegistroCpf extends Model
     public function preRegistro()
     {
         return $this->belongsTo('App\PreRegistro')->withTrashed();
+    }
+
+    public function maisDe45Anos()
+    {
+        return $this->dt_nascimento <= Carbon::today()->subYears(46)->format('Y-m-d');
     }
 }

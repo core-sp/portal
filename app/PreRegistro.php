@@ -74,31 +74,72 @@ class PreRegistro extends Model
         return implode(';', $arrayValor);
     }
 
+    private function formatTextoCorrecaoAdmin($campo, $valor)
+    {
+        $original = $campo == 'confere_anexos' ? $this->confere_anexos : $this->justificativa;
+        $texto = json_decode($original, true);
+        
+        if($campo != 'confere_anexos')
+        {                
+            if(isset($valor) && (strlen($valor) > 0))
+                $texto[$campo] = $valor;
+            elseif(isset($texto[$campo]))
+                unset($texto[$campo]);
+        
+            $texto = count($texto) == 0 ? null : json_encode($texto, JSON_FORCE_OBJECT);
+        }
+        else
+        {
+            if(!isset($texto[$valor]))
+                $texto[$valor] = "OK";
+            else
+                unset($texto[$valor]);
+        
+            $texto = count($texto) == 0 ? null : json_encode($texto, JSON_FORCE_OBJECT);
+        }
+        
+        return $texto;
+    }
+
     private function validarUpdateAjax($campo, $valor)
     {
+        $final = [$campo => $valor];
+
         switch ($campo) {
             case 'tipo_telefone':
-                $tipos = explode(';', $this->tipo_telefone);
-                $array = $this->getChaveValorTotal($valor);
-                $valor = $this->setUmCampo($tipos, $array);
-                break;
             case 'telefone':
-                $tels = explode(';', $this->telefone);
+                $temp = $campo == 'tipo_telefone' ? explode(';', $this->tipo_telefone) : explode(';', $this->telefone);
                 $array = $this->getChaveValorTotal($valor);
-                $valor = $this->setUmCampo($tels, $array);
+                $valor = $this->setUmCampo($temp, $array);
+                $final = [$campo => $valor];
                 break;
             case 'opcional_celular':
                 $options = explode(';', $this->opcional_celular);
                 $array = $this->getChaveValorTotal($valor);
                 $valor = $this->setCheckbox($options, $array);
+                $final = [$campo => $valor];
+                break;
+            case 'justificativa':
+                $texto = $this->formatTextoCorrecaoAdmin($valor['campo'], $valor['valor']);
+                $final = [
+                    'idusuario' => auth()->user()->idusuario,
+                    $campo => $texto
+                ];
+                break;
+            case 'confere_anexos':
+                $texto = $this->formatTextoCorrecaoAdmin($campo, $valor);
+                $final = [
+                    'idusuario' => auth()->user()->idusuario,
+                    $campo => $texto
+                ];
+                break;
+            case 'pergunta':
+                // Pergunta não será salva, apenas para reforçar a mensagem sobre ser Representante Comercial
+                $final = null;
                 break;
         }
 
-        // Pergunta não será salva, apenas para reforçar a mensagem sobre ser Representante Comercial
-        if($campo == 'pergunta')
-            return null;
-
-        return [$campo => $valor];
+        return $final;
     }
 
     private function validarUpdate($arrayCampos)
@@ -226,6 +267,27 @@ class PreRegistro extends Model
     public function getConfereAnexosArray()
     {
         return json_decode($this->confere_anexos, true);
+    }
+
+    public function canUpdateStatus($status)
+    {
+        $tipos = $this->anexos->first()->getObrigatoriosPreRegistro();
+        $anexos = $this->getConfereAnexosArray();
+        
+        if($anexos !== null)
+            foreach($anexos as $key => $value)
+                if(in_array($key, $tipos))
+                    unset($tipos[array_search($key, $tipos)]);
+
+        $anexosOk = count($tipos) == 0;
+        $verificaJustificativa = false;
+        if($status == PreRegistro::STATUS_APROVADO)
+            $verificaJustificativa = !isset($this->justificativa);
+        else
+            $verificaJustificativa = $status == PreRegistro::STATUS_NEGADO ? isset($this->getJustificativaArray()['negado']) : isset($this->justificativa);
+        $statusOK = in_array($this->status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]);
+
+        return $statusOK && $verificaJustificativa && $anexosOk;
     }
 
     public function atualizarAjax($classe, $campo, $valor, $gerenti)
