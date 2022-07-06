@@ -1,4 +1,23 @@
-<div class="card-body">
+<div class="card-body bg-light">
+
+    <p class="font-weight-bolder mb-2 mt-1"><i class="fas fa-info-circle text-primary"></i> Exigências sobre os documentos obrigatórios: </p>
+    @if(!$resultado->userExterno->isPessoaFisica())
+        <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> Comprovante de inscrição CNPJ</p>
+        <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> Contrato Social</p>
+        <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> Declaração Termo de indicação RT ou Procuração</p>
+        <p class="font-weight-bolder mb-2 mt-3 ml-3 text-secondary">Documentos de todos os sócios: </p>
+    @endif
+
+    <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> Comprovante de identidade pode ser:</p>
+    <p class="ml-5 mb-0 text-secondary"> RG; Carteira de Trabalho; Previdência Social; Passaporte, Certificado de Reservista; CNH (data de expedição máxima: 10 anos); Carteira de identidade Aeronáutica, Exército ou Marinha; Carteira de Conselho Profissional; RNE (para estrangeiros)</p>
+    <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> CPF</p>
+    <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> Comprovante de Residência dos últimos 3 meses em nome do solicitante. 
+        Em caso de comprovante em nome de terceiros, o solicitante deve anexar uma declaração de próprio punho, 
+        informando que reside no endereço do comprovante apresentado, assinar e datar, além de enviar cópia do Comprovante em nome de Terceiros</p>
+    <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> Certidão de quitação eleitoral (exceto estrangeiros)</p>
+    <p class="ml-3 mb-2 text-secondary"><i class="icon fa fa-check"></i> Cerificado de reservista ou dispensa para o sexo masculino que tenham até 45 anos (exceto estrangeiros)</p>
+
+    <hr>
 
     <p id="path" class="mb-4">
         <span class="font-weight-bolder">{{ array_search('path', $codAnexo) }} - Anexos: </span>
@@ -10,7 +29,7 @@
     </p>
 
     @foreach($resultado->anexos as $anexo)
-    <p>{{ $anexo->nome_original }} 
+    <p><i class="fas fa-paperclip"></i> {{ $anexo->nome_original }} 
         <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $anexo->id]) }}" 
             class="btn btn-sm btn-primary ml-2" 
             target="_blank" 
@@ -139,4 +158,7 @@
     </div>
     @endif
 
+    <p class="text-muted mt-3">
+        <em>* Obs: somente para PJ não é obrigatório confirmar a "Certidão de quitação eleitoral" e "Cerificado de reservista ou dispensa" para aprovação</em>
+    </p>
 </div>

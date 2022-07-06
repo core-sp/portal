@@ -1,4 +1,4 @@
-<div class="card-body">
+<div class="card-body bg-light">
 
     <p>
         <span class="font-weight-bolder">E-mail: </span>

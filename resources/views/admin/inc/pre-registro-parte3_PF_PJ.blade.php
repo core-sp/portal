@@ -1,4 +1,4 @@
-<div class="card-body">
+<div class="card-body bg-light">
     <h5 class="font-weight-bolder mb-3">Endereço de correspondência</h5>
 
     <p id="cep">

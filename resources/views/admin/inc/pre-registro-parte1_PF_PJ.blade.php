@@ -1,4 +1,4 @@
-<div class="card-body">
+<div class="card-body bg-light">
 @if(isset($resultado->contabil_id))
     <p id="cnpj_contabil">
         <span class="font-weight-bolder">{{ array_search('cnpj', $cod) }} - CNPJ: </span>

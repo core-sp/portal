@@ -1,5 +1,5 @@
-<div class="card-body">
-    <p>
+<div class="card-body bg-light">
+    <p id="tipo_{{ $resultado->userExterno->isPessoaFisica() ? 'cpf' : 'cnpj' }}">
         <span class="font-weight-bolder">{{ $resultado->userExterno->isPessoaFisica() ? 'CPF' : 'CNPJ' }}: </span>
         {{ formataCpfCnpj($resultado->userExterno->cpf_cnpj) }}
     </p>

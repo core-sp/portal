@@ -35,7 +35,6 @@ class PreRegistro extends Model
 
     private function setUmCampo($arrayValor, $arrayOpcoes)
     {
-
         for($i = 0; $i < $arrayOpcoes['total']; $i++)
             if($arrayOpcoes['chave'] == $i)
                 $arrayValor[$i] = $arrayOpcoes['valor'];
@@ -229,6 +228,19 @@ class PreRegistro extends Model
         return $this->hasMany('App\Anexo');
     }
 
+    public function getLabelStatus()
+    {
+        $colorStatus = [
+            PreRegistro::STATUS_ANALISE_INICIAL => '<span class="font-weight-bolder text-primary">' . PreRegistro::STATUS_ANALISE_INICIAL . '</span>',
+            PreRegistro::STATUS_CORRECAO => '<span class="font-weight-bolder text-warning">' . PreRegistro::STATUS_CORRECAO . '</span>',
+            PreRegistro::STATUS_ANALISE_CORRECAO => '<span class="font-weight-bolder text-info">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</span>',
+            PreRegistro::STATUS_APROVADO => '<span class="font-weight-bolder text-success">' . PreRegistro::STATUS_APROVADO . '</span>',
+            PreRegistro::STATUS_NEGADO => '<span class="font-weight-bolder text-danger">' . PreRegistro::STATUS_NEGADO . '</span>',
+        ];
+
+        return isset($colorStatus[$this->status]) ? $colorStatus[$this->status] : null;
+    }
+
     public function getTipoTelefone()
     {
         $tipos = explode(';', $this->tipo_telefone);
@@ -271,15 +283,21 @@ class PreRegistro extends Model
 
     public function canUpdateStatus($status)
     {
-        $tipos = $this->anexos->first()->getObrigatoriosPreRegistro();
-        $anexos = $this->getConfereAnexosArray();
-        
-        if($anexos !== null)
-            foreach($anexos as $key => $value)
-                if(in_array($key, $tipos))
-                    unset($tipos[array_search($key, $tipos)]);
+        $anexosOk = true;
 
-        $anexosOk = count($tipos) == 0;
+        if($status == PreRegistro::STATUS_APROVADO)
+        {
+            $tipos = $this->anexos->first()->getObrigatoriosPreRegistro();
+            $anexos = $this->getConfereAnexosArray();
+            
+            if($anexos !== null)
+                foreach($anexos as $key => $value)
+                    if(in_array($key, $tipos))
+                        unset($tipos[array_search($key, $tipos)]);
+
+            $anexosOk = count($tipos) == 0;
+        }
+
         $verificaJustificativa = false;
         if($status == PreRegistro::STATUS_APROVADO)
             $verificaJustificativa = !isset($this->justificativa);

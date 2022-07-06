@@ -508,25 +508,68 @@ function addJustificado(campo, valor)
     }
 
     $('#' + campo + ' span.valorJustificativaPR').text(valor);
-    console.log($('#' + campo).parent());
+}
+
+function confereAnexos()
+{
+    // confere anexos: se pf, todos devem estar ok; senão apenas 2 podem faltar por não ser possível conferir via sistema
+    var aprovado = false;
+    var ok = $('.confirmaAnexoPreRegistro:checked').length;
+    var total = $('.confirmaAnexoPreRegistro').length;
+
+    if(ok == total)
+        aprovado = true;
+
+    if($('#tipo_cnpj').length){
+        var eleitoral = false; 
+        var reservista = false;
+        $('.confirmaAnexoPreRegistro:checked').each(function() {
+            if($(this).val() == 'Certidão de quitação eleitoral')
+                eleitoral = true;
+            if($(this).val() == 'Cerificado de reservista ou dispensa')
+                reservista = true;
+        });
+        if(ok == (total - 2))
+            if(!eleitoral && !reservista)
+                aprovado = true;
+        if(ok == (total - 1))
+            if(!eleitoral || !reservista)
+                aprovado = true;
+    }
+  
+    return aprovado;
+}
+
+function habilitarBotoesStatus(justificado)
+{
+    if(justificado > 0){
+        $('button[value="aprovado"], #submitNegarPR button[value="negado"]').addClass('disabled').attr('type', 'button');
+        $('button[value="correcao"]').removeClass('disabled').attr('type', 'submit');
+    }else{
+        $('button[value="aprovado"], #submitNegarPR button[value="negado"]').removeClass('disabled').attr('type', 'submit');
+        $('button[value="correcao"]').addClass('disabled').attr('type', 'button');
+    }
 }
 
 function verificaJustificados()
 {
-  // conferir anexos também para liberar botões
     $('#accordionPreRegistro div.card-body').each(function() {
         var menu = $(this).parentsUntil('#accordionPreRegistro').find('.menuPR');
         if($(this).find('.valorJustificativaPR').text().length > 0){
-            $('button[value="aprovado"], #submitNegarPR button[value="negado"]').addClass('disabled').attr('type', 'button');
-            $('button[value="correcao"]').removeClass('disabled').attr('type', 'submit');
             if(menu.find('span').length == 0)
-              menu.append('<span class="badge badge-sm badge-warning ml-3">Justificado</span>');
-        }else{
+                menu.append('<span class="badge badge-sm badge-warning ml-3">Justificado</span>');
+        }else
             menu.find('span').remove();
-            $('button[value="aprovado"], #submitNegarPR button[value="negado"]').removeClass('disabled').attr('type', 'submit');
-            $('button[value="correcao"]').addClass('disabled').attr('type', 'button');
-        }
     });
+
+    var justificado = $('.menuPR span.badge-warning').length;
+    var aprovado = confereAnexos();
+
+    habilitarBotoesStatus(justificado);
+    if(aprovado && (justificado == 0))
+        $('button[value="aprovado"]').removeClass('disabled').attr('type', 'submit');
+    else
+        $('button[value="aprovado"]').addClass('disabled').attr('type', 'button');
 }
 
 $('#accordionPreRegistro').ready(function() {

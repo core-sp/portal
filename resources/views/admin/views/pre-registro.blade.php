@@ -87,7 +87,11 @@
 
     </div>
 
+</div>
+
+<div class="card-footer">
     <div class="row ml-0">
+        
         <form method="POST" action="{{ route('preregistro.update.aprovado', $resultado->id) }}" class="">
             @csrf
             @method('PUT')
@@ -121,13 +125,12 @@
             </button>
         </form>
 
-    </div>
-
-    <div class="col mt-4 pl-0">
-        <span class="font-weight-bolder">Atualizado por: </span>
-        <span id="userPreRegistro">{{ $resultado->user->nome }}</span>
-        <span class="font-weight-bolder">, no dia </span>
-        <span id="atualizacaoPreRegistro">{{ $resultado->updated_at->format('d\/m\/Y, \à\s H:i:s') }}</span>
+        <div class="col d-flex align-items-end justify-content-end">
+            <span class="font-weight-bolder">Atualizado por:&nbsp;</span>
+            <span id="userPreRegistro">{{ isset($resultado->user->nome) ? $resultado->user->nome : '--------' }}</span>
+            <span class="font-weight-bolder">, no dia&nbsp;</span>
+            <span id="atualizacaoPreRegistro">{{ $resultado->updated_at->format('d\/m\/Y, \à\s H:i:s') }}</span>
+        </div>
     </div>
 
 </div>

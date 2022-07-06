@@ -1,4 +1,4 @@
-<div class="card-body">
+<div class="card-body bg-light">
 
     <p id="cpf_rt">
         <span class="font-weight-bolder">{{ array_search('cpf', $codRT) }} - CPF: </span>

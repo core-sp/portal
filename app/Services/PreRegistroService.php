@@ -69,7 +69,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 $resultado->userExterno->nome,
                 $resultado->regional->regional,
                 formataData($resultado->updated_at),
-                $resultado->status,
+                isset($resultado->user->nome) ? 
+                $resultado->getLabelStatus() . '<small class="d-block">Atualizado por: <strong>'.$resultado->user->nome.'</strong></small>' : $resultado->getLabelStatus(),
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -259,6 +260,29 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         return $gerenti;
     }
+
+    // teste
+    private function getMenuComCampos()
+    {
+        $menu = $this->getMenu();
+        $menuCampos[$menu[0]] = ['1.1','1.2','1.3','1.4','1.5'];
+        $menuCampos[$menu[1]] = ['2.1','2.2','2.3','2.4','2.5','2.6','2.7','2.8','2.9','2.10','2.11','2.12','3.2','3.3'];
+        $menuCampos[$menu[2]] = ['4.1','4.2','4.3','4.4','4.5','4.6','4.7'];
+
+        // getNomesCampos()
+
+        // $menuCampos[$menu[0]] = ['1.1','1.2','1.3','1.4','1.5'];
+        // $menuCampos[$menu[0]] = ['1.1','1.2','1.3','1.4','1.5'];
+        // $menuCampos[$menu[0]] = ['1.1','1.2','1.3','1.4','1.5'];
+    }
+
+    // private function formatJustificativa($preRegistro)
+    // {
+    //     if(isset($preRegistro->justificativa) && !isset($preRegistro->getJustificativaArray()['negado']))
+    //     {
+
+    //     }
+    // }
 
     public function getNomesCampos()
     {
@@ -464,8 +488,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $query->select('id', 'cpf_cnpj', 'nome');
         }, 'regional' => function ($query2) {
             $query2->select('idregional', 'regional');
+        }, 'user' => function ($query3) {
+            $query3->select('idusuario', 'nome');
         }])
-        ->select('id', 'updated_at', 'status', 'user_externo_id', 'idregional')
+        ->select('id', 'updated_at', 'status', 'user_externo_id', 'idregional', 'idusuario')
         ->whereNotNull('status')
         ->orderBy('id')
         ->get();
@@ -479,9 +505,12 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function view($id)
     {
+        $variaveis = $this->variaveis;
+        $variaveis['btn_lista'] = '<a href="'.route('preregistro.index').'" class="btn btn-primary mr-1">Lista dos Pré-registros</a>';
+
         return [
             'resultado' => PreRegistro::findOrFail($id), 
-            'variaveis' => (object) $this->variaveis,
+            'variaveis' => (object) $variaveis,
             'abas' => $this->getMenu(),
             'codigos' => $this->getCodigos(),
             'classes' => $this->getNomeClasses(),

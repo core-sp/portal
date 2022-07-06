@@ -1,7 +1,3 @@
-@php
-// $justificativas = 'Teste para mostrar as justificativas do Atendimento após análise';
-@endphp
-
 @if(isset($justificativas))
     <div class="d-block w-100">
         <p class="alert alert-warning">{{ $justificativas }}</p>
