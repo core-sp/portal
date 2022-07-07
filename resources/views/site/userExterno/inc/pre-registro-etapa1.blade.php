@@ -1,6 +1,6 @@
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cnpj_contabil">{{ array_search('cnpj', $cod) }} - CNPJ</label>
+        <label for="cnpj_contabil">{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label>
         <input
             name="cnpj_contabil"
             type="text"
@@ -27,7 +27,7 @@
 <fieldset id="campos_contabil" {{ isset($resultado->contabil->cnpj) ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="nome_contabil">{{ array_search('nome', $cod) }} - Nome da Contabilidade <span class="text-danger">*</span></label>
+            <label for="nome_contabil">{{ $codigos[0]['nome_contabil'] }} - Nome da Contabilidade <span class="text-danger">*</span></label>
             <input
                 name="nome_contabil"
                 type="text"
@@ -46,7 +46,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="email_contabil">{{ array_search('email', $cod) }} - E-mail <span class="text-danger">*</span></label>
+            <label for="email_contabil">{{ $codigos[0]['email_contabil'] }} - E-mail <span class="text-danger">*</span></label>
             <input
                 name="email_contabil"
                 type="email"
@@ -63,7 +63,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="nome_contato_contabil">{{ array_search('nome_contato', $cod) }} - Nome de Contato <span class="text-danger">*</span></label>
+            <label for="nome_contato_contabil">{{ $codigos[0]['nome_contato_contabil'] }} - Nome de Contato <span class="text-danger">*</span></label>
             <input
                 name="nome_contato_contabil"
                 type="text"
@@ -77,7 +77,7 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="telefone_contabil">{{ array_search('telefone', $cod) }} - Telefone <span class="text-danger">*</span></label>
+            <label for="telefone_contabil">{{ $codigos[0]['telefone_contabil'] }} - Telefone <span class="text-danger">*</span></label>
             <input type="text"
                 class="{{ $classes[1] }} form-control telefoneInput {{ $errors->has('telefone_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 name="telefone_contabil"

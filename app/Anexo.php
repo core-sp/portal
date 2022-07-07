@@ -14,11 +14,10 @@ class Anexo extends Model
     const TOTAL_PRE_REGISTRO = 5;
     const PATH_PRE_REGISTRO = 'userExterno/pre_registros';
 
-    // seguir ordem de apresentação dos campos nas blades
-    public static function codigosPreRegistro()
+    public static function camposPreRegistro()
     {
         return [
-            '7.1' => 'path',
+            'a1' => 'path',
         ];
     }
 

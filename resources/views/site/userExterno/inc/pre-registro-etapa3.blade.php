@@ -1,7 +1,7 @@
 <h5 class="bold mb-2">Endereço de correspondência</h5>
 <div class="form-row mb-2">
     <div class="col-sm-4 mb-2-576">
-        <label for="cep">{{ array_search('cep', $codPre) }} - CEP <span class="text-danger">*</span></label>
+        <label for="cep">{{ $codigos[2]['cep'] }} - CEP <span class="text-danger">*</span></label>
         <input
             type="text"
             name="cep"
@@ -16,7 +16,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="bairro">{{ array_search('bairro', $codPre) }} - Bairro <span class="text-danger">*</span></label>
+        <label for="bairro">{{ $codigos[2]['bairro'] }} - Bairro <span class="text-danger">*</span></label>
         <input
             type="text"
             name="bairro"
@@ -34,7 +34,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="logradouro">{{ array_search('logradouro', $codPre) }} - Logradouro <span class="text-danger">*</span></label>
+        <label for="logradouro">{{ $codigos[2]['logradouro'] }} - Logradouro <span class="text-danger">*</span></label>
         <input
             type="text"
             name="logradouro"
@@ -49,7 +49,7 @@
         @endif
     </div>
     <div class="col-sm-2 mb-2-576">
-        <label for="numero">{{ array_search('numero', $codPre) }} - Número <span class="text-danger">*</span></label>
+        <label for="numero">{{ $codigos[2]['numero'] }} - Número <span class="text-danger">*</span></label>
         <input
             type="text"
             name="numero"
@@ -67,7 +67,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm-3 mb-2-576">
-        <label for="complemento">{{ array_search('complemento', $codPre) }} - Complemento</label>
+        <label for="complemento">{{ $codigos[2]['complemento'] }} - Complemento</label>
         <input
             type="text"
             name="complemento"
@@ -82,7 +82,7 @@
         @endif
     </div>
     <div class="col-sm-5 mb-2-576">
-        <label for="cidade">{{ array_search('cidade', $codPre) }} - Município <span class="text-danger">*</span></label>
+        <label for="cidade">{{ $codigos[2]['cidade'] }} - Município <span class="text-danger">*</span></label>
         <input
             type="text"
             name="cidade"
@@ -97,7 +97,7 @@
         @endif
     </div>
     <div class="col-sm-4 mb-2-576">
-        <label for="uf">{{ array_search('uf', $codPre) }} - Estado <span class="text-danger">*</span></label>
+        <label for="uf">{{ $codigos[2]['uf'] }} - Estado <span class="text-danger">*</span></label>
         <select 
             name="uf" 
             id="uf_pre" 
@@ -135,7 +135,7 @@
                 name="checkEndEmpresa" 
                 {{ isset($resultado->pessoaJuridica->id) && $resultado->pessoaJuridica->mesmoEndereco() ? 'checked' : '' }}
             />
-            Mesmo endereço da correspondência
+            <span class="bold">{{ $codigos[2]['checkEndEmpresa'] }} - Mesmo endereço da correspondência</span>
             
             @if($errors->has('checkEndEmpresa'))
             <div class="invalid-feedback">
@@ -150,7 +150,7 @@
 <fieldset id="habilitarEndEmpresa" {{ isset($resultado->pessoaJuridica->id) && $resultado->pessoaJuridica->mesmoEndereco() ? 'disabled' : '' }}>
     <div class="form-row mb-2">
         <div class="col-sm-4 mb-2-576">
-            <label for="cep_empresa">{{ array_search('cep', $codCnpj) }} - CEP <span class="text-danger">*</span></label>
+            <label for="cep_empresa">{{ $codigos[2]['cep_empresa'] }} - CEP <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="cep_empresa"
@@ -166,7 +166,7 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="bairro_empresa">{{ array_search('bairro', $codCnpj) }} - Bairro <span class="text-danger">*</span></label>
+            <label for="bairro_empresa">{{ $codigos[2]['bairro_empresa'] }} - Bairro <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="bairro_empresa"
@@ -184,7 +184,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="logradouro_empresa">{{ array_search('logradouro', $codCnpj) }} - Logradouro <span class="text-danger">*</span></label>
+            <label for="logradouro_empresa">{{ $codigos[2]['logradouro_empresa'] }} - Logradouro <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="logradouro_empresa"
@@ -199,7 +199,7 @@
             @endif
         </div>
         <div class="col-sm-2 mb-2-576">
-            <label for="numero_empresa">{{ array_search('numero', $codCnpj) }} - Número <span class="text-danger">*</span></label>
+            <label for="numero_empresa">{{ $codigos[2]['numero_empresa'] }} - Número <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="numero_empresa"
@@ -217,7 +217,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm-3 mb-2-576">
-            <label for="complemento_empresa">{{ array_search('complemento', $codCnpj) }} - Complemento</label>
+            <label for="complemento_empresa">{{ $codigos[2]['complemento_empresa'] }} - Complemento</label>
             <input
                 type="text"
                 name="complemento_empresa"
@@ -232,7 +232,7 @@
             @endif
         </div>
         <div class="col-sm-5 mb-2-576">
-            <label for="cidade_empresa">{{ array_search('cidade', $codCnpj) }} - Município <span class="text-danger">*</span></label>
+            <label for="cidade_empresa">{{ $codigos[2]['cidade_empresa'] }} - Município <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="cidade_empresa"
@@ -247,7 +247,7 @@
             @endif
         </div>
         <div class="col-sm-4 mb-2-576">
-            <label for="uf_empresa">{{ array_search('uf', $codCnpj) }} - Estado <span class="text-danger">*</span></label>
+            <label for="uf_empresa">{{ $codigos[2]['uf_empresa'] }} - Estado <span class="text-danger">*</span></label>
             <select 
                 name="uf_empresa" 
                 id="uf_empresa" 

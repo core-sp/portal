@@ -12,29 +12,28 @@ class ResponsavelTecnico extends Model
     protected $table = 'responsaveis_tecnicos';
     protected $guarded = [];
 
-    // seguir ordem de apresentação dos campos nas blades
-    public static function codigosPreRegistro()
+    public static function camposPreRegistro()
     {
         return [
-            '5.1' => 'cpf',
-            '5.2' => 'registro',
-            '5.3' => 'nome',
-            '5.4' => 'nome_social',
-            '5.5' => 'dt_nascimento',
-            '5.6' => 'sexo',
-            '5.7' => 'tipo_identidade',
-            '5.8' => 'identidade',
-            '5.9' => 'orgao_emissor',
-            '5.10' => 'dt_expedicao',
-            '5.11' => 'cep',
-            '5.12' => 'bairro',
-            '5.13' => 'logradouro',
-            '5.14' => 'numero',
-            '5.15' => 'complemento',
-            '5.16' => 'cidade',
-            '5.17' => 'uf',
-            '5.18' => 'nome_mae',
-            '5.19' => 'nome_pai',
+            'rt1' => 'cpf',
+            'rt2' => 'registro',
+            'rt3' => 'nome',
+            'rt4' => 'nome_social',
+            'rt5' => 'dt_nascimento',
+            'rt6' => 'sexo',
+            'rt7' => 'tipo_identidade',
+            'rt8' => 'identidade',
+            'rt9' => 'orgao_emissor',
+            'rt10' => 'dt_expedicao',
+            'rt11' => 'cep',
+            'rt12' => 'bairro',
+            'rt13' => 'logradouro',
+            'rt14' => 'numero',
+            'rt15' => 'complemento',
+            'rt16' => 'cidade',
+            'rt17' => 'uf',
+            'rt18' => 'nome_mae',
+            'rt19' => 'nome_pai',
         ];
     }
 

@@ -27,7 +27,7 @@
 
 <!-- Carrega os arquivos do bd com seus botoes de controle -->	
 @if(!\Route::is('externo.verifica.inserir.preregistro'))
-    <label class="mt-3" for="anexos">{{ array_search('path', $codAnexo) }} - Anexo <span class="text-danger">*</span></label>
+    <label class="mt-3" for="anexos">{{ $codigos[5]['path'] }} - Anexo <span class="text-danger">*</span></label>
     @if($resultado->anexos->count() == 0)
 
         @component('components.arquivosBD', [

@@ -1,6 +1,11 @@
-@if(isset($justificativas))
+{{-- ajustar a verificação --}}
+@if(isset($resultado->status))
     <div class="d-block w-100">
-        <p class="alert alert-warning">{{ $justificativas }}</p>
+        <p class="alert alert-warning">
+        @foreach($resultado->getTextosJustificadosByAba($codigos[1]) as $key => $texto)
+            {{ $key . ': ' . $texto }}
+        @endforeach
+        </p>
     </div>
 @endif
 
@@ -38,7 +43,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_social">{{ array_search('nome_social', $codCpf) }} - Nome Social</label>
+        <label for="nome_social">{{ $codigos[1]['nome_social'] }} - Nome Social</label>
         <input
             name="nome_social"
             type="text"
@@ -55,7 +60,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="sexo">{{ array_search('sexo', $codCpf) }} - Gênero <span class="text-danger">*</span></label>
+        <label for="sexo">{{ $codigos[1]['sexo'] }} - Gênero <span class="text-danger">*</span></label>
         <br>
         <select 
             name="sexo" 
@@ -79,7 +84,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_nascimento">{{ array_search('dt_nascimento', $codCpf) }} - Data de Nascimento <span class="text-danger">*</span></label>
+        <label for="dt_nascimento">{{ $codigos[1]['dt_nascimento'] }} - Data de Nascimento <span class="text-danger">*</span></label>
         <input
             name="dt_nascimento"
             type="date"
@@ -94,7 +99,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="estado_civil">{{ array_search('estado_civil', $codCpf) }} - Estado Civil</label>
+        <label for="estado_civil">{{ $codigos[1]['estado_civil'] }} - Estado Civil</label>
         <select 
             name="estado_civil" 
             class="{{ $classes[2] }} form-control {{ $errors->has('estado_civil') ? 'is-invalid' : '' }}" 
@@ -120,7 +125,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nacionalidade">{{ array_search('nacionalidade', $codCpf) }} - Nacionalidade <span class="text-danger">*</span></label>
+        <label for="nacionalidade">{{ $codigos[1]['nacionalidade'] }} - Nacionalidade <span class="text-danger">*</span></label>
         <select 
             name="nacionalidade" 
             class="{{ $classes[2] }} form-control {{ $errors->has('nacionalidade') ? 'is-invalid' : '' }} obrigatorio" 
@@ -143,7 +148,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="naturalidade">{{ array_search('naturalidade', $codCpf) }} - Naturalidade <span class="text-danger">*</span></label>
+        <label for="naturalidade">{{ $codigos[1]['naturalidade'] }} - Naturalidade <span class="text-danger">*</span></label>
         <select 
             name="naturalidade" 
             class="{{ $classes[2] }} form-control {{ $errors->has('naturalidade') ? 'is-invalid' : '' }} obrigatorio" 
@@ -170,7 +175,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="nome_mae">{{ array_search('nome_mae', $codCpf) }} - Nome da Mãe <span class="text-danger">*</span></label>
+        <label for="nome_mae">{{ $codigos[1]['nome_mae'] }} - Nome da Mãe <span class="text-danger">*</span></label>
         <input
             name="nome_mae"
             type="text"
@@ -184,7 +189,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nome_pai">{{ array_search('nome_pai', $codCpf) }} - Nome do Pai</label>
+        <label for="nome_pai">{{ $codigos[1]['nome_pai'] }} - Nome do Pai</label>
         <input
             name="nome_pai"
             type="text"
@@ -201,7 +206,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_identidade">{{ array_search('tipo_identidade', $codCpf) }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
+        <label for="tipo_identidade">{{ $codigos[1]['tipo_identidade'] }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
         <select 
             name="tipo_identidade" 
             class="{{ $classes[2] }} form-control {{ $errors->has('tipo_identidade') ? 'is-invalid' : '' }} obrigatorio"
@@ -224,7 +229,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="identidade">{{ array_search('identidade', $codCpf) }} - N° do documento de identidade <span class="text-danger">*</span></label>
+        <label for="identidade">{{ $codigos[1]['identidade'] }} - N° do documento de identidade <span class="text-danger">*</span></label>
         <input
             name="identidade"
             type="text"
@@ -243,7 +248,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="orgao_emissor">{{ array_search('orgao_emissor', $codCpf) }} - Órgão Emissor <span class="text-danger">*</span></label>
+        <label for="orgao_emissor">{{ $codigos[1]['orgao_emissor'] }} - Órgão Emissor <span class="text-danger">*</span></label>
         <input
             name="orgao_emissor"
             type="text"
@@ -257,7 +262,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_expedicao">{{ array_search('dt_expedicao', $codCpf) }} - Data de Expedição <span class="text-danger">*</span></label>
+        <label for="dt_expedicao">{{ $codigos[1]['dt_expedicao'] }} - Data de Expedição <span class="text-danger">*</span></label>
         <input
             name="dt_expedicao"
             type="date"
@@ -277,7 +282,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="razao_social">{{ array_search('razao_social', $codCnpj) }} - Razão Social <span class="text-danger">*</span></label>
+        <label for="razao_social">{{ $codigos[1]['razao_social'] }} - Razão Social <span class="text-danger">*</span></label>
         <input
             name="razao_social"
             type="text"
@@ -295,7 +300,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="capital_social">{{ array_search('capital_social', $codCnpj) }} - Capital Social em R$ <span class="text-danger">*</span></label>
+        <label for="capital_social">{{ $codigos[1]['capital_social'] }} - Capital Social em R$ <span class="text-danger">*</span></label>
         <input
             type="text"
             name="capital_social"
@@ -310,7 +315,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="nire">{{ array_search('nire', $codCnpj) }} - NIRE</label>
+        <label for="nire">{{ $codigos[1]['nire'] }} - NIRE</label>
         <input
             type="text"
             name="nire"
@@ -329,7 +334,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="tipo_empresa">{{ array_search('tipo_empresa', $codCnpj) }} - Tipo da Empresa <span class="text-danger">*</span></label>
+        <label for="tipo_empresa">{{ $codigos[1]['tipo_empresa'] }} - Tipo da Empresa <span class="text-danger">*</span></label>
         <br>
         <select 
             name="tipo_empresa" 
@@ -353,7 +358,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="dt_inicio_atividade">{{ array_search('dt_inicio_atividade', $codCnpj) }} - Data início da atividade <span class="text-danger">*</span></label>
+        <label for="dt_inicio_atividade">{{ $codigos[1]['dt_inicio_atividade'] }} - Data início da atividade <span class="text-danger">*</span></label>
         <input
             type="date"
             name="dt_inicio_atividade"
@@ -371,7 +376,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="inscricao_municipal">{{ array_search('inscricao_municipal', $codCnpj) }} - Inscrição Municipal <span class="text-danger">*</span></label>
+        <label for="inscricao_municipal">{{ $codigos[1]['inscricao_municipal'] }} - Inscrição Municipal <span class="text-danger">*</span></label>
         <input
             type="text"
             name="inscricao_municipal"
@@ -386,7 +391,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="inscricao_estadual">{{ array_search('inscricao_estadual', $codCnpj) }} - Inscrição Estadual <span class="text-danger">*</span></label>
+        <label for="inscricao_estadual">{{ $codigos[1]['inscricao_estadual'] }} - Inscrição Estadual <span class="text-danger">*</span></label>
         <input
             type="text"
             name="inscricao_estadual"
@@ -407,7 +412,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="pergunta">{{ array_search('pergunta', $codPre) }} - Quanto tempo possui de experiência no ramo de vendas? <span class="text-danger">*</span></label>
+        <label for="pergunta">{{ $codigos[1]['pergunta'] }} - Quanto tempo possui de experiência no ramo de vendas? <span class="text-danger">*</span></label>
         <input
             type="text"
             name="pergunta"
@@ -426,7 +431,7 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="segmento">{{ array_search('segmento', $codPre) }} - Segmento <span class="text-danger">*</span></label>
+        <label for="segmento">{{ $codigos[1]['segmento'] }} - Segmento <span class="text-danger">*</span></label>
         <select 
             name="segmento" 
             class="{{ $classes[4] }} form-control {{ $errors->has('segmento') || isset($justificativas) ? 'is-invalid' : '' }} obrigatorio" 
@@ -449,7 +454,7 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="idregional">{{ array_search('idregional', $codPre) }} - Região de Atuação <span class="text-danger">*</span></label>
+        <label for="idregional">{{ $codigos[1]['idregional'] }} - Região de Atuação <span class="text-danger">*</span></label>
         <select 
             name="idregional" 
             class="{{ $classes[4] }} form-control {{ $errors->has('idregional') ? 'is-invalid' : '' }} obrigatorio" 

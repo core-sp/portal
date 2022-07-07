@@ -12,15 +12,14 @@ class Contabil extends Model
     protected $table = 'contabeis';
     protected $guarded = [];
 
-    // seguir ordem de apresentação dos campos nas blades
-    public static function codigosPreRegistro()
+    public static function camposPreRegistro()
     {
         return [
-            '1.1' => 'cnpj',
-            '1.2' => 'nome',
-            '1.3' => 'email',
-            '1.4' => 'nome_contato',
-            '1.5' => 'telefone'
+            'c1' => 'cnpj',
+            'c2' => 'nome',
+            'c3' => 'email',
+            'c4' => 'nome_contato',
+            'c5' => 'telefone'
         ];
     }
 

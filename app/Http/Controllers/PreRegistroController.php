@@ -43,13 +43,12 @@ class PreRegistroController extends Controller
             $variaveis = $dados['variaveis'];
             $abas = $dados['abas'];
             $codigos = $dados['codigos'];
-            $classes = $dados['classes'];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o pré-registro.");
         }
 
-        return view('admin.crud.mostra', compact('resultado', 'variaveis', 'abas', 'codigos', 'classes'));
+        return view('admin.crud.mostra', compact('resultado', 'variaveis', 'abas', 'codigos'));
     }
 
     public function updateAjax(PreRegistroAjaxAdminRequest $request, $id)

@@ -20,7 +20,7 @@
     <hr>
 
     <p id="path" class="mb-4">
-        <span class="font-weight-bolder">{{ array_search('path', $codAnexo) }} - Anexos: </span>
+        <span class="font-weight-bolder">{{ $codigos[5]['path'] }} - Anexos: </span>
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'path',
             'resultado' => $resultado->getJustificativaArray()

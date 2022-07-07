@@ -30,34 +30,82 @@
     <ul class="menu-registro nav nav-pills flex-column">
         <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#parte1_PF_PJ">
-                {{ $abas[0] }} {{-- - <i class="icon fa fa-check text-success"></i> --}}
+                {{ $abas[0] }}
+                @php
+                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[0]);
+                @endphp
+                @if(isset($resultado->status) && !isset($correcoes))
+                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes))
+                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @endif
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte2_PF_PJ">
-                {{ $abas[1] }} {{-- - <i class="icon fa fa-times text-danger"></i> <span class="text-danger">R27, R28</span> --}}
+                {{ $abas[1] }}
+                @php
+                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[1]);
+                @endphp
+                @if(isset($resultado->status) && !isset($correcoes))
+                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes))
+                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @endif
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte3_PF_PJ">
                 {{ $abas[2] }}
+                @php
+                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[2]);
+                @endphp
+                @if(isset($resultado->status) && !isset($correcoes))
+                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes))
+                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @endif
             </a>
         </li>
         @if(!$resultado->userExterno->isPessoaFisica())
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte4_PJ">
                 {{ $abas[3] }}
+                @php
+                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[3]);
+                @endphp
+                @if(isset($resultado->status) && !isset($correcoes))
+                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes))
+                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @endif
             </a>
         </li>
         @endif
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte4_PF_parte5_PJ">
                 {{ $abas[4] }}
+                @php
+                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[4]);
+                @endphp
+                @if(isset($resultado->status) && !isset($correcoes))
+                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes))
+                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @endif
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte5_PF_parte6_PJ">
                 {{ $abas[5] }}
+                @php
+                    $correcoes = $resultado->getCodigosJustificadosByAba($codigos[5]);
+                @endphp
+                @if(isset($resultado->status) && !isset($correcoes))
+                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes))
+                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @endif
             </a>
         </li>
     </ul>
@@ -79,49 +127,34 @@
 
             <!-- Tab 1 -->
             <div id="parte1_PF_PJ" class="tab-pane container active"><br>
-                @include('site.userExterno.inc.pre-registro-etapa1', [
-                    'cod' => $codigos[$classes[1]]
-                ])
+                @include('site.userExterno.inc.pre-registro-etapa1')
             </div>
-     
+    
             <!-- Tab 2 -->
             <div id="parte2_PF_PJ" class="tab-pane container fade"><br>
-                @include('site.userExterno.inc.pre-registro-etapa2', [
-                    'codPre' => $codigos[$classes[4]],
-                    'codCpf' => $codigos[$classes[2]],
-                    'codCnpj' => $codigos[$classes[3]]
-                ])
+                @include('site.userExterno.inc.pre-registro-etapa2')
             </div>
 
             <!-- Tab 3 -->
             <div id="parte3_PF_PJ" class="tab-pane container fade"><br>
-                @include('site.userExterno.inc.pre-registro-etapa3', [
-                    'codPre' => $codigos[$classes[4]],
-                    'codCnpj' => $codigos[$classes[3]]
-                ])
+                @include('site.userExterno.inc.pre-registro-etapa3')
             </div>
 
             <!-- Tab 4 PJ -->
             @if(!$resultado->userExterno->isPessoaFisica())
             <div id="parte4_PJ" class="tab-pane container fade"><br>
-                @include('site.userExterno.inc.pre-registro-etapa4-PJ', [
-                    'codRT' => $codigos[$classes[5]]
-                ])
+                @include('site.userExterno.inc.pre-registro-etapa4-PJ')
             </div>
             @endif
 
             <!-- Tab 4 PF e Tab 5 PJ -->
             <div id="parte4_PF_parte5_PJ" class="tab-pane container fade"><br>
-                @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ', [
-                    'codPre' => $codigos[$classes[4]]
-                ])
+                @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ')
             </div>
 
             <!-- Tab 5 PF e Tab 6 PJ -->
             <div id="parte5_PF_parte6_PJ" class="tab-pane container fade"><br>
-                @include('site.userExterno.inc.pre-registro-etapa5-PF-etapa6-PJ', [
-                    'codAnexo' => $codigos[$classes[0]],
-                ])
+                @include('site.userExterno.inc.pre-registro-etapa5-PF-etapa6-PJ')
             </div>
 
         </div>

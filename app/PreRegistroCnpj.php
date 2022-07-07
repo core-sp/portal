@@ -13,24 +13,23 @@ class PreRegistroCnpj extends Model
     protected $guarded = [];
     protected $touches = ['preRegistro'];
 
-    // seguir ordem de apresentação dos campos nas blades
-    public static function codigosPreRegistro()
+    public static function camposPreRegistro()
     {
         return [
-            '2.1' => 'razao_social',
-            '2.2' => 'capital_social',
-            '2.3' => 'nire',
-            '2.4' => 'tipo_empresa',
-            '2.5' => 'dt_inicio_atividade',
-            '2.6' => 'inscricao_municipal',
-            '2.7' => 'inscricao_estadual',
-            '4.8' => 'cep',
-            '4.9' => 'bairro',
-            '4.10' => 'logradouro',
-            '4.11' => 'numero',
-            '4.12' => 'complemento',
-            '4.13' => 'cidade',
-            '4.14' => 'uf',
+            'pj1' => 'razao_social',
+            'pj2' => 'capital_social',
+            'pj3' => 'nire',
+            'pj4' => 'tipo_empresa',
+            'pj5' => 'dt_inicio_atividade',
+            'pj6' => 'inscricao_municipal',
+            'pj7' => 'inscricao_estadual',
+            'pj8' => 'cep',
+            'pj9' => 'bairro',
+            'pj10' => 'logradouro',
+            'pj11' => 'numero',
+            'pj12' => 'complemento',
+            'pj13' => 'cidade',
+            'pj14' => 'uf',
         ];
     }
 

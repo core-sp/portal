@@ -2,7 +2,7 @@
     <h5 class="font-weight-bolder mb-3">Endereço de correspondência</h5>
 
     <p id="cep">
-        <span class="font-weight-bolder">{{ array_search('cep', $codPre) }} - CEP: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['cep'] }} - CEP: </span>
         {{ isset($resultado->cep) ? $resultado->cep : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'cep',
@@ -12,7 +12,7 @@
     </p>
 
     <p id="bairro">
-        <span class="font-weight-bolder">{{ array_search('bairro', $codPre) }} - Bairro: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['bairro'] }} - Bairro: </span>
         {{ isset($resultado->bairro) ? $resultado->bairro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'bairro',
@@ -22,7 +22,7 @@
     </p>
 
     <p id="logradouro">
-        <span class="font-weight-bolder">{{ array_search('logradouro', $codPre) }} - Logradouro: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['logradouro'] }} - Logradouro: </span>
         {{ isset($resultado->logradouro) ? $resultado->logradouro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'logradouro',
@@ -32,7 +32,7 @@
     </p>
 
     <p id="numero">
-        <span class="font-weight-bolder">{{ array_search('numero', $codPre) }} - Número: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['numero'] }} - Número: </span>
         {{ isset($resultado->numero) ? $resultado->numero : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'numero',
@@ -42,7 +42,7 @@
     </p>
 
     <p id="complemento">
-        <span class="font-weight-bolder">{{ array_search('complemento', $codPre) }} - Complemento: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['complemento'] }} - Complemento: </span>
         {{ isset($resultado->complemento) ? $resultado->complemento : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'complemento',
@@ -52,7 +52,7 @@
     </p>
 
     <p id="cidade">
-        <span class="font-weight-bolder">{{ array_search('cidade', $codPre) }} - Município: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['cidade'] }} - Município: </span>
         {{ isset($resultado->cidade) ? $resultado->cidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'cidade',
@@ -62,7 +62,7 @@
     </p>
 
     <p id="uf">
-        <span class="font-weight-bolder">{{ array_search('uf', $codPre) }} - Estado: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['uf'] }} - Estado: </span>
         {{ isset($resultado->uf) ? $resultado->uf : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'uf',
@@ -78,7 +78,7 @@
     @if($resultado->pessoaJuridica->mesmoEndereco())
 
     <p id="checkEndEmpresa">
-        <span>Mesmo endereço da correspondência </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['checkEndEmpresa'] }} - Mesmo endereço da correspondência </span>
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'checkEndEmpresa',
             'resultado' => $resultado->getJustificativaArray()
@@ -89,7 +89,7 @@
     @else
 
     <p id="cep_empresa">
-        <span class="font-weight-bolder">{{ array_search('cep', $codCnpj) }} - CEP: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['cep_empresa'] }} - CEP: </span>
         {{ isset($resultado->pessoaJuridica->cep) ? $resultado->pessoaJuridica->cep : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'cep_empresa',
@@ -99,7 +99,7 @@
     </p>
 
     <p id="bairro_empresa">
-        <span class="font-weight-bolder">{{ array_search('bairro', $codCnpj) }} - Bairro: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['bairro_empresa'] }} - Bairro: </span>
         {{ isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'bairro_empresa',
@@ -109,7 +109,7 @@
     </p>
 
     <p id="logradouro_empresa">
-        <span class="font-weight-bolder">{{ array_search('logradouro', $codCnpj) }} - Logradouro: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['logradouro_empresa'] }} - Logradouro: </span>
         {{ isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'logradouro_empresa',
@@ -119,7 +119,7 @@
     </p>
 
     <p id="numero_empresa">
-        <span class="font-weight-bolder">{{ array_search('numero', $codCnpj) }} - Número: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['numero_empresa'] }} - Número: </span>
         {{ isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'numero_empresa',
@@ -129,7 +129,7 @@
     </p>
 
     <p id="complemento_empresa">
-        <span class="font-weight-bolder">{{ array_search('complemento', $codCnpj) }} - Complemento: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['complemento_empresa'] }} - Complemento: </span>
         {{ isset($resultado->pessoaJuridica->complemento) ? $resultado->pessoaJuridica->complemento : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'complemento_empresa',
@@ -139,7 +139,7 @@
     </p>
 
     <p id="cidade_empresa">
-        <span class="font-weight-bolder">{{ array_search('cidade', $codCnpj) }} - Município: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['cidade_empresa'] }} - Município: </span>
         {{ isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'cidade_empresa',
@@ -149,7 +149,7 @@
     </p>
 
     <p id="uf_empresa">
-        <span class="font-weight-bolder">{{ array_search('uf', $codCnpj) }} - Estado: </span>
+        <span class="font-weight-bolder">{{ $codigos[2]['uf_empresa'] }} - Estado: </span>
         {{ isset($resultado->pessoaJuridica->uf) ? $resultado->pessoaJuridica->uf : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'uf_empresa',

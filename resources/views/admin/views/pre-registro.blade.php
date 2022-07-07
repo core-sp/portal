@@ -9,9 +9,7 @@
                 </div>
             </a>
             <div id="parte1_PF_PJ" class="collapse show" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte1_PF_PJ', [
-                    'cod' => $codigos[$classes[1]]
-                ])
+                @include('admin.inc.pre-registro-parte1_PF_PJ')
             </div>
         </div>
 
@@ -22,14 +20,10 @@
                 </div>
             </a>
             <div id="parte2_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte2_PF_PJ', [
-                    'codPre' => $codigos[$classes[4]],
-                    'codCpf' => $codigos[$classes[2]],
-                    'codCnpj' => $codigos[$classes[3]]
-                ])
+                @include('admin.inc.pre-registro-parte2_PF_PJ')
             </div>
         </div>
-
+        
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte3_PF_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
@@ -37,13 +31,10 @@
                 </div>
             </a>
             <div id="parte3_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte3_PF_PJ', [
-                    'codPre' => $codigos[$classes[4]],
-                    'codCnpj' => $codigos[$classes[3]]
-                ])
+                @include('admin.inc.pre-registro-parte3_PF_PJ')
             </div>
         </div>
-
+        
         @if(!$resultado->userExterno->isPessoaFisica())
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte4_PJ">
@@ -52,13 +43,11 @@
                 </div>
             </a>
             <div id="parte4_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte4_PJ', [
-                    'codRT' => $codigos[$classes[5]]
-                ])
+                @include('admin.inc.pre-registro-parte4_PJ')
             </div>
         </div>
         @endif
-
+        
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte4_PF_parte5_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
@@ -66,9 +55,7 @@
                 </div>
             </a>
             <div id="parte4_PF_parte5_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte4_PF_parte5_PJ', [
-                    'codPre' => $codigos[$classes[4]]
-                ])
+                @include('admin.inc.pre-registro-parte4_PF_parte5_PJ')
             </div>
         </div>
 
@@ -79,12 +66,10 @@
                 </div>
             </a>
             <div id="parte5_PF_parte6_PJ" class="collapse" data-parent="#accordionPreRegistro">
-                @include('admin.inc.pre-registro-parte5_PF_parte6_PJ', [
-                    'codAnexo' => $codigos[$classes[0]]
-                ])
+                @include('admin.inc.pre-registro-parte5_PF_parte6_PJ')
             </div>
         </div>
-
+        
     </div>
 
 </div>

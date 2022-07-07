@@ -1,6 +1,6 @@
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="cpf_rt">{{ array_search('cpf', $codRT) }} - CPF <span class="text-danger">*</span></label>
+        <label for="cpf_rt">{{ $codigos[3]['cpf_rt'] }} - CPF <span class="text-danger">*</span></label>
         <input
             type="text"
             class="{{ $classes[5] }} form-control cpfInput {{ $errors->has('cpf_rt') ? ' is-invalid' : '' }} obrigatorio"
@@ -16,7 +16,7 @@
     </div>
 
     <div class="col-sm mb-2-576">
-        <label for="registro">{{ array_search('registro', $codRT) }} - Registro</label>
+        <label for="registro">{{ $codigos[3]['registro'] }} - Registro</label>
         <input
             type="text"
             class="{{ $classes[5] }} form-control"
@@ -31,7 +31,7 @@
 <fieldset id="campos_rt" {{ isset($resultado->pessoaJuridica->responsavelTecnico->cpf) ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="nome_rt">{{ array_search('nome', $codRT) }} - Nome Completo <span class="text-danger">*</span></label>
+            <label for="nome_rt">{{ $codigos[3]['nome_rt'] }} - Nome Completo <span class="text-danger">*</span></label>
             <input
                 name="nome_rt"
                 type="text"
@@ -48,7 +48,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="nome_social_rt">{{ array_search('nome_social', $codRT) }} - Nome Social</label>
+            <label for="nome_social_rt">{{ $codigos[3]['nome_social_rt'] }} - Nome Social</label>
             <input
                 name="nome_social_rt"
                 type="text"
@@ -65,7 +65,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="dt_nascimento_rt">{{ array_search('dt_nascimento', $codRT) }} - Data de Nascimento <span class="text-danger">*</span></label>
+            <label for="dt_nascimento_rt">{{ $codigos[3]['dt_nascimento_rt'] }} - Data de Nascimento <span class="text-danger">*</span></label>
             <input
                 name="dt_nascimento_rt"
                 type="date"
@@ -80,7 +80,7 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="sexo_rt">{{ array_search('sexo', $codRT) }} - Gênero <span class="text-danger">*</span></label><br>
+            <label for="sexo_rt">{{ $codigos[3]['sexo_rt'] }} - Gênero <span class="text-danger">*</span></label><br>
             <select 
                 name="sexo_rt" 
                 class="{{ $classes[5] }} form-control {{ $errors->has('sexo_rt') ? 'is-invalid' : '' }} obrigatorio"
@@ -106,7 +106,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="tipo_identidade_rt">{{ array_search('tipo_identidade', $codRT) }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
+            <label for="tipo_identidade_rt">{{ $codigos[3]['tipo_identidade_rt'] }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
             <select 
                 name="tipo_identidade_rt" 
                 class="{{ $classes[5] }} form-control {{ $errors->has('tipo_identidade_rt') ? 'is-invalid' : '' }} obrigatorio"
@@ -129,7 +129,7 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="identidade_rt">{{ array_search('identidade', $codRT) }} - N° do documento de identidade <span class="text-danger">*</span></label>
+            <label for="identidade_rt">{{ $codigos[3]['identidade_rt'] }} - N° do documento de identidade <span class="text-danger">*</span></label>
             <input
                 name="identidade_rt"
                 type="text"
@@ -148,7 +148,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="orgao_emissor_rt">{{ array_search('orgao_emissor', $codRT) }} - Órgão Emissor <span class="text-danger">*</span></label>
+            <label for="orgao_emissor_rt">{{ $codigos[3]['orgao_emissor_rt'] }} - Órgão Emissor <span class="text-danger">*</span></label>
             <input
                 name="orgao_emissor_rt"
                 type="text"
@@ -162,7 +162,7 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="dt_expedicao_rt">{{ array_search('dt_expedicao', $codRT) }} - Data de Expedição <span class="text-danger">*</span></label>
+            <label for="dt_expedicao_rt">{{ $codigos[3]['dt_expedicao_rt'] }} - Data de Expedição <span class="text-danger">*</span></label>
             <input
                 name="dt_expedicao_rt"
                 type="date"
@@ -182,7 +182,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm-4 mb-2-576">
-            <label for="cep_rt">{{ array_search('cep', $codRT) }} - CEP <span class="text-danger">*</span></label>
+            <label for="cep_rt">{{ $codigos[3]['cep_rt'] }} - CEP <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="cep_rt"
@@ -197,7 +197,7 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="bairro_rt">{{ array_search('bairro', $codRT) }} - Bairro <span class="text-danger">*</span></label>
+            <label for="bairro_rt">{{ $codigos[3]['bairro_rt'] }} - Bairro <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="bairro_rt"
@@ -215,7 +215,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="logradouro_rt">{{ array_search('logradouro', $codRT) }} - Logradouro <span class="text-danger">*</span></label>
+            <label for="logradouro_rt">{{ $codigos[3]['logradouro_rt'] }} - Logradouro <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="logradouro_rt"
@@ -230,7 +230,7 @@
             @endif
         </div>
         <div class="col-sm-2 mb-2-576">
-            <label for="numero_rt">{{ array_search('numero', $codRT) }} - Número <span class="text-danger">*</span></label>
+            <label for="numero_rt">{{ $codigos[3]['numero_rt'] }} - Número <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="numero_rt"
@@ -248,7 +248,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm-3 mb-2-576">
-            <label for="complemento_rt">{{ array_search('complemento', $codRT) }} - Complemento</label>
+            <label for="complemento_rt">{{ $codigos[3]['complemento_rt'] }} - Complemento</label>
             <input
                 type="text"
                 name="complemento_rt"
@@ -263,7 +263,7 @@
             @endif
         </div>
         <div class="col-sm-5 mb-2-576">
-            <label for="cidade_rt">{{ array_search('cidade', $codRT) }} - Município <span class="text-danger">*</span></label>
+            <label for="cidade_rt">{{ $codigos[3]['cidade_rt'] }} - Município <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="cidade_rt"
@@ -278,7 +278,7 @@
             @endif
         </div>
         <div class="col-sm-4 mb-2-576">
-            <label for="uf_rt">{{ array_search('uf', $codRT) }} - Estado <span class="text-danger">*</span></label>
+            <label for="uf_rt">{{ $codigos[3]['uf_rt'] }} - Estado <span class="text-danger">*</span></label>
             <select 
                 name="uf_rt" 
                 id="uf_rt" 
@@ -307,7 +307,7 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="nome_mae_rt">{{ array_search('nome_mae', $codRT) }} - Nome da Mãe <span class="text-danger">*</span></label>
+            <label for="nome_mae_rt">{{ $codigos[3]['nome_mae_rt'] }} - Nome da Mãe <span class="text-danger">*</span></label>
             <input
                 name="nome_mae_rt"
                 type="text"
@@ -321,7 +321,7 @@
             @endif
         </div>
         <div class="col-sm mb-2-576">
-            <label for="nome_pai_rt">{{ array_search('nome_pai', $codRT) }} - Nome do Pai</label>
+            <label for="nome_pai_rt">{{ $codigos[3]['nome_pai_rt'] }} - Nome do Pai</label>
             <input
                 name="nome_pai_rt"
                 type="text"

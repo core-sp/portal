@@ -108,7 +108,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $relacoes = $this->getRelacoes();
 
         foreach($relacoes as $key => $model)
-            $codigos[$model] = $key::codigosPreRegistro();
+            $codigos[$model] = $key::camposPreRegistro();
         
         return $codigos;
     }
@@ -241,7 +241,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
         
         if(isset($ass_id))
         {
-            // Confirmar se necessita de mais dados para o RT
             $resultadosGerenti = utf8_converter($gerentiRepository->gerentiDadosGeraisPF($ass_id));
 
             $gerenti['nome_mae'] = isset($resultadosGerenti['Nome da mãe']) ? $resultadosGerenti['Nome da mãe'] : null;
@@ -261,28 +260,44 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return $gerenti;
     }
 
-    // teste
-    private function getMenuComCampos()
+    private function getAbasCampos($externo)
     {
-        $menu = $this->getMenu();
-        $menuCampos[$menu[0]] = ['1.1','1.2','1.3','1.4','1.5'];
-        $menuCampos[$menu[1]] = ['2.1','2.2','2.3','2.4','2.5','2.6','2.7','2.8','2.9','2.10','2.11','2.12','3.2','3.3'];
-        $menuCampos[$menu[2]] = ['4.1','4.2','4.3','4.4','4.5','4.6','4.7'];
+        $pf = 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao';
+        $pj = 'razao_social,capital_social,nire,tipo_empresa,dt_inicio_atividade,inscricao_municipal,inscricao_estadual';
+        $dadosGerais = $externo->isPessoaFisica() ? $pf : $pj;
 
-        // getNomesCampos()
-
-        // $menuCampos[$menu[0]] = ['1.1','1.2','1.3','1.4','1.5'];
-        // $menuCampos[$menu[0]] = ['1.1','1.2','1.3','1.4','1.5'];
-        // $menuCampos[$menu[0]] = ['1.1','1.2','1.3','1.4','1.5'];
+        // A índice é referente a índice do menu
+        // Colocar na ordem dos campos nas blades
+        return [
+            'cnpj_contabil,nome_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
+            $dadosGerais . ',pergunta,segmento,idregional',
+            'cep,bairro,logradouro,numero,complemento,cidade,uf,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
+            'cpf_rt,registro,nome_rt,nome_social_rt,dt_nascimento_rt,sexo_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt',
+            'tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1',
+            'path',
+        ];
     }
 
-    // private function formatJustificativa($preRegistro)
-    // {
-    //     if(isset($preRegistro->justificativa) && !isset($preRegistro->getJustificativaArray()['negado']))
-    //     {
+    // Fazer os códigos automaticos
+    private function getCodigosCampos($externo)
+    {
+        $arrayCampos = $this->getAbasCampos($externo);
+        $codigos = array();
 
-    //     }
-    // }
+        foreach($arrayCampos as $key => $value)
+        {
+            $temp = explode(',', $value);
+            $cont = 1;
+            $chave = (string) $key + 1;
+            foreach($temp as $campo)
+            {
+                $codigos[$key][$campo] = $chave . '.' . $cont;
+                $cont++;
+            }
+        }
+
+        return $codigos;
+    }
 
     public function getNomesCampos()
     {
@@ -350,7 +365,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             
         return [
             'resultado' => $resultado,
-            'codigos' => $this->getCodigos(),
+            'codigos' => $this->getCodigosCampos($externo),
             'regionais' => $service->getService('Regional')
                 ->all()
                 ->splice(0, 13)
@@ -507,13 +522,13 @@ class PreRegistroService implements PreRegistroServiceInterface {
     {
         $variaveis = $this->variaveis;
         $variaveis['btn_lista'] = '<a href="'.route('preregistro.index').'" class="btn btn-primary mr-1">Lista dos Pré-registros</a>';
+        $resultado = PreRegistro::findOrFail($id);
 
         return [
-            'resultado' => PreRegistro::findOrFail($id), 
+            'resultado' => $resultado, 
             'variaveis' => (object) $variaveis,
             'abas' => $this->getMenu(),
-            'codigos' => $this->getCodigos(),
-            'classes' => $this->getNomeClasses(),
+            'codigos' => $this->getCodigosCampos($resultado->userExterno),
         ];
     }
 

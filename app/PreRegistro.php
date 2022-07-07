@@ -173,23 +173,21 @@ class PreRegistro extends Model
         return $arrayCampos;
     }
 
-    // seguir ordem de apresentação dos campos nas blades
-    public static function codigosPreRegistro()
+    public static function camposPreRegistro()
     {
         return [
-            '3.1' => 'pergunta',
-            '3.2' => 'segmento',
-            '3.3' => 'idregional',
-            '6.1' => 'tipo_telefone',
-            '6.2' => 'telefone',
-            '6.3' => 'opcional_celular',
-            '4.1' => 'cep',
-            '4.2' => 'bairro',
-            '4.3' => 'logradouro',
-            '4.4' => 'numero',
-            '4.5' => 'complemento',
-            '4.6' => 'cidade',
-            '4.7' => 'uf',
+            'p1' => 'segmento',
+            'p2' => 'idregional',
+            'p3' => 'tipo_telefone',
+            'p4' => 'telefone',
+            'p5' => 'opcional_celular',
+            'p6' => 'cep',
+            'p7' => 'bairro',
+            'p8' => 'logradouro',
+            'p9' => 'numero',
+            'p10' => 'complemento',
+            'p11' => 'cidade',
+            'p12' => 'uf',
         ];
     }
 
@@ -279,6 +277,39 @@ class PreRegistro extends Model
     public function getConfereAnexosArray()
     {
         return json_decode($this->confere_anexos, true);
+    }
+
+    public function getCodigosJustificadosByAba($arrayAba)
+    {
+        if($this->status == PreRegistro::STATUS_CORRECAO)
+        {
+            $correcoes = array();
+            $array = $this->getJustificativaArray();
+            foreach($array as $key => $campo)
+                if(in_array($key, array_keys($arrayAba)))
+                    array_push($correcoes, $arrayAba[$key]);
+
+            $final = implode(' * ', $correcoes);
+            return strlen($final) > 0 ? $final : null;
+        }
+
+        return null;
+    }
+
+    public function getTextosJustificadosByAba($arrayAba)
+    {
+        if($this->status == PreRegistro::STATUS_CORRECAO)
+        {
+            $correcoes = array();
+            $array = $this->getJustificativaArray();
+            foreach($array as $key => $campo)
+                if(in_array($key, array_keys($arrayAba)))
+                    $correcoes[$arrayAba[$key]] = $campo;
+
+            return $correcoes;
+        }
+
+        return null;
     }
 
     public function canUpdateStatus($status)
