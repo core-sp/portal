@@ -16,6 +16,7 @@
                 >
                     <i class="fas fa-download"></i>
                 </a>
+                @if($podeExcluir)
                 <button class="btn btn-danger modalExcluir"
                     value="{{ $id }}"
                     type="button" 
@@ -25,6 +26,7 @@
                 >
                     <i class="fas fa-trash-alt"></i>
                 </button>
+                @endif
             </div>
         </div>
     </div>

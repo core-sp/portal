@@ -20,6 +20,15 @@
                     @if(isset($gerenti))
                     <p>Você já possui registro ativo no Core-SP: <strong>{{ formataRegistro($gerenti) }}</strong></p>
                     @else
+                        @if(isset($resultado->status))
+                        <h4>Status: {!! $resultado->getLabelStatusUser() !!}</h4>
+                            @if(isset($resultado->status) && ($resultado->status == $resultado::STATUS_NEGADO))
+                            <p>
+                                <strong>Justificativa:</strong>
+                                {{ $resultado->getJustificativaNegado() }}
+                            </p>
+                            @endif
+                        @endif
                     <form action="{{ route('externo.inserir.preregistro.view') }}" autocomplete="off">
                         <div class="form-check mt-3">
                             <input type="checkbox"
@@ -32,7 +41,13 @@
                             </label>
                         </div>
                         <button type="submit" class="btn btn-link {{ isset($resultado->id) ? 'btn-secondary' : 'btn-success' }} link-nostyle branco mt-3">
-                            {{ isset($resultado->id) ? 'Continuar' : 'Iniciar' }} a solicitação do registro
+                            @if(!isset($resultado->id))
+                                Iniciar a solicitação do registro
+                            @elseif(!isset($resultado->status))
+                                Continuar a solicitação do registro
+                            @else
+                                {{ $resultado->userPodeCorrigir() ? 'Corrigir' : 'Visualizar' }} a solicitação do registro
+                            @endif
                         </button>
                     </form>
                     @endif

@@ -1,11 +1,17 @@
-{{-- ajustar a verificação --}}
-@if(isset($resultado->status))
+@php
+    $correcoes = $resultado->getTextosJustificadosByAba($codigos[1]);
+@endphp
+@if($resultado->userPodeCorrigir() && !empty($correcoes))
     <div class="d-block w-100">
-        <p class="alert alert-warning">
-        @foreach($resultado->getTextosJustificadosByAba($codigos[1]) as $key => $texto)
-            {{ $key . ': ' . $texto }}
+        <div class="alert alert-warning">
+            <span class="bold">Justificativa(s):</span>
+            <br>
+        @foreach($correcoes as $key => $texto)
+            <p>
+                <span class="bold">{{ $key . ': ' }}</span>{{ $texto }}
+            </p>
         @endforeach
-        </p>
+        </div>
     </div>
 @endif
 
@@ -412,25 +418,6 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="pergunta">{{ $codigos[1]['pergunta'] }} - Quanto tempo possui de experiência no ramo de vendas? <span class="text-danger">*</span></label>
-        <input
-            type="text"
-            name="pergunta"
-            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('pergunta') ? 'is-invalid' : '' }} obrigatorio"
-            placeholder=""
-            {{-- por não salvar no bd, para não passar nula para o próximo request de envio --}}
-            value="{{ empty(old('pergunta')) ? request()->pergunta : old('pergunta') }}"
-        />
-        @if($errors->has('pergunta'))
-        <div class="invalid-feedback">
-            {{ $errors->first('pergunta') }}
-        </div>
-        @endif
-    </div>
-</div>
-
-<div class="form-row mb-2">
-    <div class="col-sm mb-2-576">
         <label for="segmento">{{ $codigos[1]['segmento'] }} - Segmento <span class="text-danger">*</span></label>
         <select 
             name="segmento" 
@@ -473,6 +460,26 @@
         @if($errors->has('idregional'))
         <div class="invalid-feedback">
             {{ $errors->first('idregional') }}
+        </div>
+        @endif
+    </div>
+</div>
+
+{{-- Deixar sempre no final do form a pergunta para não afetar a ordenação para o atendente no admin --}}
+<div class="form-row mb-2">
+    <div class="col-sm mb-2-576">
+        <label for="pergunta">{{ $codigos[1]['pergunta'] }} - Quanto tempo possui de experiência no ramo de vendas? <span class="text-danger">*</span></label>
+        <input
+            type="text"
+            name="pergunta"
+            class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('pergunta') ? 'is-invalid' : '' }} obrigatorio"
+            placeholder=""
+            {{-- por não salvar no bd, para não passar nula para o próximo request de envio --}}
+            value="{{ empty(old('pergunta')) ? request()->pergunta : old('pergunta') }}"
+        />
+        @if($errors->has('pergunta'))
+        <div class="invalid-feedback">
+            {{ $errors->first('pergunta') }}
         </div>
         @endif
     </div>

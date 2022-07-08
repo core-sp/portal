@@ -484,6 +484,10 @@ function getErrorMsg(request)
         errorMessage = "Sua sessão expirou! Recarregue a página";
         time = 2000;
     }
+    if(request.status == 429){
+      errorMessage = "Excedeu o limite de requisições por minuto.";
+      time = 2000;
+    }
     return [errorMessage, time];
 }
 

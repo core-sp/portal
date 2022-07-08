@@ -30,81 +30,93 @@
     <ul class="menu-registro nav nav-pills flex-column">
         <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#parte1_PF_PJ">
-                {{ $abas[0] }}
+                {{ $abas[0] }}&nbsp;
                 @php
                     $correcoes = $resultado->getCodigosJustificadosByAba($codigos[0]);
                 @endphp
-                @if(isset($resultado->status) && !isset($correcoes))
-                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes))
-                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @if($resultado->userPodeCorrigir() && empty($correcoes))
+                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes) && !empty($correcoes))
+                    @foreach($correcoes as $correcao)
+                    <span class="badge badge-danger"> {{ $correcao }}</span>
+                    @endforeach
                 @endif
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte2_PF_PJ">
-                {{ $abas[1] }}
+                {{ $abas[1] }}&nbsp;
                 @php
                     $correcoes = $resultado->getCodigosJustificadosByAba($codigos[1]);
                 @endphp
-                @if(isset($resultado->status) && !isset($correcoes))
-                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes))
-                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @if($resultado->userPodeCorrigir() && empty($correcoes))
+                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes) && !empty($correcoes))
+                    @foreach($correcoes as $correcao)
+                    <span class="badge badge-danger"> {{ $correcao }}</span>
+                    @endforeach
                 @endif
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte3_PF_PJ">
-                {{ $abas[2] }}
+                {{ $abas[2] }}&nbsp;
                 @php
                     $correcoes = $resultado->getCodigosJustificadosByAba($codigos[2]);
                 @endphp
-                @if(isset($resultado->status) && !isset($correcoes))
-                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes))
-                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @if($resultado->userPodeCorrigir() && empty($correcoes))
+                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes) && !empty($correcoes))
+                    @foreach($correcoes as $correcao)
+                    <span class="badge badge-danger"> {{ $correcao }}</span>
+                    @endforeach
                 @endif
             </a>
         </li>
         @if(!$resultado->userExterno->isPessoaFisica())
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte4_PJ">
-                {{ $abas[3] }}
+                {{ $abas[3] }}&nbsp;
                 @php
                     $correcoes = $resultado->getCodigosJustificadosByAba($codigos[3]);
                 @endphp
-                @if(isset($resultado->status) && !isset($correcoes))
-                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes))
-                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @if($resultado->userPodeCorrigir() && empty($correcoes))
+                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes) && !empty($correcoes))
+                    @foreach($correcoes as $correcao)
+                    <span class="badge badge-danger"> {{ $correcao }}</span>
+                    @endforeach
                 @endif
             </a>
         </li>
         @endif
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte4_PF_parte5_PJ">
-                {{ $abas[4] }}
+                {{ $abas[4] }}&nbsp;
                 @php
                     $correcoes = $resultado->getCodigosJustificadosByAba($codigos[4]);
                 @endphp
-                @if(isset($resultado->status) && !isset($correcoes))
-                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes))
-                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @if($resultado->userPodeCorrigir() && empty($correcoes))
+                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes) && !empty($correcoes))
+                    @foreach($correcoes as $correcao)
+                    <span class="badge badge-danger"> {{ $correcao }}</span>
+                    @endforeach
                 @endif
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-toggle="pill" href="#parte5_PF_parte6_PJ">
-                {{ $abas[5] }}
+                {{ $abas[5] }}&nbsp;
                 @php
                     $correcoes = $resultado->getCodigosJustificadosByAba($codigos[5]);
                 @endphp
-                @if(isset($resultado->status) && !isset($correcoes))
-                 - <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
-                @elseif(isset($correcoes))
-                 - <span class="badge badge-danger"> {{ $correcoes }}</span>
+                @if($resultado->userPodeCorrigir() && empty($correcoes))
+                <span class="badge badge-success"><i class="icon fa fa-check"></i></span>
+                @elseif(isset($correcoes) && !empty($correcoes))
+                    @foreach($correcoes as $correcao)
+                    <span class="badge badge-danger"> {{ $correcao }}</span>
+                    @endforeach
                 @endif
             </a>
         </li>
@@ -121,35 +133,45 @@
     >
         @csrf
         @method('PUT')
-
+        
         <!-- Tab panes -->
         <div class="tab-content">
-
+        
             <!-- Tab 1 -->
             <div id="parte1_PF_PJ" class="tab-pane container active"><br>
+                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
                 @include('site.userExterno.inc.pre-registro-etapa1')
+                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
             </div>
     
             <!-- Tab 2 -->
             <div id="parte2_PF_PJ" class="tab-pane container fade"><br>
+                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
                 @include('site.userExterno.inc.pre-registro-etapa2')
+                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
             </div>
 
             <!-- Tab 3 -->
             <div id="parte3_PF_PJ" class="tab-pane container fade"><br>
+                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
                 @include('site.userExterno.inc.pre-registro-etapa3')
+                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
             </div>
 
             <!-- Tab 4 PJ -->
             @if(!$resultado->userExterno->isPessoaFisica())
             <div id="parte4_PJ" class="tab-pane container fade"><br>
+                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
                 @include('site.userExterno.inc.pre-registro-etapa4-PJ')
+                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
             </div>
             @endif
 
             <!-- Tab 4 PF e Tab 5 PJ -->
             <div id="parte4_PF_parte5_PJ" class="tab-pane container fade"><br>
+                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
                 @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ')
+                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
             </div>
 
             <!-- Tab 5 PF e Tab 6 PJ -->
@@ -174,6 +196,7 @@
                 </button>
             </div>
 
+            @if($resultado->userPodeEditar())
             <div class="col-6">
                 <button 
                     class="btn btn-primary btn-sm float-right" 
@@ -184,6 +207,7 @@
                     Verificar Pendências
                 </button>
             </div>
+            @endif
         </div>
     </form>
 

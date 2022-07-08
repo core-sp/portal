@@ -47,6 +47,7 @@
 
     <hr>
 
+    {!! !$resultado->atendentePodeEditar() ? '<fieldset disabled>' : '' !!}
     <label for="confere_anexos[]"><i class="fas fa-check"></i> Anexos entregues: </label>
     <br>
 
@@ -161,4 +162,6 @@
     <p class="text-muted mt-3">
         <em>* Obs: somente para PJ não é obrigatório confirmar a "Certidão de quitação eleitoral" e "Cerificado de reservista ou dispensa" para aprovação</em>
     </p>
+    {!! !$resultado->atendentePodeEditar() ? '</fieldset>' : '' !!}
+    
 </div>

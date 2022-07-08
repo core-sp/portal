@@ -230,10 +230,23 @@ class PreRegistro extends Model
     {
         $colorStatus = [
             PreRegistro::STATUS_ANALISE_INICIAL => '<span class="font-weight-bolder text-primary">' . PreRegistro::STATUS_ANALISE_INICIAL . '</span>',
-            PreRegistro::STATUS_CORRECAO => '<span class="font-weight-bolder text-warning">' . PreRegistro::STATUS_CORRECAO . '</span>',
+            PreRegistro::STATUS_CORRECAO => '<span class="font-weight-bolder text-secondary">' . PreRegistro::STATUS_CORRECAO . '</span>',
             PreRegistro::STATUS_ANALISE_CORRECAO => '<span class="font-weight-bolder text-info">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</span>',
             PreRegistro::STATUS_APROVADO => '<span class="font-weight-bolder text-success">' . PreRegistro::STATUS_APROVADO . '</span>',
             PreRegistro::STATUS_NEGADO => '<span class="font-weight-bolder text-danger">' . PreRegistro::STATUS_NEGADO . '</span>',
+        ];
+
+        return isset($colorStatus[$this->status]) ? $colorStatus[$this->status] : null;
+    }
+
+    public function getLabelStatusUser()
+    {
+        $colorStatus = [
+            PreRegistro::STATUS_ANALISE_INICIAL => '<span class="badge badge-primary">' . PreRegistro::STATUS_ANALISE_INICIAL . '</span>',
+            PreRegistro::STATUS_CORRECAO => '<span class="badge badge-warning">' . PreRegistro::STATUS_CORRECAO . '</span>',
+            PreRegistro::STATUS_ANALISE_CORRECAO => '<span class="badge badge-info">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</span>',
+            PreRegistro::STATUS_APROVADO => '<span class="badge badge-success">' . PreRegistro::STATUS_APROVADO . '</span>',
+            PreRegistro::STATUS_NEGADO => '<span class="badge badge-danger">' . PreRegistro::STATUS_NEGADO . '</span>',
         ];
 
         return isset($colorStatus[$this->status]) ? $colorStatus[$this->status] : null;
@@ -279,18 +292,38 @@ class PreRegistro extends Model
         return json_decode($this->confere_anexos, true);
     }
 
+    public function getJustificativaNegado()
+    {
+        return isset($this->getJustificativaArray()['negado']) ? $this->getJustificativaArray()['negado'] : null;
+    }
+
+    public function userPodeCorrigir()
+    {
+        return isset($this->status) && ($this->status == PreRegistro::STATUS_CORRECAO);
+    }
+
+    public function userPodeEditar()
+    {
+        return !isset($this->status) || $this->userPodeCorrigir();
+    }
+
+    public function atendentePodeEditar()
+    {
+        return isset($this->status) && in_array($this->status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]);
+    }
+
     public function getCodigosJustificadosByAba($arrayAba)
     {
-        if($this->status == PreRegistro::STATUS_CORRECAO)
+        $array = $this->getJustificativaArray();
+        if($this->userPodeCorrigir() && ($array !== null))
         {
             $correcoes = array();
-            $array = $this->getJustificativaArray();
             foreach($array as $key => $campo)
                 if(in_array($key, array_keys($arrayAba)))
                     array_push($correcoes, $arrayAba[$key]);
 
-            $final = implode(' * ', $correcoes);
-            return strlen($final) > 0 ? $final : null;
+            natsort($correcoes);
+            return $correcoes;
         }
 
         return null;
@@ -298,14 +331,15 @@ class PreRegistro extends Model
 
     public function getTextosJustificadosByAba($arrayAba)
     {
-        if($this->status == PreRegistro::STATUS_CORRECAO)
+        $array = $this->getJustificativaArray();
+        if($this->userPodeCorrigir() && ($array !== null))
         {
             $correcoes = array();
-            $array = $this->getJustificativaArray();
             foreach($array as $key => $campo)
                 if(in_array($key, array_keys($arrayAba)))
                     $correcoes[$arrayAba[$key]] = $campo;
 
+            uksort($correcoes, "strnatcmp");
             return $correcoes;
         }
 

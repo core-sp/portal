@@ -228,13 +228,16 @@
         <span class="font-weight-bolder">Registro Secundário: </span>
         <input 
             type="text" 
-            value="{{ isset($resultado->registro_secundario) ? $resultado->registro_secundario : '' }}"
+            value="{{ isset($resultado->registro_secundario) ? formataRegistro($resultado->registro_secundario) : '' }}"
             name="registro_secundario"
             maxlength="20"
+            {{ $resultado->atendentePodeEditar() ? '' : 'disabled' }}
         />
+        @if($resultado->atendentePodeEditar())
         <button class="btn btn-outline-success btn-sm ml-2 addValorPreRegistro" type="button" value="registro_secundario">
             <i class="fas fa-save"></i>
         </button>
+        @endif
     </p>
 
 </div>

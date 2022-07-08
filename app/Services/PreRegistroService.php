@@ -60,7 +60,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
         // $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
         foreach($resultados as $resultado) 
         {
-            $acoes = '<a href="'.route('preregistro.view', $resultado->id).'" class="btn btn-sm btn-default">Analisar</a> ';
+            $texto = $resultado->atendentePodeEditar() ? 'Editar' : 'Visualizar';
+            $cor = $resultado->atendentePodeEditar() ? 'primary' : 'info';
+            $acoes = '<a href="'.route('preregistro.view', $resultado->id).'" class="btn btn-sm btn-' . $cor . '">'. $texto .'</a> ';
             // if($userPodeEditar)
             //     $acoes .= '<a href="'.route('regionais.edit', $resultado->idregional).'" class="btn btn-sm btn-primary">Editar</a> ';
             $conteudo = [
@@ -188,7 +190,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 else
                     $camposLimpos[$classe][$this->limparNomeCamposAjax($classe, $key)] = null;
             }
-                
         }
 
         return $camposLimpos;
@@ -204,13 +205,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
             PreRegistroService::RELATION_PRE_REGISTRO,
             PreRegistroService::RELATION_RT,
         ];
-    }
-
-    private function abortar($preRegistro)
-    {
-        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
-        if(!isset($preRegistro)/* || ()*/)
-            throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
     }
 
     private function getRTGerenti(GerentiRepositoryInterface $gerentiRepository, $cpf)
@@ -270,7 +264,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         // Colocar na ordem dos campos nas blades
         return [
             'cnpj_contabil,nome_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
-            $dadosGerais . ',pergunta,segmento,idregional',
+            $dadosGerais . ',segmento,idregional,pergunta',
             'cep,bairro,logradouro,numero,complemento,cidade,uf,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
             'cpf_rt,registro,nome_rt,nome_social_rt,dt_nascimento_rt,sexo_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt',
             'tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1',
@@ -361,7 +355,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
             }
 
         if(\Route::is('externo.verifica.inserir.preregistro'))
+        {
             $resultado = $externo->load('preRegistro')->preRegistro;
+            if(!$resultado->userPodeEditar())
+                throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
+        }
             
         return [
             'resultado' => $resultado,
@@ -380,8 +378,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
     {
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
-        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
-        $this->abortar($preRegistro);
+        if(!isset($preRegistro))
+            throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
+
+        if(!$preRegistro->userPodeEditar())
+            throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
         $resultado = null;
         $objeto = null;
@@ -409,8 +410,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
     {
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
-        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
-        $this->abortar($preRegistro);
+        if(!isset($preRegistro))
+            throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
+
+        if(!$preRegistro->userPodeEditar())
+            throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
         $camposLimpos = $this->limparNomeCampos($externo, $request);
 
@@ -430,20 +434,21 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 throw new \Exception('Não salvou os dados em ' . $key, 500);
         }
 
-        $resultado = $preRegistro->update(['status' => $preRegistro::STATUS_ANALISE_INICIAL]);
+        $status = !isset($preRegistro->status) ? $preRegistro::STATUS_ANALISE_INICIAL : $preRegistro::STATUS_ANALISE_CORRECAO;
+        $resultado = $preRegistro->update(['status' => $status]);
 
         if(!isset($resultado))
-            throw new \Exception('Não atualizou o status da solicitação de registro para ' . $preRegistro::STATUS_ANALISE_INICIAL, 500);
+            throw new \Exception('Não atualizou o status da solicitação de registro para ' . $status, 500);
         
         Mail::to($externo->email)->queue(new PreRegistroMail($preRegistro));
 
         $string = 'Usuário Externo com ';
         $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
-        $string .= $externo->cpf_cnpj . ', enviou para análise incial a solicitação de registro com a id: ' . $preRegistro->id;
+        $string .= $externo->cpf_cnpj . ', atualizou o status para ' . $status . ' da solicitação de registro com a id: ' . $preRegistro->id;
         event(new ExternoEvent($string));
         
         return [
-            'message' => '<i class="icon fa fa-check"></i> Solicitação de registro enviada para análise!',
+            'message' => '<i class="icon fa fa-check"></i> Solicitação de registro enviada para análise! <strong>Status atualizado para:</strong> ' . $status,
             'class' => 'alert-success'
         ];
     }
@@ -455,8 +460,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
         else
             $preRegistro = $externo->load('preRegistro')->preRegistro;
 
-        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
-        $this->abortar($preRegistro);
+        if(!isset($preRegistro))
+            throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
 
         $anexo = $preRegistro->anexos()->where('id', $id)->first();
 
@@ -470,8 +475,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
     {
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
-        // Inserir para não aceitar se já esta num status que não pode mais editar o formulario
-        $this->abortar($preRegistro);
+        if(!isset($preRegistro))
+            throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
+
+        if(!$preRegistro->userPodeEditar())
+            throw new \Exception('Não autorizado a excluir arquivo com status diferente de ' . PreRegistro::STATUS_CORRECAO, 401);
 
         $anexo = $preRegistro->anexos()->where('id', $id)->first();
 
@@ -524,6 +532,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $variaveis['btn_lista'] = '<a href="'.route('preregistro.index').'" class="btn btn-primary mr-1">Lista dos Pré-registros</a>';
         $resultado = PreRegistro::findOrFail($id);
 
+        // Atendente não pode acessar um pré-registro sem status, pois ainda está sendo editado pelo usuário
+        if(!isset($resultado->status))
+            throw new \Exception('Não autorizado a acessar pré-registro sem status', 401);
+
         return [
             'resultado' => $resultado, 
             'variaveis' => (object) $variaveis,
@@ -535,6 +547,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
     public function saveAjaxAdmin($request, $id, $user)
     {
         $preRegistro = PreRegistro::findOrFail($id);
+
+        // Atendente não pode editar um pré-registro com status diferente de analise inicial e analise da correção
+        if(!isset($preRegistro->status) || !$preRegistro->atendentePodeEditar())
+            throw new \Exception('Não autorizado a editar o pré-registro sem status ou finalizado', 401);
+
         $campo = $request['campo'];
         $valor = $request['valor'];
 
@@ -552,6 +569,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
 
         $preRegistro->atualizarAjax($camposCanEdit[$campo], $campo, $valor, null);
+        event(new CrudEvent('pré-registro', 'fez a ação de "' . $request['acao'] . '" o campo "' . $request['campo'] . '"', $preRegistro->id));
 
         return [
             'user' => $user->nome,

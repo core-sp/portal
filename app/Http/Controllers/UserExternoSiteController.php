@@ -16,7 +16,8 @@ class UserExternoSiteController extends Controller
 
     public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
     {
-        $this->middleware('auth:user_externo')->except(['cadastroView', 'cadastro', 'verificaEmail']);
+        // Limitação de requisições por minuto para cada usuário, senão erro 429
+        $this->middleware(['auth:user_externo', 'throttle:60,1'])->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->service = $service;
         $this->gerentiRepository = $gerentiRepository;
     }

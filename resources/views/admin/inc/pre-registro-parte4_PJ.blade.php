@@ -14,13 +14,16 @@
         <span class="font-weight-bolder">{{ $codigos[3]['registro'] }} - Registro: </span>
         <input 
             type="text" 
-            value="{{ isset($resultado->pessoaJuridica->responsavelTecnico->registro) ? $resultado->pessoaJuridica->responsavelTecnico->registro : '' }}"
+            value="{{ isset($resultado->pessoaJuridica->responsavelTecnico->registro) ? formataRegistro($resultado->pessoaJuridica->responsavelTecnico->registro) : '' }}"
             name="registro"
             maxlength="20"
+            {{ $resultado->atendentePodeEditar() ? '' : 'disabled' }}
         />
+        @if($resultado->atendentePodeEditar())
         <button class="btn btn-outline-success btn-sm ml-2 addValorPreRegistro" type="button" value="registro">
             <i class="fas fa-save"></i>
         </button>
+        @endif
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'registro',
             'resultado' => $resultado->getJustificativaArray()

@@ -1,3 +1,20 @@
+@php
+    $correcoes = $resultado->getTextosJustificadosByAba($codigos[5]);
+@endphp
+@if($resultado->userPodeCorrigir() && !empty($correcoes))
+    <div class="d-block w-100">
+        <div class="alert alert-warning">
+            <span class="bold">Justificativa(s):</span>
+            <br>
+        @foreach($correcoes as $key => $texto)
+            <p>
+                <span class="bold">{{ $key . ': ' }}</span>{{ $texto }}
+            </p>
+        @endforeach
+        </div>
+    </div>
+@endif
+
 <p class="text-dark mb-2"><i class="fas fa-info-circle text-primary"></i> <strong>Atenção!</strong>
     <br>
     <span class="ml-3"><strong>*</strong> Limite de até {{ $totalFiles }} anexos com, no máximo, 5MB de tamanho</span>
@@ -35,7 +52,8 @@
             'nome_file' => '', 
             'rota_download' => '',
             'id' => '',
-            'display' => 'display:none'
+            'display' => 'display:none',
+            'podeExcluir' => true,
             ])
         @endcomponent
 
@@ -47,7 +65,8 @@
                 'nome_file' => $anexo->nome_original, 
                 'rota_download' => route('externo.preregistro.anexo.download', $anexo->id),
                 'id' => $anexo->id,
-                'display' => ''
+                'display' => '',
+                'podeExcluir' => $resultado->userPodeEditar(),
             ])
             @endcomponent
         @endforeach
@@ -56,11 +75,13 @@
 
     <input type="hidden" id="fileObrigatorio" class="obrigatorio" value="{{ $resultado->anexos->count() > 0 ? 'existeAnexo' : '' }}">
 
-    @component('components.arquivos_form', [
-        'nome' => 'anexo', 
-        'classes' => $classes[0],
-        'errors' => $errors
-    ])
-    @endcomponent
+    @if($resultado->userPodeEditar())
+        @component('components.arquivos_form', [
+            'nome' => 'anexo', 
+            'classes' => $classes[0],
+            'errors' => $errors
+        ])
+        @endcomponent
+    @endif
 
 @endif

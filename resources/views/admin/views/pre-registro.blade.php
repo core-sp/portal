@@ -1,4 +1,12 @@
 <div class="card-body">
+
+    @if(isset($resultado->status) && ($resultado->status == $resultado::STATUS_NEGADO))
+    <p class="mb-4">
+        <strong>Justificativa:</strong>
+        {{ $resultado->getJustificativaNegado() }}
+    </p>
+    @endif
+
     <div id="accordionPreRegistro" class="mt-3">
         <input type="hidden" name="idPreRegistro" value="{{ $resultado->id }}" />
 
@@ -69,14 +77,15 @@
                 @include('admin.inc.pre-registro-parte5_PF_parte6_PJ')
             </div>
         </div>
-        
+
     </div>
 
 </div>
 
 <div class="card-footer">
     <div class="row ml-0">
-        
+
+    @if($resultado->atendentePodeEditar())
         <form method="POST" action="{{ route('preregistro.update.aprovado', $resultado->id) }}" class="">
             @csrf
             @method('PUT')
@@ -109,6 +118,7 @@
                 <i class="fas fa-ban"></i> Negar
             </button>
         </form>
+        @endif
 
         <div class="col d-flex align-items-end justify-content-end">
             <span class="font-weight-bolder">Atualizado por:&nbsp;</span>
@@ -140,7 +150,9 @@
                 
             <!-- Modal footer -->
             <div class="modal-footer">
+                @if($resultado->atendentePodeEditar())
                 <button type="button" class="btn btn-success" id="submitJustificativaPreRegistro" value="">Salvar</button>
+                @endif
                 <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fechar</button>
             </div>
         </div>
