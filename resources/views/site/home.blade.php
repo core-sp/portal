@@ -237,17 +237,17 @@
     <div class="row">
       <div class="col-12">
         <div class="beneficios-box row nomargin">
-          <div class="col-lg-5 hide-992">
-            <img class="lazy" data-src="{{ asset('img/benef-v2.png') }}" id="computer" alt="Programa de Benefícios | Core-SP" />
-          </div>
           <div class="col-lg-7 beneficios-txt center-992">
-            <h2 class="stronger branco text-uppercase">Programa de Benefícios</h2>
-            <p class="branco light">O Core-SP traz benefícios diferenciados para Representantes Comerciais.</p>
-            <p class="branco light">Faça parte do Grupo do WhatsApp e receba todos os dias os benefícios disponíveis.</p>
+            <h2 class="stronger text-dark text-uppercase">Programa de Incentivos</h2>
+            <p class="text-dark light">O Core-SP traz benefícios diferenciados para Representantes Comerciais.</p>
+            <p class="text-dark light">Faça parte do Grupo do WhatsApp e receba todos os dias os benefícios disponíveis.</p>
             <div>
-              <a href="/programa-de-beneficios" class="btn-beneficios">saiba mais</a>
+              <a href="/programa-de-incentivos" class="btn-beneficios">saiba mais</a>
               <a href="https://chat.whatsapp.com/HPAXB7yne537CRQChfRfQe" class="btn-beneficios"><i class="fab fa-whatsapp fa-lg"></i> Grupo WhatsApp</a>
             </div>
+          </div>
+          <div class="col-lg-5 hide-992">
+            <img class="lazy" data-src="{{ asset('img/arte-capa002.png') }}" id="computer" alt="Programa de Benefícios | Core-SP" />
           </div>
         </div>
       </div>

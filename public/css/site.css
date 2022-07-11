@@ -1004,7 +1004,7 @@ input[type=file]::-webkit-file-upload-button {
 }
 
 .beneficios-box {
-	background-image: url('/img/verde-80.png');
+	background-image: url('/img/arte-02-fundo-final-jpeg-final-jpeg-final-jpeg.jpg');
 	background-size: cover;
 	background-position: center;
 	background-attachment: fixed;
@@ -1038,8 +1038,8 @@ input[type=file]::-webkit-file-upload-button {
 .btn-beneficios {
 	padding: 0.75rem 2.25rem;
 	text-transform: uppercase;
-	color: #FFFFFF;
-	border: 1px solid #FFFFFF;
+	color: #000;
+	border: 1px solid #000;
 	display: inline-block;
 	transition: .3s;
 }
