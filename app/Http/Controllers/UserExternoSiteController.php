@@ -98,9 +98,10 @@ class UserExternoSiteController extends Controller
     public function preRegistroView()
     {
         try{
-            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, auth()->guard('user_externo')->user());
-            $resultado = $dados['resultado'];
+            $externo = auth()->guard('user_externo')->user();
+            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
             $gerenti = $dados['gerenti'];
+            $resultado = isset($gerenti) ? null : $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao verificar os dados para permitir ou não a solicitação de registro');
@@ -116,11 +117,11 @@ class UserExternoSiteController extends Controller
                 return redirect(route('externo.preregistro.view'));
 
             $externo = auth()->guard('user_externo')->user();
-            $verificacao = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
-            if(isset($verificacao['gerenti']))
-                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $verificacao['gerenti']]);
+            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
+            if(isset($dados['gerenti']))
+                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $dados['gerenti']]);
                 
-            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo, $verificacao['resultado']);
+            $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
             $codigos = $dados['codigos'];
             $resultado = $dados['resultado'];
             $regionais = $dados['regionais'];
@@ -157,6 +158,10 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
             $codigos = $dados['codigos'];
             $resultado = $dados['resultado'];
+
+            if(!$resultado->userPodeEditar())
+                abort(401, 'Não autorizado a editar o formulário com a solicitação em análise ou finalizada');
+
             $regionais = $dados['regionais'];
             $classes = $dados['classes'];
             $totalFiles = $dados['totalFiles'];
@@ -164,6 +169,7 @@ class UserExternoSiteController extends Controller
             $semPendencia = true;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao verificar pendências da solicitação de registro');
         }
         

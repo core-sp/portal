@@ -38,6 +38,7 @@ class CreatePreRegistrosTable extends Migration
             $table->string('status')->nullable();
             $table->text('justificativa')->nullable();
             $table->text('confere_anexos')->nullable();
+            $table->string('historico_contabil')->default(json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT))->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

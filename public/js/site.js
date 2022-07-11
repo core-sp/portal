@@ -1205,8 +1205,9 @@ function getErrorMsg(request)
 		time = 2000;
 	}
 	if(request.status == 429){
-		errorMessage = "Excedeu o limite de requisições por minuto.";
-		time = 2000;
+		var aguarde = request.getResponseHeader('Retry-After');
+		errorMessage = "Excedeu o limite de requisições por minuto.<br>Aguarde " + aguarde + " segundos";
+		time = 2500;
 	}
 	return [errorMessage, time];
 }
@@ -1224,34 +1225,55 @@ function confereEnderecoEmpresa()
 
 function preencheContabil(dados)
 {
-	if($('#inserirRegistro input[name="cnpj_contabil"]').val() == ""){
-		$('#inserirRegistro [name$="_contabil"]').each(function(){
-			$(this).val('');
-		});
-		$('#campos_contabil').prop("disabled", true);
+	if(_.has(dados,"update")){
+		var texto = "Somente pode trocar o CNPJ novamente dia: <br>" + dados.update;
+		$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + texto);
+		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
+		setTimeout(function() {
+			$("#modalLoadingPreRegistro").modal('hide');
+		}, 2500);
 	}else{
-		$('#campos_contabil').prop("disabled", false);
-		$('#inserirRegistro [name$="_contabil"]').each(function(){
-			var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_contabil'));
-			if(name != 'cnpj')
-				$(this).val(dados[name]);
-		});
+		if($('#inserirRegistro input[name="cnpj_contabil"]').val() == ""){
+			$('#inserirRegistro [name$="_contabil"]').each(function(){
+				$(this).val('');
+			});
+			$('#campos_contabil').prop("disabled", true);
+		}else{
+			$('#campos_contabil').prop("disabled", false);
+			$('#inserirRegistro [name$="_contabil"]').each(function(){
+				var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_contabil'));
+				if(name != 'cnpj')
+					$(this).val(dados[name]);
+			});
+		}
 	}
 }
 
 function preencheRT(dados)
 {
-	if($('#inserirRegistro input[name="cpf_rt"]').val() == ""){
-		$('#campos_rt').prop("disabled", true);
-		$('#inserirRegistro #registro_preRegistro').prop("disabled", true).val('');
+	if(_.has(dados,"update")){
+		var texto = "Somente pode trocar o CPF novamente dia: <br>" + dados.update;
+		$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + texto);
+		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
+		setTimeout(function() {
+			$("#modalLoadingPreRegistro").modal('hide');
+		}, 2500);
 	}else{
-		$('#campos_rt').prop("disabled", false);
-		$('#inserirRegistro #registro_preRegistro').prop("disabled", false).val(dados.registro);
-		$('#inserirRegistro [name$="_rt"]').each(function(){
-			var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_rt'));
-			if(name != 'cpf')
-				$(this).val(dados[name]);
-		});
+		if($('#inserirRegistro input[name="cpf_rt"]').val() == ""){
+			$('#campos_rt').prop("disabled", true);
+			$('#inserirRegistro #registro_preRegistro').prop("disabled", true).val('');
+			$('#inserirRegistro [name$="_rt"]').each(function(){
+				$(this).val('');
+			});
+		}else{
+			$('#campos_rt').prop("disabled", false);
+			$('#inserirRegistro #registro_preRegistro').prop("disabled", false).val(dados.registro);
+			$('#inserirRegistro [name$="_rt"]').each(function(){
+				var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_rt'));
+				if(name != 'cpf')
+					$(this).val(dados[name]);
+			});
+		}
 	}
 }
 

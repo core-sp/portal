@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class PreRegistroCnpj extends Model
 {
@@ -12,6 +13,8 @@ class PreRegistroCnpj extends Model
     protected $table = 'pre_registros_cnpj';
     protected $guarded = [];
     protected $touches = ['preRegistro'];
+
+    const TOTAL_HIST = 1;
 
     public static function camposPreRegistro()
     {
@@ -41,6 +44,36 @@ class PreRegistroCnpj extends Model
     public function responsavelTecnico()
     {
         return $this->belongsTo('App\ResponsavelTecnico')->withTrashed();
+    }
+
+    public function getHistoricoCanEdit()
+    {
+        $array = $this->getHistoricoArray();
+        return intval($array['tentativas']) < PreRegistroCnpj::TOTAL_HIST;
+    }
+
+    public function getHistoricoArray()
+    {
+        return json_decode($this->historico_rt, true);
+    }
+
+    public function getNextUpdateHistorico()
+    {
+        $update = $this->getHistoricoArray()['update'];
+        $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
+        $updateCarbon->addDay()->addHour();
+        $updateCarbon->subMinutes($updateCarbon->minute);
+
+        return $updateCarbon->format('d\/m\/Y, \à\s H:i');
+    }
+
+    public function setHistorico()
+    {
+        $array = $this->getHistoricoArray();
+        $tentativas = intval($array['tentativas']);
+        $array['tentativas'] = $tentativas + 1;
+        $array['update'] = now()->format('Y-m-d H:i:s');
+        return json_encode($array, JSON_FORCE_OBJECT);
     }
 
     public function mesmoEndereco()

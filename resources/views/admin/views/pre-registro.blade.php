@@ -16,7 +16,7 @@
                     {{ $abas[0] }} 
                 </div>
             </a>
-            <div id="parte1_PF_PJ" class="collapse show" data-parent="#accordionPreRegistro">
+            <div id="parte1_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
                 @include('admin.inc.pre-registro-parte1_PF_PJ')
             </div>
         </div>

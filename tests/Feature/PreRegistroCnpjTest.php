@@ -2422,6 +2422,6 @@ class PreRegistroCnpjTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString('Usuário Externo com cnpj: ' . $pr->userExterno->cpf_cnpj, $log);
-        $this->assertStringContainsString(', enviou para análise incial a solicitação de registro com a id: ' . $pr->id, $log);
+        $this->assertStringContainsString(', atualizou o status para ' . $pr::STATUS_ANALISE_INICIAL . ' da solicitação de registro com a id: ' . $pr->id, $log);
     }
 }

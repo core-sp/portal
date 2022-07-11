@@ -15,7 +15,13 @@
     </div>
 @endif
 
-<div class="form-row mb-2">
+<small class="text-muted text-left">
+    <em>
+        <span class="font-weight-bolder">Obs:</span> Após inserir um CPF válido, para trocar aguarde 24h
+    </em>
+</small>
+
+<div class="form-row mb-2 mt-2">
     <div class="col-sm mb-2-576">
         <label for="cpf_rt">{{ $codigos[3]['cpf_rt'] }} - CPF <span class="text-danger">*</span></label>
         <input

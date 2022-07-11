@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class PreRegistro extends Model
 {
@@ -20,6 +21,22 @@ class PreRegistro extends Model
     const STATUS_NEGADO = 'Negado';
     const STATUS_PENDENTE_PGTO = 'Pendente de pagamento';
     const MENU = 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Canal de Relacionamento,Anexos';
+    const TOTAL_HIST = 1;
+
+    private function setHistorico()
+    {
+        $array = $this->getHistoricoArray();
+        $tentativas = intval($array['tentativas']);
+        $array['tentativas'] = $tentativas + 1;
+        $array['update'] = now()->format('Y-m-d H:i:s');
+        return json_encode($array, JSON_FORCE_OBJECT);
+    }
+
+    private function getHistoricoCanEdit()
+    {
+        $array = $this->getHistoricoArray();
+        return intval($array['tentativas']) < PreRegistro::TOTAL_HIST;
+    }
 
     private function getChaveValorTotal($valor = null)
     {
@@ -292,6 +309,21 @@ class PreRegistro extends Model
         return json_decode($this->confere_anexos, true);
     }
 
+    public function getHistoricoArray()
+    {
+        return json_decode($this->historico_contabil, true);
+    }
+
+    public function getNextUpdateHistorico()
+    {
+        $update = $this->getHistoricoArray()['update'];
+        $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
+        $updateCarbon->addDay()->addHour();
+        $updateCarbon->subMinutes($updateCarbon->minute);
+
+        return $updateCarbon->format('d\/m\/Y, \à\s H:i');
+    }
+
     public function getJustificativaNegado()
     {
         return isset($this->getJustificativaArray()['negado']) ? $this->getJustificativaArray()['negado'] : null;
@@ -391,9 +423,15 @@ class PreRegistro extends Model
                 $this->pessoaJuridica->update($valido);
                 break;
             case 'contabil':
-                $valido = $this->contabil->validarUpdateAjax($campo, $valor);
+                $valido = $this->contabil->validarUpdateAjax($campo, $valor, $this->getHistoricoCanEdit());
                 if(isset($valido))
-                    $resultado = $this->update(['contabil_id' => $valido == 'remover' ? null : $valido->id]);
+                {
+                    if($valido == 'notUpdate')
+                        $valido = ['update' => $this->getNextUpdateHistorico()];
+                    else
+                        $valido == 'remover' ? $this->update(['contabil_id' => null]) : 
+                        $this->update(['contabil_id' => $valido->id, 'historico_contabil' => $this->setHistorico()]);
+                }
                 else
                 {
                     $this->contabil->updateAjax($campo, $valor);
@@ -402,9 +440,15 @@ class PreRegistro extends Model
                 $resultado = $valido;
                 break;
             case 'pessoaJuridica.responsavelTecnico':
-                $valido = $this->pessoaJuridica->responsavelTecnico->validarUpdateAjax($campo, $valor, $gerenti);
+                $valido = $this->pessoaJuridica->responsavelTecnico->validarUpdateAjax($campo, $valor, $gerenti, $this->pessoaJuridica->getHistoricoCanEdit());
                 if(isset($valido))
-                    $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido == 'remover' ? null : $valido->id]);
+                {
+                    if($valido == 'notUpdate')
+                        $valido = ['update' => $this->pessoaJuridica->getNextUpdateHistorico()];
+                    else
+                        $valido == 'remover' ? $this->pessoaJuridica->update(['responsavel_tecnico_id' => null]) : 
+                        $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $this->pessoaJuridica->setHistorico()]);
+                }
                 else
                 {
                     $this->pessoaJuridica->responsavelTecnico->updateAjax($campo, $valor);
@@ -423,15 +467,25 @@ class PreRegistro extends Model
 
         switch ($relacao) {
             case 'pessoaJuridica.responsavelTecnico':
-                $valido = $campo == 'cpf' ? $classe::buscar($valor, $gerenti) : null;
+                $valido = $campo == 'cpf' ? $classe::buscar($valor, $gerenti, $this->pessoaJuridica->getHistoricoCanEdit()) : null;
                 if(isset($valido))
-                    $resultado = $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id]);
+                {
+                    if($valido == 'notUpdate')
+                        $valido = ['update' => $this->pessoaJuridica->getNextUpdateHistorico()];
+                    else
+                        $this->pessoaJuridica->update(['responsavel_tecnico_id' => $valido->id, 'historico_rt' => $this->pessoaJuridica->setHistorico()]);
+                }
                 $resultado = $valido;
                 break;
             case 'contabil':
-                $valido = $campo == 'cnpj' ? $classe::buscar($valor) : null;
+                $valido = $campo == 'cnpj' ? $classe::buscar($valor, $this->getHistoricoCanEdit()) : null;
                 if(isset($valido))
-                    $resultado = $this->update(['contabil_id' => $valido->id]);
+                {
+                    if($valido == 'notUpdate')
+                        $valido = ['update' => $this->getNextUpdateHistorico()];
+                    else
+                        $this->update(['contabil_id' => $valido->id, 'historico_contabil' => $this->setHistorico()]);
+                }
                 $resultado = $valido;
                 break;
             case 'anexos':

@@ -17,7 +17,7 @@
 
 <section id="pagina-erro">
   <div class="container text-center">
-    <h4 class="font-normal">Excedeu o limite de requisições por minuto</h4>
+    <h4 class="font-normal">Excedeu o limite de requisições por minuto. Aguarde {{ $exception->getHeaders()['Retry-After'] }} segundos</h4>
   </div>
 </section>
 

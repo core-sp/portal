@@ -42,10 +42,13 @@ class ResponsavelTecnico extends Model
         return $this->hasMany('App\PreRegistroCnpj')->withTrashed();
     }
 
-    public static function buscar($cpf, $gerenti)
+    public static function buscar($cpf, $gerenti, $canEdit = null)
     {
         if(isset($cpf) && (strlen($cpf) == 11))
         {   
+            if(isset($canEdit) && !$canEdit)
+                return 'notUpdate';
+
             $existe = ResponsavelTecnico::where('cpf', $cpf)->first();
 
             if(!isset($existe))
@@ -57,12 +60,12 @@ class ResponsavelTecnico extends Model
         return null;
     }
 
-    public function validarUpdateAjax($campo, $valor, $gerenti)
+    public function validarUpdateAjax($campo, $valor, $gerenti, $canEdit = null)
     {
         if($campo == 'cpf')
         {
             if(isset($valor) && (strlen($valor) == 11)) 
-                return ResponsavelTecnico::buscar($valor, $gerenti);
+                return ResponsavelTecnico::buscar($valor, $gerenti, $canEdit);
             if(!isset($valor))
                 return 'remover';
         }

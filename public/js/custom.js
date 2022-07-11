@@ -485,8 +485,9 @@ function getErrorMsg(request)
         time = 2000;
     }
     if(request.status == 429){
-      errorMessage = "Excedeu o limite de requisições por minuto.";
-      time = 2000;
+      var aguarde = request.getResponseHeader('Retry-After');
+      errorMessage = "Excedeu o limite de requisições por minuto.<br>Aguarde " + aguarde + " segundos";
+      time = 2500;
     }
     return [errorMessage, time];
 }

@@ -28,10 +28,13 @@ class Contabil extends Model
         return $this->hasMany('App\PreRegistro')->withTrashed();
     }
 
-    public static function buscar($cnpj)
+    public static function buscar($cnpj, $canEdit = null)
     {
         if(isset($cnpj) && (strlen($cnpj) == 14))
         {
+            if(isset($canEdit) && !$canEdit)
+                return 'notUpdate';
+
             $existe = Contabil::where('cnpj', $cnpj)->first();
 
             return isset($existe) ? $existe : Contabil::create(['cnpj' => $cnpj]);
@@ -40,12 +43,12 @@ class Contabil extends Model
         return null;
     }
 
-    public function validarUpdateAjax($campo, $valor)
+    public function validarUpdateAjax($campo, $valor, $canEdit = null)
     {
         if($campo == 'cnpj')
         {
             if(isset($valor) && (strlen($valor) == 14)) 
-                return Contabil::buscar($valor);
+                return Contabil::buscar($valor, $canEdit);
             if(!isset($valor))
                 return 'remover';
         }

@@ -15,7 +15,13 @@
     </div>
 @endif
 
-<div class="form-row mb-2">
+<small class="text-muted text-left">
+    <em>
+        <span class="font-weight-bolder">Obs:</span> Após inserir um CNPJ válido, para trocar aguarde 24h
+    </em>
+</small>
+
+<div class="form-row mb-3 mt-2">
     <div class="col-sm mb-2-576">
         <label for="cnpj_contabil">{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label>
         <input

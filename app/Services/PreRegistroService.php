@@ -332,35 +332,25 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 }
             }
 
-        $preRegistro = isset($gerenti) ? null : $externo->load('preRegistro')->preRegistro;
-
         return [
             'gerenti' => $gerenti,
-            'resultado' => $preRegistro,
         ];
     }
 
-    public function getPreRegistro(MediadorServiceInterface $service, $externo, $resultado = null)
+    public function getPreRegistro(MediadorServiceInterface $service, $externo)
     {
-        if(\Route::is('externo.inserir.preregistro.view'))
-            if(!isset($resultado))
-            {
-                $resultado = $externo->preRegistro()->create();
-                $externo->isPessoaFisica() ? $resultado->pessoaFisica()->create() : $resultado->pessoaJuridica()->create();
-
-                $string = 'Usuário Externo com ';
-                $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
-                $string .= $externo->cpf_cnpj . ', iniciou o processo de solicitação de registro com a id: ' . $resultado->id;
-                event(new ExternoEvent($string));
-            }
-
-        if(\Route::is('externo.verifica.inserir.preregistro'))
+        $resultado = $externo->load('preRegistro')->preRegistro;
+        if(!isset($resultado))
         {
-            $resultado = $externo->load('preRegistro')->preRegistro;
-            if(!$resultado->userPodeEditar())
-                throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
+            $resultado = $externo->preRegistro()->create();
+            $externo->isPessoaFisica() ? $resultado->pessoaFisica()->create() : $resultado->pessoaJuridica()->create();
+
+            $string = 'Usuário Externo com ';
+            $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
+            $string .= $externo->cpf_cnpj . ', iniciou o processo de solicitação de registro com a id: ' . $resultado->id;
+            event(new ExternoEvent($string));
         }
-            
+
         return [
             'resultado' => $resultado,
             'codigos' => $this->getCodigosCampos($externo),
