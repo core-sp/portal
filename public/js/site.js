@@ -546,7 +546,7 @@ $('#ano-mapa').on({
 
 		$('#notRC-agendamento').click(function(){
 			$('#tipo-outros .modal-body')
-			.html('Você está no Portal dos Representantes Comerciais, este agendamento é para uso exclusivo a categoria de Representante Comercial');
+			.html('Você está no Portal dos Representantes Comerciais, este agendamento é para uso exclusivo à categoria de Representante Comercial');
 			$('#tipo-outros .modal-footer').hide();
 		});
 
