@@ -16,6 +16,16 @@ class PreRegistroCnpj extends Model
 
     const TOTAL_HIST = 1;
 
+    private function horaUpdateHistorico()
+    {
+        $update = $this->getHistoricoArray()['update'];
+        $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
+        $updateCarbon->addDay()->addHour();
+        $updateCarbon->subMinutes($updateCarbon->minute);
+
+        return $updateCarbon;
+    }
+
     public static function camposPreRegistro()
     {
         return [
@@ -46,10 +56,18 @@ class PreRegistroCnpj extends Model
         return $this->belongsTo('App\ResponsavelTecnico')->withTrashed();
     }
 
+    public function canUpdateStatus()
+    {
+        return isset($this->responsavelTecnico->registro) && (strlen($this->responsavelTecnico->registro) > 4);
+    }
+
     public function getHistoricoCanEdit()
     {
         $array = $this->getHistoricoArray();
-        return intval($array['tentativas']) < PreRegistroCnpj::TOTAL_HIST;
+        $can = intval($array['tentativas']) < PreRegistroCnpj::TOTAL_HIST;
+        $horaUpdate = $this->horaUpdateHistorico();
+
+        return $can || (!$can && ($horaUpdate < now()));
     }
 
     public function getHistoricoArray()
@@ -59,20 +77,18 @@ class PreRegistroCnpj extends Model
 
     public function getNextUpdateHistorico()
     {
-        $update = $this->getHistoricoArray()['update'];
-        $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
-        $updateCarbon->addDay()->addHour();
-        $updateCarbon->subMinutes($updateCarbon->minute);
-
-        return $updateCarbon->format('d\/m\/Y, \à\s H:i');
+        return $this->horaUpdateHistorico()->format('d\/m\/Y, \à\s H:i');
     }
 
     public function setHistorico()
     {
         $array = $this->getHistoricoArray();
-        $tentativas = intval($array['tentativas']);
-        $array['tentativas'] = $tentativas + 1;
+        $totalTentativas = intval($array['tentativas']) < PreRegistroCnpj::TOTAL_HIST;
+
+        if($totalTentativas)
+            $array['tentativas'] = intval($array['tentativas']) + 1;
         $array['update'] = now()->format('Y-m-d H:i:s');
+
         return json_encode($array, JSON_FORCE_OBJECT);
     }
 

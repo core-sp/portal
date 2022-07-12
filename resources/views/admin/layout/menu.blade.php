@@ -366,6 +366,14 @@
             </ul>
         </li>
         @endif
+
+        <!-- Falta permissão -->
+        <li class="nav-item">
+            <a href="{{ route('preregistro.index') }}" class="nav-link">
+                <i class="nav-icon fas fa-address-card"></i>
+                <p>Pré-registros</p>
+            </a>
+        </li>
         @endif
 
         <!-- Jurídico -->

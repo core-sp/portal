@@ -23,19 +23,35 @@ class PreRegistro extends Model
     const MENU = 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Canal de Relacionamento,Anexos';
     const TOTAL_HIST = 1;
 
+    private function horaUpdateHistorico()
+    {
+        $update = $this->getHistoricoArray()['update'];
+        $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
+        $updateCarbon->addDay()->addHour();
+        $updateCarbon->subMinutes($updateCarbon->minute);
+
+        return $updateCarbon;
+    }
+
     private function setHistorico()
     {
         $array = $this->getHistoricoArray();
-        $tentativas = intval($array['tentativas']);
-        $array['tentativas'] = $tentativas + 1;
+        $totalTentativas = intval($array['tentativas']) < PreRegistro::TOTAL_HIST;
+
+        if($totalTentativas)
+            $array['tentativas'] = intval($array['tentativas']) + 1;
         $array['update'] = now()->format('Y-m-d H:i:s');
+
         return json_encode($array, JSON_FORCE_OBJECT);
     }
 
     private function getHistoricoCanEdit()
     {
         $array = $this->getHistoricoArray();
-        return intval($array['tentativas']) < PreRegistro::TOTAL_HIST;
+        $can = intval($array['tentativas']) < PreRegistro::TOTAL_HIST;
+        $horaUpdate = $this->horaUpdateHistorico();
+        
+        return $can || (!$can && ($horaUpdate < now()));
     }
 
     private function getChaveValorTotal($valor = null)
@@ -136,6 +152,8 @@ class PreRegistro extends Model
                 $final = [$campo => $valor];
                 break;
             case 'justificativa':
+                if($valor['campo'] == 'negado')
+                    $this->update(['justificativa' => null]);
                 $texto = $this->formatTextoCorrecaoAdmin($valor['campo'], $valor['valor']);
                 $final = [
                     'idusuario' => auth()->user()->idusuario,
@@ -205,6 +223,17 @@ class PreRegistro extends Model
             'p10' => 'complemento',
             'p11' => 'cidade',
             'p12' => 'uf',
+        ];
+    }
+
+    public static function getStatus()
+    {
+        return [
+            PreRegistro::STATUS_ANALISE_INICIAL,
+            PreRegistro::STATUS_CORRECAO,
+            PreRegistro::STATUS_ANALISE_CORRECAO,
+            PreRegistro::STATUS_APROVADO,
+            PreRegistro::STATUS_NEGADO,
         ];
     }
 
@@ -316,12 +345,7 @@ class PreRegistro extends Model
 
     public function getNextUpdateHistorico()
     {
-        $update = $this->getHistoricoArray()['update'];
-        $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
-        $updateCarbon->addDay()->addHour();
-        $updateCarbon->subMinutes($updateCarbon->minute);
-
-        return $updateCarbon->format('d\/m\/Y, \à\s H:i');
+        return $this->horaUpdateHistorico()->format('d\/m\/Y, \à\s H:i');
     }
 
     public function getJustificativaNegado()
@@ -380,6 +404,8 @@ class PreRegistro extends Model
 
     public function canUpdateStatus($status)
     {
+        $texto = $status != PreRegistro::STATUS_APROVADO ? 'não possui' : 'possui';
+        $temp = $status == PreRegistro::STATUS_CORRECAO ? 'enviado para correção' : strtolower($status);
         $anexosOk = true;
 
         if($status == PreRegistro::STATUS_APROVADO)
@@ -395,14 +421,44 @@ class PreRegistro extends Model
             $anexosOk = count($tipos) == 0;
         }
 
+        if(!$anexosOk)
+            return [
+                'msg' => 'faltou anexos',
+                'final' => false
+            ];
+
         $verificaJustificativa = false;
+        $verificaRegistro = false;
         if($status == PreRegistro::STATUS_APROVADO)
+        {
             $verificaJustificativa = !isset($this->justificativa);
+            $verificaRegistro = $this->userExterno->isPessoaFisica() || (!$this->userExterno->isPessoaFisica() && $this->pessoaJuridica->canUpdateStatus());
+            if(!$verificaRegistro)
+                return [
+                    'msg' => 'faltou o registro do Responsável Técnico',
+                    'final' => false
+                ];
+        }
         else
             $verificaJustificativa = $status == PreRegistro::STATUS_NEGADO ? isset($this->getJustificativaArray()['negado']) : isset($this->justificativa);
-        $statusOK = in_array($this->status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]);
+        
+        if(!$verificaJustificativa)
+            return [
+                'msg' => $texto . ' justificativas',
+                'final' => false
+            ];
 
-        return $statusOK && $verificaJustificativa && $anexosOk;
+        $statusOK = in_array($this->status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]);
+        if(!$statusOK)
+            return [
+                'msg' => 'não possui o status necessário para ser ' . $temp,
+                'final' => false
+            ];
+
+        return [
+            'msg' => $temp,
+            'final' => true
+        ];
     }
 
     public function atualizarAjax($classe, $campo, $valor, $gerenti)

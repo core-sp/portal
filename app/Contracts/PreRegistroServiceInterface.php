@@ -24,9 +24,11 @@ interface PreRegistroServiceInterface {
     // ADMIN
     public function getTiposAnexos();
 
-    public function listar();
+    public function listar($request, MediadorServiceInterface $service, $user);
 
     public function view($id);
+
+    public function buscar($busca);
 
     public function saveAjaxAdmin($request, $id, $user);
 

@@ -17,12 +17,14 @@ class PreRegistroController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         // $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('PreRegistro')->listar();
+            $user = auth()->user();
+            $dados = $this->service->getService('PreRegistro')->listar($request, $this->service, $user);
+            $temFiltro = $dados['temFiltro'];
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
@@ -32,7 +34,7 @@ class PreRegistroController extends Controller
             abort(500, "Erro ao carregar os pré-registros.");
         }
 
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
 
     public function view($id)
@@ -52,6 +54,24 @@ class PreRegistroController extends Controller
         }
 
         return view('admin.crud.mostra', compact('resultado', 'variaveis', 'abas', 'codigos'));
+    }
+
+    public function busca(Request $request)
+    {
+        // $this->authorize('viewAny', auth()->user());
+
+        try{
+            $busca = $request->q;
+            $dados = $this->service->getService('PreRegistro')->buscar($busca);
+            $resultados = $dados['resultados'];
+            $tabela = $dados['tabela'];
+            $variaveis = $dados['variaveis'];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao buscar o texto em pré-registros.");
+        }
+
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 
     public function updateAjax(PreRegistroAjaxAdminRequest $request, $id)
@@ -98,7 +118,7 @@ class PreRegistroController extends Controller
             abort(500, "Erro ao enviar para correção o pré-registro.");
         }
 
-        return redirect(route('preregistro.index'))->with($dados);
+        return redirect(session('url_pre_registro') ?? route('preregistro.index'))->with($dados);
     }
 
     public function updateAprovado($id)
@@ -113,7 +133,7 @@ class PreRegistroController extends Controller
             abort(500, "Erro ao aprovar o pré-registro.");
         }
 
-        return redirect(route('preregistro.index'))->with($dados);
+        return redirect(session('url_pre_registro') ?? route('preregistro.index'))->with($dados);
     }
 
     public function updateNegado($id)
@@ -128,6 +148,6 @@ class PreRegistroController extends Controller
             abort(500, "Erro ao negar o pré-registro.");
         }
 
-        return redirect(route('preregistro.index'))->with($dados);
+        return redirect(session('url_pre_registro') ?? route('preregistro.index'))->with($dados);
     }
 }

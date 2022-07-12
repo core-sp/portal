@@ -197,14 +197,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     private function getNomeClasses()
     {
-        return [
-            PreRegistroService::RELATION_ANEXOS,
-            PreRegistroService::RELATION_CONTABIL,
-            PreRegistroService::RELATION_PF,
-            PreRegistroService::RELATION_PJ,
-            PreRegistroService::RELATION_PRE_REGISTRO,
-            PreRegistroService::RELATION_RT,
-        ];
+        $array = array();
+        foreach($this->getRelacoes() as $value)
+            array_push($array, $value);
+
+        return $array;
     }
 
     private function getRTGerenti(GerentiRepositoryInterface $gerentiRepository, $cpf)
@@ -229,7 +226,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 {
                     $ass_id = $resultado["ASS_ID"];
                     $gerenti['nome'] = $resultado["ASS_NOME"];
-                    $gerenti['registro'] = $resultado["ASS_REGISTRO"];
+                    $gerenti['registro'] = apenasNumeros($resultado["ASS_REGISTRO"]);
                 }
             }
         
@@ -291,6 +288,91 @@ class PreRegistroService implements PreRegistroServiceInterface {
         }
 
         return $codigos;
+    }
+
+    private function validacaoFiltroAtivo($request, $user)
+    {
+        // $canFiltroRegional = auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user());
+        if($user->idregional == 14)
+            $user->idregional = 1;
+
+        return [
+            'regional' => $request->filled('regional') /*&& $canFiltroRegional*/ ? $request->regional : $user->idregional,
+            'status' => $request->filled('status') && in_array($request->status, PreRegistro::getStatus()) ? $request->status : 'Qualquer',
+        ];
+    }
+
+    private function filtro($request, MediadorServiceInterface $service, $user)
+    {
+        $filtro = '';
+        $temFiltro = null;
+        $this->variaveis['continuacao_titulo'] = 'em <strong>'.$user->regional->regional.'</strong>';
+
+        if(\Route::is('preregistro.filtro'))
+        {
+            $temFiltro = true;
+            $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
+        }
+
+        // if(auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user()))
+        // {
+            $regionais = $service->getService('Regional')->all()->splice(0, 13)->sortBy('regional');
+            $options = !isset($request->regional) ? 
+            getFiltroOptions('Todas', 'Todas', true) : getFiltroOptions('Todas', 'Todas');
+
+            foreach($regionais as $regional)
+                $options .= isset($request->regional) && ($request->regional == $regional->idregional) ? 
+                getFiltroOptions($regional->idregional, $regional->regional, true) : 
+                getFiltroOptions($regional->idregional, $regional->regional);
+
+            $filtro .= getFiltroCamposSelect('Seccional', 'regional', $options);
+        // }
+
+        $options = isset($request->status) && ($request->status == 'Qualquer') ? 
+        getFiltroOptions('Qualquer', 'Qualquer', true) : getFiltroOptions('Qualquer', 'Qualquer');
+
+        foreach(PreRegistro::getStatus() as $s)
+            $options .= isset($request->status) && ($request->status == $s) ? 
+            getFiltroOptions($s, $s, true) : getFiltroOptions($s, $s);
+
+        $filtro .= getFiltroCamposSelect('Status', 'status', $options);
+        $filtro = getFiltro(route('preregistro.filtro'), $filtro);
+        $this->variaveis['filtro'] = $filtro;
+
+        return $temFiltro;
+    }
+
+    private function getResultadosFiltro($dados)
+    {
+        if(isset($dados))
+        {
+            $regional = $dados['regional'];
+            $status = $dados['status'];
+
+            return PreRegistro::with(['userExterno' => function ($query) {
+                $query->select('id', 'cpf_cnpj', 'nome');
+            }, 'regional' => function ($query2) {
+                $query2->select('idregional', 'regional');
+            }, 'user' => function ($query3) {
+                $query3->select('idusuario', 'nome');
+            }])
+            ->select('id', 'updated_at', 'status', 'user_externo_id', 'idregional', 'idusuario')
+            ->whereNotNull('status')
+            ->when($regional != 'Todas', function ($query) use ($regional) {
+                $query->where('idregional', $regional);
+            })->when($status != 'Qualquer', function ($query) use ($status) {
+                $query->where('status', $status);
+            })->orderByRaw(
+                'CASE 
+                    WHEN status = "' . PreRegistro::STATUS_ANALISE_INICIAL . '" THEN 1
+                    WHEN status = "' . PreRegistro::STATUS_ANALISE_CORRECAO . '" THEN 2
+                    WHEN status = "' . PreRegistro::STATUS_CORRECAO . '" THEN 3
+                    ELSE 4
+                END'
+            )
+            ->orderByDesc('updated_at')
+            ->paginate(25);
+        }
     }
 
     public function getNomesCampos()
@@ -494,25 +576,19 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return Anexo::getAceitosPreRegistro();
     }
 
-    public function listar()
+    public function listar($request, MediadorServiceInterface $service, $user)
     {
-        // ordenar depois por solicitações em estagio inicial, seguido de correçoes, etc
-        $resultados = PreRegistro::with(['userExterno' => function ($query) {
-            $query->select('id', 'cpf_cnpj', 'nome');
-        }, 'regional' => function ($query2) {
-            $query2->select('idregional', 'regional');
-        }, 'user' => function ($query3) {
-            $query3->select('idusuario', 'nome');
-        }])
-        ->select('id', 'updated_at', 'status', 'user_externo_id', 'idregional', 'idusuario')
-        ->whereNotNull('status')
-        ->orderBy('id')
-        ->get();
+        session(['url_pre_registro' => url()->full()]);
 
+        $dados = $this->validacaoFiltroAtivo($request, $user);
+        $resultados = $this->getResultadosFiltro($dados, $user);
+        $this->variaveis['mostraFiltros'] = true;
+    
         return [
             'resultados' => $resultados, 
             'tabela' => $this->tabelaCompleta($resultados), 
-            'variaveis' => (object) $this->variaveis
+            'temFiltro' => $this->filtro($request, $service, $user),
+            'variaveis' => (object) $this->variaveis,
         ];
     }
 
@@ -531,6 +607,38 @@ class PreRegistroService implements PreRegistroServiceInterface {
             'variaveis' => (object) $variaveis,
             'abas' => $this->getMenu(),
             'codigos' => $this->getCodigosCampos($resultado->userExterno),
+        ];
+    }
+
+    public function buscar($busca)
+    {
+        $numero = apenasNumeros($busca);
+        if(strlen($numero) == 0)
+            $numero = null;
+
+        $resultados = PreRegistro::with(['userExterno' => function ($query) {
+            $query->select('id', 'cpf_cnpj', 'nome');
+        }, 'regional' => function ($query2) {
+            $query2->select('idregional', 'regional');
+        }, 'user' => function ($query3) {
+            $query3->select('idusuario', 'nome');
+        }])
+        ->select('id', 'updated_at', 'status', 'user_externo_id', 'idregional', 'idusuario')
+        ->whereHas('userExterno', function ($query) use ($numero, $busca){
+            // Busca pelo cpf_cnpj se tiver numero, caso contrário busca pelo nome
+            $query->when(isset($numero), function($query2) use ($numero){
+                $query2->where('cpf_cnpj', 'LIKE','%'.$numero.'%');
+            }, function ($query2) use ($busca) { 
+                $query2->where('nome','LIKE','%'.$busca.'%');
+            });
+        })
+        ->orWhere('id', $busca)
+        ->paginate(10);
+
+        return [
+            'resultados' => $resultados,
+            'tabela' => $this->tabelaCompleta($resultados), 
+            'variaveis' => (object) $this->variaveis
         ];
     }
 
@@ -575,24 +683,22 @@ class PreRegistroService implements PreRegistroServiceInterface {
             'negar' => PreRegistro::STATUS_NEGADO,
             'corrigir' => PreRegistro::STATUS_CORRECAO,
         ];
-        $texto = $status[$situacao] != PreRegistro::STATUS_APROVADO ? 'não possui' : 'possui';
-        $temp = $status[$situacao] == PreRegistro::STATUS_CORRECAO ? 'enviado para correção' : strtolower($status[$situacao]);
-
-        if($preRegistro->canUpdateStatus($status[$situacao]))
+        
+        $canUpdate = $preRegistro->canUpdateStatus($status[$situacao]);
+        if($canUpdate['final'])
         {
             $preRegistro->update(['idusuario' => $user->idusuario, 'status' => $status[$situacao]]);
             Mail::to($preRegistro->userExterno->email)->queue(new PreRegistroMail($preRegistro));
             event(new CrudEvent('pré-registro', 'atualizou status para ' . $status[$situacao], $preRegistro->id));
 
             return [
-                'message' => '<i class="icon fa fa-check"></i>Pré-registro com a ID: ' . $preRegistro->id . ' foi ' . $temp . ' com sucesso', 
+                'message' => '<i class="icon fa fa-check"></i>Pré-registro com a ID: ' . $preRegistro->id . ' foi ' . $canUpdate['msg'] . ' com sucesso', 
                 'class' => 'alert-success'
             ];
         }
         
-        $preRegistro->update(['justificativa' => null]);
         return [
-            'message' => '<i class="icon fa fa-ban"></i>Pré-registro com a ID: ' . $preRegistro->id . ' não possui o status necessário para ser ' . $temp . ' ou ' . $texto . ' justificativas ou faltou anexos', 
+            'message' => '<i class="icon fa fa-ban"></i>Pré-registro com a ID: ' . $preRegistro->id . ' não pode ser atualizado pois ' . $canUpdate['msg'], 
             'class' => 'alert-danger'
         ];
     }

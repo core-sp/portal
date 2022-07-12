@@ -222,6 +222,7 @@ Route::prefix('admin')->group(function() {
     Route::put('/aprovado/{id}', 'PreRegistroController@updateAprovado')->name('preregistro.update.aprovado');
     Route::put('/negado/{id}', 'PreRegistroController@updateNegado')->name('preregistro.update.negado');
     Route::get('/busca', 'PreRegistroController@busca')->name('preregistro.busca');
+    Route::get('/filtro', 'PreRegistroController@index')->name('preregistro.filtro');
   });
 
 });
