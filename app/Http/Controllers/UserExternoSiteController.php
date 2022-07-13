@@ -17,7 +17,11 @@ class UserExternoSiteController extends Controller
     public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
     {
         // Limitação de requisições por minuto para cada usuário, senão erro 429
-        $this->middleware(['auth:user_externo', 'throttle:60,1'])->except(['cadastroView', 'cadastro', 'verificaEmail']);
+        $qtd = '60';
+        if((env("APP_ENV") == "local") || (env("APP_ENV") == "testing"))
+            $qtd = '100';
+
+        $this->middleware(['auth:user_externo', 'throttle:' . $qtd . ',1'])->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->service = $service;
         $this->gerentiRepository = $gerentiRepository;
     }
@@ -160,7 +164,7 @@ class UserExternoSiteController extends Controller
             $resultado = $dados['resultado'];
 
             if(!$resultado->userPodeEditar())
-                abort(401, 'Não autorizado a editar o formulário com a solicitação em análise ou finalizada');
+                throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
             $regionais = $dados['regionais'];
             $classes = $dados['classes'];
@@ -198,7 +202,12 @@ class UserExternoSiteController extends Controller
     {
         try{
             $externo = auth()->guard('user_externo')->user();
-            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $externo);
+            $preRegistro = $externo->load('preRegistro')->preRegistro;
+
+            if(!isset($preRegistro))
+                throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
+
+            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $preRegistro->id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 

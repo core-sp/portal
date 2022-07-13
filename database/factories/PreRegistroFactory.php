@@ -25,7 +25,8 @@ $factory->define(PreRegistro::class, function (Faker $faker) {
         'idusuario' => factory('App\User'),
         'status' => null,
         'justificativa' => null,
-        'confere_anexos' => null
+        'confere_anexos' => null,
+        'historico_contabil' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT)
     ];
 });
 
@@ -34,5 +35,12 @@ $factory->state(PreRegistro::class, 'low', function (Faker $faker) {
         'segmento' => segmentos()[5],
         'tipo_telefone' => tipos_contatos()[0],
         'opcional_celular' => opcoes_celular()[1] . ',' . opcoes_celular()[0],
+    ];
+});
+
+$factory->state(PreRegistro::class, 'analise_inicial', function (Faker $faker) {
+    return [
+        'status' => PreRegistro::STATUS_ANALISE_INICIAL,
+        'idusuario' => null,
     ];
 });

@@ -66,6 +66,7 @@ class AdminTest extends TestCase
             ->assertSee('/admin/representantes')
             ->assertSee('/admin/representante-enderecos')
             ->assertSee(route('solicita-cedula.index'))
+            ->assertSee(route('preregistro.index'))
             ->assertSee(route('licitacoes.index'))
             ->assertSee(route('licitacoes.create'))
             ->assertSee(route('concursos.index'))

@@ -21,6 +21,7 @@ $factory->define(PreRegistroCnpj::class, function (Faker $faker) {
         'bairro' => 'TESTE BAIRRO',
         'cidade' => 'SÃO PAULO',
         'uf' => 'SP',
+        'historico_rt' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
         'responsavel_tecnico_id' => factory('App\ResponsavelTecnico'),
         'pre_registro_id' => factory('App\PreRegistro'),
     ];

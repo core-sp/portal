@@ -15,6 +15,28 @@ class ContabilTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** @test */
+    public function view_msg_update()
+    {
+        $externo = $this->signInAsUserExterno();
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertSeeText('Atualizado em: ')
+        ->assertSeeText(PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s'));
+        $atual = PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s');
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => '78087976000130'
+        ])->assertStatus(200);
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertSeeText('Atualizado em: ')
+        ->assertSeeText(PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s'));
+        $this->assertNotEquals($atual, PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s'));
+    }
+
     /** 
      * =======================================================================================================
      * TESTES PRE-REGISTRO CONTABIL VIA AJAX - CLIENT
@@ -417,6 +439,63 @@ class ContabilTest extends TestCase
         $this->assertDatabaseHas('pre_registros', [
             'contabil_id' => null
         ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_contabeis_by_ajax_whith_status_different_aguardando_correcao_or_null()
+    {
+        $externo = $this->signInAsUserExterno();
+        $contabil = factory('App\Contabil')->create();
+        $preRegistro = factory('App\PreRegistro')->create([
+                'user_externo_id' => $externo->id,
+                'contabil_id' => $contabil->id
+        ]);
+
+        $contabilAjax = $contabil->toArray();
+        $pular = ['updated_at', 'created_at', 'id'];
+        
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistro->update(['status' => $status]);
+            if($status != PreRegistro::STATUS_CORRECAO)
+                foreach($contabilAjax as $key => $value)
+                {
+                    if(!in_array($key, $pular))
+                        $this->post(route('externo.inserir.preregistro.ajax'), [
+                            'classe' => 'contabil',
+                            'campo' => $key . '_contabil',
+                            'valor' => ''
+                        ])->assertStatus(401);
+                }
+        }
+    }
+
+    /** @test */
+    public function can_update_table_contabeis_by_ajax_whith_status_aguardando_correcao_or_null()
+    {
+        $externo = $this->signInAsUserExterno();
+        $contabil = factory('App\Contabil')->create();
+        $preRegistro = factory('App\PreRegistro')->create([
+                'user_externo_id' => $externo->id,
+                'contabil_id' => $contabil->id
+        ]);
+
+        $contabilAjax = $contabil->toArray();
+        $pular = ['updated_at', 'created_at', 'id'];
+        
+        foreach([PreRegistro::STATUS_CORRECAO, null] as $status)
+        {
+            $preRegistro->update(['status' => $status]);
+            foreach($contabilAjax as $key => $value)
+            {
+                if(!in_array($key, $pular))
+                    $this->post(route('externo.inserir.preregistro.ajax'), [
+                        'classe' => 'contabil',
+                        'campo' => $key . '_contabil',
+                        'valor' => ''
+                    ])->assertStatus(200);
+            }
+        }
     }
 
     /** 

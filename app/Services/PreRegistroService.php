@@ -525,12 +525,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function downloadAnexo($id, $externo)
+    public function downloadAnexo($id, $idPreRegistro)
     {
-        if(\Route::is('preregistro.anexo.download'))
-            $preRegistro = PreRegistro::findOrFail($externo);
-        else
-            $preRegistro = $externo->load('preRegistro')->preRegistro;
+        $preRegistro = PreRegistro::findOrFail($idPreRegistro);
 
         if(!isset($preRegistro))
             throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
@@ -696,6 +693,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 'class' => 'alert-success'
             ];
         }
+
+        // Apaga a justificativa 'negado' devido a erro
+        if($status[$situacao] == PreRegistro::STATUS_NEGADO)
+            $preRegistro->update(['justificativa' => null]);
         
         return [
             'message' => '<i class="icon fa fa-ban"></i>Pré-registro com a ID: ' . $preRegistro->id . ' não pode ser atualizado pois ' . $canUpdate['msg'], 

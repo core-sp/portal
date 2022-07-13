@@ -13,7 +13,10 @@ class PreRegistroController extends Controller
     public function __construct(MediadorServiceInterface $service)
     {
         // Limitação de requisições por minuto para cada usuário, senão erro 429
-        $this->middleware(['auth', 'throttle:50,1']);
+        $qtd = '50';
+        if((env("APP_ENV") == "local") || (env("APP_ENV") == "testing"))
+            $qtd = '100';
+        $this->middleware(['auth', 'throttle:' . $qtd . ',1']);
         $this->service = $service;
     }
 
