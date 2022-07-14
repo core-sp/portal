@@ -3,6 +3,7 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\PreRegistroCpf;
+use App\PreRegistro;
 use Faker\Generator as Faker;
 
 $factory->define(PreRegistroCpf::class, function (Faker $faker) {
@@ -30,5 +31,23 @@ $factory->state(PreRegistroCpf::class, 'low', function (Faker $faker) {
         'naturalidade' => 'São Paulo',
         'nome_mae' => $faker->name,
         'tipo_identidade' => tipos_identidade()[0],
+    ];
+});
+
+$factory->state(PreRegistroCpf::class, 'justificado', function (Faker $faker) {
+    $campos = ['segmento','cep','logradouro','numero','complemento','bairro','cidade','uf','telefone','telefone_1','tipo_telefone',
+    'tipo_telefone_1','opcional_celular','opcional_celular_1','idregional','path','cnpj_contabil','nome_contabil','email_contabil','nome_contato_contabil',
+    'telefone_contabil','nome_social','dt_nascimento','sexo','estado_civil','naturalidade','nacionalidade','nome_mae','nome_pai','tipo_identidade','identidade',
+    'orgao_emissor','dt_expedicao'];
+    $arrayFinal = array();
+    foreach($campos as $campo)
+        $arrayFinal[$campo] = $faker->text(500);
+
+    $pr = factory('App\PreRegistro')->state('analise_inicial')->create([
+        'justificativa' => json_encode($arrayFinal, JSON_FORCE_OBJECT)
+    ]);
+
+    return [
+        'pre_registro_id' => $pr->id,
     ];
 });

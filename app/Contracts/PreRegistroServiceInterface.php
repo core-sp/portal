@@ -22,7 +22,7 @@ interface PreRegistroServiceInterface {
     public function excluirAnexo($id, $externo);
 
     // ADMIN
-    public function getTiposAnexos();
+    public function getTiposAnexos($idPreRegistro);
 
     public function listar($request, MediadorServiceInterface $service, $user);
 

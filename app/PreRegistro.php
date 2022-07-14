@@ -440,11 +440,12 @@ class PreRegistro extends Model
                 ];
         }
         else
-            $verificaJustificativa = $status == PreRegistro::STATUS_NEGADO ? isset($this->getJustificativaArray()['negado']) : isset($this->justificativa);
+            $verificaJustificativa = $status == PreRegistro::STATUS_NEGADO ? isset($this->getJustificativaArray()['negado']) : 
+                (isset($this->justificativa) && !isset($this->getJustificativaArray()['negado']));
         
         if(!$verificaJustificativa)
             return [
-                'msg' => $texto . ' justificativas',
+                'msg' => $texto . ' justificativa(s)',
                 'final' => false
             ];
 

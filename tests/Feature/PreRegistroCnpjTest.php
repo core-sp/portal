@@ -513,7 +513,7 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
-    public function cannot_update_table_pre_registros_cnpj_by_ajax_whith_status_different_aguardando_correcao_or_null()
+    public function cannot_update_table_pre_registros_cnpj_by_ajax_with_status_different_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistroCnpj')->create([
@@ -542,7 +542,7 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
-    public function can_update_table_pre_registros_cnpj_by_ajax_whith_status_aguardando_correcao_or_null()
+    public function can_update_table_pre_registros_cnpj_by_ajax_with_status_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistroCnpj')->create([
@@ -2545,7 +2545,7 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_cnpj_whith_status_different_aguardando_correcao_or_null()
+    public function cannot_submit_pre_registro_cnpj_with_status_different_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'
@@ -2584,7 +2584,7 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
-    public function can_submit_pre_registro_cnpj_whith_status_aguardando_correcao_or_null()
+    public function can_submit_pre_registro_cnpj_with_status_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '06985713000138'

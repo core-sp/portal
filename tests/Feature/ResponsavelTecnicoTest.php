@@ -600,7 +600,7 @@ class ResponsavelTecnicoTest extends TestCase
     }
 
     /** @test */
-    public function cannot_update_table_responsaveis_tecnicos_by_ajax_whith_status_different_aguardando_correcao_or_null()
+    public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_status_different_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $rt = factory('App\ResponsavelTecnico')->create();
@@ -631,7 +631,7 @@ class ResponsavelTecnicoTest extends TestCase
     }
 
     /** @test */
-    public function can_update_table_responsaveis_tecnicos_by_ajax_whith_status_aguardando_correcao_or_null()
+    public function can_update_table_responsaveis_tecnicos_by_ajax_with_status_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $rt = factory('App\ResponsavelTecnico')->create();

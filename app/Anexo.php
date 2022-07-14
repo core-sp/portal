@@ -37,7 +37,7 @@ class Anexo extends Model
         return null;
     }
 
-    public static function getAceitosPreRegistro()
+    private static function getAceitosPreRegistro()
     {
         return [
             'Comprovante de identidade',
@@ -79,6 +79,17 @@ class Anexo extends Model
             unset($tipos[3]);
             unset($tipos[4]);
         }
+
+        return $tipos;
+    }
+
+    public function getOpcoesPreRegistro()
+    {
+        $tipos = Anexo::getAceitosPreRegistro();
+        $preRegistro = $this->preRegistro;
+
+        if($preRegistro->userExterno->isPessoaFisica())
+            $tipos = $this->getAceitosPF($preRegistro, $tipos);
 
         return $tipos;
     }

@@ -568,9 +568,15 @@ class PreRegistroService implements PreRegistroServiceInterface {
         throw new \Exception('Arquivo não existe / não pode acessar', 401);
     }
 
-    public function getTiposAnexos()
+    public function getTiposAnexos($idPreRegistro)
     {
-        return Anexo::getAceitosPreRegistro();
+        $preRegistro = PreRegistro::findOrFail($idPreRegistro);
+
+        // Atendente não pode editar um pré-registro com status diferente de analise inicial e analise da correção
+        if(!isset($preRegistro->status) || !$preRegistro->atendentePodeEditar())
+            throw new \Exception('Não autorizado a editar o pré-registro sem status, aguardando correção ou finalizado', 401);
+            
+        return $preRegistro->anexos->first()->getOpcoesPreRegistro();
     }
 
     public function listar($request, MediadorServiceInterface $service, $user)
@@ -645,7 +651,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         // Atendente não pode editar um pré-registro com status diferente de analise inicial e analise da correção
         if(!isset($preRegistro->status) || !$preRegistro->atendentePodeEditar())
-            throw new \Exception('Não autorizado a editar o pré-registro sem status ou finalizado', 401);
+            throw new \Exception('Não autorizado a editar o pré-registro sem status, aguardando correção ou finalizado', 401);
 
         $campo = $request['campo'];
         $valor = $request['valor'];

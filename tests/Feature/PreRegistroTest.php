@@ -159,7 +159,7 @@ class PreRegistroTest extends TestCase
         // Considerado o valor local que está no PreRegistroController
         $admin = $this->signInAsAdmin();
 
-        for($i = 1; $i <= 100; $i++)
+        for($i = 1; $i <= 150; $i++)
             $this->get(route('preregistro.index'))->assertStatus(200);
 
         $this->get(route('preregistro.index'))->assertStatus(429);
@@ -416,7 +416,7 @@ class PreRegistroTest extends TestCase
     // Status do pré-registro
 
     /** @test */
-    public function cannot_view_button_verificar_pendencias_whith_status_different_aguardando_correcao_or_null()
+    public function cannot_view_button_verificar_pendencias_with_status_different_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistroCpf')->create([
@@ -454,7 +454,7 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
-    public function can_view_button_verificar_pendencias_whith_status_aguardando_correcao_or_null()
+    public function can_view_button_verificar_pendencias_with_status_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistroCpf')->create([
@@ -1482,7 +1482,7 @@ class PreRegistroTest extends TestCase
     // Status do pré-registro
 
     /** @test */
-    public function cannot_update_table_pre_registros_by_ajax_whith_status_different_aguardando_correcao_or_null()
+    public function cannot_update_table_pre_registros_by_ajax_with_status_different_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistro')->create([
@@ -1509,7 +1509,7 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
-    public function can_update_table_pre_registros_by_ajax_whith_status_aguardando_correcao_or_null()
+    public function can_update_table_pre_registros_by_ajax_with_status_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistro')->create([
@@ -2340,8 +2340,39 @@ class PreRegistroTest extends TestCase
 
     /** 
      * =======================================================================================================
-     * TESTES PRE-REGISTRO VIA AJAX - ADMIN
+     * TESTES PRE-REGISTRO - ADMIN
      * =======================================================================================================
      */
 
+    /** @test */
+    public function view_list_pre_registros()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistro1 = factory('App\PreRegistro')->state('analise_inicial')->create([
+            'idregional' => $admin->idregional
+        ]);
+        $preRegistro2 = factory('App\PreRegistro')->state('analise_inicial')->create([
+            'user_externo_id' => factory('App\UserExterno')->create([
+                'cpf_cnpj' => '47662011089'
+            ]),
+            'contabil_id' => null,
+            'idregional' => $admin->idregional
+        ]);
+        $preRegistro3 = factory('App\PreRegistro')->state('analise_inicial')->create([
+            'user_externo_id' => factory('App\UserExterno')->create([
+                'cpf_cnpj' => '06985713000138'
+            ]),
+            'contabil_id' => null,
+            'idregional' => $admin->idregional
+        ]);
+        
+        $this->get(route('preregistro.index'))
+        ->assertSeeText(formataCpfCnpj($preRegistro1->userExterno->cpf_cnpj))
+        ->assertSeeText(formataCpfCnpj($preRegistro2->userExterno->cpf_cnpj))
+        ->assertSeeText(formataCpfCnpj($preRegistro3->userExterno->cpf_cnpj))
+        ->assertSeeText($preRegistro1->userExterno->nome)
+        ->assertSeeText($preRegistro2->userExterno->nome)
+        ->assertSeeText($preRegistro3->userExterno->nome);
+    }
 }

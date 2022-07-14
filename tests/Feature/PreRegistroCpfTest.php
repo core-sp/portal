@@ -391,7 +391,7 @@ class PreRegistroCpfTest extends TestCase
     // Status do pré-registro
 
     /** @test */
-    public function cannot_update_table_pre_registros_cpf_by_ajax_whith_status_different_aguardando_correcao_or_null()
+    public function cannot_update_table_pre_registros_cpf_by_ajax_with_status_different_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistroCpf')->create([
@@ -420,7 +420,7 @@ class PreRegistroCpfTest extends TestCase
     }
 
     /** @test */
-    public function can_update_table_pre_registros_cpf_by_ajax_whith_status_aguardando_correcao_or_null()
+    public function can_update_table_pre_registros_cpf_by_ajax_with_status_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistroCpf')->create([
@@ -1782,7 +1782,7 @@ class PreRegistroCpfTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_whith_status_different_aguardando_correcao_or_null()
+    public function cannot_submit_pre_registro_with_status_different_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistro')->state('low')->create([
@@ -1808,7 +1808,7 @@ class PreRegistroCpfTest extends TestCase
     }
 
     /** @test */
-    public function can_submit_pre_registro_whith_status_aguardando_correcao_or_null()
+    public function can_submit_pre_registro_with_status_aguardando_correcao_or_null()
     {
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistro')->state('low')->create([
@@ -1836,36 +1836,854 @@ class PreRegistroCpfTest extends TestCase
 
     /** 
      * =======================================================================================================
-     * TESTES PRE-REGISTRO VIA AJAX - ADMIN
+     * TESTES PRE-REGISTRO-CPF VIA AJAX - ADMIN
      * =======================================================================================================
      */
 
-    // /** @test */
-    // public function can_update_justificativa()
-    // {
-    //     $admin = $this->signInAsAdmin();
-    //     $preRegistro = factory('App\PreRegistro')->state('analise_inicial')->create();
-    //     $anexo = factory('App\Anexo')->state('pre_registro')->create([
-    //         'pre_registro_id' => $preRegistro->id
-    //     ]);
-    //     $preRegistroCpf = factory('App\PreRegistroCpf')->create([
-    //         'pre_registro_id' => $preRegistro->id
-    //     ]);
-    //     $tempContabil = array();
-    //     foreach($preRegistro->contabil->toArray() as $key => $temp)
-    //         if(!in_array($key, ['id', 'created_at', 'updated_at', 'deleted_at']))
-    //             $tempContabil[$key . '_contabil'] = $temp;
+    /** @test */
+    public function can_update_justificativa()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistro = factory('App\PreRegistro')->state('analise_inicial')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $tempContabil = array();
+        foreach($preRegistro->contabil->toArray() as $key => $temp)
+            if(!in_array($key, ['id', 'created_at', 'updated_at', 'deleted_at']))
+                $tempContabil[$key . '_contabil'] = $temp;
 
-    //     $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->toArray(), $tempContabil);
-    //     $pular = ['id', 'created_at', 'updated_at', 'deleted_at', 'pre_registro', 'pre_registro_id', 'contabil', 'contabil_id', 'user_externo_id',
-    //     'idusuario', 'status', 'historico_contabil', 'registro_secundario', 'justificativa'];
+        $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->toArray(), $tempContabil, ['path' => 'nnn']);
+        $pular = ['id', 'created_at', 'updated_at', 'deleted_at', 'pre_registro', 'pre_registro_id', 'contabil', 'contabil_id', 'user_externo_id',
+        'idusuario', 'status', 'historico_contabil', 'registro_secundario', 'justificativa', 'confere_anexos'];
 
-    //     foreach($dados as $campo => $valor)
-    //         if(!in_array($campo, $pular))
-    //             $this->post(route('preregistro.update.ajax', $preRegistro->id), [
-    //                 'acao' => 'justificar',
-    //                 'campo' => $campo,
-    //                 'valor' => 'tetetete'
-    //             ])->assertStatus(200);                
-    // }
+        $justificativas = array();
+        foreach($dados as $campo => $valor)
+            if(!in_array($campo, $pular))
+            {
+                $texto = $faker->text(500);
+                $justificativas[$campo] = $texto;
+                $this->post(route('preregistro.update.ajax', $preRegistro->id), [
+                    'acao' => 'justificar',
+                    'campo' => $campo,
+                    'valor' => $texto
+                ])->assertStatus(200);    
+            }
+
+        $this->assertDatabaseHas('pre_registros', [
+                'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function can_update_justificativa_with_status_em_analise_or_analise_da_correcao()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistro = factory('App\PreRegistro')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $tempContabil = array();
+        foreach($preRegistro->contabil->toArray() as $key => $temp)
+            if(!in_array($key, ['id', 'created_at', 'updated_at', 'deleted_at']))
+                $tempContabil[$key . '_contabil'] = $temp;
+
+        $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->toArray(), $tempContabil, ['path' => 'nnn']);
+        $pular = ['id', 'created_at', 'updated_at', 'deleted_at', 'pre_registro', 'pre_registro_id', 'contabil', 'contabil_id', 'user_externo_id',
+        'idusuario', 'status', 'historico_contabil', 'registro_secundario', 'justificativa', 'confere_anexos'];
+
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistro->update(['status' => $status]);
+            if(in_array($status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]))
+                foreach($dados as $campo => $valor)
+                    if(!in_array($campo, $pular))
+                        $this->post(route('preregistro.update.ajax', $preRegistro->id), [
+                            'acao' => 'justificar',
+                            'campo' => $campo,
+                            'valor' => $faker->text(500)
+                        ])->assertStatus(200);    
+        }
+    }
+
+    /** @test */
+    public function can_edit_justificativas()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+
+        $dados = $preRegistroCpf->preRegistro->getJustificativaArray();
+        foreach($dados as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'justificar',
+                'campo' => $campo,
+                'valor' => ''
+            ])->assertStatus(200);    
+
+        $this->assertDatabaseHas('pre_registros', [
+                'justificativa' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_more_than_500_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistro = factory('App\PreRegistro')->state('analise_inicial')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $tempContabil = array();
+        foreach($preRegistro->contabil->toArray() as $key => $temp)
+            if(!in_array($key, ['id', 'created_at', 'updated_at', 'deleted_at']))
+                $tempContabil[$key . '_contabil'] = $temp;
+
+        $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->toArray(), $tempContabil, ['path' => 'nnn']);
+        $pular = ['id', 'created_at', 'updated_at', 'deleted_at', 'pre_registro', 'pre_registro_id', 'contabil', 'contabil_id', 'user_externo_id',
+        'idusuario', 'status', 'historico_contabil', 'registro_secundario', 'justificativa', 'confere_anexos'];
+
+        $justificativas = array();
+        foreach($dados as $campo => $valor)
+            if(!in_array($campo, $pular))
+            {
+                $texto = $faker->text(800);
+                $justificativas[$campo] = $texto;
+                $this->post(route('preregistro.update.ajax', $preRegistro->id), [
+                    'acao' => 'justificar',
+                    'campo' => $campo,
+                    'valor' => $texto
+                ])->assertStatus(302);    
+            }
+            
+        $this->assertDatabaseMissing('pre_registros', [
+                'justificativa' => json_encode($justificativas, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_wrong_inputs()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistro = factory('App\PreRegistro')->state('analise_inicial')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $tempContabil = array();
+        $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->toArray(), $tempContabil);
+
+        foreach($dados as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistro->id), [
+                'acao' => 'justificar',
+                'campo' => $campo . '_erro',
+                'valor' => $faker->text(500)
+            ])->assertStatus(302);    
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_wrong_input_acao()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistro = factory('App\PreRegistro')->state('analise_inicial')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $tempContabil = array();
+        foreach($preRegistro->contabil->toArray() as $key => $temp)
+            if(!in_array($key, ['id', 'created_at', 'updated_at', 'deleted_at']))
+                $tempContabil[$key . '_contabil'] = $temp;
+
+        $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->toArray(), $tempContabil, ['path' => 'nnn']);
+        $pular = ['id', 'created_at', 'updated_at', 'deleted_at', 'pre_registro', 'pre_registro_id', 'contabil', 'contabil_id', 'user_externo_id',
+        'idusuario', 'status', 'historico_contabil', 'registro_secundario', 'justificativa', 'confere_anexos'];
+
+        foreach($dados as $campo => $valor)
+            if(!in_array($campo, $pular))
+                $this->post(route('preregistro.update.ajax', $preRegistro->id), [
+                    'acao' => 'justificar_',
+                    'campo' => $campo,
+                    'valor' => $faker->text(500)
+                ])->assertStatus(302);    
+    }
+
+    /** @test */
+    public function cannot_update_justificativa_with_status_different_em_analise_or_analise_da_correcao()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistro = factory('App\PreRegistro')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => $preRegistro->id
+        ]);
+        $tempContabil = array();
+        foreach($preRegistro->contabil->toArray() as $key => $temp)
+            if(!in_array($key, ['id', 'created_at', 'updated_at', 'deleted_at']))
+                $tempContabil[$key . '_contabil'] = $temp;
+
+        $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->toArray(), $tempContabil, ['path' => 'nnn']);
+        $pular = ['id', 'created_at', 'updated_at', 'deleted_at', 'pre_registro', 'pre_registro_id', 'contabil', 'contabil_id', 'user_externo_id',
+        'idusuario', 'status', 'historico_contabil', 'registro_secundario', 'justificativa', 'confere_anexos'];
+
+        $allStatus = array_merge(PreRegistro::getStatus(), [null]);
+        foreach($allStatus as $status)
+        {
+            $preRegistro->update(['status' => $status]);
+            if(!in_array($status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]))
+                foreach($dados as $campo => $valor)
+                    if(!in_array($campo, $pular))
+                        $this->post(route('preregistro.update.ajax', $preRegistro->id), [
+                            'acao' => 'justificar',
+                            'campo' => $campo,
+                            'valor' => $faker->text(500)
+                        ])->assertStatus(401);    
+        }
+    }
+
+    /** @test */
+    public function can_save_inputs()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $campos = ['registro_secundario' => '000011234'];
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar',
+                'campo' => $campo,
+                'valor' => $valor
+            ])->assertStatus(200);    
+
+        $this->assertDatabaseHas('pre_registros', $campos);
+    }
+
+    /** @test */
+    public function can_clean_inputs_saved_after_update()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $campos = ['registro_secundario' => '000011234'];
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar',
+                'campo' => $campo,
+                'valor' => $valor
+            ])->assertStatus(200);    
+
+        $this->assertDatabaseHas('pre_registros', $campos);
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar',
+                'campo' => $campo,
+                'valor' => ''
+            ])->assertStatus(200);    
+
+        $this->assertDatabaseMissing('pre_registros', $campos);
+    }
+
+    /** @test */
+    public function cannot_save_inputs_with_wrong_action()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $campos = ['registro_secundario' => '000011234'];
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar_',
+                'campo' => $campo,
+                'valor' => $valor
+            ])->assertStatus(302);    
+    }
+
+    /** @test */
+    public function cannot_save_inputs_with_wrong_field()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $campos = ['registro_secundario' => '000011234'];
+
+        foreach($campos as $campo => $valor)
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'editar',
+                'campo' => $campo . '-',
+                'valor' => $valor
+            ])->assertStatus(302);    
+    }
+
+    /** @test */
+    public function can_check_anexos()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $tipos = $anexo->first()->getObrigatoriosPreRegistro();
+        $arrayAnexos = array();
+        foreach($tipos as $tipo)
+        {
+            $arrayAnexos[$tipo] = "OK";
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'conferir',
+                'campo' => 'confere_anexos[]',
+                'valor' => $tipo
+            ])->assertStatus(200);    
+        }
+            
+        $this->assertDatabaseHas('pre_registros', [
+            'confere_anexos' => json_encode($arrayAnexos, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function cannot_check_reservista_if_sexo_not_M()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $tipo = 'Cerificado de reservista ou dispensa';
+        $arrayAnexos['Cerificado de reservista ou dispensa'] = "OK";
+
+        foreach(generos() as $key => $valor)
+        {
+            $preRegistroCpf->update(['sexo' => $key]);
+            if($key != 'M')
+                $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                    'acao' => 'conferir',
+                    'campo' => 'confere_anexos[]',
+                    'valor' => $tipo
+                ])->assertSessionHasErrors('valor'); 
+        }
+
+        $this->assertDatabaseMissing('pre_registros', [
+            'confere_anexos' => json_encode($arrayAnexos, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function cannot_check_reservista_if_more_than_45_years_old()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $tipo = 'Cerificado de reservista ou dispensa';
+        $arrayAnexos['Cerificado de reservista ou dispensa'] = "OK";
+
+        $preRegistroCpf->update(['dt_nascimento' => Carbon::today()->subYears(46)->format('Y-m-d')]);
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'conferir',
+            'campo' => 'confere_anexos[]',
+            'valor' => $tipo
+        ])->assertSessionHasErrors('valor'); 
+
+        $this->assertDatabaseMissing('pre_registros', [
+            'confere_anexos' => json_encode($arrayAnexos, JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function can_check_anexos_with_wrong_action()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $tipos = $anexo->first()->getObrigatoriosPreRegistro();
+        $arrayAnexos = array();
+        foreach($tipos as $tipo)
+        {
+            $arrayAnexos[$tipo] = "OK";
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'conferir_',
+                'campo' => 'confere_anexos[]',
+                'valor' => $tipo
+            ])->assertSessionHasErrors('acao'); 
+        }
+    }
+
+    /** @test */
+    public function can_check_anexos_with_wrong_value()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $tipos = $anexo->first()->getObrigatoriosPreRegistro();
+        $arrayAnexos = array();
+        foreach($tipos as $tipo)
+        {
+            $arrayAnexos[$tipo] = "OK";
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'conferir',
+                'campo' => 'confere_anexos[]',
+                'valor' => $tipo . '-'
+            ])->assertSessionHasErrors('valor'); 
+        }
+    }
+
+    /** @test */
+    public function can_check_anexos_with_wrong_field()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $tipos = $anexo->first()->getObrigatoriosPreRegistro();
+        $arrayAnexos = array();
+        foreach($tipos as $tipo)
+        {
+            $arrayAnexos[$tipo] = "OK";
+            $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                'acao' => 'conferir',
+                'campo' => 'confere_anexos[]_',
+                'valor' => $tipo
+            ])->assertSessionHasErrors('campo'); 
+        }
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO-CPF VIA SUBMIT - ADMIN
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function can_update_status_enviar_para_correcao()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $arrayAnexos = array();
+        foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
+            $arrayAnexos[$tipo] = "OK";
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCpf->preRegistro->update(['confere_anexos' => $final]);
+
+        $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('enviado para correção')
+        ->assertSeeText('sucesso');
+    }
+
+    /** @test */
+    public function can_update_status_enviar_para_correcao_without_confere_anexos()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+
+        $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('enviado para correção')
+        ->assertSeeText('sucesso');
+    }
+
+    /** @test */
+    public function cannot_update_status_enviar_para_correcao_without_justificativa()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $preRegistroCpf->preRegistro->update(['justificativa' => null]);
+
+        $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('não possui justificativa(s)');
+    }
+
+    /** @test */
+    public function cannot_update_status_enviar_para_correcao_only_key_negado()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $preRegistroCpf->preRegistro->update(['justificativa' => '{"negado":"teste"}']);
+
+        $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('não possui justificativa(s)');
+    }
+
+    /** @test */
+    public function cannot_update_status_enviar_para_correcao_with_status_different_analise_inicial_or_analise_da_correcao()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO];
+        $all_status = array_merge(PreRegistro::getStatus(), [null]);
+        foreach($all_status as $status)
+            if(!in_array($status, $canUpdate))
+            {
+                $preRegistroCpf->preRegistro->update(['status' => $status]);
+                $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+                ->assertRedirect(route('preregistro.index'));
+                $this->get(route('preregistro.index'))
+                ->assertSeeText('não possui o status necessário para ser enviado para correção');
+            }
+    }
+
+    /** @test */
+    public function can_update_status_enviar_para_correcao_with_status_analise_inicial_or_analise_da_correcao()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO];
+        foreach($canUpdate as $status)
+        {
+            $preRegistroCpf->preRegistro->update(['status' => $status]);
+            $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+            ->assertRedirect(route('preregistro.index'));
+            $this->get(route('preregistro.index'))
+            ->assertSeeText('enviado para correção')
+            ->assertSeeText('sucesso');
+        }
+    }
+
+    /** @test */
+    public function can_update_status_negado()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $arrayAnexos = array();
+        foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
+            $arrayAnexos[$tipo] = "OK";
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'justificar',
+            'campo' => 'negado',
+            'valor' => $faker->text(500)
+        ])->assertStatus(200); 
+
+        $this->put(route('preregistro.update.negado', $preRegistroCpf->pre_registro_id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('Negado')
+        ->assertSeeText('sucesso');
+    }
+
+    /** @test */
+    public function can_update_status_negado_without_confere_anexos()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'justificar',
+            'campo' => 'negado',
+            'valor' => $faker->text(500)
+        ])->assertStatus(200); 
+
+        $this->put(route('preregistro.update.negado', $preRegistroCpf->pre_registro_id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('Negado')
+        ->assertSeeText('sucesso');
+    }
+
+    /** @test */
+    public function cannot_update_status_negado_without_justificativa_negado()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $arrayAnexos = array();
+        $tipos = $anexo->first()->getOpcoesPreRegistro();
+        foreach($tipos as $tipo)
+            $arrayAnexos[$tipo] = "OK";
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
+
+        $this->put(route('preregistro.update.negado', $preRegistroCpf->preRegistro->id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('Negado')
+        ->assertSeeText('não possui justificativa(s)');
+    }
+
+    /** @test */
+    public function cannot_update_status_negado_with_others_justificativa_and_without_negado()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+
+        $this->put(route('preregistro.update.negado', $preRegistroCpf->preRegistro->id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('Negado')
+        ->assertSeeText('não possui justificativa(s)');
+    }
+
+    /** @test */
+    public function can_update_status_negado_with_others_justificativa_and_negado()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'justificar',
+            'campo' => 'negado',
+            'valor' => $faker->text(500)
+        ])->assertStatus(200); 
+
+        $this->put(route('preregistro.update.negado', $preRegistroCpf->preRegistro->id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('Negado')
+        ->assertSeeText('sucesso');
+    }
+
+    /** @test */
+    public function cannot_update_status_negado_with_status_different_analise_inicial_or_analise_da_correcao()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'justificar',
+            'campo' => 'negado',
+            'valor' => $faker->text(500)
+        ])->assertStatus(200); 
+
+        $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO];
+        $all_status = array_merge(PreRegistro::getStatus(), [null]);
+        foreach($all_status as $status)
+            if(!in_array($status, $canUpdate))
+            {
+                $preRegistroCpf->preRegistro->update(['status' => $status]);
+                $this->put(route('preregistro.update.negado', $preRegistroCpf->pre_registro_id))
+                ->assertRedirect(route('preregistro.index'));
+                $this->get(route('preregistro.index'))
+                ->assertSee('<i class="icon fa fa-ban"></i>');
+            }
+    }
+
+    /** @test */
+    public function can_update_status_negado_with_status_analise_inicial_or_analise_da_correcao()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+
+        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+            'acao' => 'justificar',
+            'campo' => 'negado',
+            'valor' => $faker->text(500)
+        ])->assertStatus(200); 
+
+        $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO];
+        foreach($canUpdate as $status)
+        {
+            $preRegistroCpf->preRegistro->update(['status' => $status]);
+            $this->put(route('preregistro.update.negado', $preRegistroCpf->pre_registro_id))
+            ->assertRedirect(route('preregistro.index'));
+            $this->get(route('preregistro.index'))
+            ->assertSeeText('negado')
+            ->assertSeeText('sucesso');
+        }
+    }
+
+    /** @test */
+    public function can_update_status_aprovado()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $arrayAnexos = array();
+        foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
+            $arrayAnexos[$tipo] = "OK";
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
+
+        $this->put(route('preregistro.update.aprovado', $preRegistroCpf->pre_registro_id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('aprovado')
+        ->assertSeeText('sucesso');
+    }
+
+    /** @test */
+    public function cannot_update_status_aprovado_without_confere_anexos()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+
+        $this->put(route('preregistro.update.aprovado', $preRegistroCpf->pre_registro_id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('faltou anexos');
+    }
+
+    /** @test */
+    public function cannot_update_status_aprovado_with_justificativa()
+    {
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $arrayAnexos = array();
+        $tipos = $anexo->first()->getOpcoesPreRegistro();
+        foreach($tipos as $tipo)
+            $arrayAnexos[$tipo] = "OK";
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
+
+        $this->put(route('preregistro.update.aprovado', $preRegistroCpf->preRegistro->id))
+        ->assertRedirect(route('preregistro.index'));
+
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('possui justificativa(s)');
+    }
+
+    /** @test */
+    public function cannot_update_status_aprovado_with_status_different_analise_inicial_or_analise_da_correcao()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $arrayAnexos = array();
+        $tipos = $anexo->first()->getOpcoesPreRegistro();
+        foreach($tipos as $tipo)
+            $arrayAnexos[$tipo] = "OK";
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCpf->preRegistro->update(['confere_anexos' => $final]);
+
+        $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO];
+        $all_status = array_merge(PreRegistro::getStatus(), [null]);
+        foreach($all_status as $status)
+            if(!in_array($status, $canUpdate))
+            {
+                $preRegistroCpf->preRegistro->update(['status' => $status]);
+                $this->put(route('preregistro.update.aprovado', $preRegistroCpf->pre_registro_id))
+                ->assertRedirect(route('preregistro.index'));
+                $this->get(route('preregistro.index'))
+                ->assertSee('<i class="icon fa fa-ban"></i>');
+            }
+    }
+
+    /** @test */
+    public function can_update_status_aprovado_with_status_analise_inicial_or_analise_da_correcao()
+    {
+        $faker = \Faker\Factory::create();
+        $admin = $this->signInAsAdmin();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->state('pre_registro')->create([
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+        $arrayAnexos = array();
+        $tipos = $anexo->first()->getOpcoesPreRegistro();
+        foreach($tipos as $tipo)
+            $arrayAnexos[$tipo] = "OK";
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCpf->preRegistro->update(['confere_anexos' => $final]);
+
+        $canUpdate = [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO];
+        foreach($canUpdate as $status)
+        {
+            $preRegistroCpf->preRegistro->update(['status' => $status]);
+            $this->put(route('preregistro.update.aprovado', $preRegistroCpf->pre_registro_id))
+            ->assertRedirect(route('preregistro.index'));
+            $this->get(route('preregistro.index'))
+            ->assertSeeText('aprovado')
+            ->assertSeeText('sucesso');
+        }
+    }
 }

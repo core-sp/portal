@@ -15,7 +15,7 @@ $factory->define(Anexo::class, function (Faker $faker) {
 
 $factory->state(Anexo::class, 'pre_registro', function (Faker $faker) {
     return [
-        'path' => 'userExterno/pre_registros/' . (string) \Str::uuid(),
+        'path' => 'userExterno/pre_registros/' . (string) \Str::uuid() . '.jpg',
         'pre_registro_id' => factory('App\PreRegistro'),
     ];
 });

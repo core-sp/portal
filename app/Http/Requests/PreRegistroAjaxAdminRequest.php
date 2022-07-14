@@ -31,9 +31,13 @@ class PreRegistroAjaxAdminRequest extends FormRequest
             ]);
         }
 
-        $tipos_anexos = $this->service->getService('PreRegistro')->getTiposAnexos();
         if($this->campo == 'confere_anexos')
+        {
+            $url = request()->url();
+            $id = substr($url, strrpos($url, '/') + 1);
+            $tipos_anexos = $this->service->getService('PreRegistro')->getTiposAnexos($id);
             $this->regraValor = ['in:' . implode(',', $tipos_anexos)];
+        }
     }
 
     public function rules()
@@ -44,8 +48,12 @@ class PreRegistroAjaxAdminRequest extends FormRequest
         foreach($campos_array as $key => $campos)
             $todos .= isset($todos) ? ','.$campos : $campos;
 
-        $todos .= ',registro,registro_secundario,confere_anexos,negado';
-        
+        $todos .= ',registro,negado';
+        if(request()->acao == 'editar')
+            $todos = 'registro,registro_secundario';
+        if(request()->acao == 'conferir')
+            $todos = 'confere_anexos';
+
         return [
             'acao' => 'required|in:justificar,editar,conferir',
             'valor' => $this->regraValor,
