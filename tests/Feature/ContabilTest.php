@@ -1004,4 +1004,43 @@ class ContabilTest extends TestCase
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_contabil');
     }
+
+    /** 
+     * =======================================================================================================
+     * TESTES PRÉ-REGISTRO CONTÁBIL - ADMIN
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function view_pre_registro_contabil()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+        $contabil = $preRegistroCpf->preRegistro->contabil;
+        
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeText(formataCpfCnpj($contabil->cnpj))
+        ->assertSeeText($contabil->nome)
+        ->assertSeeText($contabil->nome_contato)
+        ->assertSeeText($contabil->email)
+        ->assertSeeText($contabil->telefone);
+    }
+
+    /** @test */
+    public function view_text_justificado_contabil()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->state('justificado')->create();
+        $justificativas = $preRegistroCpf->preRegistro->getJustificativaArray();
+
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeText($justificativas['cnpj_contabil'])
+        ->assertSeeText($justificativas['nome_contabil'])
+        ->assertSeeText($justificativas['nome_contato_contabil'])
+        ->assertSeeText($justificativas['email_contabil'])
+        ->assertSeeText($justificativas['telefone_contabil']);
+    }
 }

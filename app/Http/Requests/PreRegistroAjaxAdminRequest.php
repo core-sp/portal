@@ -36,7 +36,14 @@ class PreRegistroAjaxAdminRequest extends FormRequest
             $url = request()->url();
             $id = substr($url, strrpos($url, '/') + 1);
             $tipos_anexos = $this->service->getService('PreRegistro')->getTiposAnexos($id);
-            $this->regraValor = ['in:' . implode(',', $tipos_anexos)];
+            if(!isset($tipos_anexos))
+            {
+                $this->regraValor = ['required'];
+                $this->merge([
+                    'valor' => '',
+                ]);
+            }else
+                $this->regraValor = ['in:' . implode(',', $tipos_anexos)];
         }
     }
 

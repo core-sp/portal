@@ -14,3 +14,9 @@ $factory->define(UserExterno::class, function (Faker $faker) {
         'aceite' => 1
     ];
 });
+
+$factory->state(UserExterno::class, 'pj', function (Faker $faker) {
+    return [
+        'cpf_cnpj' => '06985713000138'
+    ];
+});

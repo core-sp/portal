@@ -474,8 +474,13 @@
             name="pergunta"
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('pergunta') ? 'is-invalid' : '' }} obrigatorio"
             placeholder=""
+            {{ isset($resultado->status) ? 'readonly' : '' }}
             {{-- por não salvar no bd, para não passar nula para o próximo request de envio --}}
+            @if(isset($resultado->status))
+            value="**********"
+            @else
             value="{{ empty(old('pergunta')) ? request()->pergunta : old('pergunta') }}"
+            @endif
         />
         @if($errors->has('pergunta'))
         <div class="invalid-feedback">

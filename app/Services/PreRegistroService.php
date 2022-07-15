@@ -295,7 +295,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         // $canFiltroRegional = auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user());
         if($user->idregional == 14)
             $user->idregional = 1;
-
+            
         return [
             'regional' => $request->filled('regional') /*&& $canFiltroRegional*/ ? $request->regional : $user->idregional,
             'status' => $request->filled('status') && in_array($request->status, PreRegistro::getStatus()) ? $request->status : 'Qualquer',
@@ -573,8 +573,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $preRegistro = PreRegistro::findOrFail($idPreRegistro);
 
         // Atendente não pode editar um pré-registro com status diferente de analise inicial e analise da correção
-        if(!isset($preRegistro->status) || !$preRegistro->atendentePodeEditar())
-            throw new \Exception('Não autorizado a editar o pré-registro sem status, aguardando correção ou finalizado', 401);
+        if(!isset($preRegistro->status) || !$preRegistro->atendentePodeEditar() || ($preRegistro->anexos->count() == 0))
+            return null;
             
         return $preRegistro->anexos->first()->getOpcoesPreRegistro();
     }

@@ -38,9 +38,39 @@ $factory->state(PreRegistro::class, 'low', function (Faker $faker) {
     ];
 });
 
+$factory->state(PreRegistro::class, 'pj', function (Faker $faker) {
+    return [
+        'user_externo_id' => factory('App\UserExterno')->state('pj'),
+    ];
+});
+
 $factory->state(PreRegistro::class, 'analise_inicial', function (Faker $faker) {
     return [
         'status' => PreRegistro::STATUS_ANALISE_INICIAL,
         'idusuario' => null,
+    ];
+});
+
+$factory->state(PreRegistro::class, 'enviado_correcao', function (Faker $faker) {
+    return [
+        'status' => PreRegistro::STATUS_CORRECAO,
+    ];
+});
+
+$factory->state(PreRegistro::class, 'analise_correcao', function (Faker $faker) {
+    return [
+        'status' => PreRegistro::STATUS_ANALISE_CORRECAO,
+    ];
+});
+
+$factory->state(PreRegistro::class, 'aprovado', function (Faker $faker) {
+    return [
+        'status' => PreRegistro::STATUS_APROVADO,
+    ];
+});
+
+$factory->state(PreRegistro::class, 'negado', function (Faker $faker) {
+    return [
+        'status' => PreRegistro::STATUS_NEGADO,
     ];
 });

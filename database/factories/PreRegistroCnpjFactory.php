@@ -23,7 +23,7 @@ $factory->define(PreRegistroCnpj::class, function (Faker $faker) {
         'uf' => 'SP',
         'historico_rt' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
         'responsavel_tecnico_id' => factory('App\ResponsavelTecnico'),
-        'pre_registro_id' => factory('App\PreRegistro'),
+        'pre_registro_id' => factory('App\PreRegistro')->state('pj'),
     ];
 });
 
@@ -31,5 +31,28 @@ $factory->state(PreRegistroCnpj::class, 'low', function (Faker $faker) {
     return [
         'razao_social' => $faker->company,
         'tipo_empresa' => tipos_empresa()[0],
+    ];
+});
+
+$factory->state(PreRegistroCnpj::class, 'justificado', function (Faker $faker) {
+    $campos = ['segmento','cep','logradouro','numero','complemento','bairro','cidade','uf','telefone','telefone_1','tipo_telefone',
+    'tipo_telefone_1','opcional_celular','opcional_celular_1','idregional','path','cnpj_contabil','nome_contabil','email_contabil','nome_contato_contabil',
+    'telefone_contabil','cpf_rt','registro','nome_rt','nome_social_rt','sexo_rt','dt_nascimento_rt','cep_rt','logradouro_rt','numero_rt','complemento_rt',
+    'bairro_rt','cidade_rt','uf_rt','nome_mae_rt','nome_pai_rt','tipo_identidade_rt','identidade_rt','orgao_emissor_rt','dt_expedicao_rt','razao_social',
+    'nire','tipo_empresa','dt_inicio_atividade','inscricao_municipal','inscricao_estadual','capital_social','cep_empresa','logradouro_empresa','numero_empresa',
+    'complemento_empresa','bairro_empresa','cidade_empresa','uf_empresa'];
+    $arrayFinal = array();
+    foreach($campos as $campo)
+        $arrayFinal[$campo] = $faker->text(500);
+
+    $pr = factory('App\PreRegistro')->state('analise_inicial')->create([
+        'user_externo_id' => factory('App\UserExterno')->create([
+            'cpf_cnpj' => '06985713000138'
+        ]),
+        'justificativa' => json_encode($arrayFinal, JSON_FORCE_OBJECT)
+    ]);
+
+    return [
+        'pre_registro_id' => $pr->id,
     ];
 });

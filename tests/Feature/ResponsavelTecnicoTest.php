@@ -19,9 +19,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function view_msg_update()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
         ->assertSeeText('Atualizado em: ')
@@ -49,9 +47,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function can_update_table_responsaveis_tecnicos_by_ajax()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -75,9 +71,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function can_update_table_responsaveis_tecnicos_by_ajax_with_upperCase()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -125,9 +119,7 @@ class ResponsavelTecnicoTest extends TestCase
             ])
         ]);
 
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -180,9 +172,7 @@ class ResponsavelTecnicoTest extends TestCase
             ])
         ]);
 
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $rt = factory('App\ResponsavelTecnico')->raw();
@@ -213,9 +203,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_wrong_input_name()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -238,9 +226,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_classe()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -264,9 +250,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_wrong_classe()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -290,9 +274,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_campo()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -316,9 +298,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_input_type_text_more_191_chars()
     {
         $faker = \Faker\Factory::create();
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = [
@@ -352,9 +332,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_cpf_wrong()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
@@ -375,9 +353,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_under_18_years_old()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
@@ -398,9 +374,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_with_dt_expedicao_after_today()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $this->post(route('externo.inserir.preregistro.ajax'), [
@@ -421,9 +395,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_date_type()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $datas = [
@@ -448,9 +420,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_without_relationship()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -477,9 +447,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_when_remove_relationship()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -513,9 +481,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function get_responsavel_tecnico_by_ajax_when_exists_in_database()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = factory('App\ResponsavelTecnico')->create();
@@ -531,9 +497,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function get_responsavel_tecnico_by_ajax_when_exists_in_gerenti()
     {
         // Caso dê erro, analisar o GerentiMock para editar em gerentiBusca(), em pessoa física, no campo ASS_TP_ASSOC para 5
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $rt = [
@@ -560,9 +524,7 @@ class ResponsavelTecnicoTest extends TestCase
     /** @test */
     public function cannot_update_table_responsaveis_tecnicos_by_ajax_when_clean_inputs()
     {
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
@@ -670,9 +632,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function can_submit_pre_registro_cnpj_if_rt_exists_in_database()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $rt = factory('App\ResponsavelTecnico')->state('low')->create();
 
@@ -729,9 +689,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         // Caso dê erro, analisar o GerentiMock para editar em gerentiBusca(), em pessoa física, no campo ASS_TP_ASSOC para 5
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $rt = factory('App\ResponsavelTecnico')->state('low')->raw([
             'cpf' => '86294373085',
@@ -784,9 +742,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_cpf_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -829,9 +785,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_cpf_rt_with_wrong_value()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -874,9 +828,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_nome_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -920,9 +872,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -966,9 +916,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1012,9 +960,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1058,9 +1004,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1103,9 +1047,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_sexo_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1148,9 +1090,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_sexo_rt_wrong_value()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1193,9 +1133,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_dt_nascimento_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1238,9 +1176,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_dt_nascimento_rt_without_date_type()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1283,9 +1219,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_dt_nascimento_rt_under_18_years_old()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1328,9 +1262,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_tipo_identidade_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1373,9 +1305,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_tipo_identidade_rt_with_wrong_value()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1418,9 +1348,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_identidade_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1463,9 +1391,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_identidade_rt_more_than_30_chars()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1508,9 +1434,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_orgao_emissor_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1554,9 +1478,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1599,9 +1521,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_dt_expedicao_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1644,9 +1564,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_dt_expedicao_rt_without_date_type()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1689,9 +1607,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_dt_expedicao_rt_after_today()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1734,9 +1650,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_cep_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1779,9 +1693,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_cep_rt_more_than_9_chars()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1824,9 +1736,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_bairro_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1870,9 +1780,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1915,9 +1823,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_logradouro_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -1961,9 +1867,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2006,9 +1910,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_numero_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2051,9 +1953,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_numero_rt_more_than_10_chars()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2097,9 +1997,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2142,9 +2040,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_cidade_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2188,9 +2084,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2233,9 +2127,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_uf_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2278,9 +2170,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_with_uf_rt_with_wrong_value()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2323,9 +2213,7 @@ class ResponsavelTecnicoTest extends TestCase
     public function cannot_submit_pre_registro_cnpj_without_nome_mae_rt()
     {
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2369,9 +2257,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2415,9 +2301,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2461,9 +2345,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2507,9 +2389,7 @@ class ResponsavelTecnicoTest extends TestCase
     {
         $faker = \Faker\Factory::create();
         Storage::fake('local');
-        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]));
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
 
         $preRegistro = factory('App\PreRegistro')->state('low')->raw([
             'id' => 1,
@@ -2546,5 +2426,72 @@ class ResponsavelTecnicoTest extends TestCase
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_pai_rt');
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO-CPF - ADMIN
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function view_pre_registro_rt()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->create();
+        $preRegistroCnpj->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+        $rt = $preRegistroCnpj->responsavelTecnico;
+        
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText(formataRegistro($rt->registro))
+        ->assertSeeText(formataCpfCnpj($rt->cpf))
+        ->assertSeeText($rt->nome)
+        ->assertSeeText($rt->nome_social)
+        ->assertSeeText(onlyDate($rt->dt_nascimento))
+        ->assertSeeText($rt->sexo)
+        ->assertSeeText($rt->nome_mae)
+        ->assertSeeText($rt->nome_pai)
+        ->assertSeeText($rt->tipo_identidade)
+        ->assertSeeText($rt->identidade)
+        ->assertSeeText($rt->orgao_emissor)
+        ->assertSeeText(onlyDate($rt->dt_expedicao))
+        ->assertSeeText($rt->cep)
+        ->assertSeeText($rt->logradouro)
+        ->assertSeeText($rt->numero)
+        ->assertSeeText($rt->complemento)
+        ->assertSeeText($rt->bairro)
+        ->assertSeeText($rt->cidade)
+        ->assertSeeText($rt->uf);
+    }
+
+    /** @test */
+    public function view_text_justificado_rt()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCnpj = factory('App\PreRegistroCnpj')->state('justificado')->create();
+        $justificativas = $preRegistroCnpj->preRegistro->getJustificativaArray();
+
+        $this->get(route('preregistro.view', $preRegistroCnpj->preRegistro->id))
+        ->assertSeeText($justificativas['registro'])
+        ->assertSeeText($justificativas['cpf_rt'])
+        ->assertSeeText($justificativas['nome_rt'])
+        ->assertSeeText($justificativas['nome_social_rt'])
+        ->assertSeeText($justificativas['dt_nascimento_rt'])
+        ->assertSeeText($justificativas['sexo_rt'])
+        ->assertSeeText($justificativas['nome_mae_rt'])
+        ->assertSeeText($justificativas['nome_pai_rt'])
+        ->assertSeeText($justificativas['tipo_identidade_rt'])
+        ->assertSeeText($justificativas['identidade_rt'])
+        ->assertSeeText($justificativas['orgao_emissor_rt'])
+        ->assertSeeText($justificativas['dt_expedicao_rt'])
+        ->assertSeeText($justificativas['cep_rt'])
+        ->assertSeeText($justificativas['logradouro_rt'])
+        ->assertSeeText($justificativas['numero_rt'])
+        ->assertSeeText($justificativas['complemento_rt'])
+        ->assertSeeText($justificativas['bairro_rt'])
+        ->assertSeeText($justificativas['cidade_rt'])
+        ->assertSeeText($justificativas['uf_rt']);
     }
 }
