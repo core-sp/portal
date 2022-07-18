@@ -236,8 +236,8 @@
                 
                 <!-- Modal body -->
                 <div class="modal-body">
-                    Texto....
-                    Sua solicitação de registro para ser <strong>REPRESENTANTE COMERCIAL</strong>
+                    Sua solicitação não possui pendências. <br>Você pode prosseguir com o pedido de registro no CORE-SP para ser
+                    <strong>REPRESENTANTE COMERCIAL</strong>
                 </div>
                 
                 <!-- Modal footer -->

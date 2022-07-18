@@ -105,7 +105,7 @@ class UserExternoSiteController extends Controller
             $externo = auth()->guard('user_externo')->user();
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
             $gerenti = $dados['gerenti'];
-            $resultado = isset($gerenti) ? null : $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo)['resultado'];
+            $resultado = isset($gerenti) ? null : $externo->load('preRegistro')->preRegistro;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao verificar os dados para permitir ou não a solicitação de registro');

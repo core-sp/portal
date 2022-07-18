@@ -15,7 +15,7 @@
         <div class="linha-lg-mini mb-2"></div>
             <div class="list-group w-100">
                 <div class="d-block mt-2 mb-3">
-                    <p>Algum texto explicando sobre o formulário, e onde pode visualizar a atual situação da solicitação</p>
+                    <p>Algum texto explicando sobre o formulário</p>
                     <br>
                     @if(isset($gerenti))
                     <p>Você já possui registro ativo no Core-SP: <strong>{{ formataRegistro($gerenti) }}</strong></p>
@@ -35,6 +35,7 @@
                                 name="checkPreRegistro"
                                 class="form-check-input"
                                 required
+                                {{ isset($resultado->status) ? 'checked' : '' }}
                             /> 
                             <label for="termo" class="text-justify">
                                 Estou ciente que iniciarei o processo de solicitação de registro para ser <strong>REPRESENTANTE COMERCIAL</strong>
