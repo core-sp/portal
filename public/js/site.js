@@ -1212,16 +1212,16 @@ function getErrorMsg(request)
 	return [errorMessage, time];
 }
 
-function confereEnderecoEmpresa()
-{
-	var cep = $('#inserirRegistro input[name="cep"]').val().trim() == "";
-	var logradouro = $('#inserirRegistro input[name="logradouro"]').val().trim() == "";
-	var bairro = $('#inserirRegistro input[name="bairro"]').val().trim() == "";
-	var cidade = $('#inserirRegistro input[name="cidade"]').val().trim() == "";
-	var uf = $('#inserirRegistro select[name="uf"]:selected').val() == "";
+// function confereEnderecoEmpresa()
+// {
+// 	var cep = $('#inserirRegistro input[name="cep"]').val().trim() == "";
+// 	var logradouro = $('#inserirRegistro input[name="logradouro"]').val().trim() == "";
+// 	var bairro = $('#inserirRegistro input[name="bairro"]').val().trim() == "";
+// 	var cidade = $('#inserirRegistro input[name="cidade"]').val().trim() == "";
+// 	var uf = $('#inserirRegistro select[name="uf"]:selected').val() == "";
 
-	return cep || logradouro || bairro || cidade || uf;
-}
+// 	return cep || logradouro || bairro || cidade || uf;
+// }
 
 function preencheContabil(dados)
 {
@@ -1499,8 +1499,9 @@ $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(functio
 });
 
 $('#inserirRegistro input:checkbox').change(function(){
-	var endEmpresa = ($(this).attr('name') == 'checkEndEmpresa') && confereEnderecoEmpresa();
-	if((this.checked && !endEmpresa) || ($(this).attr('name') != 'checkEndEmpresa'))
+	var checkMesmoEndereco = $(this).attr('name') == 'checkEndEmpresa';
+	// var endEmpresa = confereEnderecoEmpresa();
+	if((this.checked && /*!endEmpresa && */checkMesmoEndereco) || !checkMesmoEndereco)
 		putDadosPreRegistro($(this));
 });
 
