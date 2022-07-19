@@ -26,7 +26,7 @@ class AgendamentoBloqueioController extends Controller
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os bloqueios dos agendamentos.");
         }
 
@@ -42,7 +42,7 @@ class AgendamentoBloqueioController extends Controller
             $variaveis = $dados['variaveis'];
             $regionais = $dados['regionais'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para criar o bloqueio do agendamento.");
         }
 
@@ -57,7 +57,7 @@ class AgendamentoBloqueioController extends Controller
             $validated = $request->validated();
             $this->service->getService('Agendamento')->saveBloqueio($validated, $this->service);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar o bloqueio do agendamento.");
         }
 
@@ -76,7 +76,7 @@ class AgendamentoBloqueioController extends Controller
             $resultado = $dados['resultado'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para atualizar o bloqueio do agendamento.");
         }
 
@@ -91,7 +91,7 @@ class AgendamentoBloqueioController extends Controller
             $validated = $request->validated();
             $this->service->getService('Agendamento')->saveBloqueio($validated, $this->service, $id);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o bloqueio do agendamento.");
         }
 
@@ -108,7 +108,7 @@ class AgendamentoBloqueioController extends Controller
         try{
             $this->service->getService('Agendamento')->delete($id);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao excluir o bloqueio do agendamento.");
         }
 
@@ -129,7 +129,7 @@ class AgendamentoBloqueioController extends Controller
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em bloqueios.");
         }
 
@@ -148,7 +148,7 @@ class AgendamentoBloqueioController extends Controller
             ];
             
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar os dados da regional.");
         }
 

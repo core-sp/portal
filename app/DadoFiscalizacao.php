@@ -8,7 +8,7 @@ class DadoFiscalizacao extends Model
 {
     protected $table = 'dados_fiscalizacao';
     protected $guarded = [];
-    protected $with = ['regional'];
+    // protected $with = ['regional'];
 
     public function regional()
     {
@@ -17,6 +17,6 @@ class DadoFiscalizacao extends Model
 
     public function ano()
     {
-    	return $this->belongsTo('App\PeriodoFiscalizacao', 'ano');
+    	return $this->belongsTo('App\PeriodoFiscalizacao', 'idperiodo');
     }
 }

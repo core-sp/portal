@@ -8,7 +8,7 @@ class PeriodoFiscalizacao extends Model
 {
     protected $table = 'periodos_fiscalizacao';
     protected $guarded = [];
-    protected $with = ['dadoFiscalizacao'];
+    // protected $with = ['dadoFiscalizacao'];
 
     const STATUS_PUBLICADO = 'Publicado';
     const STATUS_NAO_PUBLICADO = 'Não Publicado';

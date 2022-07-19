@@ -171,7 +171,7 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
         $this->put(route('agendamentos.update', $agendamento->idagendamento), $agendamento->toArray())
-        ->assertStatus(500)
+        ->assertStatus(400)
         ->assertSee('Erro por falta de campo no request');
 
         $this->assertDatabaseMissing('agendamentos', [
@@ -192,7 +192,7 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
         $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)
-        ->assertStatus(500)
+        ->assertStatus(400)
         ->assertSee('Erro na validação de campo no request');
 
         $this->assertDatabaseMissing('agendamentos', [
@@ -209,7 +209,7 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
         $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)
-        ->assertStatus(500)
+        ->assertStatus(400)
         ->assertSee('Erro na validação de campo no request');
 
         $this->assertDatabaseMissing('agendamentos', [
