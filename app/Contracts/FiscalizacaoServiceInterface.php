@@ -10,7 +10,7 @@ interface FiscalizacaoServiceInterface {
 
     public function view($id = null);
 
-    public function save($validated, MediadorServiceInterface $service, $id = null);
+    public function save($validated, MediadorServiceInterface $service = null, $id = null);
 
     public function updateStatus($id);
 

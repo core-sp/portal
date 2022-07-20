@@ -8,17 +8,67 @@ use Faker\Generator as Faker;
 
 $factory->define(DadoFiscalizacao::class, function (Faker $faker) {
     return [
-        "idregional" => 1,
-        "idperiodo" => 1,
-        "processofiscalizacaopf" => 1,
-        "processofiscalizacaopj" => 2,
-        "registroconvertidopf" => 3,
-        "registroconvertidopj" => 4,
-        "processoverificacao" => 5,
-        "dispensaregistro" => 6,
-        "notificacaort" => 7,
-        "orientacaorepresentada" => 8,
-        "orientacaorepresentante" => 9,
-        "cooperacaoinstitucional" => 10
+        "idregional" => factory('App\Regional'),
+        "idperiodo" => factory('App\PeriodoFiscalizacao'),
+        "processofiscalizacaopf" => $faker->numberBetween(0, 999999999),
+        "processofiscalizacaopj" => $faker->numberBetween(0, 999999999),
+        "registroconvertidopf" => $faker->numberBetween(0, 999999999),
+        "registroconvertidopj" => $faker->numberBetween(0, 999999999),
+        "processoverificacao" => $faker->numberBetween(0, 999999999),
+        "dispensaregistro" => $faker->numberBetween(0, 999999999),
+        "notificacaort" => $faker->numberBetween(0, 999999999),
+        "orientacaorepresentada" => $faker->numberBetween(0, 999999999),
+        "orientacaorepresentante" => $faker->numberBetween(0, 999999999),
+        "cooperacaoinstitucional" => $faker->numberBetween(0, 999999999),
+        "autoconstatacao" => $faker->numberBetween(0, 999999999),
+        "autosdeinfracao" => $faker->numberBetween(0, 999999999),
+        "multaadministrativa" => $faker->numberBetween(0, 999999999),
+    ];
+});
+
+$factory->state(DadoFiscalizacao::class, 'raw_request', function ($faker) {
+    $cont = 0;
+    $final = array();
+    $dados = [
+        'id' => 1,
+        'campo' => [
+            "processofiscalizacaopf",
+            "processofiscalizacaopj",
+            "registroconvertidopf",
+            "registroconvertidopj",
+            "processoverificacao",
+            "dispensaregistro",
+            "notificacaort",
+            "orientacaorepresentada",
+            "orientacaorepresentante",
+            "cooperacaoinstitucional",
+            "autoconstatacao",
+            "autosdeinfracao",
+            "multaadministrativa",
+        ],
+        'valor' => [
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+            $faker->numberBetween(0, 999999999),
+        ],
+    ];
+    for($i = 0; $i < 13; $i++)
+    {
+        $dados['id'] = $i + 1;
+        $final[$i] = $dados;
+    }
+
+    return [
+        'final' => $final
     ];
 });

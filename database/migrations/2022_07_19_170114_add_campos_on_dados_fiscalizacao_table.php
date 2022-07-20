@@ -15,8 +15,8 @@ class AddCamposOnDadosFiscalizacaoTable extends Migration
     {
         Schema::table('dados_fiscalizacao', function (Blueprint $table) {
             $table->Integer('autoconstatacao')->after('cooperacaoinstitucional')->default('0');
-            $table->Integer('autosdeinfracao')->default('0');
-            $table->Integer('multaadministrativa')->default('0');
+            $table->Integer('autosdeinfracao')->after('autoconstatacao')->default('0');
+            $table->Integer('multaadministrativa')->after('autosdeinfracao')->default('0');
         });
     }
 

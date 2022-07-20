@@ -3,6 +3,9 @@
     @if(isset($resultado))
         @method('PUT')
     @endif
+    @php
+        $cont = 0;
+    @endphp
     <div class="card-body">
         <div class="form-row mb-2">
             <div class="col">
@@ -15,196 +18,320 @@
             </div>
         </div>
         @foreach($resultado->dadoFiscalizacao as $r)
+        @php
+            $contCampos = 0;
+        @endphp
+        <input type="hidden" name="dados[{{ $cont }}][id]" value="{{ $r->id }}" />
         <hr>
         <h3>{{ $r->regional->prefixo }} - {{ $r->regional->regional }} </h3>
         <div class="form-row mb-2">
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="processofiscalizacaopf" />
                 <label for="processofiscalizacaopf">Processos de Fiscalização PF</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.processofiscalizacaopf') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][processofiscalizacaopf]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['processofiscalizacaopf'] : $r->processofiscalizacaopf }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->processofiscalizacaopf }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.processofiscalizacaopf'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.processofiscalizacaopf') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="processofiscalizacaopj" />
                 <label for="processofiscalizacaopj">Processos de Fiscalização PJ</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.processofiscalizacaopj') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][processofiscalizacaopj]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['processofiscalizacaopj'] : $r->processofiscalizacaopj }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->processofiscalizacaopj }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.processofiscalizacaopj'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.processofiscalizacaopj') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="registroconvertidopf" />
                 <label for="registroconvertidopf">Registros Convertidos PF</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.registroconvertidopf') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][registroconvertidopf]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['registroconvertidopf'] : $r->registroconvertidopf }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->registroconvertidopf }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.registroconvertidopf'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.registroconvertidopf') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="registroconvertidopj" />
                 <label for="registroconvertidopj">Registros Convertidos PJ</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.registroconvertidopj') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][registroconvertidopj]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['registroconvertidopj'] : $r->registroconvertidopj }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->registroconvertidopj }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.registroconvertidopj'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.registroconvertidopj') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="processoverificacao" />
                 <label for="processoverificacao">Processos de Verificação</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.processoverificacao') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][processoverificacao]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['processoverificacao'] : $r->processoverificacao }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->processoverificacao }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.processoverificacao'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.processoverificacao') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
         </div>
 
         <div class="form-row mb-2">
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="dispensaregistro" />
                 <label for="dispensaregistro">Dispensa de Registro</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.dispensaregistro') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][dispensaregistro]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['dispensaregistro'] : $r->dispensaregistro }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->dispensaregistro }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.dispensaregistro'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.dispensaregistro') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="notificacaort" />
                 <label for="notificacaort">Notificações de RT</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.notificacaort') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][notificacaort]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['notificacaort'] : $r->notificacaort }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->notificacaort }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.notificacaort'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.notificacaort') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="orientacaorepresentada" />
                 <label for="orientacaorepresentada">Orientações às representadas</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.orientacaorepresentada') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][orientacaorepresentada]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['orientacaorepresentada'] : $r->orientacaorepresentada }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->orientacaorepresentada }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.orientacaorepresentada'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.orientacaorepresentada') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="orientacaorepresentante" />
                 <label for="orientacaorepresentante">Orientações aos RCs</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.orientacaorepresentante') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][orientacaorepresentante]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['orientacaorepresentante'] : $r->orientacaorepresentante }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->orientacaorepresentante }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.orientacaorepresentante'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.orientacaorepresentante') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="cooperacaoinstitucional" />
                 <label for="cooperacaoinstitucional">Cooperação Institucional</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.cooperacaoinstitucional') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][cooperacaoinstitucional]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['cooperacaoinstitucional'] : $r->cooperacaoinstitucional }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->cooperacaoinstitucional }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.cooperacaoinstitucional'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.cooperacaoinstitucional') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
         </div>
 
         <div class="form-row mb-2">
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="autoconstatacao" />
                 <label for="autoconstatacao">Autos de Constatação</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.autoconstatacao') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][autoconstatacao]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['autoconstatacao'] : $r->autoconstatacao }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->autoconstatacao }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.autoconstatacao'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.autoconstatacao') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="autosdeinfracao" />
                 <label for="autosdeinfracao">Autos de Infração</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.autosdeinfracao') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][autosdeinfracao]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['autosdeinfracao'] : $r->autosdeinfracao }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->autosdeinfracao }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.autosdeinfracao'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.autosdeinfracao') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
 
             <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="multaadministrativa" />
                 <label for="multaadministrativa">Multa Administrativa</label>
                 <input type="number"
-                    class="form-control {{ $errors->has('regional.' . $r->idregional . '.multaadministrativa') ? 'is-invalid' : '' }}"
-                    name="regional[{{ $r->idregional }}][multaadministrativa]"
-                    value="{{ count($errors) > 0 ? old('regional')[$r->idregional]['multaadministrativa'] : $r->multaadministrativa }}"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->multaadministrativa }}"
                 />
-                @if($errors->has('regional.' . $r->idregional . '.multaadministrativa'))
+                @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('regional.' . $r->idregional . '.multaadministrativa') }}
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
                 </div>
                 @endif
+                @php
+                    $contCampos++;
+                @endphp
             </div>
         </div>
         </br></br>
+        @php
+            $cont++;
+        @endphp
         @endforeach
     </div>
 

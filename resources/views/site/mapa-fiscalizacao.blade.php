@@ -52,6 +52,7 @@
         {!! file_get_contents((public_path() . '/img/sp.svg')) !!}
       </div>
 
+      @if(isset($periodoSelecionado))
       <div id="dados-fiscalizacao" class="col-lg-5 align-self-center text-center">
         <div id="instrucao-mapa" class="conteudo-txt">
           <p>Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano {{ $periodoSelecionado->periodo }}.<p>
@@ -125,8 +126,12 @@
         </div>
         @endforeach
 
+        @if(isset($dataAtualizacao))
         <p>Dados atualizados em: {{ $dataAtualizacao }}</p>
+        @endif
+
       </div>
+      @endif
     </div>  
     @endif
 

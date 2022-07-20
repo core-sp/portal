@@ -91,7 +91,7 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
         ];
     }
 
-    public function save($validated, MediadorServiceInterface $service, $id = null)
+    public function save($validated, MediadorServiceInterface $service = null, $id = null)
     {
         if(!isset($id))
         {
@@ -103,27 +103,11 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
 
             return null;
         }
-
+        
         $anoUpdate = PeriodoFiscalizacao::with(['dadoFiscalizacao', 'dadoFiscalizacao.regional'])->findOrFail($id);
-        $campos = array_keys($anoUpdate->dadoFiscalizacao->first()->toArray());
-        $regionais = $service->getService('Regional')->all()->slice(0,13)->modelKeys();
-        foreach($validated['regional'] as $key => $valor)
-        {
-            if(!in_array($key, $regionais))
-                return [
-                    'message' => '<i class="icon fa fa-ban"></i>Foi encontrada uma regional inexistente',
-                    'class' => 'alert-danger'
-                ];
-            foreach($valor as $campo => $val)
-                if(!in_array($campo, $campos))
-                    return [
-                        'message' => '<i class="icon fa fa-ban"></i>Foi encontrado um campo inexistente',
-                        'class' => 'alert-danger'
-                    ];
-        }
-
-        foreach($anoUpdate->dadoFiscalizacao as $dados)
-            $dados->update($validated['regional'][$dados->idregional]);
+        $dados = $anoUpdate->dadoFiscalizacao;
+        foreach($validated['dados'] as $key => $array)
+            $dados->find($array['id'])->update(array_combine($array['campo'], $array['valor']));
         event(new CrudEvent('dados do período da fiscalização', 'atualizados', $id));
 
         return null;

@@ -199,7 +199,7 @@ class FiscalizacaoController extends Controller
 
         try{
             $validated = $request->validated();
-            $erro = $this->service->getService('Fiscalizacao')->save($validated, $this->service, $id);
+            $erro = $this->service->getService('Fiscalizacao')->save($validated, null, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao editar os dados do período da fiscalização.");
