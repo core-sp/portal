@@ -108,7 +108,7 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
         $dados = $anoUpdate->dadoFiscalizacao;
         foreach($validated['dados'] as $key => $array)
             $dados->find($array['id'])->update(array_combine($array['campo'], $array['valor']));
-        event(new CrudEvent('dados do período da fiscalização', 'atualizados', $id));
+        event(new CrudEvent('dados do período da fiscalização', 'atualizou', $id));
 
         return null;
     }
@@ -117,9 +117,9 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
     {
         $resultado = PeriodoFiscalizacao::findOrFail($id);
         $valor = $resultado->status ? 0 : 1;
-        $texto = $resultado->status ? 'realizou a' : 'reverteu a';
+        $texto = $resultado->status ? 'realizou' : 'reverteu';
         $resultado->update(['status' => $valor]);
-        event(new CrudEvent('ano de fiscalização', $texto . ' publicação do período com ID', $id));
+        event(new CrudEvent($texto, ' atualizou a publicação do período da fiscalização com o status ', $id));
     }
 
     public function buscar($busca)

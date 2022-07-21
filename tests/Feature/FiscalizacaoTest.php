@@ -202,6 +202,576 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
+     * Usuário com autorização pode editar periodo de fiscalização.
+    */
+    public function authorized_users_can_edit_one_input_dados_fiscalizacao()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+                $dados['dados'][$key]['valor'] = array_values($temp);
+        }
+
+        $indice = 11;
+        $valor = 0;
+        $dados['dados'][$indice]['valor'][3] = $valor;
+        $nomeCampo = $dados['dados'][$indice]['campo'][3];
+        $dadoFiscalizacao->get($indice)->update([$nomeCampo => $valor]);
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_processofiscalizacaopf()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'processofiscalizacaopf')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->processofiscalizacaopf);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'processofiscalizacaopf' => $dadoFiscalizacao->get($i)->processofiscalizacaopf
+            ]);
+            $dadoFiscalizacao->get($i)->update(['processofiscalizacaopf' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_processofiscalizacaopj()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'processofiscalizacaopj')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->processofiscalizacaopj);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'processofiscalizacaopj' => $dadoFiscalizacao->get($i)->processofiscalizacaopj
+            ]);
+            $dadoFiscalizacao->get($i)->update(['processofiscalizacaopj' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_registroconvertidopf()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'registroconvertidopf')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->registroconvertidopf);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'registroconvertidopf' => $dadoFiscalizacao->get($i)->registroconvertidopf
+            ]);
+            $dadoFiscalizacao->get($i)->update(['registroconvertidopf' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_registroconvertidopj()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'registroconvertidopj')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->registroconvertidopj);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'registroconvertidopj' => $dadoFiscalizacao->get($i)->registroconvertidopj
+            ]);
+            $dadoFiscalizacao->get($i)->update(['registroconvertidopj' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_processoverificacao()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'processoverificacao')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->processoverificacao);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'processoverificacao' => $dadoFiscalizacao->get($i)->processoverificacao
+            ]);
+            $dadoFiscalizacao->get($i)->update(['processoverificacao' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_dispensaregistro()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'dispensaregistro')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->dispensaregistro);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'dispensaregistro' => $dadoFiscalizacao->get($i)->dispensaregistro
+            ]);
+            $dadoFiscalizacao->get($i)->update(['dispensaregistro' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_notificacaort()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'notificacaort')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->notificacaort);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'notificacaort' => $dadoFiscalizacao->get($i)->notificacaort
+            ]);
+            $dadoFiscalizacao->get($i)->update(['notificacaort' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_orientacaorepresentada()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'orientacaorepresentada')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->orientacaorepresentada);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'orientacaorepresentada' => $dadoFiscalizacao->get($i)->orientacaorepresentada
+            ]);
+            $dadoFiscalizacao->get($i)->update(['orientacaorepresentada' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_orientacaorepresentante()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'orientacaorepresentante')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->orientacaorepresentante);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'orientacaorepresentante' => $dadoFiscalizacao->get($i)->orientacaorepresentante
+            ]);
+            $dadoFiscalizacao->get($i)->update(['orientacaorepresentante' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_cooperacaoinstitucional()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'cooperacaoinstitucional')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->cooperacaoinstitucional);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'cooperacaoinstitucional' => $dadoFiscalizacao->get($i)->cooperacaoinstitucional
+            ]);
+            $dadoFiscalizacao->get($i)->update(['cooperacaoinstitucional' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_autoconstatacao()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'autoconstatacao')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->autoconstatacao);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'autoconstatacao' => $dadoFiscalizacao->get($i)->autoconstatacao
+            ]);
+            $dadoFiscalizacao->get($i)->update(['autoconstatacao' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_autosdeinfracao()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'autosdeinfracao')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->autosdeinfracao);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'autosdeinfracao' => $dadoFiscalizacao->get($i)->autosdeinfracao
+            ]);
+            $dadoFiscalizacao->get($i)->update(['autosdeinfracao' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_multaadministrativa()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'multaadministrativa')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->multaadministrativa);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'multaadministrativa' => $dadoFiscalizacao->get($i)->multaadministrativa
+            ]);
+            $dadoFiscalizacao->get($i)->update(['multaadministrativa' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
      * Usuário com autorização pode publicar periodo de fiscalização.
     */
     public function authorized_users_can_publish_periodo_fiscalizacao()
@@ -267,90 +837,645 @@ class FiscalizacaoTest extends TestCase
         $this->assertEquals(PeriodoFiscalizacao::count(), 0);
     }
 
-    // /** 
-    //  * =======================================================================================================
-    //  * TESTES NO PORTAL
-    //  * =======================================================================================================
-    //  */
+    /** @test 
+     * 
+    */
+    public function cannot_create_periodo_with_less_than_4_chars()
+    {
+        $this->signInAsAdmin();
 
-    // /** @test 
-    //  * 
-    //  * Testando acesso a página do mapa.
-    // */
-    // public function access_mapas_from_portal()
-    // {
-    //     $this->get(route("fiscalizacao.mapa"))->assertOk();
-    // }
+        $atributos = factory("App\PeriodoFiscalizacao")->raw([
+            "periodo" => 202
+        ]);
 
-    // /** @test 
-    //  * 
-    //  * Se nenhum periodo estiver publicado, mapa deve ser aberto com o combobox desabilitado e
-    //  * com o valor "Indisponível".
-    // */
-    // public function access_periodo_mapas_from_portal_with_no_periodo_published()
-    // {
-    //     $this->get(route("fiscalizacao.mapa"))
-    //         ->assertOk()
-    //         ->assertSee("Indisponível");
-    // }
+        $this->post(route("fiscalizacao.storeperiodo", $atributos))
+        ->assertSessionHasErrors("periodo");
 
-    // /** @test 
-    //  * 
-    //  * Se algum periodo estiver publicado, mapa deve ser aberto com o combobox habilitado e
-    //  * com o valores dos periodos publicados.
-    // */
-    // public function access_periodo_mapas_from_portal_with_periodo_published()
-    // {
-    //     $periodo2020 = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
-    //     $periodo2021 = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2021, "status" => 1]);
+        $this->assertEquals(PeriodoFiscalizacao::count(), 0);
+    }
 
-    //     factory("App\Regional")->create();
-    //     factory("App\DadoFiscalizacao")->create(["idperiodo" => $periodo2020->id]);
-    //     factory("App\DadoFiscalizacao")->create(["idperiodo" => $periodo2021->id]);
+    /** @test 
+     * 
+    */
+    public function cannot_create_periodo_with_date_before_2000()
+    {
+        $this->signInAsAdmin();
 
-    //     $this->get(route("fiscalizacao.mapa"))
-    //         ->assertOk()
-    //         ->assertSee("2020")
-    //         ->assertSee("2021");
-    // }
+        $atributos = factory("App\PeriodoFiscalizacao")->raw([
+            "periodo" => 1999
+        ]);
 
-    // /** @test 
-    //  * 
-    //  * periodos publicados devem mostrar seus respectivos dados de fiscalização.
-    //  * Página padrão sempre mostrar o maior periodo.
-    // */
-    // public function access_periodo_mapas_from_portal_with_dados()
-    // {
-    //     factory("App\Regional")->create();
-    //     factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
-    //     factory("App\DadoFiscalizacao")->create(["processofiscalizacaopf" => 11111]);
+        $this->post(route("fiscalizacao.storeperiodo", $atributos))
+        ->assertSessionHasErrors("periodo");
 
-    //     $this->get(route("fiscalizacao.mapa"))
-    //         ->assertOk()
-    //         ->assertSee("11111");
-    // }
+        $this->assertEquals(PeriodoFiscalizacao::count(), 0);
+    }
 
-    // /** @test 
-    //  * 
-    //  * Múltiplos periodos publicados devem mostrar seus respectivos dados de fiscalização.
-    // */
-    // public function access_periodo_mapas_from_portal_with_multiple_periodos_and_dados()
-    // {
-    //     $periodo2020 = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2020, "status" => 1]);
-    //     $periodo2021 = factory("App\PeriodoFiscalizacao")->create(["periodo" => 2021, "status" => 1]);
+    /** @test 
+     * 
+    */
+    public function cannot_create_periodo_without_date_format()
+    {
+        $this->signInAsAdmin();
 
-    //     factory("App\Regional")->create();
-    //     factory("App\DadoFiscalizacao")->create(["idperiodo" => $periodo2020->id, "processofiscalizacaopf" => 11111]);
-    //     factory("App\DadoFiscalizacao")->create(["idperiodo" => $periodo2021->id, "processofiscalizacaopf" => 22222]);
+        $atributos = factory("App\PeriodoFiscalizacao")->raw([
+            "periodo" => '202A'
+        ]);
 
-    //     $this->get(route("fiscalizacao.mapaperiodo", $periodo2020->id))
-    //         ->assertOk()
-    //         ->assertSee("11111")
-    //         ->assertDontSee("22222");
+        $this->post(route("fiscalizacao.storeperiodo", $atributos))
+        ->assertSessionHasErrors("periodo");
 
-    //     $this->get(route("fiscalizacao.mapaperiodo", $periodo2021->id))
-    //         ->assertOk()
-    //         ->assertDontSee("11111")
-    //         ->assertSee("22222");
-    // }
+        $this->assertEquals(PeriodoFiscalizacao::count(), 0);
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_with_array_less_than_13()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        unset($dados['dados'][12]);
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_without_array_format()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), ['dados' => 'teste'])
+        ->assertSessionHasErrors("dados");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_without_array()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), ['dados' => null])
+        ->assertSessionHasErrors("dados");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_with_wrong_id()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id,
+        ])['final'];  
+        $dados['dados'][0]['id'] = 25;
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.id");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_with_duplicated_id()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id,
+        ])['final'];  
+        $dados['dados'][0]['id'] = 2;
+        $dados['dados'][2]['id'] = 2;
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.id");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_without_id()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id,
+        ])['final'];  
+        $dados['dados'][0]['id'] = null;
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.id");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_with_campo_array_less_than_13()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        unset($dados['dados'][0]['campo'][12]);
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.campo");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_without_campo_array_format()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        $dados['dados'][0]['campo'] = 'teste';
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.campo");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_without_campo_array()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        $dados['dados'][0]['campo'] = null;
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.campo");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_without_value_in_campo_array()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        $dados['dados'][0]['campo'][0] = null;
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.campo.*");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_with_wrong_value_in_campo_array()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        $dados['dados'][0]['campo'][0] = 'teste';
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.campo.*");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_with_valor_array_less_than_13()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        unset($dados['dados'][0]['valor'][12]);
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.valor");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_without_valor_array_format()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        $dados['dados'][0]['valor'] = 'teste';
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.valor");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_without_valor_array()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        $dados['dados'][0]['valor'] = null;
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.valor");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_without_value_in_valor_array()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        $dados['dados'][0]['valor'][0] = null;
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.valor.*");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_with_valor_not_integer()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        $dados['dados'][0]['valor'][0] = 'ABC';
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.valor.*");
+    }
+
+    /** @test 
+     * 
+    */
+    public function cannot_edit_dados_fiscalizacao_with_valor_more_than_999999999()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        $dados['dados'][0]['valor'][0] = 9999999991;
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.valor.*");
+    }
+
+    /** @test 
+     * 
+    */
+    public function view_inputs_when_edit_periodo_fiscalizacao()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        factory('App\DadoFiscalizacao')->create();
+        factory('App\DadoFiscalizacao')->create([
+                'idperiodo' => $periodoFiscalizacao->id
+        ]);  
+
+        $campos = array_keys(PeriodoFiscalizacao::with('dadoFiscalizacao')
+            ->find(1)
+            ->dadoFiscalizacao
+            ->get(0)
+            ->toArray()
+        );
+        unset($campos[array_search('id', $campos)]);
+        unset($campos[array_search('idregional', $campos)]);
+        unset($campos[array_search('idperiodo', $campos)]);
+        unset($campos[array_search('created_at', $campos)]);
+        unset($campos[array_search('updated_at', $campos)]);
+
+        $this->get(route("fiscalizacao.editperiodo", $periodoFiscalizacao->id))
+        ->assertSeeInOrder($campos);
+    }
+
+    /** @test */
+    public function log_is_generated_when_periodo_is_created()
+    {
+        $user = $this->signInAsAdmin();
+        $atributos = factory("App\PeriodoFiscalizacao")->raw();
+        $this->post(route("fiscalizacao.storeperiodo", $atributos));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('criou', $log);
+        $this->assertStringContainsString('período fiscalização', $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_status_periodo_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+        $atributos = factory("App\PeriodoFiscalizacao")->create();
+        $this->put(route("fiscalizacao.updatestatus", $atributos->id));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('reverteu', $log);
+        $this->assertStringContainsString('atualizou a publicação do período da fiscalização com o status', $log);
+
+        $this->put(route("fiscalizacao.updatestatus", $atributos->id));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('realizou', $log);
+        $this->assertStringContainsString('atualizou a publicação do período da fiscalização com o status', $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_periodo_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('atualizou', $log);
+        $this->assertStringContainsString('dados do período da fiscalização', $log);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES NO PORTAL
+     * =======================================================================================================
+     */
+
+    /** @test 
+     * 
+     * Testando acesso a página do mapa.
+    */
+    public function access_mapas_from_portal()
+    {
+        $this->get(route("fiscalizacao.mapa"))->assertOk();
+    }
+
+    /** @test 
+     * 
+    */
+    public function view_periodos_and_msg_when_access_mapas_from_portal()
+    {
+        $periodo = factory("App\PeriodoFiscalizacao")->create([
+            "status" => 1
+        ]);
+        factory("App\DadoFiscalizacao")->create([
+            "idperiodo" => $periodo->id
+        ]);
+
+        $this->get(route("fiscalizacao.mapa"))
+        ->assertOk()
+        ->assertSeeText($periodo->periodo)
+        ->assertSeeText('Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano ' . $periodo->periodo)
+        ->assertSeeText(onlyDate($periodo->dadoFiscalizacao->get(0)->updated_at));
+    }
+
+    /** @test 
+     * 
+     * Se nenhum periodo estiver publicado, mapa deve ser aberto com o combobox desabilitado e
+     * com o valor "Indisponível".
+    */
+    public function access_periodo_mapas_from_portal_with_no_periodo_published()
+    {
+        $this->get(route("fiscalizacao.mapa"))
+            ->assertOk()
+            ->assertSee("Indisponível");
+    }
+
+    /** @test 
+     * 
+     * Se algum periodo estiver publicado, mapa deve ser aberto com o combobox habilitado e
+     * com o valores dos periodos publicados.
+    */
+    public function access_periodo_mapas_from_portal_with_periodo_published()
+    {
+        $periodo2020 = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020, "status" => 1
+        ]);
+        $periodo2021 = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2021, "status" => 1
+        ]);
+
+        factory("App\DadoFiscalizacao")->create([
+            "idperiodo" => $periodo2020->id
+        ]);
+        factory("App\DadoFiscalizacao")->create([
+            "idperiodo" => $periodo2021->id
+        ]);
+
+        $this->get(route("fiscalizacao.mapa"))
+            ->assertOk()
+            ->assertSee("2020")
+            ->assertSee("2021")
+            ->assertSeeText(onlyDate($periodo2021->dadoFiscalizacao->get(0)->updated_at));
+    }
+
+    /** @test 
+     * 
+     * periodos publicados devem mostrar seus respectivos dados de fiscalização.
+     * Página padrão sempre mostrar o maior periodo.
+    */
+    public function access_periodo_mapas_from_portal_with_dados()
+    {
+        $fiscal = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020, 
+            "status" => 1
+        ]);
+        $dados = factory("App\DadoFiscalizacao")->create([
+            'idperiodo' => $fiscal->id
+        ]);
+
+        $this->get(route("fiscalizacao.mapaperiodo", $fiscal->id))
+            ->assertOk()
+            ->assertDontSeeText($dados->processofiscalizacaopf)
+            ->assertSeeText($dados->processofiscalizacaopj)
+            ->assertDontSeeText($dados->registroconvertidopf)
+            ->assertSeeText($dados->registroconvertidopj)
+            ->assertSeeText($dados->processoverificacao)
+            ->assertDontSeeText($dados->dispensaregistro)
+            ->assertSeeText($dados->notificacaort)
+            ->assertSeeText($dados->orientacaorepresentada)
+            ->assertDontSeeText($dados->orientacaorepresentante)
+            ->assertSeeText($dados->cooperacaoinstitucional)
+            ->assertSeeText($dados->autoconstatacao)
+            ->assertSeeText($dados->autosdeinfracao)
+            ->assertSeeText($dados->multaadministrativa)
+            ->assertSeeText(onlyDate($dados->updated_at));
+    }
+
+    /** @test 
+     * 
+     * Múltiplos periodos publicados devem mostrar seus respectivos dados de fiscalização.
+    */
+    public function access_periodo_mapas_from_portal_with_multiple_periodos_and_dados()
+    {
+        $periodo2020 = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020,
+            "status" => 1
+        ]);
+        $periodo2021 = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2021,
+            "status" => 1
+        ]);
+
+        factory("App\DadoFiscalizacao")->create([
+            "idperiodo" => $periodo2020->id,
+            "processofiscalizacaopj" => 11111
+        ]);
+        factory("App\DadoFiscalizacao")->create([
+            "idperiodo" => $periodo2021->id,
+            "processofiscalizacaopj" => 22222
+        ]);
+
+        $this->get(route("fiscalizacao.mapaperiodo", $periodo2020->id))
+            ->assertOk()
+            ->assertSee("11111")
+            ->assertDontSee("22222");
+
+        $this->get(route("fiscalizacao.mapaperiodo", $periodo2021->id))
+            ->assertOk()
+            ->assertDontSee("11111")
+            ->assertSee("22222");
+    }
+
+    /** @test 
+     * 
+     * periodos publicados devem mostrar seus respectivos dados de fiscalização.
+     * Página padrão sempre mostrar o maior periodo.
+    */
+    public function cannot_access_periodo_mapas_from_portal_with_dados_with_wrong_id()
+    {
+        $fiscal = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020, 
+            "status" => 1
+        ]);
+        $dados = factory("App\DadoFiscalizacao")->create([
+            'idperiodo' => $fiscal->id
+        ]);
+
+        $this->get(route("fiscalizacao.mapaperiodo", 22))
+            ->assertOk()
+            ->assertDontSeeText($dados->processofiscalizacaopf)
+            ->assertDontSeeText($dados->processofiscalizacaopj)
+            ->assertDontSeeText($dados->registroconvertidopf)
+            ->assertDontSeeText($dados->registroconvertidopj)
+            ->assertDontSeeText($dados->processoverificacao)
+            ->assertDontSeeText($dados->dispensaregistro)
+            ->assertDontSeeText($dados->notificacaort)
+            ->assertDontSeeText($dados->orientacaorepresentada)
+            ->assertDontSeeText($dados->orientacaorepresentante)
+            ->assertDontSeeText($dados->cooperacaoinstitucional)
+            ->assertDontSeeText($dados->autoconstatacao)
+            ->assertDontSeeText($dados->autosdeinfracao)
+            ->assertDontSeeText($dados->multaadministrativa)
+            ->assertDontSeeText('Clique em uma das regionais para obter mais detalhes sobre fiscalização do ano ' . $fiscal->periodo)
+            ->assertDontSeeText(onlyDate($dados->updated_at))
+            ->assertSeeText($fiscal->periodo);
+    }
 }

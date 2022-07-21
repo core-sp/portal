@@ -74,7 +74,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td class="text-left" style="width:50%; font-size: 15px">Processos de Fiscalização <small class="text-danger">*<small></td>
+                  <td class="text-left" style="width:50%; font-size: 15px">Processos de Fiscalização <!--<small class="text-danger">*<small>--></td>
                   <td style="width:20%">{{-- $r->processofiscalizacaopf --}}</td>
                   <td style="width:20%">{{ $r->processofiscalizacaopj }}</td>
                 </tr>

@@ -67,7 +67,6 @@ Route::prefix('admin')->group(function() {
     Route::get('/', 'FiscalizacaoController@index')->name('fiscalizacao.index');
     Route::get('/createPeriodo', 'FiscalizacaoController@createPeriodo')->name('fiscalizacao.createperiodo');
     Route::post('/createPeriodo', 'FiscalizacaoController@storePeriodo')->name('fiscalizacao.storeperiodo');
-    // Route::post('/updateStatus', 'FiscalizacaoController@updateStatus')->name('fiscalizacao.updatestatus');
     Route::put('/updateStatus/{id}', 'FiscalizacaoController@updateStatus')->name('fiscalizacao.updatestatus');
     Route::get('/busca', 'FiscalizacaoController@busca')->name('fiscalizacao.busca');
     Route::get('/editPeriodo/{id}', 'FiscalizacaoController@editPeriodo')->name('fiscalizacao.editperiodo');
@@ -277,8 +276,6 @@ Route::prefix('/')->group(function() {
   // Rotas para o SIG (Sistema de Informação Geográfico)
   Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
   Route::get('/mapa-fiscalizacao/{id}', 'FiscalizacaoController@mostrarMapaPeriodo')->name('fiscalizacao.mapaperiodo');
-
-  // Fiscalização
   Route::get('espaco-do-contador', 'SiteController@espacoContador')->name('fiscalizacao.espacoContador');
 
   // Simulador

@@ -30,8 +30,10 @@ class PeriodoFiscalizacaoRequest extends FormRequest
             'periodo.required_without' => 'Período obrigatório',
             'dados.required_without' => 'Dados obrigatórios',
             'dados.*.id.required_without' => 'Obrigatória a id dos dados',
-            'dados.*.campo.*.required_without' => 'Obrigatório o campo',
-            'dados.*.valor.*.required_without' => 'Obrigatório o valor',
+            'dados.*.campo.required_without' => 'Obrigatório o campo',
+            'dados.*.campo.*.required_without' => 'Obrigatório o nome do campo',
+            'dados.*.valor.required_without' => 'Obrigatório o valor',
+            'dados.*.valor.*.required_without' => 'Obrigatório inserir o valor',
             'date_format' => 'Ano inválido',
             'periodo.size' => 'O ano deve conter 4 dígitos',
             'after_or_equal' => 'O ano deve ser maior ou igual a 2000',
@@ -43,8 +45,8 @@ class PeriodoFiscalizacaoRequest extends FormRequest
             'exists' => 'ID inexistente',
             'in' => 'Nome do campo inválido',
             'dados.size' => 'Quantidade errada de regionais',
-            'campo.size' => 'Quantidade errada de campos',
-            'valor.size' => 'Quantidade errada de valores',
+            'dados.*.campo.size' => 'Quantidade errada de campos',
+            'dados.*.valor.size' => 'Quantidade errada de valores',
             'distinct' => 'Existe id repetida'
         ];
     }
