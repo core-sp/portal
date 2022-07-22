@@ -308,6 +308,7 @@ function noWeekendsOrHolidays(date) {
 	}
 }
 
+// Funcionalidade Mapa Fiscalização ++++++++++++++++++++++++++++++++++++++++
 $('.mapa_regional').on({
 	"click": function() {
 		$(".dado-regional").addClass('d-none');
@@ -324,6 +325,7 @@ $('#ano-mapa').on({
 		window.location.href = "/mapa-fiscalizacao/" + $(this).val();
 	},
 });
+// Fim da Funcionalidade Mapa Fiscalização ++++++++++++++++++++++++++++++++++++++++
 
 (function($){
 	$(function(){

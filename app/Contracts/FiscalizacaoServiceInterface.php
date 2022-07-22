@@ -14,5 +14,7 @@ interface FiscalizacaoServiceInterface {
 
     public function updateStatus($id);
 
+    public function buscar($busca);
+
     public function mapaSite($id = null);
 }

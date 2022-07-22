@@ -32,6 +32,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->processofiscalizacaopf }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -55,6 +56,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->processofiscalizacaopj }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -101,6 +103,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->registroconvertidopj }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -124,6 +127,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->processoverificacao }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -149,6 +153,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->dispensaregistro }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -172,6 +177,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->notificacaort }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -195,6 +201,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $contCampos) : $r->orientacaorepresentada }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -218,6 +225,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->orientacaorepresentante }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -241,6 +249,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->cooperacaoinstitucional }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -261,11 +270,12 @@
         <div class="form-row mb-2">
             <div class="col">
                 <input type="hidden" name="dados[{{ $cont }}][campo][]" value="autoconstatacao" />
-                <label for="autoconstatacao">Autos de Constatação</label>
+                <label for="autoconstatacao">Auto de Constatação</label>
                 <input type="number"
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->autoconstatacao }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -289,6 +299,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->autosdeinfracao }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">
@@ -312,6 +323,7 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->multaadministrativa }}"
+                    min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
                 <div class="invalid-feedback">

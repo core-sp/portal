@@ -117,7 +117,7 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
     {
         $resultado = PeriodoFiscalizacao::findOrFail($id);
         $valor = $resultado->status ? 0 : 1;
-        $texto = $resultado->status ? 'realizou' : 'reverteu';
+        $texto = $resultado->status ? 'não publicado' : 'publicado';
         $resultado->update(['status' => $valor]);
         event(new CrudEvent($texto, ' atualizou a publicação do período da fiscalização com o status ', $id));
     }

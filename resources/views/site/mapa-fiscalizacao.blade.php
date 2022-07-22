@@ -108,7 +108,7 @@
                   <td class="text-center" colspan="2">{{ $r->cooperacaoinstitucional }}</td>
                 </tr>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Autos de Constatação</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">Auto de Constatação</td>
                   <td class="text-center" colspan="2">{{ $r->autoconstatacao }}</td>
                 </tr>
                 <tr>

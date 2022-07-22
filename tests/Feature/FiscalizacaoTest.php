@@ -984,6 +984,27 @@ class FiscalizacaoTest extends TestCase
     /** @test 
      * 
     */
+    public function cannot_edit_dados_fiscalizacao_with_duplicated_campo()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create();
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id,
+        ])['final'];  
+        $dados['dados'][0]['campo'][3] = $dados['dados'][0]['campo'][5];
+        $dados['dados'][2]['campo'][10] = $dados['dados'][2]['campo'][7];
+
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados)
+        ->assertSessionHasErrors("dados.*.campo");
+    }
+
+    /** @test 
+     * 
+    */
     public function cannot_edit_dados_fiscalizacao_without_id()
     {
         $this->signInAsAdmin();
@@ -1272,14 +1293,14 @@ class FiscalizacaoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('reverteu', $log);
+        $this->assertStringContainsString('publicado', $log);
         $this->assertStringContainsString('atualizou a publicação do período da fiscalização com o status', $log);
 
         $this->put(route("fiscalizacao.updatestatus", $atributos->id));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('realizou', $log);
+        $this->assertStringContainsString('não publicado', $log);
         $this->assertStringContainsString('atualizou a publicação do período da fiscalização com o status', $log);
     }
 

@@ -7,6 +7,19 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PeriodoFiscalizacaoRequest extends FormRequest
 {
+    protected function prepareForValidation()
+    {
+        // Remove os nomes dos campos repetidos em cada regional
+        if(isset(request()->dados) && (gettype(request()->dados) == 'array'))
+        {
+            $all = $this->all();
+            foreach($all['dados'] as $key => $value)
+                if(isset($all['dados'][$key]['campo']) && (gettype($all['dados'][$key]['campo']) == 'array'))
+                    $all['dados'][$key]['campo'] = array_unique($value['campo']);
+            $this->replace($all);
+        }
+    }
+
     public function rules()
     {
         $campos = 'processofiscalizacaopf,processofiscalizacaopj,registroconvertidopf,registroconvertidopj,processoverificacao,';

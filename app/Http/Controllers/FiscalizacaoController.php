@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 // use App\Repositories\FiscalizacaoRepository;
 use App\Http\Requests\PeriodoFiscalizacaoRequest;
 use App\Contracts\MediadorServiceInterface;
-use Illuminate\Support\Facades\Request as IlluminateRequest;
+// use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class FiscalizacaoController extends Controller
 {
