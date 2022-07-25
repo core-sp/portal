@@ -29,7 +29,7 @@ class CreatePreRegistrosCnpjTable extends Migration
             $table->string('bairro')->nullable();
             $table->string('cidade')->nullable();
             $table->char('uf', 2)->nullable();
-            $table->string('historico_rt')->default(json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT))->nullable();
+            $table->string('historico_rt')->nullable();
             $table->bigInteger('responsavel_tecnico_id')->unsigned()->nullable();
             $table->foreign('responsavel_tecnico_id')->references('id')->on('responsaveis_tecnicos');
             $table->bigInteger('pre_registro_id')->unsigned();

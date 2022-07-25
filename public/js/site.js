@@ -1155,7 +1155,7 @@ function putDadosPreRegistro(objeto)
 			removerMsgErroServer(objeto, campo);
 			$('#atualizacaoPreRegistro').text(response['dt_atualizado']);
 			valorPreRegistro = valor;
-			confereObrigatorios();
+			// confereObrigatorios();
 		},
 		error: function(request, status, error) {
 			$('.loaderPreRegistro').removeClass('active');
@@ -1345,21 +1345,21 @@ function avancarVoltarPreRegistro(tipo, ativado, ordemMenu)
 	return ativado;
 }
 
-function confereObrigatorios()
-{
-	var obrigatorios = $('.obrigatorio:enabled');
-	var total = obrigatorios.length;
+// function confereObrigatorios()
+// {
+// 	var obrigatorios = $('.obrigatorio:enabled');
+// 	var total = obrigatorios.length;
 	
-	obrigatorios.each(function(){
-		if($(this).val() != "")
-			total--;
-	});
+// 	obrigatorios.each(function(){
+// 		if($(this).val() != "")
+// 			total--;
+// 	});
 
-	if(total == 0)
-		$('#btnVerificaPend').prop('disabled', false);
-	else
-		$('#btnVerificaPend').prop('disabled', true);
-}
+// 	if(total == 0)
+// 		$('#btnVerificaPend').prop('disabled', false);
+// 	else
+// 		$('#btnVerificaPend').prop('disabled', true);
+// }
 
 function disabledOptionsSelect(name, valor)
 {
@@ -1377,9 +1377,9 @@ function disabledOptionsSelect(name, valor)
 		$('#inserirRegistro #opcoesCelular_1').prop("disabled", false);
 }
 
-$('#inserirPreRegistro').ready(function(){
-	confereObrigatorios();
-})
+// $('#inserirPreRegistro').ready(function(){
+// 	// confereObrigatorios();
+// })
 
 $('#voltarPreRegistro, #avancarPreRegistro, .menu-registro .nav-link').click(function() {
 	var ordemMenu = [];

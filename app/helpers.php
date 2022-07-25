@@ -22,7 +22,8 @@ function montaTabela($headers, $contents, $classes = null)
     $table .= "</thead>";
     $table .= "<tbody>";
     foreach($contents as $content) {
-        $table .= "<tr>";
+        $table .= isset($content['corDaLinha']) ? $content['corDaLinha'] : '<tr>';
+        unset($content['corDaLinha']);
         foreach($content as $single) {
             if($single === end($content))
                 $table .= "<td class='nowrap'>";

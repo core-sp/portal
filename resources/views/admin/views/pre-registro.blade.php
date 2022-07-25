@@ -1,12 +1,28 @@
 <div class="card-body">
 
-    @if(isset($resultado->status) && ($resultado->status == $resultado::STATUS_NEGADO))
+    @if($resultado->status == $resultado::STATUS_NEGADO)
     <p class="mb-4">
         <strong>Justificativa:</strong>
         {{ $resultado->getJustificativaNegado() }}
     </p>
     @endif
 
+    @if(isset($resultado->historico_status))
+    <p class="font-weight-bolder mb-0">Histórico de atualizações de status:</p>
+    <small>
+        <ul class="list-group list-group-flush mb-5">
+        @foreach($resultado->getHistoricoStatus() as $status)
+            @php
+                $temp = explode(';', $status);
+            @endphp
+            <li class="list-group-item pl-0">
+                <span class="rounded p-1 bg{{ $resultado->getLabelStatus($temp[0]) }}">{{ $temp[0] }}</span> - {{ organizaData($temp[1]) }}
+            </li>
+        @endforeach
+        </ul>
+    </small>
+    @endif
+    
     <div id="accordionPreRegistro" class="mt-3">
         <input type="hidden" name="idPreRegistro" value="{{ $resultado->id }}" />
 
@@ -14,6 +30,9 @@
             <a class="card-link" data-toggle="collapse" href="#parte1_PF_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     {{ $abas[0] }} 
+                    @if(!empty(array_intersect_key($codigos[0], $resultado->getCamposEditados())))
+                    <span class="badge badge-danger ml-2">Campos alterados</span>
+                    @endif
                 </div>
             </a>
             <div id="parte1_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
@@ -25,6 +44,9 @@
             <a class="card-link" data-toggle="collapse" href="#parte2_PF_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     {{ $abas[1] }}
+                    @if(!empty(array_intersect_key($codigos[1], $resultado->getCamposEditados())))
+                    <span class="badge badge-danger ml-2">Campos alterados</span>
+                    @endif
                 </div>
             </a>
             <div id="parte2_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
@@ -36,6 +58,9 @@
             <a class="card-link" data-toggle="collapse" href="#parte3_PF_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     {{ $abas[2] }}
+                    @if(!empty(array_intersect_key($codigos[2], $resultado->getCamposEditados())))
+                    <span class="badge badge-danger ml-2">Campos alterados</span>
+                    @endif
                 </div>
             </a>
             <div id="parte3_PF_PJ" class="collapse" data-parent="#accordionPreRegistro">
@@ -48,6 +73,9 @@
             <a class="card-link" data-toggle="collapse" href="#parte4_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     {{ $abas[3] }}
+                    @if(!empty(array_intersect_key($codigos[3], $resultado->getCamposEditados())))
+                    <span class="badge badge-danger ml-2">Campos alterados</span>
+                    @endif
                 </div>
             </a>
             <div id="parte4_PJ" class="collapse" data-parent="#accordionPreRegistro">
@@ -60,6 +88,9 @@
             <a class="card-link" data-toggle="collapse" href="#parte4_PF_parte5_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     {{ $abas[4] }}
+                    @if(!empty(array_intersect_key($codigos[4], $resultado->getCamposEditados())))
+                    <span class="badge badge-danger ml-2">Campos alterados</span>
+                    @endif
                 </div>
             </a>
             <div id="parte4_PF_parte5_PJ" class="collapse" data-parent="#accordionPreRegistro">
@@ -71,6 +102,9 @@
             <a class="card-link" data-toggle="collapse" href="#parte5_PF_parte6_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     {{ $abas[5] }}
+                    @if(!empty(array_intersect_key($codigos[5], $resultado->getCamposEditados())))
+                    <span class="badge badge-danger ml-2">Campos alterados</span>
+                    @endif
                 </div>
             </a>
             <div id="parte5_PF_parte6_PJ" class="collapse" data-parent="#accordionPreRegistro">

@@ -503,12 +503,12 @@ function contJustificativaPR(obj)
 function addJustificado(campo, valor)
 {
     if(valor != ""){
-        if($('#' + campo + ' span.badge').length == 0){
+        if($('#' + campo + ' span.badge-warning').length == 0){
             $('#' + campo).append('<span class="badge badge-warning ml-2">Justificado</span>');
             $('#' + campo + ' button.justificativaPreRegistro').html('<i class="fas fa-edit"></i>');
         }
     }else{
-        $('#' + campo + ' span.badge').remove();
+        $('#' + campo + ' span.badge-warning').remove();
         $('#' + campo + ' button.justificativaPreRegistro').html('<i class="fas fa-times"></i>');
     }
 
@@ -561,10 +561,10 @@ function verificaJustificados()
     $('#accordionPreRegistro div.card-body').each(function() {
         var menu = $(this).parentsUntil('#accordionPreRegistro').find('.menuPR');
         if($(this).find('.valorJustificativaPR').text().length > 0){
-            if(menu.find('span').length == 0)
+            if(menu.find('span.badge-warning').length == 0)
                 menu.append('<span class="badge badge-sm badge-warning ml-3">Justificado</span>');
         }else
-            menu.find('span').remove();
+            menu.find('span.badge-warning').remove();
     });
 
     var justificado = $('.menuPR span.badge-warning').length;

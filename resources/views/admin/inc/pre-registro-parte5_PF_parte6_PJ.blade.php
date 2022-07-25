@@ -26,6 +26,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['path']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     @foreach($resultado->anexos as $anexo)

@@ -474,9 +474,9 @@
             name="pergunta"
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('pergunta') ? 'is-invalid' : '' }} obrigatorio"
             placeholder=""
-            {{ isset($resultado->status) ? 'readonly' : '' }}
+            {{ $resultado->status != $resultado::STATUS_CRIADO ? 'readonly' : '' }}
             {{-- por não salvar no bd, para não passar nula para o próximo request de envio --}}
-            @if(isset($resultado->status))
+            @if($resultado->status != $resultado::STATUS_CRIADO)
             value="**********"
             @else
             value="{{ empty(old('pergunta')) ? request()->pergunta : old('pergunta') }}"

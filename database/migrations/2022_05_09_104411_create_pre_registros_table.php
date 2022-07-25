@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\PreRegistro;
 
 class CreatePreRegistrosTable extends Migration
 {
@@ -35,10 +36,13 @@ class CreatePreRegistrosTable extends Migration
             $table->foreign('idregional')->references('idregional')->on('regionais');
             $table->bigInteger('idusuario')->unsigned()->nullable();
             $table->foreign('idusuario')->references('idusuario')->on('users');
-            $table->string('status')->nullable();
+            $table->string('status')->default(PreRegistro::STATUS_CRIADO)->nullable();
             $table->text('justificativa')->nullable();
             $table->text('confere_anexos')->nullable();
-            $table->string('historico_contabil')->default(json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT))->nullable();
+            $table->string('historico_contabil')->nullable();
+            $table->text('historico_status')->nullable();
+            $table->text('campos_espelho')->nullable();
+            $table->text('campos_editados')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

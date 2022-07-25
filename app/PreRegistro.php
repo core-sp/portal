@@ -13,13 +13,12 @@ class PreRegistro extends Model
     protected $table = 'pre_registros';
     protected $guarded = [];
 
-    // Ideias de status. A verificar
+    const STATUS_CRIADO = 'Sendo elaborado';
     const STATUS_ANALISE_INICIAL = 'Em análise inicial';
     const STATUS_CORRECAO = 'Aguardando correção';
     const STATUS_ANALISE_CORRECAO = 'Em análise da correção';
     const STATUS_APROVADO = 'Aprovado';
     const STATUS_NEGADO = 'Negado';
-    const STATUS_PENDENTE_PGTO = 'Pendente de pagamento';
     const MENU = 'Contabilidade,Dados Gerais,Endereço,Contato / RT,Canal de Relacionamento,Anexos';
     const TOTAL_HIST = 1;
 
@@ -155,17 +154,11 @@ class PreRegistro extends Model
                 if($valor['campo'] == 'negado')
                     $this->update(['justificativa' => null]);
                 $texto = $this->formatTextoCorrecaoAdmin($valor['campo'], $valor['valor']);
-                $final = [
-                    'idusuario' => auth()->user()->idusuario,
-                    $campo => $texto
-                ];
+                $final = [$campo => $texto];
                 break;
             case 'confere_anexos':
                 $texto = $this->formatTextoCorrecaoAdmin($campo, $valor);
-                $final = [
-                    'idusuario' => auth()->user()->idusuario,
-                    $campo => $texto
-                ];
+                $final = [$campo => $texto];
                 break;
             case 'pergunta':
                 // Pergunta não será salva, apenas para reforçar a mensagem sobre ser Representante Comercial
@@ -272,27 +265,29 @@ class PreRegistro extends Model
         return $this->hasMany('App\Anexo');
     }
 
-    public function getLabelStatus()
+    public function getLabelStatus($status = null)
     {
         $colorStatus = [
-            PreRegistro::STATUS_ANALISE_INICIAL => '<span class="font-weight-bolder text-primary">' . PreRegistro::STATUS_ANALISE_INICIAL . '</span>',
-            PreRegistro::STATUS_CORRECAO => '<span class="font-weight-bolder text-secondary">' . PreRegistro::STATUS_CORRECAO . '</span>',
-            PreRegistro::STATUS_ANALISE_CORRECAO => '<span class="font-weight-bolder text-info">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</span>',
-            PreRegistro::STATUS_APROVADO => '<span class="font-weight-bolder text-success">' . PreRegistro::STATUS_APROVADO . '</span>',
-            PreRegistro::STATUS_NEGADO => '<span class="font-weight-bolder text-danger">' . PreRegistro::STATUS_NEGADO . '</span>',
+            PreRegistro::STATUS_CRIADO => '-light',
+            PreRegistro::STATUS_ANALISE_INICIAL => '-primary',
+            PreRegistro::STATUS_CORRECAO => '-secondary',
+            PreRegistro::STATUS_ANALISE_CORRECAO => '-warning',
+            PreRegistro::STATUS_APROVADO => '-success',
+            PreRegistro::STATUS_NEGADO => '-danger',
         ];
 
-        return isset($colorStatus[$this->status]) ? $colorStatus[$this->status] : null;
+        return isset($status) ? $colorStatus[$status] : $colorStatus[$this->status];
     }
 
     public function getLabelStatusUser()
     {
         $colorStatus = [
-            PreRegistro::STATUS_ANALISE_INICIAL => '<span class="badge badge-primary">' . PreRegistro::STATUS_ANALISE_INICIAL . '</span>',
-            PreRegistro::STATUS_CORRECAO => '<span class="badge badge-warning">' . PreRegistro::STATUS_CORRECAO . '</span>',
-            PreRegistro::STATUS_ANALISE_CORRECAO => '<span class="badge badge-info">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</span>',
-            PreRegistro::STATUS_APROVADO => '<span class="badge badge-success">' . PreRegistro::STATUS_APROVADO . '</span>',
-            PreRegistro::STATUS_NEGADO => '<span class="badge badge-danger">' . PreRegistro::STATUS_NEGADO . '</span>',
+            PreRegistro::STATUS_CRIADO => '<span class="badge badge-secondary">' . PreRegistro::STATUS_CRIADO . '</span><small> - O formulário ainda está sendo elaborado pelo solicitante</small>',
+            PreRegistro::STATUS_ANALISE_INICIAL => '<span class="badge badge-primary">' . PreRegistro::STATUS_ANALISE_INICIAL . '</span><small> - O formulário foi enviado pelo solicitante e está aguardando a análise pelo atendente</small>',
+            PreRegistro::STATUS_CORRECAO => '<span class="badge badge-warning">' . PreRegistro::STATUS_CORRECAO . '</span><small> - O formulário foi analisado pelo atendente e possui correções a serem realizadas pelo solicitante</small>',
+            PreRegistro::STATUS_ANALISE_CORRECAO => '<span class="badge badge-info">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</span><small> - O formulário foi enviado pelo solicitante e está aguardando a análise da correção pelo atendente</small>',
+            PreRegistro::STATUS_APROVADO => '<span class="badge badge-success">' . PreRegistro::STATUS_APROVADO . '</span><small> - O formulário foi aprovado pelo atendente</small>',
+            PreRegistro::STATUS_NEGADO => '<span class="badge badge-danger">' . PreRegistro::STATUS_NEGADO . '</span><small> - O formulário foi negado pelo atendente com justificativa</small>',
         ];
 
         return isset($colorStatus[$this->status]) ? $colorStatus[$this->status] : null;
@@ -355,17 +350,17 @@ class PreRegistro extends Model
 
     public function userPodeCorrigir()
     {
-        return isset($this->status) && ($this->status == PreRegistro::STATUS_CORRECAO);
+        return $this->status == PreRegistro::STATUS_CORRECAO;
     }
 
     public function userPodeEditar()
     {
-        return !isset($this->status) || $this->userPodeCorrigir();
+        return ($this->status == PreRegistro::STATUS_CRIADO) || $this->userPodeCorrigir();
     }
 
     public function atendentePodeEditar()
     {
-        return isset($this->status) && in_array($this->status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]);
+        return in_array($this->status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]);
     }
 
     public function getCodigosJustificadosByAba($arrayAba)
@@ -460,6 +455,39 @@ class PreRegistro extends Model
             'msg' => $temp,
             'final' => true
         ];
+    }
+
+    public function setHistoricoStatus()
+    {
+        $historico = json_decode($this->historico_status, true);
+        if(gettype($historico) != 'array')
+            $historico = array();
+        array_push($historico, $this->status . ';' . $this->updated_at);
+        $this->update(['historico_status' => json_encode($historico, JSON_FORCE_OBJECT)]);
+    }
+
+    public function getHistoricoStatus()
+    {
+        return json_decode($this->historico_status, true);
+    }
+
+    public function setCamposEspelho($request)
+    {
+        $anexos = $this->anexos;
+        $nomesAnexos = array();
+        $final = array();
+        foreach($anexos as $anexo)
+            array_push($nomesAnexos, substr($anexo->path, strripos($anexo->path, '/') + 1));
+        $request['path'] = implode(',', $nomesAnexos);
+
+        if($this->status == PreRegistro::STATUS_CORRECAO)
+            $this->update(['campos_editados' => array_diff_assoc(json_decode($this->campos_espelho, true), $request)]);
+        $this->update(['campos_espelho' => json_encode($request, JSON_FORCE_OBJECT)]);
+    }
+
+    public function getCamposEditados()
+    {
+        return $this->status == PreRegistro::STATUS_ANALISE_CORRECAO ? json_decode($this->campos_editados, true) : [];
     }
 
     public function atualizarAjax($classe, $campo, $valor, $gerenti)

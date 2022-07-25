@@ -8,6 +8,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['cpf_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="registro">
@@ -39,6 +42,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['nome_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="nome_social_rt">
@@ -49,6 +55,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['nome_social_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="dt_nascimento_rt">
@@ -59,6 +68,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['dt_nascimento_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="sexo_rt">
@@ -69,6 +81,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['sexo_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="tipo_identidade_rt">
@@ -79,6 +94,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['tipo_identidade_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="identidade_rt">
@@ -89,6 +107,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['identidade_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="orgao_emissor_rt">
@@ -99,6 +120,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['orgao_emissor_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="dt_expedicao_rt">
@@ -109,6 +133,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['dt_expedicao_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="cep_rt">
@@ -119,6 +146,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['cep_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="bairro_rt">
@@ -129,6 +159,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['bairro_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="logradouro_rt">
@@ -139,6 +172,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['logradouro_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="numero_rt">
@@ -149,6 +185,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['numero_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="complemento_rt">
@@ -159,6 +198,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['complemento_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="cidade_rt">
@@ -169,6 +211,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['cidade_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="uf_rt">
@@ -179,6 +224,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['uf_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="nome_mae_rt">
@@ -189,6 +237,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['nome_mae_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="nome_pai_rt">
@@ -199,6 +250,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['nome_pai_rt']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
 </div>

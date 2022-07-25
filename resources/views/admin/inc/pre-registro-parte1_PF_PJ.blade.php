@@ -1,4 +1,5 @@
 <div class="card-body bg-light">
+    
 @if(isset($resultado->contabil_id))
     <p id="cnpj_contabil">
         <span class="font-weight-bolder">{{ $codigos[0]['cnpj_contabil'] }} - CNPJ: </span>
@@ -8,6 +9,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['cnpj_contabil']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="nome_contabil">
@@ -18,6 +22,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['nome_contabil']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="email_contabil">
@@ -28,6 +35,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['email_contabil']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="nome_contato_contabil">
@@ -38,6 +48,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['nome_contato_contabil']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="telefone_contabil">
@@ -48,6 +61,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['telefone_contabil']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
 @else

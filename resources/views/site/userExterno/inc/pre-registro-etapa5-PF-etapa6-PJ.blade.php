@@ -17,7 +17,7 @@
 
 <p class="text-dark mb-2"><i class="fas fa-info-circle text-primary"></i> <strong>Atenção!</strong>
     <br>
-    <span class="ml-3"><strong>*</strong> Limite de até {{ $totalFiles }} anexos com, no máximo, 5MB de tamanho</span>
+    <span class="ml-3"><strong>*</strong> Limite de até {{ $totalFiles }} anexos com, no máximo, 2MB de tamanho</span>
     <br>
     <span class="ml-3"><strong>*</strong> Somente arquivos com extensão: .pdf, .jpg, .jpeg, .png</span>
 </p>

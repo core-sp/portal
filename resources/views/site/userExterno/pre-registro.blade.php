@@ -20,9 +20,9 @@
                     @if(isset($gerenti))
                     <p>Você já possui registro ativo no Core-SP: <strong>{{ formataRegistro($gerenti) }}</strong></p>
                     @else
-                        @if(isset($resultado->status))
+                        @if(isset($resultado->id))
                         <h4>Status: {!! $resultado->getLabelStatusUser() !!}</h4>
-                            @if(isset($resultado->status) && ($resultado->status == $resultado::STATUS_NEGADO))
+                            @if($resultado->status == $resultado::STATUS_NEGADO)
                             <p>
                                 <strong>Justificativa:</strong>
                                 {{ $resultado->getJustificativaNegado() }}
@@ -35,16 +35,16 @@
                                 name="checkPreRegistro"
                                 class="form-check-input"
                                 required
-                                {{ isset($resultado->status) ? 'checked' : '' }}
+                                {{ isset($resultado->status) && ($resultado->status != $resultado::STATUS_CRIADO) ? 'checked' : '' }}
                             /> 
                             <label for="termo" class="text-justify">
                                 Estou ciente que iniciarei o processo de solicitação de registro para ser <strong>REPRESENTANTE COMERCIAL</strong>
                             </label>
                         </div>
-                        <button type="submit" class="btn btn-link {{ isset($resultado->id) ? 'btn-secondary' : 'btn-success' }} link-nostyle branco mt-3">
-                            @if(!isset($resultado->id))
+                        <button type="submit" class="btn btn-link {{ isset($resultado) ? 'btn-secondary' : 'btn-success' }} link-nostyle branco mt-3">
+                            @if(!isset($resultado))
                                 Iniciar a solicitação do registro
-                            @elseif(!isset($resultado->status))
+                            @elseif($resultado->status == $resultado::STATUS_CRIADO)
                                 Continuar a solicitação do registro
                             @else
                                 {{ $resultado->userPodeCorrigir() ? 'Corrigir' : 'Visualizar' }} a solicitação do registro

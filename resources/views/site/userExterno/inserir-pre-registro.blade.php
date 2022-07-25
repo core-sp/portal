@@ -202,7 +202,6 @@
                     class="btn btn-primary btn-sm float-right" 
                     type="submit" 
                     id="btnVerificaPend"
-                    disabled
                 >
                     Verificar Pendências
                 </button>

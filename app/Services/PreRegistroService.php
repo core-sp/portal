@@ -66,13 +66,15 @@ class PreRegistroService implements PreRegistroServiceInterface {
             // if($userPodeEditar)
             //     $acoes .= '<a href="'.route('regionais.edit', $resultado->idregional).'" class="btn btn-sm btn-primary">Editar</a> ';
             $conteudo = [
+                'corDaLinha' => '<tr class="table' . $resultado->getLabelStatus() . '">',
                 $resultado->id,
                 formataCpfCnpj($resultado->userExterno->cpf_cnpj),
                 $resultado->userExterno->nome,
                 $resultado->regional->regional,
                 formataData($resultado->updated_at),
                 isset($resultado->user->nome) ? 
-                $resultado->getLabelStatus() . '<small class="d-block">Atualizado por: <strong>'.$resultado->user->nome.'</strong></small>' : $resultado->getLabelStatus(),
+                '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span><small class="d-block">Atualizado por: <strong>'.$resultado->user->nome.'</strong></small>' : 
+                '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span>',
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -157,13 +159,14 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return $request;
     }
 
-    private function limparNomeCampos($externo, $request)
+    private function limparNomeCampos($preRegistro, $request)
     {
         $request = $this->formatCampos($request);
+        $preRegistro->setCamposEspelho($request);
         $camposLimpos = array();
         $classe = null;
         $camposView = $this->getNomesCampos();
-        $array = $externo->isPessoaFisica() ? [
+        $array = $preRegistro->userExterno->isPessoaFisica() ? [
             PreRegistroService::RELATION_PRE_REGISTRO => explode(',', $camposView[PreRegistroService::RELATION_PRE_REGISTRO]),
             PreRegistroService::RELATION_CONTABIL => explode(',', $camposView[PreRegistroService::RELATION_CONTABIL]),
             PreRegistroService::RELATION_PF => explode(',', $camposView[PreRegistroService::RELATION_PF]),
@@ -299,6 +302,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         return [
             'regional' => $request->filled('regional') /*&& $canFiltroRegional*/ ? $request->regional : $user->idregional,
             'status' => $request->filled('status') && in_array($request->status, PreRegistro::getStatus()) ? $request->status : 'Qualquer',
+            'atendente' => $request->filled('atendente') ? $request->atendente : 'Todos',
         ];
     }
 
@@ -336,6 +340,19 @@ class PreRegistroService implements PreRegistroServiceInterface {
             getFiltroOptions($s, $s, true) : getFiltroOptions($s, $s);
 
         $filtro .= getFiltroCamposSelect('Status', 'status', $options);
+
+        // // Enquanto não possui o UserService
+        $atendentes = \App\User::select('idusuario', 'nome', 'idperfil')
+            ->whereIn('idperfil', [8, 10, 11, 12, 13, 18, 21])
+            ->orderBy('nome')
+            ->get();
+        $options = !isset($request->atendente) ? getFiltroOptions('Todos', 'Todos', true) : getFiltroOptions('Todos', 'Todos');
+        foreach($atendentes as $atendente)
+            $options .= isset($request->atendente) && ($request->atendente == $atendente->idusuario) ? 
+            getFiltroOptions($atendente->idusuario, $atendente->nome, true) : 
+            getFiltroOptions($atendente->idusuario, $atendente->nome);
+        $filtro .= getFiltroCamposSelect('Atendentes', 'atendente', $options);
+
         $filtro = getFiltro(route('preregistro.filtro'), $filtro);
         $this->variaveis['filtro'] = $filtro;
 
@@ -348,6 +365,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         {
             $regional = $dados['regional'];
             $status = $dados['status'];
+            $atendente = $dados['atendente'];
 
             return PreRegistro::with(['userExterno' => function ($query) {
                 $query->select('id', 'cpf_cnpj', 'nome');
@@ -357,17 +375,21 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 $query3->select('idusuario', 'nome');
             }])
             ->select('id', 'updated_at', 'status', 'user_externo_id', 'idregional', 'idusuario')
-            ->whereNotNull('status')
             ->when($regional != 'Todas', function ($query) use ($regional) {
                 $query->where('idregional', $regional);
-            })->when($status != 'Qualquer', function ($query) use ($status) {
+            })
+            ->when($status != 'Qualquer', function ($query) use ($status) {
                 $query->where('status', $status);
+            })
+            ->when($atendente != 'Todos', function ($query) use ($atendente) {
+                $query->where('idusuario', $atendente);
             })->orderByRaw(
                 'CASE 
                     WHEN status = "' . PreRegistro::STATUS_ANALISE_INICIAL . '" THEN 1
                     WHEN status = "' . PreRegistro::STATUS_ANALISE_CORRECAO . '" THEN 2
                     WHEN status = "' . PreRegistro::STATUS_CORRECAO . '" THEN 3
-                    ELSE 4
+                    WHEN status = "' . PreRegistro::STATUS_CRIADO . '" THEN 4
+                    ELSE 5
                 END'
             )
             ->orderByDesc('updated_at')
@@ -425,7 +447,16 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(!isset($resultado))
         {
             $resultado = $externo->preRegistro()->create();
-            $externo->isPessoaFisica() ? $resultado->pessoaFisica()->create() : $resultado->pessoaJuridica()->create();
+            if(!$externo->isPessoaFisica())
+            {
+                $pj = $resultado->pessoaJuridica()->create();
+                $pj->update(['historico_rt' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT)]);
+            }else
+                $resultado->pessoaFisica()->create();
+            $resultado->update([
+                'historico_contabil' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
+                'historico_status' => json_encode([PreRegistro::STATUS_CRIADO . ';' . now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT)
+            ]);
 
             $string = 'Usuário Externo com ';
             $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
@@ -488,7 +519,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if(!$preRegistro->userPodeEditar())
             throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
-        $camposLimpos = $this->limparNomeCampos($externo, $request);
+        $camposLimpos = $this->limparNomeCampos($preRegistro, $request);
 
         foreach($camposLimpos as $key => $arrayCampos)
         {
@@ -506,8 +537,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 throw new \Exception('Não salvou os dados em ' . $key, 500);
         }
 
-        $status = !isset($preRegistro->status) ? $preRegistro::STATUS_ANALISE_INICIAL : $preRegistro::STATUS_ANALISE_CORRECAO;
+        $status = $preRegistro->status == PreRegistro::STATUS_CRIADO ? $preRegistro::STATUS_ANALISE_INICIAL : $preRegistro::STATUS_ANALISE_CORRECAO;
         $resultado = $preRegistro->update(['status' => $status]);
+        $preRegistro->setHistoricoStatus();
+        
 
         if(!isset($resultado))
             throw new \Exception('Não atualizou o status da solicitação de registro para ' . $status, 500);
@@ -573,7 +606,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $preRegistro = PreRegistro::findOrFail($idPreRegistro);
 
         // Atendente não pode editar um pré-registro com status diferente de analise inicial e analise da correção
-        if(!isset($preRegistro->status) || !$preRegistro->atendentePodeEditar() || ($preRegistro->anexos->count() == 0))
+        if(!$preRegistro->atendentePodeEditar() || ($preRegistro->anexos->count() == 0))
             return null;
             
         return $preRegistro->anexos->first()->getOpcoesPreRegistro();
@@ -600,10 +633,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $variaveis = $this->variaveis;
         $variaveis['btn_lista'] = '<a href="'.route('preregistro.index').'" class="btn btn-primary mr-1">Lista dos Pré-registros</a>';
         $resultado = PreRegistro::findOrFail($id);
-
-        // Atendente não pode acessar um pré-registro sem status, pois ainda está sendo editado pelo usuário
-        if(!isset($resultado->status))
-            throw new \Exception('Não autorizado a acessar pré-registro sem status', 401);
 
         return [
             'resultado' => $resultado, 
@@ -650,8 +679,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $preRegistro = PreRegistro::findOrFail($id);
 
         // Atendente não pode editar um pré-registro com status diferente de analise inicial e analise da correção
-        if(!isset($preRegistro->status) || !$preRegistro->atendentePodeEditar())
-            throw new \Exception('Não autorizado a editar o pré-registro sem status, aguardando correção ou finalizado', 401);
+        if(!$preRegistro->atendentePodeEditar())
+            throw new \Exception('Não autorizado a editar o pré-registro sendo elaborado, aguardando correção ou finalizado', 401);
 
         $campo = $request['campo'];
         $valor = $request['valor'];
@@ -670,6 +699,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
 
         $preRegistro->atualizarAjax($camposCanEdit[$campo], $campo, $valor, null);
+        $preRegistro->update(['idusuario' => $user->idusuario]);
         event(new CrudEvent('pré-registro', 'fez a ação de "' . $request['acao'] . '" o campo "' . $request['campo'] . '"', $preRegistro->id));
 
         return [
@@ -691,6 +721,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         if($canUpdate['final'])
         {
             $preRegistro->update(['idusuario' => $user->idusuario, 'status' => $status[$situacao]]);
+            $preRegistro->setHistoricoStatus();
             Mail::to($preRegistro->userExterno->email)->queue(new PreRegistroMail($preRegistro));
             event(new CrudEvent('pré-registro', 'atualizou status para ' . $status[$situacao], $preRegistro->id));
 

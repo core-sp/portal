@@ -13,6 +13,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['tipo_telefone']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="telefone">
@@ -23,6 +26,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['telefone']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     @if($resultado->getTipoTelefone()[0] == mb_strtoupper(tipos_contatos()[0], 'UTF-8'))
@@ -35,6 +41,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['opcional_celular']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
     @endif
 
@@ -47,6 +56,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['tipo_telefone_1']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     <p id="telefone_1">
@@ -58,6 +70,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['telefone_1']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
 
     @if(isset($resultado->getTipoTelefone()[1]) && ($resultado->getTipoTelefone()[1] == mb_strtoupper(tipos_contatos()[0], 'UTF-8')))
@@ -70,6 +85,9 @@
             'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
+        @if(isset($resultado->getCamposEditados()['opcional_celular_1']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
     </p>
     @endif
 
