@@ -1261,13 +1261,13 @@ function preencheRT(dados)
 	}else{
 		if($('#inserirRegistro input[name="cpf_rt"]').val() == ""){
 			$('#campos_rt').prop("disabled", true);
-			$('#inserirRegistro #registro_preRegistro').prop("disabled", true).val('');
+			$('#inserirRegistro #registro_preRegistro').val('');
 			$('#inserirRegistro [name$="_rt"]').each(function(){
 				$(this).val('');
 			});
 		}else{
 			$('#campos_rt').prop("disabled", false);
-			$('#inserirRegistro #registro_preRegistro').prop("disabled", false).val(dados.registro);
+			$('#inserirRegistro #registro_preRegistro').val(dados.registro);
 			$('#inserirRegistro [name$="_rt"]').each(function(){
 				var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_rt'));
 				if(name != 'cpf')
@@ -1364,9 +1364,9 @@ function avancarVoltarPreRegistro(tipo, ativado, ordemMenu)
 function disabledOptionsSelect(name, valor)
 {
 	if(name == 'nacionalidade')
-		valor != 'Brasileiro' ? 
-		$('#inserirRegistro select[name="naturalidade"]').prop("disabled", true) : 
-		$('#inserirRegistro select[name="naturalidade"]').prop("disabled", false);
+		valor != 'Brasileira' ? 
+		$('#inserirRegistro input[name="naturalidade_cidade"], #inserirRegistro select[name="naturalidade_estado"]').prop("disabled", true) : 
+		$('#inserirRegistro input[name="naturalidade_cidade"], #inserirRegistro select[name="naturalidade_estado"]').prop("disabled", false);
 
 	if(name == 'tipo_telefone')
 		valor != 'Celular' ? $('#inserirRegistro #opcoesCelular').prop("disabled", true) : 
@@ -1377,9 +1377,30 @@ function disabledOptionsSelect(name, valor)
 		$('#inserirRegistro #opcoesCelular_1').prop("disabled", false);
 }
 
-// $('#inserirPreRegistro').ready(function(){
-// 	// confereObrigatorios();
-// })
+function changeLabelIdentidade(objeto)
+{
+	if((objeto.attr('name') == 'tipo_identidade') || (objeto.attr('name') == 'tipo_identidade_rt')){
+		if(objeto.attr('name') == 'tipo_identidade'){
+			$('label[for="identidade"]').text('N° do(a) ' + $('[name="tipo_identidade"] option:selected').text());
+			$(' <span class="text-danger"> *</span>').appendTo('label[for="identidade"]');
+		}else{
+			$('label[for="identidade_rt"]').text('N° do(a) ' + $('[name="tipo_identidade_rt"] option:selected').text());
+			$('<span class="text-danger"> *</span>').appendTo('label[for="identidade_rt"]');
+		}
+	}
+}
+
+$('#inserirPreRegistro').ready(function(){
+	// confereObrigatorios();
+	if($('[name="tipo_telefone"]').length)
+		disabledOptionsSelect("tipo_telefone", $('[name="tipo_telefone"]').val());
+	if($('[name="tipo_telefone_1"]').length)
+		disabledOptionsSelect("tipo_telefone_1", $('[name="tipo_telefone_1"]').val());
+	if($('[name="tipo_identidade"]').length)
+		changeLabelIdentidade($('[name="tipo_identidade"]'));
+	if($('[name="tipo_identidade_rt"]').length)
+		changeLabelIdentidade($('[name="tipo_identidade_rt"]'));
+})
 
 $('#voltarPreRegistro, #avancarPreRegistro, .menu-registro .nav-link').click(function() {
 	var ordemMenu = [];
@@ -1425,7 +1446,7 @@ $('#inserirRegistro .Arquivo-Excluir').click(function(){
 });
 
 // gerencia os arquivos, cria os inputs, remove os inputs, controla as quantidades de inputs e files vindo do bd
-var pre_registro_total_files = 5;
+var pre_registro_total_files = $('#totalFilesServer').length ? $('#totalFilesServer').val() : 0;
 
 // ao carregar a pagina, verifica se possui o limite maximo de arquivos permitidos, caso sim, ele impede de adicionar mais
 $('form #inserirRegistro').ready(function(){
@@ -1496,6 +1517,7 @@ $('#inserirRegistro input:not(:checkbox,:file,[name="cpf_rt"],[name="cnpj_contab
 $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(function(){
 	disabledOptionsSelect($(this).attr('name'), $(this).val());
 	($(this).attr('type') == 'file') && ($(this).val() == "") ? null : putDadosPreRegistro($(this));
+	changeLabelIdentidade($(this));
 });
 
 $('#inserirRegistro input:checkbox').change(function(){

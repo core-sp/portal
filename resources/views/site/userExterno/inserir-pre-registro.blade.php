@@ -139,39 +139,59 @@
         
             <!-- Tab 1 -->
             <div id="parte1_PF_PJ" class="tab-pane container active"><br>
-                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
-                @include('site.userExterno.inc.pre-registro-etapa1')
-                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
+                @if(!$resultado->userPodeEditar())
+                <fieldset disabled>
+                @endif
+                    @include('site.userExterno.inc.pre-registro-etapa1')
+                @if(!$resultado->userPodeEditar())
+                </fieldset>
+                @endif
             </div>
     
             <!-- Tab 2 -->
             <div id="parte2_PF_PJ" class="tab-pane container fade"><br>
-                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
-                @include('site.userExterno.inc.pre-registro-etapa2')
-                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
+                @if(!$resultado->userPodeEditar())
+                <fieldset disabled>
+                @endif
+                    @include('site.userExterno.inc.pre-registro-etapa2')
+                @if(!$resultado->userPodeEditar())
+                </fieldset>
+                @endif
             </div>
 
             <!-- Tab 3 -->
             <div id="parte3_PF_PJ" class="tab-pane container fade"><br>
-                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
-                @include('site.userExterno.inc.pre-registro-etapa3')
-                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
+                @if(!$resultado->userPodeEditar())
+                <fieldset disabled>
+                @endif
+                    @include('site.userExterno.inc.pre-registro-etapa3')
+                @if(!$resultado->userPodeEditar())
+                </fieldset>
+                @endif
             </div>
 
             <!-- Tab 4 PJ -->
             @if(!$resultado->userExterno->isPessoaFisica())
             <div id="parte4_PJ" class="tab-pane container fade"><br>
-                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
-                @include('site.userExterno.inc.pre-registro-etapa4-PJ')
-                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
+                @if(!$resultado->userPodeEditar())
+                <fieldset disabled>
+                @endif
+                    @include('site.userExterno.inc.pre-registro-etapa4-PJ')
+                @if(!$resultado->userPodeEditar())
+                </fieldset>
+                @endif
             </div>
             @endif
 
             <!-- Tab 4 PF e Tab 5 PJ -->
             <div id="parte4_PF_parte5_PJ" class="tab-pane container fade"><br>
-                {!! !$resultado->userPodeEditar() ? '<fieldset disabled>' : '' !!}
-                @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ')
-                {!! !$resultado->userPodeEditar() ? '</fieldset>' : '' !!}
+                @if(!$resultado->userPodeEditar())
+                <fieldset disabled>
+                @endif
+                    @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ')
+                @if(!$resultado->userPodeEditar())
+                </fieldset>
+                @endif
             </div>
 
             <!-- Tab 5 PF e Tab 6 PJ -->

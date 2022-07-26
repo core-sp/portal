@@ -18,7 +18,7 @@
 <h5 class="bold mb-2">Endereço de correspondência</h5>
 <div class="form-row mb-2">
     <div class="col-sm-4 mb-2-576">
-        <label for="cep">{{ $codigos[2]['cep'] }} - CEP <span class="text-danger">*</span></label>
+        <label for="cep_pre">{{ $codigos[2]['cep'] }} - CEP <span class="text-danger">*</span></label>
         <input
             type="text"
             name="cep"
@@ -33,13 +33,15 @@
         @endif
     </div>
     <div class="col-sm mb-2-576">
-        <label for="bairro">{{ $codigos[2]['bairro'] }} - Bairro <span class="text-danger">*</span></label>
+        <label for="bairro_pre">{{ $codigos[2]['bairro'] }} - Bairro <span class="text-danger">*</span></label>
         <input
             type="text"
             name="bairro"
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }} obrigatorio"
             id="bairro_pre"
             value="{{ empty(old('bairro')) && isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
+            minlength="4"
+            maxlength="191"
         />
         @if($errors->has('bairro'))
         <div class="invalid-feedback">
@@ -51,13 +53,15 @@
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="logradouro">{{ $codigos[2]['logradouro'] }} - Logradouro <span class="text-danger">*</span></label>
+        <label for="rua_pre">{{ $codigos[2]['logradouro'] }} - Logradouro <span class="text-danger">*</span></label>
         <input
             type="text"
             name="logradouro"
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }} obrigatorio"
             id="rua_pre"
             value="{{ empty(old('logradouro')) && isset($resultado->logradouro) ? $resultado->logradouro : old('logradouro') }}"
+            minlength="4"
+            maxlength="191"
         />
         @if($errors->has('logradouro'))
         <div class="invalid-feedback">
@@ -66,13 +70,15 @@
         @endif
     </div>
     <div class="col-sm-2 mb-2-576">
-        <label for="numero">{{ $codigos[2]['numero'] }} - Número <span class="text-danger">*</span></label>
+        <label for="numero_pre">{{ $codigos[2]['numero'] }} - Número <span class="text-danger">*</span></label>
         <input
             type="text"
             name="numero"
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('numero') ? 'is-invalid' : '' }} obrigatorio"
             id="numero_pre"
             value="{{ empty(old('numero')) && isset($resultado->numero) ? $resultado->numero : old('numero') }}"
+            minlength="1"
+            maxlength="10"
         />
         @if($errors->has('numero'))
         <div class="invalid-feedback">
@@ -84,13 +90,15 @@
 
 <div class="form-row mb-2">
     <div class="col-sm-3 mb-2-576">
-        <label for="complemento">{{ $codigos[2]['complemento'] }} - Complemento</label>
+        <label for="complemento_pre">{{ $codigos[2]['complemento'] }} - Complemento</label>
         <input
             type="text"
             name="complemento"
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
             id="complemento_pre"
             value="{{ empty(old('complemento')) && isset($resultado->complemento) ? $resultado->complemento : old('complemento') }}"
+            minlength="1"
+            maxlength="50"
         />
         @if($errors->has('complemento'))
         <div class="invalid-feedback">
@@ -99,13 +107,15 @@
         @endif
     </div>
     <div class="col-sm-5 mb-2-576">
-        <label for="cidade">{{ $codigos[2]['cidade'] }} - Município <span class="text-danger">*</span></label>
+        <label for="cidade_pre">{{ $codigos[2]['cidade'] }} - Município <span class="text-danger">*</span></label>
         <input
             type="text"
             name="cidade"
             id="cidade_pre"
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('cidade')) && isset($resultado->cidade) ? $resultado->cidade : old('cidade') }}"
+            minlength="4"
+            maxlength="191"
         />
         @if($errors->has('cidade'))
         <div class="invalid-feedback">
@@ -114,7 +124,7 @@
         @endif
     </div>
     <div class="col-sm-4 mb-2-576">
-        <label for="uf">{{ $codigos[2]['uf'] }} - Estado <span class="text-danger">*</span></label>
+        <label for="uf_pre">{{ $codigos[2]['uf'] }} - Estado <span class="text-danger">*</span></label>
         <select 
             name="uf" 
             id="uf_pre" 
@@ -145,7 +155,7 @@
 <h5 class="bold mb-2">Endereço da empresa</h5>
 <div class="form-row mb-2">
     <div class="form-check-inline">
-        <label class="form-check-label">
+        <label for="checkEndEmpresa" class="form-check-label">
             <input type="checkbox" 
                 id="checkEndEmpresa" 
                 class="{{ $classes[3] }} form-check-input {{ $errors->has('checkEndEmpresa') ? 'is-invalid' : '' }}" 
@@ -190,6 +200,8 @@
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('bairro_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="bairro_empresa"
                 value="{{ empty(old('bairro_empresa')) && isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : old('bairro_empresa') }}"
+                minlength="4"
+                maxlength="191"
             />
             @if($errors->has('bairro_empresa'))
             <div class="invalid-feedback">
@@ -201,13 +213,15 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="logradouro_empresa">{{ $codigos[2]['logradouro_empresa'] }} - Logradouro <span class="text-danger">*</span></label>
+            <label for="rua_empresa">{{ $codigos[2]['logradouro_empresa'] }} - Logradouro <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="logradouro_empresa"
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('logradouro_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="rua_empresa"
                 value="{{ empty(old('logradouro_empresa')) && isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : old('logradouro_empresa') }}"
+                minlength="4"
+                maxlength="191"
             />
             @if($errors->has('logradouro_empresa'))
             <div class="invalid-feedback">
@@ -223,6 +237,8 @@
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="numero_empresa"
                 value="{{ empty(old('numero_empresa')) && isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : old('numero_empresa') }}"
+                minlength="1"
+                maxlength="10"
             />
             @if($errors->has('numero_empresa'))
             <div class="invalid-feedback">
@@ -241,6 +257,8 @@
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('complemento_empresa') ? 'is-invalid' : '' }}"
                 id="complemento_empresa"
                 value="{{ empty(old('complemento_empresa')) && isset($resultado->pessoaJuridica->complemento) ? $resultado->pessoaJuridica->complemento : old('complemento_empresa') }}"
+                minlength="1"
+                maxlength="50"
             />
             @if($errors->has('complemento_empresa'))
             <div class="invalid-feedback">
@@ -256,6 +274,8 @@
                 id="cidade_empresa"
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('cidade_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('cidade_empresa')) && isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : old('cidade_empresa') }}"
+                minlength="4"
+                maxlength="191"
             />
             @if($errors->has('cidade_empresa'))
             <div class="invalid-feedback">

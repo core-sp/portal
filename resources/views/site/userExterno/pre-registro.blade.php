@@ -32,17 +32,18 @@
                     <form action="{{ route('externo.inserir.preregistro.view') }}" autocomplete="off">
                         <div class="form-check mt-3">
                             <input type="checkbox"
+                                id="checkPreRegistro"
                                 name="checkPreRegistro"
                                 class="form-check-input"
                                 required
                                 {{ isset($resultado->status) && ($resultado->status != $resultado::STATUS_CRIADO) ? 'checked' : '' }}
                             /> 
-                            <label for="termo" class="text-justify">
+                            <label for="checkPreRegistro" class="text-justify font-weight-light">
                                 Estou ciente que iniciarei o processo de solicitação de registro para ser <strong>REPRESENTANTE COMERCIAL</strong>
                             </label>
                         </div>
                         <button type="submit" class="btn btn-link {{ isset($resultado) ? 'btn-secondary' : 'btn-success' }} link-nostyle branco mt-3">
-                            @if(!isset($resultado))
+                            @if(!isset($resultado->id))
                                 Iniciar a solicitação do registro
                             @elseif($resultado->status == $resultado::STATUS_CRIADO)
                                 Continuar a solicitação do registro

@@ -221,13 +221,17 @@ class PreRegistro extends Model
 
     public static function getStatus()
     {
-        return [
+        $array = [
+            PreRegistro::STATUS_CRIADO,
             PreRegistro::STATUS_ANALISE_INICIAL,
             PreRegistro::STATUS_CORRECAO,
             PreRegistro::STATUS_ANALISE_CORRECAO,
             PreRegistro::STATUS_APROVADO,
             PreRegistro::STATUS_NEGADO,
         ];
+        sort($array, SORT_STRING);
+        
+        return $array;
     }
 
     public function userExterno()
@@ -575,7 +579,7 @@ class PreRegistro extends Model
                 break;
             case 'anexos':
                 $anexos = $this->anexos();
-                $valido = $classe::armazenar($anexos->count(), $valor);
+                $valido = $classe::armazenar($anexos->count(), $valor, $this->userExterno->isPessoaFisica());
                 if(isset($valido))
                 {
                     $resultado = $anexos->create([$campo => $valido, 'nome_original' => $valor->getClientOriginalName()]);

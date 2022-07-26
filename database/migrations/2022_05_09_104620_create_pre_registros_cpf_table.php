@@ -19,8 +19,9 @@ class CreatePreRegistrosCpfTable extends Migration
             $table->date('dt_nascimento')->nullable();
             $table->char('sexo', 1)->nullable();
             $table->string('estado_civil')->nullable();
-            $table->string('naturalidade')->nullable();
-            $table->string('nacionalidade')->default('BRASILEIRO')->nullable();
+            $table->string('nacionalidade')->default('BRASILEIRA')->nullable();
+            $table->string('naturalidade_cidade')->nullable();
+            $table->string('naturalidade_estado')->nullable();
             $table->string('nome_mae')->nullable();
             $table->string('nome_pai')->nullable();
             $table->string('tipo_identidade')->nullable();

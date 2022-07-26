@@ -26,12 +26,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
     const RELATION_PRE_REGISTRO = "preRegistro";
     const RELATION_RT = "pessoaJuridica.responsavelTecnico";
 
-    private $totalFiles;
     private $variaveis;
 
     public function __construct()
     {
-        $this->totalFiles = Anexo::TOTAL_PRE_REGISTRO;
         $this->variaveis = [
             'singular' => 'pré-registro',
             'singulariza' => 'o pré-registro',
@@ -70,9 +68,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 $resultado->id,
                 formataCpfCnpj($resultado->userExterno->cpf_cnpj),
                 $resultado->userExterno->nome,
-                $resultado->regional->regional,
+                isset($resultado->idregional) ? $resultado->regional->regional : 'Sem regional no momento',
                 formataData($resultado->updated_at),
-                isset($resultado->user->nome) ? 
+                isset($resultado->idusuario) ? 
                 '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span><small class="d-block">Atualizado por: <strong>'.$resultado->user->nome.'</strong></small>' : 
                 '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span>',
                 $acoes
@@ -151,10 +149,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $request['opcional_celular'] = null;
         if(isset($request['opcional_celular_1']))
             $request['opcional_celular_1'] = implode(',', $request['opcional_celular_1']);
-
-        // Pergunta não será salva, apenas para reforçar a mensagem sobre ser Representante Comercial
-        if(isset($request['pergunta']))
-            unset($request['pergunta']);
+        unset($request['pergunta']);
         
         return $request;
     }
@@ -256,7 +251,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     private function getAbasCampos($externo)
     {
-        $pf = 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao';
+        $pf = 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao';
         $pj = 'razao_social,capital_social,nire,tipo_empresa,dt_inicio_atividade,inscricao_municipal,inscricao_estadual';
         $dadosGerais = $externo->isPessoaFisica() ? $pf : $pj;
 
@@ -405,7 +400,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $classes[0] => 'path',
             $classes[1] => 'nome_contabil,cnpj_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
             $classes[4] => 'segmento,idregional,cep,bairro,logradouro,numero,complemento,cidade,uf,tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1,pergunta',
-            $classes[2] => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao',
+            $classes[2] => 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao',
             $classes[3] => 'razao_social,capital_social,nire,tipo_empresa,dt_inicio_atividade,inscricao_estadual,inscricao_municipal,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
             $classes[5] => 'nome_rt,nome_social_rt,sexo_rt,dt_nascimento_rt,cpf_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt'
         ];
@@ -472,7 +467,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 ->splice(0, 13)
                 ->sortBy('regional'),
             'classes' => $this->getNomeClasses(),
-            'totalFiles' => $this->totalFiles,
+            'totalFiles' => $externo->isPessoaFisica() ? Anexo::TOTAL_PF_PRE_REGISTRO : Anexo::TOTAL_PJ_PRE_REGISTRO,
             'abas' => $this->getMenu()
         ];
     }

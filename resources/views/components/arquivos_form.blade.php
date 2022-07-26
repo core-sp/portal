@@ -9,8 +9,9 @@
                     id="anexos"
                     name="path"
                     value=""
+                    accept="{{ $accept }}"
                 />
-                <label class="custom-file-label ml-0" for="customFile"><span class="text-secondary">Escolher arquivo</span></label>
+                <label class="custom-file-label ml-0" for="anexos"><span class="text-secondary">Escolher arquivo</span></label>
             </div>
             <div class="input-group-append">
                 <button class="btn btn-danger limparFile" type="button"><i class="fas fa-trash-alt"></i></button>

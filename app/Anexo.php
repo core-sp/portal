@@ -11,7 +11,8 @@ class Anexo extends Model
     protected $guarded = [];
     protected $touches = ['preRegistro'];
 
-    const TOTAL_PRE_REGISTRO = 5;
+    const TOTAL_PF_PRE_REGISTRO = 10;
+    const TOTAL_PJ_PRE_REGISTRO = 15;
     const PATH_PRE_REGISTRO = 'userExterno/pre_registros';
 
     public static function camposPreRegistro()
@@ -26,9 +27,10 @@ class Anexo extends Model
         return $this->belongsTo('App\PreRegistro');
     }
 
-    public static function armazenar($total, $valor)
+    public static function armazenar($total, $valor, $pf = true)
     {
-        if($total < Anexo::TOTAL_PRE_REGISTRO)
+        $totalAnexo = $pf ? Anexo::TOTAL_PF_PRE_REGISTRO : Anexo::TOTAL_PJ_PRE_REGISTRO;
+        if($total < $totalAnexo)
         {
             $nome = (string) Str::uuid() . '.' . $valor->extension();
             return $valor->storeAs(Anexo::PATH_PRE_REGISTRO, $nome, 'local');
@@ -53,7 +55,7 @@ class Anexo extends Model
 
     private function getAceitosPF($preRegistro, $tipos)
     {
-        if($preRegistro->pessoaFisica->nacionalidade != 'BRASILEIRO')
+        if($preRegistro->pessoaFisica->nacionalidade != 'BRASILEIRA')
             unset($tipos[3]);
 
         if(($preRegistro->pessoaFisica->sexo != 'M') || (($preRegistro->pessoaFisica->sexo == 'M') && $preRegistro->pessoaFisica->maisDe45Anos()))

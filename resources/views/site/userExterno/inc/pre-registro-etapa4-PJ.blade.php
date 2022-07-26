@@ -17,15 +17,21 @@
 
 <small class="text-muted text-left">
     <em>
-        <span class="font-weight-bolder">Obs:</span> Após inserir um CPF válido, para trocar aguarde 24h
+        <span class="font-weight-bolder">Atenção!</span> Estes dados são relacionados exclusivamente ao Representante Comercial
     </em>
 </small>
 
 <div class="form-row mb-2 mt-2">
     <div class="col-sm mb-2-576">
         <label for="cpf_rt">{{ $codigos[3]['cpf_rt'] }} - CPF <span class="text-danger">*</span></label>
+        <small class="text-muted text-left ml-2">
+            <em>
+                Após inserir um CPF válido, para trocar aguarde 24h
+            </em>
+        </small>
         <input
             type="text"
+            id="cpf_rt"
             class="{{ $classes[5] }} form-control cpfInput {{ $errors->has('cpf_rt') ? ' is-invalid' : '' }} obrigatorio"
             name="cpf_rt"
             value="{{ empty(old('cpf_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cpf) ? $resultado->pessoaJuridica->responsavelTecnico->cpf : old('cpf_rt') }}"
@@ -39,7 +45,7 @@
     </div>
 
     <div class="col-sm mb-2-576">
-        <label for="registro">{{ $codigos[3]['registro'] }} - Registro</label>
+        <label for="registro_preRegistro">{{ $codigos[3]['registro'] }} - Registro</label>
         <input
             type="text"
             class="{{ $classes[5] }} form-control"
@@ -57,9 +63,12 @@
             <label for="nome_rt">{{ $codigos[3]['nome_rt'] }} - Nome Completo <span class="text-danger">*</span></label>
             <input
                 name="nome_rt"
+                id="nome_rt"
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome) ? $resultado->pessoaJuridica->responsavelTecnico->nome : old('nome_rt') }}"
+                minlength="5"
+                maxlength="191"
             />
             @if($errors->has('nome_rt'))
             <div class="invalid-feedback">
@@ -74,9 +83,12 @@
             <label for="nome_social_rt">{{ $codigos[3]['nome_social_rt'] }} - Nome Social</label>
             <input
                 name="nome_social_rt"
+                id="nome_social_rt"
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_social_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_social_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_social) ? $resultado->pessoaJuridica->responsavelTecnico->nome_social : old('nome_social_rt') }}"
+                minlength="5"
+                maxlength="191"
             />
             @if($errors->has('nome_social_rt'))
             <div class="invalid-feedback">
@@ -91,6 +103,7 @@
             <label for="dt_nascimento_rt">{{ $codigos[3]['dt_nascimento_rt'] }} - Data de Nascimento <span class="text-danger">*</span></label>
             <input
                 name="dt_nascimento_rt"
+                id="dt_nascimento_rt"
                 type="date"
                 class="{{ $classes[5] }} form-control {{ $errors->has('dt_nascimento_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('dt_nascimento_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->dt_nascimento) ? $resultado->pessoaJuridica->responsavelTecnico->dt_nascimento : old('dt_nascimento_rt') }}"
@@ -106,6 +119,7 @@
             <label for="sexo_rt">{{ $codigos[3]['sexo_rt'] }} - Gênero <span class="text-danger">*</span></label><br>
             <select 
                 name="sexo_rt" 
+                id="sexo_rt"
                 class="{{ $classes[5] }} form-control {{ $errors->has('sexo_rt') ? 'is-invalid' : '' }} obrigatorio"
             >
                 <option value="">Selecione a opção...</option>
@@ -132,6 +146,7 @@
             <label for="tipo_identidade_rt">{{ $codigos[3]['tipo_identidade_rt'] }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
             <select 
                 name="tipo_identidade_rt" 
+                id="tipo_identidade_rt"
                 class="{{ $classes[5] }} form-control {{ $errors->has('tipo_identidade_rt') ? 'is-invalid' : '' }} obrigatorio"
             >
                 <option value="">Selecione a opção...</option>
@@ -156,9 +171,10 @@
             <input
                 name="identidade_rt"
                 type="text"
-                id="rg"
+                id="identidade_rt"
                 class="{{ $classes[5] }} form-control text-uppercase {{ $errors->has('identidade_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('identidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->identidade) ? $resultado->pessoaJuridica->responsavelTecnico->identidade : old('identidade_rt') }}"
+                minlength="4"
                 maxlength="30"
             />
             @if($errors->has('identidade_rt'))
@@ -174,9 +190,12 @@
             <label for="orgao_emissor_rt">{{ $codigos[3]['orgao_emissor_rt'] }} - Órgão Emissor <span class="text-danger">*</span></label>
             <input
                 name="orgao_emissor_rt"
+                id="orgao_emissor_rt"
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('orgao_emissor_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->orgao_emissor) ? $resultado->pessoaJuridica->responsavelTecnico->orgao_emissor : old('orgao_emissor_rt') }}"
+                minlength="3"
+                maxlength="191"
             />
             @if($errors->has('orgao_emissor_rt'))
             <div class="invalid-feedback">
@@ -188,6 +207,7 @@
             <label for="dt_expedicao_rt">{{ $codigos[3]['dt_expedicao_rt'] }} - Data de Expedição <span class="text-danger">*</span></label>
             <input
                 name="dt_expedicao_rt"
+                id="dt_expedicao_rt"
                 type="date"
                 class="{{ $classes[5] }} form-control {{ $errors->has('dt_expedicao_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('dt_expedicao_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->dt_expedicao) ? $resultado->pessoaJuridica->responsavelTecnico->dt_expedicao : old('dt_expedicao_rt') }}"
@@ -227,6 +247,8 @@
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="bairro_rt"
                 value="{{ empty(old('bairro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->bairro) ? $resultado->pessoaJuridica->responsavelTecnico->bairro : old('bairro_rt') }}"
+                minlength="4"
+                maxlength="191"
             />
             @if($errors->has('bairro_rt'))
             <div class="invalid-feedback">
@@ -238,13 +260,15 @@
 
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="logradouro_rt">{{ $codigos[3]['logradouro_rt'] }} - Logradouro <span class="text-danger">*</span></label>
+            <label for="rua_rt">{{ $codigos[3]['logradouro_rt'] }} - Logradouro <span class="text-danger">*</span></label>
             <input
                 type="text"
                 name="logradouro_rt"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="rua_rt"
                 value="{{ empty(old('logradouro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->logradouro) ? $resultado->pessoaJuridica->responsavelTecnico->logradouro : old('logradouro_rt') }}"
+                minlength="4"
+                maxlength="191"
             />
             @if($errors->has('logradouro_rt'))
             <div class="invalid-feedback">
@@ -260,6 +284,8 @@
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('numero_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="numero_rt"
                 value="{{ empty(old('numero_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->numero) ? $resultado->pessoaJuridica->responsavelTecnico->numero : old('numero_rt') }}"
+                minlength="1"
+                maxlength="10"
             />
             @if($errors->has('numero_rt'))
             <div class="invalid-feedback">
@@ -278,6 +304,8 @@
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('complemento_rt') ? 'is-invalid' : '' }}"
                 id="complemento_rt"
                 value="{{ empty(old('complemento_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->complemento) ? $resultado->pessoaJuridica->responsavelTecnico->complemento : old('complemento_rt') }}"
+                minlength="1"
+                maxlength="50"
             />
             @if($errors->has('complemento_rt'))
             <div class="invalid-feedback">
@@ -293,6 +321,8 @@
                 id="cidade_rt"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('cidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cidade) ? $resultado->pessoaJuridica->responsavelTecnico->cidade : old('cidade_rt') }}"
+                minlength="4"
+                maxlength="191"
             />
             @if($errors->has('cidade_rt'))
             <div class="invalid-feedback">
@@ -333,9 +363,12 @@
             <label for="nome_mae_rt">{{ $codigos[3]['nome_mae_rt'] }} - Nome da Mãe <span class="text-danger">*</span></label>
             <input
                 name="nome_mae_rt"
+                id="nome_mae_rt"
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_mae_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_mae) ? $resultado->pessoaJuridica->responsavelTecnico->nome_mae : old('nome_mae_rt') }}"
+                minlength="5"
+                maxlength="191"
             />
             @if($errors->has('nome_mae_rt'))
             <div class="invalid-feedback">
@@ -347,9 +380,12 @@
             <label for="nome_pai_rt">{{ $codigos[3]['nome_pai_rt'] }} - Nome do Pai</label>
             <input
                 name="nome_pai_rt"
+                id="nome_pai_rt"
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_pai_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_pai_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_pai) ? $resultado->pessoaJuridica->responsavelTecnico->nome_pai : old('nome_pai_rt') }}"
+                minlength="5"
+                maxlength="191"
             />
             @if($errors->has('nome_pai_rt'))
             <div class="invalid-feedback">

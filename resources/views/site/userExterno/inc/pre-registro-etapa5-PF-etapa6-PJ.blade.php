@@ -17,9 +17,10 @@
 
 <p class="text-dark mb-2"><i class="fas fa-info-circle text-primary"></i> <strong>Atenção!</strong>
     <br>
-    <span class="ml-3"><strong>*</strong> Limite de até {{ $totalFiles }} anexos com, no máximo, 2MB de tamanho</span>
+    <span class="ml-3"><strong>*</strong> Limite de até {{ $totalFiles }} anexos com, no máximo, 5MB de tamanho</span>
+    <input id="totalFilesServer" type="hidden" value="{{ $totalFiles }}" />
     <br>
-    <span class="ml-3"><strong>*</strong> Somente arquivos com extensão: .pdf, .jpg, .jpeg, .png</span>
+    <span class="ml-3"><strong>*</strong> Somente arquivos com extensão: .pdf, .jpg, .jpeg, .png, .zip, .rar</span>
 </p>
 
 <div class="linha-lg-mini"></div>
@@ -32,7 +33,7 @@
 @endif
 
 <p class="ml-3"><i class="icon fa fa-check"></i> Comprovante de identidade pode ser:</p>
-<p class="ml-5"> RG; Carteira de Trabalho; Previdência Social; Passaporte, Certificado de Reservista; CNH (data de expedição máxima: 10 anos); Carteira de identidade Aeronáutica, Exército ou Marinha; Carteira de Conselho Profissional; RNE (para estrangeiros)</p>
+<p class="ml-5"> RG; Passaporte, CNH (data de expedição máxima: 10 anos); Carteira de Conselho Profissional; RNE (para estrangeiros)</p>
 <p class="ml-3"><i class="icon fa fa-check"></i> CPF</p>
 <p class="ml-3"><i class="icon fa fa-check"></i> Comprovante de Residência dos últimos 3 meses em nome do solicitante. 
     Em caso de comprovante em nome de terceiros, o solicitante deve anexar uma declaração de próprio punho, 
@@ -75,11 +76,13 @@
 
     <input type="hidden" id="fileObrigatorio" class="obrigatorio" value="{{ $resultado->anexos->count() > 0 ? 'existeAnexo' : '' }}">
 
+    {{-- Em 'accept' só aparece os tipos de files que são aceitos, string idêntica ao PreRegistroAjaxRequest --}}
     @if($resultado->userPodeEditar())
         @component('components.arquivos_form', [
             'nome' => 'anexo', 
             'classes' => $classes[0],
-            'errors' => $errors
+            'errors' => $errors,
+            'accept' => 'application/pdf,image/jpeg,image/png,application/x-rar-compressed,application/zip,application/x-zip-compressed,multipart/x-zip,application/octet-stream',
         ])
         @endcomponent
     @endif

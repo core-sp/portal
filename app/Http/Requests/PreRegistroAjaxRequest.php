@@ -55,7 +55,7 @@ class PreRegistroAjaxRequest extends FormRequest
         if(request()->campo == 'path')
             $this->regraValor = [
                 'file',
-                'mimetypes:application/pdf,image/jpeg,image/png',
+                'mimetypes:application/pdf,image/jpeg,image/png,application/x-rar-compressed,application/zip,application/x-zip-compressed,multipart/x-zip,application/octet-stream',
                 'max:5120',
             ];
 
@@ -112,6 +112,7 @@ class PreRegistroAjaxRequest extends FormRequest
             'required' => 'Falta dados para enviar a requisição',
             'mimetypes' => 'O arquivo não possui extensão permitida ou está com erro',
             'file' => 'Deve ser um arquivo',
+            'uploaded' => 'Falhou o upload por erro no servidor',
             'date' => 'Deve ser tipo data',
             'before_or_equal' => strpos(request()->campo, 'dt_nascimento') !== false ? 'Deve ter 18 anos completos ou mais' : 'Data deve ser igual ou anterior a hoje',
             'exists' => 'Esta regional não existe',

@@ -75,15 +75,28 @@
         @endif
     </p>
 
-    <p id="naturalidade">
-        <span class="font-weight-bolder">{{ $codigos[1]['naturalidade'] }} - Naturalidade: </span>
-        {{ isset($resultado->pessoaFisica->naturalidade) ? $resultado->pessoaFisica->naturalidade : '------' }}
+    <p id="naturalidade_cidade">
+        <span class="font-weight-bolder">{{ $codigos[1]['naturalidade_cidade'] }} - Naturalidade - Cidade: </span>
+        {{ isset($resultado->pessoaFisica->naturalidade_cidade) ? $resultado->pessoaFisica->naturalidade_cidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
-                'campo' => 'naturalidade',
+                'campo' => 'naturalidade_cidade',
                 'resultado' => $resultado->getJustificativaArray()
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['naturalidade']))
+        @if(isset($resultado->getCamposEditados()['naturalidade_cidade']))
+        <span class="badge badge-danger ml-2">Campo alterado</span>
+        @endif
+    </p>
+
+    <p id="naturalidade_estado">
+        <span class="font-weight-bolder">{{ $codigos[1]['naturalidade_estado'] }} - Naturalidade - Estado: </span>
+        {{ isset($resultado->pessoaFisica->naturalidade_estado) ? $resultado->pessoaFisica->naturalidade_estado : '------' }}
+        @component('components.justificativa_pre_registro_admin', [
+                'campo' => 'naturalidade_estado',
+                'resultado' => $resultado->getJustificativaArray()
+        ])
+        @endcomponent
+        @if(isset($resultado->getCamposEditados()['naturalidade_estado']))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>

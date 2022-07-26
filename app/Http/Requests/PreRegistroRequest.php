@@ -11,84 +11,84 @@ class PreRegistroRequest extends FormRequest
     private $regraDtNasc;
     private $regraPath;
     private $externo;
-    private $regraRegexTel;
 
     private function getRules($externo)
     {
         $rules = [
             'path' => $this->regraPath,
             'cnpj_contabil' => ['nullable', new CpfCnpj],
-            'nome_contabil' => 'required_with:cnpj_contabil|max:191',
-            'email_contabil' => 'required_with:cnpj_contabil|max:191|email',
-            'nome_contato_contabil' => 'required_with:cnpj_contabil|max:191|regex:/^\D*$/',
-            'telefone_contabil' => 'required_with:cnpj_contabil|max:20|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})/',
-            'segmento' => 'required|in:'.implode(',', segmentos()),
+            'nome_contabil' => 'sometimes|required_with:cnpj_contabil|min:5|max:191',
+            'email_contabil' => 'sometimes|required_with:cnpj_contabil|email:rfc,spoof,filter|min:10|max:191',
+            'nome_contato_contabil' => 'required_with:cnpj_contabil|min:5|max:191|regex:/^\D*$/',
+            'telefone_contabil' => 'required_with:cnpj_contabil|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
+            'segmento' => 'nullable|in:'.implode(',', segmentos()),
             'idregional' => 'required|exists:regionais,idregional',
-            'cep' => 'required|max:9',
-            'bairro' => 'required|max:191',
-            'logradouro' => 'required|max:191',
-            'numero' => 'required|max:10',
-            'complemento' => 'nullable|max:191',
-            'cidade' => 'required|max:191|regex:/^\D*$/',
+            'cep' => 'required|size:9',
+            'bairro' => 'required|min:4|max:191',
+            'logradouro' => 'required|min:4|max:191',
+            'numero' => 'required|min:1|max:10',
+            'complemento' => 'nullable|min:1|max:50',
+            'cidade' => 'required|min:4|max:191|regex:/^\D*$/',
             'uf' => 'required|in:'.implode(',', array_keys(estados())),
             'tipo_telefone' => 'required|in:'.implode(',', tipos_contatos()),
-            'telefone' => 'required|max:20|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})/',
-            'opcional_celular' => 'nullable|array|in:'.implode(',', opcoes_celular()),
+            'telefone' => 'required|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
+            'opcional_celular' => 'nullable|array|in:'.implode(',', opcoes_celular()) . '|distinct',
             'tipo_telefone_1' => 'required_with:telefone_1|nullable|in:'.implode(',', tipos_contatos()),
-            'telefone_1' => 'required_with:tipo_telefone_1|max:20'.$this->regraRegexTel,
-            'opcional_celular_1' => 'nullable|array|in:'.implode(',', opcoes_celular()),
-            'pergunta' => 'required|max:191|string'
+            'telefone_1' => 'required_with:tipo_telefone_1|nullable|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
+            'opcional_celular_1' => 'nullable|array|in:'.implode(',', opcoes_celular()) . '|distinct',
+            'pergunta' => 'nullable|min:1|max:191'
         ];
 
         $pessoaFisica = [
-            'nome_social' => 'nullable|max:191|regex:/^\D*$/',
-            'sexo' => 'required|size:1|in:'.implode(',', array_keys(generos())),
+            'nome_social' => 'nullable|min:5|max:191|regex:/^\D*$/',
+            'sexo' => 'required|in:'.implode(',', array_keys(generos())),
             'dt_nascimento' => 'required|date|before_or_equal:'.$this->regraDtNasc,
             'estado_civil' => 'nullable|in:'.implode(',', estados_civis()),
             'nacionalidade' => 'required|in:'.implode(',', nacionalidades()),
-            'naturalidade' => 'required_if:nacionalidade,Brasileiro|nullable|in:'.implode(',', estados()),
-            'nome_mae' => 'required|max:191|regex:/^\D*$/',
-            'nome_pai' => 'nullable|max:191|regex:/^\D*$/',
+            'naturalidade_cidade' => 'sometimes|required_if:nacionalidade,Brasileira|nullable|string|min:4|max:191',
+            'naturalidade_estado' => 'sometimes|required_if:nacionalidade,Brasileira|nullable|in:'.implode(',', estados()),
+            'nome_mae' => 'required|min:5|max:191|regex:/^\D*$/',
+            'nome_pai' => 'nullable|min:5|max:191|regex:/^\D*$/',
             'tipo_identidade' => 'required|in:'.implode(',', tipos_identidade()),
-            'identidade' => 'required|max:30',
-            'orgao_emissor' => 'required|max:191',
+            'identidade' => 'required|min:4|max:30',
+            'orgao_emissor' => 'required|min:3|max:191',
             'dt_expedicao' => 'required|date|before_or_equal:today',
         ];
         
         $pessoaJuridica = [
-            'razao_social' => 'required|max:191|regex:/^\D*$/',
-            'capital_social' => 'required|max:16|regex:/([0-9.]{1,13}),([0-9]{2})/',
-            'nire' => 'nullable|max:20',
+            'razao_social' => 'required|min:5|max:191|regex:/^\D*$/',
+            'capital_social' => 'required|min:4|max:16|regex:/([0-9.]{1,13}),([0-9]{2})/',
+            'nire' => 'nullable|min:5|max:20',
             'tipo_empresa' => 'required|in:'.implode(',', tipos_empresa()),
             'dt_inicio_atividade' => 'required|date|before_or_equal:today',
-            'inscricao_municipal' => 'required|max:30',
-            'inscricao_estadual' => 'required|max:30',
+            'inscricao_municipal' => 'nullable|min:5|max:30',
+            'inscricao_estadual' => 'nullable|min:5|max:30',
             'checkEndEmpresa' => 'present',
-            'cep_empresa' => 'required_if:checkEndEmpresa,off|nullable|max:9',
-            'bairro_empresa' => 'required_if:checkEndEmpresa,off|nullable|max:191',
-            'logradouro_empresa' => 'required_if:checkEndEmpresa,off|nullable|max:191',
-            'numero_empresa' => 'required_if:checkEndEmpresa,off|nullable|max:10',
-            'complemento_empresa' => 'nullable|max:191',
-            'cidade_empresa' => 'required_if:checkEndEmpresa,off|nullable|max:191|regex:/^\D*$/',
+            'cep_empresa' => 'sometimes|required_if:checkEndEmpresa,off|nullable|size:9',
+            'bairro_empresa' => 'sometimes|required_if:checkEndEmpresa,off|nullable|min:4|max:191',
+            'logradouro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
+            'numero_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:1|max:10',
+            'complemento_empresa' => 'nullable|min:1|max:50',
+            'cidade_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191|regex:/^\D*$/',
             'uf_empresa' => 'required_if:checkEndEmpresa,off|nullable|in:'.implode(',', array_keys(estados())),
-            'nome_rt' => 'required|max:191|regex:/^\D*$/',
-            'nome_social_rt' => 'nullable|max:191|regex:/^\D*$/',
-            'sexo_rt' => 'required|size:1|in:'.implode(',', array_keys(generos())),
+            'nome_rt' => 'required|min:5|max:191|regex:/^\D*$/',
+            'nome_social_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
+            'sexo_rt' => 'required|in:'.implode(',', array_keys(generos())),
             'dt_nascimento_rt' => 'required|date|before_or_equal:'.$this->regraDtNasc,
             'cpf_rt' => ['required', new CpfCnpj],
             'tipo_identidade_rt' => 'required|in:'.implode(',', tipos_identidade()),
-            'identidade_rt' => 'required|max:30',
-            'orgao_emissor_rt' => 'required|max:191',
+            'identidade_rt' => 'required|min:4|max:30',
+            'orgao_emissor_rt' => 'required|min:3|max:191',
             'dt_expedicao_rt' => 'required|date|before_or_equal:today',
-            'cep_rt' => 'required|max:9',
-            'bairro_rt' => 'required|max:191',
-            'logradouro_rt' => 'required|max:191',
-            'numero_rt' => 'required|max:10',
-            'complemento_rt' => 'nullable|max:191',
-            'cidade_rt' => 'required|max:191',
+            'cep_rt' => 'required|size:9',
+            'bairro_rt' => 'required|min:4|max:191',
+            'logradouro_rt' => 'required|min:4|max:191',
+            'numero_rt' => 'required|min:1|max:10',
+            'complemento_rt' => 'nullable|min:1|max:50',
+            'cidade_rt' => 'required|min:4|max:191',
             'uf_rt' => 'required|in:'.implode(',', array_keys(estados())),
-            'nome_mae_rt' => 'required|max:191|regex:/^\D*$/',
-            'nome_pai_rt' => 'nullable|max:191|regex:/^\D*$/',
+            'nome_mae_rt' => 'required|min:5|max:191|regex:/^\D*$/',
+            'nome_pai_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
         ];
 
         $outrasRules = $externo->isPessoaFisica() ? $pessoaFisica : $pessoaJuridica;
@@ -106,7 +106,6 @@ class PreRegistroRequest extends FormRequest
 
         $this->regraPath = '';
         $this->regraDtNasc = Carbon::today()->subYears(18)->format('Y-m-d');
-        $this->regraRegexTel = isset(request()->tipo_telefone_1) ? '|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})/' : '';
 
         if($anexosCount == 0)
         {
@@ -135,7 +134,7 @@ class PreRegistroRequest extends FormRequest
         
         if($this->externo->isPessoaFisica())
         {
-            if(request()->nacionalidade != "Brasileiro")
+            if(request()->nacionalidade != "Brasileira")
                 $this->merge([
                     'naturalidade' => null
                 ]);
@@ -160,8 +159,10 @@ class PreRegistroRequest extends FormRequest
         $attr = ' no item :attribute';
 
         return [
+            'min' => 'Quantidade mínima de :min caracteres' . $attr,
             'max' => 'Limite de :max caracteres' . $attr,
             'in' => 'Valor não é aceito' . $attr,
+            'sometimes' => 'Campo obrigatório quando desabilitado' . $attr,
             'required' => 'Campo obrigatório' . $attr,
             'required_if' => 'Campo obrigatório' . $attr,
             'mimetypes' => 'O arquivo não possue extensão permitida ou está com erro' . $attr,
@@ -182,6 +183,8 @@ class PreRegistroRequest extends FormRequest
             'telefone_1.required_with' => 'Campo obrigatório se possui o tipo de telefone opcional' . $attr,
             'tipo_telefone_1.required_with' => 'Campo obrigatório se possui o telefone opcional' . $attr,
             'regex' => 'Formato inválido' . $attr,
+            'distinct' => 'Os valores devem ser diferentes' . $attr,
+            'array' => 'Formato inválido' . $attr,
         ];
     }
 
@@ -223,7 +226,8 @@ class PreRegistroRequest extends FormRequest
             'dt_nascimento' => '"Data de nascimento"',
             'estado_civil' => '"Estado civil"',
             'nacionalidade' => '"Nacionalidade"',
-            'naturalidade' => '"Naturalidade"',
+            'naturalidade_cidade' => '"Naturalidade - Cidade"',
+            'naturalidade_estado' => '"Naturalidade - Estado"',
             'nome_mae' => '"Nome da mãe"',
             'nome_pai' => '"Nome do pai"',
             'tipo_identidade' => '"Tipo do documento de identidade"',

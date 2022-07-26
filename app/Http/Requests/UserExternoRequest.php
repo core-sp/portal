@@ -43,7 +43,7 @@ class UserExternoRequest extends FormRequest
                 $this->unique
             ],
             'nome' => 'sometimes|required|min:5|max:191|string',
-            'email' => 'sometimes|required|email|max:191',
+            'email' => 'sometimes|required|email:rfc,spoof,filter|max:191',
             'password' => 'sometimes|required'.$this->regrasPassword,
             'password_confirmation' => 'sometimes|required|same:password|max:191',
             'password_atual' => 'sometimes|required',
@@ -61,8 +61,10 @@ class UserExternoRequest extends FormRequest
             'password.confirmed' => 'É necessário confirmar a senha',
             'password.regex' => 'A senha deve ter, no mínimo, 8 caracteres contendo um número, uma letra maiúscula e uma minúscula.',
             'unique' => 'CPF / CNPJ já cadastrado no Login Externo.',
-            'string' => 'Deve ser texto',
-            'password_confirmation.same' => 'As senhas precisam ser idênticas entre si.'
+            'string' => 'Deve ser no formato texto',
+            'password_confirmation.same' => 'As senhas precisam ser idênticas entre si.',
+            'email' => 'Deve ser um email válido',
+            'sometimes' => 'Campo obrigatório',
         ];
     }
 

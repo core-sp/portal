@@ -9,7 +9,7 @@
     @endif
 
     <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> Comprovante de identidade pode ser:</p>
-    <p class="ml-5 mb-0 text-secondary"> RG; Carteira de Trabalho; Previdência Social; Passaporte, Certificado de Reservista; CNH (data de expedição máxima: 10 anos); Carteira de identidade Aeronáutica, Exército ou Marinha; Carteira de Conselho Profissional; RNE (para estrangeiros)</p>
+    <p class="ml-5 mb-0 text-secondary"> RG; Passaporte, CNH (data de expedição máxima: 10 anos); Carteira de Conselho Profissional; RNE (para estrangeiros)</p>
     <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> CPF</p>
     <p class="ml-3 mb-0 text-secondary"><i class="icon fa fa-check"></i> Comprovante de Residência dos últimos 3 meses em nome do solicitante. 
         Em caso de comprovante em nome de terceiros, o solicitante deve anexar uma declaração de próprio punho, 
@@ -132,7 +132,7 @@
         </label>
     </div>
 
-    @if((isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade == 'BRASILEIRO')) ||
+    @if((isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade == 'BRASILEIRA')) ||
     !$resultado->userExterno->isPessoaFisica())
     <div class="form-check">
         <label class="form-check-label">

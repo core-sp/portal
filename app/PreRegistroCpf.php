@@ -22,13 +22,14 @@ class PreRegistroCpf extends Model
             'pf3' => 'dt_nascimento',
             'pf4' => 'estado_civil',
             'pf5' => 'nacionalidade',
-            'pf6' => 'naturalidade',
-            'pf7' => 'nome_mae',
-            'pf8' => 'nome_pai',
-            'pf9' => 'tipo_identidade',
-            'pf10' => 'identidade',
-            'pf11' => 'orgao_emissor',
-            'pf12' => 'dt_expedicao'
+            'pf6' => 'naturalidade_cidade',
+            'pf7' => 'naturalidade_estado',
+            'pf8' => 'nome_mae',
+            'pf9' => 'nome_pai',
+            'pf10' => 'tipo_identidade',
+            'pf11' => 'identidade',
+            'pf12' => 'orgao_emissor',
+            'pf13' => 'dt_expedicao'
         ];
     }
 
