@@ -15,9 +15,7 @@ class UserExternoSiteController extends Controller
     private $gerentiRepository;
 
     public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
-    {
-        ini_set("upload_max_filesize", "5M");
-        
+    {        
         // Limitação de requisições por minuto para cada usuário, senão erro 429
         $qtd = '60';
         if((env("APP_ENV") == "local") || (env("APP_ENV") == "testing"))
@@ -144,6 +142,7 @@ class UserExternoSiteController extends Controller
 
     public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
     {
+        ini_set("upload_max_filesize", "5M");
         try{
             $externo = auth()->guard('user_externo')->user();
             $validatedData = $request->validated();
