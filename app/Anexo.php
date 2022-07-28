@@ -21,8 +21,9 @@ class Anexo extends Model
     const TOTAL_PJ_PRE_REGISTRO = 15;
     const PATH_PRE_REGISTRO = 'userExterno/pre_registros';
 
-    private static function ziparFilesPreRegistro(ZipArchive $zip, $files)
+    private static function ziparFilesPreRegistro($files)
     {
+        $zip = new ZipArchive;
         $path = storage_path('app/') . Anexo::PATH_PRE_REGISTRO . '/';
         $nomeZip = (string) Str::uuid() . '.zip';
 
@@ -72,7 +73,7 @@ class Anexo extends Model
         if($total < $totalAnexo)
         {
             if(count($valor) > 1)
-                return Anexo::ziparFilesPreRegistro(new ZipArchive, $valor);
+                return Anexo::ziparFilesPreRegistro($valor);
             $nome = (string) Str::uuid() . '.' . $valor[0]->extension();
             $anexo = $valor[0]->storeAs(Anexo::PATH_PRE_REGISTRO, $nome, 'local');
             return [
