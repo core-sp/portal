@@ -4,9 +4,15 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use ZipArchive;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Anexo extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'anexos';
     protected $guarded = [];
     protected $touches = ['preRegistro'];
@@ -14,6 +20,38 @@ class Anexo extends Model
     const TOTAL_PF_PRE_REGISTRO = 10;
     const TOTAL_PJ_PRE_REGISTRO = 15;
     const PATH_PRE_REGISTRO = 'userExterno/pre_registros';
+
+    private static function ziparFilesPreRegistro(ZipArchive $zip, $files)
+    {
+        $path = storage_path('app/') . Anexo::PATH_PRE_REGISTRO . '/';
+        $nomeZip = (string) Str::uuid() . '.zip';
+
+        if(!file_exists(Anexo::PATH_PRE_REGISTRO))
+            Storage::makeDirectory(Anexo::PATH_PRE_REGISTRO);
+
+        if($zip->open($path . $nomeZip, ZipArchive::CREATE) === TRUE) 
+        {
+            foreach($files as $file)
+                $zip->addFile($file->path(), (string) Str::uuid() . '.' . $file->extension());
+            $zip->close();
+        }
+
+        $zip->open($path . $nomeZip);
+        if($zip->numFiles != count($files))
+        {
+            Storage::delete(Anexo::PATH_PRE_REGISTRO . '/' . $nomeZip);
+            $zip->close();
+            throw new \Exception('Erro ao comprimir os arquivos do pré-registro, pois não possue a mesma quantidade do que foi enviado', 500);
+        }
+        $zip->close();
+
+        return [
+            'path' => Anexo::PATH_PRE_REGISTRO . '/' . $nomeZip,
+            'nome_original' => $nomeZip,
+            'tamanho_bytes' => Storage::size(Anexo::PATH_PRE_REGISTRO . '/' . $nomeZip),
+            'extensao' => 'zip',
+        ];
+    }
 
     public static function camposPreRegistro()
     {
@@ -30,10 +68,19 @@ class Anexo extends Model
     public static function armazenar($total, $valor, $pf = true)
     {
         $totalAnexo = $pf ? Anexo::TOTAL_PF_PRE_REGISTRO : Anexo::TOTAL_PJ_PRE_REGISTRO;
+
         if($total < $totalAnexo)
         {
-            $nome = (string) Str::uuid() . '.' . $valor->extension();
-            return $valor->storeAs(Anexo::PATH_PRE_REGISTRO, $nome, 'local');
+            if(count($valor) > 1)
+                return Anexo::ziparFilesPreRegistro(new ZipArchive, $valor);
+            $nome = (string) Str::uuid() . '.' . $valor[0]->extension();
+            $anexo = $valor[0]->storeAs(Anexo::PATH_PRE_REGISTRO, $nome, 'local');
+            return [
+                'path' => $anexo,
+                'nome_original' => $valor[0]->getClientOriginalName(),
+                'tamanho_bytes' => Storage::size($anexo),
+                'extensao' => $valor[0]->extension(),
+            ];
         }
 
         return null;

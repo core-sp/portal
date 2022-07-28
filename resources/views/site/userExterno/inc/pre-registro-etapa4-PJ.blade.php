@@ -26,7 +26,7 @@
         <label for="cpf_rt">{{ $codigos[3]['cpf_rt'] }} - CPF <span class="text-danger">*</span></label>
         <small class="text-muted text-left ml-2">
             <em>
-                Após inserir um CPF válido, para trocar aguarde 24h
+                Após inserir um CPF válido aguarde 24h para trocar
             </em>
         </small>
         <input

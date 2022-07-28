@@ -17,10 +17,16 @@
 
 <p class="text-dark mb-2"><i class="fas fa-info-circle text-primary"></i> <strong>Atenção!</strong>
     <br>
-    <span class="ml-3"><strong>*</strong> Limite de até {{ $totalFiles }} anexos com, no máximo, 5MB de tamanho</span>
+    <span class="ml-3"><i class="fas fa-minus"></i> Pode adicionar até {{ $totalFiles }} <span class="bold">anexos</span> com, no máximo, <mark>5MB</mark> de tamanho.</span>
+    <br>
+    <span class="ml-3"><i class="fas fa-minus"></i> Em cada anexo pode conter até 15 arquivos, basta manter a tecla <kbd>ctrl</kbd> pressionada ao selecionar.</span>
+    <br>
+    <span class="ml-3"><i class="fas fa-minus"></i> Caso selecione mais de um arquivo no anexo, ele será comprimido num arquivo com a extensão <mark>.zip</mark>.</span>
     <input id="totalFilesServer" type="hidden" value="{{ $totalFiles }}" />
     <br>
-    <span class="ml-3"><strong>*</strong> Somente arquivos com extensão: .pdf, .jpg, .jpeg, .png, .zip, .rar</span>
+    <span class="ml-3"><i class="fas fa-minus"></i> Somente arquivos com extensão <mark>.pdf, .jpg, .jpeg, .png</mark> são aceitos.</span>
+    <br>
+    <span class="ml-3"><i class="fas fa-minus"></i> Todos os arquivos são renomeados.</span>
 </p>
 
 <div class="linha-lg-mini"></div>
@@ -33,7 +39,7 @@
 @endif
 
 <p class="ml-3"><i class="icon fa fa-check"></i> Comprovante de identidade pode ser:</p>
-<p class="ml-5"> RG; Passaporte, CNH (data de expedição máxima: 10 anos); Carteira de Conselho Profissional; RNE (para estrangeiros)</p>
+<p class="ml-5"> RG; Passaporte, <span class="text-nowrap">CNH (data de expedição máxima: 10 anos);</span> <span class="text-nowrap">Carteira de Conselho Profissional;</span> <span class="text-nowrap">RNE (para estrangeiros)</span></p>
 <p class="ml-3"><i class="icon fa fa-check"></i> CPF</p>
 <p class="ml-3"><i class="icon fa fa-check"></i> Comprovante de Residência dos últimos 3 meses em nome do solicitante. 
     Em caso de comprovante em nome de terceiros, o solicitante deve anexar uma declaração de próprio punho, 
@@ -68,12 +74,14 @@
                 'id' => $anexo->id,
                 'display' => '',
                 'podeExcluir' => $resultado->userPodeEditar(),
+                'extensao' => $anexo->extensao,
             ])
             @endcomponent
         @endforeach
 
     @endif
 
+    <br>
     <input type="hidden" id="fileObrigatorio" class="obrigatorio" value="{{ $resultado->anexos->count() > 0 ? 'existeAnexo' : '' }}">
 
     {{-- Em 'accept' só aparece os tipos de files que são aceitos, string idêntica ao PreRegistroAjaxRequest --}}
@@ -82,9 +90,15 @@
             'nome' => 'anexo', 
             'classes' => $classes[0],
             'errors' => $errors,
-            'accept' => 'application/pdf,image/jpeg,image/png,application/x-rar-compressed,application/zip,application/x-zip-compressed,multipart/x-zip,application/octet-stream',
+            'accept' => 'application/pdf,image/jpeg,image/png',
+            'multiple' => true,
         ])
         @endcomponent
     @endif
+    <small class="text-muted text-left">
+    <em>
+        Para selecionar mais de um arquivo, mantenha a tecla <kbd>ctrl</kbd> pressionada ao selecionar
+    </em>
+</small>
 
 @endif

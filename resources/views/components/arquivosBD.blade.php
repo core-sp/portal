@@ -9,10 +9,20 @@
                 readonly
             />
             <div class="input-group-append">
+                @if(!strpos(request()->header('user-agent'), 'mobile'))
+                @if(isset($extensao) && in_array($extensao, ['jpg', 'jpeg', 'png', 'pdf']))
                 <a href="{{ $rota_download }}" 
-                    class="btn btn-primary Arquivo-Download" 
+                    class="btn btn-info Arquivo-Download" 
                     value="" 
                     target="_blank" 
+                >
+                    Abrir
+                </a>
+                @endif
+                @endif
+                <a href="{{ $rota_download }}" 
+                    class="btn btn-primary Arquivo-Download" 
+                    download
                 >
                     <i class="fas fa-download"></i>
                 </a>

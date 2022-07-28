@@ -1099,15 +1099,20 @@ function putDadosPreRegistro(objeto)
 	var classesObjeto = objeto.attr("class");
 	var classe = classesObjeto.split(' ')[0];
 	var campo = objeto.attr("name");
-	var valor = campo == 'path' ? objeto[0].files[0] : objeto.val();
+	var valor = campo == 'path' ? objeto[0].files : objeto.val();
 	var cT = campo == 'path' ? false : 'application/x-www-form-urlencoded';
 	var pD = campo == 'path' ? false : true;
 	var frmData = new FormData();
 	var dados = null;
 
-    frmData.append('valor', valor);
-	frmData.append('campo', campo);
-	frmData.append('classe', classe);
+console.log(valor[0]);
+
+	if(campo == 'path'){
+		for(var i = 0; i < valor.length; i++)
+			frmData.append("valor[]", valor[i]);
+		frmData.append('campo', campo);
+		frmData.append('classe', classe);
+	}
 
 	if((campo == "") || (classe == ""))
 		return;
@@ -1174,6 +1179,10 @@ function putDadosPreRegistro(objeto)
 
 function removerMsgErroServer(objeto, campo)
 {
+	var endEmpresa = '.erroPreRegistro[value="cep_empresa"], .erroPreRegistro[value="bairro_empresa"], ';
+	endEmpresa += '.erroPreRegistro[value="logradouro_empresa"], .erroPreRegistro[value="numero_empresa"], ';
+	endEmpresa += '.erroPreRegistro[value="complemento_empresa"], .erroPreRegistro[value="cidade_empresa"], .erroPreRegistro[value="uf_empresa"]';
+
 	// remove mensagem de validação do servidor
 	if(objeto.next().hasClass('invalid-feedback'))
 		objeto.removeClass('is-invalid').next().remove();
@@ -1181,6 +1190,8 @@ function removerMsgErroServer(objeto, campo)
 		$('.erroPreRegistro[value="' + campo + '"]').parent().remove();
 	if(($('.erroPreRegistro').length == 0) && ($('#erroPreRegistro').length == 1))
 		$('#erroPreRegistro').remove();
+	if(campo == 'checkEndEmpresa')
+		$(endEmpresa).parent().remove();
 }
 
 function getErrorMsg(request)
@@ -1190,7 +1201,8 @@ function getErrorMsg(request)
 	var nomesCampo = ['classe', 'campo', 'valor'];
 	if(request.status == 422){
 		for(var nome of nomesCampo){
-			var msg = request.responseJSON.errors[nome];
+			var erroNome = _.has(request.responseJSON.errors,"nome");
+			var msg = erroNome ? request.responseJSON.errors[nome] : Object.values(request.responseJSON.errors)[0];
 			if(msg != undefined)
 				errorMessage = msg[0];
 		}
@@ -1279,9 +1291,11 @@ function preencheRT(dados)
 
 function preencheFile(dados)
 {
-	if(dados.id && dados.nome_original){
-		appendArquivoBD('pre-registro-anexo', "anexo", dados.nome_original, dados.id, pre_registro_total_files);
-		$('#fileObrigatorio').val('existeAnexo');
+	if(_.has(dados,"id")){
+		if(dados.id && dados.nome_original){
+			appendArquivoBD('pre-registro-anexo', "anexo", dados.nome_original, dados.id, pre_registro_total_files);
+			$('#fileObrigatorio').val('existeAnexo');
+		}
 	}
 }
 
@@ -1381,13 +1395,19 @@ function changeLabelIdentidade(objeto)
 {
 	if((objeto.attr('name') == 'tipo_identidade') || (objeto.attr('name') == 'tipo_identidade_rt')){
 		if(objeto.attr('name') == 'tipo_identidade'){
+			$('[name="tipo_identidade"]').val() == '' ? $('label[for="identidade"]').text('N° do documento') : 
 			$('label[for="identidade"]').text('N° do(a) ' + $('[name="tipo_identidade"] option:selected').text());
-			$(' <span class="text-danger"> *</span>').appendTo('label[for="identidade"]');
+			$('<span class="text-danger"> *</span>').appendTo('label[for="identidade"]');
 		}else{
+			$('[name="tipo_identidade_rt"]').val() == '' ? $('label[for="identidade_rt"]').text('N° do documento') : 
 			$('label[for="identidade_rt"]').text('N° do(a) ' + $('[name="tipo_identidade_rt"] option:selected').text());
 			$('<span class="text-danger"> *</span>').appendTo('label[for="identidade_rt"]');
 		}
 	}
+}
+
+function getFullNameFile(item) {
+	return [item.name] + ', ';
 }
 
 $('#inserirPreRegistro').ready(function(){
@@ -1459,7 +1479,8 @@ $('form #inserirRegistro').ready(function(){
 $("#inserirRegistro .files").on("change", function() {
 
 	// procedimento usado no bootstrap 4 para usar um input file customizado
-	var fileName = $(this).val().split("\\").pop();
+	var files = Array.from(this.files);
+	var fileName = files.map(getFullNameFile);
 	$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 	// fim do procedimento do input customizado do bootstrap 4
 
@@ -1507,11 +1528,13 @@ $('#inserirRegistro input[name="cpf_rt"], #inserirRegistro input[name="cnpj_cont
 	}
 });
 
-$('#inserirRegistro input:not(:checkbox,:file,[name="cpf_rt"],[name="cnpj_contabil"],[id^="cep_"])').blur(function(){
-	if(valorPreRegistro != $(this).val()){
-		putDadosPreRegistro($(this));
-		valorPreRegistro = null;
-	}
+$('#inserirRegistro input:not(:checkbox,:file,[name="cpf_rt"],[name="cnpj_contabil"])').blur(function(){
+	var name = $(this).attr('name');
+	if(valorPreRegistro != $(this).val())
+		if((name.includes('cep_') && ($(this).val() == '')) || (!name.includes('cep_'))){
+			putDadosPreRegistro($(this));
+			valorPreRegistro = null;
+		}
 });
 
 $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(function(){

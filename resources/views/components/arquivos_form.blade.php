@@ -10,6 +10,9 @@
                     name="path"
                     value=""
                     accept="{{ $accept }}"
+                    @if($multiple)
+                        multiple
+                    @endif
                 />
                 <label class="custom-file-label ml-0" for="anexos"><span class="text-secondary">Escolher arquivo</span></label>
             </div>

@@ -582,7 +582,7 @@ class PreRegistro extends Model
                 $valido = $classe::armazenar($anexos->count(), $valor, $this->userExterno->isPessoaFisica());
                 if(isset($valido))
                 {
-                    $resultado = $anexos->create([$campo => $valido, 'nome_original' => $valor->getClientOriginalName()]);
+                    $resultado = $anexos->create($valido);
                     $this->touch();
                 }
                 break;

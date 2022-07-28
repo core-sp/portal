@@ -3079,3 +3079,8 @@ h5 {
 	margin: -32px 0 0 -32px;
 	display: block;
 }
+
+.custom-file-label {
+	white-space: nowrap;
+	overflow-x: hidden;
+}

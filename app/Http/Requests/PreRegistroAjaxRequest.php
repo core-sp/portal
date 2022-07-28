@@ -53,11 +53,14 @@ class PreRegistroAjaxRequest extends FormRequest
         }
 
         if(request()->campo == 'path')
-            $this->regraValor = [
-                'file',
-                'mimetypes:application/pdf,image/jpeg,image/png,application/x-rar-compressed,application/zip,application/x-zip-compressed,multipart/x-zip,application/octet-stream',
-                'max:5120',
-            ];
+        {
+            $total = 0;
+            foreach($this->valor as $value)
+                $total += round($value->getSize() / 1024);
+            $this->merge([
+                'total' => $total > 5120 ? '' : $total
+            ]);  
+        }
 
         if(strpos(request()->campo, 'dt_nascimento') !== false)
             if(isset(request()->valor))
@@ -97,17 +100,27 @@ class PreRegistroAjaxRequest extends FormRequest
             $todos .= isset($todos) ? ','.$campos : $campos;
         }
 
-        return [
+        $rules = [
             'valor' => $this->regraValor,
             'campo' => 'required|in:'.$todos,
             'classe' => 'required|in:'.$classes
         ];
+        $rulesPath = [
+            'valor' => 'required|array|min:1|max:15',
+            'valor.*' => 'file|mimetypes:application/pdf,image/jpeg,image/png',
+            'campo' => 'required|in:'.$todos,
+            'classe' => 'required|in:'.$classes,
+            'total' => 'required',
+        ];
+
+        return gettype(request()->valor) == 'array' ? $rulesPath : $rules;
     }
 
     public function messages()
     {
         return [
-            'max' => request()->campo != 'path' ? 'Limite de :max caracteres' : 'Limite do tamanho do arquivo é de 5 MB',
+            'max' => request()->campo != 'path' ? 'Limite de :max caracteres' : 'Existe mais de 15 arquivos',
+            'total.required' => 'A soma do tamanho dos arquivos ultrapassa 5 MB',
             'in' => 'Campo não encontrado ou não permitido alterar',
             'required' => 'Falta dados para enviar a requisição',
             'mimetypes' => 'O arquivo não possui extensão permitida ou está com erro',

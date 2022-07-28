@@ -26,7 +26,7 @@
         <label for="cnpj_contabil">{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label> 
         <small class="text-muted text-left ml-2">
             <em>
-                Após inserir um CNPJ válido, para trocar aguarde 24h
+                Após inserir um CNPJ válido aguarde 24h para trocar
             </em>
         </small>
         <input
