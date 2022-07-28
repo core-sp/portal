@@ -359,7 +359,7 @@ class PreRegistro extends Model
 
     public function userPodeEditar()
     {
-        return ($this->status == PreRegistro::STATUS_CRIADO) || $this->userPodeCorrigir();
+        return ($this->status == PreRegistro::STATUS_CRIADO) || ($this->status == PreRegistro::STATUS_CORRECAO);
     }
 
     public function atendentePodeEditar()
