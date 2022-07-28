@@ -68,20 +68,31 @@
               <thead>
                 <tr>
                   <th style="width:50%">Ação</th>
-                  <th style="width:20%">PF</th>
-                  <th style="width:20%">PJ</th>
+                  <th style="width:50%" colspan="2">Resultados</th>
                 <tr>
               </thead>
               <tbody>
                 <tr>
-                  <td class="text-left" style="width:50%; font-size: 15px">Processos de Fiscalização <!--<small class="text-danger">*<small>--></td>
-                  <td style="width:20%">{{-- $r->processofiscalizacaopf --}}</td>
-                  <td style="width:20%">{{ $r->processofiscalizacaopj }}</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">Auto de Constatação</td>
+                  <td class="text-center" colspan="2">{{ $r->autoconstatacao }}</td>
                 </tr>
                 <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">Autos de Infração</td>
+                  <td class="text-center" colspan="2">{{ $r->autosdeinfracao }}</td>
+                </tr>
+                <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">Multa Administrativa</td>
+                  <td class="text-center" colspan="2">{{ $r->multaadministrativa }}</td>
+                </tr>
+                <!--<tr>
+                  <td class="text-left" style="width:50%; font-size: 15px">Processos de Fiscalização <small class="text-danger">*<small></td>
+                  <td style="width:20%">{{-- $r->processofiscalizacaopf --}}</td>
+                  <td style="width:20%">{{-- $r->processofiscalizacaopj --}}</td>
+                </tr>-->
+                <tr>
                   <td class="text-left" style="width:60%; font-size: 15px">Registros Convertidos</td>
-                  <td style="width:20%">{{-- $r->registroconvertidopf --}}</td>
-                  <td style="width:20%">{{ $r->registroconvertidopj }}</td>
+                  <!--<td style="width:20%">{{-- $r->registroconvertidopf --}}</td>-->
+                  <td style="width:50%">{{ $r->registroconvertidopj }}</td>
                 </tr>
                 <tr>
                   <td class="text-left" style="width:60%; font-size: 15px">Processos de Verificação</td>
@@ -106,18 +117,6 @@
                 <tr>
                   <td class="text-left" style="width:60%; font-size: 15px">Cooperação Institucional</td>
                   <td class="text-center" colspan="2">{{ $r->cooperacaoinstitucional }}</td>
-                </tr>
-                <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Auto de Constatação</td>
-                  <td class="text-center" colspan="2">{{ $r->autoconstatacao }}</td>
-                </tr>
-                <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Autos de Infração</td>
-                  <td class="text-center" colspan="2">{{ $r->autosdeinfracao }}</td>
-                </tr>
-                <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Multa Administrativa</td>
-                  <td class="text-center" colspan="2">{{ $r->multaadministrativa }}</td>
                 </tr>
               </tbody>
             </table>
