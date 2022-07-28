@@ -43,7 +43,7 @@ class UserExternoRequest extends FormRequest
                 $this->unique
             ],
             'nome' => 'sometimes|required|min:5|max:191|string',
-            'email' => 'sometimes|required|email:rfc,spoof,filter|max:191',
+            'email' => 'sometimes|required|email:rfc,filter|max:191',
             'password' => 'sometimes|required'.$this->regrasPassword,
             'password_confirmation' => 'sometimes|required|same:password|max:191',
             'password_atual' => 'sometimes|required',

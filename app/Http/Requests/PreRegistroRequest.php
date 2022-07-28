@@ -18,7 +18,7 @@ class PreRegistroRequest extends FormRequest
             'path' => $this->regraPath,
             'cnpj_contabil' => ['nullable', new CpfCnpj],
             'nome_contabil' => 'sometimes|required_with:cnpj_contabil|min:5|max:191',
-            'email_contabil' => 'sometimes|required_with:cnpj_contabil|email:rfc,spoof,filter|min:10|max:191',
+            'email_contabil' => 'sometimes|required_with:cnpj_contabil|email:rfc,filter|min:10|max:191',
             'nome_contato_contabil' => 'required_with:cnpj_contabil|min:5|max:191|regex:/^\D*$/',
             'telefone_contabil' => 'required_with:cnpj_contabil|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
             'segmento' => 'nullable|in:'.implode(',', segmentos()),
