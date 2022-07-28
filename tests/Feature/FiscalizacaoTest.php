@@ -1415,7 +1415,7 @@ class FiscalizacaoTest extends TestCase
         $this->get(route("fiscalizacao.mapaperiodo", $fiscal->id))
             ->assertOk()
             ->assertDontSeeText($dados->processofiscalizacaopf)
-            ->assertSeeText($dados->processofiscalizacaopj)
+            ->assertDontSeeText($dados->processofiscalizacaopj)
             ->assertDontSeeText($dados->registroconvertidopf)
             ->assertSeeText($dados->registroconvertidopj)
             ->assertSeeText($dados->processoverificacao)
@@ -1447,11 +1447,11 @@ class FiscalizacaoTest extends TestCase
 
         factory("App\DadoFiscalizacao")->create([
             "idperiodo" => $periodo2020->id,
-            "processofiscalizacaopj" => 11111
+            "autoconstatacao" => 11111
         ]);
         factory("App\DadoFiscalizacao")->create([
             "idperiodo" => $periodo2021->id,
-            "processofiscalizacaopj" => 22222
+            "autoconstatacao" => 22222
         ]);
 
         $this->get(route("fiscalizacao.mapaperiodo", $periodo2020->id))
