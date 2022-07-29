@@ -142,7 +142,6 @@ class UserExternoSiteController extends Controller
 
     public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
     {
-        ini_set("upload_max_filesize", "5M");
         try{
             $externo = auth()->guard('user_externo')->user();
             $validatedData = $request->validated();

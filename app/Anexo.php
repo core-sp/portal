@@ -5,7 +5,6 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
-use ZipArchive;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -23,28 +22,38 @@ class Anexo extends Model
 
     private static function ziparFilesPreRegistro($files)
     {
-        $zip = new ZipArchive;
         $path = storage_path('app/') . Anexo::PATH_PRE_REGISTRO . '/';
         $nomeZip = (string) Str::uuid() . '.zip';
 
-        if(!file_exists(Anexo::PATH_PRE_REGISTRO))
+        if(!file_exists(storage_path('app/') . Anexo::PATH_PRE_REGISTRO))
             Storage::makeDirectory(Anexo::PATH_PRE_REGISTRO);
+        if(!file_exists(storage_path('app/temp')))
+            Storage::makeDirectory('temp');
 
-        if($zip->open($path . $nomeZip, ZipArchive::CREATE) === TRUE) 
+        $nomeFiles = '';
+        $nomesTemp = '';
+        foreach($files as $key => $file)
         {
-            foreach($files as $file)
-                $zip->addFile($file->path(), (string) Str::uuid() . '.' . $file->extension());
-            $zip->close();
+            $nome = (string) Str::uuid() . '.' . $file->extension();
+            $file->storeAs('temp', $nome, 'local');
+            $nomeFiles .= $nome . ' ';
+            $nomesTemp .= 'temp/' . $nome . ' ';
         }
+        $final = shell_exec('cd ' . storage_path('app/temp') . ' ; zip ' . $path . $nomeZip . ' ' . $nomeFiles);
 
-        $zip->open($path . $nomeZip);
-        if($zip->numFiles != count($files))
+        $final = explode(PHP_EOL, $final);
+        foreach($final as $key => $fim)
+            if($fim == '')
+                unset($final[$key]);
+                
+        $array = explode(' ', $nomesTemp);
+        Storage::delete($array);
+    
+        if(count($final) != count($files))
         {
             Storage::delete(Anexo::PATH_PRE_REGISTRO . '/' . $nomeZip);
-            $zip->close();
-            throw new \Exception('Erro ao comprimir os arquivos do pré-registro, pois não possue a mesma quantidade do que foi enviado', 500);
+            throw new \Exception('Erro ao comprimir os arquivos do pré-registro, pois não possui a mesma quantidade do que foi enviado', 500);
         }
-        $zip->close();
 
         return [
             'path' => Anexo::PATH_PRE_REGISTRO . '/' . $nomeZip,

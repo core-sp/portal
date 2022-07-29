@@ -1105,8 +1105,6 @@ function putDadosPreRegistro(objeto)
 	var frmData = new FormData();
 	var dados = null;
 
-console.log(valor[0]);
-
 	if(campo == 'path'){
 		for(var i = 0; i < valor.length; i++)
 			frmData.append("valor[]", valor[i]);
