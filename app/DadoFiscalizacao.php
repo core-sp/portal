@@ -8,7 +8,6 @@ class DadoFiscalizacao extends Model
 {
     protected $table = 'dados_fiscalizacao';
     protected $guarded = [];
-    // protected $with = ['regional'];
 
     public function regional()
     {

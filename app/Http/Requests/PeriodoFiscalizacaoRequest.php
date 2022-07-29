@@ -63,12 +63,4 @@ class PeriodoFiscalizacaoRequest extends FormRequest
             'distinct' => 'Existe id repetida'
         ];
     }
-
-    // public function toModel()
-    // {
-    //     return [
-    //         'periodo' => $this->periodo,
-    //         'status' => false
-    //     ];
-    // }
 }
