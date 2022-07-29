@@ -1077,9 +1077,11 @@ function appendArquivoBD(finalLink, nome, valor, id, totalFiles)
 	
 	if((total >= 1) && (total < totalFiles) && !($(".ArquivoBD_" + nome).css("display") == "none"))
 		cloneBD = $(".ArquivoBD_" + nome + ":last").clone(true);
-	
+
 	cloneBD.find("input").val(valor);
-	cloneBD.find(".Arquivo-Download").attr("href", link + 'download/' + id);
+	cloneBD.find(".Arquivo-Download, .Arquivo-Abrir").attr("href", link + 'download/' + id);
+	(cloneBD.find(".NomeFile").val().indexOf('.zip') != -1) || (navigator.userAgent.indexOf('mobile') != -1) ? 
+	cloneBD.find(".Arquivo-Abrir").hide() : cloneBD.find(".Arquivo-Abrir").show();
 	cloneBD.find(".modalExcluir").val(id);
 
 	if((total == 1) && (cloneBD.css("display") == "none"))

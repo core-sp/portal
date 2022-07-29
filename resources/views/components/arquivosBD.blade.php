@@ -4,20 +4,23 @@
         <div class="input-group col-sm mb-2-576">
             <input 
                 type="text" 
-                class="form-control" 
+                class="form-control NomeFile" 
                 value="{{ $nome_file }}"
                 readonly
             />
             <div class="input-group-append">
-                @if((!strpos(request()->header('user-agent'), 'mobile')) && (isset($extensao) && in_array($extensao, ['jpg', 'jpeg', 'png', 'pdf'])))
+                
                 <a href="{{ $rota_download }}" 
-                    class="btn btn-info Arquivo-Download" 
+                    class="btn btn-info Arquivo-Abrir" 
                     value="" 
                     target="_blank" 
+                    @if(strpos(request()->header('user-agent'), 'mobile') || (isset($extensao) && !in_array($extensao, ['jpg', 'jpeg', 'png', 'pdf'])))
+                    style="display:none;"
+                    @endif
                 >
                     Abrir
                 </a>
-                @endif
+                
                 <a href="{{ $rota_download }}" 
                     class="btn btn-primary Arquivo-Download" 
                     download
