@@ -11,21 +11,11 @@
             <div class="input-group-append">
                 
                 <a href="{{ $rota_download }}" 
-                    class="btn btn-info Arquivo-Abrir" 
+                    class="btn btn-primary Arquivo-Download" 
                     value="" 
                     target="_blank" 
-                    @if(strpos(request()->header('user-agent'), 'mobile') || (isset($extensao) && !in_array($extensao, ['jpg', 'jpeg', 'png', 'pdf'])))
-                    style="display:none;"
-                    @endif
                 >
                     Abrir
-                </a>
-                
-                <a href="{{ $rota_download }}" 
-                    class="btn btn-primary Arquivo-Download" 
-                    download
-                >
-                    <i class="fas fa-download"></i>
                 </a>
                 @if($podeExcluir)
                 <button class="btn btn-danger modalExcluir"
