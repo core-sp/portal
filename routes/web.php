@@ -225,6 +225,11 @@ Route::prefix('admin')->group(function() {
     Route::get('/filtro', 'PreRegistroController@index')->name('preregistro.filtro');
   });
 
+  Route::get('phpinfo', function () {
+    if(auth()->user()->isAdmin())
+      phpinfo();
+  })->name('phpinfo');
+
 });
 
 /*
