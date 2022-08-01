@@ -1,3 +1,8 @@
+@php
+    $camposEditados = $resultado->getCamposEditados();
+    $arrayJustificativas = $resultado->getJustificativaArray();
+@endphp
+
 <div class="card-body bg-light">
 
     <p>
@@ -10,10 +15,10 @@
         {{ isset($resultado->getTipoTelefone()[0]) ? $resultado->getTipoTelefone()[0] : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'tipo_telefone',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['tipo_telefone']))
+        @if(array_key_exists('tipo_telefone', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -23,10 +28,10 @@
         {{ isset($resultado->getTelefone()[0]) ? $resultado->getTelefone()[0] : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'telefone',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['telefone']))
+        @if(array_key_exists('telefone', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -38,10 +43,10 @@
         {{ isset($resultado->getOpcionalCelular()[0]) ? implode(', ', $resultado->getOpcionalCelular()[0]) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'opcional_celular',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['opcional_celular']))
+        @if(array_key_exists('opcional_celular', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -53,10 +58,10 @@
         {{ isset($resultado->getTipoTelefone()[1]) ? $resultado->getTipoTelefone()[1] : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'tipo_telefone_1',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['tipo_telefone_1']))
+        @if(array_key_exists('tipo_telefone_1', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -67,10 +72,10 @@
         {{ isset($resultado->getTelefone()[1]) ? $resultado->getTelefone()[1] : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'telefone_1',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['telefone_1']))
+        @if(array_key_exists('telefone_1', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -82,10 +87,10 @@
         {{ isset($resultado->getOpcionalCelular()[1]) ? implode(', ', $resultado->getOpcionalCelular()[1]) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'opcional_celular_1',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['opcional_celular_1']))
+        @if(array_key_exists('opcional_celular_1', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>

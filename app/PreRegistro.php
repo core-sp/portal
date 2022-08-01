@@ -478,14 +478,30 @@ class PreRegistro extends Model
     public function setCamposEspelho($request)
     {
         $anexos = $this->anexos;
-        $nomesAnexos = array();
-        $final = array();
+        $idAnexos = array();
         foreach($anexos as $anexo)
-            array_push($nomesAnexos, substr($anexo->path, strripos($anexo->path, '/') + 1));
-        $request['path'] = implode(',', $nomesAnexos);
+            array_push($idAnexos, $anexo->id);
+        $request['path'] = implode(',', $idAnexos);
+        $final = $request;
+
+        if(isset($this->campos_espelho))
+        {
+            $campos = json_decode($this->campos_espelho, true);
+            $anexosAntigo = explode(',', $campos['path']);
+            foreach($idAnexos as $key => $id)
+                if(array_search($id, $anexosAntigo) !== false)
+                    unset($idAnexos[$key]);
+            if(!empty($idAnexos))
+                $final['path'] = implode(',', $idAnexos);
+        }
 
         if($this->status == PreRegistro::STATUS_CORRECAO)
-            $this->update(['campos_editados' => array_diff_assoc(json_decode($this->campos_espelho, true), $request)]);
+        {
+            $dados = array_diff_assoc(json_decode($this->campos_espelho, true), $final);
+            if(isset($dados['path']))
+                $dados['path'] = $final['path'];
+            $this->update(['campos_editados' => json_encode($dados, JSON_FORCE_OBJECT)]);
+        }
         $this->update(['campos_espelho' => json_encode($request, JSON_FORCE_OBJECT)]);
     }
 
@@ -579,7 +595,7 @@ class PreRegistro extends Model
                 break;
             case 'anexos':
                 $anexos = $this->anexos();
-                $valido = $classe::armazenar($anexos->count(), $valor, $this->userExterno->isPessoaFisica());
+                $valido = $classe::armazenar($anexos->count(), $valor, $this->id, $this->userExterno->isPessoaFisica());
                 if(isset($valido))
                 {
                     $resultado = $anexos->create($valido);

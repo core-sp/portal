@@ -1,3 +1,8 @@
+@php
+    $arrayJustificativas = $resultado->getJustificativaArray();
+    $campoAnexo = isset($resultado->getCamposEditados()['path']) ? explode(',', $resultado->getCamposEditados()['path']) : [];
+@endphp
+
 <div class="card-body bg-light">
 
     <p class="font-weight-bolder mb-2 mt-1"><i class="fas fa-info-circle text-primary"></i> Exigências sobre os documentos obrigatórios: </p>
@@ -23,12 +28,9 @@
         <span class="font-weight-bolder">{{ $codigos[5]['path'] }} - Anexos: </span>
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'path',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['path']))
-        <span class="badge badge-danger ml-2">Campo alterado</span>
-        @endif
     </p>
 
     @foreach($resultado->anexos as $anexo)
@@ -47,6 +49,9 @@
         >
             <i class="fas fa-download"></i>
         </a>
+        @if(!empty($campoAnexo) && (array_search($anexo->id, $campoAnexo) !== false))
+        <span class="badge badge-success ml-2">Novo anexo</span>
+        @endif
     </p>
     @endforeach
 

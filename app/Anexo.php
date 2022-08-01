@@ -20,45 +20,43 @@ class Anexo extends Model
     const TOTAL_PJ_PRE_REGISTRO = 15;
     const PATH_PRE_REGISTRO = 'userExterno/pre_registros';
 
-    private static function ziparFilesPreRegistro($files)
+    private static function ziparFilesPreRegistro($files, $id)
     {
-        $path = storage_path('app/') . Anexo::PATH_PRE_REGISTRO . '/';
+        $path = storage_path('app/') . Anexo::PATH_PRE_REGISTRO . '/' . $id . '/';
         $nomeZip = (string) Str::uuid() . '.zip';
 
-        if(!file_exists(storage_path('app/') . Anexo::PATH_PRE_REGISTRO))
-            Storage::makeDirectory(Anexo::PATH_PRE_REGISTRO);
-        if(!file_exists(storage_path('app/temp')))
-            Storage::makeDirectory('temp');
+        if(!file_exists(storage_path('app/') . Anexo::PATH_PRE_REGISTRO . '/' . $id))
+            Storage::makeDirectory(Anexo::PATH_PRE_REGISTRO . '/' . $id);
+        if(!file_exists(storage_path('app/temp/' . $id)))
+            Storage::makeDirectory('temp/' . $id);
 
         $nomeFiles = '';
         $nomesTemp = '';
+        $cont = 1;
         foreach($files as $key => $file)
         {
-            $nome = (string) Str::uuid() . '.' . $file->extension();
-            $file->storeAs('temp', $nome, 'local');
-            $nomeFiles .= $nome . ' ';
-            $nomesTemp .= 'temp/' . $nome . ' ';
+            $nome = (string) Carbon::now()->timestamp . '_' . $cont . '.' . $file->extension();
+            $file->storeAs('temp/' . $id, $nome, 'local');
+            $cont++;
         }
-        $final = shell_exec('cd ' . storage_path('app/temp') . ' ; zip ' . $path . $nomeZip . ' ' . $nomeFiles);
+        $final = shell_exec('cd ' . storage_path('app/temp/' . $id) . ' ; zip -r ' . $path . $nomeZip . ' .');
+        Storage::deleteDirectory('temp/' . $id);
 
-        $final = explode(PHP_EOL, $final);
-        foreach($final as $key => $fim)
+        $finalArray = explode(PHP_EOL, $final);
+        foreach($finalArray as $key => $fim)
             if($fim == '')
-                unset($final[$key]);
-                
-        $array = explode(' ', $nomesTemp);
-        Storage::delete($array);
+                unset($finalArray[$key]);
     
-        if(count($final) != count($files))
+        if(count($finalArray) != count($files))
         {
-            Storage::delete(Anexo::PATH_PRE_REGISTRO . '/' . $nomeZip);
-            throw new \Exception('Erro ao comprimir os arquivos do pré-registro, pois não possui a mesma quantidade do que foi enviado', 500);
+            Storage::delete(Anexo::PATH_PRE_REGISTRO . '/' . $id . '/' . $nomeZip);
+            throw new \Exception('Erro ao comprimir os arquivos do pré-registro, pois não possui a mesma quantidade do que foi enviado - Erro shell: ' . $final, 500);
         }
 
         return [
-            'path' => Anexo::PATH_PRE_REGISTRO . '/' . $nomeZip,
+            'path' => Anexo::PATH_PRE_REGISTRO . '/' . $id . '/' . $nomeZip,
             'nome_original' => $nomeZip,
-            'tamanho_bytes' => Storage::size(Anexo::PATH_PRE_REGISTRO . '/' . $nomeZip),
+            'tamanho_bytes' => Storage::size(Anexo::PATH_PRE_REGISTRO . '/' . $id . '/' . $nomeZip),
             'extensao' => 'zip',
         ];
     }
@@ -75,16 +73,16 @@ class Anexo extends Model
         return $this->belongsTo('App\PreRegistro');
     }
 
-    public static function armazenar($total, $valor, $pf = true)
+    public static function armazenar($total, $valor, $id, $pf = true)
     {
         $totalAnexo = $pf ? Anexo::TOTAL_PF_PRE_REGISTRO : Anexo::TOTAL_PJ_PRE_REGISTRO;
 
         if($total < $totalAnexo)
         {
             if(count($valor) > 1)
-                return Anexo::ziparFilesPreRegistro($valor);
+                return Anexo::ziparFilesPreRegistro($valor, $id);
             $nome = (string) Str::uuid() . '.' . $valor[0]->extension();
-            $anexo = $valor[0]->storeAs(Anexo::PATH_PRE_REGISTRO, $nome, 'local');
+            $anexo = $valor[0]->storeAs(Anexo::PATH_PRE_REGISTRO . '/' . $id, $nome, 'local');
             return [
                 'path' => $anexo,
                 'nome_original' => $valor[0]->getClientOriginalName(),

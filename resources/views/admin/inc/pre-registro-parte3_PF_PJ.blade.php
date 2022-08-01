@@ -1,3 +1,8 @@
+@php
+    $camposEditados = $resultado->getCamposEditados();
+    $arrayJustificativas = $resultado->getJustificativaArray();
+@endphp
+
 <div class="card-body bg-light">
     <h5 class="font-weight-bolder mb-3">Endereço de correspondência</h5>
 
@@ -6,10 +11,10 @@
         {{ isset($resultado->cep) ? $resultado->cep : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'cep',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['cep']))
+        @if(array_key_exists('cep', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -19,10 +24,10 @@
         {{ isset($resultado->bairro) ? $resultado->bairro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'bairro',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['bairro']))
+        @if(array_key_exists('bairro', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -32,10 +37,10 @@
         {{ isset($resultado->logradouro) ? $resultado->logradouro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'logradouro',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['logradouro']))
+        @if(array_key_exists('logradouro', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -45,10 +50,10 @@
         {{ isset($resultado->numero) ? $resultado->numero : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'numero',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['numero']))
+        @if(array_key_exists('numero', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -58,10 +63,10 @@
         {{ isset($resultado->complemento) ? $resultado->complemento : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'complemento',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['complemento']))
+        @if(array_key_exists('complemento', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -71,10 +76,10 @@
         {{ isset($resultado->cidade) ? $resultado->cidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'cidade',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['cidade']))
+        @if(array_key_exists('cidade', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -84,10 +89,10 @@
         {{ isset($resultado->uf) ? $resultado->uf : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'uf',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['uf']))
+        @if(array_key_exists('uf', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -102,10 +107,10 @@
         <span class="font-weight-bolder">{{ $codigos[2]['checkEndEmpresa'] }} - Mesmo endereço da correspondência </span>
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'checkEndEmpresa',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['checkEndEmpresa']))
+        @if(array_key_exists('checkEndEmpresa', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -117,10 +122,10 @@
         {{ isset($resultado->pessoaJuridica->cep) ? $resultado->pessoaJuridica->cep : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'cep_empresa',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['cep_empresa']))
+        @if(array_key_exists('cep_empresa', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -130,10 +135,10 @@
         {{ isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'bairro_empresa',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['bairro_empresa']))
+        @if(array_key_exists('bairro_empresa', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -143,10 +148,10 @@
         {{ isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'logradouro_empresa',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['logradouro_empresa']))
+        @if(array_key_exists('logradouro_empresa', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -156,10 +161,10 @@
         {{ isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'numero_empresa',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['numero_empresa']))
+        @if(array_key_exists('numero_empresa', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -169,10 +174,10 @@
         {{ isset($resultado->pessoaJuridica->complemento) ? $resultado->pessoaJuridica->complemento : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'complemento_empresa',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['complemento_empresa']))
+        @if(array_key_exists('complemento_empresa', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -182,10 +187,10 @@
         {{ isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'cidade_empresa',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['cidade_empresa']))
+        @if(array_key_exists('cidade_empresa', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
@@ -195,10 +200,10 @@
         {{ isset($resultado->pessoaJuridica->uf) ? $resultado->pessoaJuridica->uf : '------' }}
         @component('components.justificativa_pre_registro_admin', [
             'campo' => 'uf_empresa',
-            'resultado' => $resultado->getJustificativaArray()
+            'resultado' => $arrayJustificativas
         ])
         @endcomponent
-        @if(isset($resultado->getCamposEditados()['uf_empresa']))
+        @if(array_key_exists('uf_empresa', $camposEditados))
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>

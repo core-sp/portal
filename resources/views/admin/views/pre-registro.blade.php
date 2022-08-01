@@ -103,7 +103,7 @@
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
                     {{ $abas[5] }}
                     @if(!empty(array_intersect_key($codigos[5], $resultado->getCamposEditados())))
-                    <span class="badge badge-danger ml-2">Campos alterados</span>
+                    <span class="badge badge-success ml-2">Novos anexos</span>
                     @endif
                 </div>
             </a>

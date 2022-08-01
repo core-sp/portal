@@ -21,7 +21,7 @@
     <br>
     <span class="ml-3"><i class="fas fa-minus"></i> Em cada anexo pode conter até 15 arquivos, basta manter a tecla <kbd>ctrl</kbd> pressionada ao selecionar.</span>
     <br>
-    <span class="ml-3"><i class="fas fa-minus"></i> Caso selecione mais de um arquivo no anexo, ele será comprimido num arquivo com a extensão <mark>.zip</mark>.</span>
+    <span class="ml-3"><i class="fas fa-minus"></i> Caso selecione mais de um arquivo no anexo, ele será compactado num arquivo com a extensão <mark>.zip</mark>.</span>
     <input id="totalFilesServer" type="hidden" value="{{ $totalFiles }}" />
     <br>
     <span class="ml-3"><i class="fas fa-minus"></i> Somente arquivos com extensão <mark>.pdf, .jpg, .jpeg, .png</mark> são aceitos.</span>
