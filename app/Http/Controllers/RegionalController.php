@@ -24,7 +24,7 @@ class RegionalController extends Controller
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as regionais.");
         }
 
@@ -40,7 +40,7 @@ class RegionalController extends Controller
             $resultado = $dados['resultado'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a regional.");
         }
 
@@ -55,7 +55,7 @@ class RegionalController extends Controller
             $validated = $request->validated();
             $this->service->getService('Regional')->save($validated, $id);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar a regional.");
         }
 
@@ -72,7 +72,7 @@ class RegionalController extends Controller
             $resultado = $dados['resultado'];
             $noticias = $dados['noticias'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página da regional no portal.");
         }
 
@@ -90,7 +90,7 @@ class RegionalController extends Controller
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em regionais.");
         }
 
@@ -102,7 +102,7 @@ class RegionalController extends Controller
         try{
             $regionais = $this->service->getService('Regional')->all();
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as regionais no portal.");
         }
         return response()

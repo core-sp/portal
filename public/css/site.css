@@ -384,21 +384,49 @@ figure.align-left {
 /*
  * Estilo para o mapa do SIG
  */
-.SEDE {fill:#31b7ea}
-.ES01 {fill:#1d8ece}
-.ES02 {fill:#33b8eb}
-.ES03 {fill:#33b8eb}
-.ES04 {fill:#0f699c}
-.ES05 {fill:#1d8ece}
-.ES06 {fill:#0e689a}
-.ES07 {fill:#1f4798}
-.ES08 {fill:#4c61aa}
-.ES09 {fill:#1f4798}
-.ES10 {fill:#33b0e5}
-.ES11 {fill:#0f6293}
-.ES12 {fill:#1f4798}
+.SEDE {
+	fill:#31b7ea
+}
+.ES01 {
+	fill:#1d8ece
+}
+.ES02 {
+	fill:#33b8eb
+}
+.ES03 {
+	fill:#33b8eb
+}
+.ES04 {
+	fill:#0f699c
+}
+.ES05 {
+	fill:#1d8ece
+}
+.ES06 {
+	fill:#0e689a
+}
+.ES07 {
+	fill:#1f4798
+}
+.ES08 {
+	fill:#4c61aa
+}
+.ES09 {
+	fill:#1f4798
+}
+.ES10 {
+	fill:#33b0e5
+}
+.ES11 {
+	fill:#0f6293
+}
+.ES12 {
+	fill:#1f4798
+}
 
-.mapa_regional:hover {opacity:0.4}
+.mapa_regional:hover {
+	opacity:0.4
+}
 
 .dado-oculto {
 	display: none;

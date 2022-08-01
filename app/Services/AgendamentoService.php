@@ -11,6 +11,7 @@ use App\Events\ExternoEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
+use Exception;
 
 class AgendamentoService implements AgendamentoServiceInterface {
 
@@ -199,12 +200,12 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $updateStatus = \Route::is('agendamentos.updateStatus');
 
         if(!$updateStatus && !isset($dados['antigo'])) 
-            abort(500, 'Erro por falta de campo no request');
+            throw new Exception('Erro por falta de campo no request', 400);
 
         if(isset($dados['antigo']))
         {
             if(($dados['antigo'] == 0 && !$agendamento->isAfter()) || ($dados['antigo'] == 1 && $agendamento->isAfter()))
-                abort(500, 'Erro na validação de campo no request');
+                throw new Exception('Erro na validação de campo no request', 400);
             unset($dados['antigo']);
         }            
 
@@ -457,7 +458,8 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
         $sameRegional = auth()->user()->can('sameRegional', $agendamento);
-        abort_if($atendOrGere && !$sameRegional, 403);
+        if($atendOrGere && !$sameRegional)
+            throw new Exception('Não autorizado', 403);
 
         $status = $this->status();
         if($agendamento->isAfter())
@@ -541,7 +543,8 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
         $sameRegional = auth()->user()->can('sameRegional', $agendamento);
-        abort_if($atendOrGere && !$sameRegional, 403);
+        if($atendOrGere && !$sameRegional)
+            throw new Exception('Não autorizado', 403);
 
         Mail::to($agendamento->email)->queue(new AgendamentoMailGuest($agendamento));
     }
@@ -553,7 +556,8 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
         $sameRegional = auth()->user()->can('sameRegional', $agendamento);
-        abort_if($atendOrGere && !$sameRegional, 403);
+        if($atendOrGere && !$sameRegional)
+            throw new Exception('Não autorizado', 403);
 
         $valido = $this->validarUpdate($dados, $agendamento);
         if(isset($valido['message']))
@@ -671,7 +675,8 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ];
             
         $update = $agendamento->update(['status' => Agendamento::STATUS_CANCELADO]);
-        abort_if(!$update, 500);
+        if(!$update)
+            throw new Exception('Erro ao atualizar o status do agendamento', 500);
 
         $string = $agendamento->nome.' (CPF: '.$agendamento->cpf.') *cancelou* atendimento em *'.$agendamento->regional->regional;
         $string .= '* no dia '.onlyDate($agendamento->dia);
