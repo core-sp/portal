@@ -22,14 +22,15 @@ class Anexo extends Model
 
     private static function ziparFilesPreRegistro($files, $id)
     {
-        $path = storage_path('app/') . Anexo::PATH_PRE_REGISTRO . '/' . $id . '/';
+        $pathStorage = env("APP_ENV") == "testing" ? storage_path('framework/testing/disks/local/') : storage_path('app/');
+        $path = $pathStorage . Anexo::PATH_PRE_REGISTRO . '/' . $id . '/';
         $nomeZip = (string) Str::uuid() . '.zip';
 
-        if(!file_exists(storage_path('app/') . Anexo::PATH_PRE_REGISTRO . '/' . $id))
+        if(!file_exists($pathStorage . Anexo::PATH_PRE_REGISTRO . '/' . $id))
             Storage::makeDirectory(Anexo::PATH_PRE_REGISTRO . '/' . $id);
-        if(!file_exists(storage_path('app/temp/' . $id)))
+        if(!file_exists($pathStorage . 'temp/' . $id))
             Storage::makeDirectory('temp/' . $id);
-
+            
         $nomeFiles = '';
         $nomesTemp = '';
         $cont = 1;
@@ -39,7 +40,7 @@ class Anexo extends Model
             $file->storeAs('temp/' . $id, $nome, 'local');
             $cont++;
         }
-        $final = shell_exec('cd ' . storage_path('app/temp/' . $id) . ' ; zip -r ' . $path . $nomeZip . ' .');
+        $final = shell_exec('cd ' . $pathStorage . 'temp/' . $id . ' ; zip -r ' . $path . $nomeZip . ' .');
         Storage::deleteDirectory('temp/' . $id);
 
         $finalArray = explode(PHP_EOL, $final);

@@ -34,7 +34,9 @@
     </p>
 
     @foreach($resultado->anexos as $anexo)
-    <p><i class="fas fa-paperclip"></i> {{ $anexo->nome_original }} 
+    <span class="font-weight-bolder">ID: {{ $anexo->id }} </span>
+    <p class="mb-0">
+        <i class="fas fa-paperclip"></i> {{ $anexo->nome_original }} 
         @if(in_array($anexo->extensao, ['jpg', 'jpeg', 'png', 'pdf']))
         <a href="{{ route('preregistro.anexo.download', ['idPreRegistro' => $resultado->id, 'id' => $anexo->id]) }}" 
             class="btn btn-sm btn-primary ml-2" 

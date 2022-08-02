@@ -11,6 +11,8 @@ class PreRegistroAjaxRequest extends FormRequest
 {
     private $regraValor;
     private $service;
+    private $classes;
+    private $todos;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -19,6 +21,13 @@ class PreRegistroAjaxRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        $campos_array = $this->service->getService('PreRegistro')->getNomesCampos();
+        foreach($campos_array as $key => $campos)
+        {
+            $this->classes .= isset($this->classes) ? ','.$key : $key;
+            $this->todos .= isset($this->todos) ? ','.$campos : $campos;
+        }
+
         $this->regraValor = ['max:191'];
 
         if(in_array(request()->campo, ['opcional_celular[]', 'opcional_celular_1[]']))
@@ -55,11 +64,18 @@ class PreRegistroAjaxRequest extends FormRequest
         if(request()->campo == 'path')
         {
             $total = 0;
-            foreach($this->valor as $value)
-                $total += round($value->getSize() / 1024);
-            $this->merge([
-                'total' => $total > 5120 ? '' : $total
-            ]);  
+            if(!request()->hasFile('valor'))
+                $this->merge([
+                    'total' => $total
+                ]);  
+            else{
+                $files = request()->file('valor');
+                foreach($files as $value)
+                    $total += round($value->getSize() / 1024);
+                $this->merge([
+                    'total' => $total > 5120 ? '' : $total
+                ]);  
+            }
         }
 
         if(strpos(request()->campo, 'dt_nascimento') !== false)
@@ -82,7 +98,7 @@ class PreRegistroAjaxRequest extends FormRequest
             ];
 
         $notUpper = ['path', 'checkEndEmpresa', 'email_contabil'];
-        if(!in_array($this->campo, $notUpper) && isset($this->valor))
+        if(!in_array($this->campo, $notUpper) && isset($this->valor) && !is_array($this->valor))
             $this->merge([
                 'valor' => mb_strtoupper($this->valor, 'UTF-8')
             ]);
@@ -90,30 +106,20 @@ class PreRegistroAjaxRequest extends FormRequest
 
     public function rules()
     {
-        $classes = null;
-        $todos = null;
-        $campos_array = $this->service->getService('PreRegistro')->getNomesCampos();
+        if(request()->campo == 'path')
+            return [
+                'valor' => 'required|array|min:1|max:15',
+                'valor.*' => 'file|mimetypes:application/pdf,image/jpeg,image/png',
+                'campo' => 'required|in:'.$this->todos,
+                'classe' => 'required|in:'.$this->classes,
+                'total' => 'required',
+            ];
 
-        foreach($campos_array as $key => $campos)
-        {
-            $classes .= isset($classes) ? ','.$key : $key;
-            $todos .= isset($todos) ? ','.$campos : $campos;
-        }
-
-        $rules = [
+        return [
             'valor' => $this->regraValor,
-            'campo' => 'required|in:'.$todos,
-            'classe' => 'required|in:'.$classes
+            'campo' => 'required|in:'.$this->todos,
+            'classe' => 'required|in:'.$this->classes
         ];
-        $rulesPath = [
-            'valor' => 'required|array|min:1|max:15',
-            'valor.*' => 'file|mimetypes:application/pdf,image/jpeg,image/png',
-            'campo' => 'required|in:'.$todos,
-            'classe' => 'required|in:'.$classes,
-            'total' => 'required',
-        ];
-
-        return gettype(request()->valor) == 'array' ? $rulesPath : $rules;
     }
 
     public function messages()

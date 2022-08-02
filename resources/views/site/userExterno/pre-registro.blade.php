@@ -11,7 +11,7 @@
 
 <div class="representante-content w-100">
     <div class="conteudo-txt-mini light">
-        <h4 class="pt-1 pb-1">Solicitação de Registro</h4>
+        <h4 class="pt-1 pb-1">Solicitação de registro para ser <strong>Representante Comercial</strong></h4>
         <div class="linha-lg-mini mb-2"></div>
             <div class="list-group w-100">
                 <div class="d-block mt-2 mb-3">

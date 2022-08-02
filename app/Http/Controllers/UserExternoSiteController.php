@@ -18,7 +18,7 @@ class UserExternoSiteController extends Controller
     {        
         // Limitação de requisições por minuto para cada usuário, senão erro 429
         $qtd = '60';
-        if((env("APP_ENV") == "local") || (env("APP_ENV") == "testing"))
+        if(env("APP_ENV") == "testing")
             $qtd = '100';
 
         $this->middleware(['auth:user_externo', 'throttle:' . $qtd . ',1'])->except(['cadastroView', 'cadastro', 'verificaEmail']);
@@ -40,6 +40,12 @@ class UserExternoSiteController extends Controller
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao criar o cadastro no Login Externo');
         }
+
+        if(isset($dados['erro']))
+            return redirect(route('externo.cadastro'))->withInput()->with([
+                'message' => $dados['erro'],
+                'class' => $dados['class']
+            ]);
 
         return view('site.agradecimento')->with([
             'agradece' => 'Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>'

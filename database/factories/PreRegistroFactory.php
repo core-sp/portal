@@ -18,15 +18,18 @@ $factory->define(PreRegistro::class, function (Faker $faker) {
         'uf' => 'SP',
         'telefone' => '(11) 00000-0000',
         'tipo_telefone' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
-        'opcional_celular' => mb_strtoupper(opcoes_celular()[1], 'UTF-8') . ',' . mb_strtoupper(opcoes_celular()[0], 'UTF-8'),
+        'opcional_celular' => mb_strtoupper(opcoes_celular()[1], 'UTF-8'),
         'user_externo_id' => factory('App\UserExterno'),
         'contabil_id' => factory('App\Contabil'),
         'idregional' => factory('App\Regional'),
         'idusuario' => factory('App\User'),
-        'status' => null,
+        'status' => PreRegistro::STATUS_CRIADO,
         'justificativa' => null,
         'confere_anexos' => null,
-        'historico_contabil' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT)
+        'historico_contabil' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
+        'historico_status' => json_encode([PreRegistro::STATUS_CRIADO . ';' . now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
+        'campos_espelho' => null,
+        'campos_editados' => null,
     ];
 });
 
@@ -40,7 +43,7 @@ $factory->state(PreRegistro::class, 'low', function (Faker $faker) {
 
 $factory->state(PreRegistro::class, 'pj', function (Faker $faker) {
     return [
-        'user_externo_id' => factory('App\UserExterno')->state('pj'),
+        'user_externo_id' => factory('App\UserExterno')->states('pj'),
     ];
 });
 

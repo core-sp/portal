@@ -16,6 +16,13 @@ class UserExternoService implements UserExternoServiceInterface {
         $dados['password'] = Hash::make($dados['password']);
         $dados['aceite'] = true;
         unset($dados['password_confirmation']);
+        $emails = UserExterno::where('email', $dados['email'])->count();
+
+        if($emails >= 2)
+            return [
+                'erro' => 'Este email já está cadastrado em duas contas, por favor insira outro.',
+                'class' => 'alert-danger'
+            ];
 
         $externo = UserExterno::where('cpf_cnpj', $dados['cpf_cnpj'])
             ->where('ativo', 0)

@@ -460,7 +460,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         }
 
         return [
-            'resultado' => $resultado,
+            'resultado' => isset($resultado->status) ? $resultado : $resultado->fresh(),
             'codigos' => $this->getCodigosCampos($externo),
             'regionais' => $service->getService('Regional')
                 ->all()

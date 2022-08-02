@@ -11,8 +11,8 @@ $factory->define(PreRegistroCnpj::class, function (Faker $faker) {
         'nire' => null,
         'tipo_empresa' => mb_strtoupper(tipos_empresa()[0], 'UTF-8'),
         'dt_inicio_atividade' => '2020-12-21',
-        'inscricao_municipal' => '123456789',
-        'inscricao_estadual' => '987654321',
+        'inscricao_municipal' => null,
+        'inscricao_estadual' => null,
         'capital_social' => '1.000,00',
         'cep' => '01234-050',
         'logradouro' => 'RUA TESTE DA RUA',
@@ -23,7 +23,7 @@ $factory->define(PreRegistroCnpj::class, function (Faker $faker) {
         'uf' => 'SP',
         'historico_rt' => json_encode(['tentativas' => 0, 'update' => now()->format('Y-m-d H:i:s')], JSON_FORCE_OBJECT),
         'responsavel_tecnico_id' => factory('App\ResponsavelTecnico'),
-        'pre_registro_id' => factory('App\PreRegistro')->state('pj'),
+        'pre_registro_id' => factory('App\PreRegistro')->states('pj'),
     ];
 });
 
@@ -45,10 +45,7 @@ $factory->state(PreRegistroCnpj::class, 'justificado', function (Faker $faker) {
     foreach($campos as $campo)
         $arrayFinal[$campo] = $faker->text(500);
 
-    $pr = factory('App\PreRegistro')->state('analise_inicial')->create([
-        'user_externo_id' => factory('App\UserExterno')->create([
-            'cpf_cnpj' => '06985713000138'
-        ]),
+    $pr = factory('App\PreRegistro')->states('pj', 'analise_inicial')->create([
         'justificativa' => json_encode($arrayFinal, JSON_FORCE_OBJECT)
     ]);
 

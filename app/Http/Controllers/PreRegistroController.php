@@ -14,7 +14,7 @@ class PreRegistroController extends Controller
     {
         // Limitação de requisições por minuto para cada usuário, senão erro 429
         $qtd = '50';
-        if((env("APP_ENV") == "local") || (env("APP_ENV") == "testing"))
+        if(env("APP_ENV") == "testing")
             $qtd = '150';
         $this->middleware(['auth', 'throttle:' . $qtd . ',1']);
         $this->service = $service;

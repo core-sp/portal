@@ -36,8 +36,9 @@
                 <p class="alert alert-danger">{{ Session::get('message') }}</p>
                 @endif
                 <p>Seja bem-vindo(a).</p>
-                <p>A Área Restrita do Login Externo é destinada a usuários que desejam utilizar os serviços que não necessitam do registro de Representante Comercial.</p>
+                <p>A Área Restrita do Login Externo é destinada a usuários que desejam utilizar os serviços que não necessitam do registro de <strong>Representante Comercial</strong>.</p>
                 <p>Preencha as informações abaixo e realize o seu cadastro.</p>
+                <p class="text-danger">É recomendável a criação de uma senha forte para a sua segurança.</p>
                 <hr>
                 <form action="{{ route('externo.cadastro.submit') }}" method="POST" class="cadastroRepresentante">
                     @csrf

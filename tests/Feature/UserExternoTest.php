@@ -245,6 +245,36 @@ class UserExternoTest extends TestCase
 
     /** @test 
      * 
+    */
+    public function cannot_register_if_exist_more_than_two_email_equals()
+    {
+        $pre = factory('App\UserExterno')->create();
+        $pre2 = factory('App\UserExterno')->create([
+            'cpf_cnpj' => '03961439893',
+            'email' => $pre->email
+        ]);
+        $dados = factory('App\UserExterno')->raw([
+            'cpf_cnpj' => '09361260000167',
+            'aceite' => 'on',
+            'password' => 'Teste102030',
+            'password_confirmation' => 'Teste102030',
+            'email' => $pre->email
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertRedirect(route('externo.cadastro'));
+
+        $this->get(route('externo.cadastro'))
+        ->assertSeeText('Este email já está cadastrado em duas contas, por favor insira outro.');
+
+        $this->assertDatabaseMissing('users_externo', [
+            'nome' => $dados['nome']
+        ]);
+    }
+
+    /** @test 
+     * 
      * Pode se registrar com todas as informações certas.
     */
     public function register_new_user_externo()

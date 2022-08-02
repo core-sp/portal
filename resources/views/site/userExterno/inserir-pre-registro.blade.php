@@ -141,10 +141,10 @@
             <div id="parte1_PF_PJ" class="tab-pane container active"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                @endif
                     @include('site.userExterno.inc.pre-registro-etapa1')
-                @if(!$resultado->userPodeEditar())
                 </fieldset>
+                @else
+                    @include('site.userExterno.inc.pre-registro-etapa1')
                 @endif
             </div>
     
@@ -152,10 +152,10 @@
             <div id="parte2_PF_PJ" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                @endif
                     @include('site.userExterno.inc.pre-registro-etapa2')
-                @if(!$resultado->userPodeEditar())
                 </fieldset>
+                @else
+                    @include('site.userExterno.inc.pre-registro-etapa2')
                 @endif
             </div>
 
@@ -163,10 +163,10 @@
             <div id="parte3_PF_PJ" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                @endif
                     @include('site.userExterno.inc.pre-registro-etapa3')
-                @if(!$resultado->userPodeEditar())
                 </fieldset>
+                @else
+                    @include('site.userExterno.inc.pre-registro-etapa3')
                 @endif
             </div>
 
@@ -175,10 +175,10 @@
             <div id="parte4_PJ" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                @endif
                     @include('site.userExterno.inc.pre-registro-etapa4-PJ')
-                @if(!$resultado->userPodeEditar())
                 </fieldset>
+                @else
+                    @include('site.userExterno.inc.pre-registro-etapa4-PJ')
                 @endif
             </div>
             @endif
@@ -187,10 +187,10 @@
             <div id="parte4_PF_parte5_PJ" class="tab-pane container fade"><br>
                 @if(!$resultado->userPodeEditar())
                 <fieldset disabled>
-                @endif
                     @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ')
-                @if(!$resultado->userPodeEditar())
                 </fieldset>
+                @else
+                    @include('site.userExterno.inc.pre-registro-etapa4-PF-etapa5-PJ')
                 @endif
             </div>
 
