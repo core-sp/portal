@@ -488,7 +488,7 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
-        $preRegistro = factory('App\PreRegistro')->state('low')->make([
+        $preRegistro = factory('App\PreRegistro')->states('low')->make([
             'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'tipo_telefone_1' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
@@ -645,7 +645,7 @@ class PreRegistroTest extends TestCase
             'historico_status', 'campos_espelho', 'campos_editados'
         ]);
         
-        foreach($preRegistro as $key => $value)
+        foreach($preRegistro->toArray() as $key => $value)
             $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'preRegistro',
                 'campo' => '',
@@ -707,534 +707,370 @@ class PreRegistroTest extends TestCase
         ]);
     }
 
-    // /** @test */
-    // public function cannot_update_table_anexos_by_ajax_with_more_than_5_files()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     for($count = 1; $count <= 5; $count++)
-    //     {
-    //         $this->post(route('externo.inserir.preregistro.ajax'), [
-    //             'classe' => 'anexos',
-    //             'campo' => 'path',
-    //             'valor' => UploadedFile::fake()->create('random' . $count . '.pdf')
-    //         ])->assertOk();
-
-    //         $this->assertDatabaseHas('anexos', [
-    //             'pre_registro_id' => 1,
-    //             'nome_original' => 'random' . $count. '.pdf',
-    //         ]);
-    //     }
-
-    //     $anexos = $externo->load('preRegistro')->preRegistro->anexos;
-    //     foreach($anexos as $anexo)
-    //         Storage::disk('local')->assertExists($anexo->path);
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random6.pdf')
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseMissing('anexos', [
-    //         'pre_registro_id' => 1,
-    //         'nome_original' => 'random6.pdf'
-    //     ]);
-
-    //     Storage::disk('local')->assertMissing('userExterno/pre_registros/random6.pdf');
-    // }
-
-    // /** @test */
-    // public function owner_can_delete_file()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
-
-    //     $anexo = $externo->load('preRegistro')->preRegistro->anexos->first();
-    //     Storage::disk('local')->assertExists($anexo->path);
-
-    //     $this->delete(route('externo.preregistro.anexo.excluir', $anexo->id))->assertOk();
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-    //     ->assertDontSee('random.pdf');
-
-    //     $this->assertDatabaseMissing('anexos', [
-    //         'pre_registro_id' => 1,
-    //         'nome_original' => 'random.pdf'
-    //     ]);
-
-    //     Storage::disk('local')->assertMissing($anexo->path);
-    // }
-
-    // /** @test */
-    // public function owner_can_download_file()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
-
-    //     $anexo = $externo->load('preRegistro')->preRegistro->anexos->first();
-    //     Storage::disk('local')->assertExists($anexo->path);
-
-    //     $this->get(route('externo.preregistro.anexo.download', $anexo->id))->assertOk();
-    // }
-
-    // /** @test */
-    // public function not_owner_cannot_delete_file()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
-
-    //     $pr = $externo->load('preRegistro')->preRegistro;
-    //     $anexo = $pr->anexos->first();
-    //     Storage::disk('local')->assertExists($anexo->path);
-
-    //     $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $this->delete(route('externo.preregistro.anexo.excluir', $anexo->id))->assertStatus(401);
-
-    //     $this->assertDatabaseHas('anexos', [
-    //         'path' => $anexo->path,
-    //         'nome_original' => $anexo->nome_original,
-    //         'pre_registro_id' => $pr->id
-    //     ]);
-
-    //     Storage::disk('local')->assertExists($anexo->path);
-    // }
-
-    // /** @test */
-    // public function not_owner_cannot_download_file()
-    // {
-    //     Storage::fake('local');
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'anexos',
-    //         'campo' => 'path',
-    //         'valor' => UploadedFile::fake()->create('random.pdf')
-    //     ])->assertOk();
-
-    //     $anexo = $externo->load('preRegistro')->preRegistro->anexos->first();
-    //     Storage::disk('local')->assertExists($anexo->path);
-
-    //     $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $this->get(route('externo.preregistro.anexo.download', $anexo->id))->assertStatus(401);
-    // }
-
-    // /** @test */
-    // public function owner_cannot_delete_without_file()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $this->delete(route('externo.preregistro.anexo.excluir', 1))->assertStatus(401);
-    // }
-
-    // /** @test */
-    // public function owner_cannot_download_without_file()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
-    // }
-
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_when_insert_tel_optional()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-    //     $preRegistro = $externo->load('preRegistro')->preRegistro;
-
-    //     $telefone = '(11) 98765-4321';
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'tipo_telefone_1',
-    //         'valor' => tipos_contatos()[1]
-    //     ])->assertOk();
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'telefone_1',
-    //         'valor' => $telefone
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'tipo_telefone' => $preRegistro->tipo_telefone . ';' . mb_strtoupper(tipos_contatos()[1], 'UTF-8'),
-    //         'telefone' => $preRegistro->telefone . ';' . $telefone,
-    //     ]);
-    // }
-
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_with_tel_principal_after_insert_tel_optional()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-    //     $preRegistro = $externo->load('preRegistro')->preRegistro;
-
-    //     $telefone = '(11) 97777-3216';
-    //     $telefoneOptional = '(11) 98765-4321';
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'tipo_telefone_1',
-    //         'valor' => tipos_contatos()[1]
-    //     ])->assertOk();
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'telefone_1',
-    //         'valor' => $telefoneOptional
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'tipo_telefone' => $preRegistro->tipo_telefone . ';' . mb_strtoupper(tipos_contatos()[1], 'UTF-8'),
-    //         'telefone' => $preRegistro->telefone . ';' . $telefoneOptional,
-    //     ]);
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'tipo_telefone',
-    //         'valor' => tipos_contatos()[0]
-    //     ])->assertOk();
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'telefone',
-    //         'valor' => $telefone
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'tipo_telefone' => mb_strtoupper(tipos_contatos()[0], 'UTF-8') . ';' . mb_strtoupper(tipos_contatos()[1], 'UTF-8'),
-    //         'telefone' => $telefone . ';' . $telefoneOptional,
-    //     ]);
-    // }
-
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_when_insert_cel_option()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $opcao_celular = opcoes_celular()[1];
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'opcional_celular',
-    //         'valor' => $opcao_celular
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'opcional_celular' => mb_strtoupper($opcao_celular, 'UTF-8') . ';',
-    //     ]);
-
-    //     $opcao_celular = opcoes_celular()[0];
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'opcional_celular',
-    //         'valor' => $opcao_celular
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ',' . $opcao_celular, 'UTF-8') . ';',
-    //     ]);
-    // }
-
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_when_insert_cel_option_1()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $opcao_celular = opcoes_celular()[1];
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'opcional_celular_1',
-    //         'valor' => $opcao_celular
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'opcional_celular' => ';' . mb_strtoupper($opcao_celular, 'UTF-8'),
-    //     ]);
-
-    //     $opcao_celular = opcoes_celular()[0];
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'opcional_celular_1',
-    //         'valor' => $opcao_celular
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'opcional_celular' => ';' . mb_strtoupper(opcoes_celular()[1] . ',' . $opcao_celular, 'UTF-8'),
-    //     ]);
-    // }
-
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_with_cel_option_principal_after_insert_cel_option_optional()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-    //     $preRegistro = $externo->load('preRegistro')->preRegistro;
-
-    //     $opcao_cel_1 = opcoes_celular()[1];
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'opcional_celular_1',
-    //         'valor' => $opcao_cel_1
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'opcional_celular' => ';' . mb_strtoupper($opcao_cel_1, 'UTF-8'),
-    //     ]);
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'opcional_celular',
-    //         'valor' => $opcao_cel_1
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'opcional_celular' => mb_strtoupper($opcao_cel_1, 'UTF-8') . ';' . mb_strtoupper($opcao_cel_1, 'UTF-8'),
-    //     ]);
-    // }
-
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_when_clean_inputs()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-
-    //     $preRegistro = factory('App\PreRegistro')->create([
-    //         'user_externo_id' => $externo->id,
-    //         'contabil_id' => null,
-    //         'idusuario' => null,
-    //     ]);
-    //     $preRegistroPF = factory('App\PreRegistroCpf')->create([
-    //         'pre_registro_id' => $preRegistro->id,
-    //     ]);
-
-    //     $preRegistro = $preRegistro->toArray();
-    //     $preRegistro['tipo_telefone_1'] = '';
-    //     $preRegistro['telefone_1'] = '';
-
-    //     $pular = ['registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'updated_at', 'created_at', 'id', 'confere_anexos', 'historico_contabil'];
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_when_insert_tel_optional()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $preRegistro = $externo->load('preRegistro')->preRegistro;
+
+        $telefone = '(11) 98765-4321';
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'tipo_telefone_1',
+            'valor' => tipos_contatos()[1]
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'telefone_1',
+            'valor' => $telefone
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'tipo_telefone' => $preRegistro->tipo_telefone . ';' . mb_strtoupper(tipos_contatos()[1], 'UTF-8'),
+            'telefone' => $preRegistro->telefone . ';' . $telefone,
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_with_tel_principal_after_insert_tel_optional()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $preRegistro = $externo->load('preRegistro')->preRegistro;
+
+        $telefone = '(11) 97777-3216';
+        $telefoneOptional = '(11) 98765-4321';
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'tipo_telefone_1',
+            'valor' => tipos_contatos()[1]
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'telefone_1',
+            'valor' => $telefoneOptional
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'tipo_telefone' => $preRegistro->tipo_telefone . ';' . mb_strtoupper(tipos_contatos()[1], 'UTF-8'),
+            'telefone' => $preRegistro->telefone . ';' . $telefoneOptional,
+        ]);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'tipo_telefone',
+            'valor' => tipos_contatos()[0]
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'telefone',
+            'valor' => $telefone
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'tipo_telefone' => mb_strtoupper(tipos_contatos()[0], 'UTF-8') . ';' . mb_strtoupper(tipos_contatos()[1], 'UTF-8'),
+            'telefone' => $telefone . ';' . $telefoneOptional,
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_when_insert_cel_option()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $opcao_celular = opcoes_celular()[1];
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'opcional_celular',
+            'valor' => $opcao_celular
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'opcional_celular' => mb_strtoupper($opcao_celular, 'UTF-8') . ';',
+        ]);
+
+        $opcao_celular = opcoes_celular()[0];
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'opcional_celular',
+            'valor' => $opcao_celular
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'opcional_celular' => mb_strtoupper(opcoes_celular()[1] . ',' . $opcao_celular, 'UTF-8') . ';',
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_when_insert_cel_option_1()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $opcao_celular = opcoes_celular()[1];
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'opcional_celular_1',
+            'valor' => $opcao_celular
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'opcional_celular' => ';' . mb_strtoupper($opcao_celular, 'UTF-8'),
+        ]);
+
+        $opcao_celular = opcoes_celular()[0];
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'opcional_celular_1',
+            'valor' => $opcao_celular
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'opcional_celular' => ';' . mb_strtoupper(opcoes_celular()[1] . ',' . $opcao_celular, 'UTF-8'),
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_with_cel_option_principal_after_insert_cel_option_optional()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $preRegistro = $externo->load('preRegistro')->preRegistro;
+
+        $opcao_cel_1 = opcoes_celular()[1];
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'opcional_celular_1',
+            'valor' => $opcao_cel_1
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'opcional_celular' => ';' . mb_strtoupper($opcao_cel_1, 'UTF-8'),
+        ]);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'opcional_celular',
+            'valor' => $opcao_cel_1
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'opcional_celular' => mb_strtoupper($opcao_cel_1, 'UTF-8') . ';' . mb_strtoupper($opcao_cel_1, 'UTF-8'),
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_when_clean_inputs()
+    {
+        $externo = $this->signInAsUserExterno();
+        $preRegistroPF = factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'user_externo_id' => $externo->id,
+                'contabil_id' => null,
+            ]),
+        ]);
+        $preRegistro = $preRegistroPF->preRegistro;
+        $preRegistro['tipo_telefone_1'] = '';
+        $preRegistro['telefone_1'] = '';
+        $preRegistro['opcional_celular_1[]'] = '';
+
+        $preRegistro = $preRegistro->makeHidden([
+            'id', 'updated_at', 'created_at', 'deleted_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
+            'historico_status', 'campos_espelho', 'campos_editados'
+        ]);
+
+        foreach($preRegistro->toArray() as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'preRegistro',
+                'campo' => $key,
+                'valor' => ''
+            ])->assertStatus(200);
+
+        $preRegistro = $preRegistro->makeHidden([
+            'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
+            'historico_status', 'campos_espelho', 'campos_editados', 'tipo_telefone_1', 'telefone_1', 'opcional_celular_1[]'
+        ])->toArray();
+
+        $this->assertDatabaseMissing('pre_registros', $preRegistro);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_blocked_historico_contabil()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => null,
+        ]);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => '78087976000130'
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => 1,
+        ]);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => '06985713000138'
+        ])->assertOk();
+
+        $this->assertDatabaseMissing('pre_registros', [
+            'contabil_id' => 2,
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_when_not_blocked_historico_contabil()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => null,
+        ]);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => '78087976000130'
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => '1',
+        ]);
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_with_empty_cnpj_contabil_and_blocked_historico_contabil()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => '78087976000130'
+        ])->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'contabil',
+            'campo' => 'cnpj_contabil',
+            'valor' => ''
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => null,
+        ]);
+    }
+
+    // Status do pré-registro
+
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_status_different_aguardando_correcao_or_sendo_elaborado()
+    {
+        $externo = $this->signInAsUserExterno();
+        $preRegistro = factory('App\PreRegistro')->create([
+            'contabil_id' => null,
+            'user_externo_id' => $externo->id,
+        ]);
+
+        $preRegistro = $preRegistro->makeHidden([
+            'id', 'updated_at', 'created_at', 'deleted_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
+            'historico_status', 'campos_espelho', 'campos_editados'
+        ]);
         
-    //     foreach($preRegistro as $key => $value)
-    //     {
-    //         if(!in_array($key, $pular))
-    //             $this->post(route('externo.inserir.preregistro.ajax'), [
-    //                 'classe' => 'preRegistro',
-    //                 'campo' => $key,
-    //                 'valor' => ''
-    //             ])->assertStatus(200);
-    //     }
-        
-    //     unset($preRegistro['tipo_telefone_1']);
-    //     unset($preRegistro['telefone_1']);
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistro->update(['status' => $status]);
+            if(!in_array($status, [PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO]))
+                foreach($preRegistro->toArray() as $key => $value)
+                    $this->post(route('externo.inserir.preregistro.ajax'), [
+                        'classe' => 'preRegistro',
+                        'campo' => $key,
+                        'valor' => ''
+                    ])->assertStatus(401);
+        }
+    }
 
-    //     $this->assertDatabaseMissing('pre_registros', $preRegistro);
-    // }
+    /** @test */
+    public function can_update_table_pre_registros_by_ajax_with_status_aguardando_correcao_or_sendo_elaborado()
+    {
+        $externo = $this->signInAsUserExterno();
+        $preRegistro = factory('App\PreRegistro')->create([
+            'contabil_id' => null,
+            'user_externo_id' => $externo->id,
+        ]);
 
-    // /** @test */
-    // public function cannot_update_table_pre_registros_by_ajax_with_pergunta_filled()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $preRegistro = $preRegistro->makeHidden([
+            'id', 'updated_at', 'created_at', 'deleted_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
+            'historico_status', 'campos_espelho', 'campos_editados'
+        ]);
 
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'preRegistro',
-    //         'campo' => 'pergunta',
-    //         'valor' => 'resposta da pergunta'
-    //     ])->assertOk();
+        foreach([PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO] as $status)
+        {
+            $preRegistro->update(['status' => $status]);
+            foreach($preRegistro->toArray() as $key => $value)
+                $this->post(route('externo.inserir.preregistro.ajax'), [
+                    'classe' => 'preRegistro',
+                    'campo' => $key,
+                    'valor' => ''
+                ])->assertStatus(200);
+        }
+    }
 
-    //     $this->assertDatabaseMissing('pre_registros', [
-    //         'pergunta' => 'resposta da pergunta',
-    //     ]);
-    // }
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO VIA SUBMIT - CLIENT
+     * =======================================================================================================
+     */
 
-    // /** @test */
-    // public function cannot_update_table_pre_registros_by_ajax_with_blocked_historico_contabil()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+    /** @test */
+    public function view_message_errors_when_submit()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
+        $this->put(route('externo.verifica.inserir.preregistro'), ['cnpj_contabil' => '46217816000172'])->assertStatus(302);
 
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'contabil',
-    //         'campo' => 'cnpj_contabil',
-    //         'valor' => '78087976000130'
-    //     ])->assertOk();
+        $errors = session('errors');
+        $keys = array();
+        foreach($errors->messages() as $key => $value)
+            array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
 
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'contabil',
-    //         'campo' => 'cnpj_contabil',
-    //         'valor' => '06985713000138'
-    //     ])->assertOk();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
+        ->assertSeeInOrder($keys);
 
-    //     $this->assertDatabaseMissing('pre_registros', [
-    //         'contabil_id' => '2',
-    //     ]);
-    // }
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
+        $this->put(route('externo.verifica.inserir.preregistro'), ['cnpj_contabil' => '46217816000172'])->assertStatus(302);
 
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_when_not_blocked_historico_contabil()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $errors = session('errors');
+        $keys = array();
+        foreach($errors->messages() as $key => $value)
+            array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
 
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'contabil',
-    //         'campo' => 'cnpj_contabil',
-    //         'valor' => '78087976000130'
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'contabil_id' => '1',
-    //     ]);
-    // }
-
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_when_empty_cnpj_contabil_and_blocked_historico_contabil()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'contabil',
-    //         'campo' => 'cnpj_contabil',
-    //         'valor' => '78087976000130'
-    //     ])->assertOk();
-
-    //     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //         'classe' => 'contabil',
-    //         'campo' => 'cnpj_contabil',
-    //         'valor' => ''
-    //     ])->assertOk();
-
-    //     $this->assertDatabaseHas('pre_registros', [
-    //         'contabil_id' => null,
-    //     ]);
-    // }
-
-    // // Status do pré-registro
-
-    // /** @test */
-    // public function cannot_update_table_pre_registros_by_ajax_with_status_different_aguardando_correcao_or_null()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $preRegistro = factory('App\PreRegistro')->create([
-    //             'user_externo_id' => $externo->id,
-    //     ]);
-
-    //     $preRegistroAjax = $preRegistro->toArray();
-    //     $pular = ['registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'updated_at', 'created_at', 'id', 'confere_anexos', 'historico_contabil'];
-        
-    //     foreach(PreRegistro::getStatus() as $status)
-    //     {
-    //         $preRegistro->update(['status' => $status]);
-    //         if($status != PreRegistro::STATUS_CORRECAO)
-    //             foreach($preRegistroAjax as $key => $value)
-    //             {
-    //                 if(!in_array($key, $pular))
-    //                     $this->post(route('externo.inserir.preregistro.ajax'), [
-    //                         'classe' => 'preRegistro',
-    //                         'campo' => $key,
-    //                         'valor' => ''
-    //                     ])->assertStatus(401);
-    //             }
-    //     }
-    // }
-
-    // /** @test */
-    // public function can_update_table_pre_registros_by_ajax_with_status_aguardando_correcao_or_null()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $preRegistro = factory('App\PreRegistro')->create([
-    //             'user_externo_id' => $externo->id,
-    //     ]);
-
-    //     $preRegistroAjax = $preRegistro->toArray();
-    //     $pular = ['registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'updated_at', 'created_at', 'id', 'confere_anexos', 'historico_contabil'];
-        
-    //     foreach([PreRegistro::STATUS_CORRECAO, null] as $status)
-    //     {
-    //         $preRegistro->update(['status' => $status]);
-    //         foreach($preRegistroAjax as $key => $value)
-    //         {
-    //             if(!in_array($key, $pular))
-    //                 $this->post(route('externo.inserir.preregistro.ajax'), [
-    //                     'classe' => 'preRegistro',
-    //                     'campo' => $key,
-    //                     'valor' => ''
-    //                 ])->assertStatus(200);
-    //         }
-    //     }
-    // }
-
-    // /** 
-    //  * =======================================================================================================
-    //  * TESTES PRE-REGISTRO VIA SUBMIT - CLIENT
-    //  * =======================================================================================================
-    //  */
-
-    // /** @test */
-    // public function view_message_errors_when_submit()
-    // {
-    //     $externo = $this->signInAsUserExterno();
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
-    //     $this->put(route('externo.verifica.inserir.preregistro'), ['cnpj_contabil' => '46217816000172'])->assertStatus(302);
-
-    //     $errors = session('errors');
-    //     $keys = array();
-    //     foreach($errors->messages() as $key => $value)
-    //         array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-    //     ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
-    //     ->assertSeeInOrder($keys);
-
-    //     $externo = $this->signInAsUserExterno(factory('App\UserExterno')->state('pj')->create());
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
-    //     $this->put(route('externo.verifica.inserir.preregistro'), ['cnpj_contabil' => '46217816000172'])->assertStatus(302);
-
-    //     $errors = session('errors');
-    //     $keys = array();
-    //     foreach($errors->messages() as $key => $value)
-    //         array_push($keys, '<button class="btn btn-sm btn-link erroPreRegistro" value="' . $key . '">');
-
-    //     $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-    //     ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
-    //     ->assertSeeInOrder($keys);
-    // }
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertSeeText('Foram encontrados ' . count($errors->messages()) . ' erros:')
+        ->assertSeeInOrder($keys);
+    }
 
     // /** @test */
     // public function view_message_errors_when_submit_with_anexos()

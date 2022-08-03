@@ -164,6 +164,51 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
+    public function can_upload_up_to_10_anexos_with_15_files_if_pf_by_ajax()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $id = $externo->load('preRegistro')->preRegistro->id;
+
+        $anexos = [
+            UploadedFile::fake()->image('random1.jpg')->size(10),
+            UploadedFile::fake()->image('random2.jpg')->size(10),
+            UploadedFile::fake()->image('random3.jpg')->size(10),
+            UploadedFile::fake()->image('random4.jpg')->size(10),
+            UploadedFile::fake()->image('random5.jpg')->size(10),
+            UploadedFile::fake()->image('random6.jpg')->size(10),
+            UploadedFile::fake()->image('random7.jpg')->size(10),
+            UploadedFile::fake()->image('random8.jpg')->size(10),
+            UploadedFile::fake()->image('random9.jpg')->size(10),
+            UploadedFile::fake()->image('random10.jpg')->size(10),
+            UploadedFile::fake()->image('random11.jpg')->size(10),
+            UploadedFile::fake()->image('random12.jpg')->size(10),
+            UploadedFile::fake()->image('random13.jpg')->size(10),
+            UploadedFile::fake()->image('random14.jpg')->size(10),
+            UploadedFile::fake()->image('random15.jpg')->size(10),
+        ];
+
+        for($cont = 1; $cont <= 10; $cont++)
+        {
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'anexos',
+                'campo' => 'path',
+                'valor' => $anexos
+            ])->assertStatus(200);
+
+            $this->assertDatabaseHas('anexos', [
+                'nome_original' => Anexo::find($cont)->nome_original,
+                'pre_registro_id' => $id
+            ]);
+    
+            Storage::disk('local')->assertExists(Anexo::find($cont)->path);
+        }
+
+        $this->assertEquals(Anexo::count(), 10);
+    }
+
+    /** @test */
     public function cannot_create_if_pf_and_more_than_10_anexos_by_ajax()
     {
         Storage::fake('local');
@@ -194,7 +239,6 @@ class AnexoTest extends TestCase
         ])->assertStatus(200);
 
         $this->assertEquals(Anexo::count(), 10);
-        Storage::disk('local')->assertMissing('userExterno/preRegistros/1/random_11.jpg');
     }
 
     /** @test */
@@ -220,6 +264,51 @@ class AnexoTest extends TestCase
     
             Storage::disk('local')->assertExists(Anexo::find($cont)->path);
         }
+    }
+
+    /** @test */
+    public function can_upload_up_to_15_anexos_with_15_files_if_pj_by_ajax()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $id = $externo->load('preRegistro')->preRegistro->id;
+
+        $anexos = [
+            UploadedFile::fake()->image('random1.jpg')->size(10),
+            UploadedFile::fake()->image('random2.jpg')->size(10),
+            UploadedFile::fake()->image('random3.jpg')->size(10),
+            UploadedFile::fake()->image('random4.jpg')->size(10),
+            UploadedFile::fake()->image('random5.jpg')->size(10),
+            UploadedFile::fake()->image('random6.jpg')->size(10),
+            UploadedFile::fake()->image('random7.jpg')->size(10),
+            UploadedFile::fake()->image('random8.jpg')->size(10),
+            UploadedFile::fake()->image('random9.jpg')->size(10),
+            UploadedFile::fake()->image('random10.jpg')->size(10),
+            UploadedFile::fake()->image('random11.jpg')->size(10),
+            UploadedFile::fake()->image('random12.jpg')->size(10),
+            UploadedFile::fake()->image('random13.jpg')->size(10),
+            UploadedFile::fake()->image('random14.jpg')->size(10),
+            UploadedFile::fake()->image('random15.jpg')->size(10),
+        ];
+
+        for($cont = 1; $cont <= 15; $cont++)
+        {
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'anexos',
+                'campo' => 'path',
+                'valor' => $anexos
+            ])->assertStatus(200);
+
+            $this->assertDatabaseHas('anexos', [
+                'nome_original' => Anexo::find($cont)->nome_original,
+                'pre_registro_id' => $id
+            ]);
+    
+            Storage::disk('local')->assertExists(Anexo::find($cont)->path);
+        }
+
+        $this->assertEquals(Anexo::count(), 15);
     }
 
     /** @test */
@@ -253,7 +342,6 @@ class AnexoTest extends TestCase
         ])->assertStatus(200);
 
         $this->assertEquals(Anexo::count(), 15);
-        Storage::disk('local')->assertMissing('userExterno/preRegistros/1/random_16.jpg');
     }
 
     /** @test */
@@ -378,6 +466,8 @@ class AnexoTest extends TestCase
                 'nome_original' => 'random.' . $extensao
             ]);
         }
+
+        $this->assertEquals(Anexo::count(), 0);
     }
 
     /** @test */
@@ -417,5 +507,138 @@ class AnexoTest extends TestCase
                 UploadedFile::fake()->create('random2.pdf')->size(150),
             ]
         ])->assertSessionHasErrors('total');
+    }
+
+    /** @test */
+    public function cannot_create_anexos_by_ajax_without_type_array()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $id = $externo->load('preRegistro')->preRegistro->id;
+        
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => UploadedFile::fake()->create('random.pdf')->size(2500)->path()
+        ])->assertSessionHasErrors('valor');
+    }
+
+    /** @test */
+    public function owner_can_delete_file()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        Storage::disk('local')->assertExists(Anexo::find(1)->path);
+        $caminho = Anexo::find(1)->path;
+
+        $this->delete(route('externo.preregistro.anexo.excluir', Anexo::find(1)->id))->assertOk();
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertDontSee('random.pdf');
+
+        $this->assertSoftDeleted('anexos', [
+            'pre_registro_id' => 1,
+            'nome_original' => 'random.pdf'
+        ]);
+
+        Storage::disk('local')->assertMissing($caminho);
+    }
+
+    /** @test */
+    public function owner_can_download_file()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        Storage::disk('local')->assertExists(Anexo::find(1)->path);
+
+        $this->get(route('externo.preregistro.anexo.download', Anexo::find(1)->id))->assertOk();
+    }
+
+    /** @test */
+    public function not_owner_cannot_delete_file()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        $pr = $externo->load('preRegistro')->preRegistro;
+        $anexo = $pr->anexos->first();
+        Storage::disk('local')->assertExists($anexo->path);
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->delete(route('externo.preregistro.anexo.excluir', $anexo->id))->assertStatus(401);
+
+        $this->assertDatabaseHas('anexos', [
+            'path' => $anexo->path,
+            'nome_original' => $anexo->nome_original,
+            'pre_registro_id' => $pr->id
+        ]);
+
+        Storage::disk('local')->assertExists($anexo->path);
+    }
+
+    /** @test */
+    public function not_owner_cannot_download_file()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        $anexo = $externo->load('preRegistro')->preRegistro->anexos->first();
+        Storage::disk('local')->assertExists($anexo->path);
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->get(route('externo.preregistro.anexo.download', $anexo->id))->assertStatus(401);
+    }
+
+    /** @test */
+    public function owner_cannot_delete_without_file()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->delete(route('externo.preregistro.anexo.excluir', 1))->assertStatus(401);
+    }
+
+    /** @test */
+    public function owner_cannot_download_without_file()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
     }
 }
