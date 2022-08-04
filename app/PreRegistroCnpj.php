@@ -72,7 +72,7 @@ class PreRegistroCnpj extends Model
 
     public function getHistoricoArray()
     {
-        return json_decode($this->historico_rt, true);
+        return isset($this->historico_rt) ? json_decode($this->historico_rt, true) : array();
     }
 
     public function getNextUpdateHistorico()

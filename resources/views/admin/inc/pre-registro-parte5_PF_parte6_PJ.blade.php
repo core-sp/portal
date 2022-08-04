@@ -1,6 +1,6 @@
 @php
     $arrayJustificativas = $resultado->getJustificativaArray();
-    $campoAnexo = isset($resultado->getCamposEditados()['path']) ? explode(',', $resultado->getCamposEditados()['path']) : [];
+    $campoAnexo = isset($resultado->getCamposEditados()['path']) ? explode(',', $resultado->getCamposEditados()['path']) : array();
 @endphp
 
 <div class="card-body bg-light">

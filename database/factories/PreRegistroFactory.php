@@ -50,6 +50,10 @@ $factory->state(PreRegistro::class, 'pj', function (Faker $faker) {
 $factory->state(PreRegistro::class, 'analise_inicial', function (Faker $faker) {
     return [
         'status' => PreRegistro::STATUS_ANALISE_INICIAL,
+        'historico_status' => json_encode([
+            PreRegistro::STATUS_CRIADO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_ANALISE_INICIAL . ';' . now()->format('Y-m-d H:i:s')
+        ], JSON_FORCE_OBJECT),
         'idusuario' => null,
     ];
 });
@@ -57,23 +61,48 @@ $factory->state(PreRegistro::class, 'analise_inicial', function (Faker $faker) {
 $factory->state(PreRegistro::class, 'enviado_correcao', function (Faker $faker) {
     return [
         'status' => PreRegistro::STATUS_CORRECAO,
+        'historico_status' => json_encode([
+            PreRegistro::STATUS_CRIADO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_ANALISE_INICIAL . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_CORRECAO . ';' . now()->format('Y-m-d H:i:s')
+        ], JSON_FORCE_OBJECT),
     ];
 });
 
 $factory->state(PreRegistro::class, 'analise_correcao', function (Faker $faker) {
     return [
         'status' => PreRegistro::STATUS_ANALISE_CORRECAO,
+        'historico_status' => json_encode([
+            PreRegistro::STATUS_CRIADO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_ANALISE_INICIAL . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_CORRECAO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_ANALISE_CORRECAO . ';' . now()->format('Y-m-d H:i:s')
+        ], JSON_FORCE_OBJECT),
     ];
 });
 
 $factory->state(PreRegistro::class, 'aprovado', function (Faker $faker) {
     return [
         'status' => PreRegistro::STATUS_APROVADO,
+        'historico_status' => json_encode([
+            PreRegistro::STATUS_CRIADO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_ANALISE_INICIAL . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_CORRECAO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_ANALISE_CORRECAO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_APROVADO . ';' . now()->format('Y-m-d H:i:s')
+        ], JSON_FORCE_OBJECT),
     ];
 });
 
 $factory->state(PreRegistro::class, 'negado', function (Faker $faker) {
     return [
         'status' => PreRegistro::STATUS_NEGADO,
+        'historico_status' => json_encode([
+            PreRegistro::STATUS_CRIADO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_ANALISE_INICIAL . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_CORRECAO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_ANALISE_CORRECAO . ';' . now()->format('Y-m-d H:i:s'),
+            PreRegistro::STATUS_NEGADO . ';' . now()->format('Y-m-d H:i:s')
+        ], JSON_FORCE_OBJECT),
     ];
 });

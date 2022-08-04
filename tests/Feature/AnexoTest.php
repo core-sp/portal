@@ -8,16 +8,17 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use App\PreRegistro;
 use App\Anexo;
+use Illuminate\Support\Str;
 
 class AnexoTest extends TestCase
 {
     use RefreshDatabase;
 
-    // /** 
-    //  * =======================================================================================================
-    //  * TESTES PRE-REGISTRO
-    //  * =======================================================================================================
-    //  */
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO
+     * =======================================================================================================
+     */
 
     /** @test */
     public function view_files()
@@ -640,5 +641,31 @@ class AnexoTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES PRE-REGISTRO - ADMIN
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function view_label_novo_anexo_when_user_change_files()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
+        factory('App\Anexo', 2)->create([
+            'path' =>  Anexo::PATH_PRE_REGISTRO . '/' . $preRegistroCpf->pre_registro_id . '/' . (string) \Str::uuid() . '.jpg',
+            'pre_registro_id' => $preRegistroCpf->pre_registro_id
+        ]);
+
+        $preRegistroCpf->preRegistro->update([
+            'status' => PreRegistro::STATUS_ANALISE_CORRECAO,
+            'campos_editados' => json_encode(['path' => '2'], JSON_FORCE_OBJECT)
+        ]);
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeText('Novos anexos')
+        ->assertSeeText('Novo anexo');
     }
 }

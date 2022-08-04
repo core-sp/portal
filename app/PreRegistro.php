@@ -108,7 +108,7 @@ class PreRegistro extends Model
     private function formatTextoCorrecaoAdmin($campo, $valor)
     {
         $original = $campo == 'confere_anexos' ? $this->confere_anexos : $this->justificativa;
-        $texto = json_decode($original, true);
+        $texto = isset($original) ? json_decode($original, true) : array();
         
         if($campo != 'confere_anexos')
         {                
@@ -329,17 +329,17 @@ class PreRegistro extends Model
 
     public function getJustificativaArray()
     {
-        return json_decode($this->justificativa, true);
+        return isset($this->justificativa) ? json_decode($this->justificativa, true) : array();
     }
 
     public function getConfereAnexosArray()
     {
-        return json_decode($this->confere_anexos, true);
+        return isset($this->confere_anexos) ? json_decode($this->confere_anexos, true) : array();
     }
 
     public function getHistoricoArray()
     {
-        return json_decode($this->historico_contabil, true);
+        return isset($this->historico_contabil) ? json_decode($this->historico_contabil, true) : array();
     }
 
     public function getNextUpdateHistorico()
@@ -412,7 +412,7 @@ class PreRegistro extends Model
             $tipos = $this->anexos->first()->getObrigatoriosPreRegistro();
             $anexos = $this->getConfereAnexosArray();
             
-            if($anexos !== null)
+            if(count($anexos) > 0)
                 foreach($anexos as $key => $value)
                     if(in_array($key, $tipos))
                         unset($tipos[array_search($key, $tipos)]);
@@ -463,16 +463,14 @@ class PreRegistro extends Model
 
     public function setHistoricoStatus()
     {
-        $historico = json_decode($this->historico_status, true);
-        if(gettype($historico) != 'array')
-            $historico = array();
+        $historico = isset($this->historico_status) ? json_decode($this->historico_status, true) : array();
         array_push($historico, $this->status . ';' . $this->updated_at);
         $this->update(['historico_status' => json_encode($historico, JSON_FORCE_OBJECT)]);
     }
 
     public function getHistoricoStatus()
     {
-        return json_decode($this->historico_status, true);
+        return isset($this->historico_status) ? json_decode($this->historico_status, true) : array();
     }
 
     public function setCamposEspelho($request)
@@ -497,7 +495,8 @@ class PreRegistro extends Model
 
         if($this->status == PreRegistro::STATUS_CORRECAO)
         {
-            $dados = array_diff_assoc(json_decode($this->campos_espelho, true), $final);
+            $camposEspelho = isset($this->campos_espelho) ? json_decode($this->campos_espelho, true) : array();
+            $dados = array_diff_assoc($camposEspelho, $final);
             if(isset($dados['path']))
                 $dados['path'] = $final['path'];
             $this->update(['campos_editados' => json_encode($dados, JSON_FORCE_OBJECT)]);
@@ -507,7 +506,9 @@ class PreRegistro extends Model
 
     public function getCamposEditados()
     {
-        return $this->status == PreRegistro::STATUS_ANALISE_CORRECAO ? json_decode($this->campos_editados, true) : [];
+        if($this->status == PreRegistro::STATUS_ANALISE_CORRECAO)
+            return isset($this->campos_editados) ? json_decode($this->campos_editados, true) : array();
+        return array();
     }
 
     public function atualizarAjax($classe, $campo, $valor, $gerenti)
