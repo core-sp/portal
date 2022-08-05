@@ -192,13 +192,13 @@
             {{ isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade != 'BRASILEIRA') ? 'disabled' : '' }}
         >
             <option value="">Selecione a opção...</option>
-        @foreach(estados() as $naturalidade)
+        @foreach(estados() as $key => $naturalidade)
             @if(!empty(old('naturalidade_estado')))
-            <option value="{{ $naturalidade }}" {{ old('naturalidade_estado') == $naturalidade ? 'selected' : '' }}>{{ $naturalidade }}</option>
+            <option value="{{ $key }}" {{ old('naturalidade_estado') == $key ? 'selected' : '' }}>{{ $naturalidade }}</option>
             @elseif(isset($resultado->pessoaFisica->naturalidade_estado))
-            <option value="{{ $naturalidade }}" {{ mb_strtoupper($naturalidade, 'UTF-8') == $resultado->pessoaFisica->naturalidade_estado ? 'selected' : '' }}>{{ $naturalidade }}</option>
+            <option value="{{ $key }}" {{ mb_strtoupper($key, 'UTF-8') == $resultado->pessoaFisica->naturalidade_estado ? 'selected' : '' }}>{{ $naturalidade }}</option>
             @else
-            <option value="{{ $naturalidade }}">{{ $naturalidade }}</option>
+            <option value="{{ $key }}">{{ $naturalidade }}</option>
             @endif
         @endforeach
         </select>

@@ -17,17 +17,17 @@ class PreRegistroRequest extends FormRequest
         $rules = [
             'path' => $this->regraPath,
             'cnpj_contabil' => ['nullable', new CpfCnpj],
-            'nome_contabil' => 'sometimes|required_with:cnpj_contabil|min:5|max:191',
-            'email_contabil' => 'sometimes|required_with:cnpj_contabil|email:rfc,filter|min:10|max:191',
-            'nome_contato_contabil' => 'required_with:cnpj_contabil|min:5|max:191|regex:/^\D*$/',
-            'telefone_contabil' => 'required_with:cnpj_contabil|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
+            'nome_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191',
+            'email_contabil' => 'required_with:cnpj_contabil|nullable|email:rfc,filter|min:10|max:191',
+            'nome_contato_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191|regex:/^\D*$/',
+            'telefone_contabil' => 'required_with:cnpj_contabil|nullable|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
             'segmento' => 'nullable|in:'.implode(',', segmentos()),
             'idregional' => 'required|exists:regionais,idregional',
             'cep' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})/',
             'bairro' => 'required|min:4|max:191',
             'logradouro' => 'required|min:4|max:191',
             'numero' => 'required|min:1|max:10',
-            'complemento' => 'nullable|min:2|max:50',
+            'complemento' => 'nullable|max:50',
             'cidade' => 'required|min:4|max:191|regex:/^\D*$/',
             'uf' => 'required|in:'.implode(',', array_keys(estados())),
             'tipo_telefone' => 'required|in:'.implode(',', tipos_contatos()),
@@ -47,8 +47,8 @@ class PreRegistroRequest extends FormRequest
             'dt_nascimento' => 'required|date|before_or_equal:'.$this->regraDtNasc,
             'estado_civil' => 'nullable|in:'.implode(',', estados_civis()),
             'nacionalidade' => 'required|in:'.implode(',', nacionalidades()),
-            'naturalidade_cidade' => 'sometimes|required_if:nacionalidade,Brasileira|nullable|string|min:4|max:191',
-            'naturalidade_estado' => 'sometimes|required_if:nacionalidade,Brasileira|nullable|in:'.implode(',', estados()),
+            'naturalidade_cidade' => 'required_if:nacionalidade,Brasileira|nullable|string|min:4|max:191',
+            'naturalidade_estado' => 'required_if:nacionalidade,Brasileira|nullable|in:'.implode(',', array_keys(estados())),
             'nome_mae' => 'required|min:5|max:191|regex:/^\D*$/',
             'nome_pai' => 'nullable|min:5|max:191|regex:/^\D*$/',
             'tipo_identidade' => 'required|in:'.implode(',', tipos_identidade()),
@@ -66,11 +66,11 @@ class PreRegistroRequest extends FormRequest
             'inscricao_municipal' => 'nullable|min:5|max:30',
             'inscricao_estadual' => 'nullable|min:5|max:30',
             'checkEndEmpresa' => 'present',
-            'cep_empresa' => 'sometimes|required_if:checkEndEmpresa,off|nullable|size:9|regex:/([0-9]{5})\-([0-9]{3})/',
-            'bairro_empresa' => 'sometimes|required_if:checkEndEmpresa,off|nullable|min:4|max:191',
+            'cep_empresa' => 'required_if:checkEndEmpresa,off|nullable|size:9|regex:/([0-9]{5})\-([0-9]{3})/',
+            'bairro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
             'logradouro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
             'numero_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:1|max:10',
-            'complemento_empresa' => 'nullable|min:2|max:50',
+            'complemento_empresa' => 'nullable|max:50',
             'cidade_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191|regex:/^\D*$/',
             'uf_empresa' => 'required_if:checkEndEmpresa,off|nullable|in:'.implode(',', array_keys(estados())),
             'nome_rt' => 'required|min:5|max:191|regex:/^\D*$/',
@@ -86,7 +86,7 @@ class PreRegistroRequest extends FormRequest
             'bairro_rt' => 'required|min:4|max:191',
             'logradouro_rt' => 'required|min:4|max:191',
             'numero_rt' => 'required|min:1|max:10',
-            'complemento_rt' => 'nullable|min:2|max:50',
+            'complemento_rt' => 'nullable|max:50',
             'cidade_rt' => 'required|min:4|max:191',
             'uf_rt' => 'required|in:'.implode(',', array_keys(estados())),
             'nome_mae_rt' => 'required|min:5|max:191|regex:/^\D*$/',
@@ -138,7 +138,8 @@ class PreRegistroRequest extends FormRequest
         {
             if(request()->nacionalidade != "Brasileira")
                 $this->merge([
-                    'naturalidade' => null
+                    'naturalidade_cidade' => null,
+                    'naturalidade_estado' => null
                 ]);
             $this->merge([
                 'identidade' => strtoupper(apenasNumerosLetras(request()->identidade))

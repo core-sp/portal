@@ -139,9 +139,7 @@ class PreRegistroTest extends TestCase
     {
         // Considerado o valor local que está no UserExternoSiteController
         $externo = $this->signInAsUserExterno();
-        $preRegistro = factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
-        ]);
+        $preRegistro = factory('App\PreRegistro')->create();
 
         for($i = 1; $i <= 100; $i++)
             $this->post(route('externo.inserir.preregistro.ajax'), [
@@ -343,11 +341,7 @@ class PreRegistroTest extends TestCase
     public function cannot_view_button_verificar_pendencias_with_status_different_aguardando_correcao_or_sendo_elaborado()
     {
         $externo = $this->signInAsUserExterno();
-        $preRegistro = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
-            ])
-        ]);
+        $preRegistro = factory('App\PreRegistroCpf')->create();
 
         foreach(PreRegistro::getStatus() as $status)
         {
@@ -360,7 +354,6 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistro = factory('App\PreRegistroCnpj')->create([
             'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
                 'contabil_id' => null,
             ])
         ]);
@@ -378,11 +371,7 @@ class PreRegistroTest extends TestCase
     public function can_view_button_verificar_pendencias_with_status_aguardando_correcao_or_sendo_elaborado()
     {
         $externo = $this->signInAsUserExterno();
-        $preRegistro = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
-            ])
-        ]);
+        $preRegistro = factory('App\PreRegistroCpf')->create();
 
         foreach([PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO] as $status)
         {
@@ -394,7 +383,6 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistro = factory('App\PreRegistroCnpj')->create([
             'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
                 'contabil_id' => null,
             ])
         ]);
@@ -411,11 +399,7 @@ class PreRegistroTest extends TestCase
     public function can_view_all_status()
     {
         $externo = $this->signInAsUserExterno();
-        $preRegistro = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
-            ])
-        ]);
+        $preRegistro = factory('App\PreRegistroCpf')->create();
 
         foreach(PreRegistro::getStatus() as $status)
         {
@@ -427,7 +411,6 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistro = factory('App\PreRegistroCnpj')->create([
             'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
                 'contabil_id' => null,
             ])
         ]);
@@ -453,7 +436,6 @@ class PreRegistroTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $preRegistro = factory('App\PreRegistro')->make([
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'tipo_telefone_1' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
             'telefone_1' => '(11) 99999-8888',
@@ -490,7 +472,6 @@ class PreRegistroTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->make([
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'tipo_telefone_1' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
             'telefone_1' => '(11) 99999-8888',
@@ -531,7 +512,6 @@ class PreRegistroTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $preRegistro = factory('App\PreRegistro')->make([
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'tipo_telefone_1' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
             'telefone_1' => '(11) 99999-8888',
@@ -564,7 +544,6 @@ class PreRegistroTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $preRegistro = factory('App\PreRegistro')->make([
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'tipo_telefone_1' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
             'telefone_1' => '(11) 99999-8888',
@@ -597,7 +576,6 @@ class PreRegistroTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $preRegistro = factory('App\PreRegistro')->make([
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'tipo_telefone_1' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
             'telefone_1' => '(11) 99999-8888',
@@ -630,7 +608,6 @@ class PreRegistroTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $preRegistro = factory('App\PreRegistro')->make([
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'tipo_telefone_1' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
             'telefone_1' => '(11) 99999-8888',
@@ -873,7 +850,6 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $preRegistroPF = factory('App\PreRegistroCpf')->create([
             'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
                 'contabil_id' => null,
             ]),
         ]);
@@ -883,8 +859,8 @@ class PreRegistroTest extends TestCase
         $preRegistro['opcional_celular_1[]'] = '';
 
         $preRegistro = $preRegistro->makeHidden([
-            'id', 'updated_at', 'created_at', 'deleted_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
-            'historico_status', 'campos_espelho', 'campos_editados'
+            'id', 'updated_at', 'created_at', 'deleted_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 
+            'justificativa', 'confere_anexos', 'historico_contabil', 'historico_status', 'campos_espelho', 'campos_editados'
         ]);
 
         foreach($preRegistro->toArray() as $key => $value)
@@ -984,12 +960,11 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistro')->create([
             'contabil_id' => null,
-            'user_externo_id' => $externo->id,
         ]);
 
         $preRegistro = $preRegistro->makeHidden([
-            'id', 'updated_at', 'created_at', 'deleted_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
-            'historico_status', 'campos_espelho', 'campos_editados'
+            'id', 'updated_at', 'created_at', 'deleted_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 
+            'justificativa', 'confere_anexos', 'historico_contabil', 'historico_status', 'campos_espelho', 'campos_editados'
         ]);
         
         foreach(PreRegistro::getStatus() as $status)
@@ -1011,12 +986,11 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistro')->create([
             'contabil_id' => null,
-            'user_externo_id' => $externo->id,
         ]);
 
         $preRegistro = $preRegistro->makeHidden([
-            'id', 'updated_at', 'created_at', 'deleted_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
-            'historico_status', 'campos_espelho', 'campos_editados'
+            'id', 'updated_at', 'created_at', 'deleted_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 
+            'justificativa', 'confere_anexos', 'historico_contabil', 'historico_status', 'campos_espelho', 'campos_editados'
         ]);
 
         foreach([PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO] as $status)
@@ -1117,7 +1091,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1142,7 +1115,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1168,7 +1140,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1194,7 +1165,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1220,7 +1190,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1246,7 +1215,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1273,7 +1241,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1299,7 +1266,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1326,7 +1292,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1352,7 +1317,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1371,32 +1335,6 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
-    public function cannot_submit_pre_registro_with_complemento_less_than_2_chars()
-    {
-        Storage::fake('local');
-        $externo = $this->signInAsUserExterno();
-
-        $preRegistro = factory('App\PreRegistro')->states('low')->raw([
-            'id' => 1,
-            'user_externo_id' => $externo->id,
-            'contabil_id' => null,
-            'idusuario' => null,
-            'opcional_celular' => null,
-            'complemento' => '0'
-        ]);
-        $preRegistroCpf = factory('App\PreRegistroCpf')->states('low')->raw([
-            'pre_registro_id' => $preRegistro['id']
-        ]);
-
-        $dados = array_merge($preRegistro, $preRegistroCpf);
-        
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
-        
-        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-        ->assertSessionHasErrors('complemento');
-    }
-
-    /** @test */
     public function cannot_submit_pre_registro_with_complemento_more_than_50_chars()
     {
         $faker = \Faker\Factory::create();
@@ -1405,7 +1343,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1431,7 +1368,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1458,7 +1394,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1484,7 +1419,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1510,7 +1444,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1536,7 +1469,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1562,7 +1494,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1588,7 +1519,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1614,7 +1544,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => ['KKKKKK', 'SMS']
@@ -1639,7 +1568,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => ['SMS', 'SMS'],
@@ -1664,7 +1592,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => 'SMS',
@@ -1689,7 +1616,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1715,7 +1641,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1741,7 +1666,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1768,7 +1692,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular_1' => ['KKKKKK', 'SMS']
@@ -1793,7 +1716,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1819,7 +1741,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1845,7 +1766,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1872,7 +1792,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -1900,7 +1819,6 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
             'id' => 1,
-            'user_externo_id' => $externo->id,
             'contabil_id' => null,
             'idusuario' => null,
             'opcional_celular' => null,
@@ -2368,11 +2286,15 @@ class PreRegistroTest extends TestCase
             'idusuario' => $admin2->idusuario,
         ]);
         
-        $this->get(route('preregistro.filtro', ['status' => $preRegistro->status, 'atendente' => $preRegistro->idusuario, 'regional' => $preRegistro->idregional]))
+        $this->get(route('preregistro.filtro', [
+            'status' => $preRegistro->status, 'atendente' => $preRegistro->idusuario, 'regional' => $preRegistro->idregional
+        ]))
         ->assertSeeText(formataCpfCnpj($preRegistro->userExterno->cpf_cnpj))
         ->assertDontSeeText(formataCpfCnpj($preRegistro2->userExterno->cpf_cnpj));
 
-        $this->get(route('preregistro.filtro', ['status' => $preRegistro2->status, 'atendente' => $preRegistro2->idusuario, 'regional' => $preRegistro2->idregional]))
+        $this->get(route('preregistro.filtro', [
+            'status' => $preRegistro2->status, 'atendente' => $preRegistro2->idusuario, 'regional' => $preRegistro2->idregional
+        ]))
         ->assertDontSeeText(formataCpfCnpj($preRegistro->userExterno->cpf_cnpj))
         ->assertSeeText(formataCpfCnpj($preRegistro2->userExterno->cpf_cnpj));
 
