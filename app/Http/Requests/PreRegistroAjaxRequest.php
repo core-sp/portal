@@ -29,14 +29,37 @@ class PreRegistroAjaxRequest extends FormRequest
         }
 
         $this->regraValor = ['max:191'];
+        $arrayIn = [
+            'segmento' => implode(',', segmentos()),
+            'uf' => implode(',', array_keys(estados())),
+            'tipo_telefone' => implode(',', tipos_contatos()),
+            'opcional_celular' => implode(',', opcoes_celular()),
+            'sexo' => implode(',', array_keys(generos())),
+            'estado_civil' => implode(',', estados_civis()),
+            'nacionalidade' => implode(',', nacionalidades()),
+            'naturalidade_estado' => implode(',', array_keys(estados())),
+            'tipo_identidade' => implode(',', tipos_identidade()),
+            'tipo_empresa' => implode(',', tipos_empresa()),
+            'uf_empresa' => implode(',', array_keys(estados())),
+            'sexo_rt' => implode(',', array_keys(generos())),
+            'tipo_identidade_rt' => implode(',', tipos_identidade()),
+            'uf_rt' => implode(',', array_keys(estados())),
+        ];
+
+        if(in_array(request()->campo, array_keys($arrayIn)) && isset(request()->valor))
+            $this->regraValor = 'in:' . mb_strtoupper($arrayIn[request()->campo], 'UTF-8');
 
         if(in_array(request()->campo, ['opcional_celular[]', 'opcional_celular_1[]']))
             $this->merge([
                 'campo' => str_replace('[]', '', request()->campo),
             ]);
 
-        $telefoneOptions = ['tipo_telefone_1', 'telefone_1', 'opcional_celular_1'];
-        if(in_array($this->campo, $telefoneOptions))
+        $telefoneOptions = [
+            'tipo_telefone_1' => tipos_contatos(), 
+            'telefone_1' => null, 
+            'opcional_celular_1' => opcoes_celular(),
+        ];
+        if(in_array($this->campo, array_keys($telefoneOptions)))
         {
             // a quantidade de ';' define qual a chave do valor no campo
             // lembrar de alterar a quantidade de campos no model do PreRegistro em: getChaveValorTotal($valor = null)
@@ -44,6 +67,10 @@ class PreRegistroAjaxRequest extends FormRequest
             $total = intval(substr($this->campo, strripos($this->campo, '_') + 1));
             for($i = 0; $i  < $total; $i++)
                 $flag .= ';';
+
+            $implode = $telefoneOptions[$this->campo];
+            if(isset(request()->valor) && isset($implode))
+                $this->regraValor = 'in:' . mb_strtoupper(implode($flag . ',', $implode), 'UTF-8') . $flag;
             $this->merge([
                 'campo' => str_replace(substr($this->campo, strripos($this->campo, '_')), '', $this->campo),
                 'valor' => request()->valor . $flag
@@ -127,7 +154,8 @@ class PreRegistroAjaxRequest extends FormRequest
         return [
             'max' => request()->campo != 'path' ? 'Limite de :max caracteres' : 'Existe mais de 15 arquivos',
             'total.required' => 'A soma do tamanho dos arquivos ultrapassa 5 MB',
-            'in' => 'Campo não encontrado ou não permitido alterar',
+            'campo.in' => 'Campo não encontrado ou não permitido alterar',
+            'valor.in' => 'Valor não encontrado',
             'required' => 'Falta dados para enviar a requisição',
             'mimetypes' => 'O arquivo não possui extensão permitida ou está com erro',
             'file' => 'Deve ser um arquivo',

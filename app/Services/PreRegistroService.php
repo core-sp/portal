@@ -63,6 +63,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $acoes = '<a href="'.route('preregistro.view', $resultado->id).'" class="btn btn-sm btn-' . $cor . '">'. $texto .'</a> ';
             // if($userPodeEditar)
             //     $acoes .= '<a href="'.route('regionais.edit', $resultado->idregional).'" class="btn btn-sm btn-primary">Editar</a> ';
+            $textoUser = '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span>';
             $conteudo = [
                 'corDaLinha' => '<tr class="table' . $resultado->getLabelStatus() . '">',
                 $resultado->id,
@@ -70,9 +71,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 $resultado->userExterno->nome,
                 isset($resultado->idregional) ? $resultado->regional->regional : 'Sem regional no momento',
                 formataData($resultado->updated_at),
-                isset($resultado->idusuario) ? 
-                '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span><small class="d-block">Atualizado por: <strong>'.$resultado->user->nome.'</strong></small>' : 
-                '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span>',
+                isset($resultado->idusuario) ? $textoUser . '<small class="d-block">Atualizado por: <strong>'.$resultado->user->nome.'</strong></small>' : $textoUser,
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -536,7 +535,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $resultado = $preRegistro->update(['status' => $status]);
         $preRegistro->setHistoricoStatus();
         
-
         if(!isset($resultado))
             throw new \Exception('Não atualizou o status da solicitação de registro para ' . $status, 500);
         
@@ -695,7 +693,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         $preRegistro->atualizarAjax($camposCanEdit[$campo], $campo, $valor, null);
         $preRegistro->update(['idusuario' => $user->idusuario]);
-        event(new CrudEvent('pré-registro', 'fez a ação de "' . $request['acao'] . '" o campo "' . $request['campo'] . '"', $preRegistro->id));
+        event(new CrudEvent('pré-registro', 'fez a ação de "' . $request['acao'] . '" o campo "' . $request['campo'] . '", inserindo ou removendo valor', $preRegistro->id));
 
         return [
             'user' => $user->nome,

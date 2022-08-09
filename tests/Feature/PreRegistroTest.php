@@ -31,10 +31,7 @@ class PreRegistroTest extends TestCase
 
         // ADMIN
         $preRegistro = factory('App\PreRegistroCpf')->create();
-        $anexo = factory('App\Anexo')->create([
-            'path' => Anexo::PATH_PRE_REGISTRO . '/' . $preRegistro->id . '/' . (string) \Str::uuid() . '.jpg',
-            'pre_registro_id' => $preRegistro->id
-        ]);
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
         $this->get(route('preregistro.index'))->assertRedirect(route('login'));
         $this->get(route('preregistro.view', $preRegistro->id))->assertRedirect(route('login'));
@@ -437,9 +434,9 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->make([
             'contabil_id' => null,
-            'tipo_telefone_1' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
+            'tipo_telefone_1' => tipos_contatos()[0],
             'telefone_1' => '(11) 99999-8888',
-            'opcional_celular_1[]' => mb_strtoupper(opcoes_celular()[1], 'UTF-8'),
+            'opcional_celular_1[]' => opcoes_celular()[1],
         ]);
 
         $preRegistro = $preRegistro->makeHidden([
@@ -454,9 +451,9 @@ class PreRegistroTest extends TestCase
                 'valor' => $value
             ])->assertStatus(200);
         
-        $preRegistro['tipo_telefone'] = $preRegistro['tipo_telefone'] . ';'. $preRegistro['tipo_telefone_1'];
+        $preRegistro['tipo_telefone'] = $preRegistro['tipo_telefone'] . ';'. mb_strtoupper($preRegistro['tipo_telefone_1'], 'UTF-8');
         $preRegistro['telefone'] = $preRegistro['telefone'] . ';' . $preRegistro['telefone_1'];
-        $preRegistro['opcional_celular'] = $preRegistro['opcional_celular'] . ';' . $preRegistro['opcional_celular_1[]'];
+        $preRegistro['opcional_celular'] = $preRegistro['opcional_celular'] . ';' . mb_strtoupper($preRegistro['opcional_celular_1[]'], 'UTF-8');
 
         $preRegistro = $preRegistro->makeHidden([
             'tipo_telefone_1', 'telefone_1', 'opcional_celular_1[]'
@@ -473,16 +470,16 @@ class PreRegistroTest extends TestCase
 
         $preRegistro = factory('App\PreRegistro')->states('low')->make([
             'contabil_id' => null,
-            'tipo_telefone_1' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
+            'tipo_telefone_1' => tipos_contatos()[0],
             'telefone_1' => '(11) 99999-8888',
-            'opcional_celular_1[]' => mb_strtoupper(opcoes_celular()[1], 'UTF-8'),
+            'opcional_celular_1[]' => opcoes_celular()[1],
         ]);
 
         $preRegistro = $preRegistro->makeHidden([
             'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
             'historico_status', 'campos_espelho', 'campos_editados'
         ]);
-        
+
         foreach($preRegistro->toArray() as $key => $value)
             $this->post(route('externo.inserir.preregistro.ajax'), [
                 'classe' => 'preRegistro',
@@ -677,6 +674,108 @@ class PreRegistroTest extends TestCase
 
         $this->assertDatabaseHas('pre_registros', [
             'idregional' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_segmento_wrong()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'segmento',
+            'valor' => 'teste'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros', [
+            'segmento' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_uf_wrong()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'uf',
+            'valor' => 'teste'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros', [
+            'uf' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_tipo_telefone_wrong()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'tipo_telefone',
+            'valor' => 'teste'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros', [
+            'tipo_telefone' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_opcional_celular_wrong()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'opcional_celular',
+            'valor' => 'teste'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros', [
+            'opcional_celular' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_tipo_telefone_1_wrong()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'tipo_telefone_1',
+            'valor' => 'teste'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros', [
+            'tipo_telefone' => null
+        ]);
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_by_ajax_with_opcional_celular_1_wrong()
+    {
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'opcional_celular_1',
+            'valor' => 'teste'
+        ])->assertSessionHasErrors('valor');
+
+        $this->assertDatabaseHas('pre_registros', [
+            'opcional_celular' => null
         ]);
     }
 
@@ -1836,6 +1935,64 @@ class PreRegistroTest extends TestCase
         ->assertSessionHasErrors('pergunta');
     }
 
+    /** @test */
+    public function filled_campos_editados_pre_registro_when_form_is_submitted_when_status_aguardando_correcao()
+    {
+        $externo = $this->signInAsUserExterno();
+        factory('App\Regional')->create();
+        $preRegistro = factory('App\PreRegistro')->states('low')->create([
+            'contabil_id' => null,
+            'opcional_celular' => null
+        ])->makeHidden([
+            'id', 'updated_at', 'created_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 'confere_anexos', 'historico_contabil',
+            'historico_status', 'campos_espelho', 'campos_editados'
+        ]);
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('low')->create([
+            'pre_registro_id' => $preRegistro->id
+        ])->makeHidden(['pre_registro_id', 'id', 'updated_at', 'created_at',]);
+
+        $ce = array_merge($preRegistro->toArray(), $preRegistroCpf->attributesToArray(), ['path' => 1]);
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $this->put(route('externo.inserir.preregistro'), $ce)->assertRedirect(route('externo.preregistro.view'));
+
+        $preRegistro->update(['status' => PreRegistro::STATUS_CORRECAO]);
+        $preRegistro->idregional = 3;
+        $preRegistro->segmento = segmentos()[7];
+        $preRegistro->cep = '01234-050';
+        $preRegistro->logradouro = 'Rua outro teste';
+        $preRegistro->numero = '659';
+        $preRegistro->complemento = 'fundos';
+        $preRegistro->bairro = 'Bairro teste';
+        $preRegistro->cidade = 'Osasco';
+        $preRegistro->uf = 'SC';
+        $preRegistro->telefone = '(12) 00000-0000';
+        $preRegistro->tipo_telefone = tipos_contatos()[1];
+        $preRegistro['opcional_celular'] = opcoes_celular()[1];
+        $preRegistro['telefone_1'] = '(11) 11111-0000';
+        $preRegistro['tipo_telefone_1'] = tipos_contatos()[0];
+        $preRegistro['opcional_celular_1'] = opcoes_celular()[1];
+      
+        foreach($preRegistro->toArray() as $key => $val)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'preRegistro',
+                'campo' => $key,
+                'valor' => $val
+            ])->assertStatus(200);
+            
+        $preRegistro['opcional_celular'] = [$preRegistro['opcional_celular']];
+        $preRegistro['opcional_celular_1'] = [$preRegistro['opcional_celular_1']];
+        $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->attributesToArray(), ['path' => '1']);
+
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $pr = PreRegistro::first();
+
+        $arrayFinal = array_diff(array_keys($dados), array_keys(json_decode($pr->campos_espelho, true)));
+        $this->assertEquals($arrayFinal, array());
+        $arrayFinal = array_diff(array_keys($preRegistro->toArray()), array_keys($pr->getCamposEditados()));
+        $this->assertEquals($arrayFinal, array());
+    }
+
     /** 
      * =======================================================================================================
      * TESTES PRE-REGISTRO - ADMIN
@@ -2410,10 +2567,7 @@ class PreRegistroTest extends TestCase
         $preRegistroCpf = factory('App\PreRegistroCpf')->create();
         $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
         $preRegistro = $preRegistroCpf->preRegistro;
-        $anexo = factory('App\Anexo')->create([
-            'path' =>  Anexo::PATH_PRE_REGISTRO . '/' . $preRegistroCpf->pre_registro_id . '/' . (string) \Str::uuid() . '.jpg',
-            'pre_registro_id' => $preRegistroCpf->pre_registro_id
-        ]);
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
         ->assertSeeText($anexo->nome_original);
@@ -2468,10 +2622,7 @@ class PreRegistroTest extends TestCase
 
         $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
         $justificativas = $preRegistroCpf->preRegistro->getJustificativaArray();
-        $anexo = factory('App\Anexo')->create([
-            'path' =>  Anexo::PATH_PRE_REGISTRO . '/' . $preRegistroCpf->pre_registro_id . '/' . (string) \Str::uuid() . '.jpg',
-            'pre_registro_id' => $preRegistroCpf->pre_registro_id
-        ]);
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
         $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
         ->assertSeeText($justificativas['idregional'])

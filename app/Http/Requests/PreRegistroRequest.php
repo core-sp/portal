@@ -177,7 +177,7 @@ class PreRegistroRequest extends FormRequest
             'dt_expedicao.before_or_equal' => 'Data deve ser igual ou anterior a hoje' . $attr,
             'dt_nascimento.before_or_equal' => 'Deve ter 18 anos completos ou mais' . $attr,
             'dt_nascimento_rt.before_or_equal' => 'Deve ter 18 anos completos ou mais' . $attr,
-            'email' => 'Deve ser no formato de email teste@teste.com' . $attr,
+            'email' => 'Deve ser no formato de email email@email.com' . $attr,
             'checkEndEmpresa.present' => 'Campo opção "Mesmo Endereço" deve estar presente' . $attr,
             'nome_contabil.required_with' => 'Campo obrigatório se possui o CNPJ' . $attr,
             'nome_contato_contabil.required_with' => 'Campo obrigatório se possui o CNPJ' . $attr,

@@ -643,6 +643,43 @@ class AnexoTest extends TestCase
         $this->get(route('externo.preregistro.anexo.download', 1))->assertStatus(401);
     }
 
+    /** @test */
+    public function filled_campos_editados_anexos_when_form_is_submitted_when_status_aguardando_correcao()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $preRegistro = factory('App\PreRegistro')->states('low')->create([
+            'contabil_id' => null,
+            'opcional_celular' => null
+        ])->makeHidden([
+            'id', 'updated_at', 'created_at', 'registro_secundario', 'user_externo_id', 'contabil_id', 'idusuario', 'status', 'justificativa', 
+            'confere_anexos', 'historico_contabil', 'historico_status', 'campos_espelho', 'campos_editados'
+        ]);
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('low')->create([
+            'pre_registro_id' => $preRegistro->id
+        ])->makeHidden(['pre_registro_id', 'id', 'updated_at', 'created_at',]);
+
+        $ce = array_merge($preRegistro->toArray(), $preRegistroCpf->attributesToArray(), ['path' => 1]);
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $this->put(route('externo.inserir.preregistro'), $ce)->assertRedirect(route('externo.preregistro.view'));
+
+        $preRegistro->update(['status' => PreRegistro::STATUS_CORRECAO]);
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->attributesToArray(), ['path' => '1,2']);
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+        $pr = PreRegistro::first();
+
+        $arrayFinal = array_diff(array_keys(json_decode($pr->campos_espelho, true)), array_keys($dados));
+        $this->assertEquals($arrayFinal, array());
+        $this->assertEquals(json_decode($pr->campos_editados, true), ['path' => 2]);
+    }
+
     /** 
      * =======================================================================================================
      * TESTES PRE-REGISTRO - ADMIN
@@ -655,10 +692,7 @@ class AnexoTest extends TestCase
         $admin = $this->signInAsAdmin();
 
         $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
-        factory('App\Anexo', 2)->create([
-            'path' =>  Anexo::PATH_PRE_REGISTRO . '/' . $preRegistroCpf->pre_registro_id . '/' . (string) \Str::uuid() . '.jpg',
-            'pre_registro_id' => $preRegistroCpf->pre_registro_id
-        ]);
+        factory('App\Anexo', 2)->states('pre_registro')->create();
 
         $preRegistroCpf->preRegistro->update([
             'status' => PreRegistro::STATUS_ANALISE_CORRECAO,

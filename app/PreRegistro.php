@@ -272,7 +272,7 @@ class PreRegistro extends Model
     public function getLabelStatus($status = null)
     {
         $colorStatus = [
-            PreRegistro::STATUS_CRIADO => '-light',
+            PreRegistro::STATUS_CRIADO => '-info',
             PreRegistro::STATUS_ANALISE_INICIAL => '-primary',
             PreRegistro::STATUS_CORRECAO => '-secondary',
             PreRegistro::STATUS_ANALISE_CORRECAO => '-warning',
@@ -496,7 +496,9 @@ class PreRegistro extends Model
         if($this->status == PreRegistro::STATUS_CORRECAO)
         {
             $camposEspelho = isset($this->campos_espelho) ? json_decode($this->campos_espelho, true) : array();
-            $dados = array_diff_assoc($camposEspelho, $final);
+            $dados1 = array_diff_assoc($camposEspelho, $final);
+            $dados2 = array_diff_assoc($final, $camposEspelho);
+            $dados = array_merge($dados1, $dados2);
             if(isset($dados['path']))
                 $dados['path'] = $final['path'];
             $this->update(['campos_editados' => json_encode($dados, JSON_FORCE_OBJECT)]);
@@ -514,7 +516,7 @@ class PreRegistro extends Model
     public function atualizarAjax($classe, $campo, $valor, $gerenti)
     {
         $resultado = null;
-
+        
         switch ($classe) {
             case 'preRegistro':
                 $valido = $this->validarUpdateAjax($campo, $valor);

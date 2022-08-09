@@ -3,6 +3,7 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\PreRegistro;
+use App\UserExterno;
 use Faker\Generator as Faker;
 
 $factory->define(PreRegistro::class, function (Faker $faker) {
@@ -19,7 +20,7 @@ $factory->define(PreRegistro::class, function (Faker $faker) {
         'telefone' => '(11) 00000-0000',
         'tipo_telefone' => mb_strtoupper(tipos_contatos()[0], 'UTF-8'),
         'opcional_celular' => mb_strtoupper(opcoes_celular()[1], 'UTF-8'),
-        'user_externo_id' => isset(auth()->guard('user_externo')->user()->id) ? auth()->guard('user_externo')->user() : factory('App\UserExterno'),
+        'user_externo_id' => UserExterno::count() > 0 ? UserExterno::count() : factory('App\UserExterno'),
         'contabil_id' => factory('App\Contabil'),
         'idregional' => factory('App\Regional'),
         'idusuario' => factory('App\User'),
@@ -37,14 +38,14 @@ $factory->state(PreRegistro::class, 'low', function (Faker $faker) {
     return [
         'segmento' => segmentos()[5],
         'tipo_telefone' => tipos_contatos()[0],
-        'opcional_celular' => opcoes_celular()[1] . ',' . opcoes_celular()[0],
+        'opcional_celular' => opcoes_celular()[1],
         'contabil_id' => factory('App\Contabil')->states('low'),
     ];
 });
 
 $factory->state(PreRegistro::class, 'pj', function (Faker $faker) {
     return [
-        'user_externo_id' => isset(auth()->guard('user_externo')->user()->id) ? auth()->guard('user_externo')->user() : factory('App\UserExterno')->states('pj'),
+        'user_externo_id' => UserExterno::count() > 0 ? UserExterno::count() : factory('App\UserExterno')->states('pj'),
     ];
 });
 

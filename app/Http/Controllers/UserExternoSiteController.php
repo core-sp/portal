@@ -18,7 +18,7 @@ class UserExternoSiteController extends Controller
     {        
         // Limitação de requisições por minuto para cada usuário, senão erro 429
         $qtd = '60';
-        if(env("APP_ENV") == "testing")
+        if(config('app.env') == "testing")
             $qtd = '100';
 
         $this->middleware(['auth:user_externo', 'throttle:' . $qtd . ',1'])->except(['cadastroView', 'cadastro', 'verificaEmail']);
