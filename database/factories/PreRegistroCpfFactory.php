@@ -48,12 +48,10 @@ $factory->state(PreRegistroCpf::class, 'justificado', function (Faker $faker) {
     foreach($campos as $campo)
         $arrayFinal[$campo] = $faker->text(500);
 
-    $pr = factory('App\PreRegistro')->states('analise_inicial')->create([
-        'justificativa' => json_encode($arrayFinal, JSON_FORCE_OBJECT)
-    ]);
-
     return [
-        'pre_registro_id' => $pr->id,
+        'pre_registro_id' => factory('App\PreRegistro')->states('analise_inicial')->create([
+            'justificativa' => json_encode($arrayFinal, JSON_FORCE_OBJECT)
+        ]),
     ];
 });
 
@@ -66,12 +64,10 @@ $factory->state(PreRegistroCpf::class, 'campos_editados', function (Faker $faker
     foreach($campos as $campo)
         $arrayFinal[$campo] = null;
 
-    $pr = factory('App\PreRegistro')->states('analise_correcao')->create([
-        'campos_editados' => json_encode($arrayFinal, JSON_FORCE_OBJECT)
-    ]);
-
     return [
-        'pre_registro_id' => $pr->id,
+        'pre_registro_id' => factory('App\PreRegistro')->states('analise_correcao')->create([
+            'campos_editados' => json_encode($arrayFinal, JSON_FORCE_OBJECT)
+        ]),
     ];
 });
 

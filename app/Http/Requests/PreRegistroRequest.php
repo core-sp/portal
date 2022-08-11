@@ -44,7 +44,7 @@ class PreRegistroRequest extends FormRequest
         $pessoaFisica = [
             'nome_social' => 'nullable|min:5|max:191|regex:/^\D*$/',
             'sexo' => 'required|in:'.implode(',', array_keys(generos())),
-            'dt_nascimento' => 'required|date|before_or_equal:'.$this->regraDtNasc,
+            'dt_nascimento' => 'required|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
             'estado_civil' => 'nullable|in:'.implode(',', estados_civis()),
             'nacionalidade' => 'required|in:'.implode(',', nacionalidades()),
             'naturalidade_cidade' => 'required_if:nacionalidade,Brasileira|nullable|string|min:4|max:191',
@@ -54,7 +54,7 @@ class PreRegistroRequest extends FormRequest
             'tipo_identidade' => 'required|in:'.implode(',', tipos_identidade()),
             'identidade' => 'required|min:4|max:30',
             'orgao_emissor' => 'required|min:3|max:191',
-            'dt_expedicao' => 'required|date|before_or_equal:today',
+            'dt_expedicao' => 'required|date_format:Y-m-d|before_or_equal:today',
         ];
         
         $pessoaJuridica = [
@@ -62,26 +62,26 @@ class PreRegistroRequest extends FormRequest
             'capital_social' => 'required|min:4|max:16|regex:/([0-9.]{1,13}),([0-9]{2})/',
             'nire' => 'nullable|min:5|max:20',
             'tipo_empresa' => 'required|in:'.implode(',', tipos_empresa()),
-            'dt_inicio_atividade' => 'required|date|before_or_equal:today',
+            'dt_inicio_atividade' => 'required|date_format:Y-m-d|before_or_equal:today',
             'inscricao_municipal' => 'nullable|min:5|max:30',
             'inscricao_estadual' => 'nullable|min:5|max:30',
             'checkEndEmpresa' => 'present',
             'cep_empresa' => 'required_if:checkEndEmpresa,off|nullable|size:9|regex:/([0-9]{5})\-([0-9]{3})/',
             'bairro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
             'logradouro_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191',
-            'numero_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:1|max:10',
+            'numero_empresa' => 'required_if:checkEndEmpresa,off|nullable|max:10',
             'complemento_empresa' => 'nullable|max:50',
             'cidade_empresa' => 'required_if:checkEndEmpresa,off|nullable|min:4|max:191|regex:/^\D*$/',
             'uf_empresa' => 'required_if:checkEndEmpresa,off|nullable|in:'.implode(',', array_keys(estados())),
             'nome_rt' => 'required|min:5|max:191|regex:/^\D*$/',
             'nome_social_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
             'sexo_rt' => 'required|in:'.implode(',', array_keys(generos())),
-            'dt_nascimento_rt' => 'required|date|before_or_equal:'.$this->regraDtNasc,
+            'dt_nascimento_rt' => 'required|date_format:Y-m-d|before_or_equal:'.$this->regraDtNasc,
             'cpf_rt' => ['required', new CpfCnpj],
             'tipo_identidade_rt' => 'required|in:'.implode(',', tipos_identidade()),
             'identidade_rt' => 'required|min:4|max:30',
             'orgao_emissor_rt' => 'required|min:3|max:191',
-            'dt_expedicao_rt' => 'required|date|before_or_equal:today',
+            'dt_expedicao_rt' => 'required|date_format:Y-m-d|before_or_equal:today',
             'cep_rt' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})/',
             'bairro_rt' => 'required|min:4|max:191',
             'logradouro_rt' => 'required|min:4|max:191',
@@ -101,7 +101,7 @@ class PreRegistroRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->externo = auth()->guard('user_externo')->user();
-        $preRegistro = $this->externo->preRegistro;
+        $preRegistro = $this->externo->load('preRegistro')->preRegistro;
 
         // Obrigatório salvar os anexos via rota ajax
         $anexosCount = isset($preRegistro) ? $preRegistro->anexos->count() : 0;
@@ -120,10 +120,9 @@ class PreRegistroRequest extends FormRequest
                 'path' => $anexosCount
             ]);
         
-        
         if(!$this->externo->isPessoaFisica())
         {
-            if(!isset(request()->checkEndEmpresa))
+            if(!isset(request()->checkEndEmpresa) || (isset(request()->checkEndEmpresa) && (request()->checkEndEmpresa != 'on')))
                 $this->merge([
                     'checkEndEmpresa' => "off",
                 ]);
@@ -172,7 +171,8 @@ class PreRegistroRequest extends FormRequest
             'file' => 'Deve ser um arquivo' . $attr,
             'size' => 'Deve ter :size caracteres' . $attr,
             'exists' => 'Esta regional não existe' . $attr,
-            'date' => 'Deve ser tipo data' . $attr,
+            'date_format' => 'Deve ser tipo data' . $attr,
+            'dt_inicio_atividade.before_or_equal' => 'Data deve ser igual ou anterior a hoje' . $attr,
             'dt_expedicao_rt.before_or_equal' => 'Data deve ser igual ou anterior a hoje' . $attr,
             'dt_expedicao.before_or_equal' => 'Data deve ser igual ou anterior a hoje' . $attr,
             'dt_nascimento.before_or_equal' => 'Deve ter 18 anos completos ou mais' . $attr,

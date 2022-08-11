@@ -67,7 +67,6 @@
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome) ? $resultado->pessoaJuridica->responsavelTecnico->nome : old('nome_rt') }}"
-                minlength="5"
                 maxlength="191"
             />
             @if($errors->has('nome_rt'))
@@ -87,7 +86,6 @@
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_social_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_social_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_social) ? $resultado->pessoaJuridica->responsavelTecnico->nome_social : old('nome_social_rt') }}"
-                minlength="5"
                 maxlength="191"
             />
             @if($errors->has('nome_social_rt'))
@@ -174,7 +172,6 @@
                 id="identidade_rt"
                 class="{{ $classes[5] }} form-control text-uppercase {{ $errors->has('identidade_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('identidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->identidade) ? $resultado->pessoaJuridica->responsavelTecnico->identidade : old('identidade_rt') }}"
-                minlength="4"
                 maxlength="30"
             />
             @if($errors->has('identidade_rt'))
@@ -194,7 +191,6 @@
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('orgao_emissor_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('orgao_emissor_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->orgao_emissor) ? $resultado->pessoaJuridica->responsavelTecnico->orgao_emissor : old('orgao_emissor_rt') }}"
-                minlength="3"
                 maxlength="191"
             />
             @if($errors->has('orgao_emissor_rt'))
@@ -247,7 +243,6 @@
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('bairro_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="bairro_rt"
                 value="{{ empty(old('bairro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->bairro) ? $resultado->pessoaJuridica->responsavelTecnico->bairro : old('bairro_rt') }}"
-                minlength="4"
                 maxlength="191"
             />
             @if($errors->has('bairro_rt'))
@@ -267,7 +262,6 @@
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('logradouro_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="rua_rt"
                 value="{{ empty(old('logradouro_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->logradouro) ? $resultado->pessoaJuridica->responsavelTecnico->logradouro : old('logradouro_rt') }}"
-                minlength="4"
                 maxlength="191"
             />
             @if($errors->has('logradouro_rt'))
@@ -284,7 +278,6 @@
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('numero_rt') ? 'is-invalid' : '' }} obrigatorio"
                 id="numero_rt"
                 value="{{ empty(old('numero_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->numero) ? $resultado->pessoaJuridica->responsavelTecnico->numero : old('numero_rt') }}"
-                minlength="1"
                 maxlength="10"
             />
             @if($errors->has('numero_rt'))
@@ -304,7 +297,6 @@
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('complemento_rt') ? 'is-invalid' : '' }}"
                 id="complemento_rt"
                 value="{{ empty(old('complemento_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->complemento) ? $resultado->pessoaJuridica->responsavelTecnico->complemento : old('complemento_rt') }}"
-                minlength="1"
                 maxlength="50"
             />
             @if($errors->has('complemento_rt'))
@@ -321,7 +313,6 @@
                 id="cidade_rt"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('cidade_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('cidade_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->cidade) ? $resultado->pessoaJuridica->responsavelTecnico->cidade : old('cidade_rt') }}"
-                minlength="4"
                 maxlength="191"
             />
             @if($errors->has('cidade_rt'))
@@ -367,7 +358,6 @@
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_mae_rt') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_mae_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_mae) ? $resultado->pessoaJuridica->responsavelTecnico->nome_mae : old('nome_mae_rt') }}"
-                minlength="5"
                 maxlength="191"
             />
             @if($errors->has('nome_mae_rt'))
@@ -384,7 +374,6 @@
                 type="text"
                 class="{{ $classes[5] }} text-uppercase form-control {{ $errors->has('nome_pai_rt') ? 'is-invalid' : '' }}"
                 value="{{ empty(old('nome_pai_rt')) && isset($resultado->pessoaJuridica->responsavelTecnico->nome_pai) ? $resultado->pessoaJuridica->responsavelTecnico->nome_pai : old('nome_pai_rt') }}"
-                minlength="5"
                 maxlength="191"
             />
             @if($errors->has('nome_pai_rt'))

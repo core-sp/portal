@@ -1106,6 +1106,7 @@ function putDadosPreRegistro(objeto)
 	var pD = campo == 'path' ? false : true;
 	var frmData = new FormData();
 	var dados = null;
+	var arrayEndereco = ['cep', 'logradouro', 'numero', 'complemento', 'cidade', 'uf'];
 
 	if(campo == 'path'){
 		for(var i = 0; i < valor.length; i++)
@@ -1149,6 +1150,8 @@ function putDadosPreRegistro(objeto)
 		success: function(response) {
 			$('.loaderPreRegistro').removeClass('active');
 			$('#loaderPreRegistro').removeClass('active');
+			if(arrayEndereco.indexOf(campo) != -1)
+				confereEnderecoEmpresa(response['resultado']);
 			if(campo == 'cpf_rt')
 				preencheRT(response['resultado']);
 			if(campo == 'cnpj_contabil')
@@ -1224,16 +1227,18 @@ function getErrorMsg(request)
 	return [errorMessage, time];
 }
 
-// function confereEnderecoEmpresa()
-// {
-// 	var cep = $('#inserirRegistro input[name="cep"]').val().trim() == "";
-// 	var logradouro = $('#inserirRegistro input[name="logradouro"]').val().trim() == "";
-// 	var bairro = $('#inserirRegistro input[name="bairro"]').val().trim() == "";
-// 	var cidade = $('#inserirRegistro input[name="cidade"]').val().trim() == "";
-// 	var uf = $('#inserirRegistro select[name="uf"]:selected').val() == "";
-
-// 	return cep || logradouro || bairro || cidade || uf;
-// }
+function confereEnderecoEmpresa(boolMesmoEndereco)
+{
+	if(boolMesmoEndereco === null)
+		return;
+	if(boolMesmoEndereco){
+		$('#checkEndEmpresa').prop('checked', true);
+		$("#habilitarEndEmpresa").prop('disabled', true).hide();
+	}else{
+		$('#checkEndEmpresa').prop('checked', false);
+		$("#habilitarEndEmpresa").prop('disabled', false).show();
+	}
+}
 
 function preencheContabil(dados)
 {
@@ -1545,8 +1550,7 @@ $('#inserirRegistro select, #inserirRegistro input[type="file"]').change(functio
 
 $('#inserirRegistro input:checkbox').change(function(){
 	var checkMesmoEndereco = $(this).attr('name') == 'checkEndEmpresa';
-	// var endEmpresa = confereEnderecoEmpresa();
-	if((this.checked && /*!endEmpresa && */checkMesmoEndereco) || !checkMesmoEndereco)
+	if((this.checked && checkMesmoEndereco) || !checkMesmoEndereco)
 		putDadosPreRegistro($(this));
 });
 

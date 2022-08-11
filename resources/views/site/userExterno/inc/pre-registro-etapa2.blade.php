@@ -58,7 +58,6 @@
             type="text"
             class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('nome_social') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_social')) && isset($resultado->pessoaFisica->nome_social) ? $resultado->pessoaFisica->nome_social : old('nome_social') }}"
-            minlength="5"
             maxlength="191"
         />
         @if($errors->has('nome_social'))
@@ -173,7 +172,6 @@
             type="text"
             class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('naturalidade_cidade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('naturalidade_cidade')) && isset($resultado->pessoaFisica->naturalidade_cidade) ? $resultado->pessoaFisica->naturalidade_cidade : old('naturalidade_cidade') }}"
-            minlength="4"
             maxlength="191"
             {{ isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade != 'BRASILEIRA') ? 'disabled' : '' }}
         />
@@ -219,7 +217,6 @@
             type="text"
             class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('nome_mae') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('nome_mae')) && isset($resultado->pessoaFisica->nome_mae) ? $resultado->pessoaFisica->nome_mae : old('nome_mae') }}"
-            minlength="5"
             maxlength="191"
         />
         @if($errors->has('nome_mae'))
@@ -236,7 +233,6 @@
             type="text"
             class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('nome_pai') ? 'is-invalid' : '' }}"
             value="{{ empty(old('nome_pai')) && isset($resultado->pessoaFisica->nome_pai) ? $resultado->pessoaFisica->nome_pai : old('nome_pai') }}"
-            minlength="5"
             maxlength="191"
         />
         @if($errors->has('nome_pai'))
@@ -280,7 +276,6 @@
             type="text"
             class="{{ $classes[2] }} text-uppercase form-control {{ $errors->has('identidade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('identidade')) && isset($resultado->pessoaFisica->identidade) ? $resultado->pessoaFisica->identidade : old('identidade') }}"
-            minlength="4"
             maxlength="30"
         />
         @if($errors->has('identidade'))
@@ -300,7 +295,6 @@
             type="text"
             class="{{ $classes[2] }} form-control text-uppercase {{ $errors->has('orgao_emissor') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('orgao_emissor')) && isset($resultado->pessoaFisica->orgao_emissor) ? $resultado->pessoaFisica->orgao_emissor : old('orgao_emissor') }}"
-            minlength="3"
             maxlength="191"
         />
         @if($errors->has('orgao_emissor'))
@@ -338,7 +332,6 @@
             type="text"
             class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('razao_social')) && isset($resultado->pessoaJuridica->razao_social) ? $resultado->pessoaJuridica->razao_social : old('razao_social') }}"
-            minlength="5"
             maxlength="191"
         />
         @if($errors->has('razao_social'))
@@ -359,7 +352,6 @@
             class="{{ $classes[3] }} form-control capitalSocial {{ $errors->has('capital_social') ? 'is-invalid' : '' }} obrigatorio"
             placeholder="1.000,00"
             value="{{ empty(old('capital_social')) && isset($resultado->pessoaJuridica->capital_social) ? $resultado->pessoaJuridica->capital_social : old('capital_social') }}"
-            minlength="4"
             maxlength="16"
         />
         @if($errors->has('capital_social'))
@@ -377,7 +369,6 @@
             class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('nire') ? 'is-invalid' : '' }}"
             placeholder="NIRE"
             value="{{ empty(old('nire')) && isset($resultado->pessoaJuridica->nire) ? $resultado->pessoaJuridica->nire : old('nire') }}"
-            minlength="1"
             maxlength="20"
         />
         @if($errors->has('nire'))
@@ -442,7 +433,6 @@
             class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('inscricao_municipal') ? 'is-invalid' : '' }}"
             placeholder=""
             value="{{ empty(old('inscricao_municipal')) && isset($resultado->pessoaJuridica->inscricao_municipal) ? $resultado->pessoaJuridica->inscricao_municipal : old('inscricao_municipal') }}"
-            minlength="5"
             maxlength="30"
         />
         @if($errors->has('inscricao_municipal'))
@@ -460,7 +450,6 @@
             class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('inscricao_estadual') ? 'is-invalid' : '' }}"
             placeholder=""
             value="{{ empty(old('inscricao_estadual')) && isset($resultado->pessoaJuridica->inscricao_estadual) ? $resultado->pessoaJuridica->inscricao_estadual : old('inscricao_estadual') }}"
-            minlength="5"
             maxlength="30"
         />
         @if($errors->has('inscricao_estadual'))
@@ -535,7 +524,6 @@
             id="pergunta"
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('pergunta') ? 'is-invalid' : '' }}"
             placeholder=""
-            minlength="1"
             maxlength="191"
             {{ $resultado->status != $resultado::STATUS_CRIADO ? 'readonly' : '' }}
             {{-- por não salvar no bd, para não passar nula para o próximo request de envio --}}

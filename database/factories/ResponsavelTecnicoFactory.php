@@ -31,8 +31,6 @@ $factory->define(ResponsavelTecnico::class, function (Faker $faker) {
 
 $factory->state(ResponsavelTecnico::class, 'low', function (Faker $faker) {
     return [
-        'nome' => $faker->name,
-        'nome_mae' => $faker->name,
         'tipo_identidade' => tipos_identidade()[0],
     ];
 });

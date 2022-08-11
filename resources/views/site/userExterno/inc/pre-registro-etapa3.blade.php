@@ -40,7 +40,6 @@
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('bairro') ? 'is-invalid' : '' }} obrigatorio"
             id="bairro_pre"
             value="{{ empty(old('bairro')) && isset($resultado->bairro) ? $resultado->bairro : old('bairro') }}"
-            minlength="4"
             maxlength="191"
         />
         @if($errors->has('bairro'))
@@ -60,7 +59,6 @@
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('logradouro') ? 'is-invalid' : '' }} obrigatorio"
             id="rua_pre"
             value="{{ empty(old('logradouro')) && isset($resultado->logradouro) ? $resultado->logradouro : old('logradouro') }}"
-            minlength="4"
             maxlength="191"
         />
         @if($errors->has('logradouro'))
@@ -77,7 +75,6 @@
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('numero') ? 'is-invalid' : '' }} obrigatorio"
             id="numero_pre"
             value="{{ empty(old('numero')) && isset($resultado->numero) ? $resultado->numero : old('numero') }}"
-            minlength="1"
             maxlength="10"
         />
         @if($errors->has('numero'))
@@ -97,7 +94,6 @@
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('complemento') ? 'is-invalid' : '' }}"
             id="complemento_pre"
             value="{{ empty(old('complemento')) && isset($resultado->complemento) ? $resultado->complemento : old('complemento') }}"
-            minlength="1"
             maxlength="50"
         />
         @if($errors->has('complemento'))
@@ -114,7 +110,6 @@
             id="cidade_pre"
             class="{{ $classes[4] }} text-uppercase form-control {{ $errors->has('cidade') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('cidade')) && isset($resultado->cidade) ? $resultado->cidade : old('cidade') }}"
-            minlength="4"
             maxlength="191"
         />
         @if($errors->has('cidade'))
@@ -200,7 +195,6 @@
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('bairro_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="bairro_empresa"
                 value="{{ empty(old('bairro_empresa')) && isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : old('bairro_empresa') }}"
-                minlength="4"
                 maxlength="191"
             />
             @if($errors->has('bairro_empresa'))
@@ -220,7 +214,6 @@
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('logradouro_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="rua_empresa"
                 value="{{ empty(old('logradouro_empresa')) && isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : old('logradouro_empresa') }}"
-                minlength="4"
                 maxlength="191"
             />
             @if($errors->has('logradouro_empresa'))
@@ -237,7 +230,6 @@
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('numero_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 id="numero_empresa"
                 value="{{ empty(old('numero_empresa')) && isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : old('numero_empresa') }}"
-                minlength="1"
                 maxlength="10"
             />
             @if($errors->has('numero_empresa'))
@@ -257,7 +249,6 @@
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('complemento_empresa') ? 'is-invalid' : '' }}"
                 id="complemento_empresa"
                 value="{{ empty(old('complemento_empresa')) && isset($resultado->pessoaJuridica->complemento) ? $resultado->pessoaJuridica->complemento : old('complemento_empresa') }}"
-                minlength="1"
                 maxlength="50"
             />
             @if($errors->has('complemento_empresa'))
@@ -274,7 +265,6 @@
                 id="cidade_empresa"
                 class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('cidade_empresa') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('cidade_empresa')) && isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : old('cidade_empresa') }}"
-                minlength="4"
                 maxlength="191"
             />
             @if($errors->has('cidade_empresa'))

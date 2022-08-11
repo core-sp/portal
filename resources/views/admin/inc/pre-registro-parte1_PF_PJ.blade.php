@@ -1,9 +1,9 @@
-<div class="card-body bg-light">
-
 @php
     $camposEditados = $resultado->getCamposEditados();
     $arrayJustificativas = $resultado->getJustificativaArray();
 @endphp
+
+<div class="card-body bg-light">
 @if(isset($resultado->contabil_id))
     <p id="cnpj_contabil">
         <span class="font-weight-bolder">{{ $codigos[0]['cnpj_contabil'] }} - CNPJ: </span>

@@ -63,7 +63,6 @@
                 type="text"
                 class="{{ $classes[1] }} text-uppercase form-control {{ $errors->has('nome_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_contabil')) && isset($resultado->contabil->nome) ? $resultado->contabil->nome : old('nome_contabil') }}"
-                minlength="5"
                 maxlength="191"
             />
             @if($errors->has('nome_contabil'))
@@ -83,7 +82,6 @@
                 type="email"
                 class="{{ $classes[1] }} form-control {{ $errors->has('email_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('email_contabil')) && isset($resultado->contabil->email) ? $resultado->contabil->email : old('email_contabil') }}"
-                minlength="10"
                 maxlength="191"
             />
             @if($errors->has('email_contabil'))
@@ -103,7 +101,6 @@
                 type="text"
                 class="{{ $classes[1] }} text-uppercase form-control {{ $errors->has('nome_contato_contabil') ? 'is-invalid' : '' }} obrigatorio"
                 value="{{ empty(old('nome_contato_contabil')) && isset($resultado->contabil->nome_contato) ? $resultado->contabil->nome_contato : old('nome_contato_contabil') }}"
-                minlength="5"
                 maxlength="191"
             />
             @if($errors->has('nome_contato_contabil'))

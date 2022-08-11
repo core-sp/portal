@@ -108,14 +108,14 @@ class PreRegistroAjaxRequest extends FormRequest
         if(strpos(request()->campo, 'dt_nascimento') !== false)
             if(isset(request()->valor))
                 $this->regraValor = [
-                    'date',
+                    'date_format:Y-m-d',
                     'before_or_equal:' . Carbon::today()->subYears(18)->format('Y-m-d'),
                 ];
 
         if((strpos(request()->campo, 'dt_expedicao') !== false) || (request()->campo == 'dt_inicio_atividade'))
             if(isset(request()->valor))
                 $this->regraValor = [
-                    'date',
+                    'date_format:Y-m-d',
                     'before_or_equal:today',
                 ];
         
@@ -160,7 +160,7 @@ class PreRegistroAjaxRequest extends FormRequest
             'mimetypes' => 'O arquivo não possui extensão permitida ou está com erro',
             'file' => 'Deve ser um arquivo',
             'uploaded' => 'Falhou o upload por erro no servidor',
-            'date' => 'Deve ser tipo data',
+            'date_format' => 'Deve ser tipo data',
             'before_or_equal' => strpos(request()->campo, 'dt_nascimento') !== false ? 'Deve ter 18 anos completos ou mais' : 'Data deve ser igual ou anterior a hoje',
             'exists' => 'Esta regional não existe',
         ];

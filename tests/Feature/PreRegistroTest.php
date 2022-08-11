@@ -158,7 +158,7 @@ class PreRegistroTest extends TestCase
         // Considerado o valor local que está no PreRegistroController
         $admin = $this->signInAsAdmin();
 
-        for($i = 1; $i <= 150; $i++)
+        for($i = 1; $i <= 190; $i++)
             $this->get(route('preregistro.index'))->assertStatus(200);
 
         $this->get(route('preregistro.index'))->assertStatus(429);
@@ -1040,6 +1040,10 @@ class PreRegistroTest extends TestCase
             'valor' => '78087976000130'
         ])->assertOk();
 
+        $this->assertDatabaseHas('pre_registros', [
+            'contabil_id' => 1,
+        ]);
+
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'contabil',
             'campo' => 'cnpj_contabil',
@@ -1145,12 +1149,7 @@ class PreRegistroTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
-
-        $this->post(route('externo.inserir.preregistro.ajax'), [
-            'classe' => 'anexos',
-            'campo' => 'path',
-            'valor' => [UploadedFile::fake()->create('random2.pdf')->size(100)]
-        ])->assertStatus(200);
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
         $this->put(route('externo.verifica.inserir.preregistro'), [])->assertStatus(302);
         $errors = session('errors');
@@ -1164,12 +1163,7 @@ class PreRegistroTest extends TestCase
 
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));
-
-        $this->post(route('externo.inserir.preregistro.ajax'), [
-            'classe' => 'anexos',
-            'campo' => 'path',
-            'valor' => [UploadedFile::fake()->create('random2.pdf')->size(100)]
-        ])->assertStatus(200);
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
         $this->put(route('externo.verifica.inserir.preregistro'), [])->assertStatus(302);
         $errors = session('errors');
@@ -1185,7 +1179,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_without_anexo()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1209,7 +1202,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_wrong_value_segmento()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1226,6 +1218,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('segmento');
@@ -1234,7 +1227,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_idregional_non_exists()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1251,6 +1243,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('idregional');
@@ -1259,7 +1252,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_cep_more_than_9_chars()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1276,6 +1268,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cep');
@@ -1284,7 +1277,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_cep_with_format_invalid()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1301,6 +1293,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cep');
@@ -1309,7 +1302,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_bairro_less_than_4_chars()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1326,6 +1318,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('bairro');
@@ -1335,7 +1328,6 @@ class PreRegistroTest extends TestCase
     public function cannot_submit_pre_registro_with_bairro_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1352,6 +1344,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('bairro');
@@ -1360,7 +1353,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_logradouro_less_than_4_chars()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1377,6 +1369,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('logradouro');
@@ -1386,7 +1379,6 @@ class PreRegistroTest extends TestCase
     public function cannot_submit_pre_registro_with_logradouro_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1403,6 +1395,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('logradouro');
@@ -1411,7 +1404,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_numero_more_than_10_chars()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1428,6 +1420,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('numero');
@@ -1437,7 +1430,6 @@ class PreRegistroTest extends TestCase
     public function cannot_submit_pre_registro_with_complemento_more_than_50_chars()
     {
         $faker = \Faker\Factory::create();
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1454,6 +1446,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('complemento');
@@ -1462,7 +1455,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_cidade_less_than_4_chars()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1479,6 +1471,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cidade');
@@ -1488,7 +1481,6 @@ class PreRegistroTest extends TestCase
     public function cannot_submit_pre_registro_with_cidade_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1505,6 +1497,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cidade');
@@ -1513,7 +1506,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_cidade_with_numbers()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1530,6 +1522,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cidade');
@@ -1538,7 +1531,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_uf_wrong_value()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1555,6 +1547,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('uf');
@@ -1563,7 +1556,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_tipo_telefone_wrong_value()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1580,6 +1572,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('tipo_telefone');
@@ -1588,7 +1581,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_telefone_less_than_14_chars()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1605,6 +1597,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone');
@@ -1613,7 +1606,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_telefone_more_than_15_chars_and_value_wrong()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1630,6 +1622,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone');
@@ -1638,7 +1631,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_opcional_celular_value_wrong()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1654,6 +1646,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('opcional_celular');
@@ -1662,7 +1655,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_opcional_celular_equals()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1678,6 +1670,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('opcional_celular.*');
@@ -1686,7 +1679,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_opcional_celular_not_type_array()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1702,6 +1694,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('opcional_celular');
@@ -1710,7 +1703,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_empty_telefone_optional_if_tipo_telefone_optional_filled()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1727,6 +1719,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_1');
@@ -1735,7 +1728,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_empty_tipo_telefone_optional_if_telefone_optional_filled()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1752,6 +1744,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('tipo_telefone_1');
@@ -1760,7 +1753,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_tipo_telefone_optional_wrong_value()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1778,6 +1770,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('tipo_telefone_1');
@@ -1786,7 +1779,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_opcional_celular_1_wrong_value()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1801,7 +1793,8 @@ class PreRegistroTest extends TestCase
 
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();   
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();  
        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('opcional_celular_1');
@@ -1810,7 +1803,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_opcional_celular_1_equals()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1827,6 +1819,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('opcional_celular_1.*');
@@ -1835,7 +1828,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_opcional_celular_1_not_type_array()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1852,6 +1844,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('opcional_celular_1');
@@ -1860,7 +1853,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_telefone_optional_less_than_14_chars()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1877,7 +1869,8 @@ class PreRegistroTest extends TestCase
 
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
-        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();    
+        $anexo = factory('App\Anexo')->states('pre_registro')->create(); 
        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_1');
@@ -1886,7 +1879,6 @@ class PreRegistroTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_with_telefone_optional_more_than_15_chars_and_wrong_value()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1904,6 +1896,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_1');
@@ -1913,7 +1906,6 @@ class PreRegistroTest extends TestCase
     public function cannot_submit_pre_registro_with_pergunta_more_than_191_chars()
     {
         $faker = \Faker\Factory::create();
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno();
 
         $preRegistro = factory('App\PreRegistro')->states('low')->raw([
@@ -1930,6 +1922,7 @@ class PreRegistroTest extends TestCase
         $dados = array_merge($preRegistro, $preRegistroCpf);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('pergunta');

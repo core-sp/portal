@@ -495,7 +495,6 @@ class ContabilTest extends TestCase
             'nome_contato_contabil' => null,
             'telefone_contabil' => null,
             'path' => null,
-            'pergunta' => 'teste'
         ];
 
         $final = array_merge($dados, $preRegistroCpf->preRegistro->toArray(), $preRegistroCpf->toArray());
@@ -564,6 +563,7 @@ class ContabilTest extends TestCase
         $dados['cnpj_contabil'] = '01234567891023';
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('cnpj_contabil');
@@ -586,6 +586,7 @@ class ContabilTest extends TestCase
         $dados['nome_contabil'] = '';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contabil');
@@ -609,6 +610,7 @@ class ContabilTest extends TestCase
         $dados['nome_contabil'] = 'Nome';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contabil');
@@ -632,6 +634,7 @@ class ContabilTest extends TestCase
         $dados['nome_contabil'] = $faker->sentence(400);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contabil');
@@ -654,6 +657,7 @@ class ContabilTest extends TestCase
         $dados['email_contabil'] = '';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('email_contabil');
@@ -676,6 +680,7 @@ class ContabilTest extends TestCase
         $dados['email_contabil'] = 'tes@.com';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('email_contabil');
@@ -699,6 +704,7 @@ class ContabilTest extends TestCase
         $dados['email_contabil'] = $faker->sentence(400);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('email_contabil');
@@ -721,6 +727,7 @@ class ContabilTest extends TestCase
         $dados['email_contabil'] = 'teste@.com';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('email_contabil');
@@ -743,6 +750,7 @@ class ContabilTest extends TestCase
         $dados['nome_contato_contabil'] = '';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contato_contabil');
@@ -766,6 +774,7 @@ class ContabilTest extends TestCase
         $dados['nome_contato_contabil'] = 'Nome';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contato_contabil');
@@ -789,6 +798,7 @@ class ContabilTest extends TestCase
         $dados['nome_contato_contabil'] = $faker->sentence(400);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contato_contabil');
@@ -811,6 +821,7 @@ class ContabilTest extends TestCase
         $dados['nome_contato_contabil'] = 'N0me C0ntato';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('nome_contato_contabil');
@@ -833,6 +844,7 @@ class ContabilTest extends TestCase
         $dados['telefone_contabil'] = '';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_contabil');
@@ -855,6 +867,7 @@ class ContabilTest extends TestCase
         $dados['telefone_contabil'] = '(11) 9888-862';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_contabil');
@@ -877,6 +890,7 @@ class ContabilTest extends TestCase
         $dados['telefone_contabil'] = '(11) 98889-86265';
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors('telefone_contabil');

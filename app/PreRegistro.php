@@ -521,7 +521,11 @@ class PreRegistro extends Model
             case 'preRegistro':
                 $valido = $this->validarUpdateAjax($campo, $valor);
                 if(isset($valido))
+                {
                     $this->update($valido);
+                    if(in_array($campo, ['cep', 'logradouro', 'numero', 'complemento', 'cidade', 'uf']) && !$this->userExterno->isPessoaFisica())
+                        $resultado = $this->pessoaJuridica->mesmoEndereco();
+                }
                 break;
             case 'pessoaFisica':
                 $this->pessoaFisica->update([$campo => $valor]);

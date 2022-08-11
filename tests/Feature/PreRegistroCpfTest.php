@@ -481,11 +481,7 @@ class PreRegistroCpfTest extends TestCase
     public function can_update_table_pre_registros_cpf_by_ajax_when_clean_inputs()
     {
         $externo = $this->signInAsUserExterno();
-        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
-            ]),
-        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
 
         $preRegistroCpf = $preRegistroCpf->makeHidden(['id', 'pre_registro_id', 'updated_at', 'created_at'])->attributesToArray();
         
@@ -505,11 +501,7 @@ class PreRegistroCpfTest extends TestCase
     public function cannot_update_table_pre_registros_cpf_by_ajax_with_status_different_aguardando_correcao_or_sendo_elaborado()
     {
         $externo = $this->signInAsUserExterno();
-        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
-            ]),
-        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
 
         $preRegistroCpf = $preRegistroCpf->makeHidden(['id', 'pre_registro_id', 'updated_at', 'created_at']);
 
@@ -530,11 +522,7 @@ class PreRegistroCpfTest extends TestCase
     public function can_update_table_pre_registros_cpf_by_ajax_with_status_aguardando_correcao_or_sendo_elaborado()
     {
         $externo = $this->signInAsUserExterno();
-        $preRegistroCpf = factory('App\PreRegistroCpf')->create([
-            'pre_registro_id' => factory('App\PreRegistro')->create([
-                'user_externo_id' => $externo->id,
-            ]),
-        ]);
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
 
         $preRegistroCpf = $preRegistroCpf->makeHidden(['id', 'pre_registro_id', 'updated_at', 'created_at']);
 
@@ -562,34 +550,12 @@ class PreRegistroCpfTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $dados = [
-            'idregional' => null,
-            'segmento' => null,
-            'cep' => null,
-            'logradouro' => null,
-            'numero' => null,
-            'bairro' => null,
-            'cidade' => null,
-            'uf' => null,
-            'tipo_telefone' => null,
-            'telefone' => null,
-            'opcional_celular.*' => ['S'],
-            'tipo_telefone_1' => '1',
-            'telefone_1' => '(1)',
-            'opcional_celular_1.*' => ['S'],
-            'dt_nascimento' => null,
-            'sexo' => null,
-            'estado_civil' => 'e',
-            'nacionalidade' => null,
-            'naturalidade_cidade' => null,
-            'naturalidade_estado' => null,
-            'nome_mae' => null,
-            'nome_pai' => 'p',
-            'tipo_identidade' => null,
-            'identidade' => null,
-            'orgao_emissor' => null,
-            'dt_expedicao' => null,
-            'path' => null,
-            'pergunta' => '1'
+            'idregional' => null,'segmento' => '1','cep' => null,'logradouro' => null,'numero' => null,
+            'bairro' => null,'cidade' => null,'uf' => null,'tipo_telefone' => null,'telefone' => null,
+            'opcional_celular.*' => ['S'],'tipo_telefone_1' => '1','telefone_1' => '(1)','opcional_celular_1.*' => ['S'],
+            'dt_nascimento' => null,'sexo' => null,'estado_civil' => 'e','nacionalidade' => null,'naturalidade_cidade' => 'r',
+            'naturalidade_estado' => 'f','nome_mae' => null,'nome_pai' => 'p','tipo_identidade' => null,'identidade' => null,
+            'orgao_emissor' => null,'dt_expedicao' => null,'path' => null,'pergunta' => '1'
         ];
 
         $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(302);
@@ -770,13 +736,10 @@ class PreRegistroCpfTest extends TestCase
             'final','preRegistro','contabil'
         ]);
         $dados = array_merge($prCpf, $final);
-        $cont = PreRegistro::find(1)->contabil;
-        $dados['contabil_id'] = $cont->id;
-        $dados['cnpj_contabil'] = $cont->cnpj;
-        $dados['nome_contabil'] = $cont->nome;
-        $dados['email_contabil'] = $cont->email;
-        $dados['nome_contato_contabil'] = $cont->nome_contato;
-        $dados['telefone_contabil'] = $cont->telefone;
+
+        $cont = PreRegistro::find(1)->contabil->makeHidden(['id','created_at','updated_at','deleted_at'])->attributesToArray();
+        foreach($cont as $key => $val)
+            $dados[$key . '_contabil'] = $val;
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();   
 
@@ -857,47 +820,16 @@ class PreRegistroCpfTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
         $dados = [
-            'idregional' => '',
-            'cep' => '',
-            'bairro' => '',
-            'logradouro' => '',
-            'numero' => '',
-            'cidade' => '',
-            'uf' => '',
-            'tipo_telefone' => '',
-            'telefone' => '',
-            'sexo' => '',
-            'dt_nascimento' => '',
-            'nacionalidade' => '',
-            'nome_mae' => '',
-            'tipo_identidade' => '',
-            'identidade' => '',
-            'orgao_emissor' => '',
-            'dt_expedicao' => '',
-            'path' => '',
+            'idregional' => '','cep' => '','bairro' => '','logradouro' => '','numero' => '','cidade' => '','uf' => '',
+            'tipo_telefone' => '','telefone' => '','sexo' => '','dt_nascimento' => '','nacionalidade' => '','nome_mae' => '',
+            'tipo_identidade' => '','identidade' => '','orgao_emissor' => '','dt_expedicao' => '','path' => '',
         ];
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();        
         $this->put(route('externo.verifica.inserir.preregistro'), $dados)
         ->assertSessionHasErrors([
-            'idregional',
-            'cep',
-            'bairro',
-            'logradouro',
-            'numero',
-            'cidade',
-            'uf',
-            'tipo_telefone',
-            'telefone',
-            'sexo',
-            'dt_nascimento',
-            'nacionalidade',
-            'nome_mae',
-            'tipo_identidade',
-            'identidade',
-            'orgao_emissor',
-            'dt_expedicao',
-            'path',
+            'idregional','cep','bairro','logradouro','numero','cidade','uf','tipo_telefone','telefone','sexo','dt_nascimento',
+            'nacionalidade','nome_mae','tipo_identidade','identidade','orgao_emissor','dt_expedicao','path',
         ]);
 
         $pr = $externo->load('preRegistro')->preRegistro;
@@ -1011,6 +943,25 @@ class PreRegistroCpfTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $preRegistroCpf = factory('App\PreRegistroCpf')->states('request')->make([
             'dt_nascimento' => ''
+        ]);
+        $final = $preRegistroCpf->final;
+        $prCpf = Arr::except($preRegistroCpf->toArray(), [
+            'final','preRegistro','contabil'
+        ]);
+        $dados = array_merge($prCpf, $final);
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        
+        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('dt_nascimento');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_dt_nascimento_incorrect_format()
+    {
+        $externo = $this->signInAsUserExterno();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('request')->make([
+            'dt_nascimento' => '2000/01/01'
         ]);
         $final = $preRegistroCpf->final;
         $prCpf = Arr::except($preRegistroCpf->toArray(), [
@@ -1471,7 +1422,7 @@ class PreRegistroCpfTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
         $preRegistroCpf = factory('App\PreRegistroCpf')->states('request')->make([
-            'orgao_emissor' => 'SS'
+            'orgao_emissor' => 'SY'
         ]);
         $final = $preRegistroCpf->final;
         $prCpf = Arr::except($preRegistroCpf->toArray(), [
@@ -1511,6 +1462,25 @@ class PreRegistroCpfTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $preRegistroCpf = factory('App\PreRegistroCpf')->states('request')->make([
             'dt_expedicao' => ''
+        ]);
+        $final = $preRegistroCpf->final;
+        $prCpf = Arr::except($preRegistroCpf->toArray(), [
+            'final','preRegistro','contabil'
+        ]);
+        $dados = array_merge($prCpf, $final);
+        
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();     
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('dt_expedicao');
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registro_with_dt_expedicao_incorrect_format()
+    {
+        $externo = $this->signInAsUserExterno();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('request')->make([
+            'dt_expedicao' => '2000/01/01'
         ]);
         $final = $preRegistroCpf->final;
         $prCpf = Arr::except($preRegistroCpf->toArray(), [
@@ -1575,13 +1545,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = array_merge($prCpf, $final);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));     
-        
-        $this->post(route('externo.inserir.preregistro.ajax'), [
-            'classe' => 'anexos',
-            'campo' => 'path',
-            'valor' => [UploadedFile::fake()->create('random.pdf')]
-        ]);
-        
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
@@ -1678,13 +1642,7 @@ class PreRegistroCpfTest extends TestCase
         $dados = array_merge($prCpf, $final, ['path' => '']);
         
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']));     
-        
-        $this->post(route('externo.inserir.preregistro.ajax'), [
-            'classe' => 'anexos',
-            'campo' => 'path',
-            'valor' => [UploadedFile::fake()->create('random.pdf')]
-        ]);
-        
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
         $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
 
         $pr = PreRegistro::first();
@@ -1727,13 +1685,6 @@ class PreRegistroCpfTest extends TestCase
         $preRegistroCpf->orgao_emissor = 'DENATRAN';
         $preRegistroCpf->dt_expedicao = '2022-01-05';
       
-        foreach($preRegistroCpf->attributesToArray() as $key => $val)
-            $this->post(route('externo.inserir.preregistro.ajax'), [
-                'classe' => 'pessoaFisica',
-                'campo' => $key,
-                'valor' => $val
-            ])->assertStatus(200);
-            
         $dados = array_merge($preRegistro->toArray(), $preRegistroCpf->attributesToArray(), ['path' => '1']);
 
         $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
@@ -2300,19 +2251,23 @@ class PreRegistroCpfTest extends TestCase
     }
 
     /** @test */
-    public function cannot_check_anexos_pre_registro_without_status()
+    public function cannot_check_anexos_pre_registro_with_status_different_analise_inicial_or_analise_correcao()
     {
         $admin = $this->signInAsAdmin();
 
         $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
         $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-        $preRegistroCpf->preRegistro->update(['status' => null]);
-        $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
-            'acao' => 'conferir',
-            'campo' => 'confere_anexos[]',
-            'valor' => 'CPF'
-        ])->assertSessionHasErrors('valor');
+        foreach(PreRegistro::getStatus() as $status)
+        {
+            $preRegistroCpf->preRegistro->update(['status' => $status]);
+            if(!in_array($status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]))
+                $this->post(route('preregistro.update.ajax', $preRegistroCpf->pre_registro_id), [
+                    'acao' => 'conferir',
+                    'campo' => 'confere_anexos[]',
+                    'valor' => 'CPF'
+                ])->assertSessionHasErrors('valor');
+        }
     }
 
     /** 
@@ -2535,7 +2490,6 @@ class PreRegistroCpfTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString('atualizou status para ' . PreRegistro::STATUS_NEGADO, $log);
-
     }
 
     /** @test */
