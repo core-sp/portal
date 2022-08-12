@@ -1318,11 +1318,11 @@ async function callbackEnderecoPreRegistro(restoId)
 	}
 	putDadosPreRegistro($("#cep_" + restoId));
 
-	if(($('#checkEndEmpresa:checked').length == 1) && (restoId != 'empresa'))
-		if($('input[id="cep_' + restoId + '"]').val() != $('input[name="cep_empresa"]').val()){
-			$('#checkEndEmpresa').prop('checked', false);
-			$('#habilitarEndEmpresa').prop('disabled', false).show();
-		}
+	// if(($('#checkEndEmpresa:checked').length == 1) && (restoId != 'empresa'))
+	// 	if($('input[id="cep_' + restoId + '"]').val() != $('input[name="cep_empresa"]').val()){
+	// 		$('#checkEndEmpresa').prop('checked', false);
+	// 		$('#habilitarEndEmpresa').prop('disabled', false).show();
+	// 	}
 }
 
 function avancarVoltarDisabled(ativado, ordemMenu)
