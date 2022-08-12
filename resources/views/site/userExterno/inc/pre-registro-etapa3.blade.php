@@ -155,7 +155,7 @@
                 id="checkEndEmpresa" 
                 class="{{ $classes[3] }} form-check-input {{ $errors->has('checkEndEmpresa') ? 'is-invalid' : '' }}" 
                 name="checkEndEmpresa" 
-                {{ isset($resultado->pessoaJuridica->id) && $resultado->pessoaJuridica->mesmoEndereco() ? 'checked' : '' }}
+                {{ $resultado->pessoaJuridica->mesmoEndereco() ? 'checked' : '' }}
             />
             <span class="bold">{{ $codigos[2]['checkEndEmpresa'] }} - Mesmo endereço da correspondência</span>
             
@@ -169,7 +169,7 @@
     </div>
 </div>
 
-<fieldset id="habilitarEndEmpresa" {{ isset($resultado->pessoaJuridica->id) && $resultado->pessoaJuridica->mesmoEndereco() ? 'disabled' : '' }}>
+<fieldset id="habilitarEndEmpresa" {{ $resultado->pessoaJuridica->mesmoEndereco() ? 'disabled' : '' }}>
     <div class="form-row mb-2">
         <div class="col-sm-4 mb-2-576">
             <label for="cep_empresa">{{ $codigos[2]['cep_empresa'] }} - CEP <span class="text-danger">*</span></label>
