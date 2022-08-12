@@ -2,9 +2,10 @@
 
     @if($resultado->status == $resultado::STATUS_NEGADO)
     <p class="mb-4">
-        <strong>Justificativa:</strong>
+        <strong class="text-danger">Justificativa:</strong>
         {{ $resultado->getJustificativaNegado() }}
     </p>
+    <hr />
     @endif
 
     @if(isset($resultado->historico_status))

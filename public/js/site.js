@@ -1130,9 +1130,6 @@ function putDadosPreRegistro(objeto)
 			'valor': valor
 		};
 
-	$('.loaderPreRegistro').addClass('active');
-	$('#loaderPreRegistro').addClass('active');
-
 	$.ajax({
 		method: 'POST',
 		enctype: 'multipart/form-data',
@@ -1148,8 +1145,6 @@ function putDadosPreRegistro(objeto)
 		cache: false,
 		timeout: 60000,
 		success: function(response) {
-			$('.loaderPreRegistro').removeClass('active');
-			$('#loaderPreRegistro').removeClass('active');
 			if(arrayEndereco.indexOf(campo) != -1)
 				confereEnderecoEmpresa(response['resultado']);
 			if(campo == 'cpf_rt')
@@ -1166,8 +1161,6 @@ function putDadosPreRegistro(objeto)
 			// confereObrigatorios();
 		},
 		error: function(request, status, error) {
-			$('.loaderPreRegistro').removeClass('active');
-			$('#loaderPreRegistro').removeClass('active');
 			var errorFunction = getErrorMsg(request);
 			$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorFunction[0]);
 			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');

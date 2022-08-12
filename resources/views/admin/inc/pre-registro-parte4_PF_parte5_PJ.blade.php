@@ -14,6 +14,7 @@
         <span class="font-weight-bolder">{{ $codigos[4]['tipo_telefone'] }} - Tipo de telefone: </span>
         {{ isset($resultado->getTipoTelefone()[0]) ? $resultado->getTipoTelefone()[0] : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'tipo_telefone',
             'resultado' => $arrayJustificativas
         ])
@@ -27,6 +28,7 @@
         <span class="font-weight-bolder">{{ $codigos[4]['telefone'] }} - Nº de telefone: </span>
         {{ isset($resultado->getTelefone()[0]) ? $resultado->getTelefone()[0] : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'telefone',
             'resultado' => $arrayJustificativas
         ])
@@ -42,6 +44,7 @@
             <small class="font-weight-bolder">({{ implode(', ', opcoes_celular()) }})</small>: </span>
         {{ isset($resultado->getOpcionalCelular()[0]) ? implode(', ', $resultado->getOpcionalCelular()[0]) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'opcional_celular',
             'resultado' => $arrayJustificativas
         ])
@@ -57,6 +60,7 @@
             <small class="font-weight-bolder">(opcional)</small> - Tipo de telefone: </span>
         {{ isset($resultado->getTipoTelefone()[1]) ? $resultado->getTipoTelefone()[1] : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'tipo_telefone_1',
             'resultado' => $arrayJustificativas
         ])
@@ -71,6 +75,7 @@
             <small class="font-weight-bolder">(opcional)</small> - Nº de telefone: </span>
         {{ isset($resultado->getTelefone()[1]) ? $resultado->getTelefone()[1] : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'telefone_1',
             'resultado' => $arrayJustificativas
         ])
@@ -86,6 +91,7 @@
             <small class="font-weight-bolder">({{ implode(', ', opcoes_celular()) }})</small>: </span>
         {{ isset($resultado->getOpcionalCelular()[1]) ? implode(', ', $resultado->getOpcionalCelular()[1]) : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'opcional_celular_1',
             'resultado' => $arrayJustificativas
         ])

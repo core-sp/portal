@@ -10,6 +10,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['cep'] }} - CEP: </span>
         {{ isset($resultado->cep) ? $resultado->cep : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'cep',
             'resultado' => $arrayJustificativas
         ])
@@ -23,6 +24,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['bairro'] }} - Bairro: </span>
         {{ isset($resultado->bairro) ? $resultado->bairro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'bairro',
             'resultado' => $arrayJustificativas
         ])
@@ -36,6 +38,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['logradouro'] }} - Logradouro: </span>
         {{ isset($resultado->logradouro) ? $resultado->logradouro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'logradouro',
             'resultado' => $arrayJustificativas
         ])
@@ -49,6 +52,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['numero'] }} - Número: </span>
         {{ isset($resultado->numero) ? $resultado->numero : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'numero',
             'resultado' => $arrayJustificativas
         ])
@@ -62,6 +66,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['complemento'] }} - Complemento: </span>
         {{ isset($resultado->complemento) ? $resultado->complemento : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'complemento',
             'resultado' => $arrayJustificativas
         ])
@@ -75,6 +80,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['cidade'] }} - Município: </span>
         {{ isset($resultado->cidade) ? $resultado->cidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'cidade',
             'resultado' => $arrayJustificativas
         ])
@@ -88,6 +94,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['uf'] }} - Estado: </span>
         {{ isset($resultado->uf) ? $resultado->uf : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'uf',
             'resultado' => $arrayJustificativas
         ])
@@ -106,6 +113,7 @@
     <p id="checkEndEmpresa">
         <span class="font-weight-bolder">{{ $codigos[2]['checkEndEmpresa'] }} - Mesmo endereço da correspondência </span>
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'checkEndEmpresa',
             'resultado' => $arrayJustificativas
         ])
@@ -121,6 +129,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['cep_empresa'] }} - CEP: </span>
         {{ isset($resultado->pessoaJuridica->cep) ? $resultado->pessoaJuridica->cep : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'cep_empresa',
             'resultado' => $arrayJustificativas
         ])
@@ -134,6 +143,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['bairro_empresa'] }} - Bairro: </span>
         {{ isset($resultado->pessoaJuridica->bairro) ? $resultado->pessoaJuridica->bairro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'bairro_empresa',
             'resultado' => $arrayJustificativas
         ])
@@ -147,6 +157,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['logradouro_empresa'] }} - Logradouro: </span>
         {{ isset($resultado->pessoaJuridica->logradouro) ? $resultado->pessoaJuridica->logradouro : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'logradouro_empresa',
             'resultado' => $arrayJustificativas
         ])
@@ -160,6 +171,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['numero_empresa'] }} - Número: </span>
         {{ isset($resultado->pessoaJuridica->numero) ? $resultado->pessoaJuridica->numero : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'numero_empresa',
             'resultado' => $arrayJustificativas
         ])
@@ -173,6 +185,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['complemento_empresa'] }} - Complemento: </span>
         {{ isset($resultado->pessoaJuridica->complemento) ? $resultado->pessoaJuridica->complemento : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'complemento_empresa',
             'resultado' => $arrayJustificativas
         ])
@@ -186,6 +199,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['cidade_empresa'] }} - Município: </span>
         {{ isset($resultado->pessoaJuridica->cidade) ? $resultado->pessoaJuridica->cidade : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'cidade_empresa',
             'resultado' => $arrayJustificativas
         ])
@@ -199,6 +213,7 @@
         <span class="font-weight-bolder">{{ $codigos[2]['uf_empresa'] }} - Estado: </span>
         {{ isset($resultado->pessoaJuridica->uf) ? $resultado->pessoaJuridica->uf : '------' }}
         @component('components.justificativa_pre_registro_admin', [
+            'preRegistro' => $resultado,
             'campo' => 'uf_empresa',
             'resultado' => $arrayJustificativas
         ])

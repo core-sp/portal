@@ -98,7 +98,7 @@ class PreRegistroCnpj extends Model
         
         $preRegistro = $this->preRegistro;
         $cepIgual = ($this->cep == $preRegistro->cep) && ($this->logradouro == $preRegistro->logradouro) && ($this->numero == $preRegistro->numero) && 
-        ($this->bairro == $preRegistro->bairro) && ($this->cidade == $preRegistro->cidade) && ($this->uf == $preRegistro->uf);
+        ($this->complemento == $preRegistro->complemento) && ($this->bairro == $preRegistro->bairro) && ($this->cidade == $preRegistro->cidade) && ($this->uf == $preRegistro->uf);
         
         return $naoNulo && $cepIgual;
     }
