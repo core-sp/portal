@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Notification;
 use Illuminate\Support\Facades\Password;
+use Carbon\Carbon;
 
 class UserExternoTest extends TestCase
 {
@@ -316,8 +317,8 @@ class UserExternoTest extends TestCase
 
         $user_externo = factory('App\UserExterno')->create([
             'ativo' => 0,
-            'deleted_at' => '2021-11-11 10:35:05'
         ]);
+        $user_externo->delete();
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), [
             'nome' => $user_externo['nome'],
@@ -339,6 +340,139 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.verifica-email', UserExterno::first()->verify_token));
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
+            'ativo' => 1
+        ]);
+    }
+
+    /** @test 
+     * 
+     * Pode se registrar se deletado e ativo 0.
+    */
+    public function cannot_to_active_register_after_24h()
+    {
+        Mail::fake();
+
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), [
+            'cpf_cnpj' => '36982299007',
+            'email' => 'teste@teste.com',
+            'nome' => 'Teste do Registro',
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'aceite' => 'on'
+        ]);
+
+        Mail::assertQueued(CadastroUserExternoMail::class);
+
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => '36982299007', 
+            'ativo' => 0
+        ]);
+
+        UserExterno::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
+        
+        $this->get(route('externo.verifica-email', UserExterno::first()->verify_token))->assertRedirect(route('externo.login'));
+
+        $this->get(route('externo.login'))
+        ->assertSeeText('Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
+        
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => '36982299007', 
+            'ativo' => 0
+        ]);
+    }
+
+    /** @test 
+     * 
+     * Pode se registrar se deletado e ativo 0.
+    */
+    public function register_after_24h_and_verify_mail()
+    {
+        Mail::fake();
+
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), [
+            'cpf_cnpj' => '36982299007',
+            'email' => 'teste@teste.com',
+            'nome' => 'Teste do Registro',
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'aceite' => 'on'
+        ]);
+
+        Mail::assertQueued(CadastroUserExternoMail::class);
+
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => '36982299007', 
+            'ativo' => 0
+        ]);
+
+        UserExterno::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
+        $this->get(route('externo.verifica-email', UserExterno::first()->verify_token))->assertRedirect(route('externo.login'));
+        $this->get(route('externo.login'))
+        ->assertSeeText('Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
+        
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => '36982299007', 
+            'ativo' => 0
+        ]);
+
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), [
+            'cpf_cnpj' => '36982299007',
+            'email' => 'teste@teste.com',
+            'nome' => 'Teste do Registro',
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'aceite' => 'on'
+        ]);
+
+        Mail::assertQueued(CadastroUserExternoMail::class);
+
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => '36982299007', 
+            'ativo' => 0,
+            'deleted_at' => null
+        ]);
+
+        // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
+        $this->get(route('externo.verifica-email', UserExterno::first()->verify_token));
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => '36982299007', 
+            'ativo' => 1
+        ]);
+    }
+
+    /** @test 
+    */
+    public function can_register_new_user_externo_when_ativo_0_and_not_deleted()
+    {
+        Mail::fake();
+
+        $user_externo = factory('App\UserExterno')->create([
+            'ativo' => 0,
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), [
+            'nome' => $user_externo['nome'],
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'email' => $user_externo['email'],
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'aceite' => 'on',
+        ]);
+
+        Mail::assertQueued(CadastroUserExternoMail::class);
+
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $user_externo->cpf_cnpj, 
+            'ativo' => 0
+        ]);
+
+        // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
+        $this->get(route('externo.verifica-email', UserExterno::first()->verify_token));
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $user_externo->cpf_cnpj, 
             'ativo' => 1
         ]);
     }
@@ -509,13 +643,38 @@ class UserExternoTest extends TestCase
     */
     public function cannot_send_mail_reset_password_for_user_externo_not_created()
     {
+        Notification::fake();
+
         $user_externo = factory('App\UserExterno')->raw();
         $this->get(route('externo.password.request'))->assertOk();
         $this->post(route('externo.password.email'), [
             'cpf_cnpj' => $user_externo['cpf_cnpj']
-        ])->assertStatus(302);
-        $this->get(route('externo.password.request'))
-        ->assertSee('CPF ou CNPJ não cadastrado.');
+        ])->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+
+        Notification::assertNothingSent();
+    }
+
+    /** @test 
+     * 
+     * Usuário Externo  não pode resetar senha com cadastro sem ativar.
+    */
+    public function cannot_send_mail_reset_password_for_user_externo_not_active()
+    {
+        Notification::fake();
+
+        $user_externo = factory('App\UserExterno')->create([
+            'ativo' => 0
+        ]);
+        $this->get(route('externo.password.request'))->assertOk();
+        $this->post(route('externo.password.email'), [
+            'cpf_cnpj' => $user_externo['cpf_cnpj']
+        ])->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+
+        Notification::assertNothingSent();
     }
 
     /** @test 
@@ -543,6 +702,8 @@ class UserExternoTest extends TestCase
     */
     public function cannot_send_mail_reset_password_when_not_find_cpfcnpj()
     {
+        Notification::fake();
+
         factory('App\UserExterno')->create([
             'cpf_cnpj' => '43795442818'
         ]);
@@ -550,8 +711,11 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.password.request'))->assertOk();
         $this->post(route('externo.password.email'), [
             'cpf_cnpj' => $user_externo['cpf_cnpj']
-        ])->assertRedirect(route('externo.password.request'));
-        $this->get(route('externo.password.request'))->assertSee('CPF ou CNPJ não cadastrado.');
+        ])->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+
+        Notification::assertNothingSent();
     }
 
     /** @test 
@@ -1142,7 +1306,11 @@ class UserExternoTest extends TestCase
         ]);
     }
 
-    // *************************************************************************************************************
+    /** 
+     * =======================================================================================================
+     * TESTES ABAS DE SERVIÇOS
+     * =======================================================================================================
+     */
 
     /** @test 
      * 

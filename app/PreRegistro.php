@@ -26,8 +26,7 @@ class PreRegistro extends Model
     {
         $update = $this->getHistoricoArray()['update'];
         $updateCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $update);
-        $updateCarbon->addDay()->addHour();
-        $updateCarbon->subMinutes($updateCarbon->minute);
+        $updateCarbon->addDay();
 
         return $updateCarbon;
     }

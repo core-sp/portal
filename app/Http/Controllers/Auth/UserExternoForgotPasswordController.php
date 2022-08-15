@@ -29,16 +29,15 @@ class UserExternoForgotPasswordController extends Controller
         $this->validateEmail($request);
         
         $cpf_cnpj = apenasNumeros($request->only('cpf_cnpj'));
+        $email = $this->getEmail($cpf_cnpj);
         $arrayCC = [
-            'cpf_cnpj' => $cpf_cnpj
+            'cpf_cnpj' => isset($email) ? $cpf_cnpj : ''
         ];
         
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
         $response = $this->broker()->sendResetLink($arrayCC);
-
-        $email = $this->getEmail($cpf_cnpj);
         
         if($response == Password::RESET_LINK_SENT)
         {
@@ -47,6 +46,22 @@ class UserExternoForgotPasswordController extends Controller
         }
 
         return $this->sendResetLinkFailedResponse($request, $response);
+    }
+
+    /**
+     * Get the response for a failed password reset link.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    protected function sendResetLinkFailedResponse(Request $request, $response)
+    {
+        $msg = trans($response) == 'Não foi possível encontrar um usuário' ? 'CPF ou CNPJ não cadastrado ou conta não está ativa' : trans($response);
+
+        return back()
+                ->withInput($request->only('cpf_cnpj'))
+                ->withErrors(['cpf_cnpj' => $msg]);
     }
 
     protected function validateEmail(Request $request)
@@ -67,13 +82,10 @@ class UserExternoForgotPasswordController extends Controller
 
     protected function getEmail($cpfCnpj)
     {
-        $first = UserExterno::where('cpf_cnpj', $cpfCnpj)->first();
+        $first = UserExterno::where('cpf_cnpj', $cpfCnpj)->where('ativo', 1)->first();
         
         if(isset($first))
             return $first->email;
-        return redirect()->back()->with([
-            'message' => 'CPF ou CNPJ não cadastrado.',
-            'class' => 'alert-danger'
-        ]);
+        return null;
     }
 }

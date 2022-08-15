@@ -44,7 +44,7 @@
                     @csrf
                     <div class="form-row">
                         <div class="col-sm mb-2-576">
-                            <label for="nome">Nome Completo *</label>
+                            <label for="nome">Nome Completo <span class="text-danger">*</span></label>
                             <input
                                 type="text"
                                 name="nome"
@@ -64,7 +64,7 @@
                     </div>
                     <div class="form-row mt-2">
                         <div class="col-sm-4 mb-2-576">
-                            <label for="cpf_cnpj">CPF ou CNPJ *</label>
+                            <label for="cpf_cnpj">CPF ou CNPJ <span class="text-danger">*</span></label>
                             <input
                                 type="text"
                                 name="cpf_cnpj"
@@ -81,7 +81,7 @@
                             @endif
                         </div>
                         <div class="col-sm mb-2-576">
-                            <label for="email">Email *</label>
+                            <label for="email">Email <span class="text-danger">*</span></label>
                             <input
                                 type="email"
                                 name="email"
@@ -101,7 +101,7 @@
                     </div>
                     <div class="form-row mt-2">
                         <div class="col-sm mb-2-576">
-                            <label for="password">Senha *</label>
+                            <label for="password">Senha <span class="text-danger">*</span></label>
                             <input
                                 type="password"
                                 name="password"
@@ -110,8 +110,6 @@
                                 placeholder="Senha"
                                 minlength="8"
                                 maxlength="191"
-                                pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
-                                title="A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número"
                                 required
                             >
                             @if($errors->has('password'))
@@ -121,7 +119,7 @@
                             @endif
                         </div>
                         <div class="col-sm mb-2-576">
-                            <label for="password_confirmation">Confirmação de senha</label>
+                            <label for="password_confirmation">Confirmação de senha <span class="text-danger">*</span></label>
                             <input
                                 type="password"
                                 name="password_confirmation"
@@ -130,8 +128,6 @@
                                 placeholder="Confirme a senha"
                                 minlength="8"
                                 maxlength="191"
-                                pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
-                                title="A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número"
                                 required
                             >
                             @if($errors->has('password_confirmation'))
@@ -145,18 +141,15 @@
                         <em>A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número</em><br />
                     </small>
                     <div class="form-check mt-3">
-                        <input class="form-check-input position-static {{ $errors->has('checkbox-tdu') ? 'is-invalid' : '' }}"
+                        <input class="form-check-input position-static {{ $errors->has('aceite') ? 'is-invalid' : '' }}"
                             name="aceite"
                             type="checkbox"
                             id="checkbox-termo-de-uso"
-                            {{ old('termo') === 'on' ? 'checked' : '' }}
                             required
                         />
-                        <p class="d-inline ml-1 lh-28">
-                            <small class="light lh-28">
-                                Li e concordo com os <a class="text-primary" href="{{ route('termo.consentimento.pdf') }}" target="_blank">Termos de Uso</a> da Área Restrita do Login Externo do Core-SP.
-                            </small>
-                        </p>
+                        <label for="checkbox-termo-de-uso">
+                            Li e concordo com os <a class="text-primary" href="{{ route('termo.consentimento.pdf') }}" target="_blank">Termos de Uso</a> da Área Restrita do Login Externo do Core-SP.
+                        </label>
                         @if($errors->has('aceite'))
                         <div class="invalid-feedback">
                             {{ $errors->first('aceite') }}

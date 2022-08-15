@@ -41,11 +41,10 @@
                     <label for="cpf_cnpj">CPF ou CNPJ *</label>
                     <input
                         type="text"
-                        class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
+                        class="form-control cpfOuCnpj"
                         id="cpf_cnpj"
                         value="{{ $resultado->cpf_cnpj }}"
                         placeholder="CPF ou CNPJ"
-                        required
                         readonly
                         disabled
                     >
@@ -102,8 +101,6 @@
                         placeholder="Senha"
                         minlength="8"
                         maxlength="191"
-                        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
-                        title="A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número"
                         required
                     >
                     @if($errors->has('password'))
@@ -122,8 +119,6 @@
                         placeholder="Confirme a senha"
                         minlength="8"
                         maxlength="191"
-                        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
-                        title="A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número"
                         required
                     >
                     @if($errors->has('password_confirmation'))
