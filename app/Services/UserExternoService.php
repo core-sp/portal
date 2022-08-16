@@ -24,8 +24,6 @@ class UserExternoService implements UserExternoServiceInterface {
                     $externo->restore();
                 return true;
             }
-            if(!$externo->trashed())
-                $externo->delete();
             return false;                
         }
         return null;
