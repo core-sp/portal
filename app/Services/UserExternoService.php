@@ -12,12 +12,8 @@ use Carbon\Carbon;
 
 class UserExternoService implements UserExternoServiceInterface {
 
-    private function podeAtivar($token)
+    private function podeAtivar($externo)
     {
-        $externo = UserExterno::where('verify_token', $token)
-            ->where('ativo', 0)
-            ->first();
-
         if(isset($externo))
         {
             $update = Carbon::createFromFormat('Y-m-d H:i:s', $externo->updated_at);
@@ -26,11 +22,11 @@ class UserExternoService implements UserExternoServiceInterface {
             {
                 if($externo->trashed())
                     $externo->restore();
-                return $externo;
+                return true;
             }
-            else
-                if(!$externo->trashed())
-                    $externo->delete();
+            if(!$externo->trashed())
+                $externo->delete();
+            return false;                
         }
         return null;
     }
@@ -40,7 +36,7 @@ class UserExternoService implements UserExternoServiceInterface {
         $dados['password'] = Hash::make($dados['password']);
         $dados['aceite'] = true;
         unset($dados['password_confirmation']);
-        $emails = UserExterno::where('email', $dados['email'])->withTrashed()->count();
+        $emails = UserExterno::where('email', $dados['email'])->where('cpf_cnpj', '!=', $dados['cpf_cnpj'])->withTrashed()->count();
 
         if($emails >= 2)
             return [
@@ -52,9 +48,17 @@ class UserExternoService implements UserExternoServiceInterface {
             ->where('ativo', 0)
             ->withTrashed()
             ->first();
-            
+        
+        $dados['verify_token'] = str_random(32);
+
         if(isset($externo))
         {
+            $temp = $this->podeAtivar($externo);
+            if($temp)
+                return [
+                    'erro' => 'Esta conta já solicitou o cadastro. Verifique seu email para ativar.',
+                    'class' => 'alert-danger'
+                ];
             if($externo->trashed())
                 $externo->restore();
             $externo->update($dados);
@@ -74,20 +78,20 @@ class UserExternoService implements UserExternoServiceInterface {
 
     public function verificaEmail($token)
     {
-        $externo = $this->podeAtivar($token);
-        if(!isset($externo))
+        $externo = UserExterno::where('verify_token', $token)
+            ->where('ativo', 0)
+            ->first();
+        $temp = $this->podeAtivar($externo);
+        if(!isset($temp) || !$temp)
             return [
                 'message' => 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.',
                 'class' => 'alert-danger'
             ];
-        else
-        {
-            $externo->update([
-                'ativo' => 1,
-                'verify_token' => null
-            ]);
-            event(new ExternoEvent('User Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") verificou o email após o cadastro.'));
-        }
+        $externo->update([
+            'ativo' => 1,
+            'verify_token' => null
+        ]);
+        event(new ExternoEvent('User Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") verificou o email após o cadastro.'));
     }
 
     public function editDados($dados, $externo)

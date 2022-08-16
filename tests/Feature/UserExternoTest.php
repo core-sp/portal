@@ -311,7 +311,7 @@ class UserExternoTest extends TestCase
      * 
      * Pode se registrar se deletado e ativo 0.
     */
-    public function register_new_user_externo_when_deleted_and_ativo_0()
+    public function register_new_user_externo_when_deleted_and_ativo_0_after_24h()
     {
         Mail::fake();
 
@@ -319,6 +319,8 @@ class UserExternoTest extends TestCase
             'ativo' => 0,
         ]);
         $user_externo->delete();
+        UserExterno::withTrashed()->first()->update(['updated_at' => Carbon::today()->subDay()]);
+
         $this->get(route('externo.cadastro'))->assertOk();
         $this->post(route('externo.cadastro.submit'), [
             'nome' => $user_externo['nome'],
@@ -341,6 +343,38 @@ class UserExternoTest extends TestCase
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'], 
             'ativo' => 1
+        ]);
+    }
+
+    /** @test 
+     * 
+     * Pode se registrar se deletado e ativo 0.
+    */
+    public function cannot_register_new_user_externo_when_ativo_0_in_24h()
+    {
+        Mail::fake();
+
+        $user_externo = factory('App\UserExterno')->create([
+            'ativo' => 0,
+        ]);
+
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), [
+            'nome' => $user_externo['nome'],
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'email' => $user_externo['email'],
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'aceite' => 'on',
+        ]);
+
+        $this->get(route('externo.cadastro'))->assertSeeText('Esta conta já solicitou o cadastro. Verifique seu email para ativar.');
+
+        Mail::assertNotQueued(CadastroUserExternoMail::class);
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'], 
+            'ativo' => 0,
+            'deleted_at' => null
         ]);
     }
 
@@ -445,7 +479,7 @@ class UserExternoTest extends TestCase
 
     /** @test 
     */
-    public function can_register_new_user_externo_when_ativo_0_and_not_deleted()
+    public function cannot_register_new_user_externo_when_ativo_0_and_deleted_in_24h()
     {
         Mail::fake();
 
@@ -462,18 +496,13 @@ class UserExternoTest extends TestCase
             'aceite' => 'on',
         ]);
 
-        Mail::assertQueued(CadastroUserExternoMail::class);
+        $this->get(route('externo.cadastro'))->assertSeeText('Esta conta já solicitou o cadastro. Verifique seu email para ativar.');
+
+        Mail::assertNotQueued(CadastroUserExternoMail::class);
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo->cpf_cnpj, 
             'ativo' => 0
-        ]);
-
-        // Checa se após acessar o link de confirmação, o campo "ativo" é atualizado para 1
-        $this->get(route('externo.verifica-email', UserExterno::first()->verify_token));
-        $this->assertDatabaseHas('users_externo', [
-            'cpf_cnpj' => $user_externo->cpf_cnpj, 
-            'ativo' => 1
         ]);
     }
 
@@ -600,6 +629,8 @@ class UserExternoTest extends TestCase
         $this->get(route('externo.login'))->assertOk();
         $this->post(route('externo.login.submit'), $dados)
         ->assertRedirect(route('externo.login'));
+
+        $this->get(route('externo.login'))->assertSeeText('CPF/CNPJ não encontrado.');
     }
 
     /** @test 
@@ -618,6 +649,23 @@ class UserExternoTest extends TestCase
         ])
         ->assertRedirect(route('externo.login'));
         $this->get(route('externo.login'))->assertSeeText('Por favor, acesse o email informado no momento do cadastro para verificar sua conta.');
+    }
+
+    /** @test 
+     * 
+     * Usuário Externo  não pode logar se não está ativo.
+    */
+    public function cannot_login_on_externo_when_deleted()
+    {
+        $user_externo = factory('App\UserExterno')->create();
+        $user_externo->delete();
+        $this->get(route('externo.login'))->assertOk();
+        $this->post(route('externo.login.submit'), [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'password' => 'Teste102030',
+        ])
+        ->assertRedirect(route('externo.login'));
+        $this->get(route('externo.login'))->assertSeeText('CPF/CNPJ não encontrado.');
     }
 
     /** @test 

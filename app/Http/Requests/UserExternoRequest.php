@@ -17,11 +17,6 @@ class UserExternoRequest extends FormRequest
         if(request()->filled('nome'))
             $all['nome'] = mb_strtoupper(request()->nome, 'UTF-8');
         $this->replace($all);
-
-        if(\Route::is('externo.cadastro.submit'))
-            $this->merge([
-                'verify_token' => str_random(32)
-            ]);
     }
 
     public function rules()
@@ -60,17 +55,5 @@ class UserExternoRequest extends FormRequest
             'sometimes' => 'Campo obrigatório',
             'cpf_cnpj.unique' => 'Esse CPF / CNPJ já está cadastrado e ativo no Login Externo',
         ];
-    }
-
-    /**
-     * Get the validated data from the request.
-     *
-     * @return array
-     */
-    public function validated()
-    {
-        $array = $this->validator->validated();
-        if(isset($array))
-            return $this->all();
     }
 }
