@@ -151,7 +151,8 @@ Route::prefix('admin')->group(function() {
   });
 
   // Rotas para Blog Posts
-  require('admin/posts.php');
+  Route::resource('/posts', 'PostsController')->except(['show']);
+  Route::get('/posts/busca', 'PostsController@busca')->name('admin.posts.busca');
 
   // Rotas para Representantes
   Route::get('/representantes', 'RepresentanteController@index');
@@ -254,7 +255,7 @@ Route::prefix('/')->group(function() {
   Route::get('/info-empresa/{cnpj}', 'BdoEmpresaController@apiGetEmpresa')->name('bdosite.apiGetEmpresa');
   
   // Busca geral
-  Route::get('/busca', 'SiteController@busca');
+  Route::get('/busca', 'SiteController@busca')->name('site.busca');
 
   // Agendamentos
   Route::get('agendamento', 'AgendamentoSiteController@formView')->name('agendamentosite.formview');
@@ -287,8 +288,8 @@ Route::prefix('/')->group(function() {
   Route::post('consulta-de-situacao', 'ConsultaSituacaoController@consulta');
 
   // Blog
-  Route::get('blog', 'PostsController@blogPage');
-  Route::get('blog/{slug}', 'PostsController@show');
+  Route::get('blog', 'PostsController@blogPage')->name('site.blog');
+  Route::get('blog/{slug}', 'PostsController@show')->name('site.blog.post');
 
   // Anuidade ano vigente
   Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView')->name('anuidade-ano-vigente');

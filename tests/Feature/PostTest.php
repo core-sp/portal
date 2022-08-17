@@ -7,6 +7,7 @@ use App\Permissao;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PostTest extends TestCase
 {
@@ -19,13 +20,13 @@ class PostTest extends TestCase
         
         $post = factory('App\Post')->create();
 
-        $this->get('/admin/posts/busca')->assertRedirect(route('login'));
-        $this->get('/admin/posts/')->assertRedirect(route('login'));
-        $this->get('/admin/posts/create')->assertRedirect(route('login'));
-        $this->post('admin/posts')->assertRedirect(route('login'));
-        $this->get('/admin/posts/'.$post->id.'/edit')->assertRedirect(route('login'));
-        $this->patch('/admin/posts/'.$post->id)->assertRedirect(route('login'));
-        $this->delete('/admin/posts/'.$post->id)->assertRedirect(route('login'));
+        $this->get(route('admin.posts.busca'))->assertRedirect(route('login'));
+        $this->get(route('posts.index'))->assertRedirect(route('login'));
+        $this->get(route('posts.create'))->assertRedirect(route('login'));
+        $this->post(route('posts.store'))->assertRedirect(route('login'));
+        $this->get(route('posts.edit', $post->id))->assertRedirect(route('login'));
+        $this->patch(route('posts.update', $post->id))->assertRedirect(route('login'));
+        $this->delete(route('posts.destroy', $post->id))->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -36,39 +37,132 @@ class PostTest extends TestCase
         
         $post = factory('App\Post')->create();
 
-        $this->get('/admin/posts/busca')->assertForbidden();
-        $this->get('/admin/posts/')->assertForbidden();
-        $this->get('/admin/posts/create')->assertForbidden();
+        $this->get(route('admin.posts.busca'))->assertForbidden();
+        $this->get(route('posts.index'))->assertForbidden();
+        $this->get(route('posts.create'))->assertForbidden();
 
         $post->titulo = 'Teste do store';
-        $this->post('admin/posts', $post->toArray())->assertForbidden();
-        $this->get('/admin/posts/'.$post->id.'/edit')->assertForbidden();
-        $this->patch('/admin/posts/'.$post->id, $post->toArray())->assertForbidden();
-        $this->delete('/admin/posts/'.$post->id)->assertForbidden();
-    }
-
-    /** @test */
-    function a_post_can_be_created()
-    {
-        $post = factory('App\Post')->create();
-
-        $this->assertDatabaseHas('posts', ['titulo' => $post->titulo]);
+        $this->post(route('posts.store'), $post->toArray())->assertForbidden();
+        $this->get(route('posts.edit', $post->id))->assertForbidden();
+        $this->patch(route('posts.update', $post->id), $post->toArray())->assertForbidden();
+        $this->delete(route('posts.destroy', $post->id))->assertForbidden();
     }
     
     /** @test */
     function post_can_be_created_by_an_user()
     {
-        $this->signInAsAdmin();
+        $user = $this->signInAsAdmin();
 
-        $attributes = factory('App\Post')->raw();
+        $attributes = factory('App\Post')->raw([
+            'idusuario' => $user->idusuario
+        ]);
 
         $this->get(route('posts.create'))->assertOk();
         $this->post(route('posts.store'), $attributes);
 
-        $this->assertDatabaseHas('posts', [
-            'titulo' => $attributes['titulo'],
-            'subtitulo' => $attributes['subtitulo']
+        $this->assertDatabaseHas('posts', $attributes);
+    }
+
+    /** @test */
+    function post_requires_a_title()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Post')->raw([
+            'titulo' => ''
         ]);
+
+        $this->post(route('posts.store'), $attributes)
+        ->assertSessionHasErrors('titulo');
+        $this->assertDatabaseMissing('posts', $attributes);
+    }
+
+    /** @test */
+    function post_requires_a_title_with_less_than_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Post')->raw([
+            'titulo' => $faker->sentence(400)
+        ]);
+
+        $this->post(route('posts.store'), $attributes)
+        ->assertSessionHasErrors('titulo');
+        $this->assertDatabaseMissing('posts', $attributes);
+    }
+
+    /** @test */
+    function a_post_requires_a_subtitle()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Post')->raw([
+            'subtitulo' => ''
+        ]);
+
+        $this->post(route('posts.store'), $attributes)
+        ->assertSessionHasErrors('subtitulo');
+        $this->assertDatabaseMissing('posts', $attributes);
+    }
+
+    /** @test */
+    function post_requires_a_subtitle_with_less_than_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Post')->raw([
+            'subtitulo' => $faker->sentence(400)
+        ]);
+
+        $this->post(route('posts.store'), $attributes)
+        ->assertSessionHasErrors('subtitulo');
+        $this->assertDatabaseMissing('posts', $attributes);
+    }
+
+    /** @test */
+    function a_post_requires_a_content()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Post')->raw([
+            'conteudo' => ''
+        ]);
+
+        $this->post(route('posts.store'), $attributes)
+        ->assertSessionHasErrors('conteudo');
+        $this->assertDatabaseMissing('posts', $attributes);
+    }
+
+    /** @test */
+    function a_post_requires_a_image()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Post')->raw([
+            'img' => ''
+        ]);
+
+        $this->post(route('posts.store'), $attributes)
+        ->assertSessionHasErrors('img');
+        $this->assertDatabaseMissing('posts', $attributes);
+    }
+
+    /** @test */
+    function a_post_cannot_have_duplicate_title()
+    {
+        $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $attributes = factory('App\Post')->raw([
+            'titulo' => $post->titulo
+        ]);
+
+        $this->post(route('posts.store'), $attributes)
+        ->assertSessionHasErrors('titulo');
+        $this->assertEquals(1, Post::count());
     }
 
     /** @test */
@@ -85,17 +179,111 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    public function non_authorized_users_cannot_create_posts()
+    function post_can_be_updated()
     {
-        $this->signIn();
+        $faker = \Faker\Factory::create();
+        $user = $this->signInAsAdmin();
 
-        $attributes = factory('App\Post')->raw();
+        $post = factory('App\Post')->create();
 
-        $this->get(route('posts.create'))->assertForbidden();
+        $antigo = $post->getAttributes();
+        $attributes = $post->getAttributes();
 
-        $this->post(route('posts.store'), $attributes)->assertForbidden();
+        $attributes['titulo'] = 'Novo titulo';
+        $attributes['slug'] = Str::slug($attributes['titulo'], '-');
+        $attributes['subtitulo'] = 'Novo subtitulo';
+        $attributes['img'] = 'teste\imagem.jpg';
+        $attributes['conteudo'] = $faker->sentence(400);
+        $attributes['conteudoBusca'] = converterParaTextoCru($attributes['conteudo']);
+        $attributes['idusuario'] = $user->idusuario;
 
-        $this->assertDatabaseMissing('posts', ['titulo' => $attributes['titulo']]);
+        $this->get(route('posts.edit', $post->id))->assertOk();
+
+        $this->patch(route('posts.update', $post->id), $attributes);
+        $this->assertDatabaseHas('posts', $attributes);
+        $this->assertDatabaseMissing('posts', $antigo);
+    }
+
+    /** @test */
+    function a_post_title_can_be_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $attributes = $post->getAttributes();
+        $attributes['titulo'] = 'Novo titulo';
+
+        $this->get(route('posts.edit', $post->id))->assertOk();
+
+        $this->patch(route('posts.update', $post->id), $attributes);
+        $this->assertEquals(Post::find($post->id)->titulo, 'Novo titulo');
+    }
+
+    /** @test */
+    function a_post_subtitle_can_be_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $attributes = $post->getAttributes();
+        $attributes['subtitulo'] = 'Novo subtitulo';
+
+        $this->get(route('posts.edit', $post->id))->assertOk();
+
+        $this->patch(route('posts.update', $post->id), $attributes);
+        $this->assertEquals(Post::find($post->id)->subtitulo, 'Novo subtitulo');
+    }
+
+    /** @test */
+    function a_post_img_can_be_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $attributes = $post->getAttributes();
+        $attributes['img'] = 'imagem.png';
+
+        $this->get(route('posts.edit', $post->id))->assertOk();
+
+        $this->patch(route('posts.update', $post->id), $attributes);
+        $this->assertEquals(Post::find($post->id)->img, 'imagem.png');
+    }
+
+    /** @test */
+    function a_post_content_can_be_updated()
+    {
+        $faker = \Faker\Factory::create();
+        $user = $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $attributes = $post->getAttributes();
+        $attributes['conteudo'] = $faker->sentence(400);
+
+        $this->get(route('posts.edit', $post->id))->assertOk();
+
+        $this->patch(route('posts.update', $post->id), $attributes);
+        $this->assertEquals(Post::find($post->id)->conteudo, $attributes['conteudo']);
+    }
+
+    /** @test */
+    public function log_is_generated_when_post_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $post = factory('App\Post')->create();
+
+        $attributes = $post->getAttributes();
+        $attributes['titulo'] = 'Novo titulo';
+
+        $this->patch(route('posts.update', $post->id), $attributes);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('editou', $log);
+        $this->assertStringContainsString('post', $log);
     }
 
     /** @test */
@@ -103,9 +291,10 @@ class PostTest extends TestCase
     {
         $post = factory('App\Post')->create();
 
-        $this->get('/blog/' . $post->slug)
+        $this->get(route('site.blog.post', $post->slug))
             ->assertOk()
             ->assertSee($post->titulo)
+            ->assertSee($post->subtitulo)
             ->assertSee($post->conteudo);
     }
 
@@ -121,86 +310,39 @@ class PostTest extends TestCase
     /** @test */
     function created_posts_are_shown_correctly()
     {
-        $post = factory('App\Post')->create();
+        $posts = factory('App\Post', 5)->create();
+        $temp = array();
+        foreach($posts as $post)
+            array_push($temp, $post->titulo);
 
-        $this->get('/blog')->assertOk()->assertSee($post->titulo);
+        $this->get(route('site.blog'))
+        ->assertOk()
+        ->assertSeeTextInOrder($temp);
+    }
+
+    /** @test */
+    function created_posts_are_shown_correctly_home()
+    {
+        $posts = factory('App\Post', 3)->create();
+        $temp = array();
+        foreach($posts as $post)
+            array_push($temp, '<h5 class="branco mt-1">'.$post->titulo.'</h5>');
+
+        $this->get(route('site.home'))
+        ->assertOk()
+        ->assertSeeInOrder($temp);
     }
 
     /** @test */
     public function posts_are_shown_on_the_admin_panel()
     {
         $this->signInAsAdmin();
-        $post = factory('App\Post')->create();
-        $postDois = factory('App\Post')->create();
+        $posts = factory('App\Post', 3)->create()->sortByDesc('id');
+        $temp = array();
+        foreach($posts as $post)
+            array_push($temp, $post->titulo);
         
-        $this->get(route('posts.index'))->assertSee($post->titulo);
-        $this->get(route('posts.index'))->assertSee($postDois->titulo);
-    }
-
-    /** @test */
-    public function non_authorized_users_cannot_see_posts_on_admin()
-    {
-        $this->signIn();
-
-        $post = factory('App\Post')->create();
-
-        $this->get(route('posts.index'))
-            ->assertForbidden()
-            ->assertDontSee($post->titulo);
-    }
-
-    /** @test */
-    function post_requires_a_title()
-    {
-        $this->signInAsAdmin();
-
-        $attributes = factory('App\Post')->raw([
-            'titulo' => ''
-        ]);
-
-        $this->post(route('posts.store'), $attributes)->assertSessionHasErrors('titulo');
-        $this->assertDatabaseMissing('posts', ['conteudo' => $attributes['conteudo']]);
-    }
-
-    /** @test */
-    function a_post_requires_a_subtitle()
-    {
-        $this->signInAsAdmin();
-
-        $attributes = factory('App\Post')->raw([
-            'subtitulo' => ''
-        ]);
-
-        $this->post(route('posts.store'), $attributes)->assertSessionHasErrors('subtitulo');
-        $this->assertDatabaseMissing('posts', ['conteudo' => $attributes['conteudo']]);
-    }
-
-    /** @test */
-    function a_post_requires_a_content()
-    {
-        $this->signInAsAdmin();
-
-        $attributes = factory('App\Post')->raw([
-            'conteudo' => ''
-        ]);
-
-        $this->post(route('posts.store'), $attributes)->assertSessionHasErrors('conteudo');
-        $this->assertDatabaseMissing('posts', ['titulo' => $attributes['titulo']]);
-    }
-
-    /** @test */
-    function a_post_cannot_have_duplicate_title()
-    {
-        $this->signInAsAdmin();
-
-        $post = factory('App\Post')->create();
-
-        $attributes = factory('App\Post')->raw([
-            'titulo' => $post->titulo
-        ]);
-
-        $this->post(route('posts.store'), $attributes)->assertSessionHasErrors('titulo');
-        $this->assertEquals(1, Post::count());
+        $this->get(route('posts.index'))->assertSeeTextInOrder($temp);
     }
 
     /** @test */
@@ -208,58 +350,8 @@ class PostTest extends TestCase
     {
         $posts = factory('App\Post', 3)->create();
 
-        $this->get($posts[1]->path())->assertSee($posts[0]->titulo)->assertSee($posts[2]->titulo);
-    }
-
-    /** @test */
-    function a_post_title_can_be_updated()
-    {
-        $user = $this->signInAsAdmin();
-
-        $post = factory('App\Post')->create();
-
-        $attributes = $post->getAttributes();
-
-        $attributes['titulo'] = 'Novo titulo';
-
-        $this->get(route('posts.edit', $post->id))->assertOk();
-
-        $this->patch(route('posts.update', $post->id), $attributes);
-        $this->assertEquals(Post::find($post->id)->titulo, 'Novo titulo');
-    }
-
-    /** @test */
-    public function log_is_generated_when_post_is_updated()
-    {
-        $user = $this->signInAsAdmin();
-
-        $post = factory('App\Post')->create();
-
-        $attributes = $post->getAttributes();
-
-        $attributes['titulo'] = 'Novo titulo';
-
-        $this->patch(route('posts.update', $post->id), $attributes);
-        $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('editou', $log);
-        $this->assertStringContainsString('post', $log);
-    }
-
-    /** @test */
-    public function non_authorized_users_cannot_update_posts_on_admin()
-    {
-        $this->signIn();
-
-        $post = factory('App\Post')->create();
-
-        $this->get(route('posts.edit', $post->id))->assertForbidden();
-
-        $post->titulo = 'Novo titulo';
-
-        $this->patch(route('posts.update', $post->id), $post->getAttributes())->assertForbidden();
-        
-        $this->assertDatabaseMissing('posts', ['titulo' => $post->titulo]);
+        $this->get(route('site.blog.post', $posts->get(1)->slug))
+        ->assertSee($posts->get(0)->titulo)->assertSee($posts->get(2)->titulo);
     }
 
     /** @test */
@@ -290,25 +382,13 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    public function non_authorized_users_cannot_destroy_a_post()
-    {
-        $this->signIn();
-
-        $post = factory('App\Post')->create();
-
-        $this->delete(route('posts.destroy', $post->id))->assertForbidden();
-
-        $this->assertDatabaseHas('posts', ['titulo' => $post->titulo]);
-    }
-
-    /** @test */
     function post_can_be_searched()
     {
         $this->signInAsAdmin();
 
         $post = factory('App\Post')->create();
 
-        $this->get('/admin/posts/busca', ['q' => $post->titulo])->assertSeeText($post->subtitulo);
+        $this->get(route('admin.posts.busca'), ['q' => $post->titulo])->assertSeeText($post->subtitulo);
     }
 
     /** @test */
@@ -357,20 +437,15 @@ class PostTest extends TestCase
 
     }
 
-    //Sistema não deve permitir atualização de posts com título já existente
     /** @test */
-    function post_title_cannot_be_updated_with_duplicated()
+    function post_can_be_searched_on_portal()
     {
-        $user = $this->signInAsAdmin();
+        $post = factory('App\Post')->create([
+            'titulo' => 'Teste título na busca da home'
+        ]);
 
-        $post = factory('App\Post')->create();
+        $this->get('/')->assertOk();
 
-        $post2 = factory('App\Post')->create();
-
-        $post2->titulo = $post->titulo;
-
-        $this->patch(route('posts.update', $post2->id), $post2->getAttributes())->assertSessionHasErrors('titulo');
-
-        $this->assertEquals(1 , Post::where('titulo', $post->titulo)->count());
+        $this->get(route('site.busca', ['busca' => 'Teste']))->assertSee($post->titulo);
     }
 }

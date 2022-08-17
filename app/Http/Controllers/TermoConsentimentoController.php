@@ -26,7 +26,7 @@ class TermoConsentimentoController extends Controller
             $validated = (object) $request->validated();
             $message = $this->service->getService('TermoConsentimento')->save(request()->ip(), $validated->email);
         } catch(\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao salvar os dados no Termo de Consentimento.");
         }
 
@@ -41,7 +41,7 @@ class TermoConsentimentoController extends Controller
         try {
             $file = $this->service->getService('TermoConsentimento')->caminhoFile();
         } catch(\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o arquivo do Termo de Consentimento.");
         }
 
@@ -55,7 +55,7 @@ class TermoConsentimentoController extends Controller
         try {
             $file = $this->service->getService('TermoConsentimento')->download();
         } catch(\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a lista do Termo de Consentimento");
         }
 

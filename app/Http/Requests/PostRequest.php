@@ -25,16 +25,16 @@ class PostRequest extends FormRequest
         ];
     }
 
-    public function toModel()
-    {
-        return [
-            'titulo' => $this->titulo,
-            'subtitulo' => $this->subtitulo,
-            'slug' => str_slug($this->titulo),
-            'img' => $this->img,
-            'conteudo' => $this->conteudo,
-            'conteudoBusca' => converterParaTextoCru($this->conteudo),
-            'idusuario' => $this->idusuario
-        ];
-    }
+    // public function toModel()
+    // {
+    //     return [
+    //         'titulo' => $this->titulo,
+    //         'subtitulo' => $this->subtitulo,
+    //         'slug' => str_slug($this->titulo),
+    //         'img' => $this->img,
+    //         'conteudo' => $this->conteudo,
+    //         'conteudoBusca' => converterParaTextoCru($this->conteudo),
+    //         'idusuario' => $this->idusuario
+    //     ];
+    // }
 }

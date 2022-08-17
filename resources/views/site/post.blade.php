@@ -72,7 +72,7 @@
           <div class="row nomargin">
             <div class="col-5">
               @if(isset($previous))
-                <a href="/blog/{{ $previous->slug }}">  
+                <a href="{{ route('site.blog.post', $previous->slug) }}">  
                   <h5><i class="fas fa-arrow-left"></i> Anterior</h5>
                   <p class="light mt-1">{{ $previous->titulo }}</p>
                 </a>
@@ -81,7 +81,7 @@
             <div class="col-2"></div>
             <div class="col-5 text-right">
               @if(isset($next))
-                <a href="/blog/{{ $next->slug }}">
+                <a href="{{ route('site.blog.post', $next->slug) }}">
                   <h5>Próximo <i class="fas fa-arrow-right"></i></h5>
                   <p class="light mt-1">{{ $next->titulo }}</p>
                 </a>

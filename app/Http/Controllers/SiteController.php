@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Post;
+// use App\Post;
 use Exception;
 use App\Pagina;
 use App\Noticia;
@@ -13,14 +13,17 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\CompromissoRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class SiteController extends Controller
 {
     private $compromissoRepository;
+    private $service;
 
-    public function __construct(CompromissoRepository $compromissoRepository)
+    public function __construct(CompromissoRepository $compromissoRepository, MediadorServiceInterface $service)
     {
         $this->compromissoRepository = $compromissoRepository;
+        $this->service = $service;
     }
 
     public function index()
@@ -39,8 +42,9 @@ class SiteController extends Controller
         $imagens = HomeImagem::select('ordem','url','url_mobile','link','target')
             ->orderBy('ordem','ASC')
             ->get();
+        $posts = $this->service->getService('Post')->latest();
         return response()
-            ->view('site.home', compact('noticias','cotidianos','imagens'))
+            ->view('site.home', compact('noticias','cotidianos','imagens', 'posts'))
             ->header('Cache-Control','no-cache');
     }
 
@@ -81,7 +85,8 @@ class SiteController extends Controller
                     }
                 })->orderBy('created_at', 'DESC')
                 ->limit(10);
-            $posts = Post::selectRaw("'Post' as tipo, titulo, subtitulo, slug, created_at,conteudo")
+            $posts = $this->service->getService('Post')->buscaSite($buscaArray);
+            /*Post::selectRaw("'Post' as tipo, titulo, subtitulo, slug, created_at,conteudo")
                 ->where(function($query) use ($buscaArray) {
                     foreach($buscaArray as $b) {
                         $query->where(function($q) use ($b) {
@@ -91,7 +96,7 @@ class SiteController extends Controller
                         });
                     }
                 })->orderBy('created_at', 'DESC')
-                ->limit(10);
+                ->limit(10);*/
 
             $resultados = $paginas->union($noticias)->union($posts)->get();
 

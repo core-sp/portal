@@ -23,7 +23,7 @@ class AgendamentoSiteController extends Controller
             $pessoas = $dados['pessoas'];
             $servicos = $dados['servicos'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para o agendamento.");
         }
 
@@ -41,7 +41,7 @@ class AgendamentoSiteController extends Controller
             $validated = $request->validated();
             $resultado = $this->service->getService('Agendamento')->consultaSite($validated);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao consultar o protocolo do agendamento.");
         }
 
@@ -54,7 +54,7 @@ class AgendamentoSiteController extends Controller
             $validated = $request->validated();
             $message = $this->service->getService('Agendamento')->saveSite($validated, $this->service);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao salvar os dados para criar o agendamento.");
         }
 
@@ -70,7 +70,7 @@ class AgendamentoSiteController extends Controller
             $validated['protocolo'] = request()->query('protocolo');
             $message = $this->service->getService('Agendamento')->cancelamentoSite($validated);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao cancelar o agendamento.");
         }
 
@@ -86,7 +86,7 @@ class AgendamentoSiteController extends Controller
             $validate['regional'] = $this->service->getService('Regional')->getById($validate['idregional']);
             $dados = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
         }
 
@@ -98,7 +98,7 @@ class AgendamentoSiteController extends Controller
         try{
             $dados = $this->service->getService('PlantaoJuridico')->getRegionaisAtivas();
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
         }
 

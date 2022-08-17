@@ -400,9 +400,7 @@
       </div>
     </div>
     <div class="row" id="home-blog">
-      @php $i = 0; $post = new \App\Post(); @endphp
-      @foreach($post->latestPosts() as $post)
-        @php $i++; @endphp
+      @foreach($posts as $post)
         @include('site.inc.post-grid')
       @endforeach
     </div>

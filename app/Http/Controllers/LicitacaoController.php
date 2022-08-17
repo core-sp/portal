@@ -26,7 +26,7 @@ class LicitacaoController extends Controller
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as licitações.");
         }
 
@@ -43,7 +43,7 @@ class LicitacaoController extends Controller
             $modalidades = $dados['modalidades'];
             $situacoes = $dados['situacoes'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página para criar a licitação.");
         }
 
@@ -59,7 +59,7 @@ class LicitacaoController extends Controller
             $user = auth()->user();
             $this->service->getService('Licitacao')->save($validated, $user);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar a licitação.");
         }
 
@@ -79,7 +79,7 @@ class LicitacaoController extends Controller
             $modalidades = $dados['modalidades'];
             $situacoes = $dados['situacoes'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página para editar a licitação.");
         }
 
@@ -95,7 +95,7 @@ class LicitacaoController extends Controller
             $user = auth()->user();
             $this->service->getService('Licitacao')->save($validated, $user, $id);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao editar a licitação.");
         }
 
@@ -109,7 +109,7 @@ class LicitacaoController extends Controller
         try{
             $licitacao = $this->service->getService('Licitacao')->viewSite($id);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página da licitação no portal.");
         }
 
@@ -125,7 +125,7 @@ class LicitacaoController extends Controller
         try{
             $this->service->getService('Licitacao')->destroy($id);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao excluir a licitação.");
         }
 
@@ -144,7 +144,7 @@ class LicitacaoController extends Controller
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as licitações excluídas.");
         }
 
@@ -158,7 +158,7 @@ class LicitacaoController extends Controller
         try{
             $this->service->getService('Licitacao')->restore($id);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao restaurar a licitação.");
         }
 
@@ -178,7 +178,7 @@ class LicitacaoController extends Controller
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em licitações.");
         }
 
@@ -193,7 +193,7 @@ class LicitacaoController extends Controller
             $modalidades = $dados['modalidades'];
             $situacoes = $dados['situacoes'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as licitações no portal.");
         }
 
@@ -211,7 +211,7 @@ class LicitacaoController extends Controller
             $modalidades = $dados['modalidades'];
             $situacoes = $dados['situacoes'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar as licitações no portal.");
         }
 

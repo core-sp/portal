@@ -10,6 +10,7 @@ use App\Contracts\TermoConsentimentoServiceInterface;
 use App\Contracts\AgendamentoServiceInterface;
 use App\Contracts\LicitacaoServiceInterface;
 use App\Contracts\FiscalizacaoServiceInterface;
+use App\Contracts\PostServiceInterface;
 
 class MediadorService implements MediadorServiceInterface {
 
@@ -23,7 +24,8 @@ class MediadorService implements MediadorServiceInterface {
         TermoConsentimentoServiceInterface $termoConsentimentoService,
         AgendamentoServiceInterface $agendamentoService,
         LicitacaoServiceInterface $licitacaoService,
-        FiscalizacaoServiceInterface $fiscalizacaoService
+        FiscalizacaoServiceInterface $fiscalizacaoService,
+        PostServiceInterface $postService
     )
     {
         $this->service = [
@@ -33,7 +35,8 @@ class MediadorService implements MediadorServiceInterface {
             'TermoConsentimento' => $termoConsentimentoService,
             'Agendamento' => $agendamentoService,
             'Licitacao' => $licitacaoService,
-            'Fiscalizacao' => $fiscalizacaoService
+            'Fiscalizacao' => $fiscalizacaoService,
+            'Post' => $postService
         ];
     }
 
