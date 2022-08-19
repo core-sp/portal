@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 // use App\Post;
 use Exception;
 use App\Pagina;
-use App\Noticia;
+// use App\Noticia;
 use App\HomeImagem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -28,21 +28,25 @@ class SiteController extends Controller
 
     public function index()
     {
-        $noticias = Noticia::where('publicada','Sim')
-            ->whereNull('idregional')
-            ->whereNull('categoria')
-            ->orderBy('created_at','DESC')
-            ->limit(6)
-            ->get();
-        $cotidianos = Noticia::where('publicada','Sim')
-            ->where('categoria','Cotidiano')
-            ->orderBy('created_at','DESC')
-            ->limit(4)
-            ->get();
+        $latestNoticias = $this->service->getService('Noticia')->latest();
+        $noticias = $latestNoticias['noticias'];
+        $cotidianos = $latestNoticias['cotidianos'];
+        // $noticias = Noticia::where('publicada','Sim')
+        //     ->whereNull('idregional')
+        //     ->whereNull('categoria')
+        //     ->orderBy('created_at','DESC')
+        //     ->limit(6)
+        //     ->get();
+        // $cotidianos = Noticia::where('publicada','Sim')
+        //     ->where('categoria','Cotidiano')
+        //     ->orderBy('created_at','DESC')
+        //     ->limit(4)
+        //     ->get();
         $imagens = HomeImagem::select('ordem','url','url_mobile','link','target')
             ->orderBy('ordem','ASC')
             ->get();
         $posts = $this->service->getService('Post')->latest();
+
         return response()
             ->view('site.home', compact('noticias','cotidianos','imagens', 'posts'))
             ->header('Cache-Control','no-cache');
@@ -75,7 +79,8 @@ class SiteController extends Controller
                         });
                     }
                 })->limit(10);
-            $noticias = Noticia::selectRaw("'Notícia' as tipo, titulo, null as subtitulo, slug, created_at, conteudo")
+            $noticias = $this->service->getService('Noticia')->buscaSite($buscaArray);
+            /*Noticia::selectRaw("'Notícia' as tipo, titulo, null as subtitulo, slug, created_at, conteudo")
                 ->where(function($query) use ($buscaArray) {
                     foreach($buscaArray as $b) {
                         $query->where(function($q) use ($b) {
@@ -84,7 +89,7 @@ class SiteController extends Controller
                         });
                     }
                 })->orderBy('created_at', 'DESC')
-                ->limit(10);
+                ->limit(10);*/
             $posts = $this->service->getService('Post')->buscaSite($buscaArray);
             /*Post::selectRaw("'Post' as tipo, titulo, subtitulo, slug, created_at,conteudo")
                 ->where(function($query) use ($buscaArray) {
@@ -108,31 +113,37 @@ class SiteController extends Controller
 
     public function feiras()
     {
-        $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
-            ->orderBy('created_at', 'DESC')
-            ->where('publicada','Sim')
-            ->where('categoria','Feiras')
-            ->paginate(9);
+        $noticias = $this->service->getService('Noticia')->latestByCategoria('Feiras');
+        // $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
+        //     ->orderBy('created_at', 'DESC')
+        //     ->where('publicada','Sim')
+        //     ->where('categoria','Feiras')
+        //     ->paginate(9);
+
         return view('site.feiras', compact('noticias'));
     }
 
     public function acoesFiscalizacao()
     {
-        $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
-            ->orderBy('created_at', 'DESC')
-            ->where('publicada','Sim')
-            ->where('categoria','Fiscalização')
-            ->paginate(9);
+        $noticias = $this->service->getService('Noticia')->latestByCategoria('Fiscalização');
+        // $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
+        //     ->orderBy('created_at', 'DESC')
+        //     ->where('publicada','Sim')
+        //     ->where('categoria','Fiscalização')
+        //     ->paginate(9);
+
         return view('site.acoes-da-fiscalizacao', compact('noticias'));
     }
 
     public function espacoContador()
     {
-        $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
-            ->orderBy('created_at', 'DESC')
-            ->where('publicada','Sim')
-            ->where('categoria','Espaço do Contador')
-            ->paginate(9);
+        $noticias = $this->service->getService('Noticia')->latestByCategoria('Espaço do Contador');
+        // $noticias = Noticia::select('img','slug','titulo','created_at','conteudo')
+        //     ->orderBy('created_at', 'DESC')
+        //     ->where('publicada','Sim')
+        //     ->where('categoria','Espaço do Contador')
+        //     ->paginate(9);
+
         return view('site.espaco-do-contador', compact('noticias'));
     }
 

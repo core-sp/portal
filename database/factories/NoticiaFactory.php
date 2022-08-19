@@ -4,14 +4,21 @@
 
 use App\Noticia;
 use Faker\Generator as Faker;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 $factory->define(Noticia::class, function (Faker $faker) {
+    $titulo = $faker->sentence;
+    $conteudo = $faker->sentence(400);
     return [
-        'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User'),
-        'titulo' => $titulo = $faker->sentence,
-        'slug' => str_slug($titulo, '-'),
-        'conteudo' => str_random(200),
-        'publicada' => 'Sim'
+        'titulo' => $titulo,
+        'slug' => Str::slug($titulo, '-'),
+        'img' => $faker->url,
+        'conteudo' => $conteudo,
+        'conteudoBusca' => converterParaTextoCru($conteudo),
+        'categoria' => null,
+        'publicada' => 'Sim',
+        'idregional' => factory('App\Regional'),
+        'idcurso' => factory('App\Curso'),
+        'idusuario' => factory('App\User'),
     ];
 });

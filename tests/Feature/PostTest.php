@@ -49,7 +49,7 @@ class PostTest extends TestCase
     }
     
     /** @test */
-    function post_can_be_created_by_an_user()
+    public function post_can_be_created_by_an_user()
     {
         $user = $this->signInAsAdmin();
 
@@ -64,7 +64,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function post_requires_a_title()
+    public function post_requires_a_title()
     {
         $this->signInAsAdmin();
 
@@ -78,7 +78,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function post_requires_a_title_with_less_than_191_chars()
+    public function post_requires_a_title_with_less_than_191_chars()
     {
         $faker = \Faker\Factory::create();
         $this->signInAsAdmin();
@@ -93,7 +93,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_requires_a_subtitle()
+    public function a_post_requires_a_subtitle()
     {
         $this->signInAsAdmin();
 
@@ -107,7 +107,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function post_requires_a_subtitle_with_less_than_191_chars()
+    public function post_requires_a_subtitle_with_less_than_191_chars()
     {
         $faker = \Faker\Factory::create();
         $this->signInAsAdmin();
@@ -122,7 +122,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_requires_a_content()
+    public function a_post_requires_a_content()
     {
         $this->signInAsAdmin();
 
@@ -136,7 +136,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_requires_a_image()
+    public function a_post_requires_a_image()
     {
         $this->signInAsAdmin();
 
@@ -150,7 +150,22 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_cannot_have_duplicate_title()
+    public function post_requires_a_img_with_less_than_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Post')->raw([
+            'img' => $faker->sentence(400)
+        ]);
+
+        $this->post(route('posts.store'), $attributes)
+        ->assertSessionHasErrors('img');
+        $this->assertDatabaseMissing('posts', $attributes);
+    }
+
+    /** @test */
+    public function a_post_cannot_have_duplicate_title()
     {
         $this->signInAsAdmin();
 
@@ -179,7 +194,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function post_can_be_updated()
+    public function post_can_be_updated()
     {
         $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
@@ -205,7 +220,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_title_can_be_updated()
+    public function a_post_title_can_be_updated()
     {
         $user = $this->signInAsAdmin();
 
@@ -221,7 +236,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_subtitle_can_be_updated()
+    public function a_post_subtitle_can_be_updated()
     {
         $user = $this->signInAsAdmin();
 
@@ -237,7 +252,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_img_can_be_updated()
+    public function a_post_img_can_be_updated()
     {
         $user = $this->signInAsAdmin();
 
@@ -253,7 +268,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_content_can_be_updated()
+    public function a_post_content_can_be_updated()
     {
         $faker = \Faker\Factory::create();
         $user = $this->signInAsAdmin();
@@ -287,7 +302,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_is_shown_correctly_on_site_after_its_creation()
+    public function a_post_is_shown_correctly_on_site_after_its_creation()
     {
         $post = factory('App\Post')->create();
 
@@ -308,7 +323,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function created_posts_are_shown_correctly()
+    public function created_posts_are_shown_correctly()
     {
         $posts = factory('App\Post', 5)->create();
         $temp = array();
@@ -321,7 +336,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function created_posts_are_shown_correctly_home()
+    public function created_posts_are_shown_correctly_home()
     {
         $posts = factory('App\Post', 3)->create();
         $temp = array();
@@ -346,7 +361,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function a_post_will_show_previous_and_next_post_if_available()
+    public function a_post_will_show_previous_and_next_post_if_available()
     {
         $posts = factory('App\Post', 3)->create();
 
@@ -355,7 +370,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function post_can_be_destroyed()
+    public function post_can_be_destroyed()
     {
         $this->signInAsAdmin();
 
@@ -382,7 +397,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function post_can_be_searched()
+    public function post_can_be_searched()
     {
         $this->signInAsAdmin();
 
@@ -392,7 +407,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function link_to_create_post_is_shown_on_admin()
+    public function link_to_create_post_is_shown_on_admin()
     {
         $this->signInAsAdmin();
 
@@ -400,7 +415,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function link_to_edit_post_is_shown_on_admin()
+    public function link_to_edit_post_is_shown_on_admin()
     {
         $this->signInAsAdmin();
 
@@ -410,7 +425,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function link_to_destroy_post_is_shown_on_admin()
+    public function link_to_destroy_post_is_shown_on_admin()
     {
         $this->signInAsAdmin();
 
@@ -421,7 +436,7 @@ class PostTest extends TestCase
 
     // Sistema deve salvar o campo 'conteudoBusca' sem tags e entities do HTML
     /** @test */
-    function post_conteudoBusca_is_stored_with_no_tags()
+    public function post_conteudoBusca_is_stored_with_no_tags()
     {
         $this->signInAsAdmin();
 
@@ -438,7 +453,7 @@ class PostTest extends TestCase
     }
 
     /** @test */
-    function post_can_be_searched_on_portal()
+    public function post_can_be_searched_on_portal()
     {
         $post = factory('App\Post')->create([
             'titulo' => 'Teste título na busca da home'

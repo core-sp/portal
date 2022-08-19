@@ -47,7 +47,7 @@ class PostService implements PostServiceInterface {
                 $acoes .= '<form method="POST" action="'.route('posts.destroy', $resultado->id).'" class="d-inline">';
                 $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
                 $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir a post?\')" />';
+                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir o post?\')" />';
                 $acoes .= '</form>';
             }
             $autor = isset($resultado->user) ? $resultado->user->nome : 'Usuário Deletado';
@@ -118,7 +118,7 @@ class PostService implements PostServiceInterface {
 
     public function buscar($busca)
     {
-        $resultados = Post::where('titulo','LIKE','%'.$busca.'%')
+        $resultados = Post::with('user')->where('titulo','LIKE','%'.$busca.'%')
             ->orWhere('conteudo','LIKE','%'.$busca.'%')
             ->paginate(10);
 

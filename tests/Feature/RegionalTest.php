@@ -240,7 +240,7 @@ class RegionalTest extends TestCase
     }
 
     /** @test */
-    function regionais_can_be_searched()
+    public function regionais_can_be_searched()
     {
         $this->signInAsAdmin();
 

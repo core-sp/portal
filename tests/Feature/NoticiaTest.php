@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
+use Illuminate\Support\Str;
 
 class NoticiaTest extends TestCase
 {
@@ -42,6 +43,8 @@ class NoticiaTest extends TestCase
         $this->get(route('noticias.index'))->assertForbidden();
         $this->get(route('noticias.create'))->assertForbidden();
         $this->get(route('noticias.edit', $noticia->idnoticia))->assertForbidden();
+
+        $noticia->titulo = 'Qualquer título';
         $this->post(route('noticias.store'), $noticia->toArray())->assertForbidden();
         $this->patch(route('noticias.update', $noticia->idnoticia), $noticia->toArray())->assertForbidden();
         $this->delete(route('noticias.destroy', $noticia->idnoticia))->assertForbidden();
@@ -53,94 +56,18 @@ class NoticiaTest extends TestCase
     /** @test */
     public function noticia_can_be_created_by_an_user()
     {
-        $this->signInAsAdmin();
-        $attributes = factory('App\Noticia')->raw();
+        $user = $this->signInAsAdmin();
+        $attributes = factory('App\Noticia')->raw([
+            'idusuario' => $user->idusuario
+        ]);
 
         $this->get(route('noticias.index'))->assertOk();
         $this->post(route('noticias.store'), $attributes);
-        $this->assertDatabaseHas('noticias', ['titulo' => $attributes['titulo']]);
+        $this->assertDatabaseHas('noticias', $attributes);
     }
 
     /** @test */
-    public function log_is_generated_when_noticia_is_created()
-    {
-        $user = $this->signInAsAdmin();
-        $attributes = factory('App\Noticia')->raw();
-
-        $this->post(route('noticias.store'), $attributes);
-        $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('criou', $log);
-        $this->assertStringContainsString('notícia', $log);
-    }
-
-    /** @test */
-    public function non_authorized_users_cannot_create_noticias()
-    {
-        $this->signIn();
-
-        $this->get(route('noticias.create'))->assertForbidden();
-
-        $attributes = factory('App\Noticia')->raw();
-
-        $this->post(route('noticias.store'), $attributes)->assertForbidden();
-        $this->assertDatabaseMissing('noticias', ['titulo' => $attributes['titulo']]);
-    }
-
-    /** @test */
-    public function noticias_are_shown_on_the_admin_panel()
-    {
-        $this->signInAsAdmin();
-        $noticia = factory('App\Noticia')->create();
-        $noticiaDois = factory('App\Noticia')->create();
-        
-        $this->get(route('noticias.index'))->assertSee($noticia->titulo);
-        $this->get(route('noticias.index'))->assertSee($noticiaDois->titulo);
-    }
-
-    /** @test */
-    public function noticia_user_creator_is_shown_on_the_admin_panel()
-    {
-        $user = $this->signInAsAdmin();
-        $noticia = factory('App\Noticia')->create();
-        
-        $this->get(route('noticias.edit', $noticia->idnoticia))->assertSee($user->nome);
-    }
-
-    /** @test */
-    public function non_authorized_users_cannot_see_noticias_on_admin()
-    {
-        $this->signIn();
-
-        $noticia = factory('App\Noticia')->create();
-
-        $this->get(route('noticias.index'))->assertForbidden()->assertDontSee($noticia->titulo);
-    }
-
-    /** @test */
-    function a_noticia_can_be_created()
-    {
-        $noticia = factory('App\Noticia')->create();
-
-        $this->assertDatabaseHas('noticias', ['titulo' => $noticia->titulo]);
-        $this->assertEquals(1, Noticia::count());
-    }
-
-    /** @test */
-    function multiple_noticias_can_be_created()
-    {
-        $this->signInAsAdmin();
-
-        $noticia = factory('App\Noticia')->create();
-        $noticiaDois = factory('App\Noticia')->create();
-
-        $this->assertDatabaseHas('noticias', ['titulo' => $noticia->titulo]);
-        $this->assertDatabaseHas('noticias', ['titulo' => $noticiaDois->titulo]);
-        $this->assertEquals(2, Noticia::count());
-    }
-
-    /** @test */
-    function a_noticia_without_titulo_cannot_be_created()
+    public function a_noticia_without_titulo_cannot_be_created()
     {
         $this->signInAsAdmin();
 
@@ -148,42 +75,41 @@ class NoticiaTest extends TestCase
             'titulo' => ''
         ]);
 
-        $this->post(route('noticias.store'), $attributes)->assertSessionHasErrors('titulo');
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('titulo');
+
         $this->assertEquals(0, Noticia::count());
     }
 
     /** @test */
-    function a_noticia_without_conteudo_cannot_be_created()
+    public function a_noticia_requires_a_title_with_less_than_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Noticia')->raw([
+            'titulo' => $faker->sentence(400)
+        ]);
+
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('titulo');
+
+        $this->assertEquals(0, Noticia::count());
+    }
+
+    /** @test */
+    public function a_noticia_requires_a_title_with_more_than_3_chars()
     {
         $this->signInAsAdmin();
 
         $attributes = factory('App\Noticia')->raw([
-            'conteudo' => ''
+            'titulo' => 'ti'
         ]);
 
-        $this->post(route('noticias.store'), $attributes)->assertSessionHasErrors('conteudo');
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('titulo');
+
         $this->assertEquals(0, Noticia::count());
-    }
-
-    /** @test */
-    public function noticia_is_shown_on_the_website()
-    {
-        $this->signInAsAdmin();
-        $noticia = factory('App\Noticia')->create();
-
-        $this->get(route('noticias.show', $noticia->slug))
-            ->assertOk()
-            ->assertSee($noticia->titulo);
-    }
-
-    /** @test */
-    public function noticia_site_grid_is_shown_on_the_website()
-    {
-        $noticia = factory('App\Noticia')->create();
-
-        $this->get(route('noticias.siteGrid', $noticia->slug))
-            ->assertOk()
-            ->assertSee($noticia->titulo);
     }
 
     /** @test */
@@ -194,24 +120,242 @@ class NoticiaTest extends TestCase
         $attributes = factory('App\Noticia')->raw([
             'titulo' => $noticia->titulo
         ]);
-        $this->post(route('noticias.store'), $attributes);
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('titulo');
+
         $this->assertEquals(1, Noticia::count());
+    }
+
+    /** @test */
+    public function a_noticia_with_img_more_than_191_chars_cannot_be_created()
+    {
+        $faker = \Faker\Factory::create();
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Noticia')->raw([
+            'img' => $faker->sentence(400)
+        ]);
+
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('img');
+
+        $this->assertEquals(0, Noticia::count());
+    }
+
+    /** @test */
+    public function a_noticia_without_conteudo_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Noticia')->raw([
+            'conteudo' => ''
+        ]);
+
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('conteudo');
+
+        $this->assertEquals(0, Noticia::count());
+    }
+
+    /** @test */
+    public function a_noticia_with_conteudo_less_than_100_chars_cannot_be_created()
+    {
+        $faker = \Faker\Factory::create();
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Noticia')->raw([
+            'conteudo' => $faker->text(90)
+        ]);
+
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('conteudo');
+
+        $this->assertEquals(0, Noticia::count());
+    }
+
+    /** @test */
+    public function a_noticia_with_categoria_with_value_wrong_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Noticia')->raw([
+            'categoria' => 'Teste'
+        ]);
+
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('categoria');
+
+        $this->assertEquals(0, Noticia::count());
+    }
+
+    /** @test */
+    public function a_noticia_with_idregional_with_value_wrong_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Noticia')->raw([
+            'idregional' => 5
+        ]);
+
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('idregional');
+
+        $this->assertEquals(0, Noticia::count());
+    }
+
+    /** @test */
+    public function a_noticia_with_idcurso_with_value_wrong_cannot_be_created()
+    {
+        $this->signInAsAdmin();
+
+        $attributes = factory('App\Noticia')->raw([
+            'idcurso' => 5
+        ]);
+
+        $this->post(route('noticias.store'), $attributes)
+        ->assertSessionHasErrors('idcurso');
+
+        $this->assertEquals(0, Noticia::count());
+    }
+
+    /** @test */
+    public function log_is_generated_when_noticia_is_created()
+    {
+        $user = $this->signInAsAdmin();
+        $attributes = factory('App\Noticia')->raw([
+            'idusuario' => $user->idusuario
+        ]);
+
+        $this->post(route('noticias.store'), $attributes);
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($user->nome, $log);
+        $this->assertStringContainsString('criou', $log);
+        $this->assertStringContainsString('notícia', $log);
     }
 
     /** @test */
     public function noticia_can_be_updated()
     {
+        $faker = \Faker\Factory::create();
+        $user = $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+        $antigo = $noticia->getAttributes();
+        $attributes = $noticia->getAttributes();
+
+        $attributes['titulo'] = 'Novo titulo';
+        $attributes['slug'] = Str::slug($attributes['titulo'], '-');
+        $attributes['img'] = 'teste\imagem.jpg';
+        $attributes['idregional'] = null;
+        $attributes['idcurso'] = null;
+        $attributes['categoria'] = 'Feiras';
+        $attributes['conteudo'] = $faker->sentence(400);
+        $attributes['conteudoBusca'] = converterParaTextoCru($attributes['conteudo']);
+        $attributes['idusuario'] = $user->idusuario;
+
+        $this->patch(route('noticias.update', $noticia->idnoticia), $attributes);
+
+        $this->assertDatabaseHas('noticias', $attributes);
+        $this->assertDatabaseMissing('noticias', $antigo);
+    }
+
+    /** @test */
+    public function a_noticia_title_can_be_updated()
+    {
         $user = $this->signInAsAdmin();
 
         $noticia = factory('App\Noticia')->create();
 
-        $this->patch(route('noticias.update', $noticia->idnoticia), [
-            'idusuario' => $user->idusuario,
-            'titulo' => 'Novo titulo',
-            'conteudo' => $noticia->conteudo
-        ]);
+        $attributes = $noticia->getAttributes();
+        $attributes['titulo'] = 'Novo titulo';
+        
+        $this->patch(route('noticias.update', $noticia->idnoticia), $attributes);
 
-        $this->assertEquals(Noticia::find($noticia->idnoticia)->titulo, 'Novo titulo');
+        $this->assertDatabaseHas('noticias', [
+            'titulo' => $attributes['titulo']
+        ]);
+    }
+
+    /** @test */
+    public function a_noticia_img_can_be_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $attributes = $noticia->getAttributes();
+        $attributes['img'] = 'teste\imagem.png';
+
+        $this->patch(route('noticias.update', $noticia->idnoticia), $attributes);
+        
+        $this->assertEquals(Noticia::find($noticia->idnoticia)->img, $attributes['img']);
+    }
+
+    /** @test */
+    public function a_noticia_idregional_can_be_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+        $id = factory('App\Regional')->create()->idregional;
+
+        $attributes = $noticia->getAttributes();
+        $attributes['idregional'] = (string) $id;
+
+        $this->patch(route('noticias.update', $noticia['idnoticia']), $attributes);
+
+        $this->assertDatabaseHas('noticias', [
+            'idregional' => $id
+        ]);
+    }
+
+    /** @test */
+    public function a_noticia_idcurso_can_be_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+        $id = factory('App\Curso')->create()->idcurso;
+
+        $attributes = $noticia->getAttributes();
+        $attributes['idcurso'] = (string) $id;
+
+        $this->patch(route('noticias.update', $noticia->idnoticia), $attributes);
+        
+        $this->assertDatabaseHas('noticias', [
+            'idcurso' => $attributes['idcurso']
+        ]);
+    }
+
+    /** @test */
+    public function a_noticia_categoria_can_be_updated()
+    {
+        $user = $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+
+        $attributes = $noticia->getAttributes();
+        $attributes['categoria'] = 'Feiras';
+
+        $this->patch(route('noticias.update', $noticia->idnoticia), $attributes);
+        
+        $this->assertEquals(Noticia::first()->categoria, $attributes['categoria']);
+    }
+
+    /** @test */
+    public function noticia_cannot_be_updated_to_existing_title()
+    {
+        $this->signInAsAdmin();
+
+        $noticia = factory('App\Noticia')->create();
+        $noticiaDois = factory('App\Noticia')->create();
+
+        $this->patch(route('noticias.update', $noticia->idnoticia), [
+            'titulo' => $noticiaDois->titulo
+        ]);
+        
+        $this->assertNotEquals(Noticia::find($noticia->idnoticia)->titulo, $noticiaDois->titulo);
+        $this->assertEquals(Noticia::find($noticia->idnoticia)->titulo, $noticia->titulo);
     }
 
     /** @test */
@@ -230,38 +374,6 @@ class NoticiaTest extends TestCase
         $this->assertStringContainsString($user->nome, $log);
         $this->assertStringContainsString('editou', $log);
         $this->assertStringContainsString('notícia', $log);
-    }
-
-    /** @test */
-    public function non_authorized_users_cannot_update_noticias()
-    {
-        $this->signIn();
-
-        $noticia = factory('App\Noticia')->create();
-
-        $this->get(route('noticias.edit', $noticia->idnoticia))->assertForbidden();
-
-        $noticia2 = $noticia->toArray();
-        $noticia2['titulo'] = 'Novo título';
-
-        $this->patch(route('noticias.update', $noticia->idnoticia), $noticia2)->assertForbidden();
-        $this->assertDatabaseMissing('noticias', ['titulo' => $noticia2['titulo']]);
-    }
-
-    /** @test */
-    public function noticia_cannot_be_updated_to_existing_title()
-    {
-        $this->signInAsAdmin();
-
-        $noticia = factory('App\Noticia')->create();
-        $noticiaDois = factory('App\Noticia')->create();
-
-        $this->patch(route('noticias.update', $noticia->idnoticia), [
-            'titulo' => $noticiaDois->titulo
-        ]);
-        
-        $this->assertNotEquals(Noticia::find($noticia->idnoticia)->titulo, $noticiaDois->titulo);
-        $this->assertEquals(Noticia::find($noticia->idnoticia)->titulo, $noticia->titulo);
     }
 
     /** @test */
@@ -287,17 +399,6 @@ class NoticiaTest extends TestCase
         $this->assertStringContainsString($user->nome, $log);
         $this->assertStringContainsString('apagou', $log);
         $this->assertStringContainsString('notícia', $log);
-    }
-
-    /** @test */
-    public function non_authorized_users_cannot_delete_noticia()
-    {
-        $this->signIn();
-
-        $noticia = factory('App\Noticia')->create();
-
-        $this->delete(route('noticias.destroy', $noticia->idnoticia))->assertForbidden();
-        $this->assertNull(Noticia::withTrashed()->find($noticia->idnoticia)->deleted_at);
     }
 
     /** @test */
@@ -354,68 +455,109 @@ class NoticiaTest extends TestCase
     }
 
     /** @test */
-    function noticia_can_be_searched()
+    public function noticia_is_shown_on_the_website()
     {
         $this->signInAsAdmin();
-
         $noticia = factory('App\Noticia')->create();
 
-        $this->get(route('noticias.busca', ['q' => $noticia->titulo]))
-            ->assertSeeText($noticia->titulo);
+        $this->get(route('noticias.show', $noticia->slug))
+            ->assertOk()
+            ->assertSee($noticia->titulo);
     }
 
-    /** @test */
-    function noticia_author_is_shown_on_admin()
-    {
-        $user = $this->signInAsAdmin();
+    // /** @test */
+    // public function noticias_are_shown_on_the_admin_panel()
+    // {
+    //     $this->signInAsAdmin();
+    //     $noticia = factory('App\Noticia')->create();
+    //     $noticiaDois = factory('App\Noticia')->create();
+        
+    //     $this->get(route('noticias.index'))->assertSee($noticia->titulo);
+    //     $this->get(route('noticias.index'))->assertSee($noticiaDois->titulo);
+    // }
 
-        factory('App\Noticia')->create();
+    // /** @test */
+    // public function noticia_user_creator_is_shown_on_the_admin_panel()
+    // {
+    //     $user = $this->signInAsAdmin();
+    //     $noticia = factory('App\Noticia')->create();
+        
+    //     $this->get(route('noticias.edit', $noticia->idnoticia))->assertSee($user->nome);
+    // }
 
-        $this->get(route('noticias.index'))->assertSee($user->nome);
-    }
+    // /** @test */
+    // public function noticia_site_grid_is_shown_on_the_website()
+    // {
+    //     $noticia = factory('App\Noticia')->create();
 
-    /** @test */
-    function link_to_edit_noticia_is_shown_on_admin()
-    {
-        $this->signInAsAdmin();
+    //     $this->get(route('noticias.siteGrid', $noticia->slug))
+    //         ->assertOk()
+    //         ->assertSee($noticia->titulo);
+    // }
 
-        $noticia = factory('App\Noticia')->create();
+    // /** @test */
+    // function noticia_can_be_searched()
+    // {
+    //     $this->signInAsAdmin();
 
-        $this->get(route('noticias.index'))->assertSee(route('noticias.edit', $noticia->idnoticia));
-    }
+    //     $noticia = factory('App\Noticia')->create();
 
-    /** @test */
-    function link_to_destroy_noticia_is_shown_on_admin()
-    {
-        $this->signInAsAdmin();
+    //     $this->get(route('noticias.busca', ['q' => $noticia->titulo]))
+    //         ->assertSeeText($noticia->titulo);
+    // }
 
-        $noticia = factory('App\Noticia')->create();
+    // /** @test */
+    // function noticia_author_is_shown_on_admin()
+    // {
+    //     $user = $this->signInAsAdmin();
 
-        $this->get(route('noticias.index'))->assertSee(route('noticias.destroy', $noticia->idnoticia));
-    }
+    //     factory('App\Noticia')->create();
 
-    /** @test */
-    function link_to_create_noticia_is_shown_on_admin()
-    {
-        $this->signInAsAdmin();
+    //     $this->get(route('noticias.index'))->assertSee($user->nome);
+    // }
 
-        $this->get(route('noticias.index'))->assertSee(route('noticias.create'));
-    }
+    // /** @test */
+    // function link_to_edit_noticia_is_shown_on_admin()
+    // {
+    //     $this->signInAsAdmin();
 
-    /** @test */
-    function noticia_conteudoBusca_is_stored_with_no_tags()
-    {
-        $this->signInAsAdmin();
+    //     $noticia = factory('App\Noticia')->create();
 
-        $attributes = factory('App\Noticia')->raw();
+    //     $this->get(route('noticias.index'))->assertSee(route('noticias.edit', $noticia->idnoticia));
+    // }
 
-        $attributes['conteudo'] = '<p>unit_test' . $attributes['conteudo'] . '</p>';
+    // /** @test */
+    // function link_to_destroy_noticia_is_shown_on_admin()
+    // {
+    //     $this->signInAsAdmin();
 
-        $this->post(route('noticias.store'), $attributes);
+    //     $noticia = factory('App\Noticia')->create();
 
-        $noticia = Noticia::first();
+    //     $this->get(route('noticias.index'))->assertSee(route('noticias.destroy', $noticia->idnoticia));
+    // }
 
-        $this->assertStringNotContainsString('<p>', $noticia->conteudoBusca);
+    // /** @test */
+    // function link_to_create_noticia_is_shown_on_admin()
+    // {
+    //     $this->signInAsAdmin();
 
-    }
+    //     $this->get(route('noticias.index'))->assertSee(route('noticias.create'));
+    // }
+
+    // /** @test */
+    // function noticia_conteudoBusca_is_stored_with_no_tags()
+    // {
+    //     $this->signInAsAdmin();
+
+    //     $attributes = factory('App\Noticia')->raw();
+
+    //     $attributes['conteudo'] = '<p>unit_test' . $attributes['conteudo'] . '</p>';
+
+    //     $this->post(route('noticias.store'), $attributes);
+
+    //     $noticia = Noticia::first();
+
+    //     $this->assertStringNotContainsString('<p>', $noticia->conteudoBusca);
+
+    // }
 }

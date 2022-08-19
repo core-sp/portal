@@ -41,8 +41,19 @@ Route::prefix('admin')->group(function() {
   
   // Rotas de páginas
   require('admin/paginas.php');
+
   // Rotas de notícias
-  require('admin/noticias.php');
+  Route::prefix('noticias')->group(function(){
+    Route::get('/', 'NoticiaController@index')->name('noticias.index');
+    Route::get('/create', 'NoticiaController@create')->name('noticias.create');
+    Route::post('/', 'NoticiaController@store')->name('noticias.store');
+    Route::get('/{id}/edit', 'NoticiaController@edit')->name('noticias.edit');
+    Route::patch('/{noticia}', 'NoticiaController@update')->name('noticias.update');
+    Route::delete('/{id}', 'NoticiaController@destroy')->name('noticias.destroy');
+    Route::get('/{id}/restore', 'NoticiaController@restore')->name('noticias.restore');
+    Route::get('/busca', 'NoticiaController@busca')->name('noticias.busca');
+    Route::get('/lixeira', 'NoticiaController@lixeira')->name('noticias.trashed');
+  });
 
   // Rotas de licitações
   Route::prefix('licitacoes')->group(function(){
@@ -233,7 +244,12 @@ Route::prefix('/')->group(function() {
   Route::get('seccionais/{id}', 'RegionalController@show')->name('regionais.show');
 
   // Notícias
-  require('site/noticias.php');
+  Route::get('/noticias', 'NoticiaController@siteGrid')->name('noticias.siteGrid');
+  Route::get('/noticias/{slug}', 'NoticiaController@show')->name('noticias.show');
+  // Redirects
+  Route::get('/noticia/{slug}', function($slug){
+      return redirect(route('noticias.show', $slug), 301);
+  });
 
   // Licitações
   Route::get('/licitacoes/busca', 'LicitacaoController@siteBusca')->name('licitacoes.siteBusca');

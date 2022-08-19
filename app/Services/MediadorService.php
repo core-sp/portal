@@ -11,6 +11,7 @@ use App\Contracts\AgendamentoServiceInterface;
 use App\Contracts\LicitacaoServiceInterface;
 use App\Contracts\FiscalizacaoServiceInterface;
 use App\Contracts\PostServiceInterface;
+use App\Contracts\NoticiaServiceInterface;
 
 class MediadorService implements MediadorServiceInterface {
 
@@ -25,7 +26,8 @@ class MediadorService implements MediadorServiceInterface {
         AgendamentoServiceInterface $agendamentoService,
         LicitacaoServiceInterface $licitacaoService,
         FiscalizacaoServiceInterface $fiscalizacaoService,
-        PostServiceInterface $postService
+        PostServiceInterface $postService,
+        NoticiaServiceInterface $noticiaService
     )
     {
         $this->service = [
@@ -36,7 +38,8 @@ class MediadorService implements MediadorServiceInterface {
             'Agendamento' => $agendamentoService,
             'Licitacao' => $licitacaoService,
             'Fiscalizacao' => $fiscalizacaoService,
-            'Post' => $postService
+            'Post' => $postService,
+            'Noticia' => $noticiaService
         ];
     }
 

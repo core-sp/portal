@@ -8,19 +8,19 @@ use App\Http\Controllers\Controller;
 
 class NoticiaControllerHelper extends Controller
 {
-    public static function categorias()
-    {
-        $array = [
-            'Benefícios',
-            'Cotidiano',
-            'Feiras',
-            'Fiscalização'
-        ];
-        return $array;
-    }
+    // public static function categorias()
+    // {
+    //     $array = [
+    //         'Benefícios',
+    //         'Cotidiano',
+    //         'Feiras',
+    //         'Fiscalização'
+    //     ];
+    //     return $array;
+    // }
 
-    public static function totalNoticias()
-    {
-        return Noticia::all()->count();
-    }
+    // public static function totalNoticias()
+    // {
+    //     return Noticia::all()->count();
+    // }
 }

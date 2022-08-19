@@ -11,7 +11,7 @@ class PostRequest extends FormRequest
         return [
             'titulo' => 'required|max:191|unique:posts,titulo,'. $this->post,
             'subtitulo' => 'required|max:191',
-            'img' => 'required',
+            'img' => 'required|max:191',
             'conteudo' => 'required'
         ];
     }

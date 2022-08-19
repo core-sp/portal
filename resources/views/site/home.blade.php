@@ -265,15 +265,13 @@
             <h2 class="pr-3 ml-1">Notícias</h2>
           </blockquote>
           <h5 class="float-right branco-bg">
-            <a href="/noticias"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
+            <a href="{{ route('noticias.siteGrid') }}"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
           </h5>
         </div>
       </div>
     </div>
     <div class="row">
-      @php $i = 0; @endphp
       @foreach($noticias as $noticia)
-        @php $i++; @endphp
         @include('site.inc.noticia-grid')
       @endforeach
     </div>

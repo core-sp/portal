@@ -24,6 +24,7 @@ class SystemTest extends TestCase
             'Licitacao' => new \App\Services\LicitacaoService(),
             'Fiscalizacao' => new \App\Services\FiscalizacaoService(),
             'Post' => new \App\Services\PostService(),
+            'Noticia' => new \App\Services\NoticiaService(),
         ];
         $mediador = $this->app->make(MediadorServiceInterface::class);
 
@@ -93,5 +94,13 @@ class SystemTest extends TestCase
         $servico = new \App\Services\PostService();
         $mediador = $this->app->make(MediadorServiceInterface::class);
         $this->assertEquals($mediador->getService('Post'), $servico);
+    }
+
+    /** @test */
+    public function mediador_interface_get_instace_noticia_service()
+    {
+        $servico = new \App\Services\NoticiaService();
+        $mediador = $this->app->make(MediadorServiceInterface::class);
+        $this->assertEquals($mediador->getService('Noticia'), $servico);
     }
 }
