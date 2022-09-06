@@ -215,7 +215,7 @@
                 name="descricao"
                 class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }} my-editor"
                 id="descricao"
-                rows="10"
+                rows="25"
                 required
             >
                 @if(!empty(old('descricao')))

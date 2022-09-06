@@ -286,7 +286,7 @@ Route::prefix('/')->group(function() {
   Route::post('newsletter', 'NewsletterController@store');
 
   // Feiras
-  Route::get('feiras', 'SiteController@feiras');
+  Route::get('feiras', 'SiteController@feiras')->name('site.feiras');
 
   // Fiscalização
   Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao')->name('fiscalizacao.acoesfiscalizacao');

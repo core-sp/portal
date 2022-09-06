@@ -457,7 +457,6 @@ class NoticiaTest extends TestCase
     /** @test */
     public function noticia_is_shown_on_the_website()
     {
-        $this->signInAsAdmin();
         $noticia = factory('App\Noticia')->create();
 
         $this->get(route('noticias.show', $noticia->slug))
@@ -465,99 +464,114 @@ class NoticiaTest extends TestCase
             ->assertSee($noticia->titulo);
     }
 
-    // /** @test */
-    // public function noticias_are_shown_on_the_admin_panel()
-    // {
-    //     $this->signInAsAdmin();
-    //     $noticia = factory('App\Noticia')->create();
-    //     $noticiaDois = factory('App\Noticia')->create();
+    /** @test */
+    public function noticias_are_shown_on_the_admin_panel()
+    {
+        $this->signInAsAdmin();
+        $noticias = factory('App\Noticia', 2)->create();
         
-    //     $this->get(route('noticias.index'))->assertSee($noticia->titulo);
-    //     $this->get(route('noticias.index'))->assertSee($noticiaDois->titulo);
-    // }
+        $this->get(route('noticias.index'))
+        ->assertSee($noticias->get(0)->titulo)
+        ->assertSee($noticias->get(1)->titulo);
+    }
 
-    // /** @test */
-    // public function noticia_user_creator_is_shown_on_the_admin_panel()
-    // {
-    //     $user = $this->signInAsAdmin();
-    //     $noticia = factory('App\Noticia')->create();
+    /** @test */
+    public function noticia_user_creator_is_shown_on_the_admin_panel()
+    {
+        $user = $this->signInAsAdmin();
+        $noticia = factory('App\Noticia')->create();
         
-    //     $this->get(route('noticias.edit', $noticia->idnoticia))->assertSee($user->nome);
-    // }
+        $this->get(route('noticias.edit', $noticia->idnoticia))->assertSee($user->nome);
+    }
 
-    // /** @test */
-    // public function noticia_site_grid_is_shown_on_the_website()
-    // {
-    //     $noticia = factory('App\Noticia')->create();
+    /** @test */
+    public function noticias_site_grid_is_shown_on_the_website()
+    {
+        $noticias = factory('App\Noticia', 5)->create();
 
-    //     $this->get(route('noticias.siteGrid', $noticia->slug))
-    //         ->assertOk()
-    //         ->assertSee($noticia->titulo);
-    // }
+        $this->get(route('noticias.siteGrid'))
+        ->assertSee($noticias->get(0)->titulo)
+        ->assertSee($noticias->get(1)->titulo)
+        ->assertSee($noticias->get(2)->titulo)
+        ->assertSee($noticias->get(3)->titulo)
+        ->assertSee($noticias->get(4)->titulo);
+    }
 
-    // /** @test */
-    // function noticia_can_be_searched()
-    // {
-    //     $this->signInAsAdmin();
+    /** @test */
+    public function noticia_can_be_searched()
+    {
+        $this->signInAsAdmin();
 
-    //     $noticia = factory('App\Noticia')->create();
+        $noticia = factory('App\Noticia')->create();
 
-    //     $this->get(route('noticias.busca', ['q' => $noticia->titulo]))
-    //         ->assertSeeText($noticia->titulo);
-    // }
+        $this->get(route('noticias.busca', ['q' => $noticia->titulo]))
+            ->assertSeeText($noticia->titulo);
+    }
 
-    // /** @test */
-    // function noticia_author_is_shown_on_admin()
-    // {
-    //     $user = $this->signInAsAdmin();
+    /** @test */
+    public function noticia_author_is_shown_on_admin()
+    {
+        $user = $this->signInAsAdmin();
 
-    //     factory('App\Noticia')->create();
+        factory('App\Noticia')->create();
 
-    //     $this->get(route('noticias.index'))->assertSee($user->nome);
-    // }
+        $this->get(route('noticias.index'))->assertSee($user->nome);
+    }
 
-    // /** @test */
-    // function link_to_edit_noticia_is_shown_on_admin()
-    // {
-    //     $this->signInAsAdmin();
+    /** @test */
+    public function link_to_edit_noticia_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
 
-    //     $noticia = factory('App\Noticia')->create();
+        $noticia = factory('App\Noticia')->create();
 
-    //     $this->get(route('noticias.index'))->assertSee(route('noticias.edit', $noticia->idnoticia));
-    // }
+        $this->get(route('noticias.index'))->assertSee(route('noticias.edit', $noticia->idnoticia));
+    }
 
-    // /** @test */
-    // function link_to_destroy_noticia_is_shown_on_admin()
-    // {
-    //     $this->signInAsAdmin();
+    /** @test */
+    public function link_to_destroy_noticia_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
 
-    //     $noticia = factory('App\Noticia')->create();
+        $noticia = factory('App\Noticia')->create();
 
-    //     $this->get(route('noticias.index'))->assertSee(route('noticias.destroy', $noticia->idnoticia));
-    // }
+        $this->get(route('noticias.index'))->assertSee(route('noticias.destroy', $noticia->idnoticia));
+    }
 
-    // /** @test */
-    // function link_to_create_noticia_is_shown_on_admin()
-    // {
-    //     $this->signInAsAdmin();
+    /** @test */
+    public function link_to_create_noticia_is_shown_on_admin()
+    {
+        $this->signInAsAdmin();
 
-    //     $this->get(route('noticias.index'))->assertSee(route('noticias.create'));
-    // }
+        $this->get(route('noticias.index'))->assertSee(route('noticias.create'));
+    }
 
-    // /** @test */
-    // function noticia_conteudoBusca_is_stored_with_no_tags()
-    // {
-    //     $this->signInAsAdmin();
+    /** @test */
+    public function noticia_conteudoBusca_is_stored_with_no_tags()
+    {
+        $this->signInAsAdmin();
 
-    //     $attributes = factory('App\Noticia')->raw();
+        $attributes = factory('App\Noticia')->raw();
 
-    //     $attributes['conteudo'] = '<p>unit_test' . $attributes['conteudo'] . '</p>';
+        $attributes['conteudo'] = '<p>unit_test' . $attributes['conteudo'] . '</p>';
 
-    //     $this->post(route('noticias.store'), $attributes);
+        $this->post(route('noticias.store'), $attributes);
 
-    //     $noticia = Noticia::first();
+        $noticia = Noticia::first();
 
-    //     $this->assertStringNotContainsString('<p>', $noticia->conteudoBusca);
+        $this->assertStringNotContainsString('<p>', $noticia->conteudoBusca);
 
-    // }
+    }
+
+    /** @test */
+    public function noticia_can_be_searched_on_portal()
+    {
+        $noticia = factory('App\Noticia')->create([
+            'titulo' => 'Teste título na busca da home'
+        ]);
+
+        $this->get('/')->assertOk();
+
+        $this->get(route('site.busca', ['busca' => 'Teste']))->assertSee($noticia->titulo);
+    }
 }

@@ -12,6 +12,17 @@ class Noticia extends Model
 
     protected $primaryKey = 'idnoticia';
     protected $guarded = [];
+
+    public static function categorias()
+    {
+        return [
+            'Benefícios',
+            'Cotidiano',
+            'Espaço do Contador',
+            'Feiras',
+            'Fiscalização',
+        ];
+    }
     
     public function regional()
     {

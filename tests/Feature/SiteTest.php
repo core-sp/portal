@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Noticia;
 
 class SiteTest extends TestCase
 {
@@ -18,28 +19,116 @@ class SiteTest extends TestCase
     /** @test */
     public function noticia_is_shown_on_homepage()
     {
-        $noticia = factory('App\Noticia')->create();
+        $noticia = factory('App\Noticia')->create([
+            'idregional' => null
+        ]);
 
         $this->get('/')->assertSee($noticia->titulo);
     }
 
     /** @test */
+    public function noticias_is_shown_on_homepage()
+    {
+        $noticias = factory('App\Noticia', 7)->create([
+            'idregional' => null
+        ]);
+
+        $this->get('/')
+        ->assertSee($noticias->get(0)->titulo)
+        ->assertSee($noticias->get(1)->titulo)
+        ->assertSee($noticias->get(2)->titulo)
+        ->assertSee($noticias->get(3)->titulo)
+        ->assertSee($noticias->get(4)->titulo)
+        ->assertSee($noticias->get(5)->titulo)
+        ->assertDontSee($noticias->get(6)->titulo);
+    }
+
+    /** @test */
     public function link_to_noticia_is_shown_on_homepage()
     {
-        $noticia = factory('App\Noticia')->create();
+        $noticia = factory('App\Noticia')->create([
+            'idregional' => null
+        ]);
 
         $this->get('/')->assertSee(route('noticias.show', $noticia->slug));
     }
 
     /** @test */
-    public function noticia_cotidiano_is_shown_on_homepage()
+    public function cotidiano_is_shown_on_homepage()
     {
         $noticia = factory('App\Noticia')->create([
             'categoria' => 'Cotidiano'
         ]);
 
+        $this->get('/')->assertSee($noticia->titulo)
+        ->assertSee(route('noticias.show', $noticia->slug));
+    }
+
+    /** @test */
+    public function cotidianos_is_shown_on_homepage()
+    {
+        $noticias = factory('App\Noticia', 5)->create([
+            'categoria' => 'Cotidiano'
+        ]);
+
         $this->get('/')
-            ->assertSee($noticia->titulo)
-            ->assertSee(route('noticias.show', $noticia->slug));
+        ->assertSee($noticias->get(0)->titulo)
+        ->assertSee($noticias->get(1)->titulo)
+        ->assertSee($noticias->get(2)->titulo)
+        ->assertSee($noticias->get(3)->titulo)
+        ->assertDontSee($noticias->get(4)->titulo);
+    }
+
+    /** @test */
+    public function post_is_shown_on_homepage()
+    {
+        $post = factory('App\Post')->create();
+
+        $this->get('/')->assertSee($post->titulo);
+    }
+
+    /** @test */
+    public function posts_is_shown_on_homepage()
+    {
+        $posts = factory('App\Post', 4)->create();
+
+        $this->get('/')
+        ->assertSee($posts->get(0)->titulo)
+        ->assertSee($posts->get(1)->titulo)
+        ->assertSee($posts->get(2)->titulo)
+        ->assertDontSee($posts->get(3)->titulo);
+    }
+
+    /** @test */
+    public function feiras_is_shown_on_homepage()
+    {
+        $noticia = factory('App\Noticia')->create([
+            'categoria' => 'Feiras'
+        ]);
+
+        $this->get(route('site.feiras'))->assertSee($noticia->titulo)
+        ->assertSee(route('noticias.show', $noticia->slug));
+    }
+
+    /** @test */
+    public function acoes_fiscalizacao_is_shown_on_homepage()
+    {
+        $noticia = factory('App\Noticia')->create([
+            'categoria' => 'Fiscalização'
+        ]);
+
+        $this->get(route('fiscalizacao.acoesfiscalizacao'))->assertSee($noticia->titulo)
+        ->assertSee(route('noticias.show', $noticia->slug));
+    }
+
+    /** @test */
+    public function espaco_contador_is_shown_on_homepage()
+    {
+        $noticia = factory('App\Noticia')->create([
+            'categoria' => 'Espaço do Contador'
+        ]);
+
+        $this->get(route('fiscalizacao.espacoContador'))->assertSee($noticia->titulo)
+        ->assertSee(route('noticias.show', $noticia->slug));
     }
 }

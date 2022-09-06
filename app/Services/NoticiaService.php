@@ -110,13 +110,7 @@ class NoticiaService implements NoticiaServiceInterface {
 
     public function getCategorias()
     {
-        return [
-            'Benefícios',
-            'Cotidiano',
-            'Espaço do Contador',
-            'Feiras',
-            'Fiscalização',
-        ];
+        return Noticia::categorias();
     }
 
     public function listar()

@@ -499,4 +499,32 @@ class CursoTest extends TestCase
             ->assertSee(route('cursos.show', $curso->idcurso))
             ->assertSee($curso->tema);
     }
+
+    /** @test */
+    function previous_cursos_with_noticia_are_shown_on_previous_curso_list_on_website()
+    {
+        $date = new \DateTime();
+        $date->sub(new DateInterval('P30D'));
+        $realizacao = $date->format('Y-m-d\TH:i:s');
+        $new_date = new \DateTime();
+        $new_date->sub(new DateInterval('P31D'));
+        $termino = $new_date->format('Y-m-d\TH:i:s');
+
+        $curso = factory('App\Curso')->create([
+            'datarealizacao' => $realizacao,
+            'datatermino' => $termino
+        ]);
+
+        $noticias = factory('App\Noticia', 2)->create([
+            'idcurso' => $curso->idcurso
+        ]);
+
+        $this->get(route('cursos.previous.website'))
+            ->assertOk()
+            ->assertSee(route('cursos.show', $curso->idcurso))
+            ->assertSee($curso->tema)
+            ->assertSeeText('Veja como foi')
+            ->assertSee('noticia/' . $noticias->get(0)->slug)
+            ->assertDontSee('noticia/' . $noticias->get(1)->slug);
+    }
 }
