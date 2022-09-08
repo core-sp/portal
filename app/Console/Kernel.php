@@ -17,6 +17,7 @@ use PDO;
 use PDOException;
 use App\SolicitaCedula;
 use App\Mail\InternoSolicitaCedulaMail;
+use App\PreRegistro;
 
 class Kernel extends ConsoleKernel
 {
@@ -162,6 +163,25 @@ class Kernel extends ConsoleKernel
                 }
             }
         })->dailyAt('4:15');
+
+        // Rotina de exclusão de arquivos do PreRegistro após 1 mês com status 'Negado' ou 'Aprovado'
+        // Rotina de exclusão de arquivos do PreRegistro após 3 meses sem atualização com status 'Sendo elaborado'
+        $schedule->call(function(){
+            $prs = PreRegistro::has('anexos')
+                ->with('anexos')
+                ->select('id', 'status', 'created_at', 'updated_at', 'user_externo_id')
+                ->where(function ($query) {
+                    $query->whereIn('status', [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO])
+                    ->where('updated_at', '<=', Carbon::today()->subMonth()->toDateString());
+                })
+                ->orWhere(function ($query) {
+                    $query->where('status', PreRegistro::STATUS_CRIADO)
+                    ->where('updated_at', '<=', Carbon::today()->subMonths(3)->toDateString());
+                })
+                ->get();
+            foreach($prs as $pr)
+                $pr->anexos()->delete();
+        })->weeklyOn(7, '3:00');
     }
 
     /**

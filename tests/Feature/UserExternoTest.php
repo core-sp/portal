@@ -348,7 +348,6 @@ class UserExternoTest extends TestCase
 
     /** @test 
      * 
-     * Pode se registrar se deletado e ativo 0.
     */
     public function cannot_register_new_user_externo_when_ativo_0_in_24h()
     {
@@ -379,8 +378,6 @@ class UserExternoTest extends TestCase
     }
 
     /** @test 
-     * 
-     * Pode se registrar se deletado e ativo 0.
     */
     public function cannot_to_active_register_after_24h()
     {
@@ -406,6 +403,40 @@ class UserExternoTest extends TestCase
         UserExterno::first()->update(['updated_at' => Carbon::today()->subDays(2)]);
         
         $this->get(route('externo.verifica-email', UserExterno::first()->verify_token))->assertRedirect(route('externo.login'));
+
+        $this->get(route('externo.login'))
+        ->assertSeeText('Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');
+        
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => '36982299007', 
+            'ativo' => 0
+        ]);
+    }
+
+    /** @test 
+    */
+    public function cannot_verify_mail_with_wrong_token()
+    {
+        Mail::fake();
+
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), [
+            'cpf_cnpj' => '36982299007',
+            'email' => 'teste@teste.com',
+            'nome' => 'Teste do Registro',
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+            'aceite' => 'on'
+        ]);
+
+        Mail::assertQueued(CadastroUserExternoMail::class);
+
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => '36982299007', 
+            'ativo' => 0
+        ]);
+        
+        $this->get(route('externo.verifica-email', UserExterno::first()->verify_token . '5'))->assertStatus(302);
 
         $this->get(route('externo.login'))
         ->assertSeeText('Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.');

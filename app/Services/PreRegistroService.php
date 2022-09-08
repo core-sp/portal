@@ -55,14 +55,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        // $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
         foreach($resultados as $resultado) 
         {
             $texto = $resultado->atendentePodeEditar() ? 'Editar' : 'Visualizar';
             $cor = $resultado->atendentePodeEditar() ? 'primary' : 'info';
             $acoes = '<a href="'.route('preregistro.view', $resultado->id).'" class="btn btn-sm btn-' . $cor . '">'. $texto .'</a> ';
-            // if($userPodeEditar)
-            //     $acoes .= '<a href="'.route('regionais.edit', $resultado->idregional).'" class="btn btn-sm btn-primary">Editar</a> ';
             $textoUser = '<span class="rounded p-1 bg' . $resultado->getLabelStatus() . ' font-weight-bolder font-italic">' . $resultado->status . '</span>';
             $conteudo = [
                 'corDaLinha' => '<tr class="table' . $resultado->getLabelStatus() . '">',
@@ -289,12 +286,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     private function validacaoFiltroAtivo($request, $user)
     {
-        // $canFiltroRegional = auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user());
         if($user->idregional == 14)
             $user->idregional = 1;
             
         return [
-            'regional' => $request->filled('regional') /*&& $canFiltroRegional*/ ? $request->regional : $user->idregional,
+            'regional' => $request->filled('regional') ? $request->regional : $user->idregional,
             'status' => $request->filled('status') && in_array($request->status, PreRegistro::getStatus()) ? $request->status : 'Qualquer',
             'atendente' => $request->filled('atendente') ? $request->atendente : 'Todos',
         ];
@@ -312,19 +308,16 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
         }
 
-        // if(auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user()))
-        // {
-            $regionais = $service->getService('Regional')->all()->splice(0, 13)->sortBy('regional');
-            $options = !isset($request->regional) ? 
-            getFiltroOptions('Todas', 'Todas', true) : getFiltroOptions('Todas', 'Todas');
+        $regionais = $service->getService('Regional')->all()->splice(0, 13)->sortBy('regional');
+        $options = !isset($request->regional) ? 
+        getFiltroOptions('Todas', 'Todas', true) : getFiltroOptions('Todas', 'Todas');
 
-            foreach($regionais as $regional)
-                $options .= isset($request->regional) && ($request->regional == $regional->idregional) ? 
-                getFiltroOptions($regional->idregional, $regional->regional, true) : 
-                getFiltroOptions($regional->idregional, $regional->regional);
+        foreach($regionais as $regional)
+            $options .= isset($request->regional) && ($request->regional == $regional->idregional) ? 
+            getFiltroOptions($regional->idregional, $regional->regional, true) : 
+            getFiltroOptions($regional->idregional, $regional->regional);
 
-            $filtro .= getFiltroCamposSelect('Seccional', 'regional', $options);
-        // }
+        $filtro .= getFiltroCamposSelect('Seccional', 'regional', $options);
 
         $options = isset($request->status) && ($request->status == 'Qualquer') ? 
         getFiltroOptions('Qualquer', 'Qualquer', true) : getFiltroOptions('Qualquer', 'Qualquer');
@@ -335,7 +328,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         $filtro .= getFiltroCamposSelect('Status', 'status', $options);
 
-        // // Enquanto não possui o UserService
+        // Enquanto não possui o UserService
         $atendentes = \App\User::select('idusuario', 'nome', 'idperfil')
             ->whereIn('idperfil', [8, 10, 11, 12, 13, 18, 21])
             ->orderBy('nome')

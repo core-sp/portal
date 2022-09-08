@@ -7,6 +7,7 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Notifications\UserExternoResetPasswordNotification;
+use Carbon\Carbon;
 
 class UserExterno extends Authenticatable
 {
@@ -31,5 +32,18 @@ class UserExterno extends Authenticatable
     public function preRegistro()
     {
         return $this->hasOne('App\PreRegistro')->withTrashed();
+    }
+
+    public function podeAtivar()
+    {
+        $update = Carbon::createFromFormat('Y-m-d H:i:s', $this->updated_at);
+        $update->addDay();
+        if($update >= now())
+        {
+            if($this->trashed())
+                $this->restore();
+            return true;
+        }
+        return false;
     }
 }

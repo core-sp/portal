@@ -289,9 +289,10 @@
             $representante = in_array($idperfil, $permitidos->find(47)['perfis']);
             $representanteEndereco = in_array($idperfil, $permitidos->find(45)['perfis']);
             $representanteCedula = in_array($idperfil, $permitidos->find(59)['perfis']);
+            //$preregistro = in_array($idperfil, $permitidos->find(67)['perfis']);
         @endphp
-        
-        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula)
+
+        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula || $preregistro)
         <li class="nav-header">ATENDIMENTO</li>
         
         @if($agendamento || $agendamentobloqueio)
@@ -367,13 +368,14 @@
         </li>
         @endif
 
-        <!-- Falta permissão -->
+        {{--@if($agendamentobloqueio)--}}
         <li class="nav-item">
             <a href="{{ route('preregistro.index') }}" class="nav-link">
                 <i class="nav-icon fas fa-address-card"></i>
                 <p>Pré-registros</p>
             </a>
         </li>
+        {{--@endif--}}
         @endif
 
         <!-- Jurídico -->

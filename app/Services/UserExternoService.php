@@ -8,26 +8,8 @@ use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CadastroUserExternoMail;
-use Carbon\Carbon;
 
 class UserExternoService implements UserExternoServiceInterface {
-
-    private function podeAtivar($externo)
-    {
-        if(isset($externo))
-        {
-            $update = Carbon::createFromFormat('Y-m-d H:i:s', $externo->updated_at);
-            $update->addDay();
-            if($update >= now())
-            {
-                if($externo->trashed())
-                    $externo->restore();
-                return true;
-            }
-            return false;                
-        }
-        return null;
-    }
 
     public function save($dados)
     {
@@ -51,8 +33,7 @@ class UserExternoService implements UserExternoServiceInterface {
 
         if(isset($externo))
         {
-            $temp = $this->podeAtivar($externo);
-            if($temp)
+            if($externo->podeAtivar())
                 return [
                     'erro' => 'Esta conta já solicitou o cadastro. Verifique seu email para ativar.',
                     'class' => 'alert-danger'
@@ -79,8 +60,7 @@ class UserExternoService implements UserExternoServiceInterface {
         $externo = UserExterno::where('verify_token', $token)
             ->where('ativo', 0)
             ->first();
-        $temp = $this->podeAtivar($externo);
-        if(!isset($temp) || !$temp)
+        if(!isset($externo) || !$externo->podeAtivar())
             return [
                 'message' => 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.',
                 'class' => 'alert-danger'

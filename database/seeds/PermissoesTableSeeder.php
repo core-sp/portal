@@ -277,7 +277,15 @@ class PermissoesTableSeeder extends Seeder
                 'controller' => 'PlantaoJuridicoBloqueioController',
                 'metodo' => 'destroy',
                 'perfis' => '1,'
-            ]
+            ], /*[
+                'controller' => 'PreRegistroController',
+                'metodo' => 'index',
+                'perfis' => '1,'
+            ], [
+                'controller' => 'PreRegistroController',
+                'metodo' => 'edit',
+                'perfis' => '1,'
+            ]*/
         ]);
     }
 }
