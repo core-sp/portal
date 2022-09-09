@@ -18,6 +18,7 @@ use PDOException;
 use App\SolicitaCedula;
 use App\Mail\InternoSolicitaCedulaMail;
 use App\PreRegistro;
+use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
 {
@@ -180,7 +181,11 @@ class Kernel extends ConsoleKernel
                 })
                 ->get();
             foreach($prs as $pr)
+            {
+                $paths = $pr->anexos->pluck('path')->all();
                 $pr->anexos()->delete();
+                Storage::delete($paths);
+            }
         })->weeklyOn(7, '3:00');
     }
 
