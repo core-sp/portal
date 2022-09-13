@@ -173,11 +173,11 @@ class Kernel extends ConsoleKernel
                 ->select('id', 'status', 'created_at', 'updated_at', 'user_externo_id')
                 ->where(function ($query) {
                     $query->whereIn('status', [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO])
-                    ->where('updated_at', '<=', Carbon::today()->subMonth()->toDateString());
+                    ->where('updated_at', '<=', Carbon::today()->subWeeks(2)->toDateString());
                 })
                 ->orWhere(function ($query) {
-                    $query->where('status', PreRegistro::STATUS_CRIADO)
-                    ->where('updated_at', '<=', Carbon::today()->subMonths(3)->toDateString());
+                    $query->whereIn('status', [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO])
+                    ->where('updated_at', '<=', Carbon::today()->subMonths(2)->toDateString());
                 })
                 ->get();
             foreach($prs as $pr)

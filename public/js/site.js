@@ -1130,6 +1130,9 @@ function putDadosPreRegistro(objeto)
 			'valor': valor
 		};
 
+	$("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Salvando');
+	$('#modalLoadingPreRegistro').modal('show');
+
 	$.ajax({
 		method: 'POST',
 		enctype: 'multipart/form-data',
@@ -1139,12 +1142,12 @@ function putDadosPreRegistro(objeto)
 		data: campo == 'path' ? frmData : dados,
 		dataType: 'json',
 		url: classe == 'Arquivo-Excluir' ? '/externo/pre-registro-anexo/excluir/' + dados.id : '/externo/inserir-registro-ajax',
-		async: false,
 		processData: pD,
         contentType: cT,
 		cache: false,
 		timeout: 60000,
 		success: function(response) {
+			$("#modalLoadingPreRegistro").modal('hide');
 			if(arrayEndereco.indexOf(campo) != -1)
 				confereEnderecoEmpresa(response['resultado']);
 			if(campo == 'cpf_rt')
@@ -1317,12 +1320,6 @@ async function callbackEnderecoPreRegistro(restoId)
 			putDadosPreRegistro(array[i]); 
 	}
 	putDadosPreRegistro($("#cep_" + restoId));
-
-	// if(($('#checkEndEmpresa:checked').length == 1) && (restoId != 'empresa'))
-	// 	if($('input[id="cep_' + restoId + '"]').val() != $('input[name="cep_empresa"]').val()){
-	// 		$('#checkEndEmpresa').prop('checked', false);
-	// 		$('#habilitarEndEmpresa').prop('disabled', false).show();
-	// 	}
 }
 
 function avancarVoltarDisabled(ativado, ordemMenu)
@@ -1497,14 +1494,17 @@ $("#inserirRegistro .limparFile").click(function(){
 	limparFile('anexo', pre_registro_total_files);
 });
 
-$('#inserirRegistro input[id^="cep_"]').on('keyup', function(event){
-	var tecla = event.keyCode;
-	var permitido = (tecla > 47 && tecla < 58) || (tecla > 95 && tecla < 106) || (tecla == 17) || (tecla == 86);
+$('#inserirRegistro input[id^="cep_"]').on('keyup', function(){
 	var indice = this.id.indexOf("_");
 	var restoId = this.id.slice(indice + 1, this.id.length);
 	var diferente = valorPreRegistro != $(this).val();
-	if($(this).val().length == 9 && permitido && diferente)
+	var valorLength = $(this).val().length == 9;
+	if(valorLength && diferente){
+		// keyup dispara multiplos eventos quando cola via teclado e ainda dispara ao final a mascara
+		// com a variável preenchida abaixo, entra na lógica somente uma vez independente da quantidade de disparos simultaneos
+		valorPreRegistro = $(this).val();
 		callbackEnderecoPreRegistro(restoId);
+	}
 });
 
 var valorPreRegistro = null;
@@ -1513,16 +1513,18 @@ $('#inserirRegistro input:not(:checkbox,:file)').focus(function(){
 	valorPreRegistro = $(this).val();
 });
 
-$('#inserirRegistro input[name="cpf_rt"], #inserirRegistro input[name="cnpj_contabil"]').keyup(function(){
+$('#inserirRegistro input[name="cpf_rt"], #inserirRegistro input[name="cnpj_contabil"]').on('keyup', function(){
 	var objeto = $(this);
 	var vazio = objeto.val() == "";
 	var validaCpf = (objeto.attr('name') == 'cpf_rt') && (objeto.val().length == 14);
 	var validaCnpj = (objeto.attr('name') == 'cnpj_contabil') && (objeto.val().length == 18);
+	var diferente = valorPreRegistro != $(this).val();
 
-	if(validaCpf || validaCnpj || vazio){
-		if(valorPreRegistro != objeto.val()){
-			putDadosPreRegistro(objeto);
-		}
+	if(diferente && (validaCpf || validaCnpj || vazio)){
+		// keyup dispara multiplos eventos quando cola via teclado e ainda dispara ao final a mascara
+		// com a variável preenchida abaixo, entra na lógica somente uma vez independente da quantidade de disparos simultaneos
+		valorPreRegistro = objeto.val();
+		putDadosPreRegistro(objeto);
 	}
 });
 
