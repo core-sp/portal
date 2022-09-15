@@ -1,5 +1,23 @@
 <div class="card-body">
 
+    @if($errors->any())
+    <div class="alert alert-dismissible alert-danger">
+        <ul class="m-0 p-0">
+        @foreach ($errors->all() as $error)
+            @if(strlen($error) > 0)
+            <li class="list-unstyled"><i class="icon fa fa-ban"></i>{{ $error }}</li>
+            @endif
+        @endforeach
+        </ul>
+    </div>
+    @endif
+
+    <p>
+        <i class="fas fa-exclamation-circle text-primary"></i>
+        &nbsp;Após 2 semanas com status <span class="badge badge-success">Aprovado</span> ou <span class="badge badge-danger">Negado</span>, os anexos serão <strong>excluídos</strong> automaticamente do sistema.
+    </p>
+    <hr />
+    
     @if($resultado->status == $resultado::STATUS_NEGADO)
     <p class="mb-4">
         <strong class="text-danger">Justificativa:</strong>
@@ -121,9 +139,10 @@
     <div class="row ml-0">
 
     @if($resultado->atendentePodeEditar())
-        <form method="POST" action="{{ route('preregistro.update.aprovado', $resultado->id) }}" class="">
+        <form method="POST" action="{{ route('preregistro.update.status', $resultado->id) }}" class="">
             @csrf
             @method('PUT')
+            <input type="hidden" name="situacao" value="aprovar">
             <button type="submit"
                 class="btn btn-success {{ isset($resultado->justificativa) ? '' : 'disabled' }}"
                 value="aprovado"
@@ -132,9 +151,10 @@
             </button>
         </form>
 
-        <form method="POST" action="{{ route('preregistro.update.enviar.correcao', $resultado->id) }}" class="ml-3">
+        <form method="POST" action="{{ route('preregistro.update.status', $resultado->id) }}" class="ml-3">
             @csrf
             @method('PUT')
+            <input type="hidden" name="situacao" value="corrigir">
             <button type="submit"
                 class="btn btn-warning"
                 value="correcao"
@@ -143,9 +163,10 @@
             </button>
         </form>
 
-        <form method="POST" action="{{ route('preregistro.update.negado', $resultado->id) }}" class="ml-3" id="submitNegarPR">
+        <form method="POST" action="{{ route('preregistro.update.status', $resultado->id) }}" class="ml-3" id="submitNegarPR">
             @csrf
             @method('PUT')
+            <input type="hidden" name="situacao" value="negar">
             <button type="submit"
                 class="btn btn-danger justificativaPreRegistro"
                 value="negado"

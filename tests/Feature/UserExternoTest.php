@@ -717,6 +717,32 @@ class UserExternoTest extends TestCase
     }
 
     /** @test 
+    */
+    public function await_login_after_5x()
+    {
+        $user_externo = factory('App\UserExterno')->create();
+
+        for($i = 0; $i < 5; $i++)
+        {
+            $this->get(route('externo.login'))->assertOk();
+            $this->post(route('externo.login.submit'), [
+                'cpf_cnpj' => $user_externo['cpf_cnpj'],
+                'password' => 'Teste10203',
+            ])
+            ->assertRedirect(route('externo.login'));
+        }
+
+        $this->post(route('externo.login.submit'), [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'password' => 'Teste10203',
+        ])->assertSessionHasErrors([
+            'cpf_cnpj'
+        ])->assertRedirect(route('externo.login'));
+        $this->get(route('externo.login'))
+        ->assertSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
+    }
+
+    /** @test 
      * 
      * Usuário Externo  não pode resetar senha sem cadastro.
     */

@@ -400,66 +400,6 @@ class PreRegistro extends Model
         return null;
     }
 
-    public function canUpdateStatus($status)
-    {
-        $texto = $status != PreRegistro::STATUS_APROVADO ? 'não possui' : 'possui';
-        $temp = $status == PreRegistro::STATUS_CORRECAO ? 'enviado para correção' : strtolower($status);
-        $anexosOk = true;
-
-        if($status == PreRegistro::STATUS_APROVADO)
-        {
-            $tipos = $this->anexos->first()->getObrigatoriosPreRegistro();
-            $anexos = $this->getConfereAnexosArray();
-            
-            if(count($anexos) > 0)
-                foreach($anexos as $key => $value)
-                    if(in_array($key, $tipos))
-                        unset($tipos[array_search($key, $tipos)]);
-
-            $anexosOk = count($tipos) == 0;
-        }
-
-        if(!$anexosOk)
-            return [
-                'msg' => 'faltou anexos',
-                'final' => false
-            ];
-
-        $verificaJustificativa = false;
-        $verificaRegistro = false;
-        if($status == PreRegistro::STATUS_APROVADO)
-        {
-            $verificaJustificativa = !isset($this->justificativa);
-            $verificaRegistro = $this->userExterno->isPessoaFisica() || (!$this->userExterno->isPessoaFisica() && $this->pessoaJuridica->canUpdateStatus());
-            if(!$verificaRegistro)
-                return [
-                    'msg' => 'faltou o registro do Responsável Técnico',
-                    'final' => false
-                ];
-        }
-        else
-            $verificaJustificativa = $status == PreRegistro::STATUS_NEGADO ? isset($this->getJustificativaArray()['negado']) : 
-                (isset($this->justificativa) && !isset($this->getJustificativaArray()['negado']));
-        
-        if(!$verificaJustificativa)
-            return [
-                'msg' => $texto . ' justificativa(s)',
-                'final' => false
-            ];
-
-        $statusOK = in_array($this->status, [PreRegistro::STATUS_ANALISE_INICIAL, PreRegistro::STATUS_ANALISE_CORRECAO]);
-        if(!$statusOK)
-            return [
-                'msg' => 'não possui o status necessário para ser ' . $temp,
-                'final' => false
-            ];
-
-        return [
-            'msg' => $temp,
-            'final' => true
-        ];
-    }
-
     public function setHistoricoStatus()
     {
         $historico = isset($this->historico_status) ? json_decode($this->historico_status, true) : array();
@@ -510,6 +450,24 @@ class PreRegistro extends Model
         if($this->status == PreRegistro::STATUS_ANALISE_CORRECAO)
             return isset($this->campos_editados) ? json_decode($this->campos_editados, true) : array();
         return array();
+    }
+
+    public function getAbasCampos()
+    {
+        $pf = 'nome_social,sexo,dt_nascimento,estado_civil,nacionalidade,naturalidade_cidade,naturalidade_estado,nome_mae,nome_pai,tipo_identidade,identidade,orgao_emissor,dt_expedicao';
+        $pj = 'razao_social,capital_social,nire,tipo_empresa,dt_inicio_atividade,inscricao_municipal,inscricao_estadual';
+        $dadosGerais = $this->userExterno->isPessoaFisica() ? $pf : $pj;
+
+        // A índice é referente a índice do menu
+        // Colocar na ordem dos campos nas blades
+        return [
+            'cnpj_contabil,nome_contabil,email_contabil,nome_contato_contabil,telefone_contabil',
+            $dadosGerais . ',segmento,idregional,pergunta',
+            'cep,bairro,logradouro,numero,complemento,cidade,uf,checkEndEmpresa,cep_empresa,bairro_empresa,logradouro_empresa,numero_empresa,complemento_empresa,cidade_empresa,uf_empresa',
+            'cpf_rt,registro,nome_rt,nome_social_rt,dt_nascimento_rt,sexo_rt,tipo_identidade_rt,identidade_rt,orgao_emissor_rt,dt_expedicao_rt,cep_rt,bairro_rt,logradouro_rt,numero_rt,complemento_rt,cidade_rt,uf_rt,nome_mae_rt,nome_pai_rt',
+            'tipo_telefone,telefone,opcional_celular,tipo_telefone_1,telefone_1,opcional_celular_1',
+            'path',
+        ];
     }
 
     public function atualizarAjax($classe, $campo, $valor, $gerenti)

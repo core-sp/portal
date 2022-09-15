@@ -2292,14 +2292,13 @@ class PreRegistroCpfTest extends TestCase
         $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
         $preRegistroCpf->preRegistro->update(['confere_anexos' => $final]);
 
-        $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'corrigir'])
         ->assertRedirect(route('preregistro.index'));
 
         Mail::assertQueued(PreRegistroMail::class);
 
         $this->get(route('preregistro.index'))
-        ->assertSeeText('enviado para correção')
-        ->assertSeeText('sucesso');
+        ->assertSeeText('Pré-registro com a ID: '.$preRegistroCpf->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_CORRECAO.'" com sucesso');
 
         $this->assertDatabaseHas('pre_registros', [
             'status' => PreRegistro::STATUS_CORRECAO,
@@ -2314,12 +2313,11 @@ class PreRegistroCpfTest extends TestCase
         $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
         $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-        $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'corrigir'])
         ->assertRedirect(route('preregistro.index'));
 
         $this->get(route('preregistro.index'))
-        ->assertSeeText('enviado para correção')
-        ->assertSeeText('sucesso');
+        ->assertSeeText('Pré-registro com a ID: '.$preRegistroCpf->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_CORRECAO.'" com sucesso');
 
         $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_CORRECAO);
     }
@@ -2333,11 +2331,11 @@ class PreRegistroCpfTest extends TestCase
         $anexo = factory('App\Anexo')->states('pre_registro')->create();
         $preRegistroCpf->preRegistro->update(['justificativa' => null]);
 
-        $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
-        ->assertRedirect(route('preregistro.index'));
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'corrigir'])
+        ->assertSessionHasErrors('status');
 
-        $this->get(route('preregistro.index'))
-        ->assertSeeText('não possui justificativa(s)');
+        $this->get(route('preregistro.view', $preRegistroCpf->pre_registro_id))
+        ->assertSeeText('Não possui justificativa(s)');
 
         $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_CORRECAO);
     }
@@ -2351,11 +2349,11 @@ class PreRegistroCpfTest extends TestCase
         $anexo = factory('App\Anexo')->states('pre_registro')->create();
         $preRegistroCpf->preRegistro->update(['justificativa' => '{"negado":"teste"}']);
 
-        $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
-        ->assertRedirect(route('preregistro.index'));
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'corrigir'])
+        ->assertSessionHasErrors('status');
 
-        $this->get(route('preregistro.index'))
-        ->assertSeeText('não possui justificativa(s)');
+        $this->get(route('preregistro.view', $preRegistroCpf->pre_registro_id))
+        ->assertSeeText('Não possui justificativa(s)');
 
         $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_CORRECAO);
     }
@@ -2373,10 +2371,11 @@ class PreRegistroCpfTest extends TestCase
             if(!in_array($status, $canUpdate))
             {
                 $preRegistroCpf->preRegistro->update(['status' => $status]);
-                $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
-                ->assertRedirect(route('preregistro.index'));
-                $this->get(route('preregistro.index'))
-                ->assertSeeText('não possui o status necessário para ser enviado para correção');
+                $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'corrigir'])
+                ->assertSessionHasErrors('status');
+
+                $this->get(route('preregistro.view', $preRegistroCpf->pre_registro_id))
+                ->assertSeeText('Não possui o status necessário para ser enviado para correção');
 
                 $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_CORRECAO);
             }
@@ -2394,11 +2393,11 @@ class PreRegistroCpfTest extends TestCase
         foreach($canUpdate as $status)
         {
             $preRegistroCpf->preRegistro->update(['status' => $status]);
-            $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+            $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'corrigir'])
             ->assertRedirect(route('preregistro.index'));
+
             $this->get(route('preregistro.index'))
-            ->assertSeeText('enviado para correção')
-            ->assertSeeText('sucesso');
+            ->assertSeeText('Pré-registro com a ID: '.$preRegistroCpf->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_CORRECAO.'" com sucesso');
 
             $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_CORRECAO);
         }
@@ -2416,11 +2415,8 @@ class PreRegistroCpfTest extends TestCase
         foreach($canUpdate as $status)
         {
             $preRegistroCpf->preRegistro->update(['status' => $status]);
-            $this->put(route('preregistro.update.enviar.correcao', $preRegistroCpf->pre_registro_id))
+            $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'corrigir'])
             ->assertRedirect(route('preregistro.index'));
-            $this->get(route('preregistro.index'))
-            ->assertSeeText('enviado para correção')
-            ->assertSeeText('sucesso');
 
             $log = tailCustom(storage_path($this->pathLogInterno()));
             $this->assertStringContainsString('atualizou status para ' . PreRegistro::STATUS_CORRECAO, $log);
@@ -2450,14 +2446,13 @@ class PreRegistroCpfTest extends TestCase
             'valor' => $faker->text(500)
         ])->assertStatus(200); 
 
-        $this->put(route('preregistro.update.negado', $preRegistroCpf->pre_registro_id))
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
         ->assertRedirect(route('preregistro.index'));
 
         Mail::assertQueued(PreRegistroMail::class);
 
         $this->get(route('preregistro.index'))
-        ->assertSeeText('negado')
-        ->assertSeeText('sucesso');
+        ->assertSeeText('Pré-registro com a ID: '.$preRegistroCpf->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_NEGADO.'" com sucesso');
 
         $this->assertDatabaseHas('pre_registros', [
             'status' => PreRegistro::STATUS_NEGADO,
@@ -2481,12 +2476,8 @@ class PreRegistroCpfTest extends TestCase
             'valor' => $faker->text(500)
         ])->assertStatus(200); 
 
-        $this->put(route('preregistro.update.negado', $preRegistroCpf->pre_registro_id))
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
         ->assertRedirect(route('preregistro.index'));
-
-        $this->get(route('preregistro.index'))
-        ->assertSeeText('negado')
-        ->assertSeeText('sucesso');
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString('atualizou status para ' . PreRegistro::STATUS_NEGADO, $log);
@@ -2508,12 +2499,11 @@ class PreRegistroCpfTest extends TestCase
             'valor' => $faker->text(500)
         ])->assertStatus(200); 
 
-        $this->put(route('preregistro.update.negado', $preRegistroCpf->pre_registro_id))
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
         ->assertRedirect(route('preregistro.index'));
 
         $this->get(route('preregistro.index'))
-        ->assertSeeText('negado')
-        ->assertSeeText('sucesso');
+        ->assertSeeText('Pré-registro com a ID: '.$preRegistroCpf->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_NEGADO.'" com sucesso');
 
         $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_NEGADO);
     }
@@ -2534,11 +2524,11 @@ class PreRegistroCpfTest extends TestCase
         $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
         $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
 
-        $this->put(route('preregistro.update.negado', $preRegistroCpf->preRegistro->id))
-        ->assertRedirect(route('preregistro.index'));
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
+        ->assertSessionHasErrors('status');
 
-        $this->get(route('preregistro.index'))
-        ->assertSeeText('não possui justificativa(s)');
+        $this->get(route('preregistro.view', $preRegistroCpf->pre_registro_id))
+        ->assertSeeText('Não possui justificativa(s)');
 
         $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_NEGADO);
     }
@@ -2550,11 +2540,11 @@ class PreRegistroCpfTest extends TestCase
         $preRegistroCpf = factory('App\PreRegistroCpf')->states('justificado')->create();
         $anexo = factory('App\Anexo')->states('pre_registro')->create();
 
-        $this->put(route('preregistro.update.negado', $preRegistroCpf->preRegistro->id))
-        ->assertRedirect(route('preregistro.index'));
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
+        ->assertSessionHasErrors('status');
 
-        $this->get(route('preregistro.index'))
-        ->assertSeeText('não possui justificativa(s)');
+        $this->get(route('preregistro.view', $preRegistroCpf->pre_registro_id))
+        ->assertSeeText('Não possui justificativa(s)');
 
         $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_NEGADO);
     }
@@ -2574,12 +2564,11 @@ class PreRegistroCpfTest extends TestCase
             'valor' => $faker->text(500)
         ])->assertStatus(200); 
 
-        $this->put(route('preregistro.update.negado', $preRegistroCpf->preRegistro->id))
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
         ->assertRedirect(route('preregistro.index'));
 
         $this->get(route('preregistro.index'))
-        ->assertSeeText('negado')
-        ->assertSeeText('sucesso');
+        ->assertSeeText('Pré-registro com a ID: '.$preRegistroCpf->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_NEGADO.'" com sucesso');
 
         $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_NEGADO);
     }
@@ -2604,10 +2593,11 @@ class PreRegistroCpfTest extends TestCase
             if(!in_array($status, $canUpdate))
             {
                 $preRegistroCpf->preRegistro->update(['status' => $status]);
-                $this->put(route('preregistro.update.negado', $preRegistroCpf->pre_registro_id))
-                ->assertRedirect(route('preregistro.index'));
-                $this->get(route('preregistro.index'))
-                ->assertSee('<i class="icon fa fa-ban"></i>');
+                $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
+                ->assertSessionHasErrors('status');
+
+                $this->get(route('preregistro.view', $preRegistroCpf->pre_registro_id))
+                ->assertSeeText('Não possui o status necessário para ser negado');
 
                 $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_NEGADO);
             }
@@ -2632,11 +2622,11 @@ class PreRegistroCpfTest extends TestCase
         foreach($canUpdate as $status)
         {
             $preRegistroCpf->preRegistro->update(['status' => $status]);
-            $this->put(route('preregistro.update.negado', $preRegistroCpf->pre_registro_id))
+            $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'negar'])
             ->assertRedirect(route('preregistro.index'));
+            
             $this->get(route('preregistro.index'))
-            ->assertSeeText('negado')
-            ->assertSeeText('sucesso');
+            ->assertSeeText('Pré-registro com a ID: '.$preRegistroCpf->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_NEGADO.'" com sucesso');
 
             $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_NEGADO);
         }
@@ -2658,14 +2648,13 @@ class PreRegistroCpfTest extends TestCase
         $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
         $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
 
-        $this->put(route('preregistro.update.aprovado', $preRegistroCpf->pre_registro_id))
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'aprovar'])
         ->assertRedirect(route('preregistro.index'));
 
         Mail::assertQueued(PreRegistroMail::class);
 
         $this->get(route('preregistro.index'))
-        ->assertSeeText('aprovado')
-        ->assertSeeText('sucesso');
+        ->assertSeeText('Pré-registro com a ID: '.$preRegistroCpf->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_APROVADO.'" com sucesso');
 
         $this->assertDatabaseHas('pre_registros', [
             'status' => PreRegistro::STATUS_APROVADO,
@@ -2688,12 +2677,8 @@ class PreRegistroCpfTest extends TestCase
         $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
         $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
 
-        $this->put(route('preregistro.update.aprovado', $preRegistroCpf->pre_registro_id))
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'aprovar'])
         ->assertRedirect(route('preregistro.index'));
-
-        $this->get(route('preregistro.index'))
-        ->assertSeeText('aprovado')
-        ->assertSeeText('sucesso');
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString('atualizou status para ' . PreRegistro::STATUS_APROVADO, $log);
@@ -2708,11 +2693,11 @@ class PreRegistroCpfTest extends TestCase
         $anexo = factory('App\Anexo')->states('pre_registro')->create();
         $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
 
-        $this->put(route('preregistro.update.aprovado', $preRegistroCpf->pre_registro_id))
-        ->assertRedirect(route('preregistro.index'));
+        $this->put(route('preregistro.update.status', $preRegistroCpf->preRegistro->id), ['situacao' => 'aprovar'])
+        ->assertSessionHasErrors('status');
 
-        $this->get(route('preregistro.index'))
-        ->assertSeeText('faltou anexos');
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeText('Faltou confirmar a entrega dos anexos');
 
         $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
     }
@@ -2733,11 +2718,11 @@ class PreRegistroCpfTest extends TestCase
         $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
         $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL, 'confere_anexos' => $final]);
 
-        $this->put(route('preregistro.update.aprovado', $preRegistroCpf->preRegistro->id))
-        ->assertRedirect(route('preregistro.index'));
+        $this->put(route('preregistro.update.status', $preRegistroCpf->preRegistro->id), ['situacao' => 'aprovar'])
+        ->assertSessionHasErrors('status');
 
-        $this->get(route('preregistro.index'))
-        ->assertSeeText('possui justificativa(s)');
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeText('Possui justificativa(s)');
 
         $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
     }
@@ -2763,10 +2748,11 @@ class PreRegistroCpfTest extends TestCase
             if(!in_array($status, $canUpdate))
             {
                 $preRegistroCpf->preRegistro->update(['status' => $status]);
-                $this->put(route('preregistro.update.aprovado', $preRegistroCpf->pre_registro_id))
-                ->assertRedirect(route('preregistro.index'));
-                $this->get(route('preregistro.index'))
-                ->assertSee('<i class="icon fa fa-ban"></i>');
+                $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'aprovar'])
+                ->assertSessionHasErrors('status');
+
+                $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+                ->assertSeeText('Não possui o status necessário para ser aprovado');
 
                 $this->assertNotEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
             }
@@ -2792,14 +2778,64 @@ class PreRegistroCpfTest extends TestCase
         foreach($canUpdate as $status)
         {
             $preRegistroCpf->preRegistro->update(['status' => $status]);
-            $this->put(route('preregistro.update.aprovado', $preRegistroCpf->pre_registro_id))
+            $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'aprovar'])
             ->assertRedirect(route('preregistro.index'));
+
             $this->get(route('preregistro.index'))
-            ->assertSeeText('aprovado')
-            ->assertSeeText('sucesso');
+            ->assertSeeText('Pré-registro com a ID: '.$preRegistroCpf->pre_registro_id.' foi atualizado para "'.PreRegistro::STATUS_APROVADO.'" com sucesso');
 
             $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_APROVADO);
         }
+    }
+
+    /** @test */
+    public function cannot_update_status_with_input_situacao_invalid()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+
+        $arrayAnexos = array();
+        foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
+            $arrayAnexos[$tipo] = "OK";
+
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCpf->preRegistro->update(['confere_anexos' => $final]);
+
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => 'aprova'])
+        ->assertSessionHasErrors('situacao');
+
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeText('Valor do status requisitado inválido');
+
+        $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_ANALISE_INICIAL);
+    }
+
+    /** @test */
+    public function cannot_update_status_without_input_situacao()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->create();
+        $anexo = factory('App\Anexo')->states('pre_registro')->create();
+        $preRegistroCpf->preRegistro->update(['status' => PreRegistro::STATUS_ANALISE_INICIAL]);
+
+        $arrayAnexos = array();
+        foreach($anexo->first()->getObrigatoriosPreRegistro() as $tipo)
+            $arrayAnexos[$tipo] = "OK";
+
+        $final = json_encode($arrayAnexos, JSON_FORCE_OBJECT);
+        $preRegistroCpf->preRegistro->update(['confere_anexos' => $final]);
+
+        $this->put(route('preregistro.update.status', $preRegistroCpf->pre_registro_id), ['situacao' => null])
+        ->assertSessionHasErrors('situacao');
+
+        $this->get(route('preregistro.view', $preRegistroCpf->preRegistro->id))
+        ->assertSeeText('Obrigatório o status requisitado');
+
+        $this->assertEquals(PreRegistro::first()->status, PreRegistro::STATUS_ANALISE_INICIAL);
     }
 
     /** 

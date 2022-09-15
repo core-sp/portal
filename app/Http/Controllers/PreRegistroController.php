@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PreRegistroAjaxAdminRequest;
+use App\Http\Requests\PreRegistroAdminRequest;
 
 class PreRegistroController extends Controller
 {
@@ -109,46 +110,17 @@ class PreRegistroController extends Controller
         return $file;
     }
 
-    public function updateEnviarCorrecao($id)
+    public function updateStatus(PreRegistroAdminRequest $request, $id)
     {
         // $this->authorize('updateOther', auth()->user());
 
         try{
+            $validated = $request->validated();
             $user = auth()->user();
-            $dados = $this->service->getService('PreRegistro')->updateStatus($id, $user, 'corrigir');
+            $dados = $this->service->getService('PreRegistro')->updateStatus($id, $user, $validated['status']);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao enviar para correção o pré-registro.");
-        }
-
-        return redirect(session('url_pre_registro') ?? route('preregistro.index'))->with($dados);
-    }
-
-    public function updateAprovado($id)
-    {
-        // $this->authorize('updateOther', auth()->user());
-
-        try{
-            $user = auth()->user();
-            $dados = $this->service->getService('PreRegistro')->updateStatus($id, $user, 'aprovar');
-        } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao aprovar o pré-registro.");
-        }
-
-        return redirect(session('url_pre_registro') ?? route('preregistro.index'))->with($dados);
-    }
-
-    public function updateNegado($id)
-    {
-        // $this->authorize('updateOther', auth()->user());
-
-        try{
-            $user = auth()->user();
-            $dados = $this->service->getService('PreRegistro')->updateStatus($id, $user, 'negar');
-        } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao negar o pré-registro.");
+            abort(500, "Erro ao atualizar o status do pré-registro.");
         }
 
         return redirect(session('url_pre_registro') ?? route('preregistro.index'))->with($dados);

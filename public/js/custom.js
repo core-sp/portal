@@ -420,6 +420,9 @@ function putDadosPreRegistro(campo, valor, acao)
             return false;
     }
 
+    $("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Salvando');
+	  $('#modalLoadingPreRegistro').modal('show');
+
     $.ajax({
         method: 'POST',
         headers: {
@@ -432,10 +435,10 @@ function putDadosPreRegistro(campo, valor, acao)
         },
         dataType: 'json',
         url: '/admin/pre-registros/update-ajax/' + id,
-        async: false,
         cache: false,
         timeout: 60000,
         success: function(response) {
+            $("#modalLoadingPreRegistro").modal('hide');
             if(campo == 'negado')
                 $('#submitNegarPR').submit();
             if(acao == 'justificar')

@@ -289,7 +289,7 @@
             $representante = in_array($idperfil, $permitidos->find(47)['perfis']);
             $representanteEndereco = in_array($idperfil, $permitidos->find(45)['perfis']);
             $representanteCedula = in_array($idperfil, $permitidos->find(59)['perfis']);
-            //$preregistro = in_array($idperfil, $permitidos->find(67)['perfis']);
+            $preregistro = true/*in_array($idperfil, $permitidos->find(67)['perfis'])*/;
         @endphp
 
         @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula || $preregistro)

@@ -32,5 +32,5 @@ interface PreRegistroServiceInterface {
 
     public function saveAjaxAdmin($request, $id, $user);
 
-    public function updateStatus($id, $user, $situacao);
+    public function updateStatus($id, $user, $status);
 }

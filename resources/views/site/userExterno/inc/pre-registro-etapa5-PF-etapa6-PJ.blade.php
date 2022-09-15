@@ -94,11 +94,11 @@
             'multiple' => true,
         ])
         @endcomponent
-    @endif
     <small class="text-muted text-left">
-    <em>
-        Para selecionar mais de um arquivo, mantenha a tecla <kbd>ctrl</kbd> pressionada ao selecionar
-    </em>
-</small>
+        <em>
+            Para selecionar mais de um arquivo, mantenha a tecla <kbd>ctrl</kbd> pressionada ao selecionar
+        </em>
+    </small>
+    @endif
 
 @endif

@@ -37,9 +37,7 @@ class PreRegistroTest extends TestCase
         $this->get(route('preregistro.view', $preRegistro->id))->assertRedirect(route('login'));
         $this->post(route('preregistro.update.ajax', $preRegistro->id))->assertRedirect(route('login'));
         $this->get(route('preregistro.anexo.download', ['idPreRegistro' => $preRegistro->id, 'id' => $anexo->id]))->assertRedirect(route('login'));
-        $this->put(route('preregistro.update.enviar.correcao', $preRegistro->id))->assertRedirect(route('login'));
-        $this->put(route('preregistro.update.aprovado', $preRegistro->id))->assertRedirect(route('login'));
-        $this->put(route('preregistro.update.negado', $preRegistro->id))->assertRedirect(route('login'));
+        $this->put(route('preregistro.update.status', $preRegistro->id), ['situacao' => 'aprovar'])->assertRedirect(route('login'));
         $this->get(route('preregistro.busca'))->assertRedirect(route('login'));
         $this->get(route('preregistro.filtro'))->assertRedirect(route('login'));
     }

@@ -42,4 +42,29 @@ class SiteTest extends TestCase
             ->assertSee($noticia->titulo)
             ->assertSee(route('noticias.show', $noticia->slug));
     }
+
+    /** @test */
+    public function representante_logged_is_shown_on_homepage()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030'])
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->get('/')->assertSee($representante->nome);
+    }
+
+    /** @test */
+    public function user_externo_logged_is_shown_on_homepage()
+    {
+        $user_externo = factory('App\UserExterno')->create();
+        $dados = [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'password' => 'Teste102030'
+        ];
+        $this->post(route('externo.login.submit'), $dados)
+        ->assertRedirect(route('externo.dashboard'));
+
+        $this->get('/')->assertSee($user_externo->nome);
+    }
 }

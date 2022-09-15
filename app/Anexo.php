@@ -22,7 +22,7 @@ class Anexo extends Model
 
     private static function ziparFilesPreRegistro($files, $id)
     {
-        $pathStorage = env("APP_ENV") == "testing" ? storage_path('framework/testing/disks/local/') : storage_path('app/');
+        $pathStorage = config('app.env') == "testing" ? storage_path('framework/testing/disks/local/') : storage_path('app/');
         $path = $pathStorage . Anexo::PATH_PRE_REGISTRO . '/' . $id . '/';
         $nomeZip = (string) Str::uuid() . '.zip';
 
