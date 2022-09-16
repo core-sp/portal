@@ -101,6 +101,24 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_anexo_created()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertStatus(200);
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString('Usuário Externo com cpf: ' . $externo->cpf_cnpj . ', anexou o arquivo "' . Anexo::first()->nome_original . '"', $log);
+        $this->assertStringContainsString(', que possui a ID: ' . Anexo::first()->id . ' na solicitação de registro com a id: ' . $externo->preRegistro->id, $log);
+    }
+
+    /** @test */
     public function can_upload_anexo_up_to_15_files_by_ajax()
     {
         Storage::fake('local');
@@ -552,6 +570,28 @@ class AnexoTest extends TestCase
         ]);
 
         Storage::disk('local')->assertMissing($caminho);
+    }
+
+    /** @test */
+    public function log_is_generated_when_anexo_deleted()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')->size(100)]
+        ])->assertOk();
+
+        Storage::disk('local')->assertExists(Anexo::find(1)->path);
+        $caminho = Anexo::find(1)->path;
+
+        $this->delete(route('externo.preregistro.anexo.excluir', Anexo::find(1)->id))->assertOk();
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString('Usuário Externo com cpf: '.$externo->cpf_cnpj.', excluiu o arquivo com a ID: '.Anexo::withTrashed()->first()->id, $log);
     }
 
     /** @test */

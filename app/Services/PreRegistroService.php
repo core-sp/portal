@@ -357,7 +357,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
                     WHEN status = "' . PreRegistro::STATUS_ANALISE_CORRECAO . '" THEN 2
                     WHEN status = "' . PreRegistro::STATUS_CORRECAO . '" THEN 3
                     WHEN status = "' . PreRegistro::STATUS_CRIADO . '" THEN 4
-                    ELSE 5
+                    WHEN status = "' . PreRegistro::STATUS_APROVADO . '" THEN 5
+                    ELSE 6
                 END'
             )
             ->orderByDesc('updated_at')
@@ -471,6 +472,15 @@ class PreRegistroService implements PreRegistroServiceInterface {
         else
             $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor'], $gerenti);
 
+        if(($request['classe'] == 'anexos') && isset($resultado))
+        {
+            $string = 'Usuário Externo com ';
+            $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
+            $string .= $externo->cpf_cnpj . ', anexou o arquivo "'.$resultado->nome_original.'", que possui a ID: '.$resultado->id;
+            $string .= ' na solicitação de registro com a id: '.$preRegistro->id;
+            event(new ExternoEvent($string));
+        }
+        
         return [
             'resultado' => $resultado,
             'dt_atualizado' => $preRegistro->fresh()->updated_at->format('d\/m\/Y, \à\s H:i:s')
@@ -554,13 +564,24 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         if(isset($anexo) && Storage::exists($anexo->path))
         {
-            if(Storage::delete($anexo->path))
+            $deleted = Storage::delete($anexo->path);
+            if($deleted)
             {
                 $anexo->delete();
                 $preRegistro->touch();
+
+                $string = 'Usuário Externo com ';
+                $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
+                $string .= $externo->cpf_cnpj . ', excluiu o arquivo com a ID: '.$id.' na solicitação de registro com a id: '.$preRegistro->id;
+                event(new ExternoEvent($string));
+
+                return [
+                    'resultado' => $id,
+                    'dt_atualizado' => $preRegistro->updated_at->format('d\/m\/Y, \à\s H:i:s')
+                ];
             }
             return [
-                'resultado' => $id,
+                'resultado' => null,
                 'dt_atualizado' => $preRegistro->updated_at->format('d\/m\/Y, \à\s H:i:s')
             ];
         }

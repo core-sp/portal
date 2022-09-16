@@ -183,8 +183,9 @@ class Kernel extends ConsoleKernel
             foreach($prs as $pr)
             {
                 $paths = $pr->anexos->pluck('path')->all();
-                $pr->anexos()->delete();
-                Storage::delete($paths);
+                $deleted = Storage::delete($paths);
+                if($deleted)
+                    $pr->anexos()->delete();
             }
         })->weeklyOn(7, '3:00');
     }
