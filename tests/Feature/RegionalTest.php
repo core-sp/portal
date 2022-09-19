@@ -240,6 +240,20 @@ class RegionalTest extends TestCase
     }
 
     /** @test */
+    public function cannot_update_regionais_with_same_hours_in_horariosage()
+    {
+        $this->signInAsAdmin();
+
+        $regional = factory('App\Regional')->create();
+        $dados = $regional->toArray();
+        $dados['horariosage'] = ['10:00', '10:00'];
+
+        $this->patch(route('regionais.update', $regional->idregional), $dados)
+            ->assertSessionHasErrors('horariosage.*');
+        $this->assertEquals(Regional::find($regional->idregional)->horariosage, $regional->horariosage);
+    }
+
+    /** @test */
     public function regionais_can_be_searched()
     {
         $this->signInAsAdmin();

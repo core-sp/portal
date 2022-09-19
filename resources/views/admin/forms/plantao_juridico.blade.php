@@ -31,7 +31,7 @@
                 <label for="horarios">Horários p/ agendamento</label>
                 <select 
                     name="horarios[]" 
-                    class="form-control {{ $errors->has('horarios') ? 'is-invalid' : '' }}" 
+                    class="form-control {{ $errors->has('horarios') || $errors->has('horarios.*') ? 'is-invalid' : '' }}" 
                     id="horarios" 
                     multiple
                 >
@@ -39,13 +39,13 @@
                     $horarios = explode(',', $resultado->horarios);
                 @endphp
                 @foreach(todasHoras() as $hora)
-                    <option value="{{ $hora }}" {{ (!empty(old('horarios')) && in_array($hora, old('horarios'))) || in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
+                    <option value="{{ $hora }}" {{ (!empty(old('horarios')) && is_array(old('horarios')) && in_array($hora, old('horarios'))) || in_array($hora, $horarios) ? 'selected' : '' }}>{{ $hora }}</option>
                 @endforeach
                 </select>
 
-                @if($errors->has('horarios'))
+                @if($errors->has('horarios') || $errors->has('horarios.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('horarios') }}
+                    {{ $errors->has('horarios') ? $errors->first('horarios') : $errors->first('horarios.*') }}
                 </div>
                 @endif
 

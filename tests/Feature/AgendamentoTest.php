@@ -2036,6 +2036,38 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_create_bloqueio_with_horarios_without_array()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'horarios' => '10:00',
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_same_hours_in_horarios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'horarios' => ['10:00', '10:00'],
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios.*'
+        ]);
+    }
+
+    /** @test */
     public function cannot_create_bloqueio_with_invalid_horarios()
     {
         $user = $this->signInAsAdmin();

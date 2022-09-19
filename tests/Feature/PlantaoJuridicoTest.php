@@ -318,6 +318,75 @@ class PlantaoJuridicoTest extends TestCase
     }
 
     /** @test */
+    public function plantao_cannot_be_edited_with_horarios_without_array_when_qtd_advogados_equal_0()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+                
+        $this->get(route('plantao.juridico.index'))->assertOk();
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertOk();
+
+        $dados = $plantao->toArray();
+        $dados['horarios'] = '10:00';
+        $dados['qtd_advogados'] = 0;
+
+        $this->put(route('plantao.juridico.editar', $plantao->id), $dados)
+        ->assertSessionHasErrors('horarios');
+        $this->assertDatabaseHas('plantoes_juridicos', [
+            'dataInicial' => $plantao->dataInicial,
+            'dataFinal' => $plantao->dataFinal,
+            'horarios' => $plantao->horarios,
+            'qtd_advogados' => $plantao->qtd_advogados
+        ]);
+    }
+
+    /** @test */
+    public function plantao_cannot_be_edited_with_horarios_without_array_when_qtd_advogados_greater_then_0()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+                
+        $this->get(route('plantao.juridico.index'))->assertOk();
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertOk();
+
+        $dados = $plantao->toArray();
+        $dados['horarios'] = '10:00';
+        $dados['qtd_advogados'] = 1;
+
+        $this->put(route('plantao.juridico.editar', $plantao->id), $dados)
+        ->assertSessionHasErrors('horarios');
+        $this->assertDatabaseHas('plantoes_juridicos', [
+            'dataInicial' => $plantao->dataInicial,
+            'dataFinal' => $plantao->dataFinal,
+            'horarios' => $plantao->horarios,
+            'qtd_advogados' => $plantao->qtd_advogados
+        ]);
+    }
+
+    /** @test */
+    public function plantao_cannot_be_edited_with_horarios_with_same_hours_when_qtd_advogados_greater_then_0()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+                
+        $this->get(route('plantao.juridico.index'))->assertOk();
+        $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertOk();
+
+        $dados = $plantao->toArray();
+        $dados['horarios'] = ['10:00', '10:00'];
+        $dados['qtd_advogados'] = 1;
+
+        $this->put(route('plantao.juridico.editar', $plantao->id), $dados)
+        ->assertSessionHasErrors('horarios.*');
+        $this->assertDatabaseHas('plantoes_juridicos', [
+            'dataInicial' => $plantao->dataInicial,
+            'dataFinal' => $plantao->dataFinal,
+            'horarios' => $plantao->horarios,
+            'qtd_advogados' => $plantao->qtd_advogados
+        ]);
+    }
+
+    /** @test */
     public function plantao_cannot_be_edited_with_invalid_dates()
     {
         $this->signInAsAdmin();
@@ -745,6 +814,52 @@ class PlantaoJuridicoTest extends TestCase
 
         $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
         ->assertSessionHasErrors('horariosBloqueio');
+        $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
+            'id' => 1
+        ]);
+    }
+
+    /** @test */
+    public function bloqueio_cannot_be_created_with_horarios_without_array()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+                
+        $this->get(route('plantao.juridico.bloqueios.index'))->assertOk();
+        $this->get(route('plantao.juridico.bloqueios.criar.view'))->assertOk();
+
+        $dados = [
+            'plantaoBloqueio' => $plantao->id,
+            'dataInicialBloqueio' => $plantao->dataInicial,
+            'dataFinalBloqueio' => $plantao->dataInicial,
+            'horariosBloqueio' => '10:00'
+        ];
+
+        $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
+        ->assertSessionHasErrors('horariosBloqueio');
+        $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
+            'id' => 1
+        ]);
+    }
+
+    /** @test */
+    public function bloqueio_cannot_be_created_with_same_hours_in_horarios()
+    {
+        $this->signInAsAdmin();
+        $plantao = factory('App\PlantaoJuridico')->create();
+                
+        $this->get(route('plantao.juridico.bloqueios.index'))->assertOk();
+        $this->get(route('plantao.juridico.bloqueios.criar.view'))->assertOk();
+
+        $dados = [
+            'plantaoBloqueio' => $plantao->id,
+            'dataInicialBloqueio' => $plantao->dataInicial,
+            'dataFinalBloqueio' => $plantao->dataInicial,
+            'horariosBloqueio' => ['10:00', '10:00']
+        ];
+
+        $this->post(route('plantao.juridico.bloqueios.criar'), $dados)
+        ->assertSessionHasErrors('horariosBloqueio.*');
         $this->assertDatabaseMissing('plantoes_juridicos_bloqueios', [
             'id' => 1
         ]);

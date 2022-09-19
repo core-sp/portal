@@ -60,7 +60,7 @@ class PlantaoJuridicoController extends Controller
         }
 
         return redirect(route('plantao.juridico.index'))->with([
-            'message' => '<i class="icon fa fa-check"></i>Plantão Jurídico atualizado com sucesso!',
+            'message' => '<i class="icon fa fa-check"></i>Plantão Jurídico com a ID: ' .$id . ' atualizado com sucesso!',
             'class' => 'alert-success'
         ]);
     }

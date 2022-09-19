@@ -22,11 +22,13 @@ class PlantaoJuridicoRequest extends FormRequest
 
         return [
             'qtd_advogados' => 'sometimes|required|regex:/^[0-9]{1}$/',
-            'horarios' => request('qtd_advogados') == 0 ? '' : 'required|array',
-            'dataInicial' => request('qtd_advogados') == 0 ? '' : 'required|nullable|date|after:'.date('Y-m-d'),
-            'dataFinal' => request('qtd_advogados') == 0 ? '' : 'required|nullable|date|after_or_equal:dataInicial',
+            'horarios' => request('qtd_advogados') == 0 ? 'array' : 'required|array',
+            'horarios.*' => 'distinct',
+            'dataInicial' => request('qtd_advogados') == 0 ? 'nullable|date' : 'required|nullable|date|after:'.date('Y-m-d'),
+            'dataFinal' => request('qtd_advogados') == 0 ? 'nullable|date' : 'required|nullable|date|after_or_equal:dataInicial',
             'plantaoBloqueio' => 'sometimes|required|exists:plantoes_juridicos,id',
             'horariosBloqueio' => 'sometimes|required|array'.$horarios,
+            'horariosBloqueio.*' => 'distinct',
             'dataInicialBloqueio' => 'sometimes|required|date|after_or_equal:'.$datas[0].'|before_or_equal:'.$datas[1],
             'dataFinalBloqueio' => 'sometimes|required|date|after_or_equal:dataInicialBloqueio|before_or_equal:'.$datas[1],
         ];
@@ -44,7 +46,9 @@ class PlantaoJuridicoRequest extends FormRequest
             'exists' => 'Este plantão não existe',
             'in' => 'Valor inexistente em horários',
             'before_or_equal' => 'Data deve ser antes ou igual a data final do plantão',
-            'date' => 'Deve ser uma data válida'
+            'date' => 'Deve ser uma data válida',
+            'distinct' => 'Existe hora repetida',
+            'array' => 'Formato inválido para os horários'
         ];
     }
 }
