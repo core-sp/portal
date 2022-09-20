@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Support\Str;
+use Illuminate\Auth\Events\PasswordReset;
 
 class ResetPasswordController extends Controller
 {
@@ -44,5 +45,7 @@ class ResetPasswordController extends Controller
             'password' => bcrypt($password),
             'remember_token' => Str::random(60),
         ])->save();
+
+        event(new PasswordReset($user));
     }
 }

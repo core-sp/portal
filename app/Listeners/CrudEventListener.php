@@ -19,6 +19,6 @@ class CrudEventListener
     {
         $nome = Auth::user()->nome;
         $id = Auth::id();
-        Log::channel('interno')->info($nome.' (usuário '.$id.') '.$event->action.' *'.$event->model.'* (id: '.$event->id.')');
+        Log::channel('interno')->info("[IP: " . request()->ip() . "] - " . $nome.' (usuário '.$id.') '.$event->action.' *'.$event->model.'* (id: '.$event->id.')');
     }
 }

@@ -12,6 +12,7 @@ use App\Mail\CadastroRepresentanteMail;
 use App\Mail\RepresentanteResetPasswordMail;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Password;
 
 class RepresentanteTest extends TestCase
 {
@@ -55,6 +56,108 @@ class RepresentanteTest extends TestCase
 
         // Checa se depois de enviar dados de login, o representante é redirecionado para a home page da área restrita
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030'])->assertRedirect(route('representante.dashboard'));
+    }
+
+    /** @test */
+    public function log_is_generated_when_login_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $this->get(route('representante.login'))->assertOk();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030'])
+        ->assertRedirect(route('representante.dashboard'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString('Usuário '.$representante->id.' ("'.$representante->registro_core.'") conectou-se à Área do Representante.', $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_logout_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $this->get(route('representante.login'))->assertOk();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030'])
+        ->assertRedirect(route('representante.dashboard'));
+        $this->get(route('representante.logout'))
+        ->assertRedirect('/');
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString('Usuário '.$representante->id.' ("'.$representante->registro_core.'") desconectou-se da Área do Representante.', $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_expired_session_and_logout_on_restrict_area()
+    {
+        $this->get(route('representante.logout'))
+        ->assertRedirect('/');
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString('Sessão expirou / não há sessão ativa ao realizar o logout da Área do Representante.', $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_failed_login_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $this->get(route('representante.login'))->assertOk();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste1020'])
+        ->assertRedirect(route('representante.login'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString('Usuário com o cpf/cnpj ' .$representante->cpf_cnpj. ' não conseguiu logar na Área do Representante.', $log);
+    }
+
+    // /** @test */
+    // public function log_is_generated_when_failed_login_on_restrict_area_and_cpf_cnpj_not_find()
+    // {
+    //     $representante = factory('App\Representante')->create();
+
+    //     $this->get(route('representante.login'))->assertOk();
+
+    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => '00000000000', 'password' => 'teste102030'])
+    //     ->assertRedirect(route('representante.login'));
+
+    //     $log = tailCustom(storage_path($this->pathLogExterno()));
+    //     $this->assertStringContainsString('Usuário não encontrado com o cpf/cnpj "'.request()->cpf_cnpj.'" não conseguiu logar na Área do Representante.', $log);
+    // }
+
+    // /** @test */
+    // public function log_is_generated_when_lockout_login_on_restrict_area()
+    // {
+    //     $representante = factory('App\Representante')->create();
+
+    //     for($i = 0; $i < 6; $i++)
+    //     {
+    //         $this->get(route('representante.login'))->assertOk();
+    //         $this->post(route('representante.login.submit'), ['cpf_cnpj' => '00000000000', 'password' => 'teste102030'])
+    //         ->assertRedirect(route('representante.login'));
+    //     }
+
+    //     $log = tailCustom(storage_path($this->pathLogExterno()));
+    //     $this->assertStringContainsString('Usuário com cpf/cnpj "'.$representante->cpf_cnpj.'" foi bloqueado temporariamente por alguns segundos devido a alcançar o limite de tentativas de login na Área do Representante.', $log);
+    // }
+
+    /** @test */
+    public function log_is_generated_when_reset_password_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+        $token = Password::broker('representantes')->createToken($representante);
+
+        $this->get(route('representante.password.reset', $token))->assertSuccessful();
+        $this->post(route('representante.password.update'), [
+            'token' => $token,
+            'cpf_cnpj' => $representante->cpf_cnpj,
+            'password' => 'Teste102030', 
+            'password_confirmation' => 'Teste102030', 
+        ])->assertRedirect(route('representante.login'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $this->assertStringContainsString('Usuário com o cpf/cnpj ' .$representante->cpf_cnpj. ' alterou a senha com sucesso na Área do Representante.', $log);
     }
 
     /** @test 

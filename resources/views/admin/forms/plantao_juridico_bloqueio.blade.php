@@ -90,17 +90,12 @@
                 @php
                     $horarios = isset($resultado->horarios) ? explode(',', $resultado->horarios) : null;
                     $horariosPlantao = isset($resultado->plantaoJuridico->horarios) ? explode(',', $resultado->plantaoJuridico->horarios) : null;
+                    $horasTotais = isset($resultado) && isset($horariosPlantao) ? $horariosPlantao : todasHoras();
                 @endphp
 
-                @if(isset($resultado) && isset($horariosPlantao))
-                    @foreach($horariosPlantao as $hora)
+                @foreach($horasTotais as $hora)
                     <option value="{{ $hora }}" {{ (!empty(old('horariosBloqueio')) && is_array(old('horariosBloqueio')) && in_array($hora, old('horariosBloqueio'))) || (isset($horarios) && in_array($hora, $horarios)) ? 'selected' : '' }}>{{ $hora }}</option>
-                    @endforeach
-                @else
-                    @foreach(todasHoras() as $hora)
-                    <option value="{{ $hora }}" {{ !empty(old('horariosBloqueio')) && is_array(old('horariosBloqueio')) && in_array($hora, old('horariosBloqueio')) ? 'selected' : '' }}>{{ $hora }}</option>
-                    @endforeach
-                @endif
+                @endforeach
                 </select>
 
                 @if($errors->has('horariosBloqueio') || $errors->has('horariosBloqueio.*'))

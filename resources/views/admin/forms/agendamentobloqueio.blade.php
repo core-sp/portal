@@ -90,8 +90,9 @@
                 >
                 @php
                     $horarios = isset($resultado->horarios) ? explode(',', $resultado->horarios) : null;
+                    $horasTotais = isset($resultado) ? $resultado->regional->horariosAge() : todasHoras();
                 @endphp
-                @foreach(todasHoras() as $hora)
+                @foreach($horasTotais as $hora)
                     <option value="{{ $hora }}" {{ !empty(old('horarios')) && is_array(old('horarios')) && in_array($hora, old('horarios')) || (isset($horarios) && in_array($hora, $horarios)) ? 'selected' : '' }}>{{ $hora }}</option>
                 @endforeach
                 </select>

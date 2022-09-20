@@ -87,8 +87,6 @@ class RepresentanteLoginController extends Controller
             'cpf_cnpj' => $cpfCnpj,
             'password' => $request->password
         ], $request->remember)) {
-            event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") conectou-se à Área do Representante.'));
-
             return redirect()->intended(route('representante.dashboard'));
         }
         
@@ -97,7 +95,6 @@ class RepresentanteLoginController extends Controller
 
     protected function redirectWithErrors($withInput, $message = 'Login inválido.', $class = 'alert-danger')
     {
-        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$withInput['cpf_cnpj']. ' não conseguiu logar.'));
         return redirect()
             ->back()
             ->with([
@@ -108,9 +105,6 @@ class RepresentanteLoginController extends Controller
 
     public function logout(Request $request)
     {
-        // Removendo log de logout do representante para evitar problema quando a sessão expira e o representante tenta fazer logout
-        // event(new ExternoEvent('Usuário ' . Auth::guard('representante')->user()->id . ' ("'. Auth::guard('representante')->user()->registro_core .'") desconectou-se da Área do Representante.'));
-
         Auth::guard('representante')->logout();
 
         $request->session()->invalidate();

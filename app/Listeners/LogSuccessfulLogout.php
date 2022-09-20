@@ -17,7 +17,22 @@ class LogSuccessfulLogout
 
     public function handle(Logout $event)
     {
-        if(!Auth::guard('representante')->check())
-            Log::channel('interno')->info($event->user->nome.' (usuário '.$event->user->idusuario.') desconectou-se do painel de administrador.');
+        $ip = "[IP: " . request()->ip() . "] - ";
+
+        if($event->guard == 'web')
+        {
+            if(Auth::guard('web')->check())
+                Log::channel('interno')->info($ip . $event->user->nome.' (usuário '.$event->user->idusuario.') desconectou-se do Painel Administrativo.');
+            else
+                Log::channel('interno')->info($ip . 'Sessão expirou / não há sessão ativa ao realizar o logout do Painel Administrativo.');
+        }
+
+        if($event->guard == 'representante')
+        {
+            if(Auth::guard('representante')->check())
+                Log::channel('externo')->info($ip . 'Usuário '.$event->user->id.' ("'.$event->user->registro_core .'") desconectou-se da Área do Representante.');
+            else
+                Log::channel('externo')->info($ip . 'Sessão expirou / não há sessão ativa ao realizar o logout da Área do Representante.');
+        }
     }
 }
