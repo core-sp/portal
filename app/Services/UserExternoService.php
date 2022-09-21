@@ -93,4 +93,9 @@ class UserExternoService implements UserExternoServiceInterface {
             event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou os dados com sucesso na Área Restrita.'));
         }
     }
+
+    public function findByCpfCnpj($cpf_cnpj)
+    {
+        return UserExterno::where('cpf_cnpj', $cpf_cnpj)->first();
+    }
 }

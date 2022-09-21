@@ -718,11 +718,11 @@ class UserExternoTest extends TestCase
 
     /** @test 
     */
-    public function await_login_after_5x()
+    public function await_login_after_3x()
     {
         $user_externo = factory('App\UserExterno')->create();
 
-        for($i = 0; $i < 5; $i++)
+        for($i = 0; $i < 3; $i++)
         {
             $this->get(route('externo.login'))->assertOk();
             $this->post(route('externo.login.submit'), [
@@ -730,6 +730,9 @@ class UserExternoTest extends TestCase
                 'password' => 'Teste10203',
             ])
             ->assertRedirect(route('externo.login'));
+
+            $this->get(route('externo.login'))
+            ->assertDontSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
         }
 
         $this->post(route('externo.login.submit'), [
@@ -738,6 +741,7 @@ class UserExternoTest extends TestCase
         ])->assertSessionHasErrors([
             'cpf_cnpj'
         ])->assertRedirect(route('externo.login'));
+        
         $this->get(route('externo.login'))
         ->assertSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
     }

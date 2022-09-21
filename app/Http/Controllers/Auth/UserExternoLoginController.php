@@ -2,37 +2,37 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\UserExterno;
 use App\Events\ExternoEvent;
 use App\Http\Requests\UserExternoRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Support\Facades\Request as IlluminateRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class UserExternoLoginController extends Controller
 {
-    use AuthenticatesUsers {
-        logout as performLogout;
-    }
+    use AuthenticatesUsers;
 
+    private $service;
     protected $redirectTo = '/externo/home';
 
-    public function __construct()
+    public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('guest:user_externo')->except('logout');
+        $this->service = $service;
     }
 
     private function verificaSeAtivo($cpf_cnpj)
     {
-        $user_externo = UserExterno::where('cpf_cnpj', $cpf_cnpj)->first();
+        $user_externo = $this->service->getService('UserExterno')->findByCpfCnpj($cpf_cnpj);
 
         if(isset($user_externo))
             if($user_externo->ativo == 0)
                 return [
                     'message' => 'Por favor, acesse o email informado no momento do cadastro para verificar sua conta.',
-                    'class' => 'alert-warning'
+                    'class' => 'alert-warning',
+                    'cpf_cnpj' => $cpf_cnpj
                 ];
             else
                 return [];
@@ -69,17 +69,9 @@ class UserExternoLoginController extends Controller
             return redirect()->back()->with($verificou);
         }
 
-        if($this->guard()->attempt([
-            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj),
-            'password' => $request->password
-        ])) 
+        if($this->attemptLogin($request))
         {
-            $request->session()->regenerate();
-            $this->clearLoginAttempts($request);
-
-            event(new ExternoEvent('Usuário ' . auth()->guard('user_externo')->user()->id . ' conectou-se à Área do Login Externo.'));
-            
-            return redirect()->intended(route('externo.dashboard'));
+            return $this->sendLoginResponse($request);
         }
         
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -87,13 +79,21 @@ class UserExternoLoginController extends Controller
         // user surpasses their maximum number of attempts they will get locked out.
         $this->incrementLoginAttempts($request);
 
-        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar no Login Externo.'));
+        return $this->sendFailedLoginResponse($request);
+    }
 
-        return redirect()->back()->with([
-            'message' => 'Login inválido.',
-            'class' => 'alert-danger',
-            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
-        ]);
+    /**
+     * Determine if the user has too many failed login attempts.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function hasTooManyLoginAttempts(Request $request)
+    {
+        $maxAttempts = 3;
+        return $this->limiter()->tooManyAttempts(
+            $this->throttleKey($request), $maxAttempts
+        );
     }
 
     protected function validateLogin(Request $request)
@@ -103,9 +103,55 @@ class UserExternoLoginController extends Controller
         $requestRules->validate($requestRules->rules(), $requestRules->messages());
     }
 
-    protected function credentials(Request $request)
+    /**
+     * Attempt to log the user into the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function attemptLogin(Request $request)
     {
-        return $request->only($this->username(), 'password');
+        return $this->guard()->attempt([
+            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj),
+            'password' => $request->password
+        ]);
+    }
+
+    /**
+     * Send the response after the user was authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+
+        $this->clearLoginAttempts($request);
+
+        event(new ExternoEvent('Usuário ' . auth()->guard('user_externo')->user()->id . ' conectou-se à Área do Login Externo.'));
+
+        return $this->authenticated($request, $this->guard()->user())
+                ?: redirect()->intended(route('externo.dashboard'));
+    }
+
+    /**
+     * Get the failed login response instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar no Login Externo.'));
+
+        return redirect()->back()->with([
+            'message' => 'Login inválido.',
+            'class' => 'alert-danger',
+            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
+        ]);
     }
 
     public function username()
