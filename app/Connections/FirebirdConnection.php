@@ -17,7 +17,7 @@ class FirebirdConnection
                 $this->config()->username,
                 $this->config()->password);
         } catch (PDOException $e) {
-            abort(500, 'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.');
+            abort(500, 'Os servidores estão passando por manutenção. Por favor, tente dentro de alguns minutos.'/*'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.'*/);
         }
 
         return $this->connection;
