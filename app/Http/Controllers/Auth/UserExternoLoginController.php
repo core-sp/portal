@@ -15,32 +15,13 @@ class UserExternoLoginController extends Controller
     use AuthenticatesUsers;
 
     private $service;
+    private $verificou;
     protected $redirectTo = '/externo/home';
 
     public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('guest:user_externo')->except('logout');
         $this->service = $service;
-    }
-
-    private function verificaSeAtivo($cpf_cnpj)
-    {
-        $user_externo = $this->service->getService('UserExterno')->findByCpfCnpj($cpf_cnpj);
-
-        if(isset($user_externo))
-            if($user_externo->ativo == 0)
-                return [
-                    'message' => 'Por favor, acesse o email informado no momento do cadastro para verificar sua conta.',
-                    'class' => 'alert-warning',
-                    'cpf_cnpj' => $cpf_cnpj
-                ];
-            else
-                return [];
-        return [
-            'message' => 'CPF/CNPJ não encontrado.',
-            'class' => 'alert-danger',
-            'cpf_cnpj' => $cpf_cnpj
-        ];
     }
 
     public function showLoginForm()
@@ -62,17 +43,11 @@ class UserExternoLoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        $verificou = $this->verificaSeAtivo(apenasNumeros($request->cpf_cnpj));
-        if(!empty($verificou))
-        {
-            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar no Login Externo. Erro: '.$verificou['message']));
-            return redirect()->back()->with($verificou);
-        }
+        $this->verificou = $this->service->getService('UserExterno')->verificaSeAtivo($request->cpf_cnpj);
 
-        if($this->attemptLogin($request))
-        {
-            return $this->sendLoginResponse($request);
-        }
+        if(empty($this->verificou))
+            if($this->attemptLogin($request))
+                return $this->sendLoginResponse($request);
         
         // If the login attempt was unsuccessful we will increment the number of attempts
         // to login and redirect the user back to the login form. Of course, when this
@@ -145,6 +120,12 @@ class UserExternoLoginController extends Controller
      */
     protected function sendFailedLoginResponse(Request $request)
     {
+        if(!empty($this->verificou))
+        {
+            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar no Login Externo. Erro: '.$this->verificou['message']));
+            return redirect()->back()->with($this->verificou);
+        }
+
         event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar no Login Externo.'));
 
         return redirect()->back()->with([

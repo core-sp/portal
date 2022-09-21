@@ -718,9 +718,71 @@ class UserExternoTest extends TestCase
 
     /** @test 
     */
-    public function await_login_after_3x()
+    public function active_user_await_login_after_3x()
     {
         $user_externo = factory('App\UserExterno')->create();
+
+        for($i = 0; $i < 3; $i++)
+        {
+            $this->get(route('externo.login'))->assertOk();
+            $this->post(route('externo.login.submit'), [
+                'cpf_cnpj' => $user_externo['cpf_cnpj'],
+                'password' => 'Teste10203',
+            ])
+            ->assertRedirect(route('externo.login'));
+
+            $this->get(route('externo.login'))
+            ->assertDontSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
+        }
+
+        $this->post(route('externo.login.submit'), [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'password' => 'Teste10203',
+        ])->assertSessionHasErrors([
+            'cpf_cnpj'
+        ])->assertRedirect(route('externo.login'));
+        
+        $this->get(route('externo.login'))
+        ->assertSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
+    }
+
+    /** @test 
+    */
+    public function not_active_user_await_login_after_3x()
+    {
+        $user_externo = factory('App\UserExterno')->create([
+            'ativo' => 0
+        ]);
+
+        for($i = 0; $i < 3; $i++)
+        {
+            $this->get(route('externo.login'))->assertOk();
+            $this->post(route('externo.login.submit'), [
+                'cpf_cnpj' => $user_externo['cpf_cnpj'],
+                'password' => 'Teste10203',
+            ])
+            ->assertRedirect(route('externo.login'));
+
+            $this->get(route('externo.login'))
+            ->assertDontSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
+        }
+
+        $this->post(route('externo.login.submit'), [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'password' => 'Teste10203',
+        ])->assertSessionHasErrors([
+            'cpf_cnpj'
+        ])->assertRedirect(route('externo.login'));
+        
+        $this->get(route('externo.login'))
+        ->assertSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
+    }
+
+    /** @test 
+    */
+    public function not_registered_user_await_login_after_3x()
+    {
+        $user_externo = factory('App\UserExterno')->make();
 
         for($i = 0; $i < 3; $i++)
         {

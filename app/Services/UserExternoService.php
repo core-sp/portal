@@ -94,8 +94,24 @@ class UserExternoService implements UserExternoServiceInterface {
         }
     }
 
-    public function findByCpfCnpj($cpf_cnpj)
+    public function verificaSeAtivo($cpf_cnpj)
     {
-        return UserExterno::where('cpf_cnpj', $cpf_cnpj)->first();
+        $cpf_cnpj = apenasNumeros($cpf_cnpj);
+        $user_externo = UserExterno::where('cpf_cnpj', $cpf_cnpj)->first();
+
+        if(isset($user_externo))
+            if($user_externo->ativo == 0)
+                return [
+                    'message' => 'Por favor, acesse o email informado no momento do cadastro para verificar sua conta.',
+                    'class' => 'alert-warning',
+                    'cpf_cnpj' => $cpf_cnpj
+                ];
+            else
+                return [];
+        return [
+            'message' => 'CPF/CNPJ não encontrado.',
+            'class' => 'alert-danger',
+            'cpf_cnpj' => $cpf_cnpj
+        ];
     }
 }
