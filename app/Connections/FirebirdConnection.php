@@ -17,6 +17,7 @@ class FirebirdConnection
                 $this->config()->username,
                 $this->config()->password);
         } catch (PDOException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Os servidores estão passando por manutenção. Por favor, tente dentro de alguns minutos.'/*'Estamos enfrentando problemas técnicos no momento. Por favor, tente dentro de alguns minutos.'*/);
         }
 
