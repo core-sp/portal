@@ -94,10 +94,16 @@ class UserExternoService implements UserExternoServiceInterface {
         }
     }
 
-    public function verificaSeAtivo($cpf_cnpj)
+    public function findByCpfCnpj($cpf_cnpj)
     {
         $cpf_cnpj = apenasNumeros($cpf_cnpj);
-        $user_externo = UserExterno::where('cpf_cnpj', $cpf_cnpj)->first();
+
+        return UserExterno::where('cpf_cnpj', $cpf_cnpj)->first();
+    }
+
+    public function verificaSeAtivo($cpf_cnpj)
+    {
+        $user_externo = $this->findByCpfCnpj($cpf_cnpj);
 
         if(isset($user_externo))
             if($user_externo->ativo == 0)

@@ -10,5 +10,7 @@ interface UserExternoServiceInterface {
 
     public function editDados($dados, $externo);
 
+    public function findByCpfCnpj($cpf_cnpj);
+
     public function verificaSeAtivo($cpf_cnpj);
 }

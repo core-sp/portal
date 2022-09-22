@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\UserExterno;
 use App\Http\Requests\UserExternoRequest;
 use App\Events\ExternoEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use App\Contracts\MediadorServiceInterface;
 
 class UserExternoForgotPasswordController extends Controller
 {
     use SendsPasswordResetEmails;
 
-    public function __construct()
+    private $service;
+
+    public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('guest:user_externo');
+        $this->service = $service;
     }
 
     public function showLinkRequestForm()
@@ -82,9 +85,9 @@ class UserExternoForgotPasswordController extends Controller
 
     protected function getEmail($cpfCnpj)
     {
-        $first = UserExterno::where('cpf_cnpj', $cpfCnpj)->where('ativo', 1)->first();
+        $first = $this->service->getService('UserExterno')->findByCpfCnpj($cpfCnpj);
         
-        if(isset($first))
+        if(isset($first) && ($first->ativo == 1))
             return $first->email;
         return null;
     }
