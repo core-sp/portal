@@ -133,7 +133,7 @@ class PostService implements PostServiceInterface {
     {
         $post = Post::where('slug', $slug)->firstOrFail();
         $next = Post::select('titulo', 'slug')->where('id', '>', $post->id)->first();
-        $previous = Post::select('titulo', 'slug')->where('id', '<', $post->id)->first();
+        $previous = Post::select('titulo', 'slug')->where('id', '<', $post->id)->orderBy('id', 'DESC')->first();
 
         return [
             'post' => $post,

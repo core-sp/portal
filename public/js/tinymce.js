@@ -40,8 +40,9 @@ var editor_config = {
     });
   },
   init_instance_callback: function(editor) {
+    // Aqui justifica o texto que o usuário "cola" tanto ao criar ou editar o post
     editor.on('SetContent', function(e) {
-      if(window.location.href.indexOf('admin/posts/create') != -1){
+      if(window.location.href.indexOf('admin/posts/') != -1){
         editor.execCommand('SelectAll');
         editor.execCommand('JustifyFull');
         editor.selection.collapse();

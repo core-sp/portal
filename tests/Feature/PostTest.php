@@ -363,10 +363,10 @@ class PostTest extends TestCase
     /** @test */
     public function a_post_will_show_previous_and_next_post_if_available()
     {
-        $posts = factory('App\Post', 3)->create();
+        $posts = factory('App\Post', 6)->create();
 
-        $this->get(route('site.blog.post', $posts->get(1)->slug))
-        ->assertSee($posts->get(0)->titulo)->assertSee($posts->get(2)->titulo);
+        $this->get(route('site.blog.post', $posts->get(4)->slug))
+        ->assertSee($posts->get(3)->titulo)->assertSee($posts->get(5)->titulo);
     }
 
     /** @test */

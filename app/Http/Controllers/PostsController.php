@@ -2,40 +2,23 @@
 
 namespace App\Http\Controllers;
 
-// use App\Events\CrudEvent;
-// use App\Post;
-// use App\Pagina;
 use App\Http\Requests\PostRequest;
-// use App\Repositories\PostRepository;
-// use Illuminate\Support\Facades\Request as IlluminateRequest;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
-    // private $class = 'PostsController';
-    // private $variaveis;
-    // private $post;
-    // private $postRepository;
     private $service;
 
-    public function __construct(MediadorServiceInterface $service/*, Post $post, PostRepository $postRepository*/)
+    public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('auth', ['except' => ['show', 'blogPage']]);
-        // $this->post = $post;
-        // $this->variaveis = $post->variaveis();
-        // $this->postRepository = $postRepository;
         $this->service = $service;
     }
 
     public function index()
     {
-        // Verificando permissão de visualização de posts
         $this->authorize('viewAny', auth()->user());
-
-        // $resultados = $this->postRepository->getToTable();
-        // $tabela = $this->post->tabelaCompleta($resultados);
-        // $variaveis = (object) $this->variaveis;
 
         try{
             $dados = $this->service->getService('Post')->listar();
@@ -51,10 +34,7 @@ class PostsController extends Controller
 
     public function create()
     {
-        // Verificando permissão de criação de posts
         $this->authorize('create', auth()->user());
-
-        // $variaveis = (object) $this->variaveis;
 
         try{
             $dados = $this->service->getService('Post')->view();
@@ -69,14 +49,7 @@ class PostsController extends Controller
 
     public function store(PostRequest $request)
     {
-        // Verificando permissão de criação de posts (mesma do create)
         $this->authorize('create', auth()->user());
-
-        // $request->validated();
-
-        // $save = $this->postRepository->store($request->toModel());
-
-        // event(new CrudEvent('post', 'criou', $save->id));
 
         try{
             $validated = $request->validated();
@@ -94,11 +67,6 @@ class PostsController extends Controller
 
     public function show($slug)
     {
-        // $post = $this->postRepository->getBySlug($slug);
-
-        // $next = $this->postRepository->getNext($post->id);
-        // $previous = $this->postRepository->getPrevious($post->id);
-
         try{
             $dados = $this->service->getService('Post')->viewSite($slug);
             $post = $dados['post'];
@@ -114,8 +82,6 @@ class PostsController extends Controller
 
     public function blogPage()
     {
-        // $posts = Post::orderBy('created_at', 'DESC')->paginate(9);
-
         try{
             $posts = $this->service->getService('Post')->siteGrid();
         } catch (\Exception $e) {
@@ -126,12 +92,9 @@ class PostsController extends Controller
         return view('site.blog', compact('posts'));
     }
 
-    public function edit($id/*Post $post*/)
+    public function edit($id)
     {
-        // Verificando permissão de edição de posts
         $this->authorize('updateOther', auth()->user());
-
-        // $variaveis = (object) $this->variaveis;
 
         try{
             $dados = $this->service->getService('Post')->view($id);
@@ -147,14 +110,7 @@ class PostsController extends Controller
 
     public function update(PostRequest $request, $id)
     {
-        // Verificando permissão de edição de posts (mesma do edit)
         $this->authorize('updateOther', auth()->user());
-        
-        // $request->validated();
-
-        // $save = $this->postRepository->update($id, $request->toModel());
-
-        // event(new CrudEvent('post', 'editou', $id));
 
         try{
             $validated = $request->validated();
@@ -172,12 +128,7 @@ class PostsController extends Controller
 
     public function destroy($id)
     {
-        // Verificando permissão de remoção de posts
         $this->authorize('delete', auth()->user());
-
-        // $this->postRepository->delete($id);
-
-        // event(new CrudEvent('post', 'apagou', $id));
 
         try{
             $this->service->getService('Post')->destroy($id);
@@ -194,14 +145,6 @@ class PostsController extends Controller
     public function busca(Request $request)
     {
         $this->authorize('viewAny', auth()->user());
-
-        // $busca = IlluminateRequest::input('q');
-
-        // $variaveis = (object) $this->variaveis;
-
-        // $resultados = $this->postRepository->getBusca($busca);
-
-        // $tabela = $this->post->tabelaCompleta($resultados);
 
         try{
             $busca = $request->q;

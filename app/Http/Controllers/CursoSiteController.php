@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Curso;
-// use App\Noticia;
 
 class CursoSiteController extends Controller
 {
@@ -22,7 +21,6 @@ class CursoSiteController extends Controller
     public static function getNoticia($id)
     {
         $noticia = Curso::findOrFail($id)->noticia->first();
-        // $noticia = Noticia::where('idcurso',$id)->first();
         if(isset($noticia))
             return $noticia->slug;
     }
