@@ -45,6 +45,10 @@ var editor_config = {
       if(window.location.href.indexOf('admin/posts/') != -1){
         editor.execCommand('SelectAll');
         editor.execCommand('JustifyFull');
+        // caso o justificado já esteja selecionado, o comando acima irá tirar o justificado de tudo,
+        // então o comando abaixo identifica que não tem justificado selecionado e justifica novamente.
+        if(!editor.queryCommandState('JustifyFull'))
+          editor.execCommand('JustifyFull');
         editor.selection.collapse();
       }
     });
