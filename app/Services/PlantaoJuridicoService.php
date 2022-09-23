@@ -236,7 +236,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         }else  
         {
             $dados['idplantaojuridico'] = $request->plantaoBloqueio;
-            $id = PlantaoJuridicoBloqueio::create($dados);
+            $id = PlantaoJuridicoBloqueio::create($dados)->id;
             event(new CrudEvent('plantão juridico bloqueio', 'criou', $id));
         }    
     }
