@@ -132,7 +132,7 @@ class NoticiaController extends Controller
         }
 
         return redirect(route('noticias.index'))
-            ->with('message', '<i class="icon fa fa-ban"></i>Notícia com a ID: ' . $id . ' foi deletada com sucesso!')
+            ->with('message', '<i class="icon fa fa-check"></i>Notícia com a ID: ' . $id . ' foi deletada com sucesso!')
             ->with('class', 'alert-success');
     }
 
