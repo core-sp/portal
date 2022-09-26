@@ -43,7 +43,7 @@ class Anexo extends Model
         $final = shell_exec('cd ' . $pathStorage . 'temp/' . $id . ' ; zip -r ' . $path . $nomeZip . ' .');
         Storage::deleteDirectory('temp/' . $id);
 
-        $finalArray = explode(PHP_EOL, $final);
+        $finalArray = isset($final) ? explode(PHP_EOL, $final) : array();
         foreach($finalArray as $key => $fim)
             if($fim == '')
                 unset($finalArray[$key]);

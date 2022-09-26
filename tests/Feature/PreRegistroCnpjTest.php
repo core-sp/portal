@@ -66,6 +66,8 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
         ->assertSeeText('Atualizado em: ')
         ->assertSeeText(PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s'));
+
+        PreRegistro::first()->update(['updated_at' => PreRegistro::first()->updated_at->subHour()]);
         $atual = PreRegistro::first()->updated_at->format('d\/m\/Y, \à\s H:i:s');
 
         $this->post(route('externo.inserir.preregistro.ajax'), [

@@ -18,7 +18,9 @@ use PDOException;
 use App\SolicitaCedula;
 use App\Mail\InternoSolicitaCedulaMail;
 use App\PreRegistro;
+use App\Anexo;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -165,29 +167,41 @@ class Kernel extends ConsoleKernel
             }
         })->dailyAt('4:15');
 
-        // Rotina de exclusão de arquivos do PreRegistro após 1 mês com status 'Negado' ou 'Aprovado'
-        // Rotina de exclusão de arquivos do PreRegistro após 3 meses sem atualização com status 'Sendo elaborado'
+        // Rotina de exclusão de arquivos do PreRegistro após 2 semanas com status 'Negado' ou 'Aprovado'
+        // Rotina de exclusão de arquivos do PreRegistro após 2 meses sem atualização com status 'Sendo elaborado'
         $schedule->call(function(){
+            $diretorio = Anexo::PATH_PRE_REGISTRO . '/';
             $prs = PreRegistro::has('anexos')
-                ->with('anexos')
-                ->select('id', 'status', 'created_at', 'updated_at', 'user_externo_id')
-                ->where(function ($query) {
-                    $query->whereIn('status', [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO])
-                    ->where('updated_at', '<=', Carbon::today()->subWeeks(2)->toDateString());
-                })
-                ->orWhere(function ($query) {
-                    $query->whereIn('status', [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO])
-                    ->where('updated_at', '<=', Carbon::today()->subMonths(2)->toDateString());
-                })
-                ->get();
+            ->with('anexos')
+            ->select('id', 'status', 'created_at', 'updated_at', 'user_externo_id')
+            ->where(function ($query) {
+                $query->whereIn('status', [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO])
+                ->where('updated_at', '<=', Carbon::today()->subWeeks(2)->toDateString());
+            })
+            ->orWhere(function ($query) {
+                $query->whereIn('status', [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO])
+                ->where('updated_at', '<=', Carbon::today()->subMonths(2)->toDateString());
+            })
+            ->get();
             foreach($prs as $pr)
             {
-                $paths = $pr->anexos->pluck('path')->all();
-                $deleted = Storage::delete($paths);
-                if($deleted)
-                    $pr->anexos()->delete();
+                try {
+                    $totalFiles = $pr->anexos()->count();
+                    $deleted = Storage::deleteDirectory($diretorio . $pr->id);
+                    if($deleted)
+                    {
+                        $pr->anexos()->delete();
+                        $pr->touch();
+                    }
+                    $totalStorage = count(Storage::files($diretorio . $pr->id));
+                    $totalBd = $pr->fresh()->anexos->count();
+                    Log::channel('interno')->info('Rotina de exclusão de arquivos do pré-registro: pré-registro com ID '.$pr->id.' possuía '.$totalFiles.' e agora possui '.$totalStorage.' no Storage e '.$totalBd.' no BD.');
+                } catch (\Exception $e) {
+                    Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+                }
             }
-        })->weeklyOn(7, '3:00');
+        })->weeklyOn(3, '3:00')
+        ->weeklyOn(7, '3:00');
     }
 
     /**
