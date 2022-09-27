@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\SuporteRequest;
 use Illuminate\Support\Facades\View;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SuporteController extends Controller
 {
@@ -35,52 +38,53 @@ class SuporteController extends Controller
         return view('admin.crud.mostra');
     }
 
-    public function viewLogExternoDoDia()
+    public function viewLogExternoDoDia($tipo)
     {
         $this->authorize('onlyAdmin', auth()->user());
+
         try{
-            $log = $this->service->getService('Suporte')->logPorData(date('Y-m-d'));
+            $log = $this->service->getService('Suporte')->logPorData(date('Y-m-d'), $tipo);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao carregar o log do dia de hoje.");
+            abort(500, "Erro ao carregar o log " . $tipo . " do dia de hoje.");
         }
 
         return isset($log) ? $log : redirect()->back()->with([
-            'message' => '<i class="icon fa fa-ban"></i>Ainda não há log do dia de hoje: '.date('d/m/Y'),
+            'message' => '<i class="icon fa fa-ban"></i>Ainda não há log ' . $tipo . ' do dia de hoje: '.date('d/m/Y'),
             'class' => 'alert-warning'
         ]);
     }
 
     public function buscaLogExterno(SuporteRequest $request)
     {
-        $request->validated();
-
         $this->authorize('onlyAdmin', auth()->user());
+
         try{
-            $dados = $this->service->getService('Suporte')->logBusca($request);
-            $busca = isset($request->data) ? onlyDate($request->data) : $request->texto;
-            $resultado = $dados['resultado'];
-            $tipo = isset($request->data) ? 'data' : 'texto';
+            $validated = $request->validated();
+            $dados = $this->service->getService('Suporte')->logBusca($validated);
+            $busca = isset($request['data']) ? onlyDate($request['data']) : $request['texto'];
+            $resultado = is_array($dados['resultado']) ? $this->paginate($dados['resultado']) : $dados['resultado'];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao carregar o log da busca.");
+            abort(500, "Erro ao carregar o resultado da busca de log(s).");
         }
 
-        return view('admin.crud.mostra', compact('resultado', 'tipo', 'busca'));
+        return view('admin.crud.mostra', compact('resultado', 'busca'));
     }
 
-    public function viewLogExterno($data)
+    public function viewLogExterno($data, $tipo)
     {
         $this->authorize('onlyAdmin', auth()->user());
+
         try{
-            $log = $this->service->getService('Suporte')->logPorData($data);
+            $log = $this->service->getService('Suporte')->logPorData($data, $tipo);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao carregar o log da data escolhida.");
+            abort(500, "Erro ao carregar o log " . $tipo . " do dia " .onlyDate($data). ".");
         }
 
         return isset($log) ? $log : redirect()->back()->with([
-            'message' => '<i class="icon fa fa-ban"></i>Não há log do dia: '.onlyDate($data),
+            'message' => '<i class="icon fa fa-ban"></i>Não há log ' . $tipo . ' do dia: '.onlyDate($data),
             'class' => 'alert-warning'
         ]);
     }
@@ -133,5 +137,23 @@ class SuporteController extends Controller
             'message' => '<i class="icon fa fa-ban"></i>Não há arquivo',
             'class' => 'alert-warning'
         ]);
+    }
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    private function paginate($items, $perPage = 10)
+    {
+        $pageStart = request('page', 1);
+        $offSet = ($pageStart * $perPage) - $perPage;
+        $itemsForCurrentPage = array_slice($items, $offSet, $perPage, TRUE);
+
+        return new LengthAwarePaginator(
+            $itemsForCurrentPage, count($items), $perPage,
+            Paginator::resolveCurrentPage(),
+            ['path' => Paginator::resolveCurrentPath()]
+        );
     }
 }

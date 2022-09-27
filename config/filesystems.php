@@ -69,6 +69,18 @@ return [
             'root' => storage_path('logs/externo'),
             'url' => env('APP_URL').'/storage/log/externo',
         ],
+
+        'log_interno' => [
+            'driver' => 'local',
+            'root' => storage_path('logs/interno'),
+            'url' => env('APP_URL').'/storage/log/interno',
+        ],
+
+        'log_erros' => [
+            'driver' => 'local',
+            'root' => storage_path('logs/erros'),
+            'url' => env('APP_URL').'/storage/log/erros',
+        ],
     ],
 
 ];

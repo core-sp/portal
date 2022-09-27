@@ -1,123 +1,214 @@
 <div class="card-body">
     <p class="mb-4">Obs: Para buscar uma informação no log use <kbd>Ctrl + F</kbd> para acionar o Localizar do navegador</p>
+    
     <div class="row mb-4">
-        <div class="col-3">
-            @if(isset($info))
-            <a class="btn btn-success" href="{{ route('suporte.log.externo.hoje.view') }}" target="{{ isset($info) ? '_blank' : '_self' }}">
-                Log de hoje
+        <div class="col">
+            @if(isset($info['externo']))
+            <a class="btn btn-success" href="{{ route('suporte.log.externo.hoje.view', 'externo') }}" target="{{ isset($info['externo']) ? '_blank' : '_self' }}">
+                Log do Site hoje
             </a>
-            <p class="mt-1"><strong> Última atualização:</strong> {{ $info }}</p>
+            <p class="mt-1"><strong> Última atualização:</strong> {{ $info['externo'] }}</p>
             @else
-            <p class="mt-1"><strong> Ainda não há log do dia de hoje:</strong> {{ date('d/m/Y') }}</p>
+            <p class="mt-1"><strong> Ainda não há log do Site do dia de hoje:</strong> {{ date('d/m/Y') }}</p>
             @endif
         </div>
-        <div class="col-3">
-            <form action="{{ route('suporte.log.externo.busca') }}">
-                @csrf
-                <div class="form-group">
-                    <label for="buscar-data">Buscar por data:</label>
-                    <input type="date" 
-                        name="data" 
-                        class="form-control {{ $errors->has('data') ? 'is-invalid' : '' }}" 
-                        id="buscar-data"
-                        value="{{ old('data') }}"
-                    >
-                    @if($errors->has('data'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('data') }}
-                    </div>
-                    @endif
-                    <button class="btn btn-primary btn-sm mt-2" type="submit">Buscar</button>
-                </div>
-            </form>
-        </div>
+
         <div class="col">
-            <form action="{{ route('suporte.log.externo.busca') }}">
-                @csrf
-                <div class="form-group">    
-                    <label for="buscar-texto">Buscar por texto nos últimos 3 logs:</label>
-                    <input type="text" 
-                        name="texto" 
-                        class="form-control {{ $errors->has('texto') ? 'is-invalid' : '' }}" 
-                        id="buscar-texto"
-                        value="{{ old('texto') }}"
-                    >
-                    @if($errors->has('texto'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('texto') }}
-                    </div>
-                    @endif
-                    <button class="btn btn-primary btn-sm mt-2" type="submit">Buscar</button>
-                </div>
-            </form>
+            @if(isset($info['interno']))
+            <a class="btn btn-primary" href="{{ route('suporte.log.externo.hoje.view', 'interno') }}" target="{{ isset($info['interno']) ? '_blank' : '_self' }}">
+                Log do Admin hoje
+            </a>
+            <p class="mt-1"><strong> Última atualização:</strong> {{ $info['interno'] }}</p>
+            @else
+            <p class="mt-1"><strong> Ainda não há log do Admin do dia de hoje:</strong> {{ date('d/m/Y') }}</p>
+            @endif
+        </div>
+
+        <div class="col">
+            @if(isset($info['erros']))
+            <a class="btn btn-danger" href="{{ route('suporte.log.externo.hoje.view', 'erros') }}" target="{{ isset($info['erros']) ? '_blank' : '_self' }}">
+                Log de Erros hoje
+            </a>
+            <p class="mt-1"><strong> Última atualização:</strong> {{ $info['erros'] }}</p>
+            @else
+            <p class="mt-1"><strong> Ainda não há log de Erros do dia de hoje:</strong> {{ date('d/m/Y') }}</p>
+            @endif
         </div>
     </div>
-    @if(isset($tipo))
-    <hr>
-    <h4 class="mt-4 mb-4">Resultado da busca por {{ $tipo }}</h4>
+
+    <hr />
+
+    <!-- BUSCA POR DATA -->
+    <div class="row mb-4">
+        <div class="col">
+            <fieldset class="border border-secondary p-3">
+                <legend>Buscar por dia</legend>
+                <form action="{{ route('suporte.log.externo.busca') }}">
+                    @csrf
+                    <div class="form-inline">
+                        <label for="tipo" class="mr-sm-2">Tipo de log:</label>
+                        <select name="tipo" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
+                            <option value="externo" {{ old('tipo') == 'externo' ? 'selected' : '' }}>Site</option>
+                            <option value="interno" {{ old('tipo') == 'interno' ? 'selected' : '' }}>Admin</option>
+                            <option value="erros" {{ old('tipo') == 'erros' ? 'selected' : '' }}>Erros</option>
+                        </select>
+                        
+                        <label for="buscar-data" class="mr-sm-2">Data:</label>
+                        <input type="date" 
+                            name="data" 
+                            class="form-control mb-2 mr-sm-3 {{ $errors->has('data') ? 'is-invalid' : '' }}" 
+                            id="buscar-data"
+                            value="{{ empty(old('data')) ? date('Y-m-d', strtotime('yesterday')) : old('data') }}"
+                            max="{{ date('Y-m-d', strtotime('yesterday')) }}"
+                        >
+                        
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit">Buscar</button>
+                        @if($errors->has('data') || $errors->has('tipo'))
+                        <div class="invalid-feedback">
+                            {{ $errors->has('data') ? $errors->first('data') : $errors->first('tipo') }}
+                        </div>
+                        @endif
+                    </div>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+
+    <!-- BUSCA POR MÊS -->
+    <div class="row mb-4">
+        <div class="col">
+            <fieldset class="border border-secondary p-3">
+                <legend>Buscar texto por mês</legend>
+                <form action="{{ route('suporte.log.externo.busca') }}">
+                    @csrf
+                    <div class="form-inline">
+                        <label for="tipo" class="mr-sm-2">Tipo de log:</label>
+                        <select name="tipo" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
+                            <option value="externo" {{ old('tipo') == 'externo' ? 'selected' : '' }}>Site</option>
+                            <option value="interno" {{ old('tipo') == 'interno' ? 'selected' : '' }}>Admin</option>
+                        </select>
+                        
+                        <label for="buscar-mes" class="mr-sm-2">Mês/Ano:</label>
+                        <input type="month" 
+                            name="mes" 
+                            class="form-control mb-2 mr-sm-3 {{ $errors->has('mes') ? 'is-invalid' : '' }}" 
+                            id="buscar-mes"
+                            value="{{ empty(old('mes')) ? date('Y-m') : old('mes') }}"
+                            max="{{ date('Y-m') }}"
+                        >
+
+                        <label for="buscar-texto" class="mr-sm-2">Texto:</label>
+                        <input type="text" 
+                            name="texto" 
+                            class="form-control mb-2 mr-sm-3 {{ $errors->has('texto') ? 'is-invalid' : '' }}" 
+                            id="buscar-texto"
+                            value="{{ old('texto') }}"
+                        >
+                        
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit">Buscar</button>
+                        @if($errors->has('mes') || $errors->has('tipo') || $errors->has('texto'))
+                        <div class="invalid-feedback">
+                            @if($errors->has('mes'))
+                                {{ $errors->first('mes') }}
+                            @elseif($errors->has('tipo'))
+                                {{ $errors->first('tipo') }}
+                            @else
+                                {{ $errors->first('texto') }}
+                            @endif
+                        </div>
+                        @endif
+                    </div>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+
+    <!-- BUSCA POR ANO -->
+    <div class="row mb-4">
+        <div class="col">
+            <fieldset class="border border-secondary p-3">
+                <legend>Buscar texto por ano</legend>
+                <form action="{{ route('suporte.log.externo.busca') }}">
+                    @csrf
+                    <div class="form-inline">
+                        <label for="tipo" class="mr-sm-2">Tipo de log:</label>
+                        <select name="tipo" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
+                            <option value="externo" {{ old('tipo') == 'externo' ? 'selected' : '' }}>Site</option>
+                            <option value="interno" {{ old('tipo') == 'interno' ? 'selected' : '' }}>Admin</option>
+                        </select>
+                        
+                        <label for="buscar-ano" class="mr-sm-2">Mês/Ano:</label>
+                        <input type="number" 
+                            name="ano" 
+                            class="form-control mb-2 mr-sm-3 {{ $errors->has('ano') ? 'is-invalid' : '' }}" 
+                            id="buscar-ano"
+                            value="{{ empty(old('ano')) ? date('Y') : old('ano') }}"
+                            min="2019"
+                            max="{{ date('Y') }}"
+                            step="1"
+                        >
+
+                        <label for="buscar-texto" class="mr-sm-2">Texto:</label>
+                        <input type="text" 
+                            name="texto" 
+                            class="form-control mb-2 mr-sm-3 {{ $errors->has('texto') ? 'is-invalid' : '' }}" 
+                            id="buscar-texto"
+                            value="{{ old('texto') }}"
+                        >
+                        
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit">Buscar</button>
+                        @if($errors->has('ano') || $errors->has('tipo') || $errors->has('texto'))
+                        <div class="invalid-feedback">
+                            @if($errors->has('ano'))
+                                {{ $errors->first('ano') }}
+                            @elseif($errors->has('tipo'))
+                                {{ $errors->first('tipo') }}
+                            @else
+                                {{ $errors->first('texto') }}
+                            @endif
+                        </div>
+                        @endif
+                    </div>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+
+    <!-- RESULTADO DA BUSCA -->
+    @if(request()->query('tipo') != "")
+    <hr />
+
+    @php
+        $tipos = ['erros' => 'de Erros', 'interno' => 'do Admin', 'externo' => 'do Site'];
+        $textoTipo = $tipos[request()->query('tipo')];
+    @endphp
+    <h4 class="mt-4 mb-4">Resultado da busca "<i>{{ $busca }}</i>" para o log <strong>{{ $textoTipo }}</strong></h4>
     <div class="row">
         <div class="col">
         @if(isset($resultado))
-            @if($tipo == 'data')
-            <p>
-                <strong>
-                    Log do dia {{ onlyDate($resultado) }}
-                </strong>
-                <a class="btn btn-success ml-3" href="{{ route('suporte.log.externo.view', $resultado) }}" target="_blank">
+
+            @if(isset(request()->query()['data']))
+            <p><i class="fas fa-file-alt"></i> - Log <strong>{{ $textoTipo }}</strong> do dia {{ onlyDate($resultado) }}
+                <a class="btn btn-info ml-3" href="{{ route('suporte.log.externo.view', ['data' => $resultado, 'tipo' => request()->query('tipo')]) }}" target="_blank">
                     Abrir Log
                 </a>
             </p>
-            @elseif($tipo == 'texto')
-                @php
-                    $i = 0;
-                @endphp
-                @foreach($resultado as $key => $value)
-                    @if(!isset($value))
-                    <p><strong>Não há log para o dia <i>{{ onlyDate($key) }}</i></strong></p>
-                    @elseif(empty($value))
-                    <p><strong>Não foi encontrado o texto: <i>{{ $busca }}</i> no log do dia <i>{{ onlyDate($key) }}</i></p>
-                    @else
-                    @php
-                        $i++;
-                    @endphp
-                    <div id="accordion">
-                        <div class="card">
-                            <div class="card-header bg-secondary">
-                                <a data-toggle="collapse" href="{{ '#collapse'.$i }}"><i class="fas fa-angle-down"></i>&nbsp;&nbsp;
-                                    <strong>
-                                        {{ count($value) == 1 ? 'Foi encontrada' : 'Foram encontradas' }} <i>{{ count($value) }}</i> {{ count($value) == 1 ? 'linha' : 'linhas' }} com o texto: <i>{{ $busca }}</i> no log do dia <i>{{ onlyDate($key) }}</i>
-                                    </strong>
-                                    <a class="btn btn-success ml-4" href="{{ route('suporte.log.externo.view', $key) }}" target="_blank">
-                                        Abrir Log
-                                    </a>
-                                </a>
-                            </div>
-                            <div id="{{ 'collapse'.$i }}" class="collapse" data-parent="#accordion">
-                                <div class="card-body bg-light">
-                                    <div class="table-responsive-lg">
-                                        <table class="table table-hover mb-0">
-                                            <tbody>
-                                        @if(!empty($value))
-                                            @foreach($value as $val) 
-                                                <tr>
-                                                    <td>{{ $val }}</td>
-                                                </tr>
-                                            @endforeach
-                                        @endif
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
+            @else
+                @foreach($resultado as $file)
+                <p><i class="fas fa-file-alt"></i> - Log <strong>{{ $textoTipo }}</strong> do dia {{ onlyDate($file) }}
+                    <a class="btn btn-info ml-3" href="{{ route('suporte.log.externo.view', ['data' => $file, 'tipo' => request()->query('tipo')]) }}" target="_blank">
+                        Abrir Log
+                    </a>
+                </p>
                 @endforeach
+                {{ $resultado->appends(request()->input())->links() }}
             @endif
+
         @else
-            <p><strong>Não foi encontrado log {{ $tipo == 'data' ? 'do dia: ' : 'para o texto: ' }}<i>{{ $busca }}</i></strong></p>
+            <p>Não foi encontrado log(s) <strong>{{ $textoTipo }}</strong> para a busca: <i>{{ $busca }}</i></p>
         @endif
         </div>
     </div>
     @endif
+
 </div>

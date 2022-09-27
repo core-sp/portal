@@ -49,7 +49,7 @@
                 <li class="nav-item">
                     <a href="{{ route('suporte.log.externo.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
-                        <p>Log Externo</p>
+                        <p>Logs</p>
                     </a>
                 </li>
                 <li class="nav-item">

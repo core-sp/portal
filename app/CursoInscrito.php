@@ -24,4 +24,9 @@ class CursoInscrito extends Model
     {
         return $this->belongsTo('App\User', 'idusuario');
     }
+
+    public function termos()
+    {
+        return $this->hasMany('App\TermoConsentimento', 'idcursoinscrito');
+    }
 }

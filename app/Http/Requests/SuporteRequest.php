@@ -9,8 +9,11 @@ class SuporteRequest extends FormRequest
     public function rules()
     {
         return [
-            'data' => 'before_or_equal:'.date('Y-m-d', strtotime('yesterday')).'|after_or_equal:'.date('Y-m-d', strtotime('2021-08-05')),
-            'texto' => 'min:3|max:191',
+            'tipo' => 'required|in:erros,interno,externo',
+            'data' => 'sometimes|required|before_or_equal:'.date('Y-m-d', strtotime('yesterday')),
+            'mes' => 'sometimes|required|before_or_equal:'.date('Y-m'),
+            'ano' => 'sometimes|required|before_or_equal:'.date('Y'),
+            'texto' => 'sometimes|required|min:3|max:191',
             'file' => 'file|mimetypes:text/plain',
         ];
     }
@@ -18,12 +21,15 @@ class SuporteRequest extends FormRequest
     public function messages()
     {
         return [
-            'before_or_equal' => 'Deve selecionar uma data entre 05/08/2021 e '.date('d/m/Y', strtotime('yesterday')),
-            'after_or_equal' => 'Deve selecionar uma data entre 05/08/2021 e '.date('d/m/Y', strtotime('yesterday')),
+            'data.before_or_equal' => 'Deve selecionar uma data anterior a hoje',
             'min' => 'O texto não pode ser menor que 3 caracteres',
             'max' => 'O texto não pode ser maior que 191 caracteres',
             'file' => 'Deve ser um arquivo válido',
-            'mimetypes' => 'Somente arquivo com a extensão .txt'
+            'mimetypes' => 'Somente arquivo com a extensão .txt',
+            'in' => 'Tipo de log não existente',
+            'required' => 'Campo obrigatório',
+            'mes.before_or_equal' => 'Deve selecionar um mês e ano anterior ou igual a hoje',
+            'ano.before_or_equal' => 'Deve selecionar um ano anterior ou igual a hoje',
         ];
     }
 }
