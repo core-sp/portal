@@ -4,16 +4,18 @@
 
 use App\Post;
 use Faker\Generator as Faker;
+use Illuminate\Support\Str;
 
 $factory->define(Post::class, function (Faker $faker) {
+    $titulo = $faker->sentence;
+    $conteudo = $faker->text;
     return [
-        'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User'),
-        'titulo' => $titulo = $faker->sentence,
-        'slug' => str_slug($titulo, '-'),
+        'titulo' => $titulo,
+        'slug' => Str::slug($titulo, '-'),
         'subtitulo' => $faker->sentence,
         'img' => $faker->url,
-        'conteudo' => $faker->text,
-        'created_at' => now(),
-        'updated_at' => now()
+        'conteudo' => $conteudo,
+        'conteudoBusca' => converterParaTextoCru($conteudo),
+        'idusuario' => factory('App\User'),
     ];
 });

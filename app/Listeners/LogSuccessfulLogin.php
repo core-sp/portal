@@ -17,7 +17,24 @@ class LogSuccessfulLogin
 
     public function handle(Login $event)
     {
-        if(!Auth::guard('representante')->check() && !Auth::guard('user_externo')->check())
-            Log::channel('interno')->info($event->user->nome.' (usuário '.$event->user->idusuario.') conectou-se ao painel de administrador.');
+        $ip = "[IP: " . request()->ip() . "] - ";
+
+        if($event->guard == 'web')
+        {
+            if(Auth::guard('web')->check())
+                Log::channel('interno')->info($ip . $event->user->nome.' (usuário '.$event->user->idusuario.') conectou-se ao Painel Administrativo.');
+        }
+
+        if($event->guard == 'representante')
+        {
+            if(Auth::guard('representante')->check())
+                Log::channel('externo')->info($ip . 'Usuário '.$event->user->id.' ("'.$event->user->registro_core.'") conectou-se à Área do Representante.');
+        }
+
+        if($event->guard == 'user_externo')
+        {
+            if(Auth::guard('user_externo')->check())
+                Log::channel('externo')->info($ip . 'Usuário '.$event->user->id.' ("'.$event->user->cpf_cnpj.'") conectou-se à Área do Usuário Externo.');
+        }
     }
 }

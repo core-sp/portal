@@ -1,4 +1,4 @@
-@extends('site.layout.app', ['title' => $titulo ])
+@extends('site.layout.app', ['title' => $noticia->titulo ])
 
 @section('description')
   <meta name="description" content="{!! retornaDescription($noticia->conteudo) !!}" />
@@ -55,14 +55,12 @@
     </div>
     <div class="row">
       <div class="col-lg-8 pr-4">
-        <div class="noticia-img">
-          @if(isset($noticia->img))
-          <img src="{{asset($noticia->img)}}" />
-          @else
-          <img src="{{ asset('img/news-generica-2.png') }}" />
-          @endif
+        @if(isset($noticia->img))
+        <div class="noticia-img mb-4">
+          <img src="{{ asset($noticia->img) }}" />
         </div>
-        <div class="mt-4 conteudo-txt">
+        @endif
+        <div class="conteudo-txt">
           {!! $noticia->conteudo !!}
         </div>
       </div>
@@ -81,9 +79,7 @@
     </div>
     <div class="linha-lg"></div>
     <div class="row mb-3">
-      @php $i = 0; @endphp
       @foreach($tres as $noticia)
-        @php $i++; @endphp
         @include('site.inc.noticia-grid')
       @endforeach
     </div>

@@ -82,7 +82,7 @@
                 <label for="horariosBloqueio">Horários bloqueados</label>
                 <select 
                     name="horariosBloqueio[]" 
-                    class="form-control {{ $errors->has('horariosBloqueio') ? 'is-invalid' : '' }}" 
+                    class="form-control {{ $errors->has('horariosBloqueio') || $errors->has('horariosBloqueio.*') ? 'is-invalid' : '' }}" 
                     id="horariosBloqueio" 
                     multiple
                     required
@@ -90,22 +90,17 @@
                 @php
                     $horarios = isset($resultado->horarios) ? explode(',', $resultado->horarios) : null;
                     $horariosPlantao = isset($resultado->plantaoJuridico->horarios) ? explode(',', $resultado->plantaoJuridico->horarios) : null;
+                    $horasTotais = isset($resultado) && isset($horariosPlantao) ? $horariosPlantao : todasHoras();
                 @endphp
 
-                @if(isset($resultado) && isset($horariosPlantao))
-                    @foreach($horariosPlantao as $hora)
-                    <option value="{{ $hora }}" {{ (!empty(old('horariosBloqueio')) && in_array($hora, old('horariosBloqueio'))) || (isset($horarios) && in_array($hora, $horarios)) ? 'selected' : '' }}>{{ $hora }}</option>
-                    @endforeach
-                @else
-                    @foreach(todasHoras() as $hora)
-                    <option value="{{ $hora }}" {{ !empty(old('horariosBloqueio')) && in_array($hora, old('horariosBloqueio')) ? 'selected' : '' }}>{{ $hora }}</option>
-                    @endforeach
-                @endif
+                @foreach($horasTotais as $hora)
+                    <option value="{{ $hora }}" {{ (!empty(old('horariosBloqueio')) && is_array(old('horariosBloqueio')) && in_array($hora, old('horariosBloqueio'))) || (isset($horarios) && in_array($hora, $horarios)) ? 'selected' : '' }}>{{ $hora }}</option>
+                @endforeach
                 </select>
 
-                @if($errors->has('horariosBloqueio'))
+                @if($errors->has('horariosBloqueio') || $errors->has('horariosBloqueio.*'))
                 <div class="invalid-feedback">
-                    {{ $errors->first('horariosBloqueio') }}
+                    {{ $errors->has('horariosBloqueio') ? $errors->first('horariosBloqueio') : $errors->first('horariosBloqueio.*') }}
                 </div>
                 @endif
 

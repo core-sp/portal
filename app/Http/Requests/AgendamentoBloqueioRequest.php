@@ -42,6 +42,7 @@ class AgendamentoBloqueioRequest extends FormRequest
             'diainicio' => 'required|date|after_or_equal:'.date('Y-m-d'),
             'diatermino' => 'date|nullable|after_or_equal:diainicio',
             'horarios' => $this->chaveHorarios,
+            'horarios.*' => 'distinct',
             'qtd_atendentes' => 'required|numeric|min:0|max:'.$this->ageporhorario
         ];
     }
@@ -58,7 +59,8 @@ class AgendamentoBloqueioRequest extends FormRequest
             'array' => 'Formato inválido',
             'numeric' => 'Deve ser um número',
             'min' => 'Valor mínimo é :min',
-            'qtd_atendentes.max' => 'Deve ser um valor máximo de: total de atendentes atual - 1. Se opção selecionada é "Todas", deve ser 0'
+            'qtd_atendentes.max' => 'Deve ser um valor máximo de: total de atendentes atual - 1. Se opção selecionada é "Todas", deve ser 0',
+            'distinct' => 'Existe hora repetida'
         ];
     }
 }

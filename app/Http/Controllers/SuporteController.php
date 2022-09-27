@@ -41,7 +41,7 @@ class SuporteController extends Controller
         try{
             $log = $this->service->getService('Suporte')->logPorData(date('Y-m-d'));
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o log do dia de hoje.");
         }
 
@@ -62,7 +62,7 @@ class SuporteController extends Controller
             $resultado = $dados['resultado'];
             $tipo = isset($request->data) ? 'data' : 'texto';
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o log da busca.");
         }
 
@@ -75,7 +75,7 @@ class SuporteController extends Controller
         try{
             $log = $this->service->getService('Suporte')->logPorData($data);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o log da data escolhida.");
         }
 
@@ -93,7 +93,7 @@ class SuporteController extends Controller
             $erros = $dados['erros'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a tabela de erros.");
         }
     
@@ -108,7 +108,7 @@ class SuporteController extends Controller
         try{
             $this->service->getService('Suporte')->uploadFileErros($request->file);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a tabela de erros.");
         }
     
@@ -125,7 +125,7 @@ class SuporteController extends Controller
         try{
             $path = $this->service->getService('Suporte')->getFileErros();
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a tabela de erros.");
         }
     

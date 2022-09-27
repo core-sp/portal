@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Events\ExternoEvent;
+use Illuminate\Auth\Events\PasswordReset;
 
 class RepresentanteResetPasswordController extends Controller
 {
@@ -23,13 +24,12 @@ class RepresentanteResetPasswordController extends Controller
 
     protected function resetPassword($user, $password)
     {
-        $u = $user->forceFill([
+        $user->forceFill([
             'password' => bcrypt($password),
             'remember_token' => Str::random(60),
         ])->save();
 
-        if(!$u)
-            event(new ExternoEvent('Usuário ' . $user->id . ' ("'. $user->registro_core .'") não conseguiu alterar a senha.'));
+        event(new PasswordReset($user));
     }
 
     protected function guard()
@@ -77,8 +77,6 @@ class RepresentanteResetPasswordController extends Controller
 
     protected function sendResetResponse(Request $request, $response)
     {
-        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' alterou a senha com sucesso.'));
-
         return redirect()
             ->route('representante.login')
             ->with([

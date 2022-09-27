@@ -10,11 +10,11 @@ class PeriodoFiscalizacaoRequest extends FormRequest
     protected function prepareForValidation()
     {
         // Remove os nomes dos campos repetidos em cada regional
-        if(isset(request()->dados) && (gettype(request()->dados) == 'array'))
+        if(isset(request()->dados) && is_array(request()->dados))
         {
             $all = $this->all();
             foreach($all['dados'] as $key => $value)
-                if(isset($all['dados'][$key]['campo']) && (gettype($all['dados'][$key]['campo']) == 'array'))
+                if(isset($all['dados'][$key]['campo']) && is_array($all['dados'][$key]['campo']))
                     $all['dados'][$key]['campo'] = array_unique($value['campo']);
             $this->replace($all);
         }

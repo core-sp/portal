@@ -5,7 +5,7 @@
 @endsection
 
 @section('meta')
-  <meta property="og:url" content="{{ url('/') . '/blog/' . $post->slug }}" />
+  <meta property="og:url" content="{{ route('site.blog.post', $post->slug) }}" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{{ $post->titulo }}" />
   <meta property="og:description" content="{!! retornaDescription($post->conteudo) !!}" />
@@ -38,16 +38,16 @@
       <div class="row limite-sociais">
         <div class="col-md-2 center sociais-post position-relative hide-768">
           <div id="prender">
-            <a class="fb-share" href="https://www.facebook.com/dialog/share?app_id=788710944865049&display=popup&href={{ url('/') . '/blog/' . $post->slug }}" target="_blank">
+            <a class="fb-share" href="https://www.facebook.com/dialog/share?app_id=788710944865049&display=popup&href={{ route('site.blog.post', $post->slug) }}" target="_blank">
               <img src="{{ asset('img/facebook-share.png') }}" alt="Core-SP | Facebook Share">
             </a>
-            <a class="twitter-share" href="https://twitter.com/intent/tweet?url={{ url('/') . '/blog/' . $post->slug }}&text={{ $post->titulo }}&hashtags=RepresentanteComercial,Core-SP,Vendas">
+            <a class="twitter-share" href="https://twitter.com/intent/tweet?url={{ route('site.blog.post', $post->slug) }}&text={{ $post->titulo }}&hashtags=RepresentanteComercial,Core-SP,Vendas">
               <img src="{{ asset('img/twitter-share.png') }}" alt="Core-SP | Twitter Share">
             </a>
-            <a href="https://wa.me/?text={{ url('/') . '/blog/' . $post->slug }}" target="_blank">
+            <a href="https://wa.me/?text={{ route('site.blog.post', $post->slug) }}" target="_blank">
               <img src="{{ asset('img/whatsapp-share.png') }}" alt="Core-SP | Whatsapp Share">
             </a>
-            <a class="linkedin-share" href="https://www.linkedin.com/shareArticle?mini=true&url={{ url('/') . '/blog/' . $post->slug }}&title={{ $post->titulo }}&summary={!! strip_tags(substr($post->conteudo, 0, 100)) !!}&source=Core-SP">
+            <a class="linkedin-share" href="https://www.linkedin.com/shareArticle?mini=true&url={{ route('site.blog.post', $post->slug) }}&title={{ $post->titulo }}&summary={!! strip_tags(substr($post->conteudo, 0, 100)) !!}&source=Core-SP">
               <img src="{{ asset('img/linkedin-share.png') }}" alt="Core-SP | LinkedIn Share">
             </a>
           </div>
@@ -72,7 +72,7 @@
           <div class="row nomargin">
             <div class="col-5">
               @if(isset($previous))
-                <a href="/blog/{{ $previous->slug }}">  
+                <a href="{{ route('site.blog.post', $previous->slug) }}">  
                   <h5><i class="fas fa-arrow-left"></i> Anterior</h5>
                   <p class="light mt-1">{{ $previous->titulo }}</p>
                 </a>
@@ -81,7 +81,7 @@
             <div class="col-2"></div>
             <div class="col-5 text-right">
               @if(isset($next))
-                <a href="/blog/{{ $next->slug }}">
+                <a href="{{ route('site.blog.post', $next->slug) }}">
                   <h5>Próximo <i class="fas fa-arrow-right"></i></h5>
                   <p class="light mt-1">{{ $next->titulo }}</p>
                 </a>

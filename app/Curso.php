@@ -33,7 +33,7 @@ class Curso extends Model
 
     public function noticia()
     {
-        return $this->hasMany('App\Noticia', 'idnoticia');
+        return $this->hasMany('App\Noticia', 'idcurso');
     }
 
     public function variaveis()

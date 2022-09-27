@@ -26,7 +26,7 @@ class FiscalizacaoController extends Controller
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os períodos da fiscalização.");
         }
 
@@ -41,7 +41,7 @@ class FiscalizacaoController extends Controller
             $dados = $this->service->getService('Fiscalizacao')->view();
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para criar o período da fiscalização.");
         }
 
@@ -56,7 +56,7 @@ class FiscalizacaoController extends Controller
             $validated = $request->validated();
             $this->service->getService('Fiscalizacao')->save($validated, $this->service);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar o período da fiscalização.");
         }
 
@@ -72,7 +72,7 @@ class FiscalizacaoController extends Controller
         try{
             $this->service->getService('Fiscalizacao')->updateStatus($id);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o status do período da fiscalização.");
         }
         
@@ -90,7 +90,7 @@ class FiscalizacaoController extends Controller
             $variaveis = $dados['variaveis'];
             $resultado = $dados['resultado'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para editar o período da fiscalização.");
         }
 
@@ -106,7 +106,7 @@ class FiscalizacaoController extends Controller
             $validated = $request->validated();
             $erro = $this->service->getService('Fiscalizacao')->save($validated, null, $id);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao editar os dados do período da fiscalização.");
         }
 
@@ -129,7 +129,7 @@ class FiscalizacaoController extends Controller
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em fiscalização.");
         }
 
@@ -144,7 +144,7 @@ class FiscalizacaoController extends Controller
             $periodoSelecionado = $dados['periodoSelecionado'];
             $dataAtualizacao = $dados['dataAtualizacao'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o mapa da fiscalização.");
         }
 
@@ -159,7 +159,7 @@ class FiscalizacaoController extends Controller
             $periodoSelecionado = $dados['periodoSelecionado'];
             $dataAtualizacao = $dados['dataAtualizacao'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o mapa da fiscalização.");
         }
 

@@ -27,7 +27,7 @@ class AgendamentoController extends Controller
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os agendamentos.");
         }
 
@@ -45,7 +45,7 @@ class AgendamentoController extends Controller
             $erro = $this->service->getService('Agendamento')->save($validated);
             $id = $validated['idagendamento'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403,400]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao atualizar o status do agendamento.");
         }
@@ -68,7 +68,7 @@ class AgendamentoController extends Controller
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em agendamentos.");
         }
 
@@ -87,7 +87,7 @@ class AgendamentoController extends Controller
             $servicos = $dados['servicos'];
             $status = $dados['status'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao carregar o agendamento.");
         }
@@ -103,7 +103,7 @@ class AgendamentoController extends Controller
             $validated = $request->validated();
             $erro = $this->service->getService('Agendamento')->save($validated, $id);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403,400]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao atualizar o agendamento.");
         }
@@ -121,7 +121,7 @@ class AgendamentoController extends Controller
         try{
             $erro = $this->service->getService('Agendamento')->enviarEmail($id);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao reenviar email do agendamento.");
         }
@@ -142,7 +142,7 @@ class AgendamentoController extends Controller
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os agendamentos pendentes.");
         }
 

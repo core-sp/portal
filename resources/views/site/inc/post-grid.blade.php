@@ -1,5 +1,5 @@
 <div class="col-lg-4 col-sm-6">
-  <a href="/blog/{{ $post->slug }}">
+  <a href="{{ route('site.blog.post', $post->slug) }}">
     <div class="box-news">
       @if(isset($post->img))
       <img class="lazy bn-img" data-src="{{ asset(imgToThumb($post->img)) }}" />

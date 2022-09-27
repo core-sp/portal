@@ -33,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('App\Contracts\AgendamentoServiceInterface', 'App\Services\AgendamentoService');
         $this->app->bind('App\Contracts\LicitacaoServiceInterface', 'App\Services\LicitacaoService');
         $this->app->bind('App\Contracts\FiscalizacaoServiceInterface', 'App\Services\FiscalizacaoService');
+        $this->app->bind('App\Contracts\PostServiceInterface', 'App\Services\PostService');
+        $this->app->bind('App\Contracts\NoticiaServiceInterface', 'App\Services\NoticiaService');
         $this->app->bind('App\Contracts\UserExternoServiceInterface', 'App\Services\UserExternoService');
         $this->app->bind('App\Contracts\PreRegistroServiceInterface', 'App\Services\PreRegistroService');
     }

@@ -10,6 +10,8 @@ use App\Contracts\TermoConsentimentoServiceInterface;
 use App\Contracts\AgendamentoServiceInterface;
 use App\Contracts\LicitacaoServiceInterface;
 use App\Contracts\FiscalizacaoServiceInterface;
+use App\Contracts\PostServiceInterface;
+use App\Contracts\NoticiaServiceInterface;
 use App\Contracts\UserExternoServiceInterface;
 use App\Contracts\PreRegistroServiceInterface;
 
@@ -26,6 +28,8 @@ class MediadorService implements MediadorServiceInterface {
         AgendamentoServiceInterface $agendamentoService,
         LicitacaoServiceInterface $licitacaoService,
         FiscalizacaoServiceInterface $fiscalizacaoService,
+        PostServiceInterface $postService,
+        NoticiaServiceInterface $noticiaService,
         UserExternoServiceInterface $userExternoService,
         PreRegistroServiceInterface $preRegistroService
     )
@@ -38,8 +42,10 @@ class MediadorService implements MediadorServiceInterface {
             'Agendamento' => $agendamentoService,
             'Licitacao' => $licitacaoService,
             'Fiscalizacao' => $fiscalizacaoService,
+            'Post' => $postService,
+            'Noticia' => $noticiaService,
             'UserExterno' => $userExternoService,
-            'PreRegistro' => $preRegistroService
+            'PreRegistro' => $preRegistroService,
         ];
     }
 

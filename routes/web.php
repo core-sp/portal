@@ -41,8 +41,19 @@ Route::prefix('admin')->group(function() {
   
   // Rotas de páginas
   require('admin/paginas.php');
+
   // Rotas de notícias
-  require('admin/noticias.php');
+  Route::prefix('noticias')->group(function(){
+    Route::get('/', 'NoticiaController@index')->name('noticias.index');
+    Route::get('/create', 'NoticiaController@create')->name('noticias.create');
+    Route::post('/', 'NoticiaController@store')->name('noticias.store');
+    Route::get('/{id}/edit', 'NoticiaController@edit')->name('noticias.edit');
+    Route::patch('/{noticia}', 'NoticiaController@update')->name('noticias.update');
+    Route::delete('/{id}', 'NoticiaController@destroy')->name('noticias.destroy');
+    Route::get('/{id}/restore', 'NoticiaController@restore')->name('noticias.restore');
+    Route::get('/busca', 'NoticiaController@busca')->name('noticias.busca');
+    Route::get('/lixeira', 'NoticiaController@lixeira')->name('noticias.trashed');
+  });
 
   // Rotas de licitações
   Route::prefix('licitacoes')->group(function(){
@@ -151,7 +162,8 @@ Route::prefix('admin')->group(function() {
   });
 
   // Rotas para Blog Posts
-  require('admin/posts.php');
+  Route::resource('/posts', 'PostsController')->except(['show']);
+  Route::get('/posts/busca', 'PostsController@busca')->name('admin.posts.busca');
 
   // Rotas para Representantes
   Route::get('/representantes', 'RepresentanteController@index');
@@ -249,7 +261,12 @@ Route::prefix('/')->group(function() {
   Route::get('seccionais/{id}', 'RegionalController@show')->name('regionais.show');
 
   // Notícias
-  require('site/noticias.php');
+  Route::get('/noticias', 'NoticiaController@siteGrid')->name('noticias.siteGrid');
+  Route::get('/noticias/{slug}', 'NoticiaController@show')->name('noticias.show');
+  // Redirects
+  Route::get('/noticia/{slug}', function($slug){
+      return redirect(route('noticias.show', $slug), 301);
+  });
 
   // Licitações
   Route::get('/licitacoes/busca', 'LicitacaoController@siteBusca')->name('licitacoes.siteBusca');
@@ -300,7 +317,7 @@ Route::prefix('/')->group(function() {
   Route::get('/info-empresa/{cnpj}', 'BdoEmpresaController@apiGetEmpresa')->name('bdosite.apiGetEmpresa');
   
   // Busca geral
-  Route::get('/busca', 'SiteController@busca');
+  Route::get('/busca', 'SiteController@busca')->name('site.busca');
 
   // Agendamentos
   Route::get('agendamento', 'AgendamentoSiteController@formView')->name('agendamentosite.formview');
@@ -315,7 +332,7 @@ Route::prefix('/')->group(function() {
   Route::post('newsletter', 'NewsletterController@store');
 
   // Feiras
-  Route::get('feiras', 'SiteController@feiras');
+  Route::get('feiras', 'SiteController@feiras')->name('site.feiras');
 
   // Fiscalização
   Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao')->name('fiscalizacao.acoesfiscalizacao');
@@ -333,8 +350,8 @@ Route::prefix('/')->group(function() {
   Route::post('consulta-de-situacao', 'ConsultaSituacaoController@consulta');
 
   // Blog
-  Route::get('blog', 'PostsController@blogPage');
-  Route::get('blog/{slug}', 'PostsController@show');
+  Route::get('blog', 'PostsController@blogPage')->name('site.blog');
+  Route::get('blog/{slug}', 'PostsController@show')->name('site.blog.post');
 
   // Anuidade ano vigente
   Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView')->name('anuidade-ano-vigente');

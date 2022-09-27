@@ -196,7 +196,7 @@
                 <label for="horariosage">Horários p/ agendamento</label>
                 <select 
                     name="horariosage[]" 
-                    class="form-control" 
+                    class="form-control {{ $errors->has('horariosage') || $errors->has('horariosage.*') ? 'is-invalid' : '' }}" 
                     size="4" 
                     multiple
                 >
@@ -204,6 +204,11 @@
                     <option value="{{ $hora }}" {{ in_array($hora, $resultado->horariosAge()) ? 'selected' : '' }}>{{ $hora }}</option>
                     @endforeach
                 </select>
+                @if($errors->has('horariosage') || $errors->has('horariosage.*'))
+                <div class="invalid-feedback">
+                    {{ $errors->has('horariosage') ? $errors->first('horariosage') : $errors->first('horariosage.*') }}
+                </div>
+                @endif
                 <small class="form-text text-muted">
                     <em>* Segure Ctrl para selecionar mais de um horário ou Shift para selecionar um grupo de horários</em>
                 </small>
@@ -215,7 +220,7 @@
                 name="descricao"
                 class="form-control {{ $errors->has('descricao') ? 'is-invalid' : '' }} my-editor"
                 id="descricao"
-                rows="10"
+                rows="25"
                 required
             >
                 @if(!empty(old('descricao')))

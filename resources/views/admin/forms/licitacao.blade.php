@@ -126,7 +126,7 @@
         <textarea name="objeto"
             class="form-control {{ $errors->has('objeto') ? 'is-invalid' : '' }} my-editor"
             id="conteudo"
-            rows="10"
+            rows="25"
         >    
             {!! empty(old('objeto')) && isset($resultado->objeto) ? $resultado->objeto : old('objeto') !!}
         </textarea>

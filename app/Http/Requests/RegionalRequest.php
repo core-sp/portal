@@ -6,11 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class RegionalRequest extends FormRequest
 {
-    // public function authorize()
-    // {
-    //     return false;
-    // }
-
     public function rules()
     {
         return [
@@ -27,6 +22,7 @@ class RegionalRequest extends FormRequest
             'responsavel' => 'max:191',
             'ageporhorario' => 'required|regex:/^[1-9]+$/',
             'horariosage' => 'array',
+            'horariosage.*' => 'distinct',
             'descricao' => 'required'
         ];
     }
@@ -38,7 +34,8 @@ class RegionalRequest extends FormRequest
             'email' => 'Formato de email inválido',
             'max' => 'O campo :attribute deve ter no máximo :max caracteres',
             'ageporhorario.regex' => 'O valor deve ser maior que 0',
-            'array' => 'Os horários não vieram da forma correta'
+            'array' => 'Os horários não vieram da forma correta',
+            'distinct' => 'Existe hora repetida'
         ];
     }
 }

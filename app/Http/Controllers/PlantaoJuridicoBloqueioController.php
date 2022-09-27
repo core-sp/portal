@@ -25,7 +25,7 @@ class PlantaoJuridicoBloqueioController extends Controller
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os bloqueios dos plantões jurídicos.");
         }
     
@@ -40,7 +40,7 @@ class PlantaoJuridicoBloqueioController extends Controller
             $variaveis = $dados['variaveis'];
             $plantoes = $dados['plantoes'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página para criar o bloqueio.");
         }
 
@@ -54,7 +54,7 @@ class PlantaoJuridicoBloqueioController extends Controller
             $validated = (object) $request->validated();
             $this->service->getService('PlantaoJuridico')->saveBloqueio($validated);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar o bloqueio do plantão jurídico.");
         }
 
@@ -70,7 +70,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         try{
             $plantao = $this->service->getService('PlantaoJuridico')->getDatasHorasLinkPlantaoAjax($request->id);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o plantao.");
         }
 
@@ -85,7 +85,7 @@ class PlantaoJuridicoBloqueioController extends Controller
             $variaveis = isset($dados['variaveis']) ? $dados['variaveis'] : null;
             $resultado = isset($dados['resultado']) ? $dados['resultado'] : null;
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página para editar o bloqueio.");
         }
 
@@ -102,7 +102,7 @@ class PlantaoJuridicoBloqueioController extends Controller
             $validated = (object) $request->validated();
             $erro = $this->service->getService('PlantaoJuridico')->saveBloqueio($validated, $id);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o bloqueio do plantão jurídico.");
         }
 
@@ -118,7 +118,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         try{
             $this->service->getService('PlantaoJuridico')->destroy($id);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao excluir o bloqueio.");
         }
 

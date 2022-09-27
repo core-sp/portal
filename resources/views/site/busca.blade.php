@@ -58,13 +58,13 @@
               <a href="/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
             </div>
             @else
-            <a href="/blog/{{ $resultado->slug }}"">
+            <a href="{{ route('site.blog.post', $resultado->slug) }}"">
               <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
             <h6 class="cinza mb-2">Publicado em: {{ onlyDate($resultado->created_at) }}</h6>
             {!! resumo($resultado->conteudo) !!}
             <div>
-              <a href="/blog/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+              <a href="{{ route('site.blog.post', $resultado->slug) }}" class="btn-curso-grid mt-3">Confira</a>
             </div>
             @endif
           </div>
