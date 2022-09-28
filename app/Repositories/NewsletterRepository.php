@@ -8,6 +8,6 @@ class NewsletterRepository
 {
     public function getCountAllNewsletter()
     {
-        return Newsletter::all()->count();
+        return Newsletter::count();
     }
 }

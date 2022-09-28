@@ -7,6 +7,8 @@
             <a class="btn btn-success" href="{{ route('suporte.log.externo.hoje.view', 'externo') }}" target="{{ isset($info['externo']) ? '_blank' : '_self' }}">
                 Log do Site hoje
             </a>
+            <br>
+            {{ $size['externo'] }}
             <p class="mt-1"><strong> Última atualização:</strong> {{ $info['externo'] }}</p>
             @else
             <p class="mt-1"><strong> Ainda não há log do Site do dia de hoje:</strong> {{ date('d/m/Y') }}</p>
@@ -18,6 +20,8 @@
             <a class="btn btn-primary" href="{{ route('suporte.log.externo.hoje.view', 'interno') }}" target="{{ isset($info['interno']) ? '_blank' : '_self' }}">
                 Log do Admin hoje
             </a>
+            <br>
+            {{ $size['interno'] }}
             <p class="mt-1"><strong> Última atualização:</strong> {{ $info['interno'] }}</p>
             @else
             <p class="mt-1"><strong> Ainda não há log do Admin do dia de hoje:</strong> {{ date('d/m/Y') }}</p>
@@ -29,6 +33,8 @@
             <a class="btn btn-danger" href="{{ route('suporte.log.externo.hoje.view', 'erros') }}" target="{{ isset($info['erros']) ? '_blank' : '_self' }}">
                 Log de Erros hoje
             </a>
+            <br>
+            {{ $size['erros'] }}
             <p class="mt-1"><strong> Última atualização:</strong> {{ $info['erros'] }}</p>
             @else
             <p class="mt-1"><strong> Ainda não há log de Erros do dia de hoje:</strong> {{ date('d/m/Y') }}</p>
@@ -105,7 +111,7 @@
                             value="{{ old('texto') }}"
                         >
                         
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit">Buscar</button>
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte">Buscar</button>
                         @if($errors->has('mes') || $errors->has('tipo') || $errors->has('texto'))
                         <div class="invalid-feedback">
                             @if($errors->has('mes'))
@@ -156,7 +162,7 @@
                             value="{{ old('texto') }}"
                         >
                         
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit">Buscar</button>
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte">Buscar</button>
                         @if($errors->has('ano') || $errors->has('tipo') || $errors->has('texto'))
                         <div class="invalid-feedback">
                             @if($errors->has('ano'))
@@ -188,20 +194,51 @@
         @if(isset($resultado))
 
             @if(isset(request()->query()['data']))
-            <p><i class="fas fa-file-alt"></i> - Log <strong>{{ $textoTipo }}</strong> do dia {{ onlyDate($resultado) }}
-                <a class="btn btn-info ml-3" href="{{ route('suporte.log.externo.view', ['data' => $resultado, 'tipo' => request()->query('tipo')]) }}" target="_blank">
-                    Abrir Log
+            @php
+                $all = explode(';', $resultado);
+            @endphp
+            <p><i class="fas fa-file-alt"></i> - Log <strong>{{ $textoTipo }}</strong> do dia {{ onlyDate($all[0]) }} - {{ $all[1] }}
+                <a class="btn btn-info ml-3" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" target="_blank">
+                    Abrir
+                </a>
+                <a class="btn btn-primary ml-3" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" download>
+                    Download
                 </a>
             </p>
             @else
-                @foreach($resultado as $file)
-                <p><i class="fas fa-file-alt"></i> - Log <strong>{{ $textoTipo }}</strong> do dia {{ onlyDate($file) }}
-                    <a class="btn btn-info ml-3" href="{{ route('suporte.log.externo.view', ['data' => $file, 'tipo' => request()->query('tipo')]) }}" target="_blank">
-                        Abrir Log
-                    </a>
-                </p>
-                @endforeach
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nome do Log</th>
+                            <th>Tamanho em KB</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($resultado as $file)
+                    @php
+                        $all = explode(';', $file);
+                    @endphp
+                        <tr>
+                            <td><i class="fas fa-file-alt"></i> - Log <strong>{{ $textoTipo }}</strong> do dia {{ onlyDate($all[0]) }}</td>
+                            <td>{{ $all[1] }}</td>
+                            <td>
+                                <a class="btn btn-info" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" target="_blank">
+                                    Abrir
+                                </a>
+                                <a class="btn btn-primary ml-3" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" download>
+                                    Download
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-start">
                 {{ $resultado->appends(request()->input())->links() }}
+            </div>
             @endif
 
         @else
@@ -210,5 +247,19 @@
         </div>
     </div>
     @endif
+
+    <!-- The Modal -->
+    <div class="modal" id="modalSuporte">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body d-flex justify-content-center">
+                <div class="spinner-border text-primary"></div>&nbsp;&nbsp;Aguarde...
+            </div>
+
+            </div>
+        </div>
+    </div>
 
 </div>

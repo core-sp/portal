@@ -125,7 +125,7 @@ $now = now();
 							required
 						/> 
 						<label for="termo" class="textoTermo text-justify">
-							Li e concordo com o <a href="{{ route('termo.consentimento.pdf') }}" target="_blank"><u>Termo de Consentimento</u></a>  de uso de dados, e estou ciente de que os meus dados serão utilizados apenas para notificações por e-mail a respeito do agendamento solicitado.
+							Li e concordo com o <a href="{{ route('termo.consentimento.pdf') }}" target="_blank"><u>Termo de Consentimento</u></a>  de uso de dados, e estou ciente de que os meus dados serão utilizados apenas para notificações por e-mail a respeito da inscrição do curso.
 						</label>
 						@if($errors->has('termo'))
 						<div class="invalid-feedback">

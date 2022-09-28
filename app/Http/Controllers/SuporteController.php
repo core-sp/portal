@@ -23,9 +23,11 @@ class SuporteController extends Controller
         {
             $dados = $this->service->getService('Suporte')->indexLog();
             $info = $dados['info'];
+            $size = $dados['size'];
             $variaveis = $dados['variaveis'];
             View::share([
                 'info' => $info, 
+                'size' => $size,
                 'variaveis' => $variaveis
             ]);
         }
