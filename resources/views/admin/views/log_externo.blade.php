@@ -1,11 +1,17 @@
 <div class="card-body">
-    <p class="mb-4">Obs: Para buscar uma informação no log use <kbd>Ctrl + F</kbd> para acionar o Localizar do navegador</p>
+    <p><strong>Obs:</strong> Para buscar uma informação no log use <kbd>Ctrl + F</kbd> para acionar o Localizar do navegador</p>
+    <p><span class="text-danger"><strong>Atenção!</strong></span> ao optar para buscar o total de ocorrências por log, considere que requer mais tempo de processamento</p>
     
-    <div class="row mb-4">
+    <hr />
+
+    <div class="row mb-4 mt-4">
         <div class="col">
             @if(isset($info['externo']))
             <a class="btn btn-success" href="{{ route('suporte.log.externo.hoje.view', 'externo') }}" target="{{ isset($info['externo']) ? '_blank' : '_self' }}">
                 Log do Site hoje
+            </a>
+            <a class="btn btn-warning ml-2" href="{{ route('suporte.log.externo.hoje.view', 'externo') }}" download">
+                <i class="fas fa-download"></i>
             </a>
             <br>
             {{ $size['externo'] }}
@@ -20,6 +26,9 @@
             <a class="btn btn-primary" href="{{ route('suporte.log.externo.hoje.view', 'interno') }}" target="{{ isset($info['interno']) ? '_blank' : '_self' }}">
                 Log do Admin hoje
             </a>
+            <a class="btn btn-warning ml-2" href="{{ route('suporte.log.externo.hoje.view', 'interno') }}" download>
+                <i class="fas fa-download"></i>
+            </a>
             <br>
             {{ $size['interno'] }}
             <p class="mt-1"><strong> Última atualização:</strong> {{ $info['interno'] }}</p>
@@ -32,6 +41,9 @@
             @if(isset($info['erros']))
             <a class="btn btn-danger" href="{{ route('suporte.log.externo.hoje.view', 'erros') }}" target="{{ isset($info['erros']) ? '_blank' : '_self' }}">
                 Log de Erros hoje
+            </a>
+            <a class="btn btn-warning ml-2" href="{{ route('suporte.log.externo.hoje.view', 'erros') }}" download>
+                <i class="fas fa-download"></i>
             </a>
             <br>
             {{ $size['erros'] }}
@@ -68,7 +80,7 @@
                             max="{{ date('Y-m-d', strtotime('yesterday')) }}"
                         >
                         
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit">Buscar</button>
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte">Buscar</button>
                         @if($errors->has('data') || $errors->has('tipo'))
                         <div class="invalid-feedback">
                             {{ $errors->has('data') ? $errors->first('data') : $errors->first('tipo') }}
@@ -110,6 +122,15 @@
                             id="buscar-texto"
                             value="{{ old('texto') }}"
                         >
+
+                        <input type="checkbox"
+							name="n_linhas"
+							class="form-check-input {{ $errors->has('n_linhas') ? 'is-invalid' : '' }}"
+							id="n_linhas_mes"
+						/> 
+						<label for="n_linhas_mes" class="text-justify mr-sm-2">
+							total de ocorrências por log
+						</label>
                         
                         <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte">Buscar</button>
                         @if($errors->has('mes') || $errors->has('tipo') || $errors->has('texto'))
@@ -143,7 +164,7 @@
                             <option value="interno" {{ old('tipo') == 'interno' ? 'selected' : '' }}>Admin</option>
                         </select>
                         
-                        <label for="buscar-ano" class="mr-sm-2">Mês/Ano:</label>
+                        <label for="buscar-ano" class="mr-sm-2">Ano:</label>
                         <input type="number" 
                             name="ano" 
                             class="form-control mb-2 mr-sm-3 {{ $errors->has('ano') ? 'is-invalid' : '' }}" 
@@ -161,6 +182,15 @@
                             id="buscar-texto"
                             value="{{ old('texto') }}"
                         >
+
+                        <input type="checkbox"
+							name="n_linhas"
+							class="form-check-input {{ $errors->has('n_linhas') ? 'is-invalid' : '' }}"
+							id="n_linhas_ano"
+						/> 
+						<label for="n_linhas_ano" class="text-justify mr-sm-2">
+							total de ocorrências por log
+						</label>
                         
                         <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte">Buscar</button>
                         @if($errors->has('ano') || $errors->has('tipo') || $errors->has('texto'))
@@ -188,7 +218,14 @@
         $tipos = ['erros' => 'de Erros', 'interno' => 'do Admin', 'externo' => 'do Site'];
         $textoTipo = $tipos[request()->query('tipo')];
     @endphp
-    <h4 class="mt-4 mb-4">Resultado da busca "<i>{{ $busca }}</i>" para o log <strong>{{ $textoTipo }}</strong></h4>
+    <div class="mt-4 mb-4">
+        <h4>Resultado da busca "<i>{{ $busca }}</i>" para o log <strong>{{ $textoTipo }}</strong></h4>
+        @if(!isset(request()->query()['data']) && isset(request()->query()['n_linhas']))
+        <h5>Total de ocorrências: {{ number_format($totalFinal, 0, ",", ".") }}</h5>
+        @endif
+    </div>
+    
+
     <div class="row">
         <div class="col">
         @if(isset($resultado))
@@ -212,6 +249,7 @@
                         <tr>
                             <th>Nome do Log</th>
                             <th>Tamanho em KB</th>
+                            <th>Total de ocorrências</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -223,12 +261,13 @@
                         <tr>
                             <td><i class="fas fa-file-alt"></i> - Log <strong>{{ $textoTipo }}</strong> do dia {{ onlyDate($all[0]) }}</td>
                             <td>{{ $all[1] }}</td>
+                            <td>{{ isset($all[2]) ? number_format($all[2], 0, ",", ".") : '-----' }}</td>
                             <td>
                                 <a class="btn btn-info" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" target="_blank">
                                     Abrir
                                 </a>
-                                <a class="btn btn-primary ml-3" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" download>
-                                    Download
+                                <a class="btn btn-warning ml-3" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" download>
+                                    <i class="fas fa-download"></i>
                                 </a>
                             </td>
                         </tr>
@@ -237,12 +276,16 @@
                 </table>
             </div>
             <div class="d-flex justify-content-start">
+                <em>{{ $resultado->total() > 1 ? 'Foram encontrados ' . $resultado->total() . ' logs' : 'Foi encontrado 1 log' }}</em>
+            </div>
+            <br>
+            <div class="d-flex justify-content-start">
                 {{ $resultado->appends(request()->input())->links() }}
             </div>
             @endif
 
         @else
-            <p>Não foi encontrado log(s) <strong>{{ $textoTipo }}</strong> para a busca: <i>{{ $busca }}</i></p>
+            <p>A busca não retornou log(s) <strong>{{ $textoTipo }}</strong></p>
         @endif
         </div>
     </div>

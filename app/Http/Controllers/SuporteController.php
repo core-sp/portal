@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class SuporteController extends Controller
 {
@@ -61,17 +62,30 @@ class SuporteController extends Controller
     {
         $this->authorize('onlyAdmin', auth()->user());
 
+        $semCache = !Cache::has('request_busca_log_'.auth()->id()) || (Cache::get('request_busca_log_'.auth()->id()) !== $request->except(['page', '_token']));
+        
         try{
             $validated = $request->validated();
-            $dados = $this->service->getService('Suporte')->logBusca($validated);
+
+            $dados = $semCache ? $this->service->getService('Suporte')->logBusca($validated) : 
+            ['resultado' => Cache::get('resultado_busca_log_'.auth()->id()), 'totalFinal' => Cache::get('totalFinal_busca_log_'.auth()->id())];
+
             $busca = isset($request['data']) ? onlyDate($request['data']) : $request['texto'];
             $resultado = is_array($dados['resultado']) ? $this->paginate($dados['resultado']) : $dados['resultado'];
+            $totalFinal = $dados['totalFinal'];
+
+            if($semCache)
+            {
+                Cache::put('resultado_busca_log_'.auth()->id(), $dados['resultado'], now()->addMinutes(15));
+                Cache::put('request_busca_log_'.auth()->id(), $request->except(['page', '_token']), now()->addMinutes(15));
+                Cache::put('totalFinal_busca_log_'.auth()->id(), $totalFinal, now()->addMinutes(15));
+            }
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o resultado da busca de log(s).");
         }
-
-        return view('admin.crud.mostra', compact('resultado', 'busca'));
+        
+        return view('admin.crud.mostra', compact('resultado', 'busca', 'totalFinal'));
     }
 
     public function viewLogExterno($data, $tipo)

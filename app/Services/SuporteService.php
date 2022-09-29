@@ -97,7 +97,9 @@ class SuporteService implements SuporteServiceInterface {
 
     public function logBusca($request)
     {  
+        $totalFinal = 0;
         $dados['resultado'] = null;
+        $dados['totalFinal'] = $totalFinal;
 
         if(isset($request['data']))
         {
@@ -116,9 +118,11 @@ class SuporteService implements SuporteServiceInterface {
             $array = array();
             $diretorio = isset($request['mes']) ? $this->getPathsLogsMonth($request['mes']) : $request['ano'];
             $all = Storage::disk('log_'.$request['tipo'])->allFiles($diretorio);
+            $com_total_linhas = isset($request['n_linhas']) && ($request['n_linhas'] == 'on');
 
             foreach($all as $key => $file)
             {
+                $total = 0;
                 $size = Storage::disk('log_'.$request['tipo'])->size($file);
                 $size = number_format($size / 1024, 2) . ' KB';
                 $path = Storage::disk('log_'.$request['tipo'])->path($file);
@@ -126,17 +130,27 @@ class SuporteService implements SuporteServiceInterface {
 
                 foreach($retorno as $line)
                 {
-                    if(strpos($line, $request['texto']) !== false)
+                    if(stripos($line, $request['texto']) !== false)
                     {
-                        array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size);
-                        break;
+                        if($com_total_linhas)
+                            $total++;
+                        else
+                        {
+                            array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size);
+                            break;
+                        }
                     }
                 }
+
+                if($com_total_linhas && ($total > 0))
+                    array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size . ';' . $total);
+                $totalFinal += $total;
             }
             
-            if(count($array) > 0)
+            if(isset($array[0]))
                 $dados['resultado'] = $array;
             unset($array);
+            $dados['totalFinal'] = $totalFinal;
 
             return $dados;
         }

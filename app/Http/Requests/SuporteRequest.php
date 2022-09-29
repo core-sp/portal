@@ -24,6 +24,7 @@ class SuporteRequest extends FormRequest
             'mes' => 'sometimes|required|date_format:Y-m|before_or_equal:'.date('Y-m'),
             'ano' => 'sometimes|required|date_format:Y|before_or_equal:'.date('Y'),
             'texto' => 'sometimes|required|min:3|max:191',
+            'n_linhas' => 'nullable',
             'file' => 'file|mimetypes:text/plain',
         ];
     }
