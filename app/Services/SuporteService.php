@@ -161,12 +161,8 @@ class SuporteService implements SuporteServiceInterface {
         if(!in_array($tipo, [self::ERROS, self::INTERNO, self::EXTERNO]))
             throw new \Exception('Tipo de log não existente', 500);
 
-        $headers = [
-            'Content-Type' => 'text/plain; charset=UTF-8',
-            'Content-Disposition' => 'inline; filename="laravel-'.$data.'.log"'
-        ];
         $log = $this->hasLog($data, $tipo);
-        return isset($log) && $log ? response()->file(Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo)), $headers) : null;
+        return isset($log) && $log ? Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo)) : null;
     }
 
     public function indexErros()

@@ -10,7 +10,7 @@
             <a class="btn btn-success" href="{{ route('suporte.log.externo.hoje.view', 'externo') }}" target="{{ isset($info['externo']) ? '_blank' : '_self' }}">
                 Log do Site hoje
             </a>
-            <a class="btn btn-warning ml-2" href="{{ route('suporte.log.externo.hoje.view', 'externo') }}" download">
+            <a class="btn btn-warning ml-2" href="{{ route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'externo']) }}">
                 <i class="fas fa-download"></i>
             </a>
             <br>
@@ -26,7 +26,7 @@
             <a class="btn btn-primary" href="{{ route('suporte.log.externo.hoje.view', 'interno') }}" target="{{ isset($info['interno']) ? '_blank' : '_self' }}">
                 Log do Admin hoje
             </a>
-            <a class="btn btn-warning ml-2" href="{{ route('suporte.log.externo.hoje.view', 'interno') }}" download>
+            <a class="btn btn-warning ml-2" href="{{ route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'interno']) }}">
                 <i class="fas fa-download"></i>
             </a>
             <br>
@@ -42,7 +42,7 @@
             <a class="btn btn-danger" href="{{ route('suporte.log.externo.hoje.view', 'erros') }}" target="{{ isset($info['erros']) ? '_blank' : '_self' }}">
                 Log de Erros hoje
             </a>
-            <a class="btn btn-warning ml-2" href="{{ route('suporte.log.externo.hoje.view', 'erros') }}" download>
+            <a class="btn btn-warning ml-2" href="{{ route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'erros']) }}">
                 <i class="fas fa-download"></i>
             </a>
             <br>
@@ -240,7 +240,7 @@
                 <a class="btn btn-info ml-3" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" target="_blank">
                     Abrir
                 </a>
-                <a class="btn btn-primary ml-3" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" download>
+                <a class="btn btn-primary ml-3" href="{{ route('suporte.log.externo.download', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}">
                     Download
                 </a>
             </p>
@@ -268,7 +268,7 @@
                                 <a class="btn btn-info" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" target="_blank">
                                     Abrir
                                 </a>
-                                <a class="btn btn-warning ml-3" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" download>
+                                <a class="btn btn-warning ml-3" href="{{ route('suporte.log.externo.download', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}">
                                     <i class="fas fa-download"></i>
                                 </a>
                             </td>

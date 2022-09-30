@@ -207,6 +207,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/logs/hoje/{tipo}', 'SuporteController@viewLogExternoDoDia')->name('suporte.log.externo.hoje.view');
     Route::get('/logs/busca', 'SuporteController@buscaLogExterno')->name('suporte.log.externo.busca');
     Route::get('/logs/log/{data}/{tipo}', 'SuporteController@viewLogExterno')->name('suporte.log.externo.view');
+    Route::get('/logs/log/download/{data}/{tipo}', 'SuporteController@downloadLogExterno')->name('suporte.log.externo.download');
     Route::get('/erros', 'SuporteController@errosIndex')->name('suporte.erros.index');
     Route::post('/erros/file', 'SuporteController@uploadFileErros')->name('suporte.erros.file.post');
     Route::get('/erros/file', 'SuporteController@getErrosFile')->name('suporte.erros.file.get');

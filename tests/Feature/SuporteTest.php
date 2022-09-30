@@ -25,6 +25,7 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.log.externo.hoje.view', 'interno'))->assertRedirect(route('login'));
         $this->get(route('suporte.log.externo.busca'))->assertRedirect(route('login'));
         $this->get(route('suporte.log.externo.view', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertRedirect(route('login'));
+        $this->get(route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertRedirect(route('login'));
         $this->get(route('suporte.erros.index'))->assertRedirect(route('login'));
         $this->post(route('suporte.erros.file.post'), ['file' => $file])->assertRedirect(route('login'));
         $this->get(route('suporte.erros.file.get'))->assertRedirect(route('login'));
@@ -42,6 +43,7 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.log.externo.hoje.view', 'interno'))->assertForbidden();
         $this->get(route('suporte.log.externo.busca', ['data' => Carbon::today()->subDay()->format('Y-m-d'), 'tipo' => 'interno']))->assertForbidden();
         $this->get(route('suporte.log.externo.view', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertForbidden();
+        $this->get(route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertForbidden();
         $this->get(route('suporte.erros.index'))->assertForbidden();
         $this->post(route('suporte.erros.file.post'), ['file' => $file])->assertForbidden();
         $this->get(route('suporte.erros.file.get'))->assertForbidden();

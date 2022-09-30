@@ -47,12 +47,16 @@ class SuporteController extends Controller
 
         try{
             $log = $this->service->getService('Suporte')->logPorData(date('Y-m-d'), $tipo);
+            $headers = [
+                'Content-Type' => 'text/plain; charset=UTF-8',
+                'Content-Disposition' => 'inline; filename="laravel-'.date('Y-m-d').'.log"'
+            ];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o log " . $tipo . " do dia de hoje.");
         }
 
-        return isset($log) ? $log : redirect()->back()->with([
+        return isset($log) ? response()->file($log, $headers) : redirect()->back()->with([
             'message' => '<i class="icon fa fa-ban"></i>Ainda não há log ' . $tipo . ' do dia de hoje: '.date('d/m/Y'),
             'class' => 'alert-warning'
         ]);
@@ -94,12 +98,34 @@ class SuporteController extends Controller
 
         try{
             $log = $this->service->getService('Suporte')->logPorData($data, $tipo);
+            $headers = [
+                'Content-Type' => 'text/plain; charset=UTF-8',
+                'Content-Disposition' => 'inline; filename="laravel-'.$data.'.log"'
+            ];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar o log " . $tipo . " do dia " .onlyDate($data). ".");
         }
 
-        return isset($log) ? $log : redirect()->back()->with([
+        return isset($log) ? response()->file($log, $headers) : redirect()->back()->with([
+            'message' => '<i class="icon fa fa-ban"></i>Não há log ' . $tipo . ' do dia: '.onlyDate($data),
+            'class' => 'alert-warning'
+        ]);
+    }
+
+    public function downloadLogExterno($data, $tipo)
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+
+        try{
+            $log = $this->service->getService('Suporte')->logPorData($data, $tipo);
+            
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao realizar o download do log " . $tipo . " do dia " .onlyDate($data). ".");
+        }
+
+        return isset($log) ? response()->download($log) : redirect()->back()->with([
             'message' => '<i class="icon fa fa-ban"></i>Não há log ' . $tipo . ' do dia: '.onlyDate($data),
             'class' => 'alert-warning'
         ]);
