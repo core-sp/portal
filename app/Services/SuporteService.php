@@ -166,7 +166,7 @@ class SuporteService implements SuporteServiceInterface {
             'Content-Disposition' => 'inline; filename="laravel-'.$data.'.log"'
         ];
         $log = $this->hasLog($data, $tipo);
-        return isset($log) ? response()->file(Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo)), $headers) : null;
+        return isset($log) && $log ? response()->file(Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo)), $headers) : null;
     }
 
     public function indexErros()

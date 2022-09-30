@@ -101,7 +101,8 @@ class TermoConsentimentoTest extends TestCase
             'idrepresentante' => null,
             'idnewsletter' => null,
             'idagendamento' => 1,
-            'idbdo' => null
+            'idbdo' => null,
+            'idcursoinscrito' => null,
         ]);
     }
 
@@ -146,7 +147,8 @@ class TermoConsentimentoTest extends TestCase
             'idrepresentante' => null,
             'idnewsletter' => 1,
             'idagendamento' => null,
-            'idbdo' => null
+            'idbdo' => null,
+            'idcursoinscrito' => null,
         ]);
     }
 
@@ -189,7 +191,8 @@ class TermoConsentimentoTest extends TestCase
             'idrepresentante' => null,
             'idnewsletter' => null,
             'idagendamento' => null,
-            'idbdo' => 1
+            'idbdo' => 1,
+            'idcursoinscrito' => null,
         ]);
     }
 
@@ -212,6 +215,58 @@ class TermoConsentimentoTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogExterno()));
 
         $this->assertStringContainsString('*'.$bdoEmpresa->razaosocial.'* ('.$bdoEmpresa->email.') solicitou inclusão de oportunidade no Balcão de Oportunidades e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
+    }
+
+    /** @test */
+    public function created_new_record_when_new_course_registration_portal()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $cursoInscrito = [
+            'idcurso' => $curso->idcurso,
+            'cpf' => '862.943.730-85',
+            'nome' => 'Testando Termo',
+            'telefone' => '(11) 99999-9999',
+            'email' => 'teste@teste.com',
+            'registrocore' => '',
+            'termo' => 'on'
+        ];
+
+        $this->post(route('cursos.inscricao', $curso->idcurso), $cursoInscrito);
+
+        $this->assertDatabaseHas('termos_consentimentos', [
+            'id' => 1,
+            'ip' => request()->ip(),
+            'email' => null,
+            'idrepresentante' => null,
+            'idnewsletter' => null,
+            'idagendamento' => null,
+            'idbdo' => null,
+            'idcursoinscrito' => 1,
+        ]);
+    }
+
+    /** @test */
+    public function id_termo_in_log_when_new_course_registration_portal()
+    {
+        $curso = factory('App\Curso')->create();
+
+        $cursoInscrito = [
+            'idcurso' => $curso->idcurso,
+            'cpf' => '862.943.730-85',
+            'nome' => 'Testando Termo',
+            'telefone' => '(11) 99999-9999',
+            'email' => 'teste@teste.com',
+            'registrocore' => '',
+            'termo' => 'on'
+        ];
+        $this->post(route('cursos.inscricao', $curso->idcurso), $cursoInscrito);
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = $cursoInscrito['nome']." (CPF: ".$cursoInscrito['cpf'].") *inscreveu-se* no curso *".$curso->tipo." - ".$curso->tema;
+        $texto .= '*, turma *'.$curso->idcurso.'* e foi criado um novo registro no termo de consentimento, com a id: 1';
+
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test */

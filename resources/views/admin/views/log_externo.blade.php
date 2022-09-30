@@ -77,6 +77,7 @@
                             class="form-control mb-2 mr-sm-3 {{ $errors->has('data') ? 'is-invalid' : '' }}" 
                             id="buscar-data"
                             value="{{ empty(old('data')) ? date('Y-m-d', strtotime('yesterday')) : old('data') }}"
+                            min="2019-01-01"
                             max="{{ date('Y-m-d', strtotime('yesterday')) }}"
                         >
                         
@@ -112,6 +113,7 @@
                             class="form-control mb-2 mr-sm-3 {{ $errors->has('mes') ? 'is-invalid' : '' }}" 
                             id="buscar-mes"
                             value="{{ empty(old('mes')) ? date('Y-m') : old('mes') }}"
+                            min="2019-01"
                             max="{{ date('Y-m') }}"
                         >
 
