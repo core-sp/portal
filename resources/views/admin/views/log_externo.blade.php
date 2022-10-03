@@ -1,7 +1,7 @@
 <div class="card-body">
     <p><strong>Obs:</strong> Para buscar uma informação no log use <kbd>Ctrl + F</kbd> para acionar o Localizar do navegador</p>
+    <p><i class="fas fa-info-circle text-primary"></i> Para cancelar a busca, tecle <kbd>ESC</kbd></p>
     <p><span class="text-danger"><strong>Atenção!</strong></span> ao optar para buscar o total de ocorrências por log, considere que requer mais tempo de processamento</p>
-    
     <hr />
 
     <div class="row mb-4 mt-4">
@@ -81,7 +81,7 @@
                             max="{{ date('Y-m-d', strtotime('yesterday')) }}"
                         >
                         
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte">Buscar</button>
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
                         @if($errors->has('data') || $errors->has('tipo'))
                         <div class="invalid-feedback">
                             {{ $errors->has('data') ? $errors->first('data') : $errors->first('tipo') }}
@@ -134,7 +134,7 @@
 							total de ocorrências por log
 						</label>
                         
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte">Buscar</button>
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
                         @if($errors->has('mes') || $errors->has('tipo') || $errors->has('texto'))
                         <div class="invalid-feedback">
                             @if($errors->has('mes'))
@@ -194,7 +194,7 @@
 							total de ocorrências por log
 						</label>
                         
-                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte">Buscar</button>
+                        <button class="btn btn-secondary btn-sm mb-2 mr-sm-3" type="submit" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">Buscar</button>
                         @if($errors->has('ano') || $errors->has('tipo') || $errors->has('texto'))
                         <div class="invalid-feedback">
                             @if($errors->has('ano'))
@@ -281,7 +281,7 @@
                 <em>{{ $resultado->total() > 1 ? 'Foram encontrados ' . $resultado->total() . ' logs' : 'Foi encontrado 1 log' }}</em>
             </div>
             <br>
-            <div class="d-flex justify-content-start" data-toggle="modal" data-target="#modalSuporte">
+            <div class="d-flex justify-content-start" data-toggle="modal" data-target="#modalSuporte" data-backdrop="static">
                 {{ $resultado->appends(request()->input())->links() }}
             </div>
             @endif

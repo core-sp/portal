@@ -401,4 +401,10 @@ $('#statusAgendamentoAdmin').ready(function(){
 		$('#parcelamento' + id).html('R$ ' + valorParcelado.replace('.', ','));
 	});
 
+  $(document).on('keydown', function(e) {
+    if((e.keyCode == 27) && (window.location.href.indexOf('/admin/suporte/logs'))){
+      $("#modalSuporte").modal('hide');
+    }
+  });
+
 })(jQuery);
