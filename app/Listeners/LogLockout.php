@@ -24,5 +24,8 @@ class LogLockout
 
         if($event->request->route()->uri == 'representante/login')
             Log::channel('externo')->info($ip . 'Usuário com cpf/cnpj "'.$event->request->cpf_cnpj.'" foi bloqueado temporariamente por alguns segundos devido a alcançar o limite de tentativas de login na Área do Representante.');
+
+        if($event->request->route()->uri == 'externo/login')
+            Log::channel('externo')->info($ip . 'Usuário com cpf/cnpj "'.$event->request->cpf_cnpj.'" foi bloqueado temporariamente por alguns segundos devido a alcançar o limite de tentativas de login na Área do Usuário Externo.');
     }
 }

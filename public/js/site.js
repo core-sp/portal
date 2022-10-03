@@ -1574,6 +1574,11 @@ $(window).on('load', function() {
 });
 
 $('#submitPreRegistro').click(function(){
+	if($('#modalSubmitPreRegistro').hasClass('show'))
+		$('#modalSubmitPreRegistro').modal('hide');
+		
+	$("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Enviando...');
+	$('#modalLoadingPreRegistro').modal('show');
 	$('#inserirRegistro').submit();
 })
 

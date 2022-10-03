@@ -34,7 +34,7 @@ class LogSuccessfulLogin
         if($event->guard == 'user_externo')
         {
             if(Auth::guard('user_externo')->check())
-                Log::channel('externo')->info($ip . 'Usuário '.$event->user->id.' ("'.$event->user->cpf_cnpj.'") conectou-se à Área do Usuário Externo.');
+                Log::channel('externo')->info($ip . 'Usuário '.$event->user->nome.' ("'.formataCpfCnpj($event->user->cpf_cnpj).'") conectou-se à Área do Usuário Externo.');
         }
     }
 }

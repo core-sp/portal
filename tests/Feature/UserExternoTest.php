@@ -608,15 +608,48 @@ class UserExternoTest extends TestCase
         ];
         $this->post(route('externo.login.submit'), $dados);
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString($user_externo->id, $log);
-        $this->assertStringContainsString('conectou-se à Área do Login Externo.', $log);
+
+        $texto = 'Usuário '.$user_externo['nome'] . ' ("'.formataCpfCnpj($user_externo['cpf_cnpj']). '") conectou-se à Área do Usuário Externo.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test 
+     * 
+     * Log externo ao logar.
+    */
+    public function log_is_generated_when_logout()
+    {
+        $user_externo = factory('App\UserExterno')->create();
+        $dados = [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'password' => 'Teste102030'
+        ];
+        $this->post(route('externo.login.submit'), $dados);
+        $this->post(route('externo.logout'));
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+
+        $texto = 'Usuário '.$user_externo['nome'] . ' ("'.formataCpfCnpj($user_externo['cpf_cnpj']). '") desconectou-se da Área do Usuário Externo.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test 
+     * 
+     * Log externo ao logar.
+    */
+    public function log_is_generated_when_logout_without_session()
+    {
+        $this->post(route('externo.logout'));
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+
+        $texto = 'Sessão expirou / não há sessão ativa ao realizar o logout da Área do Usuário Externo.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test 
      * 
      * Log externo ao não conseguir logar com cpf/cnpj válido, mas não existe no banco.
     */
-    public function log_is_generated_when_error_logon()
+    public function log_is_generated_when_failed_logon()
     {
         factory('App\UserExterno')->create();
         $dados = [
@@ -625,15 +658,16 @@ class UserExternoTest extends TestCase
         ];
         $this->post(route('externo.login.submit'), $dados);
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('72027756000135', $log);
-        $this->assertStringContainsString('não conseguiu logar no Login Externo. Erro: CPF/CNPJ não encontrado.', $log);
+
+        $texto = 'Usuário não encontrado com o cpf/cnpj "' .$dados['cpf_cnpj']. '" não conseguiu logar na Área do Usuário Externo.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test 
      * 
      * Log externo ao não conseguir logar com senha errada.
     */
-    public function log_is_generated_when_error_logon_with_password_wrong()
+    public function log_is_generated_when_failed_logon_with_password_wrong()
     {
         $user_externo = factory('App\UserExterno')->create();
         $dados = [
@@ -642,8 +676,9 @@ class UserExternoTest extends TestCase
         ];
         $this->post(route('externo.login.submit'), $dados);
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString($user_externo->cpf_cnpj, $log);
-        $this->assertStringContainsString('não conseguiu logar no Login Externo.', $log);
+
+        $texto = 'Usuário com o cpf/cnpj '.$user_externo->cpf_cnpj . ' não conseguiu logar na Área do Usuário Externo.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test 
@@ -744,6 +779,65 @@ class UserExternoTest extends TestCase
         
         $this->get(route('externo.login'))
         ->assertSeeText('Login inválido devido à quantidade de tentativas. Tente novamente em');
+    }
+
+    /** @test 
+    */
+    public function log_is_generated_when_lockout_logon_with_cpf_cnpj_not_created()
+    {
+        $externo = factory('App\UserExterno')->create();
+        $dados = [
+            'cpf_cnpj' => '72027756000135',
+            'password' => 'Teste102030'
+        ];
+        for($i = 0; $i < 4; $i++)
+            $this->post(route('externo.login.submit'), $dados);
+            
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+
+        $texto = 'Usuário com cpf/cnpj "'.$dados['cpf_cnpj'].'" foi bloqueado temporariamente por alguns segundos devido a alcançar ';
+        $texto .= 'o limite de tentativas de login na Área do Usuário Externo.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test 
+    */
+    public function log_is_generated_when_lockout_logon_with_cpf_cnpj_not_actived()
+    {
+        $externo = factory('App\UserExterno')->create([
+            'ativo' => 0
+        ]);
+        $dados = [
+            'cpf_cnpj' => $externo->cpf_cnpj,
+            'password' => 'Teste102030'
+        ];
+        for($i = 0; $i < 4; $i++)
+            $this->post(route('externo.login.submit'), $dados);
+            
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+
+        $texto = 'Usuário com cpf/cnpj "'.$dados['cpf_cnpj'].'" foi bloqueado temporariamente por alguns segundos devido a alcançar ';
+        $texto .= 'o limite de tentativas de login na Área do Usuário Externo.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test 
+    */
+    public function log_is_generated_when_lockout_logon()
+    {
+        $externo = factory('App\UserExterno')->create();
+        $dados = [
+            'cpf_cnpj' => $externo->cpf_cnpj,
+            'password' => 'Teste1020'
+        ];
+        for($i = 0; $i < 4; $i++)
+            $this->post(route('externo.login.submit'), $dados);
+            
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+
+        $texto = 'Usuário com cpf/cnpj "'.$dados['cpf_cnpj'].'" foi bloqueado temporariamente por alguns segundos devido a alcançar ';
+        $texto .= 'o limite de tentativas de login na Área do Usuário Externo.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test 
@@ -1077,8 +1171,9 @@ class UserExternoTest extends TestCase
             'password_confirmation' => 'Teste102030', 
         ]);
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('Usuário do Login Externo com o cpf/cnpj '.$user_externo['cpf_cnpj'], $log);
-        $this->assertStringContainsString('alterou a senha com sucesso.', $log);
+        $texto = 'Usuário com o cpf/cnpj '.$user_externo['cpf_cnpj'];
+        $texto .= ' alterou a senha com sucesso na Área do Usuário Externo através do "Esqueci a senha".';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test 

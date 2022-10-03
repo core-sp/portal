@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Events\ExternoEvent;
 use App\Http\Requests\UserExternoRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -45,9 +44,8 @@ class UserExternoLoginController extends Controller
 
         $this->verificou = $this->service->getService('UserExterno')->verificaSeAtivo($request->cpf_cnpj);
 
-        if(empty($this->verificou))
-            if($this->attemptLogin($request))
-                return $this->sendLoginResponse($request);
+        if($this->attemptLogin($request))
+            return $this->sendLoginResponse($request);
         
         // If the login attempt was unsuccessful we will increment the number of attempts
         // to login and redirect the user back to the login form. Of course, when this
@@ -88,7 +86,8 @@ class UserExternoLoginController extends Controller
     {
         return $this->guard()->attempt([
             'cpf_cnpj' => apenasNumeros($request->cpf_cnpj),
-            'password' => $request->password
+            'password' => $request->password,
+            'ativo' => 1
         ]);
     }
 
@@ -103,8 +102,6 @@ class UserExternoLoginController extends Controller
         $request->session()->regenerate();
 
         $this->clearLoginAttempts($request);
-
-        event(new ExternoEvent('Usuário ' . auth()->guard('user_externo')->user()->id . ' conectou-se à Área do Login Externo.'));
 
         return $this->authenticated($request, $this->guard()->user())
                 ?: redirect()->intended(route('externo.dashboard'));
@@ -121,12 +118,7 @@ class UserExternoLoginController extends Controller
     protected function sendFailedLoginResponse(Request $request)
     {
         if(!empty($this->verificou))
-        {
-            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar no Login Externo. Erro: '.$this->verificou['message']));
             return redirect()->back()->with($this->verificou);
-        }
-
-        event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' não conseguiu logar no Login Externo.'));
 
         return redirect()->back()->with([
             'message' => 'Login inválido.',

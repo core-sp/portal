@@ -26,6 +26,9 @@ class LogPasswordReset
 
             if($event->user->getTable() == 'representantes')
                 Log::channel('externo')->info($ip . 'Usuário com o cpf/cnpj ' .$event->user->cpf_cnpj. ' alterou a senha com sucesso na Área do Representante.');
+
+            if($event->user->getTable() == 'users_externo')
+                Log::channel('externo')->info($ip . 'Usuário com o cpf/cnpj ' .$event->user->cpf_cnpj. ' alterou a senha com sucesso na Área do Usuário Externo através do "Esqueci a senha".');
         }
     }
 }

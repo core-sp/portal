@@ -34,5 +34,13 @@ class LogSuccessfulLogout
             else
                 Log::channel('externo')->info($ip . 'Sessão expirou / não há sessão ativa ao realizar o logout da Área do Representante.');
         }
+
+        if($event->guard == 'user_externo')
+        {
+            if(Auth::guard('user_externo')->check())
+                Log::channel('externo')->info($ip . 'Usuário '.$event->user->nome.' ("'.formataCpfCnpj($event->user->cpf_cnpj) .'") desconectou-se da Área do Usuário Externo.');
+            else
+                Log::channel('externo')->info($ip . 'Sessão expirou / não há sessão ativa ao realizar o logout da Área do Usuário Externo.');
+        }
     }
 }

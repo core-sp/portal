@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Events\ExternoEvent;
+use Illuminate\Auth\Events\PasswordReset;
 use App\Http\Requests\UserExternoRequest;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Auth;
@@ -56,19 +56,16 @@ class UserExternoResetPasswordController extends Controller
 
     protected function resetPassword($user_externo, $password)
     {
-        $externo = $user_externo->forceFill([
+        $user_externo->forceFill([
             'password' => bcrypt($password),
             'remember_token' => Str::random(60),
         ])->save();
 
-        if(!$externo)
-            event(new ExternoEvent('Usuário do Login Externo ' . $user_externo->id . ' não conseguiu alterar a senha.'));
+        event(new PasswordReset($user_externo));
     }
 
     protected function sendResetResponse(Request $request, $response)
     {
-        event(new ExternoEvent('Usuário do Login Externo com o cpf/cnpj ' .$request->cpf_cnpj. ' alterou a senha com sucesso.'));
-
         return redirect(route('externo.login'))->with([
                 'message' => 'Senha alterada com sucesso. Favor realizar o login novamente com as novas informações.',
                 'class' => 'alert-success'
