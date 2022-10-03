@@ -240,8 +240,8 @@
                 <a class="btn btn-info ml-3" href="{{ route('suporte.log.externo.view', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}" target="_blank">
                     Abrir
                 </a>
-                <a class="btn btn-primary ml-3" href="{{ route('suporte.log.externo.download', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}">
-                    Download
+                <a class="btn btn-warning ml-3" href="{{ route('suporte.log.externo.download', ['data' => $all[0], 'tipo' => request()->query('tipo')]) }}">
+                    <i class="fas fa-download"></i>
                 </a>
             </p>
             @else
