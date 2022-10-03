@@ -33,16 +33,6 @@ class SuporteService implements SuporteServiceInterface {
     const INTERNO = 'interno';
     const EXTERNO = 'externo';
 
-    private function getLinesFile($file)
-    {
-        $f = fopen($file, 'r');
-        while(($line = fgets($f)) !== false)
-        {
-            yield $line;
-        }
-        fclose($f);
-    }
-
     private function getLastModificationLog($data, $tipo)
     {
         return $this->hasLog($data, $tipo) ? Storage::disk('log_' . $tipo)->lastModified($this->getPathLogFile($data, $tipo)) : null;
@@ -126,9 +116,9 @@ class SuporteService implements SuporteServiceInterface {
                 $size = Storage::disk('log_'.$request['tipo'])->size($file);
                 $size = number_format($size / 1024, 2) . ' KB';
                 $path = Storage::disk('log_'.$request['tipo'])->path($file);
-                $retorno = $this->getLinesFile($path);
 
-                foreach($retorno as $line)
+                $f = fopen($path, 'r');
+                while(($line = fgets($f)) !== false)
                 {
                     if(stripos($line, $request['texto']) !== false)
                     {
@@ -141,6 +131,8 @@ class SuporteService implements SuporteServiceInterface {
                         }
                     }
                 }
+                fclose($f);
+                unset($f);
 
                 if($com_total_linhas && ($total > 0))
                     array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size . ';' . $total);

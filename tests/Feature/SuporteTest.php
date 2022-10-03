@@ -246,7 +246,7 @@ class SuporteTest extends TestCase
 
         $this->signInAsAdmin();
 
-        $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'externo', 'texto' => 'teste', 'n_linhas' => 'on']))
+        $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'externo', 'texto' => date('Y'), 'n_linhas' => 'on']))
         ->assertSee('<th>Nome do Log</th>')
         ->assertSee('<th>Tamanho em KB</th>')
         ->assertSee('<th>Total de ocorrências</th>')
@@ -306,6 +306,9 @@ class SuporteTest extends TestCase
         $this->signInAsAdmin();
 
         $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'externo', 'texto' => 'info']))
+        ->assertSessionHasErrors('mes');
+
+        $this->get(route('suporte.log.externo.busca', ['mes' => $data, 'tipo' => 'interno', 'texto' => 'info']))
         ->assertSessionHasErrors('mes');
     }
 
@@ -434,6 +437,9 @@ class SuporteTest extends TestCase
         $this->signInAsAdmin();
 
         $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'externo', 'texto' => 'teste']))
+        ->assertSessionHasErrors('ano');
+
+        $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'interno', 'texto' => 'teste']))
         ->assertSessionHasErrors('ano');
     }
 
