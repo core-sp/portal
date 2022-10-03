@@ -281,7 +281,7 @@
                 <em>{{ $resultado->total() > 1 ? 'Foram encontrados ' . $resultado->total() . ' logs' : 'Foi encontrado 1 log' }}</em>
             </div>
             <br>
-            <div class="d-flex justify-content-start">
+            <div class="d-flex justify-content-start" data-toggle="modal" data-target="#modalSuporte">
                 {{ $resultado->appends(request()->input())->links() }}
             </div>
             @endif
