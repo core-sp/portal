@@ -49,6 +49,7 @@ class SuporteController extends Controller
             $log = $this->service->getService('Suporte')->logPorData(date('Y-m-d'), $tipo);
             $headers = [
                 'Content-Type' => 'text/plain; charset=UTF-8',
+                'Cache-Control' => 'no-cache, no-store',
                 'Content-Disposition' => 'inline; filename="laravel-'.date('Y-m-d').'.log"'
             ];
         } catch (\Exception $e) {
@@ -100,6 +101,7 @@ class SuporteController extends Controller
             $log = $this->service->getService('Suporte')->logPorData($data, $tipo);
             $headers = [
                 'Content-Type' => 'text/plain; charset=UTF-8',
+                'Cache-Control' => 'no-cache, no-store',
                 'Content-Disposition' => 'inline; filename="laravel-'.$data.'.log"'
             ];
         } catch (\Exception $e) {
@@ -119,13 +121,17 @@ class SuporteController extends Controller
 
         try{
             $log = $this->service->getService('Suporte')->logPorData($data, $tipo);
-            
+            $nome = 'laravel-'.$data.'.log';
+            $headers = [
+                'Content-Type' => 'text/plain; charset=UTF-8',
+                'Cache-Control' => 'no-cache, no-store',
+            ];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao realizar o download do log " . $tipo . " do dia " .onlyDate($data). ".");
         }
 
-        return isset($log) ? response()->download($log) : redirect()->back()->with([
+        return isset($log) ? response()->download($log, $nome, $headers) : redirect()->back()->with([
             'message' => '<i class="icon fa fa-ban"></i>Não há log ' . $tipo . ' do dia: '.onlyDate($data),
             'class' => 'alert-warning'
         ]);
