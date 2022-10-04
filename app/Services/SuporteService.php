@@ -96,7 +96,7 @@ class SuporteService implements SuporteServiceInterface {
             if($this->hasLog($request['data'], $request['tipo']))
             {
                 $size = Storage::disk('log_'.$request['tipo'])->size($this->getPathLogFile($request['data'], $request['tipo']));
-                $size = number_format($size / 1024, 2) . ' KB';
+                $size = number_format($size / 1024, 2, ',', '.') . ' KB';
                 $dados['resultado'] = $request['data'] . ';' . $size;
             }
 
@@ -114,7 +114,7 @@ class SuporteService implements SuporteServiceInterface {
             {
                 $total = 0;
                 $size = Storage::disk('log_'.$request['tipo'])->size($file);
-                $size = number_format($size / 1024, 2) . ' KB';
+                $size = number_format($size / 1024, 2, ',', '.') . ' KB';
                 $path = Storage::disk('log_'.$request['tipo'])->path($file);
 
                 $f = fopen($path, 'r');
