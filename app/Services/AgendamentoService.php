@@ -134,7 +134,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         if(auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user()))
         {
-            $regionais = $service->getService('Regional')->all()->sortBy('regional');
+            $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14])->sortBy('regional');
             $options = !isset($request->regional) ? 
             getFiltroOptions('Todas', 'Todas', true) : getFiltroOptions('Todas', 'Todas');
 
@@ -494,7 +494,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
     {
         if(isset($service) && !isset($id))
         {
-            $regionais = $service->getService('Regional')->all();
+            $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14]);
             $regionais->find(1)->regional = $this->renameSede;
     
             return [
@@ -516,7 +516,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     public function viewSite(MediadorServiceInterface $service)
     {
-        $regionais = $service->getService('Regional')->all();
+        $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14]);
         $regionais->find(1)->regional = $this->renameSede;
 
         $servicos = $this->servicos();
@@ -591,7 +591,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         if($dados['idregional'] == 'Todas')
         {
-            $regionais = $service->getService('Regional')->all();
+            $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14]);
             foreach($regionais as $regional)
             {
                 $dados['idregional'] = $regional->idregional;

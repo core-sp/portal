@@ -53,25 +53,34 @@ class AgendamentoRequest extends FormRequest
             if(request()->missing('hora'))
                 $this->merge(['hora' => null]);
 
-            if(request()->filled('idregional') && request()->filled('dia') && request()->filled('servico'))
+            if(request()->filled('idregional') && request()->filled('servico'))
             {
-                $regional = $this->service->getService('Regional')->getById(request()->idregional);
-                if(!isset($regional))
+                if(($this->idregional == '14') && ($this->servico != 'Plantão Jurídico'))
+                {
                     $this->merge(['idregional' => null]);
-                else
-                    $this->merge(['object_regional' => $regional]);
+                    return;
+                }
 
-                $dados = [
-                    'regional' => $regional,
-                    'dia' => request()->dia,
-                    'servico' => request()->servico
-                ];
-                
-                if(request()->servico != 'Plantão Jurídico')
-                    $this->dateFormat = $this->dateFormat.'|before_or_equal:'.Carbon::today()->addMonth()->format('d\/m\/Y');
+                if(request()->filled('dia'))
+                {
+                    $regional = $this->service->getService('Regional')->getById(request()->idregional);
+                    if(!isset($regional))
+                        $this->merge(['idregional' => null]);
+                    else
+                        $this->merge(['object_regional' => $regional]);
 
-                $horarios = $service->getDiasHorasAjaxSite($dados);
-                $this->horariosComBloqueio = isset($horarios) ? '|in:'.implode(',', $horarios) : '|in:';
+                    $dados = [
+                        'regional' => $regional,
+                        'dia' => request()->dia,
+                        'servico' => request()->servico
+                    ];
+                    
+                    if(request()->servico != 'Plantão Jurídico')
+                        $this->dateFormat = $this->dateFormat.'|before_or_equal:'.Carbon::today()->addMonth()->format('d\/m\/Y');
+
+                    $horarios = $service->getDiasHorasAjaxSite($dados);
+                    $this->horariosComBloqueio = isset($horarios) ? '|in:'.implode(',', $horarios) : '|in:';
+                }
             }
         }
     }

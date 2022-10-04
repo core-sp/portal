@@ -590,13 +590,13 @@ $('#ano-mapa').on({
 		// Zera o valor do dia, ao selecionar a regional
 		$('#agendamentoStore #idregional').change(function(){
 			limpaDiasHorariosAgendamento();
-			if($('#agendamentoStore #idregional').val() == 14){
-				var texto = 'Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: ';
-				texto += 'Av. Brigadeiro Luís Antônio, 613, Térreo, CEP: 01317-000, São Paulo/SP.';
-				$("#textoCarteirinha")
-				.html(texto);
-				$("#avisoCarteirinha").modal();
-			}
+			// if($('#agendamentoStore #idregional').val() == 14){
+			// 	var texto = 'Para realização de cédula de habilitação Profissional do Representante Comercial (Carteirinha), realizar agendamento somente em nossa sede: ';
+			// 	texto += 'Av. Brigadeiro Luís Antônio, 613, Térreo, CEP: 01317-000, São Paulo/SP.';
+			// 	$("#textoCarteirinha")
+			// 	.html(texto);
+			// 	$("#avisoCarteirinha").modal();
+			// }
 			if(($('#agendamentoStore #idregional').val() == 6) || ($('#agendamentoStore #idregional').val() == 8)){
 				var texto = 'As cidades de Araraquara e São José do Rio Preto  instituíram, por meio dos Decretos n° 12.892/2022 e n° 19.213/2022, respectivamente,';
 				texto += ' a volta da obrigatoriedade do uso de máscaras de proteção em locais fechados devido à alta nos números de infecções pelo coronavírus. ';

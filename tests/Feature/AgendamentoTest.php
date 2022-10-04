@@ -1813,6 +1813,22 @@ class AgendamentoTest extends TestCase
             ->assertDontSeeText('AGE-000006');
     }
 
+    /** @test */
+    public function cannot_view_regional_14_agendamentos_filter()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $regional_seccional = factory('App\Regional')->create([
+            'idregional' => 14,
+            'regional' => 'Alameda', 
+            'ageporhorario' => 1, 
+            'horariosage' => '10:00,11:00,12:00,13:00,14:00'
+        ]);
+
+        $this->get(route('agendamentos.lista'))
+            ->assertDontSeeText('Alameda');
+    }
+
     /** 
      * =======================================================================================================
      * TESTES AGENDAMENTO BLOQUEIO
@@ -1841,10 +1857,29 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_create_bloqueio_when_idregional_14()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\AgendamentoBloqueio')->raw([
+            'idregional' => factory('App\Regional')->create([
+                'idregional' => 14
+            ]),
+            'horarios' => ['10:00', '11:00'],
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
+        $this->post(route('agendamentobloqueios.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'idregional',
+        ]);
+    }
+
+    /** @test */
     public function can_create_bloqueio_all_day_for_all_regionais_with_0_atendentes()
     {
         $user = $this->signInAsAdmin();
-        $regionais = factory('App\Regional', 13)->create();
+        $regionais = factory('App\Regional', 12)->create();
         
         $bloqueio = factory('App\AgendamentoBloqueio')->raw([
             'idregional' => 'Todas',
@@ -1852,7 +1887,8 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
         $this->post(route('agendamentobloqueios.store'), $bloqueio)->assertRedirect(route('agendamentobloqueios.lista'));
-        $this->assertEquals(\App\AgendamentoBloqueio::count(), \App\Regional::count());
+        $all = \App\Regional::count() - 1;
+        $this->assertEquals(\App\AgendamentoBloqueio::count(), $all);
         $this->assertEquals(\App\AgendamentoBloqueio::find(1)->diatermino, $bloqueio['diatermino']);
     }
 
@@ -1860,7 +1896,7 @@ class AgendamentoTest extends TestCase
     public function can_create_bloqueio_all_day_for_all_regionais_with_0_atendentes_and_diatermino_null()
     {
         $user = $this->signInAsAdmin();
-        $regionais = factory('App\Regional', 13)->create();
+        $regionais = factory('App\Regional', 12)->create();
         
         $bloqueio = factory('App\AgendamentoBloqueio')->raw([
             'idregional' => 'Todas',
@@ -1869,7 +1905,8 @@ class AgendamentoTest extends TestCase
 
         $this->get(route('agendamentobloqueios.criar'))->assertOk(); 
         $this->post(route('agendamentobloqueios.store'), $bloqueio)->assertRedirect(route('agendamentobloqueios.lista'));
-        $this->assertEquals(\App\AgendamentoBloqueio::count(), \App\Regional::count());
+        $all = \App\Regional::count() - 1;
+        $this->assertEquals(\App\AgendamentoBloqueio::count(), $all);
         $this->assertEquals(\App\AgendamentoBloqueio::find(1)->diatermino, $bloqueio['diatermino']);
     }
 
@@ -1877,7 +1914,7 @@ class AgendamentoTest extends TestCase
     public function cannot_create_bloqueio_all_day_for_all_regionais_with_qtd_atendentes_greater_than_0()
     {
         $user = $this->signInAsAdmin();
-        $regionais = factory('App\Regional', 13)->create();
+        $regionais = factory('App\Regional', 12)->create();
         
         $bloqueio = factory('App\AgendamentoBloqueio')->raw([
             'idregional' => 'Todas',
@@ -2466,6 +2503,20 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_view_regional_14_when_create()
+    {
+        $user = $this->signInAsAdmin();
+
+        $regional = factory('App\Regional')->create([
+            'idregional' => 14,
+            'regional' => 'Alameda'
+        ]);
+
+        $this->get(route('agendamentobloqueios.criar'))
+        ->assertDontSeeText($regional->regional);
+    }
+
+    /** @test */
     public function get_horarios_and_atendentes_by_ajax()
     {
         $user = $this->signInAsAdmin();
@@ -2828,6 +2879,26 @@ class AgendamentoTest extends TestCase
     }
 
     /** @test */
+    public function agendamento_cannot_be_created_with_regional_14()
+    {
+        $pegarDia = factory('App\Agendamento')->raw();
+        $agendamento = factory('App\Agendamento')->raw([
+            'idregional' => factory('App\Regional')->create([
+                'idregional' => 14
+            ]),
+            'dia' => onlyDate($pegarDia['dia']),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+            'pessoa' => 'PF',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $agendamento)
+        ->assertSessionHasErrors([
+            'idregional'
+        ]);
+    }
+
+    /** @test */
     public function agendamento_cannot_be_created_with_dia_today()
     {
         $agendamento = factory('App\Agendamento')->raw([
@@ -3072,6 +3143,20 @@ class AgendamentoTest extends TestCase
         ->assertSee(' Favor entrar em contato com o Core-SP para regularizar o agendamento.');
 
         $this->assertEquals(Agendamento::count(), 3);
+    }
+
+    /** @test */
+    public function cannot_get_days_when_regional_14()
+    {
+        $regional = factory('App\Regional')->create([
+            'idregional' => 14
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'servico' => Agendamento::SERVICOS_OUTROS
+        ]))
+        ->assertStatus(500);
     }
 
     /** @test */
@@ -3333,6 +3418,21 @@ class AgendamentoTest extends TestCase
         ->assertJsonMissingExact(
             [$diaAge->month, $diaAge->day, 'lotado']
         );
+    }
+
+    /** @test */
+    public function cannot_get_hours_when_regional_14()
+    {
+        $regional = factory('App\Regional')->create([
+            'idregional' => 14
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $regional->idregional,
+            'dia' => date('d/m/Y'),
+            'servico' => Agendamento::SERVICOS_OUTROS,
+        ]))
+        ->assertStatus(500);
     }
 
     /** @test */
@@ -3873,6 +3973,19 @@ class AgendamentoTest extends TestCase
         ->assertSeeText($regionais->get(0)->regional)
         ->assertSeeText($regionais->get(1)->regional)
         ->assertSeeText($regionais->get(2)->regional);
+    }
+
+    /** @test */
+    public function cannot_view_regional_14_on_portal()
+    {
+        factory('App\Regional')->create();
+        $regional = factory('App\Regional')->create([
+            'idregional' => 14,
+            'regional' => 'Alameda'
+        ]);
+
+        $this->get(route('agendamentosite.formview'))
+        ->assertDontSeeText('<option value="14">'.$regional->regional.'</option>');
     }
 
     /** @test */

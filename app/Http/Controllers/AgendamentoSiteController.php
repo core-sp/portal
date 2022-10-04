@@ -83,6 +83,9 @@ class AgendamentoSiteController extends Controller
     {
         try{
             $validate = $request->only('idregional', 'servico', 'dia');
+            if(($validate['idregional'] == '14') && ($validate['servico'] != 'Plantão Jurídico'))
+                abort(500, 'Regional não permitida');
+
             $validate['regional'] = $this->service->getService('Regional')->getById($validate['idregional']);
             $dados = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate);
         } catch (\Exception $e) {

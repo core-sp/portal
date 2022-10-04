@@ -22,6 +22,9 @@ class AgendamentoBloqueioRequest extends FormRequest
         $this->chaveRegional = 'required|exists:regionais,idregional';
         $this->chaveHorarios = 'required|array|in:';
 
+        if(request()->filled('idregional') && ($this->idregional == '14'))
+            $this->merge(['idregional' => '0']);
+
         $regional = isset(request()->idregional) && (request()->idregional != 'Todas') ? $this->service->getById(request()->idregional) : null;
         $this->chaveHorarios .= isset($regional->horariosage) ? $regional->horariosage : '';
         $this->ageporhorario = isset($regional->ageporhorario) ? $regional->ageporhorario - 1 : 1;
