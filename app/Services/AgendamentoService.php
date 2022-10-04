@@ -134,7 +134,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         if(auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user()))
         {
-            $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14])->sortBy('regional');
+            $regionais = $service->getService('Regional')->all()->sortBy('regional');
             $options = !isset($request->regional) ? 
             getFiltroOptions('Todas', 'Todas', true) : getFiltroOptions('Todas', 'Todas');
 

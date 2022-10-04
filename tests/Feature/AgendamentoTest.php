@@ -1813,22 +1813,6 @@ class AgendamentoTest extends TestCase
             ->assertDontSeeText('AGE-000006');
     }
 
-    /** @test */
-    public function cannot_view_regional_14_agendamentos_filter()
-    {
-        $admin = $this->signInAsAdmin();
-
-        $regional_seccional = factory('App\Regional')->create([
-            'idregional' => 14,
-            'regional' => 'Alameda', 
-            'ageporhorario' => 1, 
-            'horariosage' => '10:00,11:00,12:00,13:00,14:00'
-        ]);
-
-        $this->get(route('agendamentos.lista'))
-            ->assertDontSeeText('Alameda');
-    }
-
     /** 
      * =======================================================================================================
      * TESTES AGENDAMENTO BLOQUEIO
