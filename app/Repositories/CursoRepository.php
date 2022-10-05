@@ -84,6 +84,6 @@ class CursoRepository {
 
     public function getTotalInscritos()
     {
-        return CursoInscrito::all()->count();
+        return CursoInscrito::count();
     }
 }

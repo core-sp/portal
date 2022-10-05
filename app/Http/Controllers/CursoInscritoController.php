@@ -247,7 +247,8 @@ class CursoInscritoController extends Controller
             'nome' => 'required|max:191|regex:/^[a-zA-Z ÁáÉéÍíÓóÚúÃãÕõÂâÊêÔô]+$/',
             'telefone' => 'required|max:191|min:14',
             'email' => 'email|max:191',
-            'registrocore' => 'max:191'
+            'registrocore' => 'max:191',
+            'termo' => 'sometimes|required|accepted'
         ];
         $mensagens = [
             'required' => 'O :attribute é obrigatório',
@@ -255,7 +256,8 @@ class CursoInscritoController extends Controller
             'nome.regex' => 'Nome inválido',
             'cpf.unique' => 'O CPF informado já está cadastrado neste curso',
             'max' => 'O :attribute excedeu o limite de caracteres permitido',
-            'telefone.min' => 'Telefone inválido'
+            'telefone.min' => 'Telefone inválido',
+            'accepted' => 'Você deve concordar com o Termo de Consentimento',
         ];
         $validation = Validator::make($request->all(), $regras, $mensagens);
         if($validation->fails()) {
@@ -276,10 +278,17 @@ class CursoInscritoController extends Controller
         $save = $inscrito->save();
         if(!$save)
             abort(500);
+
+        $termo = $inscrito->termos()->create([
+            'ip' => request()->ip()
+        ]);
+
         // Gera evento de inscrição no Curso
         $string = $inscrito->nome." (CPF: ".$inscrito->cpf.")";
         $string .= " *inscreveu-se* no curso *".$inscrito->curso->tipo." - ".$inscrito->curso->tema;
         $string .= "*, turma *".$inscrito->curso->idcurso."*";
+        $string .= " e " . $termo->message();
+
         event(new ExternoEvent($string));
         // Gera mensagem de agradecimento
         $agradece = "Sua inscrição em <strong>".$inscrito->curso->tipo;

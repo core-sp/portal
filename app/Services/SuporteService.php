@@ -16,8 +16,8 @@ class SuporteService implements SuporteServiceInterface {
     {
         $this->variaveisLog = [
             'mostra' => 'log_externo',
-            'singular' => 'Log Externo',
-            'singulariza' => 'o log externo',
+            'singular' => 'Logs',
+            'singulariza' => 'o log',
         ];
 
         $this->variaveisErros = [
@@ -29,69 +29,36 @@ class SuporteService implements SuporteServiceInterface {
         $this->nomeFileErros = 'suporte-tabela-erros.txt';
     }
 
-    private function getLog($data)
-    {
-        if($this->hasLog($data))
-        {
-            $log = Storage::disk('log_externo')->get($this->getPathLogFile($data));
-            return $this->editarConteudoLog($log);
-        }
+    const ERROS = 'erros';
+    const INTERNO = 'interno';
+    const EXTERNO = 'externo';
 
-        return null;
+    private function getLastModificationLog($data, $tipo)
+    {
+        return $this->hasLog($data, $tipo) ? Storage::disk('log_' . $tipo)->lastModified($this->getPathLogFile($data, $tipo)) : null;
     }
 
-    private function getLastModificationLog($data)
-    {
-        return $this->hasLog($data) ? Storage::disk('log_externo')->lastModified($this->getPathLogFile($data)) : null;
-    }
-
-    private function editarConteudoLog($log)
-    {
-        $array = explode(PHP_EOL, $log);
-        unset($log);
-        foreach($array as $key => $value)
-        {
-            // Ocultar o IP
-            $tamanhoTextoRemover = strlen(substr_replace(\Str::before($value, ' - '), '', 0, 21));
-            $array[$key] = substr_replace($value, '', 21, $tamanhoTextoRemover);
-            $i = $key + 1;
-            // Inserir número da linha no texto
-            $array[$key] = substr_replace($array[$key], '#'.$i.' - ', 0, 0).PHP_EOL;
-        }
-
-        return $array;
-    }
-
-    private function getPathLogFile($data)
+    private function getPathLogFile($data, $tipo)
     {
         $data = Carbon::createFromFormat('Y-m-d', $data);
         $anoMes = $data->format('Y').'/'.$data->format('m').'/';
         $nomeArquivo = 'laravel-'.$data->format('Y-m-d').'.log';
 
-        return $anoMes.$nomeArquivo;
+        return $tipo == self::ERROS ? $nomeArquivo : $anoMes.$nomeArquivo;
     }
 
-    private function getLogForBrowser($log)
+    private function getPathsLogsMonth($data)
     {
-        if(isset($log))
-        {
-            $callback = function() use($log) {
-                $fh = fopen('php://output','w');
-                foreach($log as $value)
-                    fwrite($fh, $value);
-                fclose($fh);
-            };
+        $data = Carbon::createFromFormat('Y-m', $data);
+        $anoMes = $data->format('Y').'/'.$data->format('m').'/';
 
-            return $callback;
-        }
-
-        return null;
+        return $anoMes;
     }
 
-    private function hasLog($data)
+    private function hasLog($data, $tipo)
     {
-        $log = $this->getPathLogFile($data);
-        return Storage::disk('log_externo')->exists($log);
+        $log = $this->getPathLogFile($data, $tipo);
+        return Storage::disk('log_' . $tipo)->exists($log);
     }
 
     private function editarConteudoErros($erros)
@@ -101,43 +68,93 @@ class SuporteService implements SuporteServiceInterface {
 
     public function indexLog()
     {
-        $infos = $this->getLastModificationLog(date('Y-m-d'));
+        foreach([self::ERROS, self::INTERNO, self::EXTERNO] as $tipo)
+        {
+            $infos[$tipo] = $this->getLastModificationLog(date('Y-m-d'), $tipo);
 
-        return $dados = [
-            'info' => isset($infos) ? Carbon::parse($infos)->setTimezone('America/Sao_Paulo')->format('d/m/Y, \à\s H:i') : null,
+            $infos[$tipo] = isset($infos[$tipo]) ? Carbon::parse($infos[$tipo])->setTimezone('America/Sao_Paulo')->format('d/m/Y, \à\s H:i') : null;
+
+            $size[$tipo] = isset($infos[$tipo]) ? 
+            number_format(Storage::disk('log_'.$tipo)->size($this->getPathLogFile(date('Y-m-d'), $tipo)) / 1024, 2).' KB' : null;
+        }
+
+        return [
+            'info' => $infos,
+            'size' => $size,
             'variaveis' => (object) $this->variaveisLog
         ];
     }
 
     public function logBusca($request)
-    {        
-        if(isset($request->data))
-            $dados['resultado'] = $this->hasLog($request->data) ? $request->data : null;
-        elseif(isset($request->texto))
+    {  
+        $totalFinal = 0;
+        $dados['resultado'] = null;
+        $dados['totalFinal'] = $totalFinal;
+
+        if(isset($request['data']))
         {
-            $dias = [
-                Carbon::today()->format('Y-m-d'),
-                Carbon::today()->subDays(1)->format('Y-m-d'),
-                Carbon::today()->subDays(2)->format('Y-m-d'),
-            ];
-            foreach($dias as $dia)
+            if($this->hasLog($request['data'], $request['tipo']))
             {
-                $log = $this->getLog($dia);
-                $dados['resultado'][$dia] = isset($log) ? preg_grep('/'.preg_quote($request->texto, '/').'/i', $log) : null;
+                $size = Storage::disk('log_'.$request['tipo'])->size($this->getPathLogFile($request['data'], $request['tipo']));
+                $size = number_format($size / 1024, 2, ',', '.') . ' KB';
+                $dados['resultado'] = $request['data'] . ';' . $size;
             }
+
+            return $dados;
         }
 
-        return $dados;
+        if(isset($request['mes']) || isset($request['ano']))
+        {
+            $array = array();
+            $diretorio = isset($request['mes']) ? $this->getPathsLogsMonth($request['mes']) : $request['ano'];
+            $all = Storage::disk('log_'.$request['tipo'])->allFiles($diretorio);
+            $com_total_linhas = isset($request['n_linhas']) && ($request['n_linhas'] == 'on');
+
+            foreach($all as $key => $file)
+            {
+                $total = 0;
+                $size = Storage::disk('log_'.$request['tipo'])->size($file);
+                $size = number_format($size / 1024, 2, ',', '.') . ' KB';
+                $path = Storage::disk('log_'.$request['tipo'])->path($file);
+
+                $f = fopen($path, 'r');
+                while(($line = fgets($f)) !== false)
+                {
+                    if(stripos($line, $request['texto']) !== false)
+                    {
+                        if($com_total_linhas)
+                            $total++;
+                        else
+                        {
+                            array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size);
+                            break;
+                        }
+                    }
+                }
+                fclose($f);
+                unset($f);
+
+                if($com_total_linhas && ($total > 0))
+                    array_push($array, str_replace('.log', '', substr($file, 16)) . ';' . $size . ';' . $total);
+                $totalFinal += $total;
+            }
+            
+            if(isset($array[0]))
+                $dados['resultado'] = $array;
+            unset($array);
+            $dados['totalFinal'] = $totalFinal;
+
+            return $dados;
+        }
     }
 
-    public function logPorData($data)
+    public function logPorData($data, $tipo)
     {
-        $headers = [
-            'Content-Type' => 'text/plain; charset=UTF-8',
-            'Content-Disposition' => 'inline; filename="laravel-'.$data.'.log"'
-        ];
-        $log = $this->getLog($data);
-        return isset($log) ? response()->stream($this->getLogForBrowser($log), 200, $headers) : null;
+        if(!in_array($tipo, [self::ERROS, self::INTERNO, self::EXTERNO]))
+            throw new \Exception('Tipo de log não existente', 500);
+
+        $log = $this->hasLog($data, $tipo);
+        return isset($log) && $log ? Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo)) : null;
     }
 
     public function indexErros()

@@ -29,6 +29,11 @@ class TermoConsentimento extends Model
     	return $this->belongsTo('App\BdoOportunidade', 'idbdo');
     }
 
+    public function cursoInscrito()
+    {
+    	return $this->belongsTo('App\CursoInscrito', 'idcursoinscrito');
+    }
+
     public function message()
     {
         $message = 'foi criado um novo registro no termo de consentimento, com a id: '.$this->id;

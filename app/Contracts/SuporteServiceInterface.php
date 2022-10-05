@@ -8,7 +8,7 @@ interface SuporteServiceInterface {
 
     public function logBusca($request);
 
-    public function logPorData($data);
+    public function logPorData($data, $tipo);
 
     public function indexErros();
 
