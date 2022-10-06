@@ -115,8 +115,16 @@
                   <td class="text-center" colspan="2">{{ $r->orientacaorepresentante }}</td>
                 </tr> -->
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Cooperação Institucional</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">Diligências externas</td>
                   <td class="text-center" colspan="2">{{ $r->cooperacaoinstitucional }}</td>
+                </tr>
+                <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">Orientação às contabilidades</td>
+                  <td class="text-center" colspan="2">{{ $r->orientacaocontabil }}</td>
+                </tr>
+                <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">Oficio às prefeituras</td>
+                  <td class="text-center" colspan="2">{{ $r->oficioprefeitura }}</td>
                 </tr>
               </tbody>
             </table>

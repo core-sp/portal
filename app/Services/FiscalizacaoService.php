@@ -96,7 +96,7 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
         if(!isset($id))
         {
             $periodo = PeriodoFiscalizacao::create(['periodo' => $validated['periodo']]);
-            $regionais = $service->getService('Regional')->all()->slice(0,13);
+            $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14]);
             foreach($regionais as $regional)
                 $periodo->dadoFiscalizacao()->create(['idregional' => $regional->idregional]);
             event(new CrudEvent('período fiscalização', 'criou', $periodo->id));
