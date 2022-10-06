@@ -142,6 +142,41 @@ class PreRegistroCpfTest extends TestCase
     }
 
     /** @test */
+    public function can_create_new_register_pre_registros_cpf_by_ajax_after_negado()
+    {
+        $externo = $this->signInAsUserExterno();
+        factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'status' => 'Negado'
+            ]),
+        ]);
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        
+        $this->assertDatabaseHas('pre_registros_cpf', [
+            'pre_registro_id' => 2
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_new_register_pre_registros_cpf_by_ajax_after_aprovado()
+    {
+        $externo = $this->signInAsUserExterno();
+        factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'status' => 'Aprovado'
+            ]),
+        ]);
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertSeeText('Aprovado');
+        
+        $this->assertDatabaseMissing('pre_registros_cpf', [
+            'pre_registro_id' => 2
+        ]);
+    }
+
+    /** @test */
     public function can_update_table_pre_registros_cpf_by_ajax_with_upperCase()
     {
         $externo = $this->signInAsUserExterno();
@@ -1576,6 +1611,8 @@ class PreRegistroCpfTest extends TestCase
         {
             $preRegistro->update(['status' => $status]);
             if(!in_array($status, [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO]))
+                in_array($status, [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO]) ? 
+                $this->put(route('externo.inserir.preregistro'), $dados)->assertSessionHasErrors('path') : 
                 $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(401);
         }
     }
@@ -2460,6 +2497,11 @@ class PreRegistroCpfTest extends TestCase
             'status' => PreRegistro::STATUS_NEGADO,
             'idusuario' => $admin->idusuario
         ]);
+
+        $this->assertSoftDeleted('anexos', [
+            'path' => $anexo->path,
+            'pre_registro_id' => $anexo->pre_registro_id
+        ]);
     }
 
     /** @test */
@@ -2482,7 +2524,7 @@ class PreRegistroCpfTest extends TestCase
         ->assertRedirect(route('preregistro.index'));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('atualizou status para ' . PreRegistro::STATUS_NEGADO, $log);
+        $this->assertStringContainsString('atualizou status para ' . PreRegistro::STATUS_NEGADO . ' e seus arquivos foram excluídos pelo sistema', $log);
     }
 
     /** @test */

@@ -268,6 +268,21 @@ class PreRegistro extends Model
         return $this->hasMany('App\Anexo');
     }
 
+    public function excluirAnexos()
+    {
+        if($this->anexos->count() > 0)
+        {
+            $deleted = $this->anexos->first()->excluirDiretorioPreRegistro();
+            if(!$deleted)
+                throw new \Exception('Não foi possível excluir o diretório com os arquivos para o pré-registro com id ' . $this->id, 500);
+            if($deleted)
+            {
+                $this->anexos()->delete();
+                $this->touch();
+            }
+        }
+    }
+
     public function getLabelStatus($status = null)
     {
         $colorStatus = [

@@ -29,9 +29,19 @@ class UserExterno extends Authenticatable
         return strlen($this->cpf_cnpj) == 11;
     }
 
+    public function preRegistros()
+    {
+        return $this->hasMany('App\PreRegistro')->withTrashed();
+    }
+
     public function preRegistro()
     {
-        return $this->hasOne('App\PreRegistro')->withTrashed();
+        return $this->hasOne('App\PreRegistro')->whereNotIn('status', ['Aprovado', 'Negado'])->latest();
+    }
+
+    public function preRegistroAprovado()
+    {
+        return $this->preRegistros()->where('status', 'Aprovado')->count() > 0;
     }
 
     public function podeAtivar()

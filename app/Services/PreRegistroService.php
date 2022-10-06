@@ -289,7 +289,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
         }
 
-        $regionais = $service->getService('Regional')->all()->splice(0, 13)->sortBy('regional');
+        $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14])->sortBy('regional');
         $options = !isset($request->regional) ? 
         getFiltroOptions('Todas', 'Todas', true) : getFiltroOptions('Todas', 'Todas');
 
@@ -415,7 +415,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $resultado = $externo->load('preRegistro')->preRegistro;
         if(!isset($resultado))
         {
-            $resultado = $externo->preRegistro()->create();
+            $resultado = $externo->preRegistros()->create();
             if(!$externo->isPessoaFisica())
             {
                 $pj = $resultado->pessoaJuridica()->create();
@@ -438,7 +438,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             'codigos' => $this->getCodigosCampos($resultado->getAbasCampos()),
             'regionais' => $service->getService('Regional')
                 ->all()
-                ->splice(0, 13)
+                ->whereNotIn('idregional', [14])
                 ->sortBy('regional'),
             'classes' => $this->getNomeClasses(),
             'totalFiles' => $externo->isPessoaFisica() ? Anexo::TOTAL_PF_PRE_REGISTRO : Anexo::TOTAL_PJ_PRE_REGISTRO,
@@ -512,17 +512,17 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 $resultado = $preRegistro->salvar($key, $arrayCampos, $gerenti);
             
             if(!isset($resultado))
-                throw new \Exception('Não salvou os dados em ' . $key, 500);
+                throw new \Exception('Não salvou os dados do pré-registro com id ' .$preRegistro->id. ' em ' . $key, 500);
         }
 
         $status = $preRegistro->status == PreRegistro::STATUS_CRIADO ? $preRegistro::STATUS_ANALISE_INICIAL : $preRegistro::STATUS_ANALISE_CORRECAO;
         $resultado = $preRegistro->update(['status' => $status]);
+        
+        if(!$resultado)
+            throw new \Exception('Não atualizou o status da solicitação de registro com id '.$preRegistro->id.' para ' . $status, 500);
+        
         $preRegistro->setHistoricoStatus();
-        
-        if(!isset($resultado))
-            throw new \Exception('Não atualizou o status da solicitação de registro para ' . $status, 500);
-        
-        Mail::to($externo->email)->queue(new PreRegistroMail($preRegistro));
+        Mail::to($externo->email)->queue(new PreRegistroMail($preRegistro->fresh()));
 
         $string = 'Usuário Externo com ';
         $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
@@ -544,8 +544,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         $anexo = $preRegistro->anexos()->where('id', $id)->first();
 
-        if(isset($anexo) && Storage::exists($anexo->path))
-            return response()->file(Storage::path($anexo->path), ["Cache-Control" => "no-cache"]);
+        if(isset($anexo) && Storage::disk('local')->exists($anexo->path))
+            return response()->file(Storage::disk('local')->path($anexo->path), ["Cache-Control" => "no-cache"]);
         
         throw new \Exception('Arquivo não existe / não pode acessar', 401);
     }
@@ -562,9 +562,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         $anexo = $preRegistro->anexos()->where('id', $id)->first();
 
-        if(isset($anexo) && Storage::exists($anexo->path))
+        if(isset($anexo) && Storage::disk('local')->exists($anexo->path))
         {
-            $deleted = Storage::delete($anexo->path);
+            $deleted = Storage::disk('local')->delete($anexo->path);
             if($deleted)
             {
                 $anexo->delete();
@@ -602,8 +602,6 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function listar($request, MediadorServiceInterface $service, $user)
     {
-        session(['url_pre_registro' => url()->full()]);
-
         $dados = $this->validacaoFiltroAtivo($request, $user);
         $resultados = $this->getResultadosFiltro($dados, $user);
         $this->variaveis['mostraFiltros'] = true;
@@ -699,11 +697,23 @@ class PreRegistroService implements PreRegistroServiceInterface {
     public function updateStatus($id, $user, $status)
     {
         $preRegistro = PreRegistro::findOrFail($id);
+
+        if(in_array($preRegistro->status, [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO]))
+            throw new \Exception('Não permitido atualizar o status do pré-registro já finalizado (Aprovado ou Negado)', 401);
         
         $preRegistro->update(['idusuario' => $user->idusuario, 'status' => $status]);
         $preRegistro->setHistoricoStatus();
+        $preRegistro->fresh();
+
         Mail::to($preRegistro->userExterno->email)->queue(new PreRegistroMail($preRegistro));
-        event(new CrudEvent('pré-registro', 'atualizou status para ' . $status, $id));
+        
+        if($preRegistro->status == PreRegistro::STATUS_NEGADO)
+        {
+            $preRegistro->excluirAnexos();
+            event(new CrudEvent('pré-registro', 'atualizou status para ' . $status . ' e seus arquivos foram excluídos pelo sistema', $id));
+        }
+        else
+            event(new CrudEvent('pré-registro', 'atualizou status para ' . $status, $id));
 
         return [
             'message' => '<i class="icon fa fa-check"></i>Pré-registro com a ID: ' . $id . ' foi atualizado para "' . $status . '" com sucesso', 

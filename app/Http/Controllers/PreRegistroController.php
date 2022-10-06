@@ -32,8 +32,9 @@ class PreRegistroController extends Controller
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
+            session(['url_pre_registro' => url()->full()]);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao carregar os pré-registros.");
         }
@@ -52,7 +53,7 @@ class PreRegistroController extends Controller
             $abas = $dados['abas'];
             $codigos = $dados['codigos'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao carregar o pré-registro.");
         }
@@ -71,7 +72,7 @@ class PreRegistroController extends Controller
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em pré-registros.");
         }
 
@@ -87,7 +88,7 @@ class PreRegistroController extends Controller
             $validatedData = $request->validated();
             $dados = $this->service->getService('PreRegistro')->saveAjaxAdmin($validatedData, $id, $user);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao salvar a justificativa do pré-registro.");
         }
@@ -102,7 +103,7 @@ class PreRegistroController extends Controller
         try{
             $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $idPreRegistro);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao fazer download do anexo do pré-registro.");
         }
@@ -119,7 +120,7 @@ class PreRegistroController extends Controller
             $user = auth()->user();
             $dados = $this->service->getService('PreRegistro')->updateStatus($id, $user, $validated['status']);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o status do pré-registro.");
         }
 

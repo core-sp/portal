@@ -167,15 +167,15 @@ class Kernel extends ConsoleKernel
             }
         })->dailyAt('4:15');
 
-        // Rotina de exclusão de arquivos do PreRegistro após 2 semanas com status 'Negado' ou 'Aprovado'
-        // Rotina de exclusão de arquivos do PreRegistro após 2 meses sem atualização com status 'Sendo elaborado'
+        // Rotina de exclusão de arquivos do PreRegistro após 2 semanas com status 'Aprovado'
+        // Rotina de exclusão de arquivos do PreRegistro após 2 meses sem atualização com status 'Sendo elaborado' e 'Aguardando correção'
         $schedule->call(function(){
             $diretorio = Anexo::PATH_PRE_REGISTRO . '/';
             $prs = PreRegistro::has('anexos')
             ->with('anexos')
             ->select('id', 'status', 'created_at', 'updated_at', 'user_externo_id')
             ->where(function ($query) {
-                $query->whereIn('status', [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO])
+                $query->whereIn('status', [PreRegistro::STATUS_APROVADO])
                 ->where('updated_at', '<=', Carbon::today()->subWeeks(2)->toDateString());
             })
             ->orWhere(function ($query) {
@@ -186,13 +186,8 @@ class Kernel extends ConsoleKernel
             foreach($prs as $pr)
             {
                 try {
-                    $totalFiles = $pr->anexos()->count();
-                    $deleted = Storage::deleteDirectory($diretorio . $pr->id);
-                    if($deleted)
-                    {
-                        $pr->anexos()->delete();
-                        $pr->touch();
-                    }
+                    $totalFiles = $pr->anexos->count();
+                    $pr->excluirAnexos();
                     $totalStorage = count(Storage::files($diretorio . $pr->id));
                     $totalBd = $pr->fresh()->anexos->count();
                     Log::channel('interno')->info('Rotina de exclusão de arquivos do pré-registro: pré-registro com ID '.$pr->id.' possuía '.$totalFiles.' e agora possui '.$totalStorage.' no Storage e '.$totalBd.' no BD.');
@@ -200,7 +195,9 @@ class Kernel extends ConsoleKernel
                     Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
                 }
             }
-        })->weeklyOn(3, '3:00')
+        })
+        ->weeklyOn(2, '3:00')
+        ->weeklyOn(4, '3:00')
         ->weeklyOn(7, '3:00');
     }
 

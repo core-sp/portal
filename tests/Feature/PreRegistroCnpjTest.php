@@ -112,6 +112,41 @@ class PreRegistroCnpjTest extends TestCase
     }
 
     /** @test */
+    public function can_create_new_register_pre_registros_cnpj_by_ajax_after_negado()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'status' => 'Negado'
+            ]),
+        ]);
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        
+        $this->assertDatabaseHas('pre_registros_cnpj', [
+            'pre_registro_id' => 2
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_new_register_pre_registros_cnpj_by_ajax_after_aprovado()
+    {
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        factory('App\PreRegistroCnpj')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'status' => 'Aprovado'
+            ]),
+        ]);
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertSeeText('Aprovado');
+        
+        $this->assertDatabaseMissing('pre_registros_cnpj', [
+            'pre_registro_id' => 2
+        ]);
+    }
+
+    /** @test */
     public function can_update_table_pre_registros_cnpj_by_ajax_with_upperCase()
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
@@ -1784,7 +1819,6 @@ class PreRegistroCnpjTest extends TestCase
     /** @test */
     public function log_is_generated_when_form_pj_is_submitted()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
         $final = $preRegistroCnpj->final;
@@ -1807,7 +1841,6 @@ class PreRegistroCnpjTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_status_different_aguardando_correcao_or_sendo_elaborado()
     {
-        Storage::fake('local');
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make();
         $final = $preRegistroCnpj->final;
@@ -1822,8 +1855,10 @@ class PreRegistroCnpjTest extends TestCase
 
         foreach(PreRegistro::getStatus() as $status)
         {
-            $externo->load('preRegistro')->preRegistro->update(['status' => $status]);
+            PreRegistro::find(1)->update(['status' => $status]);
             if(!in_array($status, [PreRegistro::STATUS_CRIADO, PreRegistro::STATUS_CORRECAO]))
+                in_array($status, [PreRegistro::STATUS_APROVADO, PreRegistro::STATUS_NEGADO]) ? 
+                $this->put(route('externo.inserir.preregistro'), $dados)->assertSessionHasErrors('path') : 
                 $this->put(route('externo.inserir.preregistro'), $dados)->assertStatus(401);
         }
     }
@@ -2648,6 +2683,11 @@ class PreRegistroCnpjTest extends TestCase
         $this->assertDatabaseHas('pre_registros', [
             'status' => PreRegistro::STATUS_NEGADO,
             'idusuario' => $admin->idusuario
+        ]);
+
+        $this->assertSoftDeleted('anexos', [
+            'path' => $anexo->path,
+            'pre_registro_id' => $anexo->pre_registro_id
         ]);
     }
 

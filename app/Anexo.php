@@ -74,6 +74,14 @@ class Anexo extends Model
         return $this->belongsTo('App\PreRegistro');
     }
 
+    public function excluirDiretorioPreRegistro()
+    {
+        $diretorio = Anexo::PATH_PRE_REGISTRO . '/';
+        if(Storage::disk('local')->exists($diretorio . $this->preRegistro->id))
+            return Storage::deleteDirectory($diretorio . $this->preRegistro->id);
+        return true;
+    }
+
     public static function armazenar($total, $valor, $id, $pf = true)
     {
         $totalAnexo = $pf ? Anexo::TOTAL_PF_PRE_REGISTRO : Anexo::TOTAL_PJ_PRE_REGISTRO;

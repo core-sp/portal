@@ -103,6 +103,30 @@ class AnexoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_create_anexos_by_ajax_after_aprovado()
+    {
+        $externo = $this->signInAsUserExterno();
+        factory('App\PreRegistroCpf')->create([
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'status' => 'Aprovado'
+            ]),
+        ]);
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertSeeText('Aprovado');
+        
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->image('random.jpg')]
+        ])->assertStatus(401);
+        
+        $this->assertDatabaseMissing('anexos', [
+            'nome_original' => 'random.jpg',
+            'pre_registro_id' => 2
+        ]);
+    }
+
+    /** @test */
     public function log_is_generated_when_anexo_created()
     {
         Storage::fake('local');

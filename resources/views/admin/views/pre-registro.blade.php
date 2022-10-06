@@ -14,7 +14,11 @@
 
     <p>
         <i class="fas fa-exclamation-circle text-primary"></i>
-        &nbsp;Após 2 semanas com status <span class="badge badge-success">Aprovado</span> ou <span class="badge badge-danger">Negado</span>, os anexos serão <strong>excluídos</strong> automaticamente do sistema.
+        &nbsp;Após 2 semanas com status <span class="badge badge-success">Aprovado</span>, os anexos serão <strong>excluídos</strong> automaticamente do sistema.
+    </p>
+    <p>
+        <i class="fas fa-exclamation-circle text-primary"></i>
+        &nbsp;Após atualizar o status para <span class="badge badge-danger">Negado</span>, os anexos serão <strong>excluídos</strong> automaticamente do sistema.
     </p>
     <hr />
     

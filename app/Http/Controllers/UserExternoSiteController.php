@@ -37,7 +37,7 @@ class UserExternoSiteController extends Controller
             $validated = $request->validated();
             $dados = $this->service->getService('UserExterno')->save($validated);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao criar o cadastro no Login Externo');
         }
 
@@ -57,7 +57,7 @@ class UserExternoSiteController extends Controller
         try{
             $erro = $this->service->getService('UserExterno')->verificaEmail($token);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao atualizar a verificação de email do cadastro no Login Externo');
         }
         
@@ -94,7 +94,7 @@ class UserExternoSiteController extends Controller
             $externo = auth()->guard('user_externo')->user();
             $erro = $this->service->getService('UserExterno')->editDados($validate, $externo);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao atualizar os dados cadastrais no Login Externo');
         }
 
@@ -113,7 +113,7 @@ class UserExternoSiteController extends Controller
             $gerenti = $dados['gerenti'];
             $resultado = isset($gerenti) ? null : $externo->load('preRegistro')->preRegistro;
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao verificar os dados para permitir ou não a solicitação de registro');
         }
 
@@ -128,9 +128,12 @@ class UserExternoSiteController extends Controller
 
             $externo = auth()->guard('user_externo')->user();
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
+
             if(isset($dados['gerenti']))
                 return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $dados['gerenti']]);
-                
+            if($externo->preRegistroAprovado())
+                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => null]);
+
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
             $codigos = $dados['codigos'];
             $resultado = $dados['resultado'];
@@ -139,7 +142,7 @@ class UserExternoSiteController extends Controller
             $totalFiles = $dados['totalFiles'];
             $abas = $dados['abas'];
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao carregar os dados da solicitação de registro');
         }
 
@@ -153,7 +156,7 @@ class UserExternoSiteController extends Controller
             $validatedData = $request->validated();
             $dados = $this->service->getService('PreRegistro')->saveSiteAjax($validatedData, $this->gerentiRepository, $externo);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao salvar os dados da solicitação de registro via ajax');
         }
@@ -165,6 +168,13 @@ class UserExternoSiteController extends Controller
     {
         try{
             $externo = auth()->guard('user_externo')->user();
+            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
+            
+            if(isset($dados['gerenti']))
+                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $dados['gerenti']]);
+            if($externo->preRegistroAprovado())
+                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => null]);
+
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
             $codigos = $dados['codigos'];
             $resultado = $dados['resultado'];
@@ -178,7 +188,7 @@ class UserExternoSiteController extends Controller
             $abas = $dados['abas'];
             $semPendencia = true;
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao verificar pendências da solicitação de registro');
         }
@@ -193,10 +203,15 @@ class UserExternoSiteController extends Controller
     {
         try{
             $externo = auth()->guard('user_externo')->user();
+            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
+            
+            if(isset($dados['gerenti']))
+                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $dados['gerenti']]);
+
             $validatedData = $request->validated();
             $dados = $this->service->getService('PreRegistro')->saveSite($validatedData, $this->gerentiRepository, $externo);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao enviar os dados da solicitação de registro para análise');
         }
@@ -215,7 +230,7 @@ class UserExternoSiteController extends Controller
 
             $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $preRegistro->id);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao solicitar download do arquivo');
         }
@@ -229,7 +244,7 @@ class UserExternoSiteController extends Controller
             $externo = auth()->guard('user_externo')->user();
             $dados = $this->service->getService('PreRegistro')->excluirAnexo($id, $externo);
         } catch (\Exception $e) {
-            \Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao solicitar exclusão do arquivo');
         }

@@ -340,10 +340,11 @@ class PreRegistroTest extends TestCase
         $externo = $this->signInAsUserExterno();
         $preRegistro = factory('App\PreRegistroCpf')->create();
 
+        // Status NEGADO permitido, pois irá criar uma nova solicitação
         foreach(PreRegistro::getStatus() as $status)
         {
             $preRegistro->preRegistro->update(['status' => $status]);
-            if(!in_array($preRegistro->preRegistro->status, [PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO]))
+            if(!in_array($preRegistro->preRegistro->status, [PreRegistro::STATUS_NEGADO, PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO]))
                 $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
                 ->assertDontSeeText('Verificar Pendências');
         }
@@ -358,7 +359,7 @@ class PreRegistroTest extends TestCase
         foreach(PreRegistro::getStatus() as $status)
         {
             $preRegistro->preRegistro->update(['status' => $status]);
-            if(!in_array($preRegistro->preRegistro->status, [PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO]))
+            if(!in_array($preRegistro->preRegistro->status, [PreRegistro::STATUS_NEGADO, PreRegistro::STATUS_CORRECAO, PreRegistro::STATUS_CRIADO]))
                 $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
                 ->assertDontSeeText('Verificar Pendências');
         }
@@ -402,7 +403,7 @@ class PreRegistroTest extends TestCase
         {
             $preRegistro->preRegistro->update(['status' => $status]);
             $this->get(route('externo.preregistro.view'))
-            ->assertSeeText('Status: ' . $status);
+            ->assertSeeText($status);
         }
 
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
@@ -416,7 +417,7 @@ class PreRegistroTest extends TestCase
         {
             $preRegistro->preRegistro->update(['status' => $status]);
             $this->get(route('externo.preregistro.view'))
-            ->assertSeeText('Status: ' . $status);
+            ->assertSeeText($status);
         }
     }
 
