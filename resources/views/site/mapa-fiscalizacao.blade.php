@@ -123,7 +123,7 @@
                   <td class="text-center" colspan="2">{{ $r->orientacaocontabil }}</td>
                 </tr>
                 <tr>
-                  <td class="text-left" style="width:60%; font-size: 15px">Oficio às prefeituras</td>
+                  <td class="text-left" style="width:60%; font-size: 15px">Ofício às prefeituras</td>
                   <td class="text-center" colspan="2">{{ $r->oficioprefeitura }}</td>
                 </tr>
               </tbody>
