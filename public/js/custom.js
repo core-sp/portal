@@ -427,7 +427,7 @@ function putDadosPreRegistro(campo, valor, acao)
     }
 
     $("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Salvando');
-	  $('#modalLoadingPreRegistro').modal('show');
+	  $('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
 
     $.ajax({
         method: 'POST',
@@ -463,7 +463,7 @@ function putDadosPreRegistro(campo, valor, acao)
         error: function(request, status, error) {
             var errorFunction = getErrorMsg(request);
             $("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorFunction[0]);
-            $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
+            $("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
             setTimeout(function() {
               $("#modalLoadingPreRegistro").modal('hide');
             }, errorFunction[1]); 

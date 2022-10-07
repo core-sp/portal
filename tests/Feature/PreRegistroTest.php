@@ -84,7 +84,7 @@ class PreRegistroTest extends TestCase
         ->assertSeeText('Você já possui registro ativo no Core-SP: ');
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-        ->assertSeeText('Você já possui registro ativo no Core-SP: ');
+        ->assertRedirect(route('externo.preregistro.view'));
 
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '86294373085'
@@ -94,7 +94,7 @@ class PreRegistroTest extends TestCase
         ->assertSeeText('Você já possui registro ativo no Core-SP: ');
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-        ->assertSeeText('Você já possui registro ativo no Core-SP: ');
+        ->assertRedirect(route('externo.preregistro.view'));
     }
 
     /** @test */
@@ -108,7 +108,7 @@ class PreRegistroTest extends TestCase
         ->assertSeeText('Você já possui registro ativo no Core-SP: ');
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-        ->assertSeeText('Você já possui registro ativo no Core-SP: ');
+        ->assertRedirect(route('externo.preregistro.view'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString('Usuário Externo com cnpj: ' . $externo->cpf_cnpj . ', não pode realizar a solicitação de registro ', $log);
@@ -122,7 +122,7 @@ class PreRegistroTest extends TestCase
         ->assertSeeText('Você já possui registro ativo no Core-SP: ');
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-        ->assertSeeText('Você já possui registro ativo no Core-SP: ');
+        ->assertRedirect(route('externo.preregistro.view'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString('Usuário Externo com cpf: ' . $externo->cpf_cnpj . ', não pode realizar a solicitação de registro ', $log);

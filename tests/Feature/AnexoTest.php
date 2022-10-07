@@ -112,7 +112,7 @@ class AnexoTest extends TestCase
             ]),
         ]);
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-        ->assertSeeText('Aprovado');
+        ->assertRedirect(route('externo.preregistro.view'));
         
         $this->post(route('externo.inserir.preregistro.ajax'), [
             'classe' => 'anexos',

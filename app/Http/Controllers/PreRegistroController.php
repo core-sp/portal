@@ -108,7 +108,7 @@ class PreRegistroController extends Controller
             abort(500, "Erro ao fazer download do anexo do pré-registro.");
         }
 
-        return $file;
+        return response()->file($file, ["Cache-Control" => "no-cache"]);
     }
 
     public function updateStatus(PreRegistroAdminRequest $request, $id)

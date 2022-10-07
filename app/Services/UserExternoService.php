@@ -108,7 +108,7 @@ class UserExternoService implements UserExternoServiceInterface {
         if(isset($user_externo))
             if($user_externo->ativo == 0)
                 return [
-                    'message' => 'Por favor, acesse o email informado no momento do cadastro para verificar sua conta.',
+                    'message' => 'Por favor, acesse o email informado no momento do cadastro para verificar sua conta. Caso tenha passado de 24h, se recadastre.',
                     'class' => 'alert-warning',
                     'cpf_cnpj' => $cpf_cnpj
                 ];

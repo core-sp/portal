@@ -130,9 +130,9 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
 
             if(isset($dados['gerenti']))
-                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $dados['gerenti']]);
+                return redirect(route('externo.preregistro.view'))->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
             if($externo->preRegistroAprovado())
-                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => null]);
+                return redirect(route('externo.preregistro.view'))->with(['resultado' => null, 'gerenti' => null]);
 
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
             $codigos = $dados['codigos'];
@@ -171,9 +171,9 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
             
             if(isset($dados['gerenti']))
-                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $dados['gerenti']]);
+                return redirect(route('externo.preregistro.view'))->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
             if($externo->preRegistroAprovado())
-                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => null]);
+                return redirect(route('externo.preregistro.view'))->with(['resultado' => null, 'gerenti' => null]);
 
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
             $codigos = $dados['codigos'];
@@ -203,11 +203,6 @@ class UserExternoSiteController extends Controller
     {
         try{
             $externo = auth()->guard('user_externo')->user();
-            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
-            
-            if(isset($dados['gerenti']))
-                return view('site.userExterno.pre-registro', ['resultado' => null, 'gerenti' => $dados['gerenti']]);
-
             $validatedData = $request->validated();
             $dados = $this->service->getService('PreRegistro')->saveSite($validatedData, $this->gerentiRepository, $externo);
         } catch (\Exception $e) {
@@ -235,7 +230,7 @@ class UserExternoSiteController extends Controller
             abort(500, 'Erro ao solicitar download do arquivo');
         }
         
-        return $file;
+        return response()->file($file, ["Cache-Control" => "no-cache"]);
     }
 
     public function preRegistroAnexoExcluir($id)

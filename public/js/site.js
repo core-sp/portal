@@ -1131,7 +1131,7 @@ function putDadosPreRegistro(objeto)
 		};
 
 	$("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Salvando');
-	$('#modalLoadingPreRegistro').modal('show');
+	$('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
 
 	$.ajax({
 		method: 'POST',
@@ -1166,7 +1166,7 @@ function putDadosPreRegistro(objeto)
 		error: function(request, status, error) {
 			var errorFunction = getErrorMsg(request);
 			$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + errorFunction[0]);
-			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
+			$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
 			setTimeout(function() {
 				$("#modalLoadingPreRegistro").modal('hide');
 			}, errorFunction[1]); 
@@ -1241,7 +1241,7 @@ function preencheContabil(dados)
 	if(_.has(dados,"update")){
 		var texto = "Somente pode trocar o CNPJ novamente dia: <br>" + dados.update;
 		$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + texto);
-		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
+		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
 		setTimeout(function() {
 			$("#modalLoadingPreRegistro").modal('hide');
 		}, 2500);
@@ -1267,7 +1267,7 @@ function preencheRT(dados)
 	if(_.has(dados,"update")){
 		var texto = "Somente pode trocar o CPF novamente dia: <br>" + dados.update;
 		$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + texto);
-		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false}).modal('show');
+		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
 		setTimeout(function() {
 			$("#modalLoadingPreRegistro").modal('hide');
 		}, 2500);
@@ -1578,7 +1578,7 @@ $('#submitPreRegistro').click(function(){
 		$('#modalSubmitPreRegistro').modal('hide');
 		
 	$("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Enviando...');
-	$('#modalLoadingPreRegistro').modal('show');
+	$('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
 	$('#inserirRegistro').submit();
 })
 

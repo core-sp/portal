@@ -17,7 +17,7 @@
 
 <p class="text-dark mb-2"><i class="fas fa-info-circle text-primary"></i> <strong>Atenção!</strong>
     <br>
-    <span class="ml-3"><i class="fas fa-minus"></i> Pode adicionar até {{ $totalFiles }} <span class="bold">anexos</span> com, no máximo, <mark>5MB</mark> de tamanho.</span>
+    <span class="ml-3"><i class="fas fa-minus"></i> Pode adicionar até {{ $totalFiles }} <span class="bold">anexos</span> com, no máximo, <mark>5MB</mark> de tamanho cada.</span>
     <br>
     <span class="ml-3"><i class="fas fa-minus"></i> Em cada anexo pode conter até 15 arquivos, basta manter a tecla <kbd>ctrl</kbd> pressionada ao selecionar.</span>
     <br>

@@ -169,7 +169,7 @@ class PreRegistroCpfTest extends TestCase
         ]);
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
-        ->assertSeeText('Aprovado');
+        ->assertRedirect(route('externo.preregistro.view'));
         
         $this->assertDatabaseMissing('pre_registros_cpf', [
             'pre_registro_id' => 2
@@ -244,6 +244,96 @@ class PreRegistroCpfTest extends TestCase
             ])->assertStatus(200);
 
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf->toArray());
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_1->attributesToArray());
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_2->attributesToArray());
+    }
+
+    /** @test */
+    public function can_update_table_pre_registros_cpf_by_ajax_when_exists_others_pre_registros_with_same_user_and_negado()
+    {
+        $externo = $this->signInAsUserExterno();
+        $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1970-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'user_externo_id' => $externo->id,
+                'status' => 'Negado'
+            ])
+        ]);
+
+        $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1975-10-15',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'user_externo_id' => $externo->id,
+                'status' => 'Negado'
+            ])
+        ]);
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
+        $preRegistroCpf = factory('App\PreRegistroCpf')->make([
+            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+        ]);
+
+        $preRegistroCpf = $preRegistroCpf->makeHidden([
+            'pre_registro_id'
+        ]);
+        
+        foreach($preRegistroCpf->toArray() as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaFisica',
+                'campo' => $key,
+                'valor' => $value
+            ])->assertStatus(200);
+
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf->toArray());
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_1->attributesToArray());
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_2->attributesToArray());
+    }
+
+    /** @test */
+    public function cannot_update_table_pre_registros_cpf_by_ajax_when_exists_others_pre_registros_with_same_user()
+    {
+        $externo = $this->signInAsUserExterno();
+        $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1970-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'user_externo_id' => $externo->id,
+                'status' => 'Negado'
+            ])
+        ]);
+
+        $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1975-10-15',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'user_externo_id' => $externo->id,
+                'status' => 'Aprovado'
+            ])
+        ]);
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertRedirect(route('externo.preregistro.view'));
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->make([
+            'pre_registro_id' => factory('App\PreRegistro')->make([
+                'user_externo_id' => 1,
+            ]),
+        ]);
+
+        $preRegistroCpf = $preRegistroCpf->makeHidden([
+            'pre_registro_id'
+        ]);
+        
+        foreach($preRegistroCpf->toArray() as $key => $value)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'pessoaFisica',
+                'campo' => $key,
+                'valor' => $value
+            ])->assertStatus(401);
+
+        $this->assertDatabaseMissing('pre_registros_cpf', $preRegistroCpf->toArray());
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_1->attributesToArray());
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_2->attributesToArray());
     }
@@ -742,6 +832,104 @@ class PreRegistroCpfTest extends TestCase
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_1);
         $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_2);
         $this->assertDatabaseHas('pre_registros', $externo->load('preRegistro')->preRegistro->toArray());
+    }
+
+    /** @test */
+    public function can_submit_pre_registros_cpf_when_exists_others_pre_registros_with_same_user_and_negado()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1970-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'user_externo_id' => $externo->id,
+                'status' => 'Negado'
+            ])
+        ])->attributesToArray();
+        $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1975-10-15',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'user_externo_id' => $externo->id,
+                'status' => 'Negado'
+            ])
+        ])->attributesToArray();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('request')->make();
+        $final = $preRegistroCpf->final;
+        $prCpf = Arr::except($preRegistroCpf->toArray(), [
+            'final','preRegistro','contabil'
+        ]);
+        $dados = array_merge($prCpf, $final);
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();  
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')]
+        ])->assertOk();
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
+
+        foreach($prCpf as $key => $value)
+            $prCpf[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
+        $this->assertDatabaseHas('pre_registros_cpf', $prCpf);
+
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_1);
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_2);
+        $this->assertDatabaseHas('pre_registros', $externo->load('preRegistro')->preRegistro->toArray());
+    }
+
+    /** @test */
+    public function cannot_submit_pre_registros_cpf_when_exists_others_pre_registros_with_same_user()
+    {
+        Storage::fake('local');
+        $externo = $this->signInAsUserExterno();
+        $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1970-03-10',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'user_externo_id' => $externo->id,
+                'status' => 'Negado'
+            ])
+        ])->attributesToArray();
+        $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
+            'dt_nascimento' => '1975-10-15',
+            'pre_registro_id' => factory('App\PreRegistro')->create([
+                'contabil_id' => null,
+                'user_externo_id' => $externo->id,
+                'status' => 'Aprovado'
+            ])
+        ])->attributesToArray();
+
+        $preRegistroCpf = factory('App\PreRegistroCpf')->states('request')->make();
+        $final = $preRegistroCpf->final;
+        $prCpf = Arr::except($preRegistroCpf->toArray(), [
+            'final','preRegistro','contabil'
+        ]);
+        $dados = array_merge($prCpf, $final);
+
+        $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))
+        ->assertRedirect(route('externo.preregistro.view'));
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'anexos',
+            'campo' => 'path',
+            'valor' => [UploadedFile::fake()->create('random.pdf')]
+        ])->assertStatus(401);
+        
+        $this->put(route('externo.inserir.preregistro'), $dados)
+        ->assertSessionHasErrors('path');
+
+        foreach($prCpf as $key => $value)
+            $prCpf[$key] = isset($value) ? mb_strtoupper($value, 'UTF-8') : $value;
+        $this->assertDatabaseMissing('pre_registros_cpf', $prCpf);
+
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_1);
+        $this->assertDatabaseHas('pre_registros_cpf', $preRegistroCpf_2);
+        $this->assertDatabaseMissing('pre_registros', ['id' => 3]);
     }
 
     /** @test */

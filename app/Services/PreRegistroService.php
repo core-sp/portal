@@ -545,7 +545,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $anexo = $preRegistro->anexos()->where('id', $id)->first();
 
         if(isset($anexo) && Storage::disk('local')->exists($anexo->path))
-            return response()->file(Storage::disk('local')->path($anexo->path), ["Cache-Control" => "no-cache"]);
+            return Storage::disk('local')->path($anexo->path);
         
         throw new \Exception('Arquivo não existe / não pode acessar', 401);
     }

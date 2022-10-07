@@ -222,6 +222,9 @@
                     class="btn btn-primary btn-sm float-right" 
                     type="submit" 
                     id="btnVerificaPend"
+                    data-toggle="modal" 
+                    data-target="#modalLoadingPreRegistro" 
+                    data-backdrop="static"
                 >
                     Verificar Pendências
                 </button>
@@ -231,11 +234,13 @@
     </form>
 
     <!-- The Modal Loading acionado via ajax -->
-    <div class="modal" id="modalLoadingPreRegistro">
+    <div class="modal hide" id="modalLoadingPreRegistro">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <!-- Modal body -->
-                <div id="modalLoadingBody" class="modal-body text-center"></div>
+                <div id="modalLoadingBody" class="modal-body text-center">
+                    <i class="spinner-border text-info"></i> Enviando...
+                </div>
             </div>
         </div>
     </div>
