@@ -35,7 +35,7 @@ class UserExternoService implements UserExternoServiceInterface {
         {
             if($externo->podeAtivar())
                 return [
-                    'erro' => 'Esta conta já solicitou o cadastro. Verifique seu email para ativar.',
+                    'erro' => 'Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar',
                     'class' => 'alert-danger'
                 ];
             if($externo->trashed())
@@ -86,6 +86,15 @@ class UserExternoService implements UserExternoServiceInterface {
                 ];
         else
         {
+            if($dados['email'] != $externo->email)
+            {
+                $emails = UserExterno::where('email', $dados['email'])->withTrashed()->count();
+                if($emails >= 2)
+                    return [
+                        'message' => 'Este email já está cadastrado em duas contas, por favor insira outro.',
+                        'class' => 'alert-danger',
+                    ];
+            }
             $externo->update([
                 'nome' => mb_strtoupper($dados['nome'], 'UTF-8'),
                 'email' => $dados['email']

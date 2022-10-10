@@ -222,7 +222,6 @@ class PreRegistroCnpjTest extends TestCase
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
-            'dt_inicio_atividade' => '2000-03-10',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -231,7 +230,6 @@ class PreRegistroCnpjTest extends TestCase
         ]);
 
         $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
-            'dt_inicio_atividade' => '2010-10-15',
             'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
@@ -243,7 +241,10 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
 
         $preRegistroCnpj = factory('App\PreRegistroCnpj')->make([
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id,
+            'pre_registro_id' => factory('App\PreRegistro')->make([
+                'user_externo_id' => 1,
+                'id' => 3
+            ]),
             'responsavel_tecnico_id' => null,
         ])->makeHidden(['pre_registro_id', 'responsavel_tecnico_id', 'historico_rt']);
         
@@ -266,7 +267,6 @@ class PreRegistroCnpjTest extends TestCase
     {
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
-            'dt_inicio_atividade' => '2000-03-10',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -275,7 +275,6 @@ class PreRegistroCnpjTest extends TestCase
         ]);
 
         $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
-            'dt_inicio_atividade' => '2010-10-15',
             'responsavel_tecnico_id' => $preRegistroCnpj_1->responsavel_tecnico_id,
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
@@ -891,7 +890,6 @@ class PreRegistroCnpjTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
-            'dt_inicio_atividade' => '2000-03-10',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -900,7 +898,6 @@ class PreRegistroCnpjTest extends TestCase
         ])->attributesToArray();
 
         $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
-            'dt_inicio_atividade' => '2010-10-15',
             'responsavel_tecnico_id' => $preRegistroCnpj_1['responsavel_tecnico_id'],
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
@@ -946,7 +943,6 @@ class PreRegistroCnpjTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistroCnpj_1 = factory('App\PreRegistroCnpj')->create([
-            'dt_inicio_atividade' => '2000-03-10',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -955,7 +951,6 @@ class PreRegistroCnpjTest extends TestCase
         ])->attributesToArray();
 
         $preRegistroCnpj_2 = factory('App\PreRegistroCnpj')->create([
-            'dt_inicio_atividade' => '2010-10-15',
             'responsavel_tecnico_id' => $preRegistroCnpj_1['responsavel_tecnico_id'],
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,

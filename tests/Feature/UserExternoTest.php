@@ -367,7 +367,7 @@ class UserExternoTest extends TestCase
             'aceite' => 'on',
         ]);
 
-        $this->get(route('externo.cadastro'))->assertSeeText('Esta conta já solicitou o cadastro. Verifique seu email para ativar.');
+        $this->get(route('externo.cadastro'))->assertSeeText('Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar');
 
         Mail::assertNotQueued(CadastroUserExternoMail::class);
         $this->assertDatabaseHas('users_externo', [
@@ -527,7 +527,8 @@ class UserExternoTest extends TestCase
             'aceite' => 'on',
         ]);
 
-        $this->get(route('externo.cadastro'))->assertSeeText('Esta conta já solicitou o cadastro. Verifique seu email para ativar.');
+        $this->get(route('externo.cadastro'))
+        ->assertSeeText('Esta conta já solicitou o cadastro. Verifique seu email para ativar. Caso não tenha mais acesso ao e-mail, aguarde 24h para se recadastrar');
 
         Mail::assertNotQueued(CadastroUserExternoMail::class);
 
@@ -1200,6 +1201,39 @@ class UserExternoTest extends TestCase
             'cpf_cnpj' => $user_externo['cpf_cnpj'],
             'nome' => mb_strtoupper('Novo nome do Usuário Externo', 'UTF-8'),
             'email' => 'teste@email.com.br'
+        ]);
+    }
+
+    /** @test 
+    */
+    public function cannot_after_login_update_email_with_more_than_2_mails_equal()
+    {
+        factory('App\UserExterno')->create([
+            'cpf_cnpj' => '89878398000177',
+            'email' => 'teste@email.com.br'
+        ]);
+        factory('App\UserExterno')->create([
+            'cpf_cnpj' => '98040120063',
+            'email' => 'teste@email.com.br'
+        ]);
+        $user_externo = factory('App\UserExterno')->create();
+        $dados = [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'password' => 'Teste102030',
+        ];
+        $this->get(route('externo.login'))->assertOk();
+        $this->post(route('externo.login.submit'), $dados);
+
+        $this->get(route('externo.editar.view'))->assertOk();
+        $this->put(route('externo.editar', [
+            'email' => 'teste@email.com.br'
+        ]));
+        $this->get(route('externo.editar.view'))
+        ->assertSee('Este email já está cadastrado em duas contas, por favor insira outro.');
+
+        $this->assertDatabaseHas('users_externo', [
+            'cpf_cnpj' => $user_externo['cpf_cnpj'],
+            'email' => $user_externo['email']
         ]);
     }
 

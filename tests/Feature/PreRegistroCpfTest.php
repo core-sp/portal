@@ -253,7 +253,6 @@ class PreRegistroCpfTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
         $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
-            'dt_nascimento' => '1970-03-10',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -262,7 +261,6 @@ class PreRegistroCpfTest extends TestCase
         ]);
 
         $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
-            'dt_nascimento' => '1975-10-15',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -272,7 +270,9 @@ class PreRegistroCpfTest extends TestCase
 
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $preRegistroCpf = factory('App\PreRegistroCpf')->make([
-            'pre_registro_id' => $externo->load('preRegistro')->preRegistro->id
+            'pre_registro_id' => factory('App\PreRegistro')->make([
+                'user_externo_id' => 1,
+            ]),
         ]);
 
         $preRegistroCpf = $preRegistroCpf->makeHidden([
@@ -296,7 +296,6 @@ class PreRegistroCpfTest extends TestCase
     {
         $externo = $this->signInAsUserExterno();
         $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
-            'dt_nascimento' => '1970-03-10',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -305,7 +304,6 @@ class PreRegistroCpfTest extends TestCase
         ]);
 
         $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
-            'dt_nascimento' => '1975-10-15',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -840,7 +838,6 @@ class PreRegistroCpfTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
         $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
-            'dt_nascimento' => '1970-03-10',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -848,7 +845,6 @@ class PreRegistroCpfTest extends TestCase
             ])
         ])->attributesToArray();
         $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
-            'dt_nascimento' => '1975-10-15',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -888,7 +884,6 @@ class PreRegistroCpfTest extends TestCase
         Storage::fake('local');
         $externo = $this->signInAsUserExterno();
         $preRegistroCpf_1 = factory('App\PreRegistroCpf')->create([
-            'dt_nascimento' => '1970-03-10',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,
@@ -896,7 +891,6 @@ class PreRegistroCpfTest extends TestCase
             ])
         ])->attributesToArray();
         $preRegistroCpf_2 = factory('App\PreRegistroCpf')->create([
-            'dt_nascimento' => '1975-10-15',
             'pre_registro_id' => factory('App\PreRegistro')->create([
                 'contabil_id' => null,
                 'user_externo_id' => $externo->id,

@@ -98,7 +98,10 @@ class UserExternoSiteController extends Controller
             abort(500, 'Erro ao atualizar os dados cadastrais no Login Externo');
         }
 
-        return isset($erro['message']) ? redirect(route('externo.editar.senha.view'))->with($erro) : 
+        if(isset($erro['message']) && isset($validate['password_atual']))
+            return redirect(route('externo.editar.senha.view'))->with($erro);
+
+        return isset($erro['message']) ? redirect(route('externo.editar.view'))->with($erro)->withInput() : 
             redirect(route('externo.editar.view'))->with([
                 'message' => 'Dados alterados com sucesso.',
                 'class' => 'alert-success'
