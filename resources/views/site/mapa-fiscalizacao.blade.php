@@ -126,6 +126,10 @@
                   <td class="text-left" style="width:60%; font-size: 15px">Ofício às prefeituras</td>
                   <td class="text-center" colspan="2">{{ $r->oficioprefeitura }}</td>
                 </tr>
+                <tr>
+                  <td class="text-left" style="width:60%; font-size: 15px">Ofício de incentivo a contratação de representantes comerciais</td>
+                  <td class="align-middle text-center" colspan="2">{{ $r->oficioincentivo }}</td>
+                </tr>
               </tbody>
             </table>
             <!-- <p class="text-danger text-left"><small>* notificações, ofícios e autos</small></p> -->

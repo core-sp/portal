@@ -25,6 +25,7 @@ $factory->define(DadoFiscalizacao::class, function (Faker $faker) {
         "multaadministrativa" => $faker->numberBetween(0, 999999999),
         "orientacaocontabil" => $faker->numberBetween(0, 999999999),
         "oficioprefeitura" => $faker->numberBetween(0, 999999999),
+        "oficioincentivo" => $faker->numberBetween(0, 999999999),
     ];
 });
 
@@ -49,8 +50,10 @@ $factory->state(DadoFiscalizacao::class, 'raw_request', function ($faker) {
             "multaadministrativa",
             "orientacaocontabil",
             "oficioprefeitura",
+            "oficioincentivo",
         ],
         'valor' => [
+            $faker->numberBetween(0, 999999999),
             $faker->numberBetween(0, 999999999),
             $faker->numberBetween(0, 999999999),
             $faker->numberBetween(0, 999999999),

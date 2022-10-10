@@ -24,15 +24,15 @@ class PeriodoFiscalizacaoRequest extends FormRequest
     {
         $campos = 'processofiscalizacaopf,processofiscalizacaopj,registroconvertidopf,registroconvertidopj,processoverificacao,';
         $campos .= 'dispensaregistro,notificacaort,orientacaorepresentada,orientacaorepresentante,cooperacaoinstitucional,autoconstatacao,';
-        $campos .= 'autosdeinfracao,multaadministrativa,orientacaocontabil,oficioprefeitura';
+        $campos .= 'autosdeinfracao,multaadministrativa,orientacaocontabil,oficioprefeitura,oficioincentivo';
 
         return [
             'periodo' => 'required_without:dados|date_format:Y|size:4|after_or_equal:2000|unique:periodos_fiscalizacao,periodo',
             'dados' => 'required_without:periodo|array|size:13',
             'dados.*.id' => 'required_without:periodo|exists:dados_fiscalizacao,id|distinct',
-            'dados.*.campo' => 'required_without:periodo|array|size:15',
+            'dados.*.campo' => 'required_without:periodo|array|size:16',
             'dados.*.campo.*' => 'required_without:periodo|in:' . $campos,
-            'dados.*.valor' => 'required_without:periodo|array|size:15',
+            'dados.*.valor' => 'required_without:periodo|array|size:16',
             'dados.*.valor.*' => 'required_without:periodo|integer|min:0|max:999999999',
         ];
     }
