@@ -31,6 +31,7 @@ use App\Repositories\AvisoRepository;
 use Illuminate\Support\Facades\View;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
+use App\Http\Requests\PagamentoGetnetRequest;
 
 class RepresentanteSiteController extends Controller
 {
@@ -579,5 +580,25 @@ class RepresentanteSiteController extends Controller
                 'message' => 'Solicitação enviada com sucesso! Após verificação das informações, será atualizada.',
                 'class' => 'alert-success'
             ]);
+    }
+
+    public function pagamentoView()
+    {
+        $pagamento = null;
+
+        return view('site.representante.pagamento', compact('pagamento'));
+    }
+
+    public function pagamento(PagamentoGetnetRequest $request)
+    {
+        try{
+            $validate = $request->validated();
+            $pagamento = $this->service->getService('Pagamento')->formatPagCheckout($validate);
+        }catch(Exception $e){
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao processar dados para pagamento online");
+        }
+
+        return view('site.representante.pagamento', compact('pagamento'));
     }
 }

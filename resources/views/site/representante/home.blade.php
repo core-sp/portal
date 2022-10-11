@@ -22,6 +22,11 @@
         @else
             <p class="pb-0">Já pago ou indisponível. Confira mais detalhes na guia de <a href="/representante/situacao-financeira">Situação Financeira</a>.</p>
         @endif
+
+        <br>
+        <!-- Temporário -->
+        <a href="{{ route('representante.pagamento.view') }}" class="btn btn-primary text-white text-decoration-none">Realizar Pagamento On-line</a>
+        
     </div>
 </div>
 
