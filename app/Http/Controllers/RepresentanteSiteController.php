@@ -582,23 +582,38 @@ class RepresentanteSiteController extends Controller
             ]);
     }
 
-    public function pagamentoView()
+    public function pagamentoGerentiView()
     {
         $pagamento = null;
 
         return view('site.representante.pagamento', compact('pagamento'));
     }
 
-    public function pagamento(PagamentoGetnetRequest $request)
+    public function pagamentoGerenti(/*PagamentoGerentiRequest*/Request $request)
     {
         try{
-            $validate = $request->validated();
-            $pagamento = $this->service->getService('Pagamento')->formatPagCheckout($validate);
+            // $validate = $request->validated();
+            // validação com a api do gerenti
+            $pagamento = $request->amount;
         }catch(Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao processar dados para pagamento online");
+            abort(500, "Erro ao processar dados do servidor para pagamento online");
         }
 
         return view('site.representante.pagamento', compact('pagamento'));
+    }
+
+    public function pagamentoCartao(PagamentoGetnetRequest $request)
+    {
+        try{
+            dd($validate = $request->validated());
+            $rep = Auth::guard('representante')->user();
+            dd($transacao = $this->service->getService('Pagamento')->pagamentoCredito($validate, $rep));
+        }catch(Exception $e){
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao processar dados da prestadora para pagamento online");
+        }
+
+        return redirect(route('representante.dashboard'), compact('transacao'));
     }
 }

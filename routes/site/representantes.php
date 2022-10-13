@@ -45,6 +45,7 @@ Route::prefix('representante')->group(function(){
     Route::get('/inserir-solicita-cedula', 'RepresentanteSiteController@inserirsolicitarCedulaView')->name('representante.inserirSolicitarCedulaView');
     Route::post('/inserir-solicita-cedula', 'RepresentanteSiteController@inserirsolicitarCedula')->name('representante.inserirSolicitarCedula');
 
-    Route::get('/realizar-pagamento', 'RepresentanteSiteController@pagamentoView')->name('representante.pagamento.view');
-    Route::post('/realizar-pagamento', 'RepresentanteSiteController@pagamento')->name('representante.pagamento');
+    Route::get('/realizar-pagamento', 'RepresentanteSiteController@pagamentoGerentiView')->name('representante.pagamento.view');
+    Route::post('/realizar-pagamento', 'RepresentanteSiteController@pagamentoGerenti')->name('representante.pagamentoGerenti');
+    Route::post('/confirmar-pagamento', 'RepresentanteSiteController@pagamentoCartao')->name('representante.pagamentoCartao');
 });
