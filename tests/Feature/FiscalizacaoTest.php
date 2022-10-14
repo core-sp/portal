@@ -772,6 +772,129 @@ class FiscalizacaoTest extends TestCase
 
     /** @test 
      * 
+    */
+    public function authorized_users_can_edit_orientacaocontabil()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'orientacaocontabil')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->orientacaocontabil);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'orientacaocontabil' => $dadoFiscalizacao->get($i)->orientacaocontabil
+            ]);
+            $dadoFiscalizacao->get($i)->update(['orientacaocontabil' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_oficioprefeitura()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'oficioprefeitura')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->oficioprefeitura);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'oficioprefeitura' => $dadoFiscalizacao->get($i)->oficioprefeitura
+            ]);
+            $dadoFiscalizacao->get($i)->update(['oficioprefeitura' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
+    */
+    public function authorized_users_can_edit_oficioincentivo()
+    {
+        $this->signInAsAdmin();
+
+        $periodoFiscalizacao = factory("App\PeriodoFiscalizacao")->create([
+            "periodo" => 2020
+        ]);
+        $dadoFiscalizacao = factory("App\DadoFiscalizacao", 13)->create([
+            "idperiodo" => $periodoFiscalizacao->id
+        ]);
+        $dados['dados'] = factory('App\DadoFiscalizacao')->state('raw_request')->make([
+            'idperiodo' => $periodoFiscalizacao->id
+        ])['final'];  
+        
+        foreach($dados['dados'] as $key => $value)
+        {
+            $temp = $dadoFiscalizacao->get($key)->makeHidden(['id', 'idperiodo', 'idregional', 'created_at', 'updated_at'])->toArray();
+            foreach($temp as $chave => $valor)
+            {
+                if($chave == 'oficioincentivo')
+                    $temp[$chave] = 0;
+                $dados['dados'][$key]['valor'] = array_values($temp);
+            }
+        }
+            
+        $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
+
+        for($i = 0; $i < 13; $i++)
+        {
+            $this->assertEquals(0, PeriodoFiscalizacao::find(1)->dadoFiscalizacao->get($i)->oficioincentivo);
+            $this->assertDatabaseMissing("dados_fiscalizacao", [
+                'oficioincentivo' => $dadoFiscalizacao->get($i)->oficioincentivo
+            ]);
+            $dadoFiscalizacao->get($i)->update(['oficioincentivo' => 0]);
+            $this->assertDatabaseHas("dados_fiscalizacao", $dadoFiscalizacao->get($i)->toArray());
+        }
+    }
+
+    /** @test 
+     * 
      * Usuário com autorização pode publicar periodo de fiscalização.
     */
     public function authorized_users_can_publish_periodo_fiscalizacao()

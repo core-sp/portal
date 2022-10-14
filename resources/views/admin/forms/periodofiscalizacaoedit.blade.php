@@ -119,7 +119,9 @@
                     $contCampos++;
                 @endphp
             </div>
+        </div>
 
+        <div class="form-row mb-2">
             <div class="col">
                 <input type="hidden" name="dados[{{ $cont }}][campo][]" value="processoverificacao" />
                 <label for="processoverificacao">Processos de Verificação</label>
@@ -143,9 +145,7 @@
                     $contCampos++;
                 @endphp
             </div>
-        </div>
-
-        <div class="form-row mb-2">
+            
             <div class="col">
                 <input type="hidden" name="dados[{{ $cont }}][campo][]" value="dispensaregistro" />
                 <label for="dispensaregistro">Dispensa de Registro</label>
@@ -217,7 +217,9 @@
                     $contCampos++;
                 @endphp
             </div>
+        </div>
 
+        <div class="form-row mb-2">
             <div class="col">
                 <input type="hidden" name="dados[{{ $cont }}][campo][]" value="orientacaorepresentante" />
                 <label for="orientacaorepresentante">Orientações aos RCs</label>
@@ -242,9 +244,10 @@
                 @endphp
             </div>
 
+            <!-- Nome no label foi pedido para ser alterado, mas no bd se mantem -->
             <div class="col">
                 <input type="hidden" name="dados[{{ $cont }}][campo][]" value="cooperacaoinstitucional" />
-                <label for="cooperacaoinstitucional">Cooperação Institucional</label>
+                <label for="cooperacaoinstitucional">Diligências externas</label>
                 <input type="number"
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
@@ -265,9 +268,7 @@
                     $contCampos++;
                 @endphp
             </div>
-        </div>
 
-        <div class="form-row mb-2">
             <div class="col">
                 <input type="hidden" name="dados[{{ $cont }}][campo][]" value="autoconstatacao" />
                 <label for="autoconstatacao">Auto de Constatação</label>
@@ -315,7 +316,9 @@
                     $contCampos++;
                 @endphp
             </div>
+        </div>
 
+        <div class="form-row mb-2">
             <div class="col">
                 <input type="hidden" name="dados[{{ $cont }}][campo][]" value="multaadministrativa" />
                 <label for="multaadministrativa">Multa Administrativa</label>
@@ -323,6 +326,78 @@
                     class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
                     name="dados[{{ $cont }}][valor][]"
                     value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->multaadministrativa }}"
+                    min="0" max="999999999"
+                />
+                @if($errors->has('dados.' . $cont . '.*'))
+                <div class="invalid-feedback">
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
+                </div>
+                @endif
+                @php
+                    $contCampos++;
+                @endphp
+            </div>
+
+            <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="orientacaocontabil" />
+                <label for="orientacaocontabil">Orientação às contabilidades</label>
+                <input type="number"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->orientacaocontabil }}"
+                    min="0" max="999999999"
+                />
+                @if($errors->has('dados.' . $cont . '.*'))
+                <div class="invalid-feedback">
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
+                </div>
+                @endif
+                @php
+                    $contCampos++;
+                @endphp
+            </div>
+
+            <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="oficioprefeitura" />
+                <label for="oficioprefeitura">Ofício às prefeituras</label>
+                <input type="number"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->oficioprefeitura }}"
+                    min="0" max="999999999"
+                />
+                @if($errors->has('dados.' . $cont . '.*'))
+                <div class="invalid-feedback">
+                    @foreach($errors->get('dados.' . $cont . '.*') as $error)
+                        {{ $error[0] }}
+                        @if(count($errors->get('dados.' . $cont . '.*')) > 1)
+                        <br>
+                        @endif
+                    @endforeach
+                </div>
+                @endif
+                @php
+                    $contCampos++;
+                @endphp
+            </div>
+
+            <div class="col">
+                <input type="hidden" name="dados[{{ $cont }}][campo][]" value="oficioincentivo" />
+                <label for="oficioincentivo">Ofício de incentivo a contratação de RCs</label>
+                <input type="number"
+                    class="form-control {{ $errors->has('dados.' . $cont . '.*') ? 'is-invalid' : '' }}"
+                    name="dados[{{ $cont }}][valor][]"
+                    value="{{ $errors->has('dados.' . $cont . '.*') ? old('dados.' . $cont . '.valor.' . $cont) : $r->oficioincentivo }}"
                     min="0" max="999999999"
                 />
                 @if($errors->has('dados.' . $cont . '.*'))
