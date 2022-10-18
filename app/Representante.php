@@ -107,4 +107,9 @@ class Representante extends Authenticable
     {
         return $this->hasMany('App\TermoConsentimento', 'idrepresentante');
     }
+
+    public function getSessionIdPagamento($boleto_id)
+    {
+        return apenasNumeros($this->cpf_cnpj) . $boleto_id;
+    }
 }

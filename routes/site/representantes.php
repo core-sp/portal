@@ -45,7 +45,8 @@ Route::prefix('representante')->group(function(){
     Route::get('/inserir-solicita-cedula', 'RepresentanteSiteController@inserirsolicitarCedulaView')->name('representante.inserirSolicitarCedulaView');
     Route::post('/inserir-solicita-cedula', 'RepresentanteSiteController@inserirsolicitarCedula')->name('representante.inserirSolicitarCedula');
 
-    Route::get('/realizar-pagamento', 'RepresentanteSiteController@pagamentoGerentiView')->name('representante.pagamento.view');
-    Route::post('/realizar-pagamento', 'RepresentanteSiteController@pagamentoGerenti')->name('representante.pagamentoGerenti');
-    Route::post('/confirmar-pagamento', 'RepresentanteSiteController@pagamentoCartao')->name('representante.pagamentoCartao');
+    // Falta rota de ajax que devolve os valores do gerenti conforme o usuário escolhe a forma de pagamento
+    Route::get('/{boleto}/realizar-pagamento', 'RepresentanteSiteController@pagamentoGerentiView')->name('representante.pagamento.view');
+    Route::post('/{boleto}/realizar-pagamento', 'RepresentanteSiteController@pagamentoGerenti')->name('representante.pagamentoGerenti');
+    Route::post('/{boleto}/confirmar-pagamento', 'RepresentanteSiteController@pagamentoCartao')->name('representante.pagamentoCartao');
 });

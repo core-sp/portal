@@ -3,6 +3,12 @@
 @section('content-representante')
 
 <div class="representante-content">
+    
+    @if(Session::has('message-cartao'))
+    <p class="alert {{ Session::get('class') }}">{!! Session::get('message-cartao') !!}</p>
+    <div class="linha-lg-mini mb-3"></div>
+    @endif
+
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Home</h4>
         <div class="linha-lg-mini mb-3"></div>
@@ -25,7 +31,7 @@
 
         <br>
         <!-- Temporário -->
-        <a href="{{ route('representante.pagamento.view') }}" class="btn btn-primary text-white text-decoration-none">Realizar Pagamento On-line</a>
+        <a href="{{ route('representante.pagamento.view', 1) }}" class="btn btn-primary text-white text-decoration-none">Teste Realizar Pagamento On-line</a>
         
     </div>
 </div>

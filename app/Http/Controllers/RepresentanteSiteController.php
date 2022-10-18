@@ -582,38 +582,68 @@ class RepresentanteSiteController extends Controller
             ]);
     }
 
-    public function pagamentoGerentiView()
-    {
-        $pagamento = null;
-
-        return view('site.representante.pagamento', compact('pagamento'));
-    }
-
-    public function pagamentoGerenti(/*PagamentoGerentiRequest*/Request $request)
+    public function pagamentoGerentiView($boleto)
     {
         try{
+            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado
+            $pagamento = null;
+            $boleto_dados['id'] = $boleto;
+            $boleto_dados['valor'] = '1503,03';
+        }catch(Exception $e){
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar dados do servidor para verificar pagamento");
+        }
+
+        return view('site.representante.pagamento')->with([
+            'pagamento' => $pagamento, 'boleto' => $boleto, 'boleto_dados' => $boleto_dados
+        ]);
+    }
+
+    // public function dadosPagamentoGerentiAjax(PagamentoGerentiRequest $request)
+    // {
+    //     // boleto pego do gerenti e deve estar relacionado com o usuário autenticado
+    //     $pagamento = null;
+    //     $boleto_dados['id'] = $boleto;
+    //     $boleto_dados['valor'] = '150,00';
+
+    //     return view('site.representante.pagamento')->with(['pagamento' => $pagamento, 'boleto' => $boleto, 'boleto_dados' => $boleto_dados]);
+    // }
+
+    public function pagamentoGerenti($boleto, /*PagamentoGerentiRequest*/Request $request)
+    {
+        try{
+            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado
             // $validate = $request->validated();
             // validação com a api do gerenti
-            $pagamento = $request->amount;
+            $boleto_dados['valor'] = $request['amount'];
+            $boleto_dados['tipo_pag'] = $request['tipo_pag'];
+            $boleto_dados['parcelas_1'] = $request['parcelas_1'];
+            $pagamento = true;
         }catch(Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao processar dados do servidor para pagamento online");
         }
 
-        return view('site.representante.pagamento', compact('pagamento'));
+        return view('site.representante.pagamento')->with([
+            'pagamento' => $pagamento, 'boleto' => $boleto, 'boleto_dados' => $boleto_dados
+        ]);
     }
 
-    public function pagamentoCartao(PagamentoGetnetRequest $request)
+    public function pagamentoCartao($boleto, PagamentoGetnetRequest $request)
     {
         try{
-            dd($validate = $request->validated());
+            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado
             $rep = Auth::guard('representante')->user();
-            dd($transacao = $this->service->getService('Pagamento')->pagamentoCredito($validate, $rep));
+            $validate = $request->validated();
+            $request->replace([]);
+            request()->replace([]);
+            $transacao = $this->service->getService('Pagamento')->checkout($request->ip(), $validate, $rep);
+            unset($validate);
         }catch(Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao processar dados da prestadora para pagamento online");
         }
 
-        return redirect(route('representante.dashboard'), compact('transacao'));
+        return redirect(route('representante.dashboard'))->with($transacao);
     }
 }

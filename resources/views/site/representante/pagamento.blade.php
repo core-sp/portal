@@ -5,7 +5,7 @@
 <noscript>
     <iframe 
         style="width: 100px; height: 100px; border: 0; position:absolute; top: -5000px;" 
-        src="https://h.online-metrix.net/fp/tags?org_id=1snn5n9w&session_id=123456123456">
+        src="https://h.online-metrix.net/fp/tags?org_id={{ config('app.url') != 'https://core-sp.org.br' ? '1snn5n9w' : '' }}&session_id={{ auth()->guard('representante')->user()->getSessionIdPagamento($boleto) }}">
     </iframe>
 </noscript>
 
@@ -14,20 +14,21 @@
         <h4 class="pt-1 pb-1">Pagamento On-line</h4>
         <div class="linha-lg-mini mb-1"></div>
 
-        <form action="{{ isset($pagamento) ? route('representante.pagamentoCartao') : route('representante.pagamentoGerenti') }}" method="POST">
+        <form action="{{ isset($pagamento) ? route('representante.pagamentoCartao', $boleto) : route('representante.pagamentoGerenti', $boleto) }}" method="POST" autocomplete="off">
             @csrf
+            <input type="hidden" name="boleto" value="{{ $boleto }}" />
+
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
                     <label for="amount">Valor *</label>
                     <input
                         type="text"
                         name="amount"
-                        class="form-control {{ $errors->has('amount') ? 'is-invalid' : '' }}"
-                        id="nome"
-                        value="{{ isset($pagamento) ? $pagamento : old('pagamento') }}"
-                        {{ isset($pagamento) ? 'readonly' : '' }}
-                        maxlength="10"
-
+                        class="form-control capitalSocial {{ $errors->has('amount') ? 'is-invalid' : '' }}"
+                        id="amount"
+                        value="{{ isset($boleto_dados['valor']) ? $boleto_dados['valor'] : old('amount') }}"
+                        readonly
+                        required
                     >
                     @if($errors->has('amount'))
                         <div class="invalid-feedback">
@@ -36,12 +37,17 @@
                     @endif
                 </div>
 
+                @php
+                    $tiposPag = ['credit' => 'Crédito', 'debit' => 'Débito', 'combined' => 'Com dois cartões (somente crédito)'];
+                @endphp
                 <div class="col-sm mb-2-576">
                     <label for="tipo_pag">Forma de pagamento *</label>
-                    <select name="tipo_pag" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo_pag') ? 'is-invalid' : '' }}" {{ isset($pagamento) ? 'disabled' : '' }}>
-                        <option value="Credito" {{ old('tipo_pag') == 'Credito' ? 'selected' : '' }}>Crédito</option>
-                        <option value="Debito" {{ old('tipo_pag') == 'Debito' ? 'selected' : '' }}>Débito</option>
-                        <option value="Combinado" {{ old('tipo_pag') == 'Combinado' ? 'selected' : '' }}>Com dois cartões (somente crédito)</option>
+                    <select name="tipo_pag" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo_pag') ? 'is-invalid' : '' }}" required>
+                    @foreach($tiposPag as $tipo => $texto)
+                        @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['tipo_pag'] == $tipo)))
+                        <option value="{{ $tipo }}" {{ old('tipo_pag') == $tipo ? 'selected' : '' }}>{{ $texto }}</option>
+                        @endif
+                    @endforeach
                     </select>
                     @if($errors->has('tipo_pag'))
                     <div class="invalid-feedback">
@@ -51,111 +57,216 @@
                 </div>
 
                 <div class="col-sm mb-2-576">
-                    <label for="parcelas">Parcelas *</label>
-                    <select name="parcelas" class="form-control mb-2 mr-sm-3 {{ $errors->has('parcelas') ? 'is-invalid' : '' }}" {{ isset($pagamento) ? 'disabled' : '' }}>
-                        <option value="1" {{ old('parcelas') == '1' ? 'selected' : '' }}>à vista</option>
-                        <option value="2" {{ old('parcelas') == '2' ? 'selected' : '' }}>2x sem juros</option>
-                        <option value="3" {{ old('parcelas') == '3' ? 'selected' : '' }}>3x sem juros</option>
+                    <label for="parcelas_1">Parcelas *</label>
+                    <select name="parcelas_1" class="form-control mb-2 mr-sm-3 {{ $errors->has('parcelas_1') ? 'is-invalid' : '' }}" required>
+                    @for($i = 1; $i < 11; $i++)
+                        @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['parcelas_1'] == $i)))
+                        <option value="{{ $i }}" {{ old('parcelas_1') == $i ? 'selected' : '' }}>{{ $i == 1 ? 'à vista' : $i . 'x sem juros' }}</option>
+                        @endif
+                    @endfor
                     </select>
-                    @if($errors->has('parcelas'))
+                    @if($errors->has('parcelas_1'))
                     <div class="invalid-feedback">
-                        {{ $errors->first('parcelas') }}
+                        {{ $errors->first('parcelas_1') }}
                     </div>
                     @endif
                 </div>
             </div>
 
             @if(isset($pagamento))
-            <div class="form-row mb-2 cadastroRepresentante">
-                <div class="col-sm mb-2-576">
-                    <label for="card_number">Número do cartão *</label>
-                    <input
-                        type="text"
-                        name="card_number"
-                        class="form-control {{ $errors->has('card_number') ? 'is-invalid' : '' }}"
-                        id="nome"
-                        value="{{ isset($card_number) ? $card_number : old('card_number') }}"
-                    >
-                    @if($errors->has('card_number'))
+            <fieldset class="border p-3">
+                <legend><small>Dados do {{ $boleto_dados['tipo_pag'] == 'combined' ? 'primeiro' : null }} cartão:</small></legend>
+                <div class="form-row mb-2 cadastroRepresentante">
+                    <div class="col-sm mb-2-576">
+                        <label for="card_number_1">Número do cartão *</label>
+                        <input
+                            type="text"
+                            name="card_number_1"
+                            class="form-control form-control-sm {{ $errors->has('card_number_1') ? 'is-invalid' : '' }}"
+                            id="card_number_1"
+                            minlength="13"
+                            maxlength="19"
+                            required
+                        >
+                        @if($errors->has('card_number_1'))
                         <div class="invalid-feedback">
-                            {{ $errors->first('card_number') }}
+                            {{ $errors->first('card_number_1') }}
                         </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
-            </div>
-            <div class="form-row mb-2 cadastroRepresentante">
-                <div class="col-sm mb-2-576">
-                    <label for="cardholder_name">Nome do titular *</label>
-                    <input
-                        type="text"
-                        name="cardholder_name"
-                        class="form-control {{ $errors->has('cardholder_name') ? 'is-invalid' : '' }}"
-                        id="cardholder_name"
-                        value="{{ isset($cardholder_name) ? $cardholder_name : old('cardholder_name') }}"
-                    >
-                    @if($errors->has('cardholder_name'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('cardholder_name') }}
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <div class="form-row mb-2 cadastroRepresentante">
-                <div class="col-sm mb-2-576">
-                    <label for="document_number">CPF / CNPJ *</label>
-                    <input
-                        type="text"
-                        name="document_number"
-                        class="form-control {{ $errors->has('document_number') ? 'is-invalid' : '' }}"
-                        id="nome"
-                        value="{{ isset($document_number) ? $document_number : old('document_number') }}"
-                    >
-                    @if($errors->has('document_number'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('document_number') }}
-                        </div>
-                    @endif
+                <div class="form-row mb-2 cadastroRepresentante">
+                    <div class="col-sm mb-2-576">
+                        <label for="cardholder_name_1">Nome do titular *</label>
+                        <input
+                            type="text"
+                            name="cardholder_name_1"
+                            class="form-control form-control-sm {{ $errors->has('cardholder_name_1') ? 'is-invalid' : '' }}"
+                            id="cardholder_name_1"
+                            maxlength="26"
+                            required
+                        >
+                        @if($errors->has('cardholder_name_1'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('cardholder_name_1') }}
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
-                <div class="col-sm mb-2-576">
-                    <label for="security_code">CVV *</label>
-                    <input
-                        type="text"
-                        name="security_code"
-                        class="form-control {{ $errors->has('security_code') ? 'is-invalid' : '' }}"
-                        id="security_code"
-                        value="{{ isset($security_code) ? $security_code : old('security_code') }}"
-                    >
-                    @if($errors->has('security_code'))
+                <div class="form-row mb-2 cadastroRepresentante">
+                    <div class="col-sm mb-2-576">
+                        <label for="document_number_1">CPF / CNPJ *</label>
+                        <input
+                            type="text"
+                            name="document_number_1"
+                            class="form-control form-control-sm cpfOuCnpj {{ $errors->has('document_number_1') ? 'is-invalid' : '' }}"
+                            id="document_number_1"
+                            required
+                        >
+                        @if($errors->has('document_number_1'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('document_number_1') }}
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="col-sm mb-2-576">
+                        <label for="security_code_1">CVV / CVC *</label>
+                        <input
+                            type="text"
+                            name="security_code_1"
+                            class="form-control form-control-sm {{ $errors->has('security_code_1') ? 'is-invalid' : '' }}"
+                            id="security_code_1"
+                            minlength="3"
+                            maxlength="4"
+                            required
+                        >
+                        @if($errors->has('security_code_1'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('security_code_1') }}
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="col-sm mb-2-576">
+                        <label for="expiration_1">Data de Expiração *</label>
+                        <input
+                            type="month"
+                            name="expiration_1"
+                            class="form-control form-control-sm {{ $errors->has('expiration_1') ? 'is-invalid' : '' }}"
+                            id="expiration_1"
+                            required
+                        >
+                        @if($errors->has('expiration_1'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('expiration_1') }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </fieldset>
+
+            @if($boleto_dados['tipo_pag'] == 'combined')
+            <fieldset class="border p-3">
+                <legend><small>Dados do segundo cartão:</small></legend>
+                <div class="form-row mb-2 cadastroRepresentante">
+                    <div class="col-sm mb-2-576">
+                        <label for="card_number_2">Número do cartão *</label>
+                        <input
+                            type="text"
+                            name="card_number_2"
+                            class="form-control form-control-sm {{ $errors->has('card_number_2') ? 'is-invalid' : '' }}"
+                            id="card_number_2"
+                            minlength="13"
+                            maxlength="19"
+                            required
+                        >
+                        @if($errors->has('card_number_2'))
                         <div class="invalid-feedback">
-                            {{ $errors->first('security_code') }}
+                            {{ $errors->first('card_number_2') }}
                         </div>
-                    @endif
+                        @endif
+                    </div>
+                </div>
+                <div class="form-row mb-2 cadastroRepresentante">
+                    <div class="col-sm mb-2-576">
+                        <label for="cardholder_name_2">Nome do titular *</label>
+                        <input
+                            type="text"
+                            name="cardholder_name_2"
+                            class="form-control form-control-sm {{ $errors->has('cardholder_name_2') ? 'is-invalid' : '' }}"
+                            id="cardholder_name_2"
+                            maxlength="26"
+                            required
+                        >
+                        @if($errors->has('cardholder_name_2'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('cardholder_name_2') }}
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
-                <div class="col-sm mb-2-576">
-                    <label for="expiration">Data de Expiração *</label>
-                    <input
-                        type="month"
-                        name="expiration"
-                        class="form-control {{ $errors->has('expiration') ? 'is-invalid' : '' }}"
-                        id="nome"
-                        value="{{ isset($expiration) ? $expiration : old('expiration') }}"
-                    >
-                    @if($errors->has('expiration'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('expiration') }}
-                        </div>
-                    @endif
+                <div class="form-row mb-2 cadastroRepresentante">
+                    <div class="col-sm mb-2-576">
+                        <label for="document_number_2">CPF / CNPJ *</label>
+                        <input
+                            type="text"
+                            name="document_number_2"
+                            class="form-control form-control-sm cpfOuCnpj {{ $errors->has('document_number_2') ? 'is-invalid' : '' }}"
+                            id="document_number_2"
+                            required
+                        >
+                        @if($errors->has('document_number_2'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('document_number_2') }}
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="col-sm mb-2-576">
+                        <label for="security_code_2">CVV / CVC *</label>
+                        <input
+                            type="text"
+                            name="security_code_2"
+                            class="form-control form-control-sm {{ $errors->has('security_code_2') ? 'is-invalid' : '' }}"
+                            id="security_code_2"
+                            minlength="3"
+                            maxlength="4"
+                            required
+                        >
+                        @if($errors->has('security_code_2'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('security_code_2') }}
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="col-sm mb-2-576">
+                        <label for="expiration_2">Data de Expiração *</label>
+                        <input
+                            type="month"
+                            name="expiration_2"
+                            class="form-control form-control-sm {{ $errors->has('expiration_2') ? 'is-invalid' : '' }}"
+                            id="expiration_2"
+                            required
+                        >
+                        @if($errors->has('expiration_2'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('expiration_2') }}
+                            </div>
+                        @endif
+                    </div>
                 </div>
-            </div>
+            </fieldset>
             @endif
-            
+            @endif
+
             <div class="form-group mt-4">
                 <button 
                     type="submit" 
-                    class="btn btn-primary"
+                    class="btn btn-{{ isset($pagamento) ? 'success' : 'primary' }}"
                 >
                 {{ isset($pagamento) ? 'Finalizar' : 'Confirmar dados para pagamento' }}
                 </button>

@@ -5,13 +5,11 @@ namespace App\Contracts;
 interface PagamentoServiceInterface {
 
     // em testes
-    public function getToken();
+    public function checkout($ip, $dados, $rep);
 
-    public function pagamentoDebito($ip);
+    public function cancelCheckout($dados, $rep);
 
-    public function pagamentoCredito($ip, $rep);
+    public function bin($bin);
 
-    public function cancelarPagamentoCredito($ip);
-
-    public function formatPagCheckout($request);
+    public function formatPagCheckoutIframe($request);
 }
