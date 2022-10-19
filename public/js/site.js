@@ -958,3 +958,46 @@ $('#cedula').ready(function() {
 			$('#rg').val(mascaraRG(texto));
 	}
 });
+
+// +++++++++++++++++++++++ Página pagamento Representante ++++++++++++++++++++++
+$('select[name="tipo_pag"]').change(function() {
+	if((this.value != 'debit') && (this.value != '')){
+		$('select[name="parcelas_1"]').attr('disabled', false);
+		$('#dados_combinado, #valor_combinado').hide();
+		$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', false);
+		if(this.value == 'combined'){
+			$('#dados_combinado, #valor_combinado').show();
+			$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', true);
+		}
+	}else{
+		$('select[name="parcelas_1"]').val('1').attr('disabled', true);
+		$('#dados_combinado, #valor_combinado').hide();
+		$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', false);
+	}
+});
+
+$('input[name="amount"]').ready(function() {
+	if($('select[name="tipo_pag"]').val() == ""){
+		$('select[name="parcelas_1"]').val('1').attr('disabled', true);
+		$('#dados_combinado, #valor_combinado').hide();
+		$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', false);
+	}
+});
+
+$('input[name="amount_1"], input[name="amount_2"]').keyup(function(e) {
+	if($('select[name="tipo_pag"]').val() == 'combined'){
+		var campo_digitado = this.name;
+		var campo_resto = campo_digitado == 'amount_1' ? 'amount_2' : 'amount_1';
+		var total = Number($('input[name="amount"]').val().replace(/[^0-9]/g,''));
+		var temp = total - Number($('input[name="' + campo_digitado + '"]').val().replace(/[^0-9]/g,''));
+		temp = parseFloat((temp/100)).toFixed(2);
+		$('input[name="' + campo_resto + '"]').val(new Intl.NumberFormat('id').format(temp));
+	}
+});
+// +++++++++++++++++++++++ ++++++++++++++++++++++++++++++ ++++++++++++++++++++++
+
+const input = document.getElementById('card_number_1');
+console.log(input);
+input.addEventListener('invalid', (e) => {
+  $('#modalPagamento').modal('hide');
+});

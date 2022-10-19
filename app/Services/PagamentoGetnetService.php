@@ -19,6 +19,11 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $this->urlBase = config('app.url') != 'https://core-sp.org.br' ? 'https://api-homologacao.getnet.com.br' : '';
     }
 
+    private function getStatusTransacao($transacao, $tipo_pag)
+    {
+        return $tipo_pag != 'combined' ? $transacao['status'] : [$transacao['payments'][0]['status'], $transacao['payments'][1]['status']];
+    }
+
     private function dadosBasicosPag($ip, $dados)
     {
         return [
@@ -90,6 +95,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $expiration = Carbon::createFromFormat('Y-m', $dados['expiration_1']);
         $dados['expiration_month_1'] = $expiration->format('m');
         $dados['expiration_year_1'] = $expiration->format('y');
+        $totalCartoes = 2;
 
         if($tipo != 'combined')
             $resultado['card'] = [
@@ -105,7 +111,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             $expiration = Carbon::createFromFormat('Y-m', $dados['expiration_2']);
             $dados['expiration_month_2'] = $expiration->format('m');
             $dados['expiration_year_2'] = $expiration->format('y');
-            for($i = 1; $i < 3; $i++)
+            for($i = 1; $i <= $totalCartoes; $i++)
                 $resultado['card_' . $i] = [
                     "number_token" => $dados['number_token_' . $i],
                     "cardholder_name" => $dados['cardholder_name_' . $i],
@@ -137,30 +143,20 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                     'card' => $resultado['card'],
                 ];
             case 'combined':
-                return [
-                    [
+                $array = array();
+                for($i = 1; $i <= $totalCartoes; $i++)
+                    array_push($array, [
                         "type" => "CREDIT",
-                        "amount" => apenasNumeros($dados['amount_1']),
+                        "amount" => apenasNumeros($dados['amount_' . $i]),
                         "currency" => "BRL",
                         "save_card_data" => false,
-                        "transaction_type" => $dados['tipo_parcelas_1'],
-                        "number_installments" => $dados['parcelas_1'],
-                        "payment_tag" => "pay-1",
+                        "transaction_type" => $dados['tipo_parcelas_' . $i],
+                        "number_installments" => $dados['parcelas_' . $i],
+                        "payment_tag" => "pay-" . $i,
                         "soft_descriptor" => $dados["soft_descriptor"],
-                        'card' => $resultado['card_1'],
-                    ],
-                    [
-                        "type" => "CREDIT",
-                        "amount" => apenasNumeros($dados['amount_2']),
-                        "currency" => "BRL",
-                        "save_card_data" => false,
-                        "transaction_type" => $dados['tipo_parcelas_2'],
-                        "number_installments" => $dados['parcelas_2'],
-                        "payment_tag" => "pay-2",
-                        "soft_descriptor" => $dados["soft_descriptor"],
-                        'card' => $resultado['card_2'],
-                    ],
-                ];
+                        'card' => $resultado['card_' . $i],
+                    ]);
+                return $array;
         }
     }
 
@@ -322,6 +318,8 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 ];
 
             $dadosFinais = $this->dadosBasicosPag($ip, $dados);
+            unset($dadosFinais['sub_merchant']);
+            unset($dadosFinais['currency']);
             $dadosFinais['payments'] = $this->tipoPagamento($dados['tipo_pag'], $dados);
             unset($dados);
 
@@ -375,7 +373,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         return json_decode($response->getBody()->getContents(), true);
     }
 
-    private function cancelarPagamentoCombinado($payment_id, $payment_tag)
+    private function cancelarPagamentoCombinado($payment_ids, $payment_tags)
     {
         try{
             $this->getToken();
@@ -388,8 +386,12 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 'json' => [
                     'payments' => [
                         [
-                            'payment_id' => $payment_id,
-                            'payment_tag' => $payment_tag,
+                            'payment_id' => $payment_ids[0],
+                            'payment_tag' => $payment_tags[0],
+                        ],
+                        [
+                            'payment_id' => $payment_ids[1],
+                            'payment_tag' => $payment_tags[1],
                         ],
                     ],
                 ],
@@ -424,13 +426,18 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             return $transacao;
         }
 
-        if($transacao['status'] != 'APPROVED')
+        $status = $this->getStatusTransacao($transacao, $tipo_pag);
+        $combined = is_array($status) && (($status[0] != 'AUTHORIZED') || ($status[1] != 'AUTHORIZED'));
+        $not_combined = !is_array($status) && ($status != 'APPROVED');
+
+        if($combined || $not_combined)
         {
             $string = 'Usuário ' . $rep->id . ' ("'. $rep->registro_core .'") tentou realizar o pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '*';
-            $string .= ', mas não foi possível. Retorno da Getnet: Cartão verificado, mas ao realizar o pagamento o status recebido foi' . $transacao['status'];
+            $string .= ', mas não foi possível. Retorno da Getnet: Cartão verificado, mas ao realizar o pagamento o status recebido foi' . json_encode($status);
             event(new ExternoEvent($string));
+
             return [
-                'message-cartao' => '<i class="fas fa-ban"></i> Status da transação: ' . $transacao['status'] . '. Pagamento do boleto ' . $boleto . ' não realizado.',
+                'message-cartao' => '<i class="fas fa-ban"></i> Status da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Pagamento do boleto ' . $boleto . ' não realizado.',
                 'class' => 'alert-danger'
             ];
         }
@@ -453,22 +460,27 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $boleto = $dados['boleto'];
         $tipo_pag = $dados['tipo_pag'];
         $transacao = $tipo_pag != 'combined' ? $this->cancelarPagamento($dados['payment_id'], $tipo_pag) : 
-        $this->cancelarPagamentoCombinado($dados['payment_id'], $dados['payment_tag']);
+        $this->cancelarPagamentoCombinado($dados['payment_ids'], $dados['payment_tags']);
         unset($dados);
+
+        $status = $this->getStatusTransacao($transacao, $tipo_pag);
+        $combined = is_array($status) && (($status[0] != 'CANCELED') || ($status[1] != 'CANCELED'));
+        $not_combined = !is_array($status) && ($status != 'CANCELED');
         
-        if($transacao['status'] != 'CANCELED')
+        if($combined || $not_combined)
         {
             $message = '';
             if($tipo_pag == 'combined')
-                $message = isset($transacao['payments']['credit_cancel']['message']) ? $transacao['payments']['credit_cancel']['message'] : 'status ' . $transacao['status'];
+                $message = isset($transacao['payments']['credit_cancel']['message']) ? $transacao['payments']['credit_cancel']['message'] : 'status ' . $status;
             else
-                $message = isset($transacao[$tipo_pag . '_cancel']['message']) ? $transacao[$tipo_pag . '_cancel']['message'] : 'status ' . $transacao['status'];
+                $message = isset($transacao[$tipo_pag . '_cancel']['message']) ? $transacao[$tipo_pag . '_cancel']['message'] : 'status ' . $status;
             
             $string = 'Usuário ' . $rep->id . ' ("'. $rep->registro_core .'") tentou realizar o cancelamento do pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a payment_id: ' . $dados['payment_id'];
             $string .= ', mas não foi possível. Retorno da Getnet: ' . $message;
             event(new ExternoEvent($string));
+
             return [
-                'message-cartao' => '<i class="fas fa-ban"></i> Status do cancelamento da transação: ' . $transacao['status'] . '. Cancelamento do pagamento do boleto ' . $boleto . ' não realizado.',
+                'message-cartao' => '<i class="fas fa-ban"></i> Status do cancelamento da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Cancelamento do pagamento do boleto ' . $boleto . ' não realizado.',
                 'class' => 'alert-danger'
             ];
         }

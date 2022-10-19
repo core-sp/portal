@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\CpfCnpj;
 
 class PagamentoGetnetRequest extends FormRequest
 {
@@ -12,12 +13,14 @@ class PagamentoGetnetRequest extends FormRequest
         $rep = auth()->guard('representante')->user();
 
         $this->merge([
+            'cardholder_mobile' => $this->tipo_pag == 'debit' ? '11999999999' : '',
             'email' => $rep->email,
             'name' => $rep->nome,
             'document_type' => $rep->tipoPessoa() == 'PF' ? 'CPF' : 'CNPJ',
             'document_number' => $rep->cpf_cnpj,
             'device_id' => $rep->getSessionIdPagamento($this->boleto),
             'tipo_parcelas_1' => $this->parcelas_1 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST',
+            'tipo_parcelas_2' => $this->parcelas_2 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST',
             'order_id' => '6d2e4380-d8a3-4ccb-9138-c289182818a3',
             'customer_id' => 'customer_21081826',
             'first_name' => 'Teste',
@@ -47,23 +50,25 @@ class PagamentoGetnetRequest extends FormRequest
     {
         return [
             'boleto' => 'required',
-            'amount' => 'required',
+            'amount' => 'required|max:12',
             'tipo_pag' => 'required|in:debit,credit,combined',
-            'parcelas_1' => 'required',
-            'expiration_1' => 'required',
-            'security_code_1' => 'required',
-            'document_number_1' => 'required',
-            'cardholder_name_1' => 'required',
-            'card_number_1' => 'required',
-            'cardholder_mobile' => 'required_if:tipo_pag,debit',
+            'parcelas_1' => 'required|min:1|numeric',
+            'expiration_1' => 'required|date_format:Y-m|after_or_equal:now',
+            'security_code_1' => 'required|min:3|max:4|numeric',
+            'document_number_1' => ['required', new CpfCnpj],
+            'cardholder_name_1' => 'required|max:26',
+            'card_number_1' => 'required|numeric|min:13|max:19',
+            'cardholder_mobile' => '',
             'tipo_parcelas_1' => '',
+            'amount_1' => 'required_if:tipo_pag,combined|max:12',
             // Combinado
-            'parcelas_2' => 'required_if:tipo_pag,combined',
-            'expiration_2' => 'required_if:tipo_pag,combined',
-            'security_code_2' => 'required_if:tipo_pag,combined',
-            'document_number_2' => 'required_if:tipo_pag,combined',
-            'cardholder_name_2' => 'required_if:tipo_pag,combined',
-            'card_number_2' => 'required_if:tipo_pag,combined',
+            'amount_2' => 'required_if:tipo_pag,combined|max:12',
+            'parcelas_2' => 'required_if:tipo_pag,combined|min:1|numeric',
+            'expiration_2' => 'required_if:tipo_pag,combined|date_format:Y-m|after_or_equal:now',
+            'security_code_2' => 'required_if:tipo_pag,combined|min:3|max:4|numeric',
+            'document_number_2' => ['required_if:tipo_pag,combined', new CpfCnpj],
+            'cardholder_name_2' => 'required_if:tipo_pag,combined|max:26',
+            'card_number_2' => 'required_if:tipo_pag,combined|numeric|min:13|max:19',
             'tipo_parcelas_2' => '',
             // ++++++++++++++
             'order_id' => '',

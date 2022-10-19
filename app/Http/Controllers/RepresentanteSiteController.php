@@ -618,6 +618,9 @@ class RepresentanteSiteController extends Controller
             $boleto_dados['valor'] = $request['amount'];
             $boleto_dados['tipo_pag'] = $request['tipo_pag'];
             $boleto_dados['parcelas_1'] = $request['parcelas_1'];
+            $boleto_dados['parcelas_2'] = $request['parcelas_2'];
+            $boleto_dados['amount_1'] = $request['amount_1'];
+            $boleto_dados['amount_2'] = $request['amount_2'];
             $pagamento = true;
         }catch(Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -641,7 +644,7 @@ class RepresentanteSiteController extends Controller
             unset($validate);
         }catch(Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao processar dados da prestadora para pagamento online");
+            abort(500, "Erro ao processar dados da prestadora para pagamento online. Cod: " . $e->getCode());
         }
 
         return redirect(route('representante.dashboard'))->with($transacao);

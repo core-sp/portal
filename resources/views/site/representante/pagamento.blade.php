@@ -43,9 +43,12 @@
                 <div class="col-sm mb-2-576">
                     <label for="tipo_pag">Forma de pagamento *</label>
                     <select name="tipo_pag" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo_pag') ? 'is-invalid' : '' }}" required>
+                        @if(!isset($pagamento))
+                        <option value="">Selecione a forma de pagamento...</option>
+                        @endif
                     @foreach($tiposPag as $tipo => $texto)
                         @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['tipo_pag'] == $tipo)))
-                        <option value="{{ $tipo }}" {{ old('tipo_pag') == $tipo ? 'selected' : '' }}>{{ $texto }}</option>
+                        <option value="{{ $tipo }}">{{ $texto }}</option>
                         @endif
                     @endforeach
                     </select>
@@ -55,13 +58,37 @@
                     </div>
                     @endif
                 </div>
+            </div>
+
+            <div class="form-row mb-2 cadastroRepresentante">
+                @if(!isset($pagamento) || (isset($pagamento) && isset($boleto_dados['amount_1']) && isset($boleto_dados['amount_2'])))
+                <div class="col-sm mb-2-576" id="valor_combinado">
+                    <label for="amount_1">Valor do primeiro cartão *</label>
+                    <input
+                        type="text"
+                        name="amount_1"
+                        class="form-control {{ isset($pagamento) ? '' : 'capitalSocial' }} {{ $errors->has('amount_1') ? 'is-invalid' : '' }}"
+                        id="amount_1"
+                        value="{{ isset($boleto_dados['amount_1']) ? $boleto_dados['amount_1'] : old('amount_1') }}"
+                        @if(isset($pagamento))
+                        readonly
+                        @endif
+                        required
+                    >
+                    @if($errors->has('amount_1'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('amount_1') }}
+                        </div>
+                    @endif
+                </div>
+                @endif
 
                 <div class="col-sm mb-2-576">
                     <label for="parcelas_1">Parcelas *</label>
                     <select name="parcelas_1" class="form-control mb-2 mr-sm-3 {{ $errors->has('parcelas_1') ? 'is-invalid' : '' }}" required>
                     @for($i = 1; $i < 11; $i++)
                         @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['parcelas_1'] == $i)))
-                        <option value="{{ $i }}" {{ old('parcelas_1') == $i ? 'selected' : '' }}>{{ $i == 1 ? 'à vista' : $i . 'x sem juros' }}</option>
+                        <option value="{{ $i }}">{{ $i == 1 ? 'à vista' : $i . 'x sem juros' }}</option>
                         @endif
                     @endfor
                     </select>
@@ -72,6 +99,46 @@
                     @endif
                 </div>
             </div>
+
+            @if(!isset($pagamento) || (isset($pagamento) && isset($boleto_dados['amount_1']) && isset($boleto_dados['amount_2'])))
+            <div class="form-row mb-2 cadastroRepresentante" id="dados_combinado">
+                <div class="col-sm mb-2-576">
+                    <label for="amount_2">Valor do segundo cartão *</label>
+                    <input
+                        type="text"
+                        name="amount_2"
+                        class="form-control {{ isset($pagamento) ? '' : 'capitalSocial' }} {{ $errors->has('amount_2') ? 'is-invalid' : '' }}"
+                        id="amount_2"
+                        value="{{ isset($boleto_dados['amount_2']) ? $boleto_dados['amount_2'] : old('amount_2') }}"
+                        @if(isset($pagamento))
+                        readonly
+                        @endif
+                        required
+                    >
+                    @if($errors->has('amount_2'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('amount_2') }}
+                        </div>
+                    @endif
+                </div>
+
+                <div class="col-sm mb-2-576">
+                    <label for="parcelas_2">Parcelas *</label>
+                    <select name="parcelas_2" class="form-control mb-2 mr-sm-3 {{ $errors->has('parcelas_2') ? 'is-invalid' : '' }}" required>
+                    @for($i = 1; $i < 11; $i++)
+                        @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['parcelas_2'] == $i)))
+                        <option value="{{ $i }}">{{ $i == 1 ? 'à vista' : $i . 'x sem juros' }}</option>
+                        @endif
+                    @endfor
+                    </select>
+                    @if($errors->has('parcelas_2'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('parcelas_2') }}
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endif
 
             @if(isset($pagamento))
             <fieldset class="border p-3">
@@ -86,6 +153,9 @@
                             id="card_number_1"
                             minlength="13"
                             maxlength="19"
+                            placeholder="Número de cartão válido"
+                            pattern="[0-9]{13,19}" 
+                            title="Somente números"
                             required
                         >
                         @if($errors->has('card_number_1'))
@@ -101,11 +171,14 @@
                         <input
                             type="text"
                             name="cardholder_name_1"
-                            class="form-control form-control-sm {{ $errors->has('cardholder_name_1') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm text-uppercase {{ $errors->has('cardholder_name_1') ? 'is-invalid' : '' }}"
                             id="cardholder_name_1"
                             maxlength="26"
                             required
                         >
+                        <small class="form-text text-muted">
+                            <em>* Nome idêntico ao do cartão, sem acentos ou pontuações</em>
+                        </small>
                         @if($errors->has('cardholder_name_1'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('cardholder_name_1') }}
@@ -176,10 +249,13 @@
                         <input
                             type="text"
                             name="card_number_2"
-                            class="form-control form-control-sm {{ $errors->has('card_number_2') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm numero {{ $errors->has('card_number_2') ? 'is-invalid' : '' }}"
                             id="card_number_2"
+                            placeholder="Número de cartão válido"
                             minlength="13"
                             maxlength="19"
+                            pattern="[0-9]{13,19}" 
+                            title="Somente números"
                             required
                         >
                         @if($errors->has('card_number_2'))
@@ -195,11 +271,14 @@
                         <input
                             type="text"
                             name="cardholder_name_2"
-                            class="form-control form-control-sm {{ $errors->has('cardholder_name_2') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm text-uppercase {{ $errors->has('cardholder_name_2') ? 'is-invalid' : '' }}"
                             id="cardholder_name_2"
                             maxlength="26"
                             required
                         >
+                        <small class="form-text text-muted">
+                            <em>* Nome idêntico ao do cartão, sem acentos ou pontuações</em>
+                        </small>
                         @if($errors->has('cardholder_name_2'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('cardholder_name_2') }}
@@ -267,6 +346,9 @@
                 <button 
                     type="submit" 
                     class="btn btn-{{ isset($pagamento) ? 'success' : 'primary' }}"
+                    @if(isset($pagamento))
+                        data-toggle="modal" data-target="#modalPagamento" data-backdrop="static"
+                    @endif
                 >
                 {{ isset($pagamento) ? 'Finalizar' : 'Confirmar dados para pagamento' }}
                 </button>
@@ -282,6 +364,20 @@
             </div>
         </form>
     </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="modalPagamento">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Modal body -->
+      <div class="modal-body text-center">
+        <div class="spinner-grow text-success"></div> <strong>Aguarde... finalizando o pagamento...</strong>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 {{--
