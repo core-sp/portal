@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Contracts\PagamentoServiceInterface;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use App\Events\ExternoEvent;
 
 class PagamentoGetnetService implements PagamentoServiceInterface {
@@ -174,7 +174,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                     'grant_type' => "client_credentials",
                 ],
             ]);
-        }catch(ClientException $e){
+        }catch(RequestException $e){
             $codigo = 0;
             $erroGetnet = $e->getMessage();
             if($e->hasResponse())
@@ -203,7 +203,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                     'customer_id' => $customer_id,
                 ],
             ]);
-        }catch(ClientException $e){
+        }catch(RequestException $e){
             $codigo = 0;
             $erroGetnet = $e->getMessage();
             if($e->hasResponse())
@@ -240,7 +240,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                     'security_code' => $security_code,
                 ],
             ]);
-        }catch(ClientException $e){
+        }catch(RequestException $e){
             $codigo = 0;
             $erroGetnet = $e->getMessage();
             if($e->hasResponse())
@@ -283,7 +283,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
             unset($dados);
             unset($dadosFinais);
-        }catch(ClientException $e){
+        }catch(RequestException $e){
             $codigo = 0;
             $erroGetnet = $e->getMessage();
             if($e->hasResponse())
@@ -333,7 +333,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             ]);
 
             unset($dadosFinais);
-        }catch(ClientException $e){
+        }catch(RequestException $e){
             $codigo = 0;
             $erroGetnet = $e->getMessage();
             if($e->hasResponse())
@@ -358,7 +358,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                     'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
                 ]
             ]);
-        }catch(ClientException $e){
+        }catch(RequestException $e){
             $codigo = 0;
             $erroGetnet = $e->getMessage();
             if($e->hasResponse())
@@ -396,7 +396,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                     ],
                 ],
             ]);
-        }catch(ClientException $e){
+        }catch(RequestException $e){
             $codigo = 0;
             $erroGetnet = $e->getMessage();
             if($e->hasResponse())
@@ -450,7 +450,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         unset($transacao);
 
         return [
-            'message-cartao' => '<i class="fas fa-check"></i> Pagamento Aprovado para o boleto ' . $boleto . '.<br>Detalhes do pagamento enviado por e-mail.',
+            'message-cartao' => '<i class="fas fa-check"></i> Pagamento Aprovado para o boleto ' . $boleto . '. Detalhes do pagamento enviado por e-mail.',
             'class' => 'alert-success'
         ];
     }
@@ -492,7 +492,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         unset($transacao);
 
         return [
-            'message-cartao' => '<i class="fas fa-check"></i> Cancelamento do pagamento do boleto ' . $boleto . ' aprovado.<br>Detalhes do cancelamento do pagamento enviado por e-mail.',
+            'message-cartao' => '<i class="fas fa-check"></i> Cancelamento do pagamento do boleto ' . $boleto . ' aprovado. Detalhes do cancelamento do pagamento enviado por e-mail.',
             'class' => 'alert-success'
         ];
     }
@@ -506,7 +506,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                     'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
                 ]
             ]);
-        }catch(ClientException $e){
+        }catch(RequestException $e){
             $codigo = 0;
             $erroGetnet = $e->getMessage();
             if($e->hasResponse())

@@ -9,10 +9,22 @@ class PagamentoGetnetRequest extends FormRequest
 {
     protected function prepareForValidation()
     {
+        // Tipos de parcelas: "FULL", "INSTALL_NO_INTEREST", "INSTALL_WITH_INTEREST"
+        // 'cardholder_mobile' quando debito e visa
+        
         // Temporário, muitos dados do Gerenti
         $rep = auth()->guard('representante')->user();
 
         $this->merge([
+            'amount' => apenasNumeros($this->amount),
+            'amount_1' => apenasNumeros($this->amount_1),
+            'amount_2' => apenasNumeros($this->amount_2),
+            'cardholder_name_1' => mb_strtoupper($this->cardholder_name_1),
+            'cardholder_name_2' => mb_strtoupper($this->cardholder_name_2),
+            'card_number_1' => apenasNumeros($this->card_number_1),
+            'card_number_2' => apenasNumeros($this->card_number_2),
+            'document_number_1' => apenasNumeros($this->document_number_1),
+            'document_number_2' => apenasNumeros($this->document_number_2),
             'cardholder_mobile' => $this->tipo_pag == 'debit' ? '11999999999' : '',
             'email' => $rep->email,
             'name' => $rep->nome,
@@ -50,25 +62,25 @@ class PagamentoGetnetRequest extends FormRequest
     {
         return [
             'boleto' => 'required',
-            'amount' => 'required|max:12',
+            'amount' => 'required|regex:/^[0-9]{1,10}$/',
             'tipo_pag' => 'required|in:debit,credit,combined',
-            'parcelas_1' => 'required|min:1|numeric',
-            'expiration_1' => 'required|date_format:Y-m|after_or_equal:now',
-            'security_code_1' => 'required|min:3|max:4|numeric',
+            'parcelas_1' => 'required|regex:/^[0-9]{1,2}$/',
+            'expiration_1' => 'required|date_format:Y-m|after_or_equal:' . date('Y-m'),
+            'security_code_1' => 'required|regex:/^[0-9]{3,4}$/',
             'document_number_1' => ['required', new CpfCnpj],
-            'cardholder_name_1' => 'required|max:26',
-            'card_number_1' => 'required|numeric|min:13|max:19',
+            'cardholder_name_1' => 'required|regex:/^[A-z\s]{5,26}$/',
+            'card_number_1' => 'required|regex:/^[0-9]{13,19}$/',
             'cardholder_mobile' => '',
             'tipo_parcelas_1' => '',
-            'amount_1' => 'required_if:tipo_pag,combined|max:12',
+            'amount_1' => 'required_if:tipo_pag,combined|regex:/^[0-9]{1,10}$/',
             // Combinado
-            'amount_2' => 'required_if:tipo_pag,combined|max:12',
-            'parcelas_2' => 'required_if:tipo_pag,combined|min:1|numeric',
-            'expiration_2' => 'required_if:tipo_pag,combined|date_format:Y-m|after_or_equal:now',
-            'security_code_2' => 'required_if:tipo_pag,combined|min:3|max:4|numeric',
+            'amount_2' => 'required_if:tipo_pag,combined|regex:/^[0-9]{1,10}$/',
+            'parcelas_2' => 'required_if:tipo_pag,combined|regex:/^[0-9]{1,2}$/',
+            'expiration_2' => 'required_if:tipo_pag,combined|date_format:Y-m|after_or_equal:' . date('Y-m'),
+            'security_code_2' => 'required_if:tipo_pag,combined|regex:/^[0-9]{3,4}$/',
             'document_number_2' => ['required_if:tipo_pag,combined', new CpfCnpj],
-            'cardholder_name_2' => 'required_if:tipo_pag,combined|max:26',
-            'card_number_2' => 'required_if:tipo_pag,combined|numeric|min:13|max:19',
+            'cardholder_name_2' => 'required_if:tipo_pag,combined|regex:/^[A-z\s]{5,26}$/',
+            'card_number_2' => 'required_if:tipo_pag,combined|regex:/^[0-9]{13,19}$/|different:card_number_1',
             'tipo_parcelas_2' => '',
             // ++++++++++++++
             'order_id' => '',
@@ -104,8 +116,41 @@ class PagamentoGetnetRequest extends FormRequest
     public function messages()
     {
         return [
-            'required' => 'Campo obrigatório',
-            'required_if' => 'Campo obrigatório',
+            'boleto.required' => 'ID do boleto é obrigatório',
+            'amount.required' => 'Valor total do boleto é obrigatório',
+            'amount.regex' => 'Formato do valor total do boleto é inválido',
+            'tipo_pag.required' => 'Forma de pagamento é obrigatória',
+            'tipo_pag.in' => 'Tipo de forma de pagamento inválida',
+            'parcelas_1.required' => 'Parcelas é obrigatória',
+            'parcelas_1.regex' => 'Valor das parcelas é inválido',
+            'expiration_1.required' => 'Data de expiração é obrigatória',
+            'expiration_1.date_format' => 'Formato da data de expiração é inválido',
+            'expiration_1.after_or_equal' => 'Data de expiração deve ser igual ou após a data de hoje',
+            'security_code_1.required' => 'CVV / CVC é obrigatório',
+            'security_code_1.regex' => 'Formato do CVV / CVC é inválido',
+            'document_number_1.required' => 'Número do documento é obrigatório',
+            'cardholder_name_1.required' => 'Nome do titular do cartão é obrigatório',
+            'cardholder_name_1.regex' => 'Formato do nome do titular do cartão é inválido',
+            'card_number_1.required' => 'Número do cartão é obrigatório',
+            'card_number_1.regex' => 'Formato do número do cartão é inválido',
+            // Combinado
+            'amount_1.required_if' => 'Valor parcial do primeiro cartão é obrigatório',
+            'amount_1.regex' => 'Formato do valor parcial do primeiro cartão é inválido',
+            'amount_2.required_if' => 'Valor parcial do segundo cartão é obrigatório',
+            'amount_2.regex' => 'Formato do valor parcial do segundo cartão é inválido',
+            'parcelas_2.required_if' => 'Parcelas do segundo cartão é obrigatória',
+            'parcelas_2.regex' => 'Valor das parcelas do segundo cartão é inválido',
+            'expiration_2.required_if' => 'Data de expiração do segundo cartão é obrigatória',
+            'expiration_2.date_format' => 'Formato da data de expiração do segundo cartão é inválido',
+            'expiration_2.after_or_equal' => 'Data de expiração do segundo cartão deve ser igual ou após a data de hoje',
+            'security_code_2.required_if' => 'CVV / CVC do segundo cartão é obrigatório',
+            'security_code_2.regex' => 'Formato do CVV / CVC do segundo cartão é inválido',
+            'document_number_2.required_if' => 'Número do documento do segundo cartão é obrigatório',
+            'cardholder_name_2.required_if' => 'Nome do titular do segundo cartão é obrigatório',
+            'cardholder_name_2.regex' => 'Formato do nome do titular do segundo cartão é inválido',
+            'card_number_2.required_if' => 'Número do segundo cartão é obrigatório',
+            'card_number_2.regex' => 'Formato do número do segundo cartão é inválido',
+            'card_number_2.different' => 'Número do segundo cartão deve ser diferente do primeiro cartão',
         ];
     }
 }

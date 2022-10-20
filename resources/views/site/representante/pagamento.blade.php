@@ -14,6 +14,14 @@
         <h4 class="pt-1 pb-1">Pagamento On-line</h4>
         <div class="linha-lg-mini mb-1"></div>
 
+            @if($errors->any())
+            <ul class="list-group mb-3">
+                @foreach($errors->all() as $error)
+                    <li class="list-group-item list-group-item-danger pt-1"><i class="fas fa-times"></i><small>&nbsp;&nbsp;{{ $error }}</small></li>
+                @endforeach
+            </ul>
+            @endif
+
         <form action="{{ isset($pagamento) ? route('representante.pagamentoCartao', $boleto) : route('representante.pagamentoGerenti', $boleto) }}" method="POST" autocomplete="off">
             @csrf
             <input type="hidden" name="boleto" value="{{ $boleto }}" />
@@ -24,25 +32,25 @@
                     <input
                         type="text"
                         name="amount"
-                        class="form-control capitalSocial {{ $errors->has('amount') ? 'is-invalid' : '' }}"
+                        class="form-control capitalSocial pagamento"
                         id="amount"
                         value="{{ isset($boleto_dados['valor']) ? $boleto_dados['valor'] : old('amount') }}"
                         readonly
                         required
                     >
-                    @if($errors->has('amount'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('amount') }}
-                        </div>
-                    @endif
                 </div>
 
                 @php
-                    $tiposPag = ['credit' => 'Crédito', 'debit' => 'Débito', 'combined' => 'Com dois cartões (somente crédito)'];
+                    $tiposPag = ['credit' => 'Crédito', 'combined' => 'Crédito com dois cartões', 'debit' => 'Débito'];
                 @endphp
                 <div class="col-sm mb-2-576">
                     <label for="tipo_pag">Forma de pagamento *</label>
-                    <select name="tipo_pag" class="form-control mb-2 mr-sm-3 {{ $errors->has('tipo_pag') ? 'is-invalid' : '' }}" required>
+                    <select 
+                        name="tipo_pag" 
+                        class="form-control mb-2 mr-sm-3 pagamento"
+                        id="tipo_pag" 
+                        required
+                    >
                         @if(!isset($pagamento))
                         <option value="">Selecione a forma de pagamento...</option>
                         @endif
@@ -52,11 +60,6 @@
                         @endif
                     @endforeach
                     </select>
-                    @if($errors->has('tipo_pag'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('tipo_pag') }}
-                    </div>
-                    @endif
                 </div>
             </div>
 
@@ -67,7 +70,7 @@
                     <input
                         type="text"
                         name="amount_1"
-                        class="form-control {{ isset($pagamento) ? '' : 'capitalSocial' }} {{ $errors->has('amount_1') ? 'is-invalid' : '' }}"
+                        class="form-control {{ isset($pagamento) ? '' : 'capitalSocial' }} pagamento"
                         id="amount_1"
                         value="{{ isset($boleto_dados['amount_1']) ? $boleto_dados['amount_1'] : old('amount_1') }}"
                         @if(isset($pagamento))
@@ -75,28 +78,25 @@
                         @endif
                         required
                     >
-                    @if($errors->has('amount_1'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('amount_1') }}
-                        </div>
-                    @endif
                 </div>
                 @endif
 
                 <div class="col-sm mb-2-576">
                     <label for="parcelas_1">Parcelas *</label>
-                    <select name="parcelas_1" class="form-control mb-2 mr-sm-3 {{ $errors->has('parcelas_1') ? 'is-invalid' : '' }}" required>
+                    <select 
+                        name="parcelas_1" 
+                        class="form-control mb-2 mr-sm-3 pagamento" 
+                        id="parcelas_1"
+                        pattern="[0-9]{1,2}" 
+                        title="Somente números e entre 1 e 2 dígitos"
+                        required
+                    >
                     @for($i = 1; $i < 11; $i++)
                         @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['parcelas_1'] == $i)))
                         <option value="{{ $i }}">{{ $i == 1 ? 'à vista' : $i . 'x sem juros' }}</option>
                         @endif
                     @endfor
                     </select>
-                    @if($errors->has('parcelas_1'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('parcelas_1') }}
-                    </div>
-                    @endif
                 </div>
             </div>
 
@@ -107,7 +107,7 @@
                     <input
                         type="text"
                         name="amount_2"
-                        class="form-control {{ isset($pagamento) ? '' : 'capitalSocial' }} {{ $errors->has('amount_2') ? 'is-invalid' : '' }}"
+                        class="form-control {{ isset($pagamento) ? '' : 'capitalSocial' }} pagamento"
                         id="amount_2"
                         value="{{ isset($boleto_dados['amount_2']) ? $boleto_dados['amount_2'] : old('amount_2') }}"
                         @if(isset($pagamento))
@@ -115,27 +115,24 @@
                         @endif
                         required
                     >
-                    @if($errors->has('amount_2'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('amount_2') }}
-                        </div>
-                    @endif
                 </div>
 
                 <div class="col-sm mb-2-576">
                     <label for="parcelas_2">Parcelas *</label>
-                    <select name="parcelas_2" class="form-control mb-2 mr-sm-3 {{ $errors->has('parcelas_2') ? 'is-invalid' : '' }}" required>
+                    <select 
+                        name="parcelas_2" 
+                        class="form-control mb-2 mr-sm-3 pagamento" 
+                        id="parcelas_2"
+                        pattern="[0-9]{1,2}" 
+                        title="Somente números e entre 1 e 2 dígitos"
+                        required
+                    >
                     @for($i = 1; $i < 11; $i++)
                         @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['parcelas_2'] == $i)))
                         <option value="{{ $i }}">{{ $i == 1 ? 'à vista' : $i . 'x sem juros' }}</option>
                         @endif
                     @endfor
                     </select>
-                    @if($errors->has('parcelas_2'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('parcelas_2') }}
-                    </div>
-                    @endif
                 </div>
             </div>
             @endif
@@ -149,20 +146,13 @@
                         <input
                             type="text"
                             name="card_number_1"
-                            class="form-control form-control-sm {{ $errors->has('card_number_1') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm cartao_credit pagamento"
                             id="card_number_1"
-                            minlength="13"
-                            maxlength="19"
-                            placeholder="Número de cartão válido"
-                            pattern="[0-9]{13,19}" 
-                            title="Somente números"
+                            placeholder="XXXX  XXXX  XXXX  XXXX  XXX"
+                            pattern="[0-9\s]{19,27}" 
+                            title="Somente números e entre 13 e 19 dígitos"
                             required
                         >
-                        @if($errors->has('card_number_1'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('card_number_1') }}
-                        </div>
-                        @endif
                     </div>
                 </div>
                 <div class="form-row mb-2 cadastroRepresentante">
@@ -171,19 +161,16 @@
                         <input
                             type="text"
                             name="cardholder_name_1"
-                            class="form-control form-control-sm text-uppercase {{ $errors->has('cardholder_name_1') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm text-uppercase pagamento"
                             id="cardholder_name_1"
                             maxlength="26"
+                            pattern="[A-z\s]{5,26}" 
+                            title="Somente letras não acentuadas e entre 5 e 26 caracteres"
                             required
                         >
                         <small class="form-text text-muted">
                             <em>* Nome idêntico ao do cartão, sem acentos ou pontuações</em>
                         </small>
-                        @if($errors->has('cardholder_name_1'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('cardholder_name_1') }}
-                            </div>
-                        @endif
                     </div>
                 </div>
 
@@ -193,15 +180,10 @@
                         <input
                             type="text"
                             name="document_number_1"
-                            class="form-control form-control-sm cpfOuCnpj {{ $errors->has('document_number_1') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm cpfOuCnpj pagamento"
                             id="document_number_1"
                             required
                         >
-                        @if($errors->has('document_number_1'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('document_number_1') }}
-                            </div>
-                        @endif
                     </div>
 
                     <div class="col-sm mb-2-576">
@@ -209,17 +191,17 @@
                         <input
                             type="text"
                             name="security_code_1"
-                            class="form-control form-control-sm {{ $errors->has('security_code_1') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm cvv pagamento"
                             id="security_code_1"
                             minlength="3"
                             maxlength="4"
+                            pattern="[0-9]{3,4}" 
+                            title="Somente números e entre 3 e 4 dígitos"
                             required
                         >
-                        @if($errors->has('security_code_1'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('security_code_1') }}
-                            </div>
-                        @endif
+                        <small class="form-text text-muted">
+                            <em>* Os 3 ou 4 números atrás do cartão</em>
+                        </small>
                     </div>
 
                     <div class="col-sm mb-2-576">
@@ -227,15 +209,11 @@
                         <input
                             type="month"
                             name="expiration_1"
-                            class="form-control form-control-sm {{ $errors->has('expiration_1') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm pagamento"
                             id="expiration_1"
+                            min="{{ date('Y-m') }}"
                             required
                         >
-                        @if($errors->has('expiration_1'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('expiration_1') }}
-                            </div>
-                        @endif
                     </div>
                 </div>
             </fieldset>
@@ -249,20 +227,13 @@
                         <input
                             type="text"
                             name="card_number_2"
-                            class="form-control form-control-sm numero {{ $errors->has('card_number_2') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm cartao_credit pagamento"
                             id="card_number_2"
-                            placeholder="Número de cartão válido"
-                            minlength="13"
-                            maxlength="19"
-                            pattern="[0-9]{13,19}" 
-                            title="Somente números"
+                            placeholder="XXXX  XXXX  XXXX  XXXX  XXX"
+                            pattern="[0-9\s]{19,27}" 
+                            title="Somente números e entre 13 e 19 dígitos"
                             required
                         >
-                        @if($errors->has('card_number_2'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('card_number_2') }}
-                        </div>
-                        @endif
                     </div>
                 </div>
                 <div class="form-row mb-2 cadastroRepresentante">
@@ -271,19 +242,16 @@
                         <input
                             type="text"
                             name="cardholder_name_2"
-                            class="form-control form-control-sm text-uppercase {{ $errors->has('cardholder_name_2') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm text-uppercase nome_cartao pagamento"
                             id="cardholder_name_2"
                             maxlength="26"
+                            pattern="[A-z\s]{5,26}" 
+                            title="Somente letras não acentuadas e entre 5 e 26 caracteres"
                             required
                         >
                         <small class="form-text text-muted">
                             <em>* Nome idêntico ao do cartão, sem acentos ou pontuações</em>
                         </small>
-                        @if($errors->has('cardholder_name_2'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('cardholder_name_2') }}
-                            </div>
-                        @endif
                     </div>
                 </div>
 
@@ -293,15 +261,10 @@
                         <input
                             type="text"
                             name="document_number_2"
-                            class="form-control form-control-sm cpfOuCnpj {{ $errors->has('document_number_2') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm cpfOuCnpj pagamento"
                             id="document_number_2"
                             required
                         >
-                        @if($errors->has('document_number_2'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('document_number_2') }}
-                            </div>
-                        @endif
                     </div>
 
                     <div class="col-sm mb-2-576">
@@ -309,17 +272,17 @@
                         <input
                             type="text"
                             name="security_code_2"
-                            class="form-control form-control-sm {{ $errors->has('security_code_2') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm cvv pagamento"
                             id="security_code_2"
                             minlength="3"
                             maxlength="4"
+                            pattern="[0-9]{3,4}" 
+                            title="Somente números e entre 3 e 4 dígitos"
                             required
                         >
-                        @if($errors->has('security_code_2'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('security_code_2') }}
-                            </div>
-                        @endif
+                        <small class="form-text text-muted">
+                            <em>* Os 3 ou 4 números atrás do cartão</em>
+                        </small>
                     </div>
 
                     <div class="col-sm mb-2-576">
@@ -327,15 +290,11 @@
                         <input
                             type="month"
                             name="expiration_2"
-                            class="form-control form-control-sm {{ $errors->has('expiration_2') ? 'is-invalid' : '' }}"
+                            class="form-control form-control-sm pagamento"
                             id="expiration_2"
+                            min="{{ date('Y-m') }}"
                             required
                         >
-                        @if($errors->has('expiration_2'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('expiration_2') }}
-                            </div>
-                        @endif
                     </div>
                 </div>
             </fieldset>

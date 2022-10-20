@@ -12,6 +12,8 @@ $(document).ready(function(){
 	$('.numeroInput').mask('99');
 	$('.cep').mask('00000-000');
 	$('.codigo_certidao').mask('AAAAAAAA - AAAAAAAA - AAAAAAAA - AAAAAAAA');
+	$('.cartao_credit').mask('0000  0000  0000  0999  999');
+	$('.cvv').mask('0009');
   	$('.horaInput').mask('00:00:00');
 	$('.numero').mask('ZZZZZZZZZZ', {
 		translation: {
@@ -960,28 +962,30 @@ $('#cedula').ready(function() {
 });
 
 // +++++++++++++++++++++++ Página pagamento Representante ++++++++++++++++++++++
+
+function disabledPagamento(){
+	$('select[name="parcelas_1"]').val('1').attr('disabled', true);
+	$('#dados_combinado, #valor_combinado').hide();
+	$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', false);
+}
+
+function enabledPagamento(habilita){
+	habilita ? $('#dados_combinado, #valor_combinado').show() : $('#dados_combinado, #valor_combinado').hide();
+	$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', habilita);
+}
+
 $('select[name="tipo_pag"]').change(function() {
-	if((this.value != 'debit') && (this.value != '')){
-		$('select[name="parcelas_1"]').attr('disabled', false);
-		$('#dados_combinado, #valor_combinado').hide();
-		$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', false);
-		if(this.value == 'combined'){
-			$('#dados_combinado, #valor_combinado').show();
-			$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', true);
-		}
-	}else{
-		$('select[name="parcelas_1"]').val('1').attr('disabled', true);
-		$('#dados_combinado, #valor_combinado').hide();
-		$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', false);
+	if((this.value == 'debit') || (this.value == '')){
+		disabledPagamento();
+		return;
 	}
+	$('select[name="parcelas_1"]').attr('disabled', false);
+	this.value == 'credit' ? enabledPagamento(false) : enabledPagamento(true);
 });
 
 $('input[name="amount"]').ready(function() {
-	if($('select[name="tipo_pag"]').val() == ""){
-		$('select[name="parcelas_1"]').val('1').attr('disabled', true);
-		$('#dados_combinado, #valor_combinado').hide();
-		$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', false);
-	}
+	if($('select[name="tipo_pag"]').val() == "")
+		disabledPagamento();
 });
 
 $('input[name="amount_1"], input[name="amount_2"]').keyup(function(e) {
@@ -991,13 +995,19 @@ $('input[name="amount_1"], input[name="amount_2"]').keyup(function(e) {
 		var total = Number($('input[name="amount"]').val().replace(/[^0-9]/g,''));
 		var temp = total - Number($('input[name="' + campo_digitado + '"]').val().replace(/[^0-9]/g,''));
 		temp = parseFloat((temp/100)).toFixed(2);
-		$('input[name="' + campo_resto + '"]').val(new Intl.NumberFormat('id').format(temp));
+		$('input[name="' + campo_resto + '"]').val(new Intl.NumberFormat('pt-BR').format(temp));
 	}
 });
-// +++++++++++++++++++++++ ++++++++++++++++++++++++++++++ ++++++++++++++++++++++
 
-const input = document.getElementById('card_number_1');
-console.log(input);
-input.addEventListener('invalid', (e) => {
-  $('#modalPagamento').modal('hide');
-});
+function hideModalPagamentoSubmit(elemento){
+	elemento.addEventListener('invalid', (e) => {
+		$('#modalPagamento').modal('hide');
+	});
+}
+
+const inputs = document.getElementsByClassName('pagamento');
+for(elemento of inputs){
+	hideModalPagamentoSubmit(elemento);
+}
+
+// +++++++++++++++++++++++ ++++++++++++++++++++++++++++++ ++++++++++++++++++++++
