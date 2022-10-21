@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\View;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 use App\Http\Requests\PagamentoGetnetRequest;
+use App\Http\Requests\PagamentoGerentiRequest;
 
 class RepresentanteSiteController extends Controller
 {
@@ -589,8 +590,7 @@ class RepresentanteSiteController extends Controller
             if(request()->session()->exists('errors'))
                 session()->forget(['_old_input']);
             $pagamento = null;
-            $boleto_dados['id'] = $boleto;
-            $boleto_dados['valor'] = '1503,03';
+            $boleto_dados['valor'] = '1503,00';
         }catch(Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar dados do servidor para verificar pagamento");
@@ -611,18 +611,12 @@ class RepresentanteSiteController extends Controller
     //     return view('site.representante.pagamento')->with(['pagamento' => $pagamento, 'boleto' => $boleto, 'boleto_dados' => $boleto_dados]);
     // }
 
-    public function pagamentoGerenti($boleto, /*PagamentoGerentiRequest*/Request $request)
+    public function pagamentoGerenti($boleto, PagamentoGerentiRequest $request)
     {
         try{
             // boleto pego do gerenti e deve estar relacionado com o usuário autenticado
-            // $validate = $request->validated();
-            // validação com a api do gerenti
-            $boleto_dados['valor'] = $request['amount'];
-            $boleto_dados['tipo_pag'] = $request['tipo_pag'];
-            $boleto_dados['parcelas_1'] = $boleto_dados['tipo_pag'] == 'debit' ? '1' : $request['parcelas_1'];
-            $boleto_dados['parcelas_2'] = $request['parcelas_2'];
-            $boleto_dados['amount_1'] = $request['amount_1'];
-            $boleto_dados['amount_2'] = $request['amount_2'];
+            $boleto_dados = $request->validated();
+            unset($boleto_dados['amount_soma']);
             $pagamento = true;
         }catch(Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -640,12 +634,14 @@ class RepresentanteSiteController extends Controller
             // boleto pego do gerenti e deve estar relacionado com o usuário autenticado
             $rep = Auth::guard('representante')->user();
             $validate = $request->validated();
+            unset($validate['amount_soma']);
             $request->replace([]);
             request()->replace([]);
             $transacao = $this->service->getService('Pagamento')->checkout($request->ip(), $validate, $rep);
             unset($validate);
         }catch(Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$rep->id.' ("'.$rep->registro_core .'") recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento do boleto *'.$boleto.'*. Erro registrado no Log de Erros.');
             return redirect(route('representante.dashboard'))->with([
                 'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! Código de erro da prestadora: ' . $e->getCode(),
                 'class' => 'alert-danger',

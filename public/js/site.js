@@ -994,8 +994,10 @@ $('input[name="amount_1"], input[name="amount_2"]').keyup(function(e) {
 		var campo_resto = campo_digitado == 'amount_1' ? 'amount_2' : 'amount_1';
 		var total = Number($('input[name="amount"]').val().replace(/[^0-9]/g,''));
 		var temp = total - Number($('input[name="' + campo_digitado + '"]').val().replace(/[^0-9]/g,''));
-		temp = parseFloat((temp/100)).toFixed(2);
-		$('input[name="' + campo_resto + '"]').val(new Intl.NumberFormat('pt-BR').format(temp));
+		var last = temp.toString().slice(-2);
+		var start = temp.toString().slice(0, temp.toString().length - 2);
+		temp = new Intl.NumberFormat('pt-BR').format(start);
+		$('input[name="' + campo_resto + '"]').val(temp + ',' + last);
 	}
 });
 

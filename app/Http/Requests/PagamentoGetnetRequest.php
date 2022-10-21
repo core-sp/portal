@@ -15,16 +15,22 @@ class PagamentoGetnetRequest extends FormRequest
         // Temporário, muitos dados do Gerenti
         $rep = auth()->guard('representante')->user();
 
+        if(url()->previous() != route('representante.pagamentoGerenti', $this->boleto))
+        {
+            $this->replace([]);
+            return;
+        }
+
         $this->merge([
             'amount' => apenasNumeros($this->amount),
-            'amount_1' => apenasNumeros($this->amount_1),
-            'amount_2' => apenasNumeros($this->amount_2),
+            'amount_1' => $this->filled('amount_1') ? apenasNumeros($this->amount_1) : null,
+            'amount_2' => $this->filled('amount_2') ? apenasNumeros($this->amount_2) : null,
             'cardholder_name_1' => mb_strtoupper($this->cardholder_name_1),
-            'cardholder_name_2' => mb_strtoupper($this->cardholder_name_2),
+            'cardholder_name_2' => $this->filled('cardholder_name_2') ? mb_strtoupper($this->cardholder_name_2) : null,
             'card_number_1' => apenasNumeros($this->card_number_1),
-            'card_number_2' => apenasNumeros($this->card_number_2),
+            'card_number_2' => $this->filled('card_number_2') ? apenasNumeros($this->card_number_2) : null,
             'document_number_1' => apenasNumeros($this->document_number_1),
-            'document_number_2' => apenasNumeros($this->document_number_2),
+            'document_number_2' => $this->filled('document_number_2') ? apenasNumeros($this->document_number_2) : null,
             'cardholder_mobile' => $this->tipo_pag == 'debit' ? '11999999999' : '',
             'email' => $rep->email,
             'name' => $rep->nome,
@@ -32,7 +38,6 @@ class PagamentoGetnetRequest extends FormRequest
             'document_number' => $rep->cpf_cnpj,
             'device_id' => $rep->getSessionIdPagamento($this->boleto),
             'tipo_parcelas_1' => $this->parcelas_1 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST',
-            'tipo_parcelas_2' => $this->parcelas_2 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST',
             'order_id' => '6d2e4380-d8a3-4ccb-9138-c289182818a3',
             'customer_id' => 'customer_21081826',
             'first_name' => 'Teste',
@@ -56,6 +61,14 @@ class PagamentoGetnetRequest extends FormRequest
             'ba_country' => 'Brasil',
             'ba_postal_code' => '90230060',
         ]);
+
+        if($this->filled('parcelas_2'))
+            $this->merge(['tipo_parcelas_2' => $this->parcelas_2 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST']);
+        else
+            $this->merge(['tipo_parcelas_2' => null]);
+
+        if(($this->tipo_pag == 'combined') && (isset($this->amount_1) && isset($this->amount_2)))
+            ($this->amount_1 + $this->amount_2) != $this->amount ? $this->merge(['amount_soma' => '0']) : $this->merge(['amount_soma' => $this->amount]);
     }
 
     public function rules()
@@ -72,15 +85,16 @@ class PagamentoGetnetRequest extends FormRequest
             'card_number_1' => 'required|regex:/^[0-9]{13,19}$/',
             'cardholder_mobile' => '',
             'tipo_parcelas_1' => '',
-            'amount_1' => 'required_if:tipo_pag,combined|regex:/^[0-9]{1,10}$/',
             // Combinado
-            'amount_2' => 'required_if:tipo_pag,combined|regex:/^[0-9]{1,10}$/',
-            'parcelas_2' => 'required_if:tipo_pag,combined|regex:/^[0-9]{1,2}$/',
-            'expiration_2' => 'required_if:tipo_pag,combined|date_format:Y-m|after_or_equal:' . date('Y-m'),
-            'security_code_2' => 'required_if:tipo_pag,combined|regex:/^[0-9]{3,4}$/',
-            'document_number_2' => ['required_if:tipo_pag,combined', new CpfCnpj],
-            'cardholder_name_2' => 'required_if:tipo_pag,combined|regex:/^[A-z\s]{5,26}$/',
-            'card_number_2' => 'required_if:tipo_pag,combined|regex:/^[0-9]{13,19}$/|different:card_number_1',
+            'amount_1' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',
+            'amount_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',
+            'parcelas_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,2}$/',
+            'expiration_2' => 'required_if:tipo_pag,combined|nullable|date_format:Y-m|after_or_equal:' . date('Y-m'),
+            'security_code_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{3,4}$/',
+            'document_number_2' => ['required_if:tipo_pag,combined', new CpfCnpj, 'nullable'],
+            'cardholder_name_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[A-z\s]{5,26}$/',
+            'card_number_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{13,19}$/|different:card_number_1',
+            'amount_soma' => 'nullable|same:amount',
             'tipo_parcelas_2' => '',
             // ++++++++++++++
             'order_id' => '',
@@ -121,7 +135,7 @@ class PagamentoGetnetRequest extends FormRequest
             'amount.regex' => 'Formato do valor total do boleto é inválido',
             'tipo_pag.required' => 'Forma de pagamento é obrigatória',
             'tipo_pag.in' => 'Tipo de forma de pagamento inválida',
-            'parcelas_1.required' => 'Parcelas é obrigatória',
+            'parcelas_1.required' => 'Quantidade de parcelas é obrigatória',
             'parcelas_1.regex' => 'Valor das parcelas é inválido',
             'expiration_1.required' => 'Data de expiração é obrigatória',
             'expiration_1.date_format' => 'Formato da data de expiração é inválido',
@@ -138,7 +152,7 @@ class PagamentoGetnetRequest extends FormRequest
             'amount_1.regex' => 'Formato do valor parcial do primeiro cartão é inválido',
             'amount_2.required_if' => 'Valor parcial do segundo cartão é obrigatório',
             'amount_2.regex' => 'Formato do valor parcial do segundo cartão é inválido',
-            'parcelas_2.required_if' => 'Parcelas do segundo cartão é obrigatória',
+            'parcelas_2.required_if' => 'Quantidade de parcelas do segundo cartão é obrigatória',
             'parcelas_2.regex' => 'Valor das parcelas do segundo cartão é inválido',
             'expiration_2.required_if' => 'Data de expiração do segundo cartão é obrigatória',
             'expiration_2.date_format' => 'Formato da data de expiração do segundo cartão é inválido',
@@ -151,6 +165,7 @@ class PagamentoGetnetRequest extends FormRequest
             'card_number_2.required_if' => 'Número do segundo cartão é obrigatório',
             'card_number_2.regex' => 'Formato do número do segundo cartão é inválido',
             'card_number_2.different' => 'Número do segundo cartão deve ser diferente do primeiro cartão',
+            'amount_soma.same' => 'A soma dos dois valores dos cartões está diferente do valor total',
         ];
     }
 }

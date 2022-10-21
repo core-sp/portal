@@ -22,13 +22,16 @@
             </ul>
             @endif
 
+        <small class="form-text text-muted mb-3">
+            <em><span class="text-danger">*</span> Preenchimento obrigatório</em>
+        </small>
         <form action="{{ isset($pagamento) ? route('representante.pagamentoCartao', $boleto) : route('representante.pagamentoGerenti', $boleto) }}" method="POST" autocomplete="off">
             @csrf
             <input type="hidden" name="boleto" value="{{ $boleto }}" />
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="amount">Valor *</label>
+                    <label for="amount">Valor total <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         name="amount"
@@ -44,7 +47,7 @@
                     $tiposPag = ['credit' => 'Crédito', 'combined' => 'Crédito com dois cartões', 'debit' => 'Débito'];
                 @endphp
                 <div class="col-sm mb-2-576">
-                    <label for="tipo_pag">Forma de pagamento *</label>
+                    <label for="tipo_pag">Forma de pagamento <span class="text-danger">*</span></label>
                     <select 
                         name="tipo_pag" 
                         class="form-control mb-2 mr-sm-3 pagamento"
@@ -66,11 +69,11 @@
             <div class="form-row mb-2 cadastroRepresentante">
                 @if(!isset($pagamento) || (isset($pagamento) && isset($boleto_dados['amount_1']) && isset($boleto_dados['amount_2'])))
                 <div class="col-sm mb-2-576" id="valor_combinado">
-                    <label for="amount_1">Valor do primeiro cartão *</label>
+                    <label for="amount_1">Valor no primeiro cartão <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         name="amount_1"
-                        class="form-control {{ isset($pagamento) ? '' : 'capitalSocial' }} pagamento"
+                        class="form-control capitalSocial pagamento"
                         id="amount_1"
                         value="{{ isset($boleto_dados['amount_1']) ? $boleto_dados['amount_1'] : old('amount_1') }}"
                         @if(isset($pagamento))
@@ -82,7 +85,7 @@
                 @endif
 
                 <div class="col-sm mb-2-576">
-                    <label for="parcelas_1">Parcelas *</label>
+                    <label for="parcelas_1">Parcelas <span class="text-danger">*</span></label>
                     <select 
                         name="parcelas_1" 
                         class="form-control mb-2 mr-sm-3 pagamento" 
@@ -103,11 +106,11 @@
             @if(!isset($pagamento) || (isset($pagamento) && isset($boleto_dados['amount_1']) && isset($boleto_dados['amount_2'])))
             <div class="form-row mb-2 cadastroRepresentante" id="dados_combinado">
                 <div class="col-sm mb-2-576">
-                    <label for="amount_2">Valor do segundo cartão *</label>
+                    <label for="amount_2">Valor no segundo cartão <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         name="amount_2"
-                        class="form-control {{ isset($pagamento) ? '' : 'capitalSocial' }} pagamento"
+                        class="form-control capitalSocial pagamento"
                         id="amount_2"
                         value="{{ isset($boleto_dados['amount_2']) ? $boleto_dados['amount_2'] : old('amount_2') }}"
                         @if(isset($pagamento))
@@ -118,7 +121,7 @@
                 </div>
 
                 <div class="col-sm mb-2-576">
-                    <label for="parcelas_2">Parcelas *</label>
+                    <label for="parcelas_2">Parcelas <span class="text-danger">*</span></label>
                     <select 
                         name="parcelas_2" 
                         class="form-control mb-2 mr-sm-3 pagamento" 
@@ -142,7 +145,7 @@
                 <legend><small>Dados do {{ $boleto_dados['tipo_pag'] == 'combined' ? 'primeiro' : null }} cartão:</small></legend>
                 <div class="form-row mb-2 cadastroRepresentante">
                     <div class="col-sm mb-2-576">
-                        <label for="card_number_1">Número do cartão *</label>
+                        <label for="card_number_1">Número do cartão <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="card_number_1"
@@ -157,7 +160,7 @@
                 </div>
                 <div class="form-row mb-2 cadastroRepresentante">
                     <div class="col-sm mb-2-576">
-                        <label for="cardholder_name_1">Nome do titular *</label>
+                        <label for="cardholder_name_1">Nome do titular <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="cardholder_name_1"
@@ -176,7 +179,7 @@
 
                 <div class="form-row mb-2 cadastroRepresentante">
                     <div class="col-sm mb-2-576">
-                        <label for="document_number_1">CPF / CNPJ *</label>
+                        <label for="document_number_1">CPF / CNPJ <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="document_number_1"
@@ -187,7 +190,7 @@
                     </div>
 
                     <div class="col-sm mb-2-576">
-                        <label for="security_code_1">CVV / CVC *</label>
+                        <label for="security_code_1">CVV / CVC <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="security_code_1"
@@ -205,7 +208,7 @@
                     </div>
 
                     <div class="col-sm mb-2-576">
-                        <label for="expiration_1">Data de Expiração *</label>
+                        <label for="expiration_1">Data de Expiração <span class="text-danger">*</span></label>
                         <input
                             type="month"
                             name="expiration_1"
@@ -223,7 +226,7 @@
                 <legend><small>Dados do segundo cartão:</small></legend>
                 <div class="form-row mb-2 cadastroRepresentante">
                     <div class="col-sm mb-2-576">
-                        <label for="card_number_2">Número do cartão *</label>
+                        <label for="card_number_2">Número do cartão <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="card_number_2"
@@ -238,7 +241,7 @@
                 </div>
                 <div class="form-row mb-2 cadastroRepresentante">
                     <div class="col-sm mb-2-576">
-                        <label for="cardholder_name_2">Nome do titular *</label>
+                        <label for="cardholder_name_2">Nome do titular <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="cardholder_name_2"
@@ -257,7 +260,7 @@
 
                 <div class="form-row mb-2 cadastroRepresentante">
                     <div class="col-sm mb-2-576">
-                        <label for="document_number_2">CPF / CNPJ *</label>
+                        <label for="document_number_2">CPF / CNPJ <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="document_number_2"
@@ -268,7 +271,7 @@
                     </div>
 
                     <div class="col-sm mb-2-576">
-                        <label for="security_code_2">CVV / CVC *</label>
+                        <label for="security_code_2">CVV / CVC <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="security_code_2"
@@ -286,7 +289,7 @@
                     </div>
 
                     <div class="col-sm mb-2-576">
-                        <label for="expiration_2">Data de Expiração *</label>
+                        <label for="expiration_2">Data de Expiração <span class="text-danger">*</span></label>
                         <input
                             type="month"
                             name="expiration_2"
