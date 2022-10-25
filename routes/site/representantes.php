@@ -47,6 +47,8 @@ Route::prefix('representante')->group(function(){
 
     // Falta rota de ajax que devolve os valores do gerenti conforme o usuário escolhe a forma de pagamento
     Route::get('/{boleto}/realizar-pagamento', 'RepresentanteSiteController@pagamentoGerentiView')->name('representante.pagamento.view');
-    Route::post('/{boleto}/realizar-pagamento', 'RepresentanteSiteController@pagamentoGerenti')->name('representante.pagamentoGerenti');
-    Route::post('/{boleto}/confirmar-pagamento', 'RepresentanteSiteController@pagamentoCartao')->name('representante.pagamentoCartao');
+    Route::post('/{boleto}/realizar-pagamento', 'RepresentanteSiteController@pagamentoGerenti')->name('representante.pagamento.gerenti');
+    Route::post('/{boleto}/confirmar-pagamento', 'RepresentanteSiteController@pagamentoCartao')->name('representante.pagamento.cartao');
+    Route::get('/{boleto}/{pagamento}/cancelar-pagamento', 'RepresentanteSiteController@cancelarPagamentoCartaoView')->name('representante.cancelar.pagamento.cartao.view');
+    Route::post('/{boleto}/{pagamento}/cancelar-pagamento', 'RepresentanteSiteController@cancelarPagamentoCartao')->name('representante.cancelar.pagamento.cartao');
 });

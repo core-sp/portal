@@ -969,7 +969,8 @@ function disabledPagamento(){
 	$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', false);
 }
 
-function enabledPagamento(habilita){
+function enabledPagamento(credito){
+	var habilita = credito != 'credit' ? true : false;
 	habilita ? $('#dados_combinado, #valor_combinado').show() : $('#dados_combinado, #valor_combinado').hide();
 	$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', habilita);
 }
@@ -980,7 +981,7 @@ $('select[name="tipo_pag"]').change(function() {
 		return;
 	}
 	$('select[name="parcelas_1"]').attr('disabled', false);
-	this.value == 'credit' ? enabledPagamento(false) : enabledPagamento(true);
+	enabledPagamento(this.value);
 });
 
 $('input[name="amount"]').ready(function() {

@@ -586,9 +586,17 @@ class RepresentanteSiteController extends Controller
     public function pagamentoGerentiView($boleto)
     {
         try{
-            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado
             if(request()->session()->exists('errors'))
                 session()->forget(['_old_input']);
+
+            $rep = Auth::guard('representante')->user();
+            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
+            $existe = $rep->existePagamentoAprovado($boleto);
+            if($existe)
+                return redirect(route('representante.dashboard'))->with([
+                    'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
+                    'class' => 'alert-danger',
+                ]);
             $pagamento = null;
             $boleto_dados['valor'] = '1503,00';
         }catch(Exception $e){
@@ -614,8 +622,15 @@ class RepresentanteSiteController extends Controller
     public function pagamentoGerenti($boleto, PagamentoGerentiRequest $request)
     {
         try{
-            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado
+            $rep = Auth::guard('representante')->user();
             $boleto_dados = $request->validated();
+            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
+            $existe = $rep->existePagamentoAprovado($boleto);
+            if($existe)
+                return redirect(route('representante.dashboard'))->with([
+                    'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
+                    'class' => 'alert-danger',
+                ]);
             unset($boleto_dados['amount_soma']);
             $pagamento = true;
         }catch(Exception $e){
@@ -631,8 +646,14 @@ class RepresentanteSiteController extends Controller
     public function pagamentoCartao($boleto, PagamentoGetnetRequest $request)
     {
         try{
-            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado
             $rep = Auth::guard('representante')->user();
+            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
+            $existe = $rep->existePagamentoAprovado($boleto);
+            if($existe)
+                return redirect(route('representante.dashboard'))->with([
+                    'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
+                    'class' => 'alert-danger',
+                ]);
             $validate = $request->validated();
             unset($validate['amount_soma']);
             $request->replace([]);
@@ -640,10 +661,70 @@ class RepresentanteSiteController extends Controller
             $transacao = $this->service->getService('Pagamento')->checkout($request->ip(), $validate, $rep);
             unset($validate);
         }catch(Exception $e){
+            $temp = json_decode($e->getMessage(), true);
+            if(json_last_error() === JSON_ERROR_NONE)
+                $temp = isset($temp['message']) ? $temp['message'] : 'Erro';
+            else
+                $temp = 'Erro';
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$rep->id.' ("'.$rep->registro_core .'") recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento do boleto *'.$boleto.'*. Erro registrado no Log de Erros.');
             return redirect(route('representante.dashboard'))->with([
-                'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! Código de erro da prestadora: ' . $e->getCode(),
+                'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! Código de erro da prestadora: ' . $e->getCode() . '. Mensagem: ' . $temp,
+                'class' => 'alert-danger',
+            ]);
+        }
+
+        return redirect(route('representante.dashboard'))->with($transacao);
+    }
+
+    public function cancelarPagamentoCartaoView($boleto, $id_pagamento)
+    {
+        try{
+            $rep = Auth::guard('representante')->user();
+            // verifica se o boleto existe no gerenti em relação ao usuario em condições de ser cancelado
+            $dados = $rep->getPagamento($boleto, $id_pagamento);
+            $temp = $dados->first();
+            if(!isset($temp) || !$temp->canCancel())
+                return redirect(route('representante.dashboard'))->with([
+                    'message-cartao' => '<i class="fas fa-ban"></i> Pagamento não encontrado / cancelamento não é mais possível para este boleto.',
+                    'class' => 'alert-danger',
+                ]);
+            $cancelamento = true;
+        }catch(Exception $e){
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar dados do servidor para verificar o cancelamento do pagamento");
+        }
+
+        return view('site.representante.pagamento')->with([
+            'cancelamento' => $cancelamento, 'boleto' => $boleto, 'id_pagamento' => $id_pagamento, 'dados' => $dados
+        ]);
+    }
+
+    public function cancelarPagamentoCartao($boleto, $id_pagamento, Request $request)
+    {
+        try{
+            $rep = Auth::guard('representante')->user();
+            // verifica se o boleto existe no gerenti em relação ao usuario em condições de ser cancelado
+            $pagamentos = $rep->getPagamento($boleto, $id_pagamento);
+            $temp = $pagamentos->first();
+            if(!isset($temp) || !$temp->canCancel())
+                return redirect(route('representante.dashboard'))->with([
+                    'message-cartao' => '<i class="fas fa-ban"></i> Pagamento não encontrado / cancelamento não é mais possível para este boleto.',
+                    'class' => 'alert-danger',
+                ]);
+            $dados['boleto'] = $boleto;
+            $dados['pagamento'] = $pagamentos;
+            $transacao = $this->service->getService('Pagamento')->cancelCheckout($dados, $rep);
+        }catch(Exception $e){
+            $temp = json_decode($e->getMessage(), true);
+            if(json_last_error() === JSON_ERROR_NONE)
+                $temp = isset($temp['message']) ? $temp['message'] : 'Erro';
+            else
+                $temp = 'Erro';
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$rep->id.' ("'.$rep->registro_core .'") recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o cancelamento do pagamento com a id *'.$id_pagamento.'* do boleto com a id: *'.$boleto . '*. Erro registrado no Log de Erros.');
+            return redirect(route('representante.dashboard'))->with([
+                'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! Código de erro da prestadora: ' . $e->getCode() . '. Mensagem: ' . $temp,
                 'class' => 'alert-danger',
             ]);
         }

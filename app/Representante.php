@@ -108,6 +108,23 @@ class Representante extends Authenticable
         return $this->hasMany('App\TermoConsentimento', 'idrepresentante');
     }
 
+    public function pagamentos()
+    {
+        return $this->hasMany('App\Pagamento', 'idrepresentante');
+    }
+
+    public function getPagamento($boleto_id, $pagamento_id)
+    {
+        return $this->pagamentos()->where('boleto_id', $boleto_id)
+        ->where('payment_id', $pagamento_id)->orWhere('combined_id', $pagamento_id)->get();
+    }
+
+    public function existePagamentoAprovado($boleto_id)
+    {
+        return $this->pagamentos()->where('boleto_id', $boleto_id)
+        ->whereIn('status', ['APPROVED', 'AUTHORIZED'])->count() > 0;
+    }
+
     public function getSessionIdPagamento($boleto_id)
     {
         return apenasNumeros($this->cpf_cnpj) . $boleto_id;

@@ -15,7 +15,7 @@ class PagamentoGetnetRequest extends FormRequest
         // Temporário, muitos dados do Gerenti
         $rep = auth()->guard('representante')->user();
 
-        if(url()->previous() != route('representante.pagamentoGerenti', $this->boleto))
+        if(url()->previous() != route('representante.pagamento.gerenti', $this->boleto))
         {
             $this->replace([]);
             return;

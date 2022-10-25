@@ -11,7 +11,7 @@
 
 <div class="representante-content w-100">
     <div class="conteudo-txt-mini light">
-        <h4 class="pt-1 pb-1">Pagamento On-line</h4>
+        <h4 class="pt-1 pb-1">{{ isset($cancelamento) ? 'Cancelamento do ' : null }} Pagamento On-line</h4>
         <div class="linha-lg-mini mb-1"></div>
 
             @if($errors->any())
@@ -22,10 +22,11 @@
             </ul>
             @endif
 
+        @if(!\Route::is('representante.cancelar.pagamento.*'))
         <small class="form-text text-muted mb-3">
             <em><span class="text-danger">*</span> Preenchimento obrigatório</em>
         </small>
-        <form action="{{ isset($pagamento) ? route('representante.pagamentoCartao', $boleto) : route('representante.pagamentoGerenti', $boleto) }}" method="POST" autocomplete="off">
+        <form action="{{ isset($pagamento) ? route('representante.pagamento.cartao', $boleto) : route('representante.pagamento.gerenti', $boleto) }}" method="POST" autocomplete="off">
             @csrf
             <input type="hidden" name="boleto" value="{{ $boleto }}" />
 
@@ -141,8 +142,20 @@
             @endif
 
             @if(isset($pagamento))
-            <fieldset class="border p-3">
-                <legend><small>Dados do {{ $boleto_dados['tipo_pag'] == 'combined' ? 'primeiro' : null }} cartão:</small></legend>
+            <!-- <fieldset class="border rounded pl-3"> -->
+            <div class="form-row mb-3 cadastroRepresentante mt-3">
+                <div class="col-sm mb-2-576">
+                    <img class="mr-3" src="{{ asset('img/visa.256x164.png') }}" width="48" height="31" alt="cartão visa"/>
+                    <img class="mr-3" src="{{ asset('img/mastercard.256x164.png') }}" width="48" height="31" alt="cartão master"/>
+                    <img class="mr-3" src="{{ asset('img/amex.256x168.png') }}" width="48" height="32" alt="cartão amex"/>
+                    <img class="mr-3" src="{{ asset('img/elo.256x164.png') }}" width="48" height="31" alt="cartão elo"/>
+                    <img class="mr-3" src="{{ asset('img/hipercard.256x112.png') }}" width="48" height="21" alt="cartão hipercard"/>
+                </div>
+            </div>
+            <!-- </fieldset> -->
+
+            <fieldset class="border rounded p-3">
+                <legend class="m-0"><small>Dados do {{ $boleto_dados['tipo_pag'] == 'combined' ? 'primeiro' : null }} cartão:</small></legend>
                 <div class="form-row mb-2 cadastroRepresentante">
                     <div class="col-sm mb-2-576">
                         <label for="card_number_1">Número do cartão <span class="text-danger">*</span></label>
@@ -222,8 +235,8 @@
             </fieldset>
 
             @if($boleto_dados['tipo_pag'] == 'combined')
-            <fieldset class="border p-3">
-                <legend><small>Dados do segundo cartão:</small></legend>
+            <fieldset class="border rounded p-3">
+                <legend class="m-0"><small>Dados do segundo cartão:</small></legend>
                 <div class="form-row mb-2 cadastroRepresentante">
                     <div class="col-sm mb-2-576">
                         <label for="card_number_2">Número do cartão <span class="text-danger">*</span></label>
@@ -325,6 +338,33 @@
                 --}}
             </div>
         </form>
+        @else
+        <form action="{{ route('representante.cancelar.pagamento.cartao', ['boleto' => $boleto, 'pagamento' => $id_pagamento]) }}" method="POST" autocomplete="off">
+            @csrf
+            @foreach($dados as $dado)
+                <p><strong>Boleto:</strong> {{ $dado->boleto_id }}</p>
+                <p><strong>Status do pagamento:</strong> {{ $dado->getStatus() }}</p>
+                <p><strong>Forma de pagamento:</strong> {{ $dado->getForma() }}</p>
+                <p><strong>Parcelas:</strong> {{ $dado->getParcelas() }}</p>
+                <p><strong>Data do pagamento:</strong> {{ formataData($dado->created_at) }}</p>
+                <br />
+            @endforeach
+            <div class="form-row mb-2 cadastroRepresentante">
+                <div class="col-sm mb-2-576">
+                    <button
+                        type="submit"
+                        value="Cancelar pagamento"
+                        class="btn btn-danger"
+                        data-toggle="modal" 
+                        data-target="#modalPagamento" 
+                        data-backdrop="static"
+                    >
+                    Cancelar pagamento
+                    </button>
+                </div>
+            </div>
+        </form>
+        @endif
     </div>
 </div>
 
@@ -335,7 +375,7 @@
 
       <!-- Modal body -->
       <div class="modal-body text-center">
-        <div class="spinner-grow text-success"></div> <strong>Aguarde... finalizando o pagamento...</strong>
+        <div class="spinner-grow text-success"></div> <strong>Aguarde... {{ isset($cancelamento) ? 'realizando o cancelamento' : 'finalizando o pagamento' }}...</strong>
       </div>
 
     </div>

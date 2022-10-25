@@ -32,6 +32,7 @@
         <br>
         <!-- Temporário -->
         <a href="{{ route('representante.pagamento.view', 1) }}" class="btn btn-primary text-white text-decoration-none">Teste Realizar Pagamento On-line</a>
+        <a href="{{ route('representante.cancelar.pagamento.cartao.view', ['boleto' => '1', 'pagamento' => '1']) }}" class="btn btn-danger text-white text-decoration-none">Teste Cancelar Pagamento On-line</a>
         
     </div>
 </div>
