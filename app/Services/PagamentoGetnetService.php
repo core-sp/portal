@@ -611,4 +611,30 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         return $pagamento;
     }
+
+    public function getException($erro_msg, $cod)
+    {
+        $generic = 'Erro desconhecido';
+        $msg = 'Código de erro da prestadora: ' . $cod . '.<br>';
+
+        $temp = json_decode($erro_msg, true);
+        if(json_last_error() === JSON_ERROR_NONE)
+        {
+            $opcao = isset($temp['message']) ? $temp['message'] : $generic;
+            if(isset($temp['details']) || isset($temp['payments']))
+            {
+                $campo = isset($temp['details']) ? 'details' : 'payments';
+                foreach($temp[$campo] as $key => $value)
+                    $msg .= isset($value['description']) ? 'Descrição (cartão ' . ++$key . '): ' . $value['description'] . '<br>' : $opcao;
+            }
+            elseif(isset($temp['error']))
+                $msg .= 'Erro: ' . $temp['error_description'];
+            else
+                $msg .= 'Descrição: ' . $opcao;
+        }
+        else
+            $msg = null;
+
+        return $msg;
+    }
 }

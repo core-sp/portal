@@ -5,7 +5,7 @@
 <noscript>
     <iframe 
         style="width: 100px; height: 100px; border: 0; position:absolute; top: -5000px;" 
-        src="https://h.online-metrix.net/fp/tags?org_id={{ config('app.url') != 'https://core-sp.org.br' ? '1snn5n9w' : '' }}&session_id={{ auth()->guard('representante')->user()->getSessionIdPagamento($boleto) }}">
+        src="https://h.online-metrix.net/fp/tags?org_id={{ config('app.url') != 'https://core-sp.org.br' ? '1snn5n9w' : 'k8vif92e' }}&session_id={{ auth()->guard('representante')->user()->getSessionIdPagamento($boleto) }}">
     </iframe>
 </noscript>
 
@@ -54,6 +54,9 @@
                         class="form-control mb-2 mr-sm-3 pagamento"
                         id="tipo_pag" 
                         required
+                        @if(isset($pagamento))
+                        readonly
+                        @endif
                     >
                         @if(!isset($pagamento))
                         <option value="">Selecione a forma de pagamento...</option>
@@ -94,6 +97,9 @@
                         pattern="[0-9]{1,2}" 
                         title="Somente números e entre 1 e 2 dígitos"
                         required
+                        @if(isset($pagamento))
+                        readonly
+                        @endif
                     >
                     @for($i = 1; $i < 11; $i++)
                         @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['parcelas_1'] == $i)))
@@ -130,6 +136,9 @@
                         pattern="[0-9]{1,2}" 
                         title="Somente números e entre 1 e 2 dígitos"
                         required
+                        @if(isset($pagamento))
+                        readonly
+                        @endif
                     >
                     @for($i = 1; $i < 11; $i++)
                         @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['parcelas_2'] == $i)))

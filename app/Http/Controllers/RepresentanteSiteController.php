@@ -661,15 +661,12 @@ class RepresentanteSiteController extends Controller
             $transacao = $this->service->getService('Pagamento')->checkout($request->ip(), $validate, $rep);
             unset($validate);
         }catch(Exception $e){
-            $temp = json_decode($e->getMessage(), true);
-            if(json_last_error() === JSON_ERROR_NONE)
-                $temp = isset($temp['message']) ? $temp['message'] : 'Erro';
-            else
-                $temp = 'Erro';
+            $temp = $this->service->getService('Pagamento')->getException($e->getMessage(), $e->getCode());
+            $msg = isset($temp) ? $temp : 'Erro ao processar o pagamento. Código de erro: ' . $e->getCode();
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$rep->id.' ("'.$rep->registro_core .'") recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento do boleto *'.$boleto.'*. Erro registrado no Log de Erros.');
             return redirect(route('representante.dashboard'))->with([
-                'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! Código de erro da prestadora: ' . $e->getCode() . '. Mensagem: ' . $temp,
+                'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! ' . $msg,
                 'class' => 'alert-danger',
             ]);
         }
@@ -716,15 +713,12 @@ class RepresentanteSiteController extends Controller
             $dados['pagamento'] = $pagamentos;
             $transacao = $this->service->getService('Pagamento')->cancelCheckout($dados, $rep);
         }catch(Exception $e){
-            $temp = json_decode($e->getMessage(), true);
-            if(json_last_error() === JSON_ERROR_NONE)
-                $temp = isset($temp['message']) ? $temp['message'] : 'Erro';
-            else
-                $temp = 'Erro';
+            $temp = $this->service->getService('Pagamento')->getException($e->getMessage(), $e->getCode());
+            $msg = isset($temp) ? $temp : 'Erro ao processar o pagamento. Código de erro: ' . $e->getCode();
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$rep->id.' ("'.$rep->registro_core .'") recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o cancelamento do pagamento com a id *'.$id_pagamento.'* do boleto com a id: *'.$boleto . '*. Erro registrado no Log de Erros.');
             return redirect(route('representante.dashboard'))->with([
-                'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! Código de erro da prestadora: ' . $e->getCode() . '. Mensagem: ' . $temp,
+                'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! ' . $msg,
                 'class' => 'alert-danger',
             ]);
         }

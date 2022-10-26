@@ -12,4 +12,6 @@ interface PagamentoServiceInterface {
     public function bin($bin);
 
     public function formatPagCheckoutIframe($request);
+
+    public function getException($erro_msg, $cod);
 }
