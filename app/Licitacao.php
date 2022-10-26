@@ -46,6 +46,7 @@ class Licitacao extends Model
     const SIT_EM_FASE_DE_RECURSO = 'Em fase de recurso';
     const SIT_ENCERRADO = 'Encerrado';
     const SIT_FASE_INTERNA = 'Fase interna';
+    const SIT_FRACASSADO = 'Fracassado';
     const SIT_HOMOLOGADO = 'Homologado';
     const SIT_JULGAMENTO = 'Julgamento';
     const SIT_PREPARATORIA = 'Preparatória';
@@ -94,6 +95,7 @@ class Licitacao extends Model
             Licitacao::SIT_EM_FASE_DE_RECURSO,
             Licitacao::SIT_ENCERRADO,
             Licitacao::SIT_FASE_INTERNA,
+            Licitacao::SIT_FRACASSADO,
             Licitacao::SIT_HOMOLOGADO,
             Licitacao::SIT_JULGAMENTO,
             Licitacao::SIT_PREPARATORIA,
