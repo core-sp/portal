@@ -32,12 +32,13 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         [$transacao['payments'][0]['credit_cancel']['message'], $transacao['payments'][1]['credit_cancel']['message']];
     }
 
-    private function getArraySavePagamento($transacao, $tipo_pag, $boleto, $parcelas_1, $parcelas_2, $status)
+    private function getArraySavePagamento($transacao, $tipo_pag, $boleto, $parcelas_1, $parcelas_2, $status, $tipo_parcelas_1, $tipo_parcelas_2)
     {
         $base = [
             'boleto_id' => $boleto,
             'forma' => $tipo_pag,
             'parcelas' => $parcelas_1,
+            'tipo_parcelas' => $tipo_parcelas_1,
         ];
 
         if($tipo_pag != 'combined')
@@ -55,6 +56,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $base['payment_tag'] = $transacao['payments'][0]['payment_tag'];
         $base['payment_id'] = $transacao['payments'][0]['payment_id'];
         // cartão 2
+        $base_2['tipo_parcelas'] = $tipo_parcelas_2;
         $base_2['parcelas'] = $parcelas_2;
         $base_2['authorized_at'] = $transacao['payments'][1]['credit']['authorized_at'];
         $base_2['status'] = $status[1];
@@ -452,12 +454,168 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         return json_decode($response->getBody()->getContents(), true);
     }
 
+    private function bin($bin)
+    {
+        try{
+            $this->getToken();
+            $response = $this->client->request('GET', $this->urlBase . '/v1/cards/binlookup/' . $bin, [
+                'headers' => [
+                    'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
+                ]
+            ]);
+        }catch(RequestException $e){
+            $codigo = 0;
+            $erroGetnet = $e->getMessage();
+            if($e->hasResponse())
+            {
+                $codigo = $e->getResponse()->getStatusCode();
+                $erroGetnet = $e->getResponse()->getBody()->getContents();
+            }
+                
+            throw new \Exception($erroGetnet, $codigo);
+        }
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    public function bin3DS($bin)
+    {
+        $dados = null;
+        try{
+            $this->getToken();
+            $response = $this->client->request('GET', $this->urlBase . '/v1/cards/binlookup/' . $bin, [
+                'headers' => [
+                    'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
+                ]
+            ]);
+
+            $card_type = ['visa' => '001', 'mastercard' => '002', 'amex' => '003', 'elo' => '054'];
+
+            $temp = json_decode($response->getBody()->getContents(), true);
+            $dados['brand'] = $temp['results'][0]['brand'];
+            $dados['token'] = $this->auth['token_type'] . ' ' . $this->auth['access_token'];
+            $dados['token_principal'] = "Basic " . base64_encode(env('GETNET_CLIENT_ID') . ':' . env('GETNET_CLIENT_SECRET'));
+            $brand = mb_strtolower($dados['brand']);
+            $dados['card_type'] = isset($card_type[$brand]) ? $card_type[$brand] : '';
+        }catch(RequestException $e){
+            $codigo = 0;
+            $erroGetnet = $e->getMessage();
+            if($e->hasResponse())
+            {
+                $codigo = $e->getResponse()->getStatusCode();
+                $erroGetnet = $e->getResponse()->getBody()->getContents();
+            }
+                
+            throw new \Exception($erroGetnet, $codigo);
+        }
+        
+        return $dados;
+    }
+
+    public function generateToken3DS($request)
+    {
+        // try{
+        //     $this->client = new Client();
+        //     $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/tokens', [
+        //         'headers' => [
+        //             'Content-type' => "application/json; charset=utf-8",
+        //             'Authorization' => $request->header('Authorization'),
+        //             'seller_id' => env('GETNET_SELLER_ID'),
+        //         ],
+        //         'json' => [
+        //             'client_code' => '',
+        //             'currency' => '',
+        //             'items' => [
+        //                 'description' => '',
+        //                 'name' => "",
+        //                 'sku' => "",
+        //                 'quantity' => 1,
+        //                 'total_amount' => 100,
+        //                 'unit_price' => 100
+        //             ],
+        //             'js_version': "",
+        //             'order_number' => "",
+        //             'override_payment_method' => 2,
+        //             'total_amount' => 100,
+        //             'additional_data' => [],
+        //             'additional_object' => []
+        //         ],
+        //     ]);
+        // }catch(RequestException $e){
+        //     $codigo = 0;
+        //     $erroGetnet = $e->getMessage();
+        //     if($e->hasResponse())
+        //     {
+        //         $codigo = $e->getResponse()->getStatusCode();
+        //         $erroGetnet = $e->getResponse()->getBody()->getContents();
+        //     }
+                
+        //     throw new \Exception($erroGetnet, $codigo);
+        // }
+
+        // return json_decode($response->getBody()->getContents(), true);
+    }
+
+    public function authentication3DS($request)
+    {
+        // try{
+        //     $this->client = new Client();
+        //     $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/tokens', [
+        //         'headers' => [
+        //             'Content-type' => "application/json; charset=utf-8",
+        //             'Authorization' => $request->header('Authorization'),
+        //             'seller_id' => env('GETNET_SELLER_ID'),
+        //         ],
+        //         'json' => [
+        //         ],
+        //     ]);
+        // }catch(RequestException $e){
+        //     $codigo = 0;
+        //     $erroGetnet = $e->getMessage();
+        //     if($e->hasResponse())
+        //     {
+        //         $codigo = $e->getResponse()->getStatusCode();
+        //         $erroGetnet = $e->getResponse()->getBody()->getContents();
+        //     }
+                
+        //     throw new \Exception($erroGetnet, $codigo);
+        // }
+
+        // return json_decode($response->getBody()->getContents(), true);
+    }
+
+    public function authenticationResults3DS($request)
+    {
+        // try{
+        //     $this->client = new Client();
+        //     $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/results', [
+        //         'headers' => [
+        //             'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
+        //         ]
+        //     ]);
+        // }catch(RequestException $e){
+        //     $codigo = 0;
+        //     $erroGetnet = $e->getMessage();
+        //     if($e->hasResponse())
+        //     {
+        //         $codigo = $e->getResponse()->getStatusCode();
+        //         $erroGetnet = $e->getResponse()->getBody()->getContents();
+        //     }
+                
+        //     throw new \Exception($erroGetnet, $codigo);
+        // }
+
+        // return json_decode($response->getBody()->getContents(), true);
+    }
+
     public function checkout($ip, $dados, $user)
     {
         $boleto = $dados['boleto'];
         $tipo_pag = $dados['tipo_pag'];
         $parcelas_1 = $dados['parcelas_1'];
         $parcelas_2 = isset($dados['parcelas_2']) ? $dados['parcelas_2'] : null;
+        $tipo_parcelas_1 = $dados['tipo_parcelas_1'];
+        $tipo_parcelas_2 = isset($dados['tipo_parcelas_2']) ? $dados['tipo_parcelas_2'] : null;
         $transacao = $tipo_pag != 'combined' ? $this->pagamento($ip, $dados) : $this->pagamentoCombinado($ip, $dados);
         unset($dados);
         
@@ -485,7 +643,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             ];
         }
 
-        $arrayPag = $this->getArraySavePagamento($transacao, $tipo_pag, $boleto, $parcelas_1, $parcelas_2, $status);
+        $arrayPag = $this->getArraySavePagamento($transacao, $tipo_pag, $boleto, $parcelas_1, $parcelas_2, $status, $tipo_parcelas_1, $tipo_parcelas_2);
         $pagamento = $tipo_pag != 'combined' ? $user->pagamentos()->create($arrayPag) : $user->pagamentos()->createMany($arrayPag);
 
         $string = 'Usuário ' . $user->id . ' ("'. $user->registro_core .'") realizou pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
@@ -557,30 +715,6 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         ];
     }
 
-    public function bin($bin)
-    {
-        try{
-            $this->getToken();
-            $response = $this->client->request('GET', $this->urlBase . '/v1/cards/binlookup/' . $bin, [
-                'headers' => [
-                    'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
-                ]
-            ]);
-        }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
-        }
-
-        return json_decode($response->getBody()->getContents(), true);
-    }
-
     public function formatPagCheckoutIframe($request)
     {
         $this->getToken();
@@ -629,6 +763,8 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             }
             elseif(isset($temp['error']))
                 $msg .= 'Erro: ' . $temp['error_description'];
+            elseif(isset($temp['status']))
+                $msg .= 'Status: ' . $temp['status'];
             else
                 $msg .= 'Descrição: ' . $opcao;
         }

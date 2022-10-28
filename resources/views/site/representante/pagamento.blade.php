@@ -26,7 +26,7 @@
         <small class="form-text text-muted mb-3">
             <em><span class="text-danger">*</span> Preenchimento obrigatório</em>
         </small>
-        <form action="{{ isset($pagamento) ? route('representante.pagamento.cartao', $boleto) : route('representante.pagamento.gerenti', $boleto) }}" method="POST" autocomplete="off">
+        <form action="{{ isset($pagamento) ? route('representante.pagamento.cartao', $boleto) : route('representante.pagamento.gerenti', $boleto) }}" method="POST" autocomplete="off" id="{{ isset($pagamento) ? 'formPagamento' : null }}">
             @csrf
             <input type="hidden" name="boleto" value="{{ $boleto }}" />
 
@@ -45,7 +45,7 @@
                 </div>
 
                 @php
-                    $tiposPag = ['credit' => 'Crédito', 'combined' => 'Crédito com dois cartões', 'debit' => 'Débito'];
+                    $tiposPag = ['credit' => 'Crédito', 'credit_3ds' => 'Crédito com 3DS', 'combined' => 'Crédito com dois cartões', 'debit_3ds' => 'Débito com 3DS'];
                 @endphp
                 <div class="col-sm mb-2-576">
                     <label for="tipo_pag">Forma de pagamento <span class="text-danger">*</span></label>
@@ -67,6 +67,11 @@
                         @endif
                     @endforeach
                     </select>
+                    @if(!isset($pagamento) || (isset($pagamento) && $is_3ds))
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle text-primary"></i><em> 3DS é um protocolo de autenticação mais seguro para transações financeiras on-line</em>
+                    </small>
+                    @endif
                 </div>
             </div>
 
@@ -158,7 +163,9 @@
                     <img class="mr-3" src="{{ asset('img/mastercard.256x164.png') }}" width="48" height="31" alt="cartão master"/>
                     <img class="mr-3" src="{{ asset('img/amex.256x168.png') }}" width="48" height="32" alt="cartão amex"/>
                     <img class="mr-3" src="{{ asset('img/elo.256x164.png') }}" width="48" height="31" alt="cartão elo"/>
+                    @if(!$is_3ds)
                     <img class="mr-3" src="{{ asset('img/hipercard.256x112.png') }}" width="48" height="21" alt="cartão hipercard"/>
+                    @endif
                 </div>
             </div>
             <!-- </fieldset> -->
@@ -390,6 +397,71 @@
     </div>
   </div>
 </div>
+
+<!-- condição se selecionar pagamento tipo 3DS -->
+@if(isset($pagamento) && $is_3ds)
+
+<!-- config -->
+<input type="hidden" id="gn3ds_merchantBackEndUrl" name="gn3ds_merchantBackEndUrl" class="gn3ds_merchantBackEndUrl" value="{{ route('site.home') }}">
+<input type="hidden" id="gn3ds_merchantBackEndTokenBasic" name="gn3ds_merchantBackEndTokenBasic" class="gn3ds_merchantBackEndTokenBasic" value="">
+<input type="hidden" id="gn3ds_merchantBackEndTokenOauth" name="gn3ds_merchantBackEndTokenOauth" class="gn3ds_merchantBackEndTokenOauth" value="">
+<input type="hidden" id="gn3ds_environment" name="gn3ds_environment" class="gn3ds_environment" value="{{ config('app.url') != 'https://core-sp.org.br' ? 'SDB' : 'PRD' }}">
+<input type="hidden" id="gn3ds_debug" name="gn3ds_debug" class="gn3ds_debug" value="{{ config('app.url') != 'https://core-sp.org.br' ? 'true' : 'false' }}">
+<input type="hidden" id="gn3ds_debugPrefix" name="gn3ds_debugPrefix" class="gn3ds_debugPrefix" value="{{ config('app.url') != 'https://core-sp.org.br' ? '[GN3DS]' : null }}">
+<input type="hidden" id="gn3ds_frameworkModal" name="gn3ds_frameworkModal" class="gn3ds_frameworkModal" value="bootstrap3">
+<input type="hidden" id="gn3ds_newApiVersion" name="gn3ds_newApiVersion" class="gn3ds_newApiVersion" value="false">
+
+<!-- checkout -->
+<input type="hidden" id="gn3ds_currency" name="gn3ds_currency" class="gn3ds_currency" value="BRL">
+<input type="hidden" id="gn3ds_totalAmount" name="gn3ds_totalAmount" class="gn3ds_totalAmount" value="1000">
+<input type="hidden" id="gn3ds_billToAddress1" name="gn3ds_billToAddress1" class="gn3ds_billToAddress1" value="">
+<input type="hidden" id="gn3ds_billToAddress2" name="gn3ds_billToAddress2" class="gn3ds_billToAddress2" value="">
+<input type="hidden" id="gn3ds_billToAdministrativeArea" name="gn3ds_billToAdministrativeArea" class="gn3ds_billToAdministrativeArea" value="SP">
+<input type="hidden" id="gn3ds_billToCountry" name="gn3ds_billToCountry" class="gn3ds_billToCountry" value="BR">
+<input type="hidden" id="gn3ds_billToLocality" name="gn3ds_billToLocality" class="gn3ds_billToLocality" value="Sao Paulo">
+<input type="hidden" id="gn3ds_billToHomePhone" name="gn3ds_billToHomePhone" class="gn3ds_billToHomePhone" value="11999999999">
+<input type="hidden" id="gn3ds_billToEmail" name="gn3ds_billToEmail" class="gn3ds_billToEmail" value="">
+<input type="hidden" id="gn3ds_billToPostalCode" name="gn3ds_billToPostalCode" class="gn3ds_billToPostalCode" value="04746050">
+<input type="hidden" id="gn3ds_billToMobilePhone" name="gn3ds_billToMobilePhone" class="gn3ds_billToMobilePhone" value="11999999999">
+<input type="hidden" id="gn3ds_cardType" name="gn3ds_cardType" class="gn3ds_cardType" value="">
+<input type="hidden" id="gn3ds_cardExpirationMonth" name="gn3ds_cardExpirationMonth" class="gn3ds_cardExpirationMonth" value="01">
+<input type="hidden" id="gn3ds_cardExpirationYear" name="gn3ds_cardExpirationYear" class="gn3ds_cardExpirationYear" value="2025">
+<input type="hidden" id="gn3ds_cardNumber" name="gn3ds_cardNumber" class="gn3ds_cardNumber" value="5200000000001096">
+<input type="hidden" id="gn3ds_cardHolderName" name="gn3ds_cardHolderName" class="gn3ds_cardHolderName" value="TESTE CARTAO">
+<input type="hidden" id="gn3ds_overridePaymentMethod" name="gn3ds_overridePaymentMethod" class="gn3ds_overridePaymentMethod" value="02">
+<input type="hidden" id="gn3ds_httpBrowserColorDepth" name="gn3ds_httpBrowserColorDepth" class="gn3ds_httpBrowserColorDepth" value="">
+<input type="hidden" id="gn3ds_httpBrowserJavaEnabled" name="gn3ds_httpBrowserJavaEnabled" class="gn3ds_httpBrowserJavaEnabled" value="">
+<input type="hidden" id="gn3ds_httpBrowserJavaScriptEnabled" name="gn3ds_httpBrowserJavaScriptEnabled" class="gn3ds_httpBrowserJavaScriptEnabled" value="">
+<input type="hidden" id="gn3ds_httpBrowserLanguage" name="gn3ds_httpBrowserLanguage" class="gn3ds_httpBrowserLanguage" value="">
+<input type="hidden" id="gn3ds_httpBrowserScreenHeight" name="gn3ds_httpBrowserScreenHeight" class="gn3ds_httpBrowserScreenHeight" value="">
+<input type="hidden" id="gn3ds_httpBrowserScreenWidth" name="gn3ds_httpBrowserScreenWidth" class="gn3ds_httpBrowserScreenWidth" value="">
+<input type="hidden" id="gn3ds_httpBrowserTimeDifference" name="gn3ds_httpBrowserTimeDifference" class="gn3ds_httpBrowserTimeDifference" value="">
+<input type="hidden" id="gn3ds_userAgentBrowserValue" name="gn3ds_userAgentBrowserValue" class="gn3ds_userAgentBrowserValue" value="">
+
+<input type="hidden" id="gn3ds_personalId" name="gn3ds_personalId" class="gn3ds_personalId" value="">
+<input type="hidden" id="gn3ds_personalType" name="gn3ds_personalType" class="gn3ds_personalType" value="">
+<input type="hidden" id="gn3ds_shipToAddress1" name="gn3ds_shipToAddress1" class="gn3ds_shipToAddress1" value="">
+<input type="hidden" id="gn3ds_shipToAddress2" name="gn3ds_shipToAddress2" class="gn3ds_shipToAddress2" value="">
+<input type="hidden" id="gn3ds_shipToAdministrativeArea" name="gn3ds_shipToAdministrativeArea" class="gn3ds_shipToAdministrativeArea" value="">
+<input type="hidden" id="gn3ds_shipToCountry" name="gn3ds_shipToCountry" class="gn3ds_shipToCountry" value="">
+<input type="hidden" id="gn3ds_shipToLocality" name="gn3ds_shipToLocality" class="gn3ds_shipToLocality" value="">
+<input type="hidden" id="gn3ds_shipToFirstName" name="gn3ds_shipToFirstName" class="gn3ds_shipToFirstName" value="">
+<input type="hidden" id="gn3ds_shipToLastName" name="gn3ds_shipToLastName" class="gn3ds_shipToLastName" value="">
+<input type="hidden" id="gn3ds_shipToPostalCode" name="gn3ds_shipToPostalCode" class="gn3ds_shipToPostalCode" value="">
+<input type="hidden" id="gn3ds_shipToDestinationCode" name="gn3ds_shipToDestinationCode" class="gn3ds_shipToDestinationCode" value="">
+<input type="hidden" id="gn3ds_shipToMethod" name="gn3ds_shipToMethod" class="gn3ds_shipToMethod" value="">
+<input type="hidden" id="gn3ds_item_#_totalAmount" name="gn3ds_item_#_totalAmount" class="gn3ds_item_#_totalAmount" value="">
+<input type="hidden" id="gn3ds_item_#_unitPrice" name="gn3ds_item_#_unitPrice" class="gn3ds_item_#_unitPrice" value="">
+<input type="hidden" id="gn3ds_item_#_quantity" name="gn3ds_item_#_quantity" class="gn3ds_item_#_quantity" value="">
+<input type="hidden" id="gn3ds_item_#_sku" name="gn3ds_item_#_sku" class="gn3ds_item_#_sku" value="">
+<input type="hidden" id="gn3ds_item_#_description" name="gn3ds_item_#_description" class="gn3ds_item_#_description" value="">
+<input type="hidden" id="gn3ds_item_#_name" name="gn3ds_item_#_name" class="gn3ds_item_#_name" value="">
+<input type="hidden" id="gn3ds_installmentTotalCount" name="gn3ds_installmentTotalCount" class="gn3ds_installmentTotalCount" value="">
+<input type="hidden" id="gn3ds_additionalData" name="gn3ds_additionalData" class="gn3ds_additionalData" value="">
+<input type="hidden" id="gn3ds_additionalObject" name="gn3ds_additionalObject" class="gn3ds_additionalObject" value="">
+
+<script src="{{ asset('/js/getnet_3ds.js?'.time()) }}" type="text/javascript"></script>
+@endif
 
 {{--
 @if(isset($pagamento))

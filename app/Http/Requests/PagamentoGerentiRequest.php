@@ -17,7 +17,7 @@ class PagamentoGerentiRequest extends FormRequest
             'valor' => apenasNumeros($this->amount),
             'amount_1' => $this->filled('amount_1') ? apenasNumeros($this->amount_1) : null,
             'amount_2' => $this->filled('amount_2') ? apenasNumeros($this->amount_2) : null,
-            'parcelas_1' => $this->tipo_pag == 'debit' ? '1' : $this->parcelas_1,
+            'parcelas_1' => $this->tipo_pag == 'debit_3ds' ? '1' : $this->parcelas_1,
         ]);
 
         if(($this->tipo_pag == 'combined') && (isset($this->amount_1) && isset($this->amount_2)))
@@ -29,7 +29,7 @@ class PagamentoGerentiRequest extends FormRequest
         return [
             'boleto' => 'required',
             'valor' => 'required|regex:/^[0-9]{1,10}$/',
-            'tipo_pag' => 'required|in:debit,credit,combined',
+            'tipo_pag' => 'required|in:debit_3ds,credit_3ds,credit,combined',
             'parcelas_1' => 'required|regex:/^[0-9]{1,2}$/',
             'amount_1' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',
             'amount_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',

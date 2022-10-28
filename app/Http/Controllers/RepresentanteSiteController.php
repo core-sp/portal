@@ -633,13 +633,14 @@ class RepresentanteSiteController extends Controller
                 ]);
             unset($boleto_dados['amount_soma']);
             $pagamento = true;
+            $is_3ds = strpos($boleto_dados['tipo_pag'], '_3ds') !== false;
         }catch(Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao processar dados do servidor para pagamento online");
         }
 
         return view('site.representante.pagamento')->with([
-            'pagamento' => $pagamento, 'boleto' => $boleto, 'boleto_dados' => $boleto_dados
+            'pagamento' => $pagamento, 'boleto' => $boleto, 'boleto_dados' => $boleto_dados, 'is_3ds' => $is_3ds
         ]);
     }
 

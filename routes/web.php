@@ -324,6 +324,12 @@ Route::prefix('/')->group(function() {
   Route::post('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimento')->name('termo.consentimento.post');
   Route::get('/termo-consentimento-pdf', 'TermoConsentimentoController@termoConsentimentoPdf')->name('termo.consentimento.pdf');
 
+  // teste
+  Route::get('/cardsBrand/{boleto}/{bin}', 'PagamentoController@cardsBrand')->name('pagamento.cards.brand');
+  Route::post('/generateToken', 'PagamentoController@generateToken')->name('pagamento.generate.token');
+  Route::post('/authentications', 'PagamentoController@authentications')->name('pagamento.authentications');
+  Route::post('/authentication-results', 'PagamentoController@authenticationResults')->name('pagamento.authentications.results');
+
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');
 });

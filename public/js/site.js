@@ -970,13 +970,13 @@ function disabledPagamento(){
 }
 
 function enabledPagamento(credito){
-	var habilita = credito != 'credit' ? true : false;
+	var habilita = credito == 'combined' ? true : false;
 	habilita ? $('#dados_combinado, #valor_combinado').show() : $('#dados_combinado, #valor_combinado').hide();
 	$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', habilita);
 }
 
 $('select[name="tipo_pag"]').change(function() {
-	if((this.value == 'debit') || (this.value == '')){
+	if((this.value == 'debit_3ds') || (this.value == '')){
 		disabledPagamento();
 		return;
 	}
@@ -1011,6 +1011,39 @@ function hideModalPagamentoSubmit(elemento){
 const inputs = document.getElementsByClassName('pagamento');
 for(elemento of inputs){
 	hideModalPagamentoSubmit(elemento);
+}
+
+// condição se for 3DS
+$('#formPagamento').submit(function(e) {
+	if($('#tipo_pag').val().indexOf('_3ds') != -1){
+		$('#modalPagamento').modal('hide');
+		e.preventDefault();
+		teste($('[name="boleto"]').val(), $('#card_number_1').val());
+	}
+});
+
+function teste(boleto, card)
+{
+	var brand = '';
+	var bin = card.replace(/[^0-9]/g,'').slice(0,6);
+	$.ajax({
+		method: "GET",
+		dataType: 'json',
+		url: "/cardsBrand/" + boleto + '/' + bin,
+		success: function(response, textStatus, xhr) {
+			brand = response['brand'];
+			$('.gn3ds_merchantBackEndTokenBasic').val(xhr.getResponseHeader('authorization_principal'));
+			$('.gn3ds_merchantBackEndTokenOauth').val(xhr.getResponseHeader('authorization'));
+			$('.gn3ds_cardType').val(response['card_type']);
+			window.parent.enrollment();
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			var msg = xhr.responseJSON.message;
+			$('#modalPagamento .modal-body')
+			.html('<h5><i class="fas fa-times text-danger"></i> ' + msg + '</h5><br><button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>');
+			$('#modalPagamento').modal('show');
+		}
+	});
 }
 
 // +++++++++++++++++++++++ ++++++++++++++++++++++++++++++ ++++++++++++++++++++++
