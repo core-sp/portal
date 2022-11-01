@@ -205,7 +205,7 @@
           </div>
         </div>
         <a href="/servicos-atendimento-ao-rc">
-          <div class="container-fluid rosa-claro-bg pt-2 pb-2">
+          <div class="container-fluid azul-claro-bg pt-2 pb-2">
             <div class="row">
                 <div class="container">
                   <div class="d-flex">
