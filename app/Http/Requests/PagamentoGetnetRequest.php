@@ -13,9 +13,9 @@ class PagamentoGetnetRequest extends FormRequest
         // 'cardholder_mobile' quando debito e visa
         
         // Temporário, muitos dados do Gerenti
-        $rep = auth()->guard('representante')->user();
+        $user = auth()->user();
 
-        if(url()->previous() != route('representante.pagamento.gerenti', $this->boleto))
+        if(url()->previous() != route('pagamento.gerenti', $this->boleto))
         {
             $this->replace([]);
             return;
@@ -32,11 +32,11 @@ class PagamentoGetnetRequest extends FormRequest
             'document_number_1' => apenasNumeros($this->document_number_1),
             'document_number_2' => $this->filled('document_number_2') ? apenasNumeros($this->document_number_2) : null,
             'cardholder_mobile' => '',
-            'email' => $rep->email,
-            'name' => $rep->nome,
-            'document_type' => $rep->tipoPessoa() == 'PF' ? 'CPF' : 'CNPJ',
-            'document_number' => $rep->cpf_cnpj,
-            'device_id' => $rep->getSessionIdPagamento($this->boleto),
+            'email' => $user->email,
+            'name' => $user->nome,
+            'document_type' => $user->tipoPessoa() == 'PF' ? 'CPF' : 'CNPJ',
+            'document_number' => $user->cpf_cnpj,
+            'device_id' => $user->getSessionIdPagamento($this->boleto),
             'parcelas_1' => $this->tipo_pag == 'debit_3ds' ? '1' : $this->parcelas_1,
             'tipo_parcelas_1' => $this->parcelas_1 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST',
             'order_id' => '6d2e4380-d8a3-4ccb-9138-c289182818a3',

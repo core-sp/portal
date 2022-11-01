@@ -28,7 +28,7 @@ class PagamentoMail extends Mailable
         $detalhes .= '<br /><br />';
 
         if($pagamento->aprovado()) {
-            $link = route('representante.cancelar.pagamento.cartao.view', ['boleto' => $pagamento->boleto_id, 'pagamento' => $pagamento->getIdPagamento()]);
+            $link = route('pagamento.cancelar.view', ['boleto' => $pagamento->boleto_id, 'pagamento' => $pagamento->getIdPagamento()]);
 
             $this->body = $detalhes;
             $this->body .= '<strong>Caso não reconheça esse pagamento, cancele pelo <a href="' . $link . '">link de cancelamento</a>, na área restrita do ';

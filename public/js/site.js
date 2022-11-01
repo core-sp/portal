@@ -961,7 +961,7 @@ $('#cedula').ready(function() {
 	}
 });
 
-// +++++++++++++++++++++++ Página pagamento Representante ++++++++++++++++++++++
+// +++++++++++++++++++++++ Página pagamento ++++++++++++++++++++++
 
 function disabledPagamento(){
 	$('select[name="parcelas_1"]').val('1').attr('disabled', true);
@@ -1040,7 +1040,7 @@ function teste(boleto, card)
 		error: function(xhr, ajaxOptions, thrownError) {
 			var msg = xhr.responseJSON.message;
 			$('#modalPagamento .modal-body')
-			.html('<h5><i class="fas fa-times text-danger"></i> ' + msg + '</h5><br><button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>');
+			.html('<h5><i class="fas fa-times text-danger"></i> ' + msg + '</h5><br><a class="btn btn-secondary" href="' + window.location.href + '">Fechar</a>');
 			$('#modalPagamento').modal('show');
 		}
 	});

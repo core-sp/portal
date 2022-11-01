@@ -5,7 +5,7 @@ namespace App\Contracts;
 interface PagamentoServiceInterface {
 
     // em testes
-    public function bin3DS($bin);
+    public function getDados3DS($bin);
 
     public function generateToken3DS($request);
 
@@ -17,7 +17,7 @@ interface PagamentoServiceInterface {
 
     public function cancelCheckout($dados, $user);
 
-    public function formatPagCheckoutIframe($request);
+    public function formatPagCheckoutIframe($request, $user);
 
     public function getException($erro_msg, $cod);
 }

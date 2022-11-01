@@ -324,7 +324,12 @@ Route::prefix('/')->group(function() {
   Route::post('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimento')->name('termo.consentimento.post');
   Route::get('/termo-consentimento-pdf', 'TermoConsentimentoController@termoConsentimentoPdf')->name('termo.consentimento.pdf');
 
-  // teste
+  // Pagamento
+  Route::get('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerentiView')->name('pagamento.view');
+  Route::post('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerenti')->name('pagamento.gerenti');
+  Route::post('/confirmar-pagamento/{boleto}', 'PagamentoController@pagamentoCartao')->name('pagamento.cartao');
+  Route::get('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartaoView')->name('pagamento.cancelar.view');
+  Route::post('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartao')->name('pagamento.cancelar');
   Route::get('/cardsBrand/{boleto}/{bin}', 'PagamentoController@cardsBrand')->name('pagamento.cards.brand');
   Route::post('/generateToken', 'PagamentoController@generateToken')->name('pagamento.generate.token');
   Route::post('/authentications', 'PagamentoController@authentications')->name('pagamento.authentications');

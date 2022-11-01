@@ -478,20 +478,14 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         return json_decode($response->getBody()->getContents(), true);
     }
 
-    public function bin3DS($bin)
+    public function getDados3DS($bin)
     {
         $dados = null;
+        $card_type = ['visa' => '001', 'mastercard' => '002', 'amex' => '003', 'elo' => '054'];
+
         try{
-            $this->getToken();
-            $response = $this->client->request('GET', $this->urlBase . '/v1/cards/binlookup/' . $bin, [
-                'headers' => [
-                    'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
-                ]
-            ]);
+            $temp = $this->bin($bin);
 
-            $card_type = ['visa' => '001', 'mastercard' => '002', 'amex' => '003', 'elo' => '054'];
-
-            $temp = json_decode($response->getBody()->getContents(), true);
             $dados['brand'] = $temp['results'][0]['brand'];
             $dados['token'] = $this->auth['token_type'] . ' ' . $this->auth['access_token'];
             $dados['token_principal'] = "Basic " . base64_encode(env('GETNET_CLIENT_ID') . ':' . env('GETNET_CLIENT_SECRET'));
@@ -621,7 +615,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         
         if(isset($transacao['message-cartao']))
         {
-            $string = 'Usuário ' . $user->id . ' ("'. $user->registro_core .'") tentou realizar o pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '*';
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '*';
             $string .= ', mas não foi possível. Retorno da Getnet: ' . $transacao['retorno_getnet'];
             event(new ExternoEvent($string));
             return $transacao;
@@ -633,7 +627,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         if($combined || $not_combined)
         {
-            $string = 'Usuário ' . $user->id . ' ("'. $user->registro_core .'") tentou realizar o pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '*';
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '*';
             $string .= ', mas não foi possível. Retorno da Getnet: Cartão verificado, mas ao realizar o pagamento o status recebido foi' . json_encode($status);
             event(new ExternoEvent($string));
 
@@ -646,7 +640,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $arrayPag = $this->getArraySavePagamento($transacao, $tipo_pag, $boleto, $parcelas_1, $parcelas_2, $status, $tipo_parcelas_1, $tipo_parcelas_2);
         $pagamento = $tipo_pag != 'combined' ? $user->pagamentos()->create($arrayPag) : $user->pagamentos()->createMany($arrayPag);
 
-        $string = 'Usuário ' . $user->id . ' ("'. $user->registro_core .'") realizou pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
+        $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
         $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $transacao['payment_id'] : 'combined_id: '. $transacao['combined_id'];
         $string .= '. [Dados Request:' . json_encode(request()->all()) . ']; [Dados Session:' . json_encode(session()->all()) . ']; [Dados Cache:' . json_encode(cache()) . ']';
         event(new ExternoEvent($string));
@@ -685,7 +679,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         {
             $message = $this->getMsgCancelTransacao($transacao, $tipo_pag);
 
-            $string = 'Usuário ' . $user->id . ' ("'. $user->registro_core .'") tentou realizar o cancelamento do pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
             $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $pagamento->first()->payment_id : 'combined_id: ' . $pagamento->first()->combined_id;
             $string .= ', mas não foi possível. Retorno da Getnet: ' . json_encode($message);
             event(new ExternoEvent($string));
@@ -703,7 +697,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             ]);
 
         unset($transacao);
-        $string = 'Usuário ' . $user->id . ' ("'. $user->registro_core .'") realizou o cancelamento do pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
+        $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou o cancelamento do pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
         $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $pagamento->first()->payment_id : 'combined_id: ' . $pagamento->first()->combined_id;
         event(new ExternoEvent($string));
 
@@ -715,7 +709,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         ];
     }
 
-    public function formatPagCheckoutIframe($request)
+    public function formatPagCheckoutIframe($request, $user)
     {
         $this->getToken();
 
@@ -742,6 +736,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $pagamento['country'] = 'BR';
         // $pagamento['our_number'] = '150.23';
         // $pagamento['document_number'] = '150.23';
+        $pagamento['callback'] = route($user->getRouteName() . '.dashboard');
 
         return $pagamento;
     }
@@ -759,7 +754,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             {
                 $campo = isset($temp['details']) ? 'details' : 'payments';
                 foreach($temp[$campo] as $key => $value)
-                    $msg .= isset($value['description']) ? 'Descrição (cartão ' . ++$key . '): ' . $value['description'] . '<br>' : $opcao;
+                    $msg .= isset($value['description']) ? 'Descrição (cartão ' . ++$key . '): ' . $value['description'] . '<br>' : $opcao . '<br>';
             }
             elseif(isset($temp['error']))
                 $msg .= 'Erro: ' . $temp['error_description'];

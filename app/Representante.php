@@ -129,4 +129,14 @@ class Representante extends Authenticable
     {
         return apenasNumeros($this->cpf_cnpj) . $boleto_id;
     }
+
+    public function getRouteName()
+    {
+        return 'representante';
+    }
+
+    public function getViewName()
+    {
+        return 'representante';
+    }
 }
