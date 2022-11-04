@@ -20,4 +20,6 @@ interface PagamentoServiceInterface {
     public function formatPagCheckoutIframe($request, $user);
 
     public function getException($erro_msg, $cod);
+
+    public function rotinaUpdateTransacao($dados);
 }

@@ -139,4 +139,14 @@ class Representante extends Authenticable
     {
         return 'representante';
     }
+
+    public function getName()
+    {
+        return 'Representante';
+    }
+
+    public function getCustomerId()
+    {
+        return 'customer_id_' . $this->ass_id;
+    }
 }

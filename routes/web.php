@@ -334,6 +334,8 @@ Route::prefix('/')->group(function() {
   Route::post('/generateToken', 'PagamentoController@generateToken')->name('pagamento.generate.token');
   Route::post('/authentications', 'PagamentoController@authentications')->name('pagamento.authentications');
   Route::post('/authentication-results', 'PagamentoController@authenticationResults')->name('pagamento.authentications.results');
+  Route::get('/transacao/credito', 'PagamentoController@getTransacaoCredito')->name('pagamento.transacao.credito');
+  Route::get('/transacao/debito', 'PagamentoController@getTransacaoDebito')->name('pagamento.transacao.debito');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

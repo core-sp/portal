@@ -61,7 +61,13 @@ class Pagamento extends Model
 
     public function canCancel()
     {
-        if(!$this->aprovado())
+        if(isset($this->combined_id))
+        {
+            $temp = self::where('combined_id', $this->combined_id)->where('id', '!=', $this->id)->first();
+            if(!$temp->aprovado() && !$this->aprovado())
+                return false;
+        }
+        elseif(!$this->aprovado())
             return false;
 
         return Carbon::createFromFormat('Y-m-d\TH:i:sZ', $this->authorized_at)->day == Carbon::now('UTC')->day;
@@ -70,5 +76,24 @@ class Pagamento extends Model
     public function getIdPagamento()
     {
         return $this->forma == 'combined' ? $this->combined_id : $this->payment_id;
+    }
+
+    public function getForma3DS()
+    {
+        switch($this->forma)
+        {
+            case 'debit':
+                return 'debit_3ds';
+            case 'credit':
+                return $this->is_3ds ? 'credit_3ds' : 'credit';
+            case 'combined':
+                return 'combined';
+        }
+    }
+
+    public function getUser()
+    {
+        if(isset($this->idrepresentante))
+            return $this->representante;
     }
 }

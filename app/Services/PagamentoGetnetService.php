@@ -9,16 +9,34 @@ use GuzzleHttp\Exception\RequestException;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PagamentoMail;
+use App\Pagamento;
 
 class PagamentoGetnetService implements PagamentoServiceInterface {
 
     private $urlBase;
     private $client;
     private $auth;
+    private $via_sistema;
+    const TOTAL_CARTOES = 2;
+    const TEXTO_LOG_SISTEMA = '[Rotina Portal - Transação Getnet] ';
 
     public function __construct()
     {
         $this->urlBase = config('app.url') != 'https://core-sp.org.br' ? 'https://api-homologacao.getnet.com.br' : '';
+        $this->via_sistema = false;
+    }
+
+    private function formatError(RequestException $e)
+    {
+        $codigo = 0;
+        $erroGetnet = $e->getMessage();
+        if($e->hasResponse())
+        {
+            $codigo = $e->getResponse()->getStatusCode();
+            $erroGetnet = $e->getResponse()->getBody()->getContents();
+        }
+            
+        throw new \Exception($erroGetnet, $codigo);
     }
 
     private function getStatusTransacao($transacao, $tipo_pag)
@@ -26,26 +44,43 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         return $tipo_pag != 'combined' ? $transacao['status'] : [$transacao['payments'][0]['status'], $transacao['payments'][1]['status']];
     }
 
-    private function getMsgCancelTransacao($transacao, $tipo_pag)
+    private function getMsgDtCancelTransacao($transacao, $tipo_pag)
     {
-        return $tipo_pag != 'combined' ? $transacao[$tipo_pag.'_cancel']['message'] : 
-        [$transacao['payments'][0]['credit_cancel']['message'], $transacao['payments'][1]['credit_cancel']['message']];
+        switch($tipo_pag) {
+            case 'debit_3ds':
+            case 'credit_3ds':
+                return [
+                    'msg' => $transacao['reason_message'], 
+                    'dt' => $transacao['canceled_at']
+                ];
+            case 'credit':
+                return [
+                    'msg' => $transacao[$tipo_pag.'_cancel']['message'], 
+                    'dt' => $transacao[$tipo_pag.'_cancel']['canceled_at']
+                ];
+            case 'combined':
+                return [
+                    'msg' => [$transacao['payments'][0]['credit_cancel']['message'], $transacao['payments'][1]['credit_cancel']['message']],
+                    'dt' => $transacao['payments'][0]['credit_cancel']['canceled_at']
+                ];
+        }
     }
 
-    private function getArraySavePagamento($transacao, $tipo_pag, $boleto, $parcelas_1, $parcelas_2, $status, $tipo_parcelas_1, $tipo_parcelas_2)
+    private function getArraySavePagamento($transacao, $status, $dados)
     {
         $base = [
-            'boleto_id' => $boleto,
-            'forma' => $tipo_pag,
-            'parcelas' => $parcelas_1,
-            'tipo_parcelas' => $tipo_parcelas_1,
+            'boleto_id' => $dados['boleto'],
+            'forma' => $dados['tipo_pag'],
+            'parcelas' => $dados['parcelas_1'],
+            'tipo_parcelas' => $dados['tipo_parcelas_1'],
         ];
 
-        if($tipo_pag != 'combined')
+        if($dados['tipo_pag'] != 'combined')
         {
             $base['payment_id'] = $transacao['payment_id'];
             $base['status'] = $status;
-            $base['authorized_at'] = $transacao[$tipo_pag]['authorized_at'];
+            $base['authorized_at'] = $transacao[$dados['tipo_pag']]['authorized_at'];
+            $base['is_3ds'] = strpos($dados['tipo_pag'], '_3ds') !== false ? true : false;
             return $base;
         }
 
@@ -56,8 +91,8 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $base['payment_tag'] = $transacao['payments'][0]['payment_tag'];
         $base['payment_id'] = $transacao['payments'][0]['payment_id'];
         // cartão 2
-        $base_2['tipo_parcelas'] = $tipo_parcelas_2;
-        $base_2['parcelas'] = $parcelas_2;
+        $base_2['tipo_parcelas'] = $dados['tipo_parcelas_2'];
+        $base_2['parcelas'] = $dados['parcelas_2'];
         $base_2['authorized_at'] = $transacao['payments'][1]['credit']['authorized_at'];
         $base_2['status'] = $status[1];
         $base_2['payment_tag'] = $transacao['payments'][1]['payment_tag'];
@@ -134,43 +169,51 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     private function tipoPagamento($tipo, $dados)
     {
-        $expiration = Carbon::createFromFormat('Y-m', $dados['expiration_1']);
-        $dados['expiration_month_1'] = $expiration->format('m');
-        $dados['expiration_year_1'] = $expiration->format('y');
-        $totalCartoes = 2;
-
         if($tipo != 'combined')
+        {
+            $expiration = Carbon::createFromFormat('Y-m', $dados['expiration_1']);
             $resultado['card'] = [
                 "number_token" => $dados['number_token'],
                 "cardholder_name" => $dados['cardholder_name_1'],
                 "security_code" => $dados['security_code_1'],
                 "brand" => $dados['brand'],
-                "expiration_month" => $dados['expiration_month_1'],
-                "expiration_year" => $dados['expiration_year_1']
+                "expiration_month" => $expiration->format('m'),
+                "expiration_year" => $expiration->format('y')
             ];
-        else
-        {
-            $expiration = Carbon::createFromFormat('Y-m', $dados['expiration_2']);
-            $dados['expiration_month_2'] = $expiration->format('m');
-            $dados['expiration_year_2'] = $expiration->format('y');
-            for($i = 1; $i <= $totalCartoes; $i++)
+        }else{
+            for($i = 1; $i <= self::TOTAL_CARTOES; $i++)
+            {
+                $expiration = Carbon::createFromFormat('Y-m', $dados['expiration_'.$i]);
                 $resultado['card_' . $i] = [
                     "number_token" => $dados['number_token_' . $i],
                     "cardholder_name" => $dados['cardholder_name_' . $i],
                     "security_code" => $dados['security_code_' . $i],
                     "brand" => $dados['brand_' . $i],
-                    "expiration_month" => $dados['expiration_month_' . $i],
-                    "expiration_year" => $dados['expiration_year_' . $i]
+                    "expiration_month" => $expiration->format('m'),
+                    "expiration_year" => $expiration->format('y')
                 ];
+            }
         }
         
         switch($tipo){
-            case 'debit':
+            case 'credit_3ds':
+            case 'debit_3ds':
                 return [
-                    "cardholder_mobile" => strtolower($dados["brand"]) == 'visa' ? apenasNumeros($dados["cardholder_mobile"]) : '',
+                    "order_id" => $dados["order_id"],
+                    "amount" => $dados["amount"],
+                    "currency" => "BRL",
+                    "transaction_type" => $dados["tipo_parcelas_1"],
+                    "number_installments" => $dados["parcelas_1"],
+                    "xid" => $dados["xid"],
+                    "ucaf" => $dados["ucaf"],
+                    "eci" => $dados["eci"],
+                    "tdsdsxid" => $dados["tdsdsxid"],
+                    "tdsver" => $dados["tdsver"],
+                    "payment_method" => $dados["tipo_pag"] == 'credit_3ds' ? 'CREDIT' : 'DEBIT',
                     "soft_descriptor" => $dados["soft_descriptor"],
                     "dynamic_mcc" => $dados['dynamic_mcc'],
-                    "authenticated" => false,
+                    "customer_id" => $dados['customer_id'],
+                    "credentials_on_file_type" => '',
                     'card' => $resultado['card'],
                 ];
             case 'credit':
@@ -186,7 +229,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 ];
             case 'combined':
                 $array = array();
-                for($i = 1; $i <= $totalCartoes; $i++)
+                for($i = 1; $i <= self::TOTAL_CARTOES; $i++)
                     array_push($array, [
                         "type" => "CREDIT",
                         "amount" => apenasNumeros($dados['amount_' . $i]),
@@ -200,6 +243,34 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                     ]);
                 return $array;
         }
+    }
+
+    private function aposRotinaTransacao($user, $pagamentos, $status)
+    {
+        // passa pro gerenti 
+        // * caso dê erro (por motivos de conexão, etc), rotina de cancelamento do pagamento se status aprovado() com aviso no log com motivo de erro no gerenti
+
+        $pagamento = $pagamentos->first();
+        
+        if(!$this->via_sistema)
+        {
+            if($status != 'CANCELED')
+            {
+                $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou pagamento do boleto ' . $pagamento->boleto_id . ' do tipo *' . $pagamento->forma . '* com a ';
+                $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: '. $pagamento->combined_id;
+                $string .= '. [Dados Request:' . json_encode(request()->all()) . ']; [Dados Session:' . json_encode(session()->all()) . ']; [Dados Cache:' . json_encode(cache()) . ']';
+            }else{
+                $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou o cancelamento do pagamento do boleto ' . $pagamento->boleto_id . ' do tipo *' . $pagamento->forma . '* com a ';
+                $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: ' . $pagamento->combined_id;
+            }
+        }else{
+            $string = self::TEXTO_LOG_SISTEMA . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") teve alteração de status do pagamento do boleto ' . $pagamento->boleto_id;
+            $string .= ' do tipo *' . $pagamento->forma . ' *, com a payment_id: ' . $pagamento->payment_id . ' para: ' . $status;
+        }
+        
+        event(new ExternoEvent($string));
+
+        Mail::to($user->email)->queue(new PagamentoMail($pagamentos));
     }
 
     private function getToken()
@@ -217,15 +288,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 ],
             ]);
         }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
+            $this->formatError($e);
         }
 
         $this->auth = json_decode($response->getBody()->getContents(), true);
@@ -246,15 +309,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 ],
             ]);
         }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
+            $this->formatError($e);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -283,15 +338,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 ],
             ]);
         }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
+            $this->formatError($e);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -326,15 +373,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             unset($dados);
             unset($dadosFinais);
         }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
+            $this->formatError($e);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -344,19 +383,20 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     {
         try{
             $this->getToken();
-            $dados['brand_1'] = $this->bin(substr($dados['card_number_1'], 0, 6))['results'][0]['brand'];
-            $dados['number_token_1'] = $this->tokenizacao($dados['card_number_1'], $dados['customer_id'])['number_token'];
-            $verify1 = $this->verifyCard($dados['number_token_1'], $dados['brand_1'], $dados['cardholder_name_1'], $dados['expiration_1'], $dados['security_code_1']);
-
-            $dados['brand_2'] = $this->bin(substr($dados['card_number_2'], 0, 6))['results'][0]['brand'];
-            $dados['number_token_2'] = $this->tokenizacao($dados['card_number_2'], $dados['customer_id'])['number_token'];
-            $verify2 = $this->verifyCard($dados['number_token_2'], $dados['brand_2'], $dados['cardholder_name_2'], $dados['expiration_2'], $dados['security_code_2']);
-
-            if(($verify1['status'] != 'VERIFIED') || ($verify2['status'] != 'VERIFIED'))
+            $temp = array();
+            for($i = 1; $i <= self::TOTAL_CARTOES; $i++)
+            {
+                $dados['brand_'.$i] = $this->bin(substr($dados['card_number_'.$i], 0, 6))['results'][0]['brand'];
+                $dados['number_token_'.$i] = $this->tokenizacao($dados['card_number_'.$i], $dados['customer_id'])['number_token'];
+                $verify = $this->verifyCard($dados['number_token_'.$i], $dados['brand_'.$i], $dados['cardholder_name_'.$i], $dados['expiration_'.$i], $dados['security_code_'.$i]);
+                array_push($temp, $verify['status']);
+            }
+            
+            if(($temp[0] != 'VERIFIED') || ($temp[1] != 'VERIFIED'))
                 return [
                     'message-cartao' => '<i class="fas fa-ban"></i> Cartão não é válido. Pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
                     'class' => 'alert-danger',
-                    'retorno_getnet' => 'Retorno da verificação do cartão 1: ' . $verify1['status'] . ' e do cartão 2: ' . $verify2['status']
+                    'retorno_getnet' => 'Retorno da verificação do cartão 1: ' . $temp[0] . ' e do cartão 2: ' . $temp[1]
                 ];
 
             $dadosFinais = $this->dadosBasicosPag($ip, $dados);
@@ -376,15 +416,30 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
             unset($dadosFinais);
         }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
+            $this->formatError($e);
+        }
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    private function pagamento3DS($dados)
+    {
+        try{
+            $dadosFinais = $this->tipoPagamento($dados['tipo_pag'], $dados);
+            $this->client = new Client();
+            $response = $this->client->request('POST', $this->urlBase . '/v1/payments/authenticated', [
+                'headers' => [
+                    'Content-type' => "application/json; charset=utf-8",
+                    'Authorization' => '$dadosHeader',
+                    'seller_id' => env('GETNET_SELLER_ID'),
+                ],
+                'json' => $dadosFinais,
+            ]);
+
+            unset($dados);
+            unset($dadosFinais);
+        }catch(RequestException $e){
+            $this->formatError($e);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -393,24 +448,18 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     private function cancelarPagamento($payment_id, $tipo_pag)
     {
         try{
+            $temp = strpos($tipo_pag, '_3ds') !== false ? 'authenticated' : $tipo_pag;
             $this->getToken();
-            $response = $this->client->request('POST', $this->urlBase . '/v1/payments/' . $tipo_pag . '/' . $payment_id . '/cancel', [
+            $response = $this->client->request('POST', $this->urlBase . '/v1/payments/' . $temp . '/' . $payment_id . '/cancel', [
                 'headers' => [
                     'Content-type' => "application/json; charset=utf-8",
                     'Cache-control' => 'no-cache',
                     'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
-                ]
+                ],
+                'json' => $temp == 'authenticated' ? ['payment_method' => strtoupper(str_replace('_3ds', '', $tipo_pag))] : [],
             ]);
         }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
+            $this->formatError($e);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -419,6 +468,13 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     private function cancelarPagamentoCombinado($payment_ids, $payment_tags)
     {
         try{
+            $array = array();
+            for($i = 0; $i < self::TOTAL_CARTOES; $i++)
+                if(isset($payment_ids[$i]))
+                    array_push($array, [
+                        'payment_id' => $payment_ids[$i],
+                        'payment_tag' => $payment_tags[$i],
+                    ]);
             $this->getToken();
             $response = $this->client->request('POST', $this->urlBase . '/v1/payments/combined/cancel', [
                 'headers' => [
@@ -428,27 +484,12 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 ],
                 'json' => [
                     'payments' => [
-                        [
-                            'payment_id' => $payment_ids[0],
-                            'payment_tag' => $payment_tags[0],
-                        ],
-                        [
-                            'payment_id' => $payment_ids[1],
-                            'payment_tag' => $payment_tags[1],
-                        ],
+                        $array
                     ],
                 ],
             ]);
         }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
+            $this->formatError($e);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -464,15 +505,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 ]
             ]);
         }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
+            $this->formatError($e);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -492,15 +525,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             $brand = mb_strtolower($dados['brand']);
             $dados['card_type'] = isset($card_type[$brand]) ? $card_type[$brand] : '';
         }catch(RequestException $e){
-            $codigo = 0;
-            $erroGetnet = $e->getMessage();
-            if($e->hasResponse())
-            {
-                $codigo = $e->getResponse()->getStatusCode();
-                $erroGetnet = $e->getResponse()->getBody()->getContents();
-            }
-                
-            throw new \Exception($erroGetnet, $codigo);
+            $this->formatError($e);
         }
         
         return $dados;
@@ -508,203 +533,120 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     public function generateToken3DS($request)
     {
-        // try{
-        //     $this->client = new Client();
-        //     $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/tokens', [
-        //         'headers' => [
-        //             'Content-type' => "application/json; charset=utf-8",
-        //             'Authorization' => $request->header('Authorization'),
-        //             'seller_id' => env('GETNET_SELLER_ID'),
-        //         ],
-        //         'json' => [
-        //             'client_code' => '',
-        //             'currency' => '',
-        //             'items' => [
-        //                 'description' => '',
-        //                 'name' => "",
-        //                 'sku' => "",
-        //                 'quantity' => 1,
-        //                 'total_amount' => 100,
-        //                 'unit_price' => 100
-        //             ],
-        //             'js_version': "",
-        //             'order_number' => "",
-        //             'override_payment_method' => 2,
-        //             'total_amount' => 100,
-        //             'additional_data' => [],
-        //             'additional_object' => []
-        //         ],
-        //     ]);
-        // }catch(RequestException $e){
-        //     $codigo = 0;
-        //     $erroGetnet = $e->getMessage();
-        //     if($e->hasResponse())
-        //     {
-        //         $codigo = $e->getResponse()->getStatusCode();
-        //         $erroGetnet = $e->getResponse()->getBody()->getContents();
-        //     }
-                
-        //     throw new \Exception($erroGetnet, $codigo);
-        // }
-
-        // return json_decode($response->getBody()->getContents(), true);
+        
     }
 
     public function authentication3DS($request)
     {
-        // try{
-        //     $this->client = new Client();
-        //     $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/tokens', [
-        //         'headers' => [
-        //             'Content-type' => "application/json; charset=utf-8",
-        //             'Authorization' => $request->header('Authorization'),
-        //             'seller_id' => env('GETNET_SELLER_ID'),
-        //         ],
-        //         'json' => [
-        //         ],
-        //     ]);
-        // }catch(RequestException $e){
-        //     $codigo = 0;
-        //     $erroGetnet = $e->getMessage();
-        //     if($e->hasResponse())
-        //     {
-        //         $codigo = $e->getResponse()->getStatusCode();
-        //         $erroGetnet = $e->getResponse()->getBody()->getContents();
-        //     }
-                
-        //     throw new \Exception($erroGetnet, $codigo);
-        // }
-
-        // return json_decode($response->getBody()->getContents(), true);
+        
     }
 
     public function authenticationResults3DS($request)
     {
-        // try{
-        //     $this->client = new Client();
-        //     $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/results', [
-        //         'headers' => [
-        //             'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
-        //         ]
-        //     ]);
-        // }catch(RequestException $e){
-        //     $codigo = 0;
-        //     $erroGetnet = $e->getMessage();
-        //     if($e->hasResponse())
-        //     {
-        //         $codigo = $e->getResponse()->getStatusCode();
-        //         $erroGetnet = $e->getResponse()->getBody()->getContents();
-        //     }
-                
-        //     throw new \Exception($erroGetnet, $codigo);
-        // }
-
-        // return json_decode($response->getBody()->getContents(), true);
+        
     }
 
     public function checkout($ip, $dados, $user)
     {
-        $boleto = $dados['boleto'];
-        $tipo_pag = $dados['tipo_pag'];
-        $parcelas_1 = $dados['parcelas_1'];
-        $parcelas_2 = isset($dados['parcelas_2']) ? $dados['parcelas_2'] : null;
-        $tipo_parcelas_1 = $dados['tipo_parcelas_1'];
-        $tipo_parcelas_2 = isset($dados['tipo_parcelas_2']) ? $dados['tipo_parcelas_2'] : null;
-        $transacao = $tipo_pag != 'combined' ? $this->pagamento($ip, $dados) : $this->pagamentoCombinado($ip, $dados);
-        unset($dados);
-        
+        $transacao = null;
+        switch($dados['tipo_pag']){
+            case 'credit_3ds':
+            case 'debit_3ds':
+                $transacao = $this->pagamento3DS($dados);
+                break;
+            case 'credit':
+                $transacao = $this->pagamento($ip, $dados);
+                break;
+            case 'combined':
+                $transacao = $this->pagamentoCombinado($ip, $dados);
+                break;
+        }
+
         if(isset($transacao['message-cartao']))
         {
-            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '*';
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento do boleto ' . $dados['boleto'] . ' do tipo *' . $dados['tipo_pag'] . '*';
             $string .= ', mas não foi possível. Retorno da Getnet: ' . $transacao['retorno_getnet'];
             event(new ExternoEvent($string));
             return $transacao;
         }
 
-        $status = $this->getStatusTransacao($transacao, $tipo_pag);
+        $status = $this->getStatusTransacao($transacao, $dados['tipo_pag']);
         $combined = is_array($status) && (($status[0] != 'AUTHORIZED') || ($status[1] != 'AUTHORIZED'));
         $not_combined = !is_array($status) && ($status != 'APPROVED');
 
         if($combined || $not_combined)
         {
-            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '*';
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento do boleto ' . $dados['boleto'] . ' do tipo *' . $dados['tipo_pag'] . '*';
             $string .= ', mas não foi possível. Retorno da Getnet: Cartão verificado, mas ao realizar o pagamento o status recebido foi' . json_encode($status);
             event(new ExternoEvent($string));
 
             return [
-                'message-cartao' => '<i class="fas fa-ban"></i> Status da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Pagamento do boleto ' . $boleto . ' não realizado.',
+                'message-cartao' => '<i class="fas fa-ban"></i> Status da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
                 'class' => 'alert-danger'
             ];
         }
 
-        $arrayPag = $this->getArraySavePagamento($transacao, $tipo_pag, $boleto, $parcelas_1, $parcelas_2, $status, $tipo_parcelas_1, $tipo_parcelas_2);
-        $pagamento = $tipo_pag != 'combined' ? $user->pagamentos()->create($arrayPag) : $user->pagamentos()->createMany($arrayPag);
+        $arrayPag = $this->getArraySavePagamento($transacao, $status, $dados);
+        $pagamento = $dados['tipo_pag'] != 'combined' ? $user->pagamentos()->create($arrayPag) : $user->pagamentos()->createMany($arrayPag);
 
-        $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
-        $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $transacao['payment_id'] : 'combined_id: '. $transacao['combined_id'];
-        $string .= '. [Dados Request:' . json_encode(request()->all()) . ']; [Dados Session:' . json_encode(session()->all()) . ']; [Dados Cache:' . json_encode(cache()) . ']';
-        event(new ExternoEvent($string));
         unset($transacao);
-        
-        if($tipo_pag == 'combined')
-            $pagamento = $pagamento->first();
-        Mail::to($user->email)->queue(new PagamentoMail($pagamento));
+        unset($dados);
+
+        $this->aposRotinaTransacao($user, $pagamento, is_array($status) ? $status[0] : $status);
 
         return [
-            'message-cartao' => '<i class="fas fa-check"></i> Pagamento realizado para o boleto ' . $boleto . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email,
+            'message-cartao' => '<i class="fas fa-check"></i> Pagamento realizado para o boleto ' . $pagamento->first()->boleto_id . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email,
             'class' => 'alert-success'
         ];
     }
 
     public function cancelCheckout($dados, $user)
     {
-        $boleto = $dados['boleto'];
         $pagamento = $dados['pagamento'];
-        $tipo_pag = $pagamento->first()->forma;
+        $tipo_pag = $pagamento->first()->getForma3DS();
 
         if($tipo_pag != 'combined')
             $transacao = $this->cancelarPagamento($pagamento->first()->payment_id, $tipo_pag);
         else{
-            $ids = [$pagamento->get(0)->payment_id, $pagamento->get(1)->payment_id];
-            $tags = [$pagamento->get(0)->payment_tag, $pagamento->get(1)->payment_tag];
+            for($i = 0; $i < self::TOTAL_CARTOES; $i++)
+            {
+                $ids[$i] = $pagamento->get($i)->aprovado() ? $pagamento->get($i)->payment_id : null;
+                $tags[$i] = $pagamento->get($i)->aprovado() ? $pagamento->get($i)->payment_tag : null;
+            }
             $transacao = $this->cancelarPagamentoCombinado($ids, $tags);
         }
-        unset($dados);
 
         $status = $this->getStatusTransacao($transacao, $tipo_pag);
         $combined = is_array($status) && (($status[0] != 'CANCELED') || ($status[1] != 'CANCELED'));
         $not_combined = !is_array($status) && ($status != 'CANCELED');
+        $message = $this->getMsgDtCancelTransacao($transacao, $tipo_pag);
         
         if($combined || $not_combined)
         {
-            $message = $this->getMsgCancelTransacao($transacao, $tipo_pag);
-
-            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
+            $string = $this->via_sistema ? self::TEXTO_LOG_SISTEMA : 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento do boleto ' . $dados['boleto'] . ' do tipo *' . $tipo_pag . '* com a ';
             $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $pagamento->first()->payment_id : 'combined_id: ' . $pagamento->first()->combined_id;
-            $string .= ', mas não foi possível. Retorno da Getnet: ' . json_encode($message);
+            $string .= ', mas não foi possível. Retorno da Getnet: ' . json_encode($message['msg']);
             event(new ExternoEvent($string));
 
             return [
-                'message-cartao' => '<i class="fas fa-ban"></i> Status do cancelamento da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Cancelamento do pagamento do boleto ' . $boleto . ' não realizado.',
+                'message-cartao' => '<i class="fas fa-ban"></i> Status do cancelamento da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Cancelamento do pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
                 'class' => 'alert-danger'
             ];
         }
 
+        unset($transacao);
+        unset($dados);
+
         foreach($pagamento as $pag)
             $pag->update([
                 'status' => is_array($status) ? $status[0] : $status,
-                'canceled_at' => $tipo_pag == 'combined' ? $transacao['payments'][0]['credit_cancel']['canceled_at'] : $transacao[$tipo_pag . '_cancel']['canceled_at'],
+                'canceled_at' => $message['dt'],
             ]);
-
-        unset($transacao);
-        $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou o cancelamento do pagamento do boleto ' . $boleto . ' do tipo *' . $tipo_pag . '* com a ';
-        $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $pagamento->first()->payment_id : 'combined_id: ' . $pagamento->first()->combined_id;
-        event(new ExternoEvent($string));
-
-        Mail::to($user->email)->queue(new PagamentoMail($pagamento->first()->fresh()));
+        
+        $this->aposRotinaTransacao($user, $pagamento, is_array($status) ? $status[0] : $status);
 
         return [
-            'message-cartao' => '<i class="fas fa-check"></i> Cancelamento do pagamento do boleto ' . $boleto . ' aprovado. Detalhes do cancelamento do pagamento enviado para o e-mail: ' . $user->email,
+            'message-cartao' => '<i class="fas fa-check"></i> Cancelamento do pagamento do boleto ' . $pagamento->first()->boleto_id . ' aprovado. Detalhes do cancelamento do pagamento enviado para o e-mail: ' . $user->email,
             'class' => 'alert-success'
         ];
     }
@@ -767,5 +709,43 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             $msg = null;
 
         return $msg;
+    }
+
+    // Sem considerar uso do checkout iframe (com checkout iframe o pagamento é criado no bd via notificação e não há 'combined')
+    public function rotinaUpdateTransacao($dados)
+    {
+        $pagamento = Pagamento::where('boleto_id', $dados['order_id'])->where('payment_id', $dados['payment_id'])->first();
+
+        if(!isset($pagamento))
+            throw new \Exception(self::TEXTO_LOG_SISTEMA . '- Pagamento não encontrado no Portal! Dados da Getnet: ' . json_encode($dados), 404);
+
+        $user = $pagamento->getUser();
+        if($pagamento->status != $dados['status'])
+        {
+            $this->via_sistema = true;
+            $pagamento->update([
+                'status' => $dados['status'],
+                'authorized_at' => in_array($dados['status'], ['APPROVED', 'AUTHORIZED']) ? $dados['authorization_timestamp'] : $pagamento->authorized_at,
+                'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $pagamento->canceled_at,
+            ]);
+
+            $this->aposRotinaTransacao($user, $pagamento, $dados['status']);
+
+            if(isset($pagamento->combined_id) && ($dados['status'] == 'CANCELED'))
+            {
+                $outroPagamento = Pagamento::where('boleto_id', $dados['order_id'])
+                ->where('combined_id', $pagamento->combined_id)
+                ->where('payment_id', '!=', $dados['payment_id'])
+                ->first();
+
+                $outroPagamento->update([
+                    'status' => $dados['status'],
+                    'authorized_at' => in_array($dados['status'], ['APPROVED', 'AUTHORIZED']) ? $dados['authorization_timestamp'] : $outroPagamento->authorized_at,
+                    'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $outroPagamento->canceled_at,
+                ]);
+    
+                $this->aposRotinaTransacao($user, $outroPagamento, $dados['status']);
+            }
+        }
     }
 }

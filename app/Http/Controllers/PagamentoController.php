@@ -13,7 +13,7 @@ class PagamentoController extends Controller
 
     public function __construct(MediadorServiceInterface $service) 
     {
-        $this->middleware(['auth:representante']);
+        $this->middleware(['auth:representante'])->except(['getTransacaoCredito', 'getTransacaoDebito']);
         $this->service = $service;
     }
 
@@ -31,6 +31,7 @@ class PagamentoController extends Controller
                     'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
                     'class' => 'alert-danger',
                 ]);
+
             $boleto_dados['valor'] = '1503,00';
         }catch(\Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -54,7 +55,9 @@ class PagamentoController extends Controller
                     'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
                     'class' => 'alert-danger',
                 ]);
+
             unset($boleto_dados['amount_soma']);
+
             $pagamento = true;
             $is_3ds = strpos($boleto_dados['tipo_pag'], '_3ds') !== false;
             // $pagamento = $this->service->getService('Pagamento')->formatPagCheckoutIframe($request, $user);
@@ -79,17 +82,22 @@ class PagamentoController extends Controller
                     'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
                     'class' => 'alert-danger',
                 ]);
+
             $validate = $request->validated();
             unset($validate['amount_soma']);
             $request->replace([]);
             request()->replace([]);
+
             $transacao = $this->service->getService('Pagamento')->checkout($request->ip(), $validate, $user);
+
             unset($validate);
         }catch(\Exception $e){
             $temp = $this->service->getService('Pagamento')->getException($e->getMessage(), $e->getCode());
             $msg = isset($temp) ? $temp : 'Erro ao processar o pagamento. Código de erro: ' . $e->getCode();
+
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user->getViewName().') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento do boleto *'.$boleto.'*. Erro registrado no Log de Erros.');
+            
             return redirect(route($user->getRouteName() . '.dashboard'))->with([
                 'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! ' . $msg,
                 'class' => 'alert-danger',
@@ -129,19 +137,23 @@ class PagamentoController extends Controller
             // verifica se o boleto existe no gerenti em relação ao usuario em condições de ser cancelado
             $pagamentos = $user->getPagamento($boleto, $id_pagamento);
             $temp = $pagamentos->first();
+
             if(!isset($temp) || !$temp->canCancel())
                 return redirect(route($user->getRouteName() . '.dashboard'))->with([
                     'message-cartao' => '<i class="fas fa-ban"></i> Pagamento não encontrado / cancelamento não é mais possível para este boleto.',
                     'class' => 'alert-danger',
                 ]);
+
             $dados['boleto'] = $boleto;
             $dados['pagamento'] = $pagamentos;
             $transacao = $this->service->getService('Pagamento')->cancelCheckout($dados, $user);
         }catch(\Exception $e){
             $temp = $this->service->getService('Pagamento')->getException($e->getMessage(), $e->getCode());
             $msg = isset($temp) ? $temp : 'Erro ao processar o pagamento. Código de erro: ' . $e->getCode();
+
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user->getViewName().') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o cancelamento do pagamento com a id *'.$id_pagamento.'* do boleto com a id: *'.$boleto . '*. Erro registrado no Log de Erros.');
+            
             return redirect(route($user->getRouteName() . '.dashboard'))->with([
                 'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! ' . $msg,
                 'class' => 'alert-danger',
@@ -161,14 +173,17 @@ class PagamentoController extends Controller
             // confere se o boleto existe no gerenti para o usuário autenticado e traz os dados restantes que precisa para pagar
             if($boleto == 5)
                 throw new \Exception('Boleto não encontrado!', 404);
+
             $dados = $this->service->getService('Pagamento')->getDados3DS($bin);
             $token = $dados['token'];
             $token_principal = $dados['token_principal'];
+
             unset($dados['token']);
             unset($dados['token_principal']);
         } catch (\Exception $e) {
             $temp = $this->service->getService('Pagamento')->getException($e->getMessage(), $e->getCode());
             $msg = isset($temp) ? $temp : $e->getMessage();
+
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, $msg);
         }
@@ -210,5 +225,21 @@ class PagamentoController extends Controller
         // }
 
         return response()->json($dados);
+    }
+
+    public function getTransacaoCredito(Request $request)
+    {
+        $dados = $request;
+        $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+
+        return;
+    }
+
+    public function getTransacaoDebito(Request $request)
+    {
+        $dados = $request;
+        $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+
+        return;
     }
 }
