@@ -51,12 +51,63 @@ class Pagamento extends Model
                 return 'Autorizado';
             case 'CANCELED':
                 return 'Cancelado';
+            case 'DENIED':
+                return 'Negado';
+            case 'ERROR':
+                return 'Erro';
+        }
+    }
+
+    public function getStatusLabel()
+    {
+        switch($this->status)
+        {
+            case 'APPROVED':
+                return '<span class="border rounded bg-success font-weight-bold p-1">Aprovado</span>';
+            case 'AUTHORIZED':
+                return '<span class="border rounded bg-success font-weight-bold p-1">Autorizado</span>';
+            case 'CANCELED':
+                return '<span class="border rounded bg-danger font-weight-bold p-1">Cancelado</span>';
+            case 'DENIED':
+                return '<span class="border rounded bg-danger font-weight-bold p-1">Negado</span>';
+            case 'ERROR':
+                return '<span class="border rounded bg-danger font-weight-bold p-1">Erro</span>';
+        }
+    }
+
+    public function getStatusLabelMail()
+    {
+        switch($this->status)
+        {
+            case 'APPROVED':
+                return '<span style="color:green;"><strong>Aprovado</strong></span>';
+            case 'AUTHORIZED':
+                return '<span style="color:green;"><strong>Autorizado</strong></span>';
+            case 'CANCELED':
+                return '<span style="color:red;"><strong>Cancelado</strong></span>';
+            case 'DENIED':
+                return '<span style="color:red;"><strong>Negado</strong></span>';
+            case 'ERROR':
+                return '<span style="color:red;"><strong>Erro</strong></span>';
         }
     }
 
     public function getParcelas()
     {
-        return $this->parcelas == '1' ? 'à vista' : $this->parcelas;
+        return $this->parcelas == '1' ? 'à vista' : $this->parcelas .'x';
+    }
+
+    public function getTipoParcelas()
+    {
+        switch($this->tipo_parcelas)
+        {
+            case 'FULL':
+                return '';
+            case 'INSTALL_NO_INTEREST':
+                return 'sem juros';
+            case 'INSTALL_WITH_INTEREST':
+                return 'com juros';
+        }
     }
 
     public function canCancel()

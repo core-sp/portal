@@ -1,9 +1,11 @@
+@if(!$checkoutIframe)
 <noscript>
     <iframe 
         style="width: 100px; height: 100px; border: 0; position:absolute; top: -5000px;" 
         src="https://h.online-metrix.net/fp/tags?org_id={{ config('app.url') != 'https://core-sp.org.br' ? '1snn5n9w' : 'k8vif92e' }}&session_id={{ $user->getSessionIdPagamento($boleto) }}">
     </iframe>
 </noscript>
+@endif
 
 <div class="representante-content w-100">
     <div class="conteudo-txt-mini light">
@@ -42,6 +44,8 @@
 
                 @php
                     $tiposPag = ['credit' => 'Crédito', 'credit_3ds' => 'Crédito com 3DS', 'combined' => 'Crédito com dois cartões', 'debit_3ds' => 'Débito com 3DS'];
+                    if($checkoutIframe)
+                        unset($tiposPag['combined']);
                 @endphp
                 <div class="col-sm mb-2-576">
                     <label for="tipo_pag">Forma de pagamento <span class="text-danger">*</span></label>
@@ -151,7 +155,7 @@
             </div>
             @endif
 
-            @if(isset($pagamento))
+            @if(isset($pagamento) && !$checkoutIframe)
             <!-- <fieldset class="border rounded pl-3"> -->
             <div class="form-row mb-3 cadastroRepresentante mt-3">
                 <div class="col-sm mb-2-576">
@@ -330,6 +334,7 @@
             @endif
 
             <div class="form-group mt-4">
+                @if(!$checkoutIframe)
                 <button 
                     type="submit" 
                     class="btn btn-{{ isset($pagamento) ? 'success' : 'primary' }}"
@@ -340,14 +345,16 @@
                 {{ isset($pagamento) ? 'Finalizar' : 'Confirmar dados para pagamento' }}
                 </button>
 
-                {{--
+                @else
+                <input type="hidden" name="checkoutIframe" value="1">
                 <button 
                     type="{{ isset($pagamento) ? 'button' : 'submit' }}" 
                     class="btn btn-success {{ isset($pagamento) ? 'pay-button-getnet' : '' }}"
                 >
                 {{ isset($pagamento) ? 'Finalizar' : 'Confirmar dados para pagamento' }}
                 </button>
-                --}}
+                @endif
+
             </div>
         </form>
         @else
@@ -355,9 +362,9 @@
             @csrf
             @foreach($dados as $dado)
                 <p><strong>Boleto:</strong> {{ $dado->boleto_id }}</p>
-                <p><strong>Status do pagamento:</strong> {{ $dado->getStatus() }}</p>
+                <p><strong>Status do pagamento:</strong> {!! $dado->getStatusLabel() !!}</p>
                 <p><strong>Forma de pagamento:</strong> {{ $dado->getForma() }}</p>
-                <p><strong>Parcelas:</strong> {{ $dado->getParcelas() }}</p>
+                <p><strong>Parcelas:</strong> {{ $dado->getParcelas() . ' ' . $dado->getTipoParcelas() }}</p>
                 <p><strong>Data do pagamento:</strong> {{ formataData($dado->created_at) }}</p>
                 <br />
             @endforeach
@@ -394,8 +401,7 @@
   </div>
 </div>
 
-<!-- condição se selecionar pagamento tipo 3DS -->
-@if(isset($pagamento) && $is_3ds)
+@if(isset($pagamento) && $is_3ds && !$checkoutIframe)
 
 <!-- config -->
 <input type="hidden" id="gn3ds_merchantBackEndUrl" name="gn3ds_merchantBackEndUrl" class="gn3ds_merchantBackEndUrl" value="{{ route('site.home') }}">
@@ -457,10 +463,8 @@
 <input type="hidden" id="gn3ds_additionalObject" name="gn3ds_additionalObject" class="gn3ds_additionalObject" value="">
 
 <script src="{{ asset('/js/getnet_3ds.js?'.time()) }}" type="text/javascript"></script>
-@endif
 
-{{--
-@if(isset($pagamento))
+@elseif(isset($pagamento) && $checkoutIframe)
 <script async src="https://checkout-homologacao.getnet.com.br/loader.js"
     data-getnet-sellerid="{{ isset($pagamento['sellerid']) ? $pagamento['sellerid'] : '' }}"
     data-getnet-token="{{ isset($pagamento['token']) ? $pagamento['token'] : '' }}"
@@ -489,4 +493,3 @@
     data-getnet-pre-authorization-credit="">
 </script>
 @endif
---}}

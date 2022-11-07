@@ -40,6 +40,10 @@ class Representante extends Authenticable
     const PAGO = "Pago";
     const EM_ABERTO = "Em aberto";
 
+    const NAME_ROUTE = 'representante';
+    const NAME_VIEW = 'representante';
+    const NAME_AREA_RESTRITA = 'Representante';
+
     /**
      * Mapeia código retornado pelo GERENTI na busca por Representante Comercial
      */
@@ -128,21 +132,6 @@ class Representante extends Authenticable
     public function getSessionIdPagamento($boleto_id)
     {
         return apenasNumeros($this->cpf_cnpj) . $boleto_id;
-    }
-
-    public function getRouteName()
-    {
-        return 'representante';
-    }
-
-    public function getViewName()
-    {
-        return 'representante';
-    }
-
-    public function getName()
-    {
-        return 'Representante';
     }
 
     public function getCustomerId()

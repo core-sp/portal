@@ -60,7 +60,10 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 ];
             case 'combined':
                 return [
-                    'msg' => [$transacao['payments'][0]['credit_cancel']['message'], $transacao['payments'][1]['credit_cancel']['message']],
+                    'msg' => [
+                        $transacao['payments'][0]['credit_cancel']['message'], 
+                        $transacao['payments'][1]['credit_cancel']['message']
+                    ],
                     'dt' => $transacao['payments'][0]['credit_cancel']['canceled_at']
                 ];
         }
@@ -80,7 +83,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             $base['payment_id'] = $transacao['payment_id'];
             $base['status'] = $status;
             $base['authorized_at'] = $transacao[$dados['tipo_pag']]['authorized_at'];
-            $base['is_3ds'] = strpos($dados['tipo_pag'], '_3ds') !== false ? true : false;
+            $base['is_3ds'] = strpos($dados['tipo_pag'], '_3ds') !== false;
             return $base;
         }
 
@@ -270,7 +273,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         
         event(new ExternoEvent($string));
 
-        Mail::to($user->email)->queue(new PagamentoMail($pagamentos));
+        Mail::to($user->email)->queue(new PagamentoMail($pagamentos->fresh()));
     }
 
     private function getToken()
@@ -483,9 +486,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                     'seller_id' => env('GETNET_SELLER_ID'),
                 ],
                 'json' => [
-                    'payments' => [
-                        $array
-                    ],
+                    'payments' => $array,
                 ],
             ]);
         }catch(RequestException $e){
@@ -678,7 +679,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $pagamento['country'] = 'BR';
         // $pagamento['our_number'] = '150.23';
         // $pagamento['document_number'] = '150.23';
-        $pagamento['callback'] = route($user->getRouteName() . '.dashboard');
+        $pagamento['callback'] = route($user::NAME_ROUTE . '.dashboard');
 
         return $pagamento;
     }
@@ -711,13 +712,31 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         return $msg;
     }
 
-    // Sem considerar uso do checkout iframe (com checkout iframe o pagamento é criado no bd via notificação e não há 'combined')
     public function rotinaUpdateTransacao($dados)
     {
         $pagamento = Pagamento::where('boleto_id', $dados['order_id'])->where('payment_id', $dados['payment_id'])->first();
 
         if(!isset($pagamento))
-            throw new \Exception(self::TEXTO_LOG_SISTEMA . '- Pagamento não encontrado no Portal! Dados da Getnet: ' . json_encode($dados), 404);
+        {
+            if($dados['checkouIframe'])
+            {
+                // $user = Buscar por customer_id / pelo gerenti saber qual usuario
+                $user = \App\Representante::find(1);
+                $pagamento = $user->pagamentos()->create([
+                    'payment_id' => $dados['payment_id'],
+                    'boleto_id' => $dados['order_id'],
+                    'forma' => $dados['payment_type'],
+                    'parcelas' => $dados['number_installments'],
+                    'is_3ds' => mb_strtolower($dados['payment_type']) == 'debit',
+                    'status' => $dados['status'],
+                    'authorized_at' => $dados['authorization_timestamp'],
+                ]);
+
+                $this->aposRotinaTransacao($user, $pagamento, $dados['status']);
+            }
+
+            return;
+        }
 
         $user = $pagamento->getUser();
         if($pagamento->status != $dados['status'])
@@ -731,7 +750,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
             $this->aposRotinaTransacao($user, $pagamento, $dados['status']);
 
-            if(isset($pagamento->combined_id) && ($dados['status'] == 'CANCELED'))
+            if(isset($pagamento->combined_id) && in_array($dados['status'], ['CANCELED', 'DENIED', 'ERROR']))
             {
                 $outroPagamento = Pagamento::where('boleto_id', $dados['order_id'])
                 ->where('combined_id', $pagamento->combined_id)

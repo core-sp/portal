@@ -19,7 +19,7 @@ class CreatePagamentosTable extends Migration
             $table->string('boleto_id');
             $table->string('forma');
             $table->string('parcelas');
-            $table->string('tipo_parcelas');
+            $table->string('tipo_parcelas')->nullable();
             $table->string('combined_id')->nullable();
             $table->string('payment_tag')->nullable();
             $table->boolean('is_3ds')->default(false);

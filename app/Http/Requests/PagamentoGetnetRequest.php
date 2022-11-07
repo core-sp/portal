@@ -10,7 +10,6 @@ class PagamentoGetnetRequest extends FormRequest
     protected function prepareForValidation()
     {
         // Tipos de parcelas: "FULL", "INSTALL_NO_INTEREST", "INSTALL_WITH_INTEREST"
-        // 'cardholder_mobile' quando debito e visa
         
         // Temporário, muitos dados do Gerenti
         $user = auth()->user();
@@ -31,7 +30,6 @@ class PagamentoGetnetRequest extends FormRequest
             'card_number_2' => $this->filled('card_number_2') ? apenasNumeros($this->card_number_2) : null,
             'document_number_1' => apenasNumeros($this->document_number_1),
             'document_number_2' => $this->filled('document_number_2') ? apenasNumeros($this->document_number_2) : null,
-            'cardholder_mobile' => '',
             'email' => $user->email,
             'name' => $user->nome,
             'document_type' => $user->tipoPessoa() == 'PF' ? 'CPF' : 'CNPJ',
@@ -84,7 +82,6 @@ class PagamentoGetnetRequest extends FormRequest
             'document_number_1' => ['required', new CpfCnpj],
             'cardholder_name_1' => 'required|regex:/^[A-z\s]{5,26}$/',
             'card_number_1' => 'required|regex:/^[0-9]{13,19}$/',
-            'cardholder_mobile' => '',
             'tipo_parcelas_1' => '',
             // Combinado
             'amount_1' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',

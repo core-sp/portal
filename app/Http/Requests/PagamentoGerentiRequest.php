@@ -11,13 +11,14 @@ class PagamentoGerentiRequest extends FormRequest
         // Tipos de parcelas: "FULL", "INSTALL_NO_INTEREST", "INSTALL_WITH_INTEREST"
 
         // Temporário, muitos dados do Gerenti
-        $rep = auth()->guard('representante')->user();
+        $user = auth()->user();
 
         $this->merge([
             'valor' => apenasNumeros($this->amount),
             'amount_1' => $this->filled('amount_1') ? apenasNumeros($this->amount_1) : null,
             'amount_2' => $this->filled('amount_2') ? apenasNumeros($this->amount_2) : null,
             'parcelas_1' => $this->tipo_pag == 'debit_3ds' ? '1' : $this->parcelas_1,
+            'checkoutIframe' => $this->filled('checkoutIframe') ? $this->checkoutIframe : false,
         ]);
 
         if(($this->tipo_pag == 'combined') && (isset($this->amount_1) && isset($this->amount_2)))
@@ -29,12 +30,13 @@ class PagamentoGerentiRequest extends FormRequest
         return [
             'boleto' => 'required',
             'valor' => 'required|regex:/^[0-9]{1,10}$/',
-            'tipo_pag' => 'required|in:debit_3ds,credit_3ds,credit,combined',
+            'tipo_pag' => 'required|in:debit_3ds,credit_3ds,credit' . !$this->checkoutIframe ? '' : ',combined',
             'parcelas_1' => 'required|regex:/^[0-9]{1,2}$/',
             'amount_1' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',
             'amount_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',
             'parcelas_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,2}$/',
             'amount_soma' => 'nullable|same:valor',
+            'checkoutIframe' => 'boolean',
         ];
     }
 

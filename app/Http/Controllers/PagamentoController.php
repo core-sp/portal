@@ -10,11 +10,18 @@ use App\Http\Requests\PagamentoGerentiRequest;
 class PagamentoController extends Controller
 {
     private $service;
+    private $checkoutIframe;
 
     public function __construct(MediadorServiceInterface $service) 
     {
         $this->middleware(['auth:representante'])->except(['getTransacaoCredito', 'getTransacaoDebito']);
         $this->service = $service;
+
+        // opção para chamar checkout iframe para uma situação específica, ou pode ser geral
+        $this->middleware(function ($request, $next) {
+            $this->checkoutIframe = auth()->user()->id != 1;
+            return $next($request);
+        });
     }
 
     public function pagamentoGerentiView($boleto)
@@ -27,19 +34,19 @@ class PagamentoController extends Controller
             // boleto pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
             $existe = $user->existePagamentoAprovado($boleto);
             if($existe)
-                return redirect(route($user->getRouteName() . '.dashboard'))->with([
+                return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
                     'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
                     'class' => 'alert-danger',
                 ]);
 
-            $boleto_dados['valor'] = '1503,00';
+            $boleto_dados['valor'] = '1503,03';
         }catch(\Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar dados do servidor para verificar pagamento");
         }
 
-        return view('site.' . $user->getViewName() . '.pagamento')->with([
-            'boleto' => $boleto, 'boleto_dados' => $boleto_dados
+        return view('site.' . $user::NAME_VIEW . '.pagamento')->with([
+            'boleto' => $boleto, 'boleto_dados' => $boleto_dados, 'checkoutIframe' => $this->checkoutIframe
         ]);
     }
 
@@ -51,7 +58,7 @@ class PagamentoController extends Controller
             // boleto pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
             $existe = $user->existePagamentoAprovado($boleto);
             if($existe)
-                return redirect(route($user->getRouteName() . '.dashboard'))->with([
+                return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
                     'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
                     'class' => 'alert-danger',
                 ]);
@@ -60,25 +67,30 @@ class PagamentoController extends Controller
 
             $pagamento = true;
             $is_3ds = strpos($boleto_dados['tipo_pag'], '_3ds') !== false;
-            // $pagamento = $this->service->getService('Pagamento')->formatPagCheckoutIframe($request, $user);
+
+            if($this->checkoutIframe)
+                $pagamento = $this->service->getService('Pagamento')->formatPagCheckoutIframe($request, $user);
         }catch(\Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao processar dados do servidor para pagamento online");
         }
 
-        return view('site.' . $user->getViewName() . '.pagamento')->with([
-            'pagamento' => $pagamento, 'boleto' => $boleto, 'boleto_dados' => $boleto_dados, 'is_3ds' => $is_3ds
+        return view('site.' . $user::NAME_VIEW . '.pagamento')->with([
+            'pagamento' => $pagamento, 'boleto' => $boleto, 'boleto_dados' => $boleto_dados, 'is_3ds' => $is_3ds, 'checkoutIframe' => $this->checkoutIframe
         ]);
     }
 
     public function pagamentoCartao($boleto, PagamentoGetnetRequest $request)
     {
         try{
+            if($this->checkoutIframe)
+                throw new \Exception('Página de pagamento não pode ser acessada devido ao uso do Checkout Iframe', 401);
+
             $user = auth()->user();
             // boleto pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
             $existe = $user->existePagamentoAprovado($boleto);
             if($existe)
-                return redirect(route($user->getRouteName() . '.dashboard'))->with([
+                return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
                     'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
                     'class' => 'alert-danger',
                 ]);
@@ -96,15 +108,15 @@ class PagamentoController extends Controller
             $msg = isset($temp) ? $temp : 'Erro ao processar o pagamento. Código de erro: ' . $e->getCode();
 
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user->getViewName().') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento do boleto *'.$boleto.'*. Erro registrado no Log de Erros.');
+            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento do boleto *'.$boleto.'*. Erro registrado no Log de Erros.');
             
-            return redirect(route($user->getRouteName() . '.dashboard'))->with([
+            return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
                 'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! ' . $msg,
                 'class' => 'alert-danger',
             ]);
         }
 
-        return redirect(route($user->getRouteName() . '.dashboard'))->with($transacao);
+        return redirect(route($user::NAME_ROUTE . '.dashboard'))->with($transacao);
     }
 
     public function cancelarPagamentoCartaoView($boleto, $id_pagamento)
@@ -115,7 +127,7 @@ class PagamentoController extends Controller
             $dados = $user->getPagamento($boleto, $id_pagamento);
             $temp = $dados->first();
             if(!isset($temp) || !$temp->canCancel())
-                return redirect(route($user->getRouteName() . '.dashboard'))->with([
+                return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
                     'message-cartao' => '<i class="fas fa-ban"></i> Pagamento não encontrado / cancelamento não é mais possível para este boleto.',
                     'class' => 'alert-danger',
                 ]);
@@ -125,8 +137,8 @@ class PagamentoController extends Controller
             abort(500, "Erro ao carregar dados do servidor para verificar o cancelamento do pagamento");
         }
 
-        return view('site.' . $user->getViewName() . '.pagamento')->with([
-            'cancelamento' => $cancelamento, 'boleto' => $boleto, 'id_pagamento' => $id_pagamento, 'dados' => $dados
+        return view('site.' . $user::NAME_VIEW . '.pagamento')->with([
+            'cancelamento' => $cancelamento, 'boleto' => $boleto, 'id_pagamento' => $id_pagamento, 'dados' => $dados, 'checkoutIframe' => $this->checkoutIframe
         ]);
     }
 
@@ -139,7 +151,7 @@ class PagamentoController extends Controller
             $temp = $pagamentos->first();
 
             if(!isset($temp) || !$temp->canCancel())
-                return redirect(route($user->getRouteName() . '.dashboard'))->with([
+                return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
                     'message-cartao' => '<i class="fas fa-ban"></i> Pagamento não encontrado / cancelamento não é mais possível para este boleto.',
                     'class' => 'alert-danger',
                 ]);
@@ -152,20 +164,23 @@ class PagamentoController extends Controller
             $msg = isset($temp) ? $temp : 'Erro ao processar o pagamento. Código de erro: ' . $e->getCode();
 
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user->getViewName().') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o cancelamento do pagamento com a id *'.$id_pagamento.'* do boleto com a id: *'.$boleto . '*. Erro registrado no Log de Erros.');
+            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o cancelamento do pagamento com a id *'.$id_pagamento.'* do boleto com a id: *'.$boleto . '*. Erro registrado no Log de Erros.');
             
-            return redirect(route($user->getRouteName() . '.dashboard'))->with([
+            return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
                 'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! ' . $msg,
                 'class' => 'alert-danger',
             ]);
         }
 
-        return redirect(route($user->getRouteName() . '.dashboard'))->with($transacao);
+        return redirect(route($user::NAME_ROUTE . '.dashboard'))->with($transacao);
     }
 
     public function cardsBrand($boleto, $bin)
     {
         try{
+            if($this->checkoutIframe)
+                throw new \Exception('Rota não pode ser acessada devido ao uso do Checkout Iframe', 401);
+
             if(url()->previous() != route('pagamento.gerenti', $boleto))
                 throw new \Exception('Usuário não prosseguiu com o fluxo correto de pagamento para acessar a rota atual', 500);
 
@@ -230,6 +245,7 @@ class PagamentoController extends Controller
     public function getTransacaoCredito(Request $request)
     {
         $dados = $request;
+        $dados['checkoutIframe'] = $this->checkoutIframe;
         $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
 
         return;
@@ -238,6 +254,7 @@ class PagamentoController extends Controller
     public function getTransacaoDebito(Request $request)
     {
         $dados = $request;
+        $dados['checkoutIframe'] = $this->checkoutIframe;
         $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
 
         return;
