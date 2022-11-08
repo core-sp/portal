@@ -652,33 +652,29 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         ];
     }
 
-    public function formatPagCheckoutIframe($request, $user)
+    public function checkoutIframe($request, $user)
     {
         $this->getToken();
 
+        $array_disabled = [
+            'credit' => "credito-nao-autenticado", 
+            'credit_3ds' => "credito-autenticado", 
+            'debit_3ds' => "debito-autenticado", 
+            "debito-nao-autenticado", 
+            "boleto", 
+            "qr-code",
+            "pix"
+        ];
+
+        unset($array_disabled[$request['tipo_pag']]);
         $pagamento = $request;
         $pagamento['sellerid'] = env('GETNET_SELLER_ID');
         $pagamento['token'] = $this->auth['token_type'] . ' ' . $this->auth['access_token'];
-        $pagamento['amount'] = '150.23';
-        $pagamento['customerid'] = '12345';
-        $pagamento['orderid'] = '12345';
-        $pagamento['installments'] = '1';
-        $pagamento['first_name'] = 'João';
-        $pagamento['last_name'] = 'da Silva';
-        $pagamento['document_type'] = 'CPF';
-        $pagamento['document_number'] = '22233366638';
-        $pagamento['email'] = 'teste@getnet.com.br';
-        $pagamento['phone_number'] = '1134562356';
-        $pagamento['address_street'] = 'Rua Alexandre Dumas';
-        $pagamento['address_street_number'] = '1711';
-        $pagamento['address_complementary'] = '';
-        $pagamento['address_neighborhood'] = 'Chacara Santo Antonio';
-        $pagamento['address_city'] = 'São Paulo';
-        $pagamento['address_state'] = 'SP';
-        $pagamento['address_zipcode'] = '04717004';
-        $pagamento['country'] = 'BR';
-        // $pagamento['our_number'] = '150.23';
-        // $pagamento['document_number'] = '150.23';
+        $pagamento['amount'] = substr_replace($request['valor'], '.', strlen($request['valor']) - 2, 0);
+        $pagamento['customerid'] = $user->getCustomerId();
+        $pagamento['orderid'] = $request['boleto'];
+        $pagamento['installments'] = $request['parcelas_1'];
+        $pagamento['disabled'] = implode(',', array_values($array_disabled));
         $pagamento['callback'] = route($user::NAME_ROUTE . '.dashboard');
 
         return $pagamento;

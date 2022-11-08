@@ -1041,9 +1041,42 @@ function teste(boleto, card)
 			var msg = xhr.responseJSON.message;
 			$('#modalPagamento .modal-body')
 			.html('<h5><i class="fas fa-times text-danger"></i> ' + msg + '</h5><br><a class="btn btn-secondary" href="' + window.location.href + '">Fechar</a>');
-			$('#modalPagamento').modal('show');
+			$('#modalPagamento').modal({backdrop: 'static', keyboard: false, show: true});
 		}
 	});
 }
+
+// Para o Checkout Iframe
+$('.pay-button-getnet').click(function(){
+	// Funções compatíveis com IE e outros navegadores
+	var eventMethod = (window.addEventListener ? 'addEventListener' : 'attachEvent');
+	var eventer = window[eventMethod];
+	var messageEvent = (eventMethod === 'attachEvent') ? 'onmessage' : 'message';
+
+	// Ouvindo o evento do loader
+	eventer(messageEvent, function iframeMessage(e) {
+		var data = e.data || '';
+
+		switch (data.status || data) {
+			// Corfirmação positiva do checkout.
+			case 'success':
+				window.location.replace('http://core.portal.local/checkout/sucesso/' + $('[name="boleto"]').val());
+			break;
+
+			// Notificação de que o IFrame de checkout foi fechado a aprovação.
+			case 'close':
+				window.location.replace($('#callbackURL').val());
+				break; 
+
+			// Ignora qualquer outra mensagem 
+			default:
+			break;
+		}
+	}, false);
+});
+
+// $('.pay-button-getnet').click(function(){
+	
+// })
 
 // +++++++++++++++++++++++ ++++++++++++++++++++++++++++++ ++++++++++++++++++++++

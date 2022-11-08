@@ -347,6 +347,8 @@
 
                 @else
                 <input type="hidden" name="checkoutIframe" value="1">
+                <input type="hidden" id="callbackURL" value="{{ route($user::NAME_ROUTE . '.dashboard') }}">
+                
                 <button 
                     type="{{ isset($pagamento) ? 'button' : 'submit' }}" 
                     class="btn btn-success {{ isset($pagamento) ? 'pay-button-getnet' : '' }}"
@@ -466,30 +468,34 @@
 
 @elseif(isset($pagamento) && $checkoutIframe)
 <script async src="https://checkout-homologacao.getnet.com.br/loader.js"
-    data-getnet-sellerid="{{ isset($pagamento['sellerid']) ? $pagamento['sellerid'] : '' }}"
-    data-getnet-token="{{ isset($pagamento['token']) ? $pagamento['token'] : '' }}"
-    data-getnet-payment-methods-disabled="['boleto', 'debito-nao-autenticado', 'qr-code', 'pix']"
-    data-getnet-amount="{{ isset($pagamento['amount']) ? $pagamento['amount'] : '' }}"
-    data-getnet-customerid="{{ isset($pagamento['customerid']) ? $pagamento['customerid'] : '' }}"
-    data-getnet-orderid="{{ isset($pagamento['orderid']) ? $pagamento['orderid'] : '' }}"
+    data-getnet-sellerid="{{ $pagamento['sellerid'] }}"
+    data-getnet-token="{{ $pagamento['token'] }}"
+    data-getnet-payment-methods-disabled="[{{ $pagamento['disabled'] }}]"
+    data-getnet-amount="{{ $pagamento['amount'] }}"
+    data-getnet-customerid="{{ $pagamento['customerid'] }}"
+    data-getnet-orderid="{{ $pagamento['orderid'] }}"
     data-getnet-button-class="pay-button-getnet"
-    data-getnet-installments="{{ isset($pagamento['installments']) ? $pagamento['installments'] : '' }}"
-    data-getnet-customer-first-name="{{ isset($pagamento['first_name']) ? $pagamento['first_name'] : '' }}"
-    data-getnet-customer-last-name="{{ isset($pagamento['last_name']) ? $pagamento['last_name'] : '' }}"
-    data-getnet-customer-document-type="{{ isset($pagamento['document_type']) ? $pagamento['document_type'] : '' }}"
-    data-getnet-customer-document-number="{{ isset($pagamento['document_number']) ? $pagamento['document_number'] : '' }}"
-    data-getnet-customer-email="{{ isset($pagamento['email']) ? $pagamento['email'] : '' }}"
-    data-getnet-customer-phone-number="{{ isset($pagamento['phone_number']) ? $pagamento['phone_number'] : '' }}"
-    data-getnet-customer-address-street="{{ isset($pagamento['address_street']) ? $pagamento['address_street'] : '' }}"
-    data-getnet-customer-address-street-number="{{ isset($pagamento['address_street_number']) ? $pagamento['address_street_number'] : '' }}"
-    data-getnet-customer-address-complementary="{{ isset($pagamento['address_complementary']) ? $pagamento['address_complementary'] : '' }}"
-    data-getnet-customer-address-neighborhood="{{ isset($pagamento['address_neighborhood']) ? $pagamento['address_neighborhood'] : '' }}"
-    data-getnet-customer-address-city="{{ isset($pagamento['address_city']) ? $pagamento['address_city'] : '' }}"
-    data-getnet-customer-address-state="{{ isset($pagamento['address_state']) ? $pagamento['address_state'] : '' }}"
-    data-getnet-customer-address-zipcode="{{ isset($pagamento['address_zipcode']) ? $pagamento['address_zipcode'] : '' }}"
-    data-getnet-customer-country="{{ isset($pagamento['country']) ? $pagamento['country'] : '' }}"
-    data-getnet-items='[{"name": "","description": "", "value": 0, "quantity": 0,"sku": ""}]'
-    data-getnet-url-callback="{{ $pagamento['callback'] }}"
+    data-getnet-installments="{{ $pagamento['installments'] }}"
+    data-getnet-customer-first-name="{{ $pagamento['first_name'] }}"
+    data-getnet-customer-last-name="{{ $pagamento['last_name'] }}"
+    data-getnet-customer-document-type="{{ $pagamento['document_type'] }}"
+    data-getnet-customer-document-number="{{ $pagamento['document_number'] }}"
+    data-getnet-customer-email="{{ $pagamento['email'] }}"
+    data-getnet-customer-phone-number="{{ $pagamento['phone_number'] }}"
+    data-getnet-customer-address-street="{{ $pagamento['address_street'] }}"
+    data-getnet-customer-address-street-number="{{ $pagamento['address_street_number'] }}"
+    data-getnet-customer-address-complementary="{{ $pagamento['address_complementary'] }}"
+    data-getnet-customer-address-neighborhood="{{ $pagamento['address_neighborhood'] }}"
+    data-getnet-customer-address-city="{{ $pagamento['address_city'] }}"
+    data-getnet-customer-address-state="{{ $pagamento['address_state'] }}"
+    data-getnet-customer-address-zipcode="{{ $pagamento['address_zipcode'] }}"
+    data-getnet-customer-country="{{ $pagamento['country'] }}"
+    data-getnet-items="[{{ $pagamento['items'] }}]"
+    data-getnet-document-number="{{ $pagamento['document_number_boleto'] }}"
+    data-getnet-our-number="{{ $pagamento['our_number'] }}"
+    data-getnet-soft-descriptor="{{ $pagamento['soft_descriptor'] }}"
+    data-getnet-dynamic-mcc="{{ $pagamento['dynamic_mcc'] }}"
+    data-getnet-url-callback="{{-- $pagamento['callback'] --}}"
     data-getnet-pre-authorization-credit="">
 </script>
 @endif

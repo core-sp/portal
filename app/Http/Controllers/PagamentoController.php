@@ -69,7 +69,7 @@ class PagamentoController extends Controller
             $is_3ds = strpos($boleto_dados['tipo_pag'], '_3ds') !== false;
 
             if($this->checkoutIframe)
-                $pagamento = $this->service->getService('Pagamento')->formatPagCheckoutIframe($request, $user);
+                $pagamento = $this->service->getService('Pagamento')->checkoutIframe($boleto_dados, $user);
         }catch(\Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao processar dados do servidor para pagamento online");
@@ -77,6 +77,22 @@ class PagamentoController extends Controller
 
         return view('site.' . $user::NAME_VIEW . '.pagamento')->with([
             'pagamento' => $pagamento, 'boleto' => $boleto, 'boleto_dados' => $boleto_dados, 'is_3ds' => $is_3ds, 'checkoutIframe' => $this->checkoutIframe
+        ]);
+    }
+
+    // teste
+    public function teste($boleto)
+    {
+        try{
+            $user = auth()->user();
+            
+        }catch(\Exception $e){
+            
+        }
+
+        return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
+            'message-cartao' => '<i class="fas fa-check"></i> Pagamento realizado para o boleto ' . $boleto . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email,
+            'class' => 'alert-success',
         ]);
     }
 

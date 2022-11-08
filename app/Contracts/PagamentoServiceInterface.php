@@ -17,7 +17,7 @@ interface PagamentoServiceInterface {
 
     public function cancelCheckout($dados, $user);
 
-    public function formatPagCheckoutIframe($request, $user);
+    public function checkoutIframe($request, $user);
 
     public function getException($erro_msg, $cod);
 

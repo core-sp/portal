@@ -327,6 +327,7 @@ Route::prefix('/')->group(function() {
   // Pagamento
   Route::get('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerentiView')->name('pagamento.view');
   Route::post('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerenti')->name('pagamento.gerenti');
+  Route::get('/checkout/sucesso/{boleto}', 'PagamentoController@teste')->name('pagamento.sucesso.checkout');
   Route::post('/confirmar-pagamento/{boleto}', 'PagamentoController@pagamentoCartao')->name('pagamento.cartao');
   Route::get('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartaoView')->name('pagamento.cancelar.view');
   Route::post('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartao')->name('pagamento.cancelar');
