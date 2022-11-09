@@ -1018,11 +1018,11 @@ $('#formPagamento').submit(function(e) {
 	if($('#tipo_pag').val().indexOf('_3ds') != -1){
 		$('#modalPagamento').modal('hide');
 		e.preventDefault();
-		teste($('[name="boleto"]').val(), $('#card_number_1').val());
+		tresDS($('[name="boleto"]').val(), $('#card_number_1').val());
 	}
 });
 
-function teste(boleto, card)
+function tresDS(boleto, card)
 {
 	var brand = '';
 	var bin = card.replace(/[^0-9]/g,'').slice(0,6);
@@ -1060,7 +1060,8 @@ $('.pay-button-getnet').click(function(){
 		switch (data.status || data) {
 			// Corfirmação positiva do checkout.
 			case 'success':
-				window.location.replace('http://core.portal.local/checkout/sucesso/' + $('[name="boleto"]').val());
+				var endpoint = window.location.protocol + '//' + window.location.hostname;
+				window.location.replace(endpoint + '/checkout/sucesso/' + $('[name="boleto"]').val());
 			break;
 
 			// Notificação de que o IFrame de checkout foi fechado a aprovação.
@@ -1074,9 +1075,5 @@ $('.pay-button-getnet').click(function(){
 		}
 	}, false);
 });
-
-// $('.pay-button-getnet').click(function(){
-	
-// })
 
 // +++++++++++++++++++++++ ++++++++++++++++++++++++++++++ ++++++++++++++++++++++

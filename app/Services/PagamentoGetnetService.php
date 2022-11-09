@@ -81,7 +81,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         if($dados['tipo_pag'] != 'combined')
         {
             $base['payment_id'] = $transacao['payment_id'];
-            $base['status'] = $status;
+            $base['status'] = mb_strtoupper($status);
             $base['authorized_at'] = $transacao[$dados['tipo_pag']]['authorized_at'];
             $base['is_3ds'] = strpos($dados['tipo_pag'], '_3ds') !== false;
             return $base;
@@ -90,14 +90,14 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $base['combined_id'] = $transacao['combined_id'];
         $base_2 = $base;
         $base['authorized_at'] = $transacao['payments'][0]['credit']['authorized_at'];
-        $base['status'] = $status[0];
+        $base['status'] = mb_strtoupper($status[0]);
         $base['payment_tag'] = $transacao['payments'][0]['payment_tag'];
         $base['payment_id'] = $transacao['payments'][0]['payment_id'];
         // cartão 2
         $base_2['tipo_parcelas'] = $dados['tipo_parcelas_2'];
         $base_2['parcelas'] = $dados['parcelas_2'];
         $base_2['authorized_at'] = $transacao['payments'][1]['credit']['authorized_at'];
-        $base_2['status'] = $status[1];
+        $base_2['status'] = mb_strtoupper($status[1]);
         $base_2['payment_tag'] = $transacao['payments'][1]['payment_tag'];
         $base_2['payment_id'] = $transacao['payments'][1]['payment_id'];
 
@@ -248,7 +248,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         }
     }
 
-    private function aposRotinaTransacao($user, $pagamentos, $status)
+    private function aposRotinaTransacao($user, $pagamentos, $status, $errorCode = null, $descricao = null)
     {
         // passa pro gerenti 
         // * caso dê erro (por motivos de conexão, etc), rotina de cancelamento do pagamento se status aprovado() com aviso no log com motivo de erro no gerenti
@@ -267,13 +267,67 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: ' . $pagamento->combined_id;
             }
         }else{
-            $string = self::TEXTO_LOG_SISTEMA . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") teve alteração de status do pagamento do boleto ' . $pagamento->boleto_id;
+            $string = self::TEXTO_LOG_SISTEMA . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") teve alteração de status do pagamento do boleto ' . $pagamento->boleto_id;
             $string .= ' do tipo *' . $pagamento->forma . ' *, com a payment_id: ' . $pagamento->payment_id . ' para: ' . $status;
+            if(in_array($status, ['ERROR', 'DENIED']))
+                $string .= '. Detalhes da Getnet: error code - [' . $errorCode . '], description details - [' . $descricao . '].';
         }
         
         event(new ExternoEvent($string));
 
         Mail::to($user->email)->queue(new PagamentoMail($pagamentos->fresh()));
+    }
+
+    private function createViaNotificacao($dados)
+    {
+        // $user = Buscar por customer_id / pelo gerenti saber qual usuario
+        $user = \App\Representante::find(1);
+        $pagamento = $user->pagamentos()->create([
+            'payment_id' => $dados['payment_id'],
+            'boleto_id' => $dados['order_id'],
+            'forma' => $dados['payment_type'],
+            'parcelas' => $dados['number_installments'],
+            'is_3ds' => $dados['payment_type'] == 'debit',
+            'tipo_parcelas' => $dados['tipo_parcelas'],
+            'status' => $dados['status'],
+            'authorized_at' => $dados['authorization_timestamp'],
+        ]);
+
+        $this->aposRotinaTransacao($user, $pagamento, $dados['status']);
+    }
+
+    private function updateViaNotificacao($dados, $pagamento, $user)
+    {
+        if($pagamento->status != $dados['status'])
+        {
+            $this->via_sistema = true;
+            $pagamento->update([
+                'status' => $dados['status'],
+                'authorized_at' => in_array($dados['status'], ['APPROVED', 'AUTHORIZED']) ? $dados['authorization_timestamp'] : $pagamento->authorized_at,
+                'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $pagamento->canceled_at,
+            ]);
+
+            $error = isset($dados['error_code']) ? $dados['error_code'] : null;
+            $descricao = isset($dados['description_detail']) ? $dados['description_detail'] : null;
+            $this->aposRotinaTransacao($user, $pagamento, $dados['status'], $error, $descricao);
+
+            if(isset($pagamento->combined_id) && in_array($dados['status'], ['CANCELED', 'DENIED', 'ERROR']))
+            {
+                $outroPagamento = Pagamento::where('boleto_id', $dados['order_id'])
+                ->where('combined_id', $pagamento->combined_id)
+                ->where('payment_id', '!=', $dados['payment_id'])
+                ->whereIn('status', ['APPROVED', 'AUTHORIZED'])
+                ->first();
+
+                $outroPagamento->update([
+                    'status' => $dados['status'],
+                    'authorized_at' => in_array($dados['status'], ['APPROVED', 'AUTHORIZED']) ? $dados['authorization_timestamp'] : $outroPagamento->authorized_at,
+                    'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $outroPagamento->canceled_at,
+                ]);
+    
+                $this->aposRotinaTransacao($user, $outroPagamento, $dados['status']);
+            }
+        }
     }
 
     private function getToken()
@@ -624,7 +678,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         
         if($combined || $not_combined)
         {
-            $string = $this->via_sistema ? self::TEXTO_LOG_SISTEMA : 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento do boleto ' . $dados['boleto'] . ' do tipo *' . $tipo_pag . '* com a ';
+            $string = $this->via_sistema ? self::TEXTO_LOG_SISTEMA . ' ID: ' : 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento do boleto ' . $dados['boleto'] . ' do tipo *' . $tipo_pag . '* com a ';
             $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $pagamento->first()->payment_id : 'combined_id: ' . $pagamento->first()->combined_id;
             $string .= ', mas não foi possível. Retorno da Getnet: ' . json_encode($message['msg']);
             event(new ExternoEvent($string));
@@ -710,57 +764,16 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     public function rotinaUpdateTransacao($dados)
     {
+        // Buscar no gerenti se o boleto existe
         $pagamento = Pagamento::where('boleto_id', $dados['order_id'])->where('payment_id', $dados['payment_id'])->first();
 
         if(!isset($pagamento))
         {
-            if($dados['checkouIframe'])
-            {
-                // $user = Buscar por customer_id / pelo gerenti saber qual usuario
-                $user = \App\Representante::find(1);
-                $pagamento = $user->pagamentos()->create([
-                    'payment_id' => $dados['payment_id'],
-                    'boleto_id' => $dados['order_id'],
-                    'forma' => $dados['payment_type'],
-                    'parcelas' => $dados['number_installments'],
-                    'is_3ds' => mb_strtolower($dados['payment_type']) == 'debit',
-                    'status' => $dados['status'],
-                    'authorized_at' => $dados['authorization_timestamp'],
-                ]);
-
-                $this->aposRotinaTransacao($user, $pagamento, $dados['status']);
-            }
-
-            return;
-        }
-
-        $user = $pagamento->getUser();
-        if($pagamento->status != $dados['status'])
-        {
-            $this->via_sistema = true;
-            $pagamento->update([
-                'status' => $dados['status'],
-                'authorized_at' => in_array($dados['status'], ['APPROVED', 'AUTHORIZED']) ? $dados['authorization_timestamp'] : $pagamento->authorized_at,
-                'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $pagamento->canceled_at,
-            ]);
-
-            $this->aposRotinaTransacao($user, $pagamento, $dados['status']);
-
-            if(isset($pagamento->combined_id) && in_array($dados['status'], ['CANCELED', 'DENIED', 'ERROR']))
-            {
-                $outroPagamento = Pagamento::where('boleto_id', $dados['order_id'])
-                ->where('combined_id', $pagamento->combined_id)
-                ->where('payment_id', '!=', $dados['payment_id'])
-                ->first();
-
-                $outroPagamento->update([
-                    'status' => $dados['status'],
-                    'authorized_at' => in_array($dados['status'], ['APPROVED', 'AUTHORIZED']) ? $dados['authorization_timestamp'] : $outroPagamento->authorized_at,
-                    'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $outroPagamento->canceled_at,
-                ]);
-    
-                $this->aposRotinaTransacao($user, $outroPagamento, $dados['status']);
-            }
+            if($dados['checkoutIframe'])
+                $this->createViaNotificacao($dados);
+        }else{
+            $user = $pagamento->getUser();
+            $this->updateViaNotificacao($dados, $pagamento, $user);
         }
     }
 }

@@ -44,21 +44,24 @@ class PagamentoMail extends Mailable
 
         if($pagamento->aprovado()) {
             $link = route('pagamento.cancelar.view', ['boleto' => $pagamento->boleto_id, 'pagamento' => $pagamento->getIdPagamento()]);
-
             $this->body = $detalhes;
-            $this->body .= '<strong>Caso não reconheça esse pagamento, cancele pelo <a href="' . $link . '">link de cancelamento</a>, na área restrita do ';
-            $this->body .= $pagamento->getUser()::NAME_AREA_RESTRITA . '</strong>';
-            $this->body .= '<br /><br />';
-            $this->body .= '<strong>* Cancelamento somente no mesmo dia do pagamento realizado.</strong>';
-            $this->body .= '<br /><br />';
+
+            if(!$pagamento->isDebit())
+            {
+                $this->body .= '<strong>Caso não reconheça esse pagamento, cancele pelo <a href="' . $link . '">link de cancelamento</a>, na área restrita do ';
+                $this->body .= $pagamento->getUser()::NAME_AREA_RESTRITA . '</strong>';
+                $this->body .= '<br /><br />';
+                $this->body .= '<strong>* Cancelamento somente no mesmo dia do pagamento realizado.</strong>';
+                $this->body .= '<br /><br />';
+            }
         }
-        if($pagamento->cancelado() || !$pagamento->aprovado())
+        if(!$pagamento->aprovado())
             $this->body = $detalhes;
 
         $this->body .= '<br />';
         $this->body .= 'Atenciosamente';
         $this->body .= '<br /><br />';
-        $this->body .= 'Equipe de Atendimento.';
+        $this->body .= 'Portal do Core-SP.';
     }
 
     private function textoAssunto($pagamento)

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PagamentoGetnetRequest;
 use App\Http\Requests\PagamentoGerentiRequest;
+use App\Http\Requests\NotificacaoGetnetRequest;
 
 class PagamentoController extends Controller
 {
@@ -18,8 +19,10 @@ class PagamentoController extends Controller
         $this->service = $service;
 
         // opção para chamar checkout iframe para uma situação específica, ou pode ser geral
+        $this->checkoutIframe = false;
         $this->middleware(function ($request, $next) {
-            $this->checkoutIframe = auth()->user()->id != 1;
+            if(isset(auth()->user()->id))
+                $this->checkoutIframe = auth()->user()->id != 1;
             return $next($request);
         });
     }
@@ -80,14 +83,18 @@ class PagamentoController extends Controller
         ]);
     }
 
-    // teste
-    public function teste($boleto)
+    public function checkoutIframeSucesso($boleto)
     {
         try{
             $user = auth()->user();
-            
+
+            if(url()->previous() != route('pagamento.gerenti', $boleto))
+                return redirect(route($user::NAME_ROUTE . '.dashboard'));
+
+            // boleto pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
         }catch(\Exception $e){
-            
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao buscar dados do boleto após pagamento online via checkout");
         }
 
         return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
@@ -258,18 +265,18 @@ class PagamentoController extends Controller
         return response()->json($dados);
     }
 
-    public function getTransacaoCredito(Request $request)
+    public function getTransacaoCredito(NotificacaoGetnetRequest $request)
     {
-        $dados = $request;
+        $dados = $request->validated();
         $dados['checkoutIframe'] = $this->checkoutIframe;
         $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
 
         return;
     }
 
-    public function getTransacaoDebito(Request $request)
+    public function getTransacaoDebito(NotificacaoGetnetRequest $request)
     {
-        $dados = $request;
+        $dados = $request->validated();
         $dados['checkoutIframe'] = $this->checkoutIframe;
         $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
 

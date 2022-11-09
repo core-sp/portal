@@ -112,6 +112,9 @@ class Pagamento extends Model
 
     public function canCancel()
     {
+        if($this->isDebit())
+            return false;
+
         if(isset($this->combined_id))
         {
             $temp = self::where('combined_id', $this->combined_id)->where('id', '!=', $this->id)->first();
@@ -121,7 +124,8 @@ class Pagamento extends Model
         elseif(!$this->aprovado())
             return false;
 
-        return Carbon::createFromFormat('Y-m-d\TH:i:sZ', $this->authorized_at)->day == Carbon::now('UTC')->day;
+        $formato = strpos($this->authorized_at, '.') !== false ? 'Y-m-d\TH:i:s.uZ' : 'Y-m-d\TH:i:sZ';
+        return Carbon::createFromFormat($formato, $this->authorized_at)->day == Carbon::now('UTC')->day;
     }
 
     public function getIdPagamento()
@@ -146,5 +150,10 @@ class Pagamento extends Model
     {
         if(isset($this->idrepresentante))
             return $this->representante;
+    }
+
+    public function isDebit()
+    {
+        return $this->forma == 'debit';
     }
 }
