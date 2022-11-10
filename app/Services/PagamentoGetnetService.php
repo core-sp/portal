@@ -248,10 +248,28 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         }
     }
 
-    private function aposRotinaTransacao($user, $pagamentos, $status, $errorCode = null, $descricao = null)
+    private function aposRotinaTransacao($user, $pagamentos, $status, $transacao = null, $errorCode = null, $descricao = null)
     {
         // passa pro gerenti 
-        // * caso dê erro (por motivos de conexão, etc), rotina de cancelamento do pagamento se status aprovado() com aviso no log com motivo de erro no gerenti
+        // se tudo certo, atualiza dados no bd
+        // * caso dê erro (por motivos de conexão, etc) a transação é salva como json, o campo gerenti_ok update false, com aviso no log com motivo de erro no gerenti e a rotina no Kernel tentará novamente enviar ao Gerenti.
+        
+        // Código no serviço do gerenti
+        // if($pagamentos instanceof Pagamento)
+        //     $pagamentos->updateAposSucessoGerenti();
+        // else
+        // {
+        //     foreach($pagamentos as $pag)
+        //         $pag->updateAposSucessoGerenti();
+        // }
+
+        // if($pagamentos instanceof Pagamento)
+        //     $pagamentos->updateAposErroGerenti($transacao);
+        // else
+        // {
+        //     foreach($pagamentos as $pag)
+        //         $pag->updateAposErroGerenti($transacao);
+        // }
 
         $pagamento = $pagamentos->first();
         
@@ -293,7 +311,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             'authorized_at' => $dados['authorization_timestamp'],
         ]);
 
-        $this->aposRotinaTransacao($user, $pagamento, $dados['status']);
+        $this->aposRotinaTransacao($user, $pagamento, $dados['status'], $dados);
     }
 
     private function updateViaNotificacao($dados, $pagamento, $user)
@@ -301,33 +319,64 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         if($pagamento->status != $dados['status'])
         {
             $this->via_sistema = true;
-            $pagamento->update([
-                'status' => $dados['status'],
-                'authorized_at' => in_array($dados['status'], ['APPROVED', 'AUTHORIZED']) ? $dados['authorization_timestamp'] : $pagamento->authorized_at,
-                'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $pagamento->canceled_at,
-            ]);
+            $pagamento->updateAposNotificacao($dados);
 
             $error = isset($dados['error_code']) ? $dados['error_code'] : null;
             $descricao = isset($dados['description_detail']) ? $dados['description_detail'] : null;
-            $this->aposRotinaTransacao($user, $pagamento, $dados['status'], $error, $descricao);
+            $this->aposRotinaTransacao($user, $pagamento, $dados['status'], $dados, $error, $descricao);
 
-            if(isset($pagamento->combined_id) && in_array($dados['status'], ['CANCELED', 'DENIED', 'ERROR']))
+            $outroPagamento = $pagamento->getCombinadoAposNotificacao($dados);
+
+            if(isset($outroPagamento))
             {
-                $outroPagamento = Pagamento::where('boleto_id', $dados['order_id'])
-                ->where('combined_id', $pagamento->combined_id)
-                ->where('payment_id', '!=', $dados['payment_id'])
-                ->whereIn('status', ['APPROVED', 'AUTHORIZED'])
-                ->first();
-
-                $outroPagamento->update([
-                    'status' => $dados['status'],
-                    'authorized_at' => in_array($dados['status'], ['APPROVED', 'AUTHORIZED']) ? $dados['authorization_timestamp'] : $outroPagamento->authorized_at,
-                    'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $outroPagamento->canceled_at,
-                ]);
-    
+                $outroPagamento->updateAposNotificacao($dados);
                 $this->aposRotinaTransacao($user, $outroPagamento, $dados['status']);
             }
         }
+    }
+
+    private function realizarPagamento($dados, $ip)
+    {
+        switch($dados['tipo_pag'])
+        {
+            case 'credit_3ds':
+            case 'debit_3ds':
+                return $this->pagamento3DS($dados);
+            case 'credit':
+                return $this->pagamento($ip, $dados);
+            case 'combined':
+                return $this->pagamentoCombinado($ip, $dados);
+        }
+    }
+
+    private function confirmacaoPagamento($transacao, $status)
+    {
+        if(is_array($status) && ($status[0] == 'AUTHORIZED') && ($status[1] == 'AUTHORIZED'))
+        {
+            $ids = array();
+            $tags = array();
+            foreach($transacao['payments'] as $key => $pags)
+            {
+                $ids[$key] = $pags['payment_id'];
+                $tags[$key] = $pags['payment_tag'];
+            }
+            return $this->confirmation($ids, $tags);
+        }
+
+        return $transacao;
+    }
+
+    private function cancelamentoPagamento($tipo_pag, $pagamento)
+    {
+        if($tipo_pag != 'combined')
+            return $this->cancelarPagamento($pagamento->first()->payment_id, $tipo_pag);
+        
+        for($i = 0; $i < self::TOTAL_CARTOES; $i++)
+        {
+            $ids[$i] = $pagamento->get($i)->aprovado() ? $pagamento->get($i)->payment_id : null;
+            $tags[$i] = $pagamento->get($i)->aprovado() ? $pagamento->get($i)->payment_tag : null;
+        }
+        return $this->cancelarPagamentoCombinado($ids, $tags);
     }
 
     private function getToken()
@@ -502,6 +551,33 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         return json_decode($response->getBody()->getContents(), true);
     }
 
+    private function confirmation($payment_ids, $payment_tags)
+    {
+        try{
+            $array = array();
+            for($i = 0; $i < self::TOTAL_CARTOES; $i++)
+                if(isset($payment_ids[$i]))
+                    array_push($array, [
+                        'payment_id' => $payment_ids[$i],
+                        'payment_tag' => $payment_tags[$i],
+                    ]);
+            $response = $this->client->request('POST', $this->urlBase . '/v1/payments/combined/confirm', [
+                'headers' => [
+                    'Content-type' => "application/json; charset=utf-8",
+                    'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
+                    'seller_id' => env('GETNET_SELLER_ID'),
+                ],
+                'json' => [
+                    'payments' => $array,
+                ],
+            ]);
+        }catch(RequestException $e){
+            $this->formatError($e);
+        }
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
     private function cancelarPagamento($payment_id, $tipo_pag)
     {
         try{
@@ -603,19 +679,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     public function checkout($ip, $dados, $user)
     {
-        $transacao = null;
-        switch($dados['tipo_pag']){
-            case 'credit_3ds':
-            case 'debit_3ds':
-                $transacao = $this->pagamento3DS($dados);
-                break;
-            case 'credit':
-                $transacao = $this->pagamento($ip, $dados);
-                break;
-            case 'combined':
-                $transacao = $this->pagamentoCombinado($ip, $dados);
-                break;
-        }
+        $transacao = $this->realizarPagamento($dados, $ip);
 
         if(isset($transacao['message-cartao']))
         {
@@ -626,7 +690,9 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         }
 
         $status = $this->getStatusTransacao($transacao, $dados['tipo_pag']);
-        $combined = is_array($status) && (($status[0] != 'AUTHORIZED') || ($status[1] != 'AUTHORIZED'));
+        $transacao = $this->confirmacaoPagamento($transacao, $status);
+
+        $combined = is_array($status) && (($status[0] != 'CONFIRMED') || ($status[1] != 'CONFIRMED'));
         $not_combined = !is_array($status) && ($status != 'APPROVED');
 
         if($combined || $not_combined)
@@ -647,7 +713,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         unset($transacao);
         unset($dados);
 
-        $this->aposRotinaTransacao($user, $pagamento, is_array($status) ? $status[0] : $status);
+        $this->aposRotinaTransacao($user, $pagamento, is_array($status) ? $status[0] : $status, $transacao);
 
         return [
             'message-cartao' => '<i class="fas fa-check"></i> Pagamento realizado para o boleto ' . $pagamento->first()->boleto_id . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email,
@@ -660,16 +726,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $pagamento = $dados['pagamento'];
         $tipo_pag = $pagamento->first()->getForma3DS();
 
-        if($tipo_pag != 'combined')
-            $transacao = $this->cancelarPagamento($pagamento->first()->payment_id, $tipo_pag);
-        else{
-            for($i = 0; $i < self::TOTAL_CARTOES; $i++)
-            {
-                $ids[$i] = $pagamento->get($i)->aprovado() ? $pagamento->get($i)->payment_id : null;
-                $tags[$i] = $pagamento->get($i)->aprovado() ? $pagamento->get($i)->payment_tag : null;
-            }
-            $transacao = $this->cancelarPagamentoCombinado($ids, $tags);
-        }
+        $transacao = $this->cancelamentoPagamento($tipo_pag, $pagamento);
 
         $status = $this->getStatusTransacao($transacao, $tipo_pag);
         $combined = is_array($status) && (($status[0] != 'CANCELED') || ($status[1] != 'CANCELED'));
@@ -693,12 +750,9 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         unset($dados);
 
         foreach($pagamento as $pag)
-            $pag->update([
-                'status' => is_array($status) ? $status[0] : $status,
-                'canceled_at' => $message['dt'],
-            ]);
+            $pag->updateCancelamento($status, $message);
         
-        $this->aposRotinaTransacao($user, $pagamento, is_array($status) ? $status[0] : $status);
+        $this->aposRotinaTransacao($user, $pagamento, is_array($status) ? $status[0] : $status, $transacao);
 
         return [
             'message-cartao' => '<i class="fas fa-check"></i> Cancelamento do pagamento do boleto ' . $pagamento->first()->boleto_id . ' aprovado. Detalhes do cancelamento do pagamento enviado para o e-mail: ' . $user->email,
@@ -775,5 +829,27 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             $user = $pagamento->getUser();
             $this->updateViaNotificacao($dados, $pagamento, $user);
         }
+    }
+
+    // Admin
+    public function listar()
+    {
+        $resultados = Pagamento::with(['representante'])->orderBy('updated_at', 'DESC')->paginate(25);
+
+        return Pagamento::listar($resultados);
+    }
+
+    public function buscar($busca)
+    {
+        $resultados = Pagamento::with(['representante'])
+            ->where('boleto_id','LIKE','%'.$busca.'%')
+            ->orWhereHas('representante', function ($query) use($busca) {
+                $query->where('nome','LIKE','%'.$busca.'%')
+                ->orWhere('cpf_cnpj','LIKE','%'.$busca.'%')
+                ->orWhere('registro_core','LIKE','%'.$busca.'%');
+            })
+            ->paginate(25);
+
+        return Pagamento::listar($resultados);
     }
 }

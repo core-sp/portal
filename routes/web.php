@@ -230,6 +230,12 @@ Route::prefix('admin')->group(function() {
     Route::get('/ajax', 'PlantaoJuridicoBloqueioController@getPlantaoAjax')->name('plantao.juridico.bloqueios.ajax');
   });
 
+  // Pagamentos
+  Route::prefix('pagamentos')->group(function(){
+    Route::get('/', 'PagamentoController@index')->name('pagamento.admin.view');
+    Route::get('/busca', 'PagamentoController@busca')->name('pagamento.admin.busca');
+  });
+
 });
 
 /*
@@ -325,16 +331,18 @@ Route::prefix('/')->group(function() {
   Route::get('/termo-consentimento-pdf', 'TermoConsentimentoController@termoConsentimentoPdf')->name('termo.consentimento.pdf');
 
   // Pagamento
-  Route::get('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerentiView')->name('pagamento.view');
-  Route::post('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerenti')->name('pagamento.gerenti');
-  Route::get('/checkout/sucesso/{boleto}', 'PagamentoController@checkoutIframeSucesso')->name('pagamento.sucesso.checkout');
-  Route::post('/confirmar-pagamento/{boleto}', 'PagamentoController@pagamentoCartao')->name('pagamento.cartao');
-  Route::get('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartaoView')->name('pagamento.cancelar.view');
-  Route::post('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartao')->name('pagamento.cancelar');
-  Route::get('/cardsBrand/{boleto}/{bin}', 'PagamentoController@cardsBrand')->name('pagamento.cards.brand');
-  Route::post('/generateToken', 'PagamentoController@generateToken')->name('pagamento.generate.token');
-  Route::post('/authentications', 'PagamentoController@authentications')->name('pagamento.authentications');
-  Route::post('/authentication-results', 'PagamentoController@authenticationResults')->name('pagamento.authentications.results');
+  Route::middleware(['auth:representante'])->group(function () {
+    Route::get('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerentiView')->name('pagamento.view');
+    Route::post('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerenti')->name('pagamento.gerenti');
+    Route::get('/checkout/sucesso/{boleto}', 'PagamentoController@checkoutIframeSucesso')->name('pagamento.sucesso.checkout');
+    Route::post('/confirmar-pagamento/{boleto}', 'PagamentoController@pagamentoCartao')->name('pagamento.cartao');
+    Route::get('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartaoView')->name('pagamento.cancelar.view');
+    Route::post('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartao')->name('pagamento.cancelar');
+    Route::get('/cardsBrand/{boleto}/{bin}', 'PagamentoController@cardsBrand')->name('pagamento.cards.brand');
+    Route::post('/generateToken', 'PagamentoController@generateToken')->name('pagamento.generate.token');
+    Route::post('/authentications', 'PagamentoController@authentications')->name('pagamento.authentications');
+    Route::post('/authentication-results', 'PagamentoController@authenticationResults')->name('pagamento.authentications.results');
+  });
   Route::get('/transacao/credito', 'PagamentoController@getTransacaoCredito')->name('pagamento.transacao.credito');
   Route::get('/transacao/debito', 'PagamentoController@getTransacaoDebito')->name('pagamento.transacao.debito');
 

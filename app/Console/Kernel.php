@@ -17,6 +17,7 @@ use PDO;
 use PDOException;
 use App\SolicitaCedula;
 use App\Mail\InternoSolicitaCedulaMail;
+use App\Pagamento;
 
 class Kernel extends ConsoleKernel
 {
@@ -162,6 +163,21 @@ class Kernel extends ConsoleKernel
                 }
             }
         })->dailyAt('4:15');
+
+        // Rotina para reenviar pagamentos realizados pelo portal e erro ao transmitir para o Gerenti no momento da transação
+        $schedule->call(function(){
+            try {
+                $all = Pagamento::where('gerenti_ok', false)->get();
+                foreach($all as $pagamento)
+                {
+                    // Tenta enviar dados para o gerenti novamente, se sucesso atualiza os campos
+                    $pagamento->updateAposSucessoGerenti();
+                    \Log::channel('externo')->info('[Rotina Portal Pagamento] - Pagamento com a ID: ' . $pagamento->id . ' foi reenviado para o Gerenti com SUCESSO após erro.');
+                }
+            } catch (\Exception $e) {
+                \Log::error('[Erro na rotina do Kernel] - ' . $e->getMessage());
+            }
+        })->everyThirtyMinutes();
     }
 
     /**

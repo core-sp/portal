@@ -13,6 +13,62 @@ class Pagamento extends Model
     protected $table = 'pagamentos';
     protected $guarded = [];
 
+    private static function tabelaCompleta($resultados)
+    {
+        // Opções de cabeçalho da tabela
+        $headers = [
+            'ID',
+            'Usuário',
+            'Boleto',
+            'Forma de pagamento',
+            'Parcelas',
+            'Tag <small>(mais de um cartão)</small>',
+            'Status',
+            'Enviado para o Gerenti',
+            'Última alteração',
+        ];
+        // Opções de conteúdo da tabela
+        $contents = [];
+        foreach($resultados as $resultado) 
+        {
+            $conteudo = [
+                $resultado->id,
+                $resultado->getUser()->nome.'<br><small><em>'.formataCpfCnpj($resultado->getUser()->cpf_cnpj).'</em></small>',
+                $resultado->boleto_id,
+                $resultado->getForma(),
+                $resultado->getParcelas(),
+                $resultado->payment_tag,
+                $resultado->getStatusLabel(),
+                $resultado->gerenti_ok ? '<i class="fas fa-check text-success"></i> <em>Enviado</em>' : '<i class="fas fa-ban text-danger"></i> <em>Aguardando envio</em>',
+                formataData($resultado->updated_at),
+            ];
+            array_push($contents, $conteudo);
+        }
+        $classes = [
+            'table',
+            'table-hover'
+        ];
+
+        $tabela = montaTabela($headers, $contents, $classes);
+        return $tabela;
+    }
+
+    public static function listar($resultados)
+    {
+        $variaveis = [
+            'singular' => 'pagamento',
+            'singulariza' => 'o pagamento',
+            'plural' => 'pagamentos',
+            'pluraliza' => 'pagamentos',
+        ];
+
+        return [
+            'resultados' => $resultados, 
+            'tabela' => self::tabelaCompleta($resultados), 
+            'variaveis' => (object) $variaveis
+        ];
+    }
+
     public function representante()
     {
     	return $this->belongsTo('App\Representante', 'idrepresentante');
@@ -20,7 +76,7 @@ class Pagamento extends Model
 
     public function aprovado()
     {
-        return ($this->status == 'APPROVED') || ($this->status == 'AUTHORIZED');
+        return ($this->status == 'APPROVED') || ($this->status == 'CONFIRMED');
     }
 
     public function cancelado()
@@ -49,6 +105,8 @@ class Pagamento extends Model
                 return 'Aprovado';
             case 'AUTHORIZED':
                 return 'Autorizado';
+            case 'CONFIRMED':
+                return 'Confirmado';
             case 'CANCELED':
                 return 'Cancelado';
             case 'DENIED':
@@ -66,6 +124,8 @@ class Pagamento extends Model
                 return '<span class="border rounded bg-success font-weight-bold p-1">Aprovado</span>';
             case 'AUTHORIZED':
                 return '<span class="border rounded bg-success font-weight-bold p-1">Autorizado</span>';
+            case 'CONFIRMED':
+                return '<span class="border rounded bg-success font-weight-bold p-1">Confirmado</span>';
             case 'CANCELED':
                 return '<span class="border rounded bg-danger font-weight-bold p-1">Cancelado</span>';
             case 'DENIED':
@@ -83,6 +143,8 @@ class Pagamento extends Model
                 return '<span style="color:green;"><strong>Aprovado</strong></span>';
             case 'AUTHORIZED':
                 return '<span style="color:green;"><strong>Autorizado</strong></span>';
+            case 'CONFIRMED':
+                return '<span style="color:green;"><strong>Confirmado</strong></span>';
             case 'CANCELED':
                 return '<span style="color:red;"><strong>Cancelado</strong></span>';
             case 'DENIED':
@@ -101,12 +163,13 @@ class Pagamento extends Model
     {
         switch($this->tipo_parcelas)
         {
-            case 'FULL':
-                return '';
             case 'INSTALL_NO_INTEREST':
                 return 'sem juros';
             case 'INSTALL_WITH_INTEREST':
                 return 'com juros';
+            case 'FULL':
+            default:
+                return '';
         }
     }
 
@@ -155,5 +218,49 @@ class Pagamento extends Model
     public function isDebit()
     {
         return $this->forma == 'debit';
+    }
+
+    public function updateCancelamento($status, $message)
+    {
+        $this->update([
+            'status' => is_array($status) ? $status[0] : $status,
+            'canceled_at' => $message['dt'],
+        ]);
+    }
+
+    public function updateAposErroGerenti($transacao)
+    {
+        $this->update([
+            'gerenti_ok' => false,
+            'transacao_temp' => json_encode($transacao, JSON_FORCE_OBJECT),
+        ]);
+    }
+
+    public function updateAposSucessoGerenti()
+    {
+        $this->update([
+            'gerenti_ok' => true,
+            'transacao_temp' => null,
+        ]);
+    }
+
+    public function updateAposNotificacao($dados)
+    {
+        $this->update([
+            'status' => $dados['status'],
+            'authorized_at' => in_array($dados['status'], ['APPROVED', 'CONFIRMED']) ? $dados['authorization_timestamp'] : $this->authorized_at,
+            'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $this->canceled_at,
+        ]);
+    }
+
+    public function getCombinadoAposNotificacao($dados)
+    {
+        if(isset($this->combined_id) && in_array($dados['status'], ['CANCELED', 'DENIED', 'ERROR']))
+            return self::where('boleto_id', $dados['order_id'])
+                ->where('combined_id', $this->combined_id)
+                ->where('payment_id', '!=', $dados['payment_id'])
+                ->whereIn('status', ['APPROVED', 'CONFIRMED'])
+                ->first();
+        return null;
     }
 }

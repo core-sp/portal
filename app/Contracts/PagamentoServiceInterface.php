@@ -22,4 +22,9 @@ interface PagamentoServiceInterface {
     public function getException($erro_msg, $cod);
 
     public function rotinaUpdateTransacao($dados);
+
+    // Admin ++++++++++++++++++++++++++++++++++++++++++++
+    public function listar();
+
+    public function buscar($busca);
 }

@@ -26,6 +26,8 @@ class CreatePagamentosTable extends Migration
             $table->string('status');
             $table->string('authorized_at');
             $table->string('canceled_at')->nullable();
+            $table->boolean('gerenti_ok')->default(true);
+            $table->text('transacao_temp')->nullable();
             $table->bigInteger('idrepresentante')->unsigned()->nullable();
             $table->foreign('idrepresentante')->references('id')->on('representantes');
             $table->timestamps();

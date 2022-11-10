@@ -126,7 +126,7 @@ class Representante extends Authenticable
     public function existePagamentoAprovado($boleto_id)
     {
         return $this->pagamentos()->where('boleto_id', $boleto_id)
-        ->whereIn('status', ['APPROVED', 'AUTHORIZED'])->count() > 0;
+        ->whereIn('status', ['APPROVED', 'CONFIRMED'])->count() > 0;
     }
 
     public function getSessionIdPagamento($boleto_id)

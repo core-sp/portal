@@ -15,7 +15,6 @@ class PagamentoController extends Controller
 
     public function __construct(MediadorServiceInterface $service) 
     {
-        $this->middleware(['auth:representante'])->except(['getTransacaoCredito', 'getTransacaoDebito']);
         $this->service = $service;
 
         // opção para chamar checkout iframe para uma situação específica, ou pode ser geral
@@ -25,6 +24,43 @@ class PagamentoController extends Controller
                 $this->checkoutIframe = auth()->user()->id != 1;
             return $next($request);
         });
+    }
+
+    // Visualizar pagamentos no Admin, apenas como consulta
+    public function index()
+    {
+        // $this->authorize('viewAny', auth()->user());
+
+        try{
+            $dados = $this->service->getService('Pagamento')->listar();
+            $variaveis = $dados['variaveis'];
+            $tabela = $dados['tabela'];
+            $resultados = $dados['resultados'];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os pagamentos on-line.");
+        }
+
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+    }
+
+    // Buscar pagamentos no Admin, apenas como consulta
+    public function busca(Request $request)
+    {
+        // $this->authorize('viewAny', auth()->user());
+
+        try{
+            $busca = $request->q;
+            $dados = $this->service->getService('Pagamento')->buscar($busca);
+            $resultados = $dados['resultados'];
+            $tabela = $dados['tabela'];
+            $variaveis = $dados['variaveis'];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao buscar o texto em pagamentos.");
+        }
+
+        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
     }
 
     public function pagamentoGerentiView($boleto)
@@ -88,7 +124,7 @@ class PagamentoController extends Controller
         try{
             $user = auth()->user();
 
-            if(url()->previous() != route('pagamento.gerenti', $boleto))
+            if(!$this->checkoutIframe || (url()->previous() != route('pagamento.gerenti', $boleto)))
                 return redirect(route($user::NAME_ROUTE . '.dashboard'));
 
             // boleto pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
