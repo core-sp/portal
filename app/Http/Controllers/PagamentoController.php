@@ -12,6 +12,7 @@ class PagamentoController extends Controller
 {
     private $service;
     private $checkoutIframe;
+    private $can_notification;
 
     public function __construct(MediadorServiceInterface $service) 
     {
@@ -24,6 +25,9 @@ class PagamentoController extends Controller
                 $this->checkoutIframe = auth()->user()->id != 1;
             return $next($request);
         });
+
+        $ips = ['201.87.185.248', '201.87.185.249', '201.87.188.248', '201.87.188.249'];
+        $this->can_notification = (config('app.env') != 'production') || ((config('app.env') == 'production') && in_array(request()->ip(), $ips));
     }
 
     // Visualizar pagamentos no Admin, apenas como consulta
@@ -303,6 +307,9 @@ class PagamentoController extends Controller
 
     public function getTransacaoCredito(NotificacaoGetnetRequest $request)
     {
+        if(!$this->can_notification)
+            return;
+
         $dados = $request->validated();
         $dados['checkoutIframe'] = $this->checkoutIframe;
         $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
@@ -312,6 +319,9 @@ class PagamentoController extends Controller
 
     public function getTransacaoDebito(NotificacaoGetnetRequest $request)
     {
+        if(!$this->can_notification)
+            return;
+
         $dados = $request->validated();
         $dados['checkoutIframe'] = $this->checkoutIframe;
         $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);

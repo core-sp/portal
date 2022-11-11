@@ -188,7 +188,8 @@ class Pagamento extends Model
             return false;
 
         $formato = strpos($this->authorized_at, '.') !== false ? 'Y-m-d\TH:i:s.uZ' : 'Y-m-d\TH:i:sZ';
-        return Carbon::createFromFormat($formato, $this->authorized_at)->day == Carbon::now('UTC')->day;
+        return $this->forma == 'combined' ? Carbon::createFromFormat($formato, $this->authorized_at)->addDays(7)->day <= Carbon::now('UTC')->day : 
+            Carbon::createFromFormat($formato, $this->authorized_at)->day == Carbon::now('UTC')->day;
     }
 
     public function getIdPagamento()

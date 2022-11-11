@@ -48,10 +48,11 @@ class PagamentoMail extends Mailable
 
             if(!$pagamento->isDebit())
             {
+                $texto = $pagamento->forma == 'combined' ? 'pode ser feito em até 7 dias a partir do' : 'somente no mesmo';
                 $this->body .= '<strong>Caso não reconheça esse pagamento, cancele pelo <a href="' . $link . '">link de cancelamento</a>, na área restrita do ';
                 $this->body .= $pagamento->getUser()::NAME_AREA_RESTRITA . '</strong>';
                 $this->body .= '<br /><br />';
-                $this->body .= '<strong>* Cancelamento somente no mesmo dia do pagamento realizado.</strong>';
+                $this->body .= '<strong>* Cancelamento ' . $texto . ' dia do pagamento realizado.</strong>';
                 $this->body .= '<br /><br />';
             }
         }
