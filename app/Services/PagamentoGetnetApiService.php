@@ -378,7 +378,7 @@ class PagamentoGetnetApiService {
     public function cancelarPagamento($payment_id, $tipo_pag)
     {
         try{
-            $temp = strpos($tipo_pag, '_3ds') !== false ? 'authenticated' : $tipo_pag;
+            $temp = strpos($tipo_pag, '_3ds') !== false ? 'authenticated' : 'credit';
             $this->getToken();
             $response = $this->client->request('POST', $this->urlBase . '/v1/payments/' . $temp . '/' . $payment_id . '/cancel', [
                 'headers' => [

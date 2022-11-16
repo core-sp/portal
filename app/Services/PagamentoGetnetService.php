@@ -72,14 +72,14 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         $base['combined_id'] = $transacao['combined_id'];
         $base_2 = $base;
-        $base['authorized_at'] = $transacao['payments'][0]['credit']['authorized_at'];
+        $base['authorized_at'] = $transacao['payments'][0]['credit_confirm']['confirm_date'];
         $base['status'] = mb_strtoupper($status[0]);
         $base['payment_tag'] = $transacao['payments'][0]['payment_tag'];
         $base['payment_id'] = $transacao['payments'][0]['payment_id'];
         // cartão 2
         $base_2['tipo_parcelas'] = $dados['tipo_parcelas_2'];
         $base_2['parcelas'] = $dados['parcelas_2'];
-        $base_2['authorized_at'] = $transacao['payments'][1]['credit']['authorized_at'];
+        $base_2['authorized_at'] = $transacao['payments'][1]['credit_confirm']['confirm_date'];
         $base_2['status'] = mb_strtoupper($status[1]);
         $base_2['payment_tag'] = $transacao['payments'][1]['payment_tag'];
         $base_2['payment_id'] = $transacao['payments'][1]['payment_id'];
@@ -94,23 +94,15 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         // * caso dê erro (por motivos de conexão, etc) a transação é salva como json, o campo gerenti_ok update false, com aviso no log com motivo de erro no gerenti e a rotina no Kernel tentará novamente enviar ao Gerenti.
         
         // Código no serviço do gerenti
-        // if($pagamentos instanceof Pagamento)
-        //     $pagamentos->updateAposSucessoGerenti();
-        // else
-        // {
-        //     foreach($pagamentos as $pag)
-        //         $pag->updateAposSucessoGerenti();
-        // }
+        // $pagamentos = Pagamento::getCollection($pagamentos);
+        // foreach($pagamentos as $pag)
+        //     $pag->updateAposSucessoGerenti();
 
-        // if($pagamentos instanceof Pagamento)
-        //     $pagamentos->updateAposErroGerenti($transacao);
-        // else
-        // {
-        //     foreach($pagamentos as $pag)
-        //         $pag->updateAposErroGerenti($transacao);
-        // }
+        // $pagamentos = Pagamento::getCollection($pagamentos);
+        // foreach($pagamentos as $pag)
+        //     $pag->updateAposErroGerenti($transacao);
 
-        $pagamento = $pagamentos->first();
+        $pagamento = Pagamento::getFirst($pagamentos);
         
         if(!$this->via_sistema)
         {
@@ -132,7 +124,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         
         event(new ExternoEvent($string));
 
-        Mail::to($user->email)->queue(new PagamentoMail($pagamentos->fresh()));
+        Mail::to($user->email)->queue(new PagamentoMail($pagamentos));
     }
 
     private function createViaNotificacao($dados)
@@ -162,16 +154,16 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
             $error = isset($dados['error_code']) ? $dados['error_code'] : null;
             $descricao = isset($dados['description_detail']) ? $dados['description_detail'] : null;
-            $this->aposRotinaTransacao($user, $pagamento, $dados['status'], $dados, $error, $descricao);
-
             $outroPagamento = $pagamento->getCombinadoAposNotificacao($dados);
 
             if(isset($outroPagamento))
             {
                 $dados['boleto'] = $dados['order_id'];
-                $dados['pagamento'] = $outroPagamento;
+                $dados['pagamento'] = collect([$pagamento, $outroPagamento]);
                 $this->cancelCheckout($dados, $user);
             }
+
+            $this->aposRotinaTransacao($user, $pagamento, $dados['status'], $dados, $error, $descricao);
         }
     }
 
@@ -208,8 +200,11 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     private function cancelamentoPagamento($tipo_pag, $pagamento)
     {
-        if(($tipo_pag != 'combined') || ($pagamento instanceof Pagamento))
-            return $this->api->cancelarPagamento($pagamento->first()->payment_id, $tipo_pag);
+        if($tipo_pag != 'combined')
+        {
+            $pagamento = Pagamento::getFirst($pagamento);
+            return $this->api->cancelarPagamento($pagamento->payment_id, $tipo_pag);
+        }
         
         for($i = 0; $i < self::TOTAL_CARTOES; $i++)
         {
@@ -247,6 +242,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         $status = $this->getStatusTransacao($transacao, $dados['tipo_pag']);
         $transacao = $this->confirmacaoPagamento($transacao, $status);
+        $status = $this->getStatusTransacao($transacao, $dados['tipo_pag']);
 
         $combined = is_array($status) && (($status[0] != 'CONFIRMED') || ($status[1] != 'CONFIRMED'));
         $not_combined = !is_array($status) && ($status != 'APPROVED');
@@ -254,7 +250,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         if($combined || $not_combined)
         {
             $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento do boleto ' . $dados['boleto'] . ' do tipo *' . $dados['tipo_pag'] . '*';
-            $string .= ', mas não foi possível. Retorno da Getnet: Cartão verificado, mas ao realizar o pagamento o status recebido foi' . json_encode($status);
+            $string .= ', mas não foi possível. Retorno da Getnet: Cartão verificado, mas ao realizar o pagamento o status recebido foi ' . json_encode($status);
             event(new ExternoEvent($string));
 
             return [
@@ -268,10 +264,11 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         unset($dados);
         $this->aposRotinaTransacao($user, $pagamento, is_array($status) ? $status[0] : $status, $transacao);
+        $pagamento = Pagamento::getFirst($pagamento);
         unset($transacao);
 
         return [
-            'message-cartao' => '<i class="fas fa-check"></i> Pagamento realizado para o boleto ' . $pagamento->first()->boleto_id . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email,
+            'message-cartao' => '<i class="fas fa-check"></i> Pagamento realizado para o boleto ' . $pagamento->boleto_id . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email,
             'class' => 'alert-success'
         ];
     }
@@ -282,6 +279,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $tipo_pag = $pagamento->first()->getForma3DS();
 
         $transacao = $this->cancelamentoPagamento($tipo_pag, $pagamento);
+        $pagamento = Pagamento::getCollection($pagamento);
 
         $status = $this->getStatusTransacao($transacao, $tipo_pag);
         $combined = is_array($status) && (($status[0] != 'CANCELED') || ($status[1] != 'CANCELED'));
@@ -374,6 +372,8 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     {
         $resultados = Pagamento::with(['representante'])
             ->where('boleto_id','LIKE','%'.$busca.'%')
+            ->orWhere('payment_id','LIKE','%'.$busca.'%')
+            ->orWhere('combined_id','LIKE','%'.$busca.'%')
             ->orWhereHas('representante', function ($query) use($busca) {
                 $query->where('nome','LIKE','%'.$busca.'%')
                 ->orWhere('cpf_cnpj','LIKE','%'.$busca.'%')

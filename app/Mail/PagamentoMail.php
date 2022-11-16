@@ -17,13 +17,9 @@ class PagamentoMail extends Mailable
 
     public function __construct($pagamentos)
     {
-        $pagamento = null;
-        if($pagamentos instanceof Pagamento)
-        {
-            $pagamento = $pagamentos;
-            $pagamentos = collect([$pagamentos]);
-        }else
-            $pagamento = $pagamentos->first();
+        $pagamentos = $pagamentos->fresh();
+        $pagamento = Pagamento::getFirst($pagamentos);
+        $pagamentos = Pagamento::getCollection($pagamentos);
 
         $this->textoAssunto($pagamento);
 

@@ -307,25 +307,33 @@ class PagamentoController extends Controller
 
     public function getTransacaoCredito(NotificacaoGetnetRequest $request)
     {
-        if(!$this->can_notification)
-            return;
+        try{
+            if(!$this->can_notification)
+                return;
 
-        $dados = $request->validated();
-        $dados['checkoutIframe'] = $this->checkoutIframe;
-        $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+            $dados = $request->validated();
+            $dados['checkoutIframe'] = $this->checkoutIframe;
+            $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+        }
 
-        return;
+        return null;
     }
 
     public function getTransacaoDebito(NotificacaoGetnetRequest $request)
     {
-        if(!$this->can_notification)
-            return;
+        try{
+            if(!$this->can_notification)
+                return;
 
-        $dados = $request->validated();
-        $dados['checkoutIframe'] = $this->checkoutIframe;
-        $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+            $dados = $request->validated();
+            $dados['checkoutIframe'] = $this->checkoutIframe;
+            $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+        }
 
-        return;
+        return null;
     }
 }

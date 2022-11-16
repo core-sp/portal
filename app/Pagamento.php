@@ -19,27 +19,29 @@ class Pagamento extends Model
         $headers = [
             'ID',
             'Usuário',
+            'ID Pagamento',
             'Boleto',
             'Forma de pagamento',
             'Parcelas',
-            'Tag <small>(mais de um cartão)</small>',
             'Status',
-            'Enviado para o Gerenti',
-            'Última alteração',
+            'Gerenti',
+            'Atualizado em',
         ];
         // Opções de conteúdo da tabela
         $contents = [];
         foreach($resultados as $resultado) 
         {
+            $forma = $resultado->getForma();
+            $forma .= isset($resultado->combined_id) ? '<br><small><em><strong>Tag:</strong> ' . $resultado->payment_tag . '</em></small>' : '';
             $conteudo = [
                 $resultado->id,
                 $resultado->getUser()->nome.'<br><small><em>'.formataCpfCnpj($resultado->getUser()->cpf_cnpj).'</em></small>',
+                substr_replace($resultado->payment_id, '**********', 9, strlen($resultado->payment_id)),
                 $resultado->boleto_id,
-                $resultado->getForma(),
+                $forma,
                 $resultado->getParcelas(),
-                $resultado->payment_tag,
-                $resultado->getStatusLabel(),
-                $resultado->gerenti_ok ? '<i class="fas fa-check text-success"></i> <em>Enviado</em>' : '<i class="fas fa-ban text-danger"></i> <em>Aguardando envio</em>',
+                '<small>' . $resultado->getStatusLabel() . '</small>',
+                $resultado->gerenti_ok ? '<i class="fas fa-check text-success"></i> <em>Enviado</em>' : '<i class="fas fa-times text-danger"></i> <em>Aguardando envio</em>',
                 formataData($resultado->updated_at),
             ];
             array_push($contents, $conteudo);
@@ -67,6 +69,16 @@ class Pagamento extends Model
             'tabela' => self::tabelaCompleta($resultados), 
             'variaveis' => (object) $variaveis
         ];
+    }
+
+    public static function getFirst($pagamentos)
+    {
+    	return $pagamentos instanceof Pagamento ? $pagamentos : $pagamentos->first();
+    }
+
+    public static function getCollection($pagamentos)
+    {
+    	return $pagamentos instanceof Pagamento ? collect([$pagamentos]) : $pagamentos;
     }
 
     public function representante()
@@ -113,6 +125,8 @@ class Pagamento extends Model
                 return 'Negado';
             case 'ERROR':
                 return 'Erro';
+            default:
+                return '';
         }
     }
 
@@ -132,6 +146,8 @@ class Pagamento extends Model
                 return '<span class="border rounded bg-danger font-weight-bold p-1">Negado</span>';
             case 'ERROR':
                 return '<span class="border rounded bg-danger font-weight-bold p-1">Erro</span>';
+            default:
+                return '';
         }
     }
 
@@ -151,6 +167,8 @@ class Pagamento extends Model
                 return '<span style="color:red;"><strong>Negado</strong></span>';
             case 'ERROR':
                 return '<span style="color:red;"><strong>Erro</strong></span>';
+            default:
+                return '';
         }
     }
 
@@ -188,7 +206,7 @@ class Pagamento extends Model
             return false;
 
         $formato = strpos($this->authorized_at, '.') !== false ? 'Y-m-d\TH:i:s.uZ' : 'Y-m-d\TH:i:sZ';
-        return $this->forma == 'combined' ? Carbon::createFromFormat($formato, $this->authorized_at)->addDays(7)->day <= Carbon::now('UTC')->day : 
+        return $this->forma == 'combined' ? Carbon::createFromFormat($formato, $this->authorized_at)->addDays(7)->day >= Carbon::now('UTC')->day : 
             Carbon::createFromFormat($formato, $this->authorized_at)->day == Carbon::now('UTC')->day;
     }
 
@@ -256,7 +274,7 @@ class Pagamento extends Model
 
     public function getCombinadoAposNotificacao($dados)
     {
-        if(isset($this->combined_id) && in_array($dados['status'], ['CANCELED', 'DENIED', 'ERROR']))
+        if(isset($this->combined_id))
             return self::where('boleto_id', $dados['order_id'])
                 ->where('combined_id', $this->combined_id)
                 ->where('payment_id', '!=', $dados['payment_id'])
