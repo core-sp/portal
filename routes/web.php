@@ -338,6 +338,7 @@ Route::prefix('/')->group(function() {
     Route::post('/confirmar-pagamento/{boleto}', 'PagamentoController@pagamentoCartao')->name('pagamento.cartao');
     Route::get('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartaoView')->name('pagamento.cancelar.view');
     Route::post('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartao')->name('pagamento.cancelar');
+    Route::get('/visualizar-pagamento/{boleto}/{pagamento}', 'PagamentoController@pagamentoView')->name('pagamento.visualizar');
     Route::get('/cardsBrand/{boleto}/{bin}', 'PagamentoController@cardsBrand')->name('pagamento.cards.brand');
     Route::post('/generateToken', 'PagamentoController@generateToken')->name('pagamento.generate.token');
     Route::post('/authentications', 'PagamentoController@authentications')->name('pagamento.authentications');

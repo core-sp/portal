@@ -33,10 +33,13 @@ class Pagamento extends Model
         {
             $forma = $resultado->getForma();
             $forma .= isset($resultado->combined_id) ? '<br><small><em><strong>Tag:</strong> ' . $resultado->payment_tag . '</em></small>' : '';
+            $combinado = isset($resultado->combined_id) ? 
+            '<br><small><em><strong>ID Combinado:</strong> ' . substr_replace($resultado->combined_id, '**********', 9, strlen($resultado->combined_id)) . '</em></small>' : 
+            '';
             $conteudo = [
                 $resultado->id,
                 $resultado->getUser()->nome.'<br><small><em>'.formataCpfCnpj($resultado->getUser()->cpf_cnpj).'</em></small>',
-                substr_replace($resultado->payment_id, '**********', 9, strlen($resultado->payment_id)),
+                substr_replace($resultado->payment_id, '**********', 9, strlen($resultado->payment_id)) . $combinado,
                 $resultado->boleto_id,
                 $forma,
                 $resultado->getParcelas(),

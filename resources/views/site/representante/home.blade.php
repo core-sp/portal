@@ -25,14 +25,18 @@
                     </button>
                 </a>
             </p>
+            <hr />
+            <p class="pb-0 mt-2"><strong>Pagamento On-line:&nbsp;</strong>
+                @component('components.acoes_pagamento', [
+                    'pagamento' => $pagamento,
+                    'boleto_id' => $nrBoleto,
+                    'podePagar' => true,
+                ])
+                @endcomponent
+            </p>
         @else
             <p class="pb-0">Já pago ou indisponível. Confira mais detalhes na guia de <a href="/representante/situacao-financeira">Situação Financeira</a>.</p>
         @endif
-
-        <br>
-        <!-- Temporário -->
-        <a href="{{ route('pagamento.view', 1) }}" class="btn btn-primary text-white text-decoration-none">Teste Realizar Pagamento On-line</a>
-        <a href="{{ route('pagamento.cancelar.view', ['boleto' => '1', 'pagamento' => '1']) }}" class="btn btn-danger text-white text-decoration-none">Teste Cancelar Pagamento On-line</a>
         
     </div>
 </div>

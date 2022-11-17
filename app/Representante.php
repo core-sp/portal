@@ -123,6 +123,14 @@ class Representante extends Authenticable
         ->where('payment_id', $pagamento_id)->orWhere('combined_id', $pagamento_id)->get();
     }
 
+    public function getPagamentosAprovados($boletos)
+    {
+        return $this->pagamentos()
+        ->whereIn('boleto_id', $boletos)
+        ->whereIn('status', ['APPROVED', 'CONFIRMED'])
+        ->get();
+    }
+
     public function existePagamentoAprovado($boleto_id)
     {
         return $this->pagamentos()->where('boleto_id', $boleto_id)

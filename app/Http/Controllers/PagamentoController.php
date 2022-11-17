@@ -78,7 +78,7 @@ class PagamentoController extends Controller
             $existe = $user->existePagamentoAprovado($boleto);
             if($existe)
                 return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
-                    'message-cartao' => '<i class="fas fa-ban"></i> Pagamento já realizado pelo portal para este boleto.',
+                    'message-cartao' => '<i class="fas fa-times"></i> Pagamento já realizado pelo portal para este boleto.',
                     'class' => 'alert-danger',
                 ]);
 
@@ -174,7 +174,7 @@ class PagamentoController extends Controller
             \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento do boleto *'.$boleto.'*. Erro registrado no Log de Erros.');
             
             return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
-                'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! ' . $msg,
+                'message-cartao' => '<i class="fas fa-times"></i> Não foi possível completar a operação! ' . $msg,
                 'class' => 'alert-danger',
             ]);
         }
@@ -230,12 +230,32 @@ class PagamentoController extends Controller
             \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o cancelamento do pagamento com a id *'.$id_pagamento.'* do boleto com a id: *'.$boleto . '*. Erro registrado no Log de Erros.');
             
             return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
-                'message-cartao' => '<i class="fas fa-ban"></i> Não foi possível completar a operação! ' . $msg,
+                'message-cartao' => '<i class="fas fa-times"></i> Não foi possível completar a operação! ' . $msg,
                 'class' => 'alert-danger',
             ]);
         }
 
         return redirect(route($user::NAME_ROUTE . '.dashboard'))->with($transacao);
+    }
+
+    public function pagamentoView($boleto, $pagamento_id)
+    {
+        try{
+            $user = auth()->user();
+            $dados = $user->getPagamento($boleto, $pagamento_id);
+            if($dados->isEmpty())
+                return redirect(route($user::NAME_ROUTE . '.dashboard'))->with([
+                    'message-cartao' => '<i class="fas fa-ban"></i> Não existe pagamento para este boleto e ID.',
+                    'class' => 'alert-danger',
+                ]);
+        }catch(\Exception $e){
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar dados do servidor para visualizar pagamento");
+        }
+
+        return view('site.' . $user::NAME_VIEW . '.pagamento')->with([
+            'boleto' => $boleto, 'dados' => $dados, 'checkoutIframe' => $this->checkoutIframe
+        ]);
     }
 
     public function cardsBrand($boleto, $bin)

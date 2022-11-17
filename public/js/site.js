@@ -975,6 +975,21 @@ function enabledPagamento(credito){
 	$('#dados_combinado input, #dados_combinado select, #valor_combinado input').attr('required', habilita);
 }
 
+// Data / Mês expiração
+$(".expiracao").datepicker({
+	dateFormat: 'mm/yy',
+	changeMonth: true,
+    changeYear: true,
+	showButtonPanel: true,
+	monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+	currentText: 'Hoje',
+	closeText : "Inserir",
+	minDate: 0,
+	onClose: function(dateText, inst) { 
+		$(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+	}
+});
+
 $('select[name="tipo_pag"]').change(function() {
 	if((this.value == 'debit_3ds') || (this.value == '')){
 		disabledPagamento();

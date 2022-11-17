@@ -13,16 +13,28 @@
                 <thead>
                     <tr>
                         <th>Descrição</th>
-                        <th class="quinze">Valor</th>
+                        <th class="text-nowrap text-center">Pagamento On-line</th>
+                        <th class="quinze text-center">Valor</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($cobrancas['anuidades'] as $cobranca)
+                        @php
+                            $temp = $pagamentos->where('boleto_id', 1)->first();
+                        @endphp
                         <tr>
-                            <td class="ls-meio-neg">
+                            <td class="ls-meio-neg align-middle">
                                 {{ $cobranca['DESCRICAO'] }} ⋅ {!! secondLine($cobranca['SITUACAO'], $cobranca['VENCIMENTOBOLETO'], $cobranca['LINK'], $cobranca['DESCRICAO'], $cobranca['BOLETO']) !!}
                             </td>
-                            <td class="ls-meio-neg">R$ {{ toReais($cobranca['VALOR']) }}</td>
+                            <td class="ls-meio-neg text-nowrap align-middle text-center">
+                                @component('components.acoes_pagamento', [
+                                    'pagamento' => $temp,
+                                    'boleto_id' => 1,
+                                    'podePagar' => $cobranca['SITUACAO'] != 'Pago',
+                                ])
+                                @endcomponent
+                            </td>
+                            <td class="ls-meio-neg align-middle text-center">R$ {{ toReais($cobranca['VALOR']) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -38,16 +50,28 @@
                 <thead>
                     <tr>
                         <th>Descrição</th>
-                        <th class="quinze">Valor</th>
+                        <th class="text-nowrap text-center">Pagamento On-line</th>
+                        <th class="quinze text-center">Valor</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($cobrancas['outros'] as $cobranca)
+                        @php
+                            $temp = $pagamentos->where('boleto_id', 4)->first();
+                        @endphp
                         <tr>
-                            <td class="ls-meio-neg">
+                            <td class="ls-meio-neg align-middle">
                                 {{ $cobranca['DESCRICAO'] }} ⋅ {!! secondLine($cobranca['SITUACAO'], $cobranca['VENCIMENTOBOLETO'], $cobranca['LINK'], $cobranca['DESCRICAO']) !!}
                             </td>
-                            <td class="ls-meio-neg">R$ {{ toReais($cobranca['VALOR']) }}</td>
+                            <td class="ls-meio-neg text-nowrap align-middle text-center">
+                                @component('components.acoes_pagamento', [
+                                    'pagamento' => $temp,
+                                    'boleto_id' => 1,
+                                    'podePagar' => $cobranca['SITUACAO'] != 'Pago',
+                                ])
+                                @endcomponent
+                            </td>
+                            <td class="ls-meio-neg align-middle text-center">R$ {{ toReais($cobranca['VALOR']) }}</td>
                         </tr>
                     @endforeach
                 </tbody>

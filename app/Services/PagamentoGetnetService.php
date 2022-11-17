@@ -15,10 +15,11 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     private $via_sistema;
     const TOTAL_CARTOES = 2;
     const TEXTO_LOG_SISTEMA = '[Rotina Portal - Transação Getnet] ';
+    const FORMAT_DT_EXP = 'm/Y';
 
     public function __construct()
     {
-        $this->api = new PagamentoGetnetApiService(self::TOTAL_CARTOES);
+        $this->api = new PagamentoGetnetApiService(self::TOTAL_CARTOES, self::FORMAT_DT_EXP);
         $this->via_sistema = false;
     }
 
@@ -254,7 +255,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             event(new ExternoEvent($string));
 
             return [
-                'message-cartao' => '<i class="fas fa-ban"></i> Status da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
+                'message-cartao' => '<i class="fas fa-times"></i> Status da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
                 'class' => 'alert-danger'
             ];
         }
@@ -294,7 +295,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             event(new ExternoEvent($string));
 
             return [
-                'message-cartao' => '<i class="fas fa-ban"></i> Status do cancelamento da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Cancelamento do pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
+                'message-cartao' => '<i class="fas fa-times"></i> Status do cancelamento da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Cancelamento do pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
                 'class' => 'alert-danger'
             ];
         }

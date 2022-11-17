@@ -1,3 +1,9 @@
+<style>
+    .ui-datepicker-calendar {
+        display: none;
+    }
+</style>
+
 @if(!$checkoutIframe)
 <noscript>
     <iframe 
@@ -19,8 +25,8 @@
                 @endforeach
             </ul>
             @endif
-
-        @if(!\Route::is('pagamento.cancelar.*'))
+            
+    @if(!\Route::is('pagamento.cancelar.*') && !\Route::is('pagamento.visualizar'))
         <small class="form-text text-muted mb-3">
             <em><span class="text-danger">*</span> Preenchimento obrigatório</em>
         </small>
@@ -239,11 +245,10 @@
                     <div class="col-sm mb-2-576">
                         <label for="expiration_1">Data de Expiração <span class="text-danger">*</span></label>
                         <input
-                            type="month"
+                            type="text"
                             name="expiration_1"
-                            class="form-control form-control-sm pagamento"
+                            class="form-control form-control-sm pagamento expiracao"
                             id="expiration_1"
-                            min="{{ date('Y-m') }}"
                             required
                         >
                     </div>
@@ -320,11 +325,10 @@
                     <div class="col-sm mb-2-576">
                         <label for="expiration_2">Data de Expiração <span class="text-danger">*</span></label>
                         <input
-                            type="month"
+                            type="text"
                             name="expiration_2"
-                            class="form-control form-control-sm pagamento"
+                            class="form-control form-control-sm pagamento expiracao"
                             id="expiration_2"
-                            min="{{ date('Y-m') }}"
                             required
                         >
                     </div>
@@ -359,9 +363,11 @@
 
             </div>
         </form>
-        @else
+    @else
+        @if(\Route::is('pagamento.cancelar.*'))
         <form action="{{ route('pagamento.cancelar', ['boleto' => $boleto, 'pagamento' => $id_pagamento]) }}" method="POST" autocomplete="off">
             @csrf
+        @endif
             @foreach($dados as $dado)
                 <p><strong>Boleto:</strong> {{ $dado->boleto_id }}</p>
                 <p><strong>Status do pagamento:</strong> {!! $dado->getStatusLabel() !!}</p>
@@ -370,6 +376,7 @@
                 <p><strong>Data do pagamento:</strong> {{ formataData($dado->created_at) }}</p>
                 <br />
             @endforeach
+            @if(\Route::is('pagamento.cancelar.*'))
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
                     <button
@@ -386,6 +393,7 @@
             </div>
         </form>
         @endif
+    @endif
     </div>
 </div>
 

@@ -12,11 +12,13 @@ class PagamentoGetnetApiService {
     private $client;
     private $auth;
     private $total_cartoes;
+    private $formatDt;
 
-    public function __construct($total_cartoes)
+    public function __construct($total_cartoes, $formatDt)
     {
         $this->urlBase = config('app.url') != 'https://core-sp.org.br' ? 'https://api-homologacao.getnet.com.br' : '';
         $this->total_cartoes = $total_cartoes;
+        $this->formatDt = $formatDt;
     }
 
     private function formatError(RequestException $e)
@@ -102,7 +104,7 @@ class PagamentoGetnetApiService {
     {
         if($tipo != 'combined')
         {
-            $expiration = Carbon::createFromFormat('Y-m', $dados['expiration_1']);
+            $expiration = Carbon::createFromFormat($this->formatDt, $dados['expiration_1']);
             $resultado['card'] = [
                 "number_token" => $dados['number_token'],
                 "cardholder_name" => $dados['cardholder_name_1'],
@@ -114,7 +116,7 @@ class PagamentoGetnetApiService {
         }else{
             for($i = 1; $i <= $this->total_cartoes; $i++)
             {
-                $expiration = Carbon::createFromFormat('Y-m', $dados['expiration_'.$i]);
+                $expiration = Carbon::createFromFormat($this->formatDt, $dados['expiration_'.$i]);
                 $resultado['card_' . $i] = [
                     "number_token" => $dados['number_token_' . $i],
                     "cardholder_name" => $dados['cardholder_name_' . $i],
@@ -221,7 +223,7 @@ class PagamentoGetnetApiService {
     private function verifyCard($number_token, $brand, $cardholder_name, $expiration, $security_code)
     {
         try{
-            $expiration = Carbon::createFromFormat('Y-m', $expiration);
+            $expiration = Carbon::createFromFormat($this->formatDt, $expiration);
             $expiration_month = $expiration->format('m');
             $expiration_year = $expiration->format('y');
 
