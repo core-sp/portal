@@ -13,6 +13,21 @@ class Pagamento extends Model
     protected $table = 'pagamentos';
     protected $guarded = [];
 
+    private static function cartoesImg($brand = null)
+    {
+        $cartoes = [
+            'Visa' => '<img src="' . asset('img/visa.256x164.png') . '" width="40" height="26" alt="cartão visa"/>',
+            'Mastercard' => '<img src="' . asset('img/mastercard.256x164.png') . '" width="40" height="26" alt="cartão mastercard"/>',
+            'Elo' => '<img src="' . asset('img/elo.256x164.png') . '" width="40" height="26" alt="cartão elo"/>',
+            'Amex' => '<img src="' . asset('img/amex.256x168.png') . '" width="40" height="27" alt="cartão amex"/>',
+            'Hipercard' => '<img src="' . asset('img/hipercard.256x112.png') . '" width="40" height="16" alt="cartão hipercard"/>',
+        ];
+
+        if(isset($brand))
+            return isset($cartoes[ucfirst($brand)]) ? $cartoes[ucfirst($brand)] : '';
+        return $cartoes;
+    }
+
     private static function tabelaCompleta($resultados)
     {
         // Opções de cabeçalho da tabela
@@ -31,7 +46,7 @@ class Pagamento extends Model
         $contents = [];
         foreach($resultados as $resultado) 
         {
-            $forma = $resultado->getForma();
+            $forma = $resultado->getForma() . ' ' . $resultado->getBandeiraImg();
             $forma .= isset($resultado->combined_id) ? '<br><small><em><strong>Tag:</strong> ' . $resultado->payment_tag . '</em></small>' : '';
             $combinado = isset($resultado->combined_id) ? 
             '<br><small><em><strong>ID Combinado:</strong> ' . substr_replace($resultado->combined_id, '**********', 9, strlen($resultado->combined_id)) . '</em></small>' : 
@@ -54,7 +69,11 @@ class Pagamento extends Model
             'table-hover'
         ];
 
-        $tabela = montaTabela($headers, $contents, $classes);
+        $legenda = '<p><small><em><strong>Legenda:</strong></em>&nbsp;&nbsp;';
+        foreach(self::cartoesImg() as $brand => $img)
+            $legenda .= $brand . ' ' . $img . '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+        $legenda .= '</small></p><hr />';
+        $tabela = $legenda . montaTabela($headers, $contents, $classes);
         return $tabela;
     }
 
@@ -192,6 +211,30 @@ class Pagamento extends Model
             default:
                 return '';
         }
+    }
+
+    public function getBandeiraTxt()
+    {
+        switch($this->bandeira)
+        {
+            case 'mastercard':
+                return 'Mastercard';
+            case 'visa':
+                return 'Visa';
+            case 'amex':
+                return 'Amex';
+            case 'elo':
+                return 'Elo';
+            case 'hipercard':
+                return 'Hipercard';
+            default:
+                return '';
+        }
+    }
+
+    public function getBandeiraImg()
+    {
+        return self::cartoesImg($this->bandeira);
     }
 
     public function canCancel()

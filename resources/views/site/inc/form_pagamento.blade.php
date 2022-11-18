@@ -373,6 +373,7 @@
                 <p><strong>Status do pagamento:</strong> {!! $dado->getStatusLabel() !!}</p>
                 <p><strong>Forma de pagamento:</strong> {{ $dado->getForma() }}</p>
                 <p><strong>Parcelas:</strong> {{ $dado->getParcelas() . ' ' . $dado->getTipoParcelas() }}</p>
+                <p><strong>Bandeira:</strong> {!! $dado->getBandeiraImg() !!}</p>
                 <p><strong>Data do pagamento:</strong> {{ formataData($dado->created_at) }}</p>
                 <br />
             @endforeach

@@ -35,6 +35,8 @@ class PagamentoMail extends Mailable
             $detalhes .= '<strong>Forma de pagamento:</strong> '. $pag->getForma();
             $detalhes .= '<br /><br />';
             $detalhes .= '<strong>Parcelas:</strong> '. $pag->getParcelas() . ' '. $pag->getTipoParcelas();
+            $detalhes .= '<br /><br />';
+            $detalhes .= '<strong>Bandeira:</strong> '. $pag->getBandeiraTxt();
             $detalhes .= '<br /><br /><hr />';
         }
 

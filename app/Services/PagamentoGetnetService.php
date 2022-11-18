@@ -57,9 +57,9 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     {
         $base = [
             'boleto_id' => $dados['boleto'],
-            'forma' => $dados['tipo_pag'],
+            'forma' => mb_strtolower($dados['tipo_pag']),
             'parcelas' => $dados['parcelas_1'],
-            'tipo_parcelas' => $dados['tipo_parcelas_1'],
+            'tipo_parcelas' => mb_strtoupper($dados['tipo_parcelas_1']),
         ];
 
         if($dados['tipo_pag'] != 'combined')
@@ -68,6 +68,8 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             $base['status'] = mb_strtoupper($status);
             $base['authorized_at'] = $transacao[$dados['tipo_pag']]['authorized_at'];
             $base['is_3ds'] = strpos($dados['tipo_pag'], '_3ds') !== false;
+            $base['bandeira'] = strpos($dados['tipo_pag'], '_3ds') !== false ? mb_strtolower($transacao['brand']) : 
+            mb_strtolower($transacao[$dados['tipo_pag']]['brand']);
             return $base;
         }
 
@@ -77,13 +79,15 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $base['status'] = mb_strtoupper($status[0]);
         $base['payment_tag'] = $transacao['payments'][0]['payment_tag'];
         $base['payment_id'] = $transacao['payments'][0]['payment_id'];
+        $base['bandeira'] = mb_strtolower($transacao['payments'][0]['credit']['brand']);
         // cartão 2
-        $base_2['tipo_parcelas'] = $dados['tipo_parcelas_2'];
+        $base_2['tipo_parcelas'] = mb_strtoupper($dados['tipo_parcelas_2']);
         $base_2['parcelas'] = $dados['parcelas_2'];
         $base_2['authorized_at'] = $transacao['payments'][1]['credit_confirm']['confirm_date'];
         $base_2['status'] = mb_strtoupper($status[1]);
         $base_2['payment_tag'] = $transacao['payments'][1]['payment_tag'];
         $base_2['payment_id'] = $transacao['payments'][1]['payment_id'];
+        $base_2['bandeira'] = mb_strtolower($transacao['payments'][1]['credit']['brand']);
 
         return [$base, $base_2];
     }
