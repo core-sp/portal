@@ -183,13 +183,18 @@ Route::prefix('admin')->group(function() {
   Route::get('/representante-enderecos-baixar', 'RepresentanteEnderecoController@baixarComprovante')->name('representante-endereco.baixar');
 
   // Solicita cedula
-  Route::get('/solicita-cedula', 'SolicitaCedulaController@index')->name('solicita-cedula.index');
-  Route::get('/solicita-cedula/filtro', 'SolicitaCedulaController@index')->name('solicita-cedula.filtro');
-  Route::get('/solicita-cedula/{id}', 'SolicitaCedulaController@show')->name('admin.solicita-cedula.show');
-  Route::get('/solicita-cedula/pdf/{id}', 'SolicitaCedulaController@gerarPdf')->name('admin.solicita-cedula.pdf');
-  Route::get('/solicita-cedulas/busca', 'SolicitaCedulaController@busca')->name('solicita-cedula.busca');
-  Route::post('/solicita-cedula/inserir', 'SolicitaCedulaController@inserirSolicitaCedula')->name('admin.representante-solicita-cedula.post');
-  Route::post('/solicita-cedula/reprovar', 'SolicitaCedulaController@reprovarSolicitaCedula')->name('admin.representante-solicita-cedula-reprovada.post');
+  Route::prefix('solicita-cedula')->group(function(){
+    Route::get('/', 'SolicitaCedulaController@index')->name('solicita-cedula.index');
+    Route::get('/filtro', 'SolicitaCedulaController@index')->name('solicita-cedula.filtro');
+    Route::get('/visualizar/{id}', 'SolicitaCedulaController@show')->name('solicita-cedula.show');
+    Route::get('/pdf/{id}', 'SolicitaCedulaController@gerarPdf')->name('solicita-cedula.pdf');
+    Route::get('/busca', 'SolicitaCedulaController@busca')->name('solicita-cedula.busca');
+    Route::put('/update/{id}', 'SolicitaCedulaController@updateStatus')->name('solicita-cedula.update');
+    // remover rotas abaixo
+    // Route::post('/inserir', 'SolicitaCedulaController@inserirSolicitaCedula')->name('admin.representante-solicita-cedula.post');
+    // Route::post('/reprovar', 'SolicitaCedulaController@reprovarSolicitaCedula')->name('admin.representante-solicita-cedula-reprovada.post');
+  });
+  
   
   // Termo de Consentimento, baixar CSV
   Route::get('/termo-consentimento/download', 'TermoConsentimentoController@download')->name('termo.consentimento.download');

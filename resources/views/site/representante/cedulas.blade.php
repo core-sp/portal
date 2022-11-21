@@ -13,8 +13,7 @@
         <h4 class="pt-1 pb-1">Solicitação de Cédula</h4>
         <div class="linha-lg-mini mb-2"></div>
         <h5 class="mb-2"><i class="fas fa-level-up-alt rotate-90"></i>&nbsp;&nbsp;SOLICITAÇÕES</h5>
-        @if ($emdia)
-            @if ($possuiSolicitacaoCedulaEmAndamento == 0)
+            @if ($cedulaEmAndamento == 0)
                 <div class="d-block mb-3 mt-2">
                     <a href="{{ route('representante.inserirSolicitarCedulaView') }}" class="btn btn-primary link-nostyle branco">Adicionar nova solicitação de cédula</a>
                 </div>
@@ -23,7 +22,7 @@
                     <p class="light pb-0">Você já possui uma solicitação de cédula em andamento. Por favor, aguarde a atualização do status para solicitar novamente, se necessário.</p>
                 </div>
             @endif
-            @if ($possuiSolicitacaoCedula)
+            @if ($cedulas->total() > 0)
                 <div class="list-group w-100">
                     @foreach ($cedulas as $item)
                         <div class="list-group-item light d-block bg-info">
@@ -51,11 +50,6 @@
                 {{ $cedulas->appends(request()->input())->links() }}
             @endif
             </div>
-        @else
-            <div class="contatos-table space-single mt-3">
-                <p class="light pb-0">Infelizmente não é possível solicitar cédula no momento. Por favor, entre em contato com o atendimento para mais informações.</p>
-            </div>
-        @endif
     </div>
 </div>
 

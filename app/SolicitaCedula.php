@@ -14,6 +14,15 @@ class SolicitaCedula extends Model
     const STATUS_ACEITO = "Aceito";
     const STATUS_RECUSADO = "Recusado";
 
+    public static function allStatus()
+    {
+        return [
+            self::STATUS_EM_ANDAMENTO,
+            self::STATUS_ACEITO,
+            self::STATUS_RECUSADO,
+        ];
+    }
+    
     public function representante()
     {
     	return $this->belongsTo('App\Representante', 'idrepresentante');
@@ -31,7 +40,7 @@ class SolicitaCedula extends Model
 
     public function podeGerarPdf()
     {
-        return ($this->status == SolicitaCedula::STATUS_ACEITO) ? true : false;
+        return $this->status == SolicitaCedula::STATUS_ACEITO;
     }
 
     public function showStatus()
@@ -39,19 +48,16 @@ class SolicitaCedula extends Model
         switch ($this->status) {
             case SolicitaCedula::STATUS_EM_ANDAMENTO:
                 return 'font-italic';
-            break;
-
+                break;
             case SolicitaCedula::STATUS_RECUSADO:
                 return 'text-danger';
-            break;
-
+                break;
             case SolicitaCedula::STATUS_ACEITO:
                 return 'text-success';
-            break;
-            
+                break;
             default:
-                return $null;
-            break;
+                return '';
+                break;
         }
     }
 }

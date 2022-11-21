@@ -129,20 +129,6 @@ $(document).ready(function(){
     });
   });
 
-  // Será removido após refatorar a Cédula
-  $('#filtroCedula').submit(function(e){
-    var maxDataFiltro = $('#datemax').val();
-    var minDataFiltro = $('#datemin').val();
-    if(new Date(minDataFiltro) > new Date(maxDataFiltro)) {
-      alert('Data inválida. A data inicial deve ser menor ou igual a data de término.');
-      e.preventDefault();
-    }
-    if(!minDataFiltro || !maxDataFiltro) {
-      alert('Selecione data de início e término.');
-      e.preventDefault();
-    }
-  });
-
   $('#filtroDate').submit(function(e){
     var maxDataFiltro = $('#datemax').val();
     var minDataFiltro = $('#datemin').val();
@@ -377,16 +363,8 @@ $('#statusAgendamentoAdmin').ready(function(){
     $('#recusar-form').toggle();
   });
 
-  $('.cedula_recusada').submit(function(e){
-    if($('[name="justificativa"]').val().trim().length < 5) {
-      e.preventDefault();
-      alert("O campo de justificativa deve ter, no mínimo, 5 caracteres");
-    }else if($('[name="justificativa"]').val().trim().length > 600) {
-      e.preventDefault();
-      alert("O campo de justificativa deve ter, no máximo, 600 caracteres");
-    }
-    else
-      $('.cedula_recusada').submit();
+  $('.cedula_recusada').ready(function(e){
+    $('[name="justificativa"]').val('');
   });
 
   $('.anoInput').mask('0000');

@@ -100,7 +100,7 @@ class Representante extends Authenticable
 
     public function cedulas()
     {
-        return $this->hasMany('App\SolicitaCedula', 'id');
+        return $this->hasMany('App\SolicitaCedula', 'idrepresentante');
     }
 
     public function termos()
