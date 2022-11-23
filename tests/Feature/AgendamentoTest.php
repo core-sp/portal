@@ -1811,6 +1811,19 @@ class AgendamentoTest extends TestCase
             ->assertDontSeeText('AGE-000004') 
             ->assertDontSeeText('AGE-000005')
             ->assertDontSeeText('AGE-000006');
+
+        $this->get(route('agendamentos.filtro', [
+            'regional' => $regional_seccional->idregional,
+            'status' => Agendamento::STATUS_COMPARECEU, 
+            'datemin' => now()->addDay()->format('Y-m-d'), 
+            'datemax' => date('Y-m-d')
+        ]))
+            ->assertDontSeeText('AGE-000001') 
+            ->assertDontSeeText('AGE-000002') 
+            ->assertDontSeeText('AGE-000003') 
+            ->assertDontSeeText('AGE-000004') 
+            ->assertDontSeeText('AGE-000005')
+            ->assertDontSeeText('AGE-000006');
     }
 
     /** 

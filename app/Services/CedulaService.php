@@ -39,6 +39,7 @@ class CedulaService implements CedulaServiceInterface {
             'CPF/CNPJ',
             'Registro CORE',
             'Regional',
+            'Tipo',
             'Solicitado em:',
             'Atualizado em:',
             'Status',
@@ -57,6 +58,7 @@ class CedulaService implements CedulaServiceInterface {
                 $resultado->representante->cpf_cnpj,
                 $resultado->representante->registro_core,
                 $resultado->regional->regional,
+                $resultado->tipo,
                 formataData($resultado->created_at),
                 formataData($resultado->updated_at),
                 '<strong class="' .$resultado->showStatus(). '">' .$resultado->status. '</strong>',
@@ -76,14 +78,14 @@ class CedulaService implements CedulaServiceInterface {
 
     private function validacaoFiltroAtivo($request)
     {
+        if(empty($request->all()))
+            return null;
+
         $datemin = $request->filled('datemin') ? Carbon::parse($request->datemin) : Carbon::today();
         $datemax = $request->filled('datemax') ? Carbon::parse($request->datemax) : Carbon::today();
 
         if($datemax->lt($datemin))
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Data final deve ser maior ou igual a data inicial',
-                'class' => 'alert-danger'
-            ];
+            $datemax = $datemin;
 
         return [
             'status' => $request->filled('status') ? $request->status : 'Qualquer',
@@ -94,7 +96,7 @@ class CedulaService implements CedulaServiceInterface {
 
     private function getResultadosFiltro($dados)
     {
-        if(isset($dados) && !isset($dados['message']))
+        if(isset($dados))
         {
             $status = $dados['status'];
 
@@ -103,10 +105,19 @@ class CedulaService implements CedulaServiceInterface {
                 })
                 ->whereDate('created_at', '>=', $dados['datemin'])
                 ->whereDate('created_at', '<=', $dados['datemax'])
-                ->orderBy('id')
+                ->orderBy('id', 'DESC')
                 ->limit(25)
                 ->paginate(10);
         }
+
+        return SolicitaCedula::orderByRaw(
+            'CASE WHEN 
+            status = "' . SolicitaCedula::STATUS_EM_ANDAMENTO . '" 
+            THEN 0
+            END DESC'
+        )
+        ->orderByDesc('updated_at')
+        ->paginate(10);
     }
 
     private function filtro($request)
@@ -136,6 +147,11 @@ class CedulaService implements CedulaServiceInterface {
         return $temFiltro;
     }
 
+    public function getAllTipos()
+    {
+        return SolicitaCedula::allTipos();
+    }
+
     public function getAllStatus()
     {
         return SolicitaCedula::allStatus();
@@ -146,23 +162,11 @@ class CedulaService implements CedulaServiceInterface {
         session(['url' => url()->full()]);
         $this->variaveis['mostraFiltros'] = true;
 
-        if(count($request->only(['datemin', 'datemax'])) > 0)
-        {
-            $dados = $this->validacaoFiltroAtivo($request);
-            $resultados = $this->getResultadosFiltro($dados);
-            $this->variaveis['mostraFiltros'] = true;
-        }else
-            $resultados = SolicitaCedula::orderByRaw(
-                'CASE WHEN 
-                status = "' . SolicitaCedula::STATUS_EM_ANDAMENTO . '" 
-                THEN 0
-                END DESC'
-            )
-            ->orderByDesc('updated_at')
-            ->paginate(10);
+        $dados = $this->validacaoFiltroAtivo($request);
+        $resultados = $this->getResultadosFiltro($dados);
+        $this->variaveis['mostraFiltros'] = true;
     
         return [
-            'erro' => isset($dados['message']) ? $dados : null,
             'resultados' => $resultados, 
             'tabela' => $this->tabelaCompleta($resultados), 
             'temFiltro' => $this->filtro($request),
@@ -180,6 +184,7 @@ class CedulaService implements CedulaServiceInterface {
 
     public function updateStatus($id, $dados, $user)
     {
+        unset($dados['tipo_pessoa']);
         $dados['idusuario'] = $user->idusuario;
         $txt = $dados['status'] == SolicitaCedula::STATUS_ACEITO ? 'atendente aceitou' : 'atendente recusou e justificou';
 
@@ -231,7 +236,6 @@ class CedulaService implements CedulaServiceInterface {
         ];
     }
 
-    // Migrar métodos abaixo para o futuro servico de representante???
     public function getByRepresentante($user, GerentiRepositoryInterface $gerenti = null)
     {
         $cedulas = $user->cedulas()
@@ -257,6 +261,7 @@ class CedulaService implements CedulaServiceInterface {
         $regional = $gerenti->gerentiDadosGerais($user->tipoPessoa(), $user->ass_id)['Regional'];
         $idregional = $service->getService('Regional')->getByName($regional)->idregional;
         $dados['idregional'] = $idregional;
+        $dados['tipo'] = isset($dados['tipo']) ? $dados['tipo'] : SolicitaCedula::TIPO_FISICA;
 
         $cedula = $user->cedulas()->create($dados);
 

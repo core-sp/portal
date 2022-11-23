@@ -958,3 +958,12 @@ $('#cedula').ready(function() {
 			$('#rg').val(mascaraRG(texto));
 	}
 });
+
+// Logout Representante
+$("#logout-representante").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var link = "/representante/logout";
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+	$('body').append(form);
+	$(form).submit();
+});

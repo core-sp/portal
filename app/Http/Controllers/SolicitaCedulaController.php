@@ -187,9 +187,7 @@ class SolicitaCedulaController extends Controller
             abort(500, "Erro ao carregar as solicitações de cédulas.");
         }
 
-        return !isset($dados['erro']['message']) ? 
-            view('admin.crud.home')->with($dados) : 
-            redirect(session('url'))->with($dados['erro']);
+        return view('admin.crud.home')->with($dados);
 
         // return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }

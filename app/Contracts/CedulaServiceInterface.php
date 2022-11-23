@@ -7,6 +7,8 @@ use App\Contracts\MediadorServiceInterface;
 
 interface CedulaServiceInterface {
 
+    public function getAllTipos();
+
     public function getAllStatus();
 
     public function listar($request);
@@ -19,7 +21,6 @@ interface CedulaServiceInterface {
 
     public function buscar($busca);
 
-    // Migrar métodos abaixo para o futuro servico de representante???
     public function getByRepresentante($user, GerentiRepositoryInterface $gerenti = null);
 
     public function save($dados, $user, GerentiRepositoryInterface $gerenti, MediadorServiceInterface $service);

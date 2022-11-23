@@ -18,7 +18,7 @@
                         </strong>
                     </p>
                     @if(isset($resultado->justificativa))
-                        <p class="light"><small class="light">—————<br><strong>Motivo:</strong>{{ $resultado->justificativa }}</small></p>
+                        <p class="light"><small class="light">—————<br><strong>Motivo:&nbsp;&nbsp;</strong>{{ $resultado->justificativa }}</small></p>
                     @endif
                     <hr>
                 @break
@@ -42,7 +42,10 @@
             <p class="mb-0">Número: <strong>{{ $resultado->numero }}</strong></p>
             <p class="mb-0">Complemento: <strong>{{ isset($resultado->complemento) ? $resultado->complemento : '---' }}</strong></p>
             <p class="mb-0">Estado: <strong>{{ $resultado->estado }}</strong></p>
-            <p>Município: <strong>{{ $resultado->municipio }}</strong></p>
+            <p class="mb-0">Município: <strong>{{ $resultado->municipio }}</strong></p>
+            @if(isset($resultado->tipo))
+            <p>Tipo da cédula: <strong>{{ $resultado->tipo }}</strong></p>
+            @endif
 
             <a href="{{ route('solicita-cedula.index') }}" class="btn btn-outline-secondary mt-2">
                 Voltar

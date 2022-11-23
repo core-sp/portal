@@ -13,6 +13,7 @@ use App\Contracts\FiscalizacaoServiceInterface;
 use App\Contracts\PostServiceInterface;
 use App\Contracts\NoticiaServiceInterface;
 use App\Contracts\CedulaServiceInterface;
+use App\Contracts\RepresentanteServiceInterface;
 
 class MediadorService implements MediadorServiceInterface {
 
@@ -29,7 +30,8 @@ class MediadorService implements MediadorServiceInterface {
         FiscalizacaoServiceInterface $fiscalizacaoService,
         PostServiceInterface $postService,
         NoticiaServiceInterface $noticiaService,
-        CedulaServiceInterface $cedulaService
+        CedulaServiceInterface $cedulaService,
+        RepresentanteServiceInterface $representanteService
     )
     {
         $this->service = [
@@ -42,7 +44,8 @@ class MediadorService implements MediadorServiceInterface {
             'Fiscalizacao' => $fiscalizacaoService,
             'Post' => $postService,
             'Noticia' => $noticiaService,
-            'Cedula' => $cedulaService
+            'Cedula' => $cedulaService,
+            'Representante' => $representanteService,
         ];
     }
 

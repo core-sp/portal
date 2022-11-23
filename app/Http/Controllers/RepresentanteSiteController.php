@@ -552,6 +552,7 @@ class RepresentanteSiteController extends Controller
             if($dados['cedulaEmAndamento'] > 0)
                 return redirect(route('representante.solicitarCedulaView'));
 
+            $dados['tipos'] = $this->service->getService('Cedula')->getAllTipos();
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para realizar a solicitação de cédula do representante.");
