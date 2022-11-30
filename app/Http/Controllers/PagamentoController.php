@@ -37,15 +37,12 @@ class PagamentoController extends Controller
 
         try{
             $dados = $this->service->getService('Pagamento')->listar();
-            $variaveis = $dados['variaveis'];
-            $tabela = $dados['tabela'];
-            $resultados = $dados['resultados'];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os pagamentos on-line.");
         }
 
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
+        return view('admin.crud.home', $dados);
     }
 
     // Buscar pagamentos no Admin, apenas como consulta
@@ -56,15 +53,13 @@ class PagamentoController extends Controller
         try{
             $busca = $request->q;
             $dados = $this->service->getService('Pagamento')->buscar($busca);
-            $resultados = $dados['resultados'];
-            $tabela = $dados['tabela'];
-            $variaveis = $dados['variaveis'];
+            $dados['busca'] = $busca;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em pagamentos.");
         }
 
-        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+        return view('admin.crud.home', $dados);
     }
 
     public function pagamentoGerentiView($boleto)
@@ -291,36 +286,57 @@ class PagamentoController extends Controller
 
     public function generateToken(Request $request)
     {
-        $dados = $request;
-        // try{
-        //     $dados = $this->service->getService('Pagamento')->etapa2_3DS($request);
-        // } catch (\Exception $e) {
-        //     \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-        // }
+        if($this->checkoutIframe)
+            throw new \Exception('Rota não pode ser acessada devido ao uso do Checkout Iframe', 401);
+
+        try{
+            $token = '';
+            if($request->hasHeader('authorization'))
+                $token = trim(\Str::after($request->header('authorization'), 'Bearer '));
+            else
+                throw new \Exception('Faltou autenticação da api', 401);
+            $dados = $request->all();
+            $dados['Authorization'] = $token;
+            $dados = $this->service->getService('Pagamento')->autenticacao3DS($dados, \Route::currentRouteName());
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+        }
 
         return response()->json($dados);
     }
 
     public function authentications(Request $request)
     {
-        $dados = $request;
-        // try{
-        //     $dados = $this->service->getService('Pagamento')->etapa2_3DS($request);
-        // } catch (\Exception $e) {
-        //     \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-        // }
+        if($this->checkoutIframe)
+            throw new \Exception('Rota não pode ser acessada devido ao uso do Checkout Iframe', 401);
+
+            \Log::error($request);
+        try{
+            $token = '';
+            if($request->hasHeader('authorization'))
+                $token = trim(\Str::after($request->header('authorization'), 'Bearer '));
+            else
+                throw new \Exception('Faltou autenticação da api', 401);
+            $dados = $request->all();
+            $dados['Authorization'] = $token;
+            $dados = $this->service->getService('Pagamento')->autenticacao3DS($dados, \Route::currentRouteName());
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+        }
 
         return response()->json($dados);
     }
 
     public function authenticationsResults(Request $request)
     {
-        $dados = $request;
-        // try{
-        //     $dados = $this->service->getService('Pagamento')->etapa2_3DS($request);
-        // } catch (\Exception $e) {
-        //     \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-        // }
+        if($this->checkoutIframe)
+            throw new \Exception('Rota não pode ser acessada devido ao uso do Checkout Iframe', 401);
+
+        try{
+            $dados = $this->service->getService('Pagamento')->autenticacao3DS($request, \Route::currentRouteName());
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+        }
 
         return response()->json($dados);
     }

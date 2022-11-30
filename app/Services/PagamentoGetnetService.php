@@ -79,7 +79,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $base['status'] = mb_strtoupper($status[0]);
         $base['payment_tag'] = $transacao['payments'][0]['payment_tag'];
         $base['payment_id'] = $transacao['payments'][0]['payment_id'];
-        $base['bandeira'] = mb_strtolower($transacao['payments'][0]['credit']['brand']);
+        $base['bandeira'] = mb_strtolower($transacao['payments'][0]['brand']);
         // cartão 2
         $base_2['tipo_parcelas'] = mb_strtoupper($dados['tipo_parcelas_2']);
         $base_2['parcelas'] = $dados['parcelas_2'];
@@ -87,7 +87,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $base_2['status'] = mb_strtoupper($status[1]);
         $base_2['payment_tag'] = $transacao['payments'][1]['payment_tag'];
         $base_2['payment_id'] = $transacao['payments'][1]['payment_id'];
-        $base_2['bandeira'] = mb_strtolower($transacao['payments'][1]['credit']['brand']);
+        $base_2['bandeira'] = mb_strtolower($transacao['payments'][1]['brand']);
 
         return [$base, $base_2];
     }
@@ -197,7 +197,11 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 $ids[$key] = $pags['payment_id'];
                 $tags[$key] = $pags['payment_tag'];
             }
-            return $this->api->confirmation($ids, $tags);
+            $brand1 = $transacao['payments'][0]['credit']['brand'];
+            $brand2 = $transacao['payments'][1]['credit']['brand'];
+            $transacao = $this->api->confirmation($ids, $tags);
+            $transacao['payments'][0]['brand'] = $brand1;
+            $transacao['payments'][1]['brand'] = $brand2;
         }
 
         return $transacao;
@@ -224,13 +228,19 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         return $this->api->getDados3DS($bin);
     }
 
-    public function autenticacao3DS($request)
+    public function autenticacao3DS($dados, $nome_rota)
     {
-        $this->api->generateToken3DS($request);
-        $this->api->authentication3DS($request);
-        $this->api->authenticationResults3DS($request);
-        
-        return;
+        switch($nome_rota)
+        {
+            case 'pagamento.generate.token':
+                return $this->api->generateToken3DS($dados);
+            case 'pagamento.authentications':
+                return $this->api->authentication3DS($dados);
+            case 'pagamento.authentications.results':
+                return $this->api->authenticationResults3DS($dados);
+            default:
+                return [];
+        }
     }
 
     public function checkout($ip, $dados, $user)

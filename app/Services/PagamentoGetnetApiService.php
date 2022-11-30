@@ -5,6 +5,7 @@ namespace App\Services;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Str;
 
 class PagamentoGetnetApiService {
 
@@ -32,6 +33,93 @@ class PagamentoGetnetApiService {
         }
             
         throw new \Exception($erroGetnet, $codigo);
+    }
+
+    private function tipoPagamento3ds($dados, $resultado)
+    {
+        return [
+            "order_id" => $dados["order_id"],
+            "amount" => $dados["amount"],
+            "currency" => "BRL",
+            "transaction_type" => $dados["tipo_parcelas_1"],
+            "number_installments" => $dados["parcelas_1"],
+            "xid" => $dados["xid"],
+            "ucaf" => $dados["ucaf"],
+            "eci" => $dados["eci"],
+            "tdsdsxid" => $dados["tdsdsxid"],
+            "tdsver" => $dados["tdsver"],
+            "payment_method" => $dados["tipo_pag"] == 'credit_3ds' ? 'CREDIT' : 'DEBIT',
+            "soft_descriptor" => $dados["soft_descriptor"],
+            "dynamic_mcc" => $dados['dynamic_mcc'],
+            "customer_id" => $dados['customer_id'],
+            "credentials_on_file_type" => '',
+            'card' => $resultado['card'],
+        ];
+    }
+
+    private function tipoPagamentoCombinado($dados, $resultado)
+    {
+        $array = array();
+        for($i = 1; $i <= $this->total_cartoes; $i++)
+            array_push($array, [
+                "type" => "CREDIT",
+                "amount" => apenasNumeros($dados['amount_' . $i]),
+                "currency" => "BRL",
+                "save_card_data" => false,
+                "transaction_type" => $dados['tipo_parcelas_' . $i],
+                "number_installments" => $dados['parcelas_' . $i],
+                "payment_tag" => "pay-" . $i,
+                "soft_descriptor" => $dados["soft_descriptor"],
+                'card' => $resultado['card_' . $i],
+            ]);
+        return $array;
+    }
+
+    private function tipoPagamentoCredito($dados, $resultado)
+    {
+        return [
+            "delayed" => false,
+            "pre_authorization" => false,
+            "save_card_data" => false,
+            "transaction_type" => $dados['tipo_parcelas_1'],
+            "number_installments" => $dados['parcelas_1'],
+            "soft_descriptor" => $dados["soft_descriptor"],
+            "dynamic_mcc" => $dados['dynamic_mcc'],
+            'card' => $resultado['card'],
+        ];
+    }
+
+    private function tipoPagamentoArrayCard($tipo, $dados)
+    {
+        $resultado = array();
+
+        switch($tipo){
+            case 'combined':
+                for($i = 1; $i <= $this->total_cartoes; $i++)
+                {
+                    $expiration = Carbon::createFromFormat($this->formatDt, $dados['expiration_'.$i]);
+                    $resultado['card_' . $i] = [
+                        "number_token" => $dados['number_token_' . $i],
+                        "cardholder_name" => $dados['cardholder_name_' . $i],
+                        "security_code" => $dados['security_code_' . $i],
+                        "brand" => $dados['brand_' . $i],
+                        "expiration_month" => $expiration->format('m'),
+                        "expiration_year" => $expiration->format('y')
+                    ];
+                }
+                return $resultado;
+            default:
+                $expiration = Carbon::createFromFormat($this->formatDt, $dados['expiration_1']);
+                $resultado['card'] = [
+                    "number_token" => $dados['number_token'],
+                    "cardholder_name" => $dados['cardholder_name_1'],
+                    "security_code" => $dados['security_code_1'],
+                    "brand" => $dados['brand'],
+                    "expiration_month" => $expiration->format('m'),
+                    "expiration_year" => $expiration->format('y')
+                ];
+                return $resultado;
+        }
     }
 
     private function dadosBasicosPag($ip, $dados)
@@ -102,79 +190,15 @@ class PagamentoGetnetApiService {
 
     private function tipoPagamento($tipo, $dados)
     {
-        if($tipo != 'combined')
-        {
-            $expiration = Carbon::createFromFormat($this->formatDt, $dados['expiration_1']);
-            $resultado['card'] = [
-                "number_token" => $dados['number_token'],
-                "cardholder_name" => $dados['cardholder_name_1'],
-                "security_code" => $dados['security_code_1'],
-                "brand" => $dados['brand'],
-                "expiration_month" => $expiration->format('m'),
-                "expiration_year" => $expiration->format('y')
-            ];
-        }else{
-            for($i = 1; $i <= $this->total_cartoes; $i++)
-            {
-                $expiration = Carbon::createFromFormat($this->formatDt, $dados['expiration_'.$i]);
-                $resultado['card_' . $i] = [
-                    "number_token" => $dados['number_token_' . $i],
-                    "cardholder_name" => $dados['cardholder_name_' . $i],
-                    "security_code" => $dados['security_code_' . $i],
-                    "brand" => $dados['brand_' . $i],
-                    "expiration_month" => $expiration->format('m'),
-                    "expiration_year" => $expiration->format('y')
-                ];
-            }
-        }
-        
+        $resultado = $this->tipoPagamentoArrayCard($tipo, $dados);
         switch($tipo){
             case 'credit_3ds':
             case 'debit_3ds':
-                return [
-                    "order_id" => $dados["order_id"],
-                    "amount" => $dados["amount"],
-                    "currency" => "BRL",
-                    "transaction_type" => $dados["tipo_parcelas_1"],
-                    "number_installments" => $dados["parcelas_1"],
-                    "xid" => $dados["xid"],
-                    "ucaf" => $dados["ucaf"],
-                    "eci" => $dados["eci"],
-                    "tdsdsxid" => $dados["tdsdsxid"],
-                    "tdsver" => $dados["tdsver"],
-                    "payment_method" => $dados["tipo_pag"] == 'credit_3ds' ? 'CREDIT' : 'DEBIT',
-                    "soft_descriptor" => $dados["soft_descriptor"],
-                    "dynamic_mcc" => $dados['dynamic_mcc'],
-                    "customer_id" => $dados['customer_id'],
-                    "credentials_on_file_type" => '',
-                    'card' => $resultado['card'],
-                ];
+                return $this->tipoPagamento3ds($dados, $resultado);
             case 'credit':
-                return [
-                    "delayed" => false,
-                    "pre_authorization" => false,
-                    "save_card_data" => false,
-                    "transaction_type" => $dados['tipo_parcelas_1'],
-                    "number_installments" => $dados['parcelas_1'],
-                    "soft_descriptor" => $dados["soft_descriptor"],
-                    "dynamic_mcc" => $dados['dynamic_mcc'],
-                    'card' => $resultado['card'],
-                ];
+                return $this->tipoPagamentoCredito($dados, $resultado);
             case 'combined':
-                $array = array();
-                for($i = 1; $i <= $this->total_cartoes; $i++)
-                    array_push($array, [
-                        "type" => "CREDIT",
-                        "amount" => apenasNumeros($dados['amount_' . $i]),
-                        "currency" => "BRL",
-                        "save_card_data" => false,
-                        "transaction_type" => $dados['tipo_parcelas_' . $i],
-                        "number_installments" => $dados['parcelas_' . $i],
-                        "payment_tag" => "pay-" . $i,
-                        "soft_descriptor" => $dados["soft_descriptor"],
-                        'card' => $resultado['card_' . $i],
-                    ]);
-                return $array;
+                return $this->tipoPagamentoCombinado($dados, $resultado);
         }
     }
 
@@ -461,14 +485,65 @@ class PagamentoGetnetApiService {
         return $dados;
     }
 
-    public function generateToken3DS($request)
+    public function generateToken3DS($dados)
     {
-        
+        try{
+            $this->client = new Client();
+            $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/tokens', [
+                'headers' => [
+                    'Content-type' => "application/json; charset=utf-8",
+                    'Authorization' => $dados['Authorization'],
+                    'seller_id' => env('GETNET_SELLER_ID'),
+                ],
+                'json' => [
+                    'client_code' => '1111',
+                    'currency' => 'BRL',
+                    'items' => [],
+                    'js_version' => $dados['version'],
+                    'order_number' => '1234-2019',
+                    'override_payment_method' => $dados['consumerAuthenticationInformation']['overridePaymentMethod'],
+                    'total_amount' => (int) $dados['totalAmount'],
+                    'additional_data' => $dados['additionalData'],
+                    'additional_object' => $dados['additionalObject'],
+                ],
+            ]);
+        }catch(RequestException $e){
+            $this->formatError($e);
+        }
+
+        $resultado = json_decode($response->getBody()->getContents(), true);
+
+        $final = null;
+        foreach($resultado as $key => $value)
+            $final[Str::camel($key)] = $value;
+
+        return $final;
     }
 
-    public function authentication3DS($request)
+    public function authentication3DS($dados)
     {
-        
+        \Log::error($dados);
+        try{
+            $this->client = new Client();
+            $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/authentications', [
+                'headers' => [
+                    'Content-type' => "application/json; charset=utf-8",
+                    'Authorization' => $dados['Authorization'],
+                    'seller_id' => env('GETNET_SELLER_ID'),
+                ],
+                'json' => [
+                ],
+            ]);
+        }catch(RequestException $e){
+            $this->formatError($e);
+        }
+
+        $resultado = json_decode($response->getBody()->getContents(), true);
+        $final = array();
+        // foreach($resultado as $key => $value)
+        //     $final[Str::camel($key)] = $value;
+
+        return $final;
     }
 
     public function authenticationResults3DS($request)
@@ -479,10 +554,9 @@ class PagamentoGetnetApiService {
     public function checkoutIframe($request, $user)
     {
         $this->getToken();
-
+        
         $array_disabled = [
-            'credit' => "credito-nao-autenticado", 
-            'credit_3ds' => "credito-autenticado", 
+            'credit' => strpos($request['tipo_pag'], 'credit_3ds') === false ? "credito-nao-autenticado" : "credito-autenticado", 
             'debit_3ds' => "debito-autenticado", 
             "debito-nao-autenticado", 
             "boleto", 
@@ -490,7 +564,17 @@ class PagamentoGetnetApiService {
             "pix"
         ];
 
-        unset($array_disabled[$request['tipo_pag']]);
+        $tipo_pag = strpos($request['tipo_pag'], 'credit_3ds') === false ? $request['tipo_pag'] : 'credit';
+        if(strpos($tipo_pag, 'debit') !== false)
+            $array_disabled['credit'] = "credito";
+
+        $disabled = '';
+        unset($array_disabled[$tipo_pag]);
+
+        $i = 0;
+        foreach($array_disabled as $key => $valor)
+            $disabled .= ++$i == count($array_disabled) ? '"' . $valor . '"' : '"' . $valor . '",';
+
         $pagamento = $request;
         $pagamento['sellerid'] = env('GETNET_SELLER_ID');
         $pagamento['token'] = $this->auth['token_type'] . ' ' . $this->auth['access_token'];
@@ -498,7 +582,7 @@ class PagamentoGetnetApiService {
         $pagamento['customerid'] = $user->getCustomerId();
         $pagamento['orderid'] = $request['boleto'];
         $pagamento['installments'] = $request['parcelas_1'];
-        $pagamento['disabled'] = implode(',', array_values($array_disabled));
+        $pagamento['disabled'] = $disabled;
         $pagamento['callback'] = route($user::NAME_ROUTE . '.dashboard');
 
         return $pagamento;

@@ -1028,6 +1028,29 @@ for(elemento of inputs){
 	hideModalPagamentoSubmit(elemento);
 }
 
+function enrollment() { 
+	// Invocar no botão da compra e guardar o retorno. Obs: Só invocar com sucesso do preenchimento dos campos obrigatórios no front-end. 
+	//Inserir regra de negócio se tiver. 
+	GN3DS.init(function(response) { 
+		console.log(response);
+		//Inicia o processo 3ds2.1, realiza um request para o endpoint GenerateToken e cria uma sessão no front-end (fingerprint) do navaegador. 
+		//Inserir regra de negócio se tiver. 
+		if(response != null && response.status >= 200 && response.status <= 299) { 
+			console.log('autentications....');
+			GN3DS.authentication(function(response2) { 
+				//Inicia a authenticação do 3ds2.1, realiza um request ao endpoint authentications verifica se existe ou desafio, havendo um desafio (não silencioso) a executa um request ao (authentication-results) 
+				//Inserir regra de negócio se tiver. 
+				if(response2 != null && response2.status >= 200 && response2.status <= 299) { 
+					//Tratar o sucesso. 
+				} else { //Tratar o erro. 
+				} 
+			}); 
+		} else { 
+			alert("Erro ao inciar a autenticação 3ds2.1"); 
+		} 
+	}); 
+}
+
 // condição se for 3DS
 $('#formPagamento').submit(function(e) {
 	if($('#tipo_pag').val().indexOf('_3ds') != -1){
@@ -1050,7 +1073,7 @@ function tresDS(boleto, card)
 			$('.gn3ds_merchantBackEndTokenBasic').val(xhr.getResponseHeader('authorization_principal'));
 			$('.gn3ds_merchantBackEndTokenOauth').val(xhr.getResponseHeader('authorization'));
 			$('.gn3ds_cardType').val(response['card_type']);
-			window.parent.enrollment();
+			enrollment();
 		},
 		error: function(xhr, ajaxOptions, thrownError) {
 			var msg = xhr.responseJSON.message;

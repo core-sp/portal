@@ -414,15 +414,17 @@
 
 @if(isset($pagamento) && $is_3ds && !$checkoutIframe)
 
+<script src="{{ asset('getnet_3ds220.js') }}" type="text/javascript"></script>
+
 <!-- config -->
-<input type="hidden" id="gn3ds_merchantBackEndUrl" name="gn3ds_merchantBackEndUrl" class="gn3ds_merchantBackEndUrl" value="{{ route('site.home') }}">
+<input type="hidden" id="gn3ds_merchantBackEndUrl" name="gn3ds_merchantBackEndUrl" class="gn3ds_merchantBackEndUrl" value="{{ route('site.home') }}/">
 <input type="hidden" id="gn3ds_merchantBackEndTokenBasic" name="gn3ds_merchantBackEndTokenBasic" class="gn3ds_merchantBackEndTokenBasic" value="">
 <input type="hidden" id="gn3ds_merchantBackEndTokenOauth" name="gn3ds_merchantBackEndTokenOauth" class="gn3ds_merchantBackEndTokenOauth" value="">
 <input type="hidden" id="gn3ds_environment" name="gn3ds_environment" class="gn3ds_environment" value="{{ config('app.url') != 'https://core-sp.org.br' ? 'SDB' : 'PRD' }}">
 <input type="hidden" id="gn3ds_debug" name="gn3ds_debug" class="gn3ds_debug" value="{{ config('app.url') != 'https://core-sp.org.br' ? 'true' : 'false' }}">
 <input type="hidden" id="gn3ds_debugPrefix" name="gn3ds_debugPrefix" class="gn3ds_debugPrefix" value="{{ config('app.url') != 'https://core-sp.org.br' ? '[GN3DS]' : null }}">
 <input type="hidden" id="gn3ds_frameworkModal" name="gn3ds_frameworkModal" class="gn3ds_frameworkModal" value="bootstrap3">
-<input type="hidden" id="gn3ds_newApiVersion" name="gn3ds_newApiVersion" class="gn3ds_newApiVersion" value="false">
+<input type="hidden" id="gn3ds_newApiVersion" name="gn3ds_newApiVersion" class="gn3ds_newApiVersion" value="true">
 
 <!-- checkout -->
 <input type="hidden" id="gn3ds_currency" name="gn3ds_currency" class="gn3ds_currency" value="BRL">
@@ -439,13 +441,13 @@
 <input type="hidden" id="gn3ds_cardType" name="gn3ds_cardType" class="gn3ds_cardType" value="">
 <input type="hidden" id="gn3ds_cardExpirationMonth" name="gn3ds_cardExpirationMonth" class="gn3ds_cardExpirationMonth" value="01">
 <input type="hidden" id="gn3ds_cardExpirationYear" name="gn3ds_cardExpirationYear" class="gn3ds_cardExpirationYear" value="2025">
-<input type="hidden" id="gn3ds_cardNumber" name="gn3ds_cardNumber" class="gn3ds_cardNumber" value="5200000000001096">
+<input type="hidden" id="gn3ds_cardNumber" name="gn3ds_cardNumber" class="gn3ds_cardNumber" value="5200000000001005">
 <input type="hidden" id="gn3ds_cardHolderName" name="gn3ds_cardHolderName" class="gn3ds_cardHolderName" value="TESTE CARTAO">
-<input type="hidden" id="gn3ds_overridePaymentMethod" name="gn3ds_overridePaymentMethod" class="gn3ds_overridePaymentMethod" value="02">
-<input type="hidden" id="gn3ds_httpBrowserColorDepth" name="gn3ds_httpBrowserColorDepth" class="gn3ds_httpBrowserColorDepth" value="">
-<input type="hidden" id="gn3ds_httpBrowserJavaEnabled" name="gn3ds_httpBrowserJavaEnabled" class="gn3ds_httpBrowserJavaEnabled" value="">
-<input type="hidden" id="gn3ds_httpBrowserJavaScriptEnabled" name="gn3ds_httpBrowserJavaScriptEnabled" class="gn3ds_httpBrowserJavaScriptEnabled" value="">
-<input type="hidden" id="gn3ds_httpBrowserLanguage" name="gn3ds_httpBrowserLanguage" class="gn3ds_httpBrowserLanguage" value="">
+<input type="hidden" id="gn3ds_overridePaymentMethod" name="gn3ds_overridePaymentMethod" class="gn3ds_overridePaymentMethod" value="03">
+<input type="hidden" id="gn3ds_httpBrowserColorDepth" name="gn3ds_httpBrowserColorDepth" class="gn3ds_httpBrowserColorDepth" value="32">
+<input type="hidden" id="gn3ds_httpBrowserJavaEnabled" name="gn3ds_httpBrowserJavaEnabled" class="gn3ds_httpBrowserJavaEnabled" value="N">
+<input type="hidden" id="gn3ds_httpBrowserJavaScriptEnabled" name="gn3ds_httpBrowserJavaScriptEnabled" class="gn3ds_httpBrowserJavaScriptEnabled" value="Y">
+<input type="hidden" id="gn3ds_httpBrowserLanguage" name="gn3ds_httpBrowserLanguage" class="gn3ds_httpBrowserLanguage" value="pt-BR">
 <input type="hidden" id="gn3ds_httpBrowserScreenHeight" name="gn3ds_httpBrowserScreenHeight" class="gn3ds_httpBrowserScreenHeight" value="">
 <input type="hidden" id="gn3ds_httpBrowserScreenWidth" name="gn3ds_httpBrowserScreenWidth" class="gn3ds_httpBrowserScreenWidth" value="">
 <input type="hidden" id="gn3ds_httpBrowserTimeDifference" name="gn3ds_httpBrowserTimeDifference" class="gn3ds_httpBrowserTimeDifference" value="">
@@ -463,23 +465,21 @@
 <input type="hidden" id="gn3ds_shipToPostalCode" name="gn3ds_shipToPostalCode" class="gn3ds_shipToPostalCode" value="">
 <input type="hidden" id="gn3ds_shipToDestinationCode" name="gn3ds_shipToDestinationCode" class="gn3ds_shipToDestinationCode" value="">
 <input type="hidden" id="gn3ds_shipToMethod" name="gn3ds_shipToMethod" class="gn3ds_shipToMethod" value="">
-<input type="hidden" id="gn3ds_item_#_totalAmount" name="gn3ds_item_#_totalAmount" class="gn3ds_item_#_totalAmount" value="">
-<input type="hidden" id="gn3ds_item_#_unitPrice" name="gn3ds_item_#_unitPrice" class="gn3ds_item_#_unitPrice" value="">
-<input type="hidden" id="gn3ds_item_#_quantity" name="gn3ds_item_#_quantity" class="gn3ds_item_#_quantity" value="">
-<input type="hidden" id="gn3ds_item_#_sku" name="gn3ds_item_#_sku" class="gn3ds_item_#_sku" value="">
-<input type="hidden" id="gn3ds_item_#_description" name="gn3ds_item_#_description" class="gn3ds_item_#_description" value="">
-<input type="hidden" id="gn3ds_item_#_name" name="gn3ds_item_#_name" class="gn3ds_item_#_name" value="">
+<input type="hidden" id="gn3ds_item_#_totalAmount" name="gn3ds_item_#_totalAmount" class="gn3ds_item_#_totalAmount" value="1000">
+<input type="hidden" id="gn3ds_item_#_unitPrice" name="gn3ds_item_#_unitPrice" class="gn3ds_item_#_unitPrice" value="1000">
+<input type="hidden" id="gn3ds_item_#_quantity" name="gn3ds_item_#_quantity" class="gn3ds_item_#_quantity" value="1">
+<input type="hidden" id="gn3ds_item_#_sku" name="gn3ds_item_#_sku" class="gn3ds_item_#_sku" value="1236AB">
+<input type="hidden" id="gn3ds_item_#_description" name="gn3ds_item_#_description" class="gn3ds_item_#_description" value="testando">
+<input type="hidden" id="gn3ds_item_#_name" name="gn3ds_item_#_name" class="gn3ds_item_#_name" value="boleto atrasado">
 <input type="hidden" id="gn3ds_installmentTotalCount" name="gn3ds_installmentTotalCount" class="gn3ds_installmentTotalCount" value="">
 <input type="hidden" id="gn3ds_additionalData" name="gn3ds_additionalData" class="gn3ds_additionalData" value="">
 <input type="hidden" id="gn3ds_additionalObject" name="gn3ds_additionalObject" class="gn3ds_additionalObject" value="">
-
-<script src="{{ asset('/js/getnet_3ds.js?'.time()) }}" type="text/javascript"></script>
 
 @elseif(isset($pagamento) && $checkoutIframe)
 <script async src="https://checkout-homologacao.getnet.com.br/loader.js"
     data-getnet-sellerid="{{ $pagamento['sellerid'] }}"
     data-getnet-token="{{ $pagamento['token'] }}"
-    data-getnet-payment-methods-disabled="[{{ $pagamento['disabled'] }}]"
+    data-getnet-payment-methods-disabled='[{{$pagamento["disabled"]}}]'
     data-getnet-amount="{{ $pagamento['amount'] }}"
     data-getnet-customerid="{{ $pagamento['customerid'] }}"
     data-getnet-orderid="{{ $pagamento['orderid'] }}"

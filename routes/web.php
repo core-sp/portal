@@ -232,7 +232,7 @@ Route::prefix('admin')->group(function() {
 
   // Pagamentos
   Route::prefix('pagamentos')->group(function(){
-    Route::get('/', 'PagamentoController@index')->name('pagamento.admin.view');
+    Route::get('/', 'PagamentoController@index')->name('pagamento.admin.index');
     Route::get('/busca', 'PagamentoController@busca')->name('pagamento.admin.busca');
   });
 
@@ -340,10 +340,11 @@ Route::prefix('/')->group(function() {
     Route::post('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartao')->name('pagamento.cancelar');
     Route::get('/visualizar-pagamento/{boleto}/{pagamento}', 'PagamentoController@pagamentoView')->name('pagamento.visualizar');
     Route::get('/cardsBrand/{boleto}/{bin}', 'PagamentoController@cardsBrand')->name('pagamento.cards.brand');
-    Route::post('/generateToken', 'PagamentoController@generateToken')->name('pagamento.generate.token');
-    Route::post('/authentications', 'PagamentoController@authentications')->name('pagamento.authentications');
-    Route::post('/authentication-results', 'PagamentoController@authenticationResults')->name('pagamento.authentications.results');
   });
+  
+  Route::post('/generateToken', 'PagamentoController@generateToken')->name('pagamento.generate.token');
+  Route::post('/authentications', 'PagamentoController@authentications')->name('pagamento.authentications');
+  Route::post('/authentication-results', 'PagamentoController@authenticationResults')->name('pagamento.authentications.results');
   Route::get('/transacao/credito', 'PagamentoController@getTransacaoCredito')->name('pagamento.transacao.credito');
   Route::get('/transacao/debito', 'PagamentoController@getTransacaoDebito')->name('pagamento.transacao.debito');
 
