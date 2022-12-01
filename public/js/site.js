@@ -1028,6 +1028,13 @@ for(elemento of inputs){
 	hideModalPagamentoSubmit(elemento);
 }
 
+function showModelPagamento3ds(titulo, msg)
+{
+	$('#modalPagamento .modal-body')
+	.html('<h5 class="text-break"><i class="fas fa-times text-danger"></i> ' + titulo + ' ' + msg.substring(0, 100) + ' ... </h5><br><a class="btn btn-secondary" href="' + window.location.href + '">Fechar</a>');
+	$('#modalPagamento').modal({backdrop: 'static', keyboard: false, show: true});
+}
+
 function enrollment() { 
 	// Invocar no botão da compra e guardar o retorno. Obs: Só invocar com sucesso do preenchimento dos campos obrigatórios no front-end. 
 	//Inserir regra de negócio se tiver. 
@@ -1036,17 +1043,17 @@ function enrollment() {
 		//Inicia o processo 3ds2.1, realiza um request para o endpoint GenerateToken e cria uma sessão no front-end (fingerprint) do navaegador. 
 		//Inserir regra de negócio se tiver. 
 		if(response != null && response.status >= 200 && response.status <= 299) { 
-			console.log('autentications....');
 			GN3DS.authentication(function(response2) { 
 				//Inicia a authenticação do 3ds2.1, realiza um request ao endpoint authentications verifica se existe ou desafio, havendo um desafio (não silencioso) a executa um request ao (authentication-results) 
 				//Inserir regra de negócio se tiver. 
 				if(response2 != null && response2.status >= 200 && response2.status <= 299) { 
 					//Tratar o sucesso. 
-				} else { //Tratar o erro. 
+				} else { //Tratar o erro.
+					// showModelPagamento3ds('Erro durante a autenticação!', response2.error[0]);
 				} 
 			}); 
 		} else { 
-			alert("Erro ao inciar a autenticação 3ds2.1"); 
+			showModelPagamento3ds('Erro durante a inicialização!', response.error[0]);
 		} 
 	}); 
 }

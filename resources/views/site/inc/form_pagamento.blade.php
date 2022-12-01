@@ -453,8 +453,8 @@
 <input type="hidden" id="gn3ds_httpBrowserTimeDifference" name="gn3ds_httpBrowserTimeDifference" class="gn3ds_httpBrowserTimeDifference" value="">
 <input type="hidden" id="gn3ds_userAgentBrowserValue" name="gn3ds_userAgentBrowserValue" class="gn3ds_userAgentBrowserValue" value="">
 
-<input type="hidden" id="gn3ds_personalId" name="gn3ds_personalId" class="gn3ds_personalId" value="">
-<input type="hidden" id="gn3ds_personalType" name="gn3ds_personalType" class="gn3ds_personalType" value="">
+<input type="hidden" id="gn3ds_personalId" name="gn3ds_personalId" class="gn3ds_personalId" value="00244376891">
+<input type="hidden" id="gn3ds_personalType" name="gn3ds_personalType" class="gn3ds_personalType" value="CPF">
 <input type="hidden" id="gn3ds_shipToAddress1" name="gn3ds_shipToAddress1" class="gn3ds_shipToAddress1" value="">
 <input type="hidden" id="gn3ds_shipToAddress2" name="gn3ds_shipToAddress2" class="gn3ds_shipToAddress2" value="">
 <input type="hidden" id="gn3ds_shipToAdministrativeArea" name="gn3ds_shipToAdministrativeArea" class="gn3ds_shipToAdministrativeArea" value="">
@@ -471,7 +471,7 @@
 <input type="hidden" id="gn3ds_item_#_sku" name="gn3ds_item_#_sku" class="gn3ds_item_#_sku" value="1236AB">
 <input type="hidden" id="gn3ds_item_#_description" name="gn3ds_item_#_description" class="gn3ds_item_#_description" value="testando">
 <input type="hidden" id="gn3ds_item_#_name" name="gn3ds_item_#_name" class="gn3ds_item_#_name" value="boleto atrasado">
-<input type="hidden" id="gn3ds_installmentTotalCount" name="gn3ds_installmentTotalCount" class="gn3ds_installmentTotalCount" value="">
+<input type="hidden" id="gn3ds_installmentTotalCount" name="gn3ds_installmentTotalCount" class="gn3ds_installmentTotalCount" value="1">
 <input type="hidden" id="gn3ds_additionalData" name="gn3ds_additionalData" class="gn3ds_additionalData" value="">
 <input type="hidden" id="gn3ds_additionalObject" name="gn3ds_additionalObject" class="gn3ds_additionalObject" value="">
 

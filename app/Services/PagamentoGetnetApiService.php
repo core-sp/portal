@@ -35,6 +35,29 @@ class PagamentoGetnetApiService {
         throw new \Exception($erroGetnet, $codigo);
     }
 
+    private function finalAutentication3ds($response)
+    {
+        $resultado = json_decode($response->getBody()->getContents(), true);
+        $final = [
+            'status' => $response->getStatusCode(),
+            'message' => 'SUCCESSFUL',
+            'error' => []
+        ];
+
+        $temp = array();
+        foreach($resultado as $key => $value)
+        {
+            if(is_array($key))
+                foreach($key as $key2 => $val2)
+                    $temp[Str::camel($key)][Str::camel($key2)] = $value;
+            else
+                $temp[Str::camel($key)] = $value;
+        }
+            
+        $final['data'] = [$temp];
+        return $final;
+    }
+
     private function tipoPagamento3ds($dados, $resultado)
     {
         return [
@@ -223,13 +246,13 @@ class PagamentoGetnetApiService {
         $this->auth = json_decode($response->getBody()->getContents(), true);
     }
 
-    private function tokenizacao($card_number, $customer_id)
+    private function tokenizacao($card_number, $customer_id, $auth = null)
     {
         try{
             $response = $this->client->request('POST', $this->urlBase . '/v1/tokens/card', [
                 'headers' => [
                     'Content-type' => "application/json; charset=utf-8",
-                    'Authorization' => $this->auth['token_type'] . ' ' . $this->auth['access_token'],
+                    'Authorization' => isset($auth) ? $auth : $this->auth['token_type'] . ' ' . $this->auth['access_token'],
                     'seller_id' => env('GETNET_SELLER_ID')
                 ],
                 'json' => [
@@ -511,20 +534,23 @@ class PagamentoGetnetApiService {
             $this->formatError($e);
         }
 
-        $resultado = json_decode($response->getBody()->getContents(), true);
-
-        $final = null;
-        foreach($resultado as $key => $value)
-            $final[Str::camel($key)] = $value;
-
-        return $final;
+        return $this->finalAutentication3ds($response);
     }
 
     public function authentication3DS($dados)
     {
-        \Log::error($dados);
+        $billTo = array();
+        if(isset($dados['orderInformation']['billTo']))
+            foreach($dados['orderInformation']['billTo'] as $key => $val)
+                $billTo[Str::snake($key)] = $val;
+        $shipTo = array();
+        if(isset($dados['orderInformation']['shipTo']))
+            foreach($dados['orderInformation']['shipTo'] as $key => $val)
+                $shipTo[Str::snake($key)] = $val;
+
         try{
             $this->client = new Client();
+            $number_token = $this->tokenizacao($dados['paymentInformation']['card']['number'], $dados['personalIdentification']['id'], $dados['Authorization']);
             $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/authentications', [
                 'headers' => [
                     'Content-type' => "application/json; charset=utf-8",
@@ -532,18 +558,71 @@ class PagamentoGetnetApiService {
                     'seller_id' => env('GETNET_SELLER_ID'),
                 ],
                 'json' => [
+                    'customer_card_alias' => '',
+                    'override_payment_method' => $dados['consumerAuthenticationInformation']['overridePaymentMethod'],
+                    'alternate_authentication_method' => '',
+                    'authentication' => [
+                        'token' => $dados['token'],
+                        'npa_code' => '',
+                        'challenge_code' => '01',
+                        'installment_total_count' => (int) $dados['consumerAuthenticationInformation']['installmentTotalCount'],
+                        'message_category' => '',
+                        'transaction_mode' => '',
+                        'device_channel' => '',
+                        'acs_window_size' => '02',
+                    ],
+                    'device' => [
+                        'http_accept_browser_value' => '',
+                        'http_accept_content' => '',
+                        'user_agent_browser_value' => $dados['deviceInformation']['userAgentBrowserValue'],
+                        'http_browser_color_depth' => $dados['deviceInformation']['httpBrowserColorDepth'],
+                        'http_browser_java_enabled' => $dados['deviceInformation']['httpBrowserJavaEnabled'],
+                        'http_browser_java_script_enabled' => $dados['deviceInformation']['httpBrowserJavaScriptEnabled'],
+                        'http_browser_language' => $dados['deviceInformation']['httpBrowserLanguage'],
+                        'http_browser_screen_height' => $dados['deviceInformation']['httpBrowserScreenHeight'],
+                        'http_browser_screen_width' => $dados['deviceInformation']['httpBrowserScreenWidth'],
+                        'http_browser_time_difference' => $dados['deviceInformation']['httpBrowserTimeDifference'],
+                        'ip_address' => $dados['ip_address'],
+                    ],
+                    'costumer_risk_information' => [
+                        'transaction_count_year' => '',
+                        'transaction_count_day' => '',
+                        'add_card_attempts' => '',
+                        'customer_id' => $dados['personalIdentification']['id'],
+                        'customer_type_id' => $dados['personalIdentification']['type'],
+                        'payment_account_history' => '',
+                        'payment_account_date' => '',
+                        'prior_suspicious_activity' => '',
+                    ],
+                    'recurring' => [
+                        'end_date' => '',
+                        'frequency' => '',
+                        'original_purchase_date' => '',
+                    ],
+                    'card' => [
+                        'number' => $number_token,
+                        'expiration_month' => $dados['paymentInformation']['card']['expirationMonth'],
+                        'expiration_year' => $dados['paymentInformation']['card']['expirationYear'],
+                        'default_card' => true,
+                        'type_card' => $dados['paymentInformation']['card']['type'],
+                    ],
+                    'order' => [
+                        'product_code' => '01',
+                        'currency' => $dados['orderInformation']['amountDetails']['currency'],
+                        'total_amount' => $dados['orderInformation']['amountDetails']['totalAmount'],
+                        'bill_to' => $billTo,
+                        'ship_to' => $shipTo,
+                        'items' => [],
+                    ],
+                    'additional_data' => $dados['additionalData'],
+                    'additional_object' => $dados['additionalObject'],
                 ],
             ]);
         }catch(RequestException $e){
             $this->formatError($e);
         }
 
-        $resultado = json_decode($response->getBody()->getContents(), true);
-        $final = array();
-        // foreach($resultado as $key => $value)
-        //     $final[Str::camel($key)] = $value;
-
-        return $final;
+        return $this->finalAutentication3ds($response);
     }
 
     public function authenticationResults3DS($request)
@@ -558,17 +637,13 @@ class PagamentoGetnetApiService {
         $array_disabled = [
             'credit' => strpos($request['tipo_pag'], 'credit_3ds') === false ? "credito-nao-autenticado" : "credito-autenticado", 
             'debit_3ds' => "debito-autenticado", 
-            "debito-nao-autenticado", 
-            "boleto", 
-            "qr-code",
-            "pix"
         ];
 
         $tipo_pag = strpos($request['tipo_pag'], 'credit_3ds') === false ? $request['tipo_pag'] : 'credit';
         if(strpos($tipo_pag, 'debit') !== false)
             $array_disabled['credit'] = "credito";
 
-        $disabled = '';
+        $disabled = '"debito-nao-autenticado","boleto","qr-code","pix",';
         unset($array_disabled[$tipo_pag]);
 
         $i = 0;
