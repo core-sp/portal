@@ -405,7 +405,7 @@
 
       <!-- Modal body -->
       <div class="modal-body text-center">
-        <div class="spinner-grow text-success"></div> <strong>Aguarde... {{ isset($cancelamento) ? 'realizando o cancelamento' : 'finalizando o pagamento' }}...</strong>
+        <div class="spinner-grow text-success"></div> <strong>Aguarde... {!! isset($cancelamento) ? 'realizando o cancelamento... ' : 'finalizando o pagamento... <i class="fas fa-lock"></i>' !!}</strong>
       </div>
 
     </div>
@@ -423,7 +423,7 @@
 <input type="hidden" id="gn3ds_environment" name="gn3ds_environment" class="gn3ds_environment" value="{{ config('app.url') != 'https://core-sp.org.br' ? 'SDB' : 'PRD' }}">
 <input type="hidden" id="gn3ds_debug" name="gn3ds_debug" class="gn3ds_debug" value="{{ config('app.url') != 'https://core-sp.org.br' ? 'true' : 'false' }}">
 <input type="hidden" id="gn3ds_debugPrefix" name="gn3ds_debugPrefix" class="gn3ds_debugPrefix" value="{{ config('app.url') != 'https://core-sp.org.br' ? '[GN3DS]' : null }}">
-<input type="hidden" id="gn3ds_frameworkModal" name="gn3ds_frameworkModal" class="gn3ds_frameworkModal" value="bootstrap3">
+<input type="hidden" id="gn3ds_frameworkModal" name="gn3ds_frameworkModal" class="gn3ds_frameworkModal" value="default">
 <input type="hidden" id="gn3ds_newApiVersion" name="gn3ds_newApiVersion" class="gn3ds_newApiVersion" value="true">
 
 <!-- checkout -->

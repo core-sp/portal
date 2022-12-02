@@ -336,19 +336,31 @@ class PagamentoController extends Controller
             ];
         }
 
-        \Log::error(response()->json($dados));
         return response()->json($dados);
     }
 
-    public function authenticationsResults(Request $request)
+    public function authenticationResults(Request $request)
     {
         if($this->checkoutIframe)
             throw new \Exception('Rota não pode ser acessada devido ao uso do Checkout Iframe', 401);
 
         try{
-            $dados = $this->service->getService('Pagamento')->autenticacao3DS($request, \Route::currentRouteName());
+            $token = '';
+            if($request->hasHeader('authorization'))
+                $token = trim(\Str::after($request->header('authorization'), 'Bearer '));
+            else
+                throw new \Exception('Faltou autenticação da api', 401);
+            $dados = $request->all();
+            $dados['Authorization'] = $token;
+            $dados = $this->service->getService('Pagamento')->autenticacao3DS($dados, \Route::currentRouteName());
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            $dados = [
+                'status' => $e->getCode(),
+                'message' => 'ERROR',
+                'data' => [],
+                'error' => [$e->getMessage()],
+            ];
         }
 
         return response()->json($dados);
