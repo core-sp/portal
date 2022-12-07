@@ -204,6 +204,7 @@
                             maxlength="26"
                             pattern="[A-z\s]{5,26}" 
                             title="Somente letras não acentuadas e entre 5 e 26 caracteres"
+                            value="TESTE CARTAO"
                             required
                         >
                         <small class="form-text text-muted">
@@ -220,6 +221,7 @@
                             name="document_number_1"
                             class="form-control form-control-sm cpfOuCnpj pagamento"
                             id="document_number_1"
+                            value="{{ apenasNumeros($user->cpf_cnpj) }}"
                             required
                         >
                     </div>
@@ -235,6 +237,7 @@
                             maxlength="4"
                             pattern="[0-9]{3,4}" 
                             title="Somente números e entre 3 e 4 dígitos"
+                            value="111"
                             required
                         >
                         <small class="form-text text-muted">
@@ -249,6 +252,7 @@
                             name="expiration_1"
                             class="form-control form-control-sm pagamento expiracao"
                             id="expiration_1"
+                            value="01/2025"
                             required
                         >
                     </div>
@@ -300,6 +304,7 @@
                             name="document_number_2"
                             class="form-control form-control-sm cpfOuCnpj pagamento"
                             id="document_number_2"
+                            value="{{ apenasNumeros($user->cpf_cnpj) }}"
                             required
                         >
                     </div>
@@ -340,7 +345,8 @@
             <div class="form-group mt-4">
                 @if(!$checkoutIframe)
                 <button 
-                    type="submit" 
+                    id="btnApiPag"
+                    type="{{ isset($is_3ds) && $is_3ds ? 'button' : 'submit' }}" 
                     class="btn btn-{{ isset($pagamento) ? 'success' : 'primary' }}"
                     @if(isset($pagamento))
                         data-toggle="modal" data-target="#modalPagamento" data-backdrop="static"
@@ -423,27 +429,27 @@
 <input type="hidden" id="gn3ds_environment" name="gn3ds_environment" class="gn3ds_environment" value="{{ config('app.url') != 'https://core-sp.org.br' ? 'SDB' : 'PRD' }}">
 <input type="hidden" id="gn3ds_debug" name="gn3ds_debug" class="gn3ds_debug" value="{{ config('app.url') != 'https://core-sp.org.br' ? 'true' : 'false' }}">
 <input type="hidden" id="gn3ds_debugPrefix" name="gn3ds_debugPrefix" class="gn3ds_debugPrefix" value="{{ config('app.url') != 'https://core-sp.org.br' ? '[GN3DS]' : null }}">
-<input type="hidden" id="gn3ds_frameworkModal" name="gn3ds_frameworkModal" class="gn3ds_frameworkModal" value="default">
+<input type="hidden" id="gn3ds_frameworkModal" name="gn3ds_frameworkModal" class="gn3ds_frameworkModal" value="bootstrap3">
 <input type="hidden" id="gn3ds_newApiVersion" name="gn3ds_newApiVersion" class="gn3ds_newApiVersion" value="true">
 
 <!-- checkout -->
 <input type="hidden" id="gn3ds_currency" name="gn3ds_currency" class="gn3ds_currency" value="BRL">
-<input type="hidden" id="gn3ds_totalAmount" name="gn3ds_totalAmount" class="gn3ds_totalAmount" value="1000">
+<input type="hidden" id="gn3ds_totalAmount" name="gn3ds_totalAmount" class="gn3ds_totalAmount" value="">
 <input type="hidden" id="gn3ds_billToAddress1" name="gn3ds_billToAddress1" class="gn3ds_billToAddress1" value="">
 <input type="hidden" id="gn3ds_billToAddress2" name="gn3ds_billToAddress2" class="gn3ds_billToAddress2" value="">
-<input type="hidden" id="gn3ds_billToAdministrativeArea" name="gn3ds_billToAdministrativeArea" class="gn3ds_billToAdministrativeArea" value="SP">
+<input type="hidden" id="gn3ds_billToAdministrativeArea" name="gn3ds_billToAdministrativeArea" class="gn3ds_billToAdministrativeArea" value="">
 <input type="hidden" id="gn3ds_billToCountry" name="gn3ds_billToCountry" class="gn3ds_billToCountry" value="BR">
-<input type="hidden" id="gn3ds_billToLocality" name="gn3ds_billToLocality" class="gn3ds_billToLocality" value="Sao Paulo">
-<input type="hidden" id="gn3ds_billToHomePhone" name="gn3ds_billToHomePhone" class="gn3ds_billToHomePhone" value="11999999999">
-<input type="hidden" id="gn3ds_billToEmail" name="gn3ds_billToEmail" class="gn3ds_billToEmail" value="">
-<input type="hidden" id="gn3ds_billToPostalCode" name="gn3ds_billToPostalCode" class="gn3ds_billToPostalCode" value="04746050">
+<input type="hidden" id="gn3ds_billToLocality" name="gn3ds_billToLocality" class="gn3ds_billToLocality" value="">
+<input type="hidden" id="gn3ds_billToHomePhone" name="gn3ds_billToHomePhone" class="gn3ds_billToHomePhone" value="">
+<input type="hidden" id="gn3ds_billToEmail" name="gn3ds_billToEmail" class="gn3ds_billToEmail" value="{{ $user->email }}">
+<input type="hidden" id="gn3ds_billToPostalCode" name="gn3ds_billToPostalCode" class="gn3ds_billToPostalCode" value="04546030">
 <input type="hidden" id="gn3ds_billToMobilePhone" name="gn3ds_billToMobilePhone" class="gn3ds_billToMobilePhone" value="11999999999">
 <input type="hidden" id="gn3ds_cardType" name="gn3ds_cardType" class="gn3ds_cardType" value="">
-<input type="hidden" id="gn3ds_cardExpirationMonth" name="gn3ds_cardExpirationMonth" class="gn3ds_cardExpirationMonth" value="01">
-<input type="hidden" id="gn3ds_cardExpirationYear" name="gn3ds_cardExpirationYear" class="gn3ds_cardExpirationYear" value="2025">
-<input type="hidden" id="gn3ds_cardNumber" name="gn3ds_cardNumber" class="gn3ds_cardNumber" value="5200000000001005">
-<input type="hidden" id="gn3ds_cardHolderName" name="gn3ds_cardHolderName" class="gn3ds_cardHolderName" value="TESTE CARTAO">
-<input type="hidden" id="gn3ds_overridePaymentMethod" name="gn3ds_overridePaymentMethod" class="gn3ds_overridePaymentMethod" value="03">
+<input type="hidden" id="gn3ds_cardExpirationMonth" name="gn3ds_cardExpirationMonth" class="gn3ds_cardExpirationMonth" value="">
+<input type="hidden" id="gn3ds_cardExpirationYear" name="gn3ds_cardExpirationYear" class="gn3ds_cardExpirationYear" value="">
+<input type="hidden" id="gn3ds_cardNumber" name="gn3ds_cardNumber" class="gn3ds_cardNumber" value="">
+<input type="hidden" id="gn3ds_cardHolderName" name="gn3ds_cardHolderName" class="gn3ds_cardHolderName" value="">
+<input type="hidden" id="gn3ds_overridePaymentMethod" name="gn3ds_overridePaymentMethod" class="gn3ds_overridePaymentMethod" value="">
 <input type="hidden" id="gn3ds_httpBrowserColorDepth" name="gn3ds_httpBrowserColorDepth" class="gn3ds_httpBrowserColorDepth" value="32">
 <input type="hidden" id="gn3ds_httpBrowserJavaEnabled" name="gn3ds_httpBrowserJavaEnabled" class="gn3ds_httpBrowserJavaEnabled" value="N">
 <input type="hidden" id="gn3ds_httpBrowserJavaScriptEnabled" name="gn3ds_httpBrowserJavaScriptEnabled" class="gn3ds_httpBrowserJavaScriptEnabled" value="Y">
@@ -452,9 +458,8 @@
 <input type="hidden" id="gn3ds_httpBrowserScreenWidth" name="gn3ds_httpBrowserScreenWidth" class="gn3ds_httpBrowserScreenWidth" value="">
 <input type="hidden" id="gn3ds_httpBrowserTimeDifference" name="gn3ds_httpBrowserTimeDifference" class="gn3ds_httpBrowserTimeDifference" value="">
 <input type="hidden" id="gn3ds_userAgentBrowserValue" name="gn3ds_userAgentBrowserValue" class="gn3ds_userAgentBrowserValue" value="">
-
-<input type="hidden" id="gn3ds_personalId" name="gn3ds_personalId" class="gn3ds_personalId" value="00244376891">
-<input type="hidden" id="gn3ds_personalType" name="gn3ds_personalType" class="gn3ds_personalType" value="CPF">
+<input type="hidden" id="gn3ds_personalId" name="gn3ds_personalId" class="gn3ds_personalId" value="{{ apenasNumeros($user->cpf_cnpj) }}">
+<input type="hidden" id="gn3ds_personalType" name="gn3ds_personalType" class="gn3ds_personalType" value="{{ strlen(apenasNumeros($user->cpf_cnpj)) == 11 ? 'CPF' : 'CNPJ' }}">
 <input type="hidden" id="gn3ds_shipToAddress1" name="gn3ds_shipToAddress1" class="gn3ds_shipToAddress1" value="">
 <input type="hidden" id="gn3ds_shipToAddress2" name="gn3ds_shipToAddress2" class="gn3ds_shipToAddress2" value="">
 <input type="hidden" id="gn3ds_shipToAdministrativeArea" name="gn3ds_shipToAdministrativeArea" class="gn3ds_shipToAdministrativeArea" value="">
@@ -465,13 +470,13 @@
 <input type="hidden" id="gn3ds_shipToPostalCode" name="gn3ds_shipToPostalCode" class="gn3ds_shipToPostalCode" value="">
 <input type="hidden" id="gn3ds_shipToDestinationCode" name="gn3ds_shipToDestinationCode" class="gn3ds_shipToDestinationCode" value="">
 <input type="hidden" id="gn3ds_shipToMethod" name="gn3ds_shipToMethod" class="gn3ds_shipToMethod" value="">
-<input type="hidden" id="gn3ds_item_#_totalAmount" name="gn3ds_item_#_totalAmount" class="gn3ds_item_#_totalAmount" value="1000">
-<input type="hidden" id="gn3ds_item_#_unitPrice" name="gn3ds_item_#_unitPrice" class="gn3ds_item_#_unitPrice" value="1000">
+<input type="hidden" id="gn3ds_item_#_totalAmount" name="gn3ds_item_#_totalAmount" class="gn3ds_item_#_totalAmount" value="">
+<input type="hidden" id="gn3ds_item_#_unitPrice" name="gn3ds_item_#_unitPrice" class="gn3ds_item_#_unitPrice" value="">
 <input type="hidden" id="gn3ds_item_#_quantity" name="gn3ds_item_#_quantity" class="gn3ds_item_#_quantity" value="1">
-<input type="hidden" id="gn3ds_item_#_sku" name="gn3ds_item_#_sku" class="gn3ds_item_#_sku" value="1236AB">
-<input type="hidden" id="gn3ds_item_#_description" name="gn3ds_item_#_description" class="gn3ds_item_#_description" value="testando">
-<input type="hidden" id="gn3ds_item_#_name" name="gn3ds_item_#_name" class="gn3ds_item_#_name" value="boleto atrasado">
-<input type="hidden" id="gn3ds_installmentTotalCount" name="gn3ds_installmentTotalCount" class="gn3ds_installmentTotalCount" value="1">
+<input type="hidden" id="gn3ds_item_#_sku" name="gn3ds_item_#_sku" class="gn3ds_item_#_sku" value="">
+<input type="hidden" id="gn3ds_item_#_description" name="gn3ds_item_#_description" class="gn3ds_item_#_description" value="">
+<input type="hidden" id="gn3ds_item_#_name" name="gn3ds_item_#_name" class="gn3ds_item_#_name" value="">
+<input type="hidden" id="gn3ds_installmentTotalCount" name="gn3ds_installmentTotalCount" class="gn3ds_installmentTotalCount" value="">
 <input type="hidden" id="gn3ds_additionalData" name="gn3ds_additionalData" class="gn3ds_additionalData" value="">
 <input type="hidden" id="gn3ds_additionalObject" name="gn3ds_additionalObject" class="gn3ds_additionalObject" value="">
 

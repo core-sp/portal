@@ -7,6 +7,8 @@ use App\Rules\CpfCnpj;
 
 class PagamentoGetnetRequest extends FormRequest
 {
+    private $regraEci;
+
     protected function prepareForValidation()
     {
         // Tipos de parcelas: "FULL", "INSTALL_NO_INTEREST", "INSTALL_WITH_INTEREST"
@@ -26,7 +28,7 @@ class PagamentoGetnetRequest extends FormRequest
             'amount_2' => $this->filled('amount_2') ? apenasNumeros($this->amount_2) : null,
             'cardholder_name_1' => mb_strtoupper($this->cardholder_name_1),
             'cardholder_name_2' => $this->filled('cardholder_name_2') ? mb_strtoupper($this->cardholder_name_2) : null,
-            'card_number_1' => apenasNumeros($this->card_number_1),
+            'card_number_1' => $this->filled('card_number_1') ? apenasNumeros($this->card_number_1) : null,
             'card_number_2' => $this->filled('card_number_2') ? apenasNumeros($this->card_number_2) : null,
             'document_number_1' => apenasNumeros($this->document_number_1),
             'document_number_2' => $this->filled('document_number_2') ? apenasNumeros($this->document_number_2) : null,
@@ -59,7 +61,14 @@ class PagamentoGetnetRequest extends FormRequest
             'ba_state' => 'SP',
             'ba_country' => 'Brasil',
             'ba_postal_code' => '90230060',
+            'brand' => $this->filled('brand') ? strtolower($this->brand) : '',
+            'tdsver' => $this->filled('tdsver') ? strtolower($this->tdsver) : '',
         ]);
+
+        if(strpos($this->tdsver, '2.') === 0)
+            $this->regraEci = $this->brand == 'mastercard' ? '01,02' : '05,06';
+        else
+            $this->regraEci = $this->brand == 'mastercard' ? '02' : '05';
 
         if($this->filled('parcelas_2'))
             $this->merge(['tipo_parcelas_2' => $this->parcelas_2 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST']);
@@ -72,6 +81,7 @@ class PagamentoGetnetRequest extends FormRequest
 
     public function rules()
     {
+        \Log::error($this->all());
         return [
             'boleto' => 'required',
             'amount' => 'required|regex:/^[0-9]{1,10}$/',
@@ -81,7 +91,7 @@ class PagamentoGetnetRequest extends FormRequest
             'security_code_1' => 'required|regex:/^[0-9]{3,4}$/',
             'document_number_1' => ['required', new CpfCnpj],
             'cardholder_name_1' => 'required|regex:/^[A-z\s]{5,26}$/',
-            'card_number_1' => 'required|regex:/^[0-9]{13,19}$/',
+            'card_number_1' => 'required_if:tipo_pag,credit,combined|nullable|regex:/^[0-9]{13,19}$/',
             'tipo_parcelas_1' => '',
             // Combinado
             'amount_1' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',
@@ -122,6 +132,14 @@ class PagamentoGetnetRequest extends FormRequest
             'ba_state' => '',
             'ba_country' => '',
             'ba_postal_code' => '',
+            'number_token' => 'required_if:tipo_pag,credit_3ds,debit_3ds',
+            'ucaf' => 'required_if:tipo_pag,credit_3ds,debit_3ds',
+            'eci' => 'required_if:tipo_pag,credit_3ds,debit_3ds|in:'.$this->regraEci,
+            'xid' => 'required_if:tipo_pag,credit_3ds,debit_3ds',
+            'tdsver' => '',
+            'tdsdsxid' => '',
+            'authorization' => 'required_if:tipo_pag,credit_3ds,debit_3ds',
+            'brand' => 'required_if:tipo_pag,credit_3ds,debit_3ds|nullable|in:visa,mastercard,elo,amex',
         ];
     }
 
@@ -163,7 +181,16 @@ class PagamentoGetnetRequest extends FormRequest
             'card_number_2.required_if' => 'Número do segundo cartão é obrigatório',
             'card_number_2.regex' => 'Formato do número do segundo cartão é inválido',
             'card_number_2.different' => 'Número do segundo cartão deve ser diferente do primeiro cartão',
+            // ++++++++++++++
             'amount_soma.same' => 'A soma dos dois valores dos cartões está diferente do valor total',
+            'number_token.required_if' => 'Faltou dados da prestadora para autenticação 3DS',
+            'eci.required_if' => 'Faltou dados da prestadora para autenticação 3DS',
+            'xid.required_if' => 'Faltou dados da prestadora para autenticação 3DS',
+            'ucaf.required_if' => 'Faltou dados da prestadora para autenticação 3DS',
+            'authorization.required_if' => 'Faltou dados da prestadora para autenticação 3DS',
+            'brand.required_if' => 'Faltou dados da prestadora para autenticação 3DS',
+            'brand.in' => 'Bandeira do cartão não é aceita',
+            'eci.in' => 'Não autorizado a realizar a autenticação.',
         ];
     }
 }

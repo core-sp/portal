@@ -24,7 +24,7 @@ class PagamentoGetnetApiService {
         $this->tokenPrincipal = "Basic " . base64_encode(env('GETNET_CLIENT_ID') . ':' . env('GETNET_CLIENT_SECRET'));
     }
 
-    private function formatError(RequestException $e)
+    private function formatError(RequestException $e, $metodo)
     {
         $codigo = 0;
         $erroGetnet = $e->getMessage();
@@ -34,7 +34,7 @@ class PagamentoGetnetApiService {
             $erroGetnet = $e->getResponse()->getBody()->getContents();
         }
             
-        throw new \Exception($erroGetnet, $codigo);
+        throw new \Exception($erroGetnet . ' no método: ' . $metodo, $codigo);
     }
 
     private function finalAutentication3ds($response)
@@ -64,20 +64,19 @@ class PagamentoGetnetApiService {
     {
         return [
             "order_id" => $dados["order_id"],
-            "amount" => $dados["amount"],
+            "amount" => (int) $dados["amount"],
             "currency" => "BRL",
             "transaction_type" => $dados["tipo_parcelas_1"],
             "number_installments" => $dados["parcelas_1"],
             "xid" => $dados["xid"],
             "ucaf" => $dados["ucaf"],
             "eci" => $dados["eci"],
-            "tdsdsxid" => $dados["tdsdsxid"],
-            "tdsver" => $dados["tdsver"],
+            "tdsdsxid" => isset($dados["tdsdsxid"]) ? $dados["tdsdsxid"] : '',
+            "tdsver" => isset($dados["tdsver"]) ? $dados["tdsver"] : '',
             "payment_method" => $dados["tipo_pag"] == 'credit_3ds' ? 'CREDIT' : 'DEBIT',
             "soft_descriptor" => $dados["soft_descriptor"],
             "dynamic_mcc" => $dados['dynamic_mcc'],
             "customer_id" => $dados['customer_id'],
-            "credentials_on_file_type" => '',
             'card' => $resultado['card'],
         ];
     }
@@ -242,7 +241,7 @@ class PagamentoGetnetApiService {
                 ],
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         $final = json_decode($response->getBody()->getContents(), true);
@@ -264,7 +263,7 @@ class PagamentoGetnetApiService {
                 ],
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -293,7 +292,7 @@ class PagamentoGetnetApiService {
                 ],
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -328,7 +327,7 @@ class PagamentoGetnetApiService {
             unset($dados);
             unset($dadosFinais);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -371,7 +370,7 @@ class PagamentoGetnetApiService {
 
             unset($dadosFinais);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -380,12 +379,13 @@ class PagamentoGetnetApiService {
     public function pagamento3DS($dados)
     {
         try{
-            $dadosFinais = $this->tipoPagamento($dados['tipo_pag'], $dados);
             $this->client = new Client();
+            $this->auth = $dados['authorization'];
+            $dadosFinais = $this->tipoPagamento($dados['tipo_pag'], $dados);
             $response = $this->client->request('POST', $this->urlBase . '/v1/payments/authenticated', [
                 'headers' => [
                     'Content-type' => "application/json; charset=utf-8",
-                    'Authorization' => '$dadosHeader',
+                    'Authorization' => $this->auth,
                     'seller_id' => env('GETNET_SELLER_ID'),
                 ],
                 'json' => $dadosFinais,
@@ -394,7 +394,7 @@ class PagamentoGetnetApiService {
             unset($dados);
             unset($dadosFinais);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -421,7 +421,7 @@ class PagamentoGetnetApiService {
                 ],
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -441,7 +441,7 @@ class PagamentoGetnetApiService {
                 'json' => $temp == 'authenticated' ? ['payment_method' => strtoupper(str_replace('_3ds', '', $tipo_pag))] : [],
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -469,7 +469,7 @@ class PagamentoGetnetApiService {
                 ],
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -485,7 +485,7 @@ class PagamentoGetnetApiService {
                 ]
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return json_decode($response->getBody()->getContents(), true);
@@ -505,7 +505,7 @@ class PagamentoGetnetApiService {
             $brand = mb_strtolower($dados['brand']);
             $dados['card_type'] = isset($card_type[$brand]) ? $card_type[$brand] : '';
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
         
         return $dados;
@@ -535,7 +535,7 @@ class PagamentoGetnetApiService {
                 ],
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return $this->finalAutentication3ds($response);
@@ -602,16 +602,11 @@ class PagamentoGetnetApiService {
                         'payment_account_date' => '',
                         'prior_suspicious_activity' => false,
                     ],
-                    // 'recurring' => [
-                    //     'end_date' => '',
-                    //     'frequency' => 0,
-                    //     'original_purchase_date' => '',
-                    // ],
                     'card' => [
                         'number_token' => $number_token['number_token'],
                         'expiration_month' => $dados['paymentInformation']['card']['expirationMonth'],
                         'expiration_year' => $dados['paymentInformation']['card']['expirationYear'],
-                        'default_card' => true,
+                        'default_card' => false,
                         'type_card' => $dados['paymentInformation']['card']['type'],
                     ],
                     'order' => [
@@ -627,7 +622,7 @@ class PagamentoGetnetApiService {
                 ],
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
         return $this->finalAutentication3ds($response);
@@ -639,6 +634,7 @@ class PagamentoGetnetApiService {
             \Log::error($dados);
             $this->client = new Client();
             $this->auth = $dados['Authorization'];
+            $number_token = $this->tokenizacao($dados['paymentInformation']['card']['number'], '00244376891');
             $response = $this->client->request('POST', $this->urlBase . '/v1/3ds/results', [
                 'headers' => [
                     'Content-type' => "application/json; charset=utf-8",
@@ -649,13 +645,13 @@ class PagamentoGetnetApiService {
                     'currency' => 'BRL',
                     'override_payment_method' => $dados['consumerAuthenticationInformation']['overridePaymentMethod'],
                     'token' => $dados['token'],
-                    'token_challenge' => '',
-                    'total_amount' => 0,
+                    'token_challenge' => $dados['tokenChallenge'],
+                    'total_amount' => (int) $dados['orderInformation']['amountDetails']['totalAmount'],
                     'card' => [
-                        'number_token' => '',
+                        'number_token' => $number_token['number_token'],
                         'expiration_month' => $dados['paymentInformation']['card']['expirationMonth'],
                         'expiration_year' => $dados['paymentInformation']['card']['expirationYear'],
-                        'default_card' => true,
+                        'default_card' => false,
                         'type_card' => $dados['paymentInformation']['card']['type'],
                     ],
                     'additional_data' => $dados['additionalData'],
@@ -663,10 +659,12 @@ class PagamentoGetnetApiService {
                 ],
             ]);
         }catch(RequestException $e){
-            $this->formatError($e);
+            $this->formatError($e, __FUNCTION__);
         }
 
-        return $this->finalAutentication3ds($response);
+        $temp = $this->finalAutentication3ds($response);
+        \Log::error($temp);
+        return $temp;
     }
 
     public function checkoutIframe($request, $user)

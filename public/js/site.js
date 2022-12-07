@@ -1028,58 +1028,97 @@ for(elemento of inputs){
 	hideModalPagamentoSubmit(elemento);
 }
 
-function showModelPagamento3ds(titulo, msg)
+function showModelPagamento3ds(msg)
 {
-	$('#modalPagamento .modal-body')
-	.html('<h5 class="text-break"><i class="fas fa-times text-danger"></i> ' + titulo + ' ' + msg.substring(0, 100) + ' ... </h5><br><a class="btn btn-secondary" href="' + window.location.href + '">Fechar</a>');
+	var texto = '<h5 class="text-break"><i class="fas fa-times text-danger"></i> ';
+	texto += msg + '</h5><br><a class="btn btn-secondary" href="' + window.location.href + '">Fechar</a>';
+
+	$('#modalPagamento').modal('hide');
+	$('#modalPagamento .modal-body').html(texto);
 	$('#modalPagamento').modal({backdrop: 'static', keyboard: false, show: true});
 }
 
-function enrollment() { 
-	// Invocar no botão da compra e guardar o retorno. Obs: Só invocar com sucesso do preenchimento dos campos obrigatórios no front-end. 
-	//Inserir regra de negócio se tiver. 
+function liberarSubmit3ds(brand, number_eci, version)
+{
+	var master = false;
+	var outros = false;
+
+	if(version.indexOf('2.') == 0){
+		master = (brand == 'Mastercard') && ((number_eci == '02') || (number_eci == '01'));
+		outros = (brand != 'Mastercard') && ((number_eci == '05') || (number_eci == '06'));
+	} else{
+		master = (brand == 'Mastercard') && (number_eci == '02');
+		outros = (brand != 'Mastercard') && (number_eci == '05');
+	}
+
+	return master || outros;
+}
+
+function tresDsIniciado(response2)
+{
+	if((response2 != null) && (response2.status >= 200) && (response2.status <= 299)) { 
+		switch(response2.data[0].status){
+			case 'AUTHENTICATION_SUCCESSFUL':
+				var brand = $('input[name="brand"]').val();
+				var dados = response2.data[0];
+				var number_eci = dados.consumerAuthenticationInformation.eci == undefined ? '' : dados.consumerAuthenticationInformation.eci;
+				var number_xid = dados.consumerAuthenticationInformation.xid == undefined ? '' : dados.consumerAuthenticationInformation.xid;
+				var version = dados.consumerAuthenticationInformation.specificationVersion;
+				var number = '<input type="hidden" name="number_token" value="' + dados.card.numberToken + '"/>';
+				var eci = '<input type="hidden" name="eci" value="' + dados.consumerAuthenticationInformation.eci + '"/>';
+				var ucaf = '<input type="hidden" name="ucaf" value="' + dados.consumerAuthenticationInformation.ucaf + '"/>';
+				var xid = '<input type="hidden" name="xid" value="' + number_xid + '"/>';
+				var tdsver = '<input type="hidden" name="tdsver" value="' + version + '"/>';
+				var tdsdsxid = '<input type="hidden" name="tdsdsxid" value="' + dados.consumerAuthenticationInformation.directoryServerTransactionId + '"/>';
+				var authorization = '<input type="hidden" name="authorization" value="' + $('.gn3ds_merchantBackEndTokenOauth').val() + '"/>';
+				if(!liberarSubmit3ds(brand, number_eci, version))
+					showModelPagamento3ds('Retorno da autenticação não permitida no momento.');
+				else{
+					$('#card_number_1').removeAttr('name');
+					$('#btnApiPag').before(number, eci, ucaf, xid, tdsver, tdsdsxid, authorization);
+					$('#formPagamento').submit();
+				}
+				break;
+			case 'AUTHENTICATION_FAILED':
+				showModelPagamento3ds('Erro durante a autenticação! Retorno da autenticação falhou.');
+				break;
+		}
+	} else
+		showModelPagamento3ds('Erro durante a autenticação! Autenticação falhou. Código de erro da prestadora: ' + response2.status);
+}
+
+function enrollment() 
+{ 
 	GN3DS.init(function(response) { 
 		console.log(response);
-		//Inicia o processo 3ds2.1, realiza um request para o endpoint GenerateToken e cria uma sessão no front-end (fingerprint) do navaegador. 
-		//Inserir regra de negócio se tiver. 
-		if(response != null && response.status >= 200 && response.status <= 299) { 
+		if((response != null) && (response.status >= 200) && (response.status <= 299)) { 
 			GN3DS.authentication(function(response2) { 
-				//Inicia a authenticação do 3ds2.1, realiza um request ao endpoint authentications verifica se existe ou desafio, havendo um desafio (não silencioso) a executa um request ao (authentication-results) 
-				//Inserir regra de negócio se tiver. 
-				if(response2 != null && response2.status >= 200 && response2.status <= 299) { 
-					//Tratar o sucesso. 
-				} else { //Tratar o erro.
-					// showModelPagamento3ds('Erro durante a autenticação!', response2.error[0]);
-				} 
+				tresDsIniciado(response2); 
 			}); 
 		} else { 
-			showModelPagamento3ds('Erro durante a inicialização!', response.error[0]);
+			showModelPagamento3ds('Erro no processo de inicialização.');
 		} 
 	}); 
 }
 
 // condição se for 3DS
-$('#formPagamento').submit(function(e) {
-	if($('#tipo_pag').val().indexOf('_3ds') != -1){
-		$('#modalPagamento').modal('hide');
-		e.preventDefault();
+$('#btnApiPag').click(function(e) {
+	if(($('#tipo_pag').val().indexOf('_3ds') != -1) && (this.type == 'button')){
 		tresDS($('[name="boleto"]').val(), $('#card_number_1').val());
 	}
 });
 
 function tresDS(boleto, card)
 {
-	var brand = '';
 	var bin = card.replace(/[^0-9]/g,'').slice(0,6);
 	$.ajax({
 		method: "GET",
 		dataType: 'json',
 		url: "/cardsBrand/" + boleto + '/' + bin,
 		success: function(response, textStatus, xhr) {
-			brand = response['brand'];
-			$('.gn3ds_merchantBackEndTokenBasic').val(xhr.getResponseHeader('authorization_principal'));
-			$('.gn3ds_merchantBackEndTokenOauth').val(xhr.getResponseHeader('authorization'));
-			$('.gn3ds_cardType').val(response['card_type']);
+			var token = xhr.getResponseHeader('authorization');
+			var tokenPrincipal = xhr.getResponseHeader('authorization_principal');
+			preencheCampos3ds(response, token, tokenPrincipal);
 			enrollment();
 		},
 		error: function(xhr, ajaxOptions, thrownError) {
@@ -1089,6 +1128,23 @@ function tresDS(boleto, card)
 			$('#modalPagamento').modal({backdrop: 'static', keyboard: false, show: true});
 		}
 	});
+}
+
+function preencheCampos3ds(response, token, tokenPrincipal)
+{
+	var metodoPag = $('#tipo_pag').val() == 'debit_3ds' ? '03' : '02';
+	$('#gn3ds_merchantBackEndTokenBasic').val(tokenPrincipal);
+	$('#gn3ds_merchantBackEndTokenOauth').val(token);
+
+	$('#gn3ds_cardType').val(response['card_type']);
+	$('#gn3ds_totalAmount').val($('#amount').val().replace(/[^0-9]/g,''));
+	$('#gn3ds_cardExpirationMonth').val($('#expiration_1').val().slice(0,2));
+	$('#gn3ds_cardExpirationYear').val($('#expiration_1').val().slice(3));
+	$('#gn3ds_cardNumber').val($('#card_number_1').val().replace(/[^0-9]/g,''));
+	$('#gn3ds_cardHolderName').val($('#cardholder_name_1').val());
+	$('#gn3ds_overridePaymentMethod').val(metodoPag);
+	$('#gn3ds_installmentTotalCount').val($('#parcelas_1').val());
+	$('#btnApiPag').before('<input type="hidden" name="brand" value="' + response['brand'] + '" />');
 }
 
 // Para o Checkout Iframe

@@ -55,9 +55,10 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     private function getArraySavePagamento($transacao, $status, $dados)
     {
+        $temp = str_replace('_3ds', '', $dados['tipo_pag']);
         $base = [
             'boleto_id' => $dados['boleto'],
-            'forma' => mb_strtolower($dados['tipo_pag']),
+            'forma' => mb_strtolower($temp),
             'parcelas' => $dados['parcelas_1'],
             'tipo_parcelas' => mb_strtoupper($dados['tipo_parcelas_1']),
         ];
@@ -66,10 +67,10 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         {
             $base['payment_id'] = $transacao['payment_id'];
             $base['status'] = mb_strtoupper($status);
-            $base['authorized_at'] = $transacao[$dados['tipo_pag']]['authorized_at'];
+            $base['authorized_at'] = strpos($dados['tipo_pag'], '_3ds') !== false ? $transacao['authorized_at'] : $transacao[$temp]['authorized_at'];
             $base['is_3ds'] = strpos($dados['tipo_pag'], '_3ds') !== false;
             $base['bandeira'] = strpos($dados['tipo_pag'], '_3ds') !== false ? mb_strtolower($transacao['brand']) : 
-            mb_strtolower($transacao[$dados['tipo_pag']]['brand']);
+            mb_strtolower($transacao[$temp]['brand']);
             return $base;
         }
 
