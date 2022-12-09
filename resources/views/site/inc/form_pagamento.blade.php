@@ -30,7 +30,12 @@
         <small class="form-text text-muted mb-3">
             <em><span class="text-danger">*</span> Preenchimento obrigatório</em>
         </small>
-        <form action="{{ isset($pagamento) ? route('pagamento.cartao', $boleto) : route('pagamento.gerenti', $boleto) }}" method="POST" autocomplete="off" id="{{ isset($pagamento) ? 'formPagamento' : null }}">
+        <form 
+            action="{{ isset($pagamento) ? route('pagamento.cartao', $boleto) : route('pagamento.gerenti', $boleto) }}" 
+            method="POST" 
+            autocomplete="off" 
+            id="{{ isset($pagamento) ? 'formPagamento' : null }}"
+        >
             @csrf
             <input type="hidden" name="boleto" value="{{ $boleto }}" />
 
@@ -49,7 +54,6 @@
                 </div>
 
                 @php
-                    $tiposPag = ['credit' => 'Crédito', 'credit_3ds' => 'Crédito com 3DS', 'combined' => 'Crédito com dois cartões', 'debit_3ds' => 'Débito com 3DS'];
                     if($checkoutIframe)
                         unset($tiposPag['combined']);
                 @endphp
@@ -73,11 +77,15 @@
                         @endif
                     @endforeach
                     </select>
+
+                    {{--
                     @if(!isset($pagamento) || (isset($pagamento) && $is_3ds))
                     <small class="form-text text-muted">
                         <i class="fas fa-info-circle text-primary"></i><em> 3DS é um protocolo de autenticação mais seguro para transações financeiras on-line</em>
                     </small>
                     @endif
+                    --}}
+
                 </div>
             </div>
 
@@ -162,24 +170,11 @@
             @endif
 
             @if(isset($pagamento) && !$checkoutIframe)
-            <!-- <fieldset class="border rounded pl-3"> -->
-            <div class="form-row mb-3 cadastroRepresentante mt-3">
-                <div class="col-sm mb-2-576">
-                    <img class="mr-3" src="{{ asset('img/visa.256x164.png') }}" width="48" height="31" alt="cartão visa"/>
-                    <img class="mr-3" src="{{ asset('img/mastercard.256x164.png') }}" width="48" height="31" alt="cartão master"/>
-                    <img class="mr-3" src="{{ asset('img/amex.256x168.png') }}" width="48" height="32" alt="cartão amex"/>
-                    <img class="mr-3" src="{{ asset('img/elo.256x164.png') }}" width="48" height="31" alt="cartão elo"/>
-                    @if(!$is_3ds)
-                    <img class="mr-3" src="{{ asset('img/hipercard.256x112.png') }}" width="48" height="21" alt="cartão hipercard"/>
-                    @endif
-                </div>
-            </div>
-            <!-- </fieldset> -->
 
             <fieldset class="border rounded p-3">
                 <legend class="m-0"><small>Dados do {{ $boleto_dados['tipo_pag'] == 'combined' ? 'primeiro' : null }} cartão:</small></legend>
                 <div class="form-row mb-2 cadastroRepresentante">
-                    <div class="col-sm mb-2-576">
+                    <div class="col-md-6 mb-2-576">
                         <label for="card_number_1">Número do cartão <span class="text-danger">*</span></label>
                         <input
                             type="text"
@@ -192,9 +187,20 @@
                             required
                         >
                     </div>
+
+                    <div class="col-md mb-2-576 d-flex flex-wrap align-content-end justify-content-center">
+                        <img class="mr-3" src="{{ asset('img/visa.256x164.png') }}" width="42" alt="cartão visa"/>
+                        <img class="mr-3" src="{{ asset('img/mastercard.256x164.png') }}" width="42" alt="cartão master"/>
+                        <img class="mr-3" src="{{ asset('img/amex.256x168.png') }}" width="42" alt="cartão amex"/>
+                        <img class="mr-3" src="{{ asset('img/elo.256x164.png') }}" width="42" alt="cartão elo"/>
+                        @if(!$is_3ds)
+                        <img class="mr-3" src="{{ asset('img/hipercard.256x112.png') }}" width="51" alt="cartão hipercard"/>
+                        @endif
+                    </div>
                 </div>
+
                 <div class="form-row mb-2 cadastroRepresentante">
-                    <div class="col-sm mb-2-576">
+                    <div class="col-md-6 mb-2-576">
                         <label for="cardholder_name_1">Nome do titular <span class="text-danger">*</span></label>
                         <input
                             type="text"
@@ -204,29 +210,15 @@
                             maxlength="26"
                             pattern="[A-z\s]{5,26}" 
                             title="Somente letras não acentuadas e entre 5 e 26 caracteres"
-                            value="TESTE CARTAO"
+                            value=""
                             required
                         >
                         <small class="form-text text-muted">
                             <em>* Nome idêntico ao do cartão, sem acentos ou pontuações</em>
                         </small>
                     </div>
-                </div>
 
-                <div class="form-row mb-2 cadastroRepresentante">
-                    <div class="col-sm mb-2-576">
-                        <label for="document_number_1">CPF / CNPJ <span class="text-danger">*</span></label>
-                        <input
-                            type="text"
-                            name="document_number_1"
-                            class="form-control form-control-sm cpfOuCnpj pagamento"
-                            id="document_number_1"
-                            value="{{ apenasNumeros($user->cpf_cnpj) }}"
-                            required
-                        >
-                    </div>
-
-                    <div class="col-sm mb-2-576">
+                    <div class="col-md mb-2-576">
                         <label for="security_code_1">CVV / CVC <span class="text-danger">*</span></label>
                         <input
                             type="text"
@@ -237,7 +229,7 @@
                             maxlength="4"
                             pattern="[0-9]{3,4}" 
                             title="Somente números e entre 3 e 4 dígitos"
-                            value="111"
+                            value=""
                             required
                         >
                         <small class="form-text text-muted">
@@ -245,14 +237,14 @@
                         </small>
                     </div>
 
-                    <div class="col-sm mb-2-576">
+                    <div class="col-md mb-2-576">
                         <label for="expiration_1">Data de Expiração <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="expiration_1"
                             class="form-control form-control-sm pagamento expiracao"
                             id="expiration_1"
-                            value="01/2025"
+                            value=""
                             required
                         >
                     </div>
@@ -263,7 +255,7 @@
             <fieldset class="border rounded p-3">
                 <legend class="m-0"><small>Dados do segundo cartão:</small></legend>
                 <div class="form-row mb-2 cadastroRepresentante">
-                    <div class="col-sm mb-2-576">
+                    <div class="col-md-6 mb-2-576">
                         <label for="card_number_2">Número do cartão <span class="text-danger">*</span></label>
                         <input
                             type="text"
@@ -276,9 +268,19 @@
                             required
                         >
                     </div>
+
+                    <div class="col-md mb-2-576 d-flex flex-wrap align-content-end justify-content-center">
+                        <img class="mr-3" src="{{ asset('img/visa.256x164.png') }}" width="42" alt="cartão visa"/>
+                        <img class="mr-3" src="{{ asset('img/mastercard.256x164.png') }}" width="42" alt="cartão master"/>
+                        <img class="mr-3" src="{{ asset('img/amex.256x168.png') }}" width="42" alt="cartão amex"/>
+                        <img class="mr-3" src="{{ asset('img/elo.256x164.png') }}" width="42" alt="cartão elo"/>
+                        @if(!$is_3ds)
+                        <img class="mr-3" src="{{ asset('img/hipercard.256x112.png') }}" width="51" alt="cartão hipercard"/>
+                        @endif
+                    </div>
                 </div>
                 <div class="form-row mb-2 cadastroRepresentante">
-                    <div class="col-sm mb-2-576">
+                    <div class="col-md-6 mb-2-576">
                         <label for="cardholder_name_2">Nome do titular <span class="text-danger">*</span></label>
                         <input
                             type="text"
@@ -294,22 +296,8 @@
                             <em>* Nome idêntico ao do cartão, sem acentos ou pontuações</em>
                         </small>
                     </div>
-                </div>
 
-                <div class="form-row mb-2 cadastroRepresentante">
-                    <div class="col-sm mb-2-576">
-                        <label for="document_number_2">CPF / CNPJ <span class="text-danger">*</span></label>
-                        <input
-                            type="text"
-                            name="document_number_2"
-                            class="form-control form-control-sm cpfOuCnpj pagamento"
-                            id="document_number_2"
-                            value="{{ apenasNumeros($user->cpf_cnpj) }}"
-                            required
-                        >
-                    </div>
-
-                    <div class="col-sm mb-2-576">
+                    <div class="col-md mb-2-576">
                         <label for="security_code_2">CVV / CVC <span class="text-danger">*</span></label>
                         <input
                             type="text"
@@ -327,7 +315,7 @@
                         </small>
                     </div>
 
-                    <div class="col-sm mb-2-576">
+                    <div class="col-md mb-2-576">
                         <label for="expiration_2">Data de Expiração <span class="text-danger">*</span></label>
                         <input
                             type="text"
@@ -442,8 +430,8 @@
 <input type="hidden" id="gn3ds_billToLocality" name="gn3ds_billToLocality" class="gn3ds_billToLocality" value="">
 <input type="hidden" id="gn3ds_billToHomePhone" name="gn3ds_billToHomePhone" class="gn3ds_billToHomePhone" value="">
 <input type="hidden" id="gn3ds_billToEmail" name="gn3ds_billToEmail" class="gn3ds_billToEmail" value="{{ $user->email }}">
-<input type="hidden" id="gn3ds_billToPostalCode" name="gn3ds_billToPostalCode" class="gn3ds_billToPostalCode" value="04546030">
-<input type="hidden" id="gn3ds_billToMobilePhone" name="gn3ds_billToMobilePhone" class="gn3ds_billToMobilePhone" value="11999999999">
+<input type="hidden" id="gn3ds_billToPostalCode" name="gn3ds_billToPostalCode" class="gn3ds_billToPostalCode" value="">
+<input type="hidden" id="gn3ds_billToMobilePhone" name="gn3ds_billToMobilePhone" class="gn3ds_billToMobilePhone" value="">
 <input type="hidden" id="gn3ds_cardType" name="gn3ds_cardType" class="gn3ds_cardType" value="">
 <input type="hidden" id="gn3ds_cardExpirationMonth" name="gn3ds_cardExpirationMonth" class="gn3ds_cardExpirationMonth" value="">
 <input type="hidden" id="gn3ds_cardExpirationYear" name="gn3ds_cardExpirationYear" class="gn3ds_cardExpirationYear" value="">
@@ -507,9 +495,6 @@
     data-getnet-items="[{{ $pagamento['items'] }}]"
     data-getnet-document-number="{{ $pagamento['document_number_boleto'] }}"
     data-getnet-our-number="{{ $pagamento['our_number'] }}"
-    data-getnet-soft-descriptor="{{ $pagamento['soft_descriptor'] }}"
-    data-getnet-dynamic-mcc="{{ $pagamento['dynamic_mcc'] }}"
-    data-getnet-url-callback="{{-- $pagamento['callback'] --}}"
-    data-getnet-pre-authorization-credit="">
+    data-getnet-url-callback="{{-- $pagamento['callback'] --}}">
 </script>
 @endif

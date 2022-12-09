@@ -3,10 +3,17 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class PagamentoGerentiRequest extends FormRequest
 {
     private $regras;
+    private $tiposPagamento;
+
+    public function __construct(MediadorServiceInterface $service) 
+    {
+        $this->service = $service->getService('Pagamento');
+    }
 
     protected function prepareForValidation()
     {
@@ -23,6 +30,8 @@ class PagamentoGerentiRequest extends FormRequest
             'checkoutIframe' => $this->filled('checkoutIframe') ? $this->checkoutIframe : false,
         ]);
 
+        $this->tiposPagamento = $this->checkoutIframe ? $this->service->getTiposPagamentoCheckout() : $this->service->getTiposPagamento();
+
         if(($this->tipo_pag == 'combined') && (isset($this->amount_1) && isset($this->amount_2)))
             ($this->amount_1 + $this->amount_2) != $this->valor ? $this->merge(['amount_soma' => '0']) : $this->merge(['amount_soma' => $this->valor]);
         
@@ -30,10 +39,10 @@ class PagamentoGerentiRequest extends FormRequest
         {
             // via gerenti
             $this->merge([
-                'first_name' => 'João',
-                'last_name' => 'da Silva',
-                'document_type' => strlen($user->cpf_cnpj) == 11 ? 'CPF' : 'CNPJ',
-                'document_number' => $user->cpf_cnpj,
+                'first_name' => substr($user->nome, 0, strpos($user->nome, ' ')),
+                'last_name' => substr($user->nome, strpos($user->nome, ' ') + 1),
+                'document_type' => strlen(apenasNumeros($user->cpf_cnpj)) == 11 ? 'CPF' : 'CNPJ',
+                'document_number' => apenasNumeros($user->cpf_cnpj),
                 'email' => $user->email,
                 'phone_number' => '1134562356',
                 'address_street' => 'Rua Alexandre Dumas',
@@ -51,8 +60,6 @@ class PagamentoGerentiRequest extends FormRequest
                     "quantity" => 1,
                     "sku" => ""
                 ]),
-                'dynamic_mcc' => '1999',
-                'soft_descriptor' => 'LOJA*TESTE*COMPRA-123',
                 'our_number' => '000001946598',
                 'document_number_boleto' => '170500000019763',
             ]);
@@ -66,7 +73,7 @@ class PagamentoGerentiRequest extends FormRequest
         $regras = [
             'boleto' => 'required',
             'valor' => 'required|regex:/^[0-9]{1,10}$/',
-            'tipo_pag' => 'required|in:debit_3ds,credit_3ds,credit' . !$this->checkoutIframe ? '' : ',combined',
+            'tipo_pag' => 'required|in:' . implode(',', array_keys($this->tiposPagamento)),
             'parcelas_1' => 'required|regex:/^[0-9]{1,2}$/',
             'amount_1' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',
             'amount_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,10}$/',

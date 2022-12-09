@@ -1,4 +1,4 @@
-@if(isset($pagamento))
+@if(isset($pagamento) && !$pagamento->cancelado())
     <a href="{{ route('pagamento.visualizar', ['boleto' => $pagamento->boleto_id, 'pagamento' => $pagamento->getIdPagamento()]) }}" class="btn btn-info btn-sm text-white text-decoration-none">Detalhes</a>
     @if($pagamento->canCancel())
     &nbsp;&nbsp;<a href="{{ route('pagamento.cancelar.view', ['boleto' => $pagamento->boleto_id, 'pagamento' => $pagamento->getIdPagamento()]) }}" class="btn btn-danger btn-sm text-white text-decoration-none">Cancelar</a>

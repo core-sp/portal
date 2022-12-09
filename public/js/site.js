@@ -1159,18 +1159,13 @@ $('.pay-button-getnet').click(function(){
 		var data = e.data || '';
 
 		switch (data.status || data) {
-			// Corfirmação positiva do checkout.
 			case 'success':
 				var endpoint = window.location.protocol + '//' + window.location.hostname;
 				window.location.replace(endpoint + '/checkout/sucesso/' + $('[name="boleto"]').val());
 			break;
-
-			// Notificação de que o IFrame de checkout foi fechado a aprovação.
 			case 'close':
 				window.location.replace($('#callbackURL').val());
 				break; 
-
-			// Ignora qualquer outra mensagem 
 			default:
 			break;
 		}

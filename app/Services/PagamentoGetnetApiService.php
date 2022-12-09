@@ -563,7 +563,7 @@ class PagamentoGetnetApiService {
                 'headers' => [
                     'Content-type' => "application/json; charset=utf-8",
                     'Authorization' => $this->auth,
-                    // 'seller_id' => env('GETNET_SELLER_ID'),
+                    'seller_id' => env('GETNET_SELLER_ID'),
                 ],
                 'json' => [
                     'customer_card_alias' => '',
@@ -631,7 +631,6 @@ class PagamentoGetnetApiService {
     public function authenticationResults3DS($dados)
     {
         try{
-            \Log::error($dados);
             $this->client = new Client();
             $this->auth = $dados['Authorization'];
             $number_token = $this->tokenizacao($dados['paymentInformation']['card']['number'], '00244376891');
@@ -662,30 +661,28 @@ class PagamentoGetnetApiService {
             $this->formatError($e, __FUNCTION__);
         }
 
-        $temp = $this->finalAutentication3ds($response);
-        \Log::error($temp);
-        return $temp;
+        return $this->finalAutentication3ds($response);
     }
 
     public function checkoutIframe($request, $user)
     {
         $this->getToken();
         
-        $array_disabled = [
-            'credit' => strpos($request['tipo_pag'], 'credit_3ds') === false ? "credito-nao-autenticado" : "credito-autenticado", 
-            'debit_3ds' => "debito-autenticado", 
-        ];
+        // $array_disabled = [
+        //     'credit' => strpos($request['tipo_pag'], 'credit_3ds') === false ? "credito-nao-autenticado" : "credito-autenticado", 
+        //     'debit_3ds' => "debito-autenticado", 
+        // ];
 
-        $tipo_pag = strpos($request['tipo_pag'], 'credit_3ds') === false ? $request['tipo_pag'] : 'credit';
-        if(strpos($tipo_pag, 'debit') !== false)
-            $array_disabled['credit'] = "credito";
+        // $tipo_pag = strpos($request['tipo_pag'], 'credit_3ds') === false ? $request['tipo_pag'] : 'credit';
+        // if(strpos($tipo_pag, 'debit') !== false)
+        //     $array_disabled['credit'] = "credito";
 
-        $disabled = '"debito-nao-autenticado","boleto","qr-code","pix",';
-        unset($array_disabled[$tipo_pag]);
+        $disabled = '"credito-autenticado","debito-nao-autenticado","debito-autenticado","debito","boleto","qr-code","pix"';
+        // unset($array_disabled[$tipo_pag]);
 
-        $i = 0;
-        foreach($array_disabled as $key => $valor)
-            $disabled .= ++$i == count($array_disabled) ? '"' . $valor . '"' : '"' . $valor . '",';
+        // $i = 0;
+        // foreach($array_disabled as $key => $valor)
+        //     $disabled .= ++$i == count($array_disabled) ? '"' . $valor . '"' : '"' . $valor . '",';
 
         $pagamento = $request;
         $pagamento['sellerid'] = env('GETNET_SELLER_ID');

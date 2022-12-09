@@ -4,6 +4,10 @@ namespace App\Contracts;
 
 interface PagamentoServiceInterface {
 
+    public function getTiposPagamento();
+
+    public function getTiposPagamentoCheckout();
+
     public function getDados3DS($bin);
 
     public function autenticacao3DS($dados, $nome_rota);

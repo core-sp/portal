@@ -3,16 +3,20 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Rules\CpfCnpj;
+use App\Contracts\MediadorServiceInterface;
 
 class PagamentoGetnetRequest extends FormRequest
 {
     private $regraEci;
+    private $tiposPagamento;
+
+    public function __construct(MediadorServiceInterface $service) 
+    {
+        $this->service = $service->getService('Pagamento');
+    }
 
     protected function prepareForValidation()
-    {
-        // Tipos de parcelas: "FULL", "INSTALL_NO_INTEREST", "INSTALL_WITH_INTEREST"
-        
+    {        
         // Temporário, muitos dados do Gerenti
         $user = auth()->user();
 
@@ -30,12 +34,12 @@ class PagamentoGetnetRequest extends FormRequest
             'cardholder_name_2' => $this->filled('cardholder_name_2') ? mb_strtoupper($this->cardholder_name_2) : null,
             'card_number_1' => $this->filled('card_number_1') ? apenasNumeros($this->card_number_1) : null,
             'card_number_2' => $this->filled('card_number_2') ? apenasNumeros($this->card_number_2) : null,
-            'document_number_1' => apenasNumeros($this->document_number_1),
-            'document_number_2' => $this->filled('document_number_2') ? apenasNumeros($this->document_number_2) : null,
+            'document_number_1' => apenasNumeros($user->cpf_cnpj),
+            'document_number_2' => $this->filled('card_number_2') ? apenasNumeros($user->cpf_cnpj) : null,
             'email' => $user->email,
             'name' => $user->nome,
             'document_type' => $user->tipoPessoa() == 'PF' ? 'CPF' : 'CNPJ',
-            'document_number' => $user->cpf_cnpj,
+            'document_number' => apenasNumeros($user->cpf_cnpj),
             'device_id' => $user->getSessionIdPagamento($this->boleto),
             'parcelas_1' => $this->tipo_pag == 'debit_3ds' ? '1' : $this->parcelas_1,
             'tipo_parcelas_1' => $this->parcelas_1 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST',
@@ -77,19 +81,20 @@ class PagamentoGetnetRequest extends FormRequest
 
         if(($this->tipo_pag == 'combined') && (isset($this->amount_1) && isset($this->amount_2)))
             ($this->amount_1 + $this->amount_2) != $this->amount ? $this->merge(['amount_soma' => '0']) : $this->merge(['amount_soma' => $this->amount]);
+
+        $this->tiposPagamento = $this->checkoutIframe ? $this->service->getTiposPagamentoCheckout() : $this->service->getTiposPagamento();
     }
 
     public function rules()
     {
-        \Log::error($this->all());
         return [
             'boleto' => 'required',
             'amount' => 'required|regex:/^[0-9]{1,10}$/',
-            'tipo_pag' => 'required|in:debit_3ds,credit,credit_3ds,combined',
+            'tipo_pag' => 'required|in:' . implode(',', array_keys($this->tiposPagamento)),
             'parcelas_1' => 'required|regex:/^[0-9]{1,2}$/',
             'expiration_1' => 'required|date_format:m/Y|after_or_equal:' . date('m/Y'),
             'security_code_1' => 'required|regex:/^[0-9]{3,4}$/',
-            'document_number_1' => ['required', new CpfCnpj],
+            'document_number_1' => '',
             'cardholder_name_1' => 'required|regex:/^[A-z\s]{5,26}$/',
             'card_number_1' => 'required_if:tipo_pag,credit,combined|nullable|regex:/^[0-9]{13,19}$/',
             'tipo_parcelas_1' => '',
@@ -99,7 +104,7 @@ class PagamentoGetnetRequest extends FormRequest
             'parcelas_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{1,2}$/',
             'expiration_2' => 'required_if:tipo_pag,combined|nullable|date_format:m/Y|after_or_equal:' . date('m/Y'),
             'security_code_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{3,4}$/',
-            'document_number_2' => ['required_if:tipo_pag,combined', new CpfCnpj, 'nullable'],
+            'document_number_2' => '',
             'cardholder_name_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[A-z\s]{5,26}$/',
             'card_number_2' => 'required_if:tipo_pag,combined|nullable|regex:/^[0-9]{13,19}$/|different:card_number_1',
             'amount_soma' => 'nullable|same:amount',
@@ -158,7 +163,6 @@ class PagamentoGetnetRequest extends FormRequest
             'expiration_1.after_or_equal' => 'Data de expiração deve ser igual ou após a data de hoje',
             'security_code_1.required' => 'CVV / CVC é obrigatório',
             'security_code_1.regex' => 'Formato do CVV / CVC é inválido',
-            'document_number_1.required' => 'Número do documento é obrigatório',
             'cardholder_name_1.required' => 'Nome do titular do cartão é obrigatório',
             'cardholder_name_1.regex' => 'Formato do nome do titular do cartão é inválido',
             'card_number_1.required' => 'Número do cartão é obrigatório',
@@ -175,7 +179,6 @@ class PagamentoGetnetRequest extends FormRequest
             'expiration_2.after_or_equal' => 'Data de expiração do segundo cartão deve ser igual ou após a data de hoje',
             'security_code_2.required_if' => 'CVV / CVC do segundo cartão é obrigatório',
             'security_code_2.regex' => 'Formato do CVV / CVC do segundo cartão é inválido',
-            'document_number_2.required_if' => 'Número do documento do segundo cartão é obrigatório',
             'cardholder_name_2.required_if' => 'Nome do titular do segundo cartão é obrigatório',
             'cardholder_name_2.regex' => 'Formato do nome do titular do segundo cartão é inválido',
             'card_number_2.required_if' => 'Número do segundo cartão é obrigatório',

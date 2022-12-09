@@ -224,6 +224,25 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         return $this->api->cancelarPagamentoCombinado($ids, $tags);
     }
 
+    public function getTiposPagamento()
+    {
+        return [
+            'credit' => 'Crédito', 
+            'combined' => 'Crédito com dois cartões', 
+            // 'credit_3ds' => 'Crédito com 3DS', 
+            // 'debit_3ds' => 'Débito com 3DS',
+        ];
+    }
+
+    public function getTiposPagamentoCheckout()
+    {
+        return [
+            'credit' => 'Crédito',
+            // 'credit_3ds' => 'Crédito com 3DS', 
+            // 'debit_3ds' => 'Débito com 3DS',
+        ];
+    }
+
     public function getDados3DS($bin)
     {
         return $this->api->getDados3DS($bin);
