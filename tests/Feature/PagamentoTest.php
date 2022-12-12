@@ -23,37 +23,19 @@ class PagamentoTest extends TestCase
     {
         $this->assertGuest();
         
-        // $licitacao = factory('App\Licitacao')->create();
-        // $licitacao->datarealizacao = Carbon::create($licitacao->datarealizacao)->format('Y-m-d H:i');
+        $pagamento = factory('App\Pagamento')->create();
 
-        // $this->get(route('licitacoes.index'))->assertRedirect(route('login'));
-        // $this->get(route('licitacoes.create'))->assertRedirect(route('login'));
-        // $this->get(route('licitacoes.edit', $licitacao->idlicitacao))->assertRedirect(route('login'));
-        // $this->post(route('licitacoes.store'))->assertRedirect(route('login'));
-        // $this->patch(route('licitacoes.update', $licitacao->idlicitacao))->assertRedirect(route('login'));
-        // $this->delete(route('licitacoes.destroy', $licitacao->idlicitacao))->assertRedirect(route('login'));
-        // $this->get(route('licitacoes.restore', $licitacao->idlicitacao))->assertRedirect(route('login'));
-        // $this->get(route('licitacoes.busca'))->assertRedirect(route('login'));
-        // $this->get(route('licitacoes.trashed'))->assertRedirect(route('login'));
-    }
+        // admin
+        $this->get(route('pagamento.admin.index'))->assertRedirect(route('site.home'));
+        $this->get(route('pagamento.admin.busca'))->assertRedirect(route('site.home'));
 
-    /** @test */
-    public function non_authorized_users_cannot_access_links()
-    {
-        // $this->signIn();
-        // $this->assertAuthenticated('web');
-        
-        // $licitacao = factory('App\Licitacao')->create();
-        // $licitacao->datarealizacao = Carbon::create($licitacao->datarealizacao)->format('Y-m-d H:i');
-
-        // $this->get(route('licitacoes.index'))->assertForbidden();
-        // $this->get(route('licitacoes.create'))->assertForbidden();
-        // $this->get(route('licitacoes.edit', $licitacao->idlicitacao))->assertForbidden();
-        // $this->post(route('licitacoes.store'), $licitacao->toArray())->assertForbidden();
-        // $this->patch(route('licitacoes.update', $licitacao->idlicitacao), $licitacao->toArray())->assertForbidden();
-        // $this->delete(route('licitacoes.destroy', $licitacao->idlicitacao))->assertForbidden();
-        // $this->get(route('licitacoes.restore', $licitacao->idlicitacao))->assertForbidden();
-        // $this->get(route('licitacoes.busca'))->assertForbidden();
-        // $this->get(route('licitacoes.trashed'))->assertForbidden();
+        // site
+        $this->get(route('pagamento.view', 1))->assertRedirect(route('representante.login'));
+        $this->post(route('pagamento.gerenti', 1))->assertRedirect(route('representante.login'));
+        $this->get(route('pagamento.sucesso.checkout', 1))->assertRedirect(route('representante.login'));
+        $this->post(route('pagamento.cartao', 1))->assertRedirect(route('representante.login'));
+        $this->get(route('pagamento.cancelar.view', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('representante.login'));
+        $this->post(route('pagamento.cancelar.view', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('representante.login'));
+        $this->get(route('pagamento.visualizar', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('representante.login'));
     }
 }

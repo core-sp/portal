@@ -107,8 +107,8 @@ class PagamentoGetnetApiService {
             "save_card_data" => false,
             "transaction_type" => $dados['tipo_parcelas_1'],
             "number_installments" => $dados['parcelas_1'],
-            "soft_descriptor" => $dados["soft_descriptor"],
-            "dynamic_mcc" => $dados['dynamic_mcc'],
+            // "soft_descriptor" => $dados["soft_descriptor"],
+            // "dynamic_mcc" => $dados['dynamic_mcc'],
             'card' => $resultado['card'],
         ];
     }
@@ -182,33 +182,33 @@ class PagamentoGetnetApiService {
                 "device_id" => $dados['device_id']
             ],
             'shippings' => [
-                // [
-                //     "first_name" => "João",
-                //     "name" => "João da Silva",
-                //     "email" => "customer@email.com.br",
-                //     "phone_number" => "5551999887766",
-                //     "shipping_amount" => 0,
-                //     "address" =>  [
-                //         "street" => "Av. Brasil",
-                //         "number" => "1000",
-                //         "complement" => "Sala 1",
-                //         "district" => "São Geraldo",
-                //         "city" => "Porto Alegre",
-                //         "state" => "RS",
-                //         "country" => "Brasil",
-                //         "postal_code" => "90230060"
-                //     ],
-                // ]
+                [
+                    "first_name" => $dados['first_name'],
+                    "name" => $dados['last_name'],
+                    "email" => $dados['email'],
+                    "phone_number" => apenasNumeros($dados['phone_number']),
+                    "shipping_amount" => 0,
+                    "address" =>  [
+                        "street" => $dados['ba_street'],
+                        "number" => $dados['ba_number'],
+                        "complement" => $dados['ba_complement'],
+                        "district" => $dados['ba_district'],
+                        "city" => $dados['ba_city'],
+                        "state" => $dados['ba_state'],
+                        "country" => $dados['ba_country'],
+                        "postal_code" => $dados['ba_postal_code']
+                    ],
+                ]
             ],
-            'sub_merchant' => [
-                "identification_code" => $dados['sm_identification_code'],
-                "document_type" => "CNPJ",
-                "document_number" => apenasNumeros($dados['sm_document_number']),
-                "address" => $dados['sm_address'],
-                "city" => $dados['sm_city'],
-                "state" => $dados['sm_state'],
-                "postal_code" => $dados['sm_postal_code']
-            ],
+            // 'sub_merchant' => [
+            //     "identification_code" => $dados['sm_identification_code'],
+            //     "document_type" => "CNPJ",
+            //     "document_number" => apenasNumeros($dados['sm_document_number']),
+            //     "address" => $dados['sm_address'],
+            //     "city" => $dados['sm_city'],
+            //     "state" => $dados['sm_state'],
+            //     "postal_code" => $dados['sm_postal_code']
+            // ],
         ];
     }
 
@@ -308,7 +308,7 @@ class PagamentoGetnetApiService {
 
             if($verify['status'] != 'VERIFIED')
                 return [
-                    'message-cartao' => '<i class="fas fa-ban"></i> Cartão não é válido. Pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
+                    'message-cartao' => '<i class="fas fa-ban"></i> Cartão não é válido. Pagamento da cobrança ' . $dados['cobranca'] . ' não realizado.',
                     'class' => 'alert-danger',
                     'retorno_getnet' => 'Retorno da verificação do cartão 1: ' . $verify['status']
                 ];
@@ -348,13 +348,13 @@ class PagamentoGetnetApiService {
             
             if(($temp[0] != 'VERIFIED') || ($temp[1] != 'VERIFIED'))
                 return [
-                    'message-cartao' => '<i class="fas fa-ban"></i> Cartão não é válido. Pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
+                    'message-cartao' => '<i class="fas fa-ban"></i> Cartão não é válido. Pagamento da cobrança ' . $dados['cobranca'] . ' não realizado.',
                     'class' => 'alert-danger',
                     'retorno_getnet' => 'Retorno da verificação do cartão 1: ' . $temp[0] . ' e do cartão 2: ' . $temp[1]
                 ];
 
             $dadosFinais = $this->dadosBasicosPag($ip, $dados);
-            unset($dadosFinais['sub_merchant']);
+            // unset($dadosFinais['sub_merchant']);
             unset($dadosFinais['currency']);
             $dadosFinais['payments'] = $this->tipoPagamento($dados['tipo_pag'], $dados);
             unset($dados);
@@ -689,7 +689,7 @@ class PagamentoGetnetApiService {
         $pagamento['token'] = $this->auth;
         $pagamento['amount'] = substr_replace($request['valor'], '.', strlen($request['valor']) - 2, 0);
         $pagamento['customerid'] = $user->getCustomerId();
-        $pagamento['orderid'] = $request['boleto'];
+        $pagamento['orderid'] = $request['cobranca'];
         $pagamento['installments'] = $request['parcelas_1'];
         $pagamento['disabled'] = $disabled;
         $pagamento['callback'] = route($user::NAME_ROUTE . '.dashboard');

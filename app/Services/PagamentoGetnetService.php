@@ -57,7 +57,8 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     {
         $temp = str_replace('_3ds', '', $dados['tipo_pag']);
         $base = [
-            'boleto_id' => $dados['boleto'],
+            'cobranca_id' => $dados['cobranca'],
+            'total' => substr_replace($dados['amount'], ',', -2, 0),
             'forma' => mb_strtolower($temp),
             'parcelas' => $dados['parcelas_1'],
             'tipo_parcelas' => mb_strtoupper($dados['tipo_parcelas_1']),
@@ -114,15 +115,15 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         {
             if($status != 'CANCELED')
             {
-                $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou pagamento do boleto ' . $pagamento->boleto_id . ' do tipo *' . $pagamento->forma . '* com a ';
+                $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a ';
                 $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: '. $pagamento->combined_id;
                 $string .= '. [Dados Request:' . json_encode(request()->all()) . ']; [Dados Session:' . json_encode(session()->all()) . ']; [Dados Cache:' . json_encode(cache()) . ']';
             }else{
-                $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou o cancelamento do pagamento do boleto ' . $pagamento->boleto_id . ' do tipo *' . $pagamento->forma . '* com a ';
+                $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou o cancelamento do pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a ';
                 $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: ' . $pagamento->combined_id;
             }
         }else{
-            $string = self::TEXTO_LOG_SISTEMA . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") teve alteração de status do pagamento do boleto ' . $pagamento->boleto_id;
+            $string = self::TEXTO_LOG_SISTEMA . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") teve alteração de status do pagamento da cobrança ' . $pagamento->cobranca_id;
             $string .= ' do tipo *' . $pagamento->forma . ' *, com a payment_id: ' . $pagamento->payment_id . ' para: ' . $status;
             if(in_array($status, ['ERROR', 'DENIED']))
                 $string .= '. Detalhes da Getnet: error code - [' . $errorCode . '], description details - [' . $descricao . '].';
@@ -139,11 +140,13 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $user = \App\Representante::find(1);
         $pagamento = $user->pagamentos()->create([
             'payment_id' => $dados['payment_id'],
-            'boleto_id' => $dados['order_id'],
+            'cobranca_id' => $dados['order_id'],
+            'total' => substr_replace($dados['amount'], ',', -2, 0),
             'forma' => $dados['payment_type'],
             'parcelas' => $dados['number_installments'],
             'is_3ds' => $dados['payment_type'] == 'debit',
             'tipo_parcelas' => $dados['tipo_parcelas'],
+            'bandeira' => $dados['brand'],
             'status' => $dados['status'],
             'authorized_at' => $dados['authorization_timestamp'],
         ]);
@@ -164,7 +167,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
             if(isset($outroPagamento))
             {
-                $dados['boleto'] = $dados['order_id'];
+                $dados['cobranca'] = $dados['order_id'];
                 $dados['pagamento'] = collect([$pagamento, $outroPagamento]);
                 $this->cancelCheckout($dados, $user);
             }
@@ -269,7 +272,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         if(isset($transacao['message-cartao']))
         {
-            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento do boleto ' . $dados['boleto'] . ' do tipo *' . $dados['tipo_pag'] . '*';
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $dados['tipo_pag'] . '*';
             $string .= ', mas não foi possível. Retorno da Getnet: ' . $transacao['retorno_getnet'];
             event(new ExternoEvent($string));
             return $transacao;
@@ -284,12 +287,12 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         if($combined || $not_combined)
         {
-            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento do boleto ' . $dados['boleto'] . ' do tipo *' . $dados['tipo_pag'] . '*';
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $dados['tipo_pag'] . '*';
             $string .= ', mas não foi possível. Retorno da Getnet: Cartão verificado, mas ao realizar o pagamento o status recebido foi ' . json_encode($status);
             event(new ExternoEvent($string));
 
             return [
-                'message-cartao' => '<i class="fas fa-times"></i> Status da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
+                'message-cartao' => '<i class="fas fa-times"></i> Status da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Pagamento da cobrança ' . $dados['cobranca'] . ' não realizado.',
                 'class' => 'alert-danger'
             ];
         }
@@ -303,7 +306,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         unset($transacao);
 
         return [
-            'message-cartao' => '<i class="fas fa-check"></i> Pagamento realizado para o boleto ' . $pagamento->boleto_id . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email,
+            'message-cartao' => '<i class="fas fa-check"></i> Pagamento realizado para a cobrança ' . $pagamento->cobranca_id . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email,
             'class' => 'alert-success'
         ];
     }
@@ -323,13 +326,13 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         
         if($combined || $not_combined)
         {
-            $string = $this->via_sistema ? self::TEXTO_LOG_SISTEMA . ' ID: ' : 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento do boleto ' . $dados['boleto'] . ' do tipo *' . $tipo_pag . '* com a ';
+            $string = $this->via_sistema ? self::TEXTO_LOG_SISTEMA . ' ID: ' : 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $tipo_pag . '* com a ';
             $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $pagamento->first()->payment_id : 'combined_id: ' . $pagamento->first()->combined_id;
             $string .= ', mas não foi possível. Retorno da Getnet: ' . json_encode($message['msg']);
             event(new ExternoEvent($string));
 
             return [
-                'message-cartao' => '<i class="fas fa-times"></i> Status do cancelamento da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Cancelamento do pagamento do boleto ' . $dados['boleto'] . ' não realizado.',
+                'message-cartao' => '<i class="fas fa-times"></i> Status do cancelamento da transação: ' . is_array($status) ? $status[0] . ' e ' . $status[1] : $status . '. Cancelamento do pagamento da cobrança ' . $dados['cobranca'] . ' não realizado.',
                 'class' => 'alert-danger'
             ];
         }
@@ -342,7 +345,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         unset($transacao);
 
         return [
-            'message-cartao' => '<i class="fas fa-check"></i> Cancelamento do pagamento do boleto ' . $pagamento->first()->boleto_id . ' aprovado. Detalhes do cancelamento do pagamento enviado para o e-mail: ' . $user->email,
+            'message-cartao' => '<i class="fas fa-check"></i> Cancelamento do pagamento da cobrança ' . $pagamento->first()->cobranca_id . ' aprovado. Detalhes do cancelamento do pagamento enviado para o e-mail: ' . $user->email,
             'class' => 'alert-success'
         ];
     }
@@ -382,8 +385,8 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     public function rotinaUpdateTransacao($dados)
     {
-        // Buscar no gerenti se o boleto existe
-        $pagamento = Pagamento::where('boleto_id', $dados['order_id'])->where('payment_id', $dados['payment_id'])->first();
+        // Buscar no gerenti se a cobrança existe
+        $pagamento = Pagamento::where('cobranca_id', $dados['order_id'])->where('payment_id', $dados['payment_id'])->first();
 
         if(!isset($pagamento))
         {
@@ -406,7 +409,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     public function buscar($busca)
     {
         $resultados = Pagamento::with(['representante'])
-            ->where('boleto_id','LIKE','%'.$busca.'%')
+            ->where('cobranca_id','LIKE','%'.$busca.'%')
             ->orWhere('payment_id','LIKE','%'.$busca.'%')
             ->orWhere('combined_id','LIKE','%'.$busca.'%')
             ->orWhereHas('representante', function ($query) use($busca) {

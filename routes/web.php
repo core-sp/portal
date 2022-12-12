@@ -332,22 +332,21 @@ Route::prefix('/')->group(function() {
 
   // Pagamento
   Route::middleware(['auth:representante'])->group(function () {
-    Route::get('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerentiView')->name('pagamento.view');
-    Route::post('/realizar-pagamento/{boleto}', 'PagamentoController@pagamentoGerenti')->name('pagamento.gerenti');
-    Route::get('/checkout/sucesso/{boleto}', 'PagamentoController@checkoutIframeSucesso')->name('pagamento.sucesso.checkout');
-    Route::post('/confirmar-pagamento/{boleto}', 'PagamentoController@pagamentoCartao')->name('pagamento.cartao');
-    Route::get('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartaoView')->name('pagamento.cancelar.view');
-    Route::post('/cancelar-pagamento/{boleto}/{pagamento}', 'PagamentoController@cancelarPagamentoCartao')->name('pagamento.cancelar');
-    Route::get('/visualizar-pagamento/{boleto}/{pagamento}', 'PagamentoController@pagamentoView')->name('pagamento.visualizar');
-    // Route::get('/cardsBrand/{boleto}/{bin}', 'PagamentoController@cardsBrand')->name('pagamento.cards.brand');
+    Route::get('/realizar-pagamento/{cobranca}', 'PagamentoController@pagamentoGerentiView')->name('pagamento.view');
+    Route::post('/realizar-pagamento/{cobranca}', 'PagamentoController@pagamentoGerenti')->name('pagamento.gerenti');
+    Route::get('/checkout/sucesso/{cobranca}', 'PagamentoController@checkoutIframeSucesso')->name('pagamento.sucesso.checkout');
+    Route::post('/confirmar-pagamento/{cobranca}', 'PagamentoController@pagamentoCartao')->name('pagamento.cartao');
+    Route::get('/cancelar-pagamento/{cobranca}/{pagamento}', 'PagamentoController@cancelarPagamentoCartaoView')->name('pagamento.cancelar.view');
+    Route::post('/cancelar-pagamento/{cobranca}/{pagamento}', 'PagamentoController@cancelarPagamentoCartao')->name('pagamento.cancelar');
+    Route::get('/visualizar-pagamento/{cobranca}/{pagamento}', 'PagamentoController@pagamentoView')->name('pagamento.visualizar');
+    // Route::get('/cardsBrand/{cobranca}/{bin}', 'PagamentoController@cardsBrand')->name('pagamento.cards.brand');
   });
-  
   // Rotas de pagamento 3DS
   // Route::post('/generateToken', 'PagamentoController@generateToken')->name('pagamento.generate.token');
   // Route::post('/authentications', 'PagamentoController@authentications')->name('pagamento.authentications');
   // Route::post('/authentication-results', 'PagamentoController@authenticationResults')->name('pagamento.authentications.results');
   Route::get('/transacao/credito', 'PagamentoController@getTransacaoCredito')->name('pagamento.transacao.credito');
-  Route::get('/transacao/debito', 'PagamentoController@getTransacaoDebito')->name('pagamento.transacao.debito');
+  // Route::get('/transacao/debito', 'PagamentoController@getTransacaoDebito')->name('pagamento.transacao.debito');
 
   // Páginas (deve ser inserido no final do arquivo de rotas)
   Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

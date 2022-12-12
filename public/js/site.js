@@ -1104,17 +1104,17 @@ function enrollment()
 // condição se for 3DS
 $('#btnApiPag').click(function(e) {
 	if(($('#tipo_pag').val().indexOf('_3ds') != -1) && (this.type == 'button')){
-		tresDS($('[name="boleto"]').val(), $('#card_number_1').val());
+		tresDS($('[name="cobranca"]').val(), $('#card_number_1').val());
 	}
 });
 
-function tresDS(boleto, card)
+function tresDS(cobranca, card)
 {
 	var bin = card.replace(/[^0-9]/g,'').slice(0,6);
 	$.ajax({
 		method: "GET",
 		dataType: 'json',
-		url: "/cardsBrand/" + boleto + '/' + bin,
+		url: "/cardsBrand/" + cobranca + '/' + bin,
 		success: function(response, textStatus, xhr) {
 			var token = xhr.getResponseHeader('authorization');
 			var tokenPrincipal = xhr.getResponseHeader('authorization_principal');
@@ -1161,7 +1161,7 @@ $('.pay-button-getnet').click(function(){
 		switch (data.status || data) {
 			case 'success':
 				var endpoint = window.location.protocol + '//' + window.location.hostname;
-				window.location.replace(endpoint + '/checkout/sucesso/' + $('[name="boleto"]').val());
+				window.location.replace(endpoint + '/checkout/sucesso/' + $('[name="cobranca"]').val());
 			break;
 			case 'close':
 				window.location.replace($('#callbackURL').val());

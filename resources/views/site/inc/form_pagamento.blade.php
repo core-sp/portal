@@ -8,7 +8,7 @@
 <noscript>
     <iframe 
         style="width: 100px; height: 100px; border: 0; position:absolute; top: -5000px;" 
-        src="https://h.online-metrix.net/fp/tags?org_id={{ config('app.url') != 'https://core-sp.org.br' ? '1snn5n9w' : 'k8vif92e' }}&session_id={{ $user->getSessionIdPagamento($boleto) }}">
+        src="https://h.online-metrix.net/fp/tags?org_id={{ config('app.url') != 'https://core-sp.org.br' ? '1snn5n9w' : 'k8vif92e' }}&session_id={{ $user->getSessionIdPagamento($cobranca) }}">
     </iframe>
 </noscript>
 @endif
@@ -31,13 +31,13 @@
             <em><span class="text-danger">*</span> Preenchimento obrigatório</em>
         </small>
         <form 
-            action="{{ isset($pagamento) ? route('pagamento.cartao', $boleto) : route('pagamento.gerenti', $boleto) }}" 
+            action="{{ isset($pagamento) ? route('pagamento.cartao', $cobranca) : route('pagamento.gerenti', $cobranca) }}" 
             method="POST" 
             autocomplete="off" 
             id="{{ isset($pagamento) ? 'formPagamento' : null }}"
         >
             @csrf
-            <input type="hidden" name="boleto" value="{{ $boleto }}" />
+            <input type="hidden" name="cobranca" value="{{ $cobranca }}" />
 
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
@@ -47,7 +47,7 @@
                         name="amount"
                         class="form-control capitalSocial pagamento"
                         id="amount"
-                        value="{{ isset($boleto_dados['valor']) ? $boleto_dados['valor'] : old('amount') }}"
+                        value="{{ isset($cobranca_dados['valor']) ? $cobranca_dados['valor'] : old('amount') }}"
                         readonly
                         required
                     >
@@ -72,7 +72,7 @@
                         <option value="">Selecione a forma de pagamento...</option>
                         @endif
                     @foreach($tiposPag as $tipo => $texto)
-                        @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['tipo_pag'] == $tipo)))
+                        @if(!isset($pagamento) || (isset($pagamento) && ($cobranca_dados['tipo_pag'] == $tipo)))
                         <option value="{{ $tipo }}">{{ $texto }}</option>
                         @endif
                     @endforeach
@@ -90,7 +90,7 @@
             </div>
 
             <div class="form-row mb-2 cadastroRepresentante">
-                @if(!isset($pagamento) || (isset($pagamento) && isset($boleto_dados['amount_1']) && isset($boleto_dados['amount_2'])))
+                @if(!isset($pagamento) || (isset($pagamento) && isset($cobranca_dados['amount_1']) && isset($cobranca_dados['amount_2'])))
                 <div class="col-sm mb-2-576" id="valor_combinado">
                     <label for="amount_1">Valor no primeiro cartão <span class="text-danger">*</span></label>
                     <input
@@ -98,7 +98,7 @@
                         name="amount_1"
                         class="form-control capitalSocial pagamento"
                         id="amount_1"
-                        value="{{ isset($boleto_dados['amount_1']) ? $boleto_dados['amount_1'] : old('amount_1') }}"
+                        value="{{ isset($cobranca_dados['amount_1']) ? $cobranca_dados['amount_1'] : old('amount_1') }}"
                         @if(isset($pagamento))
                         readonly
                         @endif
@@ -121,7 +121,7 @@
                         @endif
                     >
                     @for($i = 1; $i < 11; $i++)
-                        @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['parcelas_1'] == $i)))
+                        @if(!isset($pagamento) || (isset($pagamento) && ($cobranca_dados['parcelas_1'] == $i)))
                         <option value="{{ $i }}">{{ $i == 1 ? 'à vista' : $i . 'x sem juros' }}</option>
                         @endif
                     @endfor
@@ -129,7 +129,7 @@
                 </div>
             </div>
 
-            @if(!isset($pagamento) || (isset($pagamento) && isset($boleto_dados['amount_1']) && isset($boleto_dados['amount_2'])))
+            @if(!isset($pagamento) || (isset($pagamento) && isset($cobranca_dados['amount_1']) && isset($cobranca_dados['amount_2'])))
             <div class="form-row mb-2 cadastroRepresentante" id="dados_combinado">
                 <div class="col-sm mb-2-576">
                     <label for="amount_2">Valor no segundo cartão <span class="text-danger">*</span></label>
@@ -138,7 +138,7 @@
                         name="amount_2"
                         class="form-control capitalSocial pagamento"
                         id="amount_2"
-                        value="{{ isset($boleto_dados['amount_2']) ? $boleto_dados['amount_2'] : old('amount_2') }}"
+                        value="{{ isset($cobranca_dados['amount_2']) ? $cobranca_dados['amount_2'] : old('amount_2') }}"
                         @if(isset($pagamento))
                         readonly
                         @endif
@@ -160,7 +160,7 @@
                         @endif
                     >
                     @for($i = 1; $i < 11; $i++)
-                        @if(!isset($pagamento) || (isset($pagamento) && ($boleto_dados['parcelas_2'] == $i)))
+                        @if(!isset($pagamento) || (isset($pagamento) && ($cobranca_dados['parcelas_2'] == $i)))
                         <option value="{{ $i }}">{{ $i == 1 ? 'à vista' : $i . 'x sem juros' }}</option>
                         @endif
                     @endfor
@@ -172,7 +172,7 @@
             @if(isset($pagamento) && !$checkoutIframe)
 
             <fieldset class="border rounded p-3">
-                <legend class="m-0"><small>Dados do {{ $boleto_dados['tipo_pag'] == 'combined' ? 'primeiro' : null }} cartão:</small></legend>
+                <legend class="m-0"><small>Dados do {{ $cobranca_dados['tipo_pag'] == 'combined' ? 'primeiro' : null }} cartão:</small></legend>
                 <div class="form-row mb-2 cadastroRepresentante">
                     <div class="col-md-6 mb-2-576">
                         <label for="card_number_1">Número do cartão <span class="text-danger">*</span></label>
@@ -251,7 +251,7 @@
                 </div>
             </fieldset>
 
-            @if($boleto_dados['tipo_pag'] == 'combined')
+            @if($cobranca_dados['tipo_pag'] == 'combined')
             <fieldset class="border rounded p-3">
                 <legend class="m-0"><small>Dados do segundo cartão:</small></legend>
                 <div class="form-row mb-2 cadastroRepresentante">
@@ -359,12 +359,13 @@
         </form>
     @else
         @if(\Route::is('pagamento.cancelar.*'))
-        <form action="{{ route('pagamento.cancelar', ['boleto' => $boleto, 'pagamento' => $id_pagamento]) }}" method="POST" autocomplete="off">
+        <form action="{{ route('pagamento.cancelar', ['cobranca' => $cobranca, 'pagamento' => $id_pagamento]) }}" method="POST" autocomplete="off">
             @csrf
         @endif
             @foreach($dados as $dado)
-                <p><strong>Boleto:</strong> {{ $dado->boleto_id }}</p>
+                <p><strong>Cobrança:</strong> {{ $dado->cobranca_id }}</p>
                 <p><strong>Status do pagamento:</strong> {!! $dado->getStatusLabel() !!}</p>
+                <p><strong>Valor total:</strong> {{ $dado->getValor() }}</p>
                 <p><strong>Forma de pagamento:</strong> {{ $dado->getForma() }}</p>
                 <p><strong>Parcelas:</strong> {{ $dado->getParcelas() . ' ' . $dado->getTipoParcelas() }}</p>
                 <p><strong>Bandeira:</strong> {!! $dado->getBandeiraImg() !!}</p>
@@ -493,8 +494,6 @@
     data-getnet-customer-address-zipcode="{{ $pagamento['address_zipcode'] }}"
     data-getnet-customer-country="{{ $pagamento['country'] }}"
     data-getnet-items="[{{ $pagamento['items'] }}]"
-    data-getnet-document-number="{{ $pagamento['document_number_boleto'] }}"
-    data-getnet-our-number="{{ $pagamento['our_number'] }}"
     data-getnet-url-callback="{{-- $pagamento['callback'] --}}">
 </script>
 @endif

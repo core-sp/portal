@@ -19,11 +19,10 @@ class PagamentoGerentiRequest extends FormRequest
     {
         $this->regras = array();
 
-        // Temporário, muitos dados do Gerenti
         $user = auth()->user();
 
         $this->merge([
-            'valor' => apenasNumeros($this->amount),
+            'valor' => '200'/*apenasNumeros($this->amount)*/,
             'amount_1' => $this->filled('amount_1') ? apenasNumeros($this->amount_1) : null,
             'amount_2' => $this->filled('amount_2') ? apenasNumeros($this->amount_2) : null,
             'parcelas_1' => $this->tipo_pag == 'debit_3ds' ? '1' : $this->parcelas_1,
@@ -37,31 +36,30 @@ class PagamentoGerentiRequest extends FormRequest
         
         if($this->checkoutIframe)
         {
-            // via gerenti
             $this->merge([
                 'first_name' => substr($user->nome, 0, strpos($user->nome, ' ')),
                 'last_name' => substr($user->nome, strpos($user->nome, ' ') + 1),
                 'document_type' => strlen(apenasNumeros($user->cpf_cnpj)) == 11 ? 'CPF' : 'CNPJ',
                 'document_number' => apenasNumeros($user->cpf_cnpj),
                 'email' => $user->email,
-                'phone_number' => '1134562356',
-                'address_street' => 'Rua Alexandre Dumas',
-                'address_street_number' => '1711',
+                'phone_number' => '',
+                'address_street' => '',
+                'address_street_number' => '',
                 'address_complementary' => '',
-                'address_neighborhood' => 'Chacara Santo Antonio',
-                'address_city' => 'São Paulo',
-                'address_state' => 'SP',
-                'address_zipcode' => '04717004',
+                'address_neighborhood' => '',
+                'address_city' => '',
+                'address_state' => '',
+                'address_zipcode' => '',
                 'country' => 'BR',
                 'items' => json_encode([
-                    "name" => "nome do serviço pago",
-                    "description" => "descrição do serviço pago",
+                    "name" => "nome do serviço pago em teste",
+                    "description" => "descrição do serviço pago em teste",
                     "value" => substr_replace($this->valor, '.', strlen($this->valor) - 2, 0), 
                     "quantity" => 1,
                     "sku" => ""
                 ]),
-                'our_number' => '000001946598',
-                'document_number_boleto' => '170500000019763',
+                'our_number' => '',
+                'document_number_cobranca' => '',
             ]);
 
             $this->regras = $this->regrasCheckoutIframe();
@@ -71,7 +69,7 @@ class PagamentoGerentiRequest extends FormRequest
     public function rules()
     {
         $regras = [
-            'boleto' => 'required',
+            'cobranca' => 'required',
             'valor' => 'required|regex:/^[0-9]{1,10}$/',
             'tipo_pag' => 'required|in:' . implode(',', array_keys($this->tiposPagamento)),
             'parcelas_1' => 'required|regex:/^[0-9]{1,2}$/',
@@ -88,9 +86,9 @@ class PagamentoGerentiRequest extends FormRequest
     public function messages()
     {
         return [
-            'boleto.required' => 'ID do boleto é obrigatório',
-            'valor.required' => 'Valor total do boleto é obrigatório',
-            'valor.regex' => 'Formato do valor total do boleto é inválido',
+            'cobranca.required' => 'ID da cobrança é obrigatória',
+            'valor.required' => 'Valor total da cobrança é obrigatório',
+            'valor.regex' => 'Formato do valor total da cobrança é inválido',
             'tipo_pag.required' => 'Forma de pagamento é obrigatória',
             'tipo_pag.in' => 'Tipo de forma de pagamento inválida',
             'parcelas_1.required' => 'Quantidade de parcelas é obrigatória',
@@ -126,7 +124,7 @@ class PagamentoGerentiRequest extends FormRequest
             'dynamic_mcc' => '',
             'soft_descriptor' => '',
             'our_number' => '',
-            'document_number_boleto' => '',
+            'document_number_cobranca' => '',
         ];
     }
 }

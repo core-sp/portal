@@ -17,17 +17,16 @@ class PagamentoGetnetRequest extends FormRequest
 
     protected function prepareForValidation()
     {        
-        // Temporário, muitos dados do Gerenti
         $user = auth()->user();
 
-        if(url()->previous() != route('pagamento.gerenti', $this->boleto))
+        if(url()->previous() != route('pagamento.gerenti', $this->cobranca))
         {
             $this->replace([]);
             return;
         }
 
         $this->merge([
-            'amount' => apenasNumeros($this->amount),
+            'amount' => '200'/*apenasNumeros($this->amount)*/,
             'amount_1' => $this->filled('amount_1') ? apenasNumeros($this->amount_1) : null,
             'amount_2' => $this->filled('amount_2') ? apenasNumeros($this->amount_2) : null,
             'cardholder_name_1' => mb_strtoupper($this->cardholder_name_1),
@@ -40,31 +39,31 @@ class PagamentoGetnetRequest extends FormRequest
             'name' => $user->nome,
             'document_type' => $user->tipoPessoa() == 'PF' ? 'CPF' : 'CNPJ',
             'document_number' => apenasNumeros($user->cpf_cnpj),
-            'device_id' => $user->getSessionIdPagamento($this->boleto),
+            'device_id' => $user->getSessionIdPagamento($this->cobranca),
             'parcelas_1' => $this->tipo_pag == 'debit_3ds' ? '1' : $this->parcelas_1,
             'tipo_parcelas_1' => $this->parcelas_1 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST',
-            'order_id' => $this->boleto,
+            'order_id' => $this->cobranca,
             'customer_id' => $user->getCustomerId(),
-            'first_name' => 'Teste',
-            'last_name' => 'do Teste',
-            'phone_number' => '(11) 95632-45693',
-            'sm_identification_code' => '9058344',
-            'sm_document_number' => '60.746.179/0001-52',
-            'sm_address' => 'Torre Negra 44',
-            'sm_city' => 'Cidade',
-            'sm_state' => 'SP',
-            'sm_postal_code' => '90520000',
-            'soft_descriptor' => 'COR*SPREPRESEN',
-            'dynamic_mcc' => '1799',
-            'sales_tax' => '0',
-            'ba_street' => 'Av. Brasil',
-            'ba_number' => '1000',
+            'first_name' => substr($user->nome, 0, strpos($user->nome, ' ')),
+            'last_name' => substr($user->nome, strpos($user->nome, ' ') + 1),
+            'phone_number' => '',
+            'ba_street' => '',
+            'ba_number' => '',
             'ba_complement' => '',
-            'ba_district' => 'São Geraldo',
-            'ba_city' => 'São Paulo',
-            'ba_state' => 'SP',
+            'ba_district' => '',
+            'ba_city' => '',
+            'ba_state' => '',
             'ba_country' => 'Brasil',
-            'ba_postal_code' => '90230060',
+            'ba_postal_code' => '',
+            'sm_identification_code' => '',
+            'sm_document_number' => '',
+            'sm_address' => '',
+            'sm_city' => '',
+            'sm_state' => '',
+            'sm_postal_code' => '',
+            'soft_descriptor' => '',
+            'dynamic_mcc' => '',
+            'sales_tax' => '0',
             'brand' => $this->filled('brand') ? strtolower($this->brand) : '',
             'tdsver' => $this->filled('tdsver') ? strtolower($this->tdsver) : '',
         ]);
@@ -88,7 +87,7 @@ class PagamentoGetnetRequest extends FormRequest
     public function rules()
     {
         return [
-            'boleto' => 'required',
+            'cobranca' => 'required',
             'amount' => 'required|regex:/^[0-9]{1,10}$/',
             'tipo_pag' => 'required|in:' . implode(',', array_keys($this->tiposPagamento)),
             'parcelas_1' => 'required|regex:/^[0-9]{1,2}$/',
@@ -151,9 +150,9 @@ class PagamentoGetnetRequest extends FormRequest
     public function messages()
     {
         return [
-            'boleto.required' => 'ID do boleto é obrigatório',
-            'amount.required' => 'Valor total do boleto é obrigatório',
-            'amount.regex' => 'Formato do valor total do boleto é inválido',
+            'cobranca.required' => 'ID da cobrança é obrigatória',
+            'amount.required' => 'Valor total da cobrança é obrigatório',
+            'amount.regex' => 'Formato do valor total da cobrança é inválido',
             'tipo_pag.required' => 'Forma de pagamento é obrigatória',
             'tipo_pag.in' => 'Tipo de forma de pagamento inválida',
             'parcelas_1.required' => 'Quantidade de parcelas é obrigatória',

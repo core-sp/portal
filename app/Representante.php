@@ -117,33 +117,33 @@ class Representante extends Authenticable
         return $this->hasMany('App\Pagamento', 'idrepresentante');
     }
 
-    public function getPagamento($boleto_id, $pagamento_id)
+    public function getPagamento($cobranca_id, $pagamento_id)
     {
-        return $this->pagamentos()->where('boleto_id', $boleto_id)
+        return $this->pagamentos()->where('cobranca_id', $cobranca_id)
         ->where('payment_id', $pagamento_id)->orWhere('combined_id', $pagamento_id)->get();
     }
 
-    public function getPagamentosAprovados($boletos)
+    public function getPagamentosAprovados($cobrancas)
     {
         return $this->pagamentos()
-        ->whereIn('boleto_id', $boletos)
+        ->whereIn('cobranca_id', $cobrancas)
         ->whereIn('status', ['APPROVED', 'CONFIRMED'])
         ->get();
     }
 
-    public function existePagamentoAprovado($boleto_id)
+    public function existePagamentoAprovado($cobranca_id)
     {
-        return $this->pagamentos()->where('boleto_id', $boleto_id)
+        return $this->pagamentos()->where('cobranca_id', $cobranca_id)
         ->whereIn('status', ['APPROVED', 'CONFIRMED'])->count() > 0;
     }
 
-    public function getSessionIdPagamento($boleto_id)
+    public function getSessionIdPagamento($cobranca_id)
     {
-        return apenasNumeros($this->cpf_cnpj) . $boleto_id;
+        return apenasNumeros($this->cpf_cnpj) . $cobranca_id;
     }
 
     public function getCustomerId()
     {
-        return 'customer_id_' . $this->ass_id;
+        return apenasNumeros($this->cpf_cnpj);
     }
 }

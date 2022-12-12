@@ -74,12 +74,14 @@
             </a>
         </li>
 
+        {{-- 
         <li class="nav-item">
             <a href="{{ route('pagamento.admin.index') }}" class="nav-link">
                 <i class="nav-icon fas fa-money-bill-alt"></i>
                 <p>Pagamentos on-line</p>
             </a>
         </li>
+        --}}
 
         <!-- Conteúdo -->
 

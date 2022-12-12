@@ -23,7 +23,9 @@ class PagamentoMail extends Mailable
 
         $this->textoAssunto($pagamento);
 
-        $detalhes = 'O ' . $this->status . ' do boleto ' . $pagamento->boleto_id . ' foi realizado!';
+        $detalhes = 'O ' . $this->status . ' da cobrança ' . $pagamento->cobranca_id . ' foi realizado!';
+        $detalhes .= '<br /><br />';
+        $detalhes .= '<strong>Valor total:</strong> '. $pagamento->getValor();
         $detalhes .= '<br /><br />';
 
         foreach($pagamentos as $key => $pag)
@@ -41,7 +43,7 @@ class PagamentoMail extends Mailable
         }
 
         if($pagamento->aprovado()) {
-            $link = route('pagamento.cancelar.view', ['boleto' => $pagamento->boleto_id, 'pagamento' => $pagamento->getIdPagamento()]);
+            $link = route('pagamento.cancelar.view', ['cobranca' => $pagamento->cobranca_id, 'pagamento' => $pagamento->getIdPagamento()]);
             $this->body = $detalhes;
 
             if(!$pagamento->isDebit())
@@ -75,7 +77,7 @@ class PagamentoMail extends Mailable
 
     public function build()
     {
-        return $this->subject($this->status . ' on-line de boleto no Portal CORE-SP')
+        return $this->subject($this->status . ' on-line de cobrança no Portal CORE-SP')
             ->view('emails.default');
     }
 }

@@ -16,7 +16,8 @@ class CreatePagamentosTable extends Migration
         Schema::create('pagamentos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('payment_id');
-            $table->string('boleto_id');
+            $table->string('cobranca_id');
+            $table->string('total');
             $table->string('forma');
             $table->string('parcelas');
             $table->string('tipo_parcelas')->nullable();
