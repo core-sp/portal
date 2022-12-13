@@ -7,6 +7,7 @@ use App\Contracts\MediadorServiceInterface;
 
 class PagamentoGerentiRequest extends FormRequest
 {
+    private $service;
     private $regras;
     private $tiposPagamento;
 
@@ -22,7 +23,7 @@ class PagamentoGerentiRequest extends FormRequest
         $user = auth()->user();
 
         $this->merge([
-            'valor' => '200'/*apenasNumeros($this->amount)*/,
+            'valor' => apenasNumeros($this->amount),
             'amount_1' => $this->filled('amount_1') ? apenasNumeros($this->amount_1) : null,
             'amount_2' => $this->filled('amount_2') ? apenasNumeros($this->amount_2) : null,
             'parcelas_1' => $this->tipo_pag == 'debit_3ds' ? '1' : $this->parcelas_1,

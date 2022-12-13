@@ -7,6 +7,7 @@ use App\Contracts\MediadorServiceInterface;
 
 class PagamentoGetnetRequest extends FormRequest
 {
+    private $service;
     private $regraEci;
     private $tiposPagamento;
 
@@ -17,7 +18,12 @@ class PagamentoGetnetRequest extends FormRequest
 
     protected function prepareForValidation()
     {        
+        $this->tiposPagamento = $this->service->getTiposPagamento();
+        
         $user = auth()->user();
+
+        if(!$this->filled('cobranca'))
+            $this->merge(['cobranca' => '0']);
 
         if(url()->previous() != route('pagamento.gerenti', $this->cobranca))
         {
@@ -26,7 +32,7 @@ class PagamentoGetnetRequest extends FormRequest
         }
 
         $this->merge([
-            'amount' => '200'/*apenasNumeros($this->amount)*/,
+            'amount' => apenasNumeros($this->amount),
             'amount_1' => $this->filled('amount_1') ? apenasNumeros($this->amount_1) : null,
             'amount_2' => $this->filled('amount_2') ? apenasNumeros($this->amount_2) : null,
             'cardholder_name_1' => mb_strtoupper($this->cardholder_name_1),
@@ -80,8 +86,6 @@ class PagamentoGetnetRequest extends FormRequest
 
         if(($this->tipo_pag == 'combined') && (isset($this->amount_1) && isset($this->amount_2)))
             ($this->amount_1 + $this->amount_2) != $this->amount ? $this->merge(['amount_soma' => '0']) : $this->merge(['amount_soma' => $this->amount]);
-
-        $this->tiposPagamento = $this->checkoutIframe ? $this->service->getTiposPagamentoCheckout() : $this->service->getTiposPagamento();
     }
 
     public function rules()

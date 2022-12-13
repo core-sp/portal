@@ -27,6 +27,12 @@
             @endif
             
     @if(!\Route::is('pagamento.cancelar.*') && !\Route::is('pagamento.visualizar'))
+
+        <!-- temp -->
+        @if(!isset($pagamento))
+        <p>******** DADOS DO GERENTI QUANDO SELECIONA PARCELAS / TIPO DE PAGAMENTO **********</p>
+        @endif
+
         <small class="form-text text-muted mb-3">
             <em><span class="text-danger">*</span> Preenchimento obrigatório</em>
         </small>
@@ -53,10 +59,6 @@
                     >
                 </div>
 
-                @php
-                    if($checkoutIframe)
-                        unset($tiposPag['combined']);
-                @endphp
                 <div class="col-sm mb-2-576">
                     <label for="tipo_pag">Forma de pagamento <span class="text-danger">*</span></label>
                     <select 
@@ -471,29 +473,29 @@
 
 @elseif(isset($pagamento) && $checkoutIframe)
 <script async src="https://checkout-homologacao.getnet.com.br/loader.js"
-    data-getnet-sellerid="{{ $pagamento['sellerid'] }}"
-    data-getnet-token="{{ $pagamento['token'] }}"
-    data-getnet-payment-methods-disabled='[{{$pagamento["disabled"]}}]'
-    data-getnet-amount="{{ $pagamento['amount'] }}"
-    data-getnet-customerid="{{ $pagamento['customerid'] }}"
-    data-getnet-orderid="{{ $pagamento['orderid'] }}"
+    data-getnet-sellerid="{{ isset($pagamento['sellerid']) ? $pagamento['sellerid'] : null }}"
+    data-getnet-token="{{ isset($pagamento['token']) ? $pagamento['token'] : null }}"
+    data-getnet-payment-methods-disabled='[{{isset($pagamento["disabled"]) ? $pagamento["disabled"] : null}}]'
+    data-getnet-amount="{{ isset($pagamento['amount']) ? $pagamento['amount'] : null }}"
+    data-getnet-customerid="{{ isset($pagamento['customerid']) ? $pagamento['customerid'] : null }}"
+    data-getnet-orderid="{{ isset($pagamento['orderid']) ? $pagamento['orderid'] : null }}"
     data-getnet-button-class="pay-button-getnet"
-    data-getnet-installments="{{ $pagamento['installments'] }}"
-    data-getnet-customer-first-name="{{ $pagamento['first_name'] }}"
-    data-getnet-customer-last-name="{{ $pagamento['last_name'] }}"
-    data-getnet-customer-document-type="{{ $pagamento['document_type'] }}"
-    data-getnet-customer-document-number="{{ $pagamento['document_number'] }}"
-    data-getnet-customer-email="{{ $pagamento['email'] }}"
-    data-getnet-customer-phone-number="{{ $pagamento['phone_number'] }}"
-    data-getnet-customer-address-street="{{ $pagamento['address_street'] }}"
-    data-getnet-customer-address-street-number="{{ $pagamento['address_street_number'] }}"
-    data-getnet-customer-address-complementary="{{ $pagamento['address_complementary'] }}"
-    data-getnet-customer-address-neighborhood="{{ $pagamento['address_neighborhood'] }}"
-    data-getnet-customer-address-city="{{ $pagamento['address_city'] }}"
-    data-getnet-customer-address-state="{{ $pagamento['address_state'] }}"
-    data-getnet-customer-address-zipcode="{{ $pagamento['address_zipcode'] }}"
-    data-getnet-customer-country="{{ $pagamento['country'] }}"
-    data-getnet-items="[{{ $pagamento['items'] }}]"
-    data-getnet-url-callback="{{-- $pagamento['callback'] --}}">
+    data-getnet-installments="{{ isset($pagamento['installments']) ? $pagamento['installments'] : null }}"
+    data-getnet-customer-first-name="{{ isset($pagamento['first_name']) ? $pagamento['first_name'] : null }}"
+    data-getnet-customer-last-name="{{ isset($pagamento['last_name']) ? $pagamento['last_name'] : null }}"
+    data-getnet-customer-document-type="{{ isset($pagamento['document_type']) ? $pagamento['document_type'] : null }}"
+    data-getnet-customer-document-number="{{ isset($pagamento['document_number']) ? $pagamento['document_number'] : null }}"
+    data-getnet-customer-email="{{ isset($pagamento['email']) ? $pagamento['email'] : null }}"
+    data-getnet-customer-phone-number="{{ isset($pagamento['phone_number']) ? $pagamento['phone_number'] : null }}"
+    data-getnet-customer-address-street="{{ isset($pagamento['address_street']) ? $pagamento['address_street'] : null }}"
+    data-getnet-customer-address-street-number="{{ isset($pagamento['address_street_number']) ? $pagamento['address_street_number'] : null }}"
+    data-getnet-customer-address-complementary="{{ isset($pagamento['address_complementary']) ? $pagamento['address_complementary'] : null }}"
+    data-getnet-customer-address-neighborhood="{{ isset($pagamento['address_neighborhood']) ? $pagamento['address_neighborhood'] : null }}"
+    data-getnet-customer-address-city="{{ isset($pagamento['address_city']) ? $pagamento['address_city'] : null }}"
+    data-getnet-customer-address-state="{{ isset($pagamento['address_state']) ? $pagamento['address_state'] : null }}"
+    data-getnet-customer-address-zipcode="{{ isset($pagamento['address_zipcode']) ? $pagamento['address_zipcode'] : null }}"
+    data-getnet-customer-country="{{ isset($pagamento['country']) ? $pagamento['country'] : null }}"
+    data-getnet-items="[{{ isset($pagamento['items']) ? $pagamento['items'] : null }}]"
+    data-getnet-url-callback="{{-- isset($pagamento['callback']) ? $pagamento['callback'] : null --}}">
 </script>
 @endif

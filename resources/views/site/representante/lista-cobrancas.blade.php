@@ -13,36 +13,16 @@
                 <thead>
                     <tr>
                         <th>Descrição</th>
-
-                        {{--
-                        @if(auth()->guard('representante')->user()->id == 1)
-                        <th class="text-nowrap text-center">Pagamento On-line</th>
-                        @endif
-                        --}}
-
-                        <th class="quinze text-center">Valor</th>
+                        <th class="quinze">Valor</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($cobrancas['anuidades'] as $cobranca)
                         <tr>
-                            <td class="ls-meio-neg align-middle">
+                            <td class="ls-meio-neg">
                                 {{ $cobranca['DESCRICAO'] }} ⋅ {!! secondLine($cobranca['SITUACAO'], $cobranca['VENCIMENTOBOLETO'], $cobranca['LINK'], $cobranca['DESCRICAO'], $cobranca['BOLETO']) !!}
                             </td>
-                            {{--
-                            @if(auth()->guard('representante')->user()->id == 1)
-                            <td class="ls-meio-neg text-nowrap align-middle text-center">
-                                @component('components.acoes_pagamento', [
-                                    'pagamento' => $pagamentos->where('boleto_id', $nrBoleto)->last(),
-                                    'boleto_id' => $nrBoleto,
-                                    'podePagar' => isset($cobranca['LINK']) && (strlen($cobranca['LINK']) > 3),
-                                ])
-                                @endcomponent
-                            </td>
-                            @endif
-                            --}}
-
-                            <td class="ls-meio-neg align-middle text-center">R$ {{ toReais($cobranca['VALOR']) }}</td>
+                            <td class="ls-meio-neg">R$ {{ toReais($cobranca['VALOR']) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -58,36 +38,16 @@
                 <thead>
                     <tr>
                         <th>Descrição</th>
-                        {{--
-                        @if(auth()->guard('representante')->user()->id == 1)
-                        <th class="text-nowrap text-center">Pagamento On-line</th>
-                        @endif
-                        --}}
-
-                        <th class="quinze text-center">Valor</th>
+                        <th class="quinze">Valor</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($cobrancas['outros'] as $cobranca)
                         <tr>
-                            <td class="ls-meio-neg align-middle">
+                            <td class="ls-meio-neg">
                                 {{ $cobranca['DESCRICAO'] }} ⋅ {!! secondLine($cobranca['SITUACAO'], $cobranca['VENCIMENTOBOLETO'], $cobranca['LINK'], $cobranca['DESCRICAO']) !!}
                             </td>
-                            
-                            {{--
-                            @if(auth()->guard('representante')->user()->id == 1)
-                            <td class="ls-meio-neg text-nowrap align-middle text-center">
-                                @component('components.acoes_pagamento', [
-                                    'pagamento' => $pagamentos->where('boleto_id', $nrBoleto)->last(),
-                                    'boleto_id' => $nrBoleto,
-                                    'podePagar' => isset($cobranca['LINK']) && (strlen($cobranca['LINK']) > 3),
-                                ])
-                                @endcomponent
-                            </td>
-                            @endif
-                            --}}
-
-                            <td class="ls-meio-neg align-middle text-center">R$ {{ toReais($cobranca['VALOR']) }}</td>
+                            <td class="ls-meio-neg">R$ {{ toReais($cobranca['VALOR']) }}</td>
                         </tr>
                     @endforeach
                 </tbody>

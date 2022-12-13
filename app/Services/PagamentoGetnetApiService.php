@@ -150,7 +150,7 @@ class PagamentoGetnetApiService {
     {
         return [
             'seller_id' => env('GETNET_SELLER_ID'),
-            'amount' => apenasNumeros($dados['amount']),
+            'amount' => '200'/*apenasNumeros($dados['amount'])*/,
             'currency' => "BRL",
             'order' => [
                 "order_id" => $dados['order_id'],
@@ -684,6 +684,7 @@ class PagamentoGetnetApiService {
         // foreach($array_disabled as $key => $valor)
         //     $disabled .= ++$i == count($array_disabled) ? '"' . $valor . '"' : '"' . $valor . '",';
 
+        $request['valor'] = '200';
         $pagamento = $request;
         $pagamento['sellerid'] = env('GETNET_SELLER_ID');
         $pagamento['token'] = $this->auth;

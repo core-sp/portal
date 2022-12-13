@@ -24,22 +24,7 @@
                         <i class="fas fa-download"></i>&nbsp;&nbsp;BAIXAR BOLETO
                     </button>
                 </a>
-            </p>
-            <hr />
-            
-            {{--
-            @if(auth()->guard('representante')->user()->id == 1)
-            <p class="pb-0 mt-2"><strong>Pagamento On-line:&nbsp;</strong>
-                @component('components.acoes_pagamento', [
-                    'pagamento' => $pagamento,
-                    'boleto_id' => $nrBoleto,
-                    'podePagar' => true,
-                ])
-                @endcomponent
-            </p>
-            @endif
-            --}}
-            
+            </p>            
         @else
             <p class="pb-0">Já pago ou indisponível. Confira mais detalhes na guia de <a href="/representante/situacao-financeira">Situação Financeira</a>.</p>
         @endif

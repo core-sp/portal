@@ -24,14 +24,15 @@ class PagamentoController extends Controller
         $ips = ['201.87.185.248', '201.87.185.249', '201.87.188.248', '201.87.188.249'];
         $this->can_notification = (config('app.env') != 'production') || ((config('app.env') == 'production') && in_array(request()->ip(), $ips));
 
-        // opção para chamar checkout iframe para uma situação específica, ou pode ser geral
-        $this->checkoutIframe = false;
+        // para teste
+        $hora = (int) now()->format('H');
+        $this->checkoutIframe = ($hora % 2) == 0;
         $this->middleware(function ($request, $next) {
             // para testes
-            $possui_ids = isset(auth()->user()->id) || isset(auth()->user()->idusuario);
-            $pode_acessar = (auth()->guard('representante')->user()->id == 1) || auth()->guard('web')->check();
-            if(($possui_ids && $pode_acessar) || $this->can_notification){
-                // $this->checkoutIframe = true;
+            $pode_acessar = (auth()->guard('representante')->check() && auth()->guard('representante')->user()->id == 1) || auth()->guard('web')->check();
+            if($pode_acessar || $this->can_notification){
+                if(\Route::is('pagamento.admin.*') && !auth()->guard('web')->check())
+                    return redirect()->route('site.home');
                 return $next($request);
             }
             return redirect()->route('site.home');
@@ -80,7 +81,7 @@ class PagamentoController extends Controller
                 ]);
             
             $cobranca_dados['valor'] = '2,00';
-            $tiposPag = $this->service->getService('Pagamento')->getTiposPagamento();
+            $tiposPag = $this->checkoutIframe ? $this->service->getService('Pagamento')->getTiposPagamentoCheckout() : $this->service->getService('Pagamento')->getTiposPagamento();
         }catch(\Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar dados do servidor para verificar pagamento");
@@ -133,7 +134,7 @@ class PagamentoController extends Controller
                 $pagamento = $this->service->getService('Pagamento')->checkoutIframe($cobranca_dados, $user);
             }
 
-            $tiposPag = $this->service->getService('Pagamento')->getTiposPagamento();
+            $tiposPag = $this->checkoutIframe ? $this->service->getService('Pagamento')->getTiposPagamentoCheckout() : $this->service->getService('Pagamento')->getTiposPagamento();
         }catch(\Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao processar dados do servidor para pagamento online");
@@ -168,10 +169,10 @@ class PagamentoController extends Controller
     public function pagamentoCartao($cobranca, PagamentoGetnetRequest $request)
     {
         try{
+            $user = auth()->user();
             if($this->checkoutIframe)
                 throw new \Exception('Página de pagamento não pode ser acessada devido ao uso do Checkout Iframe', 401);
 
-            $user = auth()->user();
             // cobranca pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
             $existe = $user->existePagamentoAprovado($cobranca);
             if($existe)
@@ -303,13 +304,14 @@ class PagamentoController extends Controller
     public function cardsBrand($cobranca, $bin)
     {
         try{
+            $user = auth()->user();
+
             if($this->checkoutIframe)
                 throw new \Exception('Rota não pode ser acessada devido ao uso do Checkout Iframe', 401);
 
             if(url()->previous() != route('pagamento.gerenti', $cobranca))
                 throw new \Exception('Usuário não prosseguiu com o fluxo correto de pagamento para acessar a rota atual', 500);
 
-            $user = auth()->user();
             // confere se o cobranca existe no gerenti para o usuário autenticado e traz os dados restantes que precisa para pagar
             if($cobranca == 5)
                 throw new \Exception('Cobrança não encontrada!', 404);

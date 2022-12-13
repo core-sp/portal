@@ -5,11 +5,12 @@
 use App\Pagamento;
 use Faker\Generator as Faker;
 use Carbon\Carbon;
+use App\Representante;
 
 $factory->define(Pagamento::class, function (Faker $faker) {
     return [
         'payment_id' => $faker->uuid,
-        'cobranca_id' => '1',
+        'cobranca_id' => (string) $faker->numberBetween(100, 1000),
         'total' => '2,00',
         'forma' => 'credit',
         'parcelas' => '1',
@@ -23,13 +24,13 @@ $factory->define(Pagamento::class, function (Faker $faker) {
         'canceled_at' => null,
         'gerenti_ok' => true,
         'transacao_temp' => null,
-        'idrepresentante' => factory('App\Representante'),
+        'idrepresentante' => Representante::first() !== null ? Representante::first() : factory('App\Representante'),
     ];
 });
 
 $factory->state(Pagamento::class, 'combinado', function (Faker $faker) {
     $combined_id = $faker->uuid;
-    factory('App\Pagamento')->create([
+    $pay1 = factory('App\Pagamento')->create([
         'combined_id' => $combined_id,
         'payment_tag' => 'pay-1',
     ]);

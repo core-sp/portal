@@ -64,10 +64,6 @@ class RepresentanteSiteController extends Controller
         $rep = Auth::guard('representante')->user();
         $resultado = $this->gerentiRepository->gerentiAnuidadeVigente(apenasNumeros($rep->cpf_cnpj));
         $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
-
-        // Verificar o pagamento realizado via portal para a anuidade encontrada
-        $pagamento = $rep->getPagamentosAprovados([1])->first();
-
         $status = statusBold($this->gerentiRepository->gerentiStatus($rep->ass_id));
         $ano = date("Y");
         $dadosBasicos = utf8_converter($this->gerentiRepository->gerentiChecaLogin($rep->registro_core, $rep->cpf_cnpj, $rep->email));
@@ -75,7 +71,7 @@ class RepresentanteSiteController extends Controller
         if(isset($dadosBasicos['NOME']) && ($dadosBasicos['NOME'] != $rep->nome))
             $rep->update(['nome' => strtoupper($dadosBasicos['NOME'])]);
 
-        return view('site.representante.home', compact("nrBoleto", "status", "ano", 'pagamento'));
+        return view('site.representante.home', compact("nrBoleto", "status", "ano"));
     }
 
     public function dadosGeraisView()
@@ -108,13 +104,9 @@ class RepresentanteSiteController extends Controller
 
     public function listaCobrancas()
     {
-        $user = Auth::guard('representante')->user();
-        $cobrancas = $this->gerentiRepository->gerentiCobrancas($user->ass_id);
-        
-        // Verificar os pagamentos realizados via portal para as cobranças encontradas
-        $pagamentos = $user->getPagamentosAprovados([1, 2, 3, 4]);
+        $cobrancas = $this->gerentiRepository->gerentiCobrancas(Auth::guard('representante')->user()->ass_id);
 
-        return view('site.representante.lista-cobrancas', compact("cobrancas", 'pagamentos'));
+        return view('site.representante.lista-cobrancas', compact("cobrancas"));
     }
 
     public function cadastroView()

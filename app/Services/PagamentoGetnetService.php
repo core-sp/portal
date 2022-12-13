@@ -136,8 +136,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     private function createViaNotificacao($dados)
     {
-        // $user = Buscar por customer_id / pelo gerenti saber qual usuario
-        $user = \App\Representante::find(1);
+        $user = \App\Representante::where('cpf_cnpj', $dados['customer_id'])->first();
         $pagamento = $user->pagamentos()->create([
             'payment_id' => $dados['payment_id'],
             'cobranca_id' => $dados['order_id'],
