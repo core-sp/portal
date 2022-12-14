@@ -4,7 +4,6 @@
 
 use App\Pagamento;
 use Faker\Generator as Faker;
-use Carbon\Carbon;
 use App\Representante;
 
 $factory->define(Pagamento::class, function (Faker $faker) {
@@ -20,7 +19,7 @@ $factory->define(Pagamento::class, function (Faker $faker) {
         'payment_tag' => null,
         'is_3ds' => false,
         'status' => 'APPROVED',
-        'authorized_at' => Carbon::now('UTC'),
+        'authorized_at' => now()->toIso8601ZuluString(),
         'canceled_at' => null,
         'gerenti_ok' => true,
         'transacao_temp' => null,
@@ -44,7 +43,7 @@ $factory->state(Pagamento::class, 'combinado', function (Faker $faker) {
 $factory->state(Pagamento::class, 'cancelado', function (Faker $faker) {
     return [
         'status' => 'CANCELED',
-        'canceled_at' => Carbon::now('UTC'),
+        'canceled_at' => now()->toIso8601ZuluString(),
     ];
 });
 

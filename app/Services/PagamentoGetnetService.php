@@ -14,7 +14,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     private $api;
     private $via_sistema;
     const TOTAL_CARTOES = 2;
-    const TEXTO_LOG_SISTEMA = '[Rotina Portal - Transação Getnet] ';
+    const TEXTO_LOG_SISTEMA = '[Rotina Portal - Transação Getnet] - ';
     const FORMAT_DT_EXP = 'm/Y';
 
     public function __construct()
@@ -124,7 +124,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             }
         }else{
             $string = self::TEXTO_LOG_SISTEMA . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") teve alteração de status do pagamento da cobrança ' . $pagamento->cobranca_id;
-            $string .= ' do tipo *' . $pagamento->forma . ' *, com a payment_id: ' . $pagamento->payment_id . ' para: ' . $status;
+            $string .= ' do tipo *' . $pagamento->forma . '*, com a payment_id: ' . $pagamento->payment_id . ' para: ' . $status;
             if(in_array($status, ['ERROR', 'DENIED']))
                 $string .= '. Detalhes da Getnet: error code - [' . $errorCode . '], description details - [' . $descricao . '].';
         }
@@ -136,7 +136,13 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     private function createViaNotificacao($dados)
     {
-        $user = \App\Representante::where('cpf_cnpj', $dados['customer_id'])->first();
+        $this->via_sistema = true;
+        $user = null;
+        $cpf_cnpj = substr($dados['customer_id'], 0, strpos($dados['customer_id'], '_'));
+
+        if(strpos($dados['customer_id'], 'rep') !== false)
+            $user = \App\Representante::where('cpf_cnpj', $cpf_cnpj)->first();
+
         $pagamento = $user->pagamentos()->create([
             'payment_id' => $dados['payment_id'],
             'cobranca_id' => $dados['order_id'],
@@ -325,7 +331,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         
         if($combined || $not_combined)
         {
-            $string = $this->via_sistema ? self::TEXTO_LOG_SISTEMA . ' ID: ' : 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $tipo_pag . '* com a ';
+            $string = $this->via_sistema ? self::TEXTO_LOG_SISTEMA . 'ID: ' : 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $tipo_pag . '* com a ';
             $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $pagamento->first()->payment_id : 'combined_id: ' . $pagamento->first()->combined_id;
             $string .= ', mas não foi possível. Retorno da Getnet: ' . json_encode($message['msg']);
             event(new ExternoEvent($string));
@@ -387,7 +393,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         // Buscar no gerenti se a cobrança existe
         $pagamento = Pagamento::where('cobranca_id', $dados['order_id'])->where('payment_id', $dados['payment_id'])->first();
 
-        if(!isset($pagamento))
+        if(!isset($pagamento) && ($dados['status'] == 'APPROVED'))
         {
             if($dados['checkoutIframe'])
                 $this->createViaNotificacao($dados);

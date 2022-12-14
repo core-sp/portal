@@ -153,6 +153,8 @@ class PagamentoGetnetRequest extends FormRequest
 
     public function messages()
     {
+        $regexNome =  ' Não pode conter letra acentuada, pontuação e deve possuir entre 5 a 26 caracteres';
+
         return [
             'cobranca.required' => 'ID da cobrança é obrigatória',
             'amount.required' => 'Valor total da cobrança é obrigatório',
@@ -167,7 +169,7 @@ class PagamentoGetnetRequest extends FormRequest
             'security_code_1.required' => 'CVV / CVC é obrigatório',
             'security_code_1.regex' => 'Formato do CVV / CVC é inválido',
             'cardholder_name_1.required' => 'Nome do titular do cartão é obrigatório',
-            'cardholder_name_1.regex' => 'Formato do nome do titular do cartão é inválido',
+            'cardholder_name_1.regex' => 'Formato do nome do titular do cartão é inválido.' . $regexNome,
             'card_number_1.required' => 'Número do cartão é obrigatório',
             'card_number_1.regex' => 'Formato do número do cartão é inválido',
             // Combinado
@@ -183,7 +185,7 @@ class PagamentoGetnetRequest extends FormRequest
             'security_code_2.required_if' => 'CVV / CVC do segundo cartão é obrigatório',
             'security_code_2.regex' => 'Formato do CVV / CVC do segundo cartão é inválido',
             'cardholder_name_2.required_if' => 'Nome do titular do segundo cartão é obrigatório',
-            'cardholder_name_2.regex' => 'Formato do nome do titular do segundo cartão é inválido',
+            'cardholder_name_2.regex' => 'Formato do nome do titular do segundo cartão é inválido.' . $regexNome,
             'card_number_2.required_if' => 'Número do segundo cartão é obrigatório',
             'card_number_2.regex' => 'Formato do número do segundo cartão é inválido',
             'card_number_2.different' => 'Número do segundo cartão deve ser diferente do primeiro cartão',

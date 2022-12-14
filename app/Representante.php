@@ -144,6 +144,6 @@ class Representante extends Authenticable
 
     public function getCustomerId()
     {
-        return apenasNumeros($this->cpf_cnpj);
+        return apenasNumeros($this->cpf_cnpj) . '_rep';
     }
 }
