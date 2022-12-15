@@ -111,23 +111,8 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         $pagamento = Pagamento::getFirst($pagamentos);
         
-        if(!$this->via_sistema)
-        {
-            if($status != 'CANCELED')
-            {
-                $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a ';
-                $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: '. $pagamento->combined_id;
-                $string .= '. [Dados Request:' . json_encode(request()->all()) . ']; [Dados Session:' . json_encode(session()->all()) . ']; [Dados Cache:' . json_encode(cache()) . ']';
-            }else{
-                $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou o cancelamento do pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a ';
-                $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: ' . $pagamento->combined_id;
-            }
-        }else{
-            $string = self::TEXTO_LOG_SISTEMA . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") teve alteração de status do pagamento da cobrança ' . $pagamento->cobranca_id;
-            $string .= ' do tipo *' . $pagamento->forma . '*, com a payment_id: ' . $pagamento->payment_id . ' para: ' . $status;
-            if(in_array($status, ['ERROR', 'DENIED']))
-                $string .= '. Detalhes da Getnet: error code - [' . $errorCode . '], description details - [' . $descricao . '].';
-        }
+        $string = !$this->via_sistema ? Pagamento::logAposTransacaoByUser($user, $pagamento, $status, request()->all(), session()->all(), cache()) : 
+        Pagamento::logAposTransacaoByNotification($user, $pagamento, $status, $errorCode, $descricao, self::TEXTO_LOG_SISTEMA);
         
         event(new ExternoEvent($string));
 
@@ -277,7 +262,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         if(isset($transacao['message-cartao']))
         {
-            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $dados['tipo_pag'] . '*';
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') tentou realizar o pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $dados['tipo_pag'] . '*';
             $string .= ', mas não foi possível. Retorno da Getnet: ' . $transacao['retorno_getnet'];
             event(new ExternoEvent($string));
             return $transacao;
@@ -292,7 +277,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
         if($combined || $not_combined)
         {
-            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $dados['tipo_pag'] . '*';
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') tentou realizar o pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $dados['tipo_pag'] . '*';
             $string .= ', mas não foi possível. Retorno da Getnet: Cartão verificado, mas ao realizar o pagamento o status recebido foi ' . json_encode($status);
             event(new ExternoEvent($string));
 
@@ -331,7 +316,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         
         if($combined || $not_combined)
         {
-            $string = $this->via_sistema ? self::TEXTO_LOG_SISTEMA . 'ID: ' : 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") tentou realizar o cancelamento do pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $tipo_pag . '* com a ';
+            $string = $this->via_sistema ? self::TEXTO_LOG_SISTEMA . 'ID: ' : 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') tentou realizar o cancelamento do pagamento da cobrança ' . $dados['cobranca'] . ' do tipo *' . $tipo_pag . '* com a ';
             $string .= $tipo_pag != 'combined' ? 'payment_id: ' . $pagamento->first()->payment_id : 'combined_id: ' . $pagamento->first()->combined_id;
             $string .= ', mas não foi possível. Retorno da Getnet: ' . json_encode($message['msg']);
             event(new ExternoEvent($string));

@@ -304,7 +304,8 @@ class PagamentoGetnetApiService {
             $this->getToken();
             $dados['brand'] = $this->bin(substr($dados['card_number_1'], 0, 6))['results'][0]['brand'];
             $dados['number_token'] = $this->tokenizacao($dados['card_number_1'], $dados['customer_id'])['number_token'];
-            $verify = $this->verifyCard($dados['number_token'], $dados['brand'], $dados['cardholder_name_1'], $dados['expiration_1'], $dados['security_code_1']);
+            $verify = mb_strtolower($dados['brand']) == 'amex' ? 'VERIFIED' : 
+                $this->verifyCard($dados['number_token'], $dados['brand'], $dados['cardholder_name_1'], $dados['expiration_1'], $dados['security_code_1']);
 
             if($verify['status'] != 'VERIFIED')
                 return [
@@ -342,7 +343,7 @@ class PagamentoGetnetApiService {
             {
                 $dados['brand_'.$i] = $this->bin(substr($dados['card_number_'.$i], 0, 6))['results'][0]['brand'];
                 $dados['number_token_'.$i] = $this->tokenizacao($dados['card_number_'.$i], $dados['customer_id'])['number_token'];
-                $verify = $this->verifyCard($dados['number_token_'.$i], $dados['brand_'.$i], $dados['cardholder_name_'.$i], $dados['expiration_'.$i], $dados['security_code_'.$i]);
+                $verify = mb_strtolower($dados['brand_'.$i]) == 'amex' ? 'VERIFIED' : $this->verifyCard($dados['number_token_'.$i], $dados['brand_'.$i], $dados['cardholder_name_'.$i], $dados['expiration_'.$i], $dados['security_code_'.$i]);
                 array_push($temp, $verify['status']);
             }
             

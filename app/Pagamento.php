@@ -104,6 +104,40 @@ class Pagamento extends Model
     	return $pagamentos instanceof Pagamento ? collect([$pagamentos]) : $pagamentos;
     }
 
+    public static function logAposTransacaoByUser($user, $pagamento, $status, $requestAll, $sessionAll, $cacheAll)
+    {
+        $string = '';
+    	if($status != 'CANCELED')
+        {
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a ';
+            $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: '. $pagamento->combined_id;
+            $string .= '. [Dados Request:' . json_encode($requestAll) . ']; [Dados Session:' . json_encode($sessionAll) . ']; [Dados Cache:' . json_encode($cacheAll) . ']';
+        }else{
+            $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou o cancelamento do pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a ';
+            $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: ' . $pagamento->combined_id;
+        }
+
+        return $string;
+    }
+
+    public static function logAposTransacaoByNotification($user, $pagamento, $status, $errorCode, $descricao, $via_sistema)
+    {
+        $string = '';
+    	if(in_array($status, ['APPROVED', 'AUTHORIZED']))
+        {
+            $string = $via_sistema . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ' . $pagamento->cobranca_id;
+            $string .= ' do tipo *' . $pagamento->forma . '*, com a payment_id: ' . $pagamento->payment_id . '.';
+        }else{
+            $string = $via_sistema . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') teve alteração de status do pagamento da cobrança ' . $pagamento->cobranca_id;
+            $string .= ' do tipo *' . $pagamento->forma . '*, com a payment_id: ' . $pagamento->payment_id . ' para: ' . $status;
+
+            if(in_array($status, ['ERROR', 'DENIED']))
+                $string .= '. Detalhes da Getnet: error code - [' . $errorCode . '], description details - [' . $descricao . '].';
+        }
+
+        return $string;
+    }
+
     public function representante()
     {
     	return $this->belongsTo('App\Representante', 'idrepresentante');

@@ -1066,8 +1066,41 @@ class PagamentoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_create_payment_by_notification_with_status_different_approved()
+    {
+        $representante = factory('App\Representante')->create();
+        $pagamento = factory('App\Pagamento')->make();
+        
+        $this->get(route('pagamento.transacao.credito', [
+            'payment_type' => $pagamento->forma,
+            'customer_id' => $representante->getCustomerId(),
+            'order_id' => $pagamento->cobranca_id,
+            'payment_id' => $pagamento->payment_id,
+            'amount' => '200',
+            'status' => 'AUTHORIZED',
+            'number_installments' => $pagamento->parcelas,
+            'terminal_nsu' => '031575',
+            'authorization_code' => '9190383360902371',
+            'acquirer_transaction_id' => '000099713751',
+            'authorization_timestamp' => now()->toIso8601ZuluString(),
+            'brand' => $pagamento->bandeira,
+            'description_detail' => '',
+            'error_code' => '',
+            'tipo_parcelas' => $pagamento->tipo_parcelas,
+        ]));
+
+        $this->assertDatabaseMissing('pagamentos', [
+            'cobranca_id' => $pagamento->cobranca_id,
+            'bandeira' => 'visa',
+            'status' => 'AUTHORIZED',
+            'total' => '2,00'
+        ]);
+    }
+
+    /** @test */
     public function log_is_generated_when_payment_is_created_by_api()
     {
+        // Acessa o homolog da getnet, então as vezes pode dar erro
         $user = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -1094,8 +1127,87 @@ class PagamentoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
-        $txt = $inicio . 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") realizou pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a ';
-        $txt .= 'payment_id: ';
+        $txt = $inicio . 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ';
+        $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a payment_id: ';
+
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_payment_is_canceled_by_api()
+    {
+        // Acessa o homolog da getnet, então as vezes pode dar erro
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->make();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+        ]);
+
+        $this->post(route('pagamento.cartao', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => $pagamento->forma,
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+            'cardholder_name_1' => 'TESTE CARTAO',
+            'card_number_1' => '4012001037141112',
+            'security_code_1' => '111',
+            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+        ])->assertRedirect(route('representante.dashboard'));
+
+        $pagamento = Pagamento::first();
+        $this->post(route('pagamento.cancelar', ['cobranca' => $pagamento->cobranca_id, 'pagamento' => $pagamento->payment_id]))
+        ->assertRedirect(route('representante.dashboard'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
+        $txt = $inicio . 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou o cancelamento do pagamento da cobrança ';
+        $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a payment_id: ';
+
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_payment_error_by_api()
+    {
+        // Acessa o homolog da getnet, então as vezes pode dar erro
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->make();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+        ]);
+
+        $this->post(route('pagamento.cartao', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => $pagamento->forma,
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+            'cardholder_name_1' => 'TESTE CARTAO',
+            // cartão de teste da getnet com um número a menos
+            'card_number_1' => '515590122223000',
+            'security_code_1' => '111',
+            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+        ])->assertRedirect(route('representante.dashboard'));
+
+        $this->get(route('representante.dashboard'))
+        ->assertSeeText('Não foi possível completar a operação!');
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
+        $txt = $inicio . 'Usuário '.$user->id.' ("' . formataCpfCnpj($user->cpf_cnpj) . '", login como: '.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *';
 
         $this->assertStringContainsString($txt, $log);
     }
@@ -1115,7 +1227,7 @@ class PagamentoTest extends TestCase
             'order_id' => $pagamento->cobranca_id,
             'payment_id' => $pagamento->payment_id,
             'amount' => '200',
-            'status' => $pagamento->status,
+            'status' => 'APPROVED',
             'number_installments' => $pagamento->parcelas,
             'terminal_nsu' => '031575',
             'authorization_code' => '9190383360902371',
@@ -1129,7 +1241,39 @@ class PagamentoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
-        $txt = $inicio . '[Rotina Portal - Transação Getnet] - ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'") teve alteração de status do pagamento da cobrança ';
+        $txt = $inicio . '[Rotina Portal - Transação Getnet] - ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ';
+        $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '*, com a payment_id: ';
+
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_payment_is_updated_by_notification()
+    {
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->create();
+
+        $this->get(route('pagamento.transacao.credito', [
+            'payment_type' => $pagamento->forma,
+            'customer_id' => $user->getCustomerId(),
+            'order_id' => $pagamento->cobranca_id,
+            'payment_id' => $pagamento->payment_id,
+            'amount' => '200',
+            'status' => 'ERROR',
+            'number_installments' => $pagamento->parcelas,
+            'terminal_nsu' => '031575',
+            'authorization_code' => '9190383360902371',
+            'acquirer_transaction_id' => '000099713751',
+            'description_detail' => 'SISTEMA DO EMISSOR INDISPONIVEL. LIGUE EMISSOR',
+            'error_code' => 'PAYMENTS-021',
+            'tipo_parcelas' => $pagamento->tipo_parcelas,
+        ]));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
+        $txt = $inicio . '[Rotina Portal - Transação Getnet] - ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') teve alteração de status do pagamento da cobrança ';
         $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '*, com a payment_id: ';
 
         $this->assertStringContainsString($txt, $log);

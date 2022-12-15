@@ -214,7 +214,7 @@ class PagamentoController extends Controller
             $msg = isset($temp) ? $temp : 'Erro ao processar o pagamento. Código de erro: ' . $e->getCode();
 
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento da cobrança *'.$cobranca.'*. Erro registrado no Log de Erros.');
+            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ("' . formataCpfCnpj($user->cpf_cnpj) . '", login como: '.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento da cobrança *'.$cobranca.'*. Erro registrado no Log de Erros.');
             
             return redirect()->route($user::NAME_ROUTE . '.dashboard')->with([
                 'message-cartao' => '<i class="fas fa-times"></i> Não foi possível completar a operação! ' . $msg,
@@ -267,10 +267,10 @@ class PagamentoController extends Controller
             $transacao = $this->service->getService('Pagamento')->cancelCheckout($dados, $user);
         }catch(\Exception $e){
             $temp = $this->service->getService('Pagamento')->getException($e->getMessage(), $e->getCode());
-            $msg = isset($temp) ? $temp : 'Erro ao processar o pagamento. Código de erro: ' . $e->getCode();
+            $msg = isset($temp) ? $temp : 'Erro ao processar o cancelamento do pagamento. Código de erro: ' . $e->getCode();
 
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ('.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o cancelamento do pagamento com a id *'.$id_pagamento.'* da cobrança com a id: *'.$cobranca . '*. Erro registrado no Log de Erros.');
+            \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ("' . formataCpfCnpj($user->cpf_cnpj) . '", login como: '.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o cancelamento do pagamento com a id *'.$id_pagamento.'* da cobrança com a id: *'.$cobranca . '*. Erro registrado no Log de Erros.');
             
             return redirect()->route($user::NAME_ROUTE . '.dashboard')->with([
                 'message-cartao' => '<i class="fas fa-times"></i> Não foi possível completar a operação! ' . $msg,
@@ -422,6 +422,8 @@ class PagamentoController extends Controller
                 return;
 
             $dados = $request->validated();
+            $request->replace([]);
+            request()->replace([]);
             $dados['checkoutIframe'] = $this->checkoutIframe;
             $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
         } catch (\Exception $e) {
@@ -438,6 +440,8 @@ class PagamentoController extends Controller
                 return;
 
             $dados = $request->validated();
+            $request->replace([]);
+            request()->replace([]);
             $dados['checkoutIframe'] = $this->checkoutIframe;
             $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
         } catch (\Exception $e) {
