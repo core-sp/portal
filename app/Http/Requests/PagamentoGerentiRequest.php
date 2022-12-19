@@ -10,17 +10,43 @@ class PagamentoGerentiRequest extends FormRequest
     private $service;
     private $regras;
     private $tiposPagamento;
+    private $user;
 
     public function __construct(MediadorServiceInterface $service) 
     {
-        $this->service = $service->getService('Pagamento');
+        $this->service = $service;
+    }
+
+    private function regrasCheckoutIframe()
+    {
+        return [
+            'first_name' => '',
+            'last_name' => '',
+            'document_type' => '',
+            'document_number' => '',
+            'email' => '',
+            'phone_number' => '',
+            'address_street' => '',
+            'address_street_number' => '',
+            'address_complementary' => '',
+            'address_neighborhood' => '',
+            'address_city' => '',
+            'address_state' => '',
+            'address_zipcode' => '',
+            'country' => '',
+            'items' => '',
+            'dynamic_mcc' => '',
+            'soft_descriptor' => '',
+            'our_number' => '',
+            'document_number_cobranca' => '',
+        ];
     }
 
     protected function prepareForValidation()
     {
         $this->regras = array();
 
-        $user = auth()->user();
+        $this->user = auth()->user();
 
         $this->merge([
             'valor' => apenasNumeros($this->amount),
@@ -30,7 +56,7 @@ class PagamentoGerentiRequest extends FormRequest
             'checkoutIframe' => $this->filled('checkoutIframe') ? $this->checkoutIframe : false,
         ]);
 
-        $this->tiposPagamento = $this->checkoutIframe ? $this->service->getTiposPagamentoCheckout() : $this->service->getTiposPagamento();
+        $this->tiposPagamento = $this->checkoutIframe ? $this->service->getService('Pagamento')->getTiposPagamentoCheckout() : $this->service->getService('Pagamento')->getTiposPagamento();
 
         if(($this->tipo_pag == 'combined') && (isset($this->amount_1) && isset($this->amount_2)))
             ($this->amount_1 + $this->amount_2) != $this->valor ? $this->merge(['amount_soma' => '0']) : $this->merge(['amount_soma' => $this->valor]);
@@ -38,11 +64,11 @@ class PagamentoGerentiRequest extends FormRequest
         if($this->checkoutIframe)
         {
             $this->merge([
-                'first_name' => substr($user->nome, 0, strpos($user->nome, ' ')),
-                'last_name' => substr($user->nome, strpos($user->nome, ' ') + 1),
-                'document_type' => strlen(apenasNumeros($user->cpf_cnpj)) == 11 ? 'CPF' : 'CNPJ',
-                'document_number' => apenasNumeros($user->cpf_cnpj),
-                'email' => $user->email,
+                'first_name' => substr($this->user->nome, 0, strpos($this->user->nome, ' ')),
+                'last_name' => substr($this->user->nome, strpos($this->user->nome, ' ') + 1),
+                'document_type' => strlen(apenasNumeros($this->user->cpf_cnpj)) == 11 ? 'CPF' : 'CNPJ',
+                'document_number' => apenasNumeros($this->user->cpf_cnpj),
+                'email' => $this->user->email,
                 'phone_number' => '',
                 'address_street' => '',
                 'address_street_number' => '',
@@ -104,28 +130,23 @@ class PagamentoGerentiRequest extends FormRequest
         ];
     }
 
-    private function regrasCheckoutIframe()
+    public function validated()
     {
-        return [
-            'first_name' => '',
-            'last_name' => '',
-            'document_type' => '',
-            'document_number' => '',
-            'email' => '',
-            'phone_number' => '',
-            'address_street' => '',
-            'address_street_number' => '',
-            'address_complementary' => '',
-            'address_neighborhood' => '',
-            'address_city' => '',
-            'address_state' => '',
-            'address_zipcode' => '',
-            'country' => '',
-            'items' => '',
-            'dynamic_mcc' => '',
-            'soft_descriptor' => '',
-            'our_number' => '',
-            'document_number_cobranca' => '',
-        ];
+        if($this->checkoutIframe)
+        {
+            $dados = $this->service->getService('Gerenti')->getEnderecoContatoPagamento($this->user);
+            $this->merge([
+                'phone_number' => $dados['phone_number'],
+                'address_street' => $dados['street'],
+                'address_street_number' => $dados['street_number'],
+                'address_complementary' => $dados['complementary'],
+                'address_neighborhood' => $dados['neighborhood'],
+                'address_city' => $dados['city'],
+                'address_state' => $dados['state'],
+                'address_zipcode' => $dados['zipcode'],
+            ]);
+        }
+
+        return $this->all();
     }
 }

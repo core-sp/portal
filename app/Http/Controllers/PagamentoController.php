@@ -7,19 +7,16 @@ use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PagamentoGetnetRequest;
 use App\Http\Requests\PagamentoGerentiRequest;
 use App\Http\Requests\NotificacaoGetnetRequest;
-use App\Repositories\GerentiRepositoryInterface;
 
 class PagamentoController extends Controller
 {
     private $service;
     private $checkoutIframe;
     private $can_notification;
-    private $gerentiRepository;
 
-    public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository) 
+    public function __construct(MediadorServiceInterface $service) 
     {
         $this->service = $service;
-        $this->gerentiRepository = $gerentiRepository;
 
         $ips = ['201.87.185.248', '201.87.185.249', '201.87.188.248', '201.87.188.249'];
         $this->can_notification = (config('app.env') != 'production') || ((config('app.env') == 'production') && in_array(request()->ip(), $ips));
@@ -110,29 +107,8 @@ class PagamentoController extends Controller
             $pagamento = true;
             $is_3ds = strpos($cobranca_dados['tipo_pag'], '_3ds') !== false;
 
-            if($this->checkoutIframe){
-                // temporário
-                $contatos = $this->gerentiRepository->gerentiContatos($user->ass_id);
-                $enderecos = $this->gerentiRepository->gerentiEnderecos($user->ass_id);
-                if(isset($enderecos['Logradouro'])){
-                    $cobranca_dados['address_street'] = strpos($enderecos['Logradouro'], ',') !== false ? 
-                    substr($enderecos['Logradouro'], 0, strpos($enderecos['Logradouro'], ',')) : substr($enderecos['Logradouro'], 0, 60);
-                    $cobranca_dados['address_street_number'] = strpos($enderecos['Logradouro'], ',') !== false ? 
-                    substr($enderecos['Logradouro'], strpos($enderecos['Logradouro'], ',') + 1) : '';
-                }
-                $cobranca_dados['address_complementary'] = isset($enderecos['Complemento']) ? substr(str_replace(',', ' ', $enderecos['Complemento']), 0, 60) : '';
-                $cobranca_dados['address_neighborhood'] = isset($enderecos['Bairro']) ? substr(str_replace(',', ' ', $enderecos['Bairro']), 0, 40) : '';
-                $cobranca_dados['address_city'] = isset($enderecos['Cidade']) ? substr(str_replace(',', ' ', $enderecos['Cidade']), 0, 20) : '';
-                $cobranca_dados['address_state'] = isset($enderecos['UF']) ? substr($enderecos['UF'], 0, 20) : '';
-                $cobranca_dados['address_zipcode'] = isset($enderecos['CEP']) ? substr(str_replace('-', '', $enderecos['CEP']), 0, 8) : '';
-                foreach($contatos as $contato){
-                    if(in_array($contato['CXP_TIPO'], ['8', '7', '6', '1', '2', '4']) && (strlen($contato['CXP_VALOR']) > 5)){
-                        $cobranca_dados['phone_number'] = apenasNumeros($contato['CXP_VALOR']);
-                        break;
-                    }
-                }
+            if($this->checkoutIframe)
                 $pagamento = $this->service->getService('Pagamento')->checkoutIframe($cobranca_dados, $user);
-            }
 
             $tiposPag = $this->checkoutIframe ? $this->service->getService('Pagamento')->getTiposPagamentoCheckout() : $this->service->getService('Pagamento')->getTiposPagamento();
         }catch(\Exception $e){
@@ -186,26 +162,6 @@ class PagamentoController extends Controller
             $request->replace([]);
             request()->replace([]);
 
-            // temporário
-            $contatos = $this->gerentiRepository->gerentiContatos($user->ass_id);
-            $enderecos = $this->gerentiRepository->gerentiEnderecos($user->ass_id);
-            if(isset($enderecos['Logradouro'])){
-                $cobranca_dados['ba_street'] = strpos($enderecos['Logradouro'], ',') !== false ? 
-                substr($enderecos['Logradouro'], 0, strpos($enderecos['Logradouro'], ',')) : substr($enderecos['Logradouro'], 0, 60);
-                $cobranca_dados['ba_number'] = strpos($enderecos['Logradouro'], ',') !== false ? 
-                substr($enderecos['Logradouro'], strpos($enderecos['Logradouro'], ',') + 1) : '';
-            }
-            $validate['ba_complement'] = isset($enderecos['Complemento']) ? substr(str_replace(',', ' ', $enderecos['Complemento']), 0, 60) : '';
-            $validate['ba_district'] = isset($enderecos['Bairro']) ? substr(str_replace(',', ' ', $enderecos['Bairro']), 0, 40) : '';
-            $validate['ba_city'] = isset($enderecos['Cidade']) ? substr(str_replace(',', ' ', $enderecos['Cidade']), 0, 20) : '';
-            $validate['ba_state'] = isset($enderecos['UF']) ? substr($enderecos['UF'], 0, 20) : '';
-            $validate['ba_postal_code'] = isset($enderecos['CEP']) ? substr(str_replace('-', '', $enderecos['CEP']), 0, 8) : '';
-            foreach($contatos as $contato){
-                if(in_array($contato['CXP_TIPO'], ['8', '7', '6', '1', '2', '4']) && (strlen($contato['CXP_VALOR']) > 5)){
-                    $validate['phone_number'] = apenasNumeros($contato['CXP_VALOR']);
-                    break;
-                }
-            }
             $transacao = $this->service->getService('Pagamento')->checkout($request->ip(), $validate, $user);
 
             unset($validate);

@@ -10,17 +10,18 @@ class PagamentoGetnetRequest extends FormRequest
     private $service;
     private $regraEci;
     private $tiposPagamento;
+    private $user;
 
     public function __construct(MediadorServiceInterface $service) 
     {
-        $this->service = $service->getService('Pagamento');
+        $this->service = $service;
     }
 
     protected function prepareForValidation()
     {        
-        $this->tiposPagamento = $this->service->getTiposPagamento();
+        $this->tiposPagamento = $this->service->getService('Pagamento')->getTiposPagamento();
         
-        $user = auth()->user();
+        $this->user = auth()->user();
 
         if(!$this->filled('cobranca'))
             $this->merge(['cobranca' => '0']);
@@ -39,19 +40,19 @@ class PagamentoGetnetRequest extends FormRequest
             'cardholder_name_2' => $this->filled('cardholder_name_2') ? mb_strtoupper($this->cardholder_name_2) : null,
             'card_number_1' => $this->filled('card_number_1') ? apenasNumeros($this->card_number_1) : null,
             'card_number_2' => $this->filled('card_number_2') ? apenasNumeros($this->card_number_2) : null,
-            'document_number_1' => apenasNumeros($user->cpf_cnpj),
-            'document_number_2' => $this->filled('card_number_2') ? apenasNumeros($user->cpf_cnpj) : null,
-            'email' => $user->email,
-            'name' => $user->nome,
-            'document_type' => $user->tipoPessoa() == 'PF' ? 'CPF' : 'CNPJ',
-            'document_number' => apenasNumeros($user->cpf_cnpj),
-            'device_id' => $user->getSessionIdPagamento($this->cobranca),
+            'document_number_1' => apenasNumeros($this->user->cpf_cnpj),
+            'document_number_2' => $this->filled('card_number_2') ? apenasNumeros($this->user->cpf_cnpj) : null,
+            'email' => $this->user->email,
+            'name' => $this->user->nome,
+            'document_type' => $this->user->tipoPessoa() == 'PF' ? 'CPF' : 'CNPJ',
+            'document_number' => apenasNumeros($this->user->cpf_cnpj),
+            'device_id' => $this->user->getSessionIdPagamento($this->cobranca),
             'parcelas_1' => $this->tipo_pag == 'debit_3ds' ? '1' : $this->parcelas_1,
             'tipo_parcelas_1' => $this->parcelas_1 == 1 ? 'FULL' : 'INSTALL_NO_INTEREST',
             'order_id' => $this->cobranca,
-            'customer_id' => $user->getCustomerId(),
-            'first_name' => substr($user->nome, 0, strpos($user->nome, ' ')),
-            'last_name' => substr($user->nome, strpos($user->nome, ' ') + 1),
+            'customer_id' => $this->user->getCustomerId(),
+            'first_name' => substr($this->user->nome, 0, strpos($this->user->nome, ' ')),
+            'last_name' => substr($this->user->nome, strpos($this->user->nome, ' ') + 1),
             'phone_number' => '',
             'ba_street' => '',
             'ba_number' => '',
@@ -200,5 +201,22 @@ class PagamentoGetnetRequest extends FormRequest
             'brand.in' => 'Bandeira do cartão não é aceita',
             'eci.in' => 'Não autorizado a realizar a autenticação.',
         ];
+    }
+
+    public function validated()
+    {
+        $dados = $this->service->getService('Gerenti')->getEnderecoContatoPagamento($this->user);
+        $this->merge([
+            'phone_number' => $dados['phone_number'],
+            'ba_street' => $dados['street'],
+            'ba_number' => $dados['street_number'],
+            'ba_complement' => $dados['complementary'],
+            'ba_district' => $dados['neighborhood'],
+            'ba_city' => $dados['city'],
+            'ba_state' => $dados['state'],
+            'ba_postal_code' => $dados['zipcode'],
+        ]);
+
+        return $this->all();
     }
 }
