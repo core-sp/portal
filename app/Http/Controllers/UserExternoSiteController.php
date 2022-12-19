@@ -42,7 +42,7 @@ class UserExternoSiteController extends Controller
         }
 
         if(isset($dados['erro']))
-            return redirect(route('externo.cadastro'))->withInput()->with([
+            return redirect()->route('externo.cadastro')->withInput()->with([
                 'message' => $dados['erro'],
                 'class' => $dados['class']
             ]);
@@ -66,7 +66,7 @@ class UserExternoSiteController extends Controller
             'class' => 'alert-success'
         ];
 
-        return redirect(route('externo.login'))->with(isset($erro['message']) ? $erro : $success);
+        return redirect()->route('externo.login')->with(isset($erro['message']) ? $erro : $success);
     }
 
     public function index()
@@ -99,10 +99,10 @@ class UserExternoSiteController extends Controller
         }
 
         if(isset($erro['message']) && isset($validate['password_atual']))
-            return redirect(route('externo.editar.senha.view'))->with($erro);
+            return redirect()->route('externo.editar.senha.view')->with($erro);
 
-        return isset($erro['message']) ? redirect(route('externo.editar.view'))->with($erro)->withInput() : 
-            redirect(route('externo.editar.view'))->with([
+        return isset($erro['message']) ? redirect()->route('externo.editar.view')->with($erro)->withInput() : 
+            redirect()->route('externo.editar.view')->with([
                 'message' => 'Dados alterados com sucesso.',
                 'class' => 'alert-success'
             ]);
@@ -138,18 +138,12 @@ class UserExternoSiteController extends Controller
                 return redirect(route('externo.preregistro.view'))->with(['resultado' => null, 'gerenti' => null]);
 
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
-            $codigos = $dados['codigos'];
-            $resultado = $dados['resultado'];
-            $regionais = $dados['regionais'];
-            $classes = $dados['classes'];
-            $totalFiles = $dados['totalFiles'];
-            $abas = $dados['abas'];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao carregar os dados da solicitação de registro');
         }
 
-        return view('site.userExterno.inserir-pre-registro', compact('resultado', 'regionais', 'totalFiles', 'codigos', 'classes', 'abas'));
+        return view('site.userExterno.inserir-pre-registro', $dados);
     }
 
     public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
@@ -174,29 +168,24 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
             
             if(isset($dados['gerenti']))
-                return redirect(route('externo.preregistro.view'))->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
+                return redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
             if($externo->preRegistroAprovado())
-                return redirect(route('externo.preregistro.view'))->with(['resultado' => null, 'gerenti' => null]);
+                return redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => null]);
 
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
-            $codigos = $dados['codigos'];
             $resultado = $dados['resultado'];
 
             if(!$resultado->userPodeEditar())
                 throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
-            $regionais = $dados['regionais'];
-            $classes = $dados['classes'];
-            $totalFiles = $dados['totalFiles'];
-            $abas = $dados['abas'];
-            $semPendencia = true;
+            $dados['semPendencia'] = true;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao verificar pendências da solicitação de registro');
         }
         
-        return view('site.userExterno.inserir-pre-registro', compact('semPendencia', 'resultado', 'regionais', 'totalFiles', 'codigos', 'classes', 'abas'));
+        return view('site.userExterno.inserir-pre-registro', $dados);
     }
 
     // Esse request não devolve a página para correção.
@@ -214,7 +203,7 @@ class UserExternoSiteController extends Controller
             abort(500, 'Erro ao enviar os dados da solicitação de registro para análise');
         }
         
-        return redirect(route('externo.preregistro.view'))->with($dados);
+        return redirect()->route('externo.preregistro.view')->with($dados);
     }
 
     public function preRegistroAnexoDownload($id)
