@@ -27,11 +27,7 @@ class PreRegistroController extends Controller
 
         try{
             $user = auth()->user();
-            $dados = $this->service->getService('PreRegistro')->listar($request, $this->service, $user);
-            $temFiltro = $dados['temFiltro'];
-            $resultados = $dados['resultados'];
-            $tabela = $dados['tabela'];
-            $variaveis = $dados['variaveis'];
+            $dados = $this->service->getService('PreRegistro')->getAdminService()->listar($request, $this->service, $user);
             session(['url_pre_registro' => url()->full()]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -39,7 +35,7 @@ class PreRegistroController extends Controller
             abort(500, "Erro ao carregar os pré-registros.");
         }
 
-        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
+        return view('admin.crud.home', $dados);
     }
 
     public function view($id)
@@ -47,18 +43,14 @@ class PreRegistroController extends Controller
         // $this->authorize('updateOther', auth()->user());
         
         try{
-            $dados = $this->service->getService('PreRegistro')->view($id);
-            $resultado = $dados['resultado'];
-            $variaveis = $dados['variaveis'];
-            $abas = $dados['abas'];
-            $codigos = $dados['codigos'];
+            $dados = $this->service->getService('PreRegistro')->getAdminService()->view($id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao carregar o pré-registro.");
         }
 
-        return view('admin.crud.mostra', compact('resultado', 'variaveis', 'abas', 'codigos'));
+        return view('admin.crud.mostra', $dados);
     }
 
     public function busca(Request $request)
@@ -66,17 +58,14 @@ class PreRegistroController extends Controller
         // $this->authorize('viewAny', auth()->user());
 
         try{
-            $busca = $request->q;
-            $dados = $this->service->getService('PreRegistro')->buscar($busca);
-            $resultados = $dados['resultados'];
-            $tabela = $dados['tabela'];
-            $variaveis = $dados['variaveis'];
+            $dados = $this->service->getService('PreRegistro')->getAdminService()->buscar($request->q);
+            $dados['busca'] = $request->q;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em pré-registros.");
         }
 
-        return view('admin.crud.home', compact('resultados', 'busca', 'tabela', 'variaveis'));
+        return view('admin.crud.home', $dados);
     }
 
     public function updateAjax(PreRegistroAjaxAdminRequest $request, $id)
@@ -86,7 +75,7 @@ class PreRegistroController extends Controller
         try{
             $user = auth()->user();
             $validatedData = $request->validated();
-            $dados = $this->service->getService('PreRegistro')->saveAjaxAdmin($validatedData, $id, $user);
+            $dados = $this->service->getService('PreRegistro')->getAdminService()->saveAjaxAdmin($validatedData, $id, $user);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
@@ -118,7 +107,7 @@ class PreRegistroController extends Controller
         try{
             $validated = $request->validated();
             $user = auth()->user();
-            $dados = $this->service->getService('PreRegistro')->updateStatus($id, $user, $validated['status']);
+            $dados = $this->service->getService('PreRegistro')->getAdminService()->updateStatus($id, $user, $validated['status']);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o status do pré-registro.");

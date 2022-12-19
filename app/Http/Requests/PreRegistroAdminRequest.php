@@ -18,7 +18,7 @@ class PreRegistroAdminRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->msg = '';
-        $preRegistro = $this->service->getService('PreRegistro')->view($this->preRegistro)['resultado'];
+        $preRegistro = $this->service->getService('PreRegistro')->getAdminService()->view($this->preRegistro)['resultado'];
         $arrayStatus = [
             'aprovar' => $preRegistro::STATUS_APROVADO,
             'negar' => $preRegistro::STATUS_NEGADO,

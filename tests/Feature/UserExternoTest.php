@@ -1258,7 +1258,7 @@ class UserExternoTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $this->assertStringContainsString($user_externo->id, $log);
         $this->assertStringContainsString($user_externo->cpf_cnpj, $log);
-        $this->assertStringContainsString('alterou os dados com sucesso na Área Restrita.', $log);
+        $this->assertStringContainsString('alterou os dados com sucesso na Área Restrita após logon.', $log);
     }
 
     /** @test 

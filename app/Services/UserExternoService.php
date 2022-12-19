@@ -45,13 +45,7 @@ class UserExternoService implements UserExternoServiceInterface {
         else
             $externo = UserExterno::create($dados);
 
-        $body = '<strong>Cadastro no Login Externo do Portal Core-SP realizado com sucesso!</strong>';
-        $body .= '<br /><br />';
-        $body .= 'Você deve ativar sua conta em até 24h, caso contrário deve se recadastrar.';
-        $body .= '<br /><br />';
-        $body .= 'Para concluir o processo, basta clicar <a href="'. route('externo.verifica-email', $dados['verify_token']) .'">NESTE LINK</a>.';
-
-        Mail::to($externo->email)->queue(new CadastroUserExternoMail($body));
+        Mail::to($externo->email)->queue(new CadastroUserExternoMail($dados['verify_token']));
         event(new ExternoEvent('"' . $externo->cpf_cnpj . '" ("' . $externo->email . '") cadastrou-se na Área do Login Externo.'));
     }
 
@@ -78,7 +72,9 @@ class UserExternoService implements UserExternoServiceInterface {
             if(Hash::check($dados['password_atual'], $externo->password)) 
             {
                 $externo->update(['password' => Hash::make($dados['password'])]);
-                event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou a senha com sucesso na Área Restrita.'));
+
+                Mail::to($externo->email)->queue(new CadastroUserExternoMail(null, $externo));
+                event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou a senha com sucesso na Área Restrita após logon.'));
             }else
                 return [
                     'message' => 'A senha atual digitada está incorreta!',
@@ -99,7 +95,9 @@ class UserExternoService implements UserExternoServiceInterface {
                 'nome' => mb_strtoupper($dados['nome'], 'UTF-8'),
                 'email' => $dados['email']
             ]);
-            event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou os dados com sucesso na Área Restrita.'));
+
+            Mail::to($externo->email)->queue(new CadastroUserExternoMail(null, $externo));
+            event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou os dados com sucesso na Área Restrita após logon.'));
         }
     }
 

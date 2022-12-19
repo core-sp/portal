@@ -233,6 +233,31 @@ class PreRegistro extends Model
         return $array;
     }
 
+    public static function getMenu()
+    {
+        return explode(',', PreRegistro::MENU);
+    }
+
+    // Fazer os códigos automaticos
+    public static function getCodigosCampos($arrayCampos)
+    {
+        $codigos = array();
+
+        foreach($arrayCampos as $key => $value)
+        {
+            $temp = explode(',', $value);
+            $cont = 1;
+            $chave = (string) $key + 1;
+            foreach($temp as $campo)
+            {
+                $codigos[$key][$campo] = $chave . '.' . $cont;
+                $cont++;
+            }
+        }
+
+        return $codigos;
+    }
+
     public function userExterno()
     {
         return $this->belongsTo('App\UserExterno')->withTrashed();
