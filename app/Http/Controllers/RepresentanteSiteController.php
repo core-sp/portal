@@ -550,7 +550,7 @@ class RepresentanteSiteController extends Controller
             $representante = auth()->guard('representante')->user();
             $dados = $this->service->getService('Cedula')->getByRepresentante($representante, $this->gerentiRepository);
             if($dados['cedulaEmAndamento'] > 0)
-                return redirect(route('representante.solicitarCedulaView'));
+                return redirect()->route('representante.solicitarCedulaView');
 
             $dados['tipos'] = $this->service->getService('Cedula')->getAllTipos();
         } catch (\Exception $e) {
@@ -598,7 +598,7 @@ class RepresentanteSiteController extends Controller
             $representante = auth()->guard('representante')->user();
             $dados = $this->service->getService('Cedula')->getByRepresentante($representante);
             if($dados['cedulaEmAndamento'] > 0)
-                return redirect(route('representante.solicitarCedulaView'));
+                return redirect()->route('representante.solicitarCedulaView');
 
             $dados = $this->service->getService('Cedula')->save($validate, $representante, $this->gerentiRepository, $this->service);
         } catch (\Exception $e) {

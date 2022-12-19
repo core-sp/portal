@@ -81,7 +81,7 @@ class SolicitaCedulaController extends Controller
 
         $txt = isset($validated['justificativa']) ? 'recusada.' : 'aceita.';
 
-        return redirect(route('solicita-cedula.index'))->with([
+        return redirect()->route('solicita-cedula.index')->with([
             'message' => '<i class="fas fa-check"></i> A solicitação de cédula com a ID: ' . $id . ' foi ' . $txt,
             'class' => 'alert-success'
         ]);
@@ -204,9 +204,8 @@ class SolicitaCedulaController extends Controller
         // $variaveis = (object) $this->variaveis;
 
         try{
-            $busca = $request->q;
-            $dados = $this->service->getService('Cedula')->buscar($busca);
-            $dados['busca'] = $busca;
+            $dados = $this->service->getService('Cedula')->buscar($request->q);
+            $dados['busca'] = $request->q;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em solicitações de cédulas.");
@@ -300,7 +299,7 @@ class SolicitaCedulaController extends Controller
         if(isset($dados['stream']))
             return $dados['stream'];
 
-        return redirect(route('solicita-cedula.index'))->with([
+        return redirect()->route('solicita-cedula.index')->with([
             'message' => '<i class="fas fa-ban"></i> A solicitação de cédula não foi aceita.',
             'class' => 'alert-danger'
         ]);
