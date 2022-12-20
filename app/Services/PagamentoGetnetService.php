@@ -128,6 +128,9 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         if(strpos($dados['customer_id'], 'rep') !== false)
             $user = \App\Representante::where('cpf_cnpj', $cpf_cnpj)->first();
 
+        if(!isset($user))
+            throw new \Exception('Usuário não encontrado no Portal pela customer_id *' . $dados['customer_id'] . '* ao receber a notificação da Getnet após transação.', 404);
+        
         $pagamento = $user->pagamentos()->create([
             'payment_id' => $dados['payment_id'],
             'cobranca_id' => $dados['order_id'],

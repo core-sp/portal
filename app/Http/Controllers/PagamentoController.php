@@ -51,9 +51,8 @@ class PagamentoController extends Controller
     public function busca(Request $request)
     {
         try{
-            $busca = $request->q;
-            $dados = $this->service->getService('Pagamento')->buscar($busca);
-            $dados['busca'] = $busca;
+            $dados = $this->service->getService('Pagamento')->buscar($request->q);
+            $dados['busca'] = $request->q;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o texto em pagamentos.");

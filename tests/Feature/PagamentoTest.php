@@ -59,6 +59,19 @@ class PagamentoTest extends TestCase
         ->assertSee($pagamentoCancelado->getStatusLabel());
     }
 
+    /** @test */
+    public function user_can_search_payments()
+    {
+        $this->signInAsAdmin();
+
+        $pagamento = factory('App\Pagamento')->create();
+        $pagamentoCombinado = factory('App\Pagamento')->states('combinado')->create();
+        $pagamentoCancelado = factory('App\Pagamento')->states('cancelado')->create();
+
+        $this->get(route('pagamento.admin.busca', ['q' => $pagamento->payment_id]))
+        ->assertSeeText(substr_replace($pagamento->payment_id, '**********', 9, strlen($pagamento->payment_id)));
+    }
+
     /** 
      * =======================================================================================================
      * TESTES PAGAMENTO USUARIO
@@ -965,6 +978,37 @@ class PagamentoTest extends TestCase
         ]));
 
         $this->assertDatabaseHas('pagamentos', [
+            'cobranca_id' => $pagamento->cobranca_id,
+            'bandeira' => 'visa',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_payment_by_notification_without_user()
+    {
+        // Deve habilitar no PagamentoController o checkoutIframe
+        $representante = factory('App\Representante')->create();
+        $pagamento = factory('App\Pagamento')->make();
+        
+        $this->get(route('pagamento.transacao.credito', [
+            'payment_type' => $pagamento->forma,
+            'customer_id' => '00000000000_rep',
+            'order_id' => $pagamento->cobranca_id,
+            'payment_id' => $pagamento->payment_id,
+            'amount' => '200',
+            'status' => $pagamento->status,
+            'number_installments' => $pagamento->parcelas,
+            'terminal_nsu' => '031575',
+            'authorization_code' => '9190383360902371',
+            'acquirer_transaction_id' => '000099713751',
+            'authorization_timestamp' => now()->toIso8601ZuluString(),
+            'brand' => $pagamento->bandeira,
+            'description_detail' => '',
+            'error_code' => '',
+            'tipo_parcelas' => $pagamento->tipo_parcelas,
+        ]));
+
+        $this->assertDatabaseMissing('pagamentos', [
             'cobranca_id' => $pagamento->cobranca_id,
             'bandeira' => 'visa',
         ]);

@@ -27,14 +27,16 @@ class PagamentoGetnetApiService {
     private function formatError(RequestException $e, $metodo)
     {
         $codigo = 0;
-        $erroGetnet = $e->getMessage();
+        $erroGetnet = $e->getMessage() . ' no método: ' . $metodo;
         if($e->hasResponse())
         {
             $codigo = $e->getResponse()->getStatusCode();
             $erroGetnet = $e->getResponse()->getBody()->getContents();
+            if(strpos($erroGetnet, '{') !== false)
+                $erroGetnet = substr_replace($erroGetnet, '"metodo_portal":"' . $metodo . '",', strpos($erroGetnet, '{') + 1, 0);
         }
             
-        throw new \Exception($erroGetnet . ' no método: ' . $metodo, $codigo);
+        throw new \Exception($erroGetnet, $codigo);
     }
 
     private function finalAutentication3ds($response)
