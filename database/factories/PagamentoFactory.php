@@ -17,6 +17,7 @@ $factory->define(Pagamento::class, function (Faker $faker) {
         'bandeira' => 'visa',
         'combined_id' => null,
         'payment_tag' => null,
+        'total_combined' => null,
         'is_3ds' => false,
         'status' => 'APPROVED',
         'authorized_at' => now()->toIso8601ZuluString(),
@@ -30,13 +31,17 @@ $factory->define(Pagamento::class, function (Faker $faker) {
 $factory->state(Pagamento::class, 'combinado', function (Faker $faker) {
     $combined_id = $faker->uuid;
     $pay1 = factory('App\Pagamento')->create([
+        'forma' => 'combined',
         'combined_id' => $combined_id,
         'payment_tag' => 'pay-1',
+        'total_combined' => '1,00',
     ]);
 
     return [
+        'forma' => 'combined',
         'combined_id' => $combined_id,
         'payment_tag' => 'pay-2',
+        'total_combined' => '1,00',
     ];
 });
 

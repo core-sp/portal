@@ -24,6 +24,7 @@ class CreatePagamentosTable extends Migration
             $table->string('bandeira')->nullable();
             $table->string('combined_id')->nullable();
             $table->string('payment_tag')->nullable();
+            $table->string('total_combined')->nullable();
             $table->boolean('is_3ds')->default(false);
             $table->string('status');
             $table->string('authorized_at');

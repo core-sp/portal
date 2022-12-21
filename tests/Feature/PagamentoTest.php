@@ -12,6 +12,12 @@ class PagamentoTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** 
+     * =======================================================================================================
+     * TESTES PAGAMENTO ADMIN
+     * =======================================================================================================
+     */
+
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
@@ -87,6 +93,35 @@ class PagamentoTest extends TestCase
         $pagamento = factory('App\Pagamento')->make();
 
         $this->get(route('pagamento.view', $pagamento->cobranca_id))
+        ->assertSee('Pagamento On-line')
+        ->assertSee('Valor total')
+        ->assertSee('Forma de pagamento')
+        ->assertSee('Parcelas')
+        ->assertSee('Crédito');
+    }
+
+    /** @test */
+    public function user_cannot_view_payment_other_user()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamentoUser = factory('App\Pagamento')->create();
+        $pagamento = factory('App\Pagamento')->create([
+            'idrepresentante' => factory('App\Representante')->create([
+                'cpf_cnpj' => '12345678911'
+            ]),
+        ]);
+
+        $this->get(route('pagamento.visualizar', ['cobranca' => $pagamento->cobranca_id, 'pagamento' => $pagamento->payment_id]))
+        ->assertDontSee('Pagamento On-line')
+        ->assertDontSee('Valor total')
+        ->assertDontSee('Forma de pagamento')
+        ->assertDontSee('Parcelas')
+        ->assertDontSee('Crédito')
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->get(route('pagamento.visualizar', ['cobranca' => $pagamentoUser->cobranca_id, 'pagamento' => $pagamentoUser->payment_id]))
         ->assertSee('Pagamento On-line')
         ->assertSee('Valor total')
         ->assertSee('Forma de pagamento')
@@ -200,6 +235,39 @@ class PagamentoTest extends TestCase
     }
 
     /** @test */
+    public function user_cannot_submit_form_payment_getnet_with_cobranca_approved()
+    {
+        // Acessa o homolog da getnet, então as vezes pode dar erro
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->create();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+        ])->assertRedirect(route('representante.dashboard'));
+
+        $this->post(route('pagamento.cartao', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+            'cardholder_name_1' => 'TESTE CARTAO',
+            'card_number_1' => '4012001037141112',
+            'security_code_1' => '111',
+            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+        ])->assertRedirect(route('representante.dashboard'));
+
+        $this->assertEquals(Pagamento::count(), 1);
+    }
+
+    /** @test */
     public function user_can_submit_type_combined_form_payment_getnet_without_checkoutIframe()
     {
         // Acessa o homolog da getnet, então as vezes pode dar erro
@@ -273,34 +341,6 @@ class PagamentoTest extends TestCase
             'security_code_1',
             'expiration_1',
         ]);
-    }
-
-    /** @test */
-    public function user_cannot_submit_form_payment_getnet_with_amount_with_letters()
-    {
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-
-        $pagamento = factory('App\Pagamento')->make();
-
-        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
-        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
-            'cobranca' => $pagamento->cobranca_id,
-            'tipo_pag' => 'credit',
-            'amount' => $pagamento->total,
-            'parcelas_1' => $pagamento->parcelas,
-        ]);
-
-        $this->post(route('pagamento.cartao', $pagamento->cobranca_id), [
-            'cobranca' => $pagamento->cobranca_id,
-            'tipo_pag' => 'credit',
-            'amount' => '12a3',
-            'parcelas_1' => '1',
-            'cardholder_name_1' => 'TESTE CARTAO',
-            'card_number_1' => '4012001037141112',
-            'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
-        ])->assertSessionHasErrors('amount');
     }
 
     /** @test */
@@ -1139,6 +1179,19 @@ class PagamentoTest extends TestCase
             'status' => 'AUTHORIZED',
             'total' => '2,00'
         ]);
+    }
+
+    /** @test */
+    public function cannot_cancel_when_payment_is_canceled()
+    {
+        // Acessa o homolog da getnet, então as vezes pode dar erro
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->states('cancelado')->create();
+
+        $this->post(route('pagamento.cancelar', ['cobranca' => $pagamento->cobranca_id, 'pagamento' => $pagamento->payment_id]))
+        ->assertRedirect(route('representante.dashboard'));
     }
 
     /** @test */

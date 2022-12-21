@@ -58,7 +58,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $temp = str_replace('_3ds', '', $dados['tipo_pag']);
         $base = [
             'cobranca_id' => $dados['cobranca'],
-            'total' => substr_replace($dados['amount'], ',', -2, 0),
+            'total' => amountCentavosToReal($dados['amount']),
             'forma' => mb_strtolower($temp),
             'parcelas' => $dados['parcelas_1'],
             'tipo_parcelas' => mb_strtoupper($dados['tipo_parcelas_1']),
@@ -81,6 +81,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $base['status'] = mb_strtoupper($status[0]);
         $base['payment_tag'] = $transacao['payments'][0]['payment_tag'];
         $base['payment_id'] = $transacao['payments'][0]['payment_id'];
+        $base['total_combined'] = amountCentavosToReal($transacao['payments'][0]['amount']);
         $base['bandeira'] = mb_strtolower($transacao['payments'][0]['brand']);
         // cartão 2
         $base_2['tipo_parcelas'] = mb_strtoupper($dados['tipo_parcelas_2']);
@@ -89,6 +90,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $base_2['status'] = mb_strtoupper($status[1]);
         $base_2['payment_tag'] = $transacao['payments'][1]['payment_tag'];
         $base_2['payment_id'] = $transacao['payments'][1]['payment_id'];
+        $base_2['total_combined'] = amountCentavosToReal($transacao['payments'][1]['amount']);
         $base_2['bandeira'] = mb_strtolower($transacao['payments'][1]['brand']);
 
         return [$base, $base_2];
@@ -134,7 +136,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $pagamento = $user->pagamentos()->create([
             'payment_id' => $dados['payment_id'],
             'cobranca_id' => $dados['order_id'],
-            'total' => substr_replace($dados['amount'], ',', -2, 0),
+            'total' => amountCentavosToReal($dados['amount']),
             'forma' => $dados['payment_type'],
             'parcelas' => $dados['number_installments'],
             'is_3ds' => $dados['payment_type'] == 'debit',
@@ -407,9 +409,10 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             ->orWhere('combined_id','LIKE','%'.$busca.'%')
             ->orWhereHas('representante', function ($query) use($busca) {
                 $query->where('nome','LIKE','%'.$busca.'%')
-                ->orWhere('cpf_cnpj','LIKE','%'.$busca.'%')
-                ->orWhere('registro_core','LIKE','%'.$busca.'%');
+                ->orWhere('cpf_cnpj','LIKE','%'.apenasNumeros($busca).'%')
+                ->orWhere('registro_core','LIKE','%'.apenasNumeros($busca).'%');
             })
+            ->orderBy('id', 'DESC')
             ->paginate(25);
 
         return Pagamento::listar($resultados);

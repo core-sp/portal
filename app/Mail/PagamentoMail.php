@@ -26,11 +26,13 @@ class PagamentoMail extends Mailable
         $detalhes = 'O ' . $this->status . ' da cobrança ' . $pagamento->cobranca_id . ' foi realizado!';
         $detalhes .= '<br /><br />';
         $detalhes .= '<strong>Valor total:</strong> '. $pagamento->getValor();
-        $detalhes .= '<br /><br />';
+        $detalhes .= '<br /><br /><hr />';
 
         foreach($pagamentos as $key => $pag)
         {
             $detalhes .= '<strong>Cartão ' . ++$key . ':</strong> ';
+            $detalhes .= '<br /><br />';
+            $detalhes .= '<strong>Valor total:</strong> '. $pag->getValorParcial();
             $detalhes .= '<br /><br />';
             $detalhes .= '<strong>Status do pagamento:</strong> '. $pag->getStatusLabelMail();
             $detalhes .= '<br /><br />';
@@ -48,7 +50,7 @@ class PagamentoMail extends Mailable
 
             if(!$pagamento->isDebit())
             {
-                $texto = $pagamento->forma == 'combined' ? 'pode ser feito em até 7 dias a partir do' : 'somente no mesmo';
+                $texto = $pagamento->isCombinado() ? 'pode ser feito em até 7 dias a partir do' : 'somente no mesmo';
                 $this->body .= '<strong>Caso não reconheça esse pagamento, cancele pelo <a href="' . $link . '">link de cancelamento</a>, na área restrita do ';
                 $this->body .= $pagamento->getUser()::NAME_AREA_RESTRITA . '</strong>';
                 $this->body .= '<br /><br />';

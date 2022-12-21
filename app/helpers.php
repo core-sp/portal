@@ -804,3 +804,14 @@ function apenasNumerosLetras($string)
 {
     return preg_replace('/[^a-zA-Z0-9]/', '', $string);
 }
+
+function amountCentavosToReal($amount)
+{
+    $centavos = (string) $amount;
+    $centavos = preg_replace('/[^0-9]/', '', $amount);
+    $real = substr_replace($centavos, ',', -2, 0);
+    $index = strpos($real, ',');
+    if(($index !== false) && ($index == 0))
+        return '0' . $real;
+    return $real;
+}

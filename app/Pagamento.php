@@ -47,15 +47,15 @@ class Pagamento extends Model
         foreach($resultados as $resultado) 
         {
             $forma = $resultado->getForma() . ' ' . $resultado->getBandeiraImg();
-            $forma .= isset($resultado->combined_id) ? '<br><small><em><strong>Tag:</strong> ' . $resultado->payment_tag . '</em></small>' : '';
-            $combinado = isset($resultado->combined_id) ? 
+            $forma .= $resultado->isCombinado() ? '<br><small><em><strong>Tag:</strong> ' . $resultado->payment_tag . ' | <strong>Total parcial:</strong> ' . $resultado->getValorParcial() . '</em></small>' : '';
+            $combinado = $resultado->isCombinado() ? 
             '<br><small><em><strong>ID Combinado:</strong> ' . substr_replace($resultado->combined_id, '**********', 9, strlen($resultado->combined_id)) . '</em></small>' : 
             '';
             $conteudo = [
                 $resultado->id,
                 $resultado->getUser()->nome.'<br><small><em>'.formataCpfCnpj($resultado->getUser()->cpf_cnpj).'</em></small>',
                 substr_replace($resultado->payment_id, '**********', 9, strlen($resultado->payment_id)) . $combinado,
-                'ID: ' . $resultado->cobranca_id.'<br><small><em>Total: '.$resultado->getValor().'</em></small>',
+                'ID: ' . $resultado->cobranca_id.'<br><small><em><strong>Total:</strong> '.$resultado->getValor().'</em></small>',
                 $forma,
                 $resultado->getParcelas(),
                 '<small>' . $resultado->getStatusLabel() . '</small>',
@@ -110,11 +110,11 @@ class Pagamento extends Model
     	if($status != 'CANCELED')
         {
             $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a ';
-            $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: '. $pagamento->combined_id;
+            $string .= !$pagamento->isCombinado() ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: '. $pagamento->combined_id;
             $string .= '. [Dados Request:' . json_encode($requestAll) . ']; [Dados Session:' . json_encode($sessionAll) . ']; [Dados Cache:' . json_encode($cacheAll) . ']';
         }else{
             $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou o cancelamento do pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a ';
-            $string .= !isset($pagamento->combined_id) ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: ' . $pagamento->combined_id;
+            $string .= !$pagamento->isCombinado() ? 'payment_id: ' . $pagamento->payment_id : 'combined_id: ' . $pagamento->combined_id;
         }
 
         return $string;
@@ -169,6 +169,11 @@ class Pagamento extends Model
     public function getValor()
     {
         return 'R$ ' . $this->total;
+    }
+
+    public function getValorParcial()
+    {
+        return $this->isCombinado() ? 'R$ ' . $this->total_combined : '';
     }
 
     public function getStatus()
@@ -282,7 +287,7 @@ class Pagamento extends Model
         if($this->isDebit())
             return false;
 
-        if(isset($this->combined_id))
+        if($this->isCombinado())
         {
             $temp = self::where('combined_id', $this->combined_id)->where('id', '!=', $this->id)->first();
             if(!$temp->aprovado() && !$this->aprovado())
@@ -291,14 +296,16 @@ class Pagamento extends Model
         elseif(!$this->aprovado())
             return false;
 
+        $hoje = Carbon::now('UTC')->format('Y-m-d');
         $formato = strpos($this->authorized_at, '.') !== false ? 'Y-m-d\TH:i:s.uZ' : 'Y-m-d\TH:i:sZ';
-        return $this->forma == 'combined' ? Carbon::createFromFormat($formato, $this->authorized_at)->addDays(7)->format('Y-m-d') >= Carbon::now('UTC')->format('Y-m-d') : 
-            Carbon::createFromFormat($formato, $this->authorized_at)->format('Y-m-d') == Carbon::now('UTC')->format('Y-m-d');
+        $authorized_at = Carbon::createFromFormat($formato, $this->authorized_at);
+
+        return $this->isCombinado() ? $authorized_at->addDays(7)->format('Y-m-d') >= $hoje : $authorized_at->format('Y-m-d') == $hoje;
     }
 
     public function getIdPagamento()
     {
-        return $this->forma == 'combined' ? $this->combined_id : $this->payment_id;
+        return $this->isCombinado() ? $this->combined_id : $this->payment_id;
     }
 
     public function getForma3DS()
@@ -323,6 +330,11 @@ class Pagamento extends Model
     public function isDebit()
     {
         return $this->forma == 'debit';
+    }
+
+    public function isCombinado()
+    {
+        return $this->forma == 'combined';
     }
 
     public function updateCancelamento($status, $message)
@@ -360,7 +372,7 @@ class Pagamento extends Model
 
     public function getCombinadoAposNotificacao($dados)
     {
-        if(isset($this->combined_id))
+        if($this->isCombinado())
             return self::where('cobranca_id', $dados['order_id'])
                 ->where('combined_id', $this->combined_id)
                 ->where('payment_id', '!=', $dados['payment_id'])

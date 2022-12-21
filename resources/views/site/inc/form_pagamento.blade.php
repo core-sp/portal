@@ -364,14 +364,21 @@
         <form action="{{ route('pagamento.cancelar', ['cobranca' => $cobranca, 'pagamento' => $id_pagamento]) }}" method="POST" autocomplete="off">
             @csrf
         @endif
-            @foreach($dados as $dado)
+            @foreach($dados as $key => $dado)
+                @if($key == 0)
                 <p><strong>Cobrança:</strong> {{ $dado->cobranca_id }}</p>
-                <p><strong>Status do pagamento:</strong> {!! $dado->getStatusLabel() !!}</p>
                 <p><strong>Valor total:</strong> {{ $dado->getValor() }}</p>
+                <p><strong>Data do pagamento:</strong> {{ formataData($dado->created_at) }}</p>
+                <hr/>
+                @endif
+                <p><strong>Cartão {{ ++$key }}</strong></p>
+                @if($dado->isCombinado())
+                <p><strong>Valor total:</strong> {{ $dado->getValorParcial() }}</p>
+                @endif
+                <p><strong>Status do pagamento:</strong> {!! $dado->getStatusLabel() !!}</p>
                 <p><strong>Forma de pagamento:</strong> {{ $dado->getForma() }}</p>
                 <p><strong>Parcelas:</strong> {{ $dado->getParcelas() . ' ' . $dado->getTipoParcelas() }}</p>
                 <p><strong>Bandeira:</strong> {!! $dado->getBandeiraImg() !!}</p>
-                <p><strong>Data do pagamento:</strong> {{ formataData($dado->created_at) }}</p>
                 <br />
             @endforeach
             @if(\Route::is('pagamento.cancelar.*'))
