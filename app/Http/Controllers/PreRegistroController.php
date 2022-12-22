@@ -113,6 +113,8 @@ class PreRegistroController extends Controller
             abort(500, "Erro ao atualizar o status do pré-registro.");
         }
 
-        return redirect(session('url_pre_registro') ?? route('preregistro.index'))->with($dados);
+        $link = session()->has('url_pre_registro') ? session('url_pre_registro') : route('preregistro.index');
+        
+        return redirect($link)->with($dados);
     }
 }

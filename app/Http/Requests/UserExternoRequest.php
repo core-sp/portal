@@ -53,7 +53,7 @@ class UserExternoRequest extends FormRequest
             'password_confirmation.same' => 'As senhas precisam ser idênticas entre si.',
             'email' => 'Deve ser um email válido',
             'sometimes' => 'Campo obrigatório',
-            'cpf_cnpj.unique' => 'Esse CPF / CNPJ já está cadastrado e ativo no Login Externo',
+            'cpf_cnpj.unique' => 'Esse CPF / CNPJ já está cadastrado',
         ];
     }
 }

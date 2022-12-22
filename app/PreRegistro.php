@@ -200,6 +200,18 @@ class PreRegistro extends Model
         return $arrayCampos;
     }
 
+    private static function colorLabelStatusAdmin()
+    {
+        return [
+            PreRegistro::STATUS_CRIADO => '-info',
+            PreRegistro::STATUS_ANALISE_INICIAL => '-primary',
+            PreRegistro::STATUS_CORRECAO => '-secondary',
+            PreRegistro::STATUS_ANALISE_CORRECAO => '-warning',
+            PreRegistro::STATUS_APROVADO => '-success',
+            PreRegistro::STATUS_NEGADO => '-danger',
+        ];
+    }
+
     public static function camposPreRegistro()
     {
         return [
@@ -231,6 +243,24 @@ class PreRegistro extends Model
         sort($array, SORT_STRING);
         
         return $array;
+    }
+
+    public static function getLegendaStatus()
+    {
+        $colors = self::colorLabelStatusAdmin();
+
+        $inicio = '<button type="button" class="btn btn-sm mr-3 bg';
+        $meio = ' font-weight-bolder font-italic" data-toggle="popover" data-placement="bottom" data-content=';
+        $legenda = '<p><strong><em>Legenda<small> (click)</small>: </em></strong>';
+        $legenda .= $inicio . $colors[PreRegistro::STATUS_CRIADO] . $meio . '"<strong>Solicitante está em processo de preenchimento do formulário</strong>">' . PreRegistro::STATUS_CRIADO . '</button>';
+        $legenda .= $inicio . $colors[PreRegistro::STATUS_ANALISE_INICIAL] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados</strong>">' . PreRegistro::STATUS_ANALISE_INICIAL . '</button>';
+        $legenda .= $inicio . $colors[PreRegistro::STATUS_CORRECAO] . $meio . '"<strong>Atendente está aguardando o solicitante corrigir os dados</strong>">' . PreRegistro::STATUS_CORRECAO . '</button>';
+        $legenda .= $inicio . $colors[PreRegistro::STATUS_ANALISE_CORRECAO] . $meio . '"<strong>Solicitante está aguardando o atendente analisar os dados após correção</strong>">' . PreRegistro::STATUS_ANALISE_CORRECAO . '</button>';
+        $legenda .= $inicio . $colors[PreRegistro::STATUS_APROVADO] . $meio . '"<strong>Atendente aprovou a solicitação</strong>">' . PreRegistro::STATUS_APROVADO . '</button>';
+        $legenda .= $inicio . $colors[PreRegistro::STATUS_NEGADO] . $meio . '"<strong>Atendente negou a solicitação</strong>">' . PreRegistro::STATUS_NEGADO . '</button>';
+        $legenda .= '</p><hr/>';
+
+        return $legenda;
     }
 
     public static function getMenu()
@@ -310,14 +340,7 @@ class PreRegistro extends Model
 
     public function getLabelStatus($status = null)
     {
-        $colorStatus = [
-            PreRegistro::STATUS_CRIADO => '-info',
-            PreRegistro::STATUS_ANALISE_INICIAL => '-primary',
-            PreRegistro::STATUS_CORRECAO => '-secondary',
-            PreRegistro::STATUS_ANALISE_CORRECAO => '-warning',
-            PreRegistro::STATUS_APROVADO => '-success',
-            PreRegistro::STATUS_NEGADO => '-danger',
-        ];
+        $colorStatus = self::colorLabelStatusAdmin();
 
         return isset($status) ? $colorStatus[$status] : $colorStatus[$this->status];
     }

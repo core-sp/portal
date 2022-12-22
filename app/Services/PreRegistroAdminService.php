@@ -65,7 +65,8 @@ class PreRegistroAdminService implements PreRegistroAdminServiceInterface {
             'table-hover'
         ];
 
-        $tabela = montaTabela($headers, $contents, $classes);
+        $legenda = PreRegistro::getLegendaStatus();
+        $tabela = $legenda . montaTabela($headers, $contents, $classes);
         return $tabela;
     }
 
@@ -197,8 +198,9 @@ class PreRegistroAdminService implements PreRegistroAdminServiceInterface {
 
     public function view($id)
     {
+        $link = session()->has('url_pre_registro') ? session('url_pre_registro') : route('preregistro.index');
         $variaveis = $this->variaveis;
-        $variaveis['btn_lista'] = '<a href="'.route('preregistro.index').'" class="btn btn-primary mr-1">Lista dos Pré-registros</a>';
+        $variaveis['btn_lista'] = '<a href="'.$link.'" class="btn btn-primary mr-1">Lista dos Pré-registros</a>';
         $resultado = PreRegistro::findOrFail($id);
 
         return [
