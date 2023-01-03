@@ -243,7 +243,7 @@ Route::prefix('admin')->group(function() {
 Route::prefix('/')->group(function() {
   // Rotas de admin abertas
   Route::get('admin', 'AdminController@index')->name('admin');
-  Route::get('admin/logout', 'Auth\LoginController@logout')->name('logout');
+  // Route::post('admin/logout', 'Auth\LoginController@logout')->name('logout');
 
   // Regionais
   Route::get('seccionais', 'RegionalController@siteGrid')->name('regionais.siteGrid');

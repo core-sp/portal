@@ -8,12 +8,11 @@ use Illuminate\Http\Request;
 use App\Sessao;
 use App\Events\LoginEvent;
 use Session;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    use AuthenticatesUsers {
-        logout as performLogout;
-    }
+    use AuthenticatesUsers;
 
     protected $redirectTo = '/admin';
 
@@ -41,16 +40,45 @@ class LoginController extends Controller
         return $this->username;
     }
 
-    public function logout(Request $request)
+    protected function hasTooManyLoginAttempts(Request $request)
     {
-        $this->performLogout($request);
-        Session::flush();
-        return redirect()->route('admin');
+        $maxAttempts = 3;
+        return $this->limiter()->tooManyAttempts(
+            $this->throttleKey($request), $maxAttempts
+        );
+    }
+
+    protected function validateLogin(Request $request)
+    {
+        if($request->filled('email_system')){
+            $ip = "[IP: " . request()->ip() . "] - ";
+            \Log::channel('interno')->info($ip . 'Possível bot tentou login com username "' . $request->login . '", mas impedido de verificar o usuário no banco de dados.');
+            throw ValidationException::withMessages([
+                'email_system' => 'error',
+            ]);
+        }
+
+        $this->validate($request, [
+            'login' => 'required',
+            'password' => 'required'
+            ], [
+            'required' => 'Campo obrigatório'
+        ]);
+    }
+
+    protected function throttleKey(Request $request)
+    {
+        return $request->_token.'|'.$request->ip();
     }
 
     protected function authenticated(Request $request, $user)
     {
         $this->saveSession($request, $user);
+    }
+
+    public function decayMinutes()
+    {
+        return property_exists($this, 'decayMinutes') ? $this->decayMinutes : 10;
     }
 
     private function saveSession(Request $request, $user)

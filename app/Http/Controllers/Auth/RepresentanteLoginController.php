@@ -13,6 +13,7 @@ use App\Repositories\GerentiRepositoryInterface;
 // use Illuminate\Support\Facades\Request as IlluminateRequest;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Validation\ValidationException;
 
 class RepresentanteLoginController extends Controller
 {
@@ -132,6 +133,14 @@ class RepresentanteLoginController extends Controller
 
     protected function validateLogin(Request $request)
     {
+        if($request->filled('email_system')){
+            $ip = "[IP: " . request()->ip() . "] - ";
+            \Log::channel('externo')->info($ip . 'Possível bot tentou login com cpf/cnpj "' . apenasNumeros($request->cpf_cnpj) . '", mas impedido de verificar o usuário no banco de dados.');
+            throw ValidationException::withMessages([
+                'email_system' => 'error',
+            ]);
+        }
+
         $cpfCnpj = apenasNumeros($request->cpf_cnpj);
         $request->request->set('cpf_cnpj', $cpfCnpj);
 
@@ -141,6 +150,11 @@ class RepresentanteLoginController extends Controller
             ], [
             'required' => 'Campo obrigatório'
         ]);
+    }
+
+    protected function throttleKey(Request $request)
+    {
+        return $request->_token.'|'.$request->ip();
     }
 
     protected function attemptLogin(Request $request)
@@ -172,6 +186,11 @@ class RepresentanteLoginController extends Controller
             'class' => 'alert-danger',
             'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
         ]);
+    }
+
+    public function decayMinutes()
+    {
+        return property_exists($this, 'decayMinutes') ? $this->decayMinutes : 10;
     }
 
     public function username()

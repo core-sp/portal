@@ -90,7 +90,7 @@ class UserTest extends TestCase
 
         $this->get('admin/login')->assertOk();
         $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@'])->assertRedirect(route('admin'));
-        $this->get(route('logout'))->assertRedirect('admin');
+        $this->post(route('logout'))->assertRedirect('/');
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString($user->nome.' (usuário '.$user->idusuario.') desconectou-se do Painel Administrativo.', $log);
@@ -99,7 +99,7 @@ class UserTest extends TestCase
     /** @test */
     public function log_is_generated_when_expired_session_and_logout_on_admin()
     {
-        $this->get(route('logout'));
+        $this->post(route('logout'));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
         $this->assertStringContainsString('Sessão expirou / não há sessão ativa ao realizar o logout do Painel Administrativo.', $log);

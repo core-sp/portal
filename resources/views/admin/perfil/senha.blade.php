@@ -23,7 +23,7 @@
 	  	  	</h3>
   	  	  </div>
   	  	  <div class="card-body">
-  	  	  	<form id="form-change-password" role="form" method="POST" novalidate class="form-horizontal">
+  	  	  	<form id="form-change-password" role="form" method="POST" novalidate class="form-horizontal" autocomplete="off">
               @csrf
               {{ method_field('PUT') }}
               <div class="form-group">
@@ -68,6 +68,12 @@
                 </div>
                 @endif
               </div>
+
+              <div class="mt-2">
+                @component('components.verifica_forca_senha')
+                @endcomponent
+              </div>
+
               <div class="form-group text-right">
                 <a href="/admin/perfil" type="cancel" class="btn btn-default">Cancelar</a>&nbsp;
                 <button type="submit" class="btn btn-danger">Alterar</button>
@@ -82,5 +88,8 @@
   	</div>
   </div>	
 </section>
+
+<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
+<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
 
 @endsection

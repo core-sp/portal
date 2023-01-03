@@ -386,3 +386,12 @@ $('#statusAgendamentoAdmin').ready(function(){
   });
 
 })(jQuery);
+
+// Logout Interno
+$("#logout-interno").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var link = "/admin/logout";
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+	$('body').append(form);
+	$(form).submit();
+});
