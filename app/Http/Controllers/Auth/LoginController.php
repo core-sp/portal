@@ -21,16 +21,15 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
-        $this->username = $this->findUsername();
     }
 
-    private function findUsername()
+    private function findUsername(Request $request)
     {
-        $login = request()->input('login');
+        $login = $request->input('login');
  
         $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
  
-        request()->merge([$fieldType => $login]);
+        $request->merge([$fieldType => $login]);
  
         return $fieldType;
     }
@@ -58,6 +57,7 @@ class LoginController extends Controller
             ]);
         }
 
+        $this->username = $this->findUsername($request);
         $this->validate($request, [
             'login' => 'required',
             'password' => 'required'
@@ -68,7 +68,7 @@ class LoginController extends Controller
 
     protected function throttleKey(Request $request)
     {
-        return $request->_token.'|'.$request->ip();
+        return $request->session()->get('_token').'|'.$request->ip();
     }
 
     protected function authenticated(Request $request, $user)

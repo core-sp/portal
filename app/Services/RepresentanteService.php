@@ -32,7 +32,7 @@ class RepresentanteService implements RepresentanteServiceInterface {
                 return [];
         } else
             return [
-                'message' => 'CPF/CNPJ não encontrado.',
+                'message' => 'Senha incorreta e/ou CPF/CNPJ não encontrado.',
                 'class' => 'alert-danger'
             ];
     }

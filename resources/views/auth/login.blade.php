@@ -26,12 +26,12 @@
         @csrf
         <div class="input-group mb-3">
           <input id="login" type="text"
-            class="form-control{{ $errors->has('username') || $errors->has('email') ? ' is-invalid' : '' }}"
+            class="form-control{{ $errors->has('login') || $errors->has('username') || $errors->has('email') ? ' is-invalid' : '' }}"
             name="login" placeholder="Email ou Nome de usuário" required autofocus>
           <div class="input-group-append login-icon">
               <span class="fas fa-user input-group-text" style="line-height:1.5;"></span>
           </div>
-          @if ($errors->has('username') || $errors->has('email'))
+          @if ($errors->has('login') || $errors->has('username') || $errors->has('email'))
             <span class="invalid-feedback">
               <strong>{{ $errors->first('username') ?: $errors->first('email') }}</strong>
             </span>

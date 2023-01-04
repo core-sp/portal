@@ -154,7 +154,7 @@ class RepresentanteLoginController extends Controller
 
     protected function throttleKey(Request $request)
     {
-        return $request->_token.'|'.$request->ip();
+        return $request->session()->get('_token').'|'.$request->ip();
     }
 
     protected function attemptLogin(Request $request)

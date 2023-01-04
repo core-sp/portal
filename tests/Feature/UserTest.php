@@ -93,7 +93,9 @@ class UserTest extends TestCase
         $this->post(route('logout'))->assertRedirect('/');
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome.' (usuário '.$user->idusuario.') desconectou-se do Painel Administrativo.', $log);
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= $user->nome.' (usuário '.$user->idusuario.') desconectou-se do Painel Administrativo.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test */
@@ -102,7 +104,9 @@ class UserTest extends TestCase
         $this->post(route('logout'));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('Sessão expirou / não há sessão ativa ao realizar o logout do Painel Administrativo.', $log);
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Sessão expirou / não há sessão ativa ao realizar o logout do Painel Administrativo.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test */
@@ -116,7 +120,9 @@ class UserTest extends TestCase
         $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1'])->assertRedirect('admin/login');
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome.' (usuário '.$user->idusuario.') não conseguiu logar no Painel Administrativo.', $log);
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= $user->nome.' (usuário '.$user->idusuario.') não conseguiu logar no Painel Administrativo.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test */
@@ -130,7 +136,9 @@ class UserTest extends TestCase
         $this->post('admin/login', ['login' => $user->username.'p', 'password' => 'TestePorta1@'])->assertRedirect('admin/login');
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('Usuário não encontrado com o username "'.request()->login.'" não conseguiu logar no Painel Administrativo.', $log);
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário não encontrado com o username "'.request()->login.'" não conseguiu logar no Painel Administrativo.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test */
@@ -140,14 +148,16 @@ class UserTest extends TestCase
             'password' => bcrypt('TestePorta1@')
         ]);
 
-        for($i = 0; $i < 6; $i++)
+        for($i = 0; $i < 4; $i++)
         {
             $this->get('admin/login')->assertOk();
             $this->post('admin/login', ['login' => $user->username, 'username' => $user->username, 'password' => 'TestePorta1']);
         }
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('Usuário com username "'.request()->login.'" foi bloqueado temporariamente por alguns segundos devido a alcançar o limite de tentativas de login no Painel Administrativo.', $log);
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário com username "'.request()->login.'" foi bloqueado temporariamente por alguns segundos devido a alcançar o limite de tentativas de login no Painel Administrativo.';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test */
@@ -158,7 +168,12 @@ class UserTest extends TestCase
         ]);
         $token = Password::createToken($user);
 
-        $this->get(route('password.reset', $token))->assertSuccessful();
+        $this->get(route('password.reset', $token))
+        ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
+        ->assertSee('<div class="progress" id="password-text"></div>')
+        ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
+        ->assertSuccessful();
+
         $this->post(route('password.update'), [
             'token' => $token,
             'email' => $user->email,
@@ -167,6 +182,99 @@ class UserTest extends TestCase
         ])->assertRedirect(route('admin'));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome.' (usuário '.$user->idusuario.') resetou a senha com sucesso em "Esqueci a senha" do Painel Administrativo.', $log);
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= $user->nome.' (usuário '.$user->idusuario.') resetou a senha com sucesso em "Esqueci a senha" do Painel Administrativo.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_bot_try_login_on_admin()
+    {
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+
+        $this->get('admin/login')->assertOk();
+        $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@', 'email_system' => '1'])
+        ->assertRedirect('admin/login');
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Possível bot tentou login com username "' .$user->username. '", mas impedido de verificar o usuário no banco de dados.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function same_ip_when_lockout_admin_by_csrf_token_can_login_on_portal()
+    {
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+        $representante = factory('App\Representante')->create();
+
+        $this->get('/')->assertOk();
+        $csrf = csrf_token();
+
+        for($i = 0; $i < 4; $i++)
+        {
+            $this->get('admin/login')->assertOk();
+            $this->assertEquals($csrf, request()->session()->get('_token'));
+            $this->post('admin/login', ['login' => 'Teste', 'password' => 'TestePorta1']);
+            $this->assertEquals($csrf, request()->session()->get('_token'));
+        }
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste1020']);
+        $this->assertEquals($csrf, request()->session()->get('_token'));
+        $this->get(route('representante.login'))
+        ->assertSee('Login inválido devido à quantidade de tentativas.');
+        $this->assertEquals($csrf, request()->session()->get('_token'));
+
+        request()->session()->regenerate();
+
+        $this->get('admin/login')->assertOk();
+        $this->post('admin/login', ['login' => $user->email, 'password' => 'TestePorta1@'])
+        ->assertRedirect(route('admin'));
+    }
+
+    /** @test */
+    public function cannot_view_form_when_bot_try_login_on_admin()
+    {
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+
+        $this->get('admin/login')->assertOk();
+        $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1@', 'email_system' => '1'])
+        ->assertRedirect('admin/login');
+
+        $this->get('admin/login')
+        ->assertDontSee('<span class="fas fa-user input-group-text" style="line-height:1.5;"></span>')
+        ->assertDontSee('<span class="fa fa-lock input-group-text" style="line-height:1.5;"></span>')
+        ->assertDontSee('<button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>');
+    }
+
+    /** @test */
+    public function can_view_strength_bar_password_login_on_admin()
+    {
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+
+        $this->get('admin/login')
+        ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
+        ->assertSee('<div class="progress" id="password-text"></div>')
+        ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>');
+    }
+
+    /** @test */
+    public function can_view_strength_bar_password_when_edit_password_admin()
+    {
+        $this->signIn();
+
+        $this->get('admin/perfil/senha')
+        ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
+        ->assertSee('<div class="progress" id="password-text"></div>')
+        ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
+        ->assertOk();
     }
 }

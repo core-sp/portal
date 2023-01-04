@@ -160,7 +160,12 @@ class RepresentanteTest extends TestCase
         $representante = factory('App\Representante')->create();
         $token = Password::broker('representantes')->createToken($representante);
 
-        $this->get(route('representante.password.reset', $token))->assertSuccessful();
+        $this->get(route('representante.password.reset', $token))
+        ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
+        ->assertSee('<div class="progress" id="password-text"></div>')
+        ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
+        ->assertSuccessful();
+
         $this->post(route('representante.password.update'), [
             'token' => $token,
             'cpf_cnpj' => $representante->cpf_cnpj,
@@ -169,7 +174,85 @@ class RepresentanteTest extends TestCase
         ])->assertRedirect(route('representante.login'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('Usuário com o cpf/cnpj ' .$representante->cpf_cnpj. ' alterou a senha com sucesso na Área do Representante.', $log);
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Usuário com o cpf/cnpj ' .$representante->cpf_cnpj. ' alterou a senha com sucesso na Área do Representante.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function log_is_generated_when_bot_try_login_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $this->get(route('representante.login'))->assertOk();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste1020', 'email_system' => '1'])
+        ->assertRedirect(route('representante.login'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= 'Possível bot tentou login com cpf/cnpj "' .apenasNumeros($representante->cpf_cnpj). '", mas impedido de verificar o usuário no banco de dados.';
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function same_ip_when_lockout_representante_by_csrf_token_can_login_on_portal()
+    {
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+        $representante = factory('App\Representante')->create();
+
+        $this->get('/')->assertOk();
+        $csrf = csrf_token();
+
+        for($i = 0; $i < 4; $i++)
+        {
+            $this->get(route('representante.login'));
+            $this->assertEquals($csrf, request()->session()->get('_token'));
+            $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste1020']);
+            $this->assertEquals($csrf, request()->session()->get('_token'));
+        }
+
+        $this->post('admin/login', ['login' => $user->username, 'password' => 'TestePorta1']);
+        $this->assertEquals($csrf, request()->session()->get('_token'));
+        $this->get('admin/login')
+        ->assertSee('Login inválido devido à quantidade de tentativas.');
+        $this->assertEquals($csrf, request()->session()->get('_token'));
+
+        request()->session()->regenerate();
+
+        $this->get(route('representante.login'))->assertOk();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030'])
+        ->assertRedirect(route('representante.dashboard'));
+    }
+
+    /** @test */
+    public function cannot_view_form_when_bot_try_login_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $this->get(route('representante.login'))->assertOk();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste1020', 'email_system' => '1'])
+        ->assertRedirect(route('representante.login'));
+
+        $this->get(route('representante.login'))
+        ->assertDontSee('<label for="login">CPF ou CNPJ</label>')
+        ->assertDontSee('<label for="password">Senha</label>')
+        ->assertDontSee('<button type="submit" class="btn btn-primary">Entrar</button>');
+    }
+
+    /** @test */
+    public function can_view_strength_bar_password_login_on_restrict_area()
+    {
+        $representante = factory('App\Representante')->create();
+
+        $this->get(route('representante.login'))
+        ->assertSee('<label for="password-text" class="m-0 p-0">Força da senha</label>')
+        ->assertSee('<div class="progress" id="password-text"></div>')
+        ->assertSee('<small><em>Em caso de senha fraca ou média, considere alterá-la para sua segurança.</em></small>')
+        ->assertOk();
     }
 
     /** @test 

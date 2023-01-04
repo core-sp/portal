@@ -26,6 +26,7 @@
   	  	  	<form id="form-change-password" role="form" method="POST" novalidate class="form-horizontal" autocomplete="off">
               @csrf
               {{ method_field('PUT') }}
+              <input type="hidden" id="login" value="{{ auth()->user()->username }}" />
               <div class="form-group">
                 <label for="current-password">Senha atual</label>
                 <input type="password"

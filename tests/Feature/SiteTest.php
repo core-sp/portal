@@ -131,4 +131,33 @@ class SiteTest extends TestCase
         $this->get(route('fiscalizacao.espacoContador'))->assertSee($noticia->titulo)
         ->assertSee(route('noticias.show', $noticia->slug));
     }
+
+    /** @test */
+    public function same_csrf_token_when_lockout_cannot_try_any_login_on_portal()
+    {
+        $this->get('/')->assertOk();
+        $csrf = csrf_token();
+
+        for($i = 0; $i < 4; $i++)
+        {
+            $this->get('admin/login')->assertOk();
+            $this->assertEquals($csrf, request()->session()->get('_token'));
+            $this->post('admin/login', ['login' => 'Teste', 'password' => 'TestePorta1']);
+            $this->assertEquals($csrf, request()->session()->get('_token'));
+        }
+
+        $representante = factory('App\Representante')->create();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste1020']);
+        $this->assertEquals($csrf, request()->session()->get('_token'));
+        $this->get(route('representante.login'))
+        ->assertSee('Login inválido devido à quantidade de tentativas.');
+        
+        $this->assertEquals($csrf, request()->session()->get('_token'));
+
+        $this->post('admin/login', ['login' => 'Teste', 'password' => 'TestePorta1']);
+        $this->assertEquals($csrf, request()->session()->get('_token'));
+        $this->get('admin/login')
+        ->assertSee('Login inválido devido à quantidade de tentativas.');
+    }
 }
