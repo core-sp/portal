@@ -9,10 +9,16 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <video id="video-campanha" controls autoplay>
-                <source src="{{ asset('img/video_comunicado.mp4') }}" type="video/mp4">
-                {{--<source src="{{ asset('img/compressed.webm') }}" type="video/webm">--}}
-            </video>
+            <iframe id="video-campanha"
+                width="100%"
+                height="315" 
+                src="https://www.youtube.com/embed/ACXUu6WiC5k" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen
+            >
+            </iframe>
         </div>
     </div>
 </div>

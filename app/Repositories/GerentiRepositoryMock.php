@@ -108,7 +108,9 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
             $dados = utf8_converter($dados);
     
             if(!empty($dados['Responsável Técnico'])) {
-                $rtArray = explode('-', $dados['Responsável Técnico']);
+                $rtsArray = explode(';', $dados['Responsável Técnico']);
+                $total = count($rtsArray) - 1;
+                $rtArray = explode('-', $rtsArray[$total]);
                 $rt = ['Responsável técnico' => $rtArray[1] . ' (' . $rtArray[0] . ')'];
     
                 unset($dados['Responsável Técnico']);

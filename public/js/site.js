@@ -210,12 +210,13 @@ $(document).ready(function(){
 	// 	});
 	// }
 
-	// $(window).on('load', function(){
-	// 	$('#popup-campanha').modal('show');
-	// });
-	// $('#popup-campanha').on('hidden.bs.modal', function(){
-	// 	$('#video-campanha').get(0).pause();
-	// });
+	$(window).on('load', function(){
+		$('#popup-campanha').modal('show');
+	});
+	$('#popup-campanha').on('hidden.bs.modal', function(){
+		var youtube = $('#video-campanha').attr('src');
+		$('#video-campanha').attr('src', youtube);
+	});
 	// $('#video-campanha').on('ended', function(){
 	// 	$('#popup-campanha').modal('hide');
 	// });
