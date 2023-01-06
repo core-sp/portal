@@ -294,7 +294,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         else
             $resultado = $preRegistro->criarAjax($classeCriar, $request['classe'], $request['campo'], $request['valor'], $gerenti);
 
-        if(($request['classe'] == 'anexos') && isset($resultado))
+        if(($request['classe'] == 'anexos') && isset($resultado->nome_original))
         {
             $string = 'Usuário Externo com ';
             $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';

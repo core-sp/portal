@@ -48,9 +48,9 @@
                   type="text"
                   name="cpf_cnpj"
                   class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
-                  value="{{ isset($cpf_cnpj) ? apenasNumeros($cpf_cnpj) : apenasNumeros(old('cpf_cnpj')) }}"
                   placeholder="CPF / CNPJ"
                   required
+                  autocomplete="off"
                 >
                 @if ($errors->has('cpf_cnpj'))
                   <span class="invalid-feedback" role="alert">

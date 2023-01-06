@@ -20,7 +20,7 @@ class UserExternoService implements UserExternoServiceInterface {
 
         if($emails >= 2)
             return [
-                'erro' => 'Este email já está cadastrado em duas contas, por favor insira outro.',
+                'erro' => 'Este email já alcançou o limite de cadastro, por favor insira outro.',
                 'class' => 'alert-danger'
             ];
 
@@ -87,7 +87,7 @@ class UserExternoService implements UserExternoServiceInterface {
                 $emails = UserExterno::where('email', $dados['email'])->withTrashed()->count();
                 if($emails >= 2)
                     return [
-                        'message' => 'Este email já está cadastrado em duas contas, por favor insira outro.',
+                        'message' => 'Este email já alcançou o limite de cadastro, por favor insira outro.',
                         'class' => 'alert-danger',
                     ];
             }
@@ -122,7 +122,7 @@ class UserExternoService implements UserExternoServiceInterface {
             else
                 return [];
         return [
-            'message' => 'CPF/CNPJ não encontrado.',
+            'message' => 'Senha incorreta e/ou CPF/CNPJ não encontrado.',
             'class' => 'alert-danger',
             'cpf_cnpj' => $cpf_cnpj
         ];

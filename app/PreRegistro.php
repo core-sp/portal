@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PreRegistro extends Model
 {
@@ -288,6 +289,30 @@ class PreRegistro extends Model
         return $codigos;
     }
 
+    private function podeAnexar()
+    {
+        $limite = $this->userExterno->isPessoaFisica() ? 6 : 2;
+        $ontem = now()->subDay()->format('Y-m-d');
+        $hoje = now()->format('Y-m-d');
+
+        $anexos = $this->anexosOntemHj($ontem, $hoje);
+
+        foreach([$ontem, $hoje] as $dia)
+        {
+            if(isset($anexos[$dia]) && (count($anexos[$dia]) >= $limite))
+            {
+                $ultimo = $anexos[$dia]->first();
+                if($ultimo->created_at->addDay() >= now()) 
+                    return [
+                        'limite' => 'Atingiu o limite de ' . $limite . ' anexos por dia.', 
+                        'dia' => $ultimo->created_at->addDay()->format('d/m/Y, \à\s H:i:s')
+                    ];
+            }
+        }
+
+        return [];
+    }
+
     public function userExterno()
     {
         return $this->belongsTo('App\UserExterno')->withTrashed();
@@ -321,6 +346,18 @@ class PreRegistro extends Model
     public function anexos()
     {
         return $this->hasMany('App\Anexo');
+    }
+
+    public function anexosOntemHj($ontem, $hoje)
+    {
+        return $this->anexos()
+            ->select('created_at', DB::raw('date(created_at) as dia'))
+            ->whereDate('created_at', $ontem)
+            ->orWhereDate('created_at', $hoje)
+            ->orderBy('created_at', 'DESC')
+            ->withTrashed()
+            ->get()
+            ->groupBy('dia');
     }
 
     public function excluirAnexos()
@@ -621,13 +658,18 @@ class PreRegistro extends Model
                 $resultado = $valido;
                 break;
             case 'anexos':
-                $anexos = $this->anexos();
-                $valido = $classe::armazenar($anexos->count(), $valor, $this->id, $this->userExterno->isPessoaFisica());
-                if(isset($valido))
+                $liberado = $this->podeAnexar();
+                if(empty($liberado))
                 {
-                    $resultado = $anexos->create($valido);
-                    $this->touch();
-                }
+                    $anexos = $this->anexos();
+                    $valido = $classe::armazenar($anexos->count(), $valor, $this->id, $this->userExterno->isPessoaFisica());
+                    if(isset($valido))
+                    {
+                        $resultado = $anexos->create($valido);
+                        $this->touch();
+                    }
+                }else
+                    $resultado = $liberado;
                 break;
         }
 

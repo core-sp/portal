@@ -267,7 +267,7 @@ class UserExternoTest extends TestCase
         ->assertRedirect(route('externo.cadastro'));
 
         $this->get(route('externo.cadastro'))
-        ->assertSeeText('Este email já está cadastrado em duas contas, por favor insira outro.');
+        ->assertSeeText('Este email já alcançou o limite de cadastro, por favor insira outro.');
 
         $this->assertDatabaseMissing('users_externo', [
             'nome' => $dados['nome']
@@ -1229,7 +1229,7 @@ class UserExternoTest extends TestCase
             'email' => 'teste@email.com.br'
         ]));
         $this->get(route('externo.editar.view'))
-        ->assertSee('Este email já está cadastrado em duas contas, por favor insira outro.');
+        ->assertSee('Este email já alcançou o limite de cadastro, por favor insira outro.');
 
         $this->assertDatabaseHas('users_externo', [
             'cpf_cnpj' => $user_externo['cpf_cnpj'],

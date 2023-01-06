@@ -39,7 +39,7 @@
                 @endif
                 <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área restrita do Login Externo.</strong></p>
                 <p>Ou então, <a href="{{ route('externo.cadastro') }}">realize o cadastro</a> e depois efetue o login.</p>
-                <form action="{{ route('externo.login.submit') }}" method="POST" class="cadastroRepresentante">
+                <form action="{{ route('externo.login.submit') }}" method="POST" class="cadastroRepresentante" autocomplete="off">
                     @csrf
                     <div class="form-group">
                         <label for="cpf_cnpj">CPF ou CNPJ</label>
@@ -47,7 +47,6 @@
                             type="text"
                             class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
                             name="cpf_cnpj"
-                            value="{{ Session::get('cpf_cnpj') ? apenasNumeros(Session::get('cpf_cnpj')) : apenasNumeros(old('cpf_cnpj')) }}"
                             placeholder="CPF ou CNPJ"
                             required
                         >
@@ -62,16 +61,11 @@
                         <input
                             id="password_login"
                             type="password"
-                            class="form-control {{ $errors->has('password_login') ? ' is-invalid' : '' }}"
+                            class="form-control"
                             name="password"
                             placeholder="Senha"
                             required
                         >
-                        @if($errors->has('password'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('password') }}
-                        </div>
-                        @endif
                     </div>
                     <div class="form-group mt-2">
                         <button type="submit" class="btn btn-primary">Entrar</button>

@@ -32,7 +32,7 @@
         <div class="row mt-2">
           <div class="col-lg-8 conteudo-txt">
             <p>Preencha as informações abaixo para reconfigurar sua senha no Login Externo.</p>
-            <form method="POST" action="{{ route('externo.password.update') }}" class="cadastroRepresentante">
+            <form method="POST" action="{{ route('externo.password.update') }}" class="cadastroRepresentante" autocomplete="off">
               @csrf
               <input type="hidden" name="token" value="{{ $token }}">
               <div class="form-group">
