@@ -291,7 +291,7 @@ class PreRegistro extends Model
 
     private function podeAnexar()
     {
-        $limite = $this->userExterno->isPessoaFisica() ? 6 : 2;
+        $limite = $this->userExterno->isPessoaFisica() ? 6 : 9;
         $ontem = now()->subDay()->format('Y-m-d');
         $hoje = now()->format('Y-m-d');
 
