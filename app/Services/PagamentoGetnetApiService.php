@@ -18,7 +18,7 @@ class PagamentoGetnetApiService {
 
     public function __construct($total_cartoes, $formatDt)
     {
-        $this->urlBase = config('app.url') != 'https://core-sp.org.br' ? 'https://api-homologacao.getnet.com.br' : '';
+        $this->urlBase = env('GETNET_API');
         $this->total_cartoes = $total_cartoes;
         $this->formatDt = $formatDt;
         $this->tokenPrincipal = "Basic " . base64_encode(env('GETNET_CLIENT_ID') . ':' . env('GETNET_CLIENT_SECRET'));

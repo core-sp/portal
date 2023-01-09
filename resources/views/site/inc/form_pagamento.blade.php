@@ -4,11 +4,11 @@
     }
 </style>
 
-@if(!$checkoutIframe)
+@if(isset($pagamento) && !$checkoutIframe)
 <noscript>
     <iframe 
         style="width: 100px; height: 100px; border: 0; position:absolute; top: -5000px;" 
-        src="https://h.online-metrix.net/fp/tags?org_id={{ config('app.url') != 'https://core-sp.org.br' ? '1snn5n9w' : 'k8vif92e' }}&session_id={{ $user->getSessionIdPagamento($cobranca) }}">
+        src="https://h.online-metrix.net/fp/tags?org_id={{ env('GETNET_ORG_ID') }}&session_id={{ $user->getSessionIdPagamento($cobranca) }}">
     </iframe>
 </noscript>
 @endif
@@ -479,7 +479,7 @@
 <input type="hidden" id="gn3ds_additionalObject" name="gn3ds_additionalObject" class="gn3ds_additionalObject" value="">
 
 @elseif(isset($pagamento) && $checkoutIframe)
-<script async src="https://checkout-homologacao.getnet.com.br/loader.js"
+<script async src="{{ env('GETNET_IFRAME') }}"
     data-getnet-sellerid="{{ isset($pagamento['sellerid']) ? $pagamento['sellerid'] : null }}"
     data-getnet-token="{{ isset($pagamento['token']) ? $pagamento['token'] : null }}"
     data-getnet-payment-methods-disabled='[{{isset($pagamento["disabled"]) ? $pagamento["disabled"] : null}}]'

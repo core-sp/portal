@@ -54,7 +54,7 @@ class PagamentoMail extends Mailable
                 $this->body .= '<strong>Caso não reconheça esse pagamento, cancele pelo <a href="' . $link . '">link de cancelamento</a>, na área restrita do ';
                 $this->body .= $pagamento->getUser()::NAME_AREA_RESTRITA . '</strong>';
                 $this->body .= '<br /><br />';
-                $this->body .= '<strong>* Cancelamento ' . $texto . ' dia do pagamento realizado.</strong>';
+                $this->body .= '<span style="color:red;"><strong>* Cancelamento ' . $texto . ' dia do pagamento realizado.</strong></span>';
                 $this->body .= '<br /><br />';
             }
         }

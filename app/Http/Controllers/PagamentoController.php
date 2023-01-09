@@ -18,7 +18,7 @@ class PagamentoController extends Controller
     {
         $this->service = $service;
 
-        $ips = ['201.87.185.248', '201.87.185.249', '201.87.188.248', '201.87.188.249'];
+        $ips = explode(';', env('GETNET_IPS'));
         $this->can_notification = (config('app.env') != 'production') || ((config('app.env') == 'production') && in_array(request()->ip(), $ips));
 
         // para teste
@@ -27,7 +27,7 @@ class PagamentoController extends Controller
         $this->middleware(function ($request, $next) {
             // para testes
             $pode_acessar = (auth()->guard('representante')->check() && auth()->guard('representante')->user()->id == 1) || auth()->guard('web')->check();
-            if($pode_acessar || $this->can_notification){
+            if($pode_acessar || \Route::is('pagamento.transacao.*')){
                 if(\Route::is('pagamento.admin.*') && !auth()->guard('web')->check())
                     return redirect()->route('site.home');
                 return $next($request);
@@ -374,7 +374,10 @@ class PagamentoController extends Controller
     {
         try{
             if(!$this->can_notification)
+            {
+                \Log::error('[Transação Getnet] - IP: ' . $request->ip() . ' enviou uma notificação de transação com a payment_id: ' . $request->input('payment_id') . ' e customer_id: ' . $request->input('customer_id') . ', mas o ip não é permitido. Notificação não foi aceita.');
                 return;
+            }
 
             $dados = $request->validated();
             $request->replace([]);
@@ -392,7 +395,10 @@ class PagamentoController extends Controller
     {
         try{
             if(!$this->can_notification)
+            {
+                \Log::error('[Transação Getnet] - IP: ' . $request->ip() . ' enviou uma notificação de transação com a payment_id: ' . $request->input('payment_id') . ' e customer_id: ' . $request->input('customer_id') . ', mas o ip não é permitido. Notificação não foi aceita.');
                 return;
+            }
 
             $dados = $request->validated();
             $request->replace([]);
