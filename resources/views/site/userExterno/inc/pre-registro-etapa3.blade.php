@@ -51,7 +51,7 @@
 </div>
 
 <div class="form-row mb-2">
-    <div class="col-sm mb-2-576">
+    <div class="col-md col-lg mb-2-576">
         <label for="rua_pre">{{ $codigos[2]['logradouro'] }} - Logradouro <span class="text-danger">*</span></label>
         <input
             type="text"
@@ -67,7 +67,7 @@
         </div>
         @endif
     </div>
-    <div class="col-sm-2 mb-2-576">
+    <div class="col-md-3 col-lg-2 mb-2-576">
         <label for="numero_pre">{{ $codigos[2]['numero'] }} - Número <span class="text-danger">*</span></label>
         <input
             type="text"
@@ -86,7 +86,7 @@
 </div>
 
 <div class="form-row mb-2">
-    <div class="col-sm-3 mb-2-576">
+    <div class="col-md-3 col-lg-3 col-xl-3 mb-2-576">
         <label for="complemento_pre">{{ $codigos[2]['complemento'] }} - Complemento</label>
         <input
             type="text"
@@ -102,7 +102,7 @@
         </div>
         @endif
     </div>
-    <div class="col-sm-5 mb-2-576">
+    <div class="col-md col-lg-5 col-xl-5 mb-2-576">
         <label for="cidade_pre">{{ $codigos[2]['cidade'] }} - Município <span class="text-danger">*</span></label>
         <input
             type="text"
@@ -118,7 +118,7 @@
         </div>
         @endif
     </div>
-    <div class="col-sm-4 mb-2-576">
+    <div class="col-lg-4 col-xl-4 mb-2-576">
         <label for="uf_pre">{{ $codigos[2]['uf'] }} - Estado <span class="text-danger">*</span></label>
         <select 
             name="uf" 
@@ -206,7 +206,7 @@
     </div>
 
     <div class="form-row mb-2">
-        <div class="col-sm mb-2-576">
+        <div class="col-md col-lg mb-2-576">
             <label for="rua_empresa">{{ $codigos[2]['logradouro_empresa'] }} - Logradouro <span class="text-danger">*</span></label>
             <input
                 type="text"
@@ -222,7 +222,7 @@
             </div>
             @endif
         </div>
-        <div class="col-sm-2 mb-2-576">
+        <div class="col-md-3 col-lg-2 mb-2-576">
             <label for="numero_empresa">{{ $codigos[2]['numero_empresa'] }} - Número <span class="text-danger">*</span></label>
             <input
                 type="text"
@@ -241,7 +241,7 @@
     </div>
 
     <div class="form-row mb-2">
-        <div class="col-sm-3 mb-2-576">
+        <div class="col-md-3 col-lg-3 col-xl-3 mb-2-576">
             <label for="complemento_empresa">{{ $codigos[2]['complemento_empresa'] }} - Complemento</label>
             <input
                 type="text"
@@ -257,7 +257,7 @@
             </div>
             @endif
         </div>
-        <div class="col-sm-5 mb-2-576">
+        <div class="col-md col-lg-5 col-xl-5 mb-2-576">
             <label for="cidade_empresa">{{ $codigos[2]['cidade_empresa'] }} - Município <span class="text-danger">*</span></label>
             <input
                 type="text"
@@ -273,7 +273,7 @@
             </div>
             @endif
         </div>
-        <div class="col-sm-4 mb-2-576">
+        <div class="col-lg-4 col-xl-4 mb-2-576">
             <label for="uf_empresa">{{ $codigos[2]['uf_empresa'] }} - Estado <span class="text-danger">*</span></label>
             <select 
                 name="uf_empresa" 

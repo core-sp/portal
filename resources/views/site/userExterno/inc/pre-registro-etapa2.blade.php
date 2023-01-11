@@ -69,7 +69,7 @@
 </div>
 
 <div class="form-row mb-2">
-    <div class="col-sm mb-2-576">
+    <div class="col-md mb-2-576">
         <label for="sexo">{{ $codigos[1]['sexo'] }} - Gênero <span class="text-danger">*</span></label>
         <br>
         <select 
@@ -94,7 +94,7 @@
         </div>
         @endif
     </div>
-    <div class="col-sm mb-2-576">
+    <div class="col-md mb-2-576">
         <label for="dt_nascimento">{{ $codigos[1]['dt_nascimento'] }} - Data de Nascimento <span class="text-danger">*</span></label>
         <input
             name="dt_nascimento"
@@ -110,7 +110,7 @@
         </div>
         @endif
     </div>
-    <div class="col-sm mb-2-576">
+    <div class="col-md mb-2-576">
         <label for="estado_civil">{{ $codigos[1]['estado_civil'] }} - Estado Civil</label>
         <select 
             name="estado_civil" 
@@ -164,7 +164,7 @@
 </div>
 
 <div class="form-row mb-2">
-    <div class="col-sm mb-2-576">
+    <div class="col-md mb-2-576">
         <label for="naturalidade_cidade">{{ $codigos[1]['naturalidade_cidade'] }} - Naturalidade - Cidade <span class="text-danger">*</span></label>
         <input
             name="naturalidade_cidade"
@@ -181,7 +181,7 @@
         </div>
         @endif
     </div>
-    <div class="col-sm mb-2-576">
+    <div class="col-md mb-2-576">
         <label for="naturalidade_estado">{{ $codigos[1]['naturalidade_estado'] }} - Naturalidade - Estado <span class="text-danger">*</span></label>
         <select 
             name="naturalidade_estado" 
@@ -209,7 +209,7 @@
 </div>
 
 <div class="form-row mb-2">
-    <div class="col-sm mb-2-576">
+    <div class="col-lg mb-2-576">
         <label for="nome_mae">{{ $codigos[1]['nome_mae'] }} - Nome da Mãe <span class="text-danger">*</span></label>
         <input
             name="nome_mae"
@@ -225,7 +225,7 @@
         </div>
         @endif
     </div>
-    <div class="col-sm mb-2-576">
+    <div class="col-lg mb-2-576">
         <label for="nome_pai">{{ $codigos[1]['nome_pai'] }} - Nome do Pai</label>
         <input
             name="nome_pai"
@@ -244,7 +244,7 @@
 </div>
 
 <div class="form-row mb-2">
-    <div class="col-sm mb-2-576">
+    <div class="col-md mb-2-576">
         <label for="tipo_identidade">{{ $codigos[1]['tipo_identidade'] }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
         <select 
             name="tipo_identidade" 

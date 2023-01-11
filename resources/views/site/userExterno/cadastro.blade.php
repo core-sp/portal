@@ -138,8 +138,20 @@
                         </div>
                     </div>
                     <small class="form-text text-muted">
-                        <em>A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número</em><br />
+                        <em>A senha deve conter, no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número</em><br />
                     </small>
+
+                    <div class="form-group mt-3">
+                    @if(env('GOOGLE_RECAPTCHA_KEY'))
+                        <div class="g-recaptcha {{ $errors->has('g-recaptcha-response') ? 'is-invalid' : '' }}" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                        @if($errors->has('g-recaptcha-response'))
+                            <div class="invalid-feedback" style="display:block;">
+                            {{ $errors->first('g-recaptcha-response') }}
+                            </div>
+                        @endif
+                    @endif
+                    </div>
+
                     <div class="form-check mt-3">
                         <input class="form-check-input position-static {{ $errors->has('aceite') ? 'is-invalid' : '' }}"
                             name="aceite"

@@ -22,7 +22,7 @@
 </small>
 
 <div class="form-row mb-2 mt-2">
-    <div class="col-sm mb-2-576">
+    <div class="col-lg mb-2-576">
         <label for="cpf_rt">{{ $codigos[3]['cpf_rt'] }} - CPF <span class="text-danger">*</span></label>
         <small class="text-muted text-left ml-2">
             <em>
@@ -44,7 +44,7 @@
         @endif
     </div>
 
-    <div class="col-sm mb-2-576">
+    <div class="col-lg mb-2-576">
         <label for="registro_preRegistro">{{ $codigos[3]['registro'] }} - Registro</label>
         <input
             type="text"
@@ -140,7 +140,7 @@
     </div>
 
     <div class="form-row mb-2">
-        <div class="col-sm mb-2-576">
+        <div class="col-md mb-2-576">
             <label for="tipo_identidade_rt">{{ $codigos[3]['tipo_identidade_rt'] }} - Tipo do documento de identidade <span class="text-danger">*</span></label><br>
             <select 
                 name="tipo_identidade_rt" 
@@ -164,7 +164,7 @@
             </div>
             @endif
         </div>
-        <div class="col-sm mb-2-576">
+        <div class="col-md mb-2-576">
             <label for="identidade_rt">{{ $codigos[3]['identidade_rt'] }} - N° do documento de identidade <span class="text-danger">*</span></label>
             <input
                 name="identidade_rt"
@@ -254,7 +254,7 @@
     </div>
 
     <div class="form-row mb-2">
-        <div class="col-sm mb-2-576">
+        <div class="col-md col-lg mb-2-576">
             <label for="rua_rt">{{ $codigos[3]['logradouro_rt'] }} - Logradouro <span class="text-danger">*</span></label>
             <input
                 type="text"
@@ -270,7 +270,7 @@
             </div>
             @endif
         </div>
-        <div class="col-sm-2 mb-2-576">
+        <div class="col-md-3 col-lg-2 mb-2-576">
             <label for="numero_rt">{{ $codigos[3]['numero_rt'] }} - Número <span class="text-danger">*</span></label>
             <input
                 type="text"
@@ -289,7 +289,7 @@
     </div>
 
     <div class="form-row mb-2">
-        <div class="col-sm-3 mb-2-576">
+        <div class="col-md-3 col-lg-3 col-xl-3 mb-2-576">
             <label for="complemento_rt">{{ $codigos[3]['complemento_rt'] }} - Complemento</label>
             <input
                 type="text"
@@ -305,7 +305,7 @@
             </div>
             @endif
         </div>
-        <div class="col-sm-5 mb-2-576">
+        <div class="col-md col-lg-5 col-xl-5 mb-2-576">
             <label for="cidade_rt">{{ $codigos[3]['cidade_rt'] }} - Município <span class="text-danger">*</span></label>
             <input
                 type="text"
@@ -321,7 +321,7 @@
             </div>
             @endif
         </div>
-        <div class="col-sm-4 mb-2-576">
+        <div class="col-lg-4 col-xl-4 mb-2-576">
             <label for="uf_rt">{{ $codigos[3]['uf_rt'] }} - Estado <span class="text-danger">*</span></label>
             <select 
                 name="uf_rt" 
@@ -350,7 +350,7 @@
     <div class="linha-lg-mini mt-3 mb-3"></div>
 
     <div class="form-row mb-2">
-        <div class="col-sm mb-2-576">
+        <div class="col-lg mb-2-576">
             <label for="nome_mae_rt">{{ $codigos[3]['nome_mae_rt'] }} - Nome da Mãe <span class="text-danger">*</span></label>
             <input
                 name="nome_mae_rt"
@@ -366,7 +366,7 @@
             </div>
             @endif
         </div>
-        <div class="col-sm mb-2-576">
+        <div class="col-lg mb-2-576">
             <label for="nome_pai_rt">{{ $codigos[3]['nome_pai_rt'] }} - Nome do Pai</label>
             <input
                 name="nome_pai_rt"

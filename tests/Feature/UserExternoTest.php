@@ -247,6 +247,28 @@ class UserExternoTest extends TestCase
     /** @test 
      * 
     */
+    public function cannot_register_with_cpfcnpj_wrong()
+    {
+        $pre = factory('App\UserExterno')->create();
+        $dados = factory('App\UserExterno')->raw([
+            'cpf_cnpj' => '12345678900',
+            'aceite' => 'on',
+            'password' => 'Teste102030',
+            'password_confirmation' => 'Teste102030'
+        ]);
+        $this->get(route('externo.cadastro'))->assertOk();
+        $this->post(route('externo.cadastro.submit'), $dados)
+        ->assertSessionHasErrors([
+            'cpf_cnpj'
+        ]);
+        $this->assertDatabaseMissing('users_externo', [
+            'nome' => $dados['nome']
+        ]);
+    }
+
+    /** @test 
+     * 
+    */
     public function cannot_register_if_exist_more_than_two_email_equals()
     {
         $pre = factory('App\UserExterno')->create();

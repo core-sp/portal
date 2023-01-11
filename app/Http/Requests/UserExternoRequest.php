@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\CpfCnpj;
+use App\Rules\RecaptchaRequired;
 
 class UserExternoRequest extends FormRequest
 {
@@ -37,6 +38,7 @@ class UserExternoRequest extends FormRequest
             'password_confirmation' => 'sometimes|required|same:password|max:191',
             'password_atual' => 'sometimes|required',
             'aceite' => 'sometimes|required|accepted',
+            'g-recaptcha-response' => \Route::is('externo.cadastro.submit') ? [new RecaptchaRequired, 'recaptcha'] : '',
         ];
     }
 
@@ -54,6 +56,15 @@ class UserExternoRequest extends FormRequest
             'email' => 'Deve ser um email válido',
             'sometimes' => 'Campo obrigatório',
             'cpf_cnpj.unique' => 'Esse CPF / CNPJ já está cadastrado',
+            'g-recaptcha-response.recaptcha' => 'ReCAPTCHA inválido'
         ];
+    }
+
+    public function validated()
+    {
+        $all = $this->validator->validated();
+        unset($all['g-recaptcha-response']);
+
+        return $all;
     }
 }
