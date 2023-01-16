@@ -53,7 +53,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         }
     }
 
-    private function getArraySavePagamento($transacao, $status, $dados)
+    private function arrayBase($dados)
     {
         $temp = str_replace('_3ds', '', $dados['tipo_pag']);
         $base = [
@@ -63,6 +63,33 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             'parcelas' => $dados['parcelas_1'],
             'tipo_parcelas' => mb_strtoupper($dados['tipo_parcelas_1']),
         ];
+
+        return $base;
+    }
+
+    private function arrayConfirmed($transacao, $status)
+    {
+        if(is_array($status) && (($status[0] == 'CONFIRMED') && ($status[1] == 'CONFIRMED')))
+        {
+            $base = [
+                'transacao_temp' => null,
+                'authorized_at' => $transacao['payments'][0]['credit_confirm']['confirm_date'],
+                'status' => mb_strtoupper($status[0]),
+            ];
+            $base2 = [
+                'transacao_temp' => null,
+                'authorized_at' => $transacao['payments'][1]['credit_confirm']['confirm_date'],
+                'status' => mb_strtoupper($status[1]),
+            ];
+
+            return [$base, $base2];
+        }
+    }
+
+    private function arrayApproved($transacao, $status, $dados)
+    {
+        $base = $this->arrayBase($dados);
+        $temp = $base['forma'];
 
         if($dados['tipo_pag'] != 'combined')
         {
@@ -74,30 +101,45 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             mb_strtolower($transacao[$temp]['brand']);
             return $base;
         }
+    }
+
+    private function arrayAuthorized($transacao, $status, $dados)
+    {
+        $base = $this->arrayBase($dados);
 
         $base['combined_id'] = $transacao['combined_id'];
         $base_2 = $base;
-        $base['authorized_at'] = $transacao['payments'][0]['credit_confirm']['confirm_date'];
+        $base['transacao_temp'] = json_encode($transacao, JSON_FORCE_OBJECT);
+        $base['authorized_at'] = $transacao['payments'][0]['credit']['authorized_at'];
         $base['status'] = mb_strtoupper($status[0]);
         $base['payment_tag'] = $transacao['payments'][0]['payment_tag'];
         $base['payment_id'] = $transacao['payments'][0]['payment_id'];
         $base['total_combined'] = amountCentavosToReal($transacao['payments'][0]['amount']);
-        $base['bandeira'] = mb_strtolower($transacao['payments'][0]['brand']);
+        $base['bandeira'] = mb_strtolower($transacao['payments'][0]['credit']['brand']);
         // cartão 2
         $base_2['tipo_parcelas'] = mb_strtoupper($dados['tipo_parcelas_2']);
         $base_2['parcelas'] = $dados['parcelas_2'];
-        $base_2['authorized_at'] = $transacao['payments'][1]['credit_confirm']['confirm_date'];
+        $base_2['authorized_at'] = $transacao['payments'][1]['credit']['authorized_at'];
         $base_2['status'] = mb_strtoupper($status[1]);
         $base_2['payment_tag'] = $transacao['payments'][1]['payment_tag'];
         $base_2['payment_id'] = $transacao['payments'][1]['payment_id'];
         $base_2['total_combined'] = amountCentavosToReal($transacao['payments'][1]['amount']);
-        $base_2['bandeira'] = mb_strtolower($transacao['payments'][1]['brand']);
+        $base_2['bandeira'] = mb_strtolower($transacao['payments'][1]['credit']['brand']);
 
         return [$base, $base_2];
     }
 
     private function aposRotinaTransacao($user, $pagamentos, $status, $transacao = null, $errorCode = null, $descricao = null)
     {
+        $pagamento = Pagamento::getFirst($pagamentos);
+        
+        $string = !$this->via_sistema ? Pagamento::logAposTransacaoByUser($user, $pagamento, $status, request()->all(), session()->all(), cache()) : 
+        Pagamento::logAposTransacaoByNotification($user, $pagamento, $status, $errorCode, $descricao, self::TEXTO_LOG_SISTEMA);
+        
+        event(new ExternoEvent($string));
+
+        Mail::to($user->email)->queue(new PagamentoMail($pagamentos));
+
         // passa pro gerenti 
         // se tudo certo, atualiza dados no bd
         // * caso dê erro (por motivos de conexão, etc) a transação é salva como json, o campo gerenti_ok update false, com aviso no log com motivo de erro no gerenti e a rotina no Kernel tentará novamente enviar ao Gerenti.
@@ -110,15 +152,6 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         // $pagamentos = Pagamento::getCollection($pagamentos);
         // foreach($pagamentos as $pag)
         //     $pag->updateAposErroGerenti($transacao);
-
-        $pagamento = Pagamento::getFirst($pagamentos);
-        
-        $string = !$this->via_sistema ? Pagamento::logAposTransacaoByUser($user, $pagamento, $status, request()->all(), session()->all(), cache()) : 
-        Pagamento::logAposTransacaoByNotification($user, $pagamento, $status, $errorCode, $descricao, self::TEXTO_LOG_SISTEMA);
-        
-        event(new ExternoEvent($string));
-
-        Mail::to($user->email)->queue(new PagamentoMail($pagamentos));
     }
 
     private function createViaNotificacao($dados)
@@ -149,28 +182,6 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         $this->aposRotinaTransacao($user, $pagamento, $dados['status'], $dados);
     }
 
-    private function updateViaNotificacao($dados, $pagamento, $user)
-    {
-        if($pagamento->status != $dados['status'])
-        {
-            $this->via_sistema = true;
-            $pagamento->updateAposNotificacao($dados);
-
-            $error = isset($dados['error_code']) ? $dados['error_code'] : null;
-            $descricao = isset($dados['description_detail']) ? $dados['description_detail'] : null;
-            $outroPagamento = $pagamento->getCombinadoAposNotificacao($dados);
-
-            if(isset($outroPagamento))
-            {
-                $dados['cobranca'] = $dados['order_id'];
-                $dados['pagamento'] = collect([$pagamento, $outroPagamento]);
-                $this->cancelCheckout($dados, $user);
-            }
-
-            $this->aposRotinaTransacao($user, $pagamento, $dados['status'], $dados, $error, $descricao);
-        }
-    }
-
     private function realizarPagamento($dados, $ip)
     {
         switch($dados['tipo_pag'])
@@ -185,7 +196,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         }
     }
 
-    private function confirmacaoPagamento($transacao, $status)
+    private function confirmacaoPagamento($transacao, $status, $user = null, $dados = null)
     {
         if(is_array($status) && ($status[0] == 'AUTHORIZED') && ($status[1] == 'AUTHORIZED'))
         {
@@ -196,14 +207,30 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
                 $ids[$key] = $pags['payment_id'];
                 $tags[$key] = $pags['payment_tag'];
             }
-            $brand1 = $transacao['payments'][0]['credit']['brand'];
-            $brand2 = $transacao['payments'][1]['credit']['brand'];
+
+            if(isset($user) && isset($dados))
+            {
+                $string = 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou a autorização de pagamento da cobrança ' . $transacao['order_id'] . ' do tipo *combined*';
+                $string .= ' com a combined_id: ' . $transacao['combined_id'] . ', com as payment_ids: ' . json_encode($ids) . ' e payment_tags: ' . json_encode($tags) . '. Aguardando confirmação do pagamento via Portal.';
+                event(new ExternoEvent($string));
+    
+                $arrayPag = $this->arrayAuthorized($transacao, $status, $dados);
+                $pagamentos = $user->pagamentos()->createMany($arrayPag);
+                Mail::to($user->email)->queue(new PagamentoMail($pagamentos));
+            }
+
             $transacao = $this->api->confirmation($ids, $tags);
-            $transacao['payments'][0]['brand'] = $brand1;
-            $transacao['payments'][1]['brand'] = $brand2;
+
+            return [
+                'transacao' => $transacao,
+                'pagamentos' => isset($pagamentos) ? $pagamentos : null
+            ];
         }
 
-        return $transacao;
+        return [
+            'transacao' => $transacao,
+            'pagamentos' => null
+        ];
     }
 
     private function cancelamentoPagamento($tipo_pag, $pagamento)
@@ -274,7 +301,8 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         }
 
         $status = $this->getStatusTransacao($transacao, $dados['tipo_pag']);
-        $transacao = $this->confirmacaoPagamento($transacao, $status);
+        $resultado = $this->confirmacaoPagamento($transacao, $status, $user, $dados);
+        $transacao = $resultado['transacao'];
         $status = $this->getStatusTransacao($transacao, $dados['tipo_pag']);
 
         $combined = is_array($status) && (($status[0] != 'CONFIRMED') || ($status[1] != 'CONFIRMED'));
@@ -292,8 +320,11 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
             ];
         }
 
-        $arrayPag = $this->getArraySavePagamento($transacao, $status, $dados);
-        $pagamento = $dados['tipo_pag'] != 'combined' ? $user->pagamentos()->create($arrayPag) : $user->pagamentos()->createMany($arrayPag);
+        $arrayPag = $dados['tipo_pag'] != 'combined' ? $this->arrayApproved($transacao, $status, $dados) : $this->arrayConfirmed($transacao, $status);
+        $pagamento = $dados['tipo_pag'] != 'combined' ? $user->pagamentos()->create($arrayPag) : 
+        $resultado['pagamentos']->each(function ($item, $key) use($arrayPag) {
+           $item->update($arrayPag[$key]);
+        })->collect();
 
         unset($dados);
         $this->aposRotinaTransacao($user, $pagamento, is_array($status) ? $status[0] : $status, $transacao);
@@ -380,16 +411,36 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
 
     public function rotinaUpdateTransacao($dados)
     {
-        // Buscar no gerenti se a cobrança existe
-        $pagamento = Pagamento::where('cobranca_id', $dados['order_id'])->where('payment_id', $dados['payment_id'])->first();
-
-        if(!isset($pagamento) && ($dados['status'] == 'APPROVED'))
+        if(isset($dados['checkoutIframe']) && $dados['checkoutIframe'])
         {
-            if($dados['checkoutIframe'])
+            $pagamento = Pagamento::where('cobranca_id', $dados['order_id'])->where('payment_id', $dados['payment_id'])->first();
+            if(!isset($pagamento) && ($dados['status'] == 'APPROVED'))
                 $this->createViaNotificacao($dados);
-        }else{
-            $user = $pagamento->getUser();
-            $this->updateViaNotificacao($dados, $pagamento, $user);
+        }
+
+        if(isset($dados['updatePagamento']))
+        {
+            $this->via_sistema = true;
+            $dados = $dados['updatePagamento'];
+            $status = $this->getStatusTransacao($dados['transacao'], 'combined');
+
+            if(!$dados['pagamentos']->first()->canCancel())
+            {
+                $pagamento = $dados['pagamentos']->each(function ($item, $key) use($arrayPag) {
+                    $item->updateCancelamento('CANCELED', ['dt' => now()->toIso8601ZuluString()]);
+                })->first();
+                $pagamento::logAposTransacaoByNotification($dados['user'], $pagamento, 'CANCELED', null, null, $this->via_sistema);
+                event(new ExternoEvent($string));
+                return [];
+            }
+
+            $transacao = $this->confirmacaoPagamento($dados['transacao'], $status, $dados['user'])['transacao'];
+            $status = $this->getStatusTransacao($transacao, 'combined');
+            $arrayPag = $this->arrayConfirmed($transacao, $status);
+            $pagamentos = $dados['pagamentos']->each(function ($item, $key) use($arrayPag) {
+               $item->update($arrayPag[$key]);
+            })->collect();
+            $this->aposRotinaTransacao($dados['user'], $pagamentos, $status[0], $transacao);
         }
     }
 

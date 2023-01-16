@@ -406,6 +406,8 @@ class PagamentoGetnetApiService {
     public function confirmation($payment_ids, $payment_tags)
     {
         try{
+            if(!($this->client instanceof Client))
+                $this->getToken();
             $array = array();
             for($i = 0; $i < $this->total_cartoes; $i++)
                 if(isset($payment_ids[$i]))

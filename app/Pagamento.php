@@ -12,6 +12,7 @@ class Pagamento extends Model
 
     protected $table = 'pagamentos';
     protected $guarded = [];
+    protected $hidden = ['transacao_temp'];
 
     private static function cartoesImg($brand = null)
     {
@@ -46,6 +47,8 @@ class Pagamento extends Model
         $contents = [];
         foreach($resultados as $resultado) 
         {
+            $icone_gerenti = $resultado->isAutorizado() ? '<i class="fas fa-exclamation-circle"></i> <em>' : '<i class="fas fa-check text-success"></i> <em>';
+            $texto_gerenti = $resultado->isAutorizado() ? 'Aguardando confirmação<br>do pagamento' : 'Enviado';
             $forma = $resultado->getForma() . ' ' . $resultado->getBandeiraImg();
             $forma .= $resultado->isCombinado() ? '<br><small><em><strong>Tag:</strong> ' . $resultado->payment_tag . ' | <strong>Total parcial:</strong> ' . $resultado->getValorParcial() . '</em></small>' : '';
             $combinado = $resultado->isCombinado() ? 
@@ -59,7 +62,7 @@ class Pagamento extends Model
                 $forma,
                 $resultado->getParcelas(),
                 '<small>' . $resultado->getStatusLabel() . '</small>',
-                $resultado->gerenti_ok ? '<i class="fas fa-check text-success"></i> <em>Enviado</em>' : '<i class="fas fa-times text-danger"></i> <em>Aguardando envio</em>',
+                $resultado->gerenti_ok ? $icone_gerenti . $texto_gerenti . '</em>' : '<i class="fas fa-times text-danger"></i> <em>Aguardando envio</em>',
                 formataData($resultado->updated_at),
             ];
             array_push($contents, $conteudo);
@@ -73,7 +76,7 @@ class Pagamento extends Model
         $legenda = '<p><small><em><strong>Legenda:</strong></em>&nbsp;&nbsp;';
         foreach(self::cartoesImg() as $brand => $img)
             $legenda .= $brand . ' ' . $img . '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-        $legenda .= '</small></p><hr />';
+        $legenda .= '</small>|<span class="ml-2"><strong>Pagamento aprovado</strong> = Aprovado ou Confirmado</span></p><hr />';
         $tabela = $aviso . $legenda . montaTabela($headers, $contents, $classes);
         return $tabela;
     }
@@ -123,18 +126,16 @@ class Pagamento extends Model
     public static function logAposTransacaoByNotification($user, $pagamento, $status, $errorCode, $descricao, $via_sistema)
     {
         $string = '';
-    	if(in_array($status, ['APPROVED', 'AUTHORIZED']))
+    	if(in_array($status, ['APPROVED', 'CONFIRMED']))
         {
             $string = $via_sistema . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ' . $pagamento->cobranca_id;
-            $string .= ' do tipo *' . $pagamento->forma . '*, com a payment_id: ' . $pagamento->payment_id . '.';
-        }else{
-            $string = $via_sistema . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') teve alteração de status do pagamento da cobrança ' . $pagamento->cobranca_id;
-            $string .= ' do tipo *' . $pagamento->forma . '*, com a payment_id: ' . $pagamento->payment_id . ' para: ' . $status;
-
-            if(in_array($status, ['ERROR', 'DENIED']))
-                $string .= '. Detalhes da Getnet: error code - [' . $errorCode . '], description details - [' . $descricao . '].';
-        }
-
+            $string .= ' do tipo *' . $pagamento->forma . '*, com a ' . $pagamento->isCombinado() ? 'combined_id: ' . $pagamento->combined_id : 'payment_id: ' . $pagamento->payment_id . '.';
+        }elseif($status == 'CANCELED'){
+            $string = $via_sistema . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou a atualização de status de pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *combined*';
+            $string .= ' com a combined_id: ' . $pagamento->combined_id . ' após passar do prazo de cancelamento via Portal com a Getnet (7 dias) e não foi confirmado.';
+        }elseif(in_array($status, ['ERROR', 'DENIED']))
+            $string = $via_sistema . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') tentou realizar um pagamento. Detalhes da Getnet: error code - [' . $errorCode . '], description details - [' . $descricao . '].';
+            
         return $string;
     }
 
@@ -204,7 +205,7 @@ class Pagamento extends Model
             case 'APPROVED':
                 return '<span class="border rounded bg-success font-weight-bold p-1">Aprovado</span>';
             case 'AUTHORIZED':
-                return '<span class="border rounded bg-success font-weight-bold p-1">Autorizado</span>';
+                return '<span class="border rounded bg-warning font-weight-bold p-1">Autorizado</span>';
             case 'CONFIRMED':
                 return '<span class="border rounded bg-success font-weight-bold p-1">Confirmado</span>';
             case 'CANCELED':
@@ -286,21 +287,14 @@ class Pagamento extends Model
     {
         if($this->isDebit())
             return false;
-
-        if($this->isCombinado())
-        {
-            $temp = self::where('combined_id', $this->combined_id)->where('id', '!=', $this->id)->first();
-            if(!$temp->aprovado() && !$this->aprovado())
-                return false;
-        }
-        elseif(!$this->aprovado())
+        if($this->cancelado())
             return false;
 
         $hoje = Carbon::now('UTC')->format('Y-m-d');
         $formato = strpos($this->authorized_at, '.') !== false ? 'Y-m-d\TH:i:s.uZ' : 'Y-m-d\TH:i:sZ';
         $authorized_at = Carbon::createFromFormat($formato, $this->authorized_at);
 
-        return $this->isCombinado() ? $authorized_at->addDays(7)->format('Y-m-d') >= $hoje : $authorized_at->format('Y-m-d') == $hoje;
+        return $this->isAutorizado() ? $authorized_at->addDays(7)->format('Y-m-d') >= $hoje : $authorized_at->format('Y-m-d') == $hoje;
     }
 
     public function getIdPagamento()
@@ -337,11 +331,17 @@ class Pagamento extends Model
         return $this->forma == 'combined';
     }
 
+    public function isAutorizado()
+    {
+        return $this->status == 'AUTHORIZED';
+    }
+
     public function updateCancelamento($status, $message)
     {
         $this->update([
             'status' => is_array($status) ? $status[0] : $status,
             'canceled_at' => $message['dt'],
+            'transacao_temp' => null
         ]);
     }
 
@@ -370,14 +370,4 @@ class Pagamento extends Model
         ]);
     }
 
-    public function getCombinadoAposNotificacao($dados)
-    {
-        if($this->isCombinado())
-            return self::where('cobranca_id', $dados['order_id'])
-                ->where('combined_id', $this->combined_id)
-                ->where('payment_id', '!=', $dados['payment_id'])
-                ->whereIn('status', ['APPROVED', 'CONFIRMED'])
-                ->first();
-        return null;
-    }
 }

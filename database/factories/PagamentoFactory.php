@@ -28,13 +28,14 @@ $factory->define(Pagamento::class, function (Faker $faker) {
     ];
 });
 
-$factory->state(Pagamento::class, 'combinado', function (Faker $faker) {
+$factory->state(Pagamento::class, 'combinado_autorizado', function (Faker $faker) {
     $combined_id = $faker->uuid;
     $pay1 = factory('App\Pagamento')->create([
         'forma' => 'combined',
         'combined_id' => $combined_id,
         'payment_tag' => 'pay-1',
         'total_combined' => '1,00',
+        'status' => 'AUTHORIZED'
     ]);
 
     return [
@@ -42,6 +43,26 @@ $factory->state(Pagamento::class, 'combinado', function (Faker $faker) {
         'combined_id' => $combined_id,
         'payment_tag' => 'pay-2',
         'total_combined' => '1,00',
+        'status' => 'AUTHORIZED'
+    ];
+});
+
+$factory->state(Pagamento::class, 'combinado_confirmado', function (Faker $faker) {
+    $combined_id = $faker->uuid;
+    $pay1 = factory('App\Pagamento')->create([
+        'forma' => 'combined',
+        'combined_id' => $combined_id,
+        'payment_tag' => 'pay-1',
+        'total_combined' => '1,00',
+        'status' => 'CONFIRMED'
+    ]);
+
+    return [
+        'forma' => 'combined',
+        'combined_id' => $combined_id,
+        'payment_tag' => 'pay-2',
+        'total_combined' => '1,00',
+        'status' => 'CONFIRMED'
     ];
 });
 

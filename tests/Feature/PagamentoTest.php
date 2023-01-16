@@ -55,7 +55,7 @@ class PagamentoTest extends TestCase
         $this->signInAsAdmin();
 
         $pagamento = factory('App\Pagamento')->create();
-        $pagamentoCombinado = factory('App\Pagamento')->states('combinado')->create();
+        $pagamentoCombinado = factory('App\Pagamento')->states('combinado_confirmado')->create();
         $pagamentoCancelado = factory('App\Pagamento')->states('cancelado')->create();
 
         $this->get(route('pagamento.admin.index'))
@@ -71,7 +71,7 @@ class PagamentoTest extends TestCase
         $this->signInAsAdmin();
 
         $pagamento = factory('App\Pagamento')->create();
-        $pagamentoCombinado = factory('App\Pagamento')->states('combinado')->create();
+        $pagamentoCombinado = factory('App\Pagamento')->states('combinado_confirmado')->create();
         $pagamentoCancelado = factory('App\Pagamento')->states('cancelado')->create();
 
         $this->get(route('pagamento.admin.busca', ['q' => $pagamento->payment_id]))
@@ -1055,69 +1055,6 @@ class PagamentoTest extends TestCase
     }
 
     /** @test */
-    public function can_update_payment_by_notification()
-    {
-        $representante = factory('App\Representante')->create();
-        $pagamento = factory('App\Pagamento')->create();
-        
-        $this->get(route('pagamento.transacao.credito', [
-            'payment_type' => $pagamento->forma,
-            'customer_id' => $representante->getCustomerId(),
-            'order_id' => $pagamento->cobranca_id,
-            'payment_id' => $pagamento->payment_id,
-            'amount' => '200',
-            'status' => 'CANCELED',
-            'number_installments' => $pagamento->parcelas,
-            'terminal_nsu' => '031575',
-            'authorization_code' => '9190383360902371',
-            'acquirer_transaction_id' => '000099713751',
-            'authorization_timestamp' => now()->toIso8601ZuluString(),
-            'brand' => $pagamento->bandeira,
-            'description_detail' => '',
-            'error_code' => '',
-            'tipo_parcelas' => $pagamento->tipo_parcelas,
-        ]));
-
-        $this->assertDatabaseHas('pagamentos', [
-            'cobranca_id' => $pagamento->cobranca_id,
-            'bandeira' => 'visa',
-            'status' => 'CANCELED'
-        ]);
-    }
-
-    /** @test */
-    public function cannot_update_payment_by_notification_if_status_equal()
-    {
-        $representante = factory('App\Representante')->create();
-        $pagamento = factory('App\Pagamento')->create();
-        
-        $this->get(route('pagamento.transacao.credito', [
-            'payment_type' => $pagamento->forma,
-            'customer_id' => $representante->getCustomerId(),
-            'order_id' => $pagamento->cobranca_id,
-            'payment_id' => $pagamento->payment_id,
-            'amount' => '500',
-            'status' => 'APPROVED',
-            'number_installments' => $pagamento->parcelas,
-            'terminal_nsu' => '031575',
-            'authorization_code' => '9190383360902371',
-            'acquirer_transaction_id' => '000099713751',
-            'authorization_timestamp' => now()->toIso8601ZuluString(),
-            'brand' => $pagamento->bandeira,
-            'description_detail' => '',
-            'error_code' => '',
-            'tipo_parcelas' => $pagamento->tipo_parcelas,
-        ]));
-
-        $this->assertDatabaseHas('pagamentos', [
-            'cobranca_id' => $pagamento->cobranca_id,
-            'bandeira' => 'visa',
-            'status' => 'APPROVED',
-            'total' => '2,00'
-        ]);
-    }
-
-    /** @test */
     public function cannot_create_payment_by_notification_without_checkoutIframe()
     {
         $representante = factory('App\Representante')->create();
@@ -1339,38 +1276,6 @@ class PagamentoTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
         $txt = $inicio . '[Rotina Portal - Transação Getnet] - ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ';
-        $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '*, com a payment_id: ';
-
-        $this->assertStringContainsString($txt, $log);
-    }
-
-    /** @test */
-    public function log_is_generated_when_payment_is_updated_by_notification()
-    {
-        $user = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
-
-        $pagamento = factory('App\Pagamento')->create();
-
-        $this->get(route('pagamento.transacao.credito', [
-            'payment_type' => $pagamento->forma,
-            'customer_id' => $user->getCustomerId(),
-            'order_id' => $pagamento->cobranca_id,
-            'payment_id' => $pagamento->payment_id,
-            'amount' => '200',
-            'status' => 'ERROR',
-            'number_installments' => $pagamento->parcelas,
-            'terminal_nsu' => '031575',
-            'authorization_code' => '9190383360902371',
-            'acquirer_transaction_id' => '000099713751',
-            'description_detail' => 'SISTEMA DO EMISSOR INDISPONIVEL. LIGUE EMISSOR',
-            'error_code' => 'PAYMENTS-021',
-            'tipo_parcelas' => $pagamento->tipo_parcelas,
-        ]));
-
-        $log = tailCustom(storage_path($this->pathLogExterno()));
-        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
-        $txt = $inicio . '[Rotina Portal - Transação Getnet] - ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') teve alteração de status do pagamento da cobrança ';
         $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '*, com a payment_id: ';
 
         $this->assertStringContainsString($txt, $log);

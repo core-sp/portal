@@ -379,6 +379,10 @@
                 <p><strong>Forma de pagamento:</strong> {{ $dado->getForma() }}</p>
                 <p><strong>Parcelas:</strong> {{ $dado->getParcelas() . ' ' . $dado->getTipoParcelas() }}</p>
                 <p><strong>Bandeira:</strong> {!! $dado->getBandeiraImg() !!}</p>
+                @if($dado->isAutorizado())
+                <br>
+                <p><em>Aguardando o Portal confirmar o pagamento.</em></p>
+                @endif
                 <br />
             @endforeach
             @if(\Route::is('pagamento.cancelar.*'))

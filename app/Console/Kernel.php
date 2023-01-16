@@ -164,6 +164,29 @@ class Kernel extends ConsoleKernel
             }
         })->dailyAt('4:15');
 
+        // Rotina para reenviar pagamentos autorizados pelo portal em caso de erro e necessitam de confirmação a cada hora
+        $schedule->call(function(){
+            try {
+                $all = Pagamento::where('status', 'AUTHORIZED')->whereNotNull('transacao_temp')->get();
+                foreach($all as $pagamento)
+                {
+                    $dados['updatePagamento'] = [
+                        'transacao' => json_decode($pagamento->transacao_temp, true),
+                        'user' => $pagamento->getUser(),
+                        'pagamentos' => collect([
+                            $pagamento, 
+                            Pagamento::where('combined_id', $pagamento->combined_id)->where('payment_id', '!=', $pagamento->payment_id)->first()
+                        ])
+                    ];
+                    \Log::channel('externo')->info('[Rotina Portal Pagamento] - Pagamento com a ID: ' . $pagamento->getIdPagamento() . ' nova tentativa de confirmação de pagamento após erro.');
+                    $service = resolve('App\Contracts\MediadorServiceInterface');
+                    $service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+                }
+            } catch (\Exception $e) {
+                \Log::error('[Erro na rotina do Kernel (Confirmação de pagamento Autorizado)] - [Message: ' . $e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            }
+        })->hourly();
+
         // Rotina para reenviar pagamentos realizados pelo portal e erro ao transmitir para o Gerenti no momento da transação
         // $schedule->call(function(){
         //     try {
