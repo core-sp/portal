@@ -183,16 +183,19 @@ class Kernel extends ConsoleKernel
                 ->where('updated_at', '<=', Carbon::today()->subMonths(2)->toDateString());
             })
             ->get();
-            foreach($prs as $pr)
+            if($prs->isNotEmpty())
             {
-                try {
-                    $totalFiles = $pr->anexos->count();
-                    $pr->excluirAnexos();
-                    $totalStorage = count(Storage::files($diretorio . $pr->id));
-                    $totalBd = $pr->fresh()->anexos->count();
-                    Log::channel('interno')->info('Rotina de exclusão de arquivos do pré-registro: pré-registro com ID '.$pr->id.' possuía '.$totalFiles.' e agora possui '.$totalStorage.' no Storage e '.$totalBd.' no BD.');
-                } catch (\Exception $e) {
-                    Log::error('[Erro: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+                foreach($prs as $pr)
+                {
+                    try {
+                        $totalFiles = $pr->anexos->count();
+                        $pr->excluirAnexos();
+                        $totalStorage = count(Storage::files($diretorio . $pr->id));
+                        $totalBd = $pr->fresh()->anexos->count();
+                        Log::channel('interno')->info('[Rotina Portal] - Rotina de exclusão de arquivos do pré-registro: pré-registro com ID '.$pr->id.' possuía '.$totalFiles.' e agora possui '.$totalStorage.' no Storage e '.$totalBd.' no BD.');
+                    } catch (\Exception $e) {
+                        Log::error('[Erro na Rotina do Kernel (Exclusão de arquivos do pré-registro)] - [Message: '.$e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+                    }
                 }
             }
         })
