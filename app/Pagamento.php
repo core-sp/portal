@@ -128,8 +128,9 @@ class Pagamento extends Model
         $string = '';
     	if(in_array($status, ['APPROVED', 'CONFIRMED']))
         {
+            $texto = $pagamento->isCombinado() ? 'combined_id: ' . $pagamento->combined_id : 'payment_id: ' . $pagamento->payment_id;
             $string = $via_sistema . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ' . $pagamento->cobranca_id;
-            $string .= ' do tipo *' . $pagamento->forma . '*, com a ' . $pagamento->isCombinado() ? 'combined_id: ' . $pagamento->combined_id : 'payment_id: ' . $pagamento->payment_id . '.';
+            $string .= ' do tipo *' . $pagamento->forma . '*, com a ' . $texto . '.';
         }elseif($status == 'CANCELED'){
             $string = $via_sistema . 'ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou a atualização de status de pagamento da cobrança ' . $pagamento->cobranca_id . ' do tipo *combined*';
             $string .= ' com a combined_id: ' . $pagamento->combined_id . ' após passar do prazo de cancelamento via Portal com a Getnet (7 dias) e não foi confirmado.';
@@ -338,7 +339,7 @@ class Pagamento extends Model
 
     public function updateCancelamento($status, $message)
     {
-        $this->update([
+        return $this->update([
             'status' => is_array($status) ? $status[0] : $status,
             'canceled_at' => $message['dt'],
             'transacao_temp' => null
@@ -347,7 +348,7 @@ class Pagamento extends Model
 
     public function updateAposErroGerenti($transacao)
     {
-        $this->update([
+        return $this->update([
             'gerenti_ok' => false,
             'transacao_temp' => json_encode($transacao, JSON_FORCE_OBJECT),
         ]);
@@ -355,19 +356,9 @@ class Pagamento extends Model
 
     public function updateAposSucessoGerenti()
     {
-        $this->update([
+        return $this->update([
             'gerenti_ok' => true,
             'transacao_temp' => null,
         ]);
     }
-
-    public function updateAposNotificacao($dados)
-    {
-        $this->update([
-            'status' => $dados['status'],
-            'authorized_at' => in_array($dados['status'], ['APPROVED', 'CONFIRMED']) ? $dados['authorization_timestamp'] : $this->authorized_at,
-            'canceled_at' => $dados['status'] == 'CANCELED' ? now()->toIso8601ZuluString() : $this->canceled_at,
-        ]);
-    }
-
 }

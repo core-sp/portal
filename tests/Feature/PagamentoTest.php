@@ -306,6 +306,13 @@ class PagamentoTest extends TestCase
         ])->assertRedirect(route('representante.dashboard'));
 
         $this->get(route('representante.dashboard'))->assertSeeText('Pagamento realizado para a cobrança ' . $pagamento->cobranca_id);
+
+        $this->assertDatabaseHas('pagamentos', [
+            'cobranca_id' => $pagamento->cobranca_id,
+            'bandeira' => 'visa',
+            'forma' => 'combined',
+            'bandeira' => 'mastercard',
+        ]);
     }
 
     /** @test */
@@ -1168,6 +1175,73 @@ class PagamentoTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_payment_combined_is_created_by_api()
+    {
+        // Acessa o homolog da getnet, então as vezes pode dar erro
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->states('combinado_autorizado')->make();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'combined',
+            'amount' => $pagamento->total,
+            'amount_1' => '100',
+            'amount_2' => '100',
+            'parcelas_1' => $pagamento->parcelas,
+            'parcelas_2' => $pagamento->parcelas,
+        ]);
+
+        $this->post(route('pagamento.cartao', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'combined',
+            'amount' => $pagamento->total,
+            'amount_1' => '100',
+            'amount_2' => '100',
+            'parcelas_1' => $pagamento->parcelas,
+            'parcelas_2' => $pagamento->parcelas,
+            'cardholder_name_1' => 'TESTE CARTAO',
+            'card_number_1' => '4012001037141112',
+            'security_code_1' => '111',
+            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'cardholder_name_2' => 'TESTE CARTAO DOIS',
+            'card_number_2' => '5155901222280001',
+            'security_code_2' => '123',
+            'expiration_2' => now()->addMonths(2)->addYear()->format('m/Y'),
+        ])->assertRedirect(route('representante.dashboard'));
+
+        $ids = array();
+        $tags = array();
+        $all = Pagamento::where('status', 'CONFIRMED')->get();
+        foreach($all as $key => $pags)
+        {
+            $ids[$key] = $pags->payment_id;
+            $tags[$key] = $pags->payment_tag;
+        }
+
+        // retornar os dois últimos registros do log e separados pelo final da linha.
+        $log = tailCustom(storage_path($this->pathLogExterno()), 2);
+        $pos = strpos($log, PHP_EOL);
+        $autorizado = substr($log, 0, $pos);
+        $confirmado = substr($log, $pos + 1);
+
+        $inicio = 'testing.INFO: [IP: ' . request()->ip() . '] - ';
+        $txt = $inicio . 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou a autorização de pagamento da cobrança ';
+        $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a combined_id: ' . $all->get(0)->combined_id;
+        $txt .= ', com as payment_ids: ' . json_encode($ids) . ' e payment_tags: ' . json_encode($tags) . '. Aguardando confirmação do pagamento via Portal.';
+
+        $this->assertStringContainsString($txt, $autorizado);
+
+        $inicio = 'testing.INFO: [IP: ' . request()->ip() . '] - ';
+        $txt = $inicio . 'Usuário ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ';
+        $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '* com a combined_id: ' . $all->get(0)->combined_id;
+
+        $this->assertStringContainsString($txt, $confirmado);
+    }
+
+    /** @test */
     public function log_is_generated_when_payment_is_canceled_by_api()
     {
         // Acessa o homolog da getnet, então as vezes pode dar erro
@@ -1276,7 +1350,7 @@ class PagamentoTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
         $txt = $inicio . '[Rotina Portal - Transação Getnet] - ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ';
-        $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '*, com a payment_id: ';
+        $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '*, com a payment_id: ' . Pagamento::first()->payment_id;
 
         $this->assertStringContainsString($txt, $log);
     }

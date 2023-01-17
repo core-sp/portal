@@ -168,19 +168,22 @@ class Kernel extends ConsoleKernel
         $schedule->call(function(){
             try {
                 $all = Pagamento::where('status', 'AUTHORIZED')->whereNotNull('transacao_temp')->get();
-                foreach($all as $pagamento)
+                if($all->isNotEmpty())
                 {
-                    $dados['updatePagamento'] = [
-                        'transacao' => json_decode($pagamento->transacao_temp, true),
-                        'user' => $pagamento->getUser(),
-                        'pagamentos' => collect([
-                            $pagamento, 
-                            Pagamento::where('combined_id', $pagamento->combined_id)->where('payment_id', '!=', $pagamento->payment_id)->first()
-                        ])
-                    ];
-                    \Log::channel('externo')->info('[Rotina Portal Pagamento] - Pagamento com a ID: ' . $pagamento->getIdPagamento() . ' nova tentativa de confirmação de pagamento após erro.');
                     $service = resolve('App\Contracts\MediadorServiceInterface');
-                    $service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+                    foreach($all as $pagamento)
+                    {
+                        $dados['updatePagamento'] = [
+                            'transacao' => json_decode($pagamento->transacao_temp, true),
+                            'user' => $pagamento->getUser(),
+                            'pagamentos' => collect([
+                                $pagamento, 
+                                Pagamento::where('combined_id', $pagamento->combined_id)->where('payment_id', '!=', $pagamento->payment_id)->first()
+                            ])
+                        ];
+                        \Log::channel('externo')->info('[Rotina Portal Pagamento] - Pagamento com a combined_id: ' . $pagamento->getIdPagamento() . ' em nova tentativa de confirmação de pagamento após erro.');
+                        $service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+                    }
                 }
             } catch (\Exception $e) {
                 \Log::error('[Erro na rotina do Kernel (Confirmação de pagamento Autorizado)] - [Message: ' . $e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -198,7 +201,7 @@ class Kernel extends ConsoleKernel
         //             \Log::channel('externo')->info('[Rotina Portal Pagamento] - Pagamento com a ID: ' . $pagamento->id . ' foi reenviado para o Gerenti com SUCESSO após erro.');
         //         }
         //     } catch (\Exception $e) {
-        //         \Log::error('[Erro na rotina do Kernel] - ' . $e->getMessage());
+        //         \Log::error('[Erro na rotina do Kernel (Reenvio de pagamento para o Gerenti)] - [Message: ' . $e->getMessage().'], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
         //     }
         // })->everyThirtyMinutes();
     }
