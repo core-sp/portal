@@ -54,7 +54,7 @@
   </div>
 </section>
 
-<section id="home-news" class="mb-2">
+<section id="home-news" class="mb-2 mt-4">
   <div class="container">
     <div class="row mb-2">
       <div class="col-12">
