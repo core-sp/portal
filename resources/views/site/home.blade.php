@@ -54,7 +54,30 @@
   </div>
 </section>
 
-<section id="espaco-representante">
+<section id="home-news" class="mb-2">
+  <div class="container">
+    <div class="row mb-2">
+      <div class="col-12">
+        <div class="home-title">
+          <blockquote>
+            <i></i>
+            <h2 class="pr-3 ml-1">Notícias</h2>
+          </blockquote>
+          <h5 class="float-right branco-bg">
+            <a href="{{ route('noticias.siteGrid') }}"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
+          </h5>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      @foreach($noticias as $noticia)
+        @include('site.inc.noticia-grid')
+      @endforeach
+    </div>
+  </div>
+</section>
+
+<section id="espaco-representante" class="mb-2">
   <div class="container">
     <div class="row mb-2">
       <div class="col-12">
@@ -232,7 +255,7 @@
   </div>
 </section>
 
-<section id="beneficios" class="mb-5">
+<section id="beneficios" class="mb-2">
   <div class="container">
     <div class="row">
       <div class="col-12">
@@ -251,29 +274,6 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<section id="home-news">
-  <div class="container">
-    <div class="row mb-2">
-      <div class="col-12">
-        <div class="home-title">
-          <blockquote>
-            <i></i>
-            <h2 class="pr-3 ml-1">Notícias</h2>
-          </blockquote>
-          <h5 class="float-right branco-bg">
-            <a href="{{ route('noticias.siteGrid') }}"><i class="fas fa-plus-circle icon-title"></i> Ver mais notícias</a>
-          </h5>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      @foreach($noticias as $noticia)
-        @include('site.inc.noticia-grid')
-      @endforeach
     </div>
   </div>
 </section>
