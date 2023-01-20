@@ -610,7 +610,7 @@ function formataDataGerentiRecursive($array)
 function secondLine($situacao, $vencimento = null, $link = null, $descricao = null, $boleto = null)
 {
     if($situacao === 'Em aberto' && $vencimento === null) {
-        $str = '<strong class="text-danger">EXPIRADO</strong>';
+        $str = '<strong class="text-warning">EM ABERTO</strong> &sdot; <span class="normal text-danger">BOLETO EXPIRADO</span>';
     } elseif($situacao === 'Em aberto' && $link !== null) {
         $str = '<strong class="text-warning">EM ABERTO</strong> ⋅ <a href="' . $link . '" class="normal text-info" onclick="clickBoleto(\''. $descricao .'\')">BAIXAR BOLETO</a>';
     } elseif($situacao === 'Em aberto' && $boleto !== null) {
