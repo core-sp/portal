@@ -220,6 +220,8 @@ $(document).ready(function(){
 	// $('#video-campanha').on('ended', function(){
 	// 	$('#popup-campanha').modal('hide');
 	// });
+
+	$('[data-toggle="popover"]').popover({html: true});
 });
 
 // Lightbox

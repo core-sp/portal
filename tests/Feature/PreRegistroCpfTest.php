@@ -83,8 +83,9 @@ class PreRegistroCpfTest extends TestCase
         $pr = PreRegistro::first();
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('Usuário Externo com cpf: ' . $pr->userExterno->cpf_cnpj, $log);
-        $this->assertStringContainsString(', iniciou o processo de solicitação de registro com a id: ' . $pr->id, $log);
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário Externo com cpf: ' . $pr->userExterno->cpf_cnpj.', iniciou o processo de solicitação de registro com a id: ' . $pr->id;
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1770,8 +1771,10 @@ class PreRegistroCpfTest extends TestCase
         $pr = PreRegistro::first();
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('Usuário Externo com cpf: ' . $pr->userExterno->cpf_cnpj, $log);
-        $this->assertStringContainsString(', atualizou o status para ' . $pr::STATUS_ANALISE_INICIAL . ' da solicitação de registro com a id: ' . $pr->id, $log);
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário Externo com cpf: ' . $pr->userExterno->cpf_cnpj;
+        $txt .= ', atualizou o status para ' . $pr::STATUS_ANALISE_INICIAL . ' da solicitação de registro com a id: ' . $pr->id;
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1843,8 +1846,10 @@ class PreRegistroCpfTest extends TestCase
         $this->put(route('externo.inserir.preregistro'), $dados)->assertRedirect(route('externo.preregistro.view'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('Usuário Externo com cpf: ' . $preRegistro->userExterno->cpf_cnpj, $log);
-        $this->assertStringContainsString(', atualizou o status para ' . PreRegistro::STATUS_ANALISE_CORRECAO . ' da solicitação de registro com a id: ' . $preRegistro->id, $log);
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário Externo com cpf: ' . $preRegistro->userExterno->cpf_cnpj;
+        $txt .= ', atualizou o status para ' . PreRegistro::STATUS_ANALISE_CORRECAO . ' da solicitação de registro com a id: ' . $preRegistro->id;
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -2171,7 +2176,10 @@ class PreRegistroCpfTest extends TestCase
             ])->assertOk(); 
 
             $log = tailCustom(storage_path($this->pathLogInterno()));
-            $this->assertStringContainsString('fez a ação de "justificar" o campo "' . $campo . '", inserindo ou removendo valor', $log);
+            $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+            $txt = $inicio . 'Usuário (usuário 1) fez a ação de "justificar" o campo "' . $campo . '", ';
+            $txt .= 'inserindo ou removendo valor *pré-registro* (id: '.$preRegistroCpf->preRegistro->id.')';
+            $this->assertStringContainsString($txt, $log);
         }
     }
 
@@ -2208,7 +2216,10 @@ class PreRegistroCpfTest extends TestCase
             ])->assertStatus(200);  
 
             $log = tailCustom(storage_path($this->pathLogInterno()));
-            $this->assertStringContainsString('fez a ação de "editar" o campo "' . $campo . '", inserindo ou removendo valor', $log);
+            $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+            $txt = $inicio . 'Usuário (usuário 1) fez a ação de "editar" o campo "' . $campo . '", ';
+            $txt .= 'inserindo ou removendo valor *pré-registro* (id: '.$preRegistroCpf->preRegistro->id.')';
+            $this->assertStringContainsString($txt, $log);
         }  
 
         $this->assertDatabaseHas('pre_registros', $campos);
@@ -2331,7 +2342,10 @@ class PreRegistroCpfTest extends TestCase
             ])->assertStatus(200);
 
             $log = tailCustom(storage_path($this->pathLogInterno()));
-            $this->assertStringContainsString('fez a ação de "conferir" o campo "confere_anexos", inserindo ou removendo valor', $log);
+            $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+            $txt = $inicio . 'Usuário (usuário 1) fez a ação de "conferir" o campo "confere_anexos", ';
+            $txt .= 'inserindo ou removendo valor *pré-registro* (id: '.$preRegistroCpf->preRegistro->id.')';
+            $this->assertStringContainsString($txt, $log);
         }
     }
 
@@ -2640,7 +2654,9 @@ class PreRegistroCpfTest extends TestCase
             ->assertRedirect(route('preregistro.index'));
 
             $log = tailCustom(storage_path($this->pathLogInterno()));
-            $this->assertStringContainsString('atualizou status para ' . PreRegistro::STATUS_CORRECAO, $log);
+            $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+            $txt = $inicio . 'Usuário (usuário 1) atualizou status para ' . PreRegistro::STATUS_CORRECAO . ' *pré-registro* (id: '.$preRegistroCpf->preRegistro->id.')';
+            $this->assertStringContainsString($txt, $log);
         }
     }
 
@@ -2706,7 +2722,10 @@ class PreRegistroCpfTest extends TestCase
         ->assertRedirect(route('preregistro.index'));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('atualizou status para ' . PreRegistro::STATUS_NEGADO . ' e seus arquivos foram excluídos pelo sistema', $log);
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário (usuário 1) atualizou status para ' . PreRegistro::STATUS_NEGADO;
+        $txt .= ' e seus arquivos foram excluídos pelo sistema *pré-registro* (id: '.$preRegistroCpf->preRegistro->id.')';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -2907,7 +2926,10 @@ class PreRegistroCpfTest extends TestCase
         ->assertRedirect(route('preregistro.index'));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('atualizou status para ' . PreRegistro::STATUS_APROVADO, $log);
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário (usuário 1) atualizou status para ' . PreRegistro::STATUS_APROVADO;
+        $txt .= ' *pré-registro* (id: '.$preRegistroCpf->preRegistro->id.')';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */

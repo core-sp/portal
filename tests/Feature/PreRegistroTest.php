@@ -111,8 +111,10 @@ class PreRegistroTest extends TestCase
         ->assertRedirect(route('externo.preregistro.view'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('Usuário Externo com cnpj: ' . $externo->cpf_cnpj . ', não pode realizar a solicitação de registro ', $log);
-        $this->assertStringContainsString('devido constar no GERENTI um registro ativo : ' . formataRegistro('0000000002'), $log);
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário Externo com cnpj: ' . $externo->cpf_cnpj . ', não pode realizar a solicitação de registro ';
+        $txt .= 'devido constar no GERENTI um registro ativo : ' . formataRegistro('0000000002');
+        $this->assertStringContainsString($txt, $log);
         
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->create([
             'cpf_cnpj' => '86294373085'
@@ -125,8 +127,10 @@ class PreRegistroTest extends TestCase
         ->assertRedirect(route('externo.preregistro.view'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('Usuário Externo com cpf: ' . $externo->cpf_cnpj . ', não pode realizar a solicitação de registro ', $log);
-        $this->assertStringContainsString('devido constar no GERENTI um registro ativo : ' . formataRegistro('0000000001'), $log);
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário Externo com cpf: ' . $externo->cpf_cnpj . ', não pode realizar a solicitação de registro ';
+        $txt .= 'devido constar no GERENTI um registro ativo : ' . formataRegistro('0000000001');
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -151,6 +155,38 @@ class PreRegistroTest extends TestCase
     }
 
     /** @test */
+    public function error_code_429_externo_by_login()
+    {
+        // Considerado o valor local que está no UserExternoSiteController
+        $externo = $this->signInAsUserExterno();
+        $preRegistro = factory('App\PreRegistro')->create();
+
+        for($i = 1; $i <= 100; $i++)
+            $this->post(route('externo.inserir.preregistro.ajax'), [
+                'classe' => 'preRegistro',
+                'campo' => 'numero',
+                'valor' => '222'
+            ])->assertStatus(200);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'numero',
+            'valor' => '222'
+        ])->assertStatus(429);
+
+        $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
+        $preRegistro = factory('App\PreRegistro')->create([
+            'contabil_id' => null
+        ]);
+
+        $this->post(route('externo.inserir.preregistro.ajax'), [
+            'classe' => 'preRegistro',
+            'campo' => 'segmento',
+            'valor' => 'Alimentício'
+        ])->assertStatus(200);
+    }
+
+    /** @test */
     public function error_code_429_admin()
     {
         // Considerado o valor local que está no PreRegistroController
@@ -160,6 +196,21 @@ class PreRegistroTest extends TestCase
             $this->get(route('preregistro.index'))->assertStatus(200);
 
         $this->get(route('preregistro.index'))->assertStatus(429);
+    }
+
+    /** @test */
+    public function error_code_429_admin_by_login()
+    {
+        // Considerado o valor local que está no PreRegistroController
+        $admin = $this->signInAsAdmin();
+
+        for($i = 1; $i <= 190; $i++)
+            $this->get(route('preregistro.index'))->assertStatus(200);
+
+        $this->get(route('preregistro.index'))->assertStatus(429);
+
+        $admin = $this->signInAsAdmin('e.admin@teste.com');
+        $this->get(route('preregistro.index'))->assertStatus(200);
     }
 
     /** @test */
@@ -2023,6 +2074,39 @@ class PreRegistroTest extends TestCase
         ->assertSeeText($preRegistro1->userExterno->nome)
         ->assertSeeText($preRegistro2->userExterno->nome)
         ->assertSeeText($preRegistro3->userExterno->nome);
+    }
+
+    /** @test */
+    public function view_status_description_in_list_pre_registros()
+    {
+        $admin = $this->signInAsAdmin();
+
+        $preRegistro1 = factory('App\PreRegistro')->states('analise_inicial')->create([
+            'idregional' => $admin->idregional
+        ]);
+        $preRegistro2 = factory('App\PreRegistro')->states('analise_inicial')->create([
+            'user_externo_id' => factory('App\UserExterno')->create([
+                'cpf_cnpj' => '47662011089'
+            ]),
+            'contabil_id' => null,
+            'idregional' => $admin->idregional
+        ]);
+        $preRegistro3 = factory('App\PreRegistro')->states('analise_inicial')->create([
+            'user_externo_id' => factory('App\UserExterno')->create([
+                'cpf_cnpj' => '06985713000138'
+            ]),
+            'contabil_id' => null,
+            'idregional' => $admin->idregional
+        ]);
+        
+        $this->get(route('preregistro.index'))
+        ->assertSeeText('Legenda (click)')
+        ->assertSee('data-content="<strong>Solicitante está em processo de preenchimento do formulário</strong>')
+        ->assertSee('data-content="<strong>Solicitante está aguardando o atendente analisar os dados</strong>')
+        ->assertSee('data-content="<strong>Atendente está aguardando o solicitante corrigir os dados</strong>')
+        ->assertSee('data-content="<strong>Solicitante está aguardando o atendente analisar os dados após correção</strong>')
+        ->assertSee('data-content="<strong>Atendente aprovou a solicitação</strong>')
+        ->assertSee('data-content="<strong>Atendente negou a solicitação</strong>');
     }
 
     /** @test */

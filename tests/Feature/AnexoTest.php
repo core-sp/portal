@@ -140,8 +140,10 @@ class AnexoTest extends TestCase
         ])->assertStatus(200);
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('Usuário Externo com cpf: ' . $externo->cpf_cnpj . ', anexou o arquivo "' . Anexo::first()->nome_original . '"', $log);
-        $this->assertStringContainsString(', que possui a ID: ' . Anexo::first()->id . ' na solicitação de registro com a id: ' . $externo->preRegistro->id, $log);
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário Externo com cpf: ' . $externo->cpf_cnpj . ', anexou o arquivo "' . Anexo::first()->nome_original . '"';
+        $txt .= ', que possui a ID: ' . Anexo::first()->id . ' na solicitação de registro com a id: ' . $externo->preRegistro->id;
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -809,7 +811,9 @@ class AnexoTest extends TestCase
         $this->delete(route('externo.preregistro.anexo.excluir', Anexo::find(1)->id))->assertOk();
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString('Usuário Externo com cpf: '.$externo->cpf_cnpj.', excluiu o arquivo com a ID: '.Anexo::withTrashed()->first()->id, $log);
+        $inicio = '['. now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $txt = $inicio . 'Usuário Externo com cpf: '.$externo->cpf_cnpj.', excluiu o arquivo com a ID: '.Anexo::withTrashed()->first()->id;
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
