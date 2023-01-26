@@ -1402,9 +1402,9 @@ class FiscalizacaoTest extends TestCase
         $this->post(route("fiscalizacao.storeperiodo", $atributos));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('criou', $log);
-        $this->assertStringContainsString('período fiscalização', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *período fiscalização* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1415,16 +1415,16 @@ class FiscalizacaoTest extends TestCase
         $this->put(route("fiscalizacao.updatestatus", $atributos->id));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('publicado', $log);
-        $this->assertStringContainsString('atualizou a publicação do período da fiscalização com o status', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.')  atualizou a publicação do período da fiscalização com o status  *publicado* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
 
         $this->put(route("fiscalizacao.updatestatus", $atributos->id));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('não publicado', $log);
-        $this->assertStringContainsString('atualizou a publicação do período da fiscalização com o status', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.')  atualizou a publicação do período da fiscalização com o status  *não publicado* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1441,9 +1441,9 @@ class FiscalizacaoTest extends TestCase
 
         $this->put(route("fiscalizacao.updateperiodo", $periodoFiscalizacao->id), $dados);
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('atualizou', $log);
-        $this->assertStringContainsString('dados do período da fiscalização', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou *dados do período da fiscalização* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** 

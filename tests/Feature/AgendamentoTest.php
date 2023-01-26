@@ -156,8 +156,9 @@ class AgendamentoTest extends TestCase
         $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('agendamento', $log);
-        $this->assertStringContainsString('editou', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *agendamento* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1036,8 +1037,9 @@ class AgendamentoTest extends TestCase
         $this->put(route('agendamentos.updateStatus'), $dados);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('agendamento', $log);
-        $this->assertStringContainsString('confirmou presença', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') confirmou presença *agendamento* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1081,8 +1083,9 @@ class AgendamentoTest extends TestCase
         $this->put(route('agendamentos.updateStatus'), $dados);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('agendamento', $log);
-        $this->assertStringContainsString('confirmou falta', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') confirmou falta *agendamento* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1984,8 +1987,9 @@ class AgendamentoTest extends TestCase
         $this->post(route('agendamentobloqueios.store'), $bloqueio);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('bloqueio de agendamento', $log);
-        $this->assertStringContainsString('criou', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *bloqueio de agendamento* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -2003,7 +2007,11 @@ class AgendamentoTest extends TestCase
         $log = tailCustom(storage_path($this->pathLogInterno()), $all->count());
 
         foreach($all as $regional)
-            $this->assertStringContainsString('criou *bloqueio de agendamento* (id: '.$regional->idregional.')', $log);
+        {
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+            $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *bloqueio de agendamento* (id: '.$regional->idregional.')';
+            $this->assertStringContainsString($txt, $log);
+        }
     }
 
     /** @test */
@@ -2264,8 +2272,9 @@ class AgendamentoTest extends TestCase
         $this->put(route('agendamentobloqueios.update', $bloqueio->idagendamentobloqueio), $bloqueio->toArray());
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('bloqueio de agendamento', $log);
-        $this->assertStringContainsString('editou', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *bloqueio de agendamento* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -2431,8 +2440,9 @@ class AgendamentoTest extends TestCase
         $this->delete(route('agendamentobloqueios.delete', $bloqueio->idagendamentobloqueio));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('bloqueio de agendamento', $log);
-        $this->assertStringContainsString('cancelou', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') cancelou *bloqueio de agendamento* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -2600,8 +2610,11 @@ class AgendamentoTest extends TestCase
         $agendamento = Agendamento::find(1);
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString($agendamento->nome.' (CPF: '.$agendamento->cpf.') *agendou* atendimento em *'.$agendamento->regional->regional, $log);
-        $this->assertStringContainsString('* no dia '.onlyDate($agendamento->dia).' para o serviço '.$agendamento->tiposervico.' e ', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $agendamento->nome.' (CPF: '.$agendamento->cpf.') *agendou* atendimento em *'.$agendamento->regional->regional;
+        $txt .= '* no dia '.onlyDate($agendamento->dia).' para o serviço '.$agendamento->tiposervico.' e ';
+        $txt .= 'foi criado um novo registro no termo de consentimento, com a id: 1';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -3751,8 +3764,10 @@ class AgendamentoTest extends TestCase
         ]);
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-        $this->assertStringContainsString($agendamento->nome.' (CPF: '.$agendamento->cpf.') *cancelou* atendimento em *'.$agendamento->regional->regional, $log);
-        $this->assertStringContainsString('* no dia '.onlyDate($agendamento->dia), $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $agendamento->nome.' (CPF: '.$agendamento->cpf.') *cancelou* atendimento em *'.$agendamento->regional->regional;
+        $txt .= '* no dia '.onlyDate($agendamento->dia);
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */

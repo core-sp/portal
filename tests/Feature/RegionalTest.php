@@ -100,9 +100,9 @@ class RegionalTest extends TestCase
 
         $this->patch(route('regionais.update', $regional->idregional), $attributes);
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('editou', $log);
-        $this->assertStringContainsString('regional', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *regional* (id: ' .$regional->idregional.')';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -274,6 +274,27 @@ class RegionalTest extends TestCase
             ->assertSee($regional->regional)
             ->assertSee($regional->endereco)
             ->assertSee($regional->bairro);
+    }
+
+    /** @test */
+    public function error_404_when_regional_not_find_is_shown_on_the_website()
+    {
+        $this->get(route('regionais.show', 1))
+            ->assertStatus(404);
+    }
+
+    /** @test */
+    public function log_is_generated_when_error_404_on_website_when_not_find_regional()
+    {
+        $id = 555;
+        $this->get(route('regionais.show', $id))
+            ->assertStatus(404);
+
+        $log = tailCustom(storage_path($this->pathLogErros()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
+        $txt = $inicio . '[Erro: No query results for model [App\Regional] '.$id.'], [Controller: App\Http\Controllers\RegionalController@show], ';
+        $txt .= '[Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 387]';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */

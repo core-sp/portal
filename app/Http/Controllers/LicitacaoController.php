@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\LicitacaoRequest;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class LicitacaoController extends Controller
 {
@@ -108,6 +109,9 @@ class LicitacaoController extends Controller
     {
         try{
             $licitacao = $this->service->getService('Licitacao')->viewSite($id);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Licitação não encontrada.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página da licitação no portal.");

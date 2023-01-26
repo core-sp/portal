@@ -116,9 +116,9 @@ class LicitacaoTest extends TestCase
 
         $this->post(route('licitacoes.store'), $attributes);
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('criou', $log);
-        $this->assertStringContainsString('licitação', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *licitação* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -477,9 +477,9 @@ class LicitacaoTest extends TestCase
 
         $this->patch(route('licitacoes.update', $attributes->idlicitacao), $attributes->toArray());
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('editou', $log);
-        $this->assertStringContainsString('licitação', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *licitação* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -842,9 +842,9 @@ class LicitacaoTest extends TestCase
 
         $this->delete(route('licitacoes.destroy', $licitacao->idlicitacao));
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('apagou', $log);
-        $this->assertStringContainsString('licitação', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') apagou *licitação* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -906,9 +906,9 @@ class LicitacaoTest extends TestCase
         $this->delete(route('licitacoes.destroy', $licitacao->idlicitacao));
         $this->get(route('licitacoes.restore', $licitacao->idlicitacao));
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('restaurou', $log);
-        $this->assertStringContainsString('licitação', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') restaurou *licitação* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1066,6 +1066,27 @@ class LicitacaoTest extends TestCase
             ->assertSee($licitacao->modalidade)
             ->assertSee($licitacao->situacao)
             ->assertSee(formataData($licitacao->datarealizacao));
+    }
+
+    /** @test */
+    public function error_404_when_licitacao_not_find_is_shown_on_the_website()
+    {
+        $this->get(route('licitacoes.show', 1))
+            ->assertStatus(404);
+    }
+
+    /** @test */
+    public function log_is_generated_when_error_404_on_website_when_not_find_licitacao()
+    {
+        $id = 555;
+        $this->get(route('licitacoes.show', $id))
+            ->assertStatus(404);
+
+        $log = tailCustom(storage_path($this->pathLogErros()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
+        $txt = $inicio . '[Erro: No query results for model [App\Licitacao] '.$id.'], [Controller: App\Http\Controllers\LicitacaoController@show], ';
+        $txt .= '[Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 387]';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
