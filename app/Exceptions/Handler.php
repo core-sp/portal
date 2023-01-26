@@ -7,6 +7,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Arr;
 use Log;
+use Illuminate\Session\TokenMismatchException;
 
 class Handler extends ExceptionHandler
 {
@@ -36,6 +37,12 @@ class Handler extends ExceptionHandler
                     return redirect(route('login'));
                 break;
             }
+        }
+
+        if(($exception instanceof TokenMismatchException) && \Route::is('pagamento.*')) {
+            $msg = 'Tentativa de pagamento por uma sessão que não é mais válida. Deve refazer o fluxo de pagamento.';
+            Log::error('[Erro: '.$exception->getMessage().'], [Mensagem: '.$msg.'], [Código: '.$exception->getCode().'], [Arquivo: '.$exception->getFile().'], [Linha: '.$exception->getLine().']');
+            abort(419, $msg);
         }
 
         return parent::render($request, $exception);

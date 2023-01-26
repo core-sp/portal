@@ -1354,4 +1354,94 @@ class PagamentoTest extends TestCase
 
         $this->assertStringContainsString($txt, $log);
     }
+
+    /** @test */
+    public function log_is_generated_when_get_checkoutIframeSucesso()
+    {
+        // Deve habilitar no PagamentoController o checkoutIframe
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->make();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+        ]);
+
+        $this->get(route('pagamento.sucesso.checkout', $pagamento->cobranca_id))
+        ->assertRedirect(route('representante.dashboard'));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
+        $txt = $inicio . 'Usuário '.$user->id.' ("' . formataCpfCnpj($user->cpf_cnpj) . '", login como: '.$user::NAME_AREA_RESTRITA.') ';
+        $txt .= 'aviso que realizou o pagamento da cobrança *'.$pagamento->cobranca_id.'* via Checkout Iframe. Aguardando notificação para registro no banco de dados.';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function regenerate_session_after_submit_payment_with_error_via_api()
+    {
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->make();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+        ]);
+
+        $csrf = csrf_token();
+        $this->post(route('pagamento.cartao', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => $pagamento->forma,
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+            'cardholder_name_1' => 'TESTE CARTAO',
+            // cartão de teste da getnet com um número a menos
+            'card_number_1' => '515590122223000',
+            'security_code_1' => '111',
+            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+        ])->assertRedirect(route('representante.dashboard'));
+
+        $this->assertNotEquals($csrf, csrf_token());
+    }
+
+    /** @test */
+    public function regenerate_session_after_submit_payment_with_success_via_api()
+    {
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->make();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+        ]);
+
+        $csrf = csrf_token();
+        $this->post(route('pagamento.cartao', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => $pagamento->forma,
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+            'cardholder_name_1' => 'TESTE CARTAO',
+            'card_number_1' => '5155901222280001',
+            'security_code_1' => '111',
+            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+        ])->assertRedirect(route('representante.dashboard'));
+
+        $this->assertNotEquals($csrf, csrf_token());
+    }
 }

@@ -17,7 +17,11 @@
 
 <section id="pagina-erro">
   <div class="container text-center">
-    <p>Por favor, verifique se sua sessão está válida e se o uso de cookies está habilitado e tente novamente.</p>
+    @if(\Route::is('pagamento.*'))
+      <h4 class="font-normal">{{ $exception->getMessage() }}</h4>
+    @else
+      <h4 class="font-normal">Por favor, verifique se sua sessão está válida e se o uso de cookies está habilitado e tente novamente.</h4>
+    @endif
   </div>
 </section>
 

@@ -130,6 +130,7 @@ class PagamentoController extends Controller
                 return redirect()->route($user::NAME_ROUTE . '.dashboard');
 
             // cobranca pego do gerenti e deve estar relacionado com o usuário autenticado e não deve estar pago
+            \Log::channel('externo')->info('[IP: '.request()->ip().'] - '.'Usuário '.$user->id.' ("' . formataCpfCnpj($user->cpf_cnpj) . '", login como: '.$user::NAME_AREA_RESTRITA.') aviso que realizou o pagamento da cobrança *'.$cobranca.'* via Checkout Iframe. Aguardando notificação para registro no banco de dados.');
         }catch(\Exception $e){
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar dados da cobrança após pagamento online via checkout");
@@ -171,11 +172,15 @@ class PagamentoController extends Controller
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             \Log::channel('externo')->info('[IP: '.$request->ip().'] - '.'Usuário '.$user->id.' ("' . formataCpfCnpj($user->cpf_cnpj) . '", login como: '.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *'.$e->getCode().'* ao tentar realizar o pagamento da cobrança *'.$cobranca.'*. Erro registrado no Log de Erros.');
             
+            session()->regenerate();
+
             return redirect()->route($user::NAME_ROUTE . '.dashboard')->with([
                 'message-cartao' => '<i class="fas fa-times"></i> Não foi possível completar a operação! ' . $msg,
                 'class' => 'alert-danger',
             ]);
         }
+
+        session()->regenerate();
 
         return redirect()->route($user::NAME_ROUTE . '.dashboard')->with($transacao);
     }
