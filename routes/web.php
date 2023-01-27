@@ -334,6 +334,7 @@ Route::prefix('/')->group(function() {
   Route::middleware(['auth:representante'])->group(function () {
     Route::get('/realizar-pagamento/{cobranca}', 'PagamentoController@pagamentoGerentiView')->name('pagamento.view');
     Route::post('/realizar-pagamento/{cobranca}', 'PagamentoController@pagamentoGerenti')->name('pagamento.gerenti');
+    Route::post('/checkout/verify/{cobranca}', 'PagamentoController@checkoutIframeVerifica')->name('pagamento.verifica.checkout');
     Route::get('/checkout/sucesso/{cobranca}', 'PagamentoController@checkoutIframeSucesso')->name('pagamento.sucesso.checkout');
     Route::post('/confirmar-pagamento/{cobranca}', 'PagamentoController@pagamentoCartao')->name('pagamento.cartao');
     Route::get('/cancelar-pagamento/{cobranca}/{pagamento}', 'PagamentoController@cancelarPagamentoCartaoView')->name('pagamento.cancelar.view');

@@ -115,10 +115,30 @@ class PagamentoController extends Controller
             abort(500, "Erro ao processar dados do servidor para pagamento online");
         }
 
+        session()->regenerate();
+
         return view('site.' . $user::NAME_VIEW . '.pagamento', [
             'pagamento' => $pagamento, 'cobranca' => $cobranca, 'cobranca_dados' => $cobranca_dados, 'is_3ds' => $is_3ds, 'checkoutIframe' => $this->checkoutIframe, 
             'tiposPag' => $tiposPag
         ]);
+    }
+
+    public function checkoutIframeVerifica($cobranca, Request $request)
+    {
+        try{
+            $user = auth()->user();
+
+            if(!$this->checkoutIframe || (url()->previous() != route('pagamento.gerenti', $cobranca)))
+                return redirect()->route($user::NAME_ROUTE . '.dashboard');
+
+        }catch(\Exception $e){
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao verificar sessão do pagamento via checkout");
+        }
+
+        session()->regenerate();
+
+        return response()->json([]);
     }
 
     public function checkoutIframeSucesso($cobranca)
@@ -135,6 +155,8 @@ class PagamentoController extends Controller
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar dados da cobrança após pagamento online via checkout");
         }
+
+        session()->regenerate();
 
         return redirect()->route($user::NAME_ROUTE . '.dashboard')->with([
             'message-cartao' => '<i class="fas fa-check"></i> Pagamento realizado para a cobrança ' . $cobranca . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email,

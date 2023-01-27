@@ -342,9 +342,6 @@
                         data-toggle="modal" data-target="#modalPagamento" data-backdrop="static"
                     @endif
                 >
-                {{ isset($pagamento) ? 'Finalizar' : 'Confirmar dados para pagamento' }}
-                </button>
-
                 @else
                 <input type="hidden" name="checkoutIframe" value="1">
                 <input type="hidden" id="callbackURL" value="{{ route($user::NAME_ROUTE . '.dashboard') }}">
@@ -353,9 +350,9 @@
                     type="{{ isset($pagamento) ? 'button' : 'submit' }}" 
                     class="btn btn-success {{ isset($pagamento) ? 'pay-button-getnet' : '' }}"
                 >
+                @endif
                 {{ isset($pagamento) ? 'Finalizar' : 'Confirmar dados para pagamento' }}
                 </button>
-                @endif
 
             </div>
         </form>

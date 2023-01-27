@@ -32,6 +32,7 @@ class PagamentoTest extends TestCase
         // site
         $this->get(route('pagamento.view', 1))->assertRedirect(route('representante.login'));
         $this->post(route('pagamento.gerenti', 1))->assertRedirect(route('representante.login'));
+        $this->post(route('pagamento.verifica.checkout', 1))->assertRedirect(route('representante.login'));
         $this->get(route('pagamento.sucesso.checkout', 1))->assertRedirect(route('representante.login'));
         $this->post(route('pagamento.cartao', 1))->assertRedirect(route('representante.login'));
         $this->get(route('pagamento.cancelar.view', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('representante.login'));
@@ -1417,6 +1418,7 @@ class PagamentoTest extends TestCase
     /** @test */
     public function regenerate_session_after_submit_payment_with_success_via_api()
     {
+        // Acessa o homolog da getnet, então as vezes pode dar erro
         $user = factory('App\Representante')->create();
         $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
 
@@ -1441,6 +1443,74 @@ class PagamentoTest extends TestCase
             'security_code_1' => '111',
             'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
         ])->assertRedirect(route('representante.dashboard'));
+
+        $this->assertNotEquals($csrf, csrf_token());
+    }
+
+    /** @test */
+    public function regenerate_session_after_submit_gerenti()
+    {
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->make();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+
+        $csrf = csrf_token();
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+        ]);
+
+        $this->assertNotEquals($csrf, csrf_token());
+    }
+
+    /** @test */
+    public function regenerate_session_after_get_checkout_iframe_sucesso()
+    {
+        // Deve habilitar no PagamentoController o checkoutIframe
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->make();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+        ]);
+
+        $csrf = csrf_token();
+        $this->get(route('pagamento.sucesso.checkout', $pagamento->cobranca_id))
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->assertNotEquals($csrf, csrf_token());
+    }
+
+    /** @test */
+    public function regenerate_session_after_submit_checkout_iframe_verifica()
+    {
+        // Deve habilitar no PagamentoController o checkoutIframe
+        $user = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+        $pagamento = factory('App\Pagamento')->make();
+
+        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+            'cobranca' => $pagamento->cobranca_id,
+            'tipo_pag' => 'credit',
+            'amount' => $pagamento->total,
+            'parcelas_1' => $pagamento->parcelas,
+        ]);
+
+        $csrf = csrf_token();
+        $this->post(route('pagamento.verifica.checkout', $pagamento->cobranca_id))->assertJson([]);
 
         $this->assertNotEquals($csrf, csrf_token());
     }

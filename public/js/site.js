@@ -1150,6 +1150,10 @@ function preencheCampos3ds(response, token, tokenPrincipal)
 
 // Para o Checkout Iframe
 $('.pay-button-getnet').click(function(){
+	verificaCheckoutIframe();
+});
+
+function listenerCheckoutIframe(){
 	// Funções compatíveis com IE e outros navegadores
 	var eventMethod = (window.addEventListener ? 'addEventListener' : 'attachEvent');
 	var eventer = window[eventMethod];
@@ -1171,6 +1175,34 @@ $('.pay-button-getnet').click(function(){
 			break;
 		}
 	}, false);
-});
+}
+
+function verificaCheckoutIframe(){
+	$.ajax({
+		method: "POST",
+		dataType: 'json',
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		},
+		url: '/checkout/verify/' + $('[name="cobranca"]').val(),
+		success: function(response) {
+			listenerCheckoutIframe();
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			if(xhr.status == 419){
+				if(($('#getnet-checkout').length > 0) && ($('#getnet-loader').length > 0)){
+					$('#getnet-checkout').attr('style', 'z-index: -1').remove();
+					$('#getnet-loader').remove();
+					var msg = xhr.responseJSON.message;
+					$('#modalPagamento .modal-body')
+					.html('<h5><i class="fas fa-times text-danger"></i> ' + msg + '</h5><br><a class="btn btn-secondary" href="' + $('#callbackURL').val() + '">Fechar</a>');
+					$('#modalPagamento').modal({backdrop: 'static', keyboard: false, show: true});
+					return;
+				}
+			}
+			window.location.replace($('#callbackURL').val());
+		}
+	});
+}
 
 // +++++++++++++++++++++++ ++++++++++++++++++++++++++++++ ++++++++++++++++++++++
