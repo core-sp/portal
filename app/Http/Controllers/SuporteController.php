@@ -187,6 +187,36 @@ class SuporteController extends Controller
         ]);
     }
 
+    public function ipsView()
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+        try{
+            $dados = $this->service->getService('Suporte')->ips();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os ips bloqueados.");
+        }
+    
+        return view('admin.crud.mostra', $dados);
+    }
+
+    public function ipsExcluir($ip)
+    {
+        $this->authorize('onlyAdmin', auth()->user());
+        try{
+            $user = auth()->user();
+            $this->service->getService('Suporte')->liberarIp($ip, $user);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao liberar ip.");
+        }
+    
+        return redirect()->route('suporte.ips.view')->with([
+            'message' => '<i class="icon fa fa-check"></i>Tabela de IPs atualizada!',
+            'class' => 'alert-success'
+        ]);
+    }
+
     /**
      * The attributes that are mass assignable.
      *

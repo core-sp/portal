@@ -8,6 +8,9 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use App\SuporteIp;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InternoSuporteMail;
 
 class SuporteTest extends TestCase
 {
@@ -29,6 +32,8 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.erros.index'))->assertRedirect(route('login'));
         $this->post(route('suporte.erros.file.post'), ['file' => $file])->assertRedirect(route('login'));
         $this->get(route('suporte.erros.file.get'))->assertRedirect(route('login'));
+        $this->get(route('suporte.ips.view'))->assertRedirect(route('login'));
+        $this->delete(route('suporte.ips.excluir', request()->ip()))->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -47,6 +52,38 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.erros.index'))->assertForbidden();
         $this->post(route('suporte.erros.file.post'), ['file' => $file])->assertForbidden();
         $this->get(route('suporte.erros.file.get'))->assertForbidden();
+        $this->get(route('suporte.ips.view'))->assertForbidden();
+        $this->delete(route('suporte.ips.excluir', request()->ip()))->assertForbidden();
+    }
+
+    /** @test */
+    public function admin_can_search_logs_by_day_before_today()
+    {
+        $data = '2022-09-25';
+
+        $conteudo = '[2022-09-30 11:34:04] testing.INFO: [IP: 127.0.0.1] - Usuário 1 ("000000/0001") conectou-se à Área do Representante.';
+        Storage::disk('log_externo')->put('2022/09/laravel-'.$data.'.log', $conteudo);
+        $conteudo = '[2022-09-30 11:34:04] testing.INFO: [IP: 127.0.0.1] - Usuário (usuário 1) editou *plantão juridico* (id: 1)';
+        Storage::disk('log_interno')->put('2022/09/laravel-'.$data.'.log', $conteudo);
+        $conteudo = '[2022-09-30 11:34:04] testing.ERROR: [Erro: No query results for model [App\Noticia]. para o slug: teste], [Controller: App\Http\Controllers\NoticiaController@show], [Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 470]';
+        Storage::disk('log_erros')->put('laravel-'.$data.'.log', $conteudo);
+
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.log.externo.busca', ['data' => $data, 'tipo' => 'externo']))->assertOk()
+        ->assertSee('<i class="fas fa-file-alt"></i> - Log <strong>do Site</strong> do dia '.onlyDate($data));
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+
+        $this->get(route('suporte.log.externo.busca', ['data' => $data, 'tipo' => 'interno']))->assertOk()
+        ->assertSee('<i class="fas fa-file-alt"></i> - Log <strong>do Admin</strong> do dia '.onlyDate($data));
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
+
+        $this->get(route('suporte.log.externo.busca', ['data' => $data, 'tipo' => 'erros']))->assertOk()
+        ->assertSee('<i class="fas fa-file-alt"></i> - Log <strong>de Erros</strong> do dia '.onlyDate($data));
+
+        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
     }
 
     /** @test */
@@ -88,7 +125,7 @@ class SuporteTest extends TestCase
         $this->put(route('plantao.juridico.editar', $plantao->id), $dados);
 
         // Criando o log para teste de erros
-        $this->get('/noticias/teste')->assertStatus(500);
+        $this->get('/noticias/teste')->assertStatus(404);
 
         $this->get(route('suporte.log.externo.index'))
         ->assertOk()
@@ -111,36 +148,6 @@ class SuporteTest extends TestCase
         ->assertHeader('content-disposition', 'inline; filename="laravel-'.date('Y-m-d').'.log"')
         ->assertHeader('content-type', 'text/plain; charset=UTF-8')
         ->assertOk();
-    }
-
-    /** @test */
-    public function admin_can_search_logs_by_day_before_today()
-    {
-        $data = '2022-09-25';
-
-        $conteudo = '[2022-09-30 11:34:04] testing.INFO: [IP: 127.0.0.1] - Usuário 1 ("000000/0001") conectou-se à Área do Representante.';
-        Storage::disk('log_externo')->put('2022/09/laravel-'.$data.'.log', $conteudo);
-        $conteudo = '[2022-09-30 11:34:04] testing.INFO: [IP: 127.0.0.1] - Usuário (usuário 1) editou *plantão juridico* (id: 1)';
-        Storage::disk('log_interno')->put('2022/09/laravel-'.$data.'.log', $conteudo);
-        $conteudo = '[2022-09-30 11:34:04] testing.ERROR: [Erro: No query results for model [App\Noticia]. para o slug: teste], [Controller: App\Http\Controllers\NoticiaController@show], [Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 470]';
-        Storage::disk('log_erros')->put('laravel-'.$data.'.log', $conteudo);
-
-        $this->signInAsAdmin();
-
-        $this->get(route('suporte.log.externo.busca', ['data' => $data, 'tipo' => 'externo']))->assertOk()
-        ->assertSee('<i class="fas fa-file-alt"></i> - Log <strong>do Site</strong> do dia '.onlyDate($data));
-
-        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
-
-        $this->get(route('suporte.log.externo.busca', ['data' => $data, 'tipo' => 'interno']))->assertOk()
-        ->assertSee('<i class="fas fa-file-alt"></i> - Log <strong>do Admin</strong> do dia '.onlyDate($data));
-
-        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
-
-        $this->get(route('suporte.log.externo.busca', ['data' => $data, 'tipo' => 'erros']))->assertOk()
-        ->assertSee('<i class="fas fa-file-alt"></i> - Log <strong>de Erros</strong> do dia '.onlyDate($data));
-
-        $this->assertEquals(Cache::get('request_busca_log_'.auth()->id()), request()->except(['page', '_token']));
     }
 
     /** @test */
@@ -599,5 +606,276 @@ class SuporteTest extends TestCase
         ->assertSee('texto local')
         ->assertSee('novo texto situação')
         ->assertSee('texto sugestão');
+    }
+
+    /** @test */
+    public function admin_can_view_blocked_ips()
+    {
+        $block_ips = factory('App\SuporteIp', 3)->states('bloqueado')->create();
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.ips.view'))
+        ->assertSee('<td>'.$block_ips->get(0)->ip.'</td>')
+        ->assertSee('<td>'.$block_ips->get(1)->ip.'</td>')
+        ->assertSee('<td>'.$block_ips->get(2)->ip.'</td>')
+        ->assertSee('<td class="text-danger">'.$block_ips->get(0)->status.'</td>')
+        ->assertSee('<td class="text-danger">'.$block_ips->get(1)->status.'</td>')
+        ->assertSee('<td class="text-danger">'.$block_ips->get(2)->status.'</td>')
+        ->assertSee('<form method="POST" action="' . route('suporte.ips.excluir', $block_ips->get(0)->ip).'" class="d-inline">')
+        ->assertSee('<form method="POST" action="' . route('suporte.ips.excluir', $block_ips->get(1)->ip).'" class="d-inline">')
+        ->assertSee('<form method="POST" action="' . route('suporte.ips.excluir', $block_ips->get(2)->ip).'" class="d-inline">');
+    }
+
+    /** @test */
+    public function admin_can_view_free_ips()
+    {
+        $ips = factory('App\SuporteIp', 3)->states('liberado')->create();
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.ips.view'))
+        ->assertSee('<td>'.$ips->get(0)->ip.'</td>')
+        ->assertSee('<td>'.$ips->get(1)->ip.'</td>')
+        ->assertSee('<td>'.$ips->get(2)->ip.'</td>')
+        ->assertSee('<td class="text-success">'.$ips->get(0)->status.'</td>')
+        ->assertSee('<td class="text-success">'.$ips->get(1)->status.'</td>')
+        ->assertSee('<td class="text-success">'.$ips->get(2)->status.'</td>')
+        ->assertSeeText('Exclusão somente via SSH');
+    }
+
+    /** @test */
+    public function admin_cannot_view_unblocked_ips()
+    {
+        $ips = factory('App\SuporteIp', 3)->create();
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.ips.view'))
+        ->assertDontSee('<td>'.$ips->get(0)->ip.'</td>')
+        ->assertDontSee('<td>'.$ips->get(1)->ip.'</td>')
+        ->assertDontSee('<td>'.$ips->get(2)->ip.'</td>')
+        ->assertDontSee('<td class="text-danger">'.$ips->get(0)->status.'</td>')
+        ->assertDontSee('<td class="text-danger">'.$ips->get(1)->status.'</td>')
+        ->assertDontSee('<td class="text-danger">'.$ips->get(2)->status.'</td>')
+        ->assertDontSee('<form method="POST" action="' . route('suporte.ips.excluir', $ips->get(0)->ip).'" class="d-inline">')
+        ->assertDontSee('<form method="POST" action="' . route('suporte.ips.excluir', $ips->get(1)->ip).'" class="d-inline">')
+        ->assertDontSee('<form method="POST" action="' . route('suporte.ips.excluir', $ips->get(2)->ip).'" class="d-inline">');
+    }
+
+    /** @test */
+    public function admin_cannot_delete_free_ips()
+    {
+        $ip = factory('App\SuporteIp')->states('liberado')->create();
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.ips.view'))
+        ->assertSee('<td>'.$ip->ip.'</td>');
+
+        $this->delete(route('suporte.ips.excluir', $ip->ip))
+        ->assertStatus(302);
+
+        $this->get(route('suporte.ips.view'))
+        ->assertSee('<td>'.$ip->ip.'</td>');
+
+        $this->assertEquals(1, SuporteIp::count());
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => $ip->ip,
+        ]);
+    }
+
+    /** @test */
+    public function admin_cannot_delete_unblocked_ips()
+    {
+        $ip = factory('App\SuporteIp')->create();
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.ips.view'))
+        ->assertDontSee('<td>'.$ip->ip.'</td>');
+
+        $this->delete(route('suporte.ips.excluir', $ip->ip))
+        ->assertStatus(302);
+
+        $this->get(route('suporte.ips.view'))
+        ->assertDontSee('<td>'.$ip->ip.'</td>');
+
+        $this->assertEquals(1, SuporteIp::count());
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => $ip->ip,
+        ]);
+    }
+
+    /** @test */
+    public function admin_can_delete_blocked_ips()
+    {
+        Mail::fake();
+
+        $ip = factory('App\SuporteIp')->states('bloqueado')->create();
+        $this->signInAsAdmin();
+
+        $this->get(route('suporte.ips.view'))
+        ->assertSee('<td>'.$ip->ip.'</td>');
+
+        $this->delete(route('suporte.ips.excluir', $ip->ip))
+        ->assertStatus(302);
+
+        Mail::assertQueued(InternoSuporteMail::class);
+
+        $this->get(route('suporte.ips.view'))
+        ->assertDontSee('<td>'.$ip->ip.'</td>');
+
+        $this->assertNotEquals(1, SuporteIp::count());
+        $this->assertDatabaseMissing('suporte_ips', [
+            'ip' => $ip->ip,
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_admin_delete_blocked_ip()
+    {
+        $ip = factory('App\SuporteIp')->states('bloqueado')->create();
+        $user = $this->signInAsAdmin();
+
+        $this->delete(route('suporte.ips.excluir', $ip->ip));
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.$ip->ip.'] - ';
+        $texto .= "IP DESBLOQUEADO por " . $user->nome . " (administrador do Portal) após análise.";
+        $this->assertStringContainsString($texto, $log);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function blocked_ip_after_12_submits()
+    {
+        for($i = 1; $i <= 13; $i++)
+        {
+            $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
+            session()->regenerateToken();
+        }
+
+        $this->get(route('site.home'))->assertStatus(423);
+        $this->get(route('admin'))->assertStatus(423);
+        $this->get(route('representante.login'))->assertStatus(423);
+        $this->get(route('representante.dashboard'))->assertStatus(423);
+        $this->get(route('login'))->assertStatus(423);
+        $this->get(route('agendamentosite.formview'))->assertStatus(423);
+
+        $this->assertEquals(1, SuporteIp::count());
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'BLOQUEADO'
+        ]);
+    }
+
+    /** @test */
+    public function delete_unblocked_ip_after_login_user()
+    {
+        for($i = 1; $i <= 5; $i++)
+        {
+            $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
+            session()->regenerateToken();
+        }
+
+        $this->assertEquals(1, SuporteIp::count());
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'DESBLOQUEADO'
+        ]);
+
+        $user = factory('App\User')->create([
+            'password' => bcrypt('TestePorta1@')
+        ]);
+
+        $this->post('admin/login', ['login' => $user->email, 'password' => 'TestePorta1@'])
+        ->assertRedirect(route('admin'));
+
+        $this->assertEquals(0, SuporteIp::count());
+        $this->assertDatabaseMissing('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'DESBLOQUEADO'
+        ]);
+    }
+
+    /** @test */
+    public function delete_unblocked_ip_after_login_representante()
+    {
+        for($i = 1; $i <= 5; $i++)
+        {
+            $this->post(route('representante.login.submit'), ['cpf_cnpj' => '11748345000144', 'password' => 'teste102030']);
+            session()->regenerateToken();
+        }
+
+        $this->assertEquals(1, SuporteIp::count());
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'DESBLOQUEADO'
+        ]);
+
+        $representante = factory('App\Representante')->create();
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030'])
+        ->assertRedirect(route('representante.dashboard'));
+
+        $this->assertEquals(0, SuporteIp::count());
+        $this->assertDatabaseMissing('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'DESBLOQUEADO'
+        ]);
+    }
+
+    /** @test */
+    public function recount_unblocked_ip_when_submit_day_after()
+    {
+        for($i = 1; $i <= 5; $i++)
+        {
+            $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
+            session()->regenerateToken();
+        }
+
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'DESBLOQUEADO',
+            'tentativas' => 5
+        ]);
+
+        SuporteIp::first()->update(['updated_at' => now()->subDay()->format('Y-m-d H:i:s')]);
+
+        $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
+
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'DESBLOQUEADO',
+            'tentativas' => 1
+        ]);
+    }
+
+    /** @test */
+    public function free_ip_can_get_routes()
+    {
+        factory('App\Regional')->create();
+        $ip = factory('App\SuporteIp')->states('liberado')->create();
+
+        $this->get(route('site.home'))->assertStatus(200);
+        $this->get(route('admin'))->assertStatus(302);
+        $this->get(route('representante.login'))->assertStatus(200);
+        $this->get(route('representante.dashboard'))->assertStatus(302);
+        $this->get(route('login'))->assertStatus(200);
+        $this->get(route('agendamentosite.formview'))->assertStatus(200);
+    }
+
+    /** @test */
+    public function unblocked_ip_can_get_routes()
+    {
+        factory('App\Regional')->create();
+        $ip = factory('App\SuporteIp')->create([
+            'tentativas' => 10
+        ]);
+
+        $this->get(route('site.home'))->assertStatus(200);
+        $this->get(route('admin'))->assertStatus(302);
+        $this->get(route('representante.login'))->assertStatus(200);
+        $this->get(route('representante.dashboard'))->assertStatus(302);
+        $this->get(route('login'))->assertStatus(200);
+        $this->get(route('agendamentosite.formview'))->assertStatus(200);
     }
 }
