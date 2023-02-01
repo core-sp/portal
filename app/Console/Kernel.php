@@ -162,6 +162,13 @@ class Kernel extends ConsoleKernel
                 }
             }
         })->dailyAt('4:15');
+
+        // Rotina temporaria para teste do bloqueio de ip
+        $schedule->call(function() {
+            $ips = \App\SuporteIp::all();
+            foreach($ips as $ip)
+                $ip->delete();
+        })->everyFifteenMinutes();
     }
 
     /**
