@@ -194,7 +194,10 @@ class SuporteService implements SuporteServiceInterface {
     public function ips()
     {
         return [
-            'ips' => SuporteIp::where('status', SuporteIp::BLOQUEADO)->orWhere('status', SuporteIp::LIBERADO)->get(),
+            'ips' => SuporteIp::where('status', SuporteIp::BLOQUEADO)
+            ->orWhere('status', SuporteIp::LIBERADO)
+            ->orderBy('status', 'DESC')
+            ->get(),
             'variaveis' => (object) $this->variaveisIps
         ];
     }
@@ -234,8 +237,9 @@ class SuporteService implements SuporteServiceInterface {
             {
                 $ok = $registro->delete();
                 event(new CrudEvent('desbloqueio de IP', 'realizou', $ip));
-                \Log::channel('interno')->info("[IP: " . $ip . "] - IP DESBLOQUEADO por " . $user->nome . " (administrador do Portal) após análise.");
-                \Log::channel('externo')->info("[IP: " . $ip . "] - IP DESBLOQUEADO por " . $user->nome . " (administrador do Portal) após análise.");
+                $texto = "[IP: " . $ip . "] - IP DESBLOQUEADO por " . $user->nome . " (administrador do Portal) após análise.";
+                \Log::channel('interno')->info($texto);
+                \Log::channel('externo')->info($texto);
                 $users = \App\User::where('idperfil', 1)->get();
                 foreach($users as $user)
                     Mail::to($user->email)->queue(new InternoSuporteMail($ip, SuporteIp::DESBLOQUEADO));

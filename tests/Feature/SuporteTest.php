@@ -878,4 +878,20 @@ class SuporteTest extends TestCase
         $this->get(route('login'))->assertStatus(200);
         $this->get(route('agendamentosite.formview'))->assertStatus(200);
     }
+
+    /** @test */
+    public function blocked_ips_array()
+    {
+        $ips = factory('App\SuporteIp', 5)->states('bloqueado')->create();
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $ips_array = $service->getService('Suporte')->ipsBloqueados()->pluck('ip')->all();
+
+        $this->assertEquals([
+            $ips->get(0)->ip,
+            $ips->get(1)->ip,
+            $ips->get(2)->ip,
+            $ips->get(3)->ip,
+            $ips->get(4)->ip,
+        ], $ips_array);
+    }
 }
