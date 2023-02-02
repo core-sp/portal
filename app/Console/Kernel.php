@@ -168,6 +168,9 @@ class Kernel extends ConsoleKernel
             $ips = \App\SuporteIp::all();
             foreach($ips as $ip)
                 $ip->delete();
+            foreach(['192.168.59.19', '192.168.19.15', '192.168.25.100'] as $ip)
+                \App\SuporteIp::create(['ip' => $ip, 'status' => \App\SuporteIp::BLOQUEADO, 'tentativas' => 12]);
+            \App\SuporteIp::create(['ip' => '192.168.44.58', 'status' => \App\SuporteIp::LIBERADO, 'tentativas' => 0]);
         })->everyFifteenMinutes();
     }
 
