@@ -22,12 +22,17 @@ class SuporteIp extends Model
 
     public function isUpdateTentativa()
     {
-        return $this->status == self::DESBLOQUEADO;
+        return $this->isDesbloqueado();
     }
 
     public function isLiberado()
     {
         return $this->status == self::LIBERADO;
+    }
+
+    public function isDesbloqueado()
+    {
+        return $this->status == self::DESBLOQUEADO;
     }
 
     public function isBloqueado()

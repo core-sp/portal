@@ -15,6 +15,7 @@ $factory->define(SuporteIp::class, function (Faker $faker) {
 
 $factory->state(SuporteIp::class, 'liberado', [
     'status' => SuporteIp::LIBERADO,
+    'tentativas' => 0,
 ]);
 
 $factory->state(SuporteIp::class, 'bloqueado', [

@@ -768,6 +768,33 @@ class SuporteTest extends TestCase
     }
 
     /** @test */
+    public function cannot_to_block_free_ip_after_12_submits()
+    {
+        factory('App\SuporteIp')->states('liberado')->create([
+            'ip' => '127.0.0.1'
+        ]);
+
+        for($i = 1; $i <= 13; $i++)
+        {
+            $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
+            session()->regenerateToken();
+        }
+
+        $this->get(route('site.home'))->assertStatus(200);
+        $this->get(route('admin'))->assertStatus(302);
+        $this->get(route('representante.login'))->assertStatus(200);
+        $this->get(route('representante.dashboard'))->assertStatus(302);
+        $this->get(route('login'))->assertStatus(200);
+
+        $this->assertEquals(1, SuporteIp::count());
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'LIBERADO',
+            'tentativas' => 0
+        ]);
+    }
+
+    /** @test */
     public function delete_unblocked_ip_after_login_user()
     {
         for($i = 1; $i <= 5; $i++)

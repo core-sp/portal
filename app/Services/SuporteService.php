@@ -231,7 +231,7 @@ class SuporteService implements SuporteServiceInterface {
 
         if(isset($registro))
         {
-            if(!isset($user) && !$registro->isLiberado())
+            if(!isset($user) && $registro->isDesbloqueado())
                 $ok = $registro->delete();
             elseif(isset($user) && $registro->isBloqueado())
             {
