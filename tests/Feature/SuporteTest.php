@@ -608,6 +608,12 @@ class SuporteTest extends TestCase
         ->assertSee('texto sugestão');
     }
 
+    /** 
+     * =======================================================================================================
+     * TESTES GERENCIAR IP
+     * =======================================================================================================
+     */
+
     /** @test */
     public function admin_can_view_blocked_ips()
     {
@@ -745,9 +751,9 @@ class SuporteTest extends TestCase
     }
 
     /** @test */
-    public function blocked_ip_after_12_submits()
+    public function blocked_ip_after_6_submits()
     {
-        for($i = 1; $i <= 13; $i++)
+        for($i = 1; $i <= 7; $i++)
         {
             $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
             session()->regenerateToken();
@@ -768,13 +774,13 @@ class SuporteTest extends TestCase
     }
 
     /** @test */
-    public function cannot_to_block_free_ip_after_12_submits()
+    public function cannot_to_block_free_ip_after_6_submits()
     {
         factory('App\SuporteIp')->states('liberado')->create([
             'ip' => '127.0.0.1'
         ]);
 
-        for($i = 1; $i <= 13; $i++)
+        for($i = 1; $i <= 7; $i++)
         {
             $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
             session()->regenerateToken();
@@ -895,7 +901,7 @@ class SuporteTest extends TestCase
     {
         factory('App\Regional')->create();
         $ip = factory('App\SuporteIp')->create([
-            'tentativas' => 10
+            'tentativas' => 3
         ]);
 
         $this->get(route('site.home'))->assertStatus(200);

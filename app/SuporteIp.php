@@ -13,7 +13,7 @@ class SuporteIp extends Model
     const LIBERADO = "LIBERADO";
     const BLOQUEADO = "BLOQUEADO";
     const DESBLOQUEADO = "DESBLOQUEADO";
-    const TOTAL_TENTATIVAS = 12;
+    const TOTAL_TENTATIVAS = 6;
 
     private function mesmoDia()
     {
