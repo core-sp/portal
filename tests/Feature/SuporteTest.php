@@ -927,4 +927,15 @@ class SuporteTest extends TestCase
             $ips->get(4)->ip,
         ], $ips_array);
     }
+
+    /** @test */
+    public function error_500_when_without_suporte_ips_table()
+    {
+        \Illuminate\Support\Facades\DB::statement('drop table suporte_ips');
+        $this->get(route('site.home'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
+        $this->get(route('admin'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
+        $this->get(route('representante.login'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
+        $this->get(route('representante.dashboard'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
+        $this->get(route('login'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
+    }
 }
