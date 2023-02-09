@@ -9,6 +9,7 @@ use App\SuporteIp;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InternoSuporteMail;
+use Illuminate\Support\LazyCollection;
 
 class SuporteService implements SuporteServiceInterface {
 
@@ -160,11 +161,28 @@ class SuporteService implements SuporteServiceInterface {
 
     public function logPorData($data, $tipo)
     {
+        $conteudo = null;
         if(!in_array($tipo, [self::ERROS, self::INTERNO, self::EXTERNO]))
             throw new \Exception('Tipo de log não existente', 500);
 
         $log = $this->hasLog($data, $tipo);
-        return isset($log) && $log ? Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo)) : null;
+        if(isset($log) && $log)
+        {
+            $conteudo = '';
+            $path = Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo));
+            $logs = LazyCollection::make(function() use($path){
+                $handle = fopen($path, 'r');
+                while(($line = fgets($handle)) !== false)
+                    yield $line;
+
+                fclose($handle);
+            });
+        
+            foreach($logs as $line)
+                $conteudo .= $line;
+        }
+    
+        return isset($conteudo) ? $conteudo : null;
     }
 
     public function indexErros()

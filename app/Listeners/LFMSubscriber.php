@@ -43,10 +43,10 @@ class LFMSubscriber
             'App\Listeners\LFMSubscriber@onImageWasDeleted'
         );
 
-        // $events->listen(
-        //     ImageIsUploading::class,
-        //     'App\Listeners\LFMSubscriber@onImageIsUploading'
-        // );
+        $events->listen(
+            ImageIsUploading::class,
+            'App\Listeners\LFMSubscriber@onImageIsUploading'
+        );
 
         $events->listen(
             ImageWasUploaded::class,
@@ -108,13 +108,12 @@ class LFMSubscriber
         $this->dispararLog($texto);
     }
 
-    // Bug do package LFM quando anexando vários arquivos ao mesmo tempo
-    // public function onImageIsUploading(ImageIsUploading $event)
-    // {
-    //     $path = $this->getPath($event->path());
-    //     $texto = 'está anexando o seguinte arquivo: ' . $path;
-    //     $this->dispararLog($texto);
-    // }
+    public function onImageIsUploading(ImageIsUploading $event)
+    {
+        $path = $this->getPath($event->path());
+        $texto = 'está anexando o seguinte arquivo: ' . $path;
+        $this->dispararLog($texto);
+    }
 
     public function onImageWasUploaded(ImageWasUploaded $event)
     {

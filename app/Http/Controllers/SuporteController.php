@@ -57,7 +57,7 @@ class SuporteController extends Controller
             abort(500, "Erro ao carregar o log " . $tipo . " do dia de hoje.");
         }
 
-        return isset($log) ? response()->file($log, $headers) : redirect()->back()->with([
+        return isset($log) ? response($log)->withHeaders($headers) : redirect()->back()->with([
             'message' => '<i class="icon fa fa-ban"></i>Ainda não há log ' . $tipo . ' do dia de hoje: '.date('d/m/Y'),
             'class' => 'alert-warning'
         ]);
@@ -109,7 +109,7 @@ class SuporteController extends Controller
             abort(500, "Erro ao carregar o log " . $tipo . " do dia " .onlyDate($data). ".");
         }
 
-        return isset($log) ? response()->file($log, $headers) : redirect()->back()->with([
+        return isset($log) ? response($log)->withHeaders($headers) : redirect()->back()->with([
             'message' => '<i class="icon fa fa-ban"></i>Não há log ' . $tipo . ' do dia: '.onlyDate($data),
             'class' => 'alert-warning'
         ]);
@@ -121,7 +121,7 @@ class SuporteController extends Controller
 
         try{
             $log = $this->service->getService('Suporte')->logPorData($data, $tipo);
-            $nome = 'laravel-'.$data.'.log';
+            $nome = 'laravel-'.$data.'.txt';
             $headers = [
                 'Content-Type' => 'text/plain; charset=UTF-8',
                 'Cache-Control' => 'no-cache, no-store',
@@ -131,7 +131,9 @@ class SuporteController extends Controller
             abort(500, "Erro ao realizar o download do log " . $tipo . " do dia " .onlyDate($data). ".");
         }
 
-        return isset($log) ? response()->download($log, $nome, $headers) : redirect()->back()->with([
+        return isset($log) ? response()->streamDownload(function() use($log){
+                echo $log;
+            }, $nome, $headers) : redirect()->back()->with([
             'message' => '<i class="icon fa fa-ban"></i>Não há log ' . $tipo . ' do dia: '.onlyDate($data),
             'class' => 'alert-warning'
         ]);
