@@ -462,12 +462,15 @@
 @endif
 
 <div class="linha-lg-mini"></div>
+@php
+    $link = '<a href="' . route('bdosite.index') . '" target="_blank">Balcão de Oportunidades</a>';
+@endphp
 
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
         <label for="segmento">{{ $codigos[1]['segmento'] }} - Segmento</label>
         <i class="fas fa-info-circle d-inline azul" data-toggle="popover" data-placement="right" 
-            data-content="<strong>Na área restrita do Representante Comercial você receberá oportunidades de acordo com o seu segmento e Seccional.</strong>">
+            data-content='<strong>Na área restrita do Representante Comercial você receberá oportunidades de acordo com o seu segmento e seccional através do <u><i>{{ $link }}</i></u>.</strong>'>
         </i>
         <select 
             name="segmento" 

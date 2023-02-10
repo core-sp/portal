@@ -15,7 +15,11 @@
         <div class="linha-lg-mini mb-2"></div>
             <div class="list-group w-100">
                 <div class="d-block mt-2 mb-3">
-                    <p>Algum texto explicando sobre o formulário</p>
+                    <p>
+                        Esse formulário é para realizar a solicitação de registro para ser <strong>REPRESENTANTE COMERCIAL</strong>. 
+                        Durante o preenchimento será salvo automaticamente os dados. Os anexos serão excluídos automaticamente após finalizar a solicitação ou após muito tempo inativo. 
+                        E somente o solicitante pode excluir um anexo durante a solicitação.
+                    </p>
                     <br>
                     @if(isset($gerenti))
                     <p>Você já possui registro ativo no Core-SP: <strong>{{ formataRegistro($gerenti) }}</strong></p>
