@@ -959,7 +959,9 @@ class LicitacaoTest extends TestCase
     /** @test */
     public function licitacoes_is_shown_on_website_list_after_its_creation()
     {
-        $licitacoes = factory('App\Licitacao', 5)->create();
+        $licitacoes = factory('App\Licitacao', 5)->create([
+            'created_at' => now()->subDay()
+        ]);
         
         foreach($licitacoes as $licitacao)
             $this->get(route('licitacoes.siteGrid'))
@@ -968,6 +970,7 @@ class LicitacaoTest extends TestCase
                 ->assertSee($licitacao->nrprocesso)
                 ->assertSee($licitacao->modalidade)
                 ->assertSee($licitacao->situacao)
+                ->assertSee('<strong>Divulgação:</strong> ' . onlyDate($licitacao->created_at))
                 ->assertSee(onlyDate($licitacao->datarealizacao));
     }
 
