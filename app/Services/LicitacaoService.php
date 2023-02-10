@@ -111,7 +111,7 @@ class LicitacaoService implements LicitacaoServiceInterface {
 
     private function buscaSite($request = null)
     {
-        $inicio = Licitacao::select('nrprocesso', 'nrlicitacao', 'modalidade', 'situacao', 'titulo', 'edital', 'datarealizacao', 'objeto', 'uasg', 'idlicitacao')
+        $inicio = Licitacao::select('nrprocesso', 'nrlicitacao', 'modalidade', 'situacao', 'titulo', 'edital', 'datarealizacao', 'objeto', 'uasg', 'idlicitacao', 'created_at', 'updated_at')
         ->selectRaw("CAST(SUBSTR(nrprocesso, INSTR(nrprocesso, '/') + 1) AS DECIMAL) as anoProcesso")
         ->selectRaw("CAST(SUBSTR(nrprocesso, 1, INSTR(nrprocesso, '/') - 1) AS DECIMAL) as numeroProcesso")
         ->selectRaw("CAST(SUBSTR(nrlicitacao, INSTR(nrlicitacao, '/') + 1) AS DECIMAL) as anoLicitacao")
