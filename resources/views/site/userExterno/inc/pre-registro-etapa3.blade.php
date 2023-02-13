@@ -1,19 +1,8 @@
-@php
-    $correcoes = $resultado->getTextosJustificadosByAba($codigos[2]);
-@endphp
-@if($resultado->userPodeCorrigir() && !empty($correcoes))
-    <div class="d-block w-100">
-        <div class="alert alert-warning">
-            <span class="bold">Justificativa(s):</span>
-            <br>
-        @foreach($correcoes as $key => $texto)
-            <p>
-                <span class="bold">{{ $key . ': ' }}</span>{{ $texto }}
-            </p>
-        @endforeach
-        </div>
-    </div>
-@endif
+@component('components.justificativa_pre_registro', [
+    'resultado' => $resultado,
+    'correcoes' => $resultado->getTextosJustificadosByAba($codigos[2])
+])
+@endcomponent
 
 <h5 class="bold mb-2">Endereço de correspondência</h5>
 <div class="form-row mb-2">
