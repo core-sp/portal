@@ -9,6 +9,7 @@ use App\Sessao;
 use App\Events\LoginEvent;
 use Session;
 use Illuminate\Validation\ValidationException;
+use App\Contracts\MediadorServiceInterface;
 
 class LoginController extends Controller
 {
@@ -17,10 +18,12 @@ class LoginController extends Controller
     protected $redirectTo = '/admin';
 
     protected $username;
+    private $service;
 
-    public function __construct()
+    public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('guest')->except('logout');
+        $this->service = $service;
     }
 
     private function findUsername(Request $request)
@@ -37,6 +40,33 @@ class LoginController extends Controller
     public function username()
     {
         return $this->username;
+    }
+
+    public function login(Request $request)
+    {
+        $this->validateLogin($request);
+
+        // If the class is using the ThrottlesLogins trait, we can automatically throttle
+        // the login attempts for this application. We'll key this by the username and
+        // the IP address of the client making these requests into this application.
+        if (method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+
+            return $this->sendLockoutResponse($request);
+        }
+
+        if ($this->attemptLogin($request)) {
+            return $this->sendLoginResponse($request);
+        }
+
+        // If the login attempt was unsuccessful we will increment the number of attempts
+        // to login and redirect the user back to the login form. Of course, when this
+        // user surpasses their maximum number of attempts they will get locked out.
+        $this->incrementLoginAttempts($request);
+        $this->service->getService('Suporte')->bloquearIp($request->ip());
+
+        return $this->sendFailedLoginResponse($request);
     }
 
     protected function hasTooManyLoginAttempts(Request $request)
@@ -74,6 +104,7 @@ class LoginController extends Controller
     protected function authenticated(Request $request, $user)
     {
         $this->saveSession($request, $user);
+        $this->service->getService('Suporte')->liberarIp($request->ip());
     }
 
     public function decayMinutes()

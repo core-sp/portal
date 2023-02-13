@@ -94,6 +94,7 @@ class RepresentanteLoginController extends Controller
         // to login and redirect the user back to the login form. Of course, when this
         // user surpasses their maximum number of attempts they will get locked out.
         $this->incrementLoginAttempts($request);
+        $this->service->getService('Suporte')->bloquearIp($request->ip());
 
         return $this->sendFailedLoginResponse($request);
 
@@ -186,6 +187,11 @@ class RepresentanteLoginController extends Controller
             'class' => 'alert-danger',
             'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
         ]);
+    }
+
+    protected function authenticated(Request $request, $user)
+    {
+        $this->service->getService('Suporte')->liberarIp($request->ip());
     }
 
     public function decayMinutes()
