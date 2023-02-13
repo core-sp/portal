@@ -192,9 +192,6 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/pdf/{id}', 'SolicitaCedulaController@gerarPdf')->name('solicita-cedula.pdf');
       Route::get('/busca', 'SolicitaCedulaController@busca')->name('solicita-cedula.busca');
       Route::put('/update/{id}', 'SolicitaCedulaController@updateStatus')->name('solicita-cedula.update');
-      // remover rotas abaixo
-      // Route::post('/inserir', 'SolicitaCedulaController@inserirSolicitaCedula')->name('admin.representante-solicita-cedula.post');
-      // Route::post('/reprovar', 'SolicitaCedulaController@reprovarSolicitaCedula')->name('admin.representante-solicita-cedula-reprovada.post');
     });
     
     
