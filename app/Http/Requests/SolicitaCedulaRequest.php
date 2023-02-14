@@ -19,6 +19,8 @@ class SolicitaCedulaRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        $this->tiposAceitos = $this->service->getAllTipos();
+
         if(\Route::is('representante.inserirSolicitarCedula'))
         {
             $user = auth()->guard('representante')->user();
@@ -32,11 +34,11 @@ class SolicitaCedulaRequest extends FormRequest
                 $this->merge([
                     'tipo_pessoa' => $user->tipoPessoa(),
                     'nome' => strtoupper($this->nome),
-                    'rg' => strtoupper(apenasNumerosLetras($this->rg))
+                    'rg' => strtoupper(apenasNumerosLetras($this->rg)),
+                    'tipo' => $this->tiposAceitos[0]
                 ]);
         }
 
-        $this->tiposAceitos = $this->service->getAllTipos();
         $allStatus = $this->service->getAllStatus();
         unset($allStatus[0]);
         $this->statusAceitos = $allStatus;

@@ -206,11 +206,15 @@
             </div>
             <div class="form-row mb-2 cadastroRepresentante">
                 <div class="col-sm mb-2-576">
-                    <label for="tipo">Tipo da cédula <small>(Física via Correios e Digital via aplicativo mobile)</small> <span class="text-danger">*</span></label>
+                    <label for="tipo">Tipo da cédula <span class="text-danger">*</span></label>
                     <select name="tipo" id="tipo" class="form-control {{ $errors->has('tipo') ? 'is-invalid' : '' }}">
-                    @foreach ($tipos as $tipo)
+                    @if(auth()->guard('representante')->user()->tipoPessoa() == 'PJ')
+                        <option value="{{ $tipos[0] }}" selected>{{ $tipos[0] }}</option>
+                    @else
+                        @foreach ($tipos as $tipo)
                         <option value="{{ $tipo }}" {{ old('tipo') === $tipo ? 'selected' : '' }}>{{ $tipo }}</option>
-                    @endforeach
+                        @endforeach
+                    @endif
                     </select>
                     @if($errors->has('tipo'))
                         <div class="invalid-feedback">

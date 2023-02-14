@@ -600,7 +600,6 @@ class SolicitaCedulaTest extends TestCase
             'numero' => null, 
             'estado' => null, 
             'municipio' => null,
-            'tipo' => null,
         ];
         $this->post(route('representante.inserirSolicitarCedula'), $dados)
         ->assertSessionHasErrors([
@@ -613,7 +612,6 @@ class SolicitaCedulaTest extends TestCase
             'numero', 
             'estado', 
             'municipio',
-            'tipo',
         ]);
         $this->assertDatabaseMissing('solicitacoes_cedulas', [
             'idrepresentante' => $representante->id
@@ -1081,7 +1079,7 @@ class SolicitaCedulaTest extends TestCase
      * 
      * Representante pode solicitar cédula pela primeira vez
     */
-    public function insert_new_solicitacao_cedula()
+    public function insert_new_solicitacao_cedula_pf()
     {
         $regional = factory('App\Regional')->create([
             'regional' => 'SÃO PAULO'
@@ -1107,5 +1105,61 @@ class SolicitaCedulaTest extends TestCase
             'numero' => $cedula['numero'],
             'tipo' => $cedula['tipo']
         ]);
+    }
+
+    /** @test 
+     * 
+     * Representante pode solicitar cédula pela primeira vez
+    */
+    public function insert_new_solicitacao_cedula_pj()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO - Alameda Santos'
+        ]);
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '30735253000174'
+        ]);
+        $cedula = factory('App\SolicitaCedula')->raw([
+            'idrepresentante' => $representante->id,
+            'tipo' => null
+        ]);
+
+        unset($cedula['status']);
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
+        $this->post(route('representante.inserirSolicitarCedula'), $cedula)
+        ->assertRedirect(route('representante.solicitarCedulaView'));
+        $this->assertDatabaseHas('solicitacoes_cedulas', [
+            'idrepresentante' => $representante->id,
+            'rg' => $cedula['rg'],
+            'bairro' => $cedula['bairro'], 
+            'logradouro' => $cedula['logradouro'],
+            'numero' => $cedula['numero'],
+            'tipo' => \App\SolicitaCedula::TIPO_FISICA
+        ]);
+    }
+
+    /** @test 
+    */
+    public function cannot_view_option_digital_in_solicitacao_cedula_pj()
+    {
+        $regional = factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO'
+        ]);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO - Alameda Santos'
+        ]);
+        $representante = factory('App\Representante')->create([
+            'cpf_cnpj' => '30735253000174'
+        ]);
+
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.inserirSolicitarCedulaView'))
+        ->assertSee('<option value="Impressa" selected>Impressa</option>')
+        ->assertDontSee('<option value="Impressa e Digital">Impressa e Digital</option>')
+        ->assertDontSee('<option value="Digital">Digital</option>');
     }
 }

@@ -14,9 +14,9 @@ class SolicitaCedula extends Model
     const STATUS_ACEITO = "Aceito";
     const STATUS_RECUSADO = "Recusado";
 
-    const TIPO_FISICA = "Física";
+    const TIPO_FISICA = "Impressa";
     const TIPO_DIGITAL = "Digital";
-    const TIPO_AMBOS = "Física e Digital";
+    const TIPO_AMBOS = "Impressa e Digital";
 
     public static function allStatus()
     {
