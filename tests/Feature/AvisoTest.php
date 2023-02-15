@@ -314,7 +314,7 @@ class AvisoTest extends TestCase
         $user = $this->signInAsAdmin();
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw([
-            'cor_fundo_titulo' => 'bg-danger',
+            'cor_fundo_titulo' => 'danger',
             'idusuario' => $user->idusuario
         ]);
         $this->put(route('avisos.editar', $aviso->id), $dados)->assertStatus(302);

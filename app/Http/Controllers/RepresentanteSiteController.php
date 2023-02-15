@@ -27,7 +27,7 @@ use App\Http\Requests\SolicitaCedulaRequest;
 use App\Repositories\RepresentanteEnderecoRepository;
 use App\Repositories\SolicitaCedulaRepository;
 use App\Repositories\BdoOportunidadeRepository;
-use App\Repositories\AvisoRepository;
+// use App\Repositories\AvisoRepository;
 use Illuminate\Support\Facades\View;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
@@ -42,7 +42,7 @@ class RepresentanteSiteController extends Controller
     private $service;
     private $solicitaCedulaRepository;
 
-    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, MediadorServiceInterface $service, AvisoRepository $avisoRepository, SolicitaCedulaRepository $solicitaCedulaRepository)
+    public function __construct(GerentiRepositoryInterface $gerentiRepository, RepresentanteEnderecoRepository $representanteEnderecoRepository, GerentiApiRepository $gerentiApiRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, MediadorServiceInterface $service/*, AvisoRepository $avisoRepository, SolicitaCedulaRepository $solicitaCedulaRepository*/)
     {
         $this->middleware('auth:representante')->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->gerentiRepository = $gerentiRepository;
@@ -52,9 +52,9 @@ class RepresentanteSiteController extends Controller
         $this->service = $service;
         $this->solicitaCedulaRepository = $solicitaCedulaRepository;
 
-        if($avisoRepository->avisoAtivado('Representante'))
+        if($this->service->getService('Aviso')->avisoAtivado('Representante'))
         {
-            $aviso = $avisoRepository->getByArea('Representante');
+            $aviso = $this->service->getService('Aviso')->getByArea('Representante');
             View::share('aviso', $aviso);
         }
     }

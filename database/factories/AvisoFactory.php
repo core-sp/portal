@@ -11,7 +11,7 @@ $factory->define(Aviso::class, function (Faker $faker) {
         'area' => 'Representante',
         'titulo' => $faker->sentence,
         'conteudo' => $faker->text,
-        'cor_fundo_titulo' => $faker->colorName,
+        'cor_fundo_titulo' => Aviso::cores()[0],
         'status' => Aviso::DESATIVADO,
         'idusuario' => null
     ];

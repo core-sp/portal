@@ -25,7 +25,7 @@
                 <div class="form-check-inline">
                     <label class="form-check-label" for="radio1">
                         <input type="radio" class="form-check-input" name="cor_fundo_titulo" value="{{ $cor }}" {{ $resultado->cor_fundo_titulo == $cor ? 'checked' : '' }}>
-                        <i class="fas fa-square fa-border text-{{ str_replace('bg-', '', $cor) }}"></i>
+                        <i class="fas fa-square fa-border text-{{ $cor }}"></i>
                     </label>
                 </div>
                 @endforeach

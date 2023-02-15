@@ -5,7 +5,7 @@
                 * Alguns detalhes de layout, como margem e fonte, podem sofrer alterações na área do {{ $resultado->area }}
             </small></p>
             @component(
-                'components.aviso-'.strtolower($resultado->area), 
+                'components.aviso-'.$resultado::componente()[$resultado->area], 
                 [
                     'cor_fundo_titulo' => $resultado->cor_fundo_titulo,
                     'titulo' => $resultado->titulo, 

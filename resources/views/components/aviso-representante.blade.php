@@ -1,6 +1,6 @@
 <div id="accordion">
     <div class="card">
-        <div class="card-header {{ $cor_fundo_titulo }}">
+        <div class="card-header bg-{{ $cor_fundo_titulo }}">
             <a data-toggle="collapse" href="#collapseOne"><i class="fas fa-angle-down"></i>&nbsp;&nbsp;
                 <strong>{{ $titulo }}</strong>
             </a>

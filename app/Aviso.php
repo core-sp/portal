@@ -13,6 +13,28 @@ class Aviso extends Model
     const ATIVADO = 'Ativado';
     const DESATIVADO = 'Desativado';
 
+    public static function cores()
+    {
+        return [
+            'light',
+            'info',
+            'warning',
+            'primary',
+            'success',
+            'danger',
+            'secondary',
+            'dark'
+        ];
+    }
+
+    public static function componente()
+    {
+        return [
+            'Representante' => 'representante',
+            'Balcão de Oportunidades' => 'simples'
+        ];
+    }
+
     public function user()
     {
     	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
@@ -20,6 +42,6 @@ class Aviso extends Model
 
     public function isAtivado()
     {
-        return $this->status == Aviso::ATIVADO ? true : false;
+        return $this->status == Aviso::ATIVADO;
     }
 }

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\AnunciarVagaMail;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
+use Illuminate\Support\Facades\View;
 
 class BdoSiteController extends Controller
 {
@@ -25,6 +26,15 @@ class BdoSiteController extends Controller
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->service = $service;
+
+        if($this->service->getService('Aviso')->avisoAtivado('Balcão de Oportunidades'))
+        {
+            $aviso = $this->service->getService('Aviso')->getByArea('Balcão de Oportunidades');
+            View::share('aviso', $aviso);
+            // teste bloqueio post
+            if(\Route::is('bdosite.anunciarVaga'))
+                return redirect()->route('bdosite.anunciarVagaView');
+        }
     }
 
     public function index()

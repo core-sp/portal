@@ -35,17 +35,14 @@
                     <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
                 @endif
 
-                {{--
-                <div class="alert alert-info">
-                    <strong>Prezados</strong>,
-                    <br>
-                    Devido ao grande número de cadastramento de vagas, voltaremos a receber as novas oportunidades a partir do dia 17/01/2023.
-                    <br>
-                    Agradecemos a compreensão. 
-                    <br>
-                    Equipe Core-SP 
-                </div>
-                --}}
+                @if(isset($aviso))
+                    @component('components.aviso-simples', [
+                        'cor_fundo_titulo' => $aviso->cor_fundo_titulo,
+                        'titulo' => $aviso->titulo, 
+                        'conteudo' => $aviso->conteudo
+                    ])
+                    @endcomponent
+                @endif
 
                 <p>Preencha o formulário abaixo para solicitar a inclusão de sua(s) vaga(s) no <strong>Balcão de Oportunidades</strong> do <strong>Core-SP.</strong></p>
                 <p>A(s) vaga(s) será(ão) disponibilizada(s) após análise, que ocorrerá em até 10 (dez) dias corridos após recebimento da vaga, e permanecerá pelo prazo de até 90 (noventa) dias - após este período o status da(s) vaga(s) passará de "Em andamento" para "Concluído".</p>
@@ -346,8 +343,7 @@
                   </div>
                     <div class="form-group mt-3">
                         <button
-                            type="submit"
-                            {{-- type="button" --}}
+                            type="{{ isset($aviso) ? 'button' : 'submit' }}"
                             class="btn btn-primary"
                         >
                             Enviar
