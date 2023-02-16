@@ -10,7 +10,7 @@
         <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/ico" />
 
         <link type="text/css" href="{{ asset('/css/app.css') }}" rel="stylesheet">
-        <link type="text/css" href="{{ asset('/css/custom.css') }}" rel="stylesheet">
+        <link type="text/css" href="{{ asset('/css/custom.css?'.time()) }}" rel="stylesheet">
     </head>
     <body class="hold-transition sidebar-mini">
 
@@ -44,7 +44,7 @@
             <ul class="navbar-nav ml-auto">
               @if(Auth::user())
               <a href="/" class="btn btn-sm btn-success" target="_blank">Site</a>
-              <a href="/admin/logout" class="btn btn-sm btn-default ml-1">Logout</a>
+              <a href="#" class="btn btn-sm btn-default ml-1" id="logout-interno">Logout</a>
               @endif
             </ul>
           </nav>

@@ -2,17 +2,24 @@
     <div class="row">
         <div class="col">
             @switch($resultado->status)
-                @case('Aceito')
-                    <p><strong class="text-success"><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Solicitação aceita pelo(a) atendente {{$resultado->usuario->nome}} em {{ formataData($resultado->updated_at) }}</strong></p>
+                @case($resultado::STATUS_ACEITO)
+                    <p>
+                        <strong class="text-success">
+                            <i class="fas fa-check-circle"></i>&nbsp;&nbsp;Solicitação aceita pelo(a) atendente {{ $resultado->usuario->nome }} em {{ formataData($resultado->updated_at) }}
+                        </strong>
+                    </p>
                     <hr>
                 @break
-                @case('Recusado')
-                    <p class="{{ isset($resultado->justificativa) ? 'mb-0' : '' }}"><strong class="text-danger"><i class="fas fa-ban"></i>
-                        &nbsp;&nbsp;Solicitação reprovada pelo(a) atendente {{$resultado->usuario->nome}} em {{ formataData($resultado->updated_at) }}</strong>
+                @case($resultado::STATUS_RECUSADO)
+                    <p class="{{ isset($resultado->justificativa) ? 'mb-0' : '' }}">
+                        <strong class="text-danger">
+                            <i class="fas fa-ban"></i>
+                            &nbsp;&nbsp;Solicitação reprovada pelo(a) atendente {{ $resultado->usuario->nome }} em {{ formataData($resultado->updated_at) }}
+                        </strong>
                     </p>
-                    @isset($resultado->justificativa)
-                        <p class="light"><small class="light">{!! '—————<br><strong>Motivo:</strong> ' . $resultado->justificativa !!}</small></p>
-                    @endisset
+                    @if(isset($resultado->justificativa))
+                        <p class="light"><small class="light">—————<br><strong>Motivo:&nbsp;&nbsp;</strong>{{ $resultado->justificativa }}</small></p>
+                    @endif
                     <hr>
                 @break
             @endswitch
@@ -35,30 +42,52 @@
             <p class="mb-0">Número: <strong>{{ $resultado->numero }}</strong></p>
             <p class="mb-0">Complemento: <strong>{{ isset($resultado->complemento) ? $resultado->complemento : '---' }}</strong></p>
             <p class="mb-0">Estado: <strong>{{ $resultado->estado }}</strong></p>
-            <p>Município: <strong>{{ $resultado->municipio }}</strong></p>
-            @if ($resultado->status === 'Em andamento')
+            <p class="mb-0">Município: <strong>{{ $resultado->municipio }}</strong></p>
+            @if(isset($resultado->tipo))
+            <p>Tipo da cédula: <strong>{{ $resultado->tipo }}</strong></p>
+            @endif
+
+            <a href="{{ route('solicita-cedula.index') }}" class="btn btn-outline-secondary mt-2">
+                Voltar
+            </a>
+            @if ($resultado->status === $resultado::STATUS_EM_ANDAMENTO)
                 <hr>
                 <h4 class="mb-3">Ações</h4>
-                <form action="{{ route('admin.representante-solicita-cedula.post') }}" method="POST" class="d-inline">
+                <form action="{{ route('solicita-cedula.update', $resultado->id) }}" method="POST" class="d-inline">
                     @csrf
-                    <input type="hidden" name="id" value="{{ $resultado->id }}">
-                    <button type="submit" class="btn btn-primary">
+                    @method('PUT')
+                    <input type="hidden" name="status" value="{{ $resultado::STATUS_ACEITO }}">
+                    <button 
+                        type="submit" 
+                        class="btn btn-primary {{ $errors->has('status') ? 'is-invalid' : '' }}"
+                    >
                         Aceito
                     </button>
+                    @if($errors->has('status'))
+                        <div class="invalid-feedback">
+                        {{ $errors->first('status') }}
+                        </div>
+                    @endif
                 </form>
                 <button class="btn btn-info" id="recusar-trigger">Recusar&nbsp;&nbsp;<i class="fas fa-chevron-down"></i></button>
                 <div class="w-100" id="recusar-form">
-                    <form action="{{ route('admin.representante-solicita-cedula-reprovada.post') }}" method="POST" class="mt-2 cedula_recusada">
+                    <form action="{{ route('solicita-cedula.update', $resultado->id) }}" method="POST" class="mt-2 cedula_recusada">
                         @csrf
-                        <input type="hidden" name="id" value="{{ $resultado->id }}">
+                        @method('PUT')
+                        <input type="hidden" name="status" value="{{ $resultado::STATUS_RECUSADO }}">
+                        <label for="justificativaCedula">Insira a justificativa:</label>
                         <textarea 
                             name="justificativa" 
                             rows="3" 
-                            placeholder="Insira aqui o motivo pelo qual a solicitação foi recusada..." 
-                            class="form-control {{ $errors->has('justificativa') ? 'is-invalid' : '' }}">{{ old('justificativa') }}</textarea>
-                        @if($errors->has('justificativa'))
+                            class="form-control {{ $errors->has('justificativa') || $errors->has('status') ? 'is-invalid' : '' }}"
+                            id="justificativaCedula"
+                            maxlength="600"
+                        >
+                            {{ old('justificativa') }}
+                        </textarea>
+                        @if($errors->has('justificativa') || $errors->has('status'))
                             <div class="invalid-feedback">
-                            {{ $errors->first('justificativa') }}
+                            {{ $errors->has('justificativa') ? $errors->first('justificativa') : $errors->first('status') }}
                             </div>
                         @endif
                         <button type="submit" class="btn btn-danger mt-2">

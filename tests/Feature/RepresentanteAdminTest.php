@@ -44,11 +44,10 @@ class RepresentanteAdminTest extends TestCase
 
         $this->get(route('solicita-cedula.index'))->assertRedirect(route('login'));
         $this->get(route('solicita-cedula.filtro'))->assertRedirect(route('login'));
-        $this->get(route('admin.solicita-cedula.show', $repCedula->id))->assertRedirect(route('login'));
-        $this->get(route('admin.solicita-cedula.pdf', $repCedula->id))->assertRedirect(route('login'));
+        $this->get(route('solicita-cedula.show', $repCedula->id))->assertRedirect(route('login'));
+        $this->get(route('solicita-cedula.pdf', $repCedula->id))->assertRedirect(route('login'));
         $this->get(route('solicita-cedula.busca'))->assertRedirect(route('login'));
-        $this->post(route('admin.representante-solicita-cedula.post'))->assertRedirect(route('login'));
-        $this->post(route('admin.representante-solicita-cedula-reprovada.post'))->assertRedirect(route('login'));
+        $this->put(route('solicita-cedula.update', $repCedula->id))->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -82,11 +81,10 @@ class RepresentanteAdminTest extends TestCase
 
         $this->get(route('solicita-cedula.index'))->assertForbidden();
         $this->get(route('solicita-cedula.filtro'))->assertForbidden();
-        $this->get(route('admin.solicita-cedula.show', $repCedula->id))->assertForbidden();
-        $this->get(route('admin.solicita-cedula.pdf', $repCedula->id))->assertForbidden();
+        $this->get(route('solicita-cedula.show', $repCedula->id))->assertForbidden();
+        $this->get(route('solicita-cedula.pdf', $repCedula->id))->assertForbidden();
         $this->get(route('solicita-cedula.busca'))->assertForbidden();
-        $this->post(route('admin.representante-solicita-cedula.post'))->assertForbidden();
-        $this->post(route('admin.representante-solicita-cedula-reprovada.post'))->assertForbidden();
+        $this->put(route('solicita-cedula.update', $repCedula->id))->assertForbidden();
     }
 
     /** @test */
@@ -124,10 +122,9 @@ class RepresentanteAdminTest extends TestCase
 
         $this->get(route('solicita-cedula.index'))->assertOk();
         $this->get(route('solicita-cedula.filtro'))->assertOk();
-        $this->get(route('admin.solicita-cedula.show', $repCedula->id))->assertOk();
-        $this->get(route('admin.solicita-cedula.pdf', $repCedula->id))->assertStatus(302);
+        $this->get(route('solicita-cedula.show', $repCedula->id))->assertOk();
+        $this->get(route('solicita-cedula.pdf', $repCedula->id))->assertStatus(302);
         $this->get(route('solicita-cedula.busca'))->assertOk();
-        $this->post(route('admin.representante-solicita-cedula.post'), $repCedula->toArray())->assertStatus(302);
-        $this->post(route('admin.representante-solicita-cedula-reprovada.post'), $repCedula->toArray())->assertStatus(302);
+        $this->put(route('solicita-cedula.update', $repCedula->id), ['status' => 'Aceito'])->assertStatus(302);
     }
 }

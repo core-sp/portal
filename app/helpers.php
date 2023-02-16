@@ -804,3 +804,8 @@ function apenasNumerosLetras($string)
 {
     return preg_replace('/[^a-zA-Z0-9]/', '', $string);
 }
+
+function apenasLetras($string)
+{
+    return preg_replace('/[^a-zA-Z]/', '', $string);
+}

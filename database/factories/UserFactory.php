@@ -13,7 +13,7 @@ $factory->define(User::class, function (Faker $faker) {
         'email_verified_at' => now(),
         'idregional' => factory('App\Regional'),
         'idperfil' => factory('App\Perfil'),
-        'password' => Hash::make(str_random(8)),
+        'password' => bcrypt('Teste102030'),
         'remember_token' => Str::random(10),
         'created_at' => now(),
         'updated_at' => now()

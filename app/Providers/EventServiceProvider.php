@@ -41,6 +41,10 @@ class EventServiceProvider extends ServiceProvider
         ],
     ];
 
+    protected $subscribe = [
+        'App\Listeners\LFMSubscriber'
+    ];
+
     /**
      * Register any events for your application.
      *
