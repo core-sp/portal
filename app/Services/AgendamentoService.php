@@ -106,10 +106,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $datemax = $request->filled('datemax') ? Carbon::parse($request->datemax) : Carbon::today();
 
         if($datemax->lt($datemin))
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Data final deve ser maior ou igual a data inicial',
-                'class' => 'alert-danger'
-            ];
+            $datemax = $datemin;
 
         return [
             'datemin' => $datemin->format('Y-m-d'),
@@ -173,7 +170,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
     private function getResultadosFiltro($dados)
     {
-        if(isset($dados) && !isset($dados['message']))
+        if(isset($dados))
         {
             $regional = $dados['regional'];
             $status = $dados['status'];
@@ -413,7 +410,6 @@ class AgendamentoService implements AgendamentoServiceInterface {
             $this->variaveis['mostraFiltros'] = true;
     
             return [
-                'erro' => isset($dados['message']) ? $dados : null,
                 'resultados' => $resultados, 
                 'tabela' => $this->tabelaCompleta($resultados), 
                 'temFiltro' => $this->filtro($request, $service),

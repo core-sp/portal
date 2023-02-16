@@ -17,11 +17,11 @@
   <!-- /.login-logo -->
   <div class="login-box-body">
     <p class="login-box-msg">Digite o email e confirme a nova senha.</p>
-    <form method="POST" action="{{ route('password.update') }}">
+    <form method="POST" action="{{ route('password.update') }}" autocomplete="off">
       @csrf
       <input type="hidden" name="token" value="{{ $token }}">
       <div class="input-group mb-2">
-        <input id="email" type="email" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ $email ?? old('email') }}" placeholder="E-mail" required autofocus>
+        <input id="login" type="email" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ $email ?? old('email') }}" placeholder="E-mail" required autofocus>
         <div class="input-group-append">
           <span class="fa fa-envelope input-group-text"></span>
         </div>
@@ -48,6 +48,12 @@
           <span class="fa fa-lock input-group-text"></span>
         </div>
       </div>
+
+      <div class="mt-2 mb-2">
+        @component('components.verifica_forca_senha')
+        @endcomponent
+      </div>
+
       <button type="submit" class="btn btn-primary">
         Resetar Senha
       </button>
@@ -55,6 +61,9 @@
   </div>
 </div>
 <!-- /.login-box -->
+
+<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
+<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
 
 </body>
 </html>

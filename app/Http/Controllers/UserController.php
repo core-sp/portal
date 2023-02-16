@@ -266,7 +266,7 @@ class UserController extends Controller
     {
         $regras = [
             'current-password' => 'required',
-            'password' => 'required|min:6|regex:/^[a-zA-Z0-9]+$/',
+            'password' => 'required|min:6|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u',
             'password_confirmation' => 'required|same:password'
         ];
         $mensagens = [

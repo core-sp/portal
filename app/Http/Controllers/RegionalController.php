@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegionalRequest;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RegionalController extends Controller
 {
@@ -71,6 +72,9 @@ class RegionalController extends Controller
             $dados = $this->service->getService('Regional')->viewSite($id);
             $resultado = $dados['resultado'];
             $noticias = $dados['noticias'];
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Seccional não encontrada.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página da regional no portal.");

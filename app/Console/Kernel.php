@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Mail;
 use App\User;
 use App\Agendamento;
 use App\BdoOportunidade;
-use App\Http\Controllers\Helper;
 use App\Representante;
 use Carbon\Carbon;
 use PDO;
@@ -121,7 +120,7 @@ class Kernel extends ConsoleKernel
                 ->get();
             $hoje = date('Y-m-d');
             $ontem = Carbon::yesterday()->toDateString();
-            $diaFormatado = Helper::onlyDate($ontem);
+            $diaFormatado = onlyDate($ontem);
             foreach($users as $user) {
                 $cedulas = SolicitaCedula::whereDate('created_at', $ontem)
                     ->where('status', SolicitaCedula::STATUS_EM_ANDAMENTO)
@@ -130,33 +129,9 @@ class Kernel extends ConsoleKernel
                         return $q->regional->regional;
                     });
                 if($cedulas->isNotEmpty()) {
-                    $body = '<h3><i>(Mensagem Programada)</i></h3>';
-                    $body .= '<p>Confira abaixo a lista de cédulas solicitadas pelo Portal CORE-SP ontem, <strong>'.Helper::onlyDate($ontem).':</strong></p>';
-                    $body .= '<table border="1" cellspacing="0" cellpadding="6">';
-                    $body .= '<thead>';
-                    $body .= '<tr>';
-                    $body .= '<th>Regional</th>';
-                    $body .= '<th>Representante</th>';
-                    $body .= '<th>Registro Core</th>';
-                    $body .= '</tr>';
-                    $body .= '</thead>';
-                    $body .= '<tbody>';
-                    foreach($cedulas as $cedula) {
-                        $body .= '<tr>';
-                        $body .= '<td>'.$cedula->regional->regional.'</td>';
-                        $body .= '<td>'.$cedula->representante->nome.'</td>';
-                        $body .= '<td>'.$cedula->representante->registro_core.'</td>';
-                        $body .= '</tr>';
-                    }
-                    $body .= '</tbody>';
-                    $body .= '</table>';
-                    $body .= '<p>';
-                    $body .= 'Por favor, acesse o <a href="https://core-sp.org.br/admin" target="_blank">painel de administrador</a> do Portal CORE-SP para mais informações.';
-                    $body .= '</p>';
-                    $regional = 'Seccionais';
                     try {
                         Mail::to($user->email)
-                            ->send(new InternoSolicitaCedulaMail($body, $regional, $diaFormatado));
+                            ->send(new InternoSolicitaCedulaMail($cedulas, $diaFormatado));
                     } catch (\Exception $e) {
                         \Log::error($e->getMessage());
                     }

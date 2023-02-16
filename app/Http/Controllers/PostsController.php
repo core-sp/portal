@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PostsController extends Controller
 {
@@ -72,6 +73,9 @@ class PostsController extends Controller
             $post = $dados['post'];
             $next = $dados['next'];
             $previous = $dados['previous'];
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().' para o slug: '.$slug.'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Post não encontrado.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().' para o slug: '.$slug.'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página do post no portal.");

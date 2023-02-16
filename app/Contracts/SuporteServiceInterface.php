@@ -15,4 +15,12 @@ interface SuporteServiceInterface {
     public function uploadFileErros($file);
 
     public function getFileErros();
+
+    public function ipsBloqueados();
+
+    public function ips();
+
+    public function bloquearIp($ip);
+
+    public function liberarIp($ip, $user = null);
 }
