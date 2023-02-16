@@ -228,9 +228,9 @@ class NoticiaTest extends TestCase
 
         $this->post(route('noticias.store'), $attributes);
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('criou', $log);
-        $this->assertStringContainsString('notícia', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *notícia* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -371,9 +371,9 @@ class NoticiaTest extends TestCase
             'conteudo' => $noticia->conteudo
         ]);
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('editou', $log);
-        $this->assertStringContainsString('notícia', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *notícia* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -396,9 +396,9 @@ class NoticiaTest extends TestCase
 
         $this->delete(route('noticias.destroy', $noticia->idnoticia));
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('apagou', $log);
-        $this->assertStringContainsString('notícia', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') apagou *notícia* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -449,9 +449,9 @@ class NoticiaTest extends TestCase
         $this->delete(route('noticias.destroy', $noticia->idnoticia));
         $this->get(route('noticias.restore', $noticia->idnoticia));
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('restaurou', $log);
-        $this->assertStringContainsString('notícia', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') restaurou *notícia* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -462,6 +462,27 @@ class NoticiaTest extends TestCase
         $this->get(route('noticias.show', $noticia->slug))
             ->assertOk()
             ->assertSee($noticia->titulo);
+    }
+
+    /** @test */
+    public function error_404_when_noticia_not_find_is_shown_on_the_website()
+    {
+        $this->get(route('noticias.show', 'teste-do-error-404'))
+            ->assertStatus(404);
+    }
+
+    /** @test */
+    public function log_is_generated_when_error_404_on_website_when_not_find_noticia()
+    {
+        $slug = 'teste-do-error-404';
+        $this->get(route('noticias.show', $slug))
+            ->assertStatus(404);
+
+        $log = tailCustom(storage_path($this->pathLogErros()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
+        $txt = $inicio . '[Erro: No query results for model [App\Noticia]. para o slug: '.$slug.'], [Controller: App\Http\Controllers\NoticiaController@show], ';
+        $txt .= '[Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 470]';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */

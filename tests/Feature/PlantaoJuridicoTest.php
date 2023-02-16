@@ -124,8 +124,9 @@ class PlantaoJuridicoTest extends TestCase
         $this->put(route('plantao.juridico.editar', $plantao->id), $dados);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('plantão juridico', $log);
-        $this->assertStringContainsString('editou', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *plantão juridico* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -724,8 +725,9 @@ class PlantaoJuridicoTest extends TestCase
         $this->post(route('plantao.juridico.bloqueios.criar'), $dados);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('plantão juridico bloqueio', $log);
-        $this->assertStringContainsString('criou', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *plantão juridico bloqueio* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1175,8 +1177,9 @@ class PlantaoJuridicoTest extends TestCase
         $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id), $dados);
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('plantão juridico bloqueio', $log);
-        $this->assertStringContainsString('editou', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *plantão juridico bloqueio* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -1602,8 +1605,9 @@ class PlantaoJuridicoTest extends TestCase
         $this->delete(route('plantao.juridico.bloqueios.excluir', $bloqueio->id));
 
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString('plantão juridico bloqueio', $log);
-        $this->assertStringContainsString('excluiu', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') excluiu *plantão juridico bloqueio* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */

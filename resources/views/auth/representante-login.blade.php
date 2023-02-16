@@ -30,6 +30,7 @@
             </div>
         </div>
         <div class="linha-lg"></div>
+        @if(!$errors->has('email_system'))
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt">
                 @if(Session::has('message'))
@@ -37,20 +38,19 @@
                 @endif
                 <p>Caso já tenha se cadastrado, preencha as informações abaixo para <strong>acessar a área restrita do Representante Comercial.</strong></p>
                 <p>Ou então, <a href="{{ route('representante.cadastro') }}">realize o cadastro</a> e depois efetue o login.</p>
-                <form action="{{ route('representante.login.submit') }}" method="POST" class="cadastroRepresentante">
+                <form action="{{ route('representante.login.submit') }}" method="POST" class="cadastroRepresentante" autocomplete="off">
                     @csrf
                     <div class="form-group">
-                        <label for="cpf_cnpj">CPF ou CNPJ</label>
+                        <label for="login">CPF ou CNPJ</label>
                         <input id="login"
                             type="text"
-                            class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') || $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
+                            class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
                             name="cpf_cnpj"
-                            value="{{ old('cpf_cnpj') ?: old('cpf_cnpj') }}"
                             placeholder="CPF ou CNPJ"
                         >
-                        @if ($errors->has('cpf_cnpj') || $errors->has('cpf_cnpj'))
+                        @if ($errors->has('cpf_cnpj'))
                             <span class="invalid-feedback">
-                                <strong>{{ $errors->first('cpf_cnpj') ?: $errors->first('cpf_cnpj') }}</strong>
+                                <strong>{{ $errors->first('cpf_cnpj') }}</strong>
                             </span>
                         @endif
                     </div>
@@ -59,17 +59,15 @@
                         <input
                             id="password"
                             type="password"
-                            class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}"
+                            class="form-control mb-2"
                             name="password"
                             placeholder="Senha"
-                        >
-                        @if ($errors->has('password'))
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $errors->first('password') }}</strong>
-                            </span>
-                        @endif
+                        />
+                        @component('components.verifica_forca_senha')
+                        @endcomponent
                     </div>
                     <div class="form-group mt-2">
+                        <input id="email_system" type="text" class="form-control" name="email_system" value="" tabindex="-1">
                         <button type="submit" class="btn btn-primary">Entrar</button>
                     </div>
                     <div class="form-group mt-2">
@@ -89,7 +87,11 @@
                 @include('site.inc.content-sidebar')
             </div>
         </div>
+        @endif
     </div>
 </section>
+
+<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
+<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
 
 @endsection

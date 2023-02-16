@@ -37,8 +37,9 @@ class TermoConsentimentoTest extends TestCase
         $this->post(route('termo.consentimento.post', ['email' => 'teste@teste.com']));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-
-        $this->assertStringContainsString('Novo email e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . 'Novo email e foi criado um novo registro no termo de consentimento, com a id: 1';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */

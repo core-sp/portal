@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\NoticiaRequest;
 use App\Contracts\MediadorServiceInterface;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class NoticiaController extends Controller
 {
@@ -110,6 +111,9 @@ class NoticiaController extends Controller
             $dados = $this->service->getService('Noticia')->viewSite($slug);
             $noticia = $dados['noticia'];
             $tres = $dados['tres'];
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().' para o slug: '.$slug.'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Notícia não encontrada.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().' para o slug: '.$slug.'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página da notícia no portal.");
