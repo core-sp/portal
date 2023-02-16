@@ -37,6 +37,11 @@ abstract class TestCase extends BaseTestCase
         return 'logs/externo/'.date('Y').'/'.date('m').'/laravel-'.date('Y-m-d').'.log';
     }
 
+    protected function pathLogErros()
+    {
+        return 'logs/erros/laravel-'.date('Y-m-d').'.log';
+    }
+
     protected function signIn($user = null)
     {
         $this->seed(PermissoesTableSeeder::class);

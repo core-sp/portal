@@ -7,7 +7,7 @@
                    {{ limitRepresentanteName(Auth::guard('representante')->user()->nome) }}
                 </a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="{{ route('representante.logout') }}">
+                <a id="logout-representante" href="#">
                     Logout
                 </a>
             </small>

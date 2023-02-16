@@ -31,9 +31,7 @@ class AgendamentoController extends Controller
             abort(500, "Erro ao carregar os agendamentos.");
         }
 
-        return !isset($dados['erro']['message']) ? 
-            view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro')) : 
-            redirect(session('url'))->with($dados['erro']);
+        return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados', 'temFiltro'));
     }
 
     public function updateStatus(AgendamentoRequest $request)

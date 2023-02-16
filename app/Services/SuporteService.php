@@ -5,6 +5,11 @@ namespace App\Services;
 use App\Contracts\SuporteServiceInterface;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\SuporteIp;
+use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InternoSuporteMail;
+use Illuminate\Support\LazyCollection;
 
 class SuporteService implements SuporteServiceInterface {
 
@@ -24,6 +29,12 @@ class SuporteService implements SuporteServiceInterface {
             'mostra' => 'suporte_erros',
             'singular' => 'Tabela de Erros',
             'singulariza' => 'os erros',
+        ];
+
+        $this->variaveisIps = [
+            'mostra' => 'suporte_ips',
+            'singular' => 'Tabela de IPs bloqueados e liberados',
+            'singulariza' => 'os ips',
         ];
 
         $this->nomeFileErros = 'suporte-tabela-erros.txt';
@@ -150,11 +161,28 @@ class SuporteService implements SuporteServiceInterface {
 
     public function logPorData($data, $tipo)
     {
+        $conteudo = null;
         if(!in_array($tipo, [self::ERROS, self::INTERNO, self::EXTERNO]))
             throw new \Exception('Tipo de log não existente', 500);
 
         $log = $this->hasLog($data, $tipo);
-        return isset($log) && $log ? Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo)) : null;
+        if(isset($log) && $log)
+        {
+            $conteudo = '';
+            $path = Storage::disk('log_'.$tipo)->path($this->getPathLogFile($data, $tipo));
+            $logs = LazyCollection::make(function() use($path){
+                $handle = fopen($path, 'r');
+                while(($line = fgets($handle)) !== false)
+                    yield $line;
+
+                fclose($handle);
+            });
+        
+            foreach($logs as $line)
+                $conteudo .= $line;
+        }
+    
+        return isset($conteudo) ? $conteudo : null;
     }
 
     public function indexErros()
@@ -174,5 +202,68 @@ class SuporteService implements SuporteServiceInterface {
     public function getFileErros()
     {
         return Storage::disk('local')->exists($this->nomeFileErros) ? Storage::disk('local')->path($this->nomeFileErros) : null;
+    }
+
+    public function ipsBloqueados()
+    {
+        return SuporteIp::select('ip')->where('status', SuporteIp::BLOQUEADO)->get();
+    }
+
+    public function ips()
+    {
+        return [
+            'ips' => SuporteIp::where('status', SuporteIp::BLOQUEADO)
+            ->orWhere('status', SuporteIp::LIBERADO)
+            ->orderBy('status', 'DESC')
+            ->get(),
+            'variaveis' => (object) $this->variaveisIps
+        ];
+    }
+
+    public function bloquearIp($ip)
+    {
+        $registro = SuporteIp::where('ip', $ip)->first();
+        if(isset($registro) && $registro->isUpdateTentativa())
+        {
+            $registro = $registro->updateTentativa();
+            if($registro->isBloqueado())
+            {
+                $texto = "[IP: " . $ip . "] - [Rotina Portal - Bloqueio de IP] - IP BLOQUEADO por segurança devido a alcançar o limite de ";
+                $texto .= SuporteIp::TOTAL_TENTATIVAS . " tentativas de login.";
+                \Log::channel('interno')->info($texto);
+                \Log::channel('externo')->info($texto);
+                $users = \App\User::where('idperfil', 1)->get();
+                foreach($users as $user)
+                    Mail::to($user->email)->queue(new InternoSuporteMail($ip, $registro->status));
+            }
+        }elseif(!isset($registro)) 
+            $registro = SuporteIp::create(['ip' => $ip]);
+
+        return $registro;
+    }
+
+    public function liberarIp($ip, $user = null)
+    {
+        $ok = false;
+        $registro = SuporteIp::where('ip', $ip)->first();
+
+        if(isset($registro))
+        {
+            if(!isset($user) && $registro->isDesbloqueado())
+                $ok = $registro->delete();
+            elseif(isset($user) && $registro->isBloqueado())
+            {
+                $ok = $registro->delete();
+                event(new CrudEvent('desbloqueio de IP', 'realizou', $ip));
+                $texto = "[IP: " . $ip . "] - IP DESBLOQUEADO por " . $user->nome . " (administrador do Portal) após análise.";
+                \Log::channel('interno')->info($texto);
+                \Log::channel('externo')->info($texto);
+                $users = \App\User::where('idperfil', 1)->get();
+                foreach($users as $user)
+                    Mail::to($user->email)->queue(new InternoSuporteMail($ip, SuporteIp::DESBLOQUEADO));
+            }
+        }
+        
+        return $ok;
     }
 }

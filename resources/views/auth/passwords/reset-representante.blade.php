@@ -44,13 +44,13 @@
         <div class="row mt-2">
           <div class="col-lg-8 conteudo-txt">
             <p>Preencha as informações abaixo para reconfigurar sua senha.</p>
-            <form method="POST" action="{{ route('representante.password.update') }}" class="mt-3 cadastroRepresentante">
+            <form method="POST" action="{{ route('representante.password.update') }}" class="mt-3 cadastroRepresentante" autocomplete="off">
               @csrf
               <input type="hidden" name="token" value="{{ $token }}">
               <div class="form-group">
                 <label for="cpf_cnpj">CPF ou CNPJ</label>
                 <input
-                  id="cpf_cnpj"
+                  id="login"
                   type="text"
                   class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
                   name="cpf_cnpj"
@@ -90,6 +90,12 @@
                   >
                 </div>
               </div>
+
+              <div class="mt-2 mb-2">
+                @component('components.verifica_forca_senha')
+                @endcomponent
+              </div>
+
               <div class="form-group mt-3">
                 <button type="submit" class="btn btn-primary">Alterar senha</button>
               </div>
@@ -101,5 +107,8 @@
         </div>
     </div>
 </section>
+
+<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
+<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
 
 @endsection

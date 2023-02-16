@@ -188,9 +188,9 @@ class PostTest extends TestCase
 
         $this->post(route('posts.store'), $attributes);
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('criou', $log);
-        $this->assertStringContainsString('post', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *post* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -296,9 +296,9 @@ class PostTest extends TestCase
 
         $this->patch(route('posts.update', $post->id), $attributes);
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('editou', $log);
-        $this->assertStringContainsString('post', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *post* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -311,6 +311,27 @@ class PostTest extends TestCase
             ->assertSee($post->titulo)
             ->assertSee($post->subtitulo)
             ->assertSee($post->conteudo);
+    }
+
+    /** @test */
+    public function error_404_when_post_not_find_is_shown_on_the_website()
+    {
+        $this->get(route('site.blog.post', 'teste-do-error-404'))
+            ->assertStatus(404);
+    }
+
+    /** @test */
+    public function log_is_generated_when_error_404_on_website_when_not_find_post()
+    {
+        $slug = 'teste-do-error-404';
+        $this->get(route('site.blog.post', $slug))
+            ->assertStatus(404);
+
+        $log = tailCustom(storage_path($this->pathLogErros()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
+        $txt = $inicio . '[Erro: No query results for model [App\Post]. para o slug: '.$slug.'], [Controller: App\Http\Controllers\PostsController@show], ';
+        $txt .= '[Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 470]';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -391,9 +412,9 @@ class PostTest extends TestCase
 
         $this->delete(route('posts.destroy', $post->id));
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('apagou', $log);
-        $this->assertStringContainsString('post', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') apagou *post* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
