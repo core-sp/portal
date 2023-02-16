@@ -20,20 +20,21 @@ class BdoSiteController extends Controller
     private $bdoEmpresaRepository;
     private $bdoOportunidadeRepository;
     private $service;
+    private $avisoAtivado;
 
     public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, BdoOportunidadeRepository $bdoOportunidadeRepository, MediadorServiceInterface $service) 
     {
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->service = $service;
+        $this->avisoAtivado = $this->service->getService('Aviso')->avisoAtivado('Balcão de Oportunidades');
 
-        if($this->service->getService('Aviso')->avisoAtivado('Balcão de Oportunidades'))
+        if($this->avisoAtivado)
         {
             $aviso = $this->service->getService('Aviso')->getByArea('Balcão de Oportunidades');
             View::share('aviso', $aviso);
-            // teste bloqueio post
             if(\Route::is('bdosite.anunciarVaga'))
-                return redirect()->route('bdosite.anunciarVagaView');
+                request()->merge(['avisoAtivado' => $this->avisoAtivado]);
         }
     }
 
@@ -74,6 +75,9 @@ class BdoSiteController extends Controller
 
     public function anunciarVagaView()
     {
+        if(request()->session()->exists('errors') && $this->avisoAtivado)
+            request()->session()->forget(['errors', '_old_input']);
+
         $regionais = $this->service->getService('Regional')->getRegionais();
 
         return view('site.anunciar-vaga', compact('regionais'));

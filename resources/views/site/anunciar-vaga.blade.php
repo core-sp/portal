@@ -42,6 +42,11 @@
                         'conteudo' => $aviso->conteudo
                     ])
                     @endcomponent
+                    @php
+                        // Para não ativar o "invalid-feedback" dos campos
+                        if(isset($errors))
+                            $errors = new \Illuminate\Support\MessageBag();
+                    @endphp
                 @endif
 
                 <p>Preencha o formulário abaixo para solicitar a inclusão de sua(s) vaga(s) no <strong>Balcão de Oportunidades</strong> do <strong>Core-SP.</strong></p>

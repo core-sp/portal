@@ -9,6 +9,7 @@ use App\Traits\TabelaAdmin;
 use App\Http\Requests\BdoEmpresaRequest;
 use App\Repositories\BdoEmpresaRepository;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
+use App\Contracts\MediadorServiceInterface;
 
 class BdoEmpresaController extends Controller
 {
@@ -17,6 +18,8 @@ class BdoEmpresaController extends Controller
     // Nome da Classe
     private $class = 'BdoEmpresaController';
     private $bdoEmpresaRepository;
+    private $service;
+    private $avisoAtivado;
 
     private $variaveis = [
         'singular' => 'empresa',
@@ -30,11 +33,13 @@ class BdoEmpresaController extends Controller
         'slug' => 'bdo/empresas'
     ];
 
-    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository)
+    public function __construct(BdoEmpresaRepository $bdoEmpresaRepository, MediadorServiceInterface $service)
     {
         $this->middleware('auth', ['except' => ['show', 'apiGetEmpresa']]);
 
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
+        $this->service = $service;
+        $this->avisoAtivado = $this->service->getService('Aviso')->avisoAtivado('Balcão de Oportunidades');
     }
 
     public function index()
@@ -154,6 +159,12 @@ class BdoEmpresaController extends Controller
     /** Função usada por JQuery na tela de anúncio de vagas */
     public function apiGetEmpresa($cnpj)
     {
+        if($this->avisoAtivado)
+            return [
+                'empresa' => '{}',
+                'message' => 'Não é possível verificar no momento se a empresa está cadastrada.',
+                'class' => 'alert-warning'
+            ];
         $cnpj = formataCpfCnpj($cnpj);
 
         $empresa = $this->bdoEmpresaRepository->getToApi($cnpj);
