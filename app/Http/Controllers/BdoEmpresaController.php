@@ -39,7 +39,7 @@ class BdoEmpresaController extends Controller
 
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->service = $service;
-        $this->avisoAtivado = $this->service->getService('Aviso')->avisoAtivado('Balcão de Oportunidades');
+        $this->avisoAtivado = $this->service->getService('Aviso')->avisoAtivado($this->service->getService('Aviso')->areas()[1]);
     }
 
     public function index()

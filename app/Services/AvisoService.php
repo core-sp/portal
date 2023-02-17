@@ -68,9 +68,9 @@ class AvisoService implements AvisoServiceInterface {
         return $tabela;
     }
 
-    public function componente()
+    public function areas()
     {
-        return Aviso::componente();
+        return Aviso::areas();
     }
 
     public function cores()
@@ -80,7 +80,7 @@ class AvisoService implements AvisoServiceInterface {
 
     public function listar()
     {
-        $resultados = Aviso::orderBy('id')->paginate(5);
+        $resultados = Aviso::with(['user'])->orderBy('id')->paginate(5);
 
         return [
             'resultados' => $resultados, 
@@ -102,7 +102,7 @@ class AvisoService implements AvisoServiceInterface {
 
     public function edit($id)
     {
-        $resultado = Aviso::findOrFail($id);
+        $resultado = Aviso::with(['user'])->findOrFail($id);
 
         return [
             'resultado' => $resultado,
@@ -145,5 +145,15 @@ class AvisoService implements AvisoServiceInterface {
         $aviso = $this->getByArea($area);
 
         return isset($aviso) ? $aviso->isAtivado() : false;
+    }
+
+    public function getById($id)
+    {
+        return Aviso::find($id);
+    }
+
+    public function existeAtivado()
+    {
+        return Aviso::where('status', Aviso::ATIVADO)->exists();
     }
 }

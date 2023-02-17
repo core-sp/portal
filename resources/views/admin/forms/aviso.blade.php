@@ -3,8 +3,12 @@
     @csrf
     @method('PUT')
     <div class="card-body">
-        <div class="form-row">
-            <div class="col-8">
+        @if($resultado->area == $resultado::areas()[1])
+        <p><strong><span class="text-danger">ATENÇÃO!</span></strong> Esse aviso <strong>ATIVADO</strong> desabilita o envio de formulário para anunciar vaga!</p>
+        @endif
+        <div class="form-row mb-3">
+            @if(!$resultado->isComponenteSimples())
+            <div class="col-8 mt-2">
                 <label for="titulo">Título do aviso na área do {{ $resultado->area }}</label>
                 <input type="text"
                     class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
@@ -18,8 +22,9 @@
                     </div>
                 @endif
             </div>
-            <div class="col">
-                <label for="cor_fundo_titulo">Cor de fundo do Título</label>
+            @endif
+            <div class="col mt-2">
+                <label for="cor_fundo_titulo">Cor de fundo</label>
                 <br>
                 @foreach($cores as $cor)
                 <div class="form-check-inline">
@@ -41,7 +46,7 @@
             <textarea name="conteudo"
                 class="form-control my-editor {{ $errors->has('conteudo') ? 'is-invalid' : '' }}"
                 id="conteudo"
-                rows="10"
+                rows="25"
             >{!! isset($resultado) ? $resultado->conteudo : old('conteudo') !!}</textarea>
             @if($errors->has('conteudo'))
                 <div class="invalid-feedback">
@@ -52,7 +57,7 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            <a href="{{ route('avisos.index') }}" class="btn btn-default">Cancelar</a>
+            <a href="{{ route('avisos.index') }}" class="btn btn-default">Voltar</a>
             <button type="submit" class="btn btn-primary ml-1">
                 Salvar
             </button>

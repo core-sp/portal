@@ -48,9 +48,9 @@ class RepresentanteSiteController extends Controller
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->service = $service;
 
-        if($this->service->getService('Aviso')->avisoAtivado('Representante'))
+        if($this->service->getService('Aviso')->avisoAtivado($this->service->getService('Aviso')->areas()[0]))
         {
-            $aviso = $this->service->getService('Aviso')->getByArea('Representante');
+            $aviso = $this->service->getService('Aviso')->getByArea($this->service->getService('Aviso')->areas()[0]);
             View::share('aviso', $aviso);
         }
     }

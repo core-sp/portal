@@ -108,7 +108,7 @@ class AvisoController extends Controller
         }
 
         return redirect()->route('avisos.index')
-            ->with('message', '<i class="icon fa fa-check"></i>Aviso editado com sucesso!')
+            ->with('message', '<i class="icon fa fa-check"></i>Aviso com a ID: ' . $id . ' foi editado com sucesso!')
             ->with('class', 'alert-success');
     }
 
@@ -135,7 +135,7 @@ class AvisoController extends Controller
         }
 
         return redirect()->route('avisos.index')
-            ->with('message', '<i class="icon fa fa-check"></i>Aviso foi ' .$status. ' com sucesso!')
+            ->with('message', '<i class="icon fa fa-check"></i>Aviso com a ID: ' . $id . ' foi ' .$status. ' com sucesso!')
             ->with('class', 'alert-success');
     }
 

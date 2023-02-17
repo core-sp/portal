@@ -27,11 +27,11 @@ class BdoSiteController extends Controller
         $this->bdoEmpresaRepository = $bdoEmpresaRepository;
         $this->bdoOportunidadeRepository = $bdoOportunidadeRepository;
         $this->service = $service;
-        $this->avisoAtivado = $this->service->getService('Aviso')->avisoAtivado('Balcão de Oportunidades');
+        $this->avisoAtivado = $this->service->getService('Aviso')->avisoAtivado($this->service->getService('Aviso')->areas()[1]);
 
         if($this->avisoAtivado)
         {
-            $aviso = $this->service->getService('Aviso')->getByArea('Balcão de Oportunidades');
+            $aviso = $this->service->getService('Aviso')->getByArea($this->service->getService('Aviso')->areas()[1]);
             View::share('aviso', $aviso);
             if(\Route::is('bdosite.anunciarVaga'))
                 request()->merge(['avisoAtivado' => $this->avisoAtivado]);

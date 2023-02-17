@@ -53,11 +53,12 @@ class AvisoTest extends TestCase
         $dados = factory('App\Aviso')->raw([
             'idusuario' => $user->idusuario
         ]);
-        $this->put(route('avisos.editar', $aviso->id), $dados)->assertStatus(302);
+        $this->put(route('avisos.editar', $aviso->id), $dados)->assertRedirect(route('avisos.index'));
+
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('editou', $log);
-        $this->assertStringContainsString('aviso', $log);
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= $user->nome . ' (usuário ' . $user->idusuario . ') editou *aviso* (id: ' . $aviso->id . ')';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test 
@@ -70,14 +71,14 @@ class AvisoTest extends TestCase
         $user = $this->signInAsAdmin();
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw([
-            'idusuario' => $user->idusuario,
             'status' => 'Ativado'
         ]);
-        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertStatus(302);
+        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertRedirect(route('avisos.index'));
+
         $log = tailCustom(storage_path($this->pathLogInterno()));
-        $this->assertStringContainsString($user->nome, $log);
-        $this->assertStringContainsString('editou o status para ' .$dados['status'], $log);
-        $this->assertStringContainsString('aviso', $log);
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
+        $texto .= $user->nome . ' (usuário ' . $user->idusuario . ') editou o status para ' .$dados['status'] . ' *aviso* (id: ' . $aviso->id . ')';
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test 
@@ -89,12 +90,10 @@ class AvisoTest extends TestCase
     {
         $user = $this->signInAsAdmin();
         $aviso = factory('App\Aviso')->create();
-        $dados = factory('App\Aviso')->raw([
-            'idusuario' => $user->idusuario
-        ]);
+        $dados = factory('App\Aviso')->raw();
         $this->get(route('avisos.index'))->assertOk();
         $this->get(route('avisos.editar.view', $aviso->id))->assertOk();
-        $this->put(route('avisos.editar', $aviso->id), $dados)->assertStatus(302);
+        $this->put(route('avisos.editar', $aviso->id), $dados)->assertRedirect(route('avisos.index'));
         $this->assertDatabaseHas('avisos', ['titulo' => $dados['titulo']]);
     }
 
@@ -107,9 +106,7 @@ class AvisoTest extends TestCase
     {
         $user = $this->signIn();
         $aviso = factory('App\Aviso')->create();
-        $dados = factory('App\Aviso')->raw([
-            'idusuario' => $user->idusuario
-        ]);
+        $dados = factory('App\Aviso')->raw();
         $this->get(route('avisos.index'))->assertForbidden();
         $this->get(route('avisos.editar.view', $aviso->id))->assertForbidden();
         $this->put(route('avisos.editar', $aviso->id), $dados)->assertForbidden();
@@ -126,11 +123,10 @@ class AvisoTest extends TestCase
         $user = $this->signInAsAdmin();
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw([
-            'idusuario' => $user->idusuario,
             'status' => 'Ativado'
         ]);
         $this->get(route('avisos.index'))->assertOk();
-        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertStatus(302);
+        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertRedirect(route('avisos.index'));
         $this->assertDatabaseHas('avisos', ['status' => $dados['status']]);
     }
 
@@ -144,7 +140,6 @@ class AvisoTest extends TestCase
         $user = $this->signIn();
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw([
-            'idusuario' => $user->idusuario,
             'status' => 'Ativado'
         ]);
         $this->get(route('avisos.index'))->assertForbidden();
@@ -157,13 +152,12 @@ class AvisoTest extends TestCase
      * Não pode editar aviso com o título vazio
      * 
     */
-    public function aviso_titulo_is_required()
+    public function cannot_updated_aviso_titulo_is_required()
     {
         $user = $this->signInAsAdmin();
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw([
             'titulo' => '',
-            'idusuario' => $user->idusuario
         ]);
         $this->put(route('avisos.editar', $aviso->id), $dados)->assertSessionHasErrors('titulo');
         $this->assertDatabaseMissing('avisos', ['conteudo' => $dados['conteudo']]);
@@ -171,19 +165,45 @@ class AvisoTest extends TestCase
 
     /** @test 
      * 
+    */
+    public function can_updated_aviso_titulo_empty_if_bdo()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->states('bdo')->create();
+        $dados = factory('App\Aviso')->states('bdo')->raw([
+            'titulo' => 'Teste teste teste',
+        ]);
+        $this->put(route('avisos.editar', $aviso->id), $dados);
+        $this->assertDatabaseMissing('avisos', ['titulo' => $dados['titulo']]);
+    }
+
+    /** @test 
+     * 
      * Não pode editar aviso com o conteudo vazio
      * 
     */
-    public function aviso_conteudo_is_required()
+    public function cannot_updated_aviso_conteudo_is_required()
     {
         $user = $this->signInAsAdmin();
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw([
             'conteudo' => '',
-            'idusuario' => $user->idusuario
         ]);
         $this->put(route('avisos.editar', $aviso->id), $dados)->assertSessionHasErrors('conteudo');
         $this->assertDatabaseMissing('avisos', ['titulo' => $dados['titulo']]);
+    }
+
+    /** @test 
+    */
+    public function cannot_updated_aviso_when_not_find_cor_fundo()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->create();
+        $dados = factory('App\Aviso')->raw([
+            'cor_fundo_titulo' => 'qualquer',
+        ]);
+        $this->put(route('avisos.editar', $aviso->id), $dados)->assertSessionHasErrors('cor_fundo_titulo');
+        $this->assertDatabaseMissing('avisos', ['cor_fundo_titulo' => $dados['cor_fundo_titulo']]);
     }
 
     /** @test 
@@ -191,11 +211,11 @@ class AvisoTest extends TestCase
      * Não pode editar aviso sem usuario
      * 
     */
-    public function aviso_usuario_is_required()
+    public function cannot_updated_aviso_usuario_is_required()
     {
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw();
-        $this->put(route('avisos.editar', $aviso->id), $dados)->assertStatus(302);
+        $this->put(route('avisos.editar', $aviso->id), $dados)->assertRedirect(route('login'));
         $this->assertDatabaseMissing('avisos', ['titulo' => $dados['titulo']]);
     }
 
@@ -209,6 +229,9 @@ class AvisoTest extends TestCase
         $this->signInAsAdmin();
         $aviso = factory('App\Aviso')->create();
         $this->get(route('avisos.index'))->assertSee($aviso['titulo']);
+
+        $aviso = factory('App\Aviso')->states('bdo')->create();
+        $this->get(route('avisos.index'))->assertSee($aviso['area']);
     }
 
     /** @test 
@@ -219,9 +242,7 @@ class AvisoTest extends TestCase
     public function aviso_user_edited_is_shown_on_the_admin_panel()
     {
         $user = $this->signInAsAdmin();
-        $aviso = factory('App\Aviso')->create([
-            'idusuario' => $user->idusuario,
-        ]);
+        $aviso = factory('App\Aviso')->create();
         $this->get(route('avisos.index'))->assertSee($user->nome);
     }
 
@@ -236,9 +257,8 @@ class AvisoTest extends TestCase
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw([
             'status' => 'Ativado',
-            'idusuario' => $user->idusuario
         ]);
-        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertStatus(302);
+        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertRedirect(route('avisos.index'));
         $this->assertDatabaseHas('avisos', ['status' => $dados['status']]);
     }
 
@@ -253,7 +273,7 @@ class AvisoTest extends TestCase
         $dados = factory('App\Aviso')->raw([
             'status' => 'Ativado'
         ]);
-        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertStatus(302);
+        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertRedirect(route('login'));
         $this->assertDatabaseHas('avisos', ['status' => $aviso['status']]);
     }
 
@@ -268,9 +288,8 @@ class AvisoTest extends TestCase
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw([
             'status' => 'Ativado',
-            'idusuario' => $user->idusuario
         ]);
-        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertStatus(302);
+        $this->put(route('avisos.editar.status', $aviso->id), $dados)->assertRedirect(route('avisos.index'));
         $this->get(route('avisos.index'))->assertSee('Desativar');
     }
 
@@ -284,10 +303,17 @@ class AvisoTest extends TestCase
         $user = $this->signInAsAdmin();
         $aviso = factory('App\Aviso')->create([
             'status' => 'Ativado',
-            'idusuario' => $user->idusuario
         ]);
         $this->get(route('avisos.show', $aviso->id))
         ->assertSee($aviso->titulo)
+        ->assertSee($aviso->conteudo)
+        ->assertSee($aviso->cor_de_fundo);
+
+        $aviso = factory('App\Aviso')->states('bdo')->create([
+            'status' => 'Ativado',
+        ]);
+        $this->get(route('avisos.show', $aviso->id))
+        ->assertDontSee($aviso->titulo)
         ->assertSee($aviso->conteudo)
         ->assertSee($aviso->cor_de_fundo);
     }
@@ -315,9 +341,133 @@ class AvisoTest extends TestCase
         $aviso = factory('App\Aviso')->create();
         $dados = factory('App\Aviso')->raw([
             'cor_fundo_titulo' => 'danger',
-            'idusuario' => $user->idusuario
         ]);
-        $this->put(route('avisos.editar', $aviso->id), $dados)->assertStatus(302);
+        $this->put(route('avisos.editar', $aviso->id), $dados)->assertRedirect(route('avisos.index'));
         $this->get(route('avisos.show', $aviso->id))->assertSee($dados['cor_fundo_titulo']);
     }
+
+    /** @test 
+     * 
+     * Ver as opções de cores ao editar o aviso
+     * 
+    */
+    public function view_msg_bdo_about_disabled_form()
+    {
+        $user = $this->signInAsAdmin();
+        $aviso = factory('App\Aviso')->states('bdo')->create();
+        $this->get(route('avisos.editar.view', $aviso->id))->assertSee(
+            '<p><strong><span class="text-danger">ATENÇÃO!</span></strong> Esse aviso <strong>ATIVADO</strong> desabilita o envio de formulário para anunciar vaga!</p>'
+        );
+        $this->get(route('avisos.show', $aviso->id))->assertSee(
+            '<p><strong><span class="text-danger">ATENÇÃO!</span></strong> Esse aviso <strong>ATIVADO</strong> desabilita o envio de formulário para anunciar vaga!</p>'
+        );
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES AVISO NA ÁREA DO REPRESENTANTE
+     * =======================================================================================================
+     */
+
+    /** @test 
+     * 
+     * Visualiza o aviso que está ativado.
+     * 
+    */
+    public function view_aviso_with_status_ativado()
+    {
+        $aviso = factory('App\Aviso')->create([
+            'status' => 'Ativado',
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertSee($aviso->titulo);
+    }
+
+    /** @test 
+     * 
+     * Não visualiza o aviso que está desativado.
+     * 
+    */
+    public function cannot_view_aviso_with_status_desativado()
+    {
+        $aviso = factory('App\Aviso')->create();
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertDontSee($aviso->titulo);
+    }
+
+    /** @test 
+     *
+     * Não visualiza o aviso que não existe.
+     * 
+    */
+    public function cannot_view_aviso_uncreated()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertViewMissing('aviso');
+    }
+
+    /** @test 
+     * 
+     * Visualiza o aviso ativado em todas as rotas do RC após logon.
+     * 
+    */
+    public function view_aviso_ativado_in_all_routes_get_after_logon()
+    {
+        $aviso = factory('App\Aviso')->create([
+            'status' => 'Ativado',
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertSee($aviso->titulo);
+        $this->get(route('representante.dados-gerais'))->assertSee($aviso->titulo);
+        $this->get(route('representante.contatos.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.enderecos.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.inserir-endereco.view'))->assertSee($aviso->titulo);
+        $this->get(route('representante.lista-cobrancas'))->assertSee($aviso->titulo);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        factory('App\BdoOportunidade')->create();
+        $this->get(route('representante.bdo'))->assertSee($aviso->titulo);
+        $this->get(route('representante.solicitarCedulaView'))->assertSee($aviso->titulo);
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertSee($aviso->titulo);
+    }
+
+    /** @test 
+     *
+     * Não visualiza o aviso desativado em todas as rotas do RC após logon.
+     * 
+    */
+    public function cannot_view_aviso_desativado_in_all_routes_get_after_logon()
+    {
+        $aviso = factory('App\Aviso')->create();
+        $representante = factory('App\Representante')->create();
+        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+        $this->get(route('representante.dashboard'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.dados-gerais'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.contatos.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.enderecos.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.inserir-ou-alterar-contato.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.inserir-endereco.view'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.lista-cobrancas'))->assertDontSee($aviso->titulo);
+        factory('App\Regional')->create([
+            'regional' => 'SÃO PAULO',
+        ]);
+        factory('App\BdoOportunidade')->create();
+        $this->get(route('representante.bdo'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.solicitarCedulaView'))->assertDontSee($aviso->titulo);
+        $this->get(route('representante.inserirSolicitarCedulaView'))->assertDontSee($aviso->titulo);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES AVISO (E DESABILITA ENVIO DE FORM) NA PÁGINA DE ANUNCIAR VAGA DO BALCÃO DE OPORTUNIDADES
+     * =======================================================================================================
+     */
+
+
 }

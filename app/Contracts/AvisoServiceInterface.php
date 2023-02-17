@@ -4,7 +4,7 @@ namespace App\Contracts;
 
 interface AvisoServiceInterface {
 
-    public function componente();
+    public function areas();
 
     public function cores();
 
@@ -21,4 +21,8 @@ interface AvisoServiceInterface {
     public function getByArea($area);
     
     public function avisoAtivado($area);
+
+    public function getById($id);
+
+    public function existeAtivado();
 }

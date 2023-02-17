@@ -8,11 +8,16 @@ use Illuminate\Support\Facades\Auth;
 
 $factory->define(Aviso::class, function (Faker $faker) {
     return [
-        'area' => 'Representante',
+        'area' => Aviso::areas()[0],
         'titulo' => $faker->sentence,
         'conteudo' => $faker->text,
         'cor_fundo_titulo' => Aviso::cores()[0],
         'status' => Aviso::DESATIVADO,
-        'idusuario' => null
+        'idusuario' => auth()->id() !== null ? auth()->id() : factory('App\User')
     ];
 });
+
+$factory->state(Aviso::class, 'bdo', [
+    'area' => Aviso::areas()[1],
+    'titulo' => '-----------',
+]);
