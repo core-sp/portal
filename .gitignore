@@ -3,6 +3,7 @@
 /public/storage
 /public/.htaccess
 /public/imagens
+/public/arquivos/20*
 /storage/*.key
 /vendor
 .env
