@@ -74,6 +74,7 @@
             </div>
             @else
             <div class="form-row">
+                <input type="hidden" id="cpf_cnpj" />
                 <div class="col-sm mb-2-576">
                     <label for="password_atual">Senha atual *</label>
                     <input
@@ -128,9 +129,13 @@
                     @endif
                 </div>
             </div>
-            <small class="form-text text-muted">
+            <small class="form-text text-muted mb-2">
                 <em>A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número</em><br />
             </small>
+
+            @component('components.verifica_forca_senha')
+            @endcomponent
+
             @endif
             <div class="form-group mt-3 float-right">
                 <a
@@ -149,5 +154,10 @@
         </form>
     </div>
 </div>
+
+@if(isset($alterarSenha))
+<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
+<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
+@endif
 
 @endsection

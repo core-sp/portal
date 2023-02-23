@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Validation\ValidationException;
 
 class UserExternoLoginController extends Controller
 {
@@ -51,6 +52,7 @@ class UserExternoLoginController extends Controller
         // to login and redirect the user back to the login form. Of course, when this
         // user surpasses their maximum number of attempts they will get locked out.
         $this->incrementLoginAttempts($request);
+        $this->service->getService('Suporte')->bloquearIp($request->ip());
 
         return $this->sendFailedLoginResponse($request);
     }
@@ -71,9 +73,22 @@ class UserExternoLoginController extends Controller
 
     protected function validateLogin(Request $request)
     {
+        if($request->filled('email_system')){
+            $ip = "[IP: " . request()->ip() . "] - ";
+            \Log::channel('externo')->info($ip . 'Possível bot tentou login com cpf/cnpj "' . apenasNumeros($request->cpf_cnpj) . '" como Usuário Externo, mas impedido de verificar o usuário no banco de dados.');
+            throw ValidationException::withMessages([
+                'email_system' => 'error',
+            ]);
+        }
+
         $user_externo = new UserExternoRequest();
         $requestRules = Request::createFrom($request, $user_externo);
         $requestRules->validate($requestRules->rules(), $requestRules->messages());
+    }
+
+    protected function throttleKey(Request $request)
+    {
+        return $request->session()->get('_token').'|'.$request->ip();
     }
 
     /**
@@ -125,6 +140,16 @@ class UserExternoLoginController extends Controller
             'class' => 'alert-danger',
             'cpf_cnpj' => apenasNumeros($request->cpf_cnpj)
         ]);
+    }
+
+    protected function authenticated(Request $request, $user)
+    {
+        $this->service->getService('Suporte')->liberarIp($request->ip());
+    }
+
+    public function decayMinutes()
+    {
+        return property_exists($this, 'decayMinutes') ? $this->decayMinutes : 10;
     }
 
     public function username()

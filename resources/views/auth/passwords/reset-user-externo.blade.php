@@ -93,6 +93,12 @@
               <small class="form-text text-muted">
                 <em>A senha deve conter no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número</em><br />
               </small>
+
+              <div class="mt-2 mb-2">
+                @component('components.verifica_forca_senha')
+                @endcomponent
+              </div>
+
               <div class="form-group mt-3">
                 <button type="submit" class="btn btn-primary">Alterar senha</button>
               </div>
@@ -104,5 +110,8 @@
         </div>
     </div>
 </section>
+
+<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
+<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
 
 @endsection

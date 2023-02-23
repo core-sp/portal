@@ -763,6 +763,8 @@ class SuporteTest extends TestCase
         $this->get(route('admin'))->assertStatus(423);
         $this->get(route('representante.login'))->assertStatus(423);
         $this->get(route('representante.dashboard'))->assertStatus(423);
+        $this->get(route('externo.login'))->assertStatus(423);
+        $this->get(route('externo.dashboard'))->assertStatus(423);
         $this->get(route('login'))->assertStatus(423);
         $this->get(route('agendamentosite.formview'))->assertStatus(423);
 
@@ -790,6 +792,8 @@ class SuporteTest extends TestCase
         $this->get(route('admin'))->assertStatus(302);
         $this->get(route('representante.login'))->assertStatus(200);
         $this->get(route('representante.dashboard'))->assertStatus(302);
+        $this->get(route('externo.login'))->assertStatus(200);
+        $this->get(route('externo.dashboard'))->assertStatus(302);
         $this->get(route('login'))->assertStatus(200);
 
         $this->assertEquals(1, SuporteIp::count());
@@ -857,6 +861,33 @@ class SuporteTest extends TestCase
     }
 
     /** @test */
+    public function delete_unblocked_ip_after_login_user_externo()
+    {
+        for($i = 1; $i <= 5; $i++)
+        {
+            $this->post(route('externo.login.submit'), ['cpf_cnpj' => '11748345000144', 'password' => 'Teste102030']);
+            session()->regenerateToken();
+        }
+
+        $this->assertEquals(1, SuporteIp::count());
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'DESBLOQUEADO'
+        ]);
+
+        $externo = factory('App\UserExterno')->create();
+
+        $this->post(route('externo.login.submit'), ['cpf_cnpj' => $externo['cpf_cnpj'], 'password' => 'Teste102030'])
+        ->assertRedirect(route('externo.dashboard'));
+
+        $this->assertEquals(0, SuporteIp::count());
+        $this->assertDatabaseMissing('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'DESBLOQUEADO'
+        ]);
+    }
+
+    /** @test */
     public function recount_unblocked_ip_when_submit_day_after()
     {
         for($i = 1; $i <= 5; $i++)
@@ -892,6 +923,8 @@ class SuporteTest extends TestCase
         $this->get(route('admin'))->assertStatus(302);
         $this->get(route('representante.login'))->assertStatus(200);
         $this->get(route('representante.dashboard'))->assertStatus(302);
+        $this->get(route('externo.login'))->assertStatus(200);
+        $this->get(route('externo.dashboard'))->assertStatus(302);
         $this->get(route('login'))->assertStatus(200);
         $this->get(route('agendamentosite.formview'))->assertStatus(200);
     }
@@ -908,6 +941,8 @@ class SuporteTest extends TestCase
         $this->get(route('admin'))->assertStatus(302);
         $this->get(route('representante.login'))->assertStatus(200);
         $this->get(route('representante.dashboard'))->assertStatus(302);
+        $this->get(route('externo.login'))->assertStatus(200);
+        $this->get(route('externo.dashboard'))->assertStatus(302);
         $this->get(route('login'))->assertStatus(200);
         $this->get(route('agendamentosite.formview'))->assertStatus(200);
     }
@@ -936,6 +971,8 @@ class SuporteTest extends TestCase
         $this->get(route('admin'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
         $this->get(route('representante.login'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
         $this->get(route('representante.dashboard'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
+        $this->get(route('externo.login'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
+        $this->get(route('externo.dashboard'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
         $this->get(route('login'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
     }
 }

@@ -141,6 +141,11 @@
                         <em>A senha deve conter, no mínimo: 8 caracteres, uma letra maiúscula, uma letra minúscula e um número</em><br />
                     </small>
 
+                    <div class="mt-2">
+                        @component('components.verifica_forca_senha')
+                        @endcomponent
+                    </div>
+
                     <div class="form-group mt-3">
                     @if(env('GOOGLE_RECAPTCHA_KEY'))
                         <div class="g-recaptcha {{ $errors->has('g-recaptcha-response') ? 'is-invalid' : '' }}" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
@@ -184,5 +189,8 @@
         </div>
     </div>
 </section>
+
+<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
+<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
 
 @endsection

@@ -30,6 +30,7 @@
             </div>
         </div>
         <div class="linha-lg"></div>
+        @if(!$errors->has('email_system'))
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt">
                 @if(Session::has('message'))
@@ -61,13 +62,16 @@
                         <input
                             id="password_login"
                             type="password"
-                            class="form-control"
+                            class="form-control mb-2"
                             name="password"
                             placeholder="Senha"
                             required
                         >
+                        @component('components.verifica_forca_senha')
+                        @endcomponent
                     </div>
                     <div class="form-group mt-2">
+                        <input id="email_system" type="text" class="form-control" name="email_system" value="" tabindex="-1">
                         <button type="submit" class="btn btn-primary">Entrar</button>
                     </div>
                     <div class="form-group mt-2">
@@ -81,7 +85,11 @@
                 @include('site.inc.content-sidebar')
             </div>
         </div>
+        @endif
     </div>
 </section>
+
+<script type="text/javascript" src="{{ asset('/js/zxcvbn.js?'.time()) }}"></script>
+<script type="text/javascript" src="{{ asset('/js/security.js?'.time()) }}"></script>
 
 @endsection

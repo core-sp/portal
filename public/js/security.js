@@ -1,8 +1,8 @@
 // biblioteca desenvolvida pelo dropbox: zxcvbn
 
 var login = document.getElementById("login") == null ? undefined : document.getElementById("login").value;
-var cpfCnpj = document.getElementById("cpfCnpj") == null ? undefined : document.getElementById("cpfCnpj").value;
-var input = document.getElementById("password");
+var cpfCnpj = document.getElementById("cpfCnpj") == null ? document.getElementById("cpf_cnpj").value : document.getElementById("cpfCnpj").value;
+var input = document.getElementById("password") == null ? document.getElementById("password_login") : document.getElementById("password");
 
 input.addEventListener("keyup", getTexto);
 
