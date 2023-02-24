@@ -318,6 +318,20 @@ class AvisoTest extends TestCase
         ->assertSee($aviso->cor_de_fundo);
     }
 
+    /** @test */
+    public function view_componente_by_area_aviso()
+    {
+        $user = $this->signInAsAdmin();
+
+        $aviso = factory('App\Aviso')->create();
+        $this->get(route('avisos.show', $aviso->id))
+        ->assertSee('<a data-toggle="collapse" href="#collapseOne"><i class="fas fa-angle-down"></i>&nbsp;&nbsp;');
+
+        $aviso = factory('App\Aviso')->states('bdo')->create();
+        $this->get(route('avisos.show', $aviso->id))
+        ->assertSee('<div class="alert alert-'. $aviso->cor_fundo_titulo . '">');
+    }
+
     /** @test 
      * 
      * Ver as opções de cores ao editar o aviso
@@ -469,5 +483,178 @@ class AvisoTest extends TestCase
      * =======================================================================================================
      */
 
+    /** @test */
+    public function view_aviso_bdo_with_status_ativado()
+    {
+        $aviso = factory('App\Aviso')->states('bdo')->create([
+            'status' => 'Ativado',
+        ]);
+        $this->get(route('bdosite.anunciarVagaView'))->assertSee($aviso->conteudo);
+    }
 
+    /** @test */
+    public function cannot_view_aviso_bdo_with_status_desativado()
+    {
+        $aviso = factory('App\Aviso')->states('bdo')->create();
+        $this->get(route('bdosite.anunciarVagaView'))->assertDontSee($aviso->conteudo);
+    }
+
+    /** @test */
+    public function cannot_view_aviso_bdo_uncreated()
+    {
+        $this->get(route('bdosite.anunciarVagaView'))->assertViewMissing('aviso');
+    }
+
+    /** @test */
+    public function cannot_submit_when_aviso_bdo_with_status_ativado()
+    {
+        $bdoEmpresa = factory('App\BdoEmpresa')->raw();
+        $bdoOportunidade = factory('App\BdoOportunidade')->raw();
+        $dados = array_merge($bdoEmpresa, $bdoOportunidade);
+
+        $aviso = factory('App\Aviso')->states('bdo')->create([
+            'status' => 'Ativado',
+        ]);
+        $this->get(route('bdosite.anunciarVagaView'))->assertSee($aviso->conteudo);
+        $this->post(route('bdosite.anunciarVaga'), $dados)
+        ->assertSessionHasErrors([
+            'idempresa',
+            'cnpj',
+            'titulo',
+            'segmentoOportunidade',
+            'nrVagas',
+            'regiaoAtuacao',
+            'descricaoOportunidade',
+            'contatonome',
+            'contatotelefone',
+            'contatoemail',
+            'termo'
+        ], null, 'default');
+
+        $this->assertDatabaseMissing('bdo_oportunidades', ['titulo' => $bdoOportunidade['titulo']]);
+    }
+
+    /** @test */
+    public function can_submit_when_aviso_bdo_with_status_desativado()
+    {
+        $bdoEmpresa = factory('App\BdoEmpresa')->create()->toArray();
+        $bdoOportunidade = factory('App\BdoOportunidade')->raw();
+        $bdoOportunidade['segmentoOportunidade'] = $bdoOportunidade['segmento'];
+        $bdoOportunidade['nrVagas'] = $bdoOportunidade['vagasdisponiveis'];
+        $bdoOportunidade['regiaoAtuacao'] = explode(',', $bdoOportunidade['regiaoatuacao']);
+        $bdoOportunidade['descricaoOportunidade'] = $bdoOportunidade['descricao'];
+
+        $dados = array_merge($bdoEmpresa, $bdoOportunidade, ['termo' => 'on']);
+
+        $aviso = factory('App\Aviso')->states('bdo')->create();
+        
+        $this->get(route('bdosite.anunciarVagaView'))->assertDontSee($aviso->conteudo);
+        $this->post(route('bdosite.anunciarVaga'), $dados)
+        ->assertViewIs('site.agradecimento');
+
+        $this->assertDatabaseHas('bdo_oportunidades', ['titulo' => $bdoOportunidade['titulo']]);
+    }
+
+    /** @test */
+    public function cannot_view_errors_after_submit_when_aviso_bdo_with_status_ativado()
+    {
+        $bdoEmpresa = factory('App\BdoEmpresa')->raw();
+        $bdoOportunidade = factory('App\BdoOportunidade')->raw();
+        $dados = array_merge($bdoEmpresa, $bdoOportunidade);
+
+        $aviso = factory('App\Aviso')->states('bdo')->create([
+            'status' => 'Ativado',
+        ]);
+        $this->get(route('bdosite.anunciarVagaView'))->assertSee($aviso->conteudo);
+        $this->post(route('bdosite.anunciarVaga'), $dados)
+        ->assertSessionHasErrors([
+            'idempresa',
+            'cnpj',
+            'titulo',
+            'segmentoOportunidade',
+            'nrVagas',
+            'regiaoAtuacao',
+            'descricaoOportunidade',
+            'contatonome',
+            'contatotelefone',
+            'contatoemail',
+            'termo'
+        ], null, 'default');
+
+        $this->get(route('bdosite.anunciarVagaView'))
+        ->assertDontSee('Por favor, informe o CNPJ')
+        ->assertDontSee('Por favor, informe a quantidade de vagas da oportunidade')
+        ->assertDontSee('Por favor, selecione ao menos uma região de atuação')
+        ->assertDontSee('Por favor, insira a descrição da oportunidade')
+        ->assertDontSee('Por favor, informe o nome do contato')
+        ->assertDontSee('Por favor, informe o telefone do contato')
+        ->assertDontSee('Por favor, informe o email do contato')
+        ->assertDontSee('Por favor, informe o segmento da oportunidade')
+        ->assertDontSee('Email inválido')
+        ->assertDontSee('Você deve concordar com o Termo de Consentimento');
+
+        $this->assertDatabaseMissing('bdo_oportunidades', ['titulo' => $bdoOportunidade['titulo']]);
+    }
+
+    /** @test */
+    public function can_view_errors_after_submit_when_aviso_bdo_with_status_desativado()
+    {
+        $bdoEmpresa = factory('App\BdoEmpresa')->raw();
+        $bdoOportunidade = factory('App\BdoOportunidade')->raw();
+        $dados = array_merge($bdoEmpresa, $bdoOportunidade);
+
+        $aviso = factory('App\Aviso')->states('bdo')->create();
+
+        $this->get(route('bdosite.anunciarVagaView'))->assertDontSee($aviso->conteudo);
+        $this->post(route('bdosite.anunciarVaga'), $dados)
+        ->assertSessionHasErrors([
+            'segmentoOportunidade',
+            'nrVagas',
+            'regiaoAtuacao',
+            'descricaoOportunidade',
+            'termo'
+        ], null, 'default');
+
+        $this->get(route('bdosite.anunciarVagaView'))
+        ->assertSee('Por favor, informe a quantidade de vagas da oportunidade')
+        ->assertSee('Por favor, selecione ao menos uma região de atuação')
+        ->assertSee('Por favor, insira a descrição da oportunidade')
+        ->assertSee('Por favor, informe o segmento da oportunidade')
+        ->assertSee('Você deve concordar com o Termo de Consentimento');
+    }
+
+    /** @test */
+    public function cannot_verify_cnpj_when_aviso_bdo_with_status_ativado()
+    {
+        $bdoEmpresa = factory('App\BdoEmpresa')->create();
+
+        $aviso = factory('App\Aviso')->states('bdo')->create([
+            'status' => 'Ativado',
+        ]);
+
+        $this->get(route('bdosite.apiGetEmpresa', apenasNumeros($bdoEmpresa->cnpj)))
+        ->assertJson([
+            'empresa' => '{}',
+            'message' => 'Não é possível verificar no momento se a empresa está cadastrada.',
+            'class' => 'alert-warning'
+        ]);
+    }
+
+    /** @test */
+    public function can_verify_cnpj_when_aviso_bdo_with_status_desativado()
+    {
+        $bdoEmpresa = factory('App\BdoEmpresa')->raw();
+        $aviso = factory('App\Aviso')->states('bdo')->create();
+
+        $this->get(route('bdosite.apiGetEmpresa', apenasNumeros($bdoEmpresa['cnpj'])))
+        ->assertStatus(500);
+        
+        $bdoEmpresa = factory('App\BdoEmpresa')->create();
+
+        $this->get(route('bdosite.apiGetEmpresa', apenasNumeros($bdoEmpresa->cnpj)))
+        ->assertJsonFragment([
+            'message' => 'Empresa já cadastrada. Favor seguir com o preenchimento da oportunidade abaixo.',
+            'class' => 'alert-success'
+        ]);
+    }
 }
