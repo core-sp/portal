@@ -1221,7 +1221,7 @@ class UserExternoTest extends TestCase
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
         $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: 127.0.0.1] - ';
-        $texto .= 'Possível bot tentou login com cpf/cnpj "' .apenasNumeros($user_externo->cpf_cnpj). '", mas impedido de verificar o usuário no banco de dados.';
+        $texto .= 'Possível bot tentou login com cpf/cnpj "' .apenasNumeros($user_externo->cpf_cnpj). '" como Usuário Externo, mas impedido de verificar o usuário no banco de dados.';
         $this->assertStringContainsString($texto, $log);
     }
 

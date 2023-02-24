@@ -751,11 +751,61 @@ class SuporteTest extends TestCase
     }
 
     /** @test */
-    public function blocked_ip_after_6_submits()
+    public function blocked_ip_after_6_submits_admin()
     {
         for($i = 1; $i <= 7; $i++)
         {
             $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
+            session()->regenerateToken();
+        }
+
+        $this->get(route('site.home'))->assertStatus(423);
+        $this->get(route('admin'))->assertStatus(423);
+        $this->get(route('representante.login'))->assertStatus(423);
+        $this->get(route('representante.dashboard'))->assertStatus(423);
+        $this->get(route('externo.login'))->assertStatus(423);
+        $this->get(route('externo.dashboard'))->assertStatus(423);
+        $this->get(route('login'))->assertStatus(423);
+        $this->get(route('agendamentosite.formview'))->assertStatus(423);
+
+        $this->assertEquals(1, SuporteIp::count());
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'BLOQUEADO'
+        ]);
+    }
+
+    /** @test */
+    public function blocked_ip_after_6_submits_representante()
+    {
+        for($i = 1; $i <= 7; $i++)
+        {
+            $this->post(route('representante.login.submit'), ['cpf_cnpj' => '11748345000144', 'password' => 'teste102030']);
+            session()->regenerateToken();
+        }
+
+        $this->get(route('site.home'))->assertStatus(423);
+        $this->get(route('admin'))->assertStatus(423);
+        $this->get(route('representante.login'))->assertStatus(423);
+        $this->get(route('representante.dashboard'))->assertStatus(423);
+        $this->get(route('externo.login'))->assertStatus(423);
+        $this->get(route('externo.dashboard'))->assertStatus(423);
+        $this->get(route('login'))->assertStatus(423);
+        $this->get(route('agendamentosite.formview'))->assertStatus(423);
+
+        $this->assertEquals(1, SuporteIp::count());
+        $this->assertDatabaseHas('suporte_ips', [
+            'ip' => request()->ip(),
+            'status' => 'BLOQUEADO'
+        ]);
+    }
+
+    /** @test */
+    public function blocked_ip_after_6_submits_user_externo()
+    {
+        for($i = 1; $i <= 7; $i++)
+        {
+            $this->post(route('externo.login.submit'), ['cpf_cnpj' => '11748345000144', 'password' => 'teste102030']);
             session()->regenerateToken();
         }
 
