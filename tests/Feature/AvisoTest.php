@@ -360,11 +360,7 @@ class AvisoTest extends TestCase
         $this->get(route('avisos.show', $aviso->id))->assertSee($dados['cor_fundo_titulo']);
     }
 
-    /** @test 
-     * 
-     * Ver as opções de cores ao editar o aviso
-     * 
-    */
+    /** @test */
     public function view_msg_bdo_about_disabled_form()
     {
         $user = $this->signInAsAdmin();
@@ -375,6 +371,39 @@ class AvisoTest extends TestCase
         $this->get(route('avisos.show', $aviso->id))->assertSee(
             '<p><strong><span class="text-danger">ATENÇÃO!</span></strong> Esse aviso <strong>ATIVADO</strong> desabilita o envio de formulário para anunciar vaga!</p>'
         );
+    }
+
+    /** @test 
+     * 
+     * Ver o aviso
+     * 
+    */
+    public function badge_aviso_menu()
+    {
+        $user = $this->signInAsAdmin();
+        factory('App\Aviso')->create([
+            'status' => 'Ativado',
+        ]);
+        $this->get('/admin')
+        ->assertSee('<span class="badge badge-pill badge-warning">Ativo</span>');
+
+        factory('App\Aviso')->states('bdo')->create([
+            'status' => 'Ativado',
+        ]);
+        $this->get('/admin')
+        ->assertSee('<span class="badge badge-pill badge-warning">Ativo</span>');
+
+        Aviso::find(1)->update([
+            'status' => 'Desativado',
+        ]);
+        $this->get('/admin')
+        ->assertSee('<span class="badge badge-pill badge-warning">Ativo</span>');
+
+        Aviso::find(2)->update([
+            'status' => 'Desativado',
+        ]);
+        $this->get('/admin')
+        ->assertDontSee('<span class="badge badge-pill badge-warning">Ativo</span>');
     }
 
     /** 

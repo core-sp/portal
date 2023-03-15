@@ -28,17 +28,17 @@
                 <br>
                 @foreach($cores as $cor)
                 <div class="form-check-inline">
-                    <label class="form-check-label" for="radio1">
-                        <input type="radio" class="form-check-input" name="cor_fundo_titulo" value="{{ $cor }}" {{ $resultado->cor_fundo_titulo == $cor ? 'checked' : '' }}>
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input {{ $errors->has('cor_fundo_titulo') ? 'is-invalid' : '' }}" name="cor_fundo_titulo" value="{{ $cor }}" {{ $resultado->cor_fundo_titulo == $cor ? 'checked' : '' }}>
                         <i class="fas fa-square fa-border text-{{ $cor }}"></i>
+                        @if($errors->has('cor_fundo_titulo'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('cor_fundo_titulo') }}
+                        </div>
+                        @endif
                     </label>
                 </div>
                 @endforeach
-                @if($errors->has('cor_fundo_titulo'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('cor_fundo_titulo') }}
-                    </div>
-                @endif
             </div>
         </div>
         <div class="form-group mt-2">
