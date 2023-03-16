@@ -1,9 +1,3 @@
-<style>
-    .ui-datepicker-calendar {
-        display: none;
-    }
-</style>
-
 @if(isset($pagamento) && !$checkoutIframe)
 <noscript>
     <iframe 

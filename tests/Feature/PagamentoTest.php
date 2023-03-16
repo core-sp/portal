@@ -175,31 +175,6 @@ class PagamentoTest extends TestCase
     }
 
     /** @test */
-    public function user_can_submit_form_payment_gerenti_with_checkoutIframe()
-    {
-        // Colocar checkoutIframe = true no PagamentoController
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-
-        $pagamento = factory('App\Pagamento')->make();
-
-        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
-        $resp = $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
-            'cobranca' => $pagamento->cobranca_id,
-            'tipo_pag' => 'credit',
-            'amount' => $pagamento->total,
-            'parcelas_1' => $pagamento->parcelas,
-            'checkoutIframe' => true
-        ])
-        ->assertSeeText('Finalizar')
-        ->assertDontSeeText('Dados do  cartão:')
-        ->assertDontSeeText('Número do cartão')
-        ->assertDontSeeText('Nome do titular')
-        ->assertDontSeeText('CVV / CVC')
-        ->assertDontSeeText('Data de Expiração');
-    }
-
-    /** @test */
     public function user_can_submit_form_payment_getnet_without_checkoutIframe()
     {
         // Acessa o homolog da getnet, então as vezes pode dar erro
@@ -224,7 +199,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertRedirect(route('representante.dashboard'));
 
         $this->get(route('representante.dashboard'))->assertSeeText('Pagamento realizado para a cobrança ' . $pagamento->cobranca_id);
@@ -262,7 +237,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertRedirect(route('representante.dashboard'));
 
         $this->assertEquals(Pagamento::count(), 1);
@@ -299,11 +274,11 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
             'cardholder_name_2' => 'TESTE CARTAO DOIS',
             'card_number_2' => '5155901222280001',
             'security_code_2' => '123',
-            'expiration_2' => now()->addMonths(2)->addYear()->format('m/Y'),
+            'expiration_2' => now()->addMonths(2)->addYear()->format('m/y'),
         ])->assertRedirect(route('representante.dashboard'));
 
         $this->get(route('representante.dashboard'))->assertSeeText('Pagamento realizado para a cobrança ' . $pagamento->cobranca_id);
@@ -375,7 +350,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('tipo_pag');
     }
 
@@ -403,7 +378,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('parcelas_1');
     }
 
@@ -431,7 +406,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('parcelas_1');
     }
 
@@ -487,7 +462,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->subMonth()->format('m/Y'),
+            'expiration_1' => now()->subMonth()->format('m/y'),
         ])->assertSessionHasErrors('expiration_1');
     }
 
@@ -515,7 +490,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '11a',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('security_code_1');
     }
 
@@ -543,7 +518,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '11111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('security_code_1');
     }
 
@@ -571,7 +546,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '11',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('security_code_1');
     }
 
@@ -599,7 +574,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TEST',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('cardholder_name_1');
     }
 
@@ -627,7 +602,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE ASDERTTY PPPOUYHKL POI',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('cardholder_name_1');
     }
 
@@ -655,7 +630,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTÃO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('cardholder_name_1');
     }
 
@@ -683,7 +658,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '401200103714',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('card_number_1');
     }
 
@@ -711,7 +686,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '40120010371412365489',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors('card_number_1');
     }
 
@@ -739,7 +714,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors([
             'amount_1',
             'amount_2',
@@ -775,11 +750,11 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
             'amount_1' => '050',
             'amount_2' => '075',
             'parcelas_2' => '1',
-            'expiration_2' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_2' => now()->addMonth()->addYear()->format('m/y'),
             'security_code_2' => '123',
             'cardholder_name_2' => 'TESTE CARTAO DOIS',
             'card_number_2' => '5155901222280001'
@@ -810,11 +785,11 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
             'amount_1' => '100',
             'amount_2' => '100',
             'parcelas_2' => '1',
-            'expiration_2' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_2' => now()->addMonth()->addYear()->format('m/y'),
             'security_code_2' => '123',
             'cardholder_name_2' => 'TESTE CARTAO DOIS',
             'card_number_2' => '4012001037141112'
@@ -837,7 +812,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors([
             'cobranca',
             'tipo_pag',
@@ -873,7 +848,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertSessionHasErrors([
             'cobranca',
             'tipo_pag',
@@ -883,39 +858,6 @@ class PagamentoTest extends TestCase
             'security_code_1',
             'expiration_1'
         ]);
-    }
-
-    /** @test */
-    public function user_cannot_submit_form_payment_getnet_with_checkoutIframe()
-    {
-        // Deve habilitar no PagamentoController o checkoutIframe
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-
-        $pagamento = factory('App\Pagamento')->make();
-
-        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
-        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
-            'cobranca' => $pagamento->cobranca_id,
-            'tipo_pag' => 'credit',
-            'amount' => $pagamento->total,
-            'parcelas_1' => $pagamento->parcelas,
-            'checkoutIframe' => '1'
-        ]);
-
-        $this->post(route('pagamento.cartao', $pagamento->cobranca_id), [
-            'cobranca' => $pagamento->cobranca_id,
-            'tipo_pag' => 'credit',
-            'amount' => '200',
-            'parcelas_1' => '1',
-            'cardholder_name_1' => 'TESTE CARTAO',
-            'card_number_1' => '4012001037141112',
-            'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
-        ])->assertRedirect(route('representante.dashboard'));
-
-        $this->get(route('representante.dashboard'))
-        ->assertSeeText('Não foi possível completar a operação! Erro ao processar o pagamento. Código de erro: 401');
     }
 
     /** @test */
@@ -932,30 +874,6 @@ class PagamentoTest extends TestCase
             'amount' => $pagamento->total,
             'parcelas_1' => $pagamento->parcelas,
             'checkoutIframe' => '0'
-        ]);
-
-        $this->get(route('pagamento.sucesso.checkout', $pagamento->cobranca_id))
-        ->assertRedirect(route('representante.dashboard'));
-
-        $this->get(route('representante.dashboard'))
-        ->assertDontSeeText('Pagamento realizado para a cobrança ' . $pagamento->cobranca_id . '. Detalhes do pagamento enviado para o e-mail: ' . $representante->email);
-    }
-
-    /** @test */
-    public function user_cannot_access_route_checkout_iframe_success_with_url_previous_different_cobranca_current()
-    {
-        // Deve habilitar no PagamentoController o checkoutIframe
-        $representante = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
-
-        $pagamento = factory('App\Pagamento')->make();
-
-        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
-            'cobranca' => $pagamento->cobranca_id,
-            'tipo_pag' => 'credit',
-            'amount' => $pagamento->total,
-            'parcelas_1' => $pagamento->parcelas,
-            'checkoutIframe' => '1'
         ]);
 
         $this->get(route('pagamento.sucesso.checkout', $pagamento->cobranca_id))
@@ -989,7 +907,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertRedirect(route('pagamento.view', $pagamento->cobranca_id));
 
         // teste limpeza de dados após erro de validação na route('pagamento.view', $pagamento->cobranca_id)
@@ -998,68 +916,6 @@ class PagamentoTest extends TestCase
         session()->forget(['_old_input']);
 
         $this->assertEquals(null, session()->get('_old_input'));
-    }
-
-    /** @test */
-    public function can_create_payment_by_notification()
-    {
-        // Deve habilitar no PagamentoController o checkoutIframe
-        $representante = factory('App\Representante')->create();
-        $pagamento = factory('App\Pagamento')->make();
-        
-        $this->get(route('pagamento.transacao.credito', [
-            'payment_type' => $pagamento->forma,
-            'customer_id' => $representante->getCustomerId(),
-            'order_id' => $pagamento->cobranca_id,
-            'payment_id' => $pagamento->payment_id,
-            'amount' => '200',
-            'status' => $pagamento->status,
-            'number_installments' => $pagamento->parcelas,
-            'terminal_nsu' => '031575',
-            'authorization_code' => '9190383360902371',
-            'acquirer_transaction_id' => '000099713751',
-            'authorization_timestamp' => now()->toIso8601ZuluString(),
-            'brand' => $pagamento->bandeira,
-            'description_detail' => '',
-            'error_code' => '',
-            'tipo_parcelas' => $pagamento->tipo_parcelas,
-        ]));
-
-        $this->assertDatabaseHas('pagamentos', [
-            'cobranca_id' => $pagamento->cobranca_id,
-            'bandeira' => 'visa',
-        ]);
-    }
-
-    /** @test */
-    public function cannot_create_payment_by_notification_without_user()
-    {
-        // Deve habilitar no PagamentoController o checkoutIframe
-        $representante = factory('App\Representante')->create();
-        $pagamento = factory('App\Pagamento')->make();
-        
-        $this->get(route('pagamento.transacao.credito', [
-            'payment_type' => $pagamento->forma,
-            'customer_id' => '00000000000_rep',
-            'order_id' => $pagamento->cobranca_id,
-            'payment_id' => $pagamento->payment_id,
-            'amount' => '200',
-            'status' => $pagamento->status,
-            'number_installments' => $pagamento->parcelas,
-            'terminal_nsu' => '031575',
-            'authorization_code' => '9190383360902371',
-            'acquirer_transaction_id' => '000099713751',
-            'authorization_timestamp' => now()->toIso8601ZuluString(),
-            'brand' => $pagamento->bandeira,
-            'description_detail' => '',
-            'error_code' => '',
-            'tipo_parcelas' => $pagamento->tipo_parcelas,
-        ]));
-
-        $this->assertDatabaseMissing('pagamentos', [
-            'cobranca_id' => $pagamento->cobranca_id,
-            'bandeira' => 'visa',
-        ]);
     }
 
     /** @test */
@@ -1090,38 +946,6 @@ class PagamentoTest extends TestCase
             'cobranca_id' => $pagamento->cobranca_id,
             'bandeira' => 'visa',
             'status' => 'APPROVED',
-            'total' => '2,00'
-        ]);
-    }
-
-    /** @test */
-    public function cannot_create_payment_by_notification_with_status_different_approved()
-    {
-        $representante = factory('App\Representante')->create();
-        $pagamento = factory('App\Pagamento')->make();
-        
-        $this->get(route('pagamento.transacao.credito', [
-            'payment_type' => $pagamento->forma,
-            'customer_id' => $representante->getCustomerId(),
-            'order_id' => $pagamento->cobranca_id,
-            'payment_id' => $pagamento->payment_id,
-            'amount' => '200',
-            'status' => 'AUTHORIZED',
-            'number_installments' => $pagamento->parcelas,
-            'terminal_nsu' => '031575',
-            'authorization_code' => '9190383360902371',
-            'acquirer_transaction_id' => '000099713751',
-            'authorization_timestamp' => now()->toIso8601ZuluString(),
-            'brand' => $pagamento->bandeira,
-            'description_detail' => '',
-            'error_code' => '',
-            'tipo_parcelas' => $pagamento->tipo_parcelas,
-        ]));
-
-        $this->assertDatabaseMissing('pagamentos', [
-            'cobranca_id' => $pagamento->cobranca_id,
-            'bandeira' => 'visa',
-            'status' => 'AUTHORIZED',
             'total' => '2,00'
         ]);
     }
@@ -1164,7 +988,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertRedirect(route('representante.dashboard'));
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
@@ -1206,11 +1030,11 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
             'cardholder_name_2' => 'TESTE CARTAO DOIS',
             'card_number_2' => '5155901222280001',
             'security_code_2' => '123',
-            'expiration_2' => now()->addMonths(2)->addYear()->format('m/Y'),
+            'expiration_2' => now()->addMonths(2)->addYear()->format('m/y'),
         ])->assertRedirect(route('representante.dashboard'));
 
         $ids = array();
@@ -1267,7 +1091,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '4012001037141112',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertRedirect(route('representante.dashboard'));
 
         $pagamento = Pagamento::first();
@@ -1308,7 +1132,7 @@ class PagamentoTest extends TestCase
             // cartão de teste da getnet com um número a menos
             'card_number_1' => '515590122223000',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertRedirect(route('representante.dashboard'));
 
         $this->get(route('representante.dashboard'))
@@ -1318,68 +1142,6 @@ class PagamentoTest extends TestCase
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
         $txt = $inicio . 'Usuário '.$user->id.' ("' . formataCpfCnpj($user->cpf_cnpj) . '", login como: '.$user::NAME_AREA_RESTRITA.') recebeu um código de erro *';
 
-        $this->assertStringContainsString($txt, $log);
-    }
-
-    /** @test */
-    public function log_is_generated_when_payment_is_created_by_notification()
-    {
-        // Deve habilitar no PagamentoController o checkoutIframe
-        $user = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
-
-        $pagamento = factory('App\Pagamento')->make();
-
-        $this->get(route('pagamento.transacao.credito', [
-            'payment_type' => $pagamento->forma,
-            'customer_id' => $user->getCustomerId(),
-            'order_id' => $pagamento->cobranca_id,
-            'payment_id' => $pagamento->payment_id,
-            'amount' => '200',
-            'status' => 'APPROVED',
-            'number_installments' => $pagamento->parcelas,
-            'terminal_nsu' => '031575',
-            'authorization_code' => '9190383360902371',
-            'acquirer_transaction_id' => '000099713751',
-            'authorization_timestamp' => now()->toIso8601ZuluString(),
-            'brand' => $pagamento->bandeira,
-            'description_detail' => '',
-            'error_code' => '',
-            'tipo_parcelas' => $pagamento->tipo_parcelas,
-        ]));
-
-        $log = tailCustom(storage_path($this->pathLogExterno()));
-        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
-        $txt = $inicio . '[Rotina Portal - Transação Getnet] - ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ';
-        $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '*, com a payment_id: ' . Pagamento::first()->payment_id;
-
-        $this->assertStringContainsString($txt, $log);
-    }
-
-    /** @test */
-    public function log_is_generated_when_get_checkoutIframeSucesso()
-    {
-        // Deve habilitar no PagamentoController o checkoutIframe
-        $user = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
-
-        $pagamento = factory('App\Pagamento')->make();
-
-        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
-        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
-            'cobranca' => $pagamento->cobranca_id,
-            'tipo_pag' => 'credit',
-            'amount' => $pagamento->total,
-            'parcelas_1' => $pagamento->parcelas,
-        ]);
-
-        $this->get(route('pagamento.sucesso.checkout', $pagamento->cobranca_id))
-        ->assertRedirect(route('representante.dashboard'));
-
-        $log = tailCustom(storage_path($this->pathLogExterno()));
-        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
-        $txt = $inicio . 'Usuário '.$user->id.' ("' . formataCpfCnpj($user->cpf_cnpj) . '", login como: '.$user::NAME_AREA_RESTRITA.') ';
-        $txt .= 'aviso que realizou o pagamento da cobrança *'.$pagamento->cobranca_id.'* via Checkout Iframe. Aguardando notificação para registro no banco de dados.';
         $this->assertStringContainsString($txt, $log);
     }
 
@@ -1409,7 +1171,7 @@ class PagamentoTest extends TestCase
             // cartão de teste da getnet com um número a menos
             'card_number_1' => '515590122223000',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertRedirect(route('representante.dashboard'));
 
         $this->assertNotEquals($csrf, csrf_token());
@@ -1441,7 +1203,7 @@ class PagamentoTest extends TestCase
             'cardholder_name_1' => 'TESTE CARTAO',
             'card_number_1' => '5155901222280001',
             'security_code_1' => '111',
-            'expiration_1' => now()->addMonth()->addYear()->format('m/Y'),
+            'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
         ])->assertRedirect(route('representante.dashboard'));
 
         $this->assertNotEquals($csrf, csrf_token());
@@ -1468,50 +1230,294 @@ class PagamentoTest extends TestCase
         $this->assertNotEquals($csrf, csrf_token());
     }
 
-    /** @test */
-    public function regenerate_session_after_get_checkout_iframe_sucesso()
-    {
-        // Deve habilitar no PagamentoController o checkoutIframe
-        $user = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+    /** 
+     * =======================================================================================================
+     * TESTES PAGAMENTO CHECKOUT IFRAME
+     * =======================================================================================================
+     */
 
-        $pagamento = factory('App\Pagamento')->make();
+    // /** @test */
+    // public function user_can_submit_form_payment_gerenti_with_checkoutIframe()
+    // {
+    //     // Colocar checkoutIframe = true no PagamentoController
+    //     $representante = factory('App\Representante')->create();
+    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
-        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
-        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
-            'cobranca' => $pagamento->cobranca_id,
-            'tipo_pag' => 'credit',
-            'amount' => $pagamento->total,
-            'parcelas_1' => $pagamento->parcelas,
-        ]);
+    //     $pagamento = factory('App\Pagamento')->make();
 
-        $csrf = csrf_token();
-        $this->get(route('pagamento.sucesso.checkout', $pagamento->cobranca_id))
-        ->assertRedirect(route('representante.dashboard'));
+    //     $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+    //     $resp = $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+    //         'cobranca' => $pagamento->cobranca_id,
+    //         'tipo_pag' => 'credit',
+    //         'amount' => $pagamento->total,
+    //         'parcelas_1' => $pagamento->parcelas,
+    //         'checkoutIframe' => true
+    //     ])
+    //     ->assertSeeText('Finalizar')
+    //     ->assertDontSeeText('Dados do  cartão:')
+    //     ->assertDontSeeText('Número do cartão')
+    //     ->assertDontSeeText('Nome do titular')
+    //     ->assertDontSeeText('CVV / CVC')
+    //     ->assertDontSeeText('Data de Expiração');
+    // }
 
-        $this->assertNotEquals($csrf, csrf_token());
-    }
+    // /** @test */
+    // public function user_cannot_submit_form_payment_getnet_with_checkoutIframe()
+    // {
+    //     // Deve habilitar no PagamentoController o checkoutIframe
+    //     $representante = factory('App\Representante')->create();
+    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
 
-    /** @test */
-    public function regenerate_session_after_submit_checkout_iframe_verifica()
-    {
-        // Deve habilitar no PagamentoController o checkoutIframe
-        $user = factory('App\Representante')->create();
-        $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+    //     $pagamento = factory('App\Pagamento')->make();
 
-        $pagamento = factory('App\Pagamento')->make();
+    //     $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+    //     $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+    //         'cobranca' => $pagamento->cobranca_id,
+    //         'tipo_pag' => 'credit',
+    //         'amount' => $pagamento->total,
+    //         'parcelas_1' => $pagamento->parcelas,
+    //         'checkoutIframe' => '1'
+    //     ]);
 
-        $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
-        $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
-            'cobranca' => $pagamento->cobranca_id,
-            'tipo_pag' => 'credit',
-            'amount' => $pagamento->total,
-            'parcelas_1' => $pagamento->parcelas,
-        ]);
+    //     $this->post(route('pagamento.cartao', $pagamento->cobranca_id), [
+    //         'cobranca' => $pagamento->cobranca_id,
+    //         'tipo_pag' => 'credit',
+    //         'amount' => '200',
+    //         'parcelas_1' => '1',
+    //         'cardholder_name_1' => 'TESTE CARTAO',
+    //         'card_number_1' => '4012001037141112',
+    //         'security_code_1' => '111',
+    //         'expiration_1' => now()->addMonth()->addYear()->format('m/y'),
+    //     ])->assertRedirect(route('representante.dashboard'));
 
-        $csrf = csrf_token();
-        $this->post(route('pagamento.verifica.checkout', $pagamento->cobranca_id))->assertJson([]);
+    //     $this->get(route('representante.dashboard'))
+    //     ->assertSeeText('Não foi possível completar a operação! Erro ao processar o pagamento. Código de erro: 401');
+    // }
 
-        $this->assertNotEquals($csrf, csrf_token());
-    }
+    // /** @test */
+    // public function user_cannot_access_route_checkout_iframe_success_with_url_previous_different_cobranca_current()
+    // {
+    //     // Deve habilitar no PagamentoController o checkoutIframe
+    //     $representante = factory('App\Representante')->create();
+    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $representante['cpf_cnpj'], 'password' => 'teste102030']);
+
+    //     $pagamento = factory('App\Pagamento')->make();
+
+    //     $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+    //         'cobranca' => $pagamento->cobranca_id,
+    //         'tipo_pag' => 'credit',
+    //         'amount' => $pagamento->total,
+    //         'parcelas_1' => $pagamento->parcelas,
+    //         'checkoutIframe' => '1'
+    //     ]);
+
+    //     $this->get(route('pagamento.sucesso.checkout', $pagamento->cobranca_id))
+    //     ->assertRedirect(route('representante.dashboard'));
+
+    //     $this->get(route('representante.dashboard'))
+    //     ->assertDontSeeText('Pagamento realizado para a cobrança ' . $pagamento->cobranca_id . '. Detalhes do pagamento enviado para o e-mail: ' . $representante->email);
+    // }
+
+    // /** @test */
+    // public function can_create_payment_by_notification()
+    // {
+    //     // Deve habilitar no PagamentoController o checkoutIframe
+    //     $representante = factory('App\Representante')->create();
+    //     $pagamento = factory('App\Pagamento')->make();
+        
+    //     $this->get(route('pagamento.transacao.credito', [
+    //         'payment_type' => $pagamento->forma,
+    //         'customer_id' => $representante->getCustomerId(),
+    //         'order_id' => $pagamento->cobranca_id,
+    //         'payment_id' => $pagamento->payment_id,
+    //         'amount' => '200',
+    //         'status' => $pagamento->status,
+    //         'number_installments' => $pagamento->parcelas,
+    //         'terminal_nsu' => '031575',
+    //         'authorization_code' => '9190383360902371',
+    //         'acquirer_transaction_id' => '000099713751',
+    //         'authorization_timestamp' => now()->toIso8601ZuluString(),
+    //         'brand' => $pagamento->bandeira,
+    //         'description_detail' => '',
+    //         'error_code' => '',
+    //         'tipo_parcelas' => $pagamento->tipo_parcelas,
+    //     ]));
+
+    //     $this->assertDatabaseHas('pagamentos', [
+    //         'cobranca_id' => $pagamento->cobranca_id,
+    //         'bandeira' => 'visa',
+    //     ]);
+    // }
+
+    // /** @test */
+    // public function cannot_create_payment_by_notification_without_user()
+    // {
+    //     // Deve habilitar no PagamentoController o checkoutIframe
+    //     $representante = factory('App\Representante')->create();
+    //     $pagamento = factory('App\Pagamento')->make();
+        
+    //     $this->get(route('pagamento.transacao.credito', [
+    //         'payment_type' => $pagamento->forma,
+    //         'customer_id' => '00000000000_rep',
+    //         'order_id' => $pagamento->cobranca_id,
+    //         'payment_id' => $pagamento->payment_id,
+    //         'amount' => '200',
+    //         'status' => $pagamento->status,
+    //         'number_installments' => $pagamento->parcelas,
+    //         'terminal_nsu' => '031575',
+    //         'authorization_code' => '9190383360902371',
+    //         'acquirer_transaction_id' => '000099713751',
+    //         'authorization_timestamp' => now()->toIso8601ZuluString(),
+    //         'brand' => $pagamento->bandeira,
+    //         'description_detail' => '',
+    //         'error_code' => '',
+    //         'tipo_parcelas' => $pagamento->tipo_parcelas,
+    //     ]));
+
+    //     $this->assertDatabaseMissing('pagamentos', [
+    //         'cobranca_id' => $pagamento->cobranca_id,
+    //         'bandeira' => 'visa',
+    //     ]);
+    // }
+
+    // /** @test */
+    // public function cannot_create_payment_by_notification_with_status_different_approved()
+    // {
+    //     $representante = factory('App\Representante')->create();
+    //     $pagamento = factory('App\Pagamento')->make();
+        
+    //     $this->get(route('pagamento.transacao.credito', [
+    //         'payment_type' => $pagamento->forma,
+    //         'customer_id' => $representante->getCustomerId(),
+    //         'order_id' => $pagamento->cobranca_id,
+    //         'payment_id' => $pagamento->payment_id,
+    //         'amount' => '200',
+    //         'status' => 'AUTHORIZED',
+    //         'number_installments' => $pagamento->parcelas,
+    //         'terminal_nsu' => '031575',
+    //         'authorization_code' => '9190383360902371',
+    //         'acquirer_transaction_id' => '000099713751',
+    //         'authorization_timestamp' => now()->toIso8601ZuluString(),
+    //         'brand' => $pagamento->bandeira,
+    //         'description_detail' => '',
+    //         'error_code' => '',
+    //         'tipo_parcelas' => $pagamento->tipo_parcelas,
+    //     ]));
+
+    //     $this->assertDatabaseMissing('pagamentos', [
+    //         'cobranca_id' => $pagamento->cobranca_id,
+    //         'bandeira' => 'visa',
+    //         'status' => 'AUTHORIZED',
+    //         'total' => '2,00'
+    //     ]);
+    // }
+
+    // /** @test */
+    // public function log_is_generated_when_payment_is_created_by_notification()
+    // {
+    //     // Deve habilitar no PagamentoController o checkoutIframe
+    //     $user = factory('App\Representante')->create();
+    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+    //     $pagamento = factory('App\Pagamento')->make();
+
+    //     $this->get(route('pagamento.transacao.credito', [
+    //         'payment_type' => $pagamento->forma,
+    //         'customer_id' => $user->getCustomerId(),
+    //         'order_id' => $pagamento->cobranca_id,
+    //         'payment_id' => $pagamento->payment_id,
+    //         'amount' => '200',
+    //         'status' => 'APPROVED',
+    //         'number_installments' => $pagamento->parcelas,
+    //         'terminal_nsu' => '031575',
+    //         'authorization_code' => '9190383360902371',
+    //         'acquirer_transaction_id' => '000099713751',
+    //         'authorization_timestamp' => now()->toIso8601ZuluString(),
+    //         'brand' => $pagamento->bandeira,
+    //         'description_detail' => '',
+    //         'error_code' => '',
+    //         'tipo_parcelas' => $pagamento->tipo_parcelas,
+    //     ]));
+
+    //     $log = tailCustom(storage_path($this->pathLogExterno()));
+    //     $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
+    //     $txt = $inicio . '[Rotina Portal - Transação Getnet] - ID: ' . $user->id . ' ("'. formataCpfCnpj($user->cpf_cnpj) .'", login como: '.$user::NAME_AREA_RESTRITA.') realizou pagamento da cobrança ';
+    //     $txt .= $pagamento->cobranca_id . ' do tipo *' . $pagamento->forma . '*, com a payment_id: ' . Pagamento::first()->payment_id;
+
+    //     $this->assertStringContainsString($txt, $log);
+    // }
+
+    // /** @test */
+    // public function log_is_generated_when_get_checkoutIframeSucesso()
+    // {
+    //     // Deve habilitar no PagamentoController o checkoutIframe
+    //     $user = factory('App\Representante')->create();
+    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+    //     $pagamento = factory('App\Pagamento')->make();
+
+    //     $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+    //     $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+    //         'cobranca' => $pagamento->cobranca_id,
+    //         'tipo_pag' => 'credit',
+    //         'amount' => $pagamento->total,
+    //         'parcelas_1' => $pagamento->parcelas,
+    //     ]);
+
+    //     $this->get(route('pagamento.sucesso.checkout', $pagamento->cobranca_id))
+    //     ->assertRedirect(route('representante.dashboard'));
+
+    //     $log = tailCustom(storage_path($this->pathLogExterno()));
+    //     $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: ' . request()->ip() . '] - ';
+    //     $txt = $inicio . 'Usuário '.$user->id.' ("' . formataCpfCnpj($user->cpf_cnpj) . '", login como: '.$user::NAME_AREA_RESTRITA.') ';
+    //     $txt .= 'aviso que realizou o pagamento da cobrança *'.$pagamento->cobranca_id.'* via Checkout Iframe. Aguardando notificação para registro no banco de dados.';
+    //     $this->assertStringContainsString($txt, $log);
+    // }
+
+    // /** @test */
+    // public function regenerate_session_after_get_checkout_iframe_sucesso()
+    // {
+    //     // Deve habilitar no PagamentoController o checkoutIframe
+    //     $user = factory('App\Representante')->create();
+    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+    //     $pagamento = factory('App\Pagamento')->make();
+
+    //     $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+    //     $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+    //         'cobranca' => $pagamento->cobranca_id,
+    //         'tipo_pag' => 'credit',
+    //         'amount' => $pagamento->total,
+    //         'parcelas_1' => $pagamento->parcelas,
+    //     ]);
+
+    //     $csrf = csrf_token();
+    //     $this->get(route('pagamento.sucesso.checkout', $pagamento->cobranca_id))
+    //     ->assertRedirect(route('representante.dashboard'));
+
+    //     $this->assertNotEquals($csrf, csrf_token());
+    // }
+
+    // /** @test */
+    // public function regenerate_session_after_submit_checkout_iframe_verifica()
+    // {
+    //     // Deve habilitar no PagamentoController o checkoutIframe
+    //     $user = factory('App\Representante')->create();
+    //     $this->post(route('representante.login.submit'), ['cpf_cnpj' => $user['cpf_cnpj'], 'password' => 'teste102030']);
+
+    //     $pagamento = factory('App\Pagamento')->make();
+
+    //     $this->get(route('pagamento.view', $pagamento->cobranca_id))->assertOk();
+    //     $this->post(route('pagamento.gerenti', $pagamento->cobranca_id), [
+    //         'cobranca' => $pagamento->cobranca_id,
+    //         'tipo_pag' => 'credit',
+    //         'amount' => $pagamento->total,
+    //         'parcelas_1' => $pagamento->parcelas,
+    //     ]);
+
+    //     $csrf = csrf_token();
+    //     $this->post(route('pagamento.verifica.checkout', $pagamento->cobranca_id))->assertJson([]);
+
+    //     $this->assertNotEquals($csrf, csrf_token());
+    // }
 }

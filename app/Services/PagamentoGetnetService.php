@@ -15,7 +15,7 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     private $via_sistema;
     const TOTAL_CARTOES = 2;
     const TEXTO_LOG_SISTEMA = '[Rotina Portal - Transação Getnet] - ';
-    const FORMAT_DT_EXP = 'm/Y';
+    const FORMAT_DT_EXP = 'm/y';
 
     public function __construct()
     {
