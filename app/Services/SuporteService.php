@@ -260,7 +260,7 @@ class SuporteService implements SuporteServiceInterface {
                 \Log::channel('externo')->info($texto);
                 $users = \App\User::where('idperfil', 1)->get();
                 foreach($users as $user)
-                    Mail::to($user->email)->queue(new InternoSuporteMail($ip, SuporteIp::DESBLOQUEADO));
+                    Mail::to($user->email)->queue(new InternoSuporteMail($ip, SuporteIp::DESBLOQUEADO, $user));
             }
         }
         

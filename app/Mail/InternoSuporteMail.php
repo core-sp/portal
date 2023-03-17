@@ -14,7 +14,7 @@ class InternoSuporteMail extends Mailable
 
     public $body;
 
-    public function __construct($ip, $status)
+    public function __construct($ip, $status, $user = null)
     {
         $cor = $status == SuporteIp::BLOQUEADO ? 'red' : 'blue';
 
@@ -23,6 +23,8 @@ class InternoSuporteMail extends Mailable
         $this->body .= '<strong>IP: </strong> '. $ip;
         $this->body .= '<br /><br />';
         $this->body .= '<strong>Status:</strong> <span style="color:'. $cor .';">'. $status .'</span>';
+        if($status == SuporteIp::DESBLOQUEADO)
+            $this->body .= '<br /><br /><strong>Responsável pelo desbloqueio: </strong> '. $user->nome;
         $this->body .= '<br /><br />';
         $this->body .= 'Registrado nos logs.';
         $this->body .= '<br /><br />';

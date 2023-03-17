@@ -753,11 +753,17 @@ class SuporteTest extends TestCase
     /** @test */
     public function blocked_ip_after_6_submits()
     {
+        Mail::fake();
+
+        factory('App\User')->create();
+
         for($i = 1; $i <= 7; $i++)
         {
             $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
             session()->regenerateToken();
         }
+
+        Mail::assertQueued(InternoSuporteMail::class);
 
         $this->get(route('site.home'))->assertStatus(423);
         $this->get(route('admin'))->assertStatus(423);
@@ -771,6 +777,24 @@ class SuporteTest extends TestCase
             'ip' => request()->ip(),
             'status' => 'BLOQUEADO'
         ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_blocked_ip()
+    {
+        for($i = 1; $i <= 7; $i++)
+        {
+            $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
+            session()->regenerateToken();
+        }
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - [Rotina Portal - Bloqueio de IP] - ';
+        $texto .= "IP BLOQUEADO por segurança devido a alcançar o limite de " . SuporteIp::TOTAL_TENTATIVAS . " tentativas de login.";
+        $this->assertStringContainsString($texto, $log);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test */

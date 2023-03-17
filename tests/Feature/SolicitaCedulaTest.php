@@ -1120,7 +1120,8 @@ class SolicitaCedulaTest extends TestCase
             'regional' => 'SÃO PAULO - Alameda Santos'
         ]);
         $representante = factory('App\Representante')->create([
-            'cpf_cnpj' => '30735253000174'
+            'cpf_cnpj' => '30735253000174',
+            'ass_id' => '000002'
         ]);
         $cedula = factory('App\SolicitaCedula')->raw([
             'idrepresentante' => $representante->id,
