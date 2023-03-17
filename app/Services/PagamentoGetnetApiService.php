@@ -253,6 +253,9 @@ class PagamentoGetnetApiService {
     private function tokenizacao($card_number, $customer_id)
     {
         try{
+            \Log::channel('externo')->info(' - [Registro temporário do request via API Tokenização do cartão] - ' . json_encode([
+                'card_number' => '*******','customer_id' => $customer_id
+            ]));
             $response = $this->client->request('POST', $this->urlBase . '/v1/tokens/card', [
                 'headers' => [
                     'Content-type' => "application/json; charset=utf-8",
@@ -268,7 +271,9 @@ class PagamentoGetnetApiService {
             $this->formatError($e, __FUNCTION__);
         }
 
-        return json_decode($response->getBody()->getContents(), true);
+        $log = json_decode($response->getBody()->getContents(), true);
+        \Log::channel('externo')->info(' - [Registro temporário do response via API Tokenização do cartão] - ' . json_encode($log));
+        return $log;
     }
 
     private function verifyCard($number_token, $brand, $cardholder_name, $expiration, $security_code)
@@ -278,6 +283,14 @@ class PagamentoGetnetApiService {
             $expiration_month = $expiration->format('m');
             $expiration_year = $expiration->format('y');
 
+            \Log::channel('externo')->info(' - [Registro temporário do request via API Verificação do cartão] - ' . json_encode([
+                'number_token' => $number_token,
+                'brand' => $brand,
+                'cardholder_name' => '*********',
+                'expiration_month' => $expiration_month,
+                'expiration_year' => $expiration_year,
+                'security_code' => '***',
+            ]));
             $response = $this->client->request('POST', $this->urlBase . '/v1/cards/verification', [
                 'headers' => [
                     'Content-type' => "application/json; charset=utf-8",
@@ -297,7 +310,9 @@ class PagamentoGetnetApiService {
             $this->formatError($e, __FUNCTION__);
         }
 
-        return json_decode($response->getBody()->getContents(), true);
+        $log = json_decode($response->getBody()->getContents(), true);
+        \Log::channel('externo')->info(' - [Registro temporário do response via API Verificação do cartão] - ' . json_encode($log));
+        return $log;
     }
 
     public function pagamento($ip, $dados)

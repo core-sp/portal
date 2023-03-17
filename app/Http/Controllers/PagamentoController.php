@@ -400,6 +400,7 @@ class PagamentoController extends Controller
     public function getTransacaoCredito(NotificacaoGetnetRequest $request)
     {
         try{
+            \Log::channel('externo')->info(' - IP: [' . $request->ip() . '] - [Registro temporário da notificação recebida] - ' . json_encode($request->all()));
             if(!$this->can_notification)
             {
                 \Log::error('[Transação Getnet] - IP: ' . $request->ip() . ' enviou uma notificação de transação com a payment_id: ' . $request->input('payment_id') . ' e customer_id: ' . $request->input('customer_id') . ', mas o ip não é permitido. Notificação não foi aceita.');
