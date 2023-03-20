@@ -246,7 +246,6 @@ Route::middleware(['block_ip'])->group(function () {
   Route::prefix('/')->group(function() {
     // Rotas de admin abertas
     Route::get('admin', 'AdminController@index')->name('admin');
-    // Route::post('admin/logout', 'Auth\LoginController@logout')->name('logout');
 
     // Regionais
     Route::get('seccionais', 'RegionalController@siteGrid')->name('regionais.siteGrid');

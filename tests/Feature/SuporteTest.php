@@ -713,8 +713,18 @@ class SuporteTest extends TestCase
     {
         Mail::fake();
 
+        $users[2] = $this->signInAsAdmin();
+
         $ip = factory('App\SuporteIp')->states('bloqueado')->create();
-        $this->signInAsAdmin();
+
+        $users[0] = factory('App\User')->create([
+            'nome' => 'Teste dois',
+            'idperfil' => 1,
+        ]);
+        $users[1] = factory('App\User')->create([
+            'nome' => 'Teste tres',
+            'idperfil' => 1
+        ]);
 
         $this->get(route('suporte.ips.view'))
         ->assertSee('<td>'.$ip->ip.'</td>');
@@ -722,7 +732,9 @@ class SuporteTest extends TestCase
         $this->delete(route('suporte.ips.excluir', $ip->ip))
         ->assertStatus(302);
 
-        Mail::assertQueued(InternoSuporteMail::class);
+        Mail::assertQueued(InternoSuporteMail::class, count($users), function ($mail) use ($users) {
+            return strpos($mail->body, $users[2]->nome) !== false;
+        });
 
         $this->get(route('suporte.ips.view'))
         ->assertDontSee('<td>'.$ip->ip.'</td>');
@@ -753,11 +765,17 @@ class SuporteTest extends TestCase
     /** @test */
     public function blocked_ip_after_6_submits()
     {
+        Mail::fake();
+
+        factory('App\User')->create();
+
         for($i = 1; $i <= 7; $i++)
         {
             $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
             session()->regenerateToken();
         }
+
+        Mail::assertQueued(InternoSuporteMail::class);
 
         $this->get(route('site.home'))->assertStatus(423);
         $this->get(route('admin'))->assertStatus(423);
@@ -771,6 +789,24 @@ class SuporteTest extends TestCase
             'ip' => request()->ip(),
             'status' => 'BLOQUEADO'
         ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_blocked_ip()
+    {
+        for($i = 1; $i <= 7; $i++)
+        {
+            $this->post('admin/login', ['login' => 'teste', 'username' => 'teste', 'password' => 'TestePorta1']);
+            session()->regenerateToken();
+        }
+
+        $log = tailCustom(storage_path($this->pathLogExterno()));
+        $texto = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - [Rotina Portal - Bloqueio de IP] - ';
+        $texto .= "IP BLOQUEADO por segurança devido a alcançar o limite de " . SuporteIp::TOTAL_TENTATIVAS . " tentativas de login.";
+        $this->assertStringContainsString($texto, $log);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $this->assertStringContainsString($texto, $log);
     }
 
     /** @test */
