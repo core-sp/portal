@@ -7,6 +7,8 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Permissao;
 use Carbon\Carbon;
+use App\Mail\SolicitaCedulaMail;
+use Illuminate\Support\Facades\Mail;
 
 class SolicitaCedulaTest extends TestCase
 {
@@ -113,6 +115,8 @@ class SolicitaCedulaTest extends TestCase
     */
     public function authorized_users_can_accept_solicitacao_cedula()
     {
+        Mail::fake();
+
         $user = $this->signIn();
         Permissao::find(59)->update(['perfis' => '1,2']);
         Permissao::find(60)->update(['perfis' => '1,2']);
@@ -122,6 +126,9 @@ class SolicitaCedulaTest extends TestCase
         $this->put(route('solicita-cedula.update', $cedula->id), [
             'status' => 'Aceito',
         ])->assertStatus(302);
+
+        Mail::assertQueued(SolicitaCedulaMail::class);
+
         $this->assertDatabaseHas('solicitacoes_cedulas', ['status' => 'Aceito']);
     }
 
@@ -152,6 +159,8 @@ class SolicitaCedulaTest extends TestCase
     */
     public function authorized_users_can_refuse_solicitacao_cedula()
     {
+        Mail::fake();
+
         $user = $this->signIn();
         Permissao::find(59)->update(['perfis' => '1,2']);
         Permissao::find(60)->update(['perfis' => '1,2']);
@@ -162,6 +171,9 @@ class SolicitaCedulaTest extends TestCase
             'status' => 'Recusado',
             'justificativa' => 'Não foi aprovado, porque ...'
         ])->assertStatus(302);
+
+        Mail::assertQueued(SolicitaCedulaMail::class);
+
         $this->assertDatabaseHas('solicitacoes_cedulas', ['status' => 'Recusado']);
     }
 
@@ -1081,6 +1093,8 @@ class SolicitaCedulaTest extends TestCase
     */
     public function insert_new_solicitacao_cedula_pf()
     {
+        Mail::fake();
+
         $regional = factory('App\Regional')->create([
             'regional' => 'SÃO PAULO'
         ]);
@@ -1097,6 +1111,9 @@ class SolicitaCedulaTest extends TestCase
         $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
         $this->post(route('representante.inserirSolicitarCedula'), $cedula)
         ->assertRedirect(route('representante.solicitarCedulaView'));
+
+        Mail::assertQueued(SolicitaCedulaMail::class);
+
         $this->assertDatabaseHas('solicitacoes_cedulas', [
             'idrepresentante' => $representante->id,
             'rg' => $cedula['rg'],
@@ -1113,6 +1130,8 @@ class SolicitaCedulaTest extends TestCase
     */
     public function insert_new_solicitacao_cedula_pj()
     {
+        Mail::fake();
+
         $regional = factory('App\Regional')->create([
             'regional' => 'SÃO PAULO'
         ]);
@@ -1133,6 +1152,9 @@ class SolicitaCedulaTest extends TestCase
         $this->get(route('representante.inserirSolicitarCedulaView'))->assertOk();
         $this->post(route('representante.inserirSolicitarCedula'), $cedula)
         ->assertRedirect(route('representante.solicitarCedulaView'));
+
+        Mail::assertQueued(SolicitaCedulaMail::class);
+
         $this->assertDatabaseHas('solicitacoes_cedulas', [
             'idrepresentante' => $representante->id,
             'rg' => $cedula['rg'],
