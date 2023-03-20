@@ -713,8 +713,18 @@ class SuporteTest extends TestCase
     {
         Mail::fake();
 
+        $users[2] = $this->signInAsAdmin();
+
         $ip = factory('App\SuporteIp')->states('bloqueado')->create();
-        $this->signInAsAdmin();
+
+        $users[0] = factory('App\User')->create([
+            'nome' => 'Teste dois',
+            'idperfil' => 1,
+        ]);
+        $users[1] = factory('App\User')->create([
+            'nome' => 'Teste tres',
+            'idperfil' => 1
+        ]);
 
         $this->get(route('suporte.ips.view'))
         ->assertSee('<td>'.$ip->ip.'</td>');
@@ -722,7 +732,9 @@ class SuporteTest extends TestCase
         $this->delete(route('suporte.ips.excluir', $ip->ip))
         ->assertStatus(302);
 
-        Mail::assertQueued(InternoSuporteMail::class);
+        Mail::assertQueued(InternoSuporteMail::class, count($users), function ($mail) use ($users) {
+            return strpos($mail->body, $users[2]->nome) !== false;
+        });
 
         $this->get(route('suporte.ips.view'))
         ->assertDontSee('<td>'.$ip->ip.'</td>');
