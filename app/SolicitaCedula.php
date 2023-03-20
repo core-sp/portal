@@ -73,4 +73,24 @@ class SolicitaCedula extends Model
                 break;
         }
     }
+
+    public function contemTipoDigital()
+    {
+        return in_array($this->tipo, [self::TIPO_DIGITAL, self::TIPO_AMBOS]);
+    }
+
+    public function cedulaEmAndamento()
+    {
+        return $this->status == self::STATUS_EM_ANDAMENTO;
+    }
+
+    public function cedulaAceita()
+    {
+        return $this->status == self::STATUS_ACEITO;
+    }
+
+    public function cedulaRecusada()
+    {
+        return $this->status == self::STATUS_RECUSADO;
+    }
 }
