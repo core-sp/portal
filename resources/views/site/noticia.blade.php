@@ -1,4 +1,8 @@
-@extends('site.layout.app', ['title' => $noticia->titulo ])
+@php
+  // Devido o include 'noticia-grid', o título é sobrescrito na aba do navegador ao terminar de carregar a página. Isso corrige.
+  $titulo = $noticia->titulo;
+@endphp
+@extends('site.layout.app', ['title' => $titulo ])
 
 @section('description')
   <meta name="description" content="{!! retornaDescription($noticia->conteudo) !!}" />
