@@ -3,54 +3,28 @@
 namespace App\Services;
 
 use App\Contracts\MediadorServiceInterface;
-use App\Contracts\SuporteServiceInterface;
-use App\Contracts\PlantaoJuridicoServiceInterface;
-use App\Contracts\RegionalServiceInterface;
-use App\Contracts\TermoConsentimentoServiceInterface;
-use App\Contracts\AgendamentoServiceInterface;
-use App\Contracts\LicitacaoServiceInterface;
-use App\Contracts\FiscalizacaoServiceInterface;
-use App\Contracts\PostServiceInterface;
-use App\Contracts\NoticiaServiceInterface;
-use App\Contracts\CedulaServiceInterface;
-use App\Contracts\RepresentanteServiceInterface;
 
 class MediadorService implements MediadorServiceInterface {
 
-    private $service;
-
-    // Adicione o Serviço e o nome do Model
-    public function __construct(
-        SuporteServiceInterface $suporteService,
-        PlantaoJuridicoServiceInterface $plantaoJuridicoService,
-        RegionalServiceInterface $regionalService,
-        TermoConsentimentoServiceInterface $termoConsentimentoService,
-        AgendamentoServiceInterface $agendamentoService,
-        LicitacaoServiceInterface $licitacaoService,
-        FiscalizacaoServiceInterface $fiscalizacaoService,
-        PostServiceInterface $postService,
-        NoticiaServiceInterface $noticiaService,
-        CedulaServiceInterface $cedulaService,
-        RepresentanteServiceInterface $representanteService
-    )
-    {
-        $this->service = [
-            'Suporte' => $suporteService,
-            'PlantaoJuridico' => $plantaoJuridicoService,
-            'Regional' => $regionalService,
-            'TermoConsentimento' => $termoConsentimentoService,
-            'Agendamento' => $agendamentoService,
-            'Licitacao' => $licitacaoService,
-            'Fiscalizacao' => $fiscalizacaoService,
-            'Post' => $postService,
-            'Noticia' => $noticiaService,
-            'Cedula' => $cedulaService,
-            'Representante' => $representanteService,
-        ];
-    }
+    private $service = [
+        'Suporte' => 'App\Contracts\SuporteServiceInterface',
+        'PlantaoJuridico' => 'App\Contracts\PlantaoJuridicoServiceInterface',
+        'Regional' => 'App\Contracts\RegionalServiceInterface',
+        'TermoConsentimento' => 'App\Contracts\TermoConsentimentoServiceInterface',
+        'Agendamento' => 'App\Contracts\AgendamentoServiceInterface',
+        'Licitacao' => 'App\Contracts\LicitacaoServiceInterface',
+        'Fiscalizacao' => 'App\Contracts\FiscalizacaoServiceInterface',
+        'Post' => 'App\Contracts\PostServiceInterface',
+        'Noticia' => 'App\Contracts\NoticiaServiceInterface',
+        'Cedula' => 'App\Contracts\CedulaServiceInterface',
+        'Representante' => 'App\Contracts\RepresentanteServiceInterface',
+    ];
 
     public function getService($nomeModel)
     {
-        return isset($this->service[$nomeModel]) ? $this->service[$nomeModel] : abort(500, 'Serviço '.$nomeModel.' não encontrado no MediadorService');
+        if(isset($this->service[$nomeModel]))
+            return resolve($this->service[$nomeModel]);
+        \Log::error('[Erro: Serviço ' . $nomeModel . ' não encontrado no MediadorService.], [Código: 500], [Arquivo: App\Contracts\MediadorServiceInterface]');
+        abort(500, 'Serviço '.$nomeModel.' não encontrado no Sistema');
     }
 }
