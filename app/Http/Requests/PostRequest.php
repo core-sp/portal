@@ -24,17 +24,4 @@ class PostRequest extends FormRequest
             'unique' => 'Já existe um post com este mesmo título'
         ];
     }
-
-    // public function toModel()
-    // {
-    //     return [
-    //         'titulo' => $this->titulo,
-    //         'subtitulo' => $this->subtitulo,
-    //         'slug' => str_slug($this->titulo),
-    //         'img' => $this->img,
-    //         'conteudo' => $this->conteudo,
-    //         'conteudoBusca' => converterParaTextoCru($this->conteudo),
-    //         'idusuario' => $this->idusuario
-    //     ];
-    // }
 }
