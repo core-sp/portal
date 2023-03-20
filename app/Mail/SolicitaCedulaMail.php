@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\SolicitaCedula;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -16,7 +15,7 @@ class SolicitaCedulaMail extends Mailable
 
     public function __construct($cedula)
     {
-        if($cedula->status == SolicitaCedula::STATUS_EM_ANDAMENTO) {
+        if($cedula->cedulaEmAndamento()) {
             $this->body = 'Bem vindo ao CORE-SP. Seu pedido de emissão da cédula profissional está em análise e será postado em até 10 dias após a aprovação.';
             $this->body .= '<br /><br />';
             $this->body .= '<strong>Código da solicitação:</strong> #'. $cedula->id;
@@ -32,10 +31,17 @@ class SolicitaCedulaMail extends Mailable
             $this->body .= '<strong>Código da solicitação:</strong> #'. $cedula->id;
             $this->body .= '<br /><br />';
 
-            $cor = $cedula->status == SolicitaCedula::STATUS_RECUSADO ? 'red' : 'blue';
+            $cor = $cedula->cedulaRecusada() ? 'red' : 'blue';
 
             $this->body .= '<strong>Status:</strong> <span style="color:'. $cor .';">'. $cedula->status .'</span>';
-            if($cedula->status == SolicitaCedula::STATUS_RECUSADO) {
+
+            if($cedula->contemTipoDigital() && $cedula->cedulaAceita()){
+                $this->body .= '<br /><br />';
+                $this->body .= '<strong>Pedido de Cédula Digital aceito. Em breve, receberá um e-mail com instruções de cadastro no aplicativo. ';
+                $this->body .= '<br>Certifique que o e-mail cadastrado na Área Restrita do Representante está ativo.</strong>';
+            }
+
+            if($cedula->cedulaRecusada()) {
                 $this->body .= '<br /><br />';
                 $this->body .= '<strong>Motivo:</strong> '. $cedula->justificativa;
                 $this->body .= '<br /><br />';
