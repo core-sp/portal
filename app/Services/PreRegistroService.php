@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\PreRegistroServiceInterface;
-use App\Contracts\PreRegistroAdminServiceInterface;
+use App\Contracts\PreRegistroAdminSubServiceInterface;
 use App\PreRegistro;
 use App\Anexo;
 use App\Contracts\MediadorServiceInterface;
@@ -26,7 +26,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
     const RELATION_PRE_REGISTRO = "preRegistro";
     const RELATION_RT = "pessoaJuridica.responsavelTecnico";
 
-    public function __construct(PreRegistroAdminServiceInterface $admin)
+    public function __construct(PreRegistroAdminSubServiceInterface $admin)
     {
         $this->admin = $admin;
     }

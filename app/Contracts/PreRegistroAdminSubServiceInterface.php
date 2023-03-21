@@ -4,7 +4,7 @@ namespace App\Contracts;
 
 use App\Contracts\MediadorServiceInterface;
 
-interface PreRegistroAdminServiceInterface {
+interface PreRegistroAdminSubServiceInterface {
 
     public function getTiposAnexos($idPreRegistro);
 

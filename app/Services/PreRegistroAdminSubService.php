@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Contracts\PreRegistroAdminServiceInterface;
+use App\Contracts\PreRegistroAdminSubServiceInterface;
 use App\PreRegistro;
 use App\Anexo;
 use App\Contracts\MediadorServiceInterface;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\PreRegistroMail;
 use App\Events\CrudEvent;
 
-class PreRegistroAdminService implements PreRegistroAdminServiceInterface {
+class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface {
 
     private $variaveis;
 

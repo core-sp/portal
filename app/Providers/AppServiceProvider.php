@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('App\Contracts\RepresentanteServiceInterface', 'App\Services\RepresentanteService');
         $this->app->bind('App\Contracts\UserExternoServiceInterface', 'App\Services\UserExternoService');
         $this->app->bind('App\Contracts\PreRegistroServiceInterface', 'App\Services\PreRegistroService');
-        $this->app->bind('App\Contracts\PreRegistroAdminServiceInterface', 'App\Services\PreRegistroAdminService');
+        $this->app->bind('App\Contracts\PreRegistroAdminSubServiceInterface', 'App\Services\PreRegistroAdminSubService');
     }
 
     /**

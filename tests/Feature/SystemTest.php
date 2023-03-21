@@ -28,7 +28,7 @@ class SystemTest extends TestCase
             'Cedula' => new \App\Services\CedulaService(),
             'Representante' => new \App\Services\RepresentanteService(),
             'UserExterno' => new \App\Services\UserExternoService(),
-            'PreRegistro' => new \App\Services\PreRegistroService(new \App\Services\PreRegistroAdminService),
+            'PreRegistro' => new \App\Services\PreRegistroService(new \App\Services\PreRegistroAdminSubService),
         ];
         $mediador = $this->app->make(MediadorServiceInterface::class);
 
@@ -133,11 +133,11 @@ class SystemTest extends TestCase
     /** @test */
     public function mediador_interface_get_instace_pre_registro_service()
     {
-        $servico = new \App\Services\PreRegistroService(new \App\Services\PreRegistroAdminService);
+        $servico = new \App\Services\PreRegistroService(new \App\Services\PreRegistroAdminSubService);
         $mediador = $this->app->make(MediadorServiceInterface::class);
         $this->assertEquals($mediador->getService('PreRegistro'), $servico);
 
-        $servico = new \App\Services\PreRegistroAdminService();
+        $servico = new \App\Services\PreRegistroAdminSubService();
         $this->assertEquals($mediador->getService('PreRegistro')->getAdminService(), $servico);
     }
 }
