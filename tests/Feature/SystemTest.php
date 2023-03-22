@@ -81,6 +81,15 @@ class SystemTest extends TestCase
     }
 
     /** @test */
+    public function mediador_interface_exception_sub_service()
+    {
+        $mediador = $this->app->make(MediadorServiceInterface::class);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Serviço SuporteAdminSub não encontrado no Sistema');
+        $mediador->getService('SuporteAdminSub');
+    }
+
+    /** @test */
     public function log_is_generated_when_mediador_interface_not_find_service()
     {
         try{
@@ -90,7 +99,24 @@ class SystemTest extends TestCase
         catch(\Exception $e){
             $log = tailCustom(storage_path($this->pathLogErros()));
             $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
-            $txt = $inicio . '[Erro: Serviço Erro não encontrado no MediadorService.], [Código: 500], [Arquivo: App\Contracts\MediadorServiceInterface]';
+            $txt = $inicio . '[Erro: Target class [App\Contracts\ErroServiceInterface] does not exist.], [Código: 0], ';
+            $txt .= '[Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Container/Container.php], [Linha: 805]';
+            $this->assertStringContainsString($txt, $log);
+        }
+    }
+
+    /** @test */
+    public function log_is_generated_when_mediador_interface_get_sub_service()
+    {
+        try{
+            $mediador = $this->app->make(MediadorServiceInterface::class);
+            $mediador->getService('SuporteAdminSub');
+        }
+        catch(\Exception $e){
+            $log = tailCustom(storage_path($this->pathLogErros()));
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
+            $txt = $inicio . '[Erro: Sub Service deve ser chamado pelo serviço principal], [Código: 500], ';
+            $txt  .= '[Arquivo: /home/vagrant/Workspace/portal/app/Services/MediadorService.php], [Linha: 14]';
             $this->assertStringContainsString($txt, $log);
         }
     }
