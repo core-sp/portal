@@ -36,7 +36,7 @@
         {!! mostraChatScript() !!}
 
         <!-- ********************************************************************************************************************** -->
-        if(strpos(config('app.url'), 'homolog') !== false)
+        @if(strpos(config('app.url'), 'homolog') !== false)
         <!-- Teste de uso Clarity - Microsoft -->
         <script type="text/javascript">
           (function(c,l,a,r,i,t,y){
