@@ -29,9 +29,6 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.log.externo.busca'))->assertRedirect(route('login'));
         $this->get(route('suporte.log.externo.view', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertRedirect(route('login'));
         $this->get(route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertRedirect(route('login'));
-        $this->get(route('suporte.erros.index'))->assertRedirect(route('login'));
-        $this->post(route('suporte.erros.file.post'), ['file' => $file])->assertRedirect(route('login'));
-        $this->get(route('suporte.erros.file.get'))->assertRedirect(route('login'));
         $this->get(route('suporte.ips.view'))->assertRedirect(route('login'));
         $this->delete(route('suporte.ips.excluir', request()->ip()))->assertRedirect(route('login'));
     }
@@ -49,9 +46,6 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.log.externo.busca', ['data' => Carbon::today()->subDay()->format('Y-m-d'), 'tipo' => 'interno']))->assertForbidden();
         $this->get(route('suporte.log.externo.view', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertForbidden();
         $this->get(route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertForbidden();
-        $this->get(route('suporte.erros.index'))->assertForbidden();
-        $this->post(route('suporte.erros.file.post'), ['file' => $file])->assertForbidden();
-        $this->get(route('suporte.erros.file.get'))->assertForbidden();
         $this->get(route('suporte.ips.view'))->assertForbidden();
         $this->delete(route('suporte.ips.excluir', request()->ip()))->assertForbidden();
     }
@@ -515,97 +509,6 @@ class SuporteTest extends TestCase
 
         $this->get(route('suporte.log.externo.busca', ['ano' => $data, 'tipo' => 'externo']))
         ->assertSessionHasErrors('texto');
-    }
-
-    // MENU ERROS
-
-    /** @test */
-    public function admin_can_view_message_when_without_table_errors()
-    {
-        Storage::disk('local')->delete($this->nomeArquivo);
-        $this->signInAsAdmin();
-
-        $this->get(route('suporte.erros.index'))->assertOk()
-        ->assertSeeText('Os erros ainda não foram tabelados');
-    }
-
-    /** @test */
-    public function admin_and_email_equal_desenvolvimento_can_do_upload_file()
-    {
-        $this->signInAsAdmin('desenvolvimento@core-sp.org.br');
-
-        $file = UploadedFile::fake()->createWithContent($this->nomeArquivo, 'texto erro*texto local*texto situação*texto sugestão');
-
-        $this->get(route('suporte.erros.index'))->assertOk();
-        $this->post(route('suporte.erros.file.post'), ['file' => $file])->assertRedirect(route('suporte.erros.index'));
-        $this->get(route('suporte.erros.index'))->assertSee('Arquivo atualizado com sucesso!')
-        ->assertSee('texto erro')
-        ->assertSee('texto local')
-        ->assertSee('texto situação')
-        ->assertSee('texto sugestão');
-    }
-
-    /** @test */
-    public function admin_and_email_different_desenvolvimento_cannot_do_upload_file()
-    {
-        Storage::disk('local')->delete($this->nomeArquivo);
-        $this->signInAsAdmin();
-
-        $file = UploadedFile::fake()->createWithContent($this->nomeArquivo, 'texto erro*texto local*texto situação*texto sugestão');
-
-        $this->get(route('suporte.erros.index'))->assertOk();
-        $this->post(route('suporte.erros.file.post'), ['file' => $file])->assertForbidden();
-        Storage::disk('local')->assertMissing($this->nomeArquivo);
-    }
-
-    /** @test */
-    public function admin_and_email_equal_desenvolvimento_can_do_download_file()
-    {
-        $this->signInAsAdmin('desenvolvimento@core-sp.org.br');
-
-        $file = UploadedFile::fake()->createWithContent($this->nomeArquivo, 'texto erro*texto local*texto situação*texto sugestão');
-
-        $this->get(route('suporte.erros.index'))->assertOk();
-        $this->post(route('suporte.erros.file.post'), ['file' => $file])->assertRedirect(route('suporte.erros.index'));
-        $this->get(route('suporte.erros.file.get'))->assertOk();
-    }
-
-    /** @test */
-    public function admin_and_email_different_desenvolvimento_cannot_do_download_file()
-    {
-        $this->signInAsAdmin('desenvolvimento@core-sp.org.br');
-
-        $file = UploadedFile::fake()->createWithContent($this->nomeArquivo, 'texto erro*texto local*texto situação*texto sugestão');
-
-        $this->post(route('suporte.erros.file.post'), ['file' => $file]);
-
-        $this->signInAsAdmin();
-
-        $this->get(route('suporte.erros.file.get'))->assertForbidden();
-    }
-
-    /** @test */
-    public function admin_and_email_equal_desenvolvimento_can_update_file()
-    {
-        $this->signInAsAdmin('desenvolvimento@core-sp.org.br');
-
-        $file = UploadedFile::fake()->createWithContent($this->nomeArquivo, 'texto erro*texto local*texto situação*texto sugestão');
-        
-        $this->post(route('suporte.erros.file.post'), ['file' => $file]);
-        $this->get(route('suporte.erros.index'))->assertSee('Arquivo atualizado com sucesso!')
-        ->assertSee('texto erro')
-        ->assertSee('texto local')
-        ->assertSee('texto situação')
-        ->assertSee('texto sugestão');
-
-        $file = UploadedFile::fake()->createWithContent($this->nomeArquivo, 'novo texto erro*texto local*novo texto situação*texto sugestão');
-        
-        $this->post(route('suporte.erros.file.post'), ['file' => $file]);
-        $this->get(route('suporte.erros.index'))->assertSee('Arquivo atualizado com sucesso!')
-        ->assertSee('novo texto erro')
-        ->assertSee('texto local')
-        ->assertSee('novo texto situação')
-        ->assertSee('texto sugestão');
     }
 
     /** 

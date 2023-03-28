@@ -11,6 +11,9 @@ Route::middleware(['block_ip'])->group(function () {
     // Rotas de login
     Auth::routes();
 
+    // Manual
+    Route::get('/manual/{file?}', 'AdminController@manual')->name('admin.manual');
+
     // Rotas de Configuração
     Route::prefix('perfil')->group(function(){
       Route::get('/', 'UserController@infos')->name('admin.info');
@@ -212,9 +215,6 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/logs/busca', 'SuporteController@buscaLogExterno')->name('suporte.log.externo.busca');
       Route::get('/logs/log/{data}/{tipo}', 'SuporteController@viewLogExterno')->name('suporte.log.externo.view');
       Route::get('/logs/log/download/{data}/{tipo}', 'SuporteController@downloadLogExterno')->name('suporte.log.externo.download');
-      Route::get('/erros', 'SuporteController@errosIndex')->name('suporte.erros.index');
-      Route::post('/erros/file', 'SuporteController@uploadFileErros')->name('suporte.erros.file.post');
-      Route::get('/erros/file', 'SuporteController@getErrosFile')->name('suporte.erros.file.get');
       Route::get('/ips', 'SuporteController@ipsView')->name('suporte.ips.view');
       Route::delete('/ips/excluir/{ip}', 'SuporteController@ipsExcluir')->name('suporte.ips.excluir');
     });

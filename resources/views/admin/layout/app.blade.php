@@ -34,8 +34,11 @@
               <li class="nav-item d-none d-sm-inline-block">
                 <a href="https://app.jivosite.com/" class="nav-link" target="_blank">Chat</a>
               </li>
+              <li class="nav-item d-sm-inline-block">
+                <a href="{{ route('admin.manual') }}" class="nav-link">Manual <small><span class="badge badge-warning align-text-bottom">NOVO!</span></small></a>
+              </li>
               @if(auth()->user()->isAdmin())
-              <li class="nav-item d-none d-sm-inline-block">
+              <li class="nav-item d-sm-inline-block">
                 <a href="/horizon" class="nav-link" target="_blank">Horizon</a>
               </li>
               @endif

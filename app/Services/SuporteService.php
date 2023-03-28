@@ -14,8 +14,6 @@ use Illuminate\Support\LazyCollection;
 class SuporteService implements SuporteServiceInterface {
 
     private $variaveisLog;
-    private $variaveisErros;
-    private $nomeFileErros;
 
     public function __construct()
     {
@@ -25,19 +23,11 @@ class SuporteService implements SuporteServiceInterface {
             'singulariza' => 'o log',
         ];
 
-        $this->variaveisErros = [
-            'mostra' => 'suporte_erros',
-            'singular' => 'Tabela de Erros',
-            'singulariza' => 'os erros',
-        ];
-
         $this->variaveisIps = [
             'mostra' => 'suporte_ips',
             'singular' => 'Tabela de IPs bloqueados e liberados',
             'singulariza' => 'os ips',
         ];
-
-        $this->nomeFileErros = 'suporte-tabela-erros.txt';
     }
 
     const ERROS = 'erros';
@@ -185,25 +175,6 @@ class SuporteService implements SuporteServiceInterface {
         return isset($conteudo) ? $conteudo : null;
     }
 
-    public function indexErros()
-    {
-        $erros = Storage::disk('local')->exists($this->nomeFileErros) ? $this->editarConteudoErros(Storage::disk('local')->get($this->nomeFileErros)) : null;
-        return $dados = [
-            'erros' => $erros,
-            'variaveis' => (object) $this->variaveisErros
-        ];
-    }
-
-    public function uploadFileErros($file)
-    {
-        $file->storeAs('', $this->nomeFileErros, 'local');
-    }
-
-    public function getFileErros()
-    {
-        return Storage::disk('local')->exists($this->nomeFileErros) ? Storage::disk('local')->path($this->nomeFileErros) : null;
-    }
-
     public function ipsBloqueados()
     {
         return SuporteIp::select('ip')->where('status', SuporteIp::BLOQUEADO)->get();
@@ -265,5 +236,12 @@ class SuporteService implements SuporteServiceInterface {
         }
         
         return $ok;
+    }
+
+    public function caminhoFileManual($file)
+    {
+        $file = 'manual/' . $file;
+
+        return Storage::disk('local')->exists($file) ? Storage::disk('local')->path($file) : null;
     }
 }

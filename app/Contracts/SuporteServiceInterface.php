@@ -10,12 +10,6 @@ interface SuporteServiceInterface {
 
     public function logPorData($data, $tipo);
 
-    public function indexErros();
-
-    public function uploadFileErros($file);
-
-    public function getFileErros();
-
     public function ipsBloqueados();
 
     public function ips();
@@ -23,4 +17,6 @@ interface SuporteServiceInterface {
     public function bloquearIp($ip);
 
     public function liberarIp($ip, $user = null);
+
+    public function caminhoFileManual($file);
 }

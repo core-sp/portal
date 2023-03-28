@@ -53,12 +53,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('suporte.erros.index') }}" class="nav-link">
-                        <i class="nav-icon fa fa-angle-right"></i>
-                        <p>Erros</p>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="{{ route('suporte.ips.view') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Desbloquear IP</p>

@@ -98,4 +98,25 @@ class AdminController extends Controller
     
         return $tabela;
     }
+
+    public function manual($file = null)
+    {
+        try{
+            $variaveis = (object) [
+                'mostra' => 'manual',
+                'singular' => 'Manual',
+                'singulariza' => 'o manual',
+            ];
+    
+            if(isset($file))
+                $file = $this->service->getService('Suporte')->caminhoFileManual($file);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar a imagem do manual.");
+        }
+        
+        if(isset($file))
+            return response()->file($file, ['Cache-Control' => 'no-cache, no-store, must-revalidate']);
+        return view('admin.crud.mostra', compact('variaveis'));
+    }
 }
