@@ -43,6 +43,8 @@
                 </div>
             </div>
 
+            <hr />
+
             <div class="row mt-2">
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Atalhos - Abrir Chamados</p>
@@ -80,6 +82,8 @@
                     </a>
                 </div>
             </div>
+
+            <hr />
 
             <div class="row mt-2">
                 <div class="col-sm-4">
@@ -125,6 +129,8 @@
                 </div>
             </div>
 
+            <hr />
+
             <div class="row mt-2">
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Representante - Alterar E-mail</p>
@@ -141,6 +147,113 @@
                     </a>
                 </div>
             </div>
+        </div>
+
+        <hr />
+
+        <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#area_rep">Área do Representante</button>
+        <div id="area_rep" class="collapse" data-parent="#accordion">
+
+            <div class="row mt-2">
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - Home</p>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.dashboard') }}" target="_blank" >{{ route('representante.dashboard') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_home.JPG') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir
+                    </a>
+                </div>
+
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - Dados Gerais</p>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.dados-gerais') }}" target="_blank" >{{ route('representante.dados-gerais') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_dados_gerais.gif') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir <small>(animação)</small>
+                    </a>
+                </div>
+
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - Contatos</p>
+                    <em>Gerencia contatos no Gerenti.</em>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.contatos.view') }}" target="_blank" >{{ route('representante.contatos.view') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_contatos.JPG') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir
+                    </a>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="row mt-2">
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - Contatos > Inserir Contato</p>
+                    <em>Adiciona contato no Gerenti.</em>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.inserir-ou-alterar-contato.view') }}" target="_blank" >{{ route('representante.inserir-ou-alterar-contato.view') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_contatos_inserir.gif') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir <small>(animação)</small>
+                    </a>
+                </div>
+
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - End. de Correspondência</p>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.enderecos.view') }}" target="_blank" >{{ route('representante.enderecos.view') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_endereco.JPG') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir
+                    </a>
+                </div>
+
+                <div class="col-sm-4">
+                    <h5>Falta imagem</h5>
+                    <p class="font-weight-bolder">Aba - End. de Correspondência > Inserir Endereço</p>
+                    <em>Atualiza endereço no Gerenti após aprovação do atendente.</em>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.inserir-endereco.view') }}" target="_blank" >{{ route('representante.inserir-endereco.view') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_endereco_inserir.gif') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir <small>(animação)</small>
+                    </a>
+                </div>
+            </div>
+
         </div>
 
         <hr />
@@ -165,7 +278,7 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Representante não consegue fazer login</p>
+                    <p class="font-weight-bolder">Representante não consegue fazer login - Caso 1</p>
                     <em>Usuário com permissão deve verificar se o CPF/CNPJ existe no Gerenti pelo Portal.</em>
                     <p><span class="font-weight-bolder">Solução 1: </span>
                         <em> Representante deve se registrar no Core-SP como Representante.</em>
@@ -181,7 +294,7 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Representante não consegue fazer login</p>
+                    <p class="font-weight-bolder">Representante não consegue fazer login - Caso 2</p>
                     <em>Usuário com permissão deve verificar pelo CPF/CNPJ <strong>sem pontuação</strong> ou nome ou registro ou email se está cadastrado e ativo no Portal.</em>
                     <p class="m-0"><span class="font-weight-bolder">Condição: </span>
                         <em> Representante cadastrado no Gerenti.</em>
@@ -200,9 +313,11 @@
                 </div>
             </div>
 
+            <hr />
+
             <div class="row mt-2">
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Representante não consegue fazer login</p>
+                    <p class="font-weight-bolder">Representante não consegue fazer login - Caso 3</p>
                     <em>Usuário pode orientar o Representante como alterar a senha.</em>
                     <p class="m-0"><span class="font-weight-bolder">Condição: </span>
                         <em> Representante cadastrado no Gerenti e ativo no Portal.</em>
@@ -240,7 +355,7 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Representante não consegue alterar o e-mail</p>
+                    <p class="font-weight-bolder">Representante não consegue alterar o e-mail - Caso 1</p>
                     <p class="m-0"><span class="font-weight-bolder">Condição: </span>
                         <em> Representante cadastrado no Gerenti e cadastrado no Portal, independe se está ativo ou não.</em>
                     </p>
@@ -258,9 +373,11 @@
                 </div>
             </div>
 
+            <hr />
+
             <div class="row mt-2">
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Representante não consegue alterar o e-mail</p>
+                    <p class="font-weight-bolder">Representante não consegue alterar o e-mail - Caso 2</p>
                     <p class="m-0"><span class="font-weight-bolder">Condição: </span>
                         <em> Representante cadastrado no Gerenti e cadastrado no Portal, independe se está ativo ou não.</em>
                     </p>
