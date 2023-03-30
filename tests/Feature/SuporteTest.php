@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -16,13 +15,10 @@ class SuporteTest extends TestCase
 {
     use RefreshDatabase;
 
-    private $nomeArquivo = 'suporte-tabela-erros.txt';
-
     /** @test */
     public function non_authenticated_users_cannot_access_links()
     {
         $this->assertGuest();
-        $file = UploadedFile::fake()->create('teste.txt', 500);
                 
         $this->get(route('suporte.log.externo.index'))->assertRedirect(route('login'));
         $this->get(route('suporte.log.externo.hoje.view', 'interno'))->assertRedirect(route('login'));
@@ -31,6 +27,7 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.log.externo.download', ['data' => date('Y-m-d'), 'tipo' => 'interno']))->assertRedirect(route('login'));
         $this->get(route('suporte.ips.view'))->assertRedirect(route('login'));
         $this->delete(route('suporte.ips.excluir', request()->ip()))->assertRedirect(route('login'));
+        $this->get(route('admin.manual'))->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -38,8 +35,6 @@ class SuporteTest extends TestCase
     {
         $this->signIn();
         $this->assertAuthenticated('web');
-
-        $file = UploadedFile::fake()->create('teste.txt', 500);
 
         $this->get(route('suporte.log.externo.index'))->assertForbidden();
         $this->get(route('suporte.log.externo.hoje.view', 'interno'))->assertForbidden();
@@ -49,6 +44,12 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.ips.view'))->assertForbidden();
         $this->delete(route('suporte.ips.excluir', request()->ip()))->assertForbidden();
     }
+
+    /** 
+     * =======================================================================================================
+     * TESTES LOGS
+     * =======================================================================================================
+    */
 
     /** @test */
     public function admin_can_search_logs_by_day_before_today()
@@ -876,5 +877,97 @@ class SuporteTest extends TestCase
         $this->get(route('representante.login'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
         $this->get(route('representante.dashboard'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
         $this->get(route('login'))->assertStatus(500)->assertSeeText('Erro interno! Tente novamente mais tarde.');
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES MANUAL
+     * =======================================================================================================
+    */
+
+    /** @test */
+    public function user_can_access_manual()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))->assertOk();
+    }
+
+    /** @test */
+    public function user_can_see_tabs()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#basico">Funções Básicas <small>(Admin, Representante)</small></button>')
+        ->assertSee('<button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#area_rep">Área do Representante</button>')
+        ->assertSee('<button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#duvidas_frequentes">Dúvidas Frequentes</button>');
+    }
+
+    /** @test */
+    public function user_can_see_text_update()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<strong>Última atualização:</strong>');
+    }
+
+    /** @test */
+    public function user_can_see_content_in_funcoes_basicas_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<p class="font-weight-bolder">Admin - Menus</p>')
+        ->assertSee('<p class="font-weight-bolder">Admin - Home</p>')
+        ->assertSee('<p class="font-weight-bolder">Admin - Perfil</p>')
+        ->assertSee('<p class="font-weight-bolder">Admin - Abrir Chamados</p>')
+        ->assertSee('<p class="font-weight-bolder">Admin - Perfil pelo menu vertical</p>')
+        ->assertSee('<p class="font-weight-bolder">Admin - Alterar senha</p>')
+        ->assertSee('<p class="font-weight-bolder">Admin - Desconectar</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante - Cadastro</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante - Alterar senha</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante - Alterar e-mail</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante - Desconectar</p>');
+    }
+
+    /** @test */
+    public function user_can_see_content_in_area_representante_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<p class="font-weight-bolder">Aba - Home</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - Dados Gerais</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - Contatos</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - Contatos > Inserir Contato</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - End. de Correspondência</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - End. de Correspondência > Inserir Endereço</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - Situação Financeira</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - Emitir Certidão</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - Oportunidades</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - Solicitação de Cédula</p>')
+        ->assertSee('<p class="font-weight-bolder">Aba - Solicitação de Cédula > Solicitar Cédula</p>');
+    }
+
+    /** @test */
+    public function user_can_see_content_in_duvidas_frequentes_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<p class="font-weight-bolder">Representante com agendamento bloqueado</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante não consegue fazer login - Caso 1</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante não consegue fazer login - Caso 2</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante não consegue fazer login - Caso 3</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante não consegue alterar a senha</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante não consegue alterar o e-mail - Caso 1</p>')
+        ->assertSee('<p class="font-weight-bolder">Representante não consegue alterar o e-mail - Caso 2</p>');
     }
 }

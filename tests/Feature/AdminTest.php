@@ -20,6 +20,15 @@ class AdminTest extends TestCase
     }
 
     /** @test */
+    public function a_logged_in_user_can_see_the_manual()
+    {
+        $this->signIn();
+
+        $this->get('/admin')->assertOk()
+        ->assertSee('<a href="' . route('admin.manual') . '" class="nav-link">Manual');
+    }
+
+    /** @test */
     public function a_logged_in_user_can_see_his_info_on_the_admin_panel()
     {
         $user = $this->signInAsAdmin();

@@ -2,12 +2,15 @@
 
     <div id="accordion">
 
-        <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#basico">Funções Básicas</button>
+        <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#basico">Funções Básicas <small>(Admin, Representante)</small></button>
         <div id="basico" class="collapse" data-parent="#accordion">
         
             <div class="row mt-2">
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Menus</p>
+                    <p class="font-weight-bolder">Admin - Menus</p>
+                    <p>
+                        <em>Os serviços no menu vertical são disponibilizados conforme o perfil do usuário.</em>
+                    </p>
                     <a href="{{ route('admin.manual', 'basico_menus.png') }}" 
                         target="_blank" 
                         rel="noopener" 
@@ -19,7 +22,10 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Atalhos - Home do Admin</p>
+                    <p class="font-weight-bolder">Admin - Home</p>
+                    <p>
+                        <em>A home sofre algumas alterações conforme o perfil do usuário.</em>
+                    </p>
                     <a href="{{ route('admin.manual', 'basico_atalho_home.gif') }}" 
                         target="_blank" 
                         rel="noopener" 
@@ -31,7 +37,7 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Atalhos - Perfil no Admin</p>
+                    <p class="font-weight-bolder">Admin - Perfil</p>
                     <a href="{{ route('admin.manual', 'basico_atalho_perfil.gif') }}" 
                         target="_blank" 
                         rel="noopener" 
@@ -47,7 +53,7 @@
 
             <div class="row mt-2">
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Atalhos - Abrir Chamados</p>
+                    <p class="font-weight-bolder">Admin - Abrir Chamados</p>
                     <a href="{{ route('admin.manual', 'basico_atalho_chamados.gif') }}" 
                         target="_blank" 
                         rel="noopener" 
@@ -59,7 +65,7 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Atalhos - Perfil no Admin pelo menu vertical</p>
+                    <p class="font-weight-bolder">Admin - Perfil pelo menu vertical</p>
                     <a href="{{ route('admin.manual', 'basico_atalho_perfil_vertical.gif') }}" 
                         target="_blank" 
                         rel="noopener" 
@@ -71,7 +77,7 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Alterar senha</p>
+                    <p class="font-weight-bolder">Admin - Alterar senha</p>
                     <a href="{{ route('admin.manual', 'basico_alterar_senha.gif') }}" 
                         target="_blank" 
                         rel="noopener" 
@@ -87,7 +93,7 @@
 
             <div class="row mt-2">
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Desconectar do Admin</p>
+                    <p class="font-weight-bolder">Admin - Desconectar</p>
                     <a href="{{ route('admin.manual', 'basico_logout.gif') }}" 
                         target="_blank" 
                         rel="noopener" 
@@ -114,7 +120,7 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Representante - Alterar Senha</p>
+                    <p class="font-weight-bolder">Representante - Alterar senha</p>
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.password.request') }}" target="_blank" >{{ route('representante.password.request') }}</a></em>
                     </p>
@@ -133,7 +139,7 @@
 
             <div class="row mt-2">
                 <div class="col-sm-4">
-                    <p class="font-weight-bolder">Representante - Alterar E-mail</p>
+                    <p class="font-weight-bolder">Representante - Alterar e-mail</p>
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.email.reset.view') }}" target="_blank" >{{ route('representante.email.reset.view') }}</a></em>
                     </p>
@@ -144,6 +150,18 @@
                         class="btn btn-secondary"
                     >
                         Abrir <small>(animação)</small>
+                    </a>
+                </div>
+
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Representante - Desconectar</p>
+                    <a href="{{ route('admin.manual', 'basico_rep_logout.png') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir
                     </a>
                 </div>
             </div>
@@ -237,13 +255,97 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <h5>Falta imagem</h5>
                     <p class="font-weight-bolder">Aba - End. de Correspondência > Inserir Endereço</p>
                     <em>Atualiza endereço no Gerenti após aprovação do atendente.</em>
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.inserir-endereco.view') }}" target="_blank" >{{ route('representante.inserir-endereco.view') }}</a></em>
                     </p>
                     <a href="{{ route('admin.manual', 'area_rep_endereco_inserir.gif') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir <small>(animação)</small>
+                    </a>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="row mt-2">
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - Situação Financeira</p>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.lista-cobrancas') }}" target="_blank" >{{ route('representante.lista-cobrancas') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_financeiro.JPG') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir
+                    </a>
+                </div>
+
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - Emitir Certidão</p>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.emitirCertidaoView') }}" target="_blank" >{{ route('representante.emitirCertidaoView') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_certidao.JPG') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir
+                    </a>
+                </div>
+
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - Oportunidades</p>
+                    <em>Oportunidades do Balcão de Oportunidades.</em>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.bdo') }}" target="_blank" >{{ route('representante.bdo') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_oportunidades.JPG') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir
+                    </a>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="row mt-2">
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - Solicitação de Cédula</p>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.solicitarCedulaView') }}" target="_blank" >{{ route('representante.solicitarCedulaView') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_cedula.JPG') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir
+                    </a>
+                </div>
+
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Aba - Solicitação de Cédula > Solicitar Cédula</p>
+                    <em>Cédula (impressa e/ou digital) é enviada após aprovação do atendente.</em>
+                    <p class="font-weight-bolder">
+                        <em>Link: <a href="{{ route('representante.inserirSolicitarCedulaView') }}" target="_blank" >{{ route('representante.inserirSolicitarCedulaView') }}</a></em>
+                    </p>
+                    <a href="{{ route('admin.manual', 'area_rep_cedula_solicitar.gif') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -397,6 +499,12 @@
 
         </div>
 
+    </div>
+
+    <div class="float-right mt-4">
+        <p class="mb-0">
+            <em><strong>Última atualização:</strong> 30/03/2023</em>
+        </p>
     </div>
 
 </div>
