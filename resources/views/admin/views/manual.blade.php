@@ -106,6 +106,7 @@
 
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Representante - Cadastro</p>
+                    <em>Os dados devem constar no Gerenti e situação deve ser 'Ativo'.</em>
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.cadastro') }}" target="_blank" >{{ route('representante.cadastro') }}</a></em>
                     </p>
@@ -501,8 +502,10 @@
 
     </div>
 
-    <div class="float-right mt-4">
-        <p class="mb-0">
+    <hr />
+    
+    <div class="float-right mt-2">
+        <p class="m-0">
             <em><strong>Última atualização:</strong> 30/03/2023</em>
         </p>
     </div>
