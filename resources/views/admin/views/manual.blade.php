@@ -26,7 +26,7 @@
                     <p>
                         <em>A home sofre algumas alterações conforme o perfil do usuário.</em>
                     </p>
-                    <a href="{{ route('admin.manual', 'basico_atalho_home.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_atalho_home.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -38,7 +38,7 @@
 
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Admin - Perfil</p>
-                    <a href="{{ route('admin.manual', 'basico_atalho_perfil.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_atalho_perfil.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -54,7 +54,7 @@
             <div class="row mt-2">
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Admin - Abrir Chamados</p>
-                    <a href="{{ route('admin.manual', 'basico_atalho_chamados.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_atalho_chamados.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -66,7 +66,7 @@
 
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Admin - Perfil pelo menu vertical</p>
-                    <a href="{{ route('admin.manual', 'basico_atalho_perfil_vertical.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_atalho_perfil_vertical.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -78,7 +78,7 @@
 
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Admin - Alterar senha</p>
-                    <a href="{{ route('admin.manual', 'basico_alterar_senha.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_alterar_senha.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -94,13 +94,13 @@
             <div class="row mt-2">
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Admin - Desconectar</p>
-                    <a href="{{ route('admin.manual', 'basico_logout.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_logout.png') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
                         class="btn btn-secondary"
                     >
-                        Abrir <small>(animação)</small>
+                        Abrir
                     </a>
                 </div>
 
@@ -110,7 +110,7 @@
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.cadastro') }}" target="_blank" >{{ route('representante.cadastro') }}</a></em>
                     </p>
-                    <a href="{{ route('admin.manual', 'basico_rep_cadastro.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_rep_cadastro.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -125,7 +125,7 @@
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.password.request') }}" target="_blank" >{{ route('representante.password.request') }}</a></em>
                     </p>
-                    <a href="{{ route('admin.manual', 'basico_rep_alterar_senha.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_rep_alterar_senha.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -144,7 +144,7 @@
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.email.reset.view') }}" target="_blank" >{{ route('representante.email.reset.view') }}</a></em>
                     </p>
-                    <a href="{{ route('admin.manual', 'basico_rep_alterar_email.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_rep_alterar_email.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -194,7 +194,7 @@
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.dados-gerais') }}" target="_blank" >{{ route('representante.dados-gerais') }}</a></em>
                     </p>
-                    <a href="{{ route('admin.manual', 'area_rep_dados_gerais.gif') }}" 
+                    <a href="{{ route('admin.manual', 'area_rep_dados_gerais.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -230,7 +230,7 @@
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.inserir-ou-alterar-contato.view') }}" target="_blank" >{{ route('representante.inserir-ou-alterar-contato.view') }}</a></em>
                     </p>
-                    <a href="{{ route('admin.manual', 'area_rep_contatos_inserir.gif') }}" 
+                    <a href="{{ route('admin.manual', 'area_rep_contatos_inserir.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -261,7 +261,7 @@
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.inserir-endereco.view') }}" target="_blank" >{{ route('representante.inserir-endereco.view') }}</a></em>
                     </p>
-                    <a href="{{ route('admin.manual', 'area_rep_endereco_inserir.gif') }}" 
+                    <a href="{{ route('admin.manual', 'area_rep_endereco_inserir.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -346,7 +346,7 @@
                     <p class="font-weight-bolder">
                         <em>Link: <a href="{{ route('representante.inserirSolicitarCedulaView') }}" target="_blank" >{{ route('representante.inserirSolicitarCedulaView') }}</a></em>
                     </p>
-                    <a href="{{ route('admin.manual', 'area_rep_cedula_solicitar.gif') }}" 
+                    <a href="{{ route('admin.manual', 'area_rep_cedula_solicitar.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
