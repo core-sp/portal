@@ -684,6 +684,7 @@ $('#ano-mapa').on({
 		// Switch para máscaras de contato Gerenti
 		function switchMascaras(conteudo, id)
 		{
+			conteudo.attr('type', 'text');
 			switch (id) {
 				case '1':
 				case '4':
@@ -696,11 +697,8 @@ $('#ano-mapa').on({
 					conteudo.mask('(99) 99999-9999');
 				break;
 				case '3':
-					conteudo.mask("A", {
-						translation: {
-							"A": { pattern: /[\w@\-.+]/, recursive: true }
-						}
-					});
+					conteudo.unmask();
+					conteudo.attr('type', 'email');
 				break;
 				case '5':
 					conteudo.unmask();
