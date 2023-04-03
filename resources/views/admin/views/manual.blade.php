@@ -1,8 +1,10 @@
 <div class="card-body">
 
+    <h5 class="text-danger mb-4"><strong>ATENÇÃO!</strong> <em>Estes arquivos são de uso exclusivo por funcionários do CORE-SP.</em></h5>
+
     <div id="accordion">
 
-        <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#basico">Funções Básicas <small>(Admin, Representante)</small></button>
+        <button class="btn btn-primary btn-block font-weight-bolder" data-toggle="collapse" data-target="#basico">Funções Básicas <small>(Admin, Representante)</small></button>
         <div id="basico" class="collapse" data-parent="#accordion">
         
             <div class="row mt-2">
@@ -170,7 +172,30 @@
 
         <hr />
 
-        <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#area_rep">Área do Representante</button>
+        <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_regional">Serviço: Regionais</button>
+        <div id="serv_regional" class="collapse" data-parent="#accordion">
+
+            <div class="row mt-2">
+                <div class="col-sm-4">
+                    <p class="font-weight-bolder">Editar</p>
+                    <p><em>
+                        Ao editar o formulário da regional, o usuário com permissão irá alterar o texto que aparece nos links da página <a href="{{ route('regionais.siteGrid') }}" target="_blank" >{{ route('regionais.siteGrid') }}</a> , poderá alterar a quantidade de atendentes para agendamento e os horários permitidos.
+                    </em></p>
+                    <a href="{{ route('admin.manual', 'serv_regional_editar.mp4') }}" 
+                        target="_blank" 
+                        rel="noopener" 
+                        type="button" 
+                        class="btn btn-secondary"
+                    >
+                        Abrir <small>(animação)</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <button class="btn btn-success btn-block font-weight-bolder" data-toggle="collapse" data-target="#area_rep">Área do Representante</button>
         <div id="area_rep" class="collapse" data-parent="#accordion">
 
             <div class="row mt-2">
@@ -361,16 +386,16 @@
 
         <hr />
 
-        <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#duvidas_frequentes">Dúvidas Frequentes</button>
+        <button class="btn btn-warning btn-block font-weight-bolder" data-toggle="collapse" data-target="#duvidas_frequentes">Dúvidas Frequentes</button>
         <div id="duvidas_frequentes" class="collapse" data-parent="#accordion">
         
             <div class="row mt-2">
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Representante com agendamento bloqueado</p>
                     <p><span class="font-weight-bolder">Solução: </span>
-                        <em>Usuário com permissão deve buscar pelo cpf os últimos 3 agendamentos do representante, então atualizá-los para 'Cancelado'.</em>
+                        <em>Usuário com permissão deve buscar os agendamentos do representante pelo cpf e atualizar os últimos 3 com o status 'Não Compareceu' para 'Cancelado'.</em>
                     </p>
-                    <a href="{{ route('admin.manual', 'duvidas_agend_bloqueado.gif') }}" 
+                    <a href="{{ route('admin.manual', 'duvidas_agend_bloqueado.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -382,11 +407,11 @@
 
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Representante não consegue fazer login - Caso 1</p>
-                    <em>Usuário com permissão deve verificar se o CPF/CNPJ existe no Gerenti pelo Portal.</em>
+                    <em>Usuário com permissão deve verificar se o CPF/CNPJ existe no Gerenti.</em>
                     <p><span class="font-weight-bolder">Solução 1: </span>
                         <em> Representante deve se registrar no Core-SP como Representante.</em>
                     </p>
-                    <a href="{{ route('admin.manual', 'duvidas_rep_login_invalido_1.gif') }}" 
+                    <a href="{{ route('admin.manual', 'duvidas_rep_login_invalido_1.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -398,14 +423,14 @@
 
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Representante não consegue fazer login - Caso 2</p>
-                    <em>Usuário com permissão deve verificar pelo CPF/CNPJ <strong>sem pontuação</strong> ou nome ou registro ou email se está cadastrado e ativo no Portal.</em>
+                    <em>Usuário com permissão deve verificar pelo CPF/CNPJ <strong>sem pontuação</strong> ou nome ou registro ou e-mail se está cadastrado e ativo no Portal.</em>
                     <p class="m-0"><span class="font-weight-bolder">Condição: </span>
                         <em> Representante cadastrado no Gerenti.</em>
                     </p>
                     <p><span class="font-weight-bolder">Solução 2: </span>
                         <em> Representante deve ativar em 24 horas o cadastro pelo e-mail, caso contrário deve se recadastrar no Portal e ativar pelo novo e-mail enviado.</em>
                     </p>
-                    <a href="{{ route('admin.manual', 'duvidas_rep_login_invalido_2.gif') }}" 
+                    <a href="{{ route('admin.manual', 'duvidas_rep_login_invalido_2.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -428,7 +453,7 @@
                     <p><span class="font-weight-bolder">Solução 3: </span>
                         <em> Representante deve solicitar troca da senha com o CPF/CNPJ usado no cadastro no Portal pelo link <a href="{{ route('representante.password.request') }}" target="_blank" >{{ route('representante.password.request') }}</a> e pelo link no e-mail enviado deve alterá-la.</em>
                     </p>
-                    <a href="{{ route('admin.manual', 'duvidas_rep_login_invalido_3.gif') }}" 
+                    <a href="{{ route('admin.manual', 'basico_rep_alterar_senha.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -442,12 +467,12 @@
                     <p class="font-weight-bolder">Representante não consegue alterar a senha</p>
                     <em>Usuário pode orientar o Representante a solicitar novamente a troca de senha pelo link <a href="{{ route('representante.password.request') }}" target="_blank" >{{ route('representante.password.request') }}</a>.</em>
                     <p class="m-0"><span class="font-weight-bolder">Condição: </span>
-                        <em> Representante cadastrado no Gerenti e cadastrado no Portal, independe se está ativo ou não.</em>
+                        <em> Representante cadastrado no Gerenti e cadastrado no Portal, independente se está ativo ou não no Portal.</em>
                     </p>
                     <p><span class="font-weight-bolder">Solução: </span>
                         <em>Token do link do e-mail enviado expirou após 60 minutos, então deve refazer a solicitação e acessar o link do novo e-mail enviado.</em>
                     </p>
-                    <a href="{{ route('admin.manual', 'duvidas_rep_erro_trocar_senha.gif') }}" 
+                    <a href="{{ route('admin.manual', 'duvidas_rep_erro_trocar_senha.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -460,12 +485,12 @@
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Representante não consegue alterar o e-mail - Caso 1</p>
                     <p class="m-0"><span class="font-weight-bolder">Condição: </span>
-                        <em> Representante cadastrado no Gerenti e cadastrado no Portal, independe se está ativo ou não.</em>
+                        <em> Representante cadastrado no Gerenti e cadastrado no Portal, independente se está ativo ou não no Portal.</em>
                     </p>
                     <p><span class="font-weight-bolder">Solução 1: </span>
-                        <em>Usuário com permissão deve verificar se o novo e-mail está cadastrado no Gerenti.</em>
+                        <em>Usuário com permissão deve verificar se o novo e-mail (campo Novo e-mail) está cadastrado e ativo no Gerenti.</em>
                     </p>
-                    <a href="{{ route('admin.manual', 'duvidas_rep_erro_trocar_email_1.gif') }}" 
+                    <a href="{{ route('admin.manual', 'duvidas_rep_erro_trocar_email_1.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -482,12 +507,12 @@
                 <div class="col-sm-4">
                     <p class="font-weight-bolder">Representante não consegue alterar o e-mail - Caso 2</p>
                     <p class="m-0"><span class="font-weight-bolder">Condição: </span>
-                        <em> Representante cadastrado no Gerenti e cadastrado no Portal, independe se está ativo ou não.</em>
+                        <em> Representante cadastrado no Gerenti e cadastrado no Portal, independente se está ativo ou não no Portal.</em>
                     </p>
                     <p><span class="font-weight-bolder">Solução 2: </span>
-                        <em>Usuário com permissão deve verificar se o e-mail a ser trocado está cadastrado no Portal.</em>
+                        <em>Usuário com permissão deve verificar se o e-mail a ser trocado (campo E-mail antigo) está cadastrado no Portal.</em>
                     </p>
-                    <a href="{{ route('admin.manual', 'duvidas_rep_erro_trocar_email_2.gif') }}" 
+                    <a href="{{ route('admin.manual', 'duvidas_rep_erro_trocar_email_2.mp4') }}" 
                         target="_blank" 
                         rel="noopener" 
                         type="button" 
@@ -506,7 +531,7 @@
     
     <div class="float-right mt-2">
         <p class="m-0">
-            <em><strong>Última atualização:</strong> 30/03/2023</em>
+            <em><strong>Última atualização:</strong> 03/04/2023</em>
         </p>
     </div>
 
