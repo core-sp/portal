@@ -179,7 +179,13 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\HorizonServiceProvider::class
+        App\Providers\HorizonServiceProvider::class,
+
+        /*
+         * Custom Service Providers...
+         */
+
+        App\Providers\MediadorServiceProvider::class,
     ],
 
     /*

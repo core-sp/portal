@@ -24,21 +24,6 @@ class AppServiceProvider extends ServiceProvider
         else {
             $this->app->singleton(GerentiRepositoryInterface::class, GerentiRepository::class);
         }
-        
-        $this->app->singleton('App\Contracts\MediadorServiceInterface', 'App\Services\MediadorService');
-        $this->app->bind('App\Contracts\SuporteServiceInterface', 'App\Services\SuporteService');
-        $this->app->bind('App\Contracts\PlantaoJuridicoServiceInterface', 'App\Services\PlantaoJuridicoService');
-        $this->app->bind('App\Contracts\RegionalServiceInterface', 'App\Services\RegionalService');
-        $this->app->bind('App\Contracts\TermoConsentimentoServiceInterface', 'App\Services\TermoConsentimentoService');
-        $this->app->bind('App\Contracts\AgendamentoServiceInterface', 'App\Services\AgendamentoService');
-        $this->app->bind('App\Contracts\LicitacaoServiceInterface', 'App\Services\LicitacaoService');
-        $this->app->bind('App\Contracts\FiscalizacaoServiceInterface', 'App\Services\FiscalizacaoService');
-        $this->app->bind('App\Contracts\PostServiceInterface', 'App\Services\PostService');
-        $this->app->bind('App\Contracts\NoticiaServiceInterface', 'App\Services\NoticiaService');
-        $this->app->bind('App\Contracts\CedulaServiceInterface', 'App\Services\CedulaService');
-        $this->app->bind('App\Contracts\RepresentanteServiceInterface', 'App\Services\RepresentanteService');
-        $this->app->bind('App\Contracts\PagamentoServiceInterface', 'App\Services\PagamentoGetnetService');
-        $this->app->bind('App\Contracts\GerentiServiceInterface', 'App\Services\GerentiService');
     }
 
     /**
