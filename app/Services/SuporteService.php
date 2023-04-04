@@ -240,8 +240,21 @@ class SuporteService implements SuporteServiceInterface {
 
     public function caminhoFileManual($file)
     {
-        $file = 'manual/' . $file;
+        $variaveis = (object) [
+            'mostra' => 'manual',
+            'singular' => 'Manual',
+            'singulariza' => 'o manual',
+        ];
 
-        return Storage::disk('local')->exists($file) ? Storage::disk('local')->path($file) : null;
+        if(isset($file))
+        {
+            $file = 'manual/' . $file;
+            $file = Storage::disk('local')->exists($file) ? Storage::disk('local')->path($file) : null;
+        }
+
+        return [
+            'file' => $file,
+            'variaveis' => $variaveis
+        ];
     }
 }
