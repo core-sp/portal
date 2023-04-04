@@ -4,6 +4,7 @@
 
     <div id="accordion">
 
+    <!-- ÁREA: FUNÇÕES BÁSICAS **************************************************************************************************************************** -->
         <button class="btn btn-primary btn-block font-weight-bolder" data-toggle="collapse" data-target="#basico">Funções Básicas <small>(Admin, Representante)</small></button>
         <div id="basico" class="collapse" data-parent="#accordion">
         
@@ -169,9 +170,11 @@
                 </div>
             </div>
         </div>
+    <!-- ************************************************************************************************************************************************** -->
 
         <hr />
 
+    <!-- ÁREA: SERVIÇOS REGIONAIS **************************************************************************************************************************** -->
         <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_regional">Serviço: Regionais</button>
         <div id="serv_regional" class="collapse" data-parent="#accordion">
 
@@ -192,9 +195,11 @@
                 </div>
             </div>
         </div>
-
+    <!-- *********************************************************************************************************************************************************** -->
+        
         <hr />
 
+    <!-- ÁREA: ÁREA DO REPRESENTANTE **************************************************************************************************************************** -->
         <button class="btn btn-success btn-block font-weight-bolder" data-toggle="collapse" data-target="#area_rep">Área do Representante</button>
         <div id="area_rep" class="collapse" data-parent="#accordion">
 
@@ -381,11 +386,12 @@
                     </a>
                 </div>
             </div>
-
         </div>
-
+    <!-- *********************************************************************************************************************************************************** -->
+        
         <hr />
 
+    <!-- ÁREA: DÚVIDAS FREQUENTES **************************************************************************************************************************** -->
         <button class="btn btn-warning btn-block font-weight-bolder" data-toggle="collapse" data-target="#duvidas_frequentes">Dúvidas Frequentes</button>
         <div id="duvidas_frequentes" class="collapse" data-parent="#accordion">
         
@@ -522,9 +528,9 @@
                     </a>
                 </div>
             </div>
-
         </div>
-
+    <!-- ****************************************************************************************************************************************************** -->
+    
     </div>
 
     <hr />

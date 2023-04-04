@@ -28,6 +28,7 @@ class SuporteTest extends TestCase
         $this->get(route('suporte.ips.view'))->assertRedirect(route('login'));
         $this->delete(route('suporte.ips.excluir', request()->ip()))->assertRedirect(route('login'));
         $this->get(route('admin.manual'))->assertRedirect(route('login'));
+        $this->get(route('admin.manual', 'teste.gif'))->assertRedirect(route('login'));
     }
 
     /** @test */
@@ -900,9 +901,10 @@ class SuporteTest extends TestCase
                  
         $this->get(route('admin.manual'))
         ->assertOk()
-        ->assertSee('<button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#basico">Funções Básicas <small>(Admin, Representante)</small></button>')
-        ->assertSee('<button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#area_rep">Área do Representante</button>')
-        ->assertSee('<button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#duvidas_frequentes">Dúvidas Frequentes</button>');
+        ->assertSee('<button class="btn btn-primary btn-block font-weight-bolder" data-toggle="collapse" data-target="#basico">Funções Básicas <small>(Admin, Representante)</small></button>')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_regional">Serviço: Regionais</button>')
+        ->assertSee('<button class="btn btn-success btn-block font-weight-bolder" data-toggle="collapse" data-target="#area_rep">Área do Representante</button>')
+        ->assertSee('<button class="btn btn-warning btn-block font-weight-bolder" data-toggle="collapse" data-target="#duvidas_frequentes">Dúvidas Frequentes</button>');
     }
 
     /** @test */
@@ -933,6 +935,16 @@ class SuporteTest extends TestCase
         ->assertSee('<p class="font-weight-bolder">Representante - Alterar senha</p>')
         ->assertSee('<p class="font-weight-bolder">Representante - Alterar e-mail</p>')
         ->assertSee('<p class="font-weight-bolder">Representante - Desconectar</p>');
+    }
+
+    /** @test */
+    public function user_can_see_content_in_servicos_regionais_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<p class="font-weight-bolder">Editar</p>');
     }
 
     /** @test */
