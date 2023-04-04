@@ -6,7 +6,7 @@
 
 @section('content')
 
-@include('site.inc.popup')
+{{--@include('site.inc.popup')--}}
 
 <section>
   <div class="container-fluid">

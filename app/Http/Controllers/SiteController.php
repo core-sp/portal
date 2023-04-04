@@ -55,7 +55,6 @@ class SiteController extends Controller
         $buscaArray = preg_split('/\s+/', $busca, -1);
 
         if(isset($busca)) {
-            $resultados = collect();
             $paginas = Pagina::selectRaw("'Página' as tipo, titulo, subtitulo, slug, created_at,conteudo")
                 ->where(function($query) use ($buscaArray) {
                     foreach($buscaArray as $b) {
@@ -65,11 +64,12 @@ class SiteController extends Controller
                                 ->orWhere('conteudoBusca','LIKE','%'.$b.'%');
                         });
                     }
-                })->limit(10);
-            $noticias = $this->service->getService('Noticia')->buscaSite($buscaArray);
-            $posts = $this->service->getService('Post')->buscaSite($buscaArray);
+                })->limit(10)
+                ->get();
+            $noticias = $this->service->getService('Noticia')->buscaSite($buscaArray)->get();
+            $posts = $this->service->getService('Post')->buscaSite($buscaArray)->get();
 
-            $resultados = $paginas->union($noticias)->union($posts)->get();
+            $resultados = collect([$paginas, $noticias, $posts])->collapse();
 
             return view('site.busca', compact('busca', 'resultados'));
         } else {
