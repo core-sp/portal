@@ -20,7 +20,7 @@ class SystemTest extends TestCase
             'PlantaoJuridico' => new \App\Services\PlantaoJuridicoService(),
             'Regional' => new \App\Services\RegionalService(),
             'TermoConsentimento' => new \App\Services\TermoConsentimentoService(),
-            'Agendamento' => new \App\Services\AgendamentoService(),
+            'Agendamento' => new \App\Services\AgendamentoService(new \App\Services\AgendamentoSiteSubService, new \App\Services\AgendamentoBloqueioSubService),
             'Licitacao' => new \App\Services\LicitacaoService(),
             'Fiscalizacao' => new \App\Services\FiscalizacaoService(),
             'Post' => new \App\Services\PostService(),
@@ -156,9 +156,11 @@ class SystemTest extends TestCase
     /** @test */
     public function mediador_interface_get_instace_agendamento_service()
     {
-        $servico = new \App\Services\AgendamentoService();
+        $servico = new \App\Services\AgendamentoService(new \App\Services\AgendamentoSiteSubService, new \App\Services\AgendamentoBloqueioSubService);
         $mediador = $this->app->make(MediadorServiceInterface::class);
         $this->assertEquals($mediador->getService('Agendamento'), $servico);
+        $this->assertEquals($mediador->getService('Agendamento')->site(), $servico->site());
+        $this->assertEquals($mediador->getService('Agendamento')->bloqueio(), $servico->bloqueio());
     }
 
     /** @test */

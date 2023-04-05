@@ -78,7 +78,7 @@ class AgendamentoRequest extends FormRequest
                     if(request()->servico != 'Plantão Jurídico')
                         $this->dateFormat = $this->dateFormat.'|before_or_equal:'.Carbon::today()->addMonth()->format('d\/m\/Y');
 
-                    $horarios = $service->getDiasHorasAjaxSite($dados);
+                    $horarios = $service->site()->getDiasHorasAjax($dados);
                     $this->horariosComBloqueio = isset($horarios) ? '|in:'.implode(',', $horarios) : '|in:';
                 }
             }

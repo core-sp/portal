@@ -3,11 +3,11 @@
 namespace App\Services;
 
 use App\Contracts\AgendamentoServiceInterface;
+use App\Contracts\AgendamentoSiteSubServiceInterface;
+use App\Contracts\AgendamentoBloqueioSubServiceInterface;
 use App\Contracts\MediadorServiceInterface;
 use App\Agendamento;
-use App\AgendamentoBloqueio;
 use App\Events\CrudEvent;
-use App\Events\ExternoEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoMailGuest;
@@ -16,10 +16,10 @@ use Exception;
 class AgendamentoService implements AgendamentoServiceInterface {
 
     private $variaveis;
-    private $variaveisBloqueio;
-    private $renameSede;
+    private $site;
+    private $bloqueio;
 
-    public function __construct()
+    public function __construct(AgendamentoSiteSubServiceInterface $site, AgendamentoBloqueioSubServiceInterface $bloqueio)
     {
         $this->variaveis = [
             'singular' => 'agendamento',
@@ -28,75 +28,8 @@ class AgendamentoService implements AgendamentoServiceInterface {
             'pluraliza' => 'agendamentos'
         ];
 
-        $this->variaveisBloqueio = [
-            'singular' => 'bloqueio',
-            'singulariza' => 'o bloqueio',
-            'plural' => 'bloqueios de agendamento',
-            'pluraliza' => 'bloqueios',
-            'form' => 'agendamentobloqueio',
-            'cancelar' => 'agendamentos/bloqueios',
-            'titulo_criar' => 'Cadastrar novo bloqueio',
-            'btn_criar' => '<a href="'.route('agendamentobloqueios.criar').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Novo Bloqueio</a>',
-            'busca' => 'agendamentos/bloqueios',
-        ];
-
-        $this->renameSede = 'São Paulo - Avenida Brigadeiro Luís Antônio';
-    }
-
-    private function status()
-    { 
-        return [
-            Agendamento::STATUS_COMPARECEU,
-            Agendamento::STATUS_NAO_COMPARECEU,
-            Agendamento::STATUS_CANCELADO
-        ];
-    }
-
-    private function servicos()
-    {
-        return [
-            Agendamento::SERVICOS_ATUALIZACAO_DE_CADASTRO,
-            Agendamento::SERVICOS_CANCELAMENTO_DE_REGISTRO,
-            Agendamento::SERVICOS_PLANTAO_JURIDICO,
-            // Agendamento::SERVICOS_REFIS,
-            Agendamento::SERVICOS_REGISTRO_INICIAL,
-            Agendamento::SERVICOS_OUTROS
-        ];
-    }
-
-    private function servicosCompletos()
-    {
-        $resultado = array();
-
-        foreach($this->servicos() as $servico)
-            foreach(Agendamento::TIPOS_PESSOA as $tipoPessoa)
-                array_push($resultado, $servico.' para '.$tipoPessoa);
-
-        return $resultado;
-    }
-
-    private function getBtnByStatus($resultado)
-    {
-        if($resultado->isAfter())
-            $default = null;
-        else
-        {
-            $default = '<form method="POST" action="'.route('agendamentos.updateStatus').'" class="d-inline">';
-            $default .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-            $default .= '<input type="hidden" name="_method" value="PUT" id="method" />';
-            $default .= '<input type="hidden" name="idagendamento" value="'.$resultado->idagendamento.'" />';
-            $default .= '<button type="submit" name="status" class="btn btn-sm btn-primary" value="'.Agendamento::STATUS_COMPARECEU.'">Confirmar</button>';
-            $default .= '<button type="submit" name="status" class="btn btn-sm btn-danger ml-1" value="'.Agendamento::STATUS_NAO_COMPARECEU.'">'.Agendamento::STATUS_NAO_COMPARECEU.'</button>';
-            $default .= '</form>';
-        }
-        
-        $tiposStatus = [
-            Agendamento::STATUS_CANCELADO => '<strong>'.Agendamento::STATUS_CANCELADO.'</strong>',
-            Agendamento::STATUS_COMPARECEU => '<p class="d-inline"><i class="fas fa-check checkIcone"></i>&nbsp;&nbsp;'.Agendamento::STATUS_COMPARECEU.'</p>',
-            Agendamento::STATUS_NAO_COMPARECEU => '<strong>'.Agendamento::STATUS_NAO_COMPARECEU.'</strong>'
-        ];
-
-        return isset($tiposStatus[$resultado->status]) ? $tiposStatus[$resultado->status] : $default;
+        $this->site = $site;
+        $this->bloqueio = $bloqueio;
     }
 
     private function validacaoFiltroAtivo($request)
@@ -146,7 +79,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $options = isset($request->status) && ($request->status == 'Qualquer') ? 
         getFiltroOptions('Qualquer', 'Qualquer', true) : getFiltroOptions('Qualquer', 'Qualquer');
 
-        foreach($this->status() as $s)
+        foreach(Agendamento::status() as $s)
             $options .= isset($request->status) && ($request->status == $s) ? 
             getFiltroOptions($s, $s, true) : getFiltroOptions($s, $s);
 
@@ -155,7 +88,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $options = isset($request->servico) && ($request->servico == 'Qualquer') ? 
         getFiltroOptions('Qualquer', 'Qualquer', true) : getFiltroOptions('Qualquer', 'Qualquer');
 
-        foreach($this->servicosCompletos() as $servico)
+        foreach(Agendamento::servicosCompletos() as $servico)
             $options .= isset($request->servico) && ($request->servico == $servico) ? 
             getFiltroOptions($servico, $servico, true) : getFiltroOptions($servico, $servico);
 
@@ -248,7 +181,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
         foreach($resultados as $resultado) 
         {
-            $acoes = $this->getBtnByStatus($resultado);
+            $acoes = $resultado->getBtnByStatus();
             if($userPodeEditar)
                 $acoes .= '&nbsp;&nbsp;<a href="'.route('agendamentos.edit', $resultado->idagendamento).'" class="btn btn-sm btn-default">Editar</a>';
             if($resultado->status == Agendamento::STATUS_COMPARECEU)
@@ -271,132 +204,6 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         $tabela = montaTabela($headers, $contents, $classes);
         return $tabela;
-    }
-
-    private function tabelaCompletaBloqueio($resultados)
-    {
-        // Opções de cabeçalho da tabela
-        $headers = [
-            'Código',
-            'Regional',
-            'Duração',
-            'Horas bloqueadas/qtd de agend. alterada',
-            'Qtd. de agend. por horário',
-            'Ações',
-        ];
-        // Opções de conteúdo da tabela
-        $contents = [];
-        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
-        $userPodeExcluir = auth()->user()->can('delete', auth()->user());
-        foreach($resultados as $resultado) 
-        {
-            $acoes = '';
-            $duracao = 'Início: '.onlyDate($resultado->diainicio).'<br />';
-            $duracao .= 'Término: '.$resultado->getMsgDiaTermino();
-            if($userPodeEditar) 
-                $acoes .= '<a href="'.route('agendamentobloqueios.edit', $resultado->idagendamentobloqueio).'" class="btn btn-sm btn-primary">Editar</a> ';
-            if($userPodeExcluir) {
-                $acoes .= '<form method="POST" action="'.route('agendamentobloqueios.delete', $resultado->idagendamentobloqueio).'" class="d-inline-block">';
-                $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-                $acoes .= '<input type="hidden" name="_method" value="delete" />';
-                $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Cancelar" onclick="return confirm(\'Tem certeza que deseja cancelar o bloqueio?\')" />';
-                $acoes .= '</form>';
-            }
-            $conteudo = [
-                $resultado->idagendamentobloqueio,
-                $resultado->regional->regional,
-                $duracao,
-                $resultado->horarios,
-                $resultado->qtd_atendentes,
-                $acoes
-            ];
-            array_push($contents, $conteudo);
-        }
-        
-        // Classes da tabela
-        $classes = [
-            'table',
-            'table-hover'
-        ];
-
-        // Monta e retorna tabela        
-        $tabela = montaTabela($headers, $contents, $classes);
-        return $tabela;
-    }
-
-    private function validarStore($dados, MediadorServiceInterface $service)
-    {
-        $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
-        $agendamentos = Agendamento::where('dia', $dia)
-            ->where('cpf', $dados['cpf'])
-            ->whereNull('status')
-            ->get();
-
-        $total = $agendamentos->where('hora', $dados['hora'])->count();
-        if($total == 1)
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Este CPF já possui um agendamento neste dia e horário',
-                'class' => 'alert-danger'
-            ];
-
-        $total = $agendamentos->count();
-        if($total >= 2)
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>É permitido apenas 2 agendamentos por cpf por dia',
-                'class' => 'alert-danger'
-            ];
-
-        $total = Agendamento::where('cpf', $dados['cpf'])
-            ->where('status', Agendamento::STATUS_NAO_COMPARECEU)
-            ->whereBetween('dia', [Carbon::today()->subDays(90)->format('Y-m-d'), date('Y-m-d')])
-            ->count();
-        if($total >= 3)
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Agendamento bloqueado por excesso de falta nos últimos 90 dias. 
-                Favor entrar em contato com o Core-SP para regularizar o agendamento.',
-                'class' => 'alert-danger'
-            ];
-
-        if($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO)
-        {
-            $regional = $dados['object_regional'];
-            $plantao = $regional->plantaoJuridico;
-            $total = $regional->agendamentos()
-                ->where('cpf', $dados['cpf'])
-                ->where('tiposervico', 'LIKE', Agendamento::SERVICOS_PLANTAO_JURIDICO.'%')
-                ->whereNull('status')
-                ->whereBetween('dia', [$plantao->dataInicial, $plantao->dataFinal])
-                ->count();
-            if($total >= 1)
-                return [
-                    'message' => '<i class="icon fa fa-ban"></i>Durante o período deste plantão jurídico é permitido apenas 1 agendamento por cpf',
-                    'class' => 'alert-danger'
-                ];
-        }
-
-        $dados['dia'] = $dia;
-        $dados['nome'] = mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE);
-        $dados['protocolo'] = $this->getProtocolo();
-        $dados['tiposervico'] = $dados['servico'].' para '.$dados['pessoa'];
-        unset($dados['servico']);
-        unset($dados['pessoa']);
-        unset($dados['termo']);
-        unset($dados['object_regional']);
-
-        return $dados;
-    }
-
-    private function getProtocolo()
-    {
-        // Gera a HASH (protocolo) aleatória
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVXZ0123456789';
-        do {
-            $protocoloGerado = substr(str_shuffle($characters), 0, 6);
-            $protocoloGerado = 'AGE-'.$protocoloGerado;
-            $countProtocolo = Agendamento::where('protocolo', $protocoloGerado)->count();
-        } while($countProtocolo != 0);
-
-        return $protocoloGerado;
     }
 
     public function listar($request = null, MediadorServiceInterface $service = null)
@@ -430,24 +237,6 @@ class AgendamentoService implements AgendamentoServiceInterface {
         ];
     }
 
-    public function listarBloqueio()
-    {
-        $resultados = AgendamentoBloqueio::with('regional')
-            ->orderBy('idagendamentobloqueio', 'DESC')
-            ->where('diatermino', '>=', date('Y-m-d'))
-            ->orWhereNull('diatermino')
-            ->paginate(10);
-
-        if(auth()->user()->cannot('create', auth()->user()))
-            unset($this->variaveisBloqueio['btn_criar']);
-        
-        return [
-            'tabela' => $this->tabelaCompletaBloqueio($resultados),
-            'resultados' => $resultados,
-            'variaveis' => (object) $this->variaveisBloqueio,
-        ];
-    }
-
     public function view($id)
     {
         $agendamento = Agendamento::findOrFail($id);
@@ -457,7 +246,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         if($atendOrGere && !$sameRegional)
             throw new Exception('Não autorizado', 403);
 
-        $status = $this->status();
+        $status = Agendamento::status();
         if($agendamento->isAfter())
         {
             unset($status[0]);
@@ -478,52 +267,11 @@ class AgendamentoService implements AgendamentoServiceInterface {
             ->get();
     
         return [
-            'servicos' => $this->servicosCompletos(),
+            'servicos' => Agendamento::servicosCompletos(),
             'status' => $status,
             'variaveis' => (object) $this->variaveis,
             'atendentes' => $atendentes,
             'resultado' => $agendamento
-        ];
-    }
-
-    public function viewBloqueio($id = null, MediadorServiceInterface $service = null)
-    {
-        if(isset($service) && !isset($id))
-        {
-            $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14]);
-            $regionais->find(1)->regional = $this->renameSede;
-    
-            return [
-                'variaveis' => (object) $this->variaveisBloqueio,
-                'regionais' => $regionais->sortBy('regional'),
-            ];
-        }
-        
-        $bloqueio = AgendamentoBloqueio::findOrFail($id);
-
-        if($bloqueio->idregional == 1)
-            $bloqueio->regional->regional = $this->renameSede;
-
-        return [
-            'variaveis' => (object) $this->variaveisBloqueio,
-            'resultado' => $bloqueio,
-        ];
-    }
-
-    public function viewSite(MediadorServiceInterface $service)
-    {
-        $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14]);
-        $regionais->find(1)->regional = $this->renameSede;
-
-        $servicos = $this->servicos();
-
-        if(!$service->getService('PlantaoJuridico')->plantaoJuridicoAtivo()) 
-            unset($servicos[array_search(Agendamento::SERVICOS_PLANTAO_JURIDICO, $servicos)]);      
-
-        return [
-            'regionais' => $regionais->sortBy('regional'),
-            'pessoas' => Agendamento::TIPOS_PESSOA,
-            'servicos' => $servicos
         ];
     }
 
@@ -570,122 +318,6 @@ class AgendamentoService implements AgendamentoServiceInterface {
         }
     }
 
-    public function saveBloqueio($dados, MediadorServiceInterface $service, $id = null)
-    {
-        $dados['idusuario'] = auth()->user()->idusuario;
-        $dados['horarios'] = $dados['idregional'] != 'Todas' ? implode(',', $dados['horarios']) : null;
-
-        if(isset($id))
-        {
-            unset($dados['idregional']);
-            $bloqueio = AgendamentoBloqueio::findOrFail($id);
-            $bloqueio->update($dados);
-
-            event(new CrudEvent('bloqueio de agendamento', 'editou', $id));
-            return null;
-        }
-
-        if($dados['idregional'] == 'Todas')
-        {
-            $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14]);
-            foreach($regionais as $regional)
-            {
-                $dados['idregional'] = $regional->idregional;
-                $dados['horarios'] = $regional->horariosage;
-                $bloqueio = AgendamentoBloqueio::create($dados);
-                event(new CrudEvent('bloqueio de agendamento', 'criou', $bloqueio->idagendamentobloqueio));
-            }
-
-            return null;
-        }
-
-        $bloqueio = AgendamentoBloqueio::create($dados);
-        event(new CrudEvent('bloqueio de agendamento', 'criou', $bloqueio->idagendamentobloqueio));
-        return null;
-    }
-
-    public function saveSite($dados, MediadorServiceInterface $service)
-    {
-        $valid = $this->validarStore($dados, $service);
-        if(isset($valid['message']))
-            return $valid;
-
-        $agendamento = Agendamento::create($valid);
-        $termo = $agendamento->termos()->create([
-            'ip' => request()->ip()
-        ]);
-        $agendamento->regional = $dados['object_regional'];
-
-        $string = $agendamento->nome.' (CPF: '.$agendamento->cpf.') *agendou* atendimento em *'.$agendamento->regional->regional;
-        $string .= '* no dia '.onlyDate($agendamento->dia).' para o serviço '.$agendamento->tiposervico.' e ' .$termo->message();
-        event(new ExternoEvent($string));
-
-        $email = new AgendamentoMailGuest($agendamento);
-        Mail::to($agendamento->email)->queue($email);
-
-        return [
-            'agradece' => $email->body,
-            'adendo' => '<i>* As informações serão enviadas ao email cadastrado no formulário</i>'
-        ];
-    }
-
-    public function consultaSite($dados)
-    {
-        $protocolo = 'AGE-'.strtoupper($dados['protocolo']);
-
-        return Agendamento::with('regional')
-            ->where('protocolo', $protocolo)
-            ->where('dia', '>=', date('Y-m-d'))
-            ->first();
-    }
-
-    public function cancelamentoSite($dados)
-    {
-        if(!isset($dados['protocolo']))
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Protocolo não recebido. Faça a consulta do agendamento novamente.',
-                'class' => 'alert-danger'
-            ];
-
-        $protocolo = 'AGE-'.strtoupper($dados['protocolo']);
-        $agendamento = Agendamento::where('protocolo', $protocolo)
-            ->where('dia', '>=', date('Y-m-d'))
-            ->whereNull('status')
-            ->first();
-
-        if(!isset($agendamento))
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>O protocolo não existe para agendamentos de hoje em diante',
-                'class' => 'alert-danger'
-            ];
-        if($agendamento->cpf != $dados['cpf'])
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>O CPF informado não corresponde ao protocolo. Por favor, pesquise novamente o agendamento',
-                'class' => 'alert-danger'
-            ];
-
-        if(!$agendamento->isAfter())
-            return [
-                'message' => '<i class="icon fa fa-ban"></i>Cancelamento do agendamento deve ser antes do dia do atendimento',
-                'class' => 'alert-danger'
-            ];
-            
-        $update = $agendamento->update(['status' => Agendamento::STATUS_CANCELADO]);
-        if(!$update)
-            throw new Exception('Erro ao atualizar o status do agendamento', 500);
-
-        $string = $agendamento->nome.' (CPF: '.$agendamento->cpf.') *cancelou* atendimento em *'.$agendamento->regional->regional;
-        $string .= '* no dia '.onlyDate($agendamento->dia);
-        event(new ExternoEvent($string));
-                
-        return 'Agendamento cancelado com sucesso!';            
-    }
-
-    public function delete($id)
-    {
-        return AgendamentoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('bloqueio de agendamento', 'cancelou', $id)) : null;
-    }
-
     public function buscar($busca)
     {
         $regional = auth()->user()->can('atendenteOrGerSeccionais', auth()->user()) ? auth()->user()->idregional : null;
@@ -715,28 +347,12 @@ class AgendamentoService implements AgendamentoServiceInterface {
         ];
     }
 
-    public function buscarBloqueio($busca)
-    {
-        $resultados = AgendamentoBloqueio::with('regional')
-            ->whereHas('regional', function($q) use($busca){
-                $q->where('regional', 'LIKE', '%'.$busca.'%');
-            })->paginate(10);
-
-        $this->variaveisBloqueio['slug'] = 'agendamentos/bloqueios';
-
-        return [
-            'resultados' => $resultados,
-            'tabela' => $this->tabelaCompletaBloqueio($resultados), 
-            'variaveis' => (object) $this->variaveisBloqueio
-        ];
-    }
-
     public function getServicosOrStatusOrCompletos($tipo)
     {
         $array = [
-            'servicos' => $this->servicos(),
-            'status' => $this->status(),
-            'completos' => $this->servicosCompletos()
+            'servicos' => Agendamento::servicos(),
+            'status' => Agendamento::status(),
+            'completos' => Agendamento::servicosCompletos()
         ];
 
         return isset($array[$tipo]) ? $array[$tipo] : null;
@@ -768,41 +384,13 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return $count ? $resultados->total() : $resultados;
     }
 
-    public function getDiasHorasAjaxSite($dados)
+    public function site()
     {
-        $regional = $dados['regional'];
-        if(isset($regional))
-        {
-            $resultado = !isset($dados['servico']) || ($dados['servico'] == Agendamento::SERVICOS_PLANTAO_JURIDICO) ? 
-            $regional->plantaoJuridico()->with('bloqueios')->first() : $regional;
-    
-            if(!isset($dados['servico']) && !isset($dados['dia']))
-            {
-                $plantao = $resultado->qtd_advogados > 0 ? $resultado : null;
-        
-                if(isset($plantao))
-                {
-                    $inicial = Carbon::parse($plantao->dataInicial);
-                    $final = Carbon::parse($plantao->dataFinal);
+        return $this->site;
+    }
 
-                    return [
-                        $inicial->gt(Carbon::today()) ? $plantao->dataInicial : null,
-                        $final->gt(Carbon::today()) ? $plantao->dataFinal : null
-                    ];
-                }
-        
-                return [];
-            }
-        
-            if(isset($dados['dia']))
-            {
-                $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
-                return $resultado->removeHorariosSeLotado($dia);
-            }
-            
-            return $resultado->getDiasSeLotado();
-        }
-
-        return null;
+    public function bloqueio()
+    {
+        return $this->bloqueio;
     }
 }

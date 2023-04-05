@@ -18,7 +18,7 @@ class AgendamentoSiteController extends Controller
     public function formView()
     {
         try{
-            $dados = $this->service->getService('Agendamento')->viewSite($this->service);
+            $dados = $this->service->getService('Agendamento')->site()->view($this->service);
             $regionais = $dados['regionais'];
             $pessoas = $dados['pessoas'];
             $servicos = $dados['servicos'];
@@ -39,7 +39,7 @@ class AgendamentoSiteController extends Controller
     {
         try{
             $validated = $request->validated();
-            $resultado = $this->service->getService('Agendamento')->consultaSite($validated);
+            $resultado = $this->service->getService('Agendamento')->site()->consulta($validated);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao consultar o protocolo do agendamento.");
@@ -52,7 +52,7 @@ class AgendamentoSiteController extends Controller
     {
         try{
             $validated = $request->validated();
-            $message = $this->service->getService('Agendamento')->saveSite($validated, $this->service);
+            $message = $this->service->getService('Agendamento')->site()->save($validated, $request->ip(), $this->service);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao salvar os dados para criar o agendamento.");
@@ -68,7 +68,7 @@ class AgendamentoSiteController extends Controller
         try{
             $validated = $request->validated();
             $validated['protocolo'] = request()->query('protocolo');
-            $message = $this->service->getService('Agendamento')->cancelamentoSite($validated);
+            $message = $this->service->getService('Agendamento')->site()->cancelamento($validated);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao cancelar o agendamento.");
@@ -87,7 +87,7 @@ class AgendamentoSiteController extends Controller
                 abort(500, 'Regional não permitida');
 
             $validate['regional'] = $this->service->getService('Regional')->getById($validate['idregional']);
-            $dados = $this->service->getService('Agendamento')->getDiasHorasAjaxSite($validate);
+            $dados = $this->service->getService('Agendamento')->site()->getDiasHorasAjax($validate);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para o agendamento via ajax.");

@@ -21,7 +21,7 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->listarBloqueio();
+            $dados = $this->service->getService('Agendamento')->bloqueio()->listar();
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
@@ -38,7 +38,7 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('create', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->viewBloqueio(null, $this->service);
+            $dados = $this->service->getService('Agendamento')->bloqueio()->view(null, $this->service);
             $variaveis = $dados['variaveis'];
             $regionais = $dados['regionais'];
         } catch (\Exception $e) {
@@ -55,7 +55,7 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $validated = $request->validated();
-            $this->service->getService('Agendamento')->saveBloqueio($validated, $this->service);
+            $this->service->getService('Agendamento')->bloqueio()->save($validated, $this->service);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar o bloqueio do agendamento.");
@@ -72,7 +72,7 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('updateOther', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->viewBloqueio($id);
+            $dados = $this->service->getService('Agendamento')->bloqueio()->view($id);
             $resultado = $dados['resultado'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
@@ -89,7 +89,7 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $validated = $request->validated();
-            $this->service->getService('Agendamento')->saveBloqueio($validated, $this->service, $id);
+            $this->service->getService('Agendamento')->bloqueio()->save($validated, $this->service, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o bloqueio do agendamento.");
@@ -106,7 +106,7 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('delete', auth()->user());
 
         try{
-            $this->service->getService('Agendamento')->delete($id);
+            $this->service->getService('Agendamento')->bloqueio()->delete($id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao excluir o bloqueio do agendamento.");
@@ -124,7 +124,7 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Agendamento')->buscarBloqueio($busca);
+            $dados = $this->service->getService('Agendamento')->bloqueio()->buscar($busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
