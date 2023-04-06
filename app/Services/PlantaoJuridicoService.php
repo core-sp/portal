@@ -26,7 +26,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         $this->bloqueio = $bloqueio;
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($user, $resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -39,7 +39,7 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
+        $userPodeEditar = $user->can('updateOther', $user);
         foreach($resultados as $resultado) {
             $msgPrazoExpirado = $resultado->expirou() ? '<br><small class="text-danger"><strong>Período expirado, DESATIVE o plantão</strong></small>' : '';
             $msgAtivado = '<span class="text-success">Ativado</span><br><small>com '.$resultado->qtd_advogados.' advogado(s)</small>';
@@ -67,14 +67,14 @@ class PlantaoJuridicoService implements PlantaoJuridicoServiceInterface {
         return $tabela;
     }
 
-    public function listar()
+    public function listar($user)
     {
         $plantoes = PlantaoJuridico::with('regional')
         ->orderBy('qtd_advogados', 'DESC')
         ->get();
 
         return [
-            'tabela' => $this->tabelaCompleta($plantoes),
+            'tabela' => $this->tabelaCompleta($user, $plantoes),
             'resultados' => $plantoes,
             'variaveis' => (object) $this->variaveis
         ];

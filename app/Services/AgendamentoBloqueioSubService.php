@@ -29,7 +29,7 @@ class AgendamentoBloqueioSubService implements AgendamentoBloqueioSubServiceInte
         $this->renameSede = 'São Paulo - Avenida Brigadeiro Luís Antônio';
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($user, $resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -42,8 +42,8 @@ class AgendamentoBloqueioSubService implements AgendamentoBloqueioSubServiceInte
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
-        $userPodeExcluir = auth()->user()->can('delete', auth()->user());
+        $userPodeEditar = $user->can('updateOther', $user);
+        $userPodeExcluir = $user->can('delete', $user);
         foreach($resultados as $resultado) 
         {
             $acoes = '';
@@ -80,7 +80,7 @@ class AgendamentoBloqueioSubService implements AgendamentoBloqueioSubServiceInte
         return $tabela;
     }
 
-    public function listar()
+    public function listar($user)
     {
         $resultados = AgendamentoBloqueio::with('regional')
             ->orderBy('idagendamentobloqueio', 'DESC')
@@ -88,11 +88,11 @@ class AgendamentoBloqueioSubService implements AgendamentoBloqueioSubServiceInte
             ->orWhereNull('diatermino')
             ->paginate(10);
 
-        if(auth()->user()->cannot('create', auth()->user()))
+        if($user->cannot('create', $user))
             unset($this->variaveis['btn_criar']);
         
         return [
-            'tabela' => $this->tabelaCompleta($resultados),
+            'tabela' => $this->tabelaCompleta($user, $resultados),
             'resultados' => $resultados,
             'variaveis' => (object) $this->variaveis,
         ];
@@ -122,9 +122,9 @@ class AgendamentoBloqueioSubService implements AgendamentoBloqueioSubServiceInte
         ];
     }
 
-    public function save($dados, MediadorServiceInterface $service, $id = null)
+    public function save($user, $dados, MediadorServiceInterface $service, $id = null)
     {
-        $dados['idusuario'] = auth()->user()->idusuario;
+        $dados['idusuario'] = $user->idusuario;
         $dados['horarios'] = $dados['idregional'] != 'Todas' ? implode(',', $dados['horarios']) : null;
 
         if(isset($id))
@@ -161,7 +161,7 @@ class AgendamentoBloqueioSubService implements AgendamentoBloqueioSubServiceInte
         return AgendamentoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('bloqueio de agendamento', 'cancelou', $id)) : null;
     }
 
-    public function buscar($busca)
+    public function buscar($user, $busca)
     {
         $resultados = AgendamentoBloqueio::with('regional')
             ->whereHas('regional', function($q) use($busca){
@@ -172,7 +172,7 @@ class AgendamentoBloqueioSubService implements AgendamentoBloqueioSubServiceInte
 
         return [
             'resultados' => $resultados,
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }

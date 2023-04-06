@@ -2,9 +2,11 @@
 
 namespace App\Contracts;
 
+use App\User;
+
 interface PlantaoJuridicoServiceInterface {
 
-    public function listar();
+    public function listar(User $user);
 
     public function view($id);
 

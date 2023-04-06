@@ -21,7 +21,7 @@ class AgendamentoBloqueioController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->bloqueio()->listar();
+            $dados = $this->service->getService('Agendamento')->bloqueio()->listar(auth()->user());
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
@@ -55,7 +55,7 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $validated = $request->validated();
-            $this->service->getService('Agendamento')->bloqueio()->save($validated, $this->service);
+            $this->service->getService('Agendamento')->bloqueio()->save(auth()->user(), $validated, $this->service);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar o bloqueio do agendamento.");
@@ -89,7 +89,7 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $validated = $request->validated();
-            $this->service->getService('Agendamento')->bloqueio()->save($validated, $this->service, $id);
+            $this->service->getService('Agendamento')->bloqueio()->save(auth()->user(), $validated, $this->service, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o bloqueio do agendamento.");
@@ -124,7 +124,7 @@ class AgendamentoBloqueioController extends Controller
 
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Agendamento')->bloqueio()->buscar($busca);
+            $dados = $this->service->getService('Agendamento')->bloqueio()->buscar(auth()->user(), $busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];

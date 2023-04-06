@@ -21,7 +21,7 @@ class AgendamentoController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->listar($request, $this->service);
+            $dados = $this->service->getService('Agendamento')->listar(auth()->user(), $request, $this->service);
             $temFiltro = $dados['temFiltro'];
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
@@ -40,7 +40,7 @@ class AgendamentoController extends Controller
 
         try{
             $validated = $request->validated();
-            $erro = $this->service->getService('Agendamento')->save($validated);
+            $erro = $this->service->getService('Agendamento')->save(auth()->user(), $validated);
             $id = $validated['idagendamento'];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -61,7 +61,7 @@ class AgendamentoController extends Controller
 
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Agendamento')->buscar($busca);
+            $dados = $this->service->getService('Agendamento')->buscar(auth()->user(), $busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
@@ -78,7 +78,7 @@ class AgendamentoController extends Controller
         $this->authorize('updateOther', auth()->user());
         
         try{
-            $dados = $this->service->getService('Agendamento')->view($id);
+            $dados = $this->service->getService('Agendamento')->view(auth()->user(), $id);
             $resultado = $dados['resultado'];
             $variaveis = $dados['variaveis'];
             $atendentes = $dados['atendentes'];
@@ -99,7 +99,7 @@ class AgendamentoController extends Controller
 
         try{
             $validated = $request->validated();
-            $erro = $this->service->getService('Agendamento')->save($validated, $id);
+            $erro = $this->service->getService('Agendamento')->save(auth()->user(), $validated, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403,400]) ? abort($e->getCode(), $e->getMessage()) : 
@@ -117,7 +117,7 @@ class AgendamentoController extends Controller
         $this->authorize('updateOther', auth()->user());
 
         try{
-            $erro = $this->service->getService('Agendamento')->enviarEmail($id);
+            $erro = $this->service->getService('Agendamento')->enviarEmail(auth()->user(), $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 
@@ -135,7 +135,7 @@ class AgendamentoController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Agendamento')->listar();
+            $dados = $this->service->getService('Agendamento')->listar(auth()->user());
             $resultados = $dados['resultados'];
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];

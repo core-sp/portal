@@ -32,9 +32,9 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $this->bloqueio = $bloqueio;
     }
 
-    private function validacaoFiltroAtivo($request)
+    private function validacaoFiltroAtivo($user, $request)
     {
-        $canFiltroRegional = auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user());
+        $canFiltroRegional = $user->cannot('atendenteOrGerSeccionais', $user);
         $datemin = $request->filled('datemin') ? Carbon::parse($request->datemin) : Carbon::today();
         $datemax = $request->filled('datemax') ? Carbon::parse($request->datemax) : Carbon::today();
 
@@ -44,17 +44,17 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return [
             'datemin' => $datemin->format('Y-m-d'),
             'datemax' => $datemax->format('Y-m-d'),
-            'regional' => $request->filled('regional') && $canFiltroRegional ? $request->regional : auth()->user()->idregional,
+            'regional' => $request->filled('regional') && $canFiltroRegional ? $request->regional : $user->idregional,
             'status' => $request->filled('status') ? $request->status : 'Qualquer',
             'servico' => $request->filled('servico') ? $request->servico : 'Qualquer'
         ];
     }
 
-    private function filtro($request, MediadorServiceInterface $service)
+    private function filtro($user, $request, MediadorServiceInterface $service)
     {
         $filtro = '';
         $temFiltro = null;
-        $this->variaveis['continuacao_titulo'] = 'em <strong>'.auth()->user()->regional->regional.' - '.date('d\/m\/Y').'</strong>';
+        $this->variaveis['continuacao_titulo'] = 'em <strong>'.$user->regional->regional.' - '.date('d\/m\/Y').'</strong>';
 
         if(\Route::is('agendamentos.filtro'))
         {
@@ -62,7 +62,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
             $this->variaveis['continuacao_titulo'] = '<i>(filtro ativo)</i>';
         }
 
-        if(auth()->user()->cannot('atendenteOrGerSeccionais', auth()->user()))
+        if($user->cannot('atendenteOrGerSeccionais', $user))
         {
             $regionais = $service->getService('Regional')->all()->sortBy('regional');
             $options = !isset($request->regional) ? 
@@ -125,7 +125,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         }
     }
 
-    private function validarUpdate($dados, $agendamento)
+    private function validarUpdate($user, $dados, $agendamento)
     {   
         $updateStatus = \Route::is('agendamentos.updateStatus');
 
@@ -160,13 +160,13 @@ class AgendamentoService implements AgendamentoServiceInterface {
             $dados = [
                 'idagendamento' => $dados['idagendamento'],
                 'status' => $dados['status'],
-                'idusuario' => auth()->user()->idusuario
+                'idusuario' => $user->idusuario
             ];
 
         return $dados;
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($user, $resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -178,7 +178,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
+        $userPodeEditar = $user->can('updateOther', $user);
         foreach($resultados as $resultado) 
         {
             $acoes = $resultado->getBtnByStatus();
@@ -206,43 +206,43 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return $tabela;
     }
 
-    public function listar($request = null, MediadorServiceInterface $service = null)
+    public function listar($user, $request = null, MediadorServiceInterface $service = null)
     {
         session(['url' => url()->full()]);
 
         if(isset($request) && isset($service))
         {
-            $dados = $this->validacaoFiltroAtivo($request);
+            $dados = $this->validacaoFiltroAtivo($user, $request);
             $resultados = $this->getResultadosFiltro($dados);
             $this->variaveis['mostraFiltros'] = true;
     
             return [
                 'resultados' => $resultados, 
-                'tabela' => $this->tabelaCompleta($resultados), 
-                'temFiltro' => $this->filtro($request, $service),
+                'tabela' => $this->tabelaCompleta($user, $resultados), 
+                'temFiltro' => $this->filtro($user, $request, $service),
                 'variaveis' => (object) $this->variaveis,
             ];
         }
 
-        $resultados = $this->pendentesByPerfil(false);
+        $resultados = $this->pendentesByPerfil($user, false);
         
         $this->variaveis['continuacao_titulo'] = 'pendentes de validação';
         $this->variaveis['plural'] = 'agendamentos pendentes';
         $this->variaveis['btn_criar'] = '<a class="btn btn-primary" href="'.route('agendamentos.lista').'"><i class="fas fa-list"></i> Lista de Agendamentos</a>';
 
         return [
-            'tabela' => $this->tabelaCompleta($resultados),
+            'tabela' => $this->tabelaCompleta($user, $resultados),
             'resultados' => $resultados,
             'variaveis' => (object) $this->variaveis,
         ];
     }
 
-    public function view($id)
+    public function view($user, $id)
     {
         $agendamento = Agendamento::findOrFail($id);
 
-        $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
-        $sameRegional = auth()->user()->can('sameRegional', $agendamento);
+        $atendOrGere = $user->can('atendenteOrGerSeccionais', $user);
+        $sameRegional = $user->can('sameRegional', $agendamento);
         if($atendOrGere && !$sameRegional)
             throw new Exception('Não autorizado', 403);
 
@@ -256,7 +256,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $this->variaveis['cancela_idusuario'] = true;
 
         // Enquanto não possui o UserService
-        $idregional = auth()->user()->idregional;
+        $idregional = $user->idregional;
         $atendentes = \App\User::select('idusuario', 'nome', 'idperfil')
             ->whereIn('idperfil', [4, 6, 10, 12, 13, 18])
             ->orWhere(function($query) use($idregional) {
@@ -275,7 +275,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         ];
     }
 
-    public function enviarEmail($id)
+    public function enviarEmail($user, $id)
     {
         $agendamento = Agendamento::findOrFail($id);
 
@@ -285,25 +285,25 @@ class AgendamentoService implements AgendamentoServiceInterface {
                 'class' => 'alert-danger'
             ];
 
-        $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
-        $sameRegional = auth()->user()->can('sameRegional', $agendamento);
+        $atendOrGere = $user->can('atendenteOrGerSeccionais', $user);
+        $sameRegional = $user->can('sameRegional', $agendamento);
         if($atendOrGere && !$sameRegional)
             throw new Exception('Não autorizado', 403);
 
         Mail::to($agendamento->email)->queue(new AgendamentoMailGuest($agendamento));
     }
 
-    public function save($dados, $id = null)
+    public function save($user, $dados, $id = null)
     {
         $codigo = isset($id) ? $id : $dados['idagendamento'];
         $agendamento = Agendamento::findOrFail($codigo);
 
-        $atendOrGere = auth()->user()->can('atendenteOrGerSeccionais', auth()->user());
-        $sameRegional = auth()->user()->can('sameRegional', $agendamento);
+        $atendOrGere = $user->can('atendenteOrGerSeccionais', $user);
+        $sameRegional = $user->can('sameRegional', $agendamento);
         if($atendOrGere && !$sameRegional)
             throw new Exception('Não autorizado', 403);
 
-        $valido = $this->validarUpdate($dados, $agendamento);
+        $valido = $this->validarUpdate($user, $dados, $agendamento);
         if(isset($valido['message']))
             return $valido;
 
@@ -318,9 +318,9 @@ class AgendamentoService implements AgendamentoServiceInterface {
         }
     }
 
-    public function buscar($busca)
+    public function buscar($user, $busca)
     {
-        $regional = auth()->user()->can('atendenteOrGerSeccionais', auth()->user()) ? auth()->user()->idregional : null;
+        $regional = $user->can('atendenteOrGerSeccionais', $user) ? $user->idregional : null;
 
         $resultados = Agendamento::with(['user', 'regional'])
             ->when($regional, function ($query) use ($regional, $busca) {
@@ -342,7 +342,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
 
         return [
             'resultados' => $resultados,
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }
@@ -363,10 +363,10 @@ class AgendamentoService implements AgendamentoServiceInterface {
         return Agendamento::count();
     }
 
-    public function pendentesByPerfil($count = true)
+    public function pendentesByPerfil($user, $count = true)
     {
-        $perfil = auth()->user()->idperfil;
-        $idregional = auth()->user()->idregional;
+        $perfil = $user->idperfil;
+        $idregional = $user->idregional;
 
         $resultados = Agendamento::with(['user', 'regional'])
             ->where('dia', '<', date('Y-m-d'))

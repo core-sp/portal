@@ -25,7 +25,7 @@ class PlantaoJuridicoBloqueioSubService implements PlantaoJuridicoBloqueioSubSer
         ];
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($user, $resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -38,8 +38,8 @@ class PlantaoJuridicoBloqueioSubService implements PlantaoJuridicoBloqueioSubSer
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
-        $userPodeExcluir = auth()->user()->can('delete', auth()->user());
+        $userPodeEditar = $user->can('updateOther', $user);
+        $userPodeExcluir = $user->can('delete', $user);
         foreach($resultados as $resultado) {
             $acoes = '';
             if($resultado->podeEditar() && $userPodeEditar)
@@ -75,15 +75,15 @@ class PlantaoJuridicoBloqueioSubService implements PlantaoJuridicoBloqueioSubSer
         return $tabela;
     }
 
-    public function listar()
+    public function listar($user)
     {
         $bloqueios = PlantaoJuridicoBloqueio::with('plantaoJuridico')->paginate(15);
 
-        if(auth()->user()->cannot('create', auth()->user()))
+        if($user->cannot('create', $user))
             unset($this->variaveis['btn_criar']);
 
         return [
-            'tabela' => $this->tabelaCompleta($bloqueios),
+            'tabela' => $this->tabelaCompleta($user, $bloqueios),
             'resultados' => $bloqueios,
             'variaveis' => (object) $this->variaveis
         ];
@@ -108,13 +108,13 @@ class PlantaoJuridicoBloqueioSubService implements PlantaoJuridicoBloqueioSubSer
         ];
     }
 
-    public function save($request, $id = null)
+    public function save($user, $request, $id = null)
     {
         $dados = [
             'dataInicial' => $request->dataInicialBloqueio,
             'dataFinal' => $request->dataFinalBloqueio,
             'horarios' => implode(',', $request->horariosBloqueio),
-            'idusuario' => auth()->user()->idusuario
+            'idusuario' => $user->idusuario
         ];
 
         if(isset($id))

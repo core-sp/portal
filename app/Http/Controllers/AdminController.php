@@ -46,7 +46,7 @@ class AdminController extends Controller
         if(perfisPermitidos('AgendamentoController', 'index'))
         {
             // Alerta de atendimentos sem status
-            $count = $this->service->getService('Agendamento')->pendentesByPerfil();
+            $count = $this->service->getService('Agendamento')->pendentesByPerfil(auth()->user());
 
             if($count > 0) 
                 $alertas['agendamentoCount'] = $count;

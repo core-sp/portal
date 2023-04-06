@@ -20,7 +20,7 @@ class PlantaoJuridicoController extends Controller
     {
         $this->authorize('viewAny', auth()->user());
         try{
-            $dados = $this->service->getService('PlantaoJuridico')->listar();
+            $dados = $this->service->getService('PlantaoJuridico')->listar(auth()->user());
             $variaveis = $dados['variaveis'];
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];

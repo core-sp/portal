@@ -20,7 +20,7 @@ class PlantaoJuridicoBloqueioController extends Controller
     {
         $this->authorize('viewAny', auth()->user());
         try{
-            $dados = $this->service->getService('PlantaoJuridico')->bloqueio()->listar();
+            $dados = $this->service->getService('PlantaoJuridico')->bloqueio()->listar(auth()->user());
             $variaveis = $dados['variaveis'];
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
@@ -52,7 +52,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         $this->authorize('create', auth()->user());
         try{
             $validated = (object) $request->validated();
-            $this->service->getService('PlantaoJuridico')->bloqueio()->save($validated);
+            $this->service->getService('PlantaoJuridico')->bloqueio()->save(auth()->user(), $validated);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar o bloqueio do plantão jurídico.");
@@ -100,7 +100,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         $this->authorize('updateOther', auth()->user());
         try{
             $validated = (object) $request->validated();
-            $erro = $this->service->getService('PlantaoJuridico')->bloqueio()->save($validated, $id);
+            $erro = $this->service->getService('PlantaoJuridico')->bloqueio()->save(auth()->user(), $validated, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o bloqueio do plantão jurídico.");
