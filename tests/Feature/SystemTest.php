@@ -17,7 +17,7 @@ class SystemTest extends TestCase
     {
         $servicos = [
             'Suporte' => new \App\Services\SuporteService(),
-            'PlantaoJuridico' => new \App\Services\PlantaoJuridicoService(),
+            'PlantaoJuridico' => new \App\Services\PlantaoJuridicoService(new \App\Services\PlantaoJuridicoBloqueioSubService),
             'Regional' => new \App\Services\RegionalService(),
             'TermoConsentimento' => new \App\Services\TermoConsentimentoService(),
             'Agendamento' => new \App\Services\AgendamentoService(new \App\Services\AgendamentoSiteSubService, new \App\Services\AgendamentoBloqueioSubService),
@@ -132,9 +132,10 @@ class SystemTest extends TestCase
     /** @test */
     public function mediador_interface_get_instace_plantao_juridico_service()
     {
-        $servico = new \App\Services\PlantaoJuridicoService();
+        $servico = new \App\Services\PlantaoJuridicoService(new \App\Services\PlantaoJuridicoBloqueioSubService);
         $mediador = $this->app->make(MediadorServiceInterface::class);
         $this->assertEquals($mediador->getService('PlantaoJuridico'), $servico);
+        $this->assertEquals($mediador->getService('PlantaoJuridico')->bloqueio(), $servico->bloqueio());
     }
 
     /** @test */

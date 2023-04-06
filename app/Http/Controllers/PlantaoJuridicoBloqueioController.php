@@ -20,7 +20,7 @@ class PlantaoJuridicoBloqueioController extends Controller
     {
         $this->authorize('viewAny', auth()->user());
         try{
-            $dados = $this->service->getService('PlantaoJuridico')->listarBloqueios();
+            $dados = $this->service->getService('PlantaoJuridico')->bloqueio()->listar();
             $variaveis = $dados['variaveis'];
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
@@ -36,7 +36,7 @@ class PlantaoJuridicoBloqueioController extends Controller
     {
         $this->authorize('create', auth()->user());
         try{
-            $dados = $this->service->getService('PlantaoJuridico')->visualizarBloqueio();
+            $dados = $this->service->getService('PlantaoJuridico')->bloqueio()->view();
             $variaveis = $dados['variaveis'];
             $plantoes = $dados['plantoes'];
         } catch (\Exception $e) {
@@ -52,7 +52,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         $this->authorize('create', auth()->user());
         try{
             $validated = (object) $request->validated();
-            $this->service->getService('PlantaoJuridico')->saveBloqueio($validated);
+            $this->service->getService('PlantaoJuridico')->bloqueio()->save($validated);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao criar o bloqueio do plantão jurídico.");
@@ -68,7 +68,7 @@ class PlantaoJuridicoBloqueioController extends Controller
     {
         $this->authorize('updateOther', auth()->user());
         try{
-            $plantao = $this->service->getService('PlantaoJuridico')->getDatasHorasLinkPlantaoAjax($request->id);
+            $plantao = $this->service->getService('PlantaoJuridico')->bloqueio()->getDatasHorasLinkPlantaoAjax($request->id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao buscar o plantao.");
@@ -81,7 +81,7 @@ class PlantaoJuridicoBloqueioController extends Controller
     {
         $this->authorize('updateOther', auth()->user());
         try{
-            $dados = $this->service->getService('PlantaoJuridico')->visualizarBloqueio($id);
+            $dados = $this->service->getService('PlantaoJuridico')->bloqueio()->view($id);
             $variaveis = isset($dados['variaveis']) ? $dados['variaveis'] : null;
             $resultado = isset($dados['resultado']) ? $dados['resultado'] : null;
         } catch (\Exception $e) {
@@ -100,7 +100,7 @@ class PlantaoJuridicoBloqueioController extends Controller
         $this->authorize('updateOther', auth()->user());
         try{
             $validated = (object) $request->validated();
-            $erro = $this->service->getService('PlantaoJuridico')->saveBloqueio($validated, $id);
+            $erro = $this->service->getService('PlantaoJuridico')->bloqueio()->save($validated, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o bloqueio do plantão jurídico.");
@@ -116,7 +116,7 @@ class PlantaoJuridicoBloqueioController extends Controller
     {
         $this->authorize('delete', auth()->user());
         try{
-            $this->service->getService('PlantaoJuridico')->destroy($id);
+            $this->service->getService('PlantaoJuridico')->bloqueio()->destroy($id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao excluir o bloqueio.");

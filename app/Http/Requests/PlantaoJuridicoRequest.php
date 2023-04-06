@@ -16,7 +16,7 @@ class PlantaoJuridicoRequest extends FormRequest
 
     public function rules()
     {       
-        $arrayHorasDatas = isset(request()->plantaoBloqueio) ? $this->service->getDatasHorasLinkPlantaoAjax(request()->plantaoBloqueio) : null;
+        $arrayHorasDatas = isset(request()->plantaoBloqueio) ? $this->service->bloqueio()->getDatasHorasLinkPlantaoAjax(request()->plantaoBloqueio) : null;
         $horarios = isset($arrayHorasDatas) ? '|in:'.implode(',', $arrayHorasDatas['horarios']) : '';
         $datas = isset($arrayHorasDatas) ? $arrayHorasDatas['datas'] : [date('Y-m-d'), date('Y-m-d')];
 

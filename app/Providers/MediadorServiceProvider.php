@@ -17,6 +17,7 @@ class MediadorServiceProvider extends ServiceProvider implements DeferrableProvi
         $this->app->singleton('App\Contracts\MediadorServiceInterface', 'App\Services\MediadorService');
         $this->app->singleton('App\Contracts\SuporteServiceInterface', 'App\Services\SuporteService');
         $this->app->singleton('App\Contracts\PlantaoJuridicoServiceInterface', 'App\Services\PlantaoJuridicoService');
+        $this->app->singleton('App\Contracts\PlantaoJuridicoBloqueioSubServiceInterface', 'App\Services\PlantaoJuridicoBloqueioSubService');
         $this->app->singleton('App\Contracts\RegionalServiceInterface', 'App\Services\RegionalService');
         $this->app->singleton('App\Contracts\TermoConsentimentoServiceInterface', 'App\Services\TermoConsentimentoService');
         $this->app->singleton('App\Contracts\AgendamentoServiceInterface', 'App\Services\AgendamentoService');
@@ -51,6 +52,7 @@ class MediadorServiceProvider extends ServiceProvider implements DeferrableProvi
             'App\Contracts\MediadorServiceInterface',
             'App\Contracts\SuporteServiceInterface',
             'App\Contracts\PlantaoJuridicoServiceInterface',
+            'App\Contracts\PlantaoJuridicoBloqueioSubServiceInterface',
             'App\Contracts\RegionalServiceInterface',
             'App\Contracts\TermoConsentimentoServiceInterface',
             'App\Contracts\AgendamentoServiceInterface',

@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Permissao;
 use Carbon\Carbon;
+use App\Agendamento;
 
 class PlantaoJuridicoTest extends TestCase
 {
@@ -1700,5 +1701,722 @@ class PlantaoJuridicoTest extends TestCase
         ->assertSee('Confira <a id="linkAgendadosPlantao" href="'
         .route('plantao.juridico.editar.view', $bloqueio->plantaoJuridico->id).
         '">aqui</a> se existem agendados no horário a ser bloqueado para realizar o cancelamento.');
+    }
+
+    /** 
+     * =======================================================================================================
+     * SERVIÇO DE AGENDAMENTO DO PLANTÃO JURÍDICO
+     * =======================================================================================================
+     */
+    
+    /** @test */
+    public function can_view_plantao_juridico_option_when_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $this->get(route('agendamentosite.formview'))->assertSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
+    }
+
+    /** @test */
+    public function cannot_view_plantao_juridico_option_when_disabled_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 0
+        ]);
+
+        $this->get(route('agendamentosite.formview'))->assertDontSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
+    }
+
+    /** @test */
+    public function cannot_view_plantao_juridico_option_when_active_and_dataFinal_before_today_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1,
+            'dataFinal' => now()->subDay()->format('Y-m-d')
+        ]);
+
+        $this->get(route('agendamentosite.formview'))->assertDontSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
+    }
+
+    /** @test */
+    public function can_create_agendamento_with_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF e PJ',
+            'dia' => onlyDate($plantao->dataInicial),
+            'hora' => '10:00',
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('agendamentosite.formview'))->assertSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
+
+        $this->post(route('agendamentosite.store'), $dados)->assertOk();
+        $this->assertDatabaseHas('agendamentos', [
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function can_create_equal_qtd_agendamento_and_advogados_in_same_hour_with_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 2
+        ]);
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF e PJ',
+            'dia' => onlyDate($plantao->dataInicial),
+            'hora' => '10:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $dados)->assertOk();
+        $this->assertDatabaseHas('agendamentos', [
+            'idagendamento' => 1,
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+
+        $dados = factory('App\Agendamento')->raw([
+            'cpf' => '515.056.080-40',
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF e PJ',
+            'dia' => onlyDate($plantao->dataInicial),
+            'hora' => '10:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $dados)->assertOk();
+        $this->assertDatabaseHas('agendamentos', [
+            'idagendamento' => 2,
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_agendamentos_greater_than_qtd_advogados_in_same_hour_with_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF e PJ',
+            'dia' => onlyDate($plantao->dataInicial),
+            'hora' => '10:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $dados)->assertOk();
+        $this->assertDatabaseHas('agendamentos', [
+            'idagendamento' => 1,
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+
+        $dados = factory('App\Agendamento')->raw([
+            'cpf' => '515.056.080-40',
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF e PJ',
+            'dia' => onlyDate($plantao->dataInicial),
+            'hora' => '10:00',
+            'termo' => 'on'
+        ]);
+
+       $this->post(route('agendamentosite.store'), $dados)
+        ->assertSessionHasErrors(['hora']);
+
+        $this->assertDatabaseMissing('agendamentos', [
+            'idagendamento' => 2,
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_agendamento_with_disabled_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create();
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF',
+            'dia' => onlyDate($plantao->dataInicial),
+            'hora' => '10:00',
+            'termo' => 'on'
+        ]);
+
+        $this->get(route('agendamentosite.formview'))->assertDontSee(Agendamento::SERVICOS_PLANTAO_JURIDICO);
+
+        $this->post(route('agendamentosite.store'), $dados)
+        ->assertSessionHasErrors(['hora']);
+
+        $this->assertDatabaseMissing('agendamentos', [
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_agendamento_with_expired_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'dataInicial' => Carbon::today()->format('Y-m-d'),
+            'dataFinal' => Carbon::today()->format('Y-m-d'),
+            'qtd_advogados' => 1
+        ]);
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF',
+            'dia' => onlyDate($plantao->dataInicial),
+            'hora' => '10:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $dados)
+        ->assertSessionHasErrors(['dia']);
+        
+        $this->assertDatabaseMissing('agendamentos', [
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_agendamento_with_date_different_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF',
+            'dia' => Carbon::parse($plantao->dataFinal)->addDay()->format('d\/m\/Y'),
+            'hora' => '10:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $dados)
+        ->assertSessionHasErrors(['hora']);
+        
+        $this->assertDatabaseMissing('agendamentos', [
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_agendamento_with_hour_different_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF',
+            'dia' => onlyDate($plantao->dataFinal),
+            'hora' => '09:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $dados)
+        ->assertSessionHasErrors(['hora']);
+        
+        $this->assertDatabaseMissing('agendamentos', [
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_agendamento_with_full_day_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'horarios' => '10:00',
+            'qtd_advogados' => 1
+        ]);
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCD',
+            'dia' => $plantao->dataFinal,
+            'hora' => '10:00'
+        ]);
+
+        $dados = factory('App\Agendamento')->raw([
+            'cpf' => '274.461.700-85',
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF e PJ',
+            'dia' => onlyDate($plantao->dataFinal),
+            'hora' => '10:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $dados)
+        ->assertSessionHasErrors(['hora']);
+        
+        $this->assertDatabaseMissing('agendamentos', [
+            'idagendamento' => 2,
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_two_or_more_agendamentos_with_same_cpf_and_same_regional_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCD',
+            'dia' => $plantao->dataFinal,
+            'hora' => '10:00'
+        ]);
+
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PF',
+            'dia' => onlyDate($plantao->dataInicial),
+            'hora' => '11:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $dados)->assertStatus(302);
+
+        $this->get(route('agendamentosite.formview'))
+        ->assertSeeText('Durante o período deste plantão jurídico é permitido apenas 1 agendamento por cpf');
+        
+        $this->assertDatabaseMissing('agendamentos', [
+            'idagendamento' => 2,
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function can_create_two_or_more_agendamentos_with_same_cpf_and_differents_regionais_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        $plantao2 = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCD',
+            'dia' => $plantao->dataFinal,
+            'hora' => '10:00'
+        ]);
+
+        $dados = factory('App\Agendamento')->raw([
+            'idregional' => $plantao2->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+            'pessoa' => 'PJ',
+            'dia' => onlyDate($plantao->dataInicial),
+            'hora' => '11:00',
+            'termo' => 'on'
+        ]);
+
+        $this->post(route('agendamentosite.store'), $dados)->assertOk();
+        
+        $this->assertDatabaseHas('agendamentos', [
+            'idagendamento' => 1,
+            'idregional' => $plantao->idregional,
+            'cpf' => $agendamento['cpf'],
+            'hora' => $agendamento['hora'],
+            'tiposervico' => $agendamento['tiposervico']
+        ]);
+        $this->assertDatabaseHas('agendamentos', [
+            'idagendamento' => 2,
+            'idregional' => $plantao2->idregional,
+            'cpf' => $dados['cpf'],
+            'hora' => $dados['hora'],
+            'tiposervico' => $dados['servico'].' para '.$dados['pessoa']
+        ]);
+    }
+
+    /** @test */
+    public function get_disabled_regionais_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        $plantao2 = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 0
+        ]);
+
+        $this->get(route('agendamentosite.regionaisPlantaoJuridico'))
+        ->assertJson([$plantao->idregional]);
+    }
+
+    /** @test */
+    public function get_horarios_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'dia' => onlyDate($plantao->dataInicial),
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJson(explode(',', $plantao->horarios));
+    }
+
+    /** @test */
+    public function get_empty_horarios_when_disabled_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create();
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'dia' => onlyDate($plantao->dataInicial),
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJson([]);
+    }
+
+    /** @test */
+    public function remove_hours_when_full_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCD',
+            'dia' => $plantao->dataFinal,
+            'hora' => '10:00'
+        ]);
+
+        $horarios = explode(',', $plantao->horarios);
+        unset($horarios[array_search($agendamento->hora, $horarios)]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'dia' => onlyDate($plantao->dataFinal),
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJson($horarios);
+    }
+
+    /** @test */
+    public function get_lotado_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'horarios' => '10:00',
+            'qtd_advogados' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para Ambas',
+            'idregional' => $plantao->idregional,
+            'protocolo' => 'AGE-ABCD',
+            'dia' => $plantao->dataFinal,
+            'hora' => '10:00'
+        ]);
+
+        $dia = Carbon::parse($plantao->dataFinal);
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJson([$lotado]);
+    }
+
+    /** @test */
+    public function get_empty_lotado_when_disabled_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create();
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJson([]);
+    }
+
+    /** @test */
+    public function get_dates_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional
+        ]))
+        ->assertJson([$plantao->dataInicial, $plantao->dataFinal]);
+    }
+
+    /** @test */
+    public function get_dates_when_data_inicial_less_than_tomorrow_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'dataInicial' => date('Y-m-d'),
+            'qtd_advogados' => 1
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional
+        ]))
+        ->assertJson([null, $plantao->dataFinal]);
+    }
+
+    /** @test */
+    public function get_datas_when_data_final_less_than_tomorrow_active_plantao_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'dataInicial' => date('Y-m-d'),
+            'dataFinal' => date('Y-m-d'),
+            'qtd_advogados' => 1
+        ]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional
+        ]))
+        ->assertJson([null, null]);
+    }
+
+    /** @test */
+    public function get_empty_dates_when_disabled_planta_juridico()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create();
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional
+        ]))
+        ->assertJson([]);
+    }
+
+    /** @test */
+    public function get_full_days_with_bloqueio_pj()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'horarios' => '10:00,11:00',
+            'qtd_advogados' => 1
+        ]);
+
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id,
+            'horarios' => $plantao->horarios,
+            'dataFinal' => $plantao->dataInicial
+        ]);
+
+        $dia = Carbon::parse($plantao->dataInicial);
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $dia = Carbon::parse($plantao->dataFinal);
+        $nao_lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJsonFragment([$lotado])
+        ->assertJsonMissingExact([$nao_lotado]);
+    }
+
+    /** @test */
+    // Situação em que o bloqueio é criado para algumas horas e não cancela o agendamento já existente no horário bloqueado.
+    // Então mesmo com a hora disponível, a quantidade de agendados já foi preenchida, a não ser que ocorra o cancelamento.
+    public function get_full_days_with_bloqueio_pj_and_created_agendado()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'horarios' => '10:00,11:00',
+            'qtd_advogados' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $plantao->idregional,
+            'hora' => '10:00',
+            'dia' => $plantao->dataInicial,
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para PF'
+        ]);
+
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id,
+            'horarios' => '10:00'
+        ]);
+
+        $dia = Carbon::parse($plantao->dataInicial);
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJsonFragment([$lotado]);
+    }
+
+    /** @test */
+    // Situação em que o bloqueio é criado para algumas horas e cancela o agendamento já existente no horário bloqueado.
+    public function get_empty_days_with_bloqueio_pj_and_after_cancel_created_agendado()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'horarios' => '10:00,11:00',
+            'qtd_advogados' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $plantao->idregional,
+            'hora' => '10:00',
+            'dia' => $plantao->dataInicial,
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para PF'
+        ]);
+
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id,
+            'horarios' => '10:00'
+        ]);
+
+        $dia = Carbon::parse($plantao->dataInicial);
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJsonFragment([$lotado]);
+
+        $agendamento->update(['status' => AGENDAMENTO::STATUS_CANCELADO]);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJsonFragment([]);
+    }
+
+    /** @test */
+    public function get_full_days_when_weekends_and_empty_days_for_agendamentos_pj()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'idregional' => $plantao->idregional,
+            'hora' => '10:00',
+            'dia' => $plantao->dataInicial,
+            'tiposervico' => Agendamento::SERVICOS_PLANTAO_JURIDICO.' para PF'
+        ]);
+
+        $diaAge = Carbon::parse($agendamento->dia);
+        $lotados = array();
+        $dia = Carbon::parse($plantao->dataInicial);
+        while($dia->lte(Carbon::parse($plantao->dataFinal)))
+        {
+            if($dia->isWeekend())
+                array_push($lotados, [$dia->month, $dia->day, 'lotado']);
+            $dia->addDay();
+        }
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO
+        ]))
+        ->assertJson($lotados)
+        ->assertJsonMissing([
+            [$diaAge->month, $diaAge->day, 'lotado']
+        ]);
+    }
+
+    /** @test */
+    public function remove_full_hour_if_weekend_pj()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+
+        $sabado = Carbon::parse($plantao->dataInicial);
+        while(!$sabado->isSaturday())
+            $sabado->addDay();
+
+        $plantao->dataFinal = $sabado->format('Y-m-d');
+        $lotado = [$sabado->month, $sabado->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'dia' => $sabado->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+        ]))
+        ->assertJsonMissing([$plantao->horarios]);
+
+        $domingo = Carbon::parse($plantao->dataInicial);
+        while(!$domingo->isSaturday())
+            $domingo->addDay();
+
+        $plantao->dataFinal = $domingo->format('Y-m-d');
+        $lotado = [$domingo->month, $domingo->day, 'lotado'];
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'dia' => $domingo->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+        ]))
+        ->assertJsonMissing([$plantao->horarios]);
+    }
+
+    /** @test */
+    public function remove_full_hour_with_bloqueio_pj()
+    {
+        $plantao = factory('App\PlantaoJuridico')->create([
+            'qtd_advogados' => 1
+        ]);
+        
+        $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create([
+            'idplantaojuridico' => $plantao->id,
+            'horarios' => '10:00,11:30'
+        ]);
+            
+        $dia = Carbon::parse($plantao->dataInicial);
+
+        $this->get(route('agendamentosite.diasHorasAjax', [
+            'idregional' => $plantao->idregional,
+            'dia' => $dia->format('d\/m\/Y'),
+            'servico' => Agendamento::SERVICOS_PLANTAO_JURIDICO,
+        ]))
+        ->assertJsonMissing(explode(',', $bloqueio->horarios));
     }
 }

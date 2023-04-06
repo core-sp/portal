@@ -36,7 +36,7 @@ class PlantaoJuridicoController extends Controller
     {
         $this->authorize('updateOther', auth()->user());
         try{
-            $dados = $this->service->getService('PlantaoJuridico')->visualizar($id);
+            $dados = $this->service->getService('PlantaoJuridico')->view($id);
             $variaveis = $dados['variaveis'];
             $resultado = $dados['resultado'];
             $agendamentos = $dados['agendamentos'];

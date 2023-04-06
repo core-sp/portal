@@ -6,21 +6,14 @@ interface PlantaoJuridicoServiceInterface {
 
     public function listar();
 
-    public function listarBloqueios();
-
-    public function visualizar($id);
-
-    public function visualizarBloqueio($id = null);
+    public function view($id);
 
     public function save($request, $id);
-
-    public function saveBloqueio($request, $id = null);
-
-    public function getDatasHorasLinkPlantaoAjax($id);
-
-    public function destroy($id);
 
     public function plantaoJuridicoAtivo();
 
     public function getRegionaisAtivas();
+
+    // Retorna instância do Bloqueio
+    public function bloqueio();
 }
