@@ -2,13 +2,15 @@
 
 namespace App\Contracts;
 
+use App\User;
+
 interface LicitacaoServiceInterface {
 
     public function getModalidades();
 
     public function getSituacoes();
 
-    public function listar();
+    public function listar(User $user);
 
     public function view($id = null);
 
@@ -20,9 +22,9 @@ interface LicitacaoServiceInterface {
 
     public function restore($id);
 
-    public function buscar($busca);
+    public function buscar(User $user, $busca);
 
-    public function siteGrid($request = null);
+    public function grid($request = null);
 
-    public function viewSite($id);
+    public function show($id);
 }

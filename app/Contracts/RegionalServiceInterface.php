@@ -2,17 +2,19 @@
 
 namespace App\Contracts;
 
+use App\User;
+
 interface RegionalServiceInterface {
 
-    public function index();
+    public function listar(User $user);
 
     public function view($id);
 
     public function save($validated, $id);
 
-    public function viewSite($id);
+    public function show($id);
 
-    public function buscar($busca);
+    public function buscar(User $user, $busca);
 
     public function all();
 

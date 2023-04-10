@@ -22,7 +22,7 @@ class NoticiaController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Noticia')->listar();
+            $dados = $this->service->getService('Noticia')->listar(auth()->user());
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
@@ -108,7 +108,7 @@ class NoticiaController extends Controller
     public function show($slug)
     {
         try{
-            $dados = $this->service->getService('Noticia')->viewSite($slug);
+            $dados = $this->service->getService('Noticia')->show($slug);
             $noticia = $dados['noticia'];
             $tres = $dados['tres'];
         } catch(ModelNotFoundException $e) {
@@ -179,7 +179,7 @@ class NoticiaController extends Controller
 
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Noticia')->buscar($busca);
+            $dados = $this->service->getService('Noticia')->buscar(auth()->user(), $busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
@@ -194,7 +194,7 @@ class NoticiaController extends Controller
     public function siteGrid()
     {
         try{
-            $noticias = $this->service->getService('Noticia')->siteGrid();
+            $noticias = $this->service->getService('Noticia')->grid();
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as notícias no portal.");

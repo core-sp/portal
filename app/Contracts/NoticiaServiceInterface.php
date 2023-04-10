@@ -3,12 +3,13 @@
 namespace App\Contracts;
 
 use App\Contracts\MediadorServiceInterface;
+use App\User;
 
 interface NoticiaServiceInterface {
 
     public function getCategorias();
 
-    public function listar();
+    public function listar(User $user);
 
     public function view(MediadorServiceInterface $service, $id = null);
 
@@ -20,11 +21,11 @@ interface NoticiaServiceInterface {
 
     public function restore($id);
 
-    public function buscar($busca);
+    public function buscar(User $user, $busca);
 
-    public function viewSite($slug);
+    public function show($slug);
 
-    public function siteGrid();
+    public function grid();
 
     public function buscaSite($busca);
 

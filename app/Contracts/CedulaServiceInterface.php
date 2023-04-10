@@ -4,6 +4,8 @@ namespace App\Contracts;
 
 use App\Repositories\GerentiRepositoryInterface;
 use App\Contracts\MediadorServiceInterface;
+use App\Representante;
+use App\User;
 
 interface CedulaServiceInterface {
 
@@ -15,13 +17,13 @@ interface CedulaServiceInterface {
 
     public function view($id);
 
-    public function updateStatus($id, $dados, $user);
+    public function updateStatus($id, $dados, User $user);
 
     public function gerarPdf($id);
 
     public function buscar($busca);
 
-    public function getByRepresentante($user, GerentiRepositoryInterface $gerenti = null);
+    public function getByRepresentante(Representante $user, GerentiRepositoryInterface $gerenti = null);
 
-    public function save($dados, $user, GerentiRepositoryInterface $gerenti, MediadorServiceInterface $service);
+    public function save($dados, Representante $user, GerentiRepositoryInterface $gerenti, MediadorServiceInterface $service);
 }

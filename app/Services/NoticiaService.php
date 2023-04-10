@@ -28,7 +28,7 @@ class NoticiaService implements NoticiaServiceInterface {
         ];
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($user, $resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -40,8 +40,8 @@ class NoticiaService implements NoticiaServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
-        $userPodeExcluir = auth()->user()->can('delete', auth()->user());
+        $userPodeEditar = $user->can('updateOther', $user);
+        $userPodeExcluir = $user->can('delete', $user);
         foreach($resultados as $resultado) 
         {
             $acoes = '<a href="'.route('noticias.show', $resultado->slug).'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
@@ -113,16 +113,16 @@ class NoticiaService implements NoticiaServiceInterface {
         return Noticia::categorias();
     }
 
-    public function listar()
+    public function listar($user)
     {
         $resultados = Noticia::with(['user', 'regional'])->orderBy('idnoticia', 'DESC')->paginate(10);
 
-        if(auth()->user()->cannot('create', auth()->user()))
+        if($user->cannot('create', $user))
             unset($this->variaveis['btn_criar']);
 
         return [
             'resultados' => $resultados, 
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }
@@ -182,7 +182,7 @@ class NoticiaService implements NoticiaServiceInterface {
             event(new CrudEvent('notícia', 'restaurou', $id));
     }
 
-    public function buscar($busca)
+    public function buscar($user, $busca)
     {
         $resultados = Noticia::with(['user', 'regional'])->where('titulo','LIKE','%'.$busca.'%')
             ->orWhere('conteudo','LIKE','%'.$busca.'%')
@@ -190,12 +190,12 @@ class NoticiaService implements NoticiaServiceInterface {
 
         return [
             'resultados' => $resultados,
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }
 
-    public function viewSite($slug)
+    public function show($slug)
     {
         $noticia = Noticia::where('slug', $slug)->firstOrFail();
         $tres = Noticia::latest()
@@ -211,7 +211,7 @@ class NoticiaService implements NoticiaServiceInterface {
         ];
     }
 
-    public function siteGrid()
+    public function grid()
     {
         return Noticia::select('img', 'slug', 'titulo', 'created_at', 'conteudo')
             ->orderBy('created_at', 'DESC')

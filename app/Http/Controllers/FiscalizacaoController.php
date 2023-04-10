@@ -21,7 +21,7 @@ class FiscalizacaoController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Fiscalizacao')->listar();
+            $dados = $this->service->getService('Fiscalizacao')->listar(auth()->user());
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
@@ -124,7 +124,7 @@ class FiscalizacaoController extends Controller
 
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Fiscalizacao')->buscar($busca);
+            $dados = $this->service->getService('Fiscalizacao')->buscar(auth()->user(), $busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];

@@ -24,7 +24,7 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
         ];
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($user, $resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -35,7 +35,7 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
+        $userPodeEditar = $user->can('updateOther', $user);
         foreach($resultados as $resultado) 
         {
             $acoes = '';
@@ -69,13 +69,13 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
         return $tabela;
     }
 
-    public function listar()
+    public function listar($user)
     {
         $resultados = PeriodoFiscalizacao::orderBy('periodo', 'DESC')->paginate(25);
 
         return [
             'resultados' => $resultados, 
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }
@@ -122,14 +122,14 @@ class FiscalizacaoService implements FiscalizacaoServiceInterface {
         event(new CrudEvent($texto, ' atualizou a publicação do período da fiscalização com o status ', $id));
     }
 
-    public function buscar($busca)
+    public function buscar($user, $busca)
     {
         $resultados = PeriodoFiscalizacao::where('periodo', 'LIKE', '%'.$busca.'%')
             ->paginate(10);
 
         return [
             'resultados' => $resultados,
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }

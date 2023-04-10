@@ -20,7 +20,7 @@ class RegionalController extends Controller
     public function index()
     {
         try{
-            $dados = $this->service->getService('Regional')->index();
+            $dados = $this->service->getService('Regional')->listar(auth()->user());
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
@@ -69,7 +69,7 @@ class RegionalController extends Controller
     public function show($id)
     {
         try{
-            $dados = $this->service->getService('Regional')->viewSite($id);
+            $dados = $this->service->getService('Regional')->show($id);
             $resultado = $dados['resultado'];
             $noticias = $dados['noticias'];
         } catch(ModelNotFoundException $e) {
@@ -89,7 +89,7 @@ class RegionalController extends Controller
     {
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Regional')->buscar($busca);
+            $dados = $this->service->getService('Regional')->buscar(auth()->user(), $busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];

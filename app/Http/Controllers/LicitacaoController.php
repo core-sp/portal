@@ -22,7 +22,7 @@ class LicitacaoController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Licitacao')->listar();
+            $dados = $this->service->getService('Licitacao')->listar(auth()->user());
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
@@ -108,7 +108,7 @@ class LicitacaoController extends Controller
     public function show($id)
     {
         try{
-            $licitacao = $this->service->getService('Licitacao')->viewSite($id);
+            $licitacao = $this->service->getService('Licitacao')->show($id);
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(404, "Licitação não encontrada.");
@@ -177,7 +177,7 @@ class LicitacaoController extends Controller
 
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Licitacao')->buscar($busca);
+            $dados = $this->service->getService('Licitacao')->buscar(auth()->user(), $busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];
@@ -192,7 +192,7 @@ class LicitacaoController extends Controller
     public function siteGrid()
     {
         try{
-            $dados = $this->service->getService('Licitacao')->siteGrid();
+            $dados = $this->service->getService('Licitacao')->grid();
             $licitacoes = $dados['licitacoes'];
             $modalidades = $dados['modalidades'];
             $situacoes = $dados['situacoes'];
@@ -210,7 +210,7 @@ class LicitacaoController extends Controller
     {
         try{
             $validated = $request->validated();
-            $dados = $this->service->getService('Licitacao')->siteGrid($validated);
+            $dados = $this->service->getService('Licitacao')->grid($validated);
             $licitacoes = $dados['licitacoes'];
             $modalidades = $dados['modalidades'];
             $situacoes = $dados['situacoes'];

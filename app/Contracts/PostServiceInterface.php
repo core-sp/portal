@@ -2,9 +2,11 @@
 
 namespace App\Contracts;
 
+use App\User;
+
 interface PostServiceInterface {
 
-    public function listar();
+    public function listar(User $user);
 
     public function view($id = null);
 
@@ -12,11 +14,11 @@ interface PostServiceInterface {
 
     public function destroy($id);
 
-    public function buscar($busca);
+    public function buscar(User $user, $busca);
 
-    public function viewSite($slug);
+    public function show($slug);
 
-    public function siteGrid();
+    public function grid();
 
     public function buscaSite($busca);
 

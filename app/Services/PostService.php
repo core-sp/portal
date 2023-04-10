@@ -23,7 +23,7 @@ class PostService implements PostServiceInterface {
         ];
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($user, $resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -35,8 +35,8 @@ class PostService implements PostServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
-        $userPodeExcluir = auth()->user()->can('delete', auth()->user());
+        $userPodeEditar = $user->can('updateOther', $user);
+        $userPodeExcluir = $user->can('delete', $user);
         foreach($resultados as $resultado) 
         {
             $acoes = '<a href="'.route('site.blog.post', $resultado->slug).'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
@@ -70,13 +70,13 @@ class PostService implements PostServiceInterface {
         return $tabela;
     }
 
-    public function listar()
+    public function listar($user)
     {
         $resultados = Post::with('user')->orderBy('id','DESC')->paginate(10);
 
         return [
             'resultados' => $resultados, 
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }
@@ -116,7 +116,7 @@ class PostService implements PostServiceInterface {
             event(new CrudEvent('post', 'apagou', $id));
     }
 
-    public function buscar($busca)
+    public function buscar($user, $busca)
     {
         $resultados = Post::with('user')->where('titulo','LIKE','%'.$busca.'%')
             ->orWhere('conteudo','LIKE','%'.$busca.'%')
@@ -124,12 +124,12 @@ class PostService implements PostServiceInterface {
 
         return [
             'resultados' => $resultados,
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }
 
-    public function viewSite($slug)
+    public function show($slug)
     {
         $post = Post::where('slug', $slug)->firstOrFail();
         $next = Post::select('titulo', 'slug')->where('id', '>', $post->id)->first();
@@ -142,7 +142,7 @@ class PostService implements PostServiceInterface {
         ];
     }
 
-    public function siteGrid()
+    public function grid()
     {
         return Post::orderBy('created_at', 'DESC')->paginate(9);
     }

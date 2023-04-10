@@ -20,7 +20,7 @@ class RegionalService implements RegionalServiceInterface {
         ];
     }
 
-    private function tabelaCompleta($resultados)
+    private function tabelaCompleta($user, $resultados)
     {
         // Opções de cabeçalho da tabela
         $headers = [
@@ -32,7 +32,7 @@ class RegionalService implements RegionalServiceInterface {
         ];
         // Opções de conteúdo da tabela
         $contents = [];
-        $userPodeEditar = auth()->user()->can('updateOther', auth()->user());
+        $userPodeEditar = $user->can('updateOther', $user);
         foreach($resultados as $resultado) 
         {
             $acoes = '<a href="'.route('regionais.show', $resultado->idregional).'" class="btn btn-sm btn-default" target="_blank">Ver</a> ';
@@ -57,7 +57,7 @@ class RegionalService implements RegionalServiceInterface {
         return $tabela;
     }
 
-    public function index()
+    public function listar($user)
     {
         $resultados = Regional::select('idregional', 'prefixo', 'regional', 'telefone', 'fax', 'email')
             ->orderBy('regional')
@@ -65,7 +65,7 @@ class RegionalService implements RegionalServiceInterface {
 
         return [
             'resultados' => $resultados, 
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }
@@ -87,7 +87,7 @@ class RegionalService implements RegionalServiceInterface {
         event(new CrudEvent('regional', 'editou', $id));
     }
 
-    public function viewSite($id)
+    public function show($id)
     {
         $regional = Regional::findOrFail($id);
 
@@ -99,7 +99,7 @@ class RegionalService implements RegionalServiceInterface {
         ];
     }
 
-    public function buscar($busca)
+    public function buscar($user, $busca)
     {
         $resultados = Regional::where('regional','LIKE','%'.$busca.'%')
             ->orWhere('email','LIKE','%'.$busca.'%')
@@ -108,7 +108,7 @@ class RegionalService implements RegionalServiceInterface {
 
         return [
             'resultados' => $resultados,
-            'tabela' => $this->tabelaCompleta($resultados), 
+            'tabela' => $this->tabelaCompleta($user, $resultados), 
             'variaveis' => (object) $this->variaveis
         ];
     }

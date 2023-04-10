@@ -22,7 +22,7 @@ class PostsController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Post')->listar();
+            $dados = $this->service->getService('Post')->listar(auth()->user());
             $variaveis = $dados['variaveis'];
             $tabela = $dados['tabela'];
             $resultados = $dados['resultados'];
@@ -69,7 +69,7 @@ class PostsController extends Controller
     public function show($slug)
     {
         try{
-            $dados = $this->service->getService('Post')->viewSite($slug);
+            $dados = $this->service->getService('Post')->show($slug);
             $post = $dados['post'];
             $next = $dados['next'];
             $previous = $dados['previous'];
@@ -87,7 +87,7 @@ class PostsController extends Controller
     public function blogPage()
     {
         try{
-            $posts = $this->service->getService('Post')->siteGrid();
+            $posts = $this->service->getService('Post')->grid();
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os posts no portal.");
@@ -152,7 +152,7 @@ class PostsController extends Controller
 
         try{
             $busca = $request->q;
-            $dados = $this->service->getService('Post')->buscar($busca);
+            $dados = $this->service->getService('Post')->buscar(auth()->user(), $busca);
             $resultados = $dados['resultados'];
             $tabela = $dados['tabela'];
             $variaveis = $dados['variaveis'];

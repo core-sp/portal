@@ -3,10 +3,11 @@
 namespace App\Contracts;
 
 use App\Contracts\MediadorServiceInterface;
+use App\User;
 
 interface FiscalizacaoServiceInterface {
 
-    public function listar();
+    public function listar(User $user);
 
     public function view($id = null);
 
@@ -14,7 +15,7 @@ interface FiscalizacaoServiceInterface {
 
     public function updateStatus($id);
 
-    public function buscar($busca);
+    public function buscar(User $user, $busca);
 
     public function mapaSite($id = null);
 }
