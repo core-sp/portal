@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Exception;
-use App\Pagina;
 use App\HomeImagem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -55,17 +54,7 @@ class SiteController extends Controller
         $buscaArray = preg_split('/\s+/', $busca, -1);
 
         if(isset($busca)) {
-            $paginas = Pagina::selectRaw("'Página' as tipo, titulo, subtitulo, slug, created_at,conteudo")
-                ->where(function($query) use ($buscaArray) {
-                    foreach($buscaArray as $b) {
-                        $query->where(function($q) use ($b) {
-                            $q->where('titulo','LIKE','%'.$b.'%')
-                                ->orWhere('subtitulo','LIKE','%'.$b.'%')
-                                ->orWhere('conteudoBusca','LIKE','%'.$b.'%');
-                        });
-                    }
-                })->limit(10)
-                ->get();
+            $paginas = $this->service->getService('Pagina')->buscaSite($buscaArray)->get();
             $noticias = $this->service->getService('Noticia')->buscaSite($buscaArray)->get();
             $posts = $this->service->getService('Post')->buscaSite($buscaArray)->get();
 

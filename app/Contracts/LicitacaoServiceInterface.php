@@ -14,7 +14,7 @@ interface LicitacaoServiceInterface {
 
     public function view($id = null);
 
-    public function save($request, $user, $id = null);
+    public function save($request, User $user, $id = null);
 
     public function destroy($id);
 

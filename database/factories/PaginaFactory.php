@@ -4,14 +4,18 @@
 
 use App\Pagina;
 use Faker\Generator as Faker;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 $factory->define(Pagina::class, function (Faker $faker) {
+    $titulo = $faker->sentence;
+    $conteudo = $faker->sentence(400);
     return [
-        'idusuario' => Auth::id() !== null ? Auth::id() : factory('App\User'),
-        'titulo' => $titulo = $faker->sentence,
-        'slug' => str_slug($titulo, '-'),
+        'titulo' => $titulo,
         'subtitulo' => $faker->sentence,
-        'conteudo' => $faker->text
+        'slug' => Str::slug($titulo, '-'),
+        'img' => $faker->url,
+        'conteudo' => $conteudo,
+        'conteudoBusca' => converterParaTextoCru($conteudo),
+        'idusuario' => factory('App\User'),
     ];
 });

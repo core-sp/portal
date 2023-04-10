@@ -3,44 +3,49 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Pagina;
-use Illuminate\Support\Str;
-use App\Events\CrudEvent;
 use App\Http\Requests\PaginaRequest;
-use App\Repositories\PaginaRepository;
-use Illuminate\Support\Facades\Request as IlluminateRequest;
+use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PaginaController extends Controller
 {
-    // Nome da classe
-    private $class = 'PaginaController';
-    private $paginaModel;
-    private $variaveis;
-    private $paginaRepository;
+    private $service;
 
-    public function __construct(Pagina $pagina, PaginaRepository $paginaRepository)
+    public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('auth', ['except' => ['show']]);
-        $this->paginaModel = $pagina;
-        $this->variaveis = $pagina->variaveis();
-        $this->paginaRepository = $paginaRepository;
+        $this->service = $service;
     }
 
     public function index()
     {
         $this->authorize('viewAny', auth()->user());
-        $resultados = $this->paginaRepository->getToTable();
-        $tabela = $this->paginaModel->tabelaCompleta($resultados);
-        if(auth()->user()->cannot('create', auth()->user()))
-            unset($this->variaveis['btn_criar']);
-        $variaveis = (object) $this->variaveis;
+
+        try{
+            $dados = $this->service->getService('Pagina')->listar(auth()->user());
+            $variaveis = $dados['variaveis'];
+            $tabela = $dados['tabela'];
+            $resultados = $dados['resultados'];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar as páginas.");
+        }
+
         return view('admin.crud.home', compact('tabela', 'variaveis', 'resultados'));
     }
 
     public function create()
     {
         $this->authorize('create', auth()->user());
-        $variaveis = (object) $this->variaveis;
+
+        try{
+            $dados = $this->service->getService('Pagina')->view();
+            $variaveis = $dados['variaveis'];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar a página para criar página.");
+        }
+
         return view('admin.crud.criar', compact('variaveis'));
     }
 
@@ -48,21 +53,15 @@ class PaginaController extends Controller
     {
         $this->authorize('create', auth()->user());
 
-        $request->validated();
-
-        $slug = Str::slug($request->input('titulo'), '-');
-        $countTitulo = $this->paginaRepository->countBySlug($slug);
-        if($countTitulo >= 1) {
-            return redirect(route('paginas.index'))
-                ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar a página. Já existe uma página com esse nome.')
-                ->with('class', 'alert-danger');
+        try{
+            $validated = $request->validated();
+            $user = auth()->user();
+            $this->service->getService('Pagina')->save($validated, $user);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao criar a página.");
         }
 
-        $save = $this->paginaRepository->store($request, $slug);
-        if(!$save)
-            abort(500);
-
-        event(new CrudEvent('página', 'criou', $save->idpagina));
         return redirect(route('paginas.index'))
             ->with('message', '<i class="icon fa fa-check"></i>Página criada com sucesso!')
             ->with('class', 'alert-success');
@@ -71,8 +70,16 @@ class PaginaController extends Controller
     public function edit($id)
     {
         $this->authorize('updateOther', auth()->user());
-        $resultado = $this->paginaRepository->findById($id);
-        $variaveis = (object) $this->variaveis;
+
+        try{
+            $dados = $this->service->getService('Pagina')->view($id);
+            $resultado = $dados['resultado'];
+            $variaveis = $dados['variaveis'];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar a página para editar a página.");
+        }
+
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
@@ -80,52 +87,68 @@ class PaginaController extends Controller
     {
         $this->authorize('updateOther', auth()->user());
 
-        $request->validated();
-        
-        $slug = Str::slug($request->input('titulo'), '-');
-        $countTitulo = $this->paginaRepository->countBySlug($slug, $id);
-        if($countTitulo >= 1) {
-            return redirect(route('paginas.index'))
-                ->with('message', '<i class="icon fa fa-ban"></i>Não foi possível criar a página. Já existe uma página com esse nome.')
-                ->with('class', 'alert-danger');
+        try{
+            $validated = $request->validated();
+            $user = auth()->user();
+            $this->service->getService('Pagina')->save($validated, $user, $id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao editar a página.");
         }
 
-        $update = $this->paginaRepository->update($id, $request, $slug);
-        if(!$update)
-            abort(500);
-
-        event(new CrudEvent('página', 'editou', $id));
         return redirect(route('paginas.index'))
-            ->with('message', '<i class="icon fa fa-check"></i>Página editada com sucesso!')
+            ->with('message', '<i class="icon fa fa-check"></i>Página com a ID: ' . $id . ' foi editada com sucesso!')
             ->with('class', 'alert-success');
     }
 
     public function show($slug)
     {
-        $pagina = $this->paginaRepository->show($slug);
-        return isset($pagina) ? response()->view('site.pagina', compact('pagina'))->header('Cache-Control','no-cache') : abort(404);
+        try{
+            $dados = $this->service->getService('Pagina')->show($slug);
+            $pagina = $dados['pagina'];
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().' para o slug: '.$slug.'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Página não encontrada.");
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().' para o slug: '.$slug.'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar a página no portal.");
+        }
+
+        return response()
+            ->view('site.pagina', compact('pagina'))
+            ->header('Cache-Control','no-cache');
     }
 
     public function destroy($id)
     {
         $this->authorize('delete', auth()->user());
-        
-        $delete = $this->paginaRepository->findById($id)->delete();
-        if(!$delete)
-            abort(500);
-        
-        event(new CrudEvent('página', 'apagou', $id));
+       
+        try{
+            $this->service->getService('Pagina')->destroy($id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao excluir a página.");
+        }
+
         return redirect(route('paginas.index'))
-            ->with('message', '<i class="icon fa fa-ban"></i>Página deletada com sucesso!')
-            ->with('class', 'alert-danger');
+            ->with('message', '<i class="icon fa fa-check"></i>Página com a ID: ' . $id . ' foi deletada com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function lixeira()
     {
         $this->authorize('onlyAdmin', auth()->user());
-        $resultados = $this->paginaRepository->getTrashed();
-        $variaveis = (object) $this->variaveis;
-        $tabela = $this->paginaModel->tabelaTrashed($resultados);
+
+        try{
+            $dados = $this->service->getService('Pagina')->lixeira();
+            $variaveis = $dados['variaveis'];
+            $tabela = $dados['tabela'];
+            $resultados = $dados['resultados'];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar as páginas excluídas.");
+        }
+
         return view('admin.crud.lixeira', compact('tabela', 'variaveis', 'resultados'));
     }
 
@@ -133,23 +156,33 @@ class PaginaController extends Controller
     {
         $this->authorize('onlyAdmin', auth()->user());
 
-        $restore = $this->paginaRepository->getTrashedById($id)->restore();
-        if(!$restore)
-            abort(500);
-        
-        event(new CrudEvent('página', 'restaurou', $id));
+        try{
+            $this->service->getService('Pagina')->restore($id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao restaurar a página.");
+        }
+
         return redirect(route('paginas.index'))
-            ->with('message', '<i class="icon fa fa-check"></i>Página restaurada com sucesso!')
+            ->with('message', '<i class="icon fa fa-check"></i>Página com a ID: ' . $id . ' foi restaurada com sucesso!')
             ->with('class', 'alert-success');
     }
 
-    public function busca()
+    public function busca(Request $request)
     {
         $this->authorize('viewAny', auth()->user());
-        $busca = IlluminateRequest::input('q');
-        $variaveis = (object) $this->variaveis;
-        $resultados = $this->paginaRepository->getBusca($busca);
-        $tabela = $this->paginaModel->tabelaCompleta($resultados);
+
+        try{
+            $busca = $request->q;
+            $dados = $this->service->getService('Pagina')->buscar(auth()->user(), $busca);
+            $resultados = $dados['resultados'];
+            $tabela = $dados['tabela'];
+            $variaveis = $dados['variaveis'];
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao buscar o texto em páginas.");
+        }
+
         return view('admin.crud.home', compact('resultados', 'variaveis', 'tabela', 'busca'));
     }
 

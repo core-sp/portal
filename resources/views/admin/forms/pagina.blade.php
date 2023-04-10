@@ -1,9 +1,8 @@
-<form role="form" action="{{ !isset($resultado) ? route('paginas.store') : route('paginas.update', Request::route('id')) }}" method="POST">
+<form role="form" action="{{ !isset($resultado) ? route('paginas.store') : route('paginas.update', $resultado->idpagina) }}" method="POST">
     @csrf
     @if(isset($resultado))
         @method('PATCH')
     @endif
-    <input type="hidden" name="idusuario" value="{{ Auth::id() }}" />
     <div class="card-body">
         <div class="form-row">
             <div class="col">
@@ -12,17 +11,12 @@
                     class="form-control {{ $errors->has('titulo') ? 'is-invalid' : '' }}"
                     placeholder="Título"
                     name="titulo"
-                    @if(!empty(old('titulo')))
-                        value="{{ old('titulo') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->titulo }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('titulo')) && isset($resultado->titulo) ? $resultado->titulo : old('titulo') }}"
+                    required
+                />
                 @if($errors->has('titulo'))
                 <div class="invalid-feedback">
-                {{ $errors->first('titulo') }}
+                    {{ $errors->first('titulo') }}
                 </div>
                 @endif
             </div>
@@ -32,17 +26,11 @@
                     class="form-control {{ $errors->has('subtitulo') ? 'is-invalid' : '' }}"
                     name="subtitulo"
                     placeholder="Subtítulo"
-                    @if(!empty(old('subtitulo')))
-                        value="{{ old('subtitulo') }}"
-                    @else
-                        @if(isset($resultado))
-                            value="{{ $resultado->subtitulo }}"
-                        @endif
-                    @endif
-                    />
+                    value="{{ empty(old('subtitulo')) && isset($resultado->subtitulo) ? $resultado->subtitulo : old('subtitulo') }}"
+                />
                 @if($errors->has('subtitulo'))
                 <div class="invalid-feedback">
-                {{ $errors->first('subtitulo') }}
+                    {{ $errors->first('subtitulo') }}
                 </div>
                 @endif
             </div>
@@ -60,14 +48,13 @@
                         class="form-control"
                         type="text"
                         name="img"
-                        @if(@!empty(old('img')))
-                            value="{{ old('img') }}"
-                        @else
-                            @if(isset($resultado))
-                                value="{{ $resultado->img }}"
-                            @endif
-                        @endif
-                        />
+                        value="{{ empty(old('img')) && isset($resultado->img) ? $resultado->img : old('img') }}"
+                    />
+                    @if($errors->has('img'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('img') }}
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -76,7 +63,11 @@
             <textarea name="conteudo"
                 class="form-control my-editor {{ $errors->has('conteudo') ? 'is-invalid' : '' }}"
                 id="conteudopage"
-                rows="10">@if(!empty(old('conteudo'))){{ old('conteudo') }}@else @if(isset($resultado)){!! $resultado->conteudo !!}@endif @endif</textarea>
+                rows="25"
+                required
+            >
+                {!! empty(old('conteudo')) && isset($resultado->conteudo) ? $resultado->conteudo : old('conteudo') !!}
+            </textarea>
             @if($errors->has('conteudo'))
             <div class="invalid-feedback">
                 {{ $errors->first('conteudo') }}
@@ -86,13 +77,9 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            <a href="/admin/paginas" class="btn btn-default">Cancelar</a>
+            <a href="{{ route('paginas.index') }}" class="btn btn-default">Cancelar</a>
             <button type="submit" class="btn btn-primary ml-1">
-            @if(isset($resultado))
-                Salvar
-            @else
-                Publicar
-            @endif
+                {{ isset($resultado) ? 'Salvar' : 'Publicar' }}
             </button>
         </div>
     </div>

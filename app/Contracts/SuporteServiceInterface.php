@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use App\User;
+
 interface SuporteServiceInterface {
 
     public function indexLog();
@@ -22,5 +24,5 @@ interface SuporteServiceInterface {
 
     public function bloquearIp($ip);
 
-    public function liberarIp($ip, $user = null);
+    public function liberarIp($ip, User $user = null);
 }

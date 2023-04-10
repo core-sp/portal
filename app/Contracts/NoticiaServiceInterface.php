@@ -13,7 +13,7 @@ interface NoticiaServiceInterface {
 
     public function view(MediadorServiceInterface $service, $id = null);
 
-    public function save($request, $user, $id = null);
+    public function save($request, User $user, $id = null);
 
     public function destroy($id);
 

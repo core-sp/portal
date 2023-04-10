@@ -352,7 +352,7 @@ class NoticiaTest extends TestCase
 
         $this->patch(route('noticias.update', $noticia->idnoticia), [
             'titulo' => $noticiaDois->titulo
-        ]);
+        ])->assertSessionHasErrors('titulo');
         
         $this->assertNotEquals(Noticia::find($noticia->idnoticia)->titulo, $noticiaDois->titulo);
         $this->assertEquals(Noticia::find($noticia->idnoticia)->titulo, $noticia->titulo);
