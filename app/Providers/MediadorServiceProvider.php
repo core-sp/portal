@@ -30,6 +30,7 @@ class MediadorServiceProvider extends ServiceProvider implements DeferrableProvi
         $this->app->singleton('App\Contracts\CedulaServiceInterface', 'App\Services\CedulaService');
         $this->app->singleton('App\Contracts\RepresentanteServiceInterface', 'App\Services\RepresentanteService');
         $this->app->singleton('App\Contracts\PaginaServiceInterface', 'App\Services\PaginaService');
+        $this->app->singleton('App\Contracts\GeralServiceInterface', 'App\Services\GeralService');
     }
 
     /**
@@ -66,6 +67,7 @@ class MediadorServiceProvider extends ServiceProvider implements DeferrableProvi
             'App\Contracts\CedulaServiceInterface',
             'App\Contracts\RepresentanteServiceInterface',
             'App\Contracts\PaginaServiceInterface',
+            'App\Contracts\GeralServiceInterface',
         ];
     }
 }

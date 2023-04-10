@@ -19,7 +19,7 @@ class CompromissoController extends Controller
 
     public function __construct(CompromissoRepository $compromissoRepository)
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => ['agendaInstitucional', 'agendaInstitucionalByData']]);
         $this->compromissoRepository = $compromissoRepository;
         $this->variaveis = [
             'singular' => 'compromisso',
@@ -151,6 +151,22 @@ class CompromissoController extends Controller
         $tabela = $this->tabelaCompleta($resultados);
 
         return view('admin.crud.home', compact('resultados', 'variaveis', 'tabela', 'busca'));
+    }
+
+    public function agendaInstitucional()
+    {
+        return redirect()->route('agenda-institucional-data', date('d-m-Y'));
+    }
+
+    public function agendaInstitucionalByData($data)
+    {
+        if(!validDate($data, '01-01-1700', 'd-m-Y')) {
+            abort(404);
+        }
+
+        $resultados = $this->compromissoRepository->getByData(date('Y-m-d', strtotime($data)));
+
+        return view('site.agenda-institucional', compact('resultados', 'data'));
     }
 
     public function montaFiltros($request)

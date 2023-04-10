@@ -269,7 +269,7 @@
             </a>
             <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="/admin/imagens/bannerprincipal" class="nav-link">
+                    <a href="{{ route('imagens.banner') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Banner principal</p>
                     </a>

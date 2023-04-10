@@ -12,7 +12,7 @@ class FiscalizacaoController extends Controller
 
     public function __construct(MediadorServiceInterface $service)
     {
-        $this->middleware('auth', ['except' => ['mostrarMapa', 'mostrarMapaPeriodo']]);
+        $this->middleware('auth', ['except' => ['mostrarMapa', 'mostrarMapaPeriodo', 'acoesFiscalizacao', 'espacoContador']]);
         $this->service = $service;
     }
 
@@ -164,5 +164,29 @@ class FiscalizacaoController extends Controller
         }
 
         return view('site.mapa-fiscalizacao', compact('todosPeriodos', 'periodoSelecionado', 'dataAtualizacao'));
+    }
+
+    public function acoesFiscalizacao()
+    {
+        try{
+            $noticias = $this->service->getService('Noticia')->latestByCategoria('Fiscalização');
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar as ações da fiscalização.");
+        }
+
+        return view('site.acoes-da-fiscalizacao', compact('noticias'));
+    }
+
+    public function espacoContador()
+    {
+        try{
+            $noticias = $this->service->getService('Noticia')->latestByCategoria('Espaço do Contador');
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar as notícias do espaço do contador no portal.");
+        }
+
+        return view('site.espaco-do-contador', compact('noticias'));
     }
 }

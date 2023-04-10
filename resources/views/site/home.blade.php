@@ -17,22 +17,14 @@
           @foreach($imagens as $img)
           @php $i++; @endphp
           @if(!empty($img->url))
-            @if($i === 0)
-              <li data-target="#carousel" data-slide-to="{{ $i }}" class="active"></li>
-            @else
-              <li data-target="#carousel" data-slide-to="{{ $i }}"></li>
-            @endif
+            <li data-target="#carousel" data-slide-to="{{ $i }}" {{ $i === 0 ? 'class="active"' : '' }}></li>
           @endif
           @endforeach
         </ol>
         <div class="carousel-inner h-100">
           @foreach($imagens as $img)
           @if(!empty($img->url))
-            @if($img->ordem === 1)
-            <div class="carousel-item h-100 active">
-            @else
-            <div class="carousel-item h-100">
-            @endif
+            <div class="carousel-item h-100 {{ $img->ordem === 1 ? 'active' : '' }}">
               <a href="{{ $img->link }}" target="{{ $img->target }}">
                 <img class="w-100 hide-576" src="{{ asset($img->url) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />
                 <img class="w-100 show-576" src="{{ asset($img->url_mobile) }}" alt="Core-SP | Conselho Regional dos Representantes Comercias do Estado de São Paulo" />

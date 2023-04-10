@@ -169,8 +169,8 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Rota para Home Imagens
     Route::prefix('imagens')->group(function(){
-      Route::get('/bannerprincipal', 'HomeImagemController@editBannerPrincipal');
-      Route::put('/bannerprincipal', 'HomeImagemController@updateBannerPrincipal');
+      Route::get('/banner', 'HomeImagemController@editBanner')->name('imagens.banner');
+      Route::put('/banner', 'HomeImagemController@updateBanner')->name('imagens.banner.put');
     });
 
     // Rotas para Blog Posts
@@ -305,11 +305,11 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('feiras', 'SiteController@feiras')->name('site.feiras');
 
     // Fiscalização
-    Route::get('acoes-da-fiscalizacao', 'SiteController@acoesFiscalizacao')->name('fiscalizacao.acoesfiscalizacao');
+    Route::get('acoes-da-fiscalizacao', 'FiscalizacaoController@acoesFiscalizacao')->name('fiscalizacao.acoesfiscalizacao');
     // Rotas para o SIG (Sistema de Informação Geográfico)
     Route::get('/mapa-fiscalizacao', 'FiscalizacaoController@mostrarMapa')->name('fiscalizacao.mapa');
     Route::get('/mapa-fiscalizacao/{id}', 'FiscalizacaoController@mostrarMapaPeriodo')->name('fiscalizacao.mapaperiodo');
-    Route::get('espaco-do-contador', 'SiteController@espacoContador')->name('fiscalizacao.espacoContador');
+    Route::get('espaco-do-contador', 'FiscalizacaoController@espacoContador')->name('fiscalizacao.espacoContador');
 
     // Simulador
     Route::get('simulador', 'SimuladorController@view');
@@ -331,8 +331,8 @@ Route::middleware(['block_ip'])->group(function () {
       return view('site.chat');
     });
 
-    Route::get('/agenda-institucional', 'SiteController@agendaInstitucional')->name('agenda-institucional');
-    Route::get('/agenda-institucional/{data}', 'SiteController@agendaInstitucionalByData')->name('agenda-institucional-data');
+    Route::get('/agenda-institucional', 'CompromissoController@agendaInstitucional')->name('agenda-institucional');
+    Route::get('/agenda-institucional/{data}', 'CompromissoController@agendaInstitucionalByData')->name('agenda-institucional-data');
 
     // Página do termo de consentimento com o acesso via email
     Route::get('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimentoView')->name('termo.consentimento.view');
