@@ -41,24 +41,24 @@
           @foreach($resultados as $resultado)
           <div class="box-resultado">
             @if($resultado->tipo === "Notícia")
-            <a href="/noticia/{{ $resultado->slug }}"">
+            <a href="{{ route('noticias.show', $resultado->slug) }}">
               <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
             <h6 class="cinza mb-2">Publicado em: {{ onlyDate($resultado->created_at) }}</h6>
             {!! resumo($resultado->conteudo) !!}
             <div>
-              <a href="/noticia/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+              <a href="{{ route('noticias.show', $resultado->slug) }}" class="btn-curso-grid mt-3">Confira</a>
             </div>
             @elseif($resultado->tipo == 'Página')
-            <a href="/{{ $resultado->slug }}">
+            <a href="{{ route('paginas.site', $resultado->slug) }}">
               <h5 class="normal mb-2"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
             {!! resumo($resultado->conteudo) !!}
             <div>
-              <a href="/{{ $resultado->slug }}" class="btn-curso-grid mt-3">Confira</a>
+              <a href="{{ route('paginas.site', $resultado->slug) }}" class="btn-curso-grid mt-3">Confira</a>
             </div>
             @else
-            <a href="{{ route('site.blog.post', $resultado->slug) }}"">
+            <a href="{{ route('site.blog.post', $resultado->slug) }}">
               <h5 class="normal"><i>{{ $resultado->tipo }} -</i> <strong>{{ $resultado->titulo }}</strong></h5>
             </a>
             <h6 class="cinza mb-2">Publicado em: {{ onlyDate($resultado->created_at) }}</h6>

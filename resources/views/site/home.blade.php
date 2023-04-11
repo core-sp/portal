@@ -13,11 +13,9 @@
     <div class="row" id="conteudo-principal">
       <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="6000">
         <ol class="carousel-indicators">
-          @php $i = -1; @endphp
-          @foreach($imagens as $img)
-          @php $i++; @endphp
+          @foreach($imagens as $key => $img)
           @if(!empty($img->url))
-            <li data-target="#carousel" data-slide-to="{{ $i }}" {{ $i === 0 ? 'class="active"' : '' }}></li>
+            <li data-target="#carousel" data-slide-to="{{ $key }}" {{ $key === 0 ? 'class="active"' : '' }}></li>
           @endif
           @endforeach
         </ol>
@@ -90,10 +88,10 @@
           <div class="inside-box">
             <img src="{{ asset('img/padlock.png') }}" class="inside-img" alt="Área restrita do Representante | Core-SP" />
             <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Área restrita<br class="hide-992" /> do Representante</h3>
-            <a href="/representante/login" class="d-block h-100">
+            <a href="{{ route('representante.login') }}" class="d-block h-100">
               <button class="btn-box azul-escuro">Acessar</button>
             </a>
-            <a href="/representante/cadastro" class="d-block h-100">
+            <a href="{{ route('representante.cadastro') }}" class="d-block h-100">
               <button class="btn-box btn-box-little azul-escuro">Cadastrar-se</button>
             </a>
           </div>
@@ -115,17 +113,17 @@
           <div class="inside-box">
             <img src="{{ asset('img/001-work.png') }}" class="inside-img" alt="Balcão de Oportunidades | Core-SP" />
             <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Balcão de<br class="hide-992" /> Oportunidades</h3>
-            <a href="/balcao-de-oportunidades" class="d-inline h-100">
+            <a href="{{ route('bdosite.index') }}" class="d-inline h-100">
               <button class="btn-box azul-escuro">Acessar</button>
             </a>
-            <a href="/anunciar-vaga" class="d-inline h-100">
+            <a href="{{ route('bdosite.anunciarVagaView') }}" class="d-inline h-100">
               <button class="btn-box btn-box-little azul-escuro">Anunciar</button>
             </a>
           </div>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/anuidade-ano-vigente" class="d-block h-100">
+        <a href="{{ route('anuidade-ano-vigente') }}" class="d-block h-100">
           <div class="box text-center azul-bg">
             <div class="inside-box">
               <img src="{{ asset('img/printer.png') }}" class="inside-img" alt="Anuidade do ano vigente | Core-SP" />
@@ -151,17 +149,17 @@
           <div class="inside-box">
             <img src="{{ asset('img/appointment.png') }}" class="inside-img" alt="Agendamento | Core-SP" />
             <h3 class="text-uppercase mt-3 branco light h3-box mb-3">Agendamento<br class="hide-992" /> de Atendimento</h3>
-            <a href="/agendamento" class="d-inline h-100">
+            <a href="{{ route('agendamentosite.formview') }}" class="d-inline h-100">
               <button class="btn-box azul-escuro">Agendar</button>
             </a>
-            <a href="/agendamento-consulta" class="d-inline h-100">
+            <a href="{{ route('agendamentosite.consultaView') }}" class="d-inline h-100">
               <button class="btn-box btn-box-little azul-escuro">Consultar</button>
             </a>
           </div>
         </div>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/cartilha-do-representante" class="d-block h-100">
+        <a href="{{ route('paginas.site', 'cartilha-do-representante') }}" class="d-block h-100">
           <div class="box text-center azul-bg">
             <div class="inside-box">
               <img src="{{ asset('img/open-book.png') }}" class="inside-img" alt="Cartilha do Representante | Core-SP" />
@@ -232,7 +230,7 @@
       </div>
 
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/noticias/core-sp-e-a-protecao-de-dados-pessoais" class="d-block h-100">
+        <a href="{{ route('noticias.show', 'core-sp-e-a-protecao-de-dados-pessoais') }}" class="d-block h-100">
           <div class="box text-center azul-bg">
             <div class="inside-box">
               <img src="{{ asset('img/icone-termo.png') }}" class="inside-img" alt="Termo de Consentimento" />
@@ -257,7 +255,7 @@
             <p class="text-white light">O Core-SP traz benefícios diferenciados para Representantes Comerciais.</p>
             <p class="text-white light">Faça parte do Grupo do WhatsApp e receba todos os dias os benefícios disponíveis.</p>
             <div>
-              <a href="/programa-de-incentivos" class="btn-beneficios">saiba mais</a>
+              <a href="{{ route('paginas.site', 'programa-de-incentivos') }}" class="btn-beneficios">saiba mais</a>
               <a href="https://chat.whatsapp.com/HPAXB7yne537CRQChfRfQe" class="btn-beneficios bg-white"><i class="fab fa-whatsapp fa-lg"></i> Grupo WhatsApp</a>
             </div>
           </div>
@@ -445,14 +443,14 @@
         </div>
         <div id="calendario" class="row">
           <div class="col-sm-8">
-            <a href="/calendario-oficial-core-sp">
+            <a href="{{ route('paginas.site', 'calendario-oficial-core-sp') }}">
               <img class="lazy" data-src="{{ asset('img/arte-calendario-2023.png') }}" alt="Calendário | Core-SP" />
             </a>
           </div>
           <div class="col-sm-4 hide-576 align-self-center text-right pr-4">
             <div class="calendario-txt">
               <p class="preto">Confira o calendário completo de<br>atendimento e expediente <br>de sua região.</p>
-              <a href="/calendario-oficial-core-sp" class="btn-calendario mt-4">
+              <a href="{{ route('paginas.site', 'calendario-oficial-core-sp') }}" class="btn-calendario mt-4">
                 <h4 class="normal">confira</h4>
               </a>
             </div>

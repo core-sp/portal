@@ -160,4 +160,30 @@ class SiteTest extends TestCase
         $this->get('admin/login')
         ->assertSee('Login inválido devido à quantidade de tentativas.');
     }
+
+    /** @test */
+    public function search_on_portal()
+    {
+        $post = factory('App\Post')->create([
+            'titulo' => 'Teste título post na busca da home'
+        ]);
+
+        $noticia = factory('App\Noticia')->create([
+            'titulo' => 'Teste título notícia na busca da home'
+        ]);
+
+        $pagina = factory('App\Pagina')->create([
+            'titulo' => 'Teste título página na busca da home'
+        ]);
+
+        $this->get('/')->assertOk();
+
+        $this->get(route('site.busca', ['busca' => 'Teste home']))
+        ->assertSee('<h5 class="normal"><i>Notícia -</i> <strong>'.$noticia->titulo.'</strong></h5>')
+        ->assertSee('<h5 class="normal"><i>Post -</i> <strong>'.$post->titulo.'</strong></h5>')
+        ->assertSee('<h5 class="normal mb-2"><i>Página -</i> <strong>'.$pagina->titulo.'</strong></h5>')
+        ->assertSee($post->titulo)
+        ->assertSee($noticia->titulo)
+        ->assertSee($pagina->titulo);
+    }
 }

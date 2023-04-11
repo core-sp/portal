@@ -28,6 +28,7 @@ class SystemTest extends TestCase
             'Cedula' => new \App\Services\CedulaService(),
             'Representante' => new \App\Services\RepresentanteService(),
             'Pagina' => new \App\Services\PaginaService(),
+            'Geral' => new \App\Services\GeralService(),
         ];
         $mediador = $this->app->make(MediadorServiceInterface::class);
 
@@ -62,6 +63,7 @@ class SystemTest extends TestCase
             'Cedula' => 'App\Contracts\CedulaServiceInterface',
             'Representante' => 'App\Contracts\RepresentanteServiceInterface',
             'Pagina' => 'App\Contracts\PaginaServiceInterface',
+            'Geral' => 'App\Contracts\GeralServiceInterface',
         ];
 
         $this->get('/simulador')->assertOk();
@@ -220,5 +222,13 @@ class SystemTest extends TestCase
         $servico = new \App\Services\PaginaService();
         $mediador = $this->app->make(MediadorServiceInterface::class);
         $this->assertEquals($mediador->getService('Pagina'), $servico);
+    }
+
+    /** @test */
+    public function mediador_interface_get_instace_geral_service()
+    {
+        $servico = new \App\Services\GeralService();
+        $mediador = $this->app->make(MediadorServiceInterface::class);
+        $this->assertEquals($mediador->getService('Geral'), $servico);
     }
 }

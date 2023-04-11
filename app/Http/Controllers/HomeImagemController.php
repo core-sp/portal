@@ -38,7 +38,7 @@ class HomeImagemController extends Controller
             $dados = $this->service->getService('Geral')->carrossel($array);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
-            abort(500, "Erro ao atualizar os dados das imagens do carrossel.");
+            return $e->getCode() == 400 ? redirect()->route('imagens.banner')->with(['message' => $e->getMessage(), 'class' => 'alert-danger']) : abort(500, "Erro ao atualizar os dados das imagens do carrossel.");
         }
 
         return redirect('/admin')
