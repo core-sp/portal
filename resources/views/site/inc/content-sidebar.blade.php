@@ -11,7 +11,7 @@
       </div>
     </div>
   </a>
-  <a href="/agendamento">
+  <a href="{{ route('agendamentosite.formview') }}">
     <div class="box-dois azul-escuro-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
@@ -23,7 +23,7 @@
       </div>
     </div>
   </a>
-  <a href="/representante/login">
+  <a href="{{ route('representante.login') }}">
     <div class="box-dois azul-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
@@ -35,7 +35,7 @@
       </div>
     </div>
   </a>
-  <a href="/balcao-de-oportunidades">
+  <a href="{{ route('bdosite.index') }}">
     <div class="box-dois azul-escuro-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
@@ -47,7 +47,7 @@
       </div>
     </div>
   </a>
-  <a href="/consulta-de-situacao">
+  <a href="{{ route('consultaSituacao') }}">
     <div class="box-dois azul-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">
@@ -59,7 +59,7 @@
       </div>
     </div>
   </a>
-  <a href="/cursos">
+  <a href="{{ route('cursos.index.website') }}">
     <div class="box-dois azul-escuro-bg mb-3">
       <div class="inside-box-dois d-flex">
         <div class="align-self-center">

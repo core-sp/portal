@@ -22,7 +22,7 @@ class GeralService implements GeralServiceInterface {
         if(isset($array))
         {
             $chunk = HomeImagem::validacao($array);
-            for($cont = 1; $cont <= 7; $cont++)
+            for($cont = 1; $cont <= HomeImagem::TOTAL; $cont++)
             {
                 $indice = $cont - 1;
                 $banner = $resultado->where('ordem', $cont)
@@ -41,5 +41,38 @@ class GeralService implements GeralServiceInterface {
             'resultado' => $resultado,
             'variaveis' => (object) $variaveis,
         ];
+    }
+
+    public function consultaSituacao($dados_gerenti)
+    {
+        if(isset($dados_gerenti) && count($dados_gerenti) === 1)
+        {
+            $dados_gerenti = utf8_converter($dados_gerenti[0]);
+            $situacao = $dados_gerenti['SITUACAO'];
+            $badge = '';
+    
+            switch ($situacao) {
+                case 'Ativo':
+                    $badge = '<span class="badge badge-success">'.$situacao.'</span>';
+                break;
+                case 'Cancelado':
+                    $badge = '<span class="badge badge-danger">'.$situacao.'</span>';
+                break;
+                default:
+                    $badge = '<span class="badge badge-secondary">'.$situacao.'</span>';
+                break;
+            }
+    
+            if($situacao === 'Não encontrado')
+                return array();
+    
+            return [
+                'nome' => $dados_gerenti['NOME'],
+                'registro' => substr_replace($dados_gerenti['REGISTRONUM'], '/', -4, 0),
+                'badge_situacao' => $badge,
+            ];
+        }
+
+        return null;
     }
 }

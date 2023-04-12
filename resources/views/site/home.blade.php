@@ -98,7 +98,7 @@
         </div>
       </div>
       <div class="col-lg-3 col-sm-6 pb-15">
-        <a href="/consulta-de-situacao" class="d-block">
+        <a href="{{ route('consultaSituacao') }}" class="d-block">
           <div class="box text-center azul-bg">
             <div class="inside-box">
               <img src="{{ asset('img/file.png') }}" class="inside-img alt="Consulta de Ativos | Core-SP">

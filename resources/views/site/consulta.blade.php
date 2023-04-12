@@ -74,13 +74,13 @@
             </div>
           </form>
         </div>
-        @if(isset($resultado) && count($resultado) === 1)
+        @if(isset($resultado))
           <div class="mt-3">
             <div>
               <p class="light"><i>Resultados para a busca do CPF/CNPJ:</i> <strong>{{ Request::input('cpfCnpj') }}</strong></p>
             </div>
             <hr class="mb-4">
-            @if(utf8_encode($resultado[0]['SITUACAO']) === 'Não encontrado')
+            @if(empty($resultado))
               <p><strong>Nenhum Representante Comercial encontrado com o CPF/CNPJ fornecido!</strong></p>
             @else
               <div class="consulta-box">
@@ -89,10 +89,10 @@
                     <img src="{{ strlen(Request::input('cpfCnpj')) === 11 ? asset('img/icon-rc.png') : asset('img/icon-empresa.png') }}" alt="Avatar Representante Comercial" />
                   </div>
                   <div class="flex-one align-self-center ml-3">
-                    <h5>{{ utf8_encode($resultado[0]['NOME']) }}</h5>
-                    <p><strong>Registro:</strong> {{ substr_replace($resultado[0]['REGISTRONUM'], '/', -4, 0) }}</p>
+                    <h5>{{ $resultado['nome'] }}</h5>
+                    <p><strong>Registro:</strong> {{ $resultado['registro'] }}</p>
                     <p><strong>{{ strlen(Request::input('cpfCnpj')) === 14 ? 'CNPJ:' : 'CPF:' }}</strong> {{ Request::input('cpfCnpj') }}</p>
-                    <p class="mt-2"><strong>Situação:</strong> {!! badgeConsulta($resultado[0]['SITUACAO']) !!}</p>
+                    <p class="mt-2"><strong>Situação:</strong> {!! $resultado['badge_situacao'] !!}</p>
                   </div>
                 </div>
               </div>

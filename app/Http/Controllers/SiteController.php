@@ -5,14 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\GeralRequest;
 use App\Contracts\MediadorServiceInterface;
+use App\Repositories\GerentiRepositoryInterface;
 
 class SiteController extends Controller
 {
     private $service;
+    private $gerentiRepository;
 
-    public function __construct(MediadorServiceInterface $service)
+    public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
     {
         $this->service = $service;
+        $this->gerentiRepository = $gerentiRepository;
     }
 
     public function index()
@@ -64,5 +67,25 @@ class SiteController extends Controller
         }
 
         return view('site.feiras', compact('noticias'));
+    }
+
+    public function views_geral()
+    {
+        if(\Route::is('consultaSituacao'))
+            return view('site.consulta');
+    }
+
+    public function consultaSituacao(GeralRequest $request)
+    {
+        try{
+            $cpfCnpj = apenasNumeros($request->validated()['cpfCnpj']);
+            $dados_gerenti = $this->gerentiRepository->gerentiAtivo($cpfCnpj);
+            $resultado = $this->service->getService('Geral')->consultaSituacao($dados_gerenti);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao consultar a situação no portal.");
+        }
+
+        return view('site.consulta', compact('resultado'));
     }
 }

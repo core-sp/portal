@@ -316,8 +316,8 @@ Route::middleware(['block_ip'])->group(function () {
     Route::post('simulador', 'SimuladorController@extrato');
 
     // Consulta de Situação
-    Route::get('consulta-de-situacao', 'ConsultaSituacaoController@consultaView');
-    Route::post('consulta-de-situacao', 'ConsultaSituacaoController@consulta');
+    Route::get('consulta-de-situacao', 'SiteController@views_geral')->name('consultaSituacao');
+    Route::post('consulta-de-situacao', 'SiteController@consultaSituacao')->name('consultaSituacao.post');
 
     // Blog
     Route::get('blog', 'PostsController@blogPage')->name('site.blog');
@@ -325,7 +325,7 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Anuidade ano vigente
     Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView')->name('anuidade-ano-vigente');
-    Route::post('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigente');
+    Route::post('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigente')->name('anuidade-ano-vigente.post');
 
     Route::get('/chat', function(){
       return view('site.chat');

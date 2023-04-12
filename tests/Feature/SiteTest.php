@@ -186,4 +186,24 @@ class SiteTest extends TestCase
         ->assertSee($noticia->titulo)
         ->assertSee($pagina->titulo);
     }
+
+    /** @test */
+    public function consulta_situacao_on_portal()
+    {
+        $this->get(route('consultaSituacao'))
+        ->assertSee('<h2 class="stronger">Representante já pode consultar, com mais facilidade, sua situação junto ao Conselho!</h2>')
+        ->assertSee('<p class="mb-2 light">A consulta de situação, novo serviço oferecido pelo Core-SP, é uma solução informatizada que permite verificar a situação do Representante Comercial junto ao Conselho.</p>')
+        ->assertSee('<label for="cpfCnpj">Insira o CPF/CNPJ abaixo:</label>')
+        ->assertSee('<p class="mt-1 mb-1">O teor desta consulta é meramente informativo, não valendo como certidão.</p>');
+
+        $this->post(route('consultaSituacao.post'), ['cpfCnpj' => '86294373085'])
+        ->assertSee('<p class="light"><i>Resultados para a busca do CPF/CNPJ:</i> <strong>86294373085</strong></p>')
+        ->assertSee('<h5>RC Teste 1</h5>')
+        ->assertSee('<p><strong>Registro:</strong> 000000/0001</p>')
+        ->assertSee('<p><strong>CPF:</strong> 86294373085</p>')
+        ->assertSee('<p class="mt-2"><strong>Situação:</strong> <span class="badge badge-success">Ativo</span></p>');
+
+        $this->post(route('consultaSituacao.post'), ['cpfCnpj' => '79096445000177'])
+        ->assertSee('<p><strong>Nenhum Representante Comercial encontrado com o CPF/CNPJ fornecido!</strong></p>');
+    }
 }
