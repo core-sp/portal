@@ -324,8 +324,8 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('blog/{slug}', 'PostsController@show')->name('site.blog.post');
 
     // Anuidade ano vigente
-    Route::get('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigenteView')->name('anuidade-ano-vigente');
-    Route::post('/anuidade-ano-vigente', 'AnoVigenteSiteController@anoVigente')->name('anuidade-ano-vigente.post');
+    Route::get('/anuidade-ano-vigente', 'SiteController@views_geral')->name('anuidade-ano-vigente');
+    Route::post('/anuidade-ano-vigente', 'SiteController@anuidadeVigente')->name('anuidade-ano-vigente.post');
 
     Route::get('/chat', function(){
       return view('site.chat');

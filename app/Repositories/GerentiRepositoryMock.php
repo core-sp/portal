@@ -318,7 +318,14 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
      */
     public function gerentiAnuidadeVigente($cpfCnpj)
     {
-        return null;
+        if($cpfCnpj == "86294373085")
+            $resultado[0] = [
+                'NOSSONUMERO' => '1111111'
+            ];
+        else
+            $resultado = array();
+
+        return $resultado;
     }
 
     /**

@@ -75,4 +75,15 @@ class GeralService implements GeralServiceInterface {
 
         return null;
     }
+
+    public function anuidadeVigente($dados_gerenti)
+    {
+        if(isset($dados_gerenti[0]['NOSSONUMERO']))
+            return [
+                'nossonumero' => $dados_gerenti[0]['NOSSONUMERO']
+            ];
+        return [
+            'notFound' => true
+        ];
+    }
 }

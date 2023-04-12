@@ -32,7 +32,7 @@
         <div class="row mt-2">
             <div class="col-lg-8 conteudo-txt pr-4">
                 <p>Informe o CPF ou CNPJ abaixo para verificar a disponibilidade do boleto de anuidade do ano vigente, e então baixe-o clicando no link.</p>
-                <p>Ou, se preferir, acesse a <a href="/representante/login">Área Restrita do Representante,</a> e confira também outras informações relativas ao seu cadastro junto ao Core-SP, incluindo seu extrato financeiro detalhado.</p>
+                <p>Ou, se preferir, acesse a <a href="{{ route('representante.login') }}">Área Restrita do Representante,</a> e confira também outras informações relativas ao seu cadastro junto ao Core-SP, incluindo seu extrato financeiro detalhado.</p>
                 <p class="text-danger"><strong>
                     IMPORTANTE: para ter acesso ao boleto que unifica as cobranças de anuidade de responsável técnico e pessoa jurídica, digite o <u>CNPJ</u> no campo indicado.
                 </strong></p>    
@@ -45,7 +45,7 @@
                             name="cpfCnpj"
                             class="form-control cpfOuCnpj {{ $errors->has('cpfCnpj') ? 'is-invalid' : '' }}"
                             id="cpfCnpj"
-                            value="{{ old('cpfCnpj') }}"
+                            value="{{ apenasNumeros(old('cpfCnpj')) }}"
                             placeholder="CPF ou CNPJ"
                         >
                         @if($errors->has('cpfCnpj'))
@@ -66,16 +66,16 @@
                     </div>
                     <div class="form-group mt-3">
                         <button type="submit" class="btn btn-primary" id="anoVigenteButton">
-                           Verificar {{ Session::get('nossonumero') || Session::get('notFound') ? 'novamente' : '' }}
+                           Verificar {{ isset($resultado['nossonumero']) || isset($resultado['notFound']) ? 'novamente' : '' }}
                         </button>
                         <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" class="pt-0" alt="Loading"></div>
                     </div>
                 </form>
-                @if(Session::get('nossonumero'))
+                @if(isset($resultado['nossonumero']))
                     <hr>
                     <p class="pb-0"><strong>Anuidade encontrada!</strong> Baixe o boleto clicando no link abaixo:</p>
                     <h3 class="text-uppercase">
-                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ Session::get('nossonumero')[0]['NOSSONUMERO'] }}" class="normal text-info">
+                        <a href="https://boletoonline.caixa.gov.br/ecobranca/SIGCB/imprimir/0779951/{{ $resultado['nossonumero'] }}" class="normal text-info">
                             <button class="btn btn-success btn-lg"
                                 onClick="gtag('event', 'download', {
                                     'event_category': 'boleto',
@@ -88,8 +88,7 @@
                     </h3>
                     <hr>
                     <p><small class="light">Observação: Atente-se às datas informadas no corpo do boleto para pagar a anuidade com desconto.</small></p>
-                @endif
-                @if(Session::get('notFound'))
+                @elseif(isset($resultado['notFound']))
                     <hr>
                     <strong>Nenhum boleto encontrado para o CPF/CNPJ informado.</strong>
                 @endif

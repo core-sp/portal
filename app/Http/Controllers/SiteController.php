@@ -73,6 +73,9 @@ class SiteController extends Controller
     {
         if(\Route::is('consultaSituacao'))
             return view('site.consulta');
+
+        if(\Route::is('anuidade-ano-vigente'))
+            return view('site.anuidade-ano-vigente');
     }
 
     public function consultaSituacao(GeralRequest $request)
@@ -87,5 +90,19 @@ class SiteController extends Controller
         }
 
         return view('site.consulta', compact('resultado'));
+    }
+
+    public function anuidadeVigente(GeralRequest $request)
+    {
+        try{
+            $cpfCnpj = apenasNumeros($request->validated()['cpfCnpj']);
+            $dados_gerenti = $this->gerentiRepository->gerentiAnuidadeVigente($cpfCnpj);
+            $resultado = $this->service->getService('Geral')->anuidadeVigente($dados_gerenti);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao consultar a anuidade vigente no portal.");
+        }
+
+        return view('site.anuidade-ano-vigente', compact('resultado'));
     }
 }

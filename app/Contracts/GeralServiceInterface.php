@@ -11,4 +11,7 @@ interface GeralServiceInterface {
 
     // Formata os dados do gerenti para a view
     public function consultaSituacao($dados_gerenti);
+
+    // Formata os dados do gerenti para a view
+    public function anuidadeVigente($dados_gerenti);
 }

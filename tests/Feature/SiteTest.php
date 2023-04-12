@@ -206,4 +206,20 @@ class SiteTest extends TestCase
         $this->post(route('consultaSituacao.post'), ['cpfCnpj' => '79096445000177'])
         ->assertSee('<p><strong>Nenhum Representante Comercial encontrado com o CPF/CNPJ fornecido!</strong></p>');
     }
+
+    /** @test */
+    public function anuidade_vigente_on_portal()
+    {
+        $this->get(route('anuidade-ano-vigente'))
+        ->assertSee('<h2 class="stronger">Baixe o boleto de anuidade do ano vigente</h2>')
+        ->assertSee('<label for="cpfCnpj">CPF ou CNPJ *</label>')
+        ->assertSee('<p>Informe o CPF ou CNPJ abaixo para verificar a disponibilidade do boleto de anuidade do ano vigente, e então baixe-o clicando no link.</p>');
+
+        $this->post(route('anuidade-ano-vigente.post'), ['cpfCnpj' => '86294373085'])
+        ->assertSee('<p class="pb-0"><strong>Anuidade encontrada!</strong> Baixe o boleto clicando no link abaixo:</p>')
+        ->assertSee('<i class="fas fa-download"></i>&nbsp;&nbsp;BAIXAR BOLETO');
+
+        $this->post(route('anuidade-ano-vigente.post'), ['cpfCnpj' => '79096445000177'])
+        ->assertSee('<strong>Nenhum boleto encontrado para o CPF/CNPJ informado.</strong>');
+    }
 }
