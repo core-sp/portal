@@ -330,47 +330,47 @@
               </div>
               <div class="w-75">
                 <p class="branco">Inscreva-se para receber nossos informativos:</p>
-                <form class="mt-3" id="newsletter" method="POST" action="/newsletter">
+                <form class="mt-3" id="newsletter" method="POST" action="{{ route('newsletter.post') }}">
                   @csrf
                   <div class="form-group">
                     <input type="text"
-                      name="nomeNl"
-                      class="form-control {{ $errors->has('nomeNl') ? 'is-invalid' : '' }}"
-                      value="{{ old('nomeNl') }}"
+                      name="nome"
+                      class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
+                      value="{{ old('nome') }}"
                       placeholder="Nome *"
                       required
                       />
-                      @if($errors->has('nomeNl'))
+                      @if($errors->has('nome'))
                       <div class="invalid-feedback">
-                      {{ $errors->first('nomeNl') }}
+                      {{ $errors->first('nome') }}
                       </div>
                       @endif
                   </div>
                   <div class="form-group">
-                    <input type="text"
-                      name="emailNl"
-                      class="form-control {{ $errors->has('emailNl') ? 'is-invalid' : '' }}"
-                      value="{{ old('emailNl') }}"
+                    <input type="email"
+                      name="email"
+                      class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                      value="{{ old('email') }}"
                       placeholder="E-mail *"
                       required
                       />
-                      @if($errors->has('emailNl'))
+                      @if($errors->has('email'))
                       <div class="invalid-feedback">
-                      {{ $errors->first('emailNl') }}
+                      {{ $errors->first('email') }}
                       </div>
                       @endif
                   </div>
                   <div class="form-group">
                     <input type="text"
-                      name="celularNl"
-                      class="form-control celularInput {{ $errors->has('celularNl') ? 'is-invalid' : '' }}"
-                      value="{{ old('celularNl') }}"
+                      name="celular"
+                      class="form-control celularInput {{ $errors->has('celular') ? 'is-invalid' : '' }}"
+                      value="{{ old('celular') }}"
                       placeholder="Celular *"
                       required
                       />
-                      @if($errors->has('celularNl'))
+                      @if($errors->has('celular'))
                       <div class="invalid-feedback">
-                      {{ $errors->first('celularNl') }}
+                      {{ $errors->first('celular') }}
                       </div>
                       @endif
                   </div>
@@ -383,7 +383,8 @@
                       {{ old('termo') ? 'checked' : '' }}
                       required
                     /> 
-                    <label for="termo" class="branco textoTermo text-justify">Li e concordo com o <a href="{{route('termo.consentimento.pdf')}}" target="_blank"><u>Termo de Consentimento</u></a> de uso de dados, e aceito receber boletins informativos a respeito de parcerias e serviços do CORE-SP.
+                    <label for="termo" class="branco textoTermo text-justify">
+                      Li e concordo com o <a href="{{ route('termo.consentimento.pdf') }}" target="_blank"><u>Termo de Consentimento</u></a> de uso de dados, e aceito receber boletins informativos a respeito de parcerias e serviços do CORE-SP.
                     </label>
                     @if($errors->has('termo'))
                     <div class="invalid-feedback">

@@ -14,4 +14,10 @@ interface GeralServiceInterface {
 
     // Formata os dados do gerenti para a view
     public function anuidadeVigente($dados_gerenti);
+
+    // Salva newsletter
+    public function newsletter($dados);
+
+    // Faz download e devolve total
+    public function newsletterAdmin(bool $download = true);
 }

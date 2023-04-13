@@ -220,6 +220,9 @@ $(document).ready(function(){
 	// $('#video-campanha').on('ended', function(){
 	// 	$('#popup-campanha').modal('hide');
 	// });
+
+	if($('#rodape .is-invalid').length > 0)
+		$('#rodape input[name="nome"]').focus();
 });
 
 // Lightbox

@@ -48,7 +48,7 @@
 		</div>
 		<div class="col">
 		@if(auth()->user()->idperfil == 1 || auth()->user()->idperfil == 3)
-		<a href="/admin/newsletter/download" class="inherit">
+		<a href="{{ route('newsletter.download') }}" class="inherit">
 		@endif
 		<div class="info-box">
 			<span class="info-box-icon bg-info">

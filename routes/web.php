@@ -164,7 +164,7 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Rota para Newsletter
     Route::prefix('newsletter')->group(function(){
-      Route::get('/download', 'NewsletterController@download');
+      Route::get('/download', 'NewsletterController@download')->name('newsletter.download');
     });
 
     // Rota para Home Imagens
@@ -299,7 +299,7 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('regionais-plantao-juridico', 'AgendamentoSiteController@regionaisPlantaoJuridico')->name('agendamentosite.regionaisPlantaoJuridico');
 
     // Newsletter
-    Route::post('newsletter', 'NewsletterController@store');
+    Route::post('newsletter', 'NewsletterController@store')->name('newsletter.post');
 
     // Feiras
     Route::get('feiras', 'SiteController@feiras')->name('site.feiras');

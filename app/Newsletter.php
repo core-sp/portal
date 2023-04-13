@@ -8,6 +8,7 @@ class Newsletter extends Model
 {
     protected $table = 'newsletters';
     protected $primaryKey = 'idnewsletter';
+    protected $guarded = [];
 
     public function termos()
     {

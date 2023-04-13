@@ -133,13 +133,8 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function created_new_record_when_new_newsletter()
     {
-        $newsletter = [
-            'nomeNl' => 'Testando Termo',
-            'emailNl' => 'teste@teste.com',
-            'celularNl' => '(11) 99999-9999',
-            'termo' => 'on'
-        ];
-        $this->post('/newsletter', $newsletter);
+        $newsletter = factory('App\Newsletter')->states('request')->raw();
+        $this->post(route('newsletter.post'), $newsletter);
 
         $this->assertDatabaseHas('termos_consentimentos', [
             'id' => 1,
@@ -156,17 +151,14 @@ class TermoConsentimentoTest extends TestCase
     /** @test */
     public function id_termo_in_log_when_new_newsletter()
     {
-        $newsletter = [
-            'nomeNl' => 'Testando Termo',
-            'emailNl' => 'teste@teste.com',
-            'celularNl' => '(11) 99999-9999',
-            'termo' => 'on'
-        ];
-        $this->post('/newsletter', $newsletter);
+        $newsletter = factory('App\Newsletter')->states('request')->raw();
+        $this->post(route('newsletter.post'), $newsletter);
 
         $log = tailCustom(storage_path($this->pathLogExterno()));
-
-        $this->assertStringContainsString('*'.$newsletter['nomeNl'].'* ('.$newsletter['emailNl'].') *registrou-se* na newsletter e foi criado um novo registro no termo de consentimento, com a id: 1', $log);
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . "*".$newsletter['nome']."* (".$newsletter['email'].")";
+        $txt .= ' *registrou-se* na newsletter e foi criado um novo registro no termo de consentimento, com a id: 1';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */

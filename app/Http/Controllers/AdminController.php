@@ -7,22 +7,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\CursoRepository;
 use App\Repositories\ChamadoRepository;
-use App\Repositories\NewsletterRepository;
 use App\Contracts\MediadorServiceInterface;
 
 class AdminController extends Controller
 {
     private $chamadoRepository;
     private $cursoRepository;
-    private $newsletterRepository;
     private $service;
     
-    public function __construct(ChamadoRepository $chamadoRepository, CursoRepository $cursoRepository, NewsletterRepository $newsletterRepository, MediadorServiceInterface $service)
+    public function __construct(ChamadoRepository $chamadoRepository, CursoRepository $cursoRepository, MediadorServiceInterface $service)
     {
         $this->middleware('auth');
         $this->chamadoRepository = $chamadoRepository;
         $this->cursoRepository = $cursoRepository;
-        $this->newsletterRepository = $newsletterRepository;
         $this->service = $service;
     }
 
@@ -33,7 +30,7 @@ class AdminController extends Controller
         $chamados = $this->chamadoRepository->getChamadoByIdUsuario(Auth::user()->idusuario);
         $totalAgendamentos = $this->service->getService('Agendamento')->countAll();
         $totalInscritos = $this->cursoRepository->getTotalInscritos();
-        $totalNewsletter = $this->newsletterRepository->getCountAllNewsletter();
+        $totalNewsletter = $this->service->getService('Geral')->newsletterAdmin(false);
 
     	return view("admin.home", compact("alertas", "contagem", "chamados", "totalAgendamentos", "totalInscritos", "totalNewsletter"));
     }

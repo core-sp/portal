@@ -35,6 +35,14 @@ class GeralRequest extends FormRequest
                 'cpfCnpj' => ['required', new CpfCnpj],
                 'g-recaptcha-response' => $this->regras,
             ];
+
+        if(\Route::is('newsletter.post'))
+            return [
+                'nome' => 'required|min:5|max:191|regex:/^[a-zA-Z ÁáÉéÍíÓóÚúÃãÕõÂâÊêÔô]+$/',
+                'email' => 'required|email|unique:newsletters,email',
+                'celular' => 'required|max:17|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{4})/',
+                'termo' => 'accepted'
+            ];
     }
 
     public function messages()
@@ -44,7 +52,11 @@ class GeralRequest extends FormRequest
             'max' => 'O :attribute excedeu o limite de :max caracteres permitidos',
             'min' => 'O :attribute deve ter pelo menos :min caracteres',
             'g-recaptcha-response' => 'ReCAPTCHA inválido',
-            'g-recaptcha-response.required' => 'ReCAPTCHA obrigatório'
+            'g-recaptcha-response.required' => 'ReCAPTCHA obrigatório',
+            'regex' => 'O :attribute está num formato inválido',
+            'email' => 'Formato inválido de e-mail',
+            'unique' => 'Já está cadastrado em nosso sistema',
+            'accepted' => 'Você deve concordar com o Termo de Consentimento',
         ];
     }
 }

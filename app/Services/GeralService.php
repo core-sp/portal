@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Contracts\GeralServiceInterface;
 use App\HomeImagem;
+use App\Newsletter;
 use App\Events\CrudEvent;
+use App\Events\ExternoEvent;
 
 class GeralService implements GeralServiceInterface {
 
@@ -84,6 +86,55 @@ class GeralService implements GeralServiceInterface {
             ];
         return [
             'notFound' => true
+        ];
+    }
+
+    public function newsletter($dados)
+    {
+        $newsletter = Newsletter::create([
+            'nome' => mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE),
+            'email' => $dados['email'],
+            'celular' => apenasNumeros($dados['celular'])
+        ]);
+        $termo = $newsletter->termos()->create([
+            'ip' => $dados['ip']
+        ]);
+    
+        $string = "*".$newsletter->nome."* (".$newsletter->email.")";
+        $string .= " *registrou-se* na newsletter e ".$termo->message();
+        event(new ExternoEvent($string));
+
+        return "Muito obrigado por inscrever-se em nossa newsletter!";
+    }
+
+    public function newsletterAdmin($download = true)
+    {
+        if(!$download)
+            return Newsletter::count();
+        
+        $headers = [
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=newsletter-'.date('Ymd').'.csv',
+            'Expires' => '0',
+            'Pragma' => 'public',
+        ];
+        $lista = Newsletter::select('email','nome','celular','created_at')->get();
+        $lista = $lista->toArray();
+        array_unshift($lista, array_keys($lista[0]));
+        $callback = function() use($lista) {
+            $fh = fopen('php://output','w');
+            fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
+            foreach($lista as $linha) {
+                fputcsv($fh,$linha,';');
+            }
+            fclose($fh);
+        };
+        event(new CrudEvent('newsletter', 'realizou download', '---'));
+
+        return [
+            'arquivo' => $callback,
+            'headers' => $headers,
         ];
     }
 }

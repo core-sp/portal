@@ -1189,7 +1189,7 @@ footer p {
 	font-size: 14px;
 }
 
-#newsletter input[type="text"] {
+#newsletter input[type="text"], #newsletter input[type="email"] {
 	background-color: transparent;
 	border: 1px solid #FFFFFF;
 	color: #FFFFFF;
