@@ -222,4 +222,228 @@ class SiteTest extends TestCase
         $this->post(route('anuidade-ano-vigente.post'), ['cpfCnpj' => '79096445000177'])
         ->assertSee('<strong>Nenhum boleto encontrado para o CPF/CNPJ informado.</strong>');
     }
+
+    /** @test */
+    public function view_simulador_valores_registro_inicial_on_portal()
+    {
+        $this->get(route('simulador'))
+        ->assertSeeText('Simulador de Valores para Registro Inicial')
+        ->assertSee('<label for="tipoPessoa">Tipo de Pessoa</label>')
+        ->assertSee('<label for="dataInicio">Data de início das atividades *</label>');
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_without_requireds_inputs()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '',
+            'dataInicio' => '',
+        ])->assertSessionHasErrors([
+            'tipoPessoa',
+            'dataInicio',
+        ]);
+    }
+
+    /** @test */
+    public function can_submit_simulador_with_tipo_pessoa_fisica()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '2',
+            'dataInicio' => date('Y-m-d'),
+        ])
+        ->assertSee('<th class="border-3">Descrição</th>')
+        ->assertSee('<th class="border-3">Valor</th>')
+        ->assertSee('<h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO PESSOA FÍSICA</h4>')
+        ->assertSee('<div class="textoSimulador">');
+    }
+
+    /** @test */
+    public function can_submit_simulador_with_tipo_pessoa_fisica_rt()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '5',
+            'dataInicio' => date('Y-m-d'),
+        ])
+        ->assertSee('<th class="border-3">Descrição</th>')
+        ->assertSee('<th class="border-3">Valor</th>')
+        ->assertSee('<h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO PESSOA FÍSICA - RESPONSÁVEL TÉCNICO</h4>')
+        ->assertSee('<div class="textoSimulador">');
+    }
+
+    /** @test */
+    public function can_submit_simulador_with_tipo_pessoa_juridica()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '1',
+            'dataInicio' => date('Y-m-d'),
+            'capitalSocial' => '1,00'
+        ])
+        ->assertSee('<th class="border-3">Descrição</th>')
+        ->assertSee('<th class="border-3">Valor</th>')
+        ->assertSee('<h4 class="mb-1">Pessoa Física RT</h4>')
+        ->assertSee('<h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO PESSOA JURÍDICA</h4>')
+        ->assertSee('<div class="textoSimulador">');
+    }
+
+    /** @test */
+    public function can_submit_simulador_with_tipo_pessoa_juridica_empresario_individual()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '1',
+            'dataInicio' => date('Y-m-d'),
+            'capitalSocial' => '1,00',
+            'empresaIndividual' => 'on'
+        ])
+        ->assertSee('<th class="border-3">Descrição</th>')
+        ->assertSee('<th class="border-3">Valor</th>')
+        ->assertSee('<div class="textoSimulador">')
+        ->assertSee('<h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO EMPRESA INDIVIDUAL</h4>');
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_with_tipo_pessoa_wrong()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '9',
+            'dataInicio' => date('Y-m-d'),
+        ])->assertSessionHasErrors([
+            'tipoPessoa',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_with_data_inicio_wrong()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '2',
+            'dataInicio' => '123456',
+        ])->assertSessionHasErrors([
+            'dataInicio',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_with_data_inicio_not_today_when_tipo_pessoa_2_or_5()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '2',
+            'dataInicio' => now()->subDay()->format('Y-m-d'),
+        ])->assertSessionHasErrors([
+            'dataInicio',
+        ]);
+
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '2',
+            'dataInicio' => now()->addDay()->format('Y-m-d'),
+        ])->assertSessionHasErrors([
+            'dataInicio',
+        ]);
+
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '5',
+            'dataInicio' => now()->subDay()->format('Y-m-d'),
+        ])->assertSessionHasErrors([
+            'dataInicio',
+        ]);
+
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '5',
+            'dataInicio' => now()->addDay()->format('Y-m-d'),
+        ])->assertSessionHasErrors([
+            'dataInicio',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_with_data_inicio_after_today_when_tipo_pessoa_1()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '1',
+            'dataInicio' => now()->addDay()->format('Y-m-d'),
+        ])->assertSessionHasErrors([
+            'dataInicio',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_with_data_inicio_before_1900_when_tipo_pessoa_1()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '1',
+            'dataInicio' => '1899-12-31',
+            'capitalSocial' => '1,00',
+        ])->assertSessionHasErrors([
+            'dataInicio',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_with_capital_social_wrong_when_tipo_pessoa_1()
+    {
+        $capitalSocialErros = ['000', '0,00', '100', '1,0', 'A1,00', '1,000,00'];
+
+        foreach($capitalSocialErros as $erro)
+            $this->post(route('simulador.post'), [
+                'tipoPessoa' => '1',
+                'dataInicio' => date('Y-m-d'),
+                'capitalSocial' => $erro
+            ])->assertSessionHasErrors([
+                'capitalSocial',
+            ]);
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_with_filial_check_wrong_when_tipo_pessoa_1()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '1',
+            'dataInicio' => date('Y-m-d'),
+            'capitalSocial' => '1,00',
+            'filialCheck' => 'onn',
+            'filial' => '50'
+        ])->assertSessionHasErrors([
+            'filialCheck',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_with_filial_wrong_when_tipo_pessoa_1()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '1',
+            'dataInicio' => date('Y-m-d'),
+            'capitalSocial' => '1,00',
+            'filialCheck' => 'on',
+            'filial' => '70'
+        ])->assertSessionHasErrors([
+            'filial',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_without_filial_when_tipo_pessoa_1_and_filial_check_on()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '1',
+            'dataInicio' => date('Y-m-d'),
+            'capitalSocial' => '1,00',
+            'filialCheck' => 'on',
+            'filial' => ''
+        ])->assertSessionHasErrors([
+            'filial',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_submit_simulador_with_empresario_individual_wrong_when_tipo_pessoa_1()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '1',
+            'dataInicio' => date('Y-m-d'),
+            'capitalSocial' => '1,00',
+            'empresaIndividual' => 'onn'
+        ])->assertSessionHasErrors([
+            'empresaIndividual',
+        ]);
+    }
 }

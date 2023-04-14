@@ -76,6 +76,9 @@ class SiteController extends Controller
 
         if(\Route::is('anuidade-ano-vigente'))
             return view('site.anuidade-ano-vigente');
+
+        if(\Route::is('simulador'))
+            return view('site.simulador', ['dados' => $this->service->getService('Geral')->simulador()]);
     }
 
     public function consultaSituacao(GeralRequest $request)
@@ -104,5 +107,18 @@ class SiteController extends Controller
         }
 
         return view('site.anuidade-ano-vigente', compact('resultado'));
+    }
+
+    public function simulador(GeralRequest $request)
+    {
+        try{
+            $dados = $request->validated();
+            $resultado = $this->service->getService('Geral')->simulador($dados, $this->gerentiRepository);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao realizar a simulação de valores no portal.");
+        }
+
+        return view('site.simulador', $resultado);
     }
 }

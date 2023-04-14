@@ -807,57 +807,56 @@ function getDate() {
 	return dd+'/'+mm+'/'+yyyy;
 }
 
-// Simulador
 (function($){
-	// Opções Datepicker
-	var options = {
-		dateFormat: 'dd/mm/yy',
-		dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-		dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
-		dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
-		monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-		monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
-		nextText: 'Próximo',
-		prevText: 'Anterior',
-		maxDate: '0',
-		minDate: '-256m',
+	// // Opções Datepicker
+	// var options = {
+	// 	dateFormat: 'dd/mm/yy',
+	// 	dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+	// 	dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+	// 	dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+	// 	monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+	// 	monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+	// 	nextText: 'Próximo',
+	// 	prevText: 'Anterior',
+	// 	maxDate: '0',
+	// 	minDate: '-256m',
+	// }
+	
+	// Simulador ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	function showHideSimulador(){
+		if($('#tipoPessoa').length > 0){
+			var hoje = $('#dataInicio').attr('max');
+			if ($('#tipoPessoa').val() == 1) {
+				$('#simuladorAddons').show();
+				$('#simuladorAddons').css('display','flex');
+				$('#dataInicio').prop('readonly', false);
+			} else {
+				$('#simuladorAddons').hide();
+				$('#filial').prop('disabled', 'disabled').val('');
+				$('#dataInicio').val(hoje).prop('readonly', true);
+			}
+		}
 	}
+
 	// Mostra loading button
 	$('#submitSimulador, #anoVigenteButton').on('click', function(){
 		$('#loadingSimulador').css('display', 'inline-block');
 	});
 
-	// Calendário Simulador
-	var hoje = $('#dataInicio').attr('max');
-
-	if($('#tipoPessoa').val() != '1') {
-		$('#dataInicio').prop('readonly', true);
-	} else {
-		$('#dataInicio').prop('readonly', false);
-	}
+	showHideSimulador();
 
 	// Mudanças on change tipo de Pessoa
 	$(document).on('change', '#tipoPessoa', function(){
 		$('#simuladorTxt').hide();
-		if ($('#tipoPessoa').val() == 1) {
-			$('#simuladorAddons').show();
-			$('#simuladorAddons').css('display','flex');
-			$('#dataInicio').prop('readonly', false);
-		} else {
-			$('#simuladorAddons').hide();
-			$('#filial').prop('disabled', 'disabled').val('');
-			$('#dataInicio').val(hoje).prop('readonly', true);
-		}
+		showHideSimulador();
 	});
 
 	// Filial
 	$(document).on('change', "#filialCheck", function() {
-		if(this.checked) {
-			$('#filial').prop('disabled', false);
-		} else {
-			$('#filial').prop('disabled', 'disabled').val('');
-		}
+		this.checked ? $('#filial').prop('disabled', false) : $('#filial').prop('disabled', 'disabled').val('');
 	});
+
+	// FIM Simulador ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	// Filename comprovante de residência
 	$('#comprovante-residencia, #comprovante-residencia-dois').on('change',function(e){

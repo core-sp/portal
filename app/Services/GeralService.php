@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\GeralServiceInterface;
 use App\HomeImagem;
 use App\Newsletter;
+use App\Simulador;
 use App\Events\CrudEvent;
 use App\Events\ExternoEvent;
 
@@ -136,5 +137,28 @@ class GeralService implements GeralServiceInterface {
             'arquivo' => $callback,
             'headers' => $headers,
         ];
+    }
+
+    public function simulador($validated = null, $gerenti = null)
+    {
+        $simulador = new Simulador();
+        $dados = [
+            'cores' => $simulador::listaCores(),
+            'tipoPessoa' => $simulador::tipoPessoa(),
+        ];
+
+        if(!isset($validated))
+        {
+            $simulador = null;
+            return $dados;
+        }
+
+        $resultado = $simulador->getSimulacao($validated, $gerenti);
+        $resultado['dados'] = $dados;
+        $ei = isset($validated['empresaIndividual']) ? $validated['empresaIndividual'] : '';
+        $resultado['texto'] = $simulador->getTexto($validated['tipoPessoa'], $ei);
+        $simulador = null;
+
+        return $resultado;
     }
 }

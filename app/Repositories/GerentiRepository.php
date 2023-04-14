@@ -471,4 +471,36 @@ class GerentiRepository implements GerentiRepositoryInterface
         
         return utf8_converter($resultado);
     }
+
+    public function taxas($tipo)
+    {
+        $this->connect();
+
+        // Retorno das taxas de acordo com o tipo de pessoa
+        $run = $this->gerentiConnection->prepare("select TAX_ID, TAX_DESCRICAO, TAX_VALOR from PROCTAXAINICIAIS(:tipo)");
+        $run->execute(['tipo' => $tipo]);
+
+        $resultado = $run->fetchAll();
+
+        return utf8_converter($resultado);
+    }
+
+    public function simulador($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 0)
+    {
+        $this->connect();
+
+        // Retorno do extrato de acordo com o tipo de pessoa, data de início, capital social e filial
+        $run = $this->gerentiConnection->prepare("select descricao, valor_total, data_vencimento from procextrato ('', :tipopessoa, :datainicio, :capitalsocial, cast('NOW' as date), :filial)");
+
+        $run->execute([
+            'tipopessoa' => $tipoPessoa,
+            'datainicio' => $dataInicio,
+            'capitalsocial' => $capitalSocial,
+            'filial' => $filial
+        ]);
+
+        $resultado = $run->fetchAll();
+        
+        return utf8_converter($resultado);
+    }
 }

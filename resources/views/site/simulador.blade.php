@@ -6,17 +6,13 @@
 
 @section('content')
 
-@php
-    use \App\Http\Controllers\Helpers\SimuladorControllerHelper;
-@endphp
-
 <section id="pagina-cabecalho">
   <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
     <img src="{{ asset('img/banner-simulador.jpg') }}" />
     <div class="row position-absolute pagina-titulo">
       <div class="container text-center">
         <h1 class="branco text-uppercase">
-          Simulador de Valores para Registro inicial
+          Simulador de Valores para Registro Inicial
         </h1>
       </div>
     </div>
@@ -40,18 +36,30 @@
     <div class="linha-lg"></div>
     <div class="row mt-2" id="conteudo-principal">
       <div class="col-lg-8">
+
         <div class="row nomargin">
           <form method="post" class="w-100 simulador">
             @csrf
             <div class="form-row">
               <div class="col-sm mb-2-576">
                 <label for="tipoPessoa">Tipo de Pessoa</label>
-                <select name="tipoPessoa" id="tipoPessoa" class="form-control">
-                  @foreach(SimuladorControllerHelper::tipoPessoa() as $key => $tipo)
-                    <option value="{{ $key }}" {{ Request::input('tipoPessoa') == $key || old('tipoPessoa') == $key ? 'selected' : '' }}>{{ $tipo }}</option>
+                <select 
+                  name="tipoPessoa" 
+                  id="tipoPessoa" 
+                  class="form-control {{ $errors->has('tipoPessoa') ? 'is-invalid' : '' }}"
+                  required
+                >
+                  @foreach($dados['tipoPessoa'] as $key => $tipo)
+                    <option value="{{ $key }}" {{ (Request::input('tipoPessoa') == $key) || (old('tipoPessoa') == $key) ? 'selected' : '' }}>{{ $tipo }}</option>
                   @endforeach
                 </select>
+                @if($errors->has('tipoPessoa'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('tipoPessoa') }}
+                  </div>
+                @endif
               </div>
+
               <div class="col-sm">
                 <label for="dataInicio">Data de início das atividades *</label>
                 <input
@@ -59,72 +67,100 @@
                   name="dataInicio"
                   id="dataInicio" 
                   class="form-control {{ $errors->has('dataInicio') ? 'is-invalid' : '' }}"
-                  @if(Request::input('dataInicio'))
-                    value="{{ Request::input('dataInicio') }}"
-                  @else
-                    value="{{ $hoje }}"
-                  @endif
+                  value="{{ request()->filled('dataInicio') ? Request::input('dataInicio') : date('Y-m-d') }}"
                   autocomplete="off"
                   min="1900-01-01"
-                  max="{{ $hoje }}"
+                  max="{{ date('Y-m-d') }}"
                   readonly
                   required
                 />
                 @if($errors->has('dataInicio'))
-                  <div class="invalid-feedback">
-                    {{ $errors->first('dataInicio') }}
-                  </div>
+                <div class="invalid-feedback">
+                  {{ $errors->first('dataInicio') }}
+                </div>
                 @endif
               </div>
             </div>
-            <div class="form-row mt-2" id="simuladorAddons" style="{{ Request::input('tipoPessoa') === '1' || old('tipoPessoa') === '1' ? 'display: flex;' : '' }}">
+
+            <div class="form-row mt-2" id="simuladorAddons" style="{{ (Request::input('tipoPessoa') === '1') || (old('tipoPessoa') === '1') ? 'display: flex;' : '' }}">
               <div class="col-sm-6 mb-2-576">
                 <label for="capitalSocial">Capital Social</label>
                 <div class="input-group">
                   <div class="input-group-prepend">
-                      <span class="input-group-text">R$</span>
+                    <span class="input-group-text">R$</span>
                   </div>
                   <input
                     type="text"
                     id="capitalSocial"
                     name="capitalSocial"
-                    class="form-control capitalSocial"
-                    value="{{ Request::input('capitalSocial') ? Request::input('capitalSocial') : '1,00' }}"
+                    class="form-control capitalSocial {{ $errors->has('capitalSocial') ? 'is-invalid' : '' }}"
+                    value="{{ request()->filled('capitalSocial') ? Request::input('capitalSocial') : '1,00' }}"
                     maxlength="15"
                   />
+                  @if($errors->has('capitalSocial'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('capitalSocial') }}
+                  </div>
+                  @endif
                 </div>
               </div>
+
               <div class="col-sm-6 mb-2-576">
                 <div class="form-check">
                   <input
                     type="checkbox"
                     name="filialCheck"
                     id="filialCheck"
-                    class="form-check-input"
+                    class="form-check-input {{ $errors->has('filialCheck') ? 'is-invalid' : '' }}"
+                    value="on"
                     {{ Request::input('filialCheck') == 'on' ? 'checked' : '' }}
                   />
-                  <label for="form-check-label" for="filialCheck">Filial</label>
+                  @if($errors->has('filialCheck'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('filialCheck') }}
+                  </div>
+                  @endif
+                  <label for="filialCheck">Filial</label>
                 </div>
-                <select name="filial" id="filial" class="form-control" {{ Request::input('filialCheck') == 'on' ? '' : 'disabled' }}>
+
+                <select 
+                  name="filial" 
+                  id="filial" 
+                  class="form-control {{ $errors->has('filial') ? 'is-invalid' : '' }}" 
+                  {{ Request::input('filialCheck') == 'on' ? '' : 'disabled' }}
+                >
                   <option value="50" {{ Request::input('filial') == 50 ? 'selected' : '' }}></option>
-                  @foreach(SimuladorControllerHelper::listaCores() as $key => $filial)
-                    <option value="{{ $key }}" {{ Request::input('filial') == $key ? 'selected' : '' }}>{{ $filial }}</option>
+                  @foreach($dados['cores'] as $key => $filial)
+                  <option value="{{ $key }}" {{ Request::input('filial') == $key ? 'selected' : '' }}>{{ $filial }}</option>
                   @endforeach
                 </select>
+                @if($errors->has('filial'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('filial') }}
+                </div>
+                @endif
               </div>
+
               <div class="col-6 mt-2">
                 <div class="form-check">
                   <input
                     type="checkbox"
                     name="empresaIndividual"
                     id="empresaIndividual"
-                    class="form-check-input"
+                    class="form-check-input {{ $errors->has('empresaIndividual') ? 'is-invalid' : '' }}"
+                    value="on"
                     {{ Request::input('empresaIndividual') == 'on' ? 'checked' : '' }}
                   />
-                  <label for="form-check-label" for="empresaIndividual">Empresa Individual</label>
+                  @if($errors->has('empresaIndividual'))
+                  <div class="invalid-feedback">
+                    {{ $errors->first('empresaIndividual') }}
+                  </div>
+                  @endif
+                  <label for="empresaIndividual">Empresa Individual</label>
                 </div>
               </div>
             </div>
+
             <div class="form-row mt-2">
               <div class="col">
                 <button
@@ -136,17 +172,20 @@
                     'event_label': 'Simulador de Valores'
                   });"
                 >
-                  Simular {{ Request::input('dataInicio') ? ' novamente' : '' }}
+                  Simular {{ request()->filled('dataInicio') ? ' novamente' : '' }}
                 </button>
                 <div id="loadingSimulador"><img src="{{ asset('img/ajax-loader.gif') }}" alt="Loading"></div>
               </div>
             </div>
+
           </form>
         </div>
+
+        <!-- RESULTADO ******************************************************************************************************************************** -->
         <div id="simuladorTxt">
-        @if(isset($total) || isset($extrato){{-- || isset($taxas)--}})
+        @if(isset($total) || isset($extrato) || isset($taxas))
           <div class="row nomargin mt-4">
-            <h4 class="mb-1">Pessoa {{ SimuladorControllerHelper::tipoPessoa()[Request::input('tipoPessoa')] }} {{ Request::input('filial') && Request::input('filial') !== '50' ? ' (' . SimuladorControllerHelper::listaCores()[Request::input('filial')] . ')' : '' }}</h4>
+            <h4 class="mb-1">Pessoa {{ $dados['tipoPessoa'][Request::input('tipoPessoa')] }} {{ Request::input('filial') && (Request::input('filial') !== '50') ? ' (' . $dados['cores'][Request::input('filial')] . ')' : '' }}</h4>
             <table class="table table-sm table-hover mb-0 tableSimulador">
               <thead>
                 <tr>
@@ -210,32 +249,17 @@
           <div class="row nomargin">
             <small><i>* Os valores calculados são de acordo com as informações preenchidas</i></small>
           </div>
-          @endif
-          @if(request('tipoPessoa') === '2')
-            <hr>
-            <div class="textoSimulador">
-              {!! SimuladorControllerHelper::textoPessoaFisica() !!}
-            </div>
-          @elseif(request('tipoPessoa') === '5')
-            <hr>
-            <div class="textoSimulador">
-              {!! SimuladorControllerHelper::textoPessoaFisicaRt() !!}
-            </div>
-          @elseif(request('tipoPessoa') === '1' && request('empresaIndividual') !== 'on')
-            <hr>
-            <div class="textoSimulador">
-              {!! SimuladorControllerHelper::textoPessoaJuridica() !!}
-            </div>
-          @elseif(request('tipoPessoa') === '1' && request('empresaIndividual') === 'on')
-            <hr>
-            <div class="textoSimulador">
-              {!! SimuladorControllerHelper::textoPessoaJuridicaEmpresaIndividual() !!}
-            </div>
-          @endif
-          @if(request('tipoPessoa') !== null)
-            <hr>
-            <p class="light">Simulação emitida em: <strong>{{ date('d\/m\/Y') }}</strong></p>
-          @endif
+        @endif
+        @if(isset($texto))
+          <hr>
+          <div class="textoSimulador">
+            {!! $texto !!}
+          </div>
+        @endif
+        @if(request()->filled('tipoPessoa'))
+          <hr>
+          <p class="light">Simulação emitida em: <strong>{{ date('d\/m\/Y') }}</strong></p>
+        @endif
         </div>
       </div>
       <div class="col-lg-4">

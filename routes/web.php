@@ -312,8 +312,9 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('espaco-do-contador', 'FiscalizacaoController@espacoContador')->name('fiscalizacao.espacoContador');
 
     // Simulador
-    Route::get('simulador', 'SimuladorController@view');
-    Route::post('simulador', 'SimuladorController@extrato');
+    Route::get('simulador', 'SiteController@views_geral')->name('simulador');
+    // Route::post('simulador', 'SimuladorController@extrato')->name('simulador.post');
+    Route::post('simulador', 'SiteController@simulador')->name('simulador.post');
 
     // Consulta de Situação
     Route::get('consulta-de-situacao', 'SiteController@views_geral')->name('consultaSituacao');

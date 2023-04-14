@@ -492,4 +492,14 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
             ],
         ];
     }
+
+    public function taxas($tipo)
+    {
+        return array();
+    }
+
+    public function simulador($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 0)
+    {
+        return array();
+    }
 }

@@ -2,8 +2,6 @@
 
 namespace App\Contracts;
 
-use App\User;
-
 interface GeralServiceInterface {
 
     // Gerencia o carrossel da homepage
@@ -20,4 +18,7 @@ interface GeralServiceInterface {
 
     // Faz download e devolve total
     public function newsletterAdmin(bool $download = true);
+
+    // Realiza a simulação do registro inicial
+    public function simulador($validated = null, $gerenti = null);
 }

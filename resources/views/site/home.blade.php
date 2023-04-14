@@ -134,7 +134,7 @@
         </a>
       </div>
       <div class="col-lg-3 col-sm-6 text-right pb-15">
-        <a href="/simulador" class="d-block h-100">
+        <a href="{{ route('simulador') }}" class="d-block h-100">
           <div class="box text-center azul-bg">
             <div class="inside-box">
               <img src="{{ asset('img/001-paper.png') }}" class="inside-img" alt="Simulador | Core-SP">

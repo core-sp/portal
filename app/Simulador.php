@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Helpers;
+namespace App;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-
-class SimuladorControllerHelper extends Controller
+class Simulador
 {
     public static function listaCores()
     {
@@ -46,10 +43,9 @@ class SimuladorControllerHelper extends Controller
         ];
     }
 
-    public static function textoPessoaFisica()
+    public function textoPessoaFisica()
     {
-        return '
-            <h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO PESSOA FÍSICA</h4>
+        return '<h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO PESSOA FÍSICA</h4>
             <p><i>(Lei nº 4.886/65, Art. 3º)</i></p>
             <p>Com a aprovação do novo Código Civil em 11 de janeiro de 2003 (através da Lei Nº 10.406, de 10 de janeiro de 2002), <strong>a maioridade civil passou a ser a partir dos 18 anos no Brasil.</strong></p>
             <p>Apresentar cópia dos documentos abaixo relacionados:</p>
@@ -59,17 +55,12 @@ class SimuladorControllerHelper extends Controller
                 <li>Comprovante de quitação com o serviço militar, para os profissionais do sexo masculino que tenham até 45 anos (exceto estrangeiro);</li>
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>
                 <li>Cópia da quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009. (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
-            </ol>
-            <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
-            <strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>
-            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento@core-sp.org.br</p>
-        ';
+            </ol>' . $this->textoObs();
     }
 
-    public static function textoPessoaFisicaRt()
+    public function textoPessoaFisicaRt()
     {
-        return '
-            <h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO PESSOA FÍSICA - RESPONSÁVEL TÉCNICO</h4>
+        return '<h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO PESSOA FÍSICA - RESPONSÁVEL TÉCNICO</h4>
             <p><i>(Lei nº 4.886/65, Art. 3º)</i></p>
             <p>Com a aprovação do novo Código Civil em 11 de janeiro de 2003 (através da Lei Nº 10.406, de 10 de janeiro de 2002), <strong>a maioridade civil passou a ser a partir dos 18 anos no Brasil.</strong></p>
             <p>Apresentar cópia dos documentos abaixo relacionados:</p>
@@ -81,17 +72,12 @@ class SimuladorControllerHelper extends Controller
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>
                 <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (<a href="https://www.core-sp.org.br/arquivos/2019-07/DECLARA%C3%87%C3%83O%20DE%20RT.pdf" class="vermelho" target="_blank">Termo de indicação de Resp. Técnico</a>)</li>
                 <li>Cópia da quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009. (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
-            </ol>
-            <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
-            <strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>
-            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento@core-sp.org.br</p>
-        ';
+            </ol>' . $this->textoObs();
     }
 
-    public static function textoPessoaJuridica()
+    public function textoPessoaJuridica()
     {
-        return '
-            <h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO PESSOA JURÍDICA</h4>
+        return '<h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO PESSOA JURÍDICA</h4>
             <p><i>(Lei nº 4.886/65, Art. 3º)</i></p>
             <p>As pessoas jurídicas legalmente constituídas para os serviços de Representação Comercial, agência, agenciamento, intermediação de negócios, intermediação por conta de terceiros, distribuição ou atividade equivalente estão obrigadas a se registrarem no Conselho Regional em cuja jurisdição exerçam suas atividades, sendo-lhes exigidos CÓPIA LEGIVEL dos seguintes documentos:</p>
             <ol type="a">
@@ -101,8 +87,7 @@ class SimuladorControllerHelper extends Controller
                 <li>Quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009 (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
                 <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma;</li>
                 <li>Alvará de localização e inscrição ISS;</li>
-            </ol>
-            <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
+            </ol>' . $this->textoObs(false).'
             <h4 class="mt-4">RELAÇÃO DE DOCUMENTOS DO RESPONSÁVEL TÉCNICO EXIGIDOS PARA O REGISTRO:</h4>
             <ol type="a">
                 <li>Carteira de Identidade, CNH (data de expedição -10 anos), e ou RNE para estrangeiros;</li>
@@ -111,17 +96,12 @@ class SimuladorControllerHelper extends Controller
                 <li>Prova de estar em dia com as obrigações eleitorais - certidão de quitação eleitoral (site www.tse.jus.br >serviços ao eleitor>certidão de quitação eleitoral); (exceto estrangeiro);</li>
                 <li>Declaração de indicação do responsável técnico assinada por todos os sócios com a concordância do indicado, com reconhecimento de firma; (<a href="https://www.core-sp.org.br/arquivos/2019-07/DECLARA%C3%87%C3%83O%20DE%20RT.pdf" class="vermelho" target="_blank">Termo de indicação de Resp. Técnico</a>)</li>
                 <li>Cópia da quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009. (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
-            </ol>
-            <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
-            <strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>
-            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento@core-sp.org.br</p>
-        ';
+            </ol>' . $this->textoObs();
     }
 
-    public static function textoPessoaJuridicaEmpresaIndividual()
+    public function textoPessoaJuridicaEmpresaIndividual()
     {
-        return '
-            <h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO EMPRESA INDIVIDUAL</h4>
+        return '<h4>RELAÇÃO DE DOCUMENTOS PARA REGISTRO EMPRESA INDIVIDUAL</h4>
             <p><i>(Lei nº 4.886/65, Art. 3º)</i></p>
             <p>As pessoas jurídicas legalmente constituídas para os serviços de Representação Comercial, agência, agenciamento, intermediação de negócios, intermediação por conta de terceiros, distribuição ou atividade equivalente estão obrigadas a se registrarem no Conselho Regional em cuja jurisdição exerçam suas atividades, sendo-lhes exigidos <strong>CÓPIA LEGIVEL</strong> dos seguintes documentos:</p>
             <ol type="a">
@@ -130,10 +110,153 @@ class SimuladorControllerHelper extends Controller
                 <li>Comprovante de residência recente (no máximo 03 meses), de todos os sócios, em caso de comprovante em nome de terceiros, o representante deverá anexar uma declaração de próprio punho, informando que reside no endereço do comprovante apresentado, assinar e datar;</li>
                 <li>Cópia da quitação das contribuições devidas ao Sindicato conforme artigo 579 e 608 da CLT e nota técnica da Secretaria de Relações do Trabalho (SRT) nº 202 de 10 de dezembro de 2009. (www.sircesp.com.br); <small><strong>(caráter facultativo)</strong></small></li>
                 <li>Alvará de localização e inscrição ISS;</li>
-            </ol>
-            <p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>
-            <strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>
-            <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento@core-sp.org.br</p>
-        ';
+            </ol>' . $this->textoObs();
+    }
+
+    private function textoObs($all = true)
+    {
+        $obs = '<p>OBS. Se o registro for requerido através de terceiros será necessário apresentar procuração especifica para realizar o registro no CORE-SP, dando poderes para representá-lo, e cópia do documento do procurador;</p>';
+        return !$all ? $obs : $obs . '<strong>Conselho Regional dos Representantes Comerciais no Estado de São Paulo</strong>
+        <p>Av. Brigadeiro Luis Antonio, 613 - CEP 01317-000 - São Paulo<br />SARC: (11) 3243-5519 - Fone: (11) 3243-5500<br />Atendimento de 2ª à 6ª feiras - das 9h às 18h<br />Horário de registro - das 9h às 15h30<br />Email: atendimento@core-sp.org.br</p>';
+    }
+
+    private function descricaoDesconto($mes)
+    {
+        switch ($mes) {
+            case '01':
+                return 'Desconto de anuidade (Janeiro)'; 
+            break;
+            case '02':
+                return 'Desconto de anuidade (Fevereiro)'; 
+            break;
+            case '03':
+                return 'Desconto de anuidade (Março)'; 
+            break;
+            default:
+                return null;
+            break;
+        }
+    }
+
+    private function porcentagemDesconto($mes)
+    {
+        switch ($mes) {
+            case '01':
+                return 0.2;
+            break;
+            case '02':
+                return 0.15;
+            break;
+            case '03':
+                return 0.1;
+            break;
+            default:
+                return null;
+            break;
+        }
+    }
+
+    private function descontoAnuidade($anuidade)
+    {
+        $mes = date('m');
+        $porcentagem = $this->porcentagemDesconto($mes);
+
+        if(isset($porcentagem)) {
+            $desconto = ($anuidade * $porcentagem * -1);
+            $desconto = number_format($desconto, 2);
+            return [
+                'DESCRICAO' => $this->descricaoDesconto($mes),
+                'VALOR_TOTAL' => $desconto
+            ];
+        }
+
+        return null;        
+    }
+
+    private function taxasTotal($array)
+    {
+        $total = 0;
+        foreach($array as $calc)
+            $total += $calc['TAX_VALOR'];
+
+        return $total;
+    }
+
+    private function simuladorTotal($array)
+    {
+        $total = 0;
+        foreach ($array as $calc)
+            $total += $calc['VALOR_TOTAL'];
+
+        return $total;
+    }
+
+    private function calculoSimulador($array)
+    {
+        foreach($array as $key => $value) {
+            if (strpos($value['DESCRICAO'], 'Anuidade') !== false) {
+                $desconto = $this->descontoAnuidade($value['VALOR_TOTAL']);
+                if(isset($desconto))
+                    array_push($array, $desconto);
+            }
+            // Remove a multa do array
+            // if (strpos($value['DESCRICAO'], 'Multa') !== false)
+            //     unset($array[$key]);
+        }
+
+        return array_values($array);
+    }
+
+    public function getSimulacao($dados, $gerenti)
+    {
+        $tipoPessoa = $dados['tipoPessoa'];
+        $dataInicio = str_replace('-', '.', $dados['dataInicio']);
+        $capitalSocial = empty($dados['capitalSocial']) ? 1 : str_replace(',', '.', str_replace('.', '', $dados['capitalSocial']));
+        $filial = isset($dados['filial']) ? $dados['filial'] : 0;
+        $empresarioInd = isset($dados['empresaIndividual']) ? $dados['empresaIndividual'] : '';
+        $rt = null;
+        $rtTaxas = null;
+        $rtTotal = null;
+        $totalGeral = null;
+
+        $filial = ($tipoPessoa !== '1') || ($filial === '50') ? 0 : $filial;
+
+        $extrato = $this->calculoSimulador($gerenti->simulador($tipoPessoa, $dataInicio, $capitalSocial, $filial));
+        // $taxas = $gerenti->taxas($tipoPessoa);
+        $total = $this->simuladorTotal($extrato)/* + $this->taxasTotal($taxas)*/;
+
+        // Regras para mostrar opções do extrato na tela do Portal
+        if(($tipoPessoa == 1) && ($empresarioInd != 'on'))
+        {
+            $rt = $this->calculoSimulador($gerenti->simulador(5, date('Y.m.d')));
+            // $rtTaxas = $gerenti->taxas(5);
+            $rtTotal = number_format($this->simuladorTotal($rt)/* + $this->taxasTotal($rtTaxas)*/, 2);
+            $totalGeral = number_format($total + $rtTotal, 2, ',', '.');
+        }
+
+        return [
+            'extrato' => $extrato, 
+            // 'taxas' => $taxas,
+            'total' => number_format($total, 2, ',', '.'), 
+            'rt' => $rt,
+            // 'rtTaxas' => $rtTaxas,
+            'rtTotal' => $rtTotal,
+            'totalGeral' => $totalGeral,
+        ];
+    }
+
+    public function getTexto($tipoPessoa, $empresaIndividual)
+    {
+        if($tipoPessoa == '2')
+            return $this->textoPessoaFisica();
+
+        if($tipoPessoa == '5')
+            return $this->textoPessoaFisicaRt();
+
+        if(($tipoPessoa == '1') && ($empresaIndividual != 'on'))
+            return $this->textoPessoaJuridica();
+            
+        if(($tipoPessoa == '1') && ($empresaIndividual == 'on'))
+            return $this->textoPessoaJuridicaEmpresaIndividual();
     }
 }
