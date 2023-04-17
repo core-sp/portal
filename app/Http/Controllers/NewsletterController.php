@@ -35,7 +35,7 @@ class NewsletterController extends Controller
         $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('Geral')->newsletterAdmin();
+            $dados = $this->service->getService('Geral')->newsletter(null, true);
             $arquivo = $dados['arquivo'];
             $headers = $dados['headers'];
         } catch (\Exception $e) {

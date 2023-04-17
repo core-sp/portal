@@ -90,8 +90,17 @@ class GeralService implements GeralServiceInterface {
         ];
     }
 
-    public function newsletter($dados)
+    public function newsletter($dados = null, $download = false)
     {
+        if(!isset($dados))
+        {
+            if(!$download)
+                return Newsletter::count();
+            $lista = Newsletter::getLista();
+            isset($lista['arquivo']) ? event(new CrudEvent('newsletter', 'realizou download', '---')) : null;
+            return $lista;
+        }
+
         $newsletter = Newsletter::create([
             'nome' => mb_convert_case(mb_strtolower($dados['nome']), MB_CASE_TITLE),
             'email' => $dados['email'],
@@ -106,37 +115,6 @@ class GeralService implements GeralServiceInterface {
         event(new ExternoEvent($string));
 
         return "Muito obrigado por inscrever-se em nossa newsletter!";
-    }
-
-    public function newsletterAdmin($download = true)
-    {
-        if(!$download)
-            return Newsletter::count();
-        
-        $headers = [
-            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-            'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=newsletter-'.date('Ymd').'.csv',
-            'Expires' => '0',
-            'Pragma' => 'public',
-        ];
-        $lista = Newsletter::select('email','nome','celular','created_at')->get();
-        $lista = $lista->toArray();
-        array_unshift($lista, array_keys($lista[0]));
-        $callback = function() use($lista) {
-            $fh = fopen('php://output','w');
-            fprintf($fh, chr(0xEF).chr(0xBB).chr(0xBF));
-            foreach($lista as $linha) {
-                fputcsv($fh,$linha,';');
-            }
-            fclose($fh);
-        };
-        event(new CrudEvent('newsletter', 'realizou download', '---'));
-
-        return [
-            'arquivo' => $callback,
-            'headers' => $headers,
-        ];
     }
 
     public function simulador($validated = null, $gerenti = null)

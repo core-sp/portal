@@ -500,6 +500,38 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
 
     public function simulador($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 0)
     {
-        return array();
+        if($tipoPessoa == '1')
+            return [
+                [
+                    "DESCRICAO" => "Anuidade ".date('Y')." (Parcela Única) (Abril a Dezembro)",
+                    0 => "Anuidade 2023 (Parcela Única) (Abril a Dezembro)",
+                    "VALOR_TOTAL" => "225.00",
+                    1 => "225.00",
+                    "DATA_VENCIMENTO" => "2023-04-30",
+                    2 => "2023-04-30",
+                ],
+            ];
+        if($tipoPessoa == '2')
+            return [
+                [
+                    "DESCRICAO" => "Anuidade ".date('Y')." (Parcela Única) (Abril a Dezembro)",
+                    0 => "Anuidade ".date('Y')." (Parcela Única) (Abril a Dezembro)",
+                    "VALOR_TOTAL" => "150.00",
+                    1 => "150.00",
+                    "DATA_VENCIMENTO" => "2023-04-30",
+                    2 => "2023-04-30",
+                ],
+            ];
+        if($tipoPessoa == '5')
+            return [
+                [
+                    "DESCRICAO" => "Anuidade ".date('Y')." (Parcela Única) (Abril a Dezembro)",
+                    0 => "Anuidade ".date('Y')." (Parcela Única) (Abril a Dezembro)",
+                    "VALOR_TOTAL" => "75.00",
+                    1 => "75.00",
+                    "DATA_VENCIMENTO" => "2023-04-30",
+                    2 => "2023-04-30",
+                ],
+            ];
     }
 }

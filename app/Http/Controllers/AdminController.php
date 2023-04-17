@@ -30,7 +30,7 @@ class AdminController extends Controller
         $chamados = $this->chamadoRepository->getChamadoByIdUsuario(Auth::user()->idusuario);
         $totalAgendamentos = $this->service->getService('Agendamento')->countAll();
         $totalInscritos = $this->cursoRepository->getTotalInscritos();
-        $totalNewsletter = $this->service->getService('Geral')->newsletterAdmin(false);
+        $totalNewsletter = $this->service->getService('Geral')->newsletter(null, false);
 
     	return view("admin.home", compact("alertas", "contagem", "chamados", "totalAgendamentos", "totalInscritos", "totalNewsletter"));
     }

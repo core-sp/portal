@@ -15,11 +15,8 @@ interface GeralServiceInterface {
     // Formata os dados do gerenti para a view
     public function anuidadeVigente($dados_gerenti);
 
-    // Salva newsletter
-    public function newsletter($dados);
-
-    // Faz download e devolve total
-    public function newsletterAdmin(bool $download = true);
+    // Salva newsletter ou devolve total ou lista
+    public function newsletter($dados = null, bool $download = false);
 
     // Realiza a simulação do registro inicial
     public function simulador($validated = null, GerentiRepositoryInterface $gerenti = null);
