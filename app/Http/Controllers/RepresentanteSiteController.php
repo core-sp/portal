@@ -526,6 +526,9 @@ class RepresentanteSiteController extends Controller
                 return redirect()->route('representante.solicitarCedulaView');
 
             $dados['tipos'] = $this->service->getService('Cedula')->getAllTipos();
+        } catch (\PDOException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, $e->getMessage());
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para realizar a solicitação de cédula do representante.");
@@ -544,6 +547,9 @@ class RepresentanteSiteController extends Controller
                 return redirect()->route('representante.solicitarCedulaView');
 
             $dados = $this->service->getService('Cedula')->save($validate, $representante, $this->gerentiRepository, $this->service);
+        } catch (\PDOException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, $e->getMessage());
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao salvar a solicitação de cédula do representante.");

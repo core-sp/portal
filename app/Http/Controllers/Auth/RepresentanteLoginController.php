@@ -43,7 +43,12 @@ class RepresentanteLoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        $this->verificou = $this->service->getService('Representante')->verificaAtivoAndGerenti($request->cpf_cnpj, $this->gerentiRepository);
+        try{
+            $this->verificou = $this->service->getService('Representante')->verificaAtivoAndGerenti($request->cpf_cnpj, $this->gerentiRepository);
+        } catch (\PDOException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, $e->getMessage());
+        }
 
         if($this->attemptLogin($request))
             return $this->sendLoginResponse($request);

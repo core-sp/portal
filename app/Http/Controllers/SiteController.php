@@ -87,6 +87,9 @@ class SiteController extends Controller
             $cpfCnpj = apenasNumeros($request->validated()['cpfCnpj']);
             $dados_gerenti = $this->gerentiRepository->gerentiAtivo($cpfCnpj);
             $resultado = $this->service->getService('Geral')->consultaSituacao($dados_gerenti);
+        } catch (\PDOException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, $e->getMessage());
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao consultar a situação no portal.");
@@ -101,6 +104,9 @@ class SiteController extends Controller
             $cpfCnpj = apenasNumeros($request->validated()['cpfCnpj']);
             $dados_gerenti = $this->gerentiRepository->gerentiAnuidadeVigente($cpfCnpj);
             $resultado = $this->service->getService('Geral')->anuidadeVigente($dados_gerenti);
+        } catch (\PDOException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, $e->getMessage());
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao consultar a anuidade vigente no portal.");
@@ -114,6 +120,9 @@ class SiteController extends Controller
         try{
             $dados = $request->validated();
             $resultado = $this->service->getService('Geral')->simulador($dados, $this->gerentiRepository);
+        } catch (\PDOException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, $e->getMessage());
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao realizar a simulação de valores no portal.");

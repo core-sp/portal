@@ -378,9 +378,20 @@ class SiteTest extends TestCase
     }
 
     /** @test */
+    public function cannot_submit_simulador_without_capital_social_when_tipo_pessoa_1()
+    {
+        $this->post(route('simulador.post'), [
+            'tipoPessoa' => '1',
+            'dataInicio' => date('Y-m-d'),
+        ])->assertSessionHasErrors([
+            'capitalSocial',
+        ]);
+    }
+
+    /** @test */
     public function cannot_submit_simulador_with_capital_social_wrong_when_tipo_pessoa_1()
     {
-        $capitalSocialErros = ['000', '0,00', '100', '1,0', 'A1,00', '1,000,00'];
+        $capitalSocialErros = ['000', '0,00', '100', '1,0', 'A1,00', '1,000,00', '01,00', '1,000', '1.000'];
 
         foreach($capitalSocialErros as $erro)
             $this->post(route('simulador.post'), [

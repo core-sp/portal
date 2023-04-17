@@ -50,6 +50,7 @@ class SystemTest extends TestCase
         $servicosCarregados = [
             'Mediador' => 'App\Contracts\MediadorServiceInterface',
             'Suporte' => 'App\Contracts\SuporteServiceInterface',
+            'Geral' => 'App\Contracts\GeralServiceInterface',
         ];
         $servicosNaoCarregados = [
             'PlantaoJuridico' => 'App\Contracts\PlantaoJuridicoServiceInterface',
@@ -63,7 +64,6 @@ class SystemTest extends TestCase
             'Cedula' => 'App\Contracts\CedulaServiceInterface',
             'Representante' => 'App\Contracts\RepresentanteServiceInterface',
             'Pagina' => 'App\Contracts\PaginaServiceInterface',
-            'Geral' => 'App\Contracts\GeralServiceInterface',
         ];
 
         $this->get('/simulador')->assertOk();

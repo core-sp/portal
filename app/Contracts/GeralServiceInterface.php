@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use App\Repositories\GerentiRepositoryInterface;
+
 interface GeralServiceInterface {
 
     // Gerencia o carrossel da homepage
@@ -20,5 +22,5 @@ interface GeralServiceInterface {
     public function newsletterAdmin(bool $download = true);
 
     // Realiza a simulação do registro inicial
-    public function simulador($validated = null, $gerenti = null);
+    public function simulador($validated = null, GerentiRepositoryInterface $gerenti = null);
 }
