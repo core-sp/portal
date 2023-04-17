@@ -500,8 +500,29 @@ class GerentiRepositoryMock implements GerentiRepositoryInterface{
 
     public function simulador($tipoPessoa, $dataInicio, $capitalSocial = 1, $filial = 0)
     {
-        if($tipoPessoa == '1')
+        if(($tipoPessoa == '1') && ($dataInicio == date('Y.m.d')))
+            return [ 
+                [
+                    "DESCRICAO" => "Anuidade ".date('Y')." (Parcela Única) (Abril a Dezembro)",
+                    0 => "Anuidade 2023 (Parcela Única) (Abril a Dezembro)",
+                    "VALOR_TOTAL" => "225.00",
+                    1 => "225.00",
+                    "DATA_VENCIMENTO" => "2023-04-30",
+                    2 => "2023-04-30",
+                ],
+            ];
+            
+        // Exemplificar quando retorna multa
+        if(($tipoPessoa == '1') && ($dataInicio != date('Y.m.d')))
             return [
+                [
+                    "DESCRICAO" => "Multa de Registro (07/2022 a 03/2023)",
+                    0 => "Multa de Registro (07/2022 a 03/2023)",
+                    "VALOR_TOTAL" => "225.00",
+                    1 => "225.00",
+                    "DATA_VENCIMENTO" => "2023-04-17",
+                    2 => "2023-04-17",
+                ],             
                 [
                     "DESCRICAO" => "Anuidade ".date('Y')." (Parcela Única) (Abril a Dezembro)",
                     0 => "Anuidade 2023 (Parcela Única) (Abril a Dezembro)",
