@@ -206,6 +206,20 @@ class NewsletterTest extends TestCase
     }
 
     /** @test */
+    public function newsletter_cannot_be_created_with_email_not_unique()
+    {
+        $news_ = factory('App\Newsletter')->create();
+        $news = factory('App\Newsletter')->states('request')->raw([
+            'email' => $news_->email
+        ]);
+
+        $this->post(route('newsletter.post'), $news)
+        ->assertSessionHasErrors([
+            'email'
+        ]);
+    }
+
+    /** @test */
     public function newsletter_cannot_be_created_with_invalid_celular()
     {
         $news = factory('App\Newsletter')->states('request')->raw();
