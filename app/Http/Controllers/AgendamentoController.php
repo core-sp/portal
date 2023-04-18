@@ -75,7 +75,8 @@ class AgendamentoController extends Controller
 
     public function edit($id)
     {
-        $this->authorize('updateOther', auth()->user());
+        $view = \Route::is('agendamentos.view');
+        $view ? $this->authorize('viewAny', auth()->user()) : $this->authorize('updateOther', auth()->user());
         
         try{
             $dados = $this->service->getService('Agendamento')->view(auth()->user(), $id);
@@ -90,7 +91,7 @@ class AgendamentoController extends Controller
             abort(500, "Erro ao carregar o agendamento.");
         }
 
-        return view('admin.crud.editar', compact('resultado', 'variaveis', 'atendentes', 'servicos', 'status'));
+        return $view ? view('admin.crud.mostra', compact('resultado', 'variaveis')) : view('admin.crud.editar', compact('resultado', 'variaveis', 'atendentes', 'servicos', 'status'));
     }
 
     public function update(AgendamentoRequest $request, $id)

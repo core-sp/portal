@@ -149,6 +149,7 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/editar/{id}', 'AgendamentoController@edit')->name('agendamentos.edit');
       Route::put('/editar/{id}', 'AgendamentoController@update')->name('agendamentos.update');
       Route::post('/reenviar-email/{id}', 'AgendamentoController@reenviarEmail')->name('agendamentos.reenviarEmail');
+      Route::get('/view/{id}', 'AgendamentoController@edit')->name('agendamentos.view');
       // Lida com bloqueios
       Route::prefix('bloqueios')->group(function(){
         Route::get('/', 'AgendamentoBloqueioController@index')->name('agendamentobloqueios.lista');

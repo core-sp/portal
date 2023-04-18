@@ -182,6 +182,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         foreach($resultados as $resultado) 
         {
             $acoes = $resultado->getBtnByStatus();
+            $acoes .= '&nbsp;&nbsp;<a href="'.route('agendamentos.view', $resultado->idagendamento).'" class="btn btn-sm btn-warning">Ver</a>';
             if($userPodeEditar)
                 $acoes .= '&nbsp;&nbsp;<a href="'.route('agendamentos.edit', $resultado->idagendamento).'" class="btn btn-sm btn-default">Editar</a>';
             if($resultado->status == Agendamento::STATUS_COMPARECEU)
