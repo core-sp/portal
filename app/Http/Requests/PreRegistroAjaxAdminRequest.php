@@ -34,7 +34,7 @@ class PreRegistroAjaxAdminRequest extends FormRequest
         if($this->campo == 'confere_anexos')
         {
             $id = $this->preRegistro;
-            $tipos_anexos = $this->service->getService('PreRegistro')->getAdminService()->getTiposAnexos($id);
+            $tipos_anexos = $this->service->getService('PreRegistro')->admin()->getTiposAnexos($id);
             if(!isset($tipos_anexos))
             {
                 $this->regraValor = ['required'];

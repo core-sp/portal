@@ -17,8 +17,8 @@
                 <div class="d-block mt-2 mb-3">
                     <p>
                         Esse formulário é para realizar a solicitação de registro para ser <strong>REPRESENTANTE COMERCIAL</strong>. 
-                        Durante o preenchimento será salvo automaticamente os dados. Os anexos serão excluídos automaticamente após finalizar a solicitação ou após muito tempo inativo. 
-                        E somente o solicitante pode excluir um anexo durante a solicitação.
+                        Durante o preenchimento será salvo automaticamente os dados. Os anexos serão excluídos automaticamente após ser encerrada pelo atendente a solicitação ou após muito tempo inativo. 
+                        E somente o solicitante pode excluir um anexo enquanto a solicitação não é finalizada.
                     </p>
                     <br>
                     @if(isset($gerenti))

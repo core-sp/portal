@@ -225,6 +225,6 @@ class SystemTest extends TestCase
         $this->assertEquals($mediador->getService('PreRegistro'), $servico);
 
         $servico = new \App\Services\PreRegistroAdminSubService();
-        $this->assertEquals($mediador->getService('PreRegistro')->getAdminService(), $servico);
+        $this->assertEquals($mediador->getService('PreRegistro')->admin(), $servico);
     }
 }

@@ -21,5 +21,6 @@ interface PreRegistroServiceInterface {
 
     public function excluirAnexo($id, $externo);
 
-    public function getAdminService();
+    // Retorna os método do admin conforme o Contract PreRegistroAdminSubServiceInterface
+    public function admin();
 }

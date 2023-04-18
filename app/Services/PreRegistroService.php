@@ -411,7 +411,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         throw new \Exception('Arquivo não existe / não pode acessar', 401);
     }
 
-    public function getAdminService()
+    public function admin()
     {
         return $this->admin;
     }

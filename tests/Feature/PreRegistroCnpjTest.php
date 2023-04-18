@@ -1318,6 +1318,7 @@ class PreRegistroCnpjTest extends TestCase
     /** @test */
     public function cannot_submit_pre_registro_cnpj_with_capital_social_wrong_value()
     {
+        $capitalSocial = ['0000', '0,00', '01,00', '1,0,00', '1,000', '1000'];
         $externo = $this->signInAsUserExterno(factory('App\UserExterno')->states('pj')->create());
         $preRegistroCnpj = factory('App\PreRegistroCnpj')->states('request')->make([
             'capital_social' => '0.00'
@@ -1334,8 +1335,11 @@ class PreRegistroCnpjTest extends TestCase
         $this->get(route('externo.inserir.preregistro.view', ['checkPreRegistro' => 'on']))->assertOk();
         $anexo = factory('App\Anexo')->states('pre_registro')->create();
         
-        $this->put(route('externo.verifica.inserir.preregistro'), $dados)
-        ->assertSessionHasErrors('capital_social');
+        foreach($capitalSocial as $val){
+            $dados['capital_social'] = $val;
+            $this->put(route('externo.verifica.inserir.preregistro'), $dados)
+            ->assertSessionHasErrors('capital_social');
+        }
     }
 
     /** @test */

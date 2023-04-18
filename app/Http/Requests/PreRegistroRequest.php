@@ -59,7 +59,7 @@ class PreRegistroRequest extends FormRequest
         
         $pessoaJuridica = [
             'razao_social' => 'required|min:5|max:191|regex:/^\D*$/',
-            'capital_social' => 'required|min:4|max:16|regex:/([0-9.]{1,13}),([0-9]{2})/',
+            'capital_social' => 'required|min:4|max:16|regex:/^((?!(0))[0-9\.]{1,}),([0-9]{2})$/',
             'nire' => 'nullable|min:5|max:20',
             'tipo_empresa' => 'required|in:'.implode(',', tipos_empresa()),
             'dt_inicio_atividade' => 'required|date_format:Y-m-d|before_or_equal:today',

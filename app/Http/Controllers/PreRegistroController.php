@@ -27,7 +27,7 @@ class PreRegistroController extends Controller
 
         try{
             $user = auth()->user();
-            $dados = $this->service->getService('PreRegistro')->getAdminService()->listar($request, $this->service, $user);
+            $dados = $this->service->getService('PreRegistro')->admin()->listar($request, $this->service, $user);
             session(['url_pre_registro' => url()->full()]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -43,7 +43,7 @@ class PreRegistroController extends Controller
         // $this->authorize('updateOther', auth()->user());
         
         try{
-            $dados = $this->service->getService('PreRegistro')->getAdminService()->view($id);
+            $dados = $this->service->getService('PreRegistro')->admin()->view($id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
@@ -58,7 +58,7 @@ class PreRegistroController extends Controller
         // $this->authorize('viewAny', auth()->user());
 
         try{
-            $dados = $this->service->getService('PreRegistro')->getAdminService()->buscar($request->q);
+            $dados = $this->service->getService('PreRegistro')->admin()->buscar($request->q);
             $dados['busca'] = $request->q;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -75,7 +75,7 @@ class PreRegistroController extends Controller
         try{
             $user = auth()->user();
             $validatedData = $request->validated();
-            $dados = $this->service->getService('PreRegistro')->getAdminService()->saveAjaxAdmin($validatedData, $id, $user);
+            $dados = $this->service->getService('PreRegistro')->admin()->saveAjaxAdmin($validatedData, $id, $user);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
@@ -107,7 +107,7 @@ class PreRegistroController extends Controller
         try{
             $validated = $request->validated();
             $user = auth()->user();
-            $dados = $this->service->getService('PreRegistro')->getAdminService()->updateStatus($id, $user, $validated['status']);
+            $dados = $this->service->getService('PreRegistro')->admin()->updateStatus($id, $user, $validated['status']);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar o status do pré-registro.");
