@@ -37,6 +37,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertRedirect(route('login'));
         $this->put(route('agendamentos.edit', $agendamento->idagendamento))->assertRedirect(route('login'));
         $this->post(route('agendamentos.reenviarEmail', $agendamento->idagendamento))->assertRedirect(route('login'));
+        $this->get(route('agendamentos.view', $agendamento->idagendamento))->assertRedirect(route('login'));
 
         $this->get(route('agendamentobloqueios.lista'))->assertRedirect(route('login'));
         $this->get(route('agendamentobloqueios.busca'))->assertRedirect(route('login'));
@@ -69,6 +70,7 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertForbidden();
         $this->put(route('agendamentos.edit', $agendamento->idagendamento), $agendamento->toArray())->assertForbidden();
         $this->post(route('agendamentos.reenviarEmail', $agendamento->idagendamento))->assertForbidden();
+        $this->get(route('agendamentos.view', $agendamento->idagendamento))->assertForbidden();
 
         $this->get(route('agendamentobloqueios.lista'))->assertForbidden();
         $this->get(route('agendamentobloqueios.busca'))->assertForbidden();
@@ -95,6 +97,65 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentos.busca'))->assertForbidden();
         $this->get(route('agendamentos.filtro'))->assertForbidden();
         $this->get(route('agendamentos.pendentes'))->assertForbidden();   
+    }
+
+    /** @test */
+    public function authorized_users_can_view_button_ver()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create([
+            'dia' => date('Y-m-d'),
+            'idregional' => $user->idregional
+        ]);
+
+        $this->get(route('agendamentos.lista'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('agendamentos.view', $agendamento->idagendamento).'" class="btn btn-sm btn-warning">Ver</a>');
+    }
+
+    /** @test */
+    public function authorized_users_can_view_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\Agendamento')->create();
+
+        $this->get(route('agendamentos.view', $agendamento->idagendamento))
+        ->assertOk()
+        ->assertSee('<p>Nome: <strong>'.$agendamento->nome.'</strong></p>')
+        ->assertSee('<p>Email: <strong>'.$agendamento->email.'</strong></p>')
+        ->assertSee('<p>CPF: <strong>'.$agendamento->cpf.'</strong></p>')
+        ->assertSee('<p>Celular: <strong>'.$agendamento->celular.'</strong></p>')
+        ->assertSee('<p>Tipo de serviço: <strong>'.$agendamento->tiposervico.'</strong></p>')
+        ->assertSee('<p>Regional: <strong>'.$agendamento->regional->regional.'</strong></p>')
+        ->assertSee('<p>Dia e Hora: <strong>'.onlyDate($agendamento->dia).' às '.$agendamento->hora.'</strong></p>')
+        ->assertSee('<p>Status: <strong>Sem status</strong></p>')
+        ->assertSee('<p>Atendido por: <strong>Ninguém</strong></p>')
+        ->assertSee('<p>Data de criação do agendamento pelo site: <strong>'.onlyDate($agendamento->created_at).'</strong></p>')
+        ->assertSee('<a href="'.route('agendamentos.lista').'" class="btn btn-default">Voltar</a>');
+
+        $agendamento->update(['idusuario' => $user->idusuario, 'status' => Agendamento::STATUS_COMPARECEU, 'dia' => now()->subDay()->format('Y-m-d')]);
+
+        $this->get(route('agendamentos.view', $agendamento->idagendamento))
+        ->assertOk()
+        ->assertSee('<p class="mb-0 text-success"><strong><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Atendimento realizado com sucesso no dia '.onlyDate($agendamento->dia).', às '.$agendamento->hora.'</strong></p>')
+        ->assertSee('<p>Status: <strong>'.$agendamento->status.'</strong></p>')
+        ->assertSee('<p>Atendido por: <strong>'.$agendamento->user->nome.'</strong></p>');
+
+        $agendamento->update(['status' => Agendamento::STATUS_NAO_COMPARECEU]);
+
+        $this->get(route('agendamentos.view', $agendamento->idagendamento))
+        ->assertOk()
+        ->assertSee('<p class="mb-0 text-warning"><strong><i class="fas fa-user-alt-slash"></i>&nbsp;&nbsp;Não compareceu</strong></p>')
+        ->assertSee('<p>Status: <strong>'.$agendamento->status.'</strong></p>');
+
+        $agendamento->update(['status' => Agendamento::STATUS_CANCELADO]);
+
+        $this->get(route('agendamentos.view', $agendamento->idagendamento))
+        ->assertOk()
+        ->assertSee('<p class="mb-0 text-muted"><strong><i class="fas fa-ban"></i>&nbsp;&nbsp;Atendimento cancelado</strong></p>')
+        ->assertSee('<p>Status: <strong>'.$agendamento->status.'</strong></p>');
     }
 
     /** @test 
@@ -244,6 +305,62 @@ class AgendamentoTest extends TestCase
         $this->get(route('agendamentos.edit', $agendamento->idagendamento))->assertOk();
         $this->put(route('agendamentos.update', $agendamento->idagendamento), $dados)->assertStatus(302);
         $this->assertEquals(Agendamento::find($agendamento->idagendamento)->status, $dados['status']);
+    }
+
+    /** @test */
+    public function perfil_gerente_seccional_cannot_view_agendamento_if_different_regional()
+    {
+        $perfil = factory('App\Perfil')->create([
+            'idperfil' => 21,
+            'nome' => 'Gerente Seccionais'
+        ]);
+
+        $user = factory('App\User')->create([
+            'idperfil' => $perfil->idperfil
+        ]);
+
+        $this->signIn($user);
+        Permissao::find(27)->update(['perfis' => '1,21']);
+        Permissao::find(28)->update(['perfis' => '1,21']);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'dia' => date('Y-m-d')
+        ]);
+
+        $this->get(route('agendamentos.lista'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('agendamentos.view', $agendamento->idagendamento).'" class="btn btn-sm btn-warning">Ver</a>');
+
+        $this->get(route('agendamentos.view', $agendamento->idagendamento))
+        ->assertForbidden();
+    }
+
+    /** @test */
+    public function perfil_atendente_cannot_view_agendamento_if_different_regional()
+    {
+        $perfil = factory('App\Perfil')->create([
+            'idperfil' => 8,
+            'nome' => 'Atendente'
+        ]);
+
+        $user = factory('App\User')->create([
+            'idperfil' => $perfil->idperfil
+        ]);
+
+        $this->signIn($user);
+        Permissao::find(27)->update(['perfis' => '1,8']);
+        Permissao::find(28)->update(['perfis' => '1,8']);
+
+        $agendamento = factory('App\Agendamento')->create([
+            'dia' => date('Y-m-d')
+        ]);
+
+        $this->get(route('agendamentos.lista'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('agendamentos.view', $agendamento->idagendamento).'" class="btn btn-sm btn-warning">Ver</a>');
+
+        $this->get(route('agendamentos.view', $agendamento->idagendamento))
+        ->assertForbidden();
     }
 
     /** @test */
