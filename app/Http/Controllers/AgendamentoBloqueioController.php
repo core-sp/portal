@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\AgendamentoBloqueioRequest;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AgendamentoBloqueioController extends Controller
 {
@@ -75,6 +76,9 @@ class AgendamentoBloqueioController extends Controller
             $dados = $this->service->getService('Agendamento')->bloqueio()->view($id);
             $resultado = $dados['resultado'];
             $variaveis = $dados['variaveis'];
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Bloqueio do agendamento não encontrado.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para atualizar o bloqueio do agendamento.");

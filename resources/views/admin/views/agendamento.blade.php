@@ -1,5 +1,5 @@
 <div class="card-body">
-    @if(!$resultado->isAfter())
+    @if(isset($resultado->status))
     <div class="col mb-3 mt-2">
         {!! $resultado->getMsgByStatus() !!}
     </div>

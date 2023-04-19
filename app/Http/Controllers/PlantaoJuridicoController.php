@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PlantaoJuridicoRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PlantaoJuridicoController extends Controller
 {
@@ -40,6 +41,9 @@ class PlantaoJuridicoController extends Controller
             $variaveis = $dados['variaveis'];
             $resultado = $dados['resultado'];
             $agendamentos = $dados['agendamentos'];
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Plantão Jurídico não encontrado.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao visualizar o plantão jurídico.");

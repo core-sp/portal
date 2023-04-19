@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\PeriodoFiscalizacaoRequest;
 use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class FiscalizacaoController extends Controller
 {
@@ -65,7 +66,7 @@ class FiscalizacaoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function updateStatus(/*Request $request*/$id)
+    public function updateStatus($id)
     {
         $this->authorize('updateOther', auth()->user());
 
@@ -89,6 +90,9 @@ class FiscalizacaoController extends Controller
             $dados = $this->service->getService('Fiscalizacao')->view($id);
             $variaveis = $dados['variaveis'];
             $resultado = $dados['resultado'];
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Período não encontrado.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para editar o período da fiscalização.");

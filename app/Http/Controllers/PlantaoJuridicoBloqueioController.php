@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PlantaoJuridicoRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PlantaoJuridicoBloqueioController extends Controller
 {
@@ -84,6 +85,9 @@ class PlantaoJuridicoBloqueioController extends Controller
             $dados = $this->service->getService('PlantaoJuridico')->bloqueio()->view($id);
             $variaveis = isset($dados['variaveis']) ? $dados['variaveis'] : null;
             $resultado = isset($dados['resultado']) ? $dados['resultado'] : null;
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Bloqueio do plantão jurídico não encontrado.");
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar a página para editar o bloqueio.");
