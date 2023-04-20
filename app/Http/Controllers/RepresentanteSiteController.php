@@ -62,10 +62,14 @@ class RepresentanteSiteController extends Controller
         $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
         $status = statusBold($this->gerentiRepository->gerentiStatus($rep->ass_id));
         $ano = date("Y");
-        $dadosBasicos = utf8_converter($this->gerentiRepository->gerentiChecaLogin($rep->registro_core, $rep->cpf_cnpj, $rep->email));
-
-        if(isset($dadosBasicos['NOME']) && ($dadosBasicos['NOME'] != $rep->nome))
-            $rep->update(['nome' => strtoupper($dadosBasicos['NOME'])]);
+        $dadosBasicos = utf8_converter($this->gerentiRepository->gerentiBusca('', '', apenasNumeros($rep->cpf_cnpj)));
+        foreach($dadosBasicos as $dados)
+        {
+            $nome = isset($dados['ASS_NOME']) && ($dados['ASS_NOME'] != $rep->nome);
+            $id = isset($dados['ASS_ID']) && ($dados['ASS_ID'] == $rep->ass_id);
+            if($nome && $id)
+                $rep->update(['nome' => mb_strtoupper($dados['ASS_NOME'], 'UTF-8')]);
+        }
 
         return view('site.representante.home', compact("nrBoleto", "status", "ano"));
     }
