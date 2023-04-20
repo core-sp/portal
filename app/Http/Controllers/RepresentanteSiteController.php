@@ -62,13 +62,13 @@ class RepresentanteSiteController extends Controller
         $nrBoleto = isset($resultado[0]['NOSSONUMERO']) ? $resultado[0]['NOSSONUMERO'] : null;
         $status = statusBold($this->gerentiRepository->gerentiStatus($rep->ass_id));
         $ano = date("Y");
-        $dadosBasicos = utf8_converter($this->gerentiRepository->gerentiBusca('', '', apenasNumeros($rep->cpf_cnpj)));
-        foreach($dadosBasicos as $dados)
+        $dadosBasicos = utf8_converter($this->gerentiRepository->gerentiAtivo(apenasNumeros($rep->cpf_cnpj)));
+        $dados = isset($dadosBasicos) && (count($dadosBasicos) == 1) ? $dadosBasicos[0] : null;
+        if(isset($dados['SITUACAO']) && ($dados['SITUACAO'] != 'Não encontrado'))
         {
-            $nome = isset($dados['ASS_NOME']) && ($dados['ASS_NOME'] != $rep->nome);
+            $nome = isset($dados['NOME']) && ($dados['NOME'] != $rep->nome);
             $id = isset($dados['ASS_ID']) && ($dados['ASS_ID'] == $rep->ass_id);
-            if($nome && $id)
-                $rep->update(['nome' => mb_strtoupper($dados['ASS_NOME'], 'UTF-8')]);
+            $nome && $id ? $rep->update(['nome' => mb_strtoupper($dados['NOME'], 'UTF-8')]) : null;
         }
 
         return view('site.representante.home', compact("nrBoleto", "status", "ano"));
