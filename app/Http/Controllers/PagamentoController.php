@@ -411,7 +411,7 @@ class PagamentoController extends Controller
             $request->replace([]);
             request()->replace([]);
             $dados['checkoutIframe'] = $this->checkoutIframe;
-            $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+            $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados, $this->service);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
         }
@@ -432,7 +432,7 @@ class PagamentoController extends Controller
             $request->replace([]);
             request()->replace([]);
             $dados['checkoutIframe'] = $this->checkoutIframe;
-            $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+            $dados = $this->service->getService('Pagamento')->rotinaUpdateTransacao($dados, $this->service);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
         }

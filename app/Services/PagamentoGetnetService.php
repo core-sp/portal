@@ -154,14 +154,14 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         //     $pag->updateAposErroGerenti($transacao);
     }
 
-    private function createViaNotificacao($dados)
+    private function createViaNotificacao($dados, $service)
     {
         $this->via_sistema = true;
         $user = null;
         $cpf_cnpj = substr($dados['customer_id'], 0, strpos($dados['customer_id'], '_'));
 
         if(strpos($dados['customer_id'], 'rep') !== false)
-            $user = \App\Representante::where('cpf_cnpj', $cpf_cnpj)->first();
+            $user = $service->getService('Representante')->findByCpfCnpj($cpf_cnpj);
 
         if(!isset($user))
             throw new \Exception('Usuário não encontrado no Portal pela customer_id *' . $dados['customer_id'] . '* ao receber a notificação da Getnet após transação.', 404);
@@ -409,13 +409,13 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         return $msg;
     }
 
-    public function rotinaUpdateTransacao($dados)
+    public function rotinaUpdateTransacao($dados, $service)
     {
         if(isset($dados['checkoutIframe']) && $dados['checkoutIframe'])
         {
             $pagamento = Pagamento::where('cobranca_id', $dados['order_id'])->where('payment_id', $dados['payment_id'])->first();
             if(!isset($pagamento) && ($dados['status'] == 'APPROVED'))
-                $this->createViaNotificacao($dados);
+                $this->createViaNotificacao($dados, $service);
         }
 
         if(isset($dados['updatePagamento']))

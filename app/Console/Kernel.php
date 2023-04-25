@@ -157,7 +157,7 @@ class Kernel extends ConsoleKernel
                             ])
                         ];
                         \Log::channel('externo')->info('[Rotina Portal Pagamento] - Pagamento com a combined_id: ' . $pagamento->getIdPagamento() . ' em nova tentativa de confirmação de pagamento após erro.');
-                        $service->getService('Pagamento')->rotinaUpdateTransacao($dados);
+                        $service->getService('Pagamento')->rotinaUpdateTransacao($dados, $service);
                     }
                 }
             } catch (\Exception $e) {

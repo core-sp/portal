@@ -27,6 +27,9 @@ class Handler extends ExceptionHandler
 
     public function render($request, Exception $exception)
     {
+        if(($exception instanceof AuthenticationException) && (\Route::is('pagamento.*')))
+            return redirect(route('site.home'));
+
         if($exception instanceof AuthenticationException){
             $guard = Arr::get($exception->guards(), 0);
             switch($guard){

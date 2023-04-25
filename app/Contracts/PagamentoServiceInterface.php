@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use App\Contracts\MediadorServiceInterface;
+
 interface PagamentoServiceInterface {
 
     public function getTiposPagamento();
@@ -20,7 +22,7 @@ interface PagamentoServiceInterface {
 
     public function getException($erro_msg, $cod);
 
-    public function rotinaUpdateTransacao($dados);
+    public function rotinaUpdateTransacao($dados, MediadorServiceInterface $service);
 
     // Admin ++++++++++++++++++++++++++++++++++++++++++++
     public function listar();
