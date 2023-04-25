@@ -70,11 +70,16 @@
                 </a>
             </span>
             <input id="file"
-                class="form-control"
+                class="form-control {{ $errors->has('edital') ? 'is-invalid' : '' }}"
                 type="text"
                 name="edital"
                 value="{{ empty(old('edital')) && isset($resultado->edital) ? $resultado->edital : old('edital') }}"
             />
+            @if($errors->has('edital'))
+            <div class="invalid-feedback">
+                {{ $errors->first('edital') }}
+            </div>
+            @endif
             </div>
         </div>
         </div>
