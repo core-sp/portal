@@ -163,9 +163,6 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
         if(strpos($dados['customer_id'], 'rep') !== false)
             $user = $service->getService('Representante')->findByCpfCnpj($cpf_cnpj);
 
-        if(!isset($user))
-            throw new \Exception('Usuário não encontrado no Portal pela customer_id *' . $dados['customer_id'] . '* ao receber a notificação da Getnet após transação.', 404);
-        
         $pagamento = $user->pagamentos()->create([
             'payment_id' => $dados['payment_id'],
             'cobranca_id' => $dados['order_id'],
@@ -379,34 +376,6 @@ class PagamentoGetnetService implements PagamentoServiceInterface {
     public function checkoutIframe($request, $user)
     {
         return $this->api->checkoutIframe($request, $user);
-    }
-
-    public function getException($erro_msg, $cod)
-    {
-        $generic = 'Erro desconhecido';
-        $msg = 'Código de erro da prestadora: ' . $cod . '.<br>';
-
-        $temp = json_decode($erro_msg, true);
-        if(json_last_error() === JSON_ERROR_NONE)
-        {
-            $opcao = isset($temp['message']) ? $temp['message'] : $generic;
-            if(isset($temp['details']) || isset($temp['payments']))
-            {
-                $campo = isset($temp['details']) ? 'details' : 'payments';
-                foreach($temp[$campo] as $key => $value)
-                    $msg .= isset($value['description']) ? 'Descrição (cartão ' . ++$key . '): ' . $value['description'] . '<br>' : $opcao . '<br>';
-            }
-            elseif(isset($temp['error']))
-                $msg .= 'Erro: ' . $temp['error_description'];
-            elseif(isset($temp['status']))
-                $msg .= 'Status: ' . $temp['status'];
-            else
-                $msg .= 'Descrição: ' . $opcao;
-        }
-        else
-            $msg = null;
-
-        return $msg;
     }
 
     public function rotinaUpdateTransacao($dados, $service)

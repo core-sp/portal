@@ -30,14 +30,14 @@ class PagamentoTest extends TestCase
         $this->get(route('pagamento.admin.busca'))->assertRedirect(route('site.home'));
 
         // site
-        $this->get(route('pagamento.view', 1))->assertRedirect(route('representante.login'));
-        $this->post(route('pagamento.gerenti', 1))->assertRedirect(route('representante.login'));
-        $this->post(route('pagamento.verifica.checkout', 1))->assertRedirect(route('representante.login'));
-        $this->get(route('pagamento.sucesso.checkout', 1))->assertRedirect(route('representante.login'));
-        $this->post(route('pagamento.cartao', 1))->assertRedirect(route('representante.login'));
-        $this->get(route('pagamento.cancelar.view', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('representante.login'));
-        $this->post(route('pagamento.cancelar.view', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('representante.login'));
-        $this->get(route('pagamento.visualizar', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('representante.login'));
+        $this->get(route('pagamento.view', 1))->assertRedirect(route('site.home'));
+        $this->post(route('pagamento.gerenti', 1))->assertRedirect(route('site.home'));
+        $this->post(route('pagamento.verifica.checkout', 1))->assertRedirect(route('site.home'));
+        $this->get(route('pagamento.sucesso.checkout', 1))->assertRedirect(route('site.home'));
+        $this->post(route('pagamento.cartao', 1))->assertRedirect(route('site.home'));
+        $this->get(route('pagamento.cancelar.view', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('site.home'));
+        $this->post(route('pagamento.cancelar.view', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('site.home'));
+        $this->get(route('pagamento.visualizar', ['cobranca' => 1, 'pagamento' => $pagamento->payment_id]))->assertRedirect(route('site.home'));
     }
 
     // /** @test */
@@ -1035,7 +1035,8 @@ class PagamentoTest extends TestCase
             'card_number_2' => '5155901222280001',
             'security_code_2' => '123',
             'expiration_2' => now()->addMonths(2)->addYear()->format('m/y'),
-        ])->assertRedirect(route('representante.dashboard'));
+        ])->assertRedirect(route('representante.dashboard'))
+        ->assertSessionHas('message-cartao', '<i class="fas fa-check"></i> Pagamento realizado para a cobrança ' . $pagamento->cobranca_id . '. Detalhes do pagamento enviado para o e-mail: ' . $user->email);
 
         $ids = array();
         $tags = array();
@@ -1373,6 +1374,12 @@ class PagamentoTest extends TestCase
     //         'error_code' => '',
     //         'tipo_parcelas' => $pagamento->tipo_parcelas,
     //     ]));
+
+    //     $log = tailCustom(storage_path($this->pathLogErros()));
+    //     $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.ERROR: ';
+    //     $txt = $inicio . '[Erro: No query results for model [App\Representante]. [Notificação Getnet] para o customer_id: 00000000000_rep], [Controller: App\Http\Controllers\PagamentoController@getTransacaoCredito], ';
+    //     $txt .= '[Código: 0], [Arquivo: /home/vagrant/Workspace/portal/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php], [Linha: 470]';
+    //     $this->assertStringContainsString($txt, $log);
 
     //     $this->assertDatabaseMissing('pagamentos', [
     //         'cobranca_id' => $pagamento->cobranca_id,

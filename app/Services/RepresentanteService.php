@@ -65,6 +65,6 @@ class RepresentanteService implements RepresentanteServiceInterface {
 
     public function findByCpfCnpj($cpf_cnpj)
     {
-        return Representante::where('cpf_cnpj', $cpf_cnpj)->first();
+        return Representante::where('cpf_cnpj', $cpf_cnpj)->firstOrFail();
     }
 }

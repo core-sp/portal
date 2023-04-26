@@ -20,8 +20,6 @@ interface PagamentoServiceInterface {
 
     public function checkoutIframe($request, $user);
 
-    public function getException($erro_msg, $cod);
-
     public function rotinaUpdateTransacao($dados, MediadorServiceInterface $service);
 
     // Admin ++++++++++++++++++++++++++++++++++++++++++++

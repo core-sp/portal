@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Str;
+use App\Exceptions\PagamentoException;
 
 class PagamentoGetnetApiService {
 
@@ -36,7 +37,7 @@ class PagamentoGetnetApiService {
                 $erroGetnet = substr_replace($erroGetnet, '"metodo_portal":"' . $metodo . '",', strpos($erroGetnet, '{') + 1, 0);
         }
             
-        throw new \Exception($erroGetnet, $codigo);
+        throw new PagamentoException($erroGetnet, $codigo);
     }
 
     private function finalAutentication3ds($response)
