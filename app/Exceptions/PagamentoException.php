@@ -69,4 +69,12 @@ class PagamentoException extends Exception
         
         abort($this->getCode(), $msg);
     }
+
+    public function setException($file = null, $line = null)
+    {
+        if(isset($file))
+            $this->file = $file;
+        if(isset($line))
+            $this->line = $line;
+    }
 }

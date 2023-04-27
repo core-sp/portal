@@ -4,7 +4,9 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use RuntimeException;
+use Exception;
 use Illuminate\Support\Str;
 use App\Exceptions\PagamentoException;
 
@@ -25,19 +27,21 @@ class PagamentoGetnetApiService {
         $this->tokenPrincipal = "Basic " . base64_encode(env('GETNET_CLIENT_ID') . ':' . env('GETNET_CLIENT_SECRET'));
     }
 
-    private function formatError(RuntimeException $e, $metodo)
+    private function formatError($e, $metodo)
     {
-        $codigo = 0;
-        $erroGetnet = $e->getMessage() . ' no método: ' . $metodo;
-        if($e->hasResponse())
+        $codigo = !($e instanceof RequestException) ? $e->getCode() : 0;
+        $erroGetnet = $e->getMessage() . ' em PagamentoGetnetApiService no método: ' . $metodo;
+        if(($e instanceof RequestException) && $e->hasResponse())
         {
             $codigo = $e->getResponse()->getStatusCode();
             $erroGetnet = $e->getResponse()->getBody()->getContents();
             if(strpos($erroGetnet, '{') !== false)
                 $erroGetnet = substr_replace($erroGetnet, '"metodo_portal":"' . $metodo . '",', strpos($erroGetnet, '{') + 1, 0);
         }
-            
-        throw new PagamentoException($erroGetnet, $codigo);
+
+        $pe = new PagamentoException($erroGetnet, $codigo);
+        $pe->setException($e->getFile(), $e->getLine());
+        throw $pe;
     }
 
     private function finalAutentication3ds($response)
@@ -243,7 +247,11 @@ class PagamentoGetnetApiService {
                     'grant_type' => "client_credentials",
                 ],
             ]);
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
         }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -268,7 +276,11 @@ class PagamentoGetnetApiService {
                     'customer_id' => $customer_id,
                 ],
             ]);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -307,7 +319,11 @@ class PagamentoGetnetApiService {
                     'security_code' => $security_code,
                 ],
             ]);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -345,7 +361,11 @@ class PagamentoGetnetApiService {
 
             unset($dados);
             unset($dadosFinais);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -388,7 +408,11 @@ class PagamentoGetnetApiService {
             ]);
 
             unset($dadosFinais);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -412,7 +436,11 @@ class PagamentoGetnetApiService {
 
             unset($dados);
             unset($dadosFinais);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -441,7 +469,11 @@ class PagamentoGetnetApiService {
                     'payments' => $array,
                 ],
             ]);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -461,7 +493,11 @@ class PagamentoGetnetApiService {
                 ],
                 'json' => $temp == 'authenticated' ? ['payment_method' => strtoupper(str_replace('_3ds', '', $tipo_pag))] : [],
             ]);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -489,7 +525,11 @@ class PagamentoGetnetApiService {
                     'payments' => $array,
                 ],
             ]);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -505,7 +545,11 @@ class PagamentoGetnetApiService {
                     'Authorization' => $this->auth,
                 ]
             ]);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -525,7 +569,11 @@ class PagamentoGetnetApiService {
             $dados['token_principal'] = $this->tokenPrincipal;
             $brand = mb_strtolower($dados['brand']);
             $dados['card_type'] = isset($card_type[$brand]) ? $card_type[$brand] : '';
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
         
@@ -555,7 +603,11 @@ class PagamentoGetnetApiService {
                     'additional_object' => $dados['additionalObject'],
                 ],
             ]);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -642,7 +694,11 @@ class PagamentoGetnetApiService {
                     'additional_object' => $dados['additionalObject'],
                 ],
             ]);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
@@ -678,7 +734,11 @@ class PagamentoGetnetApiService {
                     'additional_object' => $dados['additionalObject'],
                 ],
             ]);
-        }catch(RuntimeException $e){
+        }catch(RequestException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(RuntimeException  $e){
+            $this->formatError($e, __FUNCTION__);
+        }catch(Exception  $e){
             $this->formatError($e, __FUNCTION__);
         }
 
