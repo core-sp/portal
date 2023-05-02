@@ -243,6 +243,20 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <td>Campos do formulário</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_regional_campos_form.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
                             <td>Editar</td>
                             <td>Ao editar o formulário da regional, o usuário com permissão irá alterar o texto que aparece nos links da página <a href="{{ route('regionais.siteGrid') }}" target="_blank" >{{ route('regionais.siteGrid') }}</a> , poderá alterar a quantidade de atendentes para agendamento e os horários permitidos.</td>
                             <td>
@@ -279,6 +293,20 @@
                     </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>Campos do formulário</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_noticia_campos_form.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
                         <tr>
                             <td>Criar / Editar</td>
                             <td>
@@ -337,7 +365,7 @@
                         <tr>
                             <td>Apagar</td>
                             <td>
-                                Somente usuários com permissão podem apagar.<br>
+                                Somente usuários com permissão.<br>
                                 Através do botão "Apagar" a notícia é excluída e o link retorna erro 404.<br>
                             </td>
                             <td>
@@ -354,7 +382,7 @@
                         <tr>
                             <td>Restaurar</td>
                             <td>
-                                Somente administradores do Portal podem restaurar.<br>
+                                Somente administradores do Portal.<br>
                                 Através do botão "Restaurar" a notícia é restaurada e o link retorna o conteúdo.<br>
                             </td>
                             <td>
@@ -378,7 +406,7 @@
         <hr />
 
     <!-- ÁREA: SERVIÇO POSTS **************************************************************************************************************************** -->
-    <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_post">Serviço: Blog&nbsp;&nbsp;<i class="nav-icon fas fa-rss"></i></button>
+        <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_post">Serviço: Blog&nbsp;&nbsp;<i class="nav-icon fas fa-rss"></i></button>
         <div id="serv_post" class="collapse" data-parent="#accordion">
 
             <div class="table-responsive-sm mt-3 mb-3">
@@ -391,6 +419,20 @@
                     </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>Campos do formulário</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_post_campos_form.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
                         <tr>
                             <td>Criar / Editar</td>
                             <td>
@@ -447,11 +489,84 @@
                         <tr>
                             <td>Apagar</td>
                             <td>
-                                Somente usuários com permissão podem apagar.<br>
+                                Somente usuários com permissão.<br>
                                 Através do botão "Apagar" o post é excluído e o link retorna erro 404.<br>
                             </td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_post_apagar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    <!-- *********************************************************************************************************************************************************** -->
+
+        <hr />
+
+    <!-- ÁREA: SERVIÇO AGENDAMENTO **************************************************************************************************************************** -->
+        <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_agendamento">Serviço: Agendamento&nbsp;&nbsp;<i class="nav-icon far fa-clock"></i></button>
+        <div id="serv_agendamento" class="collapse" data-parent="#accordion">
+
+            <div class="table-responsive-sm mt-3 mb-3">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Situação</th>
+                        <th>Sobre</th>
+                        <th>Ver</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Campos do formulário</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_campos_form.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Editar</td>
+                            <td>
+                                Somente usuários com permissão e dependendo da permissão somente agendamentos da regional do próprio perfil.<br>
+                                Agendamento com o dia futuro pode editar o cadastro.<br>
+                                Agendamento do dia atual ou passado, somente pode editar o serviço, status e atendente.
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_editar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Atualizar status</td>
+                            <td>
+                                Somente usuários com permissão e dependendo da permissão somente agendamentos da regional do próprio perfil.<br>
+                                Somente agendamentos do dia atual ou passado.<br>
+                                Apenas status "Compareceu" e "Não Compareceu".
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_editar_status.mp4') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
