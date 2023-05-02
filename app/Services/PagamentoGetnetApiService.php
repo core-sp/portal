@@ -351,6 +351,14 @@ class PagamentoGetnetApiService {
             $dadosFinais = $this->dadosBasicosPag($ip, $dados);
             $dadosFinais[$dados['tipo_pag']] = $this->tipoPagamento($dados['tipo_pag'], $dados);
 
+            // Temp
+            $temporario = $dadosFinais;
+            $temporario['credit']['card']['cardholder_name'] = '*************';
+            $temporario['credit']['card']['security_code'] = '***';
+            $temporario['credit']['card']['expiration_month'] = '**';
+            $temporario['credit']['card']['expiration_year'] = '**';
+            \Log::channel('externo')->info(' - [Registro temporário do request via API Transação final dos dados] - ' . json_encode($temporario));
+
             $response = $this->client->request('POST', $this->urlBase . '/v1/payments/' . $dados['tipo_pag'], [
                 'headers' => [
                     'Content-type' => "application/json; charset=utf-8",
