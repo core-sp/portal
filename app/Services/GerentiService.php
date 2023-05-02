@@ -17,7 +17,7 @@ class GerentiService implements GerentiServiceInterface {
     public function getEnderecoContatoPagamento($user)
     {
         $contatos = $this->gerentiRepository->gerentiContatos($user->ass_id);
-        $enderecos = $this->gerentiRepository->gerentiEnderecos($user->ass_id);
+        $enderecos = utf8_converter($this->gerentiRepository->gerentiEnderecos($user->ass_id));
         if(isset($enderecos['Logradouro'])){
             $cobranca_dados['street'] = strpos($enderecos['Logradouro'], ',') !== false ? 
             substr($enderecos['Logradouro'], 0, strpos($enderecos['Logradouro'], ',')) : substr($enderecos['Logradouro'], 0, 60);
