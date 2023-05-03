@@ -402,7 +402,7 @@
             
         </div>
     <!-- *********************************************************************************************************************************************************** -->
-
+        
         <hr />
 
     <!-- ÁREA: SERVIÇO POSTS **************************************************************************************************************************** -->
@@ -512,8 +512,8 @@
 
         <hr />
 
-    <!-- ÁREA: SERVIÇO AGENDAMENTO **************************************************************************************************************************** -->
-        <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_agendamento">Serviço: Agendamento&nbsp;&nbsp;<i class="nav-icon far fa-clock"></i></button>
+    <!-- ÁREA: SERVIÇO AGENDAMENTOS **************************************************************************************************************************** -->
+        <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_agendamento">Serviço: Agendamentos&nbsp;&nbsp;<i class="nav-icon far fa-clock"></i></button>
         <div id="serv_agendamento" class="collapse" data-parent="#accordion">
 
             <div class="table-responsive-sm mt-3 mb-3">
@@ -522,13 +522,95 @@
                     <tr>
                         <th>Situação</th>
                         <th>Sobre</th>
+                        <th>Link</th>
                         <th>Ver</th>
                     </tr>
                     </thead>
                     <tbody>
+                        <!-- ************************ SITE **************************************************************** -->
+                        <tr>
+                            <th class="text-center table-secondary" colspan="4">Site</th>
+                        </tr>
                         <tr>
                             <td>Campos do formulário</td>
                             <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_site_campos_form.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Criar</td>
+                            <td>
+                                Criar agendamento no Portal para atendimento nas seccionais.<br>
+                                Dependendo da regional escolhida, pode ter janelas de avisos.<br>
+                                Caso o representante selecione o tipo de serviço "Outros", então aparecerá uma janela para confirmar se é representante comercial.<br>
+                                Caso clique em "Não", retorna para a home.<br>
+                                Procedimento para amenizar agendamentos de usuários de outros conselhos por engano.
+                            </td>
+                            <td><a href="{{ route('agendamentosite.formview') }}" target="_blank">{{ route('agendamentosite.formview') }}</a></td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_site_criar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Consultar</td>
+                            <td>
+                                Consultar agendamento no Portal pelo protocolo gerado.<br>
+                                Somente agendamentos do dia de hoje em diante são possíveis de consultar.
+                            </td>
+                            <td><a href="{{ route('agendamentosite.consultaView') }}" target="_blank">{{ route('agendamentosite.consultaView') }}</a></td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_site_consultar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cancelar</td>
+                            <td>
+                                Cancelar agendamento no Portal pelo protocolo gerado seguido do cpf.<br>
+                                Somente agendamentos do dia de hoje em diante são possíveis de cancelar.
+                            </td>
+                            <td><a href="{{ route('agendamentosite.consultaView') }}" target="_blank">{{ route('agendamentosite.consultaView') }}</a></td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_site_cancelar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- ************************ ADMIN **************************************************************** -->
+                        <tr>
+                            <th class="text-center table-secondary" colspan="4">Admin</th>
+                        </tr>
+                        <tr>
+                            <td>Campos do formulário</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>-----</td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_agenda_campos_form.jpg') }}" 
                                     target="_blank" 
@@ -547,6 +629,7 @@
                                 Agendamento com o dia futuro pode editar o cadastro.<br>
                                 Agendamento do dia atual ou passado, somente pode editar o serviço, status e atendente.
                             </td>
+                            <td>-----</td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_agenda_editar.mp4') }}" 
                                     target="_blank" 
@@ -565,8 +648,274 @@
                                 Somente agendamentos do dia atual ou passado.<br>
                                 Apenas status "Compareceu" e "Não Compareceu".
                             </td>
+                            <td>-----</td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_agenda_editar_status.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Filtrar</td>
+                            <td>
+                                Somente usuários com permissão e dependendo da permissão somente agendamentos da regional do próprio perfil.<br>
+                                Todos podem filtrar a listagem dos agendamentos por: status, tipo de serviço e por dia(s).<br>
+                                Para perfis com permissão mais elevada, inclui a filtragem por seccional.<br>
+                                Clique em "Remover filtro" para voltar a listagem padrão.
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_filtrar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Buscar</td>
+                            <td>
+                                Somente usuários com permissão e dependendo da permissão somente agendamentos da regional do próprio perfil.<br>
+                                A busca pode ser feita por: cpf (com pontuação), e-mail, protocolo, código e nome.<br>
+                                O filtro não interfere no resultado da busca e vice-versa.
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_buscar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- ************************ BLOQUEIOS **************************************************************** -->
+                        <tr>
+                            <th class="text-center table-secondary" colspan="4">Admin - Bloqueios</th>
+                        </tr>
+                        <tr>
+                            <td>Listar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                A listagem dos bloqueios traz somente os bloqueios com período válido, ou seja, data de término igual ou maior que hoje.
+                            </td>
+                            <td>-----</td>
+                            <td>-----</td>
+                        </tr>
+                        <tr>
+                            <td>Campos do formulário</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_bloqueio_campos_form.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Criar / Editar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Criar ou editar bloqueios para agendamentos no Portal por período de dias e horas.<br>
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_bloqueio_criar_editar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Buscar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                A busca pode ser feita por: regional.<br>
+                                A busca retornará até os bloqueios de períodos passados que não foram cancelados.
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_bloqueio_buscar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cancelar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Através do botão "Cancelar" o bloqueio é excluído e o agendamento é liberado.<br>
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_agenda_bloqueio_apagar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    <!-- *********************************************************************************************************************************************************** -->
+
+        <hr />
+
+    <!-- ÁREA: SERVIÇO FISCALIZAÇÃO **************************************************************************************************************************** -->
+        <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_fiscal">Serviço: Dados de Fiscalização&nbsp;&nbsp;<i class="nav-icon far fa-file-alt"></i></button>
+        <div id="serv_fiscal" class="collapse" data-parent="#accordion">
+
+            <div class="table-responsive-sm mt-3 mb-3">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Situação</th>
+                        <th>Sobre</th>
+                        <th>Link</th>
+                        <th>Ver</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Campos do formulário - Criar Ano</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_fiscal_campos_form_criar.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Campos do formulário - Editar</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_fiscal_campos_form_editar.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Criar Ano</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Criar ano para editar dados da fiscalização.
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_fiscal_criar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Editar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Editar dados do ano escolhido.
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_fiscal_editar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Publicar / Reverter</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Após criar o ano e editar os dados, pode publicar os dados no site ou reverter a publicação para o público externo.
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_fiscal_publicar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Buscar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                A busca pode ser feita por: ano.
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_fiscal_buscar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Ver dados no Site</td>
+                            <td>
+                                Dados dos anos publicados estão disponíveis para o público externo.
+                            </td>
+                            <td><a href="{{ route('fiscalizacao.mapa') }}" target="_blank">{{ route('fiscalizacao.mapa') }}</a></td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_fiscal_mapa.mp4') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -919,7 +1268,7 @@
     
     <div class="float-right mt-2">
         <p class="m-0">
-            <em><strong>Última atualização:</strong> 28/04/2023</em>
+            <em><strong>Última atualização:</strong> 03/05/2023</em>
         </p>
     </div>
 
