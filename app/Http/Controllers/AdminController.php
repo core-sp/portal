@@ -102,11 +102,12 @@ class AdminController extends Controller
     public function manual($file = null)
     {
         try{
-            $dados = $this->service->getService('Suporte')->caminhoFileManual($file);
+            $dados = $this->service->getService('Suporte')->caminhoFileManual($file, auth()->user());
             $file = $dados['file'];
             $variaveis = $dados['variaveis'];
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [403]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, "Erro ao carregar a imagem do manual.");
         }
         

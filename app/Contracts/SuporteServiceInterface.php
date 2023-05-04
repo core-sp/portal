@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use App\User;
+
 interface SuporteServiceInterface {
 
     public function indexLog();
@@ -18,5 +20,5 @@ interface SuporteServiceInterface {
 
     public function liberarIp($ip, $user = null);
 
-    public function caminhoFileManual($file);
+    public function caminhoFileManual($file, User $user);
 }

@@ -1,6 +1,5 @@
 <!-- Sidebar Menu -->
 @php
-    $permitidos = perfisPermitidosMenu();
     $idperfil = auth()->user()->idperfil;
 @endphp
 <nav class="mt-2 mb-2">

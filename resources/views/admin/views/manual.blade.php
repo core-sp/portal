@@ -1,11 +1,12 @@
 <div class="card-body">
 
+    <p><i class="fas fa-info-circle text-primary"></i>&nbsp;&nbsp;O manual é baseado nas suas permissões de acesso ao serviços.</p>
     <h5 class="text-danger mb-4"><strong>ATENÇÃO!</strong> <em>Estes arquivos são de uso exclusivo por funcionários do CORE-SP.</em></h5>
 
     <div id="accordion">
 
     <!-- ÁREA: FUNÇÕES BÁSICAS **************************************************************************************************************************** -->
-        <button class="btn btn-primary btn-block font-weight-bolder" data-toggle="collapse" data-target="#basico">Funções Básicas <small>(Admin, Representante)</small></button>
+        <button class="btn btn-primary btn-block font-weight-bolder" data-toggle="collapse" data-target="#basico">Funções Básicas</button>
         <div id="basico" class="collapse" data-parent="#accordion">
         
             <div class="table-responsive-sm mt-3 mb-3">
@@ -159,66 +160,6 @@
                                 </a>
                             </td>
                         </tr>
-                        <tr>
-                            <td>Representante - Cadastro</td>
-                            <td>Os dados devem constar no Gerenti e situação deve ser 'Ativo'.</td>
-                            <td><a href="{{ route('representante.cadastro') }}" target="_blank" >{{ route('representante.cadastro') }}</a></td>
-                            <td>
-                                <a href="{{ route('admin.manual', 'basico_rep_cadastro.mp4') }}" 
-                                    target="_blank" 
-                                    rel="noopener" 
-                                    type="button" 
-                                    class="btn btn-info"
-                                >
-                                    <i class="fas fa-play fa-lg"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Representante - Alterar senha</td>
-                            <td>-----</td>
-                            <td><a href="{{ route('representante.password.request') }}" target="_blank" >{{ route('representante.password.request') }}</a></td>
-                            <td>
-                                <a href="{{ route('admin.manual', 'basico_rep_alterar_senha.mp4') }}" 
-                                    target="_blank" 
-                                    rel="noopener" 
-                                    type="button" 
-                                    class="btn btn-info"
-                                >
-                                    <i class="fas fa-play fa-lg"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Representante - Alterar e-mail</td>
-                            <td>-----</td>
-                            <td><a href="{{ route('representante.email.reset.view') }}" target="_blank" >{{ route('representante.email.reset.view') }}</a></td>
-                            <td>
-                                <a href="{{ route('admin.manual', 'basico_rep_alterar_email.mp4') }}" 
-                                    target="_blank" 
-                                    rel="noopener" 
-                                    type="button" 
-                                    class="btn btn-info"
-                                >
-                                    <i class="fas fa-play fa-lg"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Representante - Desconectar</td>
-                            <td>-----</td>
-                            <td>-----</td>
-                            <td>
-                                <a href="{{ route('admin.manual', 'basico_rep_logout.png') }}" 
-                                    target="_blank" 
-                                    rel="noopener" 
-                                    type="button" 
-                                    class="btn btn-info"
-                                >
-                                    <i class="fas fa-image fa-lg"></i>
-                                </a>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -280,6 +221,7 @@
         <hr />
 
     <!-- ÁREA: SERVIÇO NOTÍCIAS **************************************************************************************************************************** -->
+        @if(in_array(auth()->user()->idperfil, $permitidos->find(7)['perfis']))
         <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_noticia">Serviço: Notícias&nbsp;&nbsp;<i class="nav-icon far fa-newspaper"></i></button>
         <div id="serv_noticia" class="collapse" data-parent="#accordion">
 
@@ -404,8 +346,10 @@
     <!-- *********************************************************************************************************************************************************** -->
         
         <hr />
+        @endif
 
     <!-- ÁREA: SERVIÇO POSTS **************************************************************************************************************************** -->
+        @if(in_array(auth()->user()->idperfil, $permitidos->find(43)['perfis']))
         <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_post">Serviço: Blog&nbsp;&nbsp;<i class="nav-icon fas fa-rss"></i></button>
         <div id="serv_post" class="collapse" data-parent="#accordion">
 
@@ -511,8 +455,10 @@
     <!-- *********************************************************************************************************************************************************** -->
 
         <hr />
+        @endif
 
     <!-- ÁREA: SERVIÇO AGENDAMENTOS **************************************************************************************************************************** -->
+        @if(in_array(auth()->user()->idperfil, $permitidos->find(27)['perfis']) || in_array(auth()->user()->idperfil, $permitidos->find(29)['perfis']))
         <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_agendamento">Serviço: Agendamentos&nbsp;&nbsp;<i class="nav-icon far fa-clock"></i></button>
         <div id="serv_agendamento" class="collapse" data-parent="#accordion">
 
@@ -536,7 +482,7 @@
                             <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
                             <td>-----</td>
                             <td>
-                                <a href="{{ route('admin.manual', 'serv_agenda_site_campos_form.jpg') }}" 
+                                <a href="{{ route('admin.manual', 'serv_agendaSite_campos_form.jpg') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -557,7 +503,7 @@
                             </td>
                             <td><a href="{{ route('agendamentosite.formview') }}" target="_blank">{{ route('agendamentosite.formview') }}</a></td>
                             <td>
-                                <a href="{{ route('admin.manual', 'serv_agenda_site_criar.mp4') }}" 
+                                <a href="{{ route('admin.manual', 'serv_agendaSite_criar.mp4') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -575,7 +521,7 @@
                             </td>
                             <td><a href="{{ route('agendamentosite.consultaView') }}" target="_blank">{{ route('agendamentosite.consultaView') }}</a></td>
                             <td>
-                                <a href="{{ route('admin.manual', 'serv_agenda_site_consultar.mp4') }}" 
+                                <a href="{{ route('admin.manual', 'serv_agendaSite_consultar.mp4') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -593,7 +539,7 @@
                             </td>
                             <td><a href="{{ route('agendamentosite.consultaView') }}" target="_blank">{{ route('agendamentosite.consultaView') }}</a></td>
                             <td>
-                                <a href="{{ route('admin.manual', 'serv_agenda_site_cancelar.mp4') }}" 
+                                <a href="{{ route('admin.manual', 'serv_agendaSite_cancelar.mp4') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -604,6 +550,7 @@
                             </td>
                         </tr>
                         <!-- ************************ ADMIN **************************************************************** -->
+                        @if(in_array(auth()->user()->idperfil, $permitidos->find(27)['perfis']))
                         <tr>
                             <th class="text-center table-secondary" colspan="4">Admin</th>
                         </tr>
@@ -699,7 +646,9 @@
                                 </a>
                             </td>
                         </tr>
+                        @endif
                         <!-- ************************ BLOQUEIOS **************************************************************** -->
+                        @if(in_array(auth()->user()->idperfil, $permitidos->find(29)['perfis']))
                         <tr>
                             <th class="text-center table-secondary" colspan="4">Admin - Bloqueios</th>
                         </tr>
@@ -717,7 +666,7 @@
                             <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
                             <td>-----</td>
                             <td>
-                                <a href="{{ route('admin.manual', 'serv_agenda_bloqueio_campos_form.jpg') }}" 
+                                <a href="{{ route('admin.manual', 'serv_agendaBloqueio_campos_form.jpg') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -735,7 +684,7 @@
                             </td>
                             <td>-----</td>
                             <td>
-                                <a href="{{ route('admin.manual', 'serv_agenda_bloqueio_criar_editar.mp4') }}" 
+                                <a href="{{ route('admin.manual', 'serv_agendaBloqueio_criar_editar.mp4') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -754,7 +703,7 @@
                             </td>
                             <td>-----</td>
                             <td>
-                                <a href="{{ route('admin.manual', 'serv_agenda_bloqueio_buscar.mp4') }}" 
+                                <a href="{{ route('admin.manual', 'serv_agendaBloqueio_buscar.mp4') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -772,7 +721,42 @@
                             </td>
                             <td>-----</td>
                             <td>
-                                <a href="{{ route('admin.manual', 'serv_agenda_bloqueio_apagar.mp4') }}" 
+                                <a href="{{ route('admin.manual', 'serv_agendaBloqueio_apagar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ************************ DÚVIDAS FREQUENTES **************************************************************** -->
+            <div class="table-responsive-sm mt-3 mb-3">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th class="text-center table-warning" colspan="4">Dúvidas Frequentes</th>
+                    </tr>
+                    <tr>
+                        <th>Situação</th>
+                        <th>Condição</th>
+                        <th>Solução</th>
+                        <th>Ver</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Representante com agendamento bloqueado</td>
+                            <td>-----</td>
+                            <td>Usuário com permissão deve buscar os agendamentos do representante pelo cpf e atualizar os últimos 3 com o status 'Não Compareceu' para 'Cancelado'.</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'duvidas_agend_bloqueado.mp4') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -785,13 +769,171 @@
                     </tbody>
                 </table>
             </div>
-            
+
         </div>
     <!-- *********************************************************************************************************************************************************** -->
 
         <hr />
+        @endif
+
+    <!-- ÁREA: SERVIÇO LICITAÇÕES **************************************************************************************************************************** -->
+        @if(in_array(auth()->user()->idperfil, $permitidos->find(33)['perfis']))
+        <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_licitacao">Serviço: Licitações&nbsp;&nbsp;<i class="nav-icon far fa-file-alt"></i></button>
+        <div id="serv_licitacao" class="collapse" data-parent="#accordion">
+
+            <div class="table-responsive-sm mt-3 mb-3">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Situação</th>
+                        <th>Sobre</th>
+                        <th>Link</th>
+                        <th>Ver</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <!-- ************************ ADMIN **************************************************************** -->
+                        <tr>
+                            <th class="text-center table-secondary" colspan="4">Admin</th>
+                        </tr>
+                        <tr>
+                            <td>Campos do formulário</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_licitacao_campos_form.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Criar / Editar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Ao criar ou editar uma licitação, ela ficará disponível no Portal para todos através da ID gerada após criar.<br>
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_licitacao_criar_editar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Ver</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Após criar ou editar uma licitação é possível visualizar através do botão "Ver".<br>
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_licitacao_ver.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Buscar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                A busca pode ser feita por: modalidade, número da licitacao, número do processo, situação, objeto da licitação e id.<br>
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_licitacao_buscar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Apagar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Através do botão "Apagar" a licitação é excluída e o link retorna erro 404.<br>
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_licitacao_apagar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Restaurar</td>
+                            <td>
+                                Somente administradores do Portal.<br>
+                                Através do botão "Restaurar" a licitação é restaurada e o link retorna o conteúdo.<br>
+                            </td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_licitacao_restaurar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- ************************ SITE **************************************************************** -->
+                        <tr>
+                            <th class="text-center table-secondary" colspan="4">Site</th>
+                        </tr>
+                        <tr>
+                            <td>Listar</td>
+                            <td>
+                                Listagem das licitações no Portal por ordem específica: !!!!!!.
+                            </td>
+                            <td><a href="{{ route('licitacoes.siteGrid') }}" target="_blank">{{ route('licitacoes.siteGrid') }}</a></td>
+                            <td>-----</td>
+                        </tr>
+                        <tr>
+                            <td>Buscar</td>
+                            <td>
+                                A busca pode ser feita pelos mesmos campos do formulário de criação da licitação.<br>
+                                E o retorno será na mesma ordem da listagem.
+                            </td>
+                            <td><a href="{{ route('licitacoes.siteBusca') }}" target="_blank">{{ route('licitacoes.siteBusca') }}</a></td>
+                            <td>-----</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    <!-- *********************************************************************************************************************************************************** -->
+        
+        <hr />
+        @endif
 
     <!-- ÁREA: SERVIÇO FISCALIZAÇÃO **************************************************************************************************************************** -->
+        @if(in_array(auth()->user()->idperfil, $permitidos->find(50)['perfis']))
         <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_fiscal">Serviço: Dados de Fiscalização&nbsp;&nbsp;<i class="nav-icon far fa-file-alt"></i></button>
         <div id="serv_fiscal" class="collapse" data-parent="#accordion">
 
@@ -933,9 +1075,10 @@
     <!-- *********************************************************************************************************************************************************** -->
 
         <hr />
+        @endif
 
-    <!-- ÁREA: ÁREA RESTRITA DO REPRESENTANTE **************************************************************************************************************************** -->
-        <button class="btn btn-success btn-block font-weight-bolder" data-toggle="collapse" data-target="#area_rep">Área Restrita do Representante</button>
+    <!-- ÁREA: ÁREA DO REPRESENTANTE **************************************************************************************************************************** -->
+        <button class="btn btn-success btn-block font-weight-bolder" data-toggle="collapse" data-target="#area_rep">Área do Representante</button>
         <div id="area_rep" class="collapse" data-parent="#accordion">
 
             <div class="table-responsive-sm mt-3 mb-3">
@@ -949,6 +1092,69 @@
                     </tr>
                     </thead>
                     <tbody>
+                    <tr>
+                            <td>Cadastro</td>
+                            <td>Os dados devem constar no Gerenti e situação deve ser 'Ativo'.</td>
+                            <td><a href="{{ route('representante.cadastro') }}" target="_blank" >{{ route('representante.cadastro') }}</a></td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'basico_rep_cadastro.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Alterar senha</td>
+                            <td>-----</td>
+                            <td><a href="{{ route('representante.password.request') }}" target="_blank" >{{ route('representante.password.request') }}</a></td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'basico_rep_alterar_senha.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Alterar e-mail</td>
+                            <td>-----</td>
+                            <td><a href="{{ route('representante.email.reset.view') }}" target="_blank" >{{ route('representante.email.reset.view') }}</a></td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'basico_rep_alterar_email.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Desconectar</td>
+                            <td>-----</td>
+                            <td>-----</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'basico_rep_logout.png') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center table-secondary" colspan="4">Área Restrita</th>
+                        </tr>
                         <tr>
                             <td>Aba - Home</td>
                             <td>Página inicial da área do representante.</td>
@@ -1118,18 +1324,13 @@
                 </table>
             </div>
 
-        </div>
-    <!-- *********************************************************************************************************************************************************** -->
-        
-        <hr />
-
-    <!-- ÁREA: DÚVIDAS FREQUENTES **************************************************************************************************************************** -->
-        <button class="btn btn-warning btn-block font-weight-bolder" data-toggle="collapse" data-target="#duvidas_frequentes">Dúvidas Frequentes</button>
-        <div id="duvidas_frequentes" class="collapse" data-parent="#accordion">
-        
+            <!-- ************************ DÚVIDAS FREQUENTES **************************************************************** -->
             <div class="table-responsive-sm mt-3 mb-3">
                 <table class="table table-hover table-bordered">
                     <thead>
+                    <tr>
+                        <th class="text-center table-warning" colspan="4">Dúvidas Frequentes</th>
+                    </tr>
                     <tr>
                         <th>Situação</th>
                         <th>Condição</th>
@@ -1138,21 +1339,6 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Representante com agendamento bloqueado</td>
-                            <td>-----</td>
-                            <td>Usuário com permissão deve buscar os agendamentos do representante pelo cpf e atualizar os últimos 3 com o status 'Não Compareceu' para 'Cancelado'.</td>
-                            <td>
-                                <a href="{{ route('admin.manual', 'duvidas_agend_bloqueado.mp4') }}" 
-                                    target="_blank" 
-                                    rel="noopener" 
-                                    type="button" 
-                                    class="btn btn-info"
-                                >
-                                    <i class="fas fa-play fa-lg"></i>
-                                </a>
-                            </td>
-                        </tr>
                         <tr>
                             <td>Representante não consegue fazer login - Caso 1</td>
                             <td>-----</td>
@@ -1260,15 +1446,15 @@
             </div>
 
         </div>
-    <!-- ****************************************************************************************************************************************************** -->
-    
+    <!-- *********************************************************************************************************************************************************** -->
+            
     </div>
 
     <hr />
     
     <div class="float-right mt-2">
         <p class="m-0">
-            <em><strong>Última atualização:</strong> 03/05/2023</em>
+            <em><strong>Última atualização:</strong> 04/05/2023</em>
         </p>
     </div>
 

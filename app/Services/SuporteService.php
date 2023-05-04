@@ -238,7 +238,7 @@ class SuporteService implements SuporteServiceInterface {
         return $ok;
     }
 
-    public function caminhoFileManual($file)
+    public function caminhoFileManual($file, $user)
     {
         $variaveis = (object) [
             'mostra' => 'manual',
@@ -248,6 +248,31 @@ class SuporteService implements SuporteServiceInterface {
 
         if(isset($file))
         {
+            // Somente viewAny
+            $ids = [
+                7 => 'serv_noticia_',
+                27 => 'serv_agenda_',
+                29 => 'serv_agendaBloqueio_',
+                33 => 'serv_licitacao',
+                43 => 'serv_post_',
+                50 => 'serv_fiscal_',
+            ];
+            $permitidos = null;
+            $chave = 0;
+
+            foreach($ids as $key => $id)
+            {
+                if(strpos($file, $id) !== false)
+                {
+                    $permitidos = perfisPermitidosMenu();
+                    $chave = $key;
+                    break;
+                }
+            }
+
+            if(isset($permitidos) && !in_array($user->idperfil, $permitidos->find($chave)['perfis']))
+                throw new \Exception('Não autorizado a acessar o item "'. $ids[$chave] .'" do manual.', 403);
+                
             $file = 'manual/' . $file;
             $file = Storage::disk('local')->exists($file) ? Storage::disk('local')->path($file) : null;
         }
