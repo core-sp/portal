@@ -960,6 +960,24 @@ $('#cedula').ready(function() {
   }
 });
 
+// Logout Representante
+$("#logout-representante").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var link = "/representante/logout";
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+	$('body').append(form);
+	$(form).submit();
+});
+
+// Logout Externo
+$("#logout-externo").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var link = "/externo/logout";
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+	$('body').append(form);
+	$(form).submit();
+});
+
 // ----------------------------------------------------------------------------------------------------------------------------
 // Busca endereço
 
@@ -1095,7 +1113,7 @@ function appendArquivoBD(finalLink, nome, valor, id, totalFiles)
 // ----------------------------------------------------------------------------------------------------------------------------
 
 //	--------------------------------------------------------------------------------------------------------
-// Funcionalidade Solicitação de Registro
+// Funcionalidade Solicitação de Registro (Pré-registro)
 
 function putDadosPreRegistro(objeto)
 {
@@ -1440,15 +1458,6 @@ $('#voltarPreRegistro, #avancarPreRegistro, .menu-registro .nav-link').click(fun
 	
 });
 
-// Logout Externo
-$("#logout-externo").click(function(){
-	var token = $('meta[name="csrf-token"]').attr('content');
-	var link = "/externo/logout";
-	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
-	$('body').append(form);
-	$(form).submit();
-});
-
 // Habilitar Endereço da Empresa no Registro
 $("#checkEndEmpresa:checked").length == 1 ? $("#habilitarEndEmpresa").prop('disabled', true).hide() : $("#habilitarEndEmpresa").prop('disabled', false).show();
 
@@ -1513,15 +1522,6 @@ $('#inserirRegistro input[id^="cep_"]').on('keyup', function(){
 		valorPreRegistro = $(this).val();
 		callbackEnderecoPreRegistro(restoId);
 	}
-});
-
-// Logout Representante
-$("#logout-representante").click(function(){
-	var token = $('meta[name="csrf-token"]').attr('content');
-	var link = "/representante/logout";
-	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
-	$('body').append(form);
-	$(form).submit();
 });
 
 var valorPreRegistro = null;
@@ -1600,4 +1600,4 @@ $('#submitPreRegistro').click(function(){
 })
 
 //	--------------------------------------------------------------------------------------------------------
-// FIM da Funcionalidade Solicitação de Registro
+// FIM da Funcionalidade Solicitação de Registro (Pré-registro)

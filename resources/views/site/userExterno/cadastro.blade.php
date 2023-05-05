@@ -165,7 +165,7 @@
                             required
                         />
                         <label for="checkbox-termo-de-uso">
-                            Li e concordo com os <a class="text-primary" href="{{ route('termo.consentimento.pdf') }}" target="_blank">Termos de Uso</a> da Área Restrita do Login Externo do Core-SP.
+                            Li e concordo com os <a class="text-primary" href="{{-- route('termo.consentimento.pdf') --}}" target="_blank">Termos de Uso</a> da Área Restrita do Login Externo do Core-SP.
                         </label>
                         @if($errors->has('aceite'))
                         <div class="invalid-feedback">
