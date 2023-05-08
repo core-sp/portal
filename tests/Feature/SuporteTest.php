@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use App\SuporteIp;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InternoSuporteMail;
+use App\Permissao;
 
 class SuporteTest extends TestCase
 {
@@ -895,16 +896,22 @@ class SuporteTest extends TestCase
     }
 
     /** @test */
-    public function user_can_see_tabs()
+    public function user_can_see_all_tabs()
     {
-        $this->signIn();
+        $this->signInAsAdmin();
                  
         $this->get(route('admin.manual'))
         ->assertOk()
-        ->assertSee('<button class="btn btn-primary btn-block font-weight-bolder" data-toggle="collapse" data-target="#basico">Funções Básicas <small>(Admin, Representante)</small></button>')
-        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_regional">Serviço: Regionais</button>')
+        ->assertSee('<button class="btn btn-primary btn-block font-weight-bolder" data-toggle="collapse" data-target="#basico">Funções Básicas</button>')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_regional">Serviço: Regionais&nbsp;&nbsp;<i class="nav-icon fas fa-globe-americas"></i></button>')
         ->assertSee('<button class="btn btn-success btn-block font-weight-bolder" data-toggle="collapse" data-target="#area_rep">Área do Representante</button>')
-        ->assertSee('<button class="btn btn-warning btn-block font-weight-bolder" data-toggle="collapse" data-target="#duvidas_frequentes">Dúvidas Frequentes</button>');
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_noticia">Serviço: Notícias&nbsp;&nbsp;<i class="nav-icon far fa-newspaper"></i></button>')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_post">Serviço: Blog&nbsp;&nbsp;<i class="nav-icon fas fa-rss"></i></button>')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_agendamento">Serviço: Agendamentos&nbsp;&nbsp;<i class="nav-icon far fa-clock"></i></button>')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_rep">Serviço: Representantes&nbsp;&nbsp;<i class="nav-icon fa fa-users"></i></button>')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_licitacao">Serviço: Licitações&nbsp;&nbsp;<i class="nav-icon far fa-file-alt"></i></button>')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_plantao">Serviço: Plantão Jurídico&nbsp;&nbsp;<i class="nav-icon fas fa-calendar-alt"></i></button>')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_fiscal">Serviço: Dados de Fiscalização&nbsp;&nbsp;<i class="nav-icon far fa-file-alt"></i></button>');
     }
 
     /** @test */
@@ -924,17 +931,9 @@ class SuporteTest extends TestCase
                  
         $this->get(route('admin.manual'))
         ->assertOk()
-        ->assertSee('<p class="font-weight-bolder">Admin - Menus</p>')
-        ->assertSee('<p class="font-weight-bolder">Admin - Home</p>')
-        ->assertSee('<p class="font-weight-bolder">Admin - Perfil</p>')
-        ->assertSee('<p class="font-weight-bolder">Admin - Abrir Chamados</p>')
-        ->assertSee('<p class="font-weight-bolder">Admin - Perfil pelo menu vertical</p>')
-        ->assertSee('<p class="font-weight-bolder">Admin - Alterar senha</p>')
-        ->assertSee('<p class="font-weight-bolder">Admin - Desconectar</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante - Cadastro</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante - Alterar senha</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante - Alterar e-mail</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante - Desconectar</p>');
+        ->assertSee('<td>Admin - Menus</td>')
+        ->assertSee('<td>Admin - Home</td>')
+        ->assertSee('<td>Admin - Perfil</td>');
     }
 
     /** @test */
@@ -944,7 +943,8 @@ class SuporteTest extends TestCase
                  
         $this->get(route('admin.manual'))
         ->assertOk()
-        ->assertSee('<p class="font-weight-bolder">Editar</p>');
+        ->assertSee('<td>Campos do formulário</td>')
+        ->assertSee('<td>Editar</td>');
     }
 
     /** @test */
@@ -954,32 +954,254 @@ class SuporteTest extends TestCase
                  
         $this->get(route('admin.manual'))
         ->assertOk()
-        ->assertSee('<p class="font-weight-bolder">Aba - Home</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - Dados Gerais</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - Contatos</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - Contatos > Inserir Contato</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - End. de Correspondência</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - End. de Correspondência > Inserir Endereço</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - Situação Financeira</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - Emitir Certidão</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - Oportunidades</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - Solicitação de Cédula</p>')
-        ->assertSee('<p class="font-weight-bolder">Aba - Solicitação de Cédula > Solicitar Cédula</p>');
+        ->assertSee('<td>Cadastro</td>')
+        ->assertSee('<td>Aba - Home</td>')
+        ->assertSee('<td>Aba - Dados Gerais</td>');
     }
 
     /** @test */
-    public function user_can_see_content_in_duvidas_frequentes_tab()
+    public function user_can_see_content_in_servicos_noticias_tab()
+    {
+        $user = $this->signIn();
+        Permissao::find(7)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('admin.manual', 'serv_noticia_campos_form.jpg').'"');
+    }
+
+    /** @test */
+    public function user_cannot_see_servicos_noticias_tab()
     {
         $this->signIn();
                  
         $this->get(route('admin.manual'))
         ->assertOk()
-        ->assertSee('<p class="font-weight-bolder">Representante com agendamento bloqueado</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante não consegue fazer login - Caso 1</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante não consegue fazer login - Caso 2</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante não consegue fazer login - Caso 3</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante não consegue alterar a senha</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante não consegue alterar o e-mail - Caso 1</p>')
-        ->assertSee('<p class="font-weight-bolder">Representante não consegue alterar o e-mail - Caso 2</p>');
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_noticia_campos_form.jpg').'"')
+        ->assertDontSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_noticia">Serviço: Notícias&nbsp;&nbsp;<i class="nav-icon far fa-newspaper"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_noticia_campos_form.jpg'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_content_in_servicos_blog_tab()
+    {
+        $user = $this->signIn();
+        Permissao::find(43)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('admin.manual', 'serv_post_campos_form.jpg').'"');
+    }
+
+    /** @test */
+    public function user_cannot_see_servicos_blog_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_post_campos_form.jpg').'"')
+        ->assertDontSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_post">Serviço: Blog&nbsp;&nbsp;<i class="nav-icon fas fa-rss"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_post_campos_form.jpg'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_content_in_servicos_agendamentos_tab()
+    {
+        $user = $this->signIn();
+        Permissao::find(27)->update(['perfis' => '1,' . $user->idperfil]);
+        Permissao::find(29)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('admin.manual', 'serv_agenda_campos_form.jpg').'"')
+        ->assertSee('<a href="'.route('admin.manual', 'serv_agendaSite_campos_form.jpg').'"')
+        ->assertSee('<a href="'.route('admin.manual', 'serv_agendaBloqueio_campos_form.jpg').'"')
+        ->assertSee('<a href="'.route('admin.manual', 'duvidas_agenda_bloqueado.mp4').'"');
+    }
+
+    /** @test */
+    public function user_cannot_see_servicos_agendamentos_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_agenda_campos_form.jpg').'"')
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_agendaSite_campos_form.jpg').'"')
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_agendaBloqueio_campos_form.jpg').'"')
+        ->assertDontSee('<a href="'.route('admin.manual', 'duvidas_agenda_bloqueado.mp4').'"')
+        ->assertDontSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_agendamento">Serviço: Agendamentos&nbsp;&nbsp;<i class="nav-icon far fa-clock"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_agenda_campos_form.jpg'))->assertForbidden();
+        $this->get(route('admin.manual', 'serv_agendaSite_campos_form.jpg'))->assertForbidden();
+        $this->get(route('admin.manual', 'serv_agendaBloqueio_campos_form.jpg'))->assertForbidden();
+        $this->get(route('admin.manual', 'duvidas_agenda_bloqueado.mp4'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_servicos_agendamentos_tab_but_cannot_bloqueio()
+    {
+        $user = $this->signIn();
+        Permissao::find(27)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('admin.manual', 'serv_agendaSite_campos_form.jpg').'"')
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_agendaBloqueio_campos_form.jpg').'"')
+        ->assertSee('<a href="'.route('admin.manual', 'duvidas_agenda_bloqueado.mp4').'"')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_agendamento">Serviço: Agendamentos&nbsp;&nbsp;<i class="nav-icon far fa-clock"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_agendaBloqueio_campos_form.jpg'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_servicos_agendamentos_tab_but_cannot_site_and_admin()
+    {
+        $user = $this->signIn();
+        Permissao::find(29)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_agendaSite_campos_form.jpg').'"')
+        ->assertSee('<a href="'.route('admin.manual', 'serv_agendaBloqueio_campos_form.jpg').'"')
+        ->assertDontSee('<a href="'.route('admin.manual', 'duvidas_agenda_bloqueado.mp4').'"')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_agendamento">Serviço: Agendamentos&nbsp;&nbsp;<i class="nav-icon far fa-clock"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_agenda_campos_form.jpg'))->assertForbidden();
+        $this->get(route('admin.manual', 'serv_agendaSite_campos_form.jpg'))->assertForbidden();
+        $this->get(route('admin.manual', 'duvidas_agenda_bloqueado.mp4'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_content_in_servicos_representantes_tab()
+    {
+        $user = $this->signIn();
+        Permissao::find(59)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('admin.manual', 'serv_repCedula_aceitar.mp4').'"');
+    }
+
+    /** @test */
+    public function user_cannot_see_servicos_representantes_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_repCedula_aceitar.mp4').'"')
+        ->assertDontSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_rep">Serviço: Representantes&nbsp;&nbsp;<i class="nav-icon fa fa-users"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_repCedula_aceitar.mp4'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_content_in_servicos_licitacao_tab()
+    {
+        $user = $this->signIn();
+        Permissao::find(33)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('admin.manual', 'serv_licitacao_campos_form.jpg').'"');
+    }
+
+    /** @test */
+    public function user_cannot_see_servicos_licitacao_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_licitacao_campos_form.jpg').'"')
+        ->assertDontSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_licitacao">Serviço: Licitações&nbsp;&nbsp;<i class="nav-icon far fa-file-alt"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_licitacao_campos_form.jpg'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_content_in_servicos_plantao_juridico_tab()
+    {
+        $user = $this->signIn();
+        Permissao::find(61)->update(['perfis' => '1,' . $user->idperfil]);
+        Permissao::find(63)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('admin.manual', 'serv_plantao_campos_form.jpg').'"')
+        ->assertSee('<a href="'.route('admin.manual', 'serv_plantaoBloqueio_campos_form.jpg').'"');
+    }
+
+    /** @test */
+    public function user_cannot_see_servicos_plantao_juridico_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_plantao_campos_form.jpg').'"')
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_plantaoBloqueio_campos_form.jpg').'"')
+        ->assertDontSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_plantao">Serviço: Plantão Jurídico&nbsp;&nbsp;<i class="nav-icon fas fa-calendar-alt"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_plantao_campos_form.jpg'))->assertForbidden();
+        $this->get(route('admin.manual', 'serv_plantaoBloqueio_campos_form.jpg'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_servicos_plantao_juridicos_tab_but_cannot_bloqueio()
+    {
+        $user = $this->signIn();
+        Permissao::find(61)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('admin.manual', 'serv_plantao_campos_form.jpg').'"')
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_plantaoBloqueio_campos_form.jpg').'"')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_plantao">Serviço: Plantão Jurídico&nbsp;&nbsp;<i class="nav-icon fas fa-calendar-alt"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_plantaoBloqueio_campos_form.jpg'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_servicos_plantao_juridico_tab_but_cannot_admin()
+    {
+        $user = $this->signIn();
+        Permissao::find(63)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_plantao_campos_form.jpg').'"')
+        ->assertSee('<a href="'.route('admin.manual', 'serv_plantaoBloqueio_campos_form.jpg').'"')
+        ->assertSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_plantao">Serviço: Plantão Jurídico&nbsp;&nbsp;<i class="nav-icon fas fa-calendar-alt"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_plantao_campos_form.jpg'))->assertForbidden();
+    }
+
+    /** @test */
+    public function user_can_see_content_in_servicos_fiscalizacao_tab()
+    {
+        $user = $this->signIn();
+        Permissao::find(50)->update(['perfis' => '1,' . $user->idperfil]);
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertSee('<a href="'.route('admin.manual', 'serv_fiscal_campos_form_criar.jpg').'"');
+    }
+
+    /** @test */
+    public function user_cannot_see_servicos_fiscalizacao_tab()
+    {
+        $this->signIn();
+                 
+        $this->get(route('admin.manual'))
+        ->assertOk()
+        ->assertDontSee('<a href="'.route('admin.manual', 'serv_fiscal_campos_form_criar.jpg').'"')
+        ->assertDontSee('<button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_fiscal">Serviço: Dados de Fiscalização&nbsp;&nbsp;<i class="nav-icon far fa-file-alt"></i></button>');
+    
+        $this->get(route('admin.manual', 'serv_fiscal_campos_form_criar.jpg'))->assertForbidden();
     }
 }

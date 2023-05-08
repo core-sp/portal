@@ -14,6 +14,8 @@ use Illuminate\Support\LazyCollection;
 class SuporteService implements SuporteServiceInterface {
 
     private $variaveisLog;
+    private $permitidos;
+    private $chave;
 
     public function __construct()
     {
@@ -65,6 +67,56 @@ class SuporteService implements SuporteServiceInterface {
     private function editarConteudoErros($erros)
     {
         return explode(PHP_EOL, $erros);
+    }
+
+    private function verificaPermissaoManual($file, $texto, $key)
+    {
+        if(strpos($file, $texto) !== false)
+        {
+            $this->permitidos = perfisPermitidosMenu();
+            $this->chave = $key;
+            return true;
+        }
+        return false;
+    }
+
+    private function liberaAcessoFileManual($file, $user)
+    {
+        if(!$user->isAdmin())
+        {
+            // Somente viewAny
+            $ids = [
+                7 => 'serv_noticia_',
+                27 => ['serv_agenda_', 'serv_agendaSite', 'duvidas_agenda_'],
+                29 => 'serv_agendaBloqueio_',
+                33 => 'serv_licitacao',
+                43 => 'serv_post_',
+                50 => 'serv_fiscal_',
+                59 => 'serv_repCedula_',
+                61 => 'serv_plantao_',
+                63 => 'serv_plantaoBloqueio_',
+            ];
+            $this->permitidos = null;
+            $this->chave = 0;
+
+            foreach($ids as $key => $id)
+            {
+                if(is_array($id))
+                {
+                    foreach($id as $i)
+                        if($this->verificaPermissaoManual($file, $i, $key))
+                            break;
+                }
+                else
+                    if($this->verificaPermissaoManual($file, $id, $key))
+                        break;
+            }
+
+            if(isset($this->permitidos) && !in_array($user->idperfil, $this->permitidos->find($this->chave)['perfis']))
+                throw new \Exception('Não autorizado a acessar o item "'. $file .'" do manual.', 403);
+        }
+
+        return true;
     }
 
     public function indexLog()
@@ -248,30 +300,7 @@ class SuporteService implements SuporteServiceInterface {
 
         if(isset($file))
         {
-            // Somente viewAny
-            $ids = [
-                7 => 'serv_noticia_',
-                27 => 'serv_agenda_',
-                29 => 'serv_agendaBloqueio_',
-                33 => 'serv_licitacao',
-                43 => 'serv_post_',
-                50 => 'serv_fiscal_',
-            ];
-            $permitidos = null;
-            $chave = 0;
-
-            foreach($ids as $key => $id)
-            {
-                if(strpos($file, $id) !== false)
-                {
-                    $permitidos = perfisPermitidosMenu();
-                    $chave = $key;
-                    break;
-                }
-            }
-
-            if(isset($permitidos) && !in_array($user->idperfil, $permitidos->find($chave)['perfis']))
-                throw new \Exception('Não autorizado a acessar o item "'. $ids[$chave] .'" do manual.', 403);
+            $this->liberaAcessoFileManual($file, $user);
                 
             $file = 'manual/' . $file;
             $file = Storage::disk('local')->exists($file) ? Storage::disk('local')->path($file) : null;

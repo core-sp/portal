@@ -274,7 +274,7 @@
                             <td>Ver</td>
                             <td>
                                 Somente usuários com permissão.<br>
-                                Após criar ou editar uma notícia é possível visualizar através do botão "Ver".<br>
+                                Após criar ou editar uma notícia é possível visualizar através do botão "Ver".
                             </td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_noticia_ver.mp4') }}" 
@@ -292,6 +292,7 @@
                             <td>
                                 Somente usuários com permissão.<br>
                                 A busca pode ser feita por: título ou conteúdo.<br>
+                                Clique em "Mostrar Todos" para retornar com a listagem padrão.
                             </td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_noticia_buscar.mp4') }}" 
@@ -308,7 +309,7 @@
                             <td>Apagar</td>
                             <td>
                                 Somente usuários com permissão.<br>
-                                Através do botão "Apagar" a notícia é excluída e o link retorna erro 404.<br>
+                                Através do botão "Apagar" a notícia é excluída e o link retorna erro 404.
                             </td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_noticia_apagar.mp4') }}" 
@@ -325,7 +326,7 @@
                             <td>Restaurar</td>
                             <td>
                                 Somente administradores do Portal.<br>
-                                Através do botão "Restaurar" a notícia é restaurada e o link retorna o conteúdo.<br>
+                                Através do botão "Restaurar" a notícia é restaurada e o link retorna o conteúdo.
                             </td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_noticia_restaurar.mp4') }}" 
@@ -400,7 +401,7 @@
                             <td>Ver</td>
                             <td>
                                 Somente usuários com permissão.<br>
-                                Após criar ou editar um post é possível visualizar através do botão "Ver".<br>
+                                Após criar ou editar um post é possível visualizar através do botão "Ver".
                             </td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_post_ver.mp4') }}" 
@@ -418,6 +419,7 @@
                             <td>
                                 Somente usuários com permissão.<br>
                                 A busca pode ser feita por: título ou conteúdo.<br>
+                                Clique em "Mostrar Todos" para retornar com a listagem padrão.
                             </td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_post_buscar.mp4') }}" 
@@ -434,7 +436,7 @@
                             <td>Apagar</td>
                             <td>
                                 Somente usuários com permissão.<br>
-                                Através do botão "Apagar" o post é excluído e o link retorna erro 404.<br>
+                                Através do botão "Apagar" o post é excluído e o link retorna erro 404.
                             </td>
                             <td>
                                 <a href="{{ route('admin.manual', 'serv_post_apagar.mp4') }}" 
@@ -473,6 +475,7 @@
                     </tr>
                     </thead>
                     <tbody>
+                        @if(in_array(auth()->user()->idperfil, $permitidos->find(27)['perfis']))
                         <!-- ************************ SITE **************************************************************** -->
                         <tr>
                             <th class="text-center table-secondary" colspan="4">Site</th>
@@ -550,7 +553,6 @@
                             </td>
                         </tr>
                         <!-- ************************ ADMIN **************************************************************** -->
-                        @if(in_array(auth()->user()->idperfil, $permitidos->find(27)['perfis']))
                         <tr>
                             <th class="text-center table-secondary" colspan="4">Admin</th>
                         </tr>
@@ -613,7 +615,7 @@
                                 Somente usuários com permissão e dependendo da permissão somente agendamentos da regional do próprio perfil.<br>
                                 Todos podem filtrar a listagem dos agendamentos por: status, tipo de serviço e por dia(s).<br>
                                 Para perfis com permissão mais elevada, inclui a filtragem por seccional.<br>
-                                Clique em "Remover filtro" para voltar a listagem padrão.
+                                Clique em "Remover filtro" para voltar com a listagem padrão.
                             </td>
                             <td>-----</td>
                             <td>
@@ -632,7 +634,8 @@
                             <td>
                                 Somente usuários com permissão e dependendo da permissão somente agendamentos da regional do próprio perfil.<br>
                                 A busca pode ser feita por: cpf (com pontuação), e-mail, protocolo, código e nome.<br>
-                                O filtro não interfere no resultado da busca e vice-versa.
+                                O filtro não interfere no resultado da busca e vice-versa.<br>
+                                Clique em "Mostrar Todos" para retornar com a listagem padrão.
                             </td>
                             <td>-----</td>
                             <td>
@@ -681,6 +684,7 @@
                             <td>
                                 Somente usuários com permissão.<br>
                                 Criar ou editar bloqueios para agendamentos no Portal por período de dias e horas.<br>
+                                Bloqueios do agendamento não interferem nos agendamentos do plantão jurídico.
                             </td>
                             <td>-----</td>
                             <td>
@@ -699,7 +703,8 @@
                             <td>
                                 Somente usuários com permissão.<br>
                                 A busca pode ser feita por: regional.<br>
-                                A busca retornará até os bloqueios de períodos passados que não foram cancelados.
+                                A busca retornará até os bloqueios de períodos passados que não foram cancelados.<br>
+                                Clique em "Mostrar Todos" para retornar com a listagem padrão.
                             </td>
                             <td>-----</td>
                             <td>
@@ -718,6 +723,7 @@
                             <td>
                                 Somente usuários com permissão.<br>
                                 Através do botão "Cancelar" o bloqueio é excluído e o agendamento é liberado.<br>
+                                Bloqueios do agendamento cancelados não interferem nos bloqueios do plantão jurídico.
                             </td>
                             <td>-----</td>
                             <td>
@@ -736,6 +742,8 @@
                 </table>
             </div>
 
+            <br>
+
             <!-- ************************ DÚVIDAS FREQUENTES **************************************************************** -->
             <div class="table-responsive-sm mt-3 mb-3">
                 <table class="table table-hover table-bordered">
@@ -751,12 +759,16 @@
                     </tr>
                     </thead>
                     <tbody>
+                        @if(in_array(auth()->user()->idperfil, $permitidos->find(27)['perfis']))
+                        <tr>
+                            <th class="text-center table-secondary" colspan="4">Admin</th>
+                        </tr>
                         <tr>
                             <td>Representante com agendamento bloqueado</td>
                             <td>-----</td>
                             <td>Usuário com permissão deve buscar os agendamentos do representante pelo cpf e atualizar os últimos 3 com o status 'Não Compareceu' para 'Cancelado'.</td>
                             <td>
-                                <a href="{{ route('admin.manual', 'duvidas_agend_bloqueado.mp4') }}" 
+                                <a href="{{ route('admin.manual', 'duvidas_agenda_bloqueado.mp4') }}" 
                                     target="_blank" 
                                     rel="noopener" 
                                     type="button" 
@@ -766,6 +778,7 @@
                                 </a>
                             </td>
                         </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -773,6 +786,117 @@
         </div>
     <!-- *********************************************************************************************************************************************************** -->
 
+        <hr />
+        @endif
+
+    <!-- ÁREA: SERVIÇO REPRESENTANTES **************************************************************************************************************************** -->
+        @if(in_array(auth()->user()->idperfil, $permitidos->find(59)['perfis']))
+        <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_rep">Serviço: Representantes&nbsp;&nbsp;<i class="nav-icon fa fa-users"></i></button>
+        <div id="serv_rep" class="collapse" data-parent="#accordion">
+
+            <div class="table-responsive-sm mt-3 mb-3">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Situação</th>
+                        <th>Sobre</th>
+                        <th>Ver</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @if(in_array(auth()->user()->idperfil, $permitidos->find(59)['perfis']))
+                        <!-- ************************ CÉDULAS **************************************************************** -->
+                        <tr>
+                            <th class="text-center table-secondary" colspan="3">Cédulas</th>
+                        </tr>
+                        <tr>
+                            <td>Listar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                A listagem das solicitações prioriza ordenar por status "Em andamento", seguido por ordem decrescente da data de atualização.
+                            </td>
+                            <td>-----</td>
+                        </tr>
+                        <tr>
+                            <td>Aceitar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Ao aceitar a solicitação de cédula, um botão estará disponível para gerar um pdf com a data do dia atual para documentar no Gerenti.<br>
+                                O representante receberá um e-mail com detalhes da atualização da solicitação.
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_repCedula_aceitar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Recusar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Ao recusar a solicitação de cédula deve inserir a justificativa.<br>
+                                O representante receberá um e-mail com detalhes da atualização da solicitação incluindo a justificativa.
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_repCedula_recusar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Filtrar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Todos podem filtrar a listagem das solicitações de cédulas por: status e por dia(s) da data de solicitação.<br>
+                                Clique em "Remover filtro" para voltar com a listagem padrão.
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_repCedula_filtrar.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Buscar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                A busca pode ser feita por: cpf / cnpj com ou sem pontuação, pelo registro core com ou sem pontuação, pelo nome do representante ou pela regional.<br>
+                                Clique em "Mostrar Todos" para voltar com a listagem padrão.
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_repCedula_buscar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    <!-- *********************************************************************************************************************************************************** -->
+        
         <hr />
         @endif
 
@@ -815,7 +939,7 @@
                             <td>Criar / Editar</td>
                             <td>
                                 Somente usuários com permissão.<br>
-                                Ao criar ou editar uma licitação, ela ficará disponível no Portal para todos através da ID gerada após criar.<br>
+                                Ao criar ou editar uma licitação, ela ficará disponível no Portal para todos através da ID gerada após criar.
                             </td>
                             <td>-----</td>
                             <td>
@@ -833,7 +957,7 @@
                             <td>Ver</td>
                             <td>
                                 Somente usuários com permissão.<br>
-                                Após criar ou editar uma licitação é possível visualizar através do botão "Ver".<br>
+                                Após criar ou editar uma licitação é possível visualizar através do botão "Ver".
                             </td>
                             <td>-----</td>
                             <td>
@@ -852,6 +976,7 @@
                             <td>
                                 Somente usuários com permissão.<br>
                                 A busca pode ser feita por: modalidade, número da licitacao, número do processo, situação, objeto da licitação e id.<br>
+                                Clique em "Mostrar Todos" para retornar com a listagem padrão.
                             </td>
                             <td>-----</td>
                             <td>
@@ -869,7 +994,7 @@
                             <td>Apagar</td>
                             <td>
                                 Somente usuários com permissão.<br>
-                                Através do botão "Apagar" a licitação é excluída e o link retorna erro 404.<br>
+                                Através do botão "Apagar" a licitação é excluída e o link retorna erro 404.
                             </td>
                             <td>-----</td>
                             <td>
@@ -887,7 +1012,7 @@
                             <td>Restaurar</td>
                             <td>
                                 Somente administradores do Portal.<br>
-                                Através do botão "Restaurar" a licitação é restaurada e o link retorna o conteúdo.<br>
+                                Através do botão "Restaurar" a licitação é restaurada e o link retorna o conteúdo.
                             </td>
                             <td>-----</td>
                             <td>
@@ -908,7 +1033,7 @@
                         <tr>
                             <td>Listar</td>
                             <td>
-                                Listagem das licitações no Portal por ordem específica: !!!!!!.
+                                Listagem das licitações no Portal por ordem específica: primeiro por número do processo decrescente, depois por número da licitação decrescente.
                             </td>
                             <td><a href="{{ route('licitacoes.siteGrid') }}" target="_blank">{{ route('licitacoes.siteGrid') }}</a></td>
                             <td>-----</td>
@@ -929,6 +1054,159 @@
         </div>
     <!-- *********************************************************************************************************************************************************** -->
         
+        <hr />
+        @endif
+
+    <!-- ÁREA: SERVIÇO PLANTÃO JURÍDICO **************************************************************************************************************************** -->
+        @if(in_array(auth()->user()->idperfil, $permitidos->find(61)['perfis']) || in_array(auth()->user()->idperfil, $permitidos->find(63)['perfis']))
+        <button class="btn btn-info btn-block font-weight-bolder" data-toggle="collapse" data-target="#serv_plantao">Serviço: Plantão Jurídico&nbsp;&nbsp;<i class="nav-icon fas fa-calendar-alt"></i></button>
+        <div id="serv_plantao" class="collapse" data-parent="#accordion">
+
+            <div class="table-responsive-sm mt-3 mb-3">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Situação</th>
+                        <th>Sobre</th>
+                        <th>Ver</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <!-- ************************ ADMIN **************************************************************** -->
+                        @if(in_array(auth()->user()->idperfil, $permitidos->find(61)['perfis']))
+                        <tr>
+                            <th class="text-center table-secondary" colspan="3">Admin</th>
+                        </tr>
+                        <tr>
+                            <td>Campos do formulário</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_plantao_campos_form.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Editar</td>
+                            <td>Ao editar o formulário do plantão jurídico, o usuário com permissão irá alterar os detalhes do serviço de plantão jurídico no agendamento do Portal.</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_plantao_editar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Agendados</td>
+                            <td>
+                                É possível conferir durante o período do plantão jurídico os agendamentos já realizados no Portal.<br>
+                                Os agendados do plantão jurídico podem receber as mesmas ações de qualquer agendamento do Portal, no serviço de Agendamentos do Admin e do Site.<br>
+                                Para ter acesso ao serviço de Agendamentos, solicite permissão com o setor de TI.
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_plantao_agendados.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        @endif
+                        <!-- ************************ BLOQUEIO **************************************************************** -->
+                        @if(in_array(auth()->user()->idperfil, $permitidos->find(63)['perfis']))
+                        <tr>
+                            <th class="text-center table-secondary" colspan="3">Admin - Bloqueios</th>
+                        </tr>
+                        <tr>
+                            <td>Campos do formulário</td>
+                            <td>Detalhes dos campos do formulário. O que é obrigatório e para que serve.</td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_plantaoBloqueio_campos_form.jpg') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-image fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Criar / Editar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Criar ou editar bloqueios do plantão para agendamentos no Portal por período de dias e horas.<br>
+                                Bloqueios do plantão não interferem nos outros serviços do agendamento.<br>
+                                Caso exista um bloqueio com período expirado da seccional desejada, pode ser editado ao invés de "Cancelar".
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_plantaoBloqueio_criar_editar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Agendados</td>
+                            <td>
+                                Somente usuários com permissão em Editar Plantão Jurídico.<br>
+                                É possível conferir durante o período do plantão jurídico os agendamentos já realizados no Portal ao criar ou editar o bloqueio.<br>
+                                Os agendados do plantão jurídico podem receber as mesmas ações de qualquer agendamento do Portal, no serviço de Agendamentos do Admin e do Site.<br>
+                                Para ter acesso ao serviço de Agendamentos e/ou Editar Plantão Jurídico, solicite permissão com o setor de TI.
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_plantaoBloqueio_agendados.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cancelar</td>
+                            <td>
+                                Somente usuários com permissão.<br>
+                                Através do botão "Cancelar" o bloqueio do plantão é excluído e o agendamento é liberado para o plantão.<br>
+                                Bloqueios do plantão cancelados não interferem nos bloqueios dos outros serviços do agendamento.
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.manual', 'serv_plantaoBloqueio_apagar.mp4') }}" 
+                                    target="_blank" 
+                                    rel="noopener" 
+                                    type="button" 
+                                    class="btn btn-info"
+                                >
+                                    <i class="fas fa-play fa-lg"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    <!-- *********************************************************************************************************************************************************** -->
+    
         <hr />
         @endif
 
@@ -1036,7 +1314,8 @@
                             <td>Buscar</td>
                             <td>
                                 Somente usuários com permissão.<br>
-                                A busca pode ser feita por: ano.
+                                A busca pode ser feita por: ano.<br>
+                                Clique em "Mostrar Todos" para retornar com a listagem padrão.
                             </td>
                             <td>-----</td>
                             <td>
@@ -1324,6 +1603,8 @@
                 </table>
             </div>
 
+            <br>
+
             <!-- ************************ DÚVIDAS FREQUENTES **************************************************************** -->
             <div class="table-responsive-sm mt-3 mb-3">
                 <table class="table table-hover table-bordered">
@@ -1454,7 +1735,7 @@
     
     <div class="float-right mt-2">
         <p class="m-0">
-            <em><strong>Última atualização:</strong> 04/05/2023</em>
+            <em><strong>Última atualização:</strong> 08/05/2023</em>
         </p>
     </div>
 
