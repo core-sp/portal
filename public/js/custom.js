@@ -395,3 +395,62 @@ $("#logout-interno").click(function(){
 	$('body').append(form);
 	$(form).submit();
 });
+
+$(".criarTexto").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+  var id = this.value;
+	$.ajax({
+      url: '/admin/textos/teste/',
+      method: 'POST',
+      data: {
+        _token: token,
+      },
+      success: function(response) {
+        alert("criou!!!");
+      },
+      error: function() {
+      }
+  });
+});
+
+$(".updateCampos").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+  var id = this.value;
+	$.ajax({
+      url: '/admin/textos/teste/' + id,
+      method: 'POST',
+      data: {
+        _token: token,
+        tipo: $('#tipo-' + id).val(),
+        texto_tipo: $('#texto_tipo-' + id).val(),
+        com_numeracao: $('#com_numeracao-' + id).val(),
+        nivel: $('#nivel-' + id).val(),
+        conteudo: tinymce.get('conteudo-' + id).getContent(),
+      },
+      success: function(response) {
+        if(response == 1)
+          alert("Atualizou!!!");
+      },
+      error: function() {
+      }
+  });
+});
+
+$(".deleteTexto").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+  var id = this.value;
+	$.ajax({
+      url: '/admin/textos/teste/' + id,
+      method: 'DELETE',
+      data: {
+        _token: token,
+      },
+      success: function(response) {
+        if(response == 1)
+          $('#lista-' + id).remove();
+          $('#criar-' + id).remove();
+      },
+      error: function() {
+      }
+  });
+});

@@ -236,6 +236,15 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/ajax', 'PlantaoJuridicoBloqueioController@getPlantaoAjax')->name('plantao.juridico.bloqueios.ajax');
     });
 
+    // Rota para Home Imagens
+    Route::prefix('textos')->group(function(){
+      Route::get('/teste', 'GerarTextoController@view');
+      Route::post('/teste', 'GerarTextoController@create');
+      Route::delete('/teste/{id}', 'GerarTextoController@delete');
+      Route::post('/teste/{id}', 'GerarTextoController@updateCampos');
+      Route::put('/teste', 'GerarTextoController@update');
+    });
+
   });
 
   /*
