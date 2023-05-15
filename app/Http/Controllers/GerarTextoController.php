@@ -4,45 +4,49 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\GerarTexto;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class GerarTextoController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => ['show', 'buscar']]);
     }
     
-    public function create()
+    public function create($tipo_doc)
     {
-        $dados = GerarTexto::create([
-            'texto_tipo' => 'Título do texto...'
+        $total = GerarTexto::count() + 1;
+        $texto = GerarTexto::create([
+            'texto_tipo' => mb_strtoupper('Título do texto...', 'UTF-8'),
+            'ordem' => $total,
+            'tipo_doc' => $tipo_doc,
         ]);
 
-        return response()->json($dados);
+        return response()->json($texto);
     }
 
-    public function updateCampos($id, Request $request)
+    public function updateCampos($tipo_doc, $id, Request $request)
     {
         // atualiza os campos, não atualiza ordem e indice
         $dados = $request->except(['_token', '_method']);
-        $resultado = GerarTexto::findOrFail($id);
+        $dados['texto_tipo'] = mb_strtoupper($dados['texto_tipo'], 'UTF-8');
+        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail();
 
         $ok = $resultado->update($dados);
 
         return response()->json($ok);
     }
 
-    public function delete($id)
+    public function delete($tipo_doc, $id)
     {
-        $ok = GerarTexto::findOrFail($id)->delete();
+        $ok = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail()->delete();
 
         return response()->json($ok);
     }
 
-    public function view()
+    public function view($tipo_doc)
     {
-        $resultado = GerarTexto::orderBy('ordem','ASC')->get();
+        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get();
         $variaveis = [
             'singular' => 'texto',
             'singulariza' => 'o texto',
@@ -55,11 +59,11 @@ class GerarTextoController extends Controller
         return view('admin.crud.editar', compact('resultado', 'variaveis'));
     }
 
-    public function update(Request $request)
+    public function update($tipo_doc, Request $request)
     {
         // Somente atualiza ordem e indice
 
-        $resultado = GerarTexto::orderBy('ordem','ASC')->get();
+        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get();
         $array = $request->except(['_token', '_method']);
 
         $chunk = array_chunk($array, 2, true);
@@ -104,8 +108,60 @@ class GerarTextoController extends Controller
             ]);
         }
         
-        return redirect('/admin/textos/teste')
+        return redirect()->route('textos.view', $tipo_doc)
             ->with('message', '<i class="icon fa fa-check"></i>Índice atualizada com sucesso!')
             ->with('class', 'alert-success');
+    }
+
+    public function publicar($tipo_doc, Request $request)
+    {
+        $ok = GerarTexto::where('tipo_doc', $tipo_doc)->update([
+            'publicar' => $request->input('publicar')
+        ]);
+
+        return response()->json($ok);
+    }
+
+    public function show($id = null)
+    {
+        $tipo_doc = \Route::currentRouteName();
+        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+        $textos = array();
+        if(isset($id))
+        {
+            $teste = $resultado->find($id);
+            if($teste->tipo == 'Título' && $teste->com_numeracao)
+                foreach($resultado as $key => $val)
+                    Str::startsWith($val->indice, $teste->indice) ? array_push($textos, $val) : null;       
+            else
+                array_push($textos, $teste);
+        }
+
+        return response()
+            ->view('site.'.$tipo_doc, compact('resultado', 'textos'))
+            ->header('Cache-Control','no-cache');
+    }
+
+    public function buscar(Request $request)
+    {
+        $tipo_doc = Str::beforeLast(\Route::currentRouteName(), '-buscar');
+        $busca = $request->only('busca')['busca'];
+        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+        $textos = array();
+
+        if(isset($busca))
+        {
+            $busca = $resultado->filter(function ($value, $key) use($busca) {
+                $conteudo = strip_tags($value->conteudo);
+                $conteudo = stripos($conteudo, htmlentities($busca, ENT_NOQUOTES, 'UTF-8')) !== false;
+                $titulo = stripos($value->texto_tipo, $busca) !== false;
+                return $conteudo || $titulo;
+            });
+        }else
+            $busca = collect();
+
+        return response()
+            ->view('site.'.$tipo_doc, compact('resultado', 'busca'))
+            ->header('Cache-Control','no-cache');
     }
 }

@@ -102,9 +102,33 @@ $(document).ready(function(){
 
   $('.timeInput').mask('00:00');
   $('.vagasInput').mask('000');
+
   // Draggable
   $("#sortable").sortable();
   $( "#sortable" ).disableSelection();
+  var icons = {
+    header: "fas fa-angle-right",
+    activeHeader: "fas fa-angle-down"
+  };
+  $("#accordion")
+      .accordion({
+        header: "> div > div > h5",
+        collapsible: true,
+        heightStyle: "content",
+        icons: icons
+      })
+      .sortable({
+        axis: "y",
+        handle: "h5",
+        stop: function(event, ui) {
+          // IE doesn't register the blur when sorting
+          // so trigger focusout handlers to remove .ui-state-focus
+          ui.item.children("h5").triggerHandler("focusout");
+ 
+          // Refresh accordion to handle new order
+          $(this).accordion("refresh");
+        }
+      });
 
   // Regra de data no filtro de agendamento +++ Será removido depois de refatorar todos que o utilizam 
   $('#filtroAgendamento').submit(function(e){
@@ -396,17 +420,19 @@ $("#logout-interno").click(function(){
 	$(form).submit();
 });
 
-$(".criarTexto").click(function(){
+// GerarTexto
+$("#criarTexto").click(function(){
 	var token = $('meta[name="csrf-token"]').attr('content');
   var id = this.value;
 	$.ajax({
-      url: '/admin/textos/teste/',
+      url: '/admin/textos/' + $('#tipo_doc').val(),
       method: 'POST',
       data: {
         _token: token,
       },
       success: function(response) {
-        alert("criou!!!");
+        location.reload(true);
+        alert('Texto criado!');
       },
       error: function() {
       }
@@ -417,7 +443,7 @@ $(".updateCampos").click(function(){
 	var token = $('meta[name="csrf-token"]').attr('content');
   var id = this.value;
 	$.ajax({
-      url: '/admin/textos/teste/' + id,
+      url: '/admin/textos/' + $('#tipo_doc').val() + '/' + id,
       method: 'POST',
       data: {
         _token: token,
@@ -440,7 +466,7 @@ $(".deleteTexto").click(function(){
 	var token = $('meta[name="csrf-token"]').attr('content');
   var id = this.value;
 	$.ajax({
-      url: '/admin/textos/teste/' + id,
+      url: '/admin/textos/' + $('#tipo_doc').val() + '/' + id,
       method: 'DELETE',
       data: {
         _token: token,
@@ -448,7 +474,27 @@ $(".deleteTexto").click(function(){
       success: function(response) {
         if(response == 1)
           $('#lista-' + id).remove();
-          $('#criar-' + id).remove();
+      },
+      error: function() {
+      }
+  });
+});
+
+$("#publicarTexto").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+  var publicacao = $(this).val() == '0' ? ' não' : '';
+	$.ajax({
+      url: '/admin/textos/publicar/' + $('#tipo_doc').val(),
+      method: 'POST',
+      data: {
+        _token: token,
+        publicar: $(this).val()
+      },
+      success: function(response) {
+        if(response > 0){
+          location.reload(true);
+          alert('Textos' + publicacao + ' foram publicados!');
+        }
       },
       error: function() {
       }

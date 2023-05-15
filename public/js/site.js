@@ -966,3 +966,9 @@ $("#logout-representante").click(function(){
 	$('body').append(form);
 	$(form).submit();
 });
+
+$('#textosSumario').change(function(){
+	var id = $('#textosSumario').val();
+	var link = "/carta-de-servicos-ao-usuario/" + id;
+	window.location.replace(window.location.protocol + "//" + window.location.host + link);
+});

@@ -37,6 +37,8 @@ var editor_config = {
     editor.on('init', function() {
       if(window.location.href.indexOf('admin/posts/create') != -1)
         editor.execCommand('JustifyFull');
+      if(window.location.href.indexOf('admin/textos/') != -1)
+        editor.editorContainer.style.height = '400px';
     });
   },
   init_instance_callback: function(editor) {

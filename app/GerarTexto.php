@@ -20,7 +20,7 @@ class GerarTexto extends Model
     public static function tipos_doc()
     {
         return [
-            'Carta de serviços ao usuário',
+            'carta-servicos' => 'Carta de serviços ao usuário',
         ];
     }
 }

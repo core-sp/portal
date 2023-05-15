@@ -2,22 +2,27 @@
     @csrf
     @method('PUT')
     <div class="card-body">
-    <h4>Sumário:</h4>
-    @foreach($resultado as $texto)
-    @if($texto->tipo == 'Título')
-    <h5>{{ $texto->indice }}. {{ $texto->texto_tipo }}</h5>
-    @else
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->indice }} - {{ $texto->texto_tipo }}</strong></p>
-    @endif
-    @endforeach
-    <br>
-    <p class="mb-4"><i>* Arraste as caixas para definir a ordem da índice<br>
-    </i></p>
-        <ul id="sortable" class="mb-0 pl-0">
-        <button type="button" class="btn btn-success mb-3 criarTexto">+ Criar texto</button>
+        <h4><strong>Sumário:</strong></h4>
+        @foreach($resultado as $texto)
+            @if($texto->tipo == 'Título')
+            <h5>{{ isset($texto->indice) ? $texto->indice . '. ' : '' }}{{ $texto->texto_tipo }}</h5>
+            @else
+            <p>
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $texto->indice }} - {{ $texto->texto_tipo }}</strong>
+            </p>
+            @endif
+        @endforeach
+        <hr />
+        <p class="mb-4">
+            <i>* Arraste as caixas para definir a ordem da índice<br></i>
+        </p>
+        <input type="hidden" id="tipo_doc" value="{{ $texto->tipo_doc }}" />
+        <div id="accordion" class="mb-0 pl-0">
+            <button type="button" id="criarTexto" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Texto</button>
             @foreach($resultado as $texto)
-            <li class="row homeimagens" id="lista-{{ $texto->id }}">
+            <div class="row homeimagens" id="lista-{{ $texto->id }}">
                 <div class="col">
+                    <h5 class="border rounded border-info bg-info p-2 {{ $loop->last ? '' : 'mb-3' }}">&nbsp;&nbsp;<strong>{{ $texto->tipo }} <small>(nível {{ $texto->nivel }})</small>:</strong> <em>{{ $texto->texto_tipo }}</em></h5>
                     <div class="card card-default bg-light">
                         <div class="card-body">
                             <div class="form-row mb-2">
@@ -49,13 +54,13 @@
                                 <div class="col">
                                     <label for="texto_tipo-{{ $texto->id }}">Título do tipo do texto</label>
                                     <input id="texto_tipo-{{ $texto->id }}"
-                                        class="form-control"
+                                        class="form-control text-uppercase"
                                         type="text"
                                         value="{{ $texto->texto_tipo }}"
                                     />
                                 </div>
                             </div>
-                            <div class="form-row mb-2">
+                            <div class="form-row">
                                 <div class="col">
                                     <label for="conteudo-{{ $texto->id }}">Conteúdo do texto</label>
                                     <textarea 
@@ -71,20 +76,23 @@
                         <div class="card-footer">
                             <div class="float-right">
                                 <button type="button" value="{{ $texto->id }}" class="btn btn-primary updateCampos">Atualizar campos</button>
-                                <button type="button" value="{{ $texto->id }}" class="btn btn-danger deleteTexto">Excluir</button>
+                                <button type="button" value="{{ $texto->id }}" class="btn btn-danger deleteTexto"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </li>
-            <button type="button" id="criar-{{ $texto->id }}" class="btn btn-success mb-3 criarTexto">+ Criar texto</button>
+            </div>
             @endforeach
-        </ul>
+        </div>
     </div>
     <div class="card-footer">
         <div class="float-right">
             <a href="/admin" class="btn btn-default">Cancelar</a>
+            @if($resultado->get(0)->publicar)
+            <a href="{{ route($resultado->get(0)->tipo_doc) }}" target="_blank" class="btn btn-secondary ml-1">Ver</a>
+            @endif
             <button type="submit" class="btn btn-primary ml-1">Atualizar índice</button>
+            <button type="button" id="publicarTexto" value="{{ $resultado->get(0)->publicar ? '0' : '1' }}" class="btn btn-{{ $resultado->get(0)->publicar ? 'danger' : 'success' }} ml-1">{{ $texto->publicar ? 'Reverter publicação' : 'Publicar' }}</button>
         </div>
     </div>
 </form>

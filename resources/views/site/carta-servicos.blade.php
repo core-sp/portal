@@ -1,0 +1,117 @@
+@extends('site.layout.app', ['title' => 'Carta de Serviços ao Usuário'])
+
+@section('content')
+
+<section id="pagina-cabecalho">
+  <div class="container-fluid text-center nopadding position-relative pagina-titulo-img">
+  <img src="{{asset('img/institucional.png')}}" alt="CORE-SP">
+    <div class="row position-absolute pagina-titulo">
+      <div class="container text-center">
+        <h1 class="branco text-uppercase">
+        Carta de Serviços ao Usuário
+        </h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pagina-conteudo">
+  <div class="container">
+    <div class="row" id="conteudo-principal">
+      <div class="col">
+        <div class="row nomargin">
+          <div class="flex-one pr-4 align-self-center">
+            <h2 class="stronger">Core-SP lança carta de serviços ao usuário</h2>
+          </div>
+          <div class="align-self-center">
+            <a href="/" class="btn-voltar">Voltar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="linha-lg"></div>
+    <div class="row mt-2">
+	    <div class="col-lg conteudo-txt pr-4">
+        O ano foi de muito trabalho e novidades no Core-SP. Nosso portal ganhou um visual contemporâneo e conta com notícias sobre tudo o que importa para o representante desempenhar suas funções com maestria; novos meios de pagamento da anuidade, via maquininha do cartão ou impressão de boletos para a quitação antecipada; a criação da Área Restrita, onde é possível atualizar seu cadastro e ficar a par, tanto  dos pagamentos pendentes quanto daqueles que já foram feitos.
+        <br>
+        Dezembro chegou, mas as inovações e a atenção que damos a você não podem parar. Por isso, lançamos a nova Carta de serviços ao Usuário. No texto, estão dispostos, detalhadamente, todos os serviços oferecidos a quem procura o Conselho Regional dos Representantes Comerciais no Estado de São Paulo (CORE-SP), além uma Pesquisa de Satisfação – que visa amplificar a sua voz, representante. Afinal, é dessa troca de ideias que nascem as iniciativas para  que possamos atendê-lo da melhor maneira possível.
+        <br>
+        Aproveite também para registrar suas impressões a respeito do nosso trabalho e dos procedimentos envolvidos na execução dele. É por você, e pra você que estamos aqui.
+        
+        @if(!isset($resultado) || $resultado->isEmpty())
+        <br><br>
+        <strong>Ainda não consta a publicação atual.</strong>
+        @else
+
+        <br><br>
+
+        <!-- SUMÁRIO *********************************************************************************************************** -->
+        <label for="textosSumario">Sumário:</label>
+        <select
+          class="form-control mb-3" 
+          id="textosSumario"
+        >
+          <option value="" style="font-style: italic;">Escolha um título ou subtítulo ...</option>
+          @foreach($resultado as $texto)
+            @if($texto->tipo == 'Título')
+            <option value="{{ $texto->id }}">{{ isset($texto->indice) ? $texto->indice . '. ' : '' }}{{ $texto->texto_tipo }}</option>
+            @else
+            <option value="{{ $texto->id }}" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $texto->indice }} - {{ $texto->texto_tipo }}</option>
+            @endif
+          @endforeach
+        </select>
+
+        <!-- FORM BUSCA *********************************************************************************************************** -->
+        <form method="GET" class="form-inline mt-2" action="{{ route('carta-servicos-buscar') }}">
+          <label for="buscaTextoSumario" class="mb-2 mr-sm-2">Buscar:</label>
+          <input type="text"
+            name="busca"
+            class="form-control col mb-2 mr-sm-2"
+            placeholder="Palavra chave"
+            id="buscaTextoSumario"
+            value="{{ request()->query('busca') }}"
+          />
+          <button type="submit" class="btn btn-sm btn-primary mb-2">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
+
+        <hr />
+        
+        <!-- RESULTADO BUSCA *********************************************************************************************************** -->
+        @if(isset($busca))
+          <p class="light">Busca por: <strong>{{ request()->query('busca') }}</strong>
+              <small><i>- {{ $busca->count() === 1 ? $busca->count() . ' resultado' : $busca->count() . ' resultados' }}</i></small>
+          </p>
+          @if($busca->count() > 0)
+          <div class="list-group list-group-flush">
+            @foreach($busca as $t)
+              @if($t->tipo == 'Título')
+              <a href="{{ route('carta-servicos', $t->id) }}" class="list-group-item list-group-item-action"><strong>{{ isset($t->indice) ? $t->indice . '. ' : '' }}{{ $t->texto_tipo }}</strong></a>
+              @else
+              <a href="{{ route('carta-servicos', $t->id) }}" class="list-group-item list-group-item-action"><strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></a>
+              @endif
+            @endforeach
+          </div>
+          @endif
+        @endif
+
+        <!-- RESULTADO TEXTO SELECIONADO *********************************************************************************************************** -->
+        @if(isset($textos))
+          @foreach($textos as $t)
+            @if($t->tipo == 'Título')
+            <p><strong>{{ isset($t->indice) ? $t->indice . '. ' : '' }}{{ $t->texto_tipo }}</strong></p>
+            @else
+            <p><strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+            @endif
+            {!! $t->conteudo !!}
+          @endforeach
+        @endif
+
+      @endif
+      </div>
+	  </div>
+  </div>
+</section>
+
+@endsection

@@ -238,11 +238,12 @@ Route::middleware(['block_ip'])->group(function () {
 
     // Rota para Home Imagens
     Route::prefix('textos')->group(function(){
-      Route::get('/teste', 'GerarTextoController@view');
-      Route::post('/teste', 'GerarTextoController@create');
-      Route::delete('/teste/{id}', 'GerarTextoController@delete');
-      Route::post('/teste/{id}', 'GerarTextoController@updateCampos');
-      Route::put('/teste', 'GerarTextoController@update');
+      Route::get('/{tipo_doc}', 'GerarTextoController@view')->where('tipo_doc', 'carta-servicos')->name('textos.view');
+      Route::post('/{tipo_doc}', 'GerarTextoController@create')->where('tipo_doc', 'carta-servicos')->name('textos.create');
+      Route::post('/{tipo_doc}/{id}', 'GerarTextoController@updateCampos')->where('tipo_doc', 'carta-servicos')->name('textos.update.campos');
+      Route::post('/publicar/{tipo_doc}', 'GerarTextoController@publicar')->where('tipo_doc', 'carta-servicos')->name('textos.publicar');
+      Route::delete('/{tipo_doc}/{id}', 'GerarTextoController@delete')->where('tipo_doc', 'carta-servicos')->name('textos.delete');
+      Route::put('/{tipo_doc}', 'GerarTextoController@update')->where('tipo_doc', 'carta-servicos')->name('textos.update.indice');
     });
 
   });
@@ -337,6 +338,9 @@ Route::middleware(['block_ip'])->group(function () {
     Route::get('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimentoView')->name('termo.consentimento.view');
     Route::post('/termo-de-consentimento', 'TermoConsentimentoController@termoConsentimento')->name('termo.consentimento.post');
     Route::get('/termo-consentimento-pdf', 'TermoConsentimentoController@termoConsentimentoPdf')->name('termo.consentimento.pdf');
+
+    Route::get('/carta-de-servicos-ao-usuario/buscar', 'GerarTextoController@buscar')->name('carta-servicos-buscar');
+    Route::get('/carta-de-servicos-ao-usuario/{id?}', 'GerarTextoController@show')->name('carta-servicos');
 
     // Páginas (deve ser inserido no final do arquivo de rotas)
     Route::get('{slug}', 'PaginaController@show')->name('paginas.site');

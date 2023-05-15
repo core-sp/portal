@@ -20,9 +20,10 @@ class CreateGerarTextos extends Migration
             $table->text('conteudo')->nullable();
             $table->boolean('com_numeracao')->default(true);
             $table->unsignedTinyInteger('ordem')->default(1);
-            $table->string('nivel')->nullable();
-            $table->string('tipo_doc')->default('Carta de serviços ao usuário');
+            $table->string('nivel')->default(0);
+            $table->string('tipo_doc')->default('carta-servicos');
             $table->string('indice')->nullable();
+            $table->boolean('publicar')->default(false);
             $table->timestamps();
         });
     }
