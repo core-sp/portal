@@ -1,0 +1,135 @@
+<?php
+
+namespace App\Services;
+
+use App\Contracts\GerarTextoServiceInterface;
+use App\GerarTexto;
+use App\Events\CrudEvent;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+class GerarTextoService implements GerarTextoServiceInterface {
+
+    private $variaveis;
+
+    public function __construct()
+    {
+        $this->variaveis = [
+            'singular' => 'texto',
+            'singulariza' => 'o texto',
+            'plural' => 'texto',
+            'pluraliza' => 'texto',
+            'form' => 'texto'
+        ];
+    }
+
+    public function view($tipo_doc)
+    {
+        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)
+        ->orderBy('ordem','ASC')
+        ->get();
+
+        return [
+            'resultado' => $resultado,
+            'variaveis' => (object) $this->variaveis
+        ];
+    }
+
+    public function criar($tipo_doc)
+    {
+        $texto = GerarTexto::criar($tipo_doc);
+        event(new CrudEvent('novo texto do documento '.$tipo_doc, 'criou', $texto->id));
+
+        return $texto;
+    }
+
+    public function update($tipo_doc, $dados, $id = null)
+    {
+        // atualiza os campos, não atualiza ordem e indice
+        if(isset($id))
+        {
+            $dados['texto_tipo'] = $dados['tipo'] == 'Título' ? mb_strtoupper($dados['texto_tipo'], 'UTF-8') : $dados['texto_tipo'];
+            $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail();
+            $ok = $resultado->update($dados);
+            event(new CrudEvent('campos do texto do documento '.$tipo_doc, 'atualizou', $id));
+    
+            return $ok;
+        }
+
+        // Somente atualiza ordem e indice
+        $resultado = GerarTexto::select('nivel', 'com_numeracao', 'id')->where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get();
+        GerarTexto::updateIndice($dados, $resultado);
+        foreach($resultado as $val)
+            event(new CrudEvent('índice do texto do documento '.$tipo_doc, 'atualizou', $val->id));
+
+        return true;
+    }
+
+    public function publicar($tipo_doc, $publicar = false)
+    {
+        $ok = GerarTexto::where('tipo_doc', $tipo_doc)->update([
+            'publicar' => $publicar
+        ]);
+        $texto = $publicar ? 'publicou' : 'reverteu publicação';
+        $ok > 0 ? event(new CrudEvent('os textos do documento '.$tipo_doc, $texto, '---')) : null;
+
+        return $ok;
+    }
+
+    public function excluir($tipo_doc, $id)
+    {
+        $ok = 0;
+        if(GerarTexto::where('tipo_doc', $tipo_doc)->count() > 1)
+        {
+            $ok = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail()->delete();
+            $ok ? event(new CrudEvent('o texto do documento '.$tipo_doc, 'excluiu', $id)) : null;
+        }else
+            $ok = 'Deve existir no mínimo um texto.';
+        
+        return $ok;
+    }
+
+    public function show($tipo_doc, $id = null)
+    {
+        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+        $textos = array();
+        if(isset($id))
+        {
+            $texto = $resultado->find($id);
+            if(!isset($texto))
+                throw new ModelNotFoundException("No query results for model [App\GerarTexto] no documento ".$tipo_doc.", id = " . $id);
+            if(($texto->tipo == 'Título') && $texto->com_numeracao)
+                foreach($resultado as $key => $val)
+                    Str::startsWith($val->indice, $texto->indice) ? array_push($textos, $val) : null;       
+            else
+                array_push($textos, $texto);
+        }
+
+        return [
+            'resultado' => $resultado,
+            'textos' => $textos
+        ];
+    }
+
+    public function buscar($tipo_doc, $busca)
+    {
+        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
+        $textos = array();
+
+        if(isset($busca))
+        {
+            $busca = $resultado->filter(function ($value, $key) use($busca) {
+                $conteudo = strip_tags($value->conteudo);
+                $conteudo = stripos($conteudo, htmlentities($busca, ENT_NOQUOTES, 'UTF-8')) !== false;
+                $titulo = stripos($value->texto_tipo, $busca) !== false;
+                return $conteudo || $titulo;
+            });
+        }else
+            $busca = collect();
+
+        return [
+            'resultado' => $resultado,
+            'busca' => $busca
+        ];
+    }
+}

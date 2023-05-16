@@ -66,7 +66,7 @@
           <label for="buscaTextoSumario" class="mb-2 mr-sm-2">Buscar:</label>
           <input type="text"
             name="busca"
-            class="form-control col mb-2 mr-sm-2"
+            class="form-control col mb-2 mr-sm-2 {{ $errors->has('busca') ? 'is-invalid' : '' }}"
             placeholder="Palavra chave"
             id="buscaTextoSumario"
             value="{{ request()->query('busca') }}"
@@ -74,6 +74,11 @@
           <button type="submit" class="btn btn-sm btn-primary mb-2">
             <i class="fas fa-search"></i>
           </button>
+          @if($errors->has('busca'))
+            <div class="invalid-feedback">
+              {{ $errors->first('busca') }}
+            </div>
+          @endif
         </form>
 
         <hr />
@@ -99,12 +104,23 @@
         <!-- RESULTADO TEXTO SELECIONADO *********************************************************************************************************** -->
         @if(isset($textos))
           @foreach($textos as $t)
-            @if($t->tipo == 'Título')
-            <p><strong>{{ isset($t->indice) ? $t->indice . '. ' : '' }}{{ $t->texto_tipo }}</strong></p>
-            @else
-            <p><strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
-            @endif
-            {!! $t->conteudo !!}
+              @switch($t->nivel)
+                @case(1)
+                  <p>&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+                  <div class="pl-3">{!! $t->conteudo !!}</div>
+                  @break
+                @case(2)
+                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+                  <div class="pl-4">{!! $t->conteudo !!}</div>
+                  @break
+                @case(3)
+                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+                  <div class="pl-5">{!! $t->conteudo !!}</div>
+                  @break
+                @default
+                  <p><strong>{{ isset($t->indice) ? $t->indice . '. ' : '' }}{{ $t->texto_tipo }}</strong></p>
+                  <div class="pl-0">{!! $t->conteudo !!}</div>
+              @endswitch
           @endforeach
         @endif
 

@@ -3,109 +3,88 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\GerarTexto;
+use App\Http\Requests\GerarTextoRequest;
 use Illuminate\Support\Str;
+use App\Contracts\MediadorServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class GerarTextoController extends Controller
 {
-    public function __construct()
+    public function __construct(MediadorServiceInterface $service)
     {
         $this->middleware('auth', ['except' => ['show', 'buscar']]);
+        $this->service = $service;
     }
     
     public function create($tipo_doc)
     {
-        $total = GerarTexto::count() + 1;
-        $texto = GerarTexto::create([
-            'texto_tipo' => mb_strtoupper('Título do texto...', 'UTF-8'),
-            'ordem' => $total,
-            'tipo_doc' => $tipo_doc,
-        ]);
+        // $this->authorize('updateOther', auth()->user());
 
-        return response()->json($texto);
+        try{
+            $texto = $this->service->getService('GerarTexto')->criar($tipo_doc);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao criar o texto do documento ".$tipo_doc.".");
+        }
+
+        return redirect()->route('textos.view', $tipo_doc)
+            ->with('message', '<i class="icon fa fa-check"></i>Novo texto com o título: "'.$texto->texto_tipo.'" foi criado com sucesso e inserido no final do documento!')
+            ->with('class', 'alert-success');
     }
 
-    public function updateCampos($tipo_doc, $id, Request $request)
+    public function updateCampos($tipo_doc, $id, GerarTextoRequest $request)
     {
-        // atualiza os campos, não atualiza ordem e indice
-        $dados = $request->except(['_token', '_method']);
-        $dados['texto_tipo'] = mb_strtoupper($dados['texto_tipo'], 'UTF-8');
-        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail();
+        // $this->authorize('updateOther', auth()->user());
 
-        $ok = $resultado->update($dados);
+        try{
+            $dados = $request->validated();
+            $ok = $this->service->getService('GerarTexto')->update($tipo_doc, $dados, $id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao atualizar os campos do texto do documento ".$tipo_doc.".");
+        }
 
         return response()->json($ok);
     }
 
     public function delete($tipo_doc, $id)
     {
-        $ok = GerarTexto::where('tipo_doc', $tipo_doc)->where('id', $id)->firstOrFail()->delete();
+        // $this->authorize('updateOther', auth()->user());
+
+        try{
+            $ok = $this->service->getService('GerarTexto')->excluir($tipo_doc, $id);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao excluir o texto do documento ".$tipo_doc.".");
+        }
 
         return response()->json($ok);
     }
 
     public function view($tipo_doc)
     {
-        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get();
-        $variaveis = [
-            'singular' => 'texto',
-            'singulariza' => 'o texto',
-            'plural' => 'texto',
-            'pluraliza' => 'texto',
-            'form' => 'texto'
-        ];
-        $variaveis = (object) $variaveis;
+        // $this->authorize('viewAny', auth()->user());
 
-        return view('admin.crud.editar', compact('resultado', 'variaveis'));
+        try{
+            $dados = $this->service->getService('GerarTexto')->view($tipo_doc);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os textos de ".$tipo_doc.".");
+        }
+
+        return view('admin.crud.editar', $dados);
     }
 
     public function update($tipo_doc, Request $request)
     {
-        // Somente atualiza ordem e indice
+        // $this->authorize('updateOther', auth()->user());
 
-        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->orderBy('ordem','ASC')->get();
-        $array = $request->except(['_token', '_method']);
-
-        $chunk = array_chunk($array, 2, true);
-        $indice = '0';
-
-        foreach($chunk as $key => $valor)
-        {
-            $ordem = $key + 1;
-            $indice_array = explode('.', $indice);
-            $id = apenasNumeros(array_keys($valor)[0]);
-            $nivel = $valor['nivel-' . $id];
-            $com_num = $valor['com_numeracao-' . $id];
-
-            if($com_num)
-            {
-                if($nivel == 0)
-                {
-                    $indice = (int) substr($indice, 0, $indice_array[0]);
-                    $indice++;
-                    $indice = (string) $indice;
-                }
-                else{
-                    $total = substr_count($indice, '.');
-                    if($total < $nivel)
-                        $indice .= '.1';
-                    elseif($total >= $nivel)
-                    {
-                        $temp = (int) $indice_array[$nivel];
-                        $temp++;
-                        $indice_array[$nivel] = $temp;
-                        foreach($indice_array as $key => $val)
-                            if($key > $nivel)
-                                unset($indice_array[$key]);
-                        $indice = implode('.', $indice_array);
-                    }
-                }
-            }
-
-            $resultado->find($id)->update([
-                'ordem' => $ordem,
-                'indice' => $com_num ? $indice : null,
-            ]);
+        try{
+            $dados = $request->except(['_token', '_method']);
+            $this->service->getService('GerarTexto')->update($tipo_doc, $dados);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao atualizar a índice do documento ".$tipo_doc.".");
         }
         
         return redirect()->route('textos.view', $tipo_doc)
@@ -113,55 +92,55 @@ class GerarTextoController extends Controller
             ->with('class', 'alert-success');
     }
 
-    public function publicar($tipo_doc, Request $request)
+    public function publicar($tipo_doc, GerarTextoRequest $request)
     {
-        $ok = GerarTexto::where('tipo_doc', $tipo_doc)->update([
-            'publicar' => $request->input('publicar')
-        ]);
+        // $this->authorize('updateOther', auth()->user());
 
-        return response()->json($ok);
+        try{
+            $publicar = $request->validated()['publicar'];
+            $this->service->getService('GerarTexto')->publicar($tipo_doc, $publicar);
+            $texto = !$publicar ? 'Foi revertida a publicação no site' : 'Foi publicada no site';
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao atualizar o status de publicação do documento ".$tipo_doc.".");
+        }
+
+        return redirect()->route('textos.view', $tipo_doc)
+            ->with('message', '<i class="icon fa fa-check"></i>'.$texto.' com sucesso!')
+            ->with('class', 'alert-success');
     }
 
     public function show($id = null)
     {
-        $tipo_doc = \Route::currentRouteName();
-        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
-        $textos = array();
-        if(isset($id))
-        {
-            $teste = $resultado->find($id);
-            if($teste->tipo == 'Título' && $teste->com_numeracao)
-                foreach($resultado as $key => $val)
-                    Str::startsWith($val->indice, $teste->indice) ? array_push($textos, $val) : null;       
-            else
-                array_push($textos, $teste);
+        try{
+            $tipo_doc = \Route::currentRouteName();
+            $dados = $this->service->getService('GerarTexto')->show($tipo_doc, $id);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().', para o documento '.$tipo_doc.'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, "Texto não encontrado.");
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os textos do documento ".$tipo_doc.".");
         }
-
+        
         return response()
-            ->view('site.'.$tipo_doc, compact('resultado', 'textos'))
+            ->view('site.'.$tipo_doc, $dados)
             ->header('Cache-Control','no-cache');
     }
 
-    public function buscar(Request $request)
+    public function buscar(GerarTextoRequest $request)
     {
-        $tipo_doc = Str::beforeLast(\Route::currentRouteName(), '-buscar');
-        $busca = $request->only('busca')['busca'];
-        $resultado = GerarTexto::where('tipo_doc', $tipo_doc)->where('publicar', true)->orderBy('ordem','ASC')->get();
-        $textos = array();
-
-        if(isset($busca))
-        {
-            $busca = $resultado->filter(function ($value, $key) use($busca) {
-                $conteudo = strip_tags($value->conteudo);
-                $conteudo = stripos($conteudo, htmlentities($busca, ENT_NOQUOTES, 'UTF-8')) !== false;
-                $titulo = stripos($value->texto_tipo, $busca) !== false;
-                return $conteudo || $titulo;
-            });
-        }else
-            $busca = collect();
+        try{
+            $busca = $request->validated()['busca'];
+            $tipo_doc = Str::beforeLast(\Route::currentRouteName(), '-buscar');
+            $dados = $this->service->getService('GerarTexto')->buscar($tipo_doc, $busca);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao buscar textos no documento ".$tipo_doc.".");
+        }
 
         return response()
-            ->view('site.'.$tipo_doc, compact('resultado', 'busca'))
+            ->view('site.'.$tipo_doc, $dados)
             ->header('Cache-Control','no-cache');
     }
 }

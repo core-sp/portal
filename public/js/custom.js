@@ -420,83 +420,149 @@ $("#logout-interno").click(function(){
 	$(form).submit();
 });
 
-// GerarTexto
-$("#criarTexto").click(function(){
-	var token = $('meta[name="csrf-token"]').attr('content');
-  var id = this.value;
-	$.ajax({
-      url: '/admin/textos/' + $('#tipo_doc').val(),
-      method: 'POST',
-      data: {
-        _token: token,
-      },
-      success: function(response) {
-        location.reload(true);
-        alert('Texto criado!');
-      },
-      error: function() {
-      }
-  });
-});
+// Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-$(".updateCampos").click(function(){
-	var token = $('meta[name="csrf-token"]').attr('content');
-  var id = this.value;
-	$.ajax({
-      url: '/admin/textos/' + $('#tipo_doc').val() + '/' + id,
-      method: 'POST',
-      data: {
+function crudGerarTexto(acao, objeto){
+
+  $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: false});
+  var token = $('meta[name="csrf-token"]').attr('content');
+  var id = $(objeto).val();
+  var link = '/admin/textos/' + $('#tipo_doc').val() + '/' + id;
+  var metodo = '';
+  var dados = '';
+
+  switch(acao) {
+    case 'atualizar':
+      metodo = 'POST';
+      dados = {
         _token: token,
         tipo: $('#tipo-' + id).val(),
         texto_tipo: $('#texto_tipo-' + id).val(),
         com_numeracao: $('#com_numeracao-' + id).val(),
         nivel: $('#nivel-' + id).val(),
         conteudo: tinymce.get('conteudo-' + id).getContent(),
-      },
-      success: function(response) {
-        if(response == 1)
-          alert("Atualizou!!!");
-      },
-      error: function() {
       }
-  });
-});
+      break;
+    case 'excluir':
+      metodo = 'DELETE';
+      dados = {_token: token};
+      break;
+  }
 
-$(".deleteTexto").click(function(){
-	var token = $('meta[name="csrf-token"]').attr('content');
-  var id = this.value;
 	$.ajax({
-      url: '/admin/textos/' + $('#tipo_doc').val() + '/' + id,
-      method: 'DELETE',
-      data: {
-        _token: token,
-      },
+      url: link,
+      method: metodo,
+      dataType: "json",
+      data: dados,
       success: function(response) {
-        if(response == 1)
-          $('#lista-' + id).remove();
+          gerarTextoAvisosCrud(acao, response, id);          
       },
-      error: function() {
+      error: function(erro, textStatus, errorThrown) {
+        gerarTextoAvisosCrud('erro', JSON.stringify(erro.responseJSON.errors), null);
       }
   });
+}
+
+function gerarTextoAvisosCrud(acao, response, valor){
+  var texto = '';
+  var title = acao == 'erro' ? '<i class="fas fa-times" style="color: #e70d0d;"></i> Erro de validação!' : 
+  '<i class="fas fa-check-circle" style="color: #40c011;"></i> Sucesso!';
+
+  if(acao == 'excluir')
+    texto = 'Texto foi excluído com sucesso!';
+  else if(acao == 'atualizar')
+    texto = 'Campos do texto foram atualizados!';
+  else if(acao == 'erro')
+    texto = response;
+
+  if((acao == 'excluir') && (response == 1))
+    $('#lista-' + valor).remove();
+
+  if((acao == 'erro') || (response == 1)){
+    $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
+    $('#avisoTextos .modal-title')
+      .html(title);
+		$('#avisoTextos .modal-body')
+			.html(texto);
+		$('#avisoTextos .modal-footer').hide();
+    return;
+  }
+
+  if((acao == 'excluir') && (response == null)){
+    $('#avisoTextos').modal({backdrop: 'static', keyboard: false, show: true});
+    $('#avisoTextos .modal-title')
+      .html('<i class="fas fa-trash" style="color: #dc0909;"></i> Excluir');
+		$('#avisoTextos .modal-body')
+			.html('Tem certeza que deseja excluir este texto?<br>Esta ação não é reversível!');
+    $('#avisoTextos .modal-footer #excluirTexto').val(valor);
+		$('#avisoTextos .modal-footer').show();
+    return;
+  }
+}
+
+function hideShowOptions(objeto, id){
+  if(objeto.val() == 'Título'){
+    $('#nivel-' + id + ' option').hide();
+    $('#nivel-' + id + ' option').each(function(){
+      if($(this).val() == '0')
+        $(this).show();
+    });
+    $('#nivel-' + id)[0].selectedIndex = 0;
+    $('#com_numeracao-' + id + ' option').hide();
+    $('#com_numeracao-' + id + ' option').each(function(){
+        $(this).show();
+    });
+    if(!$('#texto_tipo-' + id).hasClass('text-uppercase'))
+      $('#texto_tipo-' + id).addClass('text-uppercase');
+  }else{
+    $('#nivel-' + id + ' option').show();
+    $('#nivel-' + id + ' option').each(function(){
+      if($(this).val() == '0')
+        $(this).hide();
+    });
+    $('#nivel-' + id)[0].selectedIndex = 1;
+    $('#com_numeracao-' + id + ' option').each(function(){
+      if($(this).val() == '0')
+        $(this).hide();
+    });
+    $('#com_numeracao-' + id)[0].selectedIndex = 0;
+    if($('#texto_tipo-' + id).hasClass('text-uppercase'))
+      $('#texto_tipo-' + id).removeClass('text-uppercase');
+  }
+}
+
+$("#criarTexto").click(function(){
+	var token = $('meta[name="csrf-token"]').attr('content');
+	var link = '/admin/textos/' + $('#tipo_doc').val();
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"></form>');
+	$('body').append(form);
+	$(form).submit();
 });
 
 $("#publicarTexto").click(function(){
-	var token = $('meta[name="csrf-token"]').attr('content');
-  var publicacao = $(this).val() == '0' ? ' não' : '';
-	$.ajax({
-      url: '/admin/textos/publicar/' + $('#tipo_doc').val(),
-      method: 'POST',
-      data: {
-        _token: token,
-        publicar: $(this).val()
-      },
-      success: function(response) {
-        if(response > 0){
-          location.reload(true);
-          alert('Textos' + publicacao + ' foram publicados!');
-        }
-      },
-      error: function() {
-      }
-  });
+  var token = $('meta[name="csrf-token"]').attr('content');
+	var link = '/admin/textos/publicar/' + $('#tipo_doc').val();
+	var form = $('<form action="' + link + '" method="POST"><input type="hidden" name="_token" value="' + token + '"><input type="hidden" name="publicar" value="' + $(this).val() + '"></form>');
+	$('body').append(form);
+	$(form).submit();
 });
+
+$(".updateCampos").click(function(){
+	crudGerarTexto('atualizar', $(this));
+});
+
+$(".deleteTexto").click(function(){
+  if($(".deleteTexto").length > 1)
+	  gerarTextoAvisosCrud('excluir', null, $(this).val());
+});
+
+$("#excluirTexto").click(function(){
+	crudGerarTexto('excluir', $(this));
+});
+
+$(".textoTipo").change(function(){
+	var id = $(this).attr('id').replace(/[^0-9]/g,'');
+  hideShowOptions($(this), id);
+});
+
+// FIM da Funcionalidade GerarTexto ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
