@@ -35,9 +35,11 @@
             <i>* Arraste as caixas para definir a ordem da índice<br></i>
         </p>
 
-        <input type="hidden" id="tipo_doc" value="{{ $texto->tipo_doc }}" />
+        <input type="hidden" id="tipo_doc" value="{{ $tipo_doc }}" />
         <div id="accordion" class="mb-0 pl-0">
+            @can('gerarTextoUpdate', auth()->user())
             <button type="button" id="criarTexto" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Texto</button>
+            @endcan
 
             @foreach($resultado as $texto)
             <div class="row homeimagens" id="lista-{{ $texto->id }}">
@@ -102,12 +104,14 @@
 
                         </div>
 
+                        @can('gerarTextoUpdate', auth()->user())
                         <div class="card-footer">
                             <div class="float-right">
                                 <button type="button" value="{{ $texto->id }}" class="btn btn-primary updateCampos">Atualizar campos</button>
                                 <button type="button" value="{{ $texto->id }}" class="btn btn-danger deleteTexto"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
+                        @endcan
 
                     </div>
                 </div>
@@ -121,9 +125,15 @@
     <div class="card-footer">
         <div class="float-right">
             <a href="/admin" class="btn btn-default">Cancelar</a>
-            <a href="{{ route($resultado->get(0)->tipo_doc) }}" target="_blank" class="btn btn-secondary ml-1">Ver</a>
-            <button type="submit" class="btn btn-primary ml-1">Atualizar índice</button>
-            <button type="button" id="publicarTexto" value="{{ $resultado->get(0)->publicar ? '0' : '1' }}" class="btn btn-{{ $resultado->get(0)->publicar ? 'danger' : 'success' }} ml-1">{{ $texto->publicar ? 'Reverter publicação' : 'Publicar' }}</button>
+            <a href="{{ route($tipo_doc) }}" target="_blank" class="btn btn-secondary ml-1">Ver</a>
+
+            @if(isset($resultado) && isset($texto))
+                @can('gerarTextoUpdate', auth()->user())
+                <button type="submit" class="btn btn-primary ml-1">Atualizar índice</button>
+                <button type="button" id="publicarTexto" value="{{ $resultado->get(0)->publicar ? '0' : '1' }}" class="btn btn-{{ $resultado->get(0)->publicar ? 'danger' : 'success' }} ml-1">{{ $texto->publicar ? 'Reverter publicação' : 'Publicar' }}</button>
+                @endcan
+            @endif
+
         </div>
     </div>
 </form>

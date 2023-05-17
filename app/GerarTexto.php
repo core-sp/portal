@@ -27,7 +27,8 @@ class GerarTexto extends Model
     public static function criar($tipo_doc)
     {
         $total = GerarTexto::where('tipo_doc', $tipo_doc)->count() + 1;
-        $publicada = GerarTexto::select('publicar')->where('tipo_doc', $tipo_doc)->first()->publicar;
+        $publicada = $total > 1 ? GerarTexto::select('publicar')->where('tipo_doc', $tipo_doc)->first()->publicar : false;
+
         return GerarTexto::create([
             'texto_tipo' => mb_strtoupper('Título do texto...', 'UTF-8'),
             'conteudo' => '<p>Texto...</p>',
@@ -86,5 +87,10 @@ class GerarTexto extends Model
                 ]);
             }
         }
+    }
+
+    public function getCorTituloSub()
+    {
+        return 'style="color: #548dd4;"';
     }
 }

@@ -458,14 +458,16 @@ function crudGerarTexto(acao, objeto){
           gerarTextoAvisosCrud(acao, response, id);          
       },
       error: function(erro, textStatus, errorThrown) {
-        gerarTextoAvisosCrud('erro', JSON.stringify(erro.responseJSON.errors), null);
+        var resposta = erro.status == 422 ? JSON.stringify(erro.responseJSON.errors) : 
+        'Código: ' + erro.status + ' | Mensagem: ' + erro.responseJSON.message;
+        gerarTextoAvisosCrud('erro', resposta, null);
       }
   });
 }
 
 function gerarTextoAvisosCrud(acao, response, valor){
   var texto = '';
-  var title = acao == 'erro' ? '<i class="fas fa-times" style="color: #e70d0d;"></i> Erro de validação!' : 
+  var title = acao == 'erro' ? '<i class="fas fa-times" style="color: #e70d0d;"></i> Erro!' : 
   '<i class="fas fa-check-circle" style="color: #40c011;"></i> Sucesso!';
 
   if(acao == 'excluir')

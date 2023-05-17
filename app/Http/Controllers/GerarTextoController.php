@@ -18,7 +18,7 @@ class GerarTextoController extends Controller
     
     public function create($tipo_doc)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('gerarTextoUpdate', auth()->user());
 
         try{
             $texto = $this->service->getService('GerarTexto')->criar($tipo_doc);
@@ -34,7 +34,7 @@ class GerarTextoController extends Controller
 
     public function updateCampos($tipo_doc, $id, GerarTextoRequest $request)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('gerarTextoUpdate', auth()->user());
 
         try{
             $dados = $request->validated();
@@ -49,7 +49,7 @@ class GerarTextoController extends Controller
 
     public function delete($tipo_doc, $id)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('gerarTextoUpdate', auth()->user());
 
         try{
             $ok = $this->service->getService('GerarTexto')->excluir($tipo_doc, $id);
@@ -63,10 +63,11 @@ class GerarTextoController extends Controller
 
     public function view($tipo_doc)
     {
-        // $this->authorize('viewAny', auth()->user());
+        $this->authorize('gerarTextoView', auth()->user());
 
         try{
             $dados = $this->service->getService('GerarTexto')->view($tipo_doc);
+            $dados['tipo_doc'] = $tipo_doc;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os textos de ".$tipo_doc.".");
@@ -77,7 +78,7 @@ class GerarTextoController extends Controller
 
     public function update($tipo_doc, Request $request)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('gerarTextoUpdate', auth()->user());
 
         try{
             $dados = $request->except(['_token', '_method']);
@@ -94,7 +95,7 @@ class GerarTextoController extends Controller
 
     public function publicar($tipo_doc, GerarTextoRequest $request)
     {
-        // $this->authorize('updateOther', auth()->user());
+        $this->authorize('gerarTextoUpdate', auth()->user());
 
         try{
             $publicar = $request->validated()['publicar'];

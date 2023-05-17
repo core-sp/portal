@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Support\Str;
 
 class UserPolicy
 {
@@ -58,5 +59,21 @@ class UserPolicy
     public function atendenteOrGerSeccionais(User $user)
     {
         return $user->idperfil == 8 || $user->idperfil == 21;
+    }
+
+    public function gerarTextoView(User $user)
+    {
+        $tipo = ucfirst(Str::camel(request()->tipo_doc));
+
+        if(class_basename(\Route::current()->controller) == 'GerarTextoController')
+            return true/*perfisPermitidos($tipo, 'index')*/;
+    }
+
+    public function gerarTextoUpdate(User $user)
+    {
+        $tipo = ucfirst(Str::camel(request()->tipo_doc));
+
+        if(class_basename(\Route::current()->controller) == 'GerarTextoController')
+            return true/*perfisPermitidos($tipo, 'edit')*/;
     }
 }

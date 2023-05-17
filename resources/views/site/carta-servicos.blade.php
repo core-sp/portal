@@ -106,19 +106,19 @@
           @foreach($textos as $t)
               @switch($t->nivel)
                 @case(1)
-                  <p>&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+                  <p {!! $texto->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
                   <div class="pl-3">{!! $t->conteudo !!}</div>
                   @break
                 @case(2)
-                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+                  <p {!! $texto->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
                   <div class="pl-4">{!! $t->conteudo !!}</div>
                   @break
                 @case(3)
-                  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
+                  <p {!! $texto->getCorTituloSub() !!}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>{{ $t->indice }} - {{ $t->texto_tipo }}</strong></p>
                   <div class="pl-5">{!! $t->conteudo !!}</div>
                   @break
                 @default
-                  <p><strong>{{ isset($t->indice) ? $t->indice . '. ' : '' }}{{ $t->texto_tipo }}</strong></p>
+                  <p class="font-weight-bolder" {!! $texto->getCorTituloSub() !!}>{{ isset($t->indice) ? $t->indice . '. ' : '' }}{{ $t->texto_tipo }}</p>
                   <div class="pl-0">{!! $t->conteudo !!}</div>
               @endswitch
           @endforeach

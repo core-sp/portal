@@ -36,6 +36,7 @@ class Permissao extends Model
             'SolicitaCedulaController' => 'Representante - Cédula',
             'PlantaoJuridicoController' => 'Plantão Jurídico',
             'PlantaoJuridicoBloqueioController' => 'Plantão Jurídico Bloqueio',
+            // 'CartaServicos' => 'Carta de Serviços',
         ];
     }
 }
