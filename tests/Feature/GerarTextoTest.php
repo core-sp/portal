@@ -373,6 +373,19 @@ class GerarTextoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_be_published_with_publicar_not_boolean()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 2)->create();
+
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
+        $this->post(route('textos.publicar', $textos->get(0)->tipo_doc), ['publicar' => 3])
+        ->assertSessionHasErrors([
+            'publicar'
+        ]);
+    }
+
+    /** @test */
     public function show_on_portal_after_published()
     {
         $user = $this->signInAsAdmin();
@@ -540,10 +553,226 @@ class GerarTextoTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function view_sumario_after_updated_indice()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 5)
+        ->create()
+        ->each(function ($texto) {
+            if(($texto->id > 1) && ($texto->id < 4))
+                $texto->update([
+                    'tipo' => 'Subtítulo',
+                    'nivel' => 1,
+                    'com_numeracao' => 1
+                ]);
+            elseif($texto->id == 4)
+                $texto->update([
+                    'tipo' => 'Subtítulo',
+                    'nivel' => 3,
+                    'com_numeracao' => 1
+                ]);
+        });
+
+        $dados = array();
+        foreach($textos as $key => $val)
+            $dados['id-'.$val->id] = $val->id;
+
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
+        $this->put(route('textos.update.indice', $textos->get(0)->tipo_doc), array_reverse($dados));
+
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))
+        ->assertSeeTextInOrder([
+            'Sumário:',
+            GerarTexto::where('ordem', 1)->first()->indice,
+            GerarTexto::where('ordem', 2)->first()->indice,
+            GerarTexto::where('ordem', 3)->first()->indice,
+            GerarTexto::where('ordem', 4)->first()->indice,
+            GerarTexto::where('ordem', 5)->first()->indice,
+        ]);
+    }
+
+    /** @test */
+    public function cannot_view_sumario_after_updated_indice_with_ids_invalid()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 5)->create();
+
+        $dados = array();
+        for($cont = 20; $cont < 26; $cont++)
+            $dados['id-'.$cont] = $cont;
+
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))->assertOk();
+        $this->put(route('textos.update.indice', $textos->get(0)->tipo_doc), array_reverse($dados));
+
+        $this->get(route('textos.view', $textos->get(0)->tipo_doc))
+        ->assertDontSee('<p>&nbsp;&nbsp;&nbsp;<strong>'.GerarTexto::where('ordem', 1)->first()->indice.' - '.GerarTexto::where('ordem', 1)->first()->texto_tipo.'</strong></p>');
+    }
+
     /** 
      * =======================================================================================================
      * TESTES NO PORTAL
      * =======================================================================================================
      */
 
+    /** @test */
+    public function cannot_view_sumario_on_portal_when_not_published()
+    {
+        $textos = factory('App\GerarTexto', 5)->create();
+
+        $this->get(route($textos->get(0)->tipo_doc))
+        ->assertDontSee('<label for="textosSumario">Sumário:</label>')
+        ->assertSee('<strong>Ainda não consta a publicação atual.</strong>');
+
+        $this->get(route($textos->get(0)->tipo_doc, $textos->get(0)->id))
+        ->assertStatus(404);
+    }
+
+    /** @test */
+    public function cannot_view_content_sumario_on_portal_when_not_published()
+    {
+        $textos = factory('App\GerarTexto', 5)->create();
+
+        $this->get(route($textos->get(0)->tipo_doc, $textos->get(0)->id))
+        ->assertStatus(404);
+    }
+
+    /** @test */
+    public function can_view_sumario_on_portal_when_published()
+    {
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc))
+        ->assertDontSee('<strong>Ainda não consta a publicação atual.</strong>')
+        ->assertSee('<option value="'.$textos->get(0)->id.'">'.$textos->get(0)->indice.'. '.$textos->get(0)->texto_tipo.'</option>')
+        ->assertSee('<option value="'.$textos->get(1)->id.'" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(1)->indice.' - '.$textos->get(1)->texto_tipo.'</option>')
+        ->assertSee('<option value="'.$textos->get(2)->id.'" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(2)->indice.' - '.$textos->get(2)->texto_tipo.'</option>')
+        ->assertSee('<option value="'.$textos->get(3)->id.'" style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$textos->get(3)->indice.' - '.$textos->get(3)->texto_tipo.'</option>')
+        ->assertSee('<option value="'.$textos->get(4)->id.'">'.$textos->get(4)->texto_tipo.'</option>');
+    }
+
+    /** @test */
+    public function can_view_content_sumario_on_portal_when_published()
+    {
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc, $textos->get(3)->id))
+        ->assertSeeText($textos->get(3)->conteudo);
+    }
+
+    /** @test */
+    public function can_view_titulo_with_subtitulo()
+    {
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc, $textos->get(0)->id))
+        ->assertSeeTextInOrder([
+            $textos->get(0)->conteudo,
+            $textos->get(1)->conteudo,
+            $textos->get(2)->conteudo,
+            $textos->get(3)->conteudo,
+        ]);
+    }
+
+    /** @test */
+    public function cannot_view_texto_when_not_find()
+    {
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc, 22))
+        ->assertStatus(404);
+    }
+
+    /** @test */
+    public function can_view_search_bar_when_published()
+    {
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc))
+        ->assertSee('<label for="buscaTextoSumario" class="mb-2 mr-sm-2">Buscar:</label>')
+        ->assertSee('name="buscaTexto"')
+        ->assertSee('<button type="submit" class="btn btn-sm btn-primary mb-2">');
+    }
+
+    /** @test */
+    public function cannot_view_search_bar_when_not_published()
+    {
+        $textos = factory('App\GerarTexto', 5)->create();
+
+        $this->get(route($textos->get(0)->tipo_doc))
+        ->assertDontSee('<label for="buscaTextoSumario" class="mb-2 mr-sm-2">Buscar:</label>')
+        ->assertDontSee('name="buscaTexto"')
+        ->assertDontSee('<button type="submit" class="btn btn-sm btn-primary mb-2">');
+    }
+
+    /** @test */
+    public function cannot_search_when_not_published()
+    {
+        $textos = factory('App\GerarTexto', 5)->create();
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => $textos->get(0)->texto_tipo
+            ]))
+            ->assertSee('<strong>Ainda não consta a publicação atual.</strong>');
+    }
+
+    /** @test */
+    public function can_search_when_published()
+    {
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => $textos->get(0)->texto_tipo
+        ]))
+        ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(0)->texto_tipo.'</strong>')
+        ->assertSee('<div class="list-group list-group-flush">')
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(0)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(0)->indice.'. '.$textos->get(0)->texto_tipo.'</strong></a>');
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => $textos->get(1)->texto_tipo
+        ]))
+        ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(1)->texto_tipo.'</strong>')
+        ->assertSee('<div class="list-group list-group-flush">')
+        ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->indice.' - '.$textos->get(1)->texto_tipo.'</strong></a>');
+    }
+
+    /** @test */
+    public function cannot_search_when_published_with_busca_texto_null()
+    {
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => ''
+        ]))
+        ->assertSessionHasErrors([
+            'buscaTexto'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_search_when_published_with_busca_texto_less_than_3_chars()
+    {
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => 'Te'
+        ]))
+        ->assertSessionHasErrors([
+            'buscaTexto'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_search_when_published_with_busca_texto_more_than_191_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $textos = factory('App\GerarTexto', 5)->states('sumario_publicado')->create();
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => $faker->sentence(400)
+        ]))
+        ->assertSessionHasErrors([
+            'buscaTexto'
+        ]);
+    }
 }

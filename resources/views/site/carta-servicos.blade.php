@@ -32,18 +32,19 @@
     <div class="linha-lg"></div>
     <div class="row mt-2">
 	    <div class="col-lg conteudo-txt pr-4">
-        O ano foi de muito trabalho e novidades no Core-SP. Nosso portal ganhou um visual contemporâneo e conta com notícias sobre tudo o que importa para o representante desempenhar suas funções com maestria; novos meios de pagamento da anuidade, via maquininha do cartão ou impressão de boletos para a quitação antecipada; a criação da Área Restrita, onde é possível atualizar seu cadastro e ficar a par, tanto  dos pagamentos pendentes quanto daqueles que já foram feitos.
-        <br>
-        Dezembro chegou, mas as inovações e a atenção que damos a você não podem parar. Por isso, lançamos a nova Carta de serviços ao Usuário. No texto, estão dispostos, detalhadamente, todos os serviços oferecidos a quem procura o Conselho Regional dos Representantes Comerciais no Estado de São Paulo (CORE-SP), além uma Pesquisa de Satisfação – que visa amplificar a sua voz, representante. Afinal, é dessa troca de ideias que nascem as iniciativas para  que possamos atendê-lo da melhor maneira possível.
-        <br>
-        Aproveite também para registrar suas impressões a respeito do nosso trabalho e dos procedimentos envolvidos na execução dele. É por você, e pra você que estamos aqui.
+        <p>
+          O ano foi de muito trabalho e novidades no Core-SP. Nosso portal ganhou um visual contemporâneo e conta com notícias sobre tudo o que importa para o representante desempenhar suas funções com maestria; novos meios de pagamento da anuidade, via maquininha do cartão ou impressão de boletos para a quitação antecipada; a criação da Área Restrita, onde é possível atualizar seu cadastro e ficar a par, tanto  dos pagamentos pendentes quanto daqueles que já foram feitos.
+        </p>
+        <p>
+          Dezembro chegou, mas as inovações e a atenção que damos a você não podem parar. Por isso, <strong>lançamos a nova Carta de serviços ao Usuário</strong>. No texto, estão dispostos, detalhadamente, todos os serviços oferecidos a quem procura o Conselho Regional dos Representantes Comerciais no Estado de São Paulo (CORE-SP), além uma Pesquisa de Satisfação – que visa amplificar a sua voz, representante. Afinal, é dessa troca de ideias que nascem as iniciativas para  que possamos atendê-lo da melhor maneira possível.
+        </p>
         
         @if(!isset($resultado) || $resultado->isEmpty())
-        <br><br>
-        <strong>Ainda não consta a publicação atual.</strong>
+        <p><strong>Ainda não consta a publicação atual.</strong></p>
         @else
-
-        <br><br>
+        <p>
+          Clique no sumário abaixo e acesse o documento. Aproveite  também para registrar suas impressões a respeito do nosso trabalho e dos procedimentos envolvidos na execução dele. É por você, e pra você que estamos aqui.
+        </p>
 
         <!-- SUMÁRIO *********************************************************************************************************** -->
         <label for="textosSumario">Sumário:</label>
@@ -65,27 +66,26 @@
         <form method="GET" class="form-inline mt-2" action="{{ route('carta-servicos-buscar') }}">
           <label for="buscaTextoSumario" class="mb-2 mr-sm-2">Buscar:</label>
           <input type="text"
-            name="busca"
-            class="form-control col mb-2 mr-sm-2 {{ $errors->has('busca') ? 'is-invalid' : '' }}"
+            name="buscaTexto"
+            class="form-control col mb-2 mr-sm-2 {{ $errors->has('buscaTexto') ? 'is-invalid' : '' }}"
             placeholder="Palavra chave"
             id="buscaTextoSumario"
-            value="{{ request()->query('busca') }}"
+            value="{{ request()->query('buscaTexto') }}"
           />
           <button type="submit" class="btn btn-sm btn-primary mb-2">
             <i class="fas fa-search"></i>
           </button>
-          @if($errors->has('busca'))
+          @if($errors->has('buscaTexto'))
             <div class="invalid-feedback">
-              {{ $errors->first('busca') }}
+              {{ $errors->first('buscaTexto') }}
             </div>
           @endif
         </form>
-
-        <hr />
         
         <!-- RESULTADO BUSCA *********************************************************************************************************** -->
         @if(isset($busca))
-          <p class="light">Busca por: <strong>{{ request()->query('busca') }}</strong>
+          <hr />
+          <p class="light">Busca por: <strong>{{ request()->query('buscaTexto') }}</strong>
               <small><i>- {{ $busca->count() === 1 ? $busca->count() . ' resultado' : $busca->count() . ' resultados' }}</i></small>
           </p>
           @if($busca->count() > 0)
@@ -102,7 +102,10 @@
         @endif
 
         <!-- RESULTADO TEXTO SELECIONADO *********************************************************************************************************** -->
-        @if(isset($textos))
+        @if(isset($textos) && !empty($textos))
+        <div class="border mt-3">
+          <div class="p-2">
+            <span id="corpoTexto" tabindex="0"></span>
           @foreach($textos as $t)
               @switch($t->nivel)
                 @case(1)
@@ -122,6 +125,9 @@
                   <div class="pl-0">{!! $t->conteudo !!}</div>
               @endswitch
           @endforeach
+          </div>
+          <img src="{{ asset('img/base_carta_servicos.png') }}" />
+        </div>
         @endif
 
       @endif

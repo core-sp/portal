@@ -41,7 +41,7 @@ class GerarTextoRequest extends FormRequest
         if(\Route::is('carta-servicos-buscar'))
         {
             return [
-                'busca' => 'required|min:3|max:191',
+                'buscaTexto' => 'required|min:3|max:191',
             ];
         }
     }
@@ -53,6 +53,7 @@ class GerarTextoRequest extends FormRequest
             'min' => 'O campo :attribute deve conter pelo menos :min caracteres',
             'max' => 'O campo :attribute excedeu o limite de :max caracteres',
             'in' => 'O campo :attribute possui valor inválido',
+            'boolean' => 'O campo :attribute possui valor inválido',
         ];
     }
 }

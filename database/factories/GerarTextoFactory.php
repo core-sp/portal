@@ -18,3 +18,38 @@ $factory->define(GerarTexto::class, function (Faker $faker) {
         'publicar' => false,
     ];
 });
+
+$factory->state(GerarTexto::class, 'sumario_publicado', [
+    'indice' => '1',
+    'publicar' => true,
+]);
+
+$factory->afterCreatingState(GerarTexto::class, 'sumario_publicado', function ($texto, $faker) {
+    if($texto->id == 2)
+        $texto->update([
+            'tipo' => GerarTexto::tipos()[1],
+            'nivel' => 1,
+            'indice' => '1.1',
+            'ordem' => 2
+        ]);
+    elseif($texto->id == 3)
+        $texto->update([
+            'tipo' => GerarTexto::tipos()[1],
+            'nivel' => 2,
+            'indice' => '1.1.1',
+            'ordem' => 3
+        ]);
+    elseif($texto->id == 4)
+        $texto->update([
+            'tipo' => GerarTexto::tipos()[1],
+            'nivel' => 3,
+            'indice' => '1.1.1.1',
+            'ordem' => 4
+        ]);
+    elseif($texto->id == 5)
+        $texto->update([
+            'com_numeracao' => false,
+            'ordem' => 6,
+            'indice' => null,
+        ]);
+});

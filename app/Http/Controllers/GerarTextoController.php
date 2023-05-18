@@ -132,7 +132,7 @@ class GerarTextoController extends Controller
     public function buscar(GerarTextoRequest $request)
     {
         try{
-            $busca = $request->validated()['busca'];
+            $busca = $request->validated()['buscaTexto'];
             $tipo_doc = Str::beforeLast(\Route::currentRouteName(), '-buscar');
             $dados = $this->service->getService('GerarTexto')->buscar($tipo_doc, $busca);
         } catch (\Exception $e) {
