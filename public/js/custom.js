@@ -115,7 +115,8 @@ $(document).ready(function(){
         header: "> div > div > h5",
         collapsible: true,
         heightStyle: "content",
-        icons: icons
+        icons: icons,
+        active: false
       })
       .sortable({
         axis: "y",

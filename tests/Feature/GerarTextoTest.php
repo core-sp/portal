@@ -306,7 +306,7 @@ class GerarTextoTest extends TestCase
     }
 
     /** @test */
-    public function texto_can_be_delete()
+    public function texto_can_be_deleted()
     {
         $user = $this->signInAsAdmin();
         $textos = factory('App\GerarTexto', 2)->create();
@@ -319,7 +319,7 @@ class GerarTextoTest extends TestCase
     }
 
     /** @test */
-    public function texto_cannot_be_delete_when_only_one()
+    public function texto_cannot_be_deleted_when_only_one()
     {
         $user = $this->signInAsAdmin();
         $texto = factory('App\GerarTexto')->create();
@@ -329,6 +329,20 @@ class GerarTextoTest extends TestCase
         ->assertJsonFragment(["Deve existir no mínimo um texto."]);
 
         $this->assertDatabaseHas('gerar_textos', $texto->toArray());
+    }
+
+    /** @test */
+    public function log_is_generated_when_texto_is_deleted()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 2)->create();
+        
+        $this->delete(route('textos.delete', [$textos->get(0)->tipo_doc, $textos->get(0)->id]));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') excluiu *o texto do documento '.$textos->get(0)->tipo_doc.'* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -346,6 +360,20 @@ class GerarTextoTest extends TestCase
     }
 
     /** @test */
+    public function log_is_generated_when_texto_is_published()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 2)->create();
+        
+        $this->post(route('textos.publicar', $textos->get(0)->tipo_doc), ['publicar' => 1]);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') publicou *os textos do documento '.$textos->get(0)->tipo_doc.'* (id: ---)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
     public function can_be_not_published()
     {
         $user = $this->signInAsAdmin();
@@ -357,6 +385,20 @@ class GerarTextoTest extends TestCase
         ->assertRedirect(route('textos.view', $textos->get(0)->tipo_doc));
 
         $this->assertDatabaseHas('gerar_textos', ['publicar' => 0]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_texto_is_not_published()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 2)->create();
+        
+        $this->post(route('textos.publicar', $textos->get(0)->tipo_doc), ['publicar' => 0]);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') reverteu publicação *os textos do documento '.$textos->get(0)->tipo_doc.'* (id: ---)';
+        $this->assertStringContainsString($txt, $log);
     }
 
     /** @test */
@@ -427,6 +469,27 @@ class GerarTextoTest extends TestCase
             'indice' => '1', 'indice' => '2', 'indice' => '3', 'indice' => '4', 'indice' => '5',
             'ordem' => '1', 'ordem' => '2', 'ordem' => '3', 'ordem' => '4', 'ordem' => '5'
         ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_sumario_is_updated()
+    {
+        $user = $this->signInAsAdmin();
+        $textos = factory('App\GerarTexto', 5)->create();
+        $dados = array();
+        foreach($textos as $key => $val)
+            $dados['id-'.$val->id] = $val->id;
+        
+        $this->put(route('textos.update.indice', $textos->get(0)->tipo_doc), array_reverse($dados));
+
+        $log = explode(PHP_EOL, tailCustom(storage_path($this->pathLogInterno()), 5));
+        foreach($log as $key => $val)
+        {
+            $id = $key + 1;
+            $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+            $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou *índice do texto do documento '.$textos->get(0)->tipo_doc.'* (id: '.$id.')';
+            $this->assertStringContainsString($txt, $val);
+        }
     }
 
     /** @test */
@@ -734,6 +797,13 @@ class GerarTextoTest extends TestCase
         ->assertSee('<p class="light">Busca por: <strong>'.$textos->get(1)->texto_tipo.'</strong>')
         ->assertSee('<div class="list-group list-group-flush">')
         ->assertSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->indice.' - '.$textos->get(1)->texto_tipo.'</strong></a>');
+
+        $this->get(route($textos->get(0)->tipo_doc . '-buscar', [
+            'buscaTexto' => 'xxxxxx'
+        ]))
+        ->assertSee('<p class="light">Busca por: <strong>xxxxxx</strong>')
+        ->assertDontSee('<div class="list-group list-group-flush">')
+        ->assertDontSee('<a href="'. route($textos->get(0)->tipo_doc, $textos->get(1)->id).'" class="list-group-item list-group-item-action"><strong>'.$textos->get(1)->indice.' - '.$textos->get(1)->texto_tipo.'</strong></a>');
     }
 
     /** @test */
