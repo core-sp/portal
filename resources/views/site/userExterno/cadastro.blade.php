@@ -63,23 +63,37 @@
                         </div>
                     </div>
                     <div class="form-row mt-2">
-                        <div class="col-sm-4 mb-2-576">
+                        <div class="col-sm mb-2-576">
                             <label for="cpf_cnpj">CPF ou CNPJ <span class="text-danger">*</span></label>
                             <input
                                 type="text"
                                 name="cpf_cnpj"
-                                class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}"
+                                class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') || $errors->has('cnpj') ? ' is-invalid' : '' }}"
                                 id="cpf_cnpj"
-                                value="{{ apenasNumeros(old('cpf_cnpj')) }}"
+                                value="{{ $errors->has('cpf_cnpj') ? apenasNumeros(old('cpf_cnpj')) : apenasNumeros(old('cnpj')) }}"
                                 placeholder="CPF ou CNPJ"
                                 required
                             >
-                            @if($errors->has('cpf_cnpj'))
+                            @if($errors->has('cpf_cnpj') || $errors->has('cnpj'))
                             <div class="invalid-feedback">
-                                {{ $errors->first('cpf_cnpj') }}
+                                {{ $errors->has('cpf_cnpj') ? $errors->first('cpf_cnpj') : $errors->first('cnpj') }}
                             </div>
                             @endif
                         </div>
+                        <div class="col-sm mb-2-576">
+                            <label for="tipo_conta">Tipo da conta <small>(opcional)</small></label>
+                            <select name="tipo_conta" class="form-control {{ $errors->has('tipo_conta') ? 'is-invalid' : '' }}" id="tipo_conta">
+                                <option value="user_externo" {{ old('tipo_conta') == 'user_externo' ? 'selected' : '' }}>Especifique o tipo de conta, se necessário...</option>
+                                <option value="contabil" {{ old('tipo_conta') == 'contabil' ? 'selected' : '' }}>Contabilidade</option>
+                            </select>
+                            @if($errors->has('tipo_conta'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('tipo_conta') }}
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="form-row mt-2">
                         <div class="col-sm mb-2-576">
                             <label for="email">Email <span class="text-danger">*</span></label>
                             <input

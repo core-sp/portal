@@ -2,15 +2,27 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Notifications\UserExternoResetPasswordNotification;
+use Carbon\Carbon;
 
-class Contabil extends Model
+class Contabil extends Authenticatable
 {
+    use Notifiable;
     use SoftDeletes;
 
+    protected $guard = 'contabil';
     protected $table = 'contabeis';
     protected $guarded = [];
+    protected $hidden = ['password', 'remember_token'];
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new UserExternoResetPasswordNotification($token));
+    }
 
     public static function camposPreRegistro()
     {
@@ -71,5 +83,18 @@ class Contabil extends Model
         }
 
         return 'remover';
+    }
+
+    public function podeAtivar()
+    {
+        $update = Carbon::createFromFormat('Y-m-d H:i:s', $this->updated_at);
+        $update->addDay();
+        if($update >= now())
+        {
+            if($this->trashed())
+                $this->restore();
+            return true;
+        }
+        return false;
     }
 }

@@ -20,6 +20,11 @@ class CreateContabeisTable extends Migration
             $table->string('email')->nullable();
             $table->string('nome_contato')->nullable();
             $table->string('telefone')->nullable();
+            $table->string('verify_token')->nullable();
+            $table->string('password')->nullable();
+            $table->boolean('ativo')->nullable();
+            $table->boolean('aceite')->nullable();
+            $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
         });

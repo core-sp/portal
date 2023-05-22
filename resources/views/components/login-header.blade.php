@@ -12,12 +12,12 @@
                 </a>
             </small>
         </p>
-    @elseif(Auth::guard('user_externo')->check())
+    @elseif(auth()->guard('user_externo')->check() || auth()->guard('contabil')->check())
         <p class="cinza-claro p-restrita m-auto-992">
             <small>
                 <a href="{{ route('externo.dashboard') }}">
                     <i class="fas fa-user"></i>&nbsp;
-                   {{ limitRepresentanteName(Auth::guard('user_externo')->user()->nome) }}
+                   {{ limitRepresentanteName(auth()->user()->nome) }}
                 </a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <a id="logout-externo" href="#">

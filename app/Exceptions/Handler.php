@@ -33,6 +33,7 @@ class Handler extends ExceptionHandler
                     return redirect(route('representante.login'));
                 break;
                 case 'user_externo':
+                case 'contabil':
                     return redirect(route('externo.login'));
                 break;
                 default:

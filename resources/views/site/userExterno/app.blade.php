@@ -19,7 +19,7 @@
   <div class="container">
     <div class="row nomargin" id="conteudo-principal">
       <div class="flex-one pr-4 align-self-center">
-        <h2 class="stronger">Logado como Usuário Externo</h2>
+        <h2 class="stronger">Logado como {{ auth()->guard('contabil')->check() ? 'Contabilidade' : 'Usuário Externo' }}</h2>
       </div>
     </div>
     <div class="linha-lg"></div>
@@ -27,7 +27,7 @@
       <div class="col-xl-3 pb-15-992">
         <div class="menu-representante">
           <div class="p-3 border-one-mr azul-escuro-bg">
-            <h6 class="branco"><strong>{{ auth()->guard('user_externo')->user()->nome }}</strong></h6>
+            <h6 class="branco"><strong>{{ auth()->user()->nome }}</strong></h6>
             <i class="fas fa-bars show-992" id="bars-representante"></i>
           </div>
           <div id="mobile-menu-representante" class="hide-992">
@@ -45,12 +45,14 @@
               </a>
             </div>
 
+            @if(auth()->guard('user_externo')->check())
             <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'externo.preregistro.view') || 
               (Route::currentRouteName() === 'externo.inserir.preregistro.view') ? 'mr-item-selected' : '' }}">
               <a href="{{ route('externo.preregistro.view') }}" onclick="showLoading()">
                 <h6 class="brancar"><i class="fas fa-file-alt"></i>&nbsp;&nbsp;Solicitar Registro</h6>
               </a>
             </div>
+            @endif
 
           </div>
         </div>

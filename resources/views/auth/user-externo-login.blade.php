@@ -43,17 +43,29 @@
                 <form action="{{ route('externo.login.submit') }}" method="POST" class="cadastroRepresentante" autocomplete="off">
                     @csrf
                     <div class="form-group">
+                        <label for="tipo_conta">Tipo da conta <small>(opcional)</small></label>
+                        <select name="tipo_conta" class="form-control {{ $errors->has('tipo_conta') ? 'is-invalid' : '' }}" id="tipo_conta">
+                            <option value="user_externo" selected>Especifique o tipo de conta, se necessário...</option>
+                            <option value="contabil">Contabilidade</option>
+                        </select>
+                        @if($errors->has('tipo_conta'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('tipo_conta') }}
+                            </div>
+                        @endif
+                    </div>
+                    <div class="form-group mt-2">
                         <label for="cpf_cnpj">CPF ou CNPJ</label>
                         <input id="cpf_cnpj"
                             type="text"
-                            class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
+                            class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') || $errors->has('cnpj') ? ' is-invalid' : '' }}"
                             name="cpf_cnpj"
                             placeholder="CPF ou CNPJ"
                             required
                         >
-                        @if($errors->has('cpf_cnpj'))
+                        @if($errors->has('cpf_cnpj') || $errors->has('cnpj'))
                         <div class="invalid-feedback">
-                            {{ $errors->first('cpf_cnpj') }}
+                            {{ $errors->has('cpf_cnpj') ? $errors->first('cpf_cnpj') : $errors->first('cnpj') }}
                         </div>
                         @endif
                     </div>

@@ -12,11 +12,13 @@ class CadastroUserExternoMail extends Mailable
     use Queueable, SerializesModels;
 
     public $body;
+    public $tipo;
     public $token;
     public $externo;
 
-    public function __construct($token = null, $externo = null)
+    public function __construct($tipo, $token = null, $externo = null)
     {
+        $this->tipo = $tipo;
         $this->token = $token;
         $this->externo = $externo;
     }
@@ -27,7 +29,7 @@ class CadastroUserExternoMail extends Mailable
         $body .= '<br /><br />';
         $body .= 'Você deve ativar sua conta em até 24h, caso contrário deve se recadastrar.';
         $body .= '<br /><br />';
-        $body .= 'Para concluir o processo, basta clicar <a href="'. route('externo.verifica-email', $this->token) .'">NESTE LINK</a>.';
+        $body .= 'Para concluir o processo, basta clicar <a href="'. route('externo.verifica-email', [$this->tipo, $this->token]) .'">NESTE LINK</a>.';
 
         return $body;
     }

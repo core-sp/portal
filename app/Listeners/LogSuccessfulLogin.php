@@ -31,10 +31,12 @@ class LogSuccessfulLogin
                 Log::channel('externo')->info($ip . 'Usuário '.$event->user->id.' ("'.$event->user->registro_core.'") conectou-se à Área do Representante.');
         }
 
-        if($event->guard == 'user_externo')
+        if(in_array($event->guard, ['user_externo', 'contabil']))
         {
             if(Auth::guard('user_externo')->check())
                 Log::channel('externo')->info($ip . 'Usuário '.$event->user->nome.' ("'.formataCpfCnpj($event->user->cpf_cnpj).'") conectou-se à Área do Usuário Externo.');
+            if(Auth::guard('contabil')->check())
+                Log::channel('externo')->info($ip . 'Usuário '.$event->user->nome.' ("'.formataCpfCnpj($event->user->cnpj).'") conectou-se à Área da Contabilidade.');
         }
     }
 }

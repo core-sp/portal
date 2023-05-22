@@ -4,11 +4,13 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\CpfCnpj;
+use App\Rules\Cnpj;
 use App\Rules\RecaptchaRequired;
 
 class UserExternoRequest extends FormRequest
 {
     private $regrasPassword;
+    private $regrasUnique;
 
     protected function prepareForValidation()
     {
@@ -17,20 +19,34 @@ class UserExternoRequest extends FormRequest
             $all['cpf_cnpj'] = apenasNumeros(request()->cpf_cnpj);
         if(request()->filled('nome'))
             $all['nome'] = mb_strtoupper(request()->nome, 'UTF-8');
+        if(request()->filled('nome_contato'))
+            $all['nome_contato'] = mb_strtoupper(request()->nome_contato, 'UTF-8');
+        if(!request()->filled('tipo_conta'))
+            $this->merge(['tipo_conta' => 'user_externo']);
         $this->replace($all);
+
+        if(\Route::is('externo.editar'))
+            auth()->guard('contabil')->check() ? $this->merge(['tipo_conta' => 'contabil', 'acao' => 'editar']) : $this->merge(['tipo_conta' => 'user_externo', 'acao' => 'editar']);
+
+        if(\Route::is('externo.cadastro.submit'))
+            $this->regrasUnique = $this->tipo_conta == 'contabil' ? 'unique:contabeis,cnpj,NULL,id,deleted_at,NULL,ativo,1' : 
+                'unique:users_externo,cpf_cnpj,NULL,id,deleted_at,NULL,ativo,1';
+        else
+            $this->regrasUnique = '';
     }
 
     public function rules()
     {
         $this->regrasPassword = class_basename(\Route::current()->controller) == 'UserExternoLoginController' ? '|max:191' : 
             '|confirmed|min:8|max:191|regex:/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/u';
-
+        
         return [
+            'tipo_conta' => 'required|in:user_externo,contabil',
             'cpf_cnpj' => [
                 'sometimes',
                 'required',
-                new CpfCnpj,
-                \Route::is('externo.cadastro.submit') ? 'unique:users_externo,cpf_cnpj,NULL,id,deleted_at,NULL,ativo,1' : '',
+                $this->tipo_conta == 'contabil' ? new Cnpj : new CpfCnpj,
+                $this->regrasUnique,
             ],
             'nome' => 'sometimes|required|min:5|max:191|string',
             'email' => 'sometimes|required|email:rfc,filter|max:191',
@@ -39,6 +55,8 @@ class UserExternoRequest extends FormRequest
             'password_atual' => 'sometimes|required',
             'aceite' => 'sometimes|required|accepted',
             'g-recaptcha-response' => \Route::is('externo.cadastro.submit') ? [new RecaptchaRequired, 'recaptcha'] : '',
+            'nome_contato' => 'exclude_if:tipo_conta,user_externo,acao,editar|nullable|max:191|min:5|string',
+            'telefone' => 'exclude_if:tipo_conta,user_externo,acao,editar|nullable|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})$/',
         ];
     }
 
@@ -56,7 +74,9 @@ class UserExternoRequest extends FormRequest
             'email' => 'Deve ser um email válido',
             'sometimes' => 'Campo obrigatório',
             'cpf_cnpj.unique' => 'Esse CPF / CNPJ já está cadastrado',
-            'g-recaptcha-response.recaptcha' => 'ReCAPTCHA inválido'
+            'g-recaptcha-response.recaptcha' => 'ReCAPTCHA inválido',
+            'in' => 'O :attribute possui valor inválido',
+            'telefone.regex' => 'O telefone está no formato inválido',
         ];
     }
 

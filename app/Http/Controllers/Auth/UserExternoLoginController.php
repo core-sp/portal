@@ -16,11 +16,12 @@ class UserExternoLoginController extends Controller
 
     private $service;
     private $verificou;
+    private $tipo;
     protected $redirectTo = '/externo/home';
 
     public function __construct(MediadorServiceInterface $service)
     {
-        $this->middleware('guest:user_externo')->except('logout');
+        $this->middleware('guest:user_externo,contabil')->except('logout');
         $this->service = $service;
     }
 
@@ -32,6 +33,7 @@ class UserExternoLoginController extends Controller
     public function login(Request $request)
     {
         $this->validateLogin($request);
+        $this->tipo = $this->service->getService('UserExterno')->getDefinicoes($request->tipo_conta);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
@@ -43,7 +45,7 @@ class UserExternoLoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        $this->verificou = $this->service->getService('UserExterno')->verificaSeAtivo($request->cpf_cnpj);
+        $this->verificou = $this->service->getService('UserExterno')->verificaSeAtivo($this->tipo['tipo'], $request->cpf_cnpj);
 
         if($this->attemptLogin($request))
             return $this->sendLoginResponse($request);
@@ -100,7 +102,7 @@ class UserExternoLoginController extends Controller
     protected function attemptLogin(Request $request)
     {
         return $this->guard()->attempt([
-            'cpf_cnpj' => apenasNumeros($request->cpf_cnpj),
+            $this->tipo['campo'] => apenasNumeros($request->cpf_cnpj),
             'password' => $request->password,
             'ativo' => 1
         ]);
@@ -154,11 +156,16 @@ class UserExternoLoginController extends Controller
 
     public function username()
     {
-        return 'cpf_cnpj';
+        return $this->tipo['campo'];
     }
 
     protected function guard()
     {
-        return Auth::guard('user_externo');
+        if(auth()->guard('contabil')->check())
+            $this->tipo = $this->service->getService('UserExterno')->getDefinicoes('contabil');
+        if(auth()->guard('user_externo')->check())
+            $this->tipo = $this->service->getService('UserExterno')->getDefinicoes('user_externo');
+
+        return Auth::guard($this->tipo['tipo']);
     }
 }

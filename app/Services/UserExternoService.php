@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\UserExterno;
+use App\Contabil;
 use App\Contracts\UserExternoServiceInterface;
 use App\Events\ExternoEvent;
 use Illuminate\Support\Facades\Hash;
@@ -11,12 +12,44 @@ use App\Mail\CadastroUserExternoMail;
 
 class UserExternoService implements UserExternoServiceInterface {
 
-    public function save($dados)
+    private function formatDados($dados)
     {
+        $tipo_conta = $dados['tipo_conta'];
         $dados['password'] = Hash::make($dados['password']);
         $dados['aceite'] = true;
+
+        unset($dados['tipo_conta']);
         unset($dados['password_confirmation']);
-        $emails = UserExterno::where('email', $dados['email'])->where('cpf_cnpj', '!=', $dados['cpf_cnpj'])->withTrashed()->count();
+
+        if($tipo_conta == 'contabil'){
+            $dados['cnpj'] = $dados['cpf_cnpj'];
+            $dados['ativo'] = 0;
+            unset($dados['cpf_cnpj']);
+        }
+
+        return $dados;
+    }
+
+    public function getDefinicoes($tipo)
+    {
+        return [
+            'tipo' => $tipo,
+            'campo' => $tipo == 'contabil' ? 'cnpj' : 'cpf_cnpj',
+            'classe' => $tipo == 'contabil' ? Contabil::class : UserExterno::class,
+            'rotulo' => $tipo == 'contabil' ? 'Contabilidade' : 'Usuário Externo',
+            'tabela' => $tipo == 'contabil' ? 'contabeis' : 'users_externo',
+        ];
+    }
+
+    public function save($dados)
+    {
+        $tipo_conta = $this->getDefinicoes($dados['tipo_conta']);
+        $dados = $this->formatDados($dados);
+
+        $emails = $tipo_conta['classe']::where('email', $dados['email'])
+        ->where($tipo_conta['campo'], '!=', $dados[$tipo_conta['campo']])
+        ->withTrashed()
+        ->count();
 
         if($emails >= 2)
             return [
@@ -24,10 +57,10 @@ class UserExternoService implements UserExternoServiceInterface {
                 'class' => 'alert-danger'
             ];
 
-        $externo = UserExterno::where('cpf_cnpj', $dados['cpf_cnpj'])
-            ->where('ativo', 0)
-            ->withTrashed()
-            ->first();
+        $externo = $tipo_conta['classe']::where($tipo_conta['campo'], $dados[$tipo_conta['campo']])
+        ->where('ativo', 0)
+        ->withTrashed()
+        ->first();
         
         $dados['verify_token'] = str_random(32);
 
@@ -43,17 +76,18 @@ class UserExternoService implements UserExternoServiceInterface {
             $externo->update($dados);
         }
         else
-            $externo = UserExterno::create($dados);
+            $externo = $tipo_conta['classe']::create($dados);
 
-        Mail::to($externo->email)->queue(new CadastroUserExternoMail($dados['verify_token']));
-        event(new ExternoEvent('"' . $externo->cpf_cnpj . '" ("' . $externo->email . '") cadastrou-se na Área do Login Externo.'));
+        Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo_conta['tipo'], $dados['verify_token']));
+        event(new ExternoEvent('"' . formataCpfCnpj($externo[$tipo_conta['campo']]) . '" ("' . $externo->email . '") cadastrou-se na Área do Login Externo como '.$tipo_conta['rotulo'].'.'));
     }
 
-    public function verificaEmail($token)
+    public function verificaEmail($token, $tipo)
     {
-        $externo = UserExterno::where('verify_token', $token)
-            ->where('ativo', 0)
-            ->first();
+        $tipo_conta = $this->getDefinicoes($tipo);
+        $externo = $tipo_conta['classe']::where('verify_token', $token)
+        ->where('ativo', 0)
+        ->first();
         if(!isset($externo) || !$externo->podeAtivar())
             return [
                 'message' => 'Falha na verificação. Caso e-mail já tenha sido verificado, basta logar na área restrita do Login Externo, caso contrário, por favor refazer cadastro no Login Externo.',
@@ -63,18 +97,20 @@ class UserExternoService implements UserExternoServiceInterface {
             'ativo' => 1,
             'verify_token' => null
         ]);
-        event(new ExternoEvent('User Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") verificou o email após o cadastro.'));
+        event(new ExternoEvent($tipo_conta['rotulo'].' ' . $externo->id . ' ("'. formataCpfCnpj($externo[$tipo_conta['campo']]) .'") verificou o email após o cadastro.'));
     }
 
-    public function editDados($dados, $externo)
+    public function editDados($dados, $externo, $tipo)
     {
+        $tipo_conta = $this->getDefinicoes($tipo);
+
         if(!isset($dados['nome']) && !isset($dados['email']))
             if(Hash::check($dados['password_atual'], $externo->password)) 
             {
                 $externo->update(['password' => Hash::make($dados['password'])]);
 
-                Mail::to($externo->email)->queue(new CadastroUserExternoMail(null, $externo));
-                event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou a senha com sucesso na Área Restrita após logon.'));
+                Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo, null, $externo));
+                event(new ExternoEvent($tipo_conta['rotulo'].' ' . $externo->id . ' ("'. formataCpfCnpj($externo[$tipo_conta['campo']]) .'") alterou a senha com sucesso na Área Restrita após logon.'));
             }else
                 return [
                     'message' => 'A senha atual digitada está incorreta!',
@@ -84,33 +120,32 @@ class UserExternoService implements UserExternoServiceInterface {
         {
             if($dados['email'] != $externo->email)
             {
-                $emails = UserExterno::where('email', $dados['email'])->withTrashed()->count();
+                $emails = $tipo_conta['classe']::where('email', $dados['email'])->withTrashed()->count();
                 if($emails >= 2)
                     return [
                         'message' => 'Este email já alcançou o limite de cadastro, por favor insira outro.',
                         'class' => 'alert-danger',
                     ];
             }
-            $externo->update([
-                'nome' => mb_strtoupper($dados['nome'], 'UTF-8'),
-                'email' => $dados['email']
-            ]);
 
-            Mail::to($externo->email)->queue(new CadastroUserExternoMail(null, $externo));
-            event(new ExternoEvent('Usuário Externo ' . $externo->id . ' ("'. $externo->cpf_cnpj .'") alterou os dados com sucesso na Área Restrita após logon.'));
+            $externo->update($dados);
+
+            Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo, null, $externo));
+            event(new ExternoEvent($tipo_conta['rotulo'].' ' . $externo->id . ' ("'. formataCpfCnpj($externo[$tipo_conta['campo']]) .'") alterou os dados com sucesso na Área Restrita após logon.'));
         }
     }
 
-    public function findByCpfCnpj($cpf_cnpj)
+    public function findByCpfCnpj($tipo, $cpf_cnpj)
     {
         $cpf_cnpj = apenasNumeros($cpf_cnpj);
+        $tipo_conta = $this->getDefinicoes($tipo);
 
-        return UserExterno::where('cpf_cnpj', $cpf_cnpj)->first();
+        return $tipo_conta['classe']::where($tipo_conta['campo'], $cpf_cnpj)->first();
     }
 
-    public function verificaSeAtivo($cpf_cnpj)
+    public function verificaSeAtivo($tipo, $cpf_cnpj)
     {
-        $user_externo = $this->findByCpfCnpj($cpf_cnpj);
+        $user_externo = $this->findByCpfCnpj($tipo, $cpf_cnpj);
 
         if(isset($user_externo))
             if($user_externo->ativo == 0)

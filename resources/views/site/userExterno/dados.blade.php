@@ -18,7 +18,7 @@
             @if(!isset($alterarSenha))
             <div class="form-row">
                 <div class="col-sm mb-2-576">
-                    <label for="nome">Nome Completo *</label>
+                    <label for="nome">Nome Completo <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         name="nome"
@@ -38,19 +38,19 @@
             </div>
             <div class="form-row mt-2">
                 <div class="col-sm-4 mb-2-576">
-                    <label for="cpf_cnpj">CPF ou CNPJ *</label>
+                    <label for="cpf_cnpj">{{ auth()->guard('contabil')->check() ? 'CNPJ' : 'CPF ou CNPJ' }} <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         class="form-control cpfOuCnpj"
                         id="cpf_cnpj"
-                        value="{{ $resultado->cpf_cnpj }}"
+                        value="{{ auth()->guard('contabil')->check() ? $resultado->cnpj : $resultado->cpf_cnpj }}"
                         placeholder="CPF ou CNPJ"
                         readonly
                         disabled
                     >
                 </div>
                 <div class="col-sm mb-2-576">
-                    <label for="email">Email *</label>
+                    <label for="email">Email <span class="text-danger">*</span></label>
                     <input
                         type="email"
                         name="email"
@@ -67,6 +67,42 @@
                     @endif
                 </div>
             </div>
+
+            @if(auth()->guard('contabil')->check())
+            <div class="form-row mt-2">
+                <div class="col-sm mb-2-576">
+                    <label for="nome_contato">Nome para contato</label>
+                    <input
+                        name="nome_contato"
+                        type="text"
+                        class="form-control {{ $errors->has('nome_contato') ? 'is-invalid' : '' }} upperCase"
+                        value="{{ empty(old('nome_contato')) && isset($resultado->nome_contato) ? $resultado->nome_contato : old('nome_contato') }}"
+                        maxlength="191"
+                        minlength="5"
+                    >
+                    @if($errors->has('nome_contato'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('nome_contato') }}
+                    </div>
+                    @endif
+                </div>
+                <div class="col-sm-4 mb-2-576">
+                    <label for="telefone">Telefone para contato</label>
+                    <input
+                        type="text"
+                        name="telefone"
+                        class="form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
+                        id="email"
+                        value="{{ empty(old('telefone')) && isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"
+                    >
+                    @if($errors->has('telefone'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('telefone') }}
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endif
             <div class="form-group mt-3">
                 <a href="{{ route('externo.editar.senha.view') }}" class="btn btn-danger text-decoration-none text-white">
                     Alterar Senha
@@ -76,7 +112,7 @@
             <div class="form-row">
                 <input type="hidden" id="cpf_cnpj" />
                 <div class="col-sm mb-2-576">
-                    <label for="password_atual">Senha atual *</label>
+                    <label for="password_atual">Senha atual <span class="text-danger">*</span></label>
                     <input
                         type="password"
                         name="password_atual"
@@ -93,7 +129,7 @@
             </div>
             <div class="form-row mt-2">
                 <div class="col-sm mb-2-576">
-                    <label for="password">Nova senha *</label>
+                    <label for="password">Nova senha <span class="text-danger">*</span></label>
                     <input
                         type="password"
                         name="password"
@@ -111,7 +147,7 @@
                     @endif
                 </div>
                 <div class="col-sm mb-2-576">
-                    <label for="password_confirmation">Confirmação da nova senha *</label>
+                    <label for="password_confirmation">Confirmação da nova senha <span class="text-danger">*</span></label>
                     <input
                         type="password"
                         name="password_confirmation"

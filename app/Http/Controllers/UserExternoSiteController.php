@@ -21,7 +21,7 @@ class UserExternoSiteController extends Controller
         if(config('app.env') == "testing")
             $qtd = '100';
 
-        $this->middleware(['auth:user_externo', 'throttle:' . $qtd . ',1'])->except(['cadastroView', 'cadastro', 'verificaEmail']);
+        $this->middleware(['auth:user_externo,contabil', 'throttle:' . $qtd . ',1'])->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->service = $service;
         $this->gerentiRepository = $gerentiRepository;
     }
@@ -52,10 +52,10 @@ class UserExternoSiteController extends Controller
         ]);
     }
 
-    public function verificaEmail($token)
+    public function verificaEmail($tipo, $token)
     {
         try{
-            $erro = $this->service->getService('UserExterno')->verificaEmail($token);
+            $erro = $this->service->getService('UserExterno')->verificaEmail($token, $tipo);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao atualizar a verificação de email do cadastro no Login Externo');
@@ -76,7 +76,7 @@ class UserExternoSiteController extends Controller
 
     public function editarView()
     {
-        $resultado = auth()->guard('user_externo')->user();
+        $resultado = auth()->user();
 
         return view('site.userExterno.dados', compact('resultado'));
     }
@@ -91,8 +91,9 @@ class UserExternoSiteController extends Controller
     {
         try{
             $validate = $request->validated();
-            $externo = auth()->guard('user_externo')->user();
-            $erro = $this->service->getService('UserExterno')->editDados($validate, $externo);
+            $tipo = $validate['tipo_conta'];
+            unset($validate['tipo_conta']);
+            $erro = $this->service->getService('UserExterno')->editDados($validate, auth()->user(), $tipo);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao atualizar os dados cadastrais no Login Externo');

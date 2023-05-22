@@ -27,8 +27,12 @@ class LogPasswordReset
             if($event->user->getTable() == 'representantes')
                 Log::channel('externo')->info($ip . 'Usuário com o cpf/cnpj ' .$event->user->cpf_cnpj. ' alterou a senha com sucesso na Área do Representante.');
 
-            if($event->user->getTable() == 'users_externo')
-                Log::channel('externo')->info($ip . 'Usuário com o cpf/cnpj ' .$event->user->cpf_cnpj. ' alterou a senha com sucesso na Área do Usuário Externo através do "Esqueci a senha".');
+            if(in_array($event->user->getTable(), ['user_externo', 'contabil']))
+            {
+                $campo = $event->user->getTable() == 'contabil' ? $event->user->cnpj : $event->user->cpf_cnpj;
+                $tipo = $event->user->getTable() == 'contabil' ? 'a Contabilidade' : 'o Usuário Externo';
+                Log::channel('externo')->info($ip . 'Usuário com o cpf/cnpj ' .$campo. ' alterou a senha com sucesso na Área d'.$tipo.' através do "Esqueci a senha".');
+            }
         }
     }
 }

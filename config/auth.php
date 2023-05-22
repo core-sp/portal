@@ -68,6 +68,17 @@ return [
             'provider' => 'users_externo',
             'hash' => false,
         ],
+
+        'contabil' => [
+            'driver' => 'session',
+            'provider' => 'contabeis',
+        ],
+
+        'contabil-api' => [
+            'driver' => 'token',
+            'provider' => 'contabeis',
+            'hash' => false,
+        ],
     ],
 
     /*
@@ -101,6 +112,11 @@ return [
         'users_externo' => [
             'driver' => 'eloquent',
             'model' => App\UserExterno::class,
+        ],
+
+        'contabeis' => [
+            'driver' => 'eloquent',
+            'model' => App\Contabil::class,
         ],
 
         // 'users' => [

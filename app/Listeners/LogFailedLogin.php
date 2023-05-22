@@ -35,12 +35,16 @@ class LogFailedLogin
                 Log::channel('externo')->info($ip . 'Usuário não encontrado com o cpf/cnpj "'.request()->cpf_cnpj.'" não conseguiu logar na Área do Representante.');
         }
 
-        if($event->guard == 'user_externo')
+        if(in_array($event->user->getTable(), ['user_externo', 'contabil']))
         {
             if(isset($event->user))
-                Log::channel('externo')->info($ip . 'Usuário com o cpf/cnpj ' .$event->user->cpf_cnpj. ' não conseguiu logar na Área do Usuário Externo.');
+            {
+                $campo = $event->user->getTable() == 'contabil' ? $event->user->cnpj : $event->user->cpf_cnpj;
+                $tipo = $event->user->getTable() == 'contabil' ? 'a Contabilidade' : 'o Usuário Externo';
+                Log::channel('externo')->info($ip . 'Usuário com o cpf/cnpj ' .$campo. ' não conseguiu logar na Área d'.$tipo.'.');
+            }
             else
-                Log::channel('externo')->info($ip . 'Usuário não encontrado com o cpf/cnpj "'.request()->cpf_cnpj.'" não conseguiu logar na Área do Usuário Externo.');
+                Log::channel('externo')->info($ip . 'Usuário não encontrado com o cpf/cnpj "'.request()->cpf_cnpj.'" não conseguiu logar na Área do Usuário Externo / Contabilidade.');
         }
     }
 }

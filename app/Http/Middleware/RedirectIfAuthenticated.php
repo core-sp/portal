@@ -16,6 +16,7 @@ class RedirectIfAuthenticated
                 break;
 
                 case 'user_externo':
+                case 'contabil':
                     return redirect()->route('externo.dashboard');
                 break;
                 
