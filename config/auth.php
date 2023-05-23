@@ -158,6 +158,12 @@ return [
             'table' => 'password_resets_externo',
             'expire' => 60,
         ],
+
+        'contabeis' => [
+            'provider' => 'contabeis',
+            'table' => 'password_resets_externo',
+            'expire' => 60,
+        ],
     ],
 
 ];

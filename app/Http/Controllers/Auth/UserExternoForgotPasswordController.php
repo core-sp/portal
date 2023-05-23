@@ -15,10 +15,13 @@ class UserExternoForgotPasswordController extends Controller
     use SendsPasswordResetEmails;
 
     private $service;
+    private $tipo;
 
     public function __construct(MediadorServiceInterface $service)
     {
+        $this->middleware('guest');
         $this->middleware('guest:user_externo');
+        $this->middleware('guest:contabil');
         $this->service = $service;
     }
 
@@ -30,11 +33,12 @@ class UserExternoForgotPasswordController extends Controller
     public function sendResetLinkEmail(Request $request)
     {
         $this->validateEmail($request);
+        $this->tipo = $this->service->getService('UserExterno')->getDefinicoes($request->tipo_conta);
         
         $cpf_cnpj = apenasNumeros($request->only('cpf_cnpj'));
         $email = $this->getEmail($cpf_cnpj);
         $arrayCC = [
-            'cpf_cnpj' => isset($email) ? $cpf_cnpj : ''
+            $this->tipo['campo'] => isset($email) ? $cpf_cnpj : ''
         ];
         
         // We will send the password reset link to this user. Once we have attempted
@@ -44,7 +48,7 @@ class UserExternoForgotPasswordController extends Controller
         
         if($response == Password::RESET_LINK_SENT)
         {
-            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' solicitou o envio de link para alterar a senha no Login Externo.'));
+            event(new ExternoEvent('Usuário com o cpf/cnpj ' .$request->cpf_cnpj. ' do tipo de conta "'.$this->tipo['rotulo'].'" solicitou o envio de link para alterar a senha no Login Externo.'));
             return $this->sendResetLinkResponse($request, 'O link de reconfiguração de senha foi enviado ao email ' . $email . '<br>Esse link é válido por 60 minutos');
         }
 
@@ -80,12 +84,12 @@ class UserExternoForgotPasswordController extends Controller
 
     protected function broker()
     {
-        return Password::broker('users_externo');
+        return Password::broker($this->tipo['tabela']);
     }
 
     protected function getEmail($cpfCnpj)
     {
-        $first = $this->service->getService('UserExterno')->findByCpfCnpj($cpfCnpj);
+        $first = $this->service->getService('UserExterno')->findByCpfCnpj($this->tipo['tipo'], $cpfCnpj);
         
         if(isset($first) && ($first->ativo == 1))
             return $first->email;

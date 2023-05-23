@@ -21,7 +21,9 @@ class UserExternoLoginController extends Controller
 
     public function __construct(MediadorServiceInterface $service)
     {
-        $this->middleware('guest:user_externo,contabil')->except('logout');
+        $this->middleware('guest')->except('logout');
+        $this->middleware('guest:user_externo')->except('logout');
+        $this->middleware('guest:contabil')->except('logout');
         $this->service = $service;
     }
 

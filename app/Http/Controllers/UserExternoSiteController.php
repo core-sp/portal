@@ -76,7 +76,7 @@ class UserExternoSiteController extends Controller
 
     public function editarView()
     {
-        $resultado = auth()->user();
+        $resultado = auth()->guard(getGuardExterno(auth()))->user();
 
         return view('site.userExterno.dados', compact('resultado'));
     }
@@ -93,7 +93,8 @@ class UserExternoSiteController extends Controller
             $validate = $request->validated();
             $tipo = $validate['tipo_conta'];
             unset($validate['tipo_conta']);
-            $erro = $this->service->getService('UserExterno')->editDados($validate, auth()->user(), $tipo);
+            $externo = auth()->guard(getGuardExterno(auth()))->user();
+            $erro = $this->service->getService('UserExterno')->editDados($validate, $externo, $tipo);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao atualizar os dados cadastrais no Login Externo');

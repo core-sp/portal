@@ -17,7 +17,7 @@
             <small>
                 <a href="{{ route('externo.dashboard') }}">
                     <i class="fas fa-user"></i>&nbsp;
-                   {{ limitRepresentanteName(auth()->user()->nome) }}
+                   {{ limitRepresentanteName(auth()->guard(getGuardExterno(auth()))->user()->nome) }}
                 </a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <a id="logout-externo" href="#">

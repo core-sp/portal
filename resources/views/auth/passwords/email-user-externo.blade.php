@@ -44,18 +44,31 @@
             <form action="{{ route('externo.password.email') }}" method="POST">
               @csrf
               <div class="form-group">
+                <label for="tipo_conta">Tipo da conta <small>(opcional)</small></label>
+                <select name="tipo_conta" class="form-control {{ $errors->has('tipo_conta') ? 'is-invalid' : '' }}" id="tipo_conta">
+                  <option value="user_externo" selected>Especifique o tipo de conta, se necessário...</option>
+                  <option value="contabil">Contabilidade</option>
+                </select>
+                @if($errors->has('tipo_conta'))
+                <div class="invalid-feedback">
+                  {{ $errors->first('tipo_conta') }}
+                </div>
+                @endif
+              </div>
+              <div class="form-group">
+                <label for="cpf_cnpj">CPF ou CNPJ <small class="text-danger">*</small></label>
                 <input 
                   type="text"
                   name="cpf_cnpj"
-                  class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') ? ' is-invalid' : '' }}"
+                  class="form-control cpfOuCnpj {{ $errors->has('cpf_cnpj') || $errors->has('cnpj') ? ' is-invalid' : '' }}"
                   placeholder="CPF / CNPJ"
                   required
                   autocomplete="off"
                 >
-                @if ($errors->has('cpf_cnpj'))
-                  <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('cpf_cnpj') }}</strong>
-                  </span>
+                @if($errors->has('cpf_cnpj') || $errors->has('cnpj'))
+                <div class="invalid-feedback">
+                  {{ $errors->has('cpf_cnpj') ? $errors->first('cpf_cnpj') : $errors->first('cnpj') }}
+                </div>
                 @endif
               </div>
               <div class="form-group mt-2">

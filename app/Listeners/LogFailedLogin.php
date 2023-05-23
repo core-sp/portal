@@ -35,7 +35,7 @@ class LogFailedLogin
                 Log::channel('externo')->info($ip . 'Usuário não encontrado com o cpf/cnpj "'.request()->cpf_cnpj.'" não conseguiu logar na Área do Representante.');
         }
 
-        if(in_array($event->user->getTable(), ['user_externo', 'contabil']))
+        if(in_array($event->guard, ['user_externo', 'contabil']))
         {
             if(isset($event->user))
             {

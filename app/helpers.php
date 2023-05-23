@@ -985,3 +985,12 @@ function tipos_identidade()
         'RNE'
     ];
 }
+
+function getGuardExterno($auth)
+{
+    if($auth->guard('user_externo')->check())
+        return 'user_externo';
+    if($auth->guard('contabil')->check())
+        return 'contabil';
+    return null;
+}
