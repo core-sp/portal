@@ -43,8 +43,7 @@ $now = now();
 				<div class="col conteudo-txt">
 				@if($curso->datatermino >= $now && $curso->publicado == 'Sim')
 					<p>
-						Inscrever-se em <strong>{{ $curso->tipo }} - {{ $curso->tema }}, </strong> turma <strong>{{ $curso->idcurso }},</strong> que acontecerá no dia <strong>{{ Helper::onlyDate($curso->datarealizacao) }}</strong>	às <strong>{{ Helper::onlyHour($curso->datarealizacao) }}</strong> 
-						e terminará no dia <strong>{{ Helper::onlyDate($curso->datatermino) }}</strong>	às <strong>{{ Helper::onlyHour($curso->datatermino) }}</strong>.
+						Inscrever-se em <strong>{{ $curso->tipo }} - {{ $curso->tema }}, </strong> turma <strong>{{ $curso->idcurso }}</strong>.
 					</p>
 					<div class="mt-2">
 						<form method="POST" role="form" class="inscricaoCurso">
