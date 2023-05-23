@@ -22,7 +22,6 @@ class UserExternoResetPasswordController extends Controller
 
     public function __construct(MediadorServiceInterface $service)
     {
-        $this->middleware('guest');
         $this->middleware('guest:user_externo');
         $this->middleware('guest:contabil');
         $this->service = $service;

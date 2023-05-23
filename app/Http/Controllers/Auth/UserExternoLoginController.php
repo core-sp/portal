@@ -21,7 +21,6 @@ class UserExternoLoginController extends Controller
 
     public function __construct(MediadorServiceInterface $service)
     {
-        $this->middleware('guest')->except('logout');
         $this->middleware('guest:user_externo')->except('logout');
         $this->middleware('guest:contabil')->except('logout');
         $this->service = $service;
@@ -163,10 +162,9 @@ class UserExternoLoginController extends Controller
 
     protected function guard()
     {
-        if(auth()->guard('contabil')->check())
-            $this->tipo = $this->service->getService('UserExterno')->getDefinicoes('contabil');
-        if(auth()->guard('user_externo')->check())
-            $this->tipo = $this->service->getService('UserExterno')->getDefinicoes('user_externo');
+        $guard = getGuardExterno(auth());
+        if(!isset($this->tipo) && isset($guard))
+            $this->tipo = $this->service->getService('UserExterno')->getDefinicoes($guard);
 
         return Auth::guard($this->tipo['tipo']);
     }
