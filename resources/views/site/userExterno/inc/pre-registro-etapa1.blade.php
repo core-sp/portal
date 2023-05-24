@@ -42,7 +42,7 @@
 </small>
 </div>
 
-<fieldset id="campos_contabil" {{ isset($resultado->contabil->cnpj) ? '' : 'disabled' }}>
+<fieldset id="campos_contabil" {{ isset($resultado->contabil->cnpj) && !$resultado->contabil->possuiLogin() ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
             <label for="nome_contabil">{{ $codigos[0]['nome_contabil'] }} - Nome da Contabilidade <span class="text-danger">*</span></label>

@@ -978,6 +978,13 @@ $("#logout-externo").click(function(){
 	$(form).submit();
 });
 
+// Logout Externo
+$('[name="tipo_conta"]').change(function(){
+	var valor = $(this).val();
+	valor == 'contabil' ? $('label[for="cpf_cnpj"]').text('CNPJ') : $('label[for="cpf_cnpj"]').text('CPF ou CNPJ');
+	valor == 'contabil' ? $('input[name="cpf_cnpj"]').attr('placeholder', 'CNPJ') : $('input[name="cpf_cnpj"]').attr('placeholder', 'CPF ou CNPJ');
+});
+
 // ----------------------------------------------------------------------------------------------------------------------------
 // Busca endereço
 
@@ -1271,7 +1278,8 @@ function preencheContabil(dados)
 			});
 			$('#campos_contabil').prop("disabled", true);
 		}else{
-			$('#campos_contabil').prop("disabled", false);
+			var desabilita = (dados.aceite != null) && (dados.ativo != null);
+			$('#campos_contabil').prop("disabled", desabilita);
 			$('#inserirRegistro [name$="_contabil"]').each(function(){
 				var name = $(this).attr('name').slice(0, $(this).attr('name').indexOf('_contabil'));
 				if(name != 'cnpj')

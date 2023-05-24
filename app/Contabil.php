@@ -49,7 +49,7 @@ class Contabil extends Authenticatable
 
             $existe = Contabil::where('cnpj', $cnpj)->first();
 
-            return isset($existe) ? $existe : Contabil::create(['cnpj' => $cnpj]);
+            return isset($existe) ? $existe->makeHidden(['verify_token']) : Contabil::create(['cnpj' => $cnpj]);
         }
 
         return null;
@@ -70,7 +70,8 @@ class Contabil extends Authenticatable
 
     public function updateAjax($campo, $valor)
     {
-        $this->update([$campo => $valor]);
+        if(!$this->possuiLogin())
+            $this->update([$campo => $valor]);
     }
 
     public static function atualizar($arrayCampos)
@@ -78,7 +79,8 @@ class Contabil extends Authenticatable
         if(isset($arrayCampos['cnpj']) && (strlen($arrayCampos['cnpj']) == 14))
         {
             $contabil = Contabil::buscar($arrayCampos['cnpj']);
-            $contabil->update($arrayCampos);
+            if(!$contabil->possuiLogin())
+                $contabil->update($arrayCampos);
             return $contabil;
         }
 
@@ -89,6 +91,9 @@ class Contabil extends Authenticatable
     {
         $update = Carbon::createFromFormat('Y-m-d H:i:s', $this->updated_at);
         $update->addDay();
+
+        if(!$this->possuiLogin())
+            return false;
         if($update >= now())
         {
             if($this->trashed())
@@ -96,5 +101,10 @@ class Contabil extends Authenticatable
             return true;
         }
         return false;
+    }
+
+    public function possuiLogin()
+    {
+        return isset($this->aceite) && isset($this->ativo);
     }
 }

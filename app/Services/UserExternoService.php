@@ -48,6 +48,8 @@ class UserExternoService implements UserExternoServiceInterface {
 
         $emails = $tipo_conta['classe']::where('email', $dados['email'])
         ->where($tipo_conta['campo'], '!=', $dados[$tipo_conta['campo']])
+        ->whereNotNull('ativo')
+        ->whereNotNull('aceite')
         ->withTrashed()
         ->count();
 
@@ -58,7 +60,10 @@ class UserExternoService implements UserExternoServiceInterface {
             ];
 
         $externo = $tipo_conta['classe']::where($tipo_conta['campo'], $dados[$tipo_conta['campo']])
-        ->where('ativo', 0)
+        ->where(function($query) {
+            $query->where('ativo', 0)
+            ->orWhereNull('ativo');
+        })
         ->withTrashed()
         ->first();
         
@@ -120,7 +125,11 @@ class UserExternoService implements UserExternoServiceInterface {
         {
             if($dados['email'] != $externo->email)
             {
-                $emails = $tipo_conta['classe']::where('email', $dados['email'])->withTrashed()->count();
+                $emails = $tipo_conta['classe']::where('email', $dados['email'])
+                ->whereNotNull('ativo')
+                ->whereNotNull('aceite')
+                ->withTrashed()
+                ->count();
                 if($emails >= 2)
                     return [
                         'message' => 'Este email já alcançou o limite de cadastro, por favor insira outro.',
