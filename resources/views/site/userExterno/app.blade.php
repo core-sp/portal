@@ -54,6 +54,14 @@
             </div>
             @endif
 
+            @if(auth()->guard('contabil')->check())
+            <div class="mr-item bt-unset {{ (Route::currentRouteName() === 'externo.relacao.preregistros') ? 'mr-item-selected' : '' }}">
+              <a href="{{ route('externo.relacao.preregistros') }}" onclick="showLoading()">
+                <h6 class="brancar"><i class="fas fa-file-alt"></i>&nbsp;&nbsp;Solicitações de Registro</h6>
+              </a>
+            </div>
+            @endif
+
           </div>
         </div>
       </div>

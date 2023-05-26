@@ -8,6 +8,7 @@ use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\PreRegistroAjaxRequest;
 use App\Http\Requests\PreRegistroRequest;
 use App\Repositories\GerentiRepositoryInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserExternoSiteController extends Controller
 {
@@ -109,14 +110,46 @@ class UserExternoSiteController extends Controller
                 'class' => 'alert-success'
             ]);
     }
-    
-    public function preRegistroView()
+
+    // PRE-REGISTRO ******************************************************************************************************************
+
+    public function preRegistrosRelacao()
     {
         try{
-            $externo = auth()->guard('user_externo')->user();
-            $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
-            $gerenti = $dados['gerenti'];
-            $resultado = isset($gerenti) ? null : $externo->load('preRegistro')->preRegistro;
+            if(getGuardExterno(auth()) == 'user_externo')
+                return redirect()->route('externo.preregistro.view');
+
+            $externo = auth()->guard('contabil')->user();
+            $dados = $this->service->getService('PreRegistro')->getPreRegistros($externo);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, 'Erro ao listar as solicitações de registro');
+        }
+
+        return view('site.userExterno.pre-registros', $dados);
+    }
+    
+    public function preRegistroView($preRegistro = null)
+    {
+        try{
+            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('user_externo')->user();
+
+            $gerenti = null;
+            $resultado = null;
+            
+            if(isset($externo)){
+                $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
+                $gerenti = $dados['gerenti'];
+                $resultado = isset($gerenti) ? null : $externo->load('preRegistro')->preRegistro;
+            }
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            return redirect()->route('externo.relacao.preregistros')->with([
+                'message' => 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
+                'class' => 'alert-danger'
+            ]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao verificar os dados para permitir ou não a solicitação de registro');
@@ -125,21 +158,48 @@ class UserExternoSiteController extends Controller
         return view('site.userExterno.pre-registro', compact('resultado', 'gerenti'));
     }
 
-    public function inserirPreRegistroView(Request $request)
+    public function contabilCriarPreRegistro(PreRegistroRequest $request)
     {
         try{
-            if($request->checkPreRegistro != 'on')
-                return redirect(route('externo.preregistro.view'));
+            $externo = auth()->guard('contabil')->user();
+            $validated = $request->validated();
+            $dados = $this->service->getService('PreRegistro')->setPreRegistro($this->gerentiRepository, $this->service, $externo, $validated);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, 'Erro ao verificar os dados para permitir ou não a solicitação de registro');
+        }
 
-            $externo = auth()->guard('user_externo')->user();
+        if(isset($dados['message']))
+            return redirect()->route('externo.preregistro.view')->with($dados);
+        return redirect()->route('externo.inserir.preregistro.view', $dados['resultado']->id);
+    }
+
+    public function inserirPreRegistroView(Request $request, $preRegistro = null)
+    {
+        try{
+            if(($request->checkPreRegistro != 'on') && (getGuardExterno(auth()) == 'user_externo'))
+                return redirect()->route('externo.preregistro.view');
+
+            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('user_externo')->user();
+
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
 
             if(isset($dados['gerenti']))
-                return redirect(route('externo.preregistro.view'))->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
+                return redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
             if($externo->preRegistroAprovado())
-                return redirect(route('externo.preregistro.view'))->with(['resultado' => null, 'gerenti' => null]);
+                return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro) : 
+                redirect()->route('externo.preregistro.view')
+                ->with(['resultado' => null, 'gerenti' => null]);
 
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            return redirect()->route('externo.relacao.preregistros')->with([
+                'message' => 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
+                'class' => 'alert-danger'
+            ]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, 'Erro ao carregar os dados da solicitação de registro');
@@ -148,12 +208,20 @@ class UserExternoSiteController extends Controller
         return view('site.userExterno.inserir-pre-registro', $dados);
     }
 
-    public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request)
+    public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request, $preRegistro = null)
     {
         try{
-            $externo = auth()->guard('user_externo')->user();
+            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('user_externo')->user();
+
+            $contabil = auth()->guard('contabil')->user();
+            
             $validatedData = $request->validated();
-            $dados = $this->service->getService('PreRegistro')->saveSiteAjax($validatedData, $this->gerentiRepository, $externo);
+            $dados = $this->service->getService('PreRegistro')->saveSiteAjax($validatedData, $this->gerentiRepository, $externo, $contabil);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.');
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
@@ -163,16 +231,21 @@ class UserExternoSiteController extends Controller
         return response()->json($dados);
     }
 
-    public function verificaPendenciaPreRegistro(PreRegistroRequest $request)
+    public function verificaPendenciaPreRegistro(PreRegistroRequest $request, $preRegistro = null)
     {
         try{
-            $externo = auth()->guard('user_externo')->user();
+            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('user_externo')->user();
+            
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
             
             if(isset($dados['gerenti']))
                 return redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
             if($externo->preRegistroAprovado())
-                return redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => null]);
+            return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro) : 
+                redirect()->route('externo.preregistro.view')
+                ->with(['resultado' => null, 'gerenti' => null]);
 
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
             $resultado = $dados['resultado'];
@@ -181,6 +254,12 @@ class UserExternoSiteController extends Controller
                 throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
             $dados['semPendencia'] = true;
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            return redirect()->route('externo.relacao.preregistros')->with([
+                'message' => 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
+                'class' => 'alert-danger'
+            ]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
@@ -193,31 +272,50 @@ class UserExternoSiteController extends Controller
     // Esse request não devolve a página para correção.
     // Apenas valida os dados já salvos no bd que foram carregados no form novamente ou via request direto
     // Apenas rota de confirmação do envio e onde é realizado os processos
-    public function inserirPreRegistro(PreRegistroRequest $request)
+    public function inserirPreRegistro(PreRegistroRequest $request, $preRegistro = null)
     {
         try{
-            $externo = auth()->guard('user_externo')->user();
+            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('user_externo')->user();
+
+            $contabil = auth()->guard('contabil')->user();
+
             $validatedData = $request->validated();
-            $dados = $this->service->getService('PreRegistro')->saveSite($validatedData, $this->gerentiRepository, $externo);
+            $dados = $this->service->getService('PreRegistro')->saveSite($validatedData, $this->gerentiRepository, $externo, $contabil);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            return redirect()->route('externo.relacao.preregistros')->with([
+                'message' => 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.',
+                'class' => 'alert-danger'
+            ]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao enviar os dados da solicitação de registro para análise');
         }
         
-        return redirect()->route('externo.preregistro.view')->with($dados);
+        return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro)->with($dados) : 
+        redirect()->route('externo.preregistro.view')->with($dados);
     }
 
-    public function preRegistroAnexoDownload($id)
+    public function preRegistroAnexoDownload($id, $preRegistro = null)
     {
         try{
-            $externo = auth()->guard('user_externo')->user();
+            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('user_externo')->user();
+
+            $contabil = auth()->guard('contabil')->user();
             $preRegistro = $externo->load('preRegistro')->preRegistro;
 
             if(!isset($preRegistro))
                 throw new \Exception('Não autorizado a acessar a solicitação de registro', 401);
 
-            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $preRegistro->id);
+            $file = $this->service->getService('PreRegistro')->downloadAnexo($id, $preRegistro->id, $contabil);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.');
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
@@ -227,11 +325,19 @@ class UserExternoSiteController extends Controller
         return response()->file($file, ["Cache-Control" => "no-cache"]);
     }
 
-    public function preRegistroAnexoExcluir($id)
+    public function preRegistroAnexoExcluir($id, $preRegistro = null)
     {
         try{
-            $externo = auth()->guard('user_externo')->user();
-            $dados = $this->service->getService('PreRegistro')->excluirAnexo($id, $externo);
+            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            auth()->guard('user_externo')->user();
+
+            $contabil = auth()->guard('contabil')->user();
+
+            $dados = $this->service->getService('PreRegistro')->excluirAnexo($id, $externo, $contabil);
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(404, 'Não existe solicitação de registro com esta ID relacionada com a sua contabilidade.');
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 

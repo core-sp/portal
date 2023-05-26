@@ -19,12 +19,16 @@
             </em>
         </small>
         <input
-            name="cnpj_contabil"
-            id="cnpj_contabil"
-            type="text"
             class="{{ $classes[1] }} form-control cnpjInput {{ $errors->has('cnpj_contabil') ? 'is-invalid' : '' }}"
             value="{{ empty(old('cnpj_contabil')) && isset($resultado->contabil->cnpj) ? $resultado->contabil->cnpj : old('cnpj_contabil') }}"
             placeholder="00.000.000/0000-00"
+        @if(getGuardExterno(auth()) != 'contabil')
+            name="cnpj_contabil"
+            id="cnpj_contabil"
+            type="text"
+        @else
+            readonly
+        @endif
         />
         @if($errors->has('cnpj_contabil'))
         <div class="invalid-feedback">

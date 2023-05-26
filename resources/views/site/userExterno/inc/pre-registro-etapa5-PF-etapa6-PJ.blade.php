@@ -59,7 +59,9 @@
             @component('components.arquivosBD', [
                 'nome' => 'anexo', 
                 'nome_file' => $anexo->nome_original, 
-                'rota_download' => route('externo.preregistro.anexo.download', $anexo->id),
+                'rota_download' => getGuardExterno(auth()) == 'contabil' ? 
+                route('externo.preregistro.anexo.download', ['id' => $anexo->id, 'preRegistro' => $resultado->id]) : 
+                route('externo.preregistro.anexo.download', $anexo->id),
                 'id' => $anexo->id,
                 'display' => '',
                 'podeExcluir' => $resultado->userPodeEditar(),

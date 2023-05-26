@@ -306,13 +306,15 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/editar/senha', 'UserExternoSiteController@editarSenhaView')->name('externo.editar.senha.view');
       Route::put('/editar', 'UserExternoSiteController@editar')->name('externo.editar');
       // Solicitar Registro
-      Route::get('/solicitar-registro', 'UserExternoSiteController@preRegistroView')->name('externo.preregistro.view');
-      Route::get('/inserir-registro', 'UserExternoSiteController@inserirPreRegistroView')->name('externo.inserir.preregistro.view');
-      Route::put('/verifica-pendencia', 'UserExternoSiteController@verificaPendenciaPreRegistro')->name('externo.verifica.inserir.preregistro');
-      Route::put('/inserir-registro', 'UserExternoSiteController@inserirPreRegistro')->name('externo.inserir.preregistro');
-      Route::post('/inserir-registro-ajax', 'UserExternoSiteController@inserirPreRegistroAjax')->name('externo.inserir.preregistro.ajax');
-      Route::get('/pre-registro-anexo/download/{id}', 'UserExternoSiteController@preRegistroAnexoDownload')->name('externo.preregistro.anexo.download');
-      Route::delete('/pre-registro-anexo/excluir/{id}', 'UserExternoSiteController@preRegistroAnexoExcluir')->name('externo.preregistro.anexo.excluir');
+      Route::get('/relacao-registros', 'UserExternoSiteController@preRegistrosRelacao')->name('externo.relacao.preregistros');
+      Route::post('/contabil-inserir-registro', 'UserExternoSiteController@contabilCriarPreRegistro')->name('externo.contabil.inserir.preregistro');
+      Route::get('/solicitar-registro/{preRegistro?}', 'UserExternoSiteController@preRegistroView')->name('externo.preregistro.view');
+      Route::get('/inserir-registro/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistroView')->name('externo.inserir.preregistro.view');
+      Route::put('/verifica-pendencia/{preRegistro?}', 'UserExternoSiteController@verificaPendenciaPreRegistro')->name('externo.verifica.inserir.preregistro');
+      Route::put('/inserir-registro/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistro')->name('externo.inserir.preregistro');
+      Route::post('/inserir-registro-ajax/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistroAjax')->name('externo.inserir.preregistro.ajax');
+      Route::get('/pre-registro-anexo/download/{id}/{preRegistro?}', 'UserExternoSiteController@preRegistroAnexoDownload')->name('externo.preregistro.anexo.download');
+      Route::delete('/pre-registro-anexo/excluir/{id}/{preRegistro?}', 'UserExternoSiteController@preRegistroAnexoExcluir')->name('externo.preregistro.anexo.excluir');
     });
     
     //Balcão de Oportunidades

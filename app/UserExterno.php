@@ -48,6 +48,10 @@ class UserExterno extends Authenticatable
     {
         $update = Carbon::createFromFormat('Y-m-d H:i:s', $this->updated_at);
         $update->addDay();
+
+        if(!$this->possuiLogin())
+            return false;
+
         if($update >= now())
         {
             if($this->trashed())
@@ -55,5 +59,10 @@ class UserExterno extends Authenticatable
             return true;
         }
         return false;
+    }
+
+    public function possuiLogin()
+    {
+        return $this->aceite == 1;
     }
 }

@@ -124,8 +124,13 @@
 
     <hr class="mb-0">
 
+    @php
+        $rotaInserir = getGuardExterno(auth()) == 'contabil' ? route('externo.inserir.preregistro', $resultado->id) : route('externo.inserir.preregistro');
+        $rotaVerifica = getGuardExterno(auth()) == 'contabil' ? route('externo.verifica.inserir.preregistro', $resultado->id) : route('externo.verifica.inserir.preregistro');
+        $rotaCancelar = getGuardExterno(auth()) == 'contabil' ? route('externo.inserir.preregistro.view', $resultado->id) : route('externo.inserir.preregistro.view');
+    @endphp
     <form method="POST" 
-        action="{{ isset($semPendencia) && $semPendencia ? route('externo.inserir.preregistro') : route('externo.verifica.inserir.preregistro') }}" 
+        action="{{ isset($semPendencia) && $semPendencia ? $rotaInserir : $rotaVerifica }}" 
         enctype="multipart/form-data" 
         id="inserirRegistro" 
         class="cadastroRepresentante" 
@@ -134,6 +139,10 @@
         @csrf
         @method('PUT')
         
+        @if(getGuardExterno(auth()) == 'contabil')
+        <input type="hidden" value="{{ $resultado->id }}" id="contabil_editar_pr">
+        @endif
+
         <!-- Tab panes -->
         <div class="tab-content">
         
@@ -262,7 +271,7 @@
                 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <a href="{{ route('externo.inserir.preregistro.view') }}" class="btn btn-secondary">Cancelar</a>
+                    <a href="{{ $rotaCancelar }}" class="btn btn-secondary">Cancelar</a>
                     <button type="button" class="btn btn-success" id="submitPreRegistro" value="">Enviar</button>
                 </div>
             </div>

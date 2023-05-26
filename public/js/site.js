@@ -1133,6 +1133,9 @@ function putDadosPreRegistro(objeto)
 	var frmData = new FormData();
 	var dados = null;
 	var arrayEndereco = ['cep', 'logradouro', 'numero', 'complemento', 'cidade', 'uf'];
+	var contabil_editar_id = $('#contabil_editar_pr').length > 0 ? $('#contabil_editar_pr').val() : null;
+	var link_post = '';
+	var link_delete = '';
 
 	if(campo == 'path'){
 		for(var i = 0; i < valor.length; i++)
@@ -1156,6 +1159,10 @@ function putDadosPreRegistro(objeto)
 			'valor': valor
 		};
 
+	link_post = contabil_editar_id != null ? '/externo/inserir-registro-ajax/' + contabil_editar_id : '/externo/inserir-registro-ajax/';
+	link_delete = (contabil_editar_id != null) && (classe == 'Arquivo-Excluir') ? 
+	'/externo/pre-registro-anexo/excluir/' + dados.id + '/' + contabil_editar_id : '/externo/pre-registro-anexo/excluir/' + dados.id;
+
 	$("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Salvando');
 	$('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
 
@@ -1167,7 +1174,7 @@ function putDadosPreRegistro(objeto)
 		},
 		data: campo == 'path' ? frmData : dados,
 		dataType: 'json',
-		url: classe == 'Arquivo-Excluir' ? '/externo/pre-registro-anexo/excluir/' + dados.id : '/externo/inserir-registro-ajax',
+		url: classe == 'Arquivo-Excluir' ? link_delete : link_post,
 		processData: pD,
         contentType: cT,
 		cache: false,
@@ -1604,7 +1611,12 @@ $('#submitPreRegistro').click(function(){
 		
 	$("#modalLoadingBody").html('<i class="spinner-border text-info"></i> Enviando...');
 	$('#modalLoadingPreRegistro').modal({backdrop: "static", keyboard: false, show: true});
+	$('#campos_contabil').attr('disabled', false);
 	$('#inserirRegistro').submit();
+})
+
+$('#btnVerificaPend').click(function(){
+	$('#campos_contabil').attr('disabled', false);
 })
 
 //	--------------------------------------------------------------------------------------------------------

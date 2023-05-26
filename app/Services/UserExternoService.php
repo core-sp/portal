@@ -159,7 +159,7 @@ class UserExternoService implements UserExternoServiceInterface {
         if(isset($user_externo))
             if($user_externo->ativo == 0)
                 return [
-                    'message' => 'Por favor, acesse o email informado no momento do cadastro para verificar sua conta. Caso tenha passado de 24h, se recadastre.',
+                    'message' => 'Por favor, acesse o email informado no momento do cadastro para verificar sua conta. Caso tenha passado de 24h ou tenha um cadastro prévio, se recadastre.',
                     'class' => 'alert-warning',
                     'cpf_cnpj' => $cpf_cnpj
                 ];
@@ -170,5 +170,10 @@ class UserExternoService implements UserExternoServiceInterface {
             'class' => 'alert-danger',
             'cpf_cnpj' => $cpf_cnpj
         ];
+    }
+
+    public function sendEmailCadastroPrevio($contabil, $externo)
+    {
+        Mail::to($externo->email)->queue(new CadastroUserExternoMail('contabil', null, $contabil, true));
     }
 }

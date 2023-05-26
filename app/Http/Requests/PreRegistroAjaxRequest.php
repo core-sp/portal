@@ -22,6 +22,11 @@ class PreRegistroAjaxRequest extends FormRequest
     protected function prepareForValidation()
     {
         $campos_array = $this->service->getService('PreRegistro')->getNomesCampos();
+        if((getGuardExterno(auth()) == 'contabil') && (strpos($this->campo, 'contabil') !== false))
+            $this->merge([
+                'campo' => null,
+            ]);
+
         foreach($campos_array as $key => $campos)
         {
             $this->classes .= isset($this->classes) ? ','.$key : $key;

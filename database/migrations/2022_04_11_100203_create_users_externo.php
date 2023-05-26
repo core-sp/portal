@@ -19,7 +19,7 @@ class CreateUsersExterno extends Migration
             $table->string('nome');
             $table->string('email');
             $table->string('verify_token')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->boolean('ativo')->default(0);
             $table->boolean('aceite')->default(0);
             $table->rememberToken();

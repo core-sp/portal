@@ -204,6 +204,9 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function verificacao(GerentiRepositoryInterface $gerentiRepository, $externo)
     {
+        if(!isset($externo))
+            throw new \Exception('Não foi possível verificar no gerenti devido não ser um usuário externo.', 500);
+
         $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $externo->cpf_cnpj);
         $gerenti = null;
 
@@ -232,6 +235,77 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
+    public function setPreRegistro($gerentiRepository, $service, $externo, $dados)
+    {
+        $resultado = PreRegistro::whereHas('userExterno', function ($query) use($dados) {
+            $query->where('cpf_cnpj', $dados['cpf_cnpj'])->whereNotIn('status', ['Aprovado', 'Negado']);
+        })->get();
+        if($resultado->count() > 0)
+            return [
+                'message' => 'Este CPF / CNPJ já possui uma solicitação de registro em andamento. Por gentileza, peça que o representante insira no formulário o seu CNPJ.',
+                'class' => 'alert-warning'
+            ];
+
+        $usuario = $service->getService('UserExterno')->findByCpfCnpj('user_externo', $dados['cpf_cnpj']);
+        if(isset($usuario))
+        {
+            $gerenti = $this->verificacao($gerentiRepository, $usuario);
+            if(isset($gerenti['gerenti']))
+                return [
+                    'message' => 'Este CPF / CNPJ já possui registro ativo no Core-SP: '.formataRegistro($gerenti['gerenti']),
+                    'class' => 'alert-info'
+                ];
+            $criado = $this->getPreRegistro($service, $usuario);
+            $string = 'Contabilidade com cnpj '.$externo->cnpj;
+            $string .= ', criou a solicitação de registro com a id: ' . $criado['resultado']->id;
+            event(new ExternoEvent($string));
+
+            return [
+                'resultado' => $criado['resultado']
+            ];
+        }          
+        
+        $classe = $service->getService('UserExterno')->getDefinicoes('user_externo')['classe'];
+        $user_externo = new $classe;
+        $user_externo->cpf_cnpj = $dados['cpf_cnpj'];
+        $user_externo->nome = $dados['nome'];
+        $user_externo->email = $dados['email'];
+        $gerenti = $this->verificacao($gerentiRepository, $user_externo);
+        if(isset($gerenti['gerenti']))
+            return [
+                'message' => 'Este CPF / CNPJ já possui registro ativo no Core-SP: '.formataRegistro($gerenti['gerenti']),
+                'class' => 'alert-info'
+            ];
+        
+        $user_externo->save();
+        $criado = $this->getPreRegistro($service, $user_externo);
+        $criado['resultado']->update(['contabil_id' => $externo->id]);
+        $string = 'Contabilidade com cnpj '.$externo->cnpj;
+        $string .= ', criou a solicitação de registro com a id: ' . $criado['resultado']->id . ' junto com a conta do Usuário Externo com o ';
+        $string .= $user_externo->isPessoaFisica() ? 'cpf ' : 'cnpj ';
+        $string .= $user_externo->cpf_cnpj . ' que foi notificado pelo e-mail '.$user_externo->email;
+        event(new ExternoEvent($string));
+        $service->getService('UserExterno')->sendEmailCadastroPrevio($externo, $user_externo);
+        Mail::to($externo->email)->queue(new PreRegistroMail($criado['resultado']->fresh()));
+
+        return [
+            'resultado' => $criado['resultado']
+        ];
+    }
+
+    public function getPreRegistros($externo)
+    {
+        $resultados = $externo->load('preRegistros')
+        ->preRegistros()
+        ->orderBy('updated_at', 'DESC')
+        ->orderBy('user_externo_id')
+        ->paginate(5);
+        
+        return [
+            'resultados' => $resultados
+        ];
+    }
+
     public function getPreRegistro(MediadorServiceInterface $service, $externo)
     {
         $resultado = $externo->load('preRegistro')->preRegistro;
@@ -253,6 +327,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
             $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
             $string .= $externo->cpf_cnpj . ', iniciou o processo de solicitação de registro com a id: ' . $resultado->id;
             event(new ExternoEvent($string));
+            Mail::to($externo->email)->queue(new PreRegistroMail($resultado->fresh()));
         }
 
         return [
@@ -268,7 +343,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function saveSiteAjax($request, GerentiRepositoryInterface $gerentiRepository, $externo)
+    public function saveSiteAjax($request, GerentiRepositoryInterface $gerentiRepository, $externo, $contabil = null)
     {
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
@@ -296,8 +371,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
         if(($request['classe'] == 'anexos') && isset($resultado->nome_original))
         {
-            $string = 'Usuário Externo com ';
-            $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
+            $string = isset($contabil) ? 'Contabilidade com cnpj '.$contabil->cnpj.' realizou a operação para o Usuário Externo com ' : 'Usuário Externo com ';
+            $string .= $externo->isPessoaFisica() ? 'cpf ' : 'cnpj ';
             $string .= $externo->cpf_cnpj . ', anexou o arquivo "'.$resultado->nome_original.'", que possui a ID: '.$resultado->id;
             $string .= ' na solicitação de registro com a id: '.$preRegistro->id;
             event(new ExternoEvent($string));
@@ -309,7 +384,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function saveSite($request, GerentiRepositoryInterface $gerentiRepository, $externo)
+    public function saveSite($request, GerentiRepositoryInterface $gerentiRepository, $externo, $contabil = null)
     {
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
@@ -346,7 +421,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $preRegistro->setHistoricoStatus();
         Mail::to($externo->email)->queue(new PreRegistroMail($preRegistro->fresh()));
 
-        $string = 'Usuário Externo com ';
+        $string = isset($contabil) ? 'Contabilidade com cnpj '.$contabil->cnpj.' realizou a operação para o Usuário Externo com ' : 'Usuário Externo com ';
         $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
         $string .= $externo->cpf_cnpj . ', atualizou o status para ' . $status . ' da solicitação de registro com a id: ' . $preRegistro->id;
         event(new ExternoEvent($string));
@@ -357,7 +432,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         ];
     }
 
-    public function downloadAnexo($id, $idPreRegistro)
+    public function downloadAnexo($id, $idPreRegistro, $contabil = null)
     {
         $preRegistro = PreRegistro::findOrFail($idPreRegistro);
 
@@ -372,7 +447,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         throw new \Exception('Arquivo não existe / não pode acessar', 401);
     }
 
-    public function excluirAnexo($id, $externo)
+    public function excluirAnexo($id, $externo, $contabil = null)
     {
         $preRegistro = $externo->load('preRegistro')->preRegistro;
 
@@ -392,7 +467,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
                 $anexo->delete();
                 $preRegistro->touch();
 
-                $string = 'Usuário Externo com ';
+                $string = isset($contabil) ? 'Contabilidade com cnpj '.$contabil->cnpj.' realizou a operação para o Usuário Externo com ' : 'Usuário Externo com ';
                 $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';
                 $string .= $externo->cpf_cnpj . ', excluiu o arquivo com a ID: '.$id.' na solicitação de registro com a id: '.$preRegistro->id;
                 event(new ExternoEvent($string));

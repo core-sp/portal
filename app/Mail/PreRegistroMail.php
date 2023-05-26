@@ -14,6 +14,21 @@ class PreRegistroMail extends Mailable
 
     public $body;
 
+    private function criado()
+    {
+        $this->body = "<strong>Sua solicitação de registro foi iniciada com sucesso!</strong>";
+        $this->body .= "<br>";
+        $this->body .= "<br>";
+        $this->body .= "Você iniciou o processo de solicitar registro no Portal do Core-SP, e durante o preenchimento dos dados o salvamento é automático, ";
+        $this->body .= "então seus dados não serão perdidos em caso de logout.";
+        $this->body .= "<br><br>";
+        $this->body .= 'Pode adicionar uma contabilidade e a mesma, ao realizar o cadastro no Portal do Core-SP em <a href="'. route('externo.cadastro') .'">Login Externo</a>, também pode realizar alterações na solicitação.';
+        $this->body .= "<br><br>";
+        $this->body .= "Para remover a permissão da contabilidade, basta apagar o seu CNPJ da solicitação.";
+        $this->body .= "<br><br>";
+        $this->body .= "Os anexos só serão excluídos por você ou pela contabilidade.";
+    }
+
     private function analiseInicial()
     {
         $this->body = "<strong>Sua solicitação de registro foi realizada com sucesso!</strong>";
@@ -71,6 +86,9 @@ class PreRegistroMail extends Mailable
     public function __construct($preRegistro)
     {
         switch ($preRegistro->status) {
+            case PreRegistro::STATUS_CRIADO:
+                $this->criado();
+                break;
             case PreRegistro::STATUS_ANALISE_INICIAL:
                 $this->analiseInicial();
                 break;

@@ -14,6 +14,12 @@ class PreRegistroRequest extends FormRequest
 
     private function getRules($externo)
     {
+        $contabilCriarPR = [
+            'cpf_cnpj' => ['required', new CpfCnpj],
+            'nome' => 'required|min:5|max:191',
+            'email' => 'required|email:rfc,filter|min:10|max:191',
+        ];
+
         $rules = [
             'path' => $this->regraPath,
             'cnpj_contabil' => ['nullable', new CpfCnpj],
@@ -93,6 +99,9 @@ class PreRegistroRequest extends FormRequest
             'nome_pai_rt' => 'nullable|min:5|max:191|regex:/^\D*$/',
         ];
 
+        if(\Route::is('externo.contabil.inserir.preregistro'))
+            return $contabilCriarPR;
+
         $outrasRules = $externo->isPessoaFisica() ? $pessoaFisica : $pessoaJuridica;
 
         return array_merge($rules, $outrasRules);
@@ -100,7 +109,18 @@ class PreRegistroRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->externo = auth()->guard('user_externo')->user();
+        $this->externo = getGuardExterno(auth()) == 'contabil' ? 
+        auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($this->preRegistro)->userExterno : 
+        auth()->guard('user_externo')->user();
+
+        if(\Route::is('externo.contabil.inserir.preregistro')){
+            $this->merge([
+                'cpf_cnpj' => apenasNumeros($this->cpf_cnpj),
+                'nome' => mb_strtoupper($this->nome)
+            ]);
+            return;
+        }
+
         $preRegistro = $this->externo->load('preRegistro')->preRegistro;
 
         // Obrigatório salvar os anexos via rota ajax
@@ -129,7 +149,7 @@ class PreRegistroRequest extends FormRequest
 
             $this->merge([
                 'cpf_rt' => apenasNumeros(request()->cpf_rt),
-                'identidade_rt' => strtoupper(apenasNumerosLetras(request()->identidade_rt))
+                'identidade_rt' => mb_strtoupper(apenasNumerosLetras(request()->identidade_rt))
             ]);
         }
         
@@ -141,7 +161,7 @@ class PreRegistroRequest extends FormRequest
                     'naturalidade_estado' => null
                 ]);
             $this->merge([
-                'identidade' => strtoupper(apenasNumerosLetras(request()->identidade))
+                'identidade' => mb_strtoupper(apenasNumerosLetras(request()->identidade))
             ]);
         }
 
@@ -153,7 +173,16 @@ class PreRegistroRequest extends FormRequest
 
     public function rules()
     {
-        return $this->getRules($this->externo);
+        $all = $this->getRules($this->externo);
+
+        if(getGuardExterno(auth()) == 'contabil'){
+            unset($all['cnpj_contabil']);
+            unset($all['nome_contabil']);
+            unset($all['email_contabil']);
+            unset($all['nome_contato_contabil']);
+        }
+
+        return $all;
     }
 
     public function messages()
@@ -198,6 +227,12 @@ class PreRegistroRequest extends FormRequest
      */
     public function attributes()
     {
+        $contabilCriarPR = [
+            'cpf_cnpj' => 'CPF / CNPJ',
+            'nome' => 'Nome',
+            'email' => 'E-mail',
+        ];
+
         $rules = [
             'path' => '"Anexo"',
             'cnpj_contabil' => '"CNPJ da contabilidade"',
@@ -275,6 +310,9 @@ class PreRegistroRequest extends FormRequest
             'nome_pai_rt' => '"Nome do pai do responsável técnico"',
         ];
 
+        if(\Route::is('externo.contabil.inserir.preregistro'))
+            return $contabilCriarPR;
+            
         $outrasRules = $this->externo->isPessoaFisica() ? $pessoaFisica : $pessoaJuridica;
 
         return array_merge($rules, $outrasRules);
