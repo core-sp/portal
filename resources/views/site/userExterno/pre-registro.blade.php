@@ -45,6 +45,9 @@
                         <h5>ID da solicitação: {{ $resultado->id }}</h5>
                         <h5>Solicitado em: {{ onlyDate($resultado->created_at) }}</h5>
                         <h4>Status: {!! $resultado->getLabelStatusUser() !!}</h4>
+                        @if($resultado->status == $resultado::STATUS_NEGADO)
+                        <h5><span class="text-danger">Justificativa: </span>{{ $resultado->getJustificativaNegado() }}</h5>
+                        @endif
                     @endif
                     <!-- ***************************************************************************************************************** -->
 

@@ -169,20 +169,22 @@ class PreRegistroRequest extends FormRequest
             $this->merge([
                 'cnpj_contabil' => apenasNumeros(request()->cnpj_contabil),
             ]);
+
+        if(getGuardExterno(auth()) == 'contabil')
+        {
+            $contabil = auth()->guard('contabil')->user();
+            $this->merge([
+                'cnpj_contabil' => $contabil->cnpj,
+                'nome_contabil' => $contabil->nome,
+                'email_contabil' => $contabil->email,
+                'nome_contato_contabil' => $contabil->nome_contato
+            ]);
+        }
     }
 
     public function rules()
     {
-        $all = $this->getRules($this->externo);
-
-        if(getGuardExterno(auth()) == 'contabil'){
-            unset($all['cnpj_contabil']);
-            unset($all['nome_contabil']);
-            unset($all['email_contabil']);
-            unset($all['nome_contato_contabil']);
-        }
-
-        return $all;
+        return $this->getRules($this->externo);
     }
 
     public function messages()

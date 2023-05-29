@@ -1097,7 +1097,7 @@ function limparFileBD(nome, dados, totalFiles)
 function appendArquivoBD(finalLink, nome, valor, id, totalFiles)
 {
 	var total = $(".ArquivoBD_" + nome).length;
-	var link = window.location.href.slice(0, window.location.href.lastIndexOf("/") + 1) + finalLink + '/';
+	var link = window.location.protocol + '//' + window.location.hostname + '/' + finalLink + '/';
 	var cloneBD = null;
 
 	if((total == 1) && ($(".ArquivoBD_" + nome).css("display") == "none"))
@@ -1107,6 +1107,7 @@ function appendArquivoBD(finalLink, nome, valor, id, totalFiles)
 		cloneBD = $(".ArquivoBD_" + nome + ":last").clone(true);
 
 	cloneBD.find("input").val(valor);
+	$('#contabil_editar_pr').length > 0 ? cloneBD.find(".Arquivo-Download").attr("href", link + 'download/' + id + '/' + $('#contabil_editar_pr').val()) : 
 	cloneBD.find(".Arquivo-Download").attr("href", link + 'download/' + id);
 	cloneBD.find(".modalExcluir").val(id);
 
@@ -1328,7 +1329,7 @@ function preencheFile(dados)
 {
 	if(_.has(dados,"id")){
 		if(dados.id && dados.nome_original){
-			appendArquivoBD('pre-registro-anexo', "anexo", dados.nome_original, dados.id, pre_registro_total_files);
+			appendArquivoBD('externo/pre-registro-anexo', "anexo", dados.nome_original, dados.id, pre_registro_total_files);
 			$('#fileObrigatorio').val('existeAnexo');
 		}
 	}

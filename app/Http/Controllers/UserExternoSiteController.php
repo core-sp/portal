@@ -132,9 +132,11 @@ class UserExternoSiteController extends Controller
     public function preRegistroView($preRegistro = null)
     {
         try{
-            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
-            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
+            $pr = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro) :
             auth()->guard('user_externo')->user();
+
+            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? $pr->userExterno : $pr;
 
             $gerenti = null;
             $resultado = null;
@@ -143,6 +145,9 @@ class UserExternoSiteController extends Controller
                 $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
                 $gerenti = $dados['gerenti'];
                 $resultado = isset($gerenti) ? null : $externo->load('preRegistro')->preRegistro;
+                // Em caso de pre-registro aprovado ou negado e contabil quer visualizar
+                if(!isset($resultado) && isset($preRegistro))
+                    $resultado = $pr;
             }
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
