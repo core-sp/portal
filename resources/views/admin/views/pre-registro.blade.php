@@ -126,7 +126,7 @@
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte4_PF_parte5_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
-                    {{ !$resultado->userExterno->isPessoaFisica() ? '5.' : '4.' }} {{ $abas[4] }}
+                    5. {{ $abas[4] }}
                     @if(!empty(array_intersect_key($codigos[4], $resultado->getCamposEditados())))
                     <span class="badge badge-danger ml-2">Campos alterados</span>
                     @endif
@@ -140,7 +140,7 @@
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte5_PF_parte6_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
-                    {{ !$resultado->userExterno->isPessoaFisica() ? '6.' : '5.' }} {{ $abas[5] }}
+                    6. {{ $abas[5] }}
                     @if(!empty(array_intersect_key($codigos[5], $resultado->getCamposEditados())))
                     <span class="badge badge-success ml-2">Novos anexos</span>
                     @endif
