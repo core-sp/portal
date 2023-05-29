@@ -503,11 +503,13 @@ function addJustificado(campo, valor)
     if(valor != ""){
         if($('#' + campo + ' span.badge-warning').length == 0){
             $('#' + campo).append('<span class="badge badge-warning ml-2">Justificado</span>');
+            $('#' + campo + ' button').removeClass('btn-outline-success').addClass('btn-outline-danger');
             $('#' + campo + ' button.justificativaPreRegistro').html('<i class="fas fa-edit"></i>');
         }
     }else{
         $('#' + campo + ' span.badge-warning').remove();
-        $('#' + campo + ' button.justificativaPreRegistro').html('<i class="fas fa-times"></i>');
+        $('#' + campo + ' button').removeClass('btn-outline-danger').addClass('btn-outline-success');
+        $('#' + campo + ' button.justificativaPreRegistro').html('<i class="fas fa-user-edit"></i>');
     }
 
     $('#' + campo + ' span.valorJustificativaPR').text(valor);

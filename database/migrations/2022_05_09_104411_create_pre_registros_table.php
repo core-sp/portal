@@ -41,6 +41,7 @@ class CreatePreRegistrosTable extends Migration
             $table->text('confere_anexos')->nullable();
             $table->string('historico_contabil')->nullable();
             $table->text('historico_status')->nullable();
+            $table->text('historico_justificativas')->nullable();
             $table->text('campos_espelho')->nullable();
             $table->text('campos_editados')->nullable();
             $table->timestamps();

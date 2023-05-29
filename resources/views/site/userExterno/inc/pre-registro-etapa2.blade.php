@@ -512,7 +512,7 @@
 {{-- Deixar sempre no final do form a pergunta para não afetar a ordenação para o atendente no admin --}}
 <div class="form-row mb-2">
     <div class="col-sm mb-2-576">
-        <label for="pergunta">{{ $codigos[1]['pergunta'] }} - Quanto tempo possui de experiência no ramo de vendas?</label>
+        <label for="pergunta">{{ $codigos[1]['pergunta'] }} - Quanto tempo possui de experiência no ramo de vendas? <span class="text-danger">*</span></label>
         <input
             type="text"
             name="pergunta"

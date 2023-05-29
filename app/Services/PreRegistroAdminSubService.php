@@ -286,6 +286,7 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         
         $preRegistro->update(['idusuario' => $user->idusuario, 'status' => $status]);
         $preRegistro->setHistoricoStatus();
+        $preRegistro->setHistoricoJustificativas();
         $preRegistro->fresh();
 
         Mail::to($preRegistro->userExterno->email)->queue(new PreRegistroMail($preRegistro));

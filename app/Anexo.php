@@ -6,12 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Anexo extends Model
 {
-    use SoftDeletes;
-
     protected $table = 'anexos';
     protected $guarded = [];
     protected $touches = ['preRegistro'];

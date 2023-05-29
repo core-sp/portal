@@ -44,7 +44,7 @@ class PreRegistroRequest extends FormRequest
             'telefone_1' => 'required_with:tipo_telefone_1|nullable|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
             'opcional_celular_1' => 'nullable|array|in:'.implode(',', opcoes_celular()),
             'opcional_celular_1.*' => 'distinct',
-            'pergunta' => 'nullable|min:2|max:191'
+            'pergunta' => 'required|min:2|max:191'
         ];
 
         $pessoaFisica = [

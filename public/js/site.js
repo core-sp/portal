@@ -1326,14 +1326,7 @@ function preencheRT(dados)
 
 function preencheFile(dados)
 {
-	if(_.has(dados,"limite")){
-		var texto = dados.limite + "<br>Somente pode anexar novos documentos dia: <br>" + dados.dia;
-		$("#modalLoadingBody").html('<i class="icon fa fa-times text-danger"></i> ' + texto);
-		$("#modalLoadingPreRegistro").modal({backdrop: "static", keyboard: false, show: true});
-		setTimeout(function() {
-			$("#modalLoadingPreRegistro").modal('hide');
-		}, 5000);
-	}else if(_.has(dados,"id")){
+	if(_.has(dados,"id")){
 		if(dados.id && dados.nome_original){
 			appendArquivoBD('pre-registro-anexo', "anexo", dados.nome_original, dados.id, pre_registro_total_files);
 			$('#fileObrigatorio').val('existeAnexo');

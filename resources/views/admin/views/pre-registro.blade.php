@@ -33,13 +33,29 @@
     @if(isset($resultado->historico_status))
     <p class="font-weight-bolder mb-0">Histórico de atualizações de status:</p>
     <small>
-        <ul class="list-group list-group-flush mb-5">
+        <ul class="list-group list-group-flush mb-2">
+        @php
+            $array_justificativas_hist = $resultado->getHistoricoJustificativas();
+            $cont = -1;
+        @endphp
         @foreach($resultado->getHistoricoStatus() as $status)
             @php
                 $temp = explode(';', $status);
+                $cont = $temp[0] == $resultado::STATUS_CORRECAO ? $cont + 1 : $cont;
             @endphp
             <li class="list-group-item pl-0">
                 <span class="rounded p-1 bg{{ $resultado->getLabelStatus($temp[0]) }}">{{ $temp[0] }}</span> - {{ organizaData($temp[1]) }}
+                @if(($temp[0] == $resultado::STATUS_CORRECAO) && (!empty($array_justificativas_hist)))
+                <p class="mt-2 ml-0 mr-0 mb-0">&nbsp;&nbsp;&nbsp;&nbsp;<strong>
+                    <i class="fas fa-user-edit text-success"></i> Justificativas:</strong></p>
+                    @foreach($array_justificativas_hist[$cont] as $chave => $texto)
+                    <span class="rounded p-1">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <strong>{{ $chave }}:</strong> {{ $texto }}
+                    </span>
+                    <br>
+                    @endforeach
+                @endif
             </li>
         @endforeach
         </ul>
@@ -52,7 +68,7 @@
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte1_PF_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
-                    {{ $abas[0] }} 
+                    1. {{ $abas[0] }}
                     @if(!empty(array_intersect_key($codigos[0], $resultado->getCamposEditados())))
                     <span class="badge badge-danger ml-2">Campos alterados</span>
                     @endif
@@ -66,7 +82,7 @@
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte2_PF_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
-                    {{ $abas[1] }}
+                    2. {{ $abas[1] }}
                     @if(!empty(array_intersect_key($codigos[1], $resultado->getCamposEditados())))
                     <span class="badge badge-danger ml-2">Campos alterados</span>
                     @endif
@@ -80,7 +96,7 @@
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte3_PF_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
-                    {{ $abas[2] }}
+                    3. {{ $abas[2] }}
                     @if(!empty(array_intersect_key($codigos[2], $resultado->getCamposEditados())))
                     <span class="badge badge-danger ml-2">Campos alterados</span>
                     @endif
@@ -95,7 +111,7 @@
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte4_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
-                    {{ $abas[3] }}
+                    4. {{ $abas[3] }}
                     @if(!empty(array_intersect_key($codigos[3], $resultado->getCamposEditados())))
                     <span class="badge badge-danger ml-2">Campos alterados</span>
                     @endif
@@ -110,7 +126,7 @@
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte4_PF_parte5_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
-                    {{ $abas[4] }}
+                    {{ !$resultado->userExterno->isPessoaFisica() ? '5.' : '4.' }} {{ $abas[4] }}
                     @if(!empty(array_intersect_key($codigos[4], $resultado->getCamposEditados())))
                     <span class="badge badge-danger ml-2">Campos alterados</span>
                     @endif
@@ -124,7 +140,7 @@
         <div class="card">
             <a class="card-link" data-toggle="collapse" href="#parte5_PF_parte6_PJ">
                 <div class="card-header bg-secondary text-center text-uppercase font-weight-bolder menuPR">
-                    {{ $abas[5] }}
+                    {{ !$resultado->userExterno->isPessoaFisica() ? '6.' : '5.' }} {{ $abas[5] }}
                     @if(!empty(array_intersect_key($codigos[5], $resultado->getCamposEditados())))
                     <span class="badge badge-success ml-2">Novos anexos</span>
                     @endif

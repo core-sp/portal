@@ -289,30 +289,6 @@ class PreRegistro extends Model
         return $codigos;
     }
 
-    private function podeAnexar()
-    {
-        $limite = $this->userExterno->isPessoaFisica() ? 6 : 9;
-        $ontem = now()->subDay()->format('Y-m-d');
-        $hoje = now()->format('Y-m-d');
-
-        $anexos = $this->anexosOntemHj($ontem, $hoje);
-
-        foreach([$ontem, $hoje] as $dia)
-        {
-            if(isset($anexos[$dia]) && (count($anexos[$dia]) >= $limite))
-            {
-                $ultimo = $anexos[$dia]->first();
-                if($ultimo->created_at->addDay() >= now()) 
-                    return [
-                        'limite' => 'Atingiu o limite de ' . $limite . ' anexos por dia.', 
-                        'dia' => $ultimo->created_at->addDay()->format('d/m/Y, \à\s H:i:s')
-                    ];
-            }
-        }
-
-        return [];
-    }
-
     public function userExterno()
     {
         return $this->belongsTo('App\UserExterno')->withTrashed();
@@ -346,18 +322,6 @@ class PreRegistro extends Model
     public function anexos()
     {
         return $this->hasMany('App\Anexo');
-    }
-
-    public function anexosOntemHj($ontem, $hoje)
-    {
-        return $this->anexos()
-            ->select('created_at', DB::raw('date(created_at) as dia'))
-            ->whereDate('created_at', $ontem)
-            ->orWhereDate('created_at', $hoje)
-            ->orderBy('created_at', 'DESC')
-            ->withTrashed()
-            ->get()
-            ->groupBy('dia');
     }
 
     public function excluirAnexos()
@@ -507,9 +471,46 @@ class PreRegistro extends Model
         $this->update(['historico_status' => json_encode($historico, JSON_FORCE_OBJECT)]);
     }
 
+    public function setHistoricoJustificativas()
+    {
+        if(strlen($this->justificativa) < 5)
+            return null;
+
+        $justificativas = isset($this->historico_justificativas) ? json_decode($this->historico_justificativas, true) : array();
+        array_push($justificativas, $this->justificativa . ';' . $this->updated_at);
+        $this->update(['historico_justificativas' => json_encode($justificativas, JSON_FORCE_OBJECT)]);
+    }
+
     public function getHistoricoStatus()
     {
         return isset($this->historico_status) ? json_decode($this->historico_status, true) : array();
+    }
+
+    public function getHistoricoJustificativas()
+    {
+        if(isset($this->historico_justificativas))
+        {
+            $final_campos = array();
+            $final = array();
+            $justificados = json_decode($this->historico_justificativas, true);
+            foreach($justificados as $value)
+            {
+                $temp = explode(';', $value);
+                $textos = json_decode($temp[0], true);
+                foreach($textos as $key => $texto)
+                {
+                    foreach(self::getCodigosCampos($this->getAbasCampos()) as $k => $c)
+                        if(isset($c[$key]))
+                            $final_campos[$c[$key]] = $texto;
+                }
+                ksort($final_campos, SORT_NATURAL);
+                array_push($final, $final_campos);
+            }
+
+            return $final;
+        }
+
+        return array();
     }
 
     public function setCamposEspelho($request)
@@ -658,18 +659,14 @@ class PreRegistro extends Model
                 $resultado = $valido;
                 break;
             case 'anexos':
-                $liberado = $this->podeAnexar();
-                if(empty($liberado))
+                $anexos = $this->anexos();
+                $valido = $classe::armazenar($anexos->count(), $valor, $this->id, $this->userExterno->isPessoaFisica());
+                if(isset($valido))
                 {
-                    $anexos = $this->anexos();
-                    $valido = $classe::armazenar($anexos->count(), $valor, $this->id, $this->userExterno->isPessoaFisica());
-                    if(isset($valido))
-                    {
-                        $resultado = $anexos->create($valido);
-                        $this->touch();
-                    }
+                    $resultado = $anexos->create($valido);
+                    $this->touch();
                 }else
-                    $resultado = $liberado;
+                    $resultado = $valido;
                 break;
         }
 
