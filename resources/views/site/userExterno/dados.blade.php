@@ -94,6 +94,7 @@
                         class="form-control telefoneInput {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                         id="email"
                         value="{{ empty(old('telefone')) && isset($resultado->telefone) ? $resultado->telefone : old('telefone') }}"
+                        placeholder="(99) 99999-9999"
                     >
                     @if($errors->has('telefone'))
                     <div class="invalid-feedback">

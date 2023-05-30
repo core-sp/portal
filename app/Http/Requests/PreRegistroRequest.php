@@ -109,10 +109,6 @@ class PreRegistroRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->externo = getGuardExterno(auth()) == 'contabil' ? 
-        auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($this->preRegistro)->userExterno : 
-        auth()->guard('user_externo')->user();
-
         if(\Route::is('externo.contabil.inserir.preregistro')){
             $this->merge([
                 'cpf_cnpj' => apenasNumeros($this->cpf_cnpj),
@@ -120,6 +116,10 @@ class PreRegistroRequest extends FormRequest
             ]);
             return;
         }
+        
+        $this->externo = getGuardExterno(auth()) == 'contabil' ? 
+        auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($this->preRegistro)->userExterno : 
+        auth()->guard('user_externo')->user();
 
         $preRegistro = $this->externo->load('preRegistro')->preRegistro;
 

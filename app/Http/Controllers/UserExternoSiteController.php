@@ -164,6 +164,9 @@ class UserExternoSiteController extends Controller
     public function contabilCriarPreRegistro(PreRegistroRequest $request)
     {
         try{
+            if(getGuardExterno(auth()) == 'user_externo')
+                return redirect()->route('externo.preregistro.view');
+                
             $externo = auth()->guard('contabil')->user();
             $validated = $request->validated();
             $dados = $this->service->getService('PreRegistro')->setPreRegistro($this->gerentiRepository, $this->service, $externo, $validated);
@@ -187,10 +190,16 @@ class UserExternoSiteController extends Controller
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
+            if(!isset($externo) && auth()->guard('contabil')->check())
+                return redirect()->route('externo.relacao.preregistros');
+
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
 
             if(isset($dados['gerenti']))
-                return redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
+                return isset($preRegistro) ? 
+                redirect()->route('externo.preregistro.view', $preRegistro)->with(['resultado' => null, 'gerenti' => $dados['gerenti']]) : 
+                redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
+
             if($externo->preRegistroAprovado())
                 return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro) : 
                 redirect()->route('externo.preregistro.view')
@@ -205,6 +214,7 @@ class UserExternoSiteController extends Controller
             ]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            in_array($e->getCode(), [401]) ? abort($e->getCode(), $e->getMessage()) : 
             abort(500, 'Erro ao carregar os dados da solicitação de registro');
         }
 
@@ -244,9 +254,15 @@ class UserExternoSiteController extends Controller
             $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
             
             if(isset($dados['gerenti']))
-                return redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
+                return isset($preRegistro) ? 
+                redirect()->route('externo.preregistro.view', $preRegistro)->with(['resultado' => null, 'gerenti' => $dados['gerenti']]) : 
+                redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
+
+            if(!isset($externo) && auth()->guard('contabil')->check())
+                return redirect()->route('externo.relacao.preregistros');
+
             if($externo->preRegistroAprovado())
-            return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro) : 
+                return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro) : 
                 redirect()->route('externo.preregistro.view')
                 ->with(['resultado' => null, 'gerenti' => null]);
 

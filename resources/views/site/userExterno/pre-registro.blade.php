@@ -152,16 +152,18 @@
                                 Iniciar a solicitação do registro
                             </button>
                         </form>
-                        @else
+                        @elseif(!$resultado->isFinalizado())
                         <a 
                             class="btn btn-link btn-secondary link-nostyle branco mt-3"
                             href="{{ route('externo.inserir.preregistro.view', $resultado->id) }}"
                         >
-                        @if($resultado->status == $resultado::STATUS_CRIADO)
-                            Continuar a solicitação do registro
-                        @else
-                            {{ $resultado->userPodeCorrigir() ? 'Corrigir' : 'Visualizar' }} a solicitação do registro
-                        @endif
+                            @if($resultado->status == $resultado::STATUS_CRIADO)
+                                Continuar a solicitação do registro
+                            @elseif($resultado->userPodeCorrigir())
+                                Corrigir a solicitação do registro
+                            @else
+                                Visualizar a solicitação do registro
+                            @endif
                         </a>
                         @endif
                     @endif

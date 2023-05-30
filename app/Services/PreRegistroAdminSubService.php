@@ -290,6 +290,8 @@ class PreRegistroAdminSubService implements PreRegistroAdminSubServiceInterface 
         $preRegistro->fresh();
 
         Mail::to($preRegistro->userExterno->email)->queue(new PreRegistroMail($preRegistro));
+        if(isset($preRegistro->contabil) && $preRegistro->contabil->possuiLogin())
+            Mail::to($preRegistro->contabil->email)->queue(new PreRegistroMail($preRegistro));
         
         if($preRegistro->status == PreRegistro::STATUS_NEGADO)
         {

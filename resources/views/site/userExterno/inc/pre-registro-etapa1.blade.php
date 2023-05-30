@@ -6,16 +6,22 @@
 
 <small class="text-muted text-left">
     <em>
-        <span class="font-weight-bolder">Obs:</span> Se registro realizado por Escritório de Contabilidade, inserir os dados solicitados abaixo, caso contrário, avançar esta etapa sem o preenchimento.
+        <span class="font-weight-bolder">Obs:</span> 
+        {!! getGuardExterno(auth()) == 'contabil' ? 
+            'Para alterar os dados abaixo, vá na aba "Alterar dados" do menu da esquerda.' : 
+            'Se registro realizado por Escritório de Contabilidade, inserir os dados solicitados abaixo, caso contrário, avançar esta etapa sem o preenchimento. <br>
+            Caso a contabilidade possua login no Portal, somente ela poderá alterar os dados.'
+        !!}
     </em>
 </small>
 
 <div class="form-row mb-3 mt-2">
     <div class="col-sm mb-2-576">
-        <label for="cnpj_contabil">{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label> 
+        <label {{ getGuardExterno(auth()) != 'contabil' ? 'for="cnpj_contabil"' : '' }}>{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label> 
         <small class="text-muted text-left ml-2">
             <em>
-                Após inserir um CNPJ válido aguarde 24h para trocar
+                {{ getGuardExterno(auth()) == 'contabil' ? 
+                    'Somente o representante pode alterar / remover o CNPJ da contabilidade' : 'Após inserir um CNPJ válido aguarde 24h para trocar' }}
             </em>
         </small>
         <input

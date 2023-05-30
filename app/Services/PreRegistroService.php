@@ -210,7 +210,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
     public function verificacao(GerentiRepositoryInterface $gerentiRepository, $externo)
     {
         if(!isset($externo))
-            throw new \Exception('Não foi possível verificar no gerenti devido não ser um usuário externo.', 500);
+            throw new \Exception('Somente usuário externo pode ser verificado no sistema se consta registro.', 401);
 
         $resultadosGerenti = $gerentiRepository->gerentiBusca("", null, $externo->cpf_cnpj);
         $gerenti = null;
@@ -427,6 +427,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
         
         $preRegistro->setHistoricoStatus();
         Mail::to($externo->email)->queue(new PreRegistroMail($preRegistro->fresh()));
+        if(isset($preRegistro->contabil) && $preRegistro->contabil->possuiLogin())
+            Mail::to($preRegistro->contabil->email)->queue(new PreRegistroMail($preRegistro->fresh()));
 
         $string = isset($contabil) ? 'Contabilidade com cnpj '.$contabil->cnpj.' realizou a operação para o Usuário Externo com ' : 'Usuário Externo com ';
         $string .= $externo->isPessoaFisica() ? 'cpf: ' : 'cnpj: ';

@@ -415,6 +415,11 @@ class PreRegistro extends Model
         return isset($this->getJustificativaArray()['negado']) ? $this->getJustificativaArray()['negado'] : null;
     }
 
+    public function isFinalizado()
+    {
+        return ($this->status == PreRegistro::STATUS_NEGADO) || ($this->status == PreRegistro::STATUS_APROVADO);
+    }
+
     public function userPodeCorrigir()
     {
         return $this->status == PreRegistro::STATUS_CORRECAO;

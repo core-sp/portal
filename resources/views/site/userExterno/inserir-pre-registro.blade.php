@@ -127,7 +127,7 @@
     @php
         $rotaInserir = getGuardExterno(auth()) == 'contabil' ? route('externo.inserir.preregistro', $resultado->id) : route('externo.inserir.preregistro');
         $rotaVerifica = getGuardExterno(auth()) == 'contabil' ? route('externo.verifica.inserir.preregistro', $resultado->id) : route('externo.verifica.inserir.preregistro');
-        $rotaCancelar = getGuardExterno(auth()) == 'contabil' ? route('externo.inserir.preregistro.view', $resultado->id) : route('externo.inserir.preregistro.view');
+        $rotaCancelar = getGuardExterno(auth()) == 'contabil' ? route('externo.preregistro.view', $resultado->id) : route('externo.preregistro.view');
     @endphp
     <form method="POST" 
         action="{{ isset($semPendencia) && $semPendencia ? $rotaInserir : $rotaVerifica }}" 
