@@ -490,11 +490,11 @@ class PreRegistro extends Model
     {
         if(isset($this->historico_justificativas))
         {
-            $final_campos = array();
             $final = array();
             $justificados = json_decode($this->historico_justificativas, true);
             foreach($justificados as $value)
             {
+                $final_campos = array();
                 $temp = explode(';', $value);
                 $textos = json_decode($temp[0], true);
                 foreach($textos as $key => $texto)
@@ -551,6 +551,11 @@ class PreRegistro extends Model
         if($this->status == PreRegistro::STATUS_ANALISE_CORRECAO)
             return isset($this->campos_editados) ? json_decode($this->campos_editados, true) : array();
         return array();
+    }
+
+    public function confereJustificadosSubmit()
+    {
+        return ($this->status != PreRegistro::STATUS_CORRECAO) || (($this->status == PreRegistro::STATUS_CORRECAO) && (strlen($this->campos_editados) > 5));
     }
 
     public function getAbasCampos()

@@ -4,7 +4,6 @@
 @endphp
 
 <div class="card-body bg-light">
-@if(isset($resultado->contabil_id))
     <p id="cnpj_contabil">
         <span class="font-weight-bolder">{{ $codigos[0]['cnpj_contabil'] }} - CNPJ: </span>
         {{ isset($resultado->contabil->cnpj) ? formataCpfCnpj($resultado->contabil->cnpj) : '------' }}
@@ -74,8 +73,4 @@
         <span class="badge badge-danger ml-2">Campo alterado</span>
         @endif
     </p>
-
-@else
-    <p>Sem contabilidade</p>
-@endif
 </div>

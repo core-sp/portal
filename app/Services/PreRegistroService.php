@@ -97,6 +97,11 @@ class PreRegistroService implements PreRegistroServiceInterface {
     {
         $request = $this->formatCampos($request);
         $preRegistro->setCamposEspelho($request);
+        if(!$preRegistro->confereJustificadosSubmit())
+            return [
+                'message' => '<i class="fas fa-times"></i> Formulário não foi enviado para análise da correção, pois precisa editar dados(s) conforme justificativa(s).',
+                'class' => 'alert-danger'
+            ];
         $camposLimpos = array();
         $classe = null;
         $camposView = $this->getNomesCampos();
@@ -395,6 +400,8 @@ class PreRegistroService implements PreRegistroServiceInterface {
             throw new \Exception('Não autorizado a editar o formulário com a solicitação em análise ou finalizada', 401);
 
         $camposLimpos = $this->limparNomeCampos($preRegistro, $request);
+        if(isset($camposLimpos['message']))
+            return $camposLimpos;
 
         foreach($camposLimpos as $key => $arrayCampos)
         {

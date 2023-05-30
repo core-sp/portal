@@ -68,14 +68,14 @@
 <fieldset id="opcoesCelular" {{ isset($resultado->getTelefone()[0]) && ($resultado->getTipoTelefone()[0] == 'CELULAR') ? '' : 'disabled' }}>
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
-            <label for="opcional_celular">{{ $codigos[4]['opcional_celular'] }} <small class="bold">(opcional)</small> - Opções de comunicação </label><br>
-            @foreach(opcoes_celular() as $tipo)
+            <label>{{ $codigos[4]['opcional_celular'] }} <small class="bold">(opcional)</small> - Opções de comunicação </label><br>
+            @foreach(opcoes_celular() as $key => $tipo)
             <div class="form-check-inline">
-                <label class="form-check-label">
+                <label for="{{ 'opcional_celular_' . $key }}" class="form-check-label">
                     <input 
                         type="checkbox" 
                         name="opcional_celular[]"
-                        id="opcional_celular"
+                        id="{{ 'opcional_celular_' . $key }}"
                         class="{{ $classes[4] }} form-check-input {{ $errors->has('opcional_celular') ? 'is-invalid' : '' }}" 
                         value="{{ $tipo }}" 
                         @if(!empty(old('opcional_celular')))
@@ -144,13 +144,13 @@
     <div class="form-row mb-2">
         <div class="col-sm mb-2-576">
             <label for="opcional_celular_1">{{ $codigos[4]['opcional_celular_1'] }} <small class="bold">(opcional)</small> - Opções de comunicação </label><br>
-            @foreach(opcoes_celular() as $tipo)
+            @foreach(opcoes_celular() as $key => $tipo)
             <div class="form-check-inline">
-                <label class="form-check-label">
+                <label for="{{ 'opcional_celular__' . $key }}" class="form-check-label">
                     <input 
                         type="checkbox" 
                         name="opcional_celular_1[]"
-                        id="opcional_celular_1"
+                        id="{{ 'opcional_celular__' . $key }}"
                         class="{{ $classes[4] }} form-check-input {{ $errors->has('opcional_celular_1') ? 'is-invalid' : '' }}" 
                         value="{{ $tipo }}" 
                         @if(!empty(old('opcional_celular_1')))

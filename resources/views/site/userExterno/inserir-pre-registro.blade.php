@@ -235,7 +235,7 @@
                     data-target="#modalLoadingPreRegistro" 
                     data-backdrop="static"
                 >
-                    Verificar Pendências
+                    {{ $resultado->status != $resultado::STATUS_CORRECAO ? 'Verificar Pendências' : 'Enviar' }}
                 </button>
             </div>
             @endif
@@ -265,8 +265,12 @@
                 
                 <!-- Modal body -->
                 <div class="modal-body">
+                    @if($resultado->status != $resultado::STATUS_CORRECAO)
                     Sua solicitação não possui pendências. <br>Você pode prosseguir com o pedido de registro no CORE-SP para ser
                     <strong>REPRESENTANTE COMERCIAL</strong>
+                    @else
+                    Você pode prosseguir com o pedido de registro no CORE-SP para ser <strong>REPRESENTANTE COMERCIAL</strong>
+                    @endif
                 </div>
                 
                 <!-- Modal footer -->

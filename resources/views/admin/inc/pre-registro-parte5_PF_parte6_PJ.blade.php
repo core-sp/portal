@@ -61,14 +61,15 @@
     <hr>
 
     {!! !$resultado->atendentePodeEditar() ? '<fieldset disabled>' : '' !!}
-    <label for="confere_anexos[]"><i class="fas fa-check"></i> Anexos entregues: </label>
+    <label><i class="fas fa-check"></i> Anexos entregues: </label>
     <br>
 
     @if(!$resultado->userExterno->isPessoaFisica())
 
     <div class="form-check">
-        <label class="form-check-label">
+        <label for="inscricao_cnpj" class="form-check-label">
             <input 
+                id="inscricao_cnpj"
                 type="checkbox" 
                 name="confere_anexos[]"
                 value="Comprovante de inscrição CNPJ" 
@@ -79,8 +80,9 @@
     </div>
 
     <div class="form-check">
-        <label class="form-check-label">
+        <label for="contrato_social" class="form-check-label">
             <input 
+                id="contrato_social"
                 type="checkbox" 
                 name="confere_anexos[]"
                 value="Contrato Social" 
@@ -91,8 +93,9 @@
     </div>
 
     <div class="form-check">
-        <label class="form-check-label">
+        <label for="termo_rt_procuracao" class="form-check-label">
             <input 
+                id="termo_rt_procuracao"
                 type="checkbox" 
                 name="confere_anexos[]"
                 value="Declaração Termo de indicação RT ou Procuração" 
@@ -107,8 +110,9 @@
     @endif
 
     <div class="form-check">
-        <label class="form-check-label">
+        <label for="comprovante_identidade" class="form-check-label">
             <input 
+                id="comprovante_identidade"
                 type="checkbox" 
                 name="confere_anexos[]"
                 value="Comprovante de identidade" 
@@ -119,8 +123,9 @@
     </div>
 
     <div class="form-check">
-        <label class="form-check-label">
+        <label for="comprovante_cpf" class="form-check-label">
             <input 
+                id="comprovante_cpf"
                 type="checkbox" 
                 name="confere_anexos[]"
                 value="CPF" 
@@ -131,8 +136,9 @@
     </div>
 
     <div class="form-check">
-        <label class="form-check-label">
+        <label for="comprovante_residencia" class="form-check-label">
             <input 
+                id="comprovante_residencia"
                 type="checkbox" 
                 name="confere_anexos[]"
                 value="Comprovante de Residência" 
@@ -145,8 +151,9 @@
     @if((isset($resultado->pessoaFisica->nacionalidade) && ($resultado->pessoaFisica->nacionalidade == 'BRASILEIRA')) ||
     !$resultado->userExterno->isPessoaFisica())
     <div class="form-check">
-        <label class="form-check-label">
+        <label for="cert_quitacao_eleitoral" class="form-check-label">
             <input 
+                id="cert_quitacao_eleitoral"
                 type="checkbox" 
                 name="confere_anexos[]"
                 value="Certidão de quitação eleitoral" 
@@ -160,8 +167,9 @@
     @if((isset($resultado->pessoaFisica->sexo) && ($resultado->pessoaFisica->sexo == 'M') && !$resultado->pessoaFisica->maisDe45Anos()) ||
     !$resultado->userExterno->isPessoaFisica())
     <div class="form-check">
-        <label class="form-check-label">
+        <label for="cert_reservista_dispensa" class="form-check-label">
             <input 
+                id="cert_reservista_dispensa"
                 type="checkbox" 
                 name="confere_anexos[]"
                 value="Cerificado de reservista ou dispensa" 

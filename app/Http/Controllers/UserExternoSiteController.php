@@ -144,10 +144,8 @@ class UserExternoSiteController extends Controller
             if(isset($externo)){
                 $dados = $this->service->getService('PreRegistro')->verificacao($this->gerentiRepository, $externo);
                 $gerenti = $dados['gerenti'];
-                $resultado = isset($gerenti) ? null : $externo->load('preRegistro')->preRegistro;
-                // Em caso de pre-registro aprovado ou negado e contabil quer visualizar
-                if(!isset($resultado) && isset($preRegistro))
-                    $resultado = $pr;
+                if(!isset($gerenti))
+                    $resultado = isset($preRegistro) ? $pr : $externo->load('preRegistro')->preRegistro;
             }
         } catch(ModelNotFoundException $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');

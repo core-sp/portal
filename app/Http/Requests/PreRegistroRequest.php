@@ -26,7 +26,7 @@ class PreRegistroRequest extends FormRequest
             'nome_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191',
             'email_contabil' => 'required_with:cnpj_contabil|nullable|email:rfc,filter|min:10|max:191',
             'nome_contato_contabil' => 'required_with:cnpj_contabil|nullable|min:5|max:191|regex:/^\D*$/',
-            'telefone_contabil' => 'required_with:cnpj_contabil|nullable|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{5})\-([0-9]{3,4})/',
+            'telefone_contabil' => 'required_with:cnpj_contabil|nullable|min:14|max:15|regex:/(\([0-9]{2}\))\s([0-9]{4,5})\-([0-9]{4,5})$/',
             'segmento' => 'nullable|in:'.implode(',', segmentos()),
             'idregional' => 'required|exists:regionais,idregional',
             'cep' => 'required|size:9|regex:/([0-9]{5})\-([0-9]{3})/',

@@ -316,8 +316,8 @@
     <div class="col-sm mb-2-576">
         <label for="razao_social">{{ $codigos[1]['razao_social'] }} - Razão Social <span class="text-danger">*</span></label>
         <input
+            id="razao_social"
             name="razao_social"
-            cccccc
             type="text"
             class="{{ $classes[3] }} text-uppercase form-control {{ $errors->has('razao_social') ? 'is-invalid' : '' }} obrigatorio"
             value="{{ empty(old('razao_social')) && isset($resultado->pessoaJuridica->razao_social) ? $resultado->pessoaJuridica->razao_social : old('razao_social') }}"
