@@ -1160,7 +1160,7 @@ function putDadosPreRegistro(objeto)
 			'valor': valor
 		};
 
-	link_post = contabil_editar_id != null ? '/externo/inserir-registro-ajax/' + contabil_editar_id : '/externo/inserir-registro-ajax/';
+	link_post = contabil_editar_id != null ? '/externo/inserir-registro-ajax/' + contabil_editar_id : '/externo/inserir-registro-ajax';
 	link_delete = (contabil_editar_id != null) && (classe == 'Arquivo-Excluir') ? 
 	'/externo/pre-registro-anexo/excluir/' + dados.id + '/' + contabil_editar_id : '/externo/pre-registro-anexo/excluir/' + dados.id;
 

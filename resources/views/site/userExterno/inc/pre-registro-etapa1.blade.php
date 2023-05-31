@@ -19,7 +19,7 @@
 
 <div class="form-row mb-3 mt-4">
     <div class="col-sm mb-2-576">
-        <label {{ !auth()->guard('contabil')->check() ? 'for="cnpj_contabil"' : '' }}>{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label> 
+        <label {{ !auth()->guard('contabil')->check() ? 'for=cnpj_contabil' : '' }}>{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label> 
         <small class="text-muted text-left ml-2">
             <em>
                 {{ auth()->guard('contabil')->check() ? 
