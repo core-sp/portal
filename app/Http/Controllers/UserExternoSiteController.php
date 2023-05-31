@@ -17,12 +17,6 @@ class UserExternoSiteController extends Controller
 
     public function __construct(MediadorServiceInterface $service, GerentiRepositoryInterface $gerentiRepository)
     {        
-        // Limitação de requisições por minuto para cada usuário, senão erro 429
-        $qtd = '60';
-        if(config('app.env') == "testing")
-            $qtd = '100';
-
-        $this->middleware(['auth:user_externo,contabil', 'throttle:' . $qtd . ',1'])->except(['cadastroView', 'cadastro', 'verificaEmail']);
         $this->service = $service;
         $this->gerentiRepository = $gerentiRepository;
     }
@@ -49,7 +43,8 @@ class UserExternoSiteController extends Controller
             ]);
 
         return view('site.agradecimento')->with([
-            'agradece' => 'Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>'
+            'agradece' => 'Cadastro no Login Externo realizado com sucesso. Por favor, <strong>acesse o email informado para confirmar seu cadastro.</strong>',
+            'link_temp' => route('externo.verifica-email', ['tipo' => $validated['tipo_conta'], 'token' => $dados->verify_token]),
         ]);
     }
 
@@ -116,9 +111,6 @@ class UserExternoSiteController extends Controller
     public function preRegistrosRelacao()
     {
         try{
-            if(getGuardExterno(auth()) == 'user_externo')
-                return redirect()->route('externo.preregistro.view');
-
             $externo = auth()->guard('contabil')->user();
             $dados = $this->service->getService('PreRegistro')->getPreRegistros($externo);
         } catch (\Exception $e) {
@@ -132,11 +124,11 @@ class UserExternoSiteController extends Controller
     public function preRegistroView($preRegistro = null)
     {
         try{
-            $pr = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            $pr = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro) :
             auth()->guard('user_externo')->user();
 
-            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? $pr->userExterno : $pr;
+            $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? $pr->userExterno : $pr;
 
             $gerenti = null;
             $resultado = null;
@@ -164,9 +156,6 @@ class UserExternoSiteController extends Controller
     public function contabilCriarPreRegistro(PreRegistroRequest $request)
     {
         try{
-            if(getGuardExterno(auth()) == 'user_externo')
-                return redirect()->route('externo.preregistro.view');
-                
             $externo = auth()->guard('contabil')->user();
             $validated = $request->validated();
             $dados = $this->service->getService('PreRegistro')->setPreRegistro($this->gerentiRepository, $this->service, $externo, $validated);
@@ -177,16 +166,16 @@ class UserExternoSiteController extends Controller
 
         if(isset($dados['message']))
             return redirect()->route('externo.preregistro.view')->with($dados);
-        return redirect()->route('externo.inserir.preregistro.view', $dados['resultado']->id);
+        return redirect()->route('externo.inserir.preregistro.view', $dados->id);
     }
 
     public function inserirPreRegistroView(Request $request, $preRegistro = null)
     {
         try{
-            if(($request->checkPreRegistro != 'on') && (getGuardExterno(auth()) == 'user_externo'))
+            if(($request->checkPreRegistro != 'on') && auth()->guard('user_externo')->check())
                 return redirect()->route('externo.preregistro.view');
 
-            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
@@ -199,11 +188,6 @@ class UserExternoSiteController extends Controller
                 return isset($preRegistro) ? 
                 redirect()->route('externo.preregistro.view', $preRegistro)->with(['resultado' => null, 'gerenti' => $dados['gerenti']]) : 
                 redirect()->route('externo.preregistro.view')->with(['resultado' => null, 'gerenti' => $dados['gerenti']]);
-
-            if($externo->preRegistroAprovado())
-                return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro) : 
-                redirect()->route('externo.preregistro.view')
-                ->with(['resultado' => null, 'gerenti' => null]);
 
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
         } catch(ModelNotFoundException $e) {
@@ -218,13 +202,19 @@ class UserExternoSiteController extends Controller
             abort(500, 'Erro ao carregar os dados da solicitação de registro');
         }
 
+        if(isset($dados['message']))
+            return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro)->with($dados) : 
+                redirect()->route('externo.preregistro.view')
+                ->with($dados)
+                ->with(['resultado' => null, 'gerenti' => null]);
+
         return view('site.userExterno.inserir-pre-registro', $dados);
     }
 
     public function inserirPreRegistroAjax(PreRegistroAjaxRequest $request, $preRegistro = null)
     {
         try{
-            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
@@ -247,7 +237,7 @@ class UserExternoSiteController extends Controller
     public function verificaPendenciaPreRegistro(PreRegistroRequest $request, $preRegistro = null)
     {
         try{
-            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
             
@@ -261,12 +251,14 @@ class UserExternoSiteController extends Controller
             if(!isset($externo) && auth()->guard('contabil')->check())
                 return redirect()->route('externo.relacao.preregistros');
 
-            if($externo->preRegistroAprovado())
-                return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro) : 
-                redirect()->route('externo.preregistro.view')
-                ->with(['resultado' => null, 'gerenti' => null]);
-
             $dados = $this->service->getService('PreRegistro')->getPreRegistro($this->service, $externo);
+
+            if(isset($dados['message']))
+                return isset($preRegistro) ? redirect()->route('externo.preregistro.view', $preRegistro)->with($dados) : 
+                    redirect()->route('externo.preregistro.view')
+                    ->with($dados)
+                    ->with(['resultado' => null, 'gerenti' => null]);
+
             $resultado = $dados['resultado'];
 
             if(!$resultado->userPodeEditar())
@@ -294,7 +286,7 @@ class UserExternoSiteController extends Controller
     public function inserirPreRegistro(PreRegistroRequest $request, $preRegistro = null)
     {
         try{
-            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
@@ -321,7 +313,7 @@ class UserExternoSiteController extends Controller
     public function preRegistroAnexoDownload($id, $preRegistro = null)
     {
         try{
-            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 
@@ -347,7 +339,7 @@ class UserExternoSiteController extends Controller
     public function preRegistroAnexoExcluir($id, $preRegistro = null)
     {
         try{
-            $externo = isset($preRegistro) && (getGuardExterno(auth()) == 'contabil') ? 
+            $externo = isset($preRegistro) && auth()->guard('contabil')->check() ? 
             auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($preRegistro)->userExterno :
             auth()->guard('user_externo')->user();
 

@@ -6,21 +6,23 @@
 
 <small class="text-muted text-left">
     <em>
-        <span class="font-weight-bolder">Obs:</span> 
-        {!! getGuardExterno(auth()) == 'contabil' ? 
+        <span class="font-weight-bolder">Observações:</span>
+        <br>
+        {!! auth()->guard('contabil')->check() ? 
             'Para alterar os dados abaixo, vá na aba "Alterar dados" do menu da esquerda.' : 
             'Se registro realizado por Escritório de Contabilidade, inserir os dados solicitados abaixo, caso contrário, avançar esta etapa sem o preenchimento. <br>
+            <span class="text-danger font-weight-bolder">*</span> Campos obrigatórios caso preencha CNPJ da contabilidade <br>
             Caso a contabilidade possua login no Portal, somente ela poderá alterar os dados.'
         !!}
     </em>
 </small>
 
-<div class="form-row mb-3 mt-2">
+<div class="form-row mb-3 mt-4">
     <div class="col-sm mb-2-576">
-        <label {{ getGuardExterno(auth()) != 'contabil' ? 'for="cnpj_contabil"' : '' }}>{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label> 
+        <label {{ !auth()->guard('contabil')->check() ? 'for="cnpj_contabil"' : '' }}>{{ $codigos[0]['cnpj_contabil'] }} - CNPJ</label> 
         <small class="text-muted text-left ml-2">
             <em>
-                {{ getGuardExterno(auth()) == 'contabil' ? 
+                {{ auth()->guard('contabil')->check() ? 
                     'Somente o representante pode alterar / remover o CNPJ da contabilidade' : 'Após inserir um CNPJ válido aguarde 24h para trocar' }}
             </em>
         </small>
@@ -28,7 +30,7 @@
             class="{{ $classes[1] }} form-control cnpjInput {{ $errors->has('cnpj_contabil') ? 'is-invalid' : '' }}"
             value="{{ empty(old('cnpj_contabil')) && isset($resultado->contabil->cnpj) ? $resultado->contabil->cnpj : old('cnpj_contabil') }}"
             placeholder="00.000.000/0000-00"
-        @if(getGuardExterno(auth()) != 'contabil')
+        @if(!auth()->guard('contabil')->check())
             name="cnpj_contabil"
             id="cnpj_contabil"
             type="text"
@@ -42,14 +44,6 @@
         </div>
         @endif
     </div>
-</div>
-
-<div class="col p-0 mb-2 mt-2">
-<small class="text-muted text-left">
-    <em>
-        <span class="text-danger font-weight-bolder">*</span> Campos obrigatórios caso preencha CNPJ da contabilidade
-    </em>
-</small>
 </div>
 
 <fieldset id="campos_contabil" {{ isset($resultado->contabil->cnpj) && !$resultado->contabil->possuiLogin() ? '' : 'disabled' }}>

@@ -25,7 +25,7 @@
                     <br>
                     @if(isset($gerenti))
                     <p>Você já possui registro ativo no Core-SP: <strong>{{ formataRegistro($gerenti) }}</strong></p>
-                    @elseif(getGuardExterno(auth()) == 'user_externo')
+                    @elseif(auth()->guard('user_externo')->check())
                     <hr />
                         @foreach(auth()->guard('user_externo')->user()->load('preRegistros')->preRegistros as $preRegistro)
                             @if(in_array($preRegistro->status, [$preRegistro::STATUS_NEGADO, $preRegistro::STATUS_APROVADO]))
@@ -52,7 +52,7 @@
                     <!-- ***************************************************************************************************************** -->
 
                     <!-- Para autenticação user_externo ********************************************************************************** -->
-                    @if(!isset($gerenti) && (getGuardExterno(auth()) == 'user_externo') && !auth()->guard('user_externo')->user()->preRegistroAprovado())
+                    @if(!isset($gerenti) && auth()->guard('user_externo')->check() && !auth()->guard('user_externo')->user()->preRegistroAprovado())
                         <form action="{{ route('externo.inserir.preregistro.view') }}" autocomplete="off">
                             <div class="form-check mt-3">
                                 <input type="checkbox"
@@ -80,7 +80,7 @@
                     <!-- ***************************************************************************************************************** -->
 
                     <!-- Para autenticação contabil ********************************************************************************** -->
-                    @if(!isset($gerenti) && (getGuardExterno(auth()) == 'contabil'))
+                    @if(!isset($gerenti) && auth()->guard('contabil')->check())
                         @if(!isset($resultado))
                         <p>
                             Após a solicitação ser criada, o representante com o respectivo CPF / CNPJ 

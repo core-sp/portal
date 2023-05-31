@@ -117,7 +117,7 @@ class PreRegistroRequest extends FormRequest
             return;
         }
         
-        $this->externo = getGuardExterno(auth()) == 'contabil' ? 
+        $this->externo = auth()->guard('contabil')->check() ? 
         auth()->guard('contabil')->user()->load('preRegistros')->preRegistros()->findOrFail($this->preRegistro)->userExterno : 
         auth()->guard('user_externo')->user();
 
@@ -170,7 +170,7 @@ class PreRegistroRequest extends FormRequest
                 'cnpj_contabil' => apenasNumeros(request()->cnpj_contabil),
             ]);
 
-        if(getGuardExterno(auth()) == 'contabil')
+        if(auth()->guard('contabil')->check())
         {
             $contabil = auth()->guard('contabil')->user();
             $this->merge([

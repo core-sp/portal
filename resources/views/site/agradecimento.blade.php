@@ -34,6 +34,7 @@
       <div class="col">
         <div class="novo-core-box">
           @if(isset($agradece))
+            <h5 class="text-white mb-3"><a href="{{ $link_temp }}">Link temporário de teste para verificar e-mail</a></h5>
             <h5 class="light branco">{!! $agradece !!}</h5>
           @endif
         </div>

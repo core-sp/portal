@@ -125,9 +125,9 @@
     <hr class="mb-0">
 
     @php
-        $rotaInserir = getGuardExterno(auth()) == 'contabil' ? route('externo.inserir.preregistro', $resultado->id) : route('externo.inserir.preregistro');
-        $rotaVerifica = getGuardExterno(auth()) == 'contabil' ? route('externo.verifica.inserir.preregistro', $resultado->id) : route('externo.verifica.inserir.preregistro');
-        $rotaCancelar = getGuardExterno(auth()) == 'contabil' ? route('externo.preregistro.view', $resultado->id) : route('externo.preregistro.view');
+        $rotaInserir = auth()->guard('contabil')->check() ? route('externo.inserir.preregistro', $resultado->id) : route('externo.inserir.preregistro');
+        $rotaVerifica = auth()->guard('contabil')->check() ? route('externo.verifica.inserir.preregistro', $resultado->id) : route('externo.verifica.inserir.preregistro');
+        $rotaCancelar = auth()->guard('contabil')->check() ? route('externo.preregistro.view', $resultado->id) : route('externo.preregistro.view');
     @endphp
     <form method="POST" 
         action="{{ isset($semPendencia) && $semPendencia ? $rotaInserir : $rotaVerifica }}" 
@@ -139,7 +139,7 @@
         @csrf
         @method('PUT')
         
-        @if(getGuardExterno(auth()) == 'contabil')
+        @if(auth()->guard('contabil')->check())
         <input type="hidden" value="{{ $resultado->id }}" id="contabil_editar_pr">
         @endif
 

@@ -85,6 +85,8 @@ class UserExternoService implements UserExternoServiceInterface {
 
         Mail::to($externo->email)->queue(new CadastroUserExternoMail($tipo_conta['tipo'], $dados['verify_token']));
         event(new ExternoEvent('"' . formataCpfCnpj($externo[$tipo_conta['campo']]) . '" ("' . $externo->email . '") cadastrou-se na Área do Login Externo como '.$tipo_conta['rotulo'].'.'));
+        
+        return $externo->fresh();
     }
 
     public function verificaEmail($token, $tipo)

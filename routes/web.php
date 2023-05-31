@@ -300,21 +300,21 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/password/reset/{token}', 'Auth\UserExternoResetPasswordController@showResetForm')->name('externo.password.reset');
       Route::post('/password/reset', 'Auth\UserExternoResetPasswordController@reset')->name('externo.password.update');
       // Home
-      Route::get('/home', 'UserExternoSiteController@index')->name('externo.dashboard');
+      Route::get('/home', 'UserExternoSiteController@index')->name('externo.dashboard')->middleware('auth:user_externo,contabil');
       // Editar dados do cadastro
-      Route::get('/editar', 'UserExternoSiteController@editarView')->name('externo.editar.view');
-      Route::get('/editar/senha', 'UserExternoSiteController@editarSenhaView')->name('externo.editar.senha.view');
-      Route::put('/editar', 'UserExternoSiteController@editar')->name('externo.editar');
+      Route::get('/editar', 'UserExternoSiteController@editarView')->name('externo.editar.view')->middleware('auth:user_externo,contabil');
+      Route::get('/editar/senha', 'UserExternoSiteController@editarSenhaView')->name('externo.editar.senha.view')->middleware('auth:user_externo,contabil');
+      Route::put('/editar', 'UserExternoSiteController@editar')->name('externo.editar')->middleware('auth:user_externo,contabil');
       // Solicitar Registro
-      Route::get('/relacao-registros', 'UserExternoSiteController@preRegistrosRelacao')->name('externo.relacao.preregistros');
-      Route::post('/contabil-inserir-registro', 'UserExternoSiteController@contabilCriarPreRegistro')->name('externo.contabil.inserir.preregistro');
-      Route::get('/solicitar-registro/{preRegistro?}', 'UserExternoSiteController@preRegistroView')->name('externo.preregistro.view');
-      Route::get('/inserir-registro/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistroView')->name('externo.inserir.preregistro.view');
-      Route::put('/verifica-pendencia/{preRegistro?}', 'UserExternoSiteController@verificaPendenciaPreRegistro')->name('externo.verifica.inserir.preregistro');
-      Route::put('/inserir-registro/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistro')->name('externo.inserir.preregistro');
-      Route::post('/inserir-registro-ajax/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistroAjax')->name('externo.inserir.preregistro.ajax');
-      Route::get('/pre-registro-anexo/download/{id}/{preRegistro?}', 'UserExternoSiteController@preRegistroAnexoDownload')->name('externo.preregistro.anexo.download');
-      Route::delete('/pre-registro-anexo/excluir/{id}/{preRegistro?}', 'UserExternoSiteController@preRegistroAnexoExcluir')->name('externo.preregistro.anexo.excluir');
+      Route::get('/relacao-registros', 'UserExternoSiteController@preRegistrosRelacao')->name('externo.relacao.preregistros')->middleware('auth:contabil');
+      Route::post('/contabil-inserir-registro', 'UserExternoSiteController@contabilCriarPreRegistro')->name('externo.contabil.inserir.preregistro')->middleware('auth:contabil');
+      Route::get('/solicitar-registro/{preRegistro?}', 'UserExternoSiteController@preRegistroView')->name('externo.preregistro.view')->middleware('auth:user_externo,contabil');
+      Route::get('/inserir-registro/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistroView')->name('externo.inserir.preregistro.view')->middleware('auth:user_externo,contabil');
+      Route::put('/verifica-pendencia/{preRegistro?}', 'UserExternoSiteController@verificaPendenciaPreRegistro')->name('externo.verifica.inserir.preregistro')->middleware('auth:user_externo,contabil');
+      Route::put('/inserir-registro/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistro')->name('externo.inserir.preregistro')->middleware('auth:user_externo,contabil');
+      Route::post('/inserir-registro-ajax/{preRegistro?}', 'UserExternoSiteController@inserirPreRegistroAjax')->name('externo.inserir.preregistro.ajax')->middleware('auth:user_externo,contabil', 'throttle:100,1');
+      Route::get('/pre-registro-anexo/download/{id}/{preRegistro?}', 'UserExternoSiteController@preRegistroAnexoDownload')->name('externo.preregistro.anexo.download')->middleware('auth:user_externo,contabil', 'throttle:100,1');
+      Route::delete('/pre-registro-anexo/excluir/{id}/{preRegistro?}', 'UserExternoSiteController@preRegistroAnexoExcluir')->name('externo.preregistro.anexo.excluir')->middleware('auth:user_externo,contabil', 'throttle:100,1');
     });
     
     //Balcão de Oportunidades

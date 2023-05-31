@@ -261,13 +261,16 @@ class PreRegistroService implements PreRegistroServiceInterface {
                     'class' => 'alert-info'
                 ];
             $criado = $this->getPreRegistro($service, $usuario);
+
+            if(isset($criado['message']))
+                return $criado;
+
+            $criado['resultado']->update(['contabil_id' => $externo->id]);
             $string = 'Contabilidade com cnpj '.$externo->cnpj;
             $string .= ', criou a solicitação de registro com a id: ' . $criado['resultado']->id;
             event(new ExternoEvent($string));
 
-            return [
-                'resultado' => $criado['resultado']
-            ];
+            return $criado['resultado'];
         }          
         
         $classe = $service->getService('UserExterno')->getDefinicoes('user_externo')['classe'];
@@ -284,6 +287,10 @@ class PreRegistroService implements PreRegistroServiceInterface {
         
         $user_externo->save();
         $criado = $this->getPreRegistro($service, $user_externo);
+
+        if(isset($criado['message']))
+            return $criado;
+
         $criado['resultado']->update(['contabil_id' => $externo->id]);
         $string = 'Contabilidade com cnpj '.$externo->cnpj;
         $string .= ', criou a solicitação de registro com a id: ' . $criado['resultado']->id . ' junto com a conta do Usuário Externo com o ';
@@ -293,9 +300,7 @@ class PreRegistroService implements PreRegistroServiceInterface {
         $service->getService('UserExterno')->sendEmailCadastroPrevio($externo, $user_externo);
         Mail::to($externo->email)->queue(new PreRegistroMail($criado['resultado']->fresh()));
 
-        return [
-            'resultado' => $criado['resultado']
-        ];
+        return $criado['resultado'];
     }
 
     public function getPreRegistros($externo)
@@ -313,7 +318,15 @@ class PreRegistroService implements PreRegistroServiceInterface {
 
     public function getPreRegistro(MediadorServiceInterface $service, $externo)
     {
+        if(!isset($externo))
+            throw new \Exception('Somente usuário externo ou contabilidade vinculada a um usuário externo pode solicitar registro.', 401);
+
         $resultado = $externo->load('preRegistro')->preRegistro;
+        if($externo->preRegistroAprovado())
+            return [
+                'message' => 'Este CPF / CNPJ já possui uma solicitação aprovada.',
+                'class' => 'alert-warning'
+            ];
         if(!isset($resultado))
         {
             $resultado = $externo->preRegistros()->create();
