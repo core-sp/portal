@@ -101,6 +101,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Agendamento', 'idusuario');
     }
 
+    public function salasReunioes()
+    {
+        return $this->hasMany('App\SalaReuniao', 'idusuario');
+    }
+
     public function getRelatorioAgendadosPorPerfil($todos_agendados)
     {
         $subject = 'em '.$this->regional->regional;

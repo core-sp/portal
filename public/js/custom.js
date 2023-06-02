@@ -395,3 +395,55 @@ $("#logout-interno").click(function(){
 	$('body').append(form);
 	$(form).submit();
 });
+
+
+// Funcionalidade Sala de Reunião +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+$("#itens_reuniao, #itens_coworking").on('dblclick', 'option', function(){
+  var texto = this.text;
+  var valor = this.value;
+  var numero = texto.replace(/[^0-9_,]/ig, '');
+  if(numero.trim().length > 0){
+    $('#sala_reuniao_itens').modal({backdrop: 'static', keyboard: false, show: true});
+    $('#sala_reuniao_itens')
+    .removeClass('itens_reuniao')
+    .removeClass('itens_coworking')
+    .addClass($(this).parent().attr('id'));
+    $('#sala_reuniao_itens .modal-body')
+    .html(texto.substr(0, texto.search(numero)) + ' <input type="text" id="'+ valor +'">' + texto.substr(texto.search(numero) + numero.length, texto.length));
+  }
+});
+
+$('#editar_item').click(function(){
+  var tipo = $('#sala_reuniao_itens').hasClass('itens_reuniao') ? 'itens_reuniao' : 'itens_coworking';
+  var id = $('#sala_reuniao_itens .modal-body input').attr('id');
+  var valor = $('#sala_reuniao_itens .modal-body input').val();
+  var texto = $('#' + tipo + ' option[value="' + id + '"]').text();
+  var numero = texto.replace(/[^0-9_,]/ig, '');
+  texto = texto.replace(numero, valor);
+  $('#sala_reuniao_itens .modal-body input').remove();
+  $('#' + tipo + ' option[value="' + id + '"]').val(texto).text(texto);
+  $('#sala_reuniao_itens').modal('hide');
+});
+
+$('button.addItem, button.removeItem').click(function(){
+  var tipo = (this.id == 'btnAddReuniao') || (this.id == 'btnRemoveReuniao') ? 'reuniao' : 'coworking';
+  var itens = $(this).hasClass('addItem') ? $('#todos_itens_' + tipo + ' option:selected') : $('#itens_' + tipo + ' option:selected');
+  var opcao = $(this).hasClass('addItem') ? 'add' : 'remove';
+  itens.each(function() {
+    if(opcao == 'add')
+      $('#itens_' + tipo).append('<option value="' + this.value + '">' + this.text +'</option>');
+    else{
+      var texto = this.text;
+      var numero = texto.replace(/[^0-9_,]/ig, '');
+      texto = numero.trim().length > 0 ? texto.replace(numero, '_') : texto;
+      $('#todos_itens_' + tipo).append('<option value="' + texto + '">' + texto +'</option>');
+    }
+    $(this).remove();
+  });
+});
+
+$('#form_salaReuniao button[type="submit"]').click(function(){
+  $('#itens_reuniao option').prop('selected', true);
+  $('#itens_coworking option').prop('selected', true);
+});

@@ -236,6 +236,13 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/ajax', 'PlantaoJuridicoBloqueioController@getPlantaoAjax')->name('plantao.juridico.bloqueios.ajax');
     });
 
+    // Salas de Reuniões
+    Route::prefix('salas-reunioes')->group(function(){
+      Route::get('/', 'SalaReuniaoController@index')->name('sala.reuniao.index');
+      Route::get('/editar/{id}', 'SalaReuniaoController@edit')->name('sala.reuniao.editar.view');
+      Route::put('/editar/{id}', 'SalaReuniaoController@update')->name('sala.reuniao.editar');
+    });
+
   });
 
   /*
