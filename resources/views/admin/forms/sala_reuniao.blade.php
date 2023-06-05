@@ -120,7 +120,7 @@
                         <br>
                         <br>
                     </small>
-                    <button class="btn btn-sm btn-success float-left mt-2 addItem" type="button" id="btnAddReuniao">Adicionar itens</button>
+                    <button class="btn btn-sm btn-success float-left mt-2 addItem" type="button" id="btnAddReuniao">Adicionar itens <i class="fas fa-angle-double-right"></i></button>
                 </div>
 
                 <div class="col-sm mb-2-576">
@@ -149,7 +149,7 @@
                         <br>
                         <em>** Dê um duplo clique no item para editar um valor</em>
                     </small>
-                    <button class="btn btn-sm btn-danger float-right mt-2 removeItem" type="button" id="btnRemoveReuniao">Remover itens</button>
+                    <button class="btn btn-sm btn-danger float-left mt-2 removeItem" type="button" id="btnRemoveReuniao"><i class="fas fa-angle-double-left"></i> Remover itens</button>
 
                     @if($errors->has('itens_reuniao') || $errors->has('itens_reuniao.*'))
                     <div class="invalid-feedback">
@@ -266,7 +266,7 @@
                         <br>
                         <br>
                     </small>
-                    <button class="btn btn-sm btn-success float-left mt-2 addItem" type="button" id="btnAddCoworking">Adicionar itens</button>
+                    <button class="btn btn-sm btn-success float-left mt-2 addItem" type="button" id="btnAddCoworking">Adicionar itens <i class="fas fa-angle-double-right"></i></button>
                 </div>
 
                 <div class="col-sm mb-2-576">
@@ -295,7 +295,7 @@
                         <br>
                         <em>** Dê um duplo clique no item para editar um valor</em>
                     </small>
-                    <button class="btn btn-sm btn-danger float-right mt-2 removeItem" type="button" id="btnRemoveCoworking">Remover itens</button>
+                    <button class="btn btn-sm btn-danger float-left mt-2 removeItem" type="button" id="btnRemoveCoworking"><i class="fas fa-angle-double-left"></i> Remover itens</button>
 
                     @if($errors->has('itens_coworking') || $errors->has('itens_coworking.*'))
                     <div class="invalid-feedback">

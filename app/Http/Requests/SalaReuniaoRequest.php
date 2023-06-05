@@ -16,7 +16,7 @@ class SalaReuniaoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        if($this->filled('itens_reuniao'))
+        if($this->filled('itens_reuniao') && is_array($this->itens_reuniao))
         {
             $itensReuniao = $this->service->getItensByTipo('reuniao');
             $textos = array();
@@ -58,6 +58,7 @@ class SalaReuniaoRequest extends FormRequest
     public function messages()
     {
         return [
+            'itens_reuniao.required' => 'O campo é obrigatório / itens editáveis não alterados ou com erro',
             'required' => 'O campo é obrigatório',
             'in' => 'Esse valor não existe',
             'array' => 'Formato inválido',

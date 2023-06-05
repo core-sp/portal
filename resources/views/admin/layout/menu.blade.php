@@ -372,6 +372,40 @@
             </ul>
         </li>
         @endif
+
+        <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-building"></i>
+                <p>Reunião / Coworking<i class="right fa fa-angle-left"></i></p>
+            </a>
+
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="{{ route('sala.reuniao.index') }}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Salas</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#{{-- route('sala.reuniao.index') --}}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Agendados</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#{{-- route('sala.reuniao.index') --}}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Bloqueios</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#{{-- route('sala.reuniao.index') --}}" class="nav-link">
+                        <i class="nav-icon fa fa-angle-right"></i>
+                        <p>Suspensos / Exceções</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
         @endif
 
         <!-- Jurídico -->

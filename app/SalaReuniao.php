@@ -10,7 +10,7 @@ class SalaReuniao extends Model
     protected $guarded = [];
 
     const ITEM_TV = 'TV _ polegadas com entrada HDMI';
-    const ITEM_CABO = 'Cabo de _ metro(s)';
+    const ITEM_CABO = 'Cabo de _ metro(s) para conexão HDMI';
     const ITEM_AR = 'Ar-condicionado';
     const ITEM_MESA = 'Mesa com _ cadeira(s)';
     const ITEM_AGUA = 'Água';
@@ -60,17 +60,29 @@ class SalaReuniao extends Model
 
     public function getHorariosManha($tipo)
     {
-        return $tipo == 'reuniao' ? json_decode($this->horarios_reuniao, true)['manha'] : json_decode($this->horarios_coworking, true)['manha'];
+        if($tipo == 'reuniao')
+            return json_decode($this->horarios_reuniao, true)['manha'];
+        if($tipo == 'coworking')
+            return json_decode($this->horarios_coworking, true)['manha'];
+        return array();
     }
 
     public function getHorariosTarde($tipo)
     {
-        return $tipo == 'reuniao' ? json_decode($this->horarios_reuniao, true)['tarde'] : json_decode($this->horarios_coworking, true)['tarde'];
+        if($tipo == 'reuniao')
+            return json_decode($this->horarios_reuniao, true)['tarde'];
+        if($tipo == 'coworking')
+            return json_decode($this->horarios_coworking, true)['tarde'];
+        return array();
     }
 
     public function getItens($tipo)
     {
-        return $tipo == 'reuniao' ? json_decode($this->itens_reuniao, true) : json_decode($this->itens_coworking, true);
+        if($tipo == 'reuniao')
+            return json_decode($this->itens_reuniao, true);
+        if($tipo == 'coworking')
+            return json_decode($this->itens_coworking, true);
+        return array();
     }
 
     public function getItensOriginaisReuniao()
@@ -83,8 +95,8 @@ class SalaReuniao extends Model
         foreach($all as $key_ => $val_)
             $all[$key_] = preg_replace('/[0-9,]/', '', $val_);
         foreach($original as $key => $val){
-            $original[$key] = str_replace('_', '', $val);
-            if(in_array($original[$key], $all))
+            $temp = str_replace('_', '', $val);
+            if(in_array($temp, $all))
                 unset($original[$key]);
         }
         
@@ -99,11 +111,45 @@ class SalaReuniao extends Model
         $all = json_decode($this->itens_coworking, true);
         $original = self::itensCoworking();
         foreach($original as $key => $val){
-            $original[$key] = str_replace('_', '', $val);
-            if(in_array($original[$key], $all))
+            $temp = str_replace('_', '', $val);
+            if(in_array($temp, $all))
                 unset($original[$key]);
         }
         
         return $original;
+    }
+
+    public function verificaAlteracaoItens($reuniao, $coworking, $participantes)
+    {
+        $itens['reuniao'] = array();
+        $itens['coworking'] = array();
+        $gerente = null;
+
+        if($this->wasChanged('itens_reuniao')){
+            $itens['reuniao'] = array_diff($reuniao, $this->getItens('reuniao'));
+            $itens['reuniao'] = array_merge($itens['reuniao'], array_diff($this->getItens('reuniao'), $reuniao));
+        }
+        if($this->wasChanged('participantes_reuniao'))
+            $itens['reuniao']['participantes'] = $participantes['reuniao'];
+            
+        if($this->wasChanged('itens_coworking')){
+            $itens['coworking'] = array_diff($coworking, $this->getItens('coworking'));
+            $itens['coworking'] = array_merge($itens['coworking'], array_diff($this->getItens('coworking'), $coworking));
+        }
+        if($this->wasChanged('participantes_coworking'))
+            $itens['coworking']['participantes'] = $participantes['coworking'];
+
+        if(!empty($itens['reuniao']) || !empty($itens['coworking'])){
+            $gerente = $this->regional->users()->where(function ($query) {
+                in_array($this->idregional, [1, 14]) ? 
+                $query->select('nome', 'email')->where('idusuario', 39) : 
+                $query->select('nome', 'email')->where('idperfil', 21)->where('email', 'LIKE', 'ger.%');
+            })->first();
+        }
+
+        return [
+            'gerente' => $gerente,
+            'itens' => $itens,
+        ];
     }
 }

@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Contracts\SalaReuniaoServiceInterface;
 use App\SalaReuniao;
-use Carbon\Carbon;
 use App\Events\CrudEvent;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SalaReuniaoMail;
 
 class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
@@ -28,6 +29,8 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         $headers = [
             'Id',
             'Regional',
+            'Participantes Reunião',
+            'Participantes Coworking',
             'Ações'
         ];
         // Opções de conteúdo da tabela
@@ -40,6 +43,8 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
             $conteudo = [
                 $resultado->id,
                 $resultado->regional->regional,
+                $resultado->participantes_reuniao,
+                $resultado->participantes_coworking,
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -90,7 +95,13 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
     public function save($dados, $id, $user)
     {
-        SalaReuniao::findOrFail($id)->update([
+        $sala = SalaReuniao::findOrFail($id);
+        $itens_reuniao = $sala->getItens('reuniao');
+        $participantes['reuniao'] = $sala->participantes_reuniao;
+        $itens_coworking = $sala->getItens('coworking');
+        $participantes['coworking'] = $sala->participantes_coworking;
+
+        $sala->update([
             'horarios_reuniao' => json_encode([
                 'manha' => isset($dados['manha_horarios_reuniao']) ? $dados['manha_horarios_reuniao'] : array(),
                 'tarde' => isset($dados['tarde_horarios_reuniao']) ? $dados['tarde_horarios_reuniao'] : array()
@@ -106,6 +117,14 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
             'idusuario' => $user->idusuario
         ]);
 
+        $final = $sala->verificaAlteracaoItens($itens_reuniao, $itens_coworking, $participantes);
+        if(isset($final['gerente']))
+        {
+            $gerente = $final['gerente'];
+            Mail::to($gerente->email)->queue(new SalaReuniaoMail($sala, $final['itens']));
+            event(new CrudEvent('para ' . $gerente->nome . ' (gerente da seccional ' . $sala->regional->regional.') após alteração de itens da sala de reunião', 'envio de e-mail', $id));
+        }
+        
         event(new CrudEvent('sala de reunião', 'editou', $id));
     }
 }
