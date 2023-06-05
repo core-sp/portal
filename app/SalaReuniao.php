@@ -140,10 +140,11 @@ class SalaReuniao extends Model
             $itens['coworking']['participantes'] = $participantes['coworking'];
 
         if(!empty($itens['reuniao']) || !empty($itens['coworking'])){
-            $gerente = $this->regional->users()->where(function ($query) {
-                in_array($this->idregional, [1, 14]) ? 
-                $query->select('nome', 'email')->where('idusuario', 39) : 
-                $query->select('nome', 'email')->where('idperfil', 21)->where('email', 'LIKE', 'ger.%');
+            $gerente = $this->regional->users()
+            ->when(in_array($this->idregional, [1, 14]), function ($query){
+                return $query->select('nome', 'email')->where('idusuario', 39);
+            }, function ($query) {
+                return $query->select('nome', 'email')->where('idperfil', 21)->where('email', 'LIKE', 'ger%');
             })->first();
         }
 
