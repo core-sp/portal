@@ -44,4 +44,7 @@ Route::prefix('representante')->group(function(){
     Route::get('/cedulas', 'RepresentanteSiteController@cedulasView')->name('representante.solicitarCedulaView');
     Route::get('/inserir-solicita-cedula', 'RepresentanteSiteController@inserirsolicitarCedulaView')->name('representante.inserirSolicitarCedulaView');
     Route::post('/inserir-solicita-cedula', 'RepresentanteSiteController@inserirsolicitarCedula')->name('representante.inserirSolicitarCedula');
+
+    // Agendar Salas de Reunião
+    Route::get('/inserir-agendamento-sala', 'RepresentanteSiteController@agendamentoSala')->name('representante.agendar.inserir.view');
 });

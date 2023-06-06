@@ -107,4 +107,9 @@ class Representante extends Authenticable
     {
         return $this->hasMany('App\TermoConsentimento', 'idrepresentante');
     }
+
+    public function agendamentosSalas()
+    {
+        return $this->hasMany('App\AgendamentoSala', 'idrepresentante');
+    }
 }

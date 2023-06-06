@@ -127,4 +127,40 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         
         event(new CrudEvent('sala de reunião', 'editou', $id));
     }
+
+    public function salasAtivas($tipo = null)
+    {
+        if(!isset($tipo))
+            return SalaReuniao::with('regional')
+            ->where('participantes_reuniao', '>', 0)
+            ->orWhere('participantes_coworking', '>', 0)
+            ->get()
+            ->sortBy('regional.regional');
+        
+        if(in_array($tipo, ['reuniao', 'coworking']))
+            return SalaReuniao::with('regional')
+            ->where('participantes_'.$tipo, '>', 0)
+            ->get()
+            ->sortBy('regional.regional');
+        
+        return collect();
+    }
+
+    public function getDiasHoras($tipo, $id, $dia = null)
+    {
+        if(in_array($tipo, ['reuniao', 'coworking']))
+        {
+            $sala = SalaReuniao::where('id', $id)->where('participantes_'.$tipo, '>', 0)->first();
+            
+            if(isset($dia))
+                return [
+                    'manha' => 'Manhã: ('.implode(', ',$sala->getHorariosManha($tipo)).')', 
+                    'tarde' => 'Tarde: ('.implode(', ',$sala->getHorariosTarde($tipo)).')',
+                    'itens' => implode('&nbsp;&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;&nbsp;',$sala->getItensHtml($tipo))
+                ];
+            return collect();
+        }
+           
+        return collect();
+    }
 }

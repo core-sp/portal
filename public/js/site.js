@@ -554,7 +554,7 @@ $('#ano-mapa').on({
 		});
 
 		// Datepicker Agendamentos
-		$('#agendamentoStore #datepicker').datepicker({
+		$('#agendamentoStore #datepicker, #agendamentoSala #datepicker').datepicker({
 			dateFormat: 'dd/mm/yy',
 			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
 			dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
@@ -655,6 +655,128 @@ $('#ano-mapa').on({
 		});
 
 	// FIM Funcionalidade Agendamentos ++++++++++++++++++++++++++++++++++++++++
+
+	// Funcionalidade Agendamentos Salas Area Restrita RC ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	
+	function getDadosSalas(acao, tipo, sala_id, dia = null)
+	{
+		var dados_url = acao == 'getSalas' ? 
+		"/admin/salas-reunioes/regionais-salas-ativas/" + tipo : 
+		'/admin/salas-reunioes/sala-dias-horas/' + tipo;
+		var dados_data = acao == 'getSalas' ? '' : 'sala_id=' + sala_id + '&dia=' + dia;
+
+		$.ajax({
+			method: "GET",
+			dataType: 'json',
+			url: dados_url,
+			data: dados_data,
+			beforeSend: function(){
+				dia == null ? $('#agendamentoSala #loadCalendario').show() : $('#agendamentoSala #loadHorario').show();
+			},
+			complete: function(){
+				dia == null ? $('#agendamentoSala #loadCalendario').hide() : $('#agendamentoSala #loadHorario').hide();
+			},
+			success: function(response) {
+				$('#itensShow').html('');
+				if(acao == 'getSalas'){
+					regionaisAtivas = response;
+					$('#agendamentoSala #sala_reuniao_id option').each(function(){
+						var valor = parseInt($(this).val())
+						jQuery.inArray(valor, regionaisAtivas) != -1 ? $(this).show() : $(this).hide();
+					});
+				}else if((acao == 'getDias') && (dia == null)){
+					lotados = response;
+					$('#agendamentoSala #datepicker')
+					.prop('disabled', false)
+					.prop('placeholder', 'dd/mm/aaaa');
+				}else if((acao == 'getDias') && (dia != null)){
+					if(!jQuery.isEmptyObject(response)) {
+						$('#agendamentoSala #periodo').empty();
+						$.each(response, function(i, periodo) {
+							if(i != 'itens')
+								$('#agendamentoSala #periodo').append($('<option>', { 
+									value: i,
+									text : periodo 
+								}));
+						});
+						$('#itensShow').html(response.itens);
+						$('#agendamentoSala #periodo').prop('disabled', false);
+						$('#agendamentoSala #datepicker').css('background-color','#FFFFFF');
+					} 
+					else 
+						$('#agendamentoSala #periodo')
+						.find('option')
+						.remove()
+						.end()
+						.append('<option value="" disabled selected>Nenhum período disponível</option>');
+				}
+				
+			},
+			error: function() {
+				$('#agendamentoSala #datepicker')
+				.val('')
+				.prop('disabled', true)
+				.prop('placeholder', 'Falha ao recuperar calendário');
+				$('#agendamentoSala #periodo')
+					.find('option')
+					.remove()
+					.end()
+					.append('<option value="" disabled selected>Falha ao recuperar os dados para o agendamento</option>');
+				$("#dialog_agendamento")
+					.empty()
+					.append("Falha ao recuperar calendário. <br> Por favor verifique se o uso de cookies está habilitado e recarregue a página ou tente mais tarde.");
+				$("#dialog_agendamento").dialog({
+					draggable: false,
+					buttons: [{
+						text: "Recarregar",
+						click: function() {
+							location.reload(true);
+						}
+					}]	
+				});
+			}
+		});
+	}
+
+	function limpaDiasHorariosAgendamentoSala()
+	{
+			$('#agendamentoSala #datepicker')
+				.val('')
+				.prop('disabled', true)
+				.prop('placeholder', 'dd/mm/aaaa')
+				.css('background-color','#e9ecef');
+			$('#agendamentoSala #periodo')
+				.find('option')
+				.remove()
+				.end()
+				.append('<option value="" disabled selected>Selecione o dia da reserva de sala</option>');
+			$('#agendamentoSala #periodo').prop('disabled', true);
+	}
+
+	$('#agendamentoSala #tipo_sala').change(function(){
+		$("#sala_reuniao_id").val("");
+		if(this.value == "")
+			return false;
+		limpaDiasHorariosAgendamentoSala();
+		getDadosSalas('getSalas', $("#tipo_sala").val());
+	});	
+
+	$('#agendamentoSala #sala_reuniao_id').change(function(){
+		if($("#tipo_sala").val() == "")
+			return false;
+		limpaDiasHorariosAgendamentoSala();
+		$('#agendamentoSala #sala_reuniao_id option[value=""]').hide();
+		getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val());
+	});	
+
+	if($("#agendamentoSala #tipo_sala option:selected").val() != "")
+		getDadosSalas('getSalas', $("#tipo_sala").val());
+
+	$('#agendamentoSala #datepicker').change(function(){
+		getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val(), $('#datepicker').val());
+	});
+
+	// FIM Funcionalidade Agendamentos Salas Area Restrita RC++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 		// Agenda Institucional
 		$("#agenda-institucional").datepicker({

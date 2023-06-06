@@ -558,4 +558,17 @@ class RepresentanteSiteController extends Controller
             'class' => 'alert-success'
         ]);
     }
+
+    public function agendamentoSala()
+    {
+        try{
+            $user = auth()->guard('representante')->user();
+            $salas = $this->service->getService('SalaReuniao')->salasAtivas();
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar as opções de agendamento das salas.");
+        }
+
+        return view('site.representante.inserir-agendamento-sala', compact('salas'));
+    }
 }

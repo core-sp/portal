@@ -30,6 +30,19 @@ class SalaReuniao extends Model
         ];
     }
 
+    public static function itensHTML()
+    {
+        return [
+            'tv' => '<i class="fas fa-tv text-primary"></i> ',
+            'cabo' => '',
+            'ar' => '<i class="fas fa-wind text-primary"></i> ',
+            'mesa' => '',
+            'agua' => '<i class="fas fa-coffee text-primary"></i> ',
+            'cafe' => '<i class="fas fa-mug-hot text-primary"></i> ',
+            'wifi' => '<i class="fas fa-wifi text-primary"></i> ',
+        ];
+    }
+
     public static function itensCoworking()
     {
         $itens = [
@@ -58,6 +71,11 @@ class SalaReuniao extends Model
     	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
 
+    public function agendamentosSala()
+    {
+    	return $this->hasMany('App\AgendamentoSala');
+    }
+
     public function getHorariosManha($tipo)
     {
         if($tipo == 'reuniao')
@@ -83,6 +101,41 @@ class SalaReuniao extends Model
         if($tipo == 'coworking')
             return json_decode($this->itens_coworking, true);
         return array();
+    }
+
+    public function getItensHtml($tipo)
+    {
+        $all = null;
+        if($tipo == 'reuniao')
+        {
+            if(strlen($this->itens_reuniao) < 5)
+                return null;
+
+            $all = json_decode($this->itens_reuniao, true);
+            $original = self::itens();
+            foreach($all as $key_ => $val_)
+                $all[$key_] = preg_replace('/[0-9,]/', '', $val_);
+            foreach($original as $key => $val){
+                $temp = str_replace('_', '', $val);
+                $temp_k = array_search($temp, $all, true);
+                if($temp_k !== false)
+                    $all[$temp_k] = self::itensHTML()[$key] . json_decode($this->itens_reuniao, true)[$temp_k];
+            }
+        }elseif($tipo == 'coworking'){
+            if(strlen($this->itens_coworking) < 5)
+                return null;
+            
+            $all = json_decode($this->itens_coworking, true);
+            $original = self::itensCoworking();
+            foreach($original as $key => $val){
+                $temp = str_replace('_', '', $val);
+                $temp_k = array_search($temp, $all, true);
+                if($temp_k !== false)
+                    $all[$temp_k] = self::itensHTML()[$key] . json_decode($this->itens_reuniao, true)[$temp_k];
+            }
+        }
+        
+        return $all;
     }
 
     public function getItensOriginaisReuniao()

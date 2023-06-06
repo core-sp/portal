@@ -241,6 +241,8 @@ Route::middleware(['block_ip'])->group(function () {
       Route::get('/', 'SalaReuniaoController@index')->name('sala.reuniao.index');
       Route::get('/editar/{id}', 'SalaReuniaoController@edit')->name('sala.reuniao.editar.view');
       Route::put('/editar/{id}', 'SalaReuniaoController@update')->name('sala.reuniao.editar');
+      Route::get('/regionais-salas-ativas/{tipo}', 'SalaReuniaoController@getRegionaisAtivas')->name('sala.reuniao.regionais.ativas');
+      Route::get('/sala-dias-horas/{tipo}', 'SalaReuniaoController@getDiasHoras')->name('sala.reuniao.dias.horas');
     });
 
   });

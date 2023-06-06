@@ -12,7 +12,7 @@ class SalaReuniaoController extends Controller
 
     public function __construct(MediadorServiceInterface $service)
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => ['getRegionaisAtivas', 'getDiasHoras']]);
         $this->service = $service;
     }
 
@@ -57,5 +57,30 @@ class SalaReuniaoController extends Controller
             'message' => '<i class="icon fa fa-check"></i>Sala de Reunião com a ID: ' .$id . ' atualizada com sucesso!',
             'class' => 'alert-success'
         ]);
+    }
+
+    public function getRegionaisAtivas($tipo)
+    {
+        try{
+            $dados = $this->service->getService('SalaReuniao')->salasAtivas($tipo)->pluck('id');
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
+        }
+
+        return response()->json($dados);
+    }
+
+    public function getDiasHoras(Request $request, $tipo)
+    {
+        try{
+            $validate = $request->only('sala_id', 'dia');
+            $dados = $this->service->getService('SalaReuniao')->getDiasHoras($tipo, $validate['sala_id'], $validate['dia']);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao carregar os dados para o agendamento via ajax.");
+        }
+
+        return response()->json($dados);
     }
 }

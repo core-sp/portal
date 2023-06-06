@@ -11,4 +11,8 @@ interface SalaReuniaoServiceInterface {
     public function view($id);
 
     public function save($dados, $id, $user);
+
+    public function salasAtivas($tipo = null);
+
+    public function getDiasHoras($tipo, $id, $dia = null);
 }

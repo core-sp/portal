@@ -95,8 +95,16 @@
               <a href="{{ route('representante.solicitarCedulaView') }}" onclick="showLoading()">
                 <h6 class="brancar">
                   <i class="fas fa-id-card"></i>&nbsp;&nbsp;Solicitação de Cédula&nbsp;&nbsp;&nbsp;
-                  {{-- <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
-                  </span> --}}
+                </h6>
+              </a>
+            </div>
+
+            <div class="mr-item bt-unset {{ Route::is('representante.agendar.*') ? 'mr-item-selected' : '' }}">  
+              <a href="{{ route('representante.agendar.inserir.view') }}" onclick="showLoading()">
+                <h6 class="brancar">
+                  <i class="fas fa-business-time"></i>&nbsp;&nbsp;Agendar Salas&nbsp;&nbsp;&nbsp;
+                  <span class="badge badge-warning">NOVO <span class="spinner-grow spinner-grow-sm align-middle"></span>
+                  </span>
                 </h6>
               </a>
             </div>
