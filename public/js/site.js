@@ -657,63 +657,55 @@ $('#ano-mapa').on({
 	// FIM Funcionalidade Agendamentos ++++++++++++++++++++++++++++++++++++++++
 
 	// Funcionalidade Agendamentos Salas Area Restrita RC ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	
-	function getDadosSalas(acao, tipo, sala_id, dia = null)
-	{
-		var dados_url = acao == 'getSalas' ? 
-		"/admin/salas-reunioes/regionais-salas-ativas/" + tipo : 
-		'/admin/salas-reunioes/sala-dias-horas/' + tipo;
-		var dados_data = acao == 'getSalas' ? '' : 'sala_id=' + sala_id + '&dia=' + dia;
 
-		$.ajax({
-			method: "GET",
-			dataType: 'json',
-			url: dados_url,
-			data: dados_data,
-			beforeSend: function(){
-				dia == null ? $('#agendamentoSala #loadCalendario').show() : $('#agendamentoSala #loadHorario').show();
-			},
-			complete: function(){
-				dia == null ? $('#agendamentoSala #loadCalendario').hide() : $('#agendamentoSala #loadHorario').hide();
-			},
-			success: function(response) {
-				$('#itensShow').html('');
-				if(acao == 'getSalas'){
-					regionaisAtivas = response;
-					$('#agendamentoSala #sala_reuniao_id option').each(function(){
-						var valor = parseInt($(this).val())
-						jQuery.inArray(valor, regionaisAtivas) != -1 ? $(this).show() : $(this).hide();
-					});
-				}else if((acao == 'getDias') && (dia == null)){
-					lotados = response;
-					$('#agendamentoSala #datepicker')
-					.prop('disabled', false)
-					.prop('placeholder', 'dd/mm/aaaa');
-				}else if((acao == 'getDias') && (dia != null)){
-					if(!jQuery.isEmptyObject(response)) {
-						$('#agendamentoSala #periodo').empty();
-						$.each(response, function(i, periodo) {
-							if(i != 'itens')
-								$('#agendamentoSala #periodo').append($('<option>', { 
-									value: i,
-									text : periodo 
-								}));
-						});
-						$('#itensShow').html(response.itens);
-						$('#agendamentoSala #periodo').prop('disabled', false);
-						$('#agendamentoSala #datepicker').css('background-color','#FFFFFF');
-					} 
-					else 
-						$('#agendamentoSala #periodo')
-						.find('option')
-						.remove()
-						.end()
-						.append('<option value="" disabled selected>Nenhum período disponível</option>');
-				}
-				
-			},
-			error: function() {
-				$('#agendamentoSala #datepicker')
+	function formatSalas(response){
+		regionaisAtivas = response;
+		$('#agendamentoSala #sala_reuniao_id option').each(function(){
+			var valor = parseInt($(this).val())
+			jQuery.inArray(valor, regionaisAtivas) != -1 ? $(this).show() : $(this).hide();
+		});
+	}
+
+	function formatDias(response){
+		lotados = response;
+		$('#agendamentoSala #datepicker')
+			.prop('disabled', false)
+			.prop('placeholder', 'dd/mm/aaaa');
+	}
+
+	function formatPeriodos(response, tipo){
+		if(!jQuery.isEmptyObject(response)) {
+			$('#agendamentoSala #periodo').empty();
+			$.each(response, function(i, periodo) {
+				if((i != 'itens') && (i != 'total'))
+					$('#agendamentoSala #periodo').append($('<option>', { 
+						value: i,
+						text : periodo 
+					}));
+			});
+			var itens = '';
+			$.each(response.itens, function(i, valor) {
+				itens += i == 0 ? valor : '&nbsp;&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;&nbsp;' + valor;
+			});
+			$('#itensShow').html(itens).parent().show();
+			$('#agendamentoSala #periodo').prop('disabled', false);
+			$('#agendamentoSala #datepicker').css('background-color','#FFFFFF');
+			if(tipo == 'reuniao'){
+				$(".participante:gt(0)").remove();
+				var cont = $('.participante').length;
+				if(cont < response.total)
+					for (let i = cont; i < response.total; i++)
+						$('#area_participantes').append($('.participante:last').clone());
+				$('.participante :input[name="participantes_cpf[]"]').val('').unmask().mask('999.999.999-99');
+				$('.participante :input[name="participantes_nome[]"]').val('')
+				$('#area_participantes').show();
+			}
+		}
+	}
+
+	function limpaDiasHorariosAgendamentoSala(error = false){
+		if(error){
+			$('#agendamentoSala #datepicker')
 				.val('')
 				.prop('disabled', true)
 				.prop('placeholder', 'Falha ao recuperar calendário');
@@ -734,23 +726,58 @@ $('#ano-mapa').on({
 						}
 					}]	
 				});
+			return;
+		}
+		$('#agendamentoSala #datepicker')
+			.val('')
+			.prop('disabled', true)
+			.prop('placeholder', 'dd/mm/aaaa')
+			.css('background-color','#e9ecef');
+		$('#agendamentoSala #periodo')
+			.find('option')
+			.remove()
+			.end()
+			.append('<option value="" disabled selected>Selecione o dia da reserva de sala</option>');
+		$('#agendamentoSala #periodo').prop('disabled', true);
+	}
+	
+	function getDadosSalas(acao, tipo, sala_id = '', dia = ''){
+		var dados_url = acao == 'getSalas' ? 
+		"/admin/salas-reunioes/regionais-salas-ativas/" + tipo : 
+		'/admin/salas-reunioes/sala-dias-horas/' + tipo;
+		var dados_data = acao == 'getSalas' ? '' : 'sala_id=' + sala_id + '&dia=' + dia;
+
+		$.ajax({
+			method: "GET",
+			dataType: 'json',
+			url: dados_url,
+			data: dados_data,
+			beforeSend: function(){
+				dia == '' ? $('#agendamentoSala #loadCalendario').show() : $('#agendamentoSala #loadHorario').show();
+			},
+			complete: function(){
+				dia == '' ? $('#agendamentoSala #loadCalendario').hide() : $('#agendamentoSala #loadHorario').hide();
+			},
+			success: function(response) {
+				$('#itensShow').html('').parent().hide();
+				$('#area_participantes').hide();
+				if(acao == 'getSalas')
+					formatSalas(response);
+				else if((acao == 'getDias') && (dia == ''))
+					formatDias(response);
+				else if((acao == 'getDias') && (dia != ''))
+					formatPeriodos(response, tipo);
+				else 
+					$('#agendamentoSala #periodo')
+					.find('option')
+					.remove()
+					.end()
+					.append('<option value="" disabled selected>Nenhum período disponível</option>');				
+			},
+			error: function() {
+				limpaDiasHorariosAgendamentoSala(true);
 			}
 		});
-	}
-
-	function limpaDiasHorariosAgendamentoSala()
-	{
-			$('#agendamentoSala #datepicker')
-				.val('')
-				.prop('disabled', true)
-				.prop('placeholder', 'dd/mm/aaaa')
-				.css('background-color','#e9ecef');
-			$('#agendamentoSala #periodo')
-				.find('option')
-				.remove()
-				.end()
-				.append('<option value="" disabled selected>Selecione o dia da reserva de sala</option>');
-			$('#agendamentoSala #periodo').prop('disabled', true);
 	}
 
 	$('#agendamentoSala #tipo_sala').change(function(){

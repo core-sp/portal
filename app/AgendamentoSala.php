@@ -11,7 +11,7 @@ class AgendamentoSala extends Model
 
     public function sala()
     {
-    	return $this->belongsTo('App\SalaReuniao');
+    	return $this->belongsTo('App\SalaReuniao', 'sala_reuniao_id');
     }
 
     public function representante()

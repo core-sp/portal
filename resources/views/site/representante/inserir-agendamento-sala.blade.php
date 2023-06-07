@@ -100,11 +100,40 @@
         </div>
       </div>
 
-      <div class="form-group mt-3">
+      <fieldset class="form-group border p-2 mt-3" style="display: none;">
+        <legend class="w-auto"><small><i class="far fa-check-square text-success"></i> Itens da sala</small></legend>
         <p id="itensShow"></p>
-      </div>
+      </fieldset>
+
+      <fieldset class="form-group border p-2" style="display: none;" id="area_participantes">
+        <p class="text-secondary"><span class="text-danger">*</span> <em>Deve ter pelo menos um participante</em></p>
+        <legend class="w-auto"><small><i class="fas fa-users text-info"></i> Participantes</small></legend>
+        <div class="form-row mb-2 cadastroRepresentante participante">
+          <div class="col-sm mb-2-576">
+
+            <div class="input-group mb-2-576">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Participante:</span>
+              </div>
+              <input 
+                type="text" 
+                class="form-control col-3" 
+                name="participantes_cpf[]" 
+                placeholder="CPF"
+              >
+              <input 
+                type="text" 
+                class="form-control text-uppercase" 
+                name="participantes_nome[]" 
+                placeholder="Nome Completo"
+              >
+            </div>
+
+          </div>
+        </div>
+      </fieldset>
             
-      <div class="form-group mt-4">
+      <div class="form-group float-right mt-4">
         <button type="submit" class="btn btn-primary">Agendar</button>
       </div>
     </form>

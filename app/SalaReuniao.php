@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class SalaReuniao extends Model
 {
@@ -34,9 +36,9 @@ class SalaReuniao extends Model
     {
         return [
             'tv' => '<i class="fas fa-tv text-primary"></i> ',
-            'cabo' => '',
-            'ar' => '<i class="fas fa-wind text-primary"></i> ',
-            'mesa' => '',
+            'cabo' => '<i class="fas fa-plug text-primary"></i> ',
+            'ar' => '<i class="far fa-snowflake text-primary"></i> ',
+            'mesa' => '<i class="fas fa-chair text-primary"></i> ',
             'agua' => '<i class="fas fa-coffee text-primary"></i> ',
             'cafe' => '<i class="fas fa-mug-hot text-primary"></i> ',
             'wifi' => '<i class="fas fa-wifi text-primary"></i> ',
@@ -61,6 +63,25 @@ class SalaReuniao extends Model
         return $itens;
     }
 
+    private function getPeriodos($dia, $tipo)
+    {
+        $dia = Carbon::parse($dia);
+
+        if($dia->isWeekend())
+            return [];
+
+        $periodos = array();
+        $manha = $this->getHorariosManha($tipo);
+        $tarde = $this->getHorariosTarde($tipo);
+
+        if(!empty($manha))
+            array_push($periodos, 'manha');
+        if(!empty($tarde))
+            array_push($periodos, 'tarde');
+
+        return $periodos;
+    }
+
     public function regional()
     {
     	return $this->belongsTo('App\Regional', 'idregional');
@@ -73,7 +94,25 @@ class SalaReuniao extends Model
 
     public function agendamentosSala()
     {
-    	return $this->hasMany('App\AgendamentoSala');
+    	return $this->hasMany('App\AgendamentoSala', 'sala_reuniao_id');
+    }
+
+    public function isAtivo($tipo)
+    {
+        if($tipo == 'reuniao')
+            return $this->participantes_reuniao > 0;
+        if($tipo == 'coworking')
+            return $this->participantes_coworking > 0;
+        return false;
+    }
+
+    public function getParticipantes($tipo)
+    {
+        if($tipo == 'reuniao')
+            return $this->participantes_reuniao;
+        if($tipo == 'coworking')
+            return 1;
+        return 0;
     }
 
     public function getHorariosManha($tipo)
@@ -112,6 +151,7 @@ class SalaReuniao extends Model
                 return null;
 
             $all = json_decode($this->itens_reuniao, true);
+            $final = $all;
             $original = self::itens();
             foreach($all as $key_ => $val_)
                 $all[$key_] = preg_replace('/[0-9,]/', '', $val_);
@@ -119,19 +159,20 @@ class SalaReuniao extends Model
                 $temp = str_replace('_', '', $val);
                 $temp_k = array_search($temp, $all, true);
                 if($temp_k !== false)
-                    $all[$temp_k] = self::itensHTML()[$key] . json_decode($this->itens_reuniao, true)[$temp_k];
+                    $all[$temp_k] = self::itensHTML()[$key] . $final[$temp_k];
             }
         }elseif($tipo == 'coworking'){
             if(strlen($this->itens_coworking) < 5)
                 return null;
             
             $all = json_decode($this->itens_coworking, true);
+            $final = $all;
             $original = self::itensCoworking();
             foreach($original as $key => $val){
                 $temp = str_replace('_', '', $val);
                 $temp_k = array_search($temp, $all, true);
                 if($temp_k !== false)
-                    $all[$temp_k] = self::itensHTML()[$key] . json_decode($this->itens_reuniao, true)[$temp_k];
+                    $all[$temp_k] = self::itensHTML()[$key] . $final[$temp_k];
             }
         }
         
@@ -205,5 +246,79 @@ class SalaReuniao extends Model
             'gerente' => $gerente,
             'itens' => $itens,
         ];
+    }
+
+    public function getDiasSeLotado($tipo)
+    {
+        if(!$this->isAtivo($tipo) || !in_array($tipo, ['reuniao', 'coworking']))
+            return null;
+
+        $diasLotados = array();
+        $agendados = $this->agendamentosSala()
+            ->select('dia', DB::raw('count(*) as total'))
+            ->where('tipo_sala', $tipo)
+            ->whereNull('status')
+            ->whereBetween('dia', [Carbon::tomorrow()->format('Y-m-d'), Carbon::today()->addMonth()->format('Y-m-d')])
+            ->groupBy('dia')
+            ->orderBy('dia')
+            ->get();
+
+        $dia = Carbon::tomorrow();
+        for($dia; $dia->lte(Carbon::today()->addMonth()); $dia->addDay())
+        {
+            $periodosTotal = $this->getPeriodos($dia->format('Y-m-d'), $tipo);
+            if(sizeof($periodosTotal) == 0)
+                array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+        }
+
+        foreach($agendados as $agendado)
+        {
+            $dia = Carbon::parse($agendado->dia);
+            $periodosTotal = $this->getPeriodos($dia->format('Y-m-d'), $tipo);
+            $total = $tipo == 'reuniao' ? sizeof($periodosTotal) : sizeof($periodosTotal) * $this->participantes_coworking;
+            if($agendado->total >= $total)
+                array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+        }
+
+        return $diasLotados;
+    }
+
+    public function removeHorariosSeLotado($tipo, $dia)
+    {
+        if(!$this->isAtivo($tipo) || !in_array($tipo, ['reuniao', 'coworking']))
+            return array();
+
+        $periodos = $this->getPeriodos($dia, $tipo);
+
+        if(sizeof($periodos) == 0)
+            return $periodos;
+
+        $agendado = $this->agendamentosSala()
+            ->select('periodo', DB::raw('count(*) as total'))
+            ->where('tipo_sala', $tipo)
+            ->whereNull('status')
+            ->whereDate('dia', $dia)
+            ->groupBy('periodo')
+            ->orderBy('periodo')
+            ->get();
+
+        if($agendado->isNotEmpty())
+        {
+            foreach($agendado as $value)
+            {
+                switch ($tipo) {
+                    case 'reuniao':
+                        if($value->total >= 1)
+                            unset($periodos[array_search($value->periodo, $periodos)]);
+                        break;
+                    case 'coworking':
+                        if($value->total >= $this->participantes_coworking)
+                            unset($periodos[array_search($value->periodo, $periodos)]);
+                        break;
+                }
+            }
+        }
+        
+        return $periodos;
     }
 }

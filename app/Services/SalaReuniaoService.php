@@ -7,6 +7,7 @@ use App\SalaReuniao;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SalaReuniaoMail;
+use Carbon\Carbon;
 
 class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
@@ -153,14 +154,26 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
             $sala = SalaReuniao::where('id', $id)->where('participantes_'.$tipo, '>', 0)->first();
             
             if(isset($dia))
-                return [
-                    'manha' => 'Manhã: ('.implode(', ',$sala->getHorariosManha($tipo)).')', 
-                    'tarde' => 'Tarde: ('.implode(', ',$sala->getHorariosTarde($tipo)).')',
-                    'itens' => implode('&nbsp;&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;&nbsp;',$sala->getItensHtml($tipo))
-                ];
-            return collect();
+            {
+                $final = array();
+                $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
+                $periodos = $sala->removeHorariosSeLotado($tipo, $dia);
+
+                if(!empty($periodos))
+                {
+                    if(in_array('manha', $periodos))
+                        $final['manha'] = 'Manhã: '.implode(', ',$sala->getHorariosManha($tipo));
+                    if(in_array('tarde', $periodos))
+                        $final['tarde'] = 'Tarde: '.implode(', ',$sala->getHorariosTarde($tipo));
+
+                    $final['itens'] = $sala->getItensHtml($tipo);
+                    $final['total'] = $sala->getParticipantes($tipo) - 1;
+                }
+                
+                return $final;
+            }
+
+            return $sala->getDiasSeLotado($tipo);
         }
-           
-        return collect();
     }
 }
