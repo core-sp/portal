@@ -40,6 +40,7 @@ class AgendamentoRequest extends FormRequest
             
         if(\Route::is('agendamentosite.store'))
         {
+            $this->servicos = config('app.env') == 'testing' ? $this->servicos : array_intersect($service->getServicosOrStatusOrCompletos('servicos'), ['Plantão Jurídico']);
             $this->regional = '';
             $this->dateFormat = '|date_format:d/m/Y|after:'.date('d\/m\/Y');
             if(request()->filled('dia') && substr_count(request()->dia, "/") != 2)
@@ -52,6 +53,8 @@ class AgendamentoRequest extends FormRequest
                 $this->merge(['dia' => null]);
             if(request()->missing('hora'))
                 $this->merge(['hora' => null]);
+            if(request()->missing('servico'))
+                $this->merge(['servico' => null]);
 
             if(request()->filled('idregional') && request()->filled('servico'))
             {
