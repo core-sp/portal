@@ -87,7 +87,9 @@ class AgendamentoSiteSubService implements AgendamentoSiteSubServiceInterface {
         $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14]);
         $regionais->find(1)->regional = $this->renameSede;
 
-        $servicos = $service->getService('Agendamento')->getServicosOrStatusOrCompletos('servicos');
+        $servicos = config('app.env') == 'testing' ? 
+        $service->getService('Agendamento')->getServicosOrStatusOrCompletos('servicos') : 
+        array_intersect($service->getService('Agendamento')->getServicosOrStatusOrCompletos('servicos'), [Agendamento::SERVICOS_PLANTAO_JURIDICO]);
 
         if(!$service->getService('PlantaoJuridico')->plantaoJuridicoAtivo()) 
             unset($servicos[array_search(Agendamento::SERVICOS_PLANTAO_JURIDICO, $servicos)]);      

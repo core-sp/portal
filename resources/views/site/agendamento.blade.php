@@ -37,17 +37,19 @@
           <p><strong>Importante:</strong> O atendimento presencial está suspenso temporariamente, neste período os serviços deverão ser solicitados via email. O prazo para análise e resposta do email depende do tipo de serviço solicitado.</p>
           <p>Para mais informações, acesse <a href="/servicos-atendimento-ao-rc">este link</a>.</p>
           -->
-          <p class="pb-0 text-justify">
-            <strong>Representante Comercial</strong>, agende seu atendimento presencial no Core-SP, com até um mês de antecedência.<br />Ou então, consulte as <a href="{{ route('agendamentosite.consultaView') }}" class="text-primary">informações do atendimento já agendado.</a>
-            </br></br>
+          <p class="pb-0 text-justify mb-3">
+            <strong>Representante Comercial</strong>, o Core-SP alterou o protocolo do Setor de Atendimento. A partir de agora, não é preciso realizar o agendamento pelo portal. Basta se dirigir à Sede ou ao Escritório Seccional que atende sua região entre as 9h e às 16 horas, de segunda a sexta-feira. É importante dizer: as demandas serão atendidas por ordem de chegada. Solicitamos que verifique previamente a documentação necessária para dar andamento ao processo. Acesse o link abaixo, veja as modalidades de serviço e clique sobre aquela que deseja requisitar.
+            </br>
+            <a href="/servicos-atendimento-ao-rc">https://www.core-sp.org.br/servicos-atendimento-ao-rc</a>. Será um prazer recebê-lo.</br></br>
             <strong>Atenção:</strong> Orientação jurídica – dúvidas deverão ser enviadas para o e-mail juridico@core-sp.org.br, que serão respondidas em até 5 (cinco) dias úteis, conforme PORTARIA 27/2020. Não há atendimento jurídico presencial, excepcionalmente, nesse período de pandemia.
             </br></br>
             O parcelamento de anuidades em Execução Fiscal só será realizado pelo atendimento presencialmente, se houver o contato via e-mail com o setor de Dívida Ativa (<a href="mailto:juridico.dividaativa@core-sp.org.br">juridico.dividaativa@core-sp.org.br</a>) previamente para solicitação dos valores de custas processuais e honorários advocatícios, caso haja.
           </p>
           
-          <div class="mb-3">
-            <a href="https://www.saopaulo.sp.gov.br/planosp/" target="_blank"><img src="{{ asset('img/icone-mapasp.png') }}"></a>
-          </div>
+          <!-- <div class="mb-3">
+            <a href="https://www.saopaulo.sp.gov.br/planosp/" target="_blank"><img src="{{-- asset('img/icone-mapasp.png') --}}"></a>
+          </div> -->
+
         </div>
         <div class="mt-2">
         @if(session('message'))
@@ -134,10 +136,15 @@
                   class="form-control {{ $errors->has('servico') ? 'is-invalid' : '' }}" 
                   id="selectServicos" 
                   required
+                  {{ !isset($servicos) || (is_array($servicos) && empty($servicos)) ? 'disabled' : '' }}
                 >
+                @if(!isset($servicos) || (is_array($servicos) && empty($servicos)))
+                  <option value="" selected>Sem serviços disponíveis para agendamento</option>
+                @else
                   @foreach($servicos as $servico)
                     <option value="{{ $servico }}" {{ old('servico') == $servico ? 'selected' : '' }}>{{ $servico }}</option>
                   @endforeach 
+                @endif
                 </select>
                 @if($errors->has('servico'))
                 <div class="invalid-feedback">
