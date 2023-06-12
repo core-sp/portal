@@ -45,7 +45,7 @@
                         multiple
                     >
                     @php
-                        $manha = array_slice(todasHoras(), 0, 7);
+                        $manha = $resultado::horasManha();
                     @endphp
                     @foreach($manha as $hora)
                         <option 
@@ -78,7 +78,7 @@
                         multiple
                     >
                     @php
-                        $tarde = array_slice(todasHoras(), 7);
+                        $tarde = $resultado::horasTarde();
                     @endphp
                     @foreach($tarde as $hora)
                         <option 
@@ -201,9 +201,6 @@
                         id="manha_horarios_coworking" 
                         multiple
                     >
-                    @php
-                        $manha = array_slice(todasHoras(), 0, 7);
-                    @endphp
                     @foreach($manha as $hora)
                         <option value="{{ $hora }}" {{ (!empty(old('manha_horarios_coworking')) && is_array(old('manha_horarios_coworking')) && in_array($hora, old('manha_horarios_reuniao'))) || in_array($hora, $resultado->getHorariosManha('coworking')) ? 'selected' : '' }}>{{ $hora }}</option>
                     @endforeach
@@ -228,9 +225,6 @@
                         id="tarde_horarios_coworking" 
                         multiple
                     >
-                    @php
-                        $tarde = array_slice(todasHoras(), 7);
-                    @endphp
                     @foreach($tarde as $hora)
                         <option value="{{ $hora }}" {{ (!empty(old('tarde_horarios_coworking')) && is_array(old('tarde_horarios_coworking')) && in_array($hora, old('tarde_horarios_reuniao'))) || in_array($hora, $resultado->getHorariosTarde('coworking')) ? 'selected' : '' }}>{{ $hora }}</option>
                     @endforeach

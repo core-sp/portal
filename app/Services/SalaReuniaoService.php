@@ -61,6 +61,13 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         return $tabela;
     }
 
+    public function getHoras()
+    {
+        return [
+            'manha' => SalaReuniao::horasManha(),
+            'tarde' => SalaReuniao::horasTarde()
+        ];
+    }
     public function getItensByTipo($tipo)
     {
         switch($tipo){
@@ -167,7 +174,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
                         $final['tarde'] = 'Tarde: '.implode(', ',$sala->getHorariosTarde($tipo));
 
                     $final['itens'] = $sala->getItensHtml($tipo);
-                    $final['total'] = $sala->getParticipantes($tipo) - 1;
+                    $final['total'] = $sala->getParticipantesAgendar($tipo) - 1;
                 }
                 
                 return $final;
@@ -175,5 +182,12 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
             return $sala->getDiasSeLotado($tipo);
         }
+
+        return null;
+    }
+
+    public function site()
+    {
+        return resolve('App\Contracts\SalaReuniaoSiteSubServiceInterface');
     }
 }

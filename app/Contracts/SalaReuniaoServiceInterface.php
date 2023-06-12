@@ -4,6 +4,8 @@ namespace App\Contracts;
 
 interface SalaReuniaoServiceInterface {
 
+    public function getHoras();
+
     public function getItensByTipo($tipo);
 
     public function listar();
@@ -15,4 +17,6 @@ interface SalaReuniaoServiceInterface {
     public function salasAtivas($tipo = null);
 
     public function getDiasHoras($tipo, $id, $dia = null);
+
+    public function site();
 }

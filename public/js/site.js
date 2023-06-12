@@ -697,7 +697,7 @@ $('#ano-mapa').on({
 					for (let i = cont; i < response.total; i++)
 						$('#area_participantes').append($('.participante:last').clone());
 				$('.participante :input[name="participantes_cpf[]"]').val('').unmask().mask('999.999.999-99');
-				$('.participante :input[name="participantes_nome[]"]').val('')
+				$('.participante :input[name="participantes_nome[]"]').val('');
 				$('#area_participantes').show();
 			}
 		}
@@ -759,8 +759,8 @@ $('#ano-mapa').on({
 				dia == '' ? $('#agendamentoSala #loadCalendario').hide() : $('#agendamentoSala #loadHorario').hide();
 			},
 			success: function(response) {
-				$('#itensShow').html('').parent().hide();
-				$('#area_participantes').hide();
+				$('#agendamentoSala #itensShow').html('').parent().hide();
+				$('#agendamentoSala #area_participantes').hide();
 				if(acao == 'getSalas')
 					formatSalas(response);
 				else if((acao == 'getDias') && (dia == ''))
@@ -798,6 +798,9 @@ $('#ano-mapa').on({
 
 	if($("#agendamentoSala #tipo_sala option:selected").val() != "")
 		getDadosSalas('getSalas', $("#tipo_sala").val());
+	
+	if($("#agendamentoSala #sala_reuniao_id option:selected").val() != "")
+		getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val());
 
 	$('#agendamentoSala #datepicker').change(function(){
 		getDadosSalas('getDias', $("#tipo_sala").val(), $("#sala_reuniao_id").val(), $('#datepicker').val());

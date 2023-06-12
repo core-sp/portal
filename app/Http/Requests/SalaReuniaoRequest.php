@@ -8,6 +8,7 @@ use App\Contracts\MediadorServiceInterface;
 class SalaReuniaoRequest extends FormRequest
 {
     private $service;
+    private $horas;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -16,6 +17,8 @@ class SalaReuniaoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        $this->horas = $this->service->getHoras();
+
         if($this->filled('itens_reuniao') && is_array($this->itens_reuniao))
         {
             $itensReuniao = $this->service->getItensByTipo('reuniao');
@@ -38,17 +41,17 @@ class SalaReuniaoRequest extends FormRequest
     {
         return [
             'participantes_reuniao' => 'required|integer',
-            'manha_horarios_reuniao' => 'exclude_if:participantes_reuniao,0|required|array|in:' . implode(',', array_slice(todasHoras(), 0, 7)),
+            'manha_horarios_reuniao' => 'exclude_if:participantes_reuniao,0|required|array|in:' . implode(',', $this->horas['manha']),
             'manha_horarios_reuniao.*' => 'distinct',
-            'tarde_horarios_reuniao' => 'exclude_if:participantes_reuniao,0|required|array|in:' . implode(',', array_slice(todasHoras(), 7)),
+            'tarde_horarios_reuniao' => 'exclude_if:participantes_reuniao,0|required|array|in:' . implode(',', $this->horas['tarde']),
             'tarde_horarios_reuniao.*' => 'distinct',
             'itens_reuniao' => 'exclude_if:participantes_reuniao,0|required|array',
             'itens_reuniao.*' => 'distinct',
 
             'participantes_coworking' => 'required|integer',
-            'manha_horarios_coworking' => 'exclude_if:participantes_coworking,0|required|array|in:' . implode(',', array_slice(todasHoras(), 0, 7)),
+            'manha_horarios_coworking' => 'exclude_if:participantes_coworking,0|required|array|in:' . implode(',', $this->horas['manha']),
             'manha_horarios_coworking.*' => 'distinct',
-            'tarde_horarios_coworking' => 'exclude_if:participantes_coworking,0|required|array|in:' . implode(',', array_slice(todasHoras(), 7)),
+            'tarde_horarios_coworking' => 'exclude_if:participantes_coworking,0|required|array|in:' . implode(',', $this->horas['tarde']),
             'tarde_horarios_coworking.*' => 'distinct',
             'itens_coworking' => 'exclude_if:participantes_coworking,0|required|array|in:' . implode(',', $this->service->getItensByTipo('coworking')),
             'itens_coworking.*' => 'distinct',

@@ -112,4 +112,27 @@ class Representante extends Authenticable
     {
         return $this->hasMany('App\AgendamentoSala', 'idrepresentante');
     }
+
+    public function agendamentosAtivos()
+    {
+        return $this->agendamentosSalas()
+        ->with('sala.regional')
+        ->where(function($query){
+            $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
+        })
+        ->orderBy('dia', 'ASC')
+        ->orderBy('periodo', 'ASC')
+        ->orderBy('status', 'ASC')
+        ->paginate(5);
+    }
+
+    public function podeAgendar()
+    {
+        return $this->agendamentosSalas()
+        ->whereMonth('dia', now()->month)
+        ->where(function($query){
+            $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
+        })
+        ->count() < 4;
+    }
 }

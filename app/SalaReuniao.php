@@ -19,6 +19,16 @@ class SalaReuniao extends Model
     const ITEM_CAFE = 'Café';
     const ITEM_WIFI = 'Wi-Fi';
 
+    public static function horasManha()
+    {
+        return array_slice(todasHoras(), 0, 6);
+    }
+
+    public static function horasTarde()
+    {
+        return array_slice(todasHoras(), 9, 6);
+    }
+
     public static function itens()
     {
         return [
@@ -106,7 +116,7 @@ class SalaReuniao extends Model
         return false;
     }
 
-    public function getParticipantes($tipo)
+    public function getParticipantesAgendar($tipo)
     {
         if($tipo == 'reuniao')
             return $this->participantes_reuniao;
@@ -289,6 +299,7 @@ class SalaReuniao extends Model
             return array();
 
         $periodos = $this->getPeriodos($dia, $tipo);
+        $final_periodos = $periodos;
 
         if(sizeof($periodos) == 0)
             return $periodos;
@@ -304,16 +315,22 @@ class SalaReuniao extends Model
 
         if($agendado->isNotEmpty())
         {
+            $soma = 0;
             foreach($agendado as $value)
             {
+                $soma += $value->total;
                 switch ($tipo) {
                     case 'reuniao':
                         if($value->total >= 1)
                             unset($periodos[array_search($value->periodo, $periodos)]);
+                        if($soma >= count($final_periodos))
+                            $periodos = array();
                         break;
                     case 'coworking':
                         if($value->total >= $this->participantes_coworking)
                             unset($periodos[array_search($value->periodo, $periodos)]);
+                        if($soma >= (count($final_periodos) * $this->participantes_coworking))
+                            $periodos = array();
                         break;
                 }
             }

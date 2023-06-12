@@ -63,10 +63,10 @@ class SalaReuniaoTest extends TestCase
         $dados = $sala->toArray();
         $dados['participantes_reuniao'] = 2;
         $dados['participantes_coworking'] = 2;
-        $dados['manha_horarios_reuniao'] = ['10:00', '11:00', '12:00'];
+        $dados['manha_horarios_reuniao'] = ['10:00', '11:00', '11:30'];
         $dados['tarde_horarios_reuniao'] = $horarios_r;
         $dados['manha_horarios_coworking'] = $horarios_c;
-        $dados['tarde_horarios_coworking'] = ['14:00', '15:00', '16:00'];
+        $dados['tarde_horarios_coworking'] = ['14:00', '15:00', '15:30'];
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
         $dados['itens_coworking'] = $sala->getItens('coworking');
 
@@ -93,10 +93,10 @@ class SalaReuniaoTest extends TestCase
 
         $dados = $sala->toArray();
         $dados['participantes_reuniao'] = 2;
-        $dados['manha_horarios_reuniao'] = ['10:00', '11:00', '12:00'];
+        $dados['manha_horarios_reuniao'] = ['10:00', '11:00', '11:30'];
         $dados['tarde_horarios_reuniao'] = $horarios_r;
         $dados['manha_horarios_coworking'] = $horarios_c;
-        $dados['tarde_horarios_coworking'] = ['14:00', '15:00', '16:00'];
+        $dados['tarde_horarios_coworking'] = ['14:00', '15:00', '15:30'];
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
         $dados['itens_coworking'] = $sala->getItens('coworking');
 

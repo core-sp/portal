@@ -1,0 +1,57 @@
+@extends('site.representante.app')
+
+@section('content-representante')
+
+@if(Session::has('message'))
+<div class="d-block w-100">
+    <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
+</div>
+@endif
+
+<div class="representante-content w-100">
+    <div class="conteudo-txt-mini light">
+        <h4 class="pt-1 pb-1">Agendamentos de Salas</h4>
+        <div class="linha-lg-mini mb-2"></div>
+        <div class="d-block mb-3 mt-2">
+            <a href="{{ route('representante.agendar.inserir.view', 'agendar') }}" class="btn btn-primary link-nostyle branco">Agendar sala</a>
+        </div>
+        @if($salas->isNotEmpty())
+        <div class="list-group w-100">
+            @foreach ($salas as $item)
+            <div class="list-group-item light d-block bg-info">
+                @if(isset($item->status))
+                <p class="pb-0 branco">Status: <strong>{{ $item->status }}</strong></p>
+                @endif
+                <p class="pb-0 branco">Protocolo: <strong>{{ $item->protocolo }}</strong></p>
+                <p class="pb-0 branco">Regional: <strong>{{ $item->sala->regional->regional }}</strong></p>
+                <p class="pb-0 branco">
+                    Sala: <strong>{{ $item->getTipoSala() }}</strong>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;Dia: <strong>{{ onlyDate($item->dia) }}</strong>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;Período: <strong>{{ $item->getPeriodo() }}</strong>
+                </p>
+                @if($item->tipo_sala == 'reuniao')
+                <p class="pb-0 branco"><i class="fas fa-users text-dark"></i> Participantes: 
+                    @foreach($item->getParticipantes() as $cpf => $nome)
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {!! 'CPF: <strong>'.formataCpfCnpj($cpf) . '</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Nome: <strong>' .$nome.'</strong>' !!}
+                    @endforeach
+                </p>
+                @endif
+                @if($item->podeEditarParticipantes())
+                <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $item->id]) }}" class="btn btn-secondary btn-sm link-nostyle">Editar Participantes</a>
+                @endif
+            </div>
+            <div class="linha-lg-mini mb-2"></div>
+            @endforeach
+        </div>
+        @endif
+        <div class="float-left mt-3">
+        @if($salas instanceof \Illuminate\Pagination\LengthAwarePaginator)
+            {{ $salas->appends(request()->input())->links() }}
+        @endif
+        </div>
+    </div>
+</div>
+
+@endsection

@@ -28,6 +28,7 @@ use App\Repositories\BdoOportunidadeRepository;
 use App\Repositories\AvisoRepository;
 use Illuminate\Support\Facades\View;
 use App\Contracts\MediadorServiceInterface;
+use App\Http\Requests\RepSalaReuniaoRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
 
 class RepresentanteSiteController extends Controller
@@ -559,16 +560,68 @@ class RepresentanteSiteController extends Controller
         ]);
     }
 
-    public function agendamentoSala()
+    public function agendamentoSala($acao = null, $id = null)
     {
         try{
             $user = auth()->guard('representante')->user();
-            $salas = $this->service->getService('SalaReuniao')->salasAtivas();
+            $view = 'inserir-agendamento-sala';
+            $erro = null;
+            $dados;
+            switch ($acao) {
+                case 'agendar':
+                    $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user);
+                    $dados['salas'] = $this->service->getService('SalaReuniao')->salasAtivas();
+                    break;
+                case 'editar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->verificaPodeEditar($id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    break;
+                case 'justificar':
+                    // $salas = $this->service->getService('SalaReuniao')->salasAtivas();
+                    break;
+                case 'cancelar':
+                    // $salas = $this->service->getService('SalaReuniao')->salasAtivas();
+                    break;
+                default:
+                    $dados['salas'] = $user->agendamentosAtivos();
+                    $view = 'agendamento-sala';
+                    break;
+            }
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as opções de agendamento das salas.");
         }
 
-        return view('site.representante.inserir-agendamento-sala', compact('salas'));
+        return isset($erro) ? redirect()->route('representante.agendar.inserir.view')->with($erro) : 
+        view('site.representante.'. $view, $dados);
+    }
+
+    public function salvarAgendamentoSala(RepSalaReuniaoRequest $request, $acao)
+    {
+        try{
+            $erro = null;
+            $dados = $request->validated();
+            $user = auth()->guard('representante')->user();
+            switch ($acao) {
+                case 'agendar':
+                    $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user);
+                    $this->service->getService('SalaReuniao')->site()->save($dados, $user);
+                    break;
+                // case 'justificar':
+                //     $salas = $this->service->getService('SalaReuniao')->salasAtivas();
+                //     break;
+                // case 'cancelar':
+                //     $salas = $this->service->getService('SalaReuniao')->salasAtivas();
+                //     break;
+                // default:
+                //     $salas = $user->agendamentosAtivos();
+                //     break;
+            }
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao salvar agendamento da sala.");
+        }
+
+        return redirect()->route('representante.agendar.inserir.view')->with($erro);
     }
 }
