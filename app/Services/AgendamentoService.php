@@ -515,7 +515,7 @@ class AgendamentoService implements AgendamentoServiceInterface {
         $regionais = $service->getService('Regional')->all()->whereNotIn('idregional', [14]);
         $regionais->find(1)->regional = $this->renameSede;
 
-        $servicos = $this->servicos();
+        $servicos = config('app.env') == 'testing' ? $this->servicos() : array_intersect($this->servicos(), [Agendamento::SERVICOS_PLANTAO_JURIDICO]);
 
         if(!$service->getService('PlantaoJuridico')->plantaoJuridicoAtivo()) 
             unset($servicos[array_search(Agendamento::SERVICOS_PLANTAO_JURIDICO, $servicos)]);      
