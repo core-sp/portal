@@ -47,9 +47,9 @@ Route::prefix('representante')->group(function(){
 
     // Agendar Salas de Reunião
     Route::get('/agendamento-sala/{acao?}/{id?}', 'RepresentanteSiteController@agendamentoSala')
-    ->where('acao', 'agendar|editar|justificar|cancelar')->name('representante.agendar.inserir.view');
+    ->where('acao', 'agendar|editar|cancelar|justificar')->name('representante.agendar.inserir.view');
     Route::post('/agendamento-sala/{acao}', 'RepresentanteSiteController@salvarAgendamentoSala')
     ->where('acao', 'agendar')->name('representante.agendar.inserir.post');
     Route::put('/agendamento-sala/{acao}/{id}', 'RepresentanteSiteController@salvarAgendamentoSala')
-    ->where('acao', 'editar')->name('representante.agendar.inserir.put');
+    ->where('acao', 'editar|cancelar|justificar')->name('representante.agendar.inserir.put');
 });

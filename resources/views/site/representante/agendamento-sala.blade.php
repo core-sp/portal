@@ -41,6 +41,15 @@
                 @if($item->podeEditarParticipantes())
                 <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $item->id]) }}" class="btn btn-secondary btn-sm link-nostyle">Editar Participantes</a>
                 @endif
+                @if($item->podeCancelar())
+                <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $item->id]) }}" class="btn btn-danger btn-sm link-nostyle">Cancelar</a>
+                @endif
+                @if($item->podeJustificar())
+                <p class="pb-0 branco">
+                    <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $item->id]) }}" class="btn btn-sm btn-dark link-nostyle">Justificar</a>
+                    &nbsp;&nbsp;<i class="fas fa-exclamation-triangle text-warning"></i>&nbsp;&nbsp;Caso não tenha comparecido, deve justificar até {{ $item->getDataLimiteJustificar() }}
+                </p>
+                @endif
             </div>
             <div class="linha-lg-mini mb-2"></div>
             @endforeach

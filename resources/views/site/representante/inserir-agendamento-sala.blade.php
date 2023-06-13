@@ -25,7 +25,7 @@
   @if(isset($salas))
     <form action="{{ route('representante.agendar.inserir.post', 'agendar') }}" method="POST" id="agendamentoSala">
   @elseif(isset($agendamento))
-    <form action="{{ route('representante.agendar.inserir.put', ['acao' => 'editar', 'id' => $agendamento->id]) }}" method="POST">
+    <form action="{{ route('representante.agendar.inserir.put', ['acao' => $acao, 'id' => $agendamento->id]) }}" method="POST" enctype="multipart/form-data">
     @method('PUT')
   @endif
 
@@ -93,7 +93,7 @@
               name="dia"
               placeholder="Selecione a regional"
               readonly
-              disabled
+              {{ isset($agendamento) ? '' : 'disabled' }}
               required
               value="{{ isset($agendamento) ? onlyDate($agendamento->dia) : '' }}"
             />
@@ -145,12 +145,43 @@
         </p>
       </fieldset>
 
+      @if(isset($salas) || (isset($agendamento) && ($agendamento->tipo_sala == 'reuniao')))
       <fieldset class="form-group border p-2" style="display: {{ isset($agendamento) ? 'block' : 'none' }};" id="area_participantes">
         <p class="text-secondary"><span class="text-danger">*</span> <em>Deve ter pelo menos um participante</em></p>
         <legend class="w-auto"><small><i class="fas fa-users text-info"></i> Participantes</small></legend>
+      @endif
 
-      @if(isset($agendamento))
+      @if(isset($agendamento) && ($agendamento->tipo_sala == 'reuniao'))
         @foreach($agendamento->getParticipantesComTotal() as $cpf => $nome)
+        <div class="form-row mb-2 cadastroRepresentante participante">
+          <div class="col-sm mb-2-576">
+
+            <div class="input-group mb-2-576">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Participante:</span>
+              </div>
+              <input 
+                type="text" 
+                class="form-control col-3 cpfInput" 
+                name="participantes_cpf[]" 
+                placeholder="CPF"
+                value="{{ isset($agendamento) && (strlen($cpf) > 9) ? $cpf : '' }}"
+                {{ isset($agendamento) && ($acao != 'editar') ? 'disabled' : '' }}
+              >
+              <input 
+                type="text" 
+                class="form-control text-uppercase" 
+                name="participantes_nome[]" 
+                placeholder="Nome Completo"
+                value="{{ isset($agendamento) ? $nome : '' }}"
+                {{ isset($agendamento) && ($acao != 'editar') ? 'disabled' : '' }}
+              >
+            </div>
+
+          </div>
+        </div>
+        @endforeach
+      @elseif(isset($salas))
         <div class="form-row mb-2 cadastroRepresentante participante">
           <div class="col-sm mb-2-576">
 
@@ -163,50 +194,84 @@
                 class="form-control col-3" 
                 name="participantes_cpf[]" 
                 placeholder="CPF"
-                value="{{ isset($agendamento) && (strlen($cpf) > 9) ? $cpf : '' }}"
+                {{ isset($agendamento) && ($acao != 'editar') ? 'disabled' : '' }}
               >
               <input 
                 type="text" 
                 class="form-control text-uppercase" 
                 name="participantes_nome[]" 
                 placeholder="Nome Completo"
-                value="{{ isset($agendamento) ? $nome : '' }}"
+                {{ isset($agendamento) && ($acao != 'editar') ? 'disabled' : '' }}
               >
             </div>
 
           </div>
         </div>
-        @endforeach
       @endif
       </fieldset>
+
+      @if(isset($agendamento) && ($agendamento->podeJustificar()))
+      <fieldset class="form-group border p-2">
+        <legend class="w-auto"><small><i class="fas fa-marker"></i> Justificar</small></legend>
+
+        <div class="col-sm mb-2-576">
+          <label for="justificativa">Insira a justificativa <span class="text-danger">*</span></label>
+          <textarea 
+            name="justificativa" 
+            rows="5" 
+            class="form-control {{ $errors->has('justificativa') ? 'is-invalid' : '' }}"
+            id="justificativa"
+            maxlength="1000"
+            required
+          >{{ old('justificativa') }}</textarea>
+          @if($errors->has('justificativa'))
+          <div class="invalid-feedback">
+            {{ $errors->first('justificativa') }}
+          </div>
+          @endif
+        </div>
+
+        <div class="col-sm mb-2-576 mt-2">
+          <label>Anexo <small><em>(opcional)</em> - somente .jpg, .jpeg, .png, .pdf e até 2MB</small></label>
+          <div class="custom-file">
+            <input
+              type="file"
+              name="anexo_sala"
+              class="custom-file-input {{ $errors->has('anexo_sala') ? 'is-invalid' : '' }}"
+              id="comprovante-justificativa"
+              accept="image/png, image/jpeg, image/jpg, .pdf"
+            >
+            <label class="custom-file-label" for="comprovante-justificativa">Selecionar arquivo...</label>
+            @if($errors->has('anexo_sala'))
+            <div class="invalid-feedback">
+              {{ $errors->first('anexo_sala') }}
+            </div>
+            @endif
+          </div>
+        </div>
+
+      </fieldset>
+      @endif
             
       <div class="form-group float-right mt-4">
-        <button type="submit" class="btn btn-primary">Agendar</button>
+        <button type="submit" class="btn btn-{{ $acao == 'cancelar' ? 'danger' : 'primary' }}">
+        @switch($acao)
+          @case('editar')
+            Editar
+            @break
+          @case('cancelar')
+            Cancelar
+            @break
+          @case('justificar')
+            Justificar
+            @break
+          @default
+            Agendar
+        @endswitch
+        </button>
       </div>
     </form>
 
-  </div>
-</div>
-
-<!-- The Modal -->
-<div class="modal fade">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title">Atenção</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <!-- Modal body -->
-      <div class="modal-body">
-        Você é Representante Comercial?
-      </div>
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-dismiss="modal">Sim</button>
-        <button type="button" class="btn btn-secondary">Não</button>
-      </div>
-    </div>
   </div>
 </div>
 

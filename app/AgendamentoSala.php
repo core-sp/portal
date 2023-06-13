@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class AgendamentoSala extends Model
 {
@@ -12,6 +13,7 @@ class AgendamentoSala extends Model
     const STATUS_CANCELADO = 'Cancelado';
     const STATUS_COMPARECEU = 'Compareceu';
     const STATUS_PENDENTE = 'Aguardando Justificativa';
+    const STATUS_ENVIADA = 'Justificativa Enviada';
     const STATUS_NAO_COMPARECEU = 'Não Compareceu';
     const STATUS_JUSTIFICADO = 'Não Compareceu Justificado';
 
@@ -72,5 +74,24 @@ class AgendamentoSala extends Model
     public function podeEditarParticipantes()
     {
         return ($this->tipo_sala == 'reuniao') && (now() < $this->dia) && !isset($this->status);
+    }
+
+    public function podeCancelar()
+    {
+        return (now() < $this->dia) && !isset($this->status);
+    }
+
+    public function podeJustificar()
+    {
+        $dia = Carbon::createFromFormat('Y-m-d', $this->dia);
+
+        return (now() <= $dia->addDays(2)) && (now() >= $this->dia) && (!isset($this->status) || ($this->status == self::STATUS_PENDENTE));
+    }
+
+    public function getDataLimiteJustificar()
+    {
+        $dia = Carbon::createFromFormat('Y-m-d', $this->dia);
+
+        return $dia->addDays(2)->format('d/m/Y');
     }
 }

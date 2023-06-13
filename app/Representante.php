@@ -8,6 +8,7 @@ use App\Mail\RepresentanteResetPasswordMail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticable;
 use App\Notifications\RepresentanteResetPasswordNotification;
+use Carbon\Carbon;
 
 class Representante extends Authenticable
 {
@@ -126,13 +127,50 @@ class Representante extends Authenticable
         ->paginate(5);
     }
 
-    public function podeAgendar()
-    {
-        return $this->agendamentosSalas()
+    public function podeAgendar($mes = null)
+    {        
+        if(isset($mes))
+            return $this->agendamentosSalas()
+            ->whereMonth('dia', $mes)
+            ->where(function($query){
+                $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
+            })
+            ->count() < 4;
+
+        $mesSeguinte = now()->addMonth()->month;
+
+        $atual = $this->agendamentosSalas()
         ->whereMonth('dia', now()->month)
         ->where(function($query){
             $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
         })
         ->count() < 4;
+
+        if($mesSeguinte == now()->month)
+            return $atual;
+
+        $seguinte = $this->agendamentosSalas()
+        ->whereMonth('dia', $mesSeguinte)
+        ->where(function($query){
+            $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
+        })
+        ->count() < 4;
+
+        return $atual || $seguinte;
+    }
+
+    public function podeAgendarByDiaPeriodo($dia, $periodo)
+    {
+        $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
+        if(!in_array($periodo, ['manha', 'tarde']))
+            return false;
+
+        return $this->agendamentosSalas()
+        ->where('dia', $dia)
+        ->where('periodo', $periodo)
+        ->where(function($query){
+            $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
+        })
+        ->count() == 0;
     }
 }

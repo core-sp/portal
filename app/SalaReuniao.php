@@ -119,9 +119,7 @@ class SalaReuniao extends Model
     public function getParticipantesAgendar($tipo)
     {
         if($tipo == 'reuniao')
-            return $this->participantes_reuniao;
-        if($tipo == 'coworking')
-            return 1;
+            return $this->participantes_reuniao - 1;
         return 0;
     }
 

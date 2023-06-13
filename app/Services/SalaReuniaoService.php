@@ -174,7 +174,7 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
                         $final['tarde'] = 'Tarde: '.implode(', ',$sala->getHorariosTarde($tipo));
 
                     $final['itens'] = $sala->getItensHtml($tipo);
-                    $final['total'] = $sala->getParticipantesAgendar($tipo) - 1;
+                    $final['total'] = $sala->getParticipantesAgendar($tipo);
                 }
                 
                 return $final;

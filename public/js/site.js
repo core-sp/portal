@@ -1009,7 +1009,7 @@ function getDate() {
 	});
 
 	// Filename comprovante de residência
-	$('#comprovante-residencia, #comprovante-residencia-dois').on('change',function(e){
+	$('#comprovante-residencia, #comprovante-residencia-dois, #comprovante-justificativa').on('change',function(e){
 		var fileName = e.target.files[0].name;
 		$(this).next('.custom-file-label').html(fileName);
 	})

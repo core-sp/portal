@@ -566,27 +566,30 @@ class RepresentanteSiteController extends Controller
             $user = auth()->guard('representante')->user();
             $view = 'inserir-agendamento-sala';
             $erro = null;
-            $dados;
             switch ($acao) {
                 case 'agendar':
                     $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user);
-                    $dados['salas'] = $this->service->getService('SalaReuniao')->salasAtivas();
+                    if(!isset($erro))
+                        $dados['salas'] = $this->service->getService('SalaReuniao')->salasAtivas();
                     break;
                 case 'editar':
                     $dados = $this->service->getService('SalaReuniao')->site()->verificaPodeEditar($id, $user);
                     $erro = isset($dados['message']) ? $dados : $erro;
                     break;
-                case 'justificar':
-                    // $salas = $this->service->getService('SalaReuniao')->salasAtivas();
-                    break;
                 case 'cancelar':
-                    // $salas = $this->service->getService('SalaReuniao')->salasAtivas();
+                    $dados = $this->service->getService('SalaReuniao')->site()->verificaPodeCancelar($id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    break;
+                case 'justificar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->verificaPodeJustificar($id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
                     break;
                 default:
                     $dados['salas'] = $user->agendamentosAtivos();
                     $view = 'agendamento-sala';
                     break;
             }
+            $dados['acao'] = isset($acao) ? $acao : '';
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as opções de agendamento das salas.");
@@ -596,7 +599,7 @@ class RepresentanteSiteController extends Controller
         view('site.representante.'. $view, $dados);
     }
 
-    public function salvarAgendamentoSala(RepSalaReuniaoRequest $request, $acao)
+    public function salvarAgendamentoSala(RepSalaReuniaoRequest $request, $acao, $id = null)
     {
         try{
             $erro = null;
@@ -604,24 +607,35 @@ class RepresentanteSiteController extends Controller
             $user = auth()->guard('representante')->user();
             switch ($acao) {
                 case 'agendar':
-                    $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user);
-                    $this->service->getService('SalaReuniao')->site()->save($dados, $user);
+                    $dados = $this->service->getService('SalaReuniao')->site()->save($dados, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento criado com sucesso! Foi enviado um e-mail com os detalhes.', 
+                    'class' => 'alert-success'];
                     break;
-                // case 'justificar':
-                //     $salas = $this->service->getService('SalaReuniao')->salasAtivas();
-                //     break;
-                // case 'cancelar':
-                //     $salas = $this->service->getService('SalaReuniao')->salasAtivas();
-                //     break;
-                // default:
-                //     $salas = $user->agendamentosAtivos();
-                //     break;
+                case 'editar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->editarParticipantes($dados, $id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Participantes foram alterados com sucesso! Foi enviado um e-mail com os detalhes.', 
+                    'class' => 'alert-success'];
+                    break;
+                case 'cancelar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->cancelar($id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento cancelado com sucesso!', 
+                    'class' => 'alert-success'];
+                    break;
+                case 'justificar':
+                    $dados = $this->service->getService('SalaReuniao')->site()->justificar($dados, $id, $user);
+                    $erro = isset($dados['message']) ? $dados : $erro;
+                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento justificado com sucesso! Está em análise do atendente.', 
+                    'class' => 'alert-success'];
+                    break;
             }
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao salvar agendamento da sala.");
         }
 
-        return redirect()->route('representante.agendar.inserir.view')->with($erro);
+        return redirect()->route('representante.agendar.inserir.view')->with(isset($erro) ? $erro : $msg);
     }
 }

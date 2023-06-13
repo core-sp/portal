@@ -11,19 +11,25 @@ use Carbon\Carbon;
 
 class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
-    public function verificaPodeAgendar($user)
+    public function verificaPodeAgendar($user, $mes = null)
     {
-        if(!$user->podeAgendar())
+        if(!$user->podeAgendar($mes))
             return [
-                'message' => 'Já possui o limite de 4 agendamentos a finalizar no mês.',
+                'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos a finalizar no mês atual e/ou seguinte.',
                 'class' => 'alert-danger'
             ];
     }
 
     public function save($dados, $user)
     {
-        $dia = Carbon::createFromFormat('d/m/Y', $dados['dia'])->format('Y-m-d');
+        $dia = Carbon::createFromFormat('d/m/Y', $dados['dia']);
+
+        $resultado = $this->verificaPodeAgendar($user, $dia->month);
+        if(isset($resultado['message']))
+            return $resultado;
+
         $participantes = null;
+        $dia = $dia->format('Y-m-d');
         if($dados['tipo_sala'] == 'reuniao')
             $participantes = json_encode(
                 array_combine($dados['participantes_cpf'], $dados['participantes_nome']), JSON_FORCE_OBJECT
@@ -53,8 +59,98 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
         if($agendamento->podeEditarParticipantes())
             return ['agendamento' => $agendamento];
         return [
-            'message' => 'Não é possível editar o agendamento.',
+            'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Não é possível editar o agendamento.',
             'class' => 'alert-danger'
         ];
+    }
+
+    public function editarParticipantes($dados, $id, $user)
+    {
+        $resultado = $this->verificaPodeEditar($id, $user);
+        if(isset($resultado['message']))
+            return $resultado;
+
+        $agendamento = $resultado['agendamento'];
+
+        $participantes = json_encode(
+            array_combine($dados['participantes_cpf'], $dados['participantes_nome']), JSON_FORCE_OBJECT
+        );
+
+        $agendamento->update([
+            'participantes' => $participantes,
+        ]);
+
+        $string = $user->nome.' (CPF / CNPJ: '.$user->cpf_cnpj.') *editou os participantes* da reserva da sala em *'.$agendamento->sala->regional->regional;
+        $string .= '* no dia '.onlyDate($agendamento->dia).' para '.$agendamento->tipo_sala.', no período ' .$agendamento->periodo;
+        event(new ExternoEvent($string));
+
+        Mail::to($user->email)->queue(new AgendamentoSalaMail($agendamento->fresh(), 'editar'));
+    }
+
+    public function verificaPodeCancelar($id, $user)
+    {
+        $agendamento = $user->agendamentosSalas()->where('id', $id)->firstOrFail();
+        if($agendamento->podeCancelar())
+            return ['agendamento' => $agendamento];
+        return [
+            'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Não é possível cancelar o agendamento.',
+            'class' => 'alert-danger'
+        ];
+    }
+
+    public function cancelar($id, $user)
+    {
+        $resultado = $this->verificaPodeCancelar($id, $user);
+        if(isset($resultado['message']))
+            return $resultado;
+
+        $agendamento = $resultado['agendamento'];
+
+        $agendamento->update([
+            'status' => AgendamentoSala::STATUS_CANCELADO,
+        ]);
+
+        $string = $user->nome.' (CPF / CNPJ: '.$user->cpf_cnpj.') *cancelou* a reserva da sala em *'.$agendamento->sala->regional->regional;
+        $string .= '* no dia '.onlyDate($agendamento->dia).' para '.$agendamento->tipo_sala.', no período ' .$agendamento->periodo;
+        event(new ExternoEvent($string));
+    }
+
+    public function verificaPodeJustificar($id, $user)
+    {
+        $agendamento = $user->agendamentosSalas()->where('id', $id)->firstOrFail();
+        if($agendamento->podeJustificar())
+            return ['agendamento' => $agendamento];
+        return [
+            'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Não é possível justificar o agendamento.',
+            'class' => 'alert-danger'
+        ];
+    }
+
+    public function justificar($dados, $id, $user)
+    {
+        $resultado = $this->verificaPodeJustificar($id, $user);
+        if(isset($resultado['message']))
+            return $resultado;
+
+        $agendamento = $resultado['agendamento'];
+
+        $anexo = null;
+        if(isset($dados['anexo_sala']))
+        {
+            $anexo = $user->id . '-' . time() . '.' . $dados['anexo_sala']->getClientOriginalExtension();
+            $dados['anexo_sala']->storeAs("representantes/agendamento_sala", $anexo);
+        }
+
+        $agendamento->update([
+            'justificativa' => $dados['justificativa'],
+            'anexo' => $anexo,
+            'status' => AgendamentoSala::STATUS_ENVIADA,
+        ]);
+
+        $string = $user->nome.' (CPF / CNPJ: '.$user->cpf_cnpj.') *justificou e está em análise do atendente* o não comparecimento do agendamento da sala em *'.$agendamento->sala->regional->regional;
+        $string .= '* no dia '.onlyDate($agendamento->dia).' para '.$agendamento->tipo_sala.', no período ' .$agendamento->periodo;
+        event(new ExternoEvent($string));
+
+        Mail::to($user->email)->queue(new AgendamentoSalaMail($agendamento->fresh(), 'justificar'));
     }
 }
