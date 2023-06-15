@@ -568,6 +568,11 @@ class RepresentanteSiteController extends Controller
             $erro = null;
             switch ($acao) {
                 case 'agendar':
+                    if($this->gerentiRepository->gerentiStatus($user->ass_id) != 'Situação: Em dia.')
+                        return redirect()->route('representante.agendar.inserir.view')->with([
+                            'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Não pode criar agendamento no momento. Por gentileza, procure o atendimento do Core-SP.',
+                            'class' => 'alert-warning'
+                        ]);
                     $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user);
                     if(!isset($erro))
                         $dados['salas'] = $this->service->getService('SalaReuniao')->salasAtivas();
@@ -607,6 +612,11 @@ class RepresentanteSiteController extends Controller
             $user = auth()->guard('representante')->user();
             switch ($acao) {
                 case 'agendar':
+                    if($this->gerentiRepository->gerentiStatus($user->ass_id) != 'Situação: Em dia.')
+                        return redirect()->route('representante.agendar.inserir.view')->with([
+                            'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Não pode criar agendamento no momento. Por gentileza, procure o atendimento do Core-SP.',
+                            'class' => 'alert-warning'
+                        ]);
                     $dados = $this->service->getService('SalaReuniao')->site()->save($dados, $user);
                     $erro = isset($dados['message']) ? $dados : $erro;
                     $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento criado com sucesso! Foi enviado um e-mail com os detalhes.', 
@@ -627,7 +637,7 @@ class RepresentanteSiteController extends Controller
                 case 'justificar':
                     $dados = $this->service->getService('SalaReuniao')->site()->justificar($dados, $id, $user);
                     $erro = isset($dados['message']) ? $dados : $erro;
-                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento justificado com sucesso! Está em análise do atendente.', 
+                    $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento justificado com sucesso! Está em análise do atendente. Foi enviado um e-mail com a sua justificativa.', 
                     'class' => 'alert-success'];
                     break;
             }

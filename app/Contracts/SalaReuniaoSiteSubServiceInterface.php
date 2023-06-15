@@ -19,4 +19,6 @@ interface SalaReuniaoSiteSubServiceInterface {
     public function verificaPodeJustificar($id, $user);
 
     public function justificar($dados, $id, $user);
+
+    public function participantesVetados($dia, $periodo, $array_cpfs, $id = null);
 }

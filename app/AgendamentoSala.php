@@ -83,15 +83,39 @@ class AgendamentoSala extends Model
 
     public function podeJustificar()
     {
-        $dia = Carbon::createFromFormat('Y-m-d', $this->dia);
+        $dia = Carbon::parse($this->dia);
 
         return (now() <= $dia->addDays(2)) && (now() >= $this->dia) && (!isset($this->status) || ($this->status == self::STATUS_PENDENTE));
     }
 
     public function getDataLimiteJustificar()
     {
-        $dia = Carbon::createFromFormat('Y-m-d', $this->dia);
+        $dia = Carbon::parse($this->dia);
 
         return $dia->addDays(2)->format('d/m/Y');
+    }
+
+    public static function participantesVetados($dia, $periodo, $cpfs, $id = null)
+    {
+        $vetados = array();
+
+        $agendados = self::when(isset($id), function($query) use($id){
+            return $query->where('id', '!=', $id);
+        })
+        ->whereNull('status')
+        ->where('dia', $dia)
+        ->where('periodo', $periodo)
+        ->get();        
+        
+        foreach ($agendados as $key => $value) {
+            if($value->representante->tipoPessoa() == 'PF')
+                $vetados = array_merge($vetados, array_intersect($cpfs, [apenasNumeros($value->representante->cpf_cnpj)]));
+            if($value->tipo_sala == 'reuniao'){
+                $participantes = array_keys(json_decode($value->participantes, true));
+                $vetados = array_merge($vetados, array_intersect($cpfs, $participantes));
+            }
+        }
+
+        return array_unique($vetados);
     }
 }

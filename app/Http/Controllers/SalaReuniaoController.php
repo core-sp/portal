@@ -74,8 +74,9 @@ class SalaReuniaoController extends Controller
     public function getDiasHoras(Request $request, $tipo)
     {
         try{
+            $user = auth()->guard('representante')->check() ? auth()->guard('representante')->user() : null;
             $validate = $request->only('sala_id', 'dia');
-            $dados = $this->service->getService('SalaReuniao')->getDiasHoras($tipo, $validate['sala_id'], $validate['dia']);
+            $dados = $this->service->getService('SalaReuniao')->getDiasHoras($tipo, $validate['sala_id'], $validate['dia'], $user);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar os dados para o agendamento via ajax.");

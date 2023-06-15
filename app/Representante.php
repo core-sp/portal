@@ -159,18 +159,46 @@ class Representante extends Authenticable
         return $atual || $seguinte;
     }
 
-    public function podeAgendarByDiaPeriodo($dia, $periodo)
+    public function getPeriodoByDia($dia, $periodosDisponiveis)
     {
-        $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
-        if(!in_array($periodo, ['manha', 'tarde']))
-            return false;
-
-        return $this->agendamentosSalas()
+        $agendados = $this->agendamentosSalas()
         ->where('dia', $dia)
-        ->where('periodo', $periodo)
-        ->where(function($query){
-            $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
-        })
-        ->count() == 0;
+        ->whereNull('status')
+        ->orderBy('dia')
+        ->get();
+
+        foreach($agendados as $agendado)
+        {
+            foreach($periodosDisponiveis as $key => $periodo){
+                if($periodo == $agendado->periodo)
+                    unset($periodosDisponiveis[$key]);
+            }
+        }
+
+        return $periodosDisponiveis;
+    }
+
+    public function getAgendamentos30Dias($diasLotados = array())
+    {
+        $diasAgendado = array();
+        $agendados = $this->agendamentosSalas()
+        ->whereNull('status')
+        ->whereBetween('dia', [Carbon::tomorrow()->format('Y-m-d'), Carbon::today()->addMonth()->format('Y-m-d')])
+        ->orderBy('dia')
+        ->get();
+
+        foreach($agendados as $agendado)
+        {
+            $add = true;
+            $dia = Carbon::parse($agendado->dia);
+            foreach($diasLotados as $dias){
+                if($dias === [$dia->month, $dia->day, 'lotado'])
+                    $add = false;
+            }
+            if($add)
+                array_push($diasAgendado, [$dia->month, $dia->day, 'agendado']);
+        }
+
+        return $diasAgendado;
     }
 }

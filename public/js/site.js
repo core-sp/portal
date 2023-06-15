@@ -286,7 +286,9 @@ var lotados = [];
 function diasLotados(date) {
     for (i = 0; i < lotados.length; i++) {
       if (date.getMonth() == lotados[i][0] - 1 && date.getDate() == lotados[i][1]) {
-        return [false, lotados[i][2]];
+		var habilita = lotados[i][2] === 'agendado';
+		var texto = lotados[i][2] === 'agendado' ? 'Seu agendamento. Dia disponível, menos no(s) período(s) que está agendado.' : '';
+        return [habilita, lotados[i][2], texto];
       }
 	}	
 	return [true, ''];
@@ -700,7 +702,13 @@ $('#ano-mapa').on({
 				$('.participante :input[name="participantes_nome[]"]').val('');
 				$('#area_participantes').show();
 			}
-		}
+		}else
+			$('#agendamentoSala #periodo')
+			.prop('disabled', true)
+			.find('option')
+			.remove()
+			.end()
+			.append('<option value="" disabled selected>Nenhum período disponível</option>');
 	}
 
 	function limpaDiasHorariosAgendamentoSala(error = false){
@@ -742,6 +750,9 @@ $('#ano-mapa').on({
 	}
 	
 	function getDadosSalas(acao, tipo, sala_id = '', dia = ''){
+		if((tipo != 'reuniao') && (tipo != 'coworking'))
+			return false;
+
 		var dados_url = acao == 'getSalas' ? 
 		"/admin/salas-reunioes/regionais-salas-ativas/" + tipo : 
 		'/admin/salas-reunioes/sala-dias-horas/' + tipo;

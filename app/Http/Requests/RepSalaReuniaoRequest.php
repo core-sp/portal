@@ -12,6 +12,7 @@ class RepSalaReuniaoRequest extends FormRequest
     private $service;
     private $disponivel;
     private $total_cpfs;
+    private $proprio_cpf;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -21,19 +22,21 @@ class RepSalaReuniaoRequest extends FormRequest
     private function regras()
     {
         $participantes = [
-            'participantes_cpf' => 'exclude_if:tipo_sala,coworking|required_if:tipo_sala,reuniao|array',
+            'participantes_cpf' => 'exclude_unless:tipo_sala,reuniao|required_if:tipo_sala,reuniao|array',
             'participantes_cpf.*' => [
                 'distinct',
                 new Cpf,
+                'not_in:'.$this->proprio_cpf,
             ],
-            'participantes_nome' => 'exclude_if:tipo_sala,coworking|required_if:tipo_sala,reuniao|array|size:'.$this->total_cpfs,
+            'participantes_nome' => 'exclude_unless:tipo_sala,reuniao|required_if:tipo_sala,reuniao|array|size:'.$this->total_cpfs,
             'participantes_nome.*' => 'distinct|regex:/^\D*$/|min:5|max:191',
+            'participante_vetado' => 'nullable|array|size:0',
         ];
 
         $agendar = [
+            'tipo_sala' => 'bail|required|in:reuniao,coworking',
             'sala_reuniao_id' => 'required|exists:salas_reunioes,id',
-            'tipo_sala' => 'required|in:reuniao,coworking',
-            'dia' => 'required|date_format:d/m/Y|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addMonth()->format('d\/m\/Y'),
+            'dia' => 'required|date_format:d/m/Y|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addMonth()->format('d/m/Y'),
             'periodo' => 'required|in:manha,tarde',
         ];
 
@@ -58,9 +61,18 @@ class RepSalaReuniaoRequest extends FormRequest
             return;
 
         $user = auth()->guard('representante')->user();
+        $this->proprio_cpf = $user->tipoPessoa() == 'PF' ? apenasNumeros($user->cpf_cnpj) : '';
+        $this->total_cpfs = 0;
+
         if($this->acao == 'agendar')
         {
-            $this->disponivel = $this->service->getDiasHoras($this->tipo_sala, $this->sala_reuniao_id, $this->dia);
+            if(!$this->filled('tipo_sala') || !$this->filled('sala_reuniao_id') || !$this->filled('dia') || !$this->filled('periodo'))
+                return;
+
+            if(!Carbon::hasFormat($this->dia, 'd/m/Y'))
+                return;
+
+            $this->disponivel = $this->service->getDiasHoras($this->tipo_sala, $this->sala_reuniao_id, $this->dia, $user);
             $this->total_cpfs = isset($this->disponivel['total']) ? $this->disponivel['total'] : 0;
 
             if(!isset($this->disponivel) || (!isset($this->disponivel['manha']) && !isset($this->disponivel['tarde']))){
@@ -73,16 +85,16 @@ class RepSalaReuniaoRequest extends FormRequest
     
             if((($this->periodo == 'manha') && !isset($this->disponivel['manha'])) || (($this->periodo == 'tarde') && !isset($this->disponivel['tarde'])))
                 $this->merge(['periodo' => '']);
-
-            if(!$user->podeAgendarByDiaPeriodo($this->dia, $this->periodo))
-                $this->merge([
-                    'dia' => '',
-                    'periodo' => '',
-                ]);
         }
 
-        if($this->acao == 'editar')
-            $this->total_cpfs = $user->agendamentosSalas()->find($this->id)->sala->getParticipantesAgendar('reuniao');
+        if($this->acao == 'editar'){
+            $temp = $user->agendamentosSalas()->findOrFail($this->id);
+            $this->total_cpfs = $temp->sala->getParticipantesAgendar('reuniao');
+            $this->merge([
+                'dia' => Carbon::parse($temp->dia)->format('d/m/Y'),
+                'periodo' => $temp->periodo,
+            ]);
+        }
 
         if(is_array($this->participantes_cpf) && is_array($this->participantes_nome) && ($this->total_cpfs > 0))
         {
@@ -99,6 +111,15 @@ class RepSalaReuniaoRequest extends FormRequest
             ]);
             $this->total_cpfs = $this->total_cpfs < count($cpfs) ? 0 : count($cpfs);
         }
+
+        if($this->total_cpfs > 0)
+        {
+            $vetados = $this->service->site()->participantesVetados($this->dia, $this->periodo, $this->participantes_cpf, $this->id);
+            if(!isset($vetados))
+                $this->merge(['dia' => '']);
+            if(!empty($vetados))
+                $this->merge(['participante_vetado' => $vetados]);
+        }
     }
 
     public function rules()
@@ -108,6 +129,9 @@ class RepSalaReuniaoRequest extends FormRequest
 
     public function messages()
     {
+        $participantesVetados = isset($this->participante_vetado) ? 
+        '<br><strong>' . implode('<br>', $this->participante_vetado) . '</strong>' : '';
+
         return [
             'required' => 'O campo é obrigatório',
             'required_if' => 'É obrigatório ter participante',
@@ -126,6 +150,8 @@ class RepSalaReuniaoRequest extends FormRequest
             'anexo_sala.max' => 'O anexo não pode ultrapassar 2MB',
             'justificativa.max' => 'A justificativa deve ter :max caracteres ou menos',
             'justificativa.min' => 'A justificativa deve ter :min caracteres ou mais',
+            'participantes_cpf.*.not_in' => 'Representante logado já é um participante. Não pode ser inserido novamente.',
+            'participante_vetado.size' => 'Os seguintes participantes já estão agendados neste mesmo dia e período:' . $participantesVetados,
         ];
     }
 }

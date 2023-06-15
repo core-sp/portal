@@ -7,11 +7,13 @@
     <h4 class="pt-0 pb-0">Agendamento de Sala</h4>
     <div class="linha-lg-mini mb-3"></div>
 
-    @if($errors->has('participantes_cpf') || $errors->has('participantes_cpf.*') || $errors->has('participantes_nome') || $errors->has('participantes_nome.*'))
+    @if($errors->has('participante_vetado') || $errors->has('participantes_cpf') || $errors->has('participantes_cpf.*') || $errors->has('participantes_nome') || $errors->has('participantes_nome.*'))
     <div class="d-block w-100">
       <p class="alert alert-danger">
         <i class="fas fa-times"></i>&nbsp;&nbsp;
-        @if($errors->has('participantes_cpf.*') || $errors->has('participantes_nome.*'))
+        @if($errors->has('participante_vetado'))
+        {!! $errors->first('participante_vetado') !!}
+        @elseif($errors->has('participantes_cpf.*') || $errors->has('participantes_nome.*'))
         {{ $errors->has('participantes_cpf.*') ? $errors->first('participantes_cpf.*') : $errors->first('participantes_nome.*') }}
         @else
         {{ $errors->has('participantes_cpf') ? $errors->first('participantes_cpf') : $errors->first('participantes_nome') }}
@@ -85,7 +87,11 @@
 
       <div class="form-row mb-2 cadastroRepresentante">
         <div class="col-sm mb-2-576">
-          <label for="datepicker">Dia <span class="text-danger">*</span> <span>( <i class="fa fa-square" style="color:red"></i> = sem horário disponível )</span></label>
+          <label for="datepicker">Dia <span class="text-danger">*</span> 
+            <span>
+              ( <i class="fa fa-square" style="color:red"></i> = sem período disponível, <i class="far fa-square"></i> = seu agendamento )
+            </span>
+          </label>
           <div class="input-group">
             <input type="text" 
               class="form-control {{ $errors->has('dia') ? 'is-invalid' : '' }}"
@@ -147,9 +153,37 @@
 
       @if(isset($salas) || (isset($agendamento) && ($agendamento->tipo_sala == 'reuniao')))
       <fieldset class="form-group border p-2" style="display: {{ isset($agendamento) ? 'block' : 'none' }};" id="area_participantes">
-        <p class="text-secondary"><span class="text-danger">*</span> <em>Deve ter pelo menos um participante</em></p>
+        <p class="text-secondary"><span class="text-danger">*</span> <em>Deve ter pelo menos um participante além do responsável</em></p>
         <legend class="w-auto"><small><i class="fas fa-users text-info"></i> Participantes</small></legend>
       @endif
+
+        @if(isset($salas) || (isset($agendamento) && ($agendamento->tipo_sala == 'reuniao')))
+        <div class="form-row mb-2 cadastroRepresentante">
+          <div class="col-sm mb-2-576">
+
+            <div class="input-group mb-2-576">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Participante Responsável:</span>
+              </div>
+              <input 
+                type="text" 
+                class="form-control col-3" 
+                value="{{ auth()->guard('representante')->user()->cpf_cnpj }}"
+                disabled
+                readonly
+              >
+              <input 
+                type="text" 
+                class="form-control text-uppercase" 
+                value="{{ auth()->guard('representante')->user()->nome }}"
+                disabled
+                readonly
+              >
+            </div>
+
+          </div>
+        </div>
+        @endif
 
       @if(isset($agendamento) && ($agendamento->tipo_sala == 'reuniao'))
         @foreach($agendamento->getParticipantesComTotal() as $cpf => $nome)
@@ -272,6 +306,11 @@
       </div>
     </form>
 
+    @if(isset($agendamento))
+    <div class="float-left mt-4">
+      <span><small><em>Criado em: {{ formataData($agendamento->created_at) }}</em></small></span>
+    </div>
+    @endif
   </div>
 </div>
 

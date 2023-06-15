@@ -12,11 +12,12 @@
     <div class="conteudo-txt-mini light">
         <h4 class="pt-1 pb-1">Agendamentos de Salas</h4>
         <div class="linha-lg-mini mb-2"></div>
-        <div class="d-block mb-3 mt-2">
+        <p>Serviço de reserva de sala, tanto na sede quanto nas seccionais, para reunião e/ou coworking quando disponível, através do agendamento.</p>
+        <div class="d-block mt-2">
             <a href="{{ route('representante.agendar.inserir.view', 'agendar') }}" class="btn btn-primary link-nostyle branco">Agendar sala</a>
         </div>
         @if($salas->isNotEmpty())
-        <div class="list-group w-100">
+        <div class="list-group w-100 mt-3">
             @foreach ($salas as $item)
             <div class="list-group-item light d-block bg-info">
                 @if(isset($item->status))

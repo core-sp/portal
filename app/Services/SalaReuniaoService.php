@@ -154,17 +154,24 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
         return collect();
     }
 
-    public function getDiasHoras($tipo, $id, $dia = null)
+    public function getDiasHoras($tipo, $id, $dia = null, $user = null)
     {
         if(in_array($tipo, ['reuniao', 'coworking']))
         {
             $sala = SalaReuniao::where('id', $id)->where('participantes_'.$tipo, '>', 0)->first();
+            if(!isset($sala))
+                return null;
             
             if(isset($dia))
             {
                 $final = array();
+                if(!Carbon::hasFormat($dia, 'd/m/Y'))
+                    return null;
                 $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
                 $periodos = $sala->removeHorariosSeLotado($tipo, $dia);
+
+                if(isset($user))
+                    $periodos = $user->getPeriodoByDia($dia, $periodos);
 
                 if(!empty($periodos))
                 {
@@ -180,12 +187,17 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
                 return $final;
             }
 
-            return $sala->getDiasSeLotado($tipo);
+            $lotados = $sala->getDiasSeLotado($tipo);
+
+            if(isset($user))
+                $lotados = array_merge($lotados, $user->getAgendamentos30Dias($lotados));
+            
+            return $lotados;
         }
 
         return null;
     }
-
+    
     public function site()
     {
         return resolve('App\Contracts\SalaReuniaoSiteSubServiceInterface');

@@ -22,6 +22,11 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
     public function save($dados, $user)
     {
+        if(!Carbon::hasFormat($dados['dia'], 'd/m/Y'))
+            return [
+                'message' => 'Data no formato inválido', 
+                'class' => 'alert-danger'
+            ];
         $dia = Carbon::createFromFormat('d/m/Y', $dados['dia']);
 
         $resultado = $this->verificaPodeAgendar($user, $dia->month);
@@ -152,5 +157,23 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
         event(new ExternoEvent($string));
 
         Mail::to($user->email)->queue(new AgendamentoSalaMail($agendamento->fresh(), 'justificar'));
+    }
+
+    public function participantesVetados($dia, $periodo, $array_cpfs, $id = null)
+    {
+        if(in_array($periodo, ['manha', 'tarde']))
+        {
+            if(!Carbon::hasFormat($dia, 'd/m/Y'))
+                return null;
+                
+            $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
+            $vetados = AgendamentoSala::participantesVetados($dia, $periodo, $array_cpfs, $id);
+
+            if(!empty($vetados))
+                foreach($vetados as $chave => $val)
+                    $vetados[$chave] = formataCpfCnpj($val);
+
+            return $vetados;
+        }
     }
 }
