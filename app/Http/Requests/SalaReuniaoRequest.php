@@ -40,7 +40,7 @@ class SalaReuniaoRequest extends FormRequest
     public function rules()
     {
         return [
-            'participantes_reuniao' => 'required|integer',
+            'participantes_reuniao' => 'required|integer|not_in:1',
             'manha_horarios_reuniao' => 'exclude_if:participantes_reuniao,0|required|array|in:' . implode(',', $this->horas['manha']),
             'manha_horarios_reuniao.*' => 'distinct',
             'tarde_horarios_reuniao' => 'exclude_if:participantes_reuniao,0|required|array|in:' . implode(',', $this->horas['tarde']),
@@ -66,7 +66,8 @@ class SalaReuniaoRequest extends FormRequest
             'in' => 'Esse valor não existe',
             'array' => 'Formato inválido',
             'integer' => 'Deve ser um número',
-            'distinct' => 'Existe valor repetido'
+            'distinct' => 'Existe valor repetido',
+            'participantes_reuniao.not_in' => 'Deve ter pelo menos 2 participantes em reunião, ou 0 para tornar indisponível'
         ];
     }
 }

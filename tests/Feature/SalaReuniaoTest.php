@@ -256,6 +256,27 @@ class SalaReuniaoTest extends TestCase
     }
 
     /** @test */
+    public function sala_cannot_be_edited_with_participantes_reuniao_equal_1()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->states('desativa_coworking')->create();
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['participantes_reuniao'] = 1;
+        $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
+        $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
+        $dados['itens_reuniao'] = $sala->getItens('reuniao');
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
+        ->assertSessionHasErrors([
+            'participantes_reuniao'
+        ]);
+    }
+
+    /** @test */
     public function sala_cannot_be_edited_without_periodo_manha_when_participantes_reuniao_greater_than_0()
     {
         $this->signInAsAdmin();

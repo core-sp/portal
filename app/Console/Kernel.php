@@ -16,6 +16,8 @@ use PDO;
 use PDOException;
 use App\SolicitaCedula;
 use App\Mail\InternoSolicitaCedulaMail;
+use App\AgendamentoSala;
+use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
 {
@@ -137,6 +139,31 @@ class Kernel extends ConsoleKernel
                 }
             }
         })->dailyAt('4:15');
+
+        $schedule->call(function(){
+            // Agendamentos não justificados ou status não atualizados após 2 dias
+            AgendamentoSala::whereNull('status')
+            ->whereDate('dia', '<=', now()->subDays(3)->toDateString())
+            ->update([
+                'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
+            ]);
+
+            // Agendamentos justificados, mas sem atualização de status após 7 dias
+            $agendamentosSalas = AgendamentoSala::where('status', AgendamentoSala::STATUS_ENVIADA)
+            ->whereDate('updated_at', '<=', now()->subDays(8)->toDateString())
+            ->get();
+
+            foreach($agendamentosSalas as $agendamento){
+                if(isset($agendamento->anexo)){
+                    $removeu = Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendamento->anexo);
+                    $removeu ? \Log::channel('interno')->info('[Rotina do Portal] - Removido anexo do agendamento de sala com ID ' . $agendamento->id.'.') : 
+                    \Log::channel('interno')->info('[Rotina do Portal] - Não foi removido anexo do agendamento de sala com ID ' . $agendamento->id.'.');
+                }
+                $agendamento->update([
+                    'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
+                ]);
+            }
+        })->dailyAt('1:00');
     }
 
     /**

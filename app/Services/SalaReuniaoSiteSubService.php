@@ -11,9 +11,9 @@ use Carbon\Carbon;
 
 class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
-    public function verificaPodeAgendar($user, $mes = null)
+    public function verificaPodeAgendar($user, $mes = null, $ano = null)
     {
-        if(!$user->podeAgendar($mes))
+        if(!$user->podeAgendar($mes, $ano))
             return [
                 'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos a finalizar no mês atual e/ou seguinte.',
                 'class' => 'alert-danger'
@@ -29,7 +29,7 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
             ];
         $dia = Carbon::createFromFormat('d/m/Y', $dados['dia']);
 
-        $resultado = $this->verificaPodeAgendar($user, $dia->month);
+        $resultado = $this->verificaPodeAgendar($user, $dia->month, $dia->year);
         if(isset($resultado['message']))
             return $resultado;
 
@@ -60,7 +60,7 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
     public function verificaPodeEditar($id, $user)
     {
-        $agendamento = $user->agendamentosSalas()->where('id', $id)->firstOrFail();
+        $agendamento = $user->agendamentosSalas()->findOrFail($id);
         if($agendamento->podeEditarParticipantes())
             return ['agendamento' => $agendamento];
         return [
@@ -81,6 +81,14 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
             array_combine($dados['participantes_cpf'], $dados['participantes_nome']), JSON_FORCE_OBJECT
         );
 
+        $agendamento->participantes = $participantes;
+
+        if($agendamento->isClean('participantes'))
+            return [
+                'message' => '<i class="fas fa-info-circle"></i>&nbsp;&nbsp;Não houve alterações nos participantes.',
+                'class' => 'alert-info'
+            ];
+
         $agendamento->update([
             'participantes' => $participantes,
         ]);
@@ -94,7 +102,7 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
     public function verificaPodeCancelar($id, $user)
     {
-        $agendamento = $user->agendamentosSalas()->where('id', $id)->firstOrFail();
+        $agendamento = $user->agendamentosSalas()->findOrFail($id);
         if($agendamento->podeCancelar())
             return ['agendamento' => $agendamento];
         return [
@@ -122,7 +130,7 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
     public function verificaPodeJustificar($id, $user)
     {
-        $agendamento = $user->agendamentosSalas()->where('id', $id)->firstOrFail();
+        $agendamento = $user->agendamentosSalas()->findOrFail($id);
         if($agendamento->podeJustificar())
             return ['agendamento' => $agendamento];
         return [

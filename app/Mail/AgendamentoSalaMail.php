@@ -32,14 +32,14 @@ class AgendamentoSalaMail extends Mailable
         switch ($this->acao) {
             case 'editar':
                 $texto = "<strong>Os participantes do agendamento da reserva de sala foram alterados com sucesso!</strong>";
-                $texto .= "<br>Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência e com o número de protocolo em mãos.";
+                $texto .= "<br>Por favor, compareça ao escritório do CORE-SP com o número de protocolo em mãos e documento de identificação com foto.";
                 break;
             case 'justificar':
                 $texto = "<strong>Justificativa do não comparecimento da reserva de sala.</strong>";
                 break;
             default:
                 $texto = "<strong>Sua reserva de sala foi agendada com sucesso!</strong>";
-                $texto .= "<br>Por favor, compareça ao escritório do CORE-SP com no mínimo 15 minutos de antecedência e com o número de protocolo em mãos.";
+                $texto .= "<br>Por favor, compareça ao escritório do CORE-SP com o número de protocolo em mãos e documento de identificação com foto.";
         }
 
         return $texto;
@@ -71,6 +71,19 @@ class AgendamentoSalaMail extends Mailable
 
         if($acao == 'justificar')
             $this->body .= '<br><strong>Justificativa</strong>: ' . $agendamento->justificativa . "<br>";
+        
+        if($acao != 'justificar')
+            $this->body .= "<br><strong>Em caso de não comparecimento, deve justifcar a partir de ".onlyDate($agendamento->dia)." até ".$agendamento->getDataLimiteJustificar().", caso contrário será suspenso por 30 dias.</strong><br>";
+
+        $this->body .= "<br><strong>Conforme a Resolução Nº 01/2023:</strong><br>";
+        $this->body .= "<strong>6.</strong> Os usuários das salas de reunião deverão respeitar regras básicas de convivência, como, por
+        exemplo, manter o silêncio e conservar o local de trabalho limpo e organizado.<br>";
+        $this->body .= "<strong>7.</strong> É vedado ao usuário:<br>";
+        $this->body .= "<strong>&nbsp;&nbsp;&nbsp;&nbsp;a)</strong> Fazer lanches ou refeições no espaço;<br>";
+        $this->body .= "<strong>&nbsp;&nbsp;&nbsp;&nbsp;b)</strong> Usar as salas de reunião para fins de registro de endereço comercial e/ou correspondência;<br>";
+        $this->body .= "<strong>&nbsp;&nbsp;&nbsp;&nbsp;c)</strong> Danificar qualquer material ou equipamento que se encontre na sala de reunião.<br>";
+        $this->body .= "<strong>8.</strong> A prática de condutas vedadas implicará na impossibilidade de uso das salas de reunião por período a ser ";
+        $this->body .= "determinado pela Presidência do Core-SP, sem prejuízo do ressarcimento de eventuais danos.<br>";
     }
 
     public function build()

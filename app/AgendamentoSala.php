@@ -12,7 +12,6 @@ class AgendamentoSala extends Model
 
     const STATUS_CANCELADO = 'Cancelado';
     const STATUS_COMPARECEU = 'Compareceu';
-    const STATUS_PENDENTE = 'Aguardando Justificativa';
     const STATUS_ENVIADA = 'Justificativa Enviada';
     const STATUS_NAO_COMPARECEU = 'Não Compareceu';
     const STATUS_JUSTIFICADO = 'Não Compareceu Justificado';
@@ -73,26 +72,26 @@ class AgendamentoSala extends Model
 
     public function podeEditarParticipantes()
     {
-        return ($this->tipo_sala == 'reuniao') && (now() < $this->dia) && !isset($this->status);
+        return ($this->tipo_sala == 'reuniao') && (now()->format('Y-m-d') < $this->dia) && !isset($this->status);
     }
 
     public function podeCancelar()
     {
-        return (now() < $this->dia) && !isset($this->status);
+        return (now()->format('Y-m-d') < $this->dia) && !isset($this->status);
     }
 
     public function podeJustificar()
     {
-        $dia = Carbon::parse($this->dia);
-
-        return (now() <= $dia->addDays(2)) && (now() >= $this->dia) && (!isset($this->status) || ($this->status == self::STATUS_PENDENTE));
+        return (now()->format('Y-m-d') <= $this->getDataLimiteJustificar(false)) && (now()->format('Y-m-d') >= $this->dia) && !isset($this->status);
     }
 
-    public function getDataLimiteJustificar()
+    public function getDataLimiteJustificar($comBarra = true)
     {
-        $dia = Carbon::parse($this->dia);
+        $dia = Carbon::parse($this->dia)->addDays(2);
 
-        return $dia->addDays(2)->format('d/m/Y');
+        if($comBarra)
+            return $dia->format('d/m/Y');
+        return $dia->format('Y-m-d');
     }
 
     public static function participantesVetados($dia, $periodo, $cpfs, $id = null)

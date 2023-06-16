@@ -266,7 +266,7 @@
         </div>
 
         <div class="col-sm mb-2-576 mt-2">
-          <label>Anexo <small><em>(opcional)</em> - somente .jpg, .jpeg, .png, .pdf e até 2MB</small></label>
+          <label>Comprovante <small><em>(opcional) - somente .jpg, .jpeg, .png, .pdf com até 2MB</em></small></label>
           <div class="custom-file">
             <input
               type="file"
@@ -288,6 +288,7 @@
       @endif
             
       <div class="form-group float-right mt-4">
+        <a href="{{ route('representante.agendar.inserir.view') }}" class="btn btn-secondary link-nostyle mr-2">Voltar</a>
         <button type="submit" class="btn btn-{{ $acao == 'cancelar' ? 'danger' : 'primary' }}">
         @switch($acao)
           @case('editar')

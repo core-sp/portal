@@ -118,43 +118,46 @@ class Representante extends Authenticable
     {
         return $this->agendamentosSalas()
         ->with('sala.regional')
-        ->where(function($query){
-            $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
-        })
+        ->whereNull('status')
         ->orderBy('dia', 'ASC')
         ->orderBy('periodo', 'ASC')
         ->orderBy('status', 'ASC')
         ->paginate(5);
     }
 
-    public function podeAgendar($mes = null)
-    {        
-        if(isset($mes))
-            return $this->agendamentosSalas()
-            ->whereMonth('dia', $mes)
-            ->where(function($query){
-                $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
-            })
-            ->count() < 4;
-
-        $mesSeguinte = now()->addMonth()->month;
-
+    public function podeAgendar($mes = null, $ano = null)
+    {
         $atual = $this->agendamentosSalas()
-        ->whereMonth('dia', now()->month)
-        ->where(function($query){
-            $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
+        ->when(isset($mes) && !isset($ano), function($query) use($mes){
+            $query->whereMonth('dia', $mes)
+            ->whereYear('dia', now()->year);
         })
+        ->when(isset($ano) && !isset($mes), function($query) use($ano){
+            $query->whereMonth('dia', now()->month)
+            ->whereYear('dia', $ano);
+        })
+        ->when(isset($mes) && isset($ano), function($query) use($mes, $ano){
+            $query->whereMonth('dia', $mes)
+            ->whereYear('dia', $ano);
+        })
+        ->when(!isset($mes) && !isset($ano), function($query){
+            $query->whereMonth('dia', now()->month)
+            ->whereYear('dia', now()->year);
+        })
+        ->whereNull('status')
         ->count() < 4;
 
-        if($mesSeguinte == now()->month)
-            return $atual;
-
-        $seguinte = $this->agendamentosSalas()
-        ->whereMonth('dia', $mesSeguinte)
-        ->where(function($query){
-            $query->whereNull('status')->orWhere('status', 'Aguardando Justificativa');
-        })
-        ->count() < 4;
+        $seguinte = false;
+        $dataSeguinte = now()->addMonth();
+        $mesSeguinte = $dataSeguinte->month;
+        $anoSeguinte = $dataSeguinte->year;
+        
+        if(!isset($mes) && !isset($ano))
+            $seguinte = $this->agendamentosSalas()
+            ->whereMonth('dia', $mesSeguinte)
+            ->whereYear('dia', $anoSeguinte)
+            ->whereNull('status')
+            ->count() < 4;
 
         return $atual || $seguinte;
     }

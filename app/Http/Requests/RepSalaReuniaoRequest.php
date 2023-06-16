@@ -13,6 +13,7 @@ class RepSalaReuniaoRequest extends FormRequest
     private $disponivel;
     private $total_cpfs;
     private $proprio_cpf;
+    private $salas_ids;
 
     public function __construct(MediadorServiceInterface $service)
     {
@@ -34,8 +35,8 @@ class RepSalaReuniaoRequest extends FormRequest
         ];
 
         $agendar = [
-            'tipo_sala' => 'bail|required|in:reuniao,coworking',
-            'sala_reuniao_id' => 'required|exists:salas_reunioes,id',
+            'tipo_sala' => 'required|in:reuniao,coworking',
+            'sala_reuniao_id' => 'required|in:'.$this->salas_ids,
             'dia' => 'required|date_format:d/m/Y|after:'.date('d\/m\/Y').'|before_or_equal:'.Carbon::today()->addMonth()->format('d/m/Y'),
             'periodo' => 'required|in:manha,tarde',
         ];
@@ -63,6 +64,7 @@ class RepSalaReuniaoRequest extends FormRequest
         $user = auth()->guard('representante')->user();
         $this->proprio_cpf = $user->tipoPessoa() == 'PF' ? apenasNumeros($user->cpf_cnpj) : '';
         $this->total_cpfs = 0;
+        $this->salas_ids = isset($this->id) ? $this->id : implode(',', $this->service->salasAtivas()->pluck('id')->all());
 
         if($this->acao == 'agendar')
         {
@@ -91,6 +93,7 @@ class RepSalaReuniaoRequest extends FormRequest
             $temp = $user->agendamentosSalas()->findOrFail($this->id);
             $this->total_cpfs = $temp->sala->getParticipantesAgendar('reuniao');
             $this->merge([
+                'tipo_sala' => $temp->tipo_sala,
                 'dia' => Carbon::parse($temp->dia)->format('d/m/Y'),
                 'periodo' => $temp->periodo,
             ]);
@@ -135,7 +138,7 @@ class RepSalaReuniaoRequest extends FormRequest
         return [
             'required' => 'O campo é obrigatório',
             'required_if' => 'É obrigatório ter participante',
-            'exists' => 'Essa sala não existe',
+            'sala_reuniao_id.in' => 'Essa sala não está disponível',
             'in' => 'Essa opção não existe',
             'date_format' => 'Formato inválido de dia',
             'after' => 'Não pode agendar no dia de hoje',
@@ -144,7 +147,8 @@ class RepSalaReuniaoRequest extends FormRequest
             'min' => 'O nome deve ter :min caracteres ou mais',
             'max' => 'O nome deve ter :max caracteres ou menos',
             'regex' => 'Não pode conter número no nome',
-            'distinct' => 'Existe valor repetido',
+            'participantes_cpf.*.distinct' => 'Existe CPF repetido',
+            'participantes_nome.*.distinct' => 'Existe nome repetido',
             'size' => 'Total de nomes difere do total de CPFs',
             'mimes' => 'Tipo de arquivo não suportado',
             'anexo_sala.max' => 'O anexo não pode ultrapassar 2MB',

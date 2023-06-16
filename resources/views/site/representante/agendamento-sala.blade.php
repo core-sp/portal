@@ -20,9 +20,6 @@
         <div class="list-group w-100 mt-3">
             @foreach ($salas as $item)
             <div class="list-group-item light d-block bg-info">
-                @if(isset($item->status))
-                <p class="pb-0 branco">Status: <strong>{{ $item->status }}</strong></p>
-                @endif
                 <p class="pb-0 branco">Protocolo: <strong>{{ $item->protocolo }}</strong></p>
                 <p class="pb-0 branco">Regional: <strong>{{ $item->sala->regional->regional }}</strong></p>
                 <p class="pb-0 branco">

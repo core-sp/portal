@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\View;
 use App\Contracts\MediadorServiceInterface;
 use App\Http\Requests\RepSalaReuniaoRequest;
 use Illuminate\Support\Facades\Request as IlluminateRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RepresentanteSiteController extends Controller
 {
@@ -568,7 +569,7 @@ class RepresentanteSiteController extends Controller
             $erro = null;
             switch ($acao) {
                 case 'agendar':
-                    if($this->gerentiRepository->gerentiStatus($user->ass_id) != 'Situação: Em dia.')
+                    if(trim($this->gerentiRepository->gerentiStatus($user->ass_id)) != 'Situação: Em dia.')
                         return redirect()->route('representante.agendar.inserir.view')->with([
                             'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Não pode criar agendamento no momento. Por gentileza, procure o atendimento do Core-SP.',
                             'class' => 'alert-warning'
@@ -595,6 +596,12 @@ class RepresentanteSiteController extends Controller
                     break;
             }
             $dados['acao'] = isset($acao) ? $acao : '';
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            return redirect()->route('representante.agendar.inserir.view')->with([
+                'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Não existe agendamento com a ID inserida para o seu login.',
+                'class' => 'alert-danger'
+            ]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao carregar as opções de agendamento das salas.");
@@ -612,7 +619,7 @@ class RepresentanteSiteController extends Controller
             $user = auth()->guard('representante')->user();
             switch ($acao) {
                 case 'agendar':
-                    if($this->gerentiRepository->gerentiStatus($user->ass_id) != 'Situação: Em dia.')
+                    if(trim($this->gerentiRepository->gerentiStatus($user->ass_id)) != 'Situação: Em dia.')
                         return redirect()->route('representante.agendar.inserir.view')->with([
                             'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Não pode criar agendamento no momento. Por gentileza, procure o atendimento do Core-SP.',
                             'class' => 'alert-warning'
@@ -641,6 +648,12 @@ class RepresentanteSiteController extends Controller
                     'class' => 'alert-success'];
                     break;
             }
+        } catch(ModelNotFoundException $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            return redirect()->route('representante.agendar.inserir.view')->with([
+                'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Não existe agendamento com a ID inserida para o seu login.',
+                'class' => 'alert-danger'
+            ]);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao salvar agendamento da sala.");
