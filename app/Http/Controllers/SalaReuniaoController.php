@@ -73,6 +73,8 @@ class SalaReuniaoController extends Controller
 
     public function getDiasHoras(Request $request, $tipo)
     {
+        if(!auth()->guard('representante')->check() && !auth()->guard('web')->check())
+            return null;
         try{
             $user = auth()->guard('representante')->check() ? auth()->guard('representante')->user() : null;
             $validate = $request->only('sala_id', 'dia');

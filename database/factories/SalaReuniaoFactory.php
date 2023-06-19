@@ -20,7 +20,7 @@ $factory->define(SalaReuniao::class, function (Faker $faker) {
         'participantes_coworking' => 3,
         'itens_reuniao' => json_encode(array_values($itensReuniao), JSON_FORCE_OBJECT),
         'itens_coworking' => json_encode(array_values(SalaReuniao::itensCoworking()), JSON_FORCE_OBJECT),
-        'idusuario' => auth()->id() !== null ? auth()->id() : factory('App\User')
+        'idusuario' => auth()->guard('web')->id() !== null ? auth()->guard('web')->id() : factory('App\User')
     ];
 });
 
