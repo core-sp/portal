@@ -243,6 +243,14 @@ Route::middleware(['block_ip'])->group(function () {
       Route::put('/editar/{id}', 'SalaReuniaoController@update')->name('sala.reuniao.editar');
       Route::get('/regionais-salas-ativas/{tipo}', 'SalaReuniaoController@getRegionaisAtivas')->name('sala.reuniao.regionais.ativas');
       Route::get('/sala-dias-horas/{tipo}', 'SalaReuniaoController@getDiasHoras')->name('sala.reuniao.dias.horas');
+
+      Route::prefix('agendados')->group(function(){
+        Route::get('/', 'AgendamentoController@index')->name('sala.reuniao.agendados.index');
+        Route::get('/visualizar/{id}/{anexo?}', 'AgendamentoController@view')->name('sala.reuniao.agendados.view');
+        Route::put('/{id}/{acao}', 'AgendamentoController@updateStatus')->where('acao', 'confirma|aceito|recusa')->name('sala.reuniao.agendados.update');
+        Route::get('/filtro', 'AgendamentoController@index')->name('sala.reuniao.agendados.filtro');
+        Route::get('/busca', 'AgendamentoController@busca')->name('sala.reuniao.agendados.busca');
+      });
     });
 
   });

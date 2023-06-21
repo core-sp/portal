@@ -202,4 +202,9 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
     {
         return resolve('App\Contracts\SalaReuniaoSiteSubServiceInterface');
     }
+
+    public function agendados()
+    {
+        return resolve('App\Contracts\AgendamentoSalaSubServiceInterface');
+    }
 }

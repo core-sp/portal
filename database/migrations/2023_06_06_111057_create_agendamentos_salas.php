@@ -27,6 +27,7 @@ class CreateAgendamentosSalas extends Migration
             $table->string('anexo')->nullable();
             $table->bigInteger('sala_reuniao_id')->unsigned()->nullable();
             $table->foreign('sala_reuniao_id')->references('id')->on('salas_reunioes');
+            $table->text('justificativa_admin')->nullable();
             $table->bigInteger('idusuario')->unsigned()->nullable();
             $table->foreign('idusuario')->references('idusuario')->on('users');
             $table->timestamps();

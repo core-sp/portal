@@ -151,19 +151,25 @@ class Kernel extends ConsoleKernel
             // Agendamentos justificados, mas sem atualização de status após 7 dias
             $agendamentosSalas = AgendamentoSala::where('status', AgendamentoSala::STATUS_ENVIADA)
             ->whereDate('updated_at', '<=', now()->subDays(8)->toDateString())
+            ->update([
+                'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
+            ]);
+        })->dailyAt('1:00');
+
+        // Agendamentos com anexo finalizados com 1 mês ou mais terão o anexo removido.
+        $schedule->call(function(){
+            $agendados = AgendamentoSala::whereIn('status', [AgendamentoSala::STATUS_NAO_COMPARECEU, AgendamentoSala::STATUS_JUSTIFICADO])
+            ->whereNotNull('anexo')
+            ->whereDate('updated_at', '<=', now()->subMonth()->toDateString())
             ->get();
 
-            foreach($agendamentosSalas as $agendamento){
-                if(isset($agendamento->anexo)){
-                    $removeu = Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendamento->anexo);
-                    $removeu ? \Log::channel('interno')->info('[Rotina do Portal] - Removido anexo do agendamento de sala com ID ' . $agendamento->id.'.') : 
-                    \Log::channel('interno')->info('[Rotina do Portal] - Não foi removido anexo do agendamento de sala com ID ' . $agendamento->id.'.');
-                }
-                $agendamento->update([
-                    'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
-                ]);
+            foreach($agendados as $agendado)
+            {
+                $removeu = Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendado->anexo);
+                $removeu ? \Log::channel('interno')->info('[Rotina do Portal] - Removido anexo do agendamento de sala com ID ' . $agendado->id.'.') : 
+                \Log::channel('interno')->info('[Rotina do Portal] - Não foi removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
             }
-        })->dailyAt('1:00');
+        })->monthlyOn(1, '2:00');
     }
 
     /**

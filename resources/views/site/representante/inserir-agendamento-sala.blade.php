@@ -273,7 +273,7 @@
               name="anexo_sala"
               class="custom-file-input {{ $errors->has('anexo_sala') ? 'is-invalid' : '' }}"
               id="comprovante-justificativa"
-              accept="image/png, image/jpeg, image/jpg, .pdf"
+              accept="image/png, image/jpeg, image/jpg, application/pdf"
             >
             <label class="custom-file-label" for="comprovante-justificativa">Selecionar arquivo...</label>
             @if($errors->has('anexo_sala'))
