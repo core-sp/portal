@@ -6,7 +6,7 @@ use App\Contracts\AgendamentoSalaSubServiceInterface;
 use App\AgendamentoSala;
 use App\Events\CrudEvent;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\SalaReuniaoMail;
+use App\Mail\AgendamentoSalaMail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
@@ -63,7 +63,10 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             'table',
             'table-hover'
         ];
-        $tabela = montaTabela($headers, $contents, $classes);
+        $aviso = '<p class="text-primary"><i class="fas fa-info-circle"></i> O sistema irá atualizar o status para "<span class="text-danger font-weight-bold">Não Compareceu</span>" ';
+        $aviso .= 'após 2 dias do dia do agendamento caso o representante <strong>não compareça e não envie uma justificativa</strong>.</p>';
+
+        $tabela = $aviso . montaTabela($headers, $contents, $classes);
         
         return $tabela;
     }
@@ -71,8 +74,8 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
     private function validacaoFiltroAtivo($request, $user)
     {
         $canFiltroRegional = $user->cannot('atendenteOrGerSeccionais', $user);
-        $datemin = $request->filled('datemin') ? Carbon::parse($request->datemin) : Carbon::today();
-        $datemax = $request->filled('datemax') ? Carbon::parse($request->datemax) : Carbon::today();
+        $datemin = $request->filled('datemin') && Carbon::hasFormat($request->datemin, 'Y-m-d') ? Carbon::parse($request->datemin) : Carbon::today();
+        $datemax = $request->filled('datemax') && Carbon::hasFormat($request->datemax, 'Y-m-d') ? Carbon::parse($request->datemax) : Carbon::today();
 
         if($datemax->lt($datemin))
             $datemax = $datemin;
@@ -81,8 +84,8 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             'datemin' => $datemin->format('Y-m-d'),
             'datemax' => $datemax->format('Y-m-d'),
             'regional' => $request->filled('regional') && $canFiltroRegional ? $request->regional : $user->idregional,
-            'status' => $request->filled('status') ? $request->status : 'Qualquer',
-            'sala' => $request->filled('sala') ? $request->sala : 'Qualquer'
+            'status' => $request->filled('status') && in_array($request->status, AgendamentoSala::status()) ? $request->status : 'Qualquer',
+            'sala' => $request->filled('sala') && in_array($request->sala, ['reuniao', 'coworking']) ? $request->sala : 'Qualquer'
         ];
     }
 
@@ -207,7 +210,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         ];
     }
 
-    public function update($user, $id, $justificativa = [])
+    public function update($user, $id, $justificativa = ['justificativa_admin' => null])
     {
         $agendado = AgendamentoSala::with(['sala', 'representante'])->findOrFail($id);
 
@@ -218,7 +221,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
 
         if($agendado->podeAtualizarStatus())
         {
-            $status = empty($justificativa) ? AgendamentoSala::STATUS_COMPARECEU : null;
+            $status = !isset($agendado->status) ? AgendamentoSala::STATUS_COMPARECEU : null;
             if(!isset($status))
                 $status = isset($justificativa['justificativa_admin']) ? AgendamentoSala::STATUS_NAO_COMPARECEU : AgendamentoSala::STATUS_JUSTIFICADO;
 
@@ -229,6 +232,9 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             ]);
 
             event(new CrudEvent('agendamento da sala de reunião', 'atualizou status para '.$status, $id));
+
+            if(in_array($status, [AgendamentoSala::STATUS_NAO_COMPARECEU, AgendamentoSala::STATUS_JUSTIFICADO]))
+                Mail::to($agendado->representante->email)->queue(new AgendamentoSalaMail($agendado->fresh(), $status != AgendamentoSala::STATUS_NAO_COMPARECEU ? 'aceito' : 'recusa'));
         }
     }
 

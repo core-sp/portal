@@ -295,9 +295,10 @@
             $representante = in_array($idperfil, $permitidos->find(47)['perfis']);
             $representanteEndereco = in_array($idperfil, $permitidos->find(45)['perfis']);
             $representanteCedula = in_array($idperfil, $permitidos->find(59)['perfis']);
+            $salas = true/*in_array($idperfil, $permitidos->find(59)['perfis']);*/
         @endphp
         
-        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula)
+        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula || $salas)
         <li class="nav-header">ATENDIMENTO</li>
         
         @if($agendamento || $agendamentobloqueio)
@@ -373,6 +374,7 @@
         </li>
         @endif
 
+        @if($agendamento || $agendamentobloqueio || $salas)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-building"></i>
@@ -380,24 +382,33 @@
             </a>
 
             <ul class="nav nav-treeview">
+                @if($salas)
                 <li class="nav-item">
                     <a href="{{ route('sala.reuniao.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Salas</p>
                     </a>
                 </li>
+                @endif
+
+                @if($agendamento)
                 <li class="nav-item">
                     <a href="{{ route('sala.reuniao.agendados.index') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Agendados</p>
                     </a>
                 </li>
+                @endif
+
+                @if($agendamentobloqueio)
                 <li class="nav-item">
                     <a href="#{{-- route('sala.reuniao.index') --}}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Bloqueios</p>
                     </a>
                 </li>
+                @endif
+
                 <li class="nav-item">
                     <a href="#{{-- route('sala.reuniao.index') --}}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
@@ -406,6 +417,7 @@
                 </li>
             </ul>
         </li>
+        @endif
         @endif
 
         <!-- Jurídico -->

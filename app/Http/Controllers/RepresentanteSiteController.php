@@ -592,6 +592,7 @@ class RepresentanteSiteController extends Controller
                     break;
                 default:
                     $dados['salas'] = $user->agendamentosAtivos();
+                    $dados['participando'] = $this->service->getService('SalaReuniao')->site()->getAgendadosParticipante($user);
                     $view = 'agendamento-sala';
                     break;
             }

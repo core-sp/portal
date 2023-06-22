@@ -21,6 +21,9 @@ class AgendamentoSalaMail extends Mailable
                 return 'Alteração do agendamento de uso de sala pelo site';
             case 'justificar':
                 return 'Justificativa do não comparecimento de uso de sala pelo site';
+            case 'aceito':
+            case 'recusa':
+                return 'Atualização do não comparecimento de uso de sala pelo site';
             default:
                 return 'Agendamento de uso de sala pelo site';
         }
@@ -37,6 +40,13 @@ class AgendamentoSalaMail extends Mailable
             case 'justificar':
                 $texto = "<strong>Justificativa do não comparecimento da reserva de sala.</strong>";
                 break;
+            case 'aceito':
+                $texto = "<strong>Justificativa do não comparecimento da reserva de sala foi aceita.</strong>";
+                break;
+            case 'recusa':
+                $texto = "<strong>Justificativa do não comparecimento da reserva de sala foi recusada.</strong>";
+                $texto .= "<br><strong>Devido a recusa da justificativa, será suspenso por 30 dias para criar novos agendamentos a contar do dia deste agendamento.</strong>";
+                break;
             default:
                 $texto = "<strong>Sua reserva de sala foi agendada com sucesso!</strong>";
                 $texto .= "<br>Por favor, compareça ao escritório do CORE-SP com o número de protocolo em mãos e documento de identificação com foto.";
@@ -50,6 +60,9 @@ class AgendamentoSalaMail extends Mailable
         $this->acao = $acao;
         $this->body = $this->getTitulo();
         
+        if($acao == 'recusa')
+            $this->body .= '<br><br><span style="color: red;"><strong>Motivo da recusa</strong></span>: ' . $agendamento->justificativa_admin . "<br>";
+            
         $this->body .= "<br><br>";
         $this->body .= "<strong>Protocolo:</strong> " . $agendamento->protocolo;
         $this->body .= "<br><br>";
@@ -62,7 +75,7 @@ class AgendamentoSalaMail extends Mailable
         $this->body .= "Cidade: " . $agendamento->sala->regional->regional . "<br>";
         $this->body .= "Endereço: " . $agendamento->sala->regional->endereco.", " . $agendamento->sala->regional->numero;
         $this->body .= " - " . $agendamento->sala->regional->complemento . "<br>";
-        if($agendamento->tipo_sala == 'reuniao')
+        if($agendamento->isReuniao())
         {
             $this->body .= "Participantes: <br>";
             foreach($agendamento->getParticipantes() as $cpf => $nome)
@@ -72,7 +85,7 @@ class AgendamentoSalaMail extends Mailable
         if($acao == 'justificar')
             $this->body .= '<br><strong>Justificativa</strong>: ' . $agendamento->justificativa . "<br>";
         
-        if($acao != 'justificar')
+        if(!in_array($acao, ['justificar', 'aceito', 'recusa']))
             $this->body .= "<br><strong>Em caso de não comparecimento, deve justifcar a partir de ".onlyDate($agendamento->dia)." até ".$agendamento->getDataLimiteJustificar().", caso contrário será suspenso por 30 dias.</strong><br>";
 
         $this->body .= "<br><strong>Conforme a Resolução Nº 01/2023:</strong><br>";

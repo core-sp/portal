@@ -171,7 +171,18 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
                 $periodos = $sala->removeHorariosSeLotado($tipo, $dia);
 
                 if(isset($user))
+                {
+                    // verifica agendamentos que criou
                     $periodos = $user->getPeriodoByDia($dia, $periodos);
+
+                    // verifica agendamentos como participante
+                    if($user->tipoPessoa() == 'PF'){
+                        foreach($periodos as $chave => $valor){
+                            if(!empty($this->site()->participantesVetados($dia, $valor, [apenasNumeros($user->cpf_cnpj)])))
+                                unset($periodos[$chave]);
+                        }
+                    }
+                }
 
                 if(!empty($periodos))
                 {

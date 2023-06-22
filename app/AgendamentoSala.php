@@ -42,6 +42,16 @@ class AgendamentoSala extends Model
     	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
 
+    public static function getAgendadoParticipanteByCpf($cpf)
+    {
+    	return self::where('participantes', 'LIKE', '%"'. apenasNumeros($cpf) .'"%')
+        ->whereNull('status')
+        ->whereBetween('dia', [Carbon::tomorrow()->format('Y-m-d'), Carbon::today()->addMonth()->format('Y-m-d')])
+        ->orderBy('dia')
+        ->orderBy('periodo')
+        ->get();
+    }
+
     public static function getProtocolo()
     {
         // Gera a HASH (protocolo) aleatória
@@ -55,14 +65,19 @@ class AgendamentoSala extends Model
         return $protocoloGerado;
     }
 
+    public function isReuniao()
+    {
+    	return $this->tipo_sala == 'reuniao';
+    }
+
     public function getTipoSala()
     {
-    	return $this->tipo_sala == 'reuniao' ? 'Reunião' : 'Coworking';
+    	return $this->isReuniao() ? 'Reunião' : 'Coworking';
     }
 
     public function getTipoSalaHTML()
     {
-    	return $this->tipo_sala == 'reuniao' ? '<i class="fas fa-briefcase"></i> Reunião' : '<i class="fas fa-laptop"></i> Coworking';
+    	return $this->isReuniao() ? '<i class="fas fa-briefcase"></i> Reunião' : '<i class="fas fa-laptop"></i> Coworking';
     }
 
     public function getPeriodo()
@@ -72,7 +87,7 @@ class AgendamentoSala extends Model
 
     public function getParticipantes()
     {
-        return $this->tipo_sala == 'reuniao' ? json_decode($this->participantes, true) : array();
+        return $this->isReuniao() ? json_decode($this->participantes, true) : array();
     }
 
     public function getParticipantesComTotal()
@@ -80,7 +95,7 @@ class AgendamentoSala extends Model
         $total = $this->sala->participantes_reuniao - 1;
         $final = $this->getParticipantes();
         $atual = $total - count($final);
-        if(($this->tipo_sala == 'reuniao') && (count($final) < $this->sala->participantes_reuniao))
+        if(($this->isReuniao()) && (count($final) < $this->sala->participantes_reuniao))
             for($i = 1; $i <= $atual; $i++)    
                 $final[$i] = '';
         return $final;
@@ -88,7 +103,7 @@ class AgendamentoSala extends Model
 
     public function podeEditarParticipantes()
     {
-        return ($this->tipo_sala == 'reuniao') && (now()->format('Y-m-d') < $this->dia) && !isset($this->status);
+        return $this->isReuniao() && (now()->format('Y-m-d') < $this->dia) && !isset($this->status);
     }
 
     public function podeCancelar()
@@ -130,7 +145,7 @@ class AgendamentoSala extends Model
         foreach ($agendados as $key => $value) {
             if($value->representante->tipoPessoa() == 'PF')
                 $vetados = array_merge($vetados, array_intersect($cpfs, [apenasNumeros($value->representante->cpf_cnpj)]));
-            if($value->tipo_sala == 'reuniao'){
+            if($value->isReuniao()){
                 $participantes = array_keys(json_decode($value->participantes, true));
                 $vetados = array_merge($vetados, array_intersect($cpfs, $participantes));
             }

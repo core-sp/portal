@@ -151,13 +151,13 @@
         </p>
       </fieldset>
 
-      @if(isset($salas) || (isset($agendamento) && ($agendamento->tipo_sala == 'reuniao')))
+      @if(isset($salas) || (isset($agendamento) && $agendamento->isReuniao()))
       <fieldset class="form-group border p-2" style="display: {{ isset($agendamento) ? 'block' : 'none' }};" id="area_participantes">
         <p class="text-secondary"><span class="text-danger">*</span> <em>Deve ter pelo menos um participante além do responsável</em></p>
         <legend class="w-auto"><small><i class="fas fa-users text-info"></i> Participantes</small></legend>
       @endif
 
-        @if(isset($salas) || (isset($agendamento) && ($agendamento->tipo_sala == 'reuniao')))
+        @if(isset($salas) || (isset($agendamento) && $agendamento->isReuniao()))
         <div class="form-row mb-2 cadastroRepresentante">
           <div class="col-sm mb-2-576">
 
@@ -185,7 +185,7 @@
         </div>
         @endif
 
-      @if(isset($agendamento) && ($agendamento->tipo_sala == 'reuniao'))
+      @if(isset($agendamento) && $agendamento->isReuniao())
         @foreach($agendamento->getParticipantesComTotal() as $cpf => $nome)
         <div class="form-row mb-2 cadastroRepresentante participante">
           <div class="col-sm mb-2-576">

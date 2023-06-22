@@ -13,7 +13,7 @@
             <p class="mb-0">Dia e Período: <strong>{{ onlyDate($resultado->dia) }} | {{ $resultado->getPeriodo() }}</strong></p>
             <p class="mb-0">Regional: <strong>{{ $resultado->sala->regional->regional }}</strong></p>
             <hr>
-            @if($resultado->tipo_sala == 'reuniao')
+            @if($resultado->isReuniao())
             <h4>Participantes:</h4>
                 @foreach($resultado->getParticipantes() as $cpf => $nome)
                 <p class="mb-0">CPF: <strong>{{ formataCpfCnpj($cpf) }}</strong> | Nome: <strong>{{ $nome }}</strong></p>
@@ -35,7 +35,7 @@
 
         @if(isset($resultado->justificativa_admin))
             <hr>
-            <h4>Justificativa do(a) atendente <em>{{ $resultado->user->nome }}</em>:</h4>
+            <h4 class="text-danger">Justificativa do(a) atendente <em>{{ $resultado->user->nome }}</em>:</h4>
             <p class="mb-0">{{ $resultado->justificativa_admin }}</p>
         @endif
 
@@ -67,7 +67,7 @@
                     </div>
                     @endif
                     <button type="submit" class="btn btn-danger mt-2">
-                        Atualizar para Não Compareceu
+                        Não Compareceu
                     </button>
                 </form>
             </div>

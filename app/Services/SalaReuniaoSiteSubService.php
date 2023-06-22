@@ -171,10 +171,11 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
     {
         if(in_array($periodo, ['manha', 'tarde']))
         {
-            if(!Carbon::hasFormat($dia, 'd/m/Y'))
+            if(!Carbon::hasFormat($dia, 'd/m/Y') && !Carbon::hasFormat($dia, 'Y-m-d'))
                 return null;
-                
-            $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
+            
+            if(Carbon::hasFormat($dia, 'd/m/Y'))
+                $dia = Carbon::createFromFormat('d/m/Y', $dia)->format('Y-m-d');
             $vetados = AgendamentoSala::participantesVetados($dia, $periodo, $array_cpfs, $id);
 
             if(!empty($vetados))
@@ -183,5 +184,12 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
             return $vetados;
         }
+    }
+
+    public function getAgendadosParticipante($user)
+    {
+        if($user->tipoPessoa() == 'PF')
+            return AgendamentoSala::getAgendadoParticipanteByCpf($user->cpf_cnpj);
+        return collect();
     }
 }
