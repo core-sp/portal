@@ -21,38 +21,817 @@ class AgendamentoSalaTest extends TestCase
      * =======================================================================================================
      */
 
-    // /** @test */
-    // public function non_authenticated_users_cannot_access_links()
-    // {
-    //     $this->assertGuest();
+    /** @test */
+    public function non_authenticated_users_cannot_access_links()
+    {
+        $this->assertGuest();
         
-    //     $sala = factory('App\SalaReuniao')->create();
+        $agenda = factory('App\AgendamentoSala')->create();
         
-    //     $this->get(route('sala.reuniao.index'))->assertRedirect(route('login'));
-    //     $this->get(route('sala.reuniao.editar.view', $sala->id))->assertRedirect(route('login'));
-    //     $this->put(route('sala.reuniao.editar', $sala->id))->assertRedirect(route('login'));
-    // }
+        $this->get(route('sala.reuniao.agendados.index'))->assertRedirect(route('login'));
+        $this->get(route('sala.reuniao.agendados.view', $agenda->id))->assertRedirect(route('login'));
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'confirma']))->assertRedirect(route('login'));
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'aceito']))->assertRedirect(route('login'));
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'recusa']), [
+            'justificativa_admin' => 'dfdfdfdfdfddfdfdfddfdfdf'
+        ])->assertRedirect(route('login'));
+        $this->get(route('sala.reuniao.agendados.filtro'))->assertRedirect(route('login'));
+        $this->get(route('sala.reuniao.agendados.busca'))->assertRedirect(route('login'));
+    }
 
-    // // /** @test */
-    // // public function non_authorized_users_cannot_access_links()
-    // // {
-    // //     $this->signIn();
-    // //     $this->assertAuthenticated('web');
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
 
-    // //     $plantao = factory('App\PlantaoJuridico')->create();
-    // //     $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+        $agenda = factory('App\AgendamentoSala')->create();
 
-    // //     $this->get(route('plantao.juridico.index'))->assertForbidden();
-    // //     $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertForbidden();
-    // //     $this->put(route('plantao.juridico.editar', $plantao->id))->assertForbidden();
-    // //     $this->get(route('plantao.juridico.bloqueios.index'))->assertForbidden();
-    // //     $this->get(route('plantao.juridico.bloqueios.criar.view'))->assertForbidden();
-    // //     $this->post(route('plantao.juridico.bloqueios.criar'))->assertForbidden();
-    // //     $this->get(route('plantao.juridico.bloqueios.editar.view', $bloqueio->id))->assertForbidden();
-    // //     $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id))->assertForbidden();
-    // //     $this->delete(route('plantao.juridico.bloqueios.excluir', $bloqueio->id))->assertForbidden();
-    // //     $this->get(route('plantao.juridico.bloqueios.ajax'))->assertForbidden();
-    // // }
+        $this->get(route('sala.reuniao.agendados.index'))->assertForbidden();
+        $this->get(route('sala.reuniao.agendados.view', $agenda->id))->assertForbidden();
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'confirma']))->assertForbidden();
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'aceito']))->assertForbidden();
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'recusa']), [
+            'justificativa_admin' => 'dfdfdfdfdfddfdfdfddfdfdf'
+        ])->assertForbidden();
+        $this->get(route('sala.reuniao.agendados.filtro'))->assertForbidden();
+        $this->get(route('sala.reuniao.agendados.busca'))->assertForbidden();
+    }
+
+    /** @test */
+    public function can_view_agendado()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->create();
+
+        $this->get(route('sala.reuniao.agendados.index'))->assertOk();
+
+        $this->get(route('sala.reuniao.agendados.view', $agenda->id))
+        ->assertOk()
+        ->assertSeeText($agenda->representante->nome)
+        ->assertSeeText($agenda->representante->cpf_cnpj)
+        ->assertSeeText($agenda->representante->registro)
+        ->assertSeeText($agenda->representante->email)
+        ->assertSeeText($agenda->getTipoSala())
+        ->assertSeeText(onlyDate($agenda->dia))
+        ->assertSeeText($agenda->sala->regional->regional);
+    }
+
+    /** @test */
+    public function can_view_participantes()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $this->get(route('sala.reuniao.agendados.index'))->assertOk();
+
+        $cpfs = array_keys($agenda->getParticipantes());
+        $nomes = array_values($agenda->getParticipantes());
+
+        $this->get(route('sala.reuniao.agendados.view', $agenda->id))
+        ->assertOk()
+        ->assertSee('<h4>Participantes:</h4>')
+        ->assertSee('<p class="mb-0">CPF: <strong>'.formataCpfCnpj($cpfs[0]).'</strong> | Nome: <strong>'.$nomes[0].'</strong></p>')
+        ->assertSee('<p class="mb-0">CPF: <strong>'.formataCpfCnpj($cpfs[1]).'</strong> | Nome: <strong>'.$nomes[1].'</strong></p>');
+    }
+
+    /** @test */
+    public function can_view_justificado()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create();
+
+        $this->get(route('sala.reuniao.agendados.index'))->assertOk();
+
+        $this->get(route('sala.reuniao.agendados.view', $agenda->id))
+        ->assertOk()
+        ->assertSee('<h4>Justificativa do Representante:</h4>')
+        ->assertSee('<p class="mb-0">'.$agenda->justificativa.'</p>')
+        ->assertSee('<button type="submit" class="btn btn-primary">Não Compareceu Justificado</button>')
+        ->assertSee('<label for="justificativa_admin">Insira o motivo:</label>');
+    }
+
+    /** @test */
+    public function can_view_justificado_admin()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('recusado')->create();
+
+        $this->get(route('sala.reuniao.agendados.index'))->assertOk();
+
+        $this->get(route('sala.reuniao.agendados.view', $agenda->id))
+        ->assertOk()
+        ->assertSee('<h4 class="text-danger">Justificativa do(a) atendente <em>'.$user->nome.'</em>:</h4>')
+        ->assertSee('<p class="mb-0">'.$agenda->justificativa_admin.'</p>')
+        ->assertDontSee('<button type="submit" class="btn btn-primary">Não Compareceu Justificado</button>')
+        ->assertDontSee('<label for="justificativa_admin">Insira o motivo:</label>');
+    }
+
+    /** @test */
+    public function can_view_list()
+    {
+        $user = $this->signInAsAdmin();
+        $reuniao = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'dia' => now()->format('Y-m-d'),
+            'sala_reuniao_id' => factory('App\SalaReuniao')->create([
+                'idregional' => $user->idregional
+            ])
+        ]);
+        $coworking = factory('App\AgendamentoSala')->create([
+            'dia' => now()->format('Y-m-d'),
+            'idrepresentante' => $reuniao->idrepresentante,
+            'sala_reuniao_id' => $reuniao->sala_reuniao_id,
+            'periodo' => 'tarde'
+        ]);
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertOk()
+        ->assertSeeText($reuniao->protocolo)
+        ->assertSeeText($coworking->protocolo)
+        ->assertSeeText($reuniao->representante->cpf_cnpj)
+        ->assertSeeText($coworking->representante->cpf_cnpj)
+        ->assertSee($reuniao->getTipoSalaHTML())
+        ->assertSee($coworking->getTipoSalaHTML())
+        ->assertSeeText($reuniao->sala->regional->regional)
+        ->assertSeeText($coworking->sala->regional->regional);
+    }
+
+    /** @test */
+    public function can_to_confirm()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->create([
+            'dia' => now()->format('Y-m-d'),
+        ]);
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'confirma']))
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-check"></i>Status do agendamento com o código '.$agenda->id.' foi editado com sucesso!');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_COMPARECEU,
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_confirmed()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->create([
+            'dia' => now()->format('Y-m-d'),
+        ]);
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'confirma']));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_COMPARECEU .' *agendamento da sala de reunião* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function can_to_confirm_with_dia_before_today()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->create([
+            'dia' => now()->subDay()->format('Y-m-d'),
+        ]);
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'confirma']))
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-check"></i>Status do agendamento com o código '.$agenda->id.' foi editado com sucesso!');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_COMPARECEU,
+        ]);
+    }
+
+    /** @test */
+    public function cannot_to_confirm_with_dia_after_today()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->create();
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'confirma']))
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-times"></i> Não pode atualizar o agendamento com ID '.$agenda->id.' devido ao status ou dia.');
+
+        $this->assertDatabaseMissing('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_COMPARECEU,
+        ]);
+    }
+
+    /** @test */
+    public function cannot_to_confirm_without_status_null()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->create([
+            'status' => AgendamentoSala::STATUS_CANCELADO,
+        ]);
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'confirma']))
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-times"></i> Não pode atualizar o agendamento com ID '.$agenda->id.' devido ao status ou dia.');
+
+        $this->assertDatabaseMissing('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_COMPARECEU,
+        ]);
+    }
+
+    /** @test */
+    public function can_to_accept()
+    {
+        Mail::fake();
+
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create();
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'aceito']))
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        Mail::assertQueued(AgendamentoSalaMail::class);
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-check"></i>Status do agendamento com o código '.$agenda->id.' foi editado com sucesso!');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_JUSTIFICADO,
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_accepted()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create();
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'aceito']));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_JUSTIFICADO .' *agendamento da sala de reunião* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function cannot_to_accept_without_status_justificativa_enviada()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->create([
+            'dia' => now()->format('Y-m-d'),
+        ]);
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'aceito']))
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-times"></i> Não pode atualizar o agendamento com ID '.$agenda->id.' devido ao status.');
+
+        $this->assertDatabaseMissing('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_JUSTIFICADO,
+        ]);
+    }
+
+    /** @test */
+    public function cannot_to_accept_before_dia()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create([
+            'dia' => now()->addDay()->format('Y-m-d'),
+        ]);
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'aceito']))
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-times"></i> Não pode atualizar o agendamento com ID '.$agenda->id.' devido ao status ou dia.');
+
+        $this->assertDatabaseMissing('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_JUSTIFICADO,
+        ]);
+    }
+
+    /** @test */
+    public function can_to_refuse()
+    {
+        Mail::fake();
+
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create();
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'recusa']), [
+            'justificativa_admin' => 'fgfgffgffgfffggfgfg'
+        ])
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        Mail::assertQueued(AgendamentoSalaMail::class);
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-check"></i>Status do agendamento com o código '.$agenda->id.' foi editado com sucesso!');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_NAO_COMPARECEU,
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_refused()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create();
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'recusa']), [
+            'justificativa_admin' => 'fgfgffgffgfffggfgfg'
+        ]);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_NAO_COMPARECEU .' *agendamento da sala de reunião* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function cannot_to_refuse_without_justificativa_admin()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create();
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'recusa']), [
+            'justificativa_admin' => null
+        ])
+        ->assertSessionHasErrors([
+            'justificativa_admin'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_to_refuse_with_justificativa_admin_less_than_10_chars()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create();
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'recusa']), [
+            'justificativa_admin' => 'asdertghy'
+        ])
+        ->assertSessionHasErrors([
+            'justificativa_admin'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_to_refuse_with_justificativa_admin_greater_than_1000_chars()
+    {
+        $faker = \Faker\Factory::create();
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create();
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'recusa']), [
+            'justificativa_admin' => $faker->sentence(2500)
+        ])
+        ->assertSessionHasErrors([
+            'justificativa_admin'
+        ]);
+    }
+
+    /** @test */
+    public function cannot_to_refuse_without_status_justificativa_enviada()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create([
+            'status' => null
+        ]);
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'recusa']), [
+            'justificativa_admin' => 'sderttppfkvmvb'
+        ])
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-times"></i> Não pode atualizar o agendamento com ID '.$agenda->id.' devido ao status.');
+
+        $this->assertDatabaseMissing('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_NAO_COMPARECEU,
+        ]);
+    }
+
+    /** @test */
+    public function cannot_to_refuse_before_dia()
+    {
+        $user = $this->signInAsAdmin();
+        $agenda = factory('App\AgendamentoSala')->states('justificado')->create([
+            'dia' => now()->addDay()->format('Y-m-d'),
+        ]);
+
+        $this->put(route('sala.reuniao.agendados.update', [$agenda->id, 'recusa']), [
+            'justificativa_admin' => 'sderttppfkvmvb'
+        ])
+        ->assertRedirect(route('sala.reuniao.agendados.index'));
+
+        $this->get(route('sala.reuniao.agendados.index'))
+        ->assertSee('<i class="icon fa fa-times"></i> Não pode atualizar o agendamento com ID '.$agenda->id.' devido ao status ou dia.');
+
+        $this->assertDatabaseMissing('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'status' => AgendamentoSala::STATUS_NAO_COMPARECEU,
+        ]);
+    }
+
+    /** @test */
+    public function can_view_all_filtros()
+    {
+        $user = $this->signInAsAdmin();
+
+        $this->get(route('sala.reuniao.agendados.filtro'))
+        ->assertSeeText('Seccional')
+        ->assertSeeText('Status')
+        ->assertSeeText('Sala')
+        ->assertSeeText('De')
+        ->assertSeeText('Até');
+    }
+
+    /** @test */
+    public function atendente_and_gerente_seccional_cannot_view_all_filtros()
+    {
+        $atendente = factory('App\Perfil')->create([
+            'idperfil' => 8,
+            'nome' => 'Atendimento'
+        ]);
+
+        $gerente = factory('App\Perfil')->create([
+            'idperfil' => 21,
+            'nome' => 'Gerente Seccionais'
+        ]);
+
+        $user = factory('App\User')->create([
+            'idperfil' => $atendente->idperfil
+        ]);
+
+        $agenda = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->create([
+                'idregional' => $user->idregional
+            ]),
+            'dia' => date('Y-m-d'),
+        ]);
+
+        $this->signIn($user);
+        Permissao::find(27)->update(['perfis' => '1,8']);
+
+        $this->get(route('sala.reuniao.agendados.filtro'))
+        ->assertDontSeeText('Seccional')
+        ->assertSeeText('Status')
+        ->assertSeeText('Sala')
+        ->assertSeeText('De')
+        ->assertSeeText('Até');
+
+        $user2 = factory('App\User')->create([
+            'idperfil' => $gerente->idperfil
+        ]);
+
+        $agenda = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->create([
+                'idregional' => $user2->idregional
+            ]),
+            'dia' => date('Y-m-d'),
+            'idrepresentante' => $agenda->idrepresentante
+        ]);
+
+        $this->signIn($user2);
+        Permissao::find(27)->update(['perfis' => '1,21']);
+
+        $this->get(route('sala.reuniao.agendados.filtro'))
+        ->assertDontSeeText('Seccional')
+        ->assertSeeText('Status')
+        ->assertSeeText('Sala')
+        ->assertSeeText('De')
+        ->assertSeeText('Até');
+    }
+
+    /** @test */
+    public function agendamentos_filter()
+    {
+        // Criando usuário Admin. A Regional Sede (idregional = 1) é criada junta
+        $admin = $this->signInAsAdmin();
+
+        // Criando regional seccional (idregional != 1)
+        $regional_seccional = factory('App\Regional')->create([
+            'idregional' => 2,
+            'regional' => 'Seccional'
+        ]);
+
+        // Criando Agendamento pendente no passado na sede
+        $agendamento_sede_pendente = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->create([
+                'idregional' => 1
+            ]),
+            'dia' => date('Y-m-d', strtotime('-1 day')),
+            'protocolo' => 'RC-AGE-00000001'
+        ]);
+
+        // Criando Agendamento concluído no passado na sede
+        $agendamento_sede_concluido = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => 1,
+            'dia' => date('Y-m-d', strtotime('-1 day')),
+            'protocolo' => 'RC-AGE-00000002',
+            'status' => AgendamentoSala::STATUS_COMPARECEU,
+            'idusuario' => 1,
+            'idrepresentante' => $agendamento_sede_pendente->idrepresentante
+        ]);
+
+        // Criando Agendamento pendente no futuro na sede
+        $agendamento_sede_pendente_futuro = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => 1,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'protocolo' => 'RC-AGE-00000003',
+            'idrepresentante' => $agendamento_sede_pendente->idrepresentante
+        ]);
+        
+        // Criando Agendamento pendente no passado na seccional
+        $agendamento_seccional_pendente = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->create([
+                'idregional' => 2
+            ]),
+            'dia' => date('Y-m-d', strtotime('-1 day')),
+            'protocolo' => 'RC-AGE-00000004',
+            'idrepresentante' => $agendamento_sede_pendente->idrepresentante
+        ]);
+
+        // Criando Agendamento concluído no passado na seccional
+        $agendamento_seccional_concluido = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $regional_seccional->idregional,
+            'dia' => date('Y-m-d', strtotime('-1 day')),
+            'protocolo' => 'RC-AGE-00000005',
+            'status' => AgendamentoSala::STATUS_NAO_COMPARECEU,
+            'idrepresentante' => $agendamento_sede_pendente->idrepresentante
+        ]);
+
+        // Criando Agendamento pendente no futuro na seccional
+        $agendamento_seccional_pendente_futuro = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $regional_seccional->idregional,
+            'dia' => date('Y-m-d', strtotime('+1 day')),
+            'protocolo' => 'RC-AGE-00000006',
+            'idrepresentante' => $agendamento_sede_pendente->idrepresentante
+        ]);
+
+        // Listando todos os agendamentos (qualquer regional, status e datas cobrindos todos os agendamentos)
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => 'Todas', 
+            'status' => 'Qualquer', 
+            'datemin' => date('Y-m-d', strtotime('-1 day')), 
+            'datemax' => date('Y-m-d', strtotime('+1 day'))
+        ]))->assertSeeText('RC-AGE-00000001') 
+            ->assertSeeText('RC-AGE-00000002') 
+            ->assertSeeText('RC-AGE-00000003') 
+            ->assertSeeText('RC-AGE-00000004') 
+            ->assertSeeText('RC-AGE-00000005')
+            ->assertSeeText('RC-AGE-00000006');
+
+        // Listando todos os agendamentos da Sede (qualquer status e datas cobrindos todos os agendamentos)
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => 1, 
+            'status' => 'Qualquer', 
+            'datemin' => date('Y-m-d', strtotime('-1 day')), 
+            'datemax' => date('Y-m-d', strtotime('+1 day'))
+        ]))
+            ->assertSeeText('RC-AGE-00000001') 
+            ->assertSeeText('RC-AGE-00000002') 
+            ->assertSeeText('RC-AGE-00000003') 
+            ->assertDontSeeText('RC-AGE-00000004') 
+            ->assertDontSeeText('RC-AGE-00000005')
+            ->assertDontSeeText('RC-AGE-00000006');
+
+        // Listando apenas os agendamentos com status "Compareceu" da Sede (datas cobrindos todos os agendamentos)
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => 1, 
+            'status' => AgendamentoSala::STATUS_COMPARECEU, 
+            'datemin' => date('Y-m-d', strtotime('-1 day')), 
+            'datemax' => date('Y-m-d', strtotime('+1 day'))
+        ]))
+            ->assertDontSeeText('RC-AGE-00000001') 
+            ->assertSeeText('RC-AGE-00000002') 
+            ->assertDontSeeText('RC-AGE-00000003') 
+            ->assertDontSeeText('RC-AGE-00000004') 
+            ->assertDontSeeText('RC-AGE-00000005')
+            ->assertDontSeeText('RC-AGE-00000006');
+
+        // Listando apenas agendamentos da Sede do dia -1
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => 1, 
+            'status' => 'Qualquer', 
+            'datemin' => date('Y-m-d', strtotime('-1 day')), 
+            'datemax' => date('Y-m-d', strtotime('-1 day'))
+        ]))
+            ->assertSeeText('RC-AGE-00000001') 
+            ->assertSeeText('RC-AGE-00000002') 
+            ->assertDontSeeText('RC-AGE-00000003') 
+            ->assertDontSeeText('RC-AGE-00000004') 
+            ->assertDontSeeText('RC-AGE-00000005')
+            ->assertDontSeeText('RC-AGE-00000006');
+
+        // Listando nenhum o agendamentos da Sede por causa de data sem agendamento
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => 1, 
+            'status' => AgendamentoSala::STATUS_COMPARECEU, 
+            'datemin' => date('Y-m-d'), 
+            'datemax' => date('Y-m-d')
+        ]))
+            ->assertDontSeeText('RC-AGE-00000001') 
+            ->assertDontSeeText('RC-AGE-00000002') 
+            ->assertDontSeeText('RC-AGE-00000003') 
+            ->assertDontSeeText('RC-AGE-00000004') 
+            ->assertDontSeeText('RC-AGE-00000005')
+            ->assertDontSeeText('RC-AGE-00000006');
+
+
+        // Listando todos os agendamentos da Seccional (qualquer status e datas cobrindos todos os agendamentos)
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => $regional_seccional->idregional, 
+            'status' => 'Qualquer', 
+            'datemin' => date('Y-m-d', strtotime('-1 day')), 
+            'datemax' => date('Y-m-d', strtotime('+1 day'))
+        ]))
+            ->assertDontSeeText('RC-AGE-00000001') 
+            ->assertDontSeeText('RC-AGE-00000002') 
+            ->assertDontSeeText('RC-AGE-00000003') 
+            ->assertSeeText('RC-AGE-00000004') 
+            ->assertSeeText('RC-AGE-00000005')
+            ->assertSeeText('RC-AGE-00000006');
+
+        // Listando apenas os agendamentos com status "Não Compareceu" da Seccional (datas cobrindos todos os agendamentos)
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => $regional_seccional->idregional,
+            'status' => AgendamentoSala::STATUS_NAO_COMPARECEU, 
+            'datemin' => date('Y-m-d', strtotime('-1 day')), 
+            'datemax' => date('Y-m-d', strtotime('+1 day'))
+        ]))
+            ->assertDontSeeText('RC-AGE-00000001') 
+            ->assertDontSeeText('RC-AGE-00000002') 
+            ->assertDontSeeText('RC-AGE-00000003') 
+            ->assertDontSeeText('RC-AGE-00000004') 
+            ->assertSeeText('RC-AGE-00000005')
+            ->assertDontSeeText('RC-AGE-00000006');
+
+        // Listando apenas agendamentos da Seccional do dia +1
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => $regional_seccional->idregional,
+            'status' => 'Qualquer', 
+            'datemin' => date('Y-m-d', strtotime('+1 day')), 
+            'datemax' => date('Y-m-d', strtotime('+1 day'))
+        ]))
+            ->assertDontSeeText('RC-AGE-00000001') 
+            ->assertDontSeeText('RC-AGE-00000002') 
+            ->assertDontSeeText('RC-AGE-00000003') 
+            ->assertDontSeeText('RC-AGE-00000004') 
+            ->assertDontSeeText('RC-AGE-00000005')
+            ->assertSeeText('RC-AGE-00000006');
+
+        // Listando nenhum o agendamentos da Seccional por causa de data sem agendamento
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => $regional_seccional->idregional,
+            'status' => AgendamentoSala::STATUS_COMPARECEU, 
+            'datemin' => date('Y-m-d'), 
+            'datemax' => date('Y-m-d')
+        ]))
+            ->assertDontSeeText('RC-AGE-00000001') 
+            ->assertDontSeeText('RC-AGE-00000002') 
+            ->assertDontSeeText('RC-AGE-00000003') 
+            ->assertDontSeeText('RC-AGE-00000004') 
+            ->assertDontSeeText('RC-AGE-00000005')
+            ->assertDontSeeText('RC-AGE-00000006');
+
+        $this->get(route('sala.reuniao.agendados.filtro', [
+            'regional' => $regional_seccional->idregional,
+            'status' => AgendamentoSala::STATUS_COMPARECEU, 
+            'datemin' => now()->addDay()->format('Y-m-d'), 
+            'datemax' => date('Y-m-d')
+        ]))
+            ->assertDontSeeText('RC-AGE-00000001') 
+            ->assertDontSeeText('RC-AGE-00000002') 
+            ->assertDontSeeText('RC-AGE-00000003') 
+            ->assertDontSeeText('RC-AGE-00000004') 
+            ->assertDontSeeText('RC-AGE-00000005')
+            ->assertDontSeeText('RC-AGE-00000006');
+    }
+
+    /** @test */
+    public function search_criteria_for_agendamento_for_profiles_other_than_atendente_and_gerSeccional()
+    {
+        $user = $this->signInAsAdmin();
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->create([
+                'idregional' => $user->idregional,
+            ])
+        ]);
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->id]))
+            ->assertSeeText($agendamento->protocolo); 
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->representante->cpf_cnpj]))
+            ->assertSeeText($agendamento->protocolo); 
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->protocolo]))
+            ->assertSeeText($agendamento->protocolo); 
+            
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => 'Erro busca']))
+            ->assertDontSeeText($agendamento->protocolo);
+    }
+
+    /** @test */
+    public function search_criteria_for_agendamento_atendente()
+    {
+        $perfil = factory('App\Perfil')->create([
+            'idperfil' => 8
+        ]);
+        $user = factory('App\User')->create([
+            'idperfil' => $perfil->idperfil
+        ]);
+
+        $user = $this->signIn($user);
+        Permissao::find(27)->update(['perfis' => '1,8']);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->create([
+                'idregional' => $user->idregional,
+            ])
+        ]);
+
+        $agendamento2 = factory('App\AgendamentoSala')->create([
+            'protocolo' => 'RC-AGE-YYYYYYYY',
+            'idrepresentante' => $agendamento->idrepresentante
+        ]);
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->id]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo);
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->representante->cpf_cnpj]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo); 
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->protocolo]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo);
+            
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => 'Critério de busca sem resultado']))
+            ->assertDontSeeText($agendamento->protocolo);
+    }
+
+    /** @test */
+    public function search_criteria_for_agendamento_gerente_seccional()
+    {
+        $perfil = factory('App\Perfil')->create([
+            'idperfil' => 21
+        ]);
+        $user = factory('App\User')->create([
+            'idperfil' => $perfil->idperfil
+        ]);
+
+        $user = $this->signIn($user);
+        Permissao::find(27)->update(['perfis' => '1,21']);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->create([
+                'idregional' => $user->idregional,
+            ])
+        ]);
+
+        $agendamento2 = factory('App\AgendamentoSala')->create([
+            'protocolo' => 'RC-AGE-YYYYYYYY',
+            'idrepresentante' => $agendamento->idrepresentante
+        ]);
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->id]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo);
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->representante->cpf_cnpj]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo); 
+
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => $agendamento->protocolo]))
+            ->assertSeeText($agendamento->protocolo)
+            ->assertDontSeeText($agendamento2->protocolo);
+            
+        $this->get(route('sala.reuniao.agendados.busca', ['q' => 'Critério de busca sem resultado']))
+            ->assertDontSeeText($agendamento->protocolo);
+    }
 
     /** 
      * =======================================================================================================
@@ -796,24 +1575,54 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function cannot_submit_agendar_sala_with_participante()
+    {
+        // Agendado em outra regional, mas no mesmo dia e periodo como participante
+        $representante = factory('App\Representante')->create();
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '11748345000144'
+        ]);
+        factory('App\AgendamentoSala')->states('reuniao')->create([
+            'idrepresentante' => $representante1->id,
+            'participantes' => json_encode([apenasNumeros($representante->cpf_cnpj) => 'NOME PARTICIPANTE UM'], JSON_FORCE_OBJECT),
+            'periodo' => 'manha'
+        ]);
+
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+        ])
+        ->assertSessionHasErrors([
+            'periodo'
+        ]);
+    }
+
+    /** @test */
     public function cannot_submit_agendar_sala_after_created_4_by_month()
     {
         // Dependendo do dia que o teste é executado, pode dar erro devido a mudança de mês.
-        $dia = Carbon::today()->addDays(2);
+        $dia = Carbon::today()->addMonth()->subDays(15);
         while($dia->isWeekend())
             $dia->addDay();
 
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
 
-        factory('App\AgendamentoSala', 4)->create();
+        factory('App\AgendamentoSala', 4)->create([
+            'dia' => $dia->format('Y-m-d')
+        ]);
         $agenda = factory('App\AgendamentoSala')->raw();
 
         $this->post(route('representante.agendar.inserir.post', 'agendar'), [
             'tipo_sala' => $agenda['tipo_sala'],
             'sala_reuniao_id' => $agenda['sala_reuniao_id'],
             'dia' => $dia->format('d/m/Y'), 
-            'periodo' => 'manha',
+            'periodo' => 'tarde',
         ])
         ->assertRedirect(route('representante.agendar.inserir.view'));
 

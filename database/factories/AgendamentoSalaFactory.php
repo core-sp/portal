@@ -35,3 +35,21 @@ $factory->state(AgendamentoSala::class, 'reuniao', function ($faker) {
         'tipo_sala' => 'reuniao',
     ];
 });
+
+$factory->state(AgendamentoSala::class, 'justificado', function ($faker) {
+    return [
+        'dia' => now()->format('Y-m-d'),
+        'justificativa' => $faker->text(300),
+        'status' => AgendamentoSala::STATUS_ENVIADA,
+    ];
+});
+
+$factory->state(AgendamentoSala::class, 'recusado', function ($faker) {
+    return [
+        'dia' => now()->format('Y-m-d'),
+        'justificativa' => $faker->text(300),
+        'status' => AgendamentoSala::STATUS_NAO_COMPARECEU,
+        'justificativa_admin' => $faker->text(200),
+        'idusuario' => factory('App\User')
+    ];
+});

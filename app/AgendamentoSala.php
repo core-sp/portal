@@ -118,7 +118,7 @@ class AgendamentoSala extends Model
 
     public function podeAtualizarStatus()
     {
-        return (!isset($this->status) && (now()->format('Y-m-d') >= $this->dia)) || (isset($this->status) && ($this->status == self::STATUS_ENVIADA));
+        return (now()->format('Y-m-d') >= $this->dia) && (!isset($this->status) || $this->justificativaEnviada());
     }
 
     public function getDataLimiteJustificar($comBarra = true)

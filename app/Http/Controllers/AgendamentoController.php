@@ -41,7 +41,7 @@ class AgendamentoController extends Controller
 
         try{
             $validated = $request->validated();
-            $erro = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->agendados()->update(auth()->user(), $id, $validated) : 
+            $erro = \Route::is('sala.reuniao.*') ? $this->service->getService('SalaReuniao')->agendados()->update(auth()->user(), $id, $acao, $validated) : 
             $this->service->getService('Agendamento')->save($validated);
             $id = \Route::is('sala.reuniao.*') ? $id : $validated['idagendamento'];
         } catch (\Exception $e) {

@@ -210,7 +210,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         ];
     }
 
-    public function update($user, $id, $justificativa = ['justificativa_admin' => null])
+    public function update($user, $id, $acao, $justificativa = ['justificativa_admin' => null])
     {
         $agendado = AgendamentoSala::with(['sala', 'representante'])->findOrFail($id);
 
@@ -221,9 +221,17 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
 
         if($agendado->podeAtualizarStatus())
         {
-            $status = !isset($agendado->status) ? AgendamentoSala::STATUS_COMPARECEU : null;
-            if(!isset($status))
-                $status = isset($justificativa['justificativa_admin']) ? AgendamentoSala::STATUS_NAO_COMPARECEU : AgendamentoSala::STATUS_JUSTIFICADO;
+            if(!isset($agendado->status) && ($acao == 'confirma'))
+                $status = AgendamentoSala::STATUS_COMPARECEU;
+            elseif($agendado->justificativaEnviada() && isset($justificativa['justificativa_admin']) && ($acao == 'recusa'))
+                $status = AgendamentoSala::STATUS_NAO_COMPARECEU;
+            elseif($agendado->justificativaEnviada() && !isset($justificativa['justificativa_admin']) && ($acao == 'aceito'))
+                $status = AgendamentoSala::STATUS_JUSTIFICADO;
+            else
+                return [
+                    'message' => '<i class="icon fa fa-times"></i> Não pode atualizar o agendamento com ID '.$id.' devido ao status.',
+                    'class' => 'alert-danger'
+                ];
 
             $agendado->update([
                 'status' => $status,
@@ -235,7 +243,14 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
 
             if(in_array($status, [AgendamentoSala::STATUS_NAO_COMPARECEU, AgendamentoSala::STATUS_JUSTIFICADO]))
                 Mail::to($agendado->representante->email)->queue(new AgendamentoSalaMail($agendado->fresh(), $status != AgendamentoSala::STATUS_NAO_COMPARECEU ? 'aceito' : 'recusa'));
+            
+            return null;
         }
+
+        return [
+            'message' => '<i class="icon fa fa-times"></i> Não pode atualizar o agendamento com ID '.$id.' devido ao status ou dia.',
+            'class' => 'alert-danger'
+        ];
     }
 
     public function buscar($user, $busca)
@@ -245,20 +260,25 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
         $resultados = AgendamentoSala::with(['user', 'representante', 'sala'])
             ->when($regional, function ($query) use ($regional, $busca) {
                 return $query->where('sala_reuniao_id', $regional)
-                    ->where(function($q) use ($busca) {
-                        $q->whereHas('representante', function ($q1) use ($busca) {
-                            $q1->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
-                        })
-                        ->orWhere('protocolo', 'LIKE', '%'.$busca.'%')
-                        ->orWhere('id', apenasNumeros($busca));
+                ->where(function($q) use ($busca) {
+                    $q->where('protocolo', 'LIKE', 'RC-AGE-'. str_replace('RC-AGE-', '', $busca).'%')
+                    ->orWhere('id', apenasNumeros($busca))
+                    ->when(apenasNumeros($busca) != '', function ($q1) use ($busca) {
+                        $q1->orWhereHas('representante', function ($q2) use ($busca){
+                            $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
+                        });
+                    });
                 });
             }, function ($query) use ($busca) {
-                return $query->whereHas('representante', function ($q) use ($busca) {
-                    $q->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
-                })
+                return $query->where('protocolo', 'LIKE', 'RC-AGE-'. str_replace('RC-AGE-', '', $busca).'%')
                 ->orWhere('id', apenasNumeros($busca))
-                ->orWhere('protocolo', 'LIKE', '%'.$busca.'%');
-            })->paginate(25);
+                ->when(apenasNumeros($busca) != '', function ($q) use ($busca) {
+                    $q->orWhereHas('representante', function ($q1) use ($busca){
+                        $q1->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
+                    });
+                });
+            })
+            ->paginate(25);
 
         return [
             'resultados' => $resultados,

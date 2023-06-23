@@ -18,12 +18,16 @@
         </div>
 
         <ul class="nav nav-tabs mt-3">
+            @if($salas->isNotEmpty())
             <li class="nav-item">
                 <a class="nav-link active" data-toggle="tab" href="#agendamento">Seus Agendamentos</a>
             </li>
+            @endif
+            @if(auth()->guard('representante')->user()->tipoPessoa() != 'PJ')
             <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#participando">Agendamentos como participante</a>
             </li>
+            @endif
         </ul>
 
         <div class="tab-content">
@@ -73,6 +77,7 @@
                 @endif
             </div>
 
+            @if(auth()->guard('representante')->user()->tipoPessoa() != 'PJ')
             <div class="tab-pane container fade" id="participando">
                 @if($participando->isNotEmpty())
                 <div class="list-group w-100 mt-2">
@@ -96,6 +101,7 @@
                 </div>
                 @endif
             </div>
+            @endif
 
         </div>
     </div>
