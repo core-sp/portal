@@ -1763,6 +1763,41 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function view_agendamento_participando_after_created()
+    {
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+        $agenda1 = factory('App\AgendamentoSala')->create([
+            'idrepresentante' => $representante1->id
+        ]);
+        $agenda2 = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'dia' => now()->addDays(7)->format('d/m/Y'),
+            'idrepresentante' => $representante1->id
+        ]);
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'participantes' => json_encode(['56983238010' => 'NOME PARTICIPANTE UM', '86294373085' => 'NOME PARTICIPANTE DOIS'], JSON_FORCE_OBJECT),
+            'idrepresentante' => $representante1->id,
+            'protocolo' => 'RC-AGE-XXXXXX14'
+        ]);
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<p class="pb-0 branco">Protocolo: <strong>'.$agenda->protocolo.'</strong></p>')
+        ->assertSee('Representante Responsável: ')
+        ->assertSee('CPF / CNPJ: <strong>'.$representante1->cpf_cnpj . '</strong>')
+        ->assertSee('Nome: <strong>'.$representante1->nome . '</strong>')
+        ->assertSee('<p class="pb-0 branco">Regional: <strong>'.$agenda->sala->regional->regional.'</strong></p>')
+        ->assertSee('Sala: <strong>'.$agenda->getTipoSala().'</strong>')
+        ->assertSee('&nbsp;&nbsp;|&nbsp;&nbsp;Dia: <strong>'.onlyDate($agenda->dia).'</strong>')
+        ->assertSee('&nbsp;&nbsp;|&nbsp;&nbsp;Período: <strong>'.$agenda->getPeriodo().'</strong>')
+        ->assertDontSee('<p class="pb-0 branco">Protocolo: <strong>'.$agenda2->protocolo.'</strong></p>')
+        ->assertDontSee('<p class="pb-0 branco">Protocolo: <strong>'.$agenda1->protocolo.'</strong></p>');
+    }
+
+    /** @test */
     public function can_to_edit_participantes_reuniao()
     {
         Mail::fake();

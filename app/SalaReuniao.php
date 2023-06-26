@@ -73,7 +73,7 @@ class SalaReuniao extends Model
         return $itens;
     }
 
-    private function getPeriodos($dia, $tipo)
+    private function getPeriodosCombloqueio($bloqueios, $dia, $tipo)
     {
         $dia = Carbon::parse($dia);
 
@@ -81,15 +81,31 @@ class SalaReuniao extends Model
             return [];
 
         $periodos = array();
-        $manha = $this->getHorariosManha($tipo);
-        $tarde = $this->getHorariosTarde($tipo);
+        $manha = array();
+        $tarde = array();
+        $horarios = array_merge($this->getHorariosManha($tipo), $this->getHorariosTarde($tipo));
 
-        if(!empty($manha))
-            array_push($periodos, 'manha');
-        if(!empty($tarde))
-            array_push($periodos, 'tarde');
+        if($bloqueios->isNotEmpty())
+            foreach($bloqueios as $bloqueio)
+                $horarios = $bloqueio->getHorarios($horarios, $dia);
 
-        return $periodos;
+        foreach($horarios as $hora)
+        {
+            if($hora < '12:30'){
+                array_push($periodos, 'manha');
+                array_push($manha, $hora);
+            }else{
+                array_push($periodos, 'tarde');
+                array_push($tarde, $hora);
+            }
+        }
+
+        if($tipo == 'reuniao')
+            $this->horarios_reuniao = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
+        else
+            $this->horarios_coworking = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
+
+        return array_unique($periodos);
     }
 
     public function regional()
@@ -105,6 +121,11 @@ class SalaReuniao extends Model
     public function agendamentosSala()
     {
     	return $this->hasMany('App\AgendamentoSala', 'sala_reuniao_id');
+    }
+
+    public function bloqueios()
+    {
+    	return $this->hasMany('App\SalaReuniaoBloqueio', 'sala_reuniao_id');
     }
 
     public function isAtivo($tipo)
@@ -139,6 +160,16 @@ class SalaReuniao extends Model
         if($tipo == 'coworking')
             return json_decode($this->horarios_coworking, true)['tarde'];
         return array();
+    }
+
+    public function getTodasHoras()
+    {
+        $manha = array_merge(json_decode($this->horarios_reuniao, true)['manha'], json_decode($this->horarios_coworking, true)['manha']);
+        $tarde = array_merge(json_decode($this->horarios_reuniao, true)['tarde'], json_decode($this->horarios_coworking, true)['tarde']);
+        $horas = array_unique(array_merge($manha, $tarde));
+        sort($horas, SORT_NATURAL);
+
+        return $horas;
     }
 
     public function getItens($tipo)
@@ -262,6 +293,8 @@ class SalaReuniao extends Model
             return null;
 
         $diasLotados = array();
+        $diaslotadosBloqueio = array();
+        $bloqueios = $this->bloqueios;
         $agendados = $this->agendamentosSala()
             ->select('dia', DB::raw('count(*) as total'))
             ->where('tipo_sala', $tipo)
@@ -274,18 +307,24 @@ class SalaReuniao extends Model
         $dia = Carbon::tomorrow();
         for($dia; $dia->lte(Carbon::today()->addMonth()); $dia->addDay())
         {
-            $periodosTotal = $this->getPeriodos($dia->format('Y-m-d'), $tipo);
+            $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $tipo);
             if(sizeof($periodosTotal) == 0)
+            {
                 array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+                array_push($diaslotadosBloqueio, $dia->format('Y-m-d'));
+            }
         }
 
         foreach($agendados as $agendado)
         {
             $dia = Carbon::parse($agendado->dia);
-            $periodosTotal = $this->getPeriodos($dia->format('Y-m-d'), $tipo);
-            $total = $tipo == 'reuniao' ? sizeof($periodosTotal) : sizeof($periodosTotal) * $this->participantes_coworking;
-            if($agendado->total >= $total)
-                array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+            if(!array_search($dia->format('Y-m-d'), $diaslotadosBloqueio))
+            {
+                $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $tipo);
+                $total = $tipo == 'reuniao' ? sizeof($periodosTotal) : sizeof($periodosTotal) * $this->participantes_coworking;
+                if($agendado->total >= $total)
+                    array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
+            }
         }
 
         return $diasLotados;
@@ -296,7 +335,8 @@ class SalaReuniao extends Model
         if(!$this->isAtivo($tipo) || !in_array($tipo, ['reuniao', 'coworking']))
             return array();
 
-        $periodos = $this->getPeriodos($dia, $tipo);
+        $bloqueios = $this->bloqueios;
+        $periodos = $this->getPeriodosComBloqueio($bloqueios, $dia, $tipo);
         $final_periodos = $periodos;
 
         if(sizeof($periodos) == 0)

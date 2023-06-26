@@ -402,7 +402,7 @@
 
                 @if($agendamentobloqueio)
                 <li class="nav-item">
-                    <a href="#{{-- route('sala.reuniao.index') --}}" class="nav-link">
+                    <a href="{{ route('sala.reuniao.bloqueio.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Bloqueios</p>
                     </a>

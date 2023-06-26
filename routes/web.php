@@ -251,6 +251,17 @@ Route::middleware(['block_ip'])->group(function () {
         Route::get('/filtro', 'AgendamentoController@index')->name('sala.reuniao.agendados.filtro');
         Route::get('/busca', 'AgendamentoController@busca')->name('sala.reuniao.agendados.busca');
       });
+
+      Route::prefix('bloqueios')->group(function(){
+        Route::get('/', 'AgendamentoBloqueioController@index')->name('sala.reuniao.bloqueio.lista');
+        Route::get('/busca', 'AgendamentoBloqueioController@busca')->name('sala.reuniao.bloqueio.busca');
+        Route::get('/criar', 'AgendamentoBloqueioController@create')->name('sala.reuniao.bloqueio.criar');
+        Route::post('/criar', 'AgendamentoBloqueioController@store')->name('sala.reuniao.bloqueio.store');
+        Route::get('/editar/{id}', 'AgendamentoBloqueioController@edit')->name('sala.reuniao.bloqueio.edit');
+        Route::put('/editar/{id}', 'AgendamentoBloqueioController@update')->name('sala.reuniao.bloqueio.update');
+        Route::delete('/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('sala.reuniao.bloqueio.delete');
+        Route::get('/horarios-ajax', 'AgendamentoBloqueioController@getDadosAjax')->name('sala.reuniao.bloqueio.horariosAjax');
+      });
     });
 
   });

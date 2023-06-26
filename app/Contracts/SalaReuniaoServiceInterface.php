@@ -18,7 +18,11 @@ interface SalaReuniaoServiceInterface {
 
     public function getDiasHoras($tipo, $id, $dia = null, $user = null);
 
+    public function getTodasHorasById($id);
+
     public function site();
 
     public function agendados();
+
+    public function bloqueio();
 }

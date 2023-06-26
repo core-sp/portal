@@ -208,6 +208,11 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
         return null;
     }
+
+    public function getTodasHorasById($id)
+    {
+        return SalaReuniao::findOrFail($id)->getTodasHoras();
+    }
     
     public function site()
     {
@@ -217,5 +222,10 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
     public function agendados()
     {
         return resolve('App\Contracts\AgendamentoSalaSubServiceInterface');
+    }
+
+    public function bloqueio()
+    {
+        return resolve('App\Contracts\SalaReuniaoBloqSubServiceInterface');
     }
 }

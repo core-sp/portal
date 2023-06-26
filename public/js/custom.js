@@ -294,6 +294,52 @@ $('#plantaoBloqueio').change(function(e){
 });
 // Fim da Funcionalidade Plantão Jurídico
 
+// Funcionalidade Sala Reunião
+
+function setCampoHorariosSala(sala)
+{
+  $('#horariosBloqueio option').show();
+  $('#horariosBloqueio option').each(function(){
+    var valor = $(this).val();
+    if(jQuery.inArray(valor, sala) != -1)
+      $(this).show();
+    else
+      $(this).hide();
+  });
+}
+
+function ajaxSalaBloqueio(valor)
+{
+  $.ajax({
+    method: "GET",
+    data: {
+      "id": valor,
+    },
+    dataType: 'json',
+    url: "/admin/salas-reunioes/bloqueios/horarios-ajax",
+    success: function(response) {
+      sala = response;
+      setCampoHorariosSala(sala);
+    },
+    error: function() {
+      alert('Erro ao carregar os horários. Recarregue a página.');
+    }
+  });
+}
+
+$('#salaBloqueio').ready(function(){
+  var valor = $('#salaBloqueio').val();
+    if(valor > 0)
+      ajaxSalaBloqueio(valor);
+});
+
+$('#salaBloqueio').change(function(){
+  var valor = $('#salaBloqueio').val();
+  if(valor > 0)
+    ajaxSalaBloqueio(valor);
+});
+// Fim da Funcionalidade Sala Reunião
+
 // Funcionalidade Agendamento
 function selectAtendenteByStatus(valor)
 {
