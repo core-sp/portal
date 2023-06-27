@@ -16,3 +16,9 @@ $factory->define(SalaReuniaoBloqueio::class, function (Faker $faker) {
         'idusuario' => factory('App\User')
     ];
 });
+
+$factory->state(SalaReuniaoBloqueio::class, 'tempo_indeterminado', function ($faker) {
+    return [
+        'dataFinal' => null,
+    ];
+});

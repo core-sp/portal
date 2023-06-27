@@ -14,7 +14,7 @@ $factory->define(AgendamentoSala::class, function (Faker $faker) {
         $amanha->addDay();
 
     return [
-        'protocolo' => 'RC-AGE-XXXXXX12',
+        'protocolo' => mb_strtoupper($faker->bothify('RC-AGE-##??##??'), 'UTF-8'),
         'idrepresentante' => auth()->guard('representante')->id() !== null ? auth()->guard('representante')->id() : factory('App\Representante'),
         'participantes' => null,
         'dia' => $amanha->format('Y-m-d'),
@@ -30,7 +30,7 @@ $factory->define(AgendamentoSala::class, function (Faker $faker) {
 
 $factory->state(AgendamentoSala::class, 'reuniao', function ($faker) {
     return [
-        'protocolo' => 'RC-AGE-XXXXXX13',
+        'protocolo' => mb_strtoupper($faker->bothify('RC-AGE-##??##??'), 'UTF-8'),
         'participantes' => json_encode(['56983238010' => 'NOME PARTICIPANTE UM', '81921923008' => 'NOME PARTICIPANTE DOIS'], JSON_FORCE_OBJECT),
         'tipo_sala' => 'reuniao',
     ];

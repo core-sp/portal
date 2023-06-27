@@ -2266,4 +2266,86 @@ class AgendamentoSalaTest extends TestCase
         $this->get(route('representante.agendar.inserir.view'))
         ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Não é possível justificar o agendamento.');
     }
+
+    /** @test */
+    public function get_full_days()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create();
+        factory('App\AgendamentoSala')->states('reuniao')->create([
+            'sala_reuniao_id' => $sala->id,
+        ]);
+        $agendamento = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'sala_reuniao_id' => $sala->id,
+            'periodo' => 'tarde'
+        ]);
+        
+        $dia = Carbon::parse($agendamento->dia);
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'reuniao', 'sala_id' => $agendamento->sala->id, 'dia' => ''
+        ]))
+        ->assertJsonFragment([$lotado]);
+    }
+
+    /** @test */
+    public function get_full_days_if_weekends()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create();
+
+        $sabado = Carbon::tomorrow();
+        while(!$sabado->isSaturday())
+            $sabado->addDay();
+        $lotado = [$sabado->month, $sabado->day, 'lotado'];
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'reuniao', 'sala_id' => $sala->id, 'dia' => ''
+        ]))
+        ->assertJsonFragment([$lotado]);
+
+        $domingo = Carbon::tomorrow();
+        while(!$domingo->isSunday())
+            $domingo->addDay();
+        $lotado = [$domingo->month, $domingo->day, 'lotado'];
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'reuniao', 'sala_id' => $sala->id, 'dia' => ''
+        ]))
+        ->assertJsonFragment([$lotado]);
+    }
+
+    /** @test */
+    public function get_full_days_with_bloqueio()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create();
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
+            'sala_reuniao_id' => $sala->id,
+            'horarios' => implode(',', $sala->getTodasHoras()),
+        ]);
+
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $dia->addDays(8);
+        while($dia->isWeekend())
+            $dia->addDay();
+        $nao_lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'reuniao', 'sala_id' => $sala->id, 'dia' => ''
+        ]))
+        ->assertJsonFragment([$lotado])
+        ->assertJsonMissingExact([$nao_lotado]);
+    }
 }

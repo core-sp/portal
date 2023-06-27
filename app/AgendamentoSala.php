@@ -4,9 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AgendamentoSala extends Model
 {
+    use SoftDeletes;
+    
     protected $table = 'agendamentos_salas';
     protected $guarded = [];
 

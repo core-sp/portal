@@ -100,10 +100,13 @@ class SalaReuniao extends Model
             }
         }
 
-        if($tipo == 'reuniao')
-            $this->horarios_reuniao = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
-        else
-            $this->horarios_coworking = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
+        if(!empty($manha) || !empty($tarde))
+        {
+            if($tipo == 'reuniao')
+                $this->horarios_reuniao = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
+            else
+                $this->horarios_coworking = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
+        }
 
         return array_unique($periodos);
     }
@@ -123,9 +126,15 @@ class SalaReuniao extends Model
     	return $this->hasMany('App\AgendamentoSala', 'sala_reuniao_id');
     }
 
+    // Retorna somente bloqueios com data final válida
     public function bloqueios()
     {
-    	return $this->hasMany('App\SalaReuniaoBloqueio', 'sala_reuniao_id');
+    	return $this->hasMany('App\SalaReuniaoBloqueio', 'sala_reuniao_id')
+            ->where('dataFinal', '>=', date('Y-m-d'))
+            ->orWhere(function($query) {
+                $query->where('sala_reuniao_id', $this->id)
+                ->whereNull('dataFinal');
+            });
     }
 
     public function isAtivo($tipo)
