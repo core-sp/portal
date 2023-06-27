@@ -918,6 +918,31 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
+    public function view_salas_enabled()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $salas = factory('App\SalaReuniao', 3)->create();
+        $ids = $salas->sortBy('regional.regional')->pluck('id')->all();
+
+        $this->get(route('sala.reuniao.regionais.ativas', 'coworking'))
+        ->assertJson(
+            $ids
+        );
+    }
+
+    /** @test */
+    public function cannot_get_salas_enabled()
+    {
+        $salas = factory('App\SalaReuniao', 3)->create();
+        $ids = $salas->sortBy('regional.regional')->pluck('id')->all();
+
+        $this->get(route('sala.reuniao.regionais.ativas', 'coworking'))
+        ->assertNoContent();
+    }
+
+    /** @test */
     public function view_total_and_itens_in_form_agendar_sala()
     {
         $representante = factory('App\Representante')->create();
@@ -932,6 +957,17 @@ class AgendamentoSalaTest extends TestCase
             'itens' => $agenda->sala->getItensHtml('coworking'),
             'total' => $agenda->sala->getParticipantesAgendar('coworking')
         ]);
+    }
+
+    /** @test */
+    public function cannot_get_total_and_itens_without_authentication()
+    {
+        $agenda = factory('App\AgendamentoSala')->create();
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'sala_id' => $agenda->sala->id, 'dia' => onlyDate($agenda->dia), 'tipo' => 'coworking'
+        ]))
+        ->assertNoContent();
     }
 
     /** @test */

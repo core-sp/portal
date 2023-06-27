@@ -7,12 +7,19 @@ use Tests\TestCase;
 use App\Permissao;
 use Carbon\Carbon;
 use App\SalaReuniao;
+use App\SalaReuniaoBloqueio;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SalaReuniaoMail;
 
 class SalaReuniaoTest extends TestCase
 {
     use RefreshDatabase;
+
+    /** 
+     * =======================================================================================================
+     * TESTES GERENCIAR SALA DE REUNIÃO
+     * =======================================================================================================
+     */
 
     /** @test */
     public function non_authenticated_users_cannot_access_links()
@@ -24,28 +31,52 @@ class SalaReuniaoTest extends TestCase
         $this->get(route('sala.reuniao.index'))->assertRedirect(route('login'));
         $this->get(route('sala.reuniao.editar.view', $sala->id))->assertRedirect(route('login'));
         $this->put(route('sala.reuniao.editar', $sala->id))->assertRedirect(route('login'));
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create();
+
+        $this->get(route('sala.reuniao.bloqueio.lista'))->assertRedirect(route('login'));
+        $this->get(route('sala.reuniao.bloqueio.busca'))->assertRedirect(route('login'));
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertRedirect(route('login'));
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio->id))->assertRedirect(route('login'));
+        $this->post(route('sala.reuniao.bloqueio.store'))->assertRedirect(route('login'));
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio->id))->assertRedirect(route('login'));
+        $this->delete(route('sala.reuniao.bloqueio.delete', $bloqueio->id))->assertRedirect(route('login'));
+        $this->get(route('sala.reuniao.bloqueio.horariosAjax'), ['id' => $bloqueio->sala_reuniao_id])->assertRedirect(route('login'));
     }
 
-    // /** @test */
-    // public function non_authorized_users_cannot_access_links()
-    // {
-    //     $this->signIn();
-    //     $this->assertAuthenticated('web');
+    /** @test */
+    public function non_authorized_users_cannot_access_links()
+    {
+        $this->signIn();
+        $this->assertAuthenticated('web');
 
-    //     $plantao = factory('App\PlantaoJuridico')->create();
-    //     $bloqueio = factory('App\PlantaoJuridicoBloqueio')->create();
+        // $sala = factory('App\SalaReuniao')->create();
+        
+        // $this->get(route('sala.reuniao.index'))->assertForbidden();
+        // $this->get(route('sala.reuniao.editar.view', $sala->id))->assertForbidden();
+        // $this->put(route('sala.reuniao.editar', $sala->id))->assertForbidden();
 
-    //     $this->get(route('plantao.juridico.index'))->assertForbidden();
-    //     $this->get(route('plantao.juridico.editar.view', $plantao->id))->assertForbidden();
-    //     $this->put(route('plantao.juridico.editar', $plantao->id))->assertForbidden();
-    //     $this->get(route('plantao.juridico.bloqueios.index'))->assertForbidden();
-    //     $this->get(route('plantao.juridico.bloqueios.criar.view'))->assertForbidden();
-    //     $this->post(route('plantao.juridico.bloqueios.criar'))->assertForbidden();
-    //     $this->get(route('plantao.juridico.bloqueios.editar.view', $bloqueio->id))->assertForbidden();
-    //     $this->put(route('plantao.juridico.bloqueios.editar', $bloqueio->id))->assertForbidden();
-    //     $this->delete(route('plantao.juridico.bloqueios.excluir', $bloqueio->id))->assertForbidden();
-    //     $this->get(route('plantao.juridico.bloqueios.ajax'))->assertForbidden();
-    // }
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create();
+
+        $this->get(route('sala.reuniao.bloqueio.lista'))->assertForbidden();
+        $this->get(route('sala.reuniao.bloqueio.busca'))->assertForbidden();
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertForbidden();
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio->id))->assertForbidden();
+        $this->post(route('sala.reuniao.bloqueio.store'), [
+            'sala_reuniao_id' => $bloqueio->sala_reuniao_id,
+            'dataInicial' => $bloqueio->dataInicial,
+            'dataFinal' => null,
+            'horarios' => ['10:00'],
+        ])->assertForbidden();
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio->id), [
+            'sala_reuniao_id' => $bloqueio->sala_reuniao_id,
+            'dataInicial' => $bloqueio->dataInicial,
+            'dataFinal' => null,
+            'horarios' => ['10:00'],
+        ])->assertForbidden();
+        $this->delete(route('sala.reuniao.bloqueio.delete', $bloqueio->id))->assertForbidden();
+        $this->get(route('sala.reuniao.bloqueio.horariosAjax'), ['id' => $bloqueio->sala_reuniao_id])->assertForbidden();
+    }
 
     /* SALAS */
 
@@ -924,5 +955,585 @@ class SalaReuniaoTest extends TestCase
         $this->put(route('sala.reuniao.editar', $sala->id), $dados);
 
         Mail::assertQueued(SalaReuniaoMail::class);
+    }
+
+    /** 
+     * =======================================================================================================
+     * TESTES GERENCIAR SALA DE REUNIÃO BLOQUEIO
+     * =======================================================================================================
+     */
+
+    /** @test */
+    public function can_create_bloqueio()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'horarios' => ['10:00', '11:00'],
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertRedirect(route('sala.reuniao.bloqueio.lista'));
+
+        $this->assertDatabaseHas('salas_reunioes_bloqueios', [
+            'id' => 1,
+            'dataInicial' => $bloqueio['dataInicial'],
+            'dataFinal' => $bloqueio['dataFinal'],
+            'horarios' => implode(',', $bloqueio['horarios']),
+            'sala_reuniao_id' => $bloqueio['sala_reuniao_id']
+        ]);
+    }
+
+    /** @test */
+    public function two_or_more_bloqueios_with_same_sala_can_be_created()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->create();
+
+        $dados = [
+            'sala_reuniao_id' => $sala->id,
+            'dataInicial' => now()->addDay()->format('Y-m-d'),
+            'dataFinal' => null,
+            'horarios' => ['11:00']
+        ];
+
+        $this->post(route('sala.reuniao.bloqueio.store'), $dados)
+        ->assertRedirect(route('sala.reuniao.bloqueio.lista'));
+
+        $this->assertDatabaseHas('salas_reunioes_bloqueios', [
+            'id' => 1,
+            'dataInicial' => $dados['dataInicial'],
+            'dataFinal' => $dados['dataFinal'],
+            'horarios' => '11:00',
+            'sala_reuniao_id' => $sala->id
+        ]);
+
+        $dados['dataFinal'] = now()->addDays(3)->format('Y-m-d');
+        $dados['dataFinal'] = now()->addDays(6)->format('Y-m-d');
+        $dados['horarios'] = ['10:00'];
+
+        $this->post(route('sala.reuniao.bloqueio.store'), $dados)
+        ->assertRedirect(route('sala.reuniao.bloqueio.lista'));
+
+        $this->assertDatabaseHas('salas_reunioes_bloqueios', [
+            'id' => 2,
+            'dataInicial' => $dados['dataInicial'],
+            'dataFinal' => $dados['dataFinal'],
+            'horarios' => '10:00',
+            'sala_reuniao_id' => $sala->id
+        ]);
+    }
+
+    /** @test */
+    public function can_create_bloqueio_without_data_final()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'horarios' => ['10:00', '14:00'],
+            'dataFinal' => null
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertRedirect(route('sala.reuniao.bloqueio.lista'));
+
+        $this->assertDatabaseHas('salas_reunioes_bloqueios', [
+            'id' => 1,
+            'dataInicial' => $bloqueio['dataInicial'],
+            'dataFinal' => $bloqueio['dataFinal'],
+            'horarios' => implode(',', $bloqueio['horarios']),
+            'sala_reuniao_id' => $bloqueio['sala_reuniao_id']
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_bloqueio_is_created()
+    {
+        $user = $this->signInAsAdmin();
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'horarios' => ['10:00', '11:00'],
+        ]);
+
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') criou *sala reunião bloqueio* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_without_sala_reuniao_id()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'sala_reuniao_id' => null,
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertStatus(404);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_when_sala_disabled()
+    {
+        $user = $this->signInAsAdmin();
+
+        $sala = factory('App\SalaReuniao')->states('desativa_ambos')->create();
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), [
+            'sala_reuniao_id' => $sala->id,
+            'dataInicial' => now()->addDay()->format('Y-m-d'),
+            'dataFinal' => null,
+            'horarios' => ['10:00'],
+        ])
+        ->assertSessionHasErrors([
+            'sala_reuniao_id',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_without_data_inicial()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'dataInicial' => null,
+            'horarios' => ['10:00'],
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'dataInicial',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_data_inicial_before_or_equal_today()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'dataInicial' => now()->format('Y-m-d'),
+            'horarios' => ['10:00'],
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'dataInicial',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_data_final_filled_and_before_data_inicial()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'dataFinal' => now()->format('Y-m-d'),
+            'horarios' => ['10:00'],
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'dataFinal',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_without_horarios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'horarios' => [],
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_horarios_without_array()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'horarios' => '10:00',
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_same_hours_in_horarios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'horarios' => ['10:00', '10:00'],
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios.*',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_invalid_horarios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'horarios' => ['10:00', '18:00'],
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios',
+        ]);
+    }
+
+    /** @test */
+    public function can_edit_bloqueio()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = ['10:00'];
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk();
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertRedirect(route('sala.reuniao.bloqueio.lista'));
+
+        $this->assertDatabaseHas('salas_reunioes_bloqueios', [
+            'id' => 1,
+            'dataInicial' => $bloqueio['dataInicial'],
+            'dataFinal' => $bloqueio['dataFinal'],
+            'horarios' => implode(',', $bloqueio['horarios']),
+            'sala_reuniao_id' => $bloqueio['sala_reuniao_id']
+        ]);
+    }
+
+    /** @test */
+    public function can_edit_bloqueio_without_data_final()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = ['10:00'];
+        $bloqueio['dataFinal'] = null;
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk();
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertRedirect(route('sala.reuniao.bloqueio.lista'));
+
+        $this->assertDatabaseHas('salas_reunioes_bloqueios', [
+            'id' => 1,
+            'dataInicial' => $bloqueio['dataInicial'],
+            'dataFinal' => $bloqueio['dataFinal'],
+            'horarios' => implode(',', $bloqueio['horarios']),
+            'sala_reuniao_id' => $bloqueio['sala_reuniao_id']
+        ]);
+    }
+
+    /** @test */
+    public function can_edit_bloqueio_with_sala_disabled()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
+            'sala_reuniao_id' => factory('App\SalaReuniao')->states('desativa_ambos')->create()
+        ])->toArray();
+        $bloqueio['horarios'] = ['10:00'];
+        $bloqueio['dataFinal'] = null;
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk();
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertRedirect(route('sala.reuniao.bloqueio.lista'));
+
+        $this->assertDatabaseHas('salas_reunioes_bloqueios', [
+            'id' => 1,
+            'dataInicial' => $bloqueio['dataInicial'],
+            'dataFinal' => $bloqueio['dataFinal'],
+            'horarios' => implode(',', $bloqueio['horarios']),
+            'sala_reuniao_id' => $bloqueio['sala_reuniao_id']
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_bloqueio_is_edited()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = ['10:00'];
+
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') editou *sala reunião bloqueio* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function cannot_edit_bloqueio_without_sala_reuniao_id()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['sala_reuniao_id'] = null;
+        $bloqueio['horarios'] = ['10:00'];
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk(); 
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertStatus(404);
+    }
+
+    /** @test */
+    public function cannot_edit_bloqueio_without_data_inicial()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = ['10:00'];
+        $bloqueio['dataInicial'] = null;
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk(); 
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertSessionHasErrors([
+            'dataInicial',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_edit_bloqueio_with_data_inicial_before_or_equal_today()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = ['10:00'];
+        $bloqueio['dataInicial'] = now()->format('Y-m-d');
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk(); 
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertSessionHasErrors([
+            'dataInicial',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_edit_bloqueio_with_data_final_filled_and_before_data_inicial()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = ['10:00'];
+        $bloqueio['dataFinal'] = now()->format('Y-m-d');
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk(); 
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertSessionHasErrors([
+            'dataFinal',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_edit_bloqueio_without_horarios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = [];
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk(); 
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_edit_bloqueio_with_horarios_without_array()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = '10:00';
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk(); 
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_edit_bloqueio_with_same_hours_in_horarios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = ['10:00', '10:00'];
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk(); 
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios.*',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_edit_bloqueio_with_invalid_horarios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create()->toArray();
+        $bloqueio['horarios'] = ['10:00', '18:00'];
+
+        $this->get(route('sala.reuniao.bloqueio.edit', $bloqueio['id']))->assertOk(); 
+        $this->put(route('sala.reuniao.bloqueio.update', $bloqueio['id']), $bloqueio)
+        ->assertSessionHasErrors([
+            'horarios',
+        ]);
+    }
+
+    /** @test */
+    public function can_delete_bloqueio()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create();
+
+        $this->delete(route('sala.reuniao.bloqueio.delete', $bloqueio->id))
+        ->assertRedirect(route('sala.reuniao.bloqueio.lista'));
+
+        $this->assertDatabaseMissing('salas_reunioes_bloqueios', [
+            'idagendamentobloqueio' => $bloqueio->id,
+            'dataInicial' => $bloqueio->dataInicial,
+        ]);
+    }
+
+    /** @test */
+    public function log_is_generated_when_bloqueio_is_deleted()
+    {
+        $user = $this->signInAsAdmin();
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create();
+
+        $this->delete(route('sala.reuniao.bloqueio.delete', $bloqueio->id));
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+        $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') excluiu *sala reunião bloqueio* (id: 1)';
+        $this->assertStringContainsString($txt, $log);
+    }
+
+    /** @test */
+    public function can_view_list_bloqueios()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create();
+
+        $this->get(route('sala.reuniao.bloqueio.lista'))
+        ->assertSee($bloqueio->sala->regional->regional)
+        ->assertSee($bloqueio->mostraPeriodo())
+        ->assertSee($bloqueio->horarios);
+    }
+
+    /** @test */
+    public function can_view_list_bloqueios_with_data_final_null()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
+            'dataFinal' => null
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.lista'))
+        ->assertSee($bloqueio->sala->regional->regional)
+        ->assertSee('Tempo Indeterminado');
+    }
+
+    /** @test */
+    public function can_view_button_editar_and_cancelar()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create();
+
+        $this->get(route('sala.reuniao.bloqueio.lista'))
+        ->assertSee($bloqueio->sala->regional->regional)
+        ->assertSee($bloqueio->mostraPeriodo())
+        ->assertSee($bloqueio->horarios)
+        ->assertSee('Editar')
+        ->assertSee('Apagar');
+    }
+
+    /** @test */
+    public function can_view_list_salas_when_create()
+    {
+        $user = $this->signInAsAdmin();
+
+        $salas = factory('App\SalaReuniao', 5)->create();
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))
+        ->assertSee($salas->get(0)->regional->regional)
+        ->assertSee($salas->get(1)->regional->regional)
+        ->assertSee($salas->get(2)->regional->regional)
+        ->assertSee($salas->get(3)->regional->regional)
+        ->assertSee($salas->get(4)->regional->regional);
+    }
+
+    /** @test */
+    public function cannot_view_sala_disabled_when_create()
+    {
+        $user = $this->signInAsAdmin();
+
+        $sala = factory('App\SalaReuniao')->states('desativa_ambos')->create();
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))
+        ->assertDontSeeText($sala->regional->regional);
+    }
+
+    /** @test */
+    public function get_horarios_by_ajax()
+    {
+        $user = $this->signInAsAdmin();
+
+        $sala = factory('App\SalaReuniao')->create();
+
+        $this->get(route('sala.reuniao.bloqueio.horariosAjax', ['id' => $sala->id]))
+        ->assertJson(
+            $sala->getTodasHoras()
+        );
+    }
+
+    /** @test */
+    public function get_error_when_nonexistent_sala_by_ajax()
+    {
+        $user = $this->signInAsAdmin();
+
+        $this->get(route('sala.reuniao.bloqueio.horariosAjax', ['id' => 5]))->assertStatus(500);
     }
 }

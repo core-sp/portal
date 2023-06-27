@@ -61,6 +61,8 @@ class SalaReuniaoController extends Controller
 
     public function getRegionaisAtivas($tipo)
     {
+        if(!auth()->guard('representante')->check() && !auth()->guard('web')->check())
+            return response()->json([], 204);
         try{
             $dados = $this->service->getService('SalaReuniao')->salasAtivas($tipo)->pluck('id');
         } catch (\Exception $e) {
@@ -74,7 +76,7 @@ class SalaReuniaoController extends Controller
     public function getDiasHoras(Request $request, $tipo)
     {
         if(!auth()->guard('representante')->check() && !auth()->guard('web')->check())
-            return null;
+            return response()->json([], 204);
         try{
             $user = auth()->guard('representante')->check() ? auth()->guard('representante')->user() : null;
             $validate = $request->only('sala_id', 'dia');

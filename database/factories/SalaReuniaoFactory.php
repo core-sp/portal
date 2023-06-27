@@ -35,3 +35,10 @@ $factory->state(SalaReuniao::class, 'desativa_coworking', function ($faker) {
         'participantes_coworking' => 0,
     ];
 });
+
+$factory->state(SalaReuniao::class, 'desativa_ambos', function ($faker) {
+    return [
+        'participantes_reuniao' => 0,
+        'participantes_coworking' => 0,
+    ];
+});
