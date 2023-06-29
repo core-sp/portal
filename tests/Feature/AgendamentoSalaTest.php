@@ -2267,6 +2267,8 @@ class AgendamentoSalaTest extends TestCase
         ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Não é possível justificar o agendamento.');
     }
 
+    // Testes da rota via ajax que verifica dias e períodos ******************************************************
+
     /** @test */
     public function get_full_days()
     {
@@ -2347,5 +2349,389 @@ class AgendamentoSalaTest extends TestCase
         ]))
         ->assertJsonFragment([$lotado])
         ->assertJsonMissingExact([$nao_lotado]);
+    }
+
+    /** @test */
+    // Situação em que o bloqueio é criado para algumas horas e não cancela o agendamento já existente.
+    // Então mesmo com a hora disponível, a quantidade de agendados já foi preenchida, a não ser que ocorra o cancelamento.
+    public function get_full_days_with_bloqueio_and_created_agendado()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+        
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+            
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+        ]);
+    
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
+            'sala_reuniao_id' => $sala->id,
+            'horarios' => implode(',', $sala->getHorariosManha('coworking')),
+        ]);
+
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => ''
+        ]))
+        ->assertJsonFragment([$lotado]);
+    }
+
+    /** @test */
+    // Situação em que o bloqueio é criado para algumas horas e cancela o agendamento já existente no horário bloqueado.
+    public function get_empty_days_with_bloqueio_and_after_cancel_created_agendado()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+        
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+            
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+        ]);
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
+            'sala_reuniao_id' => $sala->id,
+            'horarios' => implode(',', $sala->getHorariosManha('coworking')),
+        ]);
+
+        $lotado = [$dia->month, $dia->day, 'lotado'];
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => ''
+        ]))
+        ->assertJsonFragment([$lotado]);
+
+        $agendamento->update(['status' => AgendamentoSala::STATUS_CANCELADO]);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => ''
+        ]))
+        ->assertJsonMissing([$lotado]);
+    }
+
+    /** @test */
+    public function get_full_days_with_bloqueio_and_data_final_null()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+        
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
+            'sala_reuniao_id' => $sala->id,
+            'horarios' => implode(',', $sala->getTodasHoras()),
+            'dataFinal' => null
+        ]);
+
+        $lotados = array();
+        $dia = Carbon::tomorrow();
+        while($dia->lte(Carbon::today()->addMonth()))
+        {
+            array_push($lotados, [$dia->month, $dia->day, 'lotado']);
+            $dia->addDay();
+        }
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => ''
+        ]))
+        ->assertJson($lotados);
+    }
+
+    /** @test */
+    public function get_full_days_when_weekends_and_empty_days_for_agendamentos()
+    {
+        $representante = factory('App\Representante')->create();
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 3
+        ]);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+            'idrepresentante' => $representante->id,
+        ]);
+        $agendamento1 = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+            'idrepresentante' => $representante1->id,
+        ]);
+
+        $diaAge = Carbon::parse($agendamento->dia);
+        $lotados = array();
+        $dia = Carbon::tomorrow();
+        while($dia->lte(Carbon::today()->addMonth()))
+        {
+            if($dia->isWeekend())
+                array_push($lotados, [$dia->month, $dia->day, 'lotado']);
+            $dia->addDay();
+        }
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => ''
+        ]))
+        ->assertJson($lotados)
+        ->assertJsonMissingExact([
+            $diaAge->month, $diaAge->day, 'lotado'
+        ]);
+    }
+
+    /** @test */
+    public function get_agendado_days()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+        
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+        ]);
+
+        $diaAge = Carbon::parse($agendamento->dia);
+        $outroDia = Carbon::parse($agendamento->dia)->addDays(7);
+
+        $agendamento1 = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+            'periodo' => 'tarde',
+            'dia' => $outroDia->format('Y-m-d')
+        ]);
+
+        $agendado = array();
+        array_push($agendado, [$diaAge->month, $diaAge->day, 'agendado'], [$outroDia->month, $outroDia->day, 'agendado']);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => ''
+        ]))
+        ->assertJsonFragment([$agendado[0]])
+        ->assertJsonFragment([$agendado[1]]);
+    }
+
+    /** @test */
+    public function get_periodo()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+
+        $agendamento = factory('App\AgendamentoSala')->raw();
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => onlyDate($agendamento['dia'])
+        ]))
+        ->assertJsonFragment([
+            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+        ])
+        ->assertJsonFragment([
+            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+        ]);
+    }
+
+    /** @test */
+    public function remove_periodo()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+        ]);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => onlyDate($agendamento['dia'])
+        ]))
+        ->assertJsonMissing([
+            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+        ])
+        ->assertJsonFragment([
+            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+        ]);
+    }
+
+    /** @test */
+    public function remove_periodos()
+    {
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+        ]);
+
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'sala_reuniao_id' => $sala->id,
+            'periodo' => 'tarde',
+            'idrepresentante' => $representante1->id
+        ]);
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => onlyDate($agendamento['dia'])
+        ]))
+        ->assertJsonMissing([
+            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+        ])
+        ->assertJsonMissing([
+            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+        ]);
+    }
+
+    /** @test */
+    public function remove_periodos_if_weekend()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+
+        $sabado = Carbon::tomorrow();
+        while(!$sabado->isSaturday())
+            $sabado->addDay();
+        $lotado = [$sabado->month, $sabado->day, 'lotado'];
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $sabado->format('d/m/Y')
+        ]))
+        ->assertJsonMissing([
+            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+        ])
+        ->assertJsonMissing([
+            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+        ]);
+
+        $domingo = Carbon::tomorrow();
+        while(!$domingo->isSunday())
+            $domingo->addDay();
+        $lotado = [$domingo->month, $domingo->day, 'lotado'];
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $domingo->format('d/m/Y')
+        ]))
+        ->assertJsonMissing([
+            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+        ])
+        ->assertJsonMissing([
+            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+        ]);
+    }
+
+    /** @test */
+    public function remove_hour_with_bloqueio()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
+            'sala_reuniao_id' => $sala->id,
+            'horarios' => '10:00',
+        ]);
+
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+            
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia->format('d/m/Y')
+        ]))
+        ->assertJsonFragment([
+            'manha' => 'Manhã: 09:00',
+        ])
+        ->assertJsonMissing([
+            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+        ]);
+    }
+
+    /** @test */
+    public function remove_periodo_with_bloqueio()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
+            'sala_reuniao_id' => $sala->id,
+            'horarios' => implode(',', $sala->getHorariosManha('coworking')),
+        ]);
+
+        $dia = Carbon::tomorrow();
+        while($dia->isWeekend())
+            $dia->addDay();
+            
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia->format('d/m/Y')
+        ]))
+        ->assertJsonMissing([
+            'manha' => 'Manhã: '.implode(', ', $sala->getHorariosManha('coworking')),
+        ]);
+    }
+
+    /** @test */
+    public function remove_periodo_with_bloqueio_and_data_final_null()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $sala = factory('App\SalaReuniao')->create([
+            'participantes_coworking' => 1
+        ]);
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->create([
+            'sala_reuniao_id' => $sala->id,
+            'horarios' => implode(',', $sala->getHorariosTarde('coworking')),
+            'dataFinal' => null
+        ]);
+
+        $dia = Carbon::tomorrow()->addDays(7);
+        while($dia->isWeekend())
+            $dia->addDay();
+
+        $this->get(route('sala.reuniao.dias.horas', [
+            'tipo' => 'coworking', 'sala_id' => $sala->id, 'dia' => $dia->format('d/m/Y')
+        ]))
+        ->assertJsonMissing([
+            'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
+        ]);
     }
 }

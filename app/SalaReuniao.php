@@ -73,7 +73,8 @@ class SalaReuniao extends Model
         return $itens;
     }
 
-    private function getPeriodosCombloqueio($bloqueios, $dia, $tipo)
+    // Sobrescreve o atributo de horários da instancia do objeto
+    private function getPeriodosCombloqueio($bloqueios, $dia, $tipo, $horarios)
     {
         $dia = Carbon::parse($dia);
 
@@ -83,7 +84,6 @@ class SalaReuniao extends Model
         $periodos = array();
         $manha = array();
         $tarde = array();
-        $horarios = array_merge($this->getHorariosManha($tipo), $this->getHorariosTarde($tipo));
 
         if($bloqueios->isNotEmpty())
             foreach($bloqueios as $bloqueio)
@@ -100,13 +100,10 @@ class SalaReuniao extends Model
             }
         }
 
-        if(!empty($manha) || !empty($tarde))
-        {
-            if($tipo == 'reuniao')
-                $this->horarios_reuniao = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
-            else
-                $this->horarios_coworking = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
-        }
+        if($tipo == 'reuniao')
+            $this->horarios_reuniao = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
+        else
+            $this->horarios_coworking = json_encode(['manha' => $manha, 'tarde' => $tarde], JSON_FORCE_OBJECT);
 
         return array_unique($periodos);
     }
@@ -301,6 +298,7 @@ class SalaReuniao extends Model
         if(!$this->isAtivo($tipo) || !in_array($tipo, ['reuniao', 'coworking']))
             return null;
 
+        $horarios = array_merge($this->getHorariosManha($tipo), $this->getHorariosTarde($tipo));
         $diasLotados = array();
         $diaslotadosBloqueio = array();
         $bloqueios = $this->bloqueios;
@@ -316,7 +314,7 @@ class SalaReuniao extends Model
         $dia = Carbon::tomorrow();
         for($dia; $dia->lte(Carbon::today()->addMonth()); $dia->addDay())
         {
-            $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $tipo);
+            $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $tipo, $horarios);
             if(sizeof($periodosTotal) == 0)
             {
                 array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
@@ -329,7 +327,7 @@ class SalaReuniao extends Model
             $dia = Carbon::parse($agendado->dia);
             if(!array_search($dia->format('Y-m-d'), $diaslotadosBloqueio))
             {
-                $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $tipo);
+                $periodosTotal = $this->getPeriodosComBloqueio($bloqueios, $dia->format('Y-m-d'), $tipo, $horarios);
                 $total = $tipo == 'reuniao' ? sizeof($periodosTotal) : sizeof($periodosTotal) * $this->participantes_coworking;
                 if($agendado->total >= $total)
                     array_push($diasLotados, [$dia->month, $dia->day, 'lotado']);
@@ -344,8 +342,9 @@ class SalaReuniao extends Model
         if(!$this->isAtivo($tipo) || !in_array($tipo, ['reuniao', 'coworking']))
             return array();
 
+        $horarios = array_merge($this->getHorariosManha($tipo), $this->getHorariosTarde($tipo));
         $bloqueios = $this->bloqueios;
-        $periodos = $this->getPeriodosComBloqueio($bloqueios, $dia, $tipo);
+        $periodos = $this->getPeriodosComBloqueio($bloqueios, $dia, $tipo, $horarios);
         $final_periodos = $periodos;
 
         if(sizeof($periodos) == 0)
