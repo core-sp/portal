@@ -26,9 +26,9 @@ class MediadorServiceProvider extends ServiceProvider implements DeferrableProvi
         $this->app->singleton('App\Contracts\NoticiaServiceInterface', 'App\Services\NoticiaService');
         $this->app->singleton('App\Contracts\CedulaServiceInterface', 'App\Services\CedulaService');
         $this->app->singleton('App\Contracts\RepresentanteServiceInterface', 'App\Services\RepresentanteService');
-        $this->app->singleton('App\Contracts\UserExternoServiceInterface', 'App\Services\UserExternoService');
-        $this->app->singleton('App\Contracts\PreRegistroServiceInterface', 'App\Services\PreRegistroService');
-        $this->app->singleton('App\Contracts\PreRegistroAdminSubServiceInterface', 'App\Services\PreRegistroAdminSubService');
+        // $this->app->singleton('App\Contracts\UserExternoServiceInterface', 'App\Services\UserExternoService');
+        // $this->app->singleton('App\Contracts\PreRegistroServiceInterface', 'App\Services\PreRegistroService');
+        // $this->app->singleton('App\Contracts\PreRegistroAdminSubServiceInterface', 'App\Services\PreRegistroAdminSubService');
     }
 
     /**
@@ -61,9 +61,9 @@ class MediadorServiceProvider extends ServiceProvider implements DeferrableProvi
             'App\Contracts\NoticiaServiceInterface',
             'App\Contracts\CedulaServiceInterface',
             'App\Contracts\RepresentanteServiceInterface',
-            'App\Contracts\UserExternoServiceInterface',
-            'App\Contracts\PreRegistroServiceInterface',
-            'App\Contracts\PreRegistroAdminSubServiceInterface',
+            // 'App\Contracts\UserExternoServiceInterface',
+            // 'App\Contracts\PreRegistroServiceInterface',
+            // 'App\Contracts\PreRegistroAdminSubServiceInterface',
         ];
     }
 }
