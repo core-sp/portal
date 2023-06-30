@@ -25,4 +25,6 @@ interface SalaReuniaoServiceInterface {
     public function agendados();
 
     public function bloqueio();
+
+    public function suspensaoExcecao();
 }

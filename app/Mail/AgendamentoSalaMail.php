@@ -45,7 +45,7 @@ class AgendamentoSalaMail extends Mailable
                 break;
             case 'recusa':
                 $texto = "<strong>Justificativa do não comparecimento da reserva de sala foi recusada.</strong>";
-                $texto .= "<br><strong>Devido a recusa da justificativa, será suspenso por 30 dias para criar novos agendamentos a contar do dia deste agendamento.</strong>";
+                $texto .= "<br><strong>Devido a recusa da justificativa, será suspenso por 30 dias para criar novos agendamentos.</strong>";
                 break;
             default:
                 $texto = "<strong>Sua reserva de sala foi agendada com sucesso!</strong>";

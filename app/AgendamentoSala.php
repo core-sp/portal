@@ -45,6 +45,11 @@ class AgendamentoSala extends Model
     	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
 
+    public function suspensos()
+    {
+    	return $this->hasMany('App\SuspensaoExcecao', 'agendamento_sala_id');
+    }
+
     public static function getAgendadoParticipanteByCpf($cpf)
     {
     	return self::where('participantes', 'LIKE', '%"'. apenasNumeros($cpf) .'"%')

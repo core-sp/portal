@@ -295,10 +295,11 @@
             $representante = in_array($idperfil, $permitidos->find(47)['perfis']);
             $representanteEndereco = in_array($idperfil, $permitidos->find(45)['perfis']);
             $representanteCedula = in_array($idperfil, $permitidos->find(59)['perfis']);
-            $salas = true/*in_array($idperfil, $permitidos->find(59)['perfis']);*/
+            $salas = true/*in_array($idperfil, $permitidos->find(59)['perfis'])*/;
+            $suspensao = true/*in_array($idperfil, $permitidos->find(59)['perfis'])*/;
         @endphp
         
-        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula || $salas)
+        @if($agendamento || $agendamentobloqueio || $representante || $representanteEndereco || $representanteCedula || $salas || $suspensao)
         <li class="nav-header">ATENDIMENTO</li>
         
         @if($agendamento || $agendamentobloqueio)
@@ -374,7 +375,7 @@
         </li>
         @endif
 
-        @if($agendamento || $agendamentobloqueio || $salas)
+        @if($agendamento || $agendamentobloqueio || $salas || $suspensao)
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-building"></i>
@@ -409,12 +410,14 @@
                 </li>
                 @endif
 
+                @if($suspensao)
                 <li class="nav-item">
-                    <a href="#{{-- route('sala.reuniao.index') --}}" class="nav-link">
+                    <a href="{{ route('sala.reuniao.suspensao.lista') }}" class="nav-link">
                         <i class="nav-icon fa fa-angle-right"></i>
                         <p>Suspensos / Exceções</p>
                     </a>
                 </li>
+                @endif
             </ul>
         </li>
         @endif

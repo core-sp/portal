@@ -228,4 +228,9 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
     {
         return resolve('App\Contracts\SalaReuniaoBloqSubServiceInterface');
     }
+
+    public function suspensaoExcecao()
+    {
+        return resolve('App\Contracts\SuspensaoExcecaoSubServiceInterface');
+    }
 }

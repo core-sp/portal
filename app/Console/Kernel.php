@@ -18,6 +18,7 @@ use App\SolicitaCedula;
 use App\Mail\InternoSolicitaCedulaMail;
 use App\AgendamentoSala;
 use Illuminate\Support\Facades\Storage;
+use App\SuspensaoExcecao;
 
 class Kernel extends ConsoleKernel
 {
@@ -140,21 +141,48 @@ class Kernel extends ConsoleKernel
             }
         })->dailyAt('4:15');
 
+        // Suspensões com data finalizada serão excluídas como soft delete
+        $schedule->call(function(){
+            SuspensaoExcecao::where('data_final', '<', now()->format('Y-m-d'))
+            ->delete();
+        })->dailyAt('1:00');
+
         $schedule->call(function(){
             // Agendamentos não justificados ou status não atualizados após 2 dias
-            AgendamentoSala::whereNull('status')
+            $agendados = AgendamentoSala::whereNull('status')
             ->whereDate('dia', '<=', now()->subDays(3)->toDateString())
-            ->update([
-                'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
-            ]);
+            ->get();
 
-            // Agendamentos justificados, mas sem atualização de status após 7 dias
-            $agendamentosSalas = AgendamentoSala::where('status', AgendamentoSala::STATUS_ENVIADA)
-            ->whereDate('updated_at', '<=', now()->subDays(8)->toDateString())
-            ->update([
-                'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
-            ]);
-        })->dailyAt('1:00');
+            foreach($agendados as $agendado){
+                $agendado->update([
+                    'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
+                ]);
+                $dados = [
+                    'idrepresentante' => $agendado->idrepresentante,
+                    'data_inicial' => now()->format('Y-m-d'),
+                    'data_final' => now()->addDays(30)->format('Y-m-d'),
+                ];
+                $suspenso = SuspensaoExcecao::existeSuspensao(apenasNumeros($agendado->representante->cpf_cnpj));
+                $opcao = ' foi suspenso automaticamente por 30 dias';
+                $final = ' a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now());
+                $texto = '[Rotina do Portal] - Após verificação dos agendamentos, o agendamento com o protocolo '. $agendado->protocolo;
+                $texto .= ' teve o status atualizado para ' . AgendamentoSala::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ ';
+                $texto .= $agendado->representante->cpf_cnpj;
+                if(!isset($suspenso)){
+                    $texto .= $opcao . $final;
+                    $dados['justificativa'] = json_encode([$texto], JSON_FORCE_OBJECT);
+                    $agendado->suspensos()->create($dados);
+                }
+                else{
+                    $texto .= isset($suspenso->data_final) ? $opcao . $final : ' foi mantida a suspensão por tempo indeterminado' . $final;
+                    $dados['data_final'] = isset($suspenso->data_final) ? $dados['data_final'] : null;
+                    $dados['justificativa'] = $suspenso->addJustificativa($texto);
+                    $dados['agendamento_sala_id'] = $agendado->id;
+                    $suspenso->update($dados);
+                }
+                \Log::channel('interno')->info($texto);
+            }
+        })->dailyAt('1:30');
 
         // Agendamentos com anexo finalizados com 1 mês ou mais terão o anexo removido.
         $schedule->call(function(){

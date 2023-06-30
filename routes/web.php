@@ -262,6 +262,11 @@ Route::middleware(['block_ip'])->group(function () {
         Route::delete('/apagar/{id}', 'AgendamentoBloqueioController@destroy')->name('sala.reuniao.bloqueio.delete');
         Route::get('/horarios-ajax', 'AgendamentoBloqueioController@getDadosAjax')->name('sala.reuniao.bloqueio.horariosAjax');
       });
+
+      Route::prefix('suspensoes-excecoes')->group(function(){
+        Route::get('/', 'SuspensaoExcecaoController@index')->name('sala.reuniao.suspensao.lista');
+        Route::get('/visualizar/{id}/', 'SuspensaoExcecaoController@view')->name('sala.reuniao.suspensao.view');
+      });
     });
 
   });
