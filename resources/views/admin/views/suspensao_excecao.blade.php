@@ -1,29 +1,25 @@
 <div class="card-body">
     <div class="row">
         <div class="col">
-            <h5>Detalhes da suspensão do CPF / CNPJ <strong>{{ $resultado->getCpfCnpj() }}</strong></h5>
-            <p>{{ $resultado->mostraPeriodo() }}: <em>{{ $resultado->mostraPeriodoEmDias() }}</em></p>
-            @if(isset($resultado->agendamento_sala_id))
-            <p>
-                Link do agendamento responsável pela última suspensão através do agendamento -
-                <a href="{{ route('sala.reuniao.agendados.view', [$resultado->agendamento_sala_id]) }}">{{ $resultado->agendamento->protocolo }}</a>
-            </p>
+            <h4>Detalhes da suspensão do CPF / CNPJ <strong>{{ $resultado->getCpfCnpj() }}</strong></h4>
             <hr>
-            <p>
-                @foreach($resultado->getProtocolosDasJustificativas() as $key => $protocolo)
-                    {!! $key == 0 ? '<b>Protocolos dos agendamentos das justificativas: </b>' . $protocolo : ' <b>|</b> ' . $protocolo !!}
-                @endforeach
-            </p>
+            <p><b>Período: </b>{{ $resultado->mostraPeriodo() }} (<em>{{ $resultado->mostraPeriodoEmDias() }}</em>)</p>
             
-            @endif
+            @foreach($resultado->getProtocolosDasJustificativas() as $key => $protocolo)
+                @if($key == 0)
+                <b>Protocolos dos agendamentos das justificativas: </b>
+                @endif
+                <a href="{{ route('sala.reuniao.agendados.busca', ['q' => $protocolo]) }}" target="_blank">{{ $protocolo }}</a>&nbsp;&nbsp;<b>|</b>
+            @endforeach
+            </p>
 
-        @if(isset($resultado->justificativa))
-            <h5><b>Histórico de justificativas:</b></h5>
-            @foreach($resultado->getJustificativasDesc() as $justificativa)
+            @if(isset($resultado->justificativa))
+            <h5 class="mt-4"><b>Histórico de justificativas:</b></h5>
+                @foreach($resultado->getJustificativasDesc() as $justificativa)
                 <p>{{ $justificativa }}</p>
                 <hr>
-            @endforeach
-        @endif
+                @endforeach
+            @endif
 
         </div>
     </div>

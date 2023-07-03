@@ -34,6 +34,7 @@ class SuspensaoExcecao extends Model
     public static function existeSuspensao($cpf_cnpj)
     {
     	return self::with('representante')
+        ->where('situacao', self::SITUACAO_SUSPENSAO)
         ->where('cpf_cnpj', $cpf_cnpj)
         ->orWhereHas('representante', function($query) use($cpf_cnpj) {
             $query->where('cpf_cnpj', $cpf_cnpj);
@@ -44,6 +45,16 @@ class SuspensaoExcecao extends Model
     public function getCpfCnpj()
     {
     	return isset($this->representante) ? $this->representante->cpf_cnpj : formataCpfCnpj($this->cpf_cnpj);
+    }
+
+    public function isExcecao()
+    {
+    	return isset($this->data_inicial_excecao) && isset($this->data_final_excecao);
+    }
+
+    public function isLiberadoHoje()
+    {
+    	return $this->isExcecao() && ((now()->format('Y-m-d') >= $this->data_inicial_excecao) && (now()->format('Y-m-d') <= $this->data_final_excecao));
     }
 
     public function isSuspenso()
@@ -64,13 +75,31 @@ class SuspensaoExcecao extends Model
     	return onlyDate($this->data_inicial).' - '.$dataFinal;
     }
 
+    public function mostraPeriodoExcecao()
+    {
+        if($this->isExcecao())
+    	    return onlyDate($this->data_inicial_excecao).' - '.onlyDate($this->data_final_excecao);
+        return '-----';
+    }
+
     public function mostraPeriodoEmDias()
     {
         $dataInicial = Carbon::parse($this->data_inicial);
 
         $texto = isset($this->data_final) ? Carbon::parse($this->data_final)->diffInDays($dataInicial) : '-----';
 
-        return $this->situacao . ' por ' . $texto . ' dias.';
+        return 'Suspenso por ' . $texto . ' dias';
+    }
+
+    public function mostraPeriodoExcecaoEmDias()
+    {
+        if($this->isExcecao())
+        {
+            $dataInicial = Carbon::parse($this->data_inicial_excecao);
+            $texto = Carbon::parse($this->data_final_excecao)->diffInDays($dataInicial);
+            return 'Liberado por ' . $texto . ' dias';
+        }
+        return '';
     }
 
     public function getJustificativas()
@@ -102,5 +131,17 @@ class SuspensaoExcecao extends Model
         }
 
         return array_unique($protocolos);
+    }
+
+    public function addDiasDataFinal($dias)
+    {
+        if(isset($this->data_final))
+            return Carbon::parse($this->data_final)->addDays($dias)->format('Y-m-d');
+        return Carbon::parse($this->data_inicial)->addDays($dias)->format('Y-m-d');
+    }
+
+    public function getDataFinal()
+    {
+        return isset($this->data_final) ? Carbon::parse($this->data_final)->format('d/m/Y') : 'Tempo Indeterminado';
     }
 }

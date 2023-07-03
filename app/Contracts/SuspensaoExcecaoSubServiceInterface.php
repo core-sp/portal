@@ -6,5 +6,7 @@ interface SuspensaoExcecaoSubServiceInterface {
 
     public function listar($user);
 
-    public function view($user, $id);
+    public function view($user, $id = null);
+
+    public function save($user, $dados, $id = null);
 }

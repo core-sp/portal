@@ -14,16 +14,17 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
     public function __construct()
     {
         $this->variaveis = [
-            'singular' => 'suspensão / exceção',
-            'singulariza' => 'a suspensão / exceção',
-            'plural' => 'suspensões / exceções',
-            'pluraliza' => 'suspensões / exceções',
-            'btn_criar' => '<a href="'.route('sala.reuniao.bloqueio.criar').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Nova Suspensão</a>',
+            'singular' => 'suspensão',
+            'singulariza' => 'a suspensão',
+            'plural' => 'suspensões',
+            'pluraliza' => 'suspensões',
+            'btn_criar' => '<a href="'.route('sala.reuniao.suspensao.criar').'" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Nova Suspensão</a>',
             'titulo_criar' => 'Nova Suspensão',
             'busca' => 'salas-reunioes/suspensoes-excecoes',
             'slug' => 'salas-reunioes/suspensoes-excecoes',
             'busca' => 'salas-reunioes/suspensoes-excecoes',
             'mostra' => 'suspensao_excecao',
+            'form' => 'suspensao_excecao',
         ];
     }
 
@@ -34,31 +35,25 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
             'ID',
             'CPF / CNPJ',
             'Situação',
-            'Período',
+            'Período Suspensão',
+            'Período Exceção',
             'Ações'
         ];
         // Opções de conteúdo da tabela
         $contents = [];
         // $userPodeEditar = $user->can('updateOther', $user);
-        // $userPodeExcluir = $user->can('delete', $user);
         foreach($resultados as $resultado) {
             $acoes = '';
-            $acoes .= '<a href="' .route('sala.reuniao.suspensao.view', $resultado->id). '" class="btn btn-sm btn-primary">Ver</a> ';
+            $acoes .= '<a href="' .route('sala.reuniao.suspensao.view', $resultado->id). '" class="btn btn-sm btn-primary">Ver</a>&nbsp;&nbsp;&nbsp;';
             // if($userPodeEditar)
-            //     $acoes .= '<a href="' .route('sala.reuniao.bloqueio.edit', $resultado->id). '" class="btn btn-sm btn-primary">Editar</a> ';
-            // if($userPodeExcluir)
-            // {
-            //     $acoes .= '<form method="POST" action="'.route('sala.reuniao.bloqueio.delete', $resultado->id).'" class="d-inline">';
-            //     $acoes .= '<input type="hidden" name="_token" value="'.csrf_token().'" />';
-            //     $acoes .= '<input type="hidden" name="_method" value="delete" />';
-            //     $acoes .= '<input type="submit" class="btn btn-sm btn-danger" value="Apagar" onclick="return confirm(\'Tem certeza que deseja excluir esse bloqueio?\')" />';
-            //     $acoes .= '</form>';
-            // }
+            $acoes .= '<a href="' .route('sala.reuniao.suspensao.edit', [$resultado->id, 'suspensao']). '" class="btn btn-sm btn-warning">Editar Suspensão</a>&nbsp;&nbsp;&nbsp;';
+            $acoes .= '<a href="' .route('sala.reuniao.suspensao.edit', [$resultado->id, 'excecao']). '" class="btn btn-sm btn-success">Editar Exceção</a>';
             $conteudo = [
                 $resultado->id,
                 $resultado->getCpfCnpj(),
                 $resultado->getSituacaoHTML(),
                 $resultado->mostraPeriodo().'<br><small><em>'. $resultado->mostraPeriodoEmDias() .'</em></small>',
+                $resultado->mostraPeriodoExcecao().'<br><small><em>'. $resultado->mostraPeriodoExcecaoEmDias() .'</em></small>',
                 $acoes
             ];
             array_push($contents, $conteudo);
@@ -92,7 +87,7 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
         ];
     }
 
-    public function view($user, $id)
+    public function view($user, $id = null)
     {
         $suspenso = SuspensaoExcecao::findOrFail($id);
 
@@ -102,40 +97,23 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
         ];
     }
 
-    // public function save($user, $dados, $id = null)
-    // {
-    //     $dados['horarios'] = implode(',', $dados['horarios']);
-    //     $acao = isset($id) ? 'editou' : 'criou';
+    public function save($user, $dados, $id = null)
+    {
+        $acao = isset($id) ? 'editou período' : 'criou';
 
-    //     if(isset($id))
-    //     {
-    //         unset($dados['sala_reuniao_id']);
-    //         $bloqueio = SalaReuniaoBloqueio::findOrFail($id)->update($dados);
-    //     }
-    //     else  
-    //         $id = $user->salasReunioesBloqueios()->create($dados)->id;
+        if(isset($id))
+        {
+            $suspenso = SuspensaoExcecao::findOrFail($id);
+            $dados['idusuario'] = $user->idusuario;
+            $dados['justificativa'] = '[Funcionário(a) '.$user->nome.'] - ' . $dados['justificativa'] . ' Data da justificativa: ' . formataData(now());
+            $dados['justificativa'] = $suspenso->addJustificativa($dados['justificativa']);
 
-    //     event(new CrudEvent('sala reunião bloqueio', $acao, $id));
-    // }
+            if(isset($dados['data_final']))
+                $dados['data_final'] = $dados['data_final'] == '00' ? null : $suspenso->addDiasDataFinal($dados['data_final']);
 
-    // public function destroy($id)
-    // {
-    //     return SalaReuniaoBloqueio::findOrFail($id)->delete() ? event(new CrudEvent('sala reunião bloqueio', 'excluiu', $id)) : null;
-    // }
+            $suspenso->update($dados);
+        }
 
-    // public function buscar($busca, $user)
-    // {
-    //     $resultados = SalaReuniaoBloqueio::with('sala.regional')
-    //         ->whereHas('sala.regional', function($q) use($busca){
-    //             $q->where('regional', 'LIKE', '%'.$busca.'%');
-    //         })->paginate(10);
-
-    //     $this->variaveis['slug'] = $this->variaveis['busca'];
-
-    //     return [
-    //         'resultados' => $resultados,
-    //         'tabela' => $this->tabelaCompleta($resultados, $user), 
-    //         'variaveis' => (object) $this->variaveis
-    //     ];
-    // }
+        event(new CrudEvent('suspensão / exceção', $acao, $id));
+    }
 }

@@ -21,6 +21,8 @@ class CreateSuspensoesExcecoes extends Migration
             $table->foreign('idrepresentante')->references('id')->on('representantes');
             $table->date('data_inicial');
             $table->date('data_final')->nullable();
+            $table->date('data_inicial_excecao')->nullable();
+            $table->date('data_final_excecao')->nullable();
             $table->string('situacao')->default(SuspensaoExcecao::SITUACAO_SUSPENSAO);
             $table->bigInteger('agendamento_sala_id')->unsigned()->nullable();
             $table->foreign('agendamento_sala_id')->references('id')->on('agendamentos_salas');

@@ -114,6 +114,16 @@ class Representante extends Authenticable
         return $this->hasMany('App\AgendamentoSala', 'idrepresentante');
     }
 
+    public function suspensao()
+    {
+        return $this->hasMany('App\SuspensaoExcecao', 'idrepresentante')->where('situacao', 'Suspenso')->first();
+    }
+
+    public function excecao()
+    {
+        return $this->hasMany('App\SuspensaoExcecao', 'idrepresentante')->where('situacao', '!=', 'Suspenso')->first();
+    }
+
     public function agendamentosAtivos()
     {
         return $this->agendamentosSalas()

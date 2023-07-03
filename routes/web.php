@@ -266,6 +266,10 @@ Route::middleware(['block_ip'])->group(function () {
       Route::prefix('suspensoes-excecoes')->group(function(){
         Route::get('/', 'SuspensaoExcecaoController@index')->name('sala.reuniao.suspensao.lista');
         Route::get('/visualizar/{id}/', 'SuspensaoExcecaoController@view')->name('sala.reuniao.suspensao.view');
+        Route::get('/editar/{id}/{situacao}', 'SuspensaoExcecaoController@edit')->where('situacao', 'suspensao|excecao')->name('sala.reuniao.suspensao.edit');
+        Route::put('/editar/{id}/{situacao}', 'SuspensaoExcecaoController@update')->where('situacao', 'suspensao|excecao')->name('sala.reuniao.suspensao.update');
+        Route::get('/criar', 'SuspensaoExcecaoController@create')->name('sala.reuniao.suspensao.criar');
+        Route::post('/criar', 'SuspensaoExcecaoController@store')->name('sala.reuniao.suspensao.store');
       });
     });
 

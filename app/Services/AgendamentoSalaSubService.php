@@ -244,6 +244,12 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             if(in_array($status, [AgendamentoSala::STATUS_NAO_COMPARECEU, AgendamentoSala::STATUS_JUSTIFICADO]))
                 Mail::to($agendado->representante->email)->queue(new AgendamentoSalaMail($agendado->fresh(), $status != AgendamentoSala::STATUS_NAO_COMPARECEU ? 'aceito' : 'recusa'));
             
+            if($status == AgendamentoSala::STATUS_NAO_COMPARECEU)
+            {
+                $texto = $agendado->updateRotina($user);
+                \Log::channel('interno')->info($texto);
+            }
+
             return null;
         }
 

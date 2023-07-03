@@ -45,9 +45,9 @@ class AgendamentoSala extends Model
     	return $this->belongsTo('App\User', 'idusuario')->withTrashed();
     }
 
-    public function suspensos()
+    public function suspenso()
     {
-    	return $this->hasMany('App\SuspensaoExcecao', 'agendamento_sala_id');
+    	return $this->hasOne('App\SuspensaoExcecao', 'agendamento_sala_id');
     }
 
     public static function getAgendadoParticipanteByCpf($cpf)
@@ -195,5 +195,59 @@ class AgendamentoSala extends Model
             return $default;
         }
         return '';
+    }
+
+    public function getTextoRotina($suspenso = false, $dataFinal = null, $user = null)
+    {
+        $opcao = ' foi suspenso automaticamente por 30 dias';
+        $final = ' a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now());
+
+        if(isset($user))
+        {
+            $texto = '[Funcionário(a) '.$user->nome.'] - Após análise da justificativa enviada pelo representante, o agendamento com o protocolo '. $this->protocolo;
+            $texto .= ' teve o status atualizado para ' . self::STATUS_NAO_COMPARECEU . ' devido a recusa. A justificativa do funcionário está no agendamento. Então, o CPF / CNPJ ';
+        }else{
+            $texto = '[Rotina do Portal] - Após verificação dos agendamentos, o agendamento com o protocolo '. $this->protocolo;
+            $texto .= ' teve o status atualizado para ' . self::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ ';
+        }
+
+        $texto .= $this->representante->cpf_cnpj;
+        if($suspenso)
+            $texto .= isset($dataFinal) ? $opcao . $final : ' foi mantida a suspensão por tempo indeterminado' . $final;
+        else
+            $texto .= $opcao . $final;
+        
+        return $texto;
+    }
+
+    public function updateRotina($user = null)
+    {
+        $texto = null;
+        $this->update([
+            'status' => self::STATUS_NAO_COMPARECEU
+        ]);
+
+        $dados = [
+            'idrepresentante' => $this->idrepresentante,
+            'data_inicial' => now()->format('Y-m-d'),
+            'data_final' => now()->addDays(30)->format('Y-m-d'),
+            'idusuario' => isset($user) ? $user->idusuario : null,
+        ];
+        $suspenso = $this->representante->suspensao();
+
+        if(!isset($suspenso)){
+            $texto = $this->getTextoRotina(false, null, $user);
+            $dados['justificativa'] = json_encode([$texto], JSON_FORCE_OBJECT);
+            $this->suspenso()->create($dados);
+        }
+        else{
+            $texto = $this->getTextoRotina(true, $suspenso->data_final, $user);
+            $dados['data_final'] = isset($suspenso->data_final) ? $dados['data_final'] : null;
+            $dados['justificativa'] = $suspenso->addJustificativa($texto);
+            $dados['agendamento_sala_id'] = $this->id;
+            $suspenso->update($dados);
+        }
+
+        return $texto;
     }
 }

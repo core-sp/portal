@@ -141,10 +141,31 @@ class Kernel extends ConsoleKernel
             }
         })->dailyAt('4:15');
 
+        /** 
+         * =======================================================================================================
+         * ROTINAS SALAS DE REUNIÕES 
+         * =======================================================================================================
+        */ 
+        
         // Suspensões com data finalizada serão excluídas como soft delete
         $schedule->call(function(){
             SuspensaoExcecao::where('data_final', '<', now()->format('Y-m-d'))
             ->delete();
+        })->daily();
+
+        // Atualizar situação das suspensoes
+        $schedule->call(function(){
+            SuspensaoExcecao::where('situacao', SuspensaoExcecao::SITUACAO_SUSPENSAO)
+            ->where('data_inicial_excecao', '<=', now()->format('Y-m-d'))
+            ->where('data_final_excecao', '>=', now()->format('Y-m-d'))
+            ->update(['situacao' => SuspensaoExcecao::SITUACAO_EXCECAO]);
+
+            SuspensaoExcecao::where('situacao', SuspensaoExcecao::SITUACAO_EXCECAO)
+            ->whereNull('data_inicial_excecao')
+            ->whereNull('data_final_excecao')
+            ->orWhere('data_inicial_excecao', '>', now()->format('Y-m-d'))
+            ->orWhere('data_final_excecao', '<', now()->format('Y-m-d'))
+            ->update(['situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO]);
         })->dailyAt('1:00');
 
         $schedule->call(function(){
@@ -154,32 +175,7 @@ class Kernel extends ConsoleKernel
             ->get();
 
             foreach($agendados as $agendado){
-                $agendado->update([
-                    'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
-                ]);
-                $dados = [
-                    'idrepresentante' => $agendado->idrepresentante,
-                    'data_inicial' => now()->format('Y-m-d'),
-                    'data_final' => now()->addDays(30)->format('Y-m-d'),
-                ];
-                $suspenso = SuspensaoExcecao::existeSuspensao(apenasNumeros($agendado->representante->cpf_cnpj));
-                $opcao = ' foi suspenso automaticamente por 30 dias';
-                $final = ' a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now());
-                $texto = '[Rotina do Portal] - Após verificação dos agendamentos, o agendamento com o protocolo '. $agendado->protocolo;
-                $texto .= ' teve o status atualizado para ' . AgendamentoSala::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ ';
-                $texto .= $agendado->representante->cpf_cnpj;
-                if(!isset($suspenso)){
-                    $texto .= $opcao . $final;
-                    $dados['justificativa'] = json_encode([$texto], JSON_FORCE_OBJECT);
-                    $agendado->suspensos()->create($dados);
-                }
-                else{
-                    $texto .= isset($suspenso->data_final) ? $opcao . $final : ' foi mantida a suspensão por tempo indeterminado' . $final;
-                    $dados['data_final'] = isset($suspenso->data_final) ? $dados['data_final'] : null;
-                    $dados['justificativa'] = $suspenso->addJustificativa($texto);
-                    $dados['agendamento_sala_id'] = $agendado->id;
-                    $suspenso->update($dados);
-                }
+                $texto = $agendado->updateRotina();
                 \Log::channel('interno')->info($texto);
             }
         })->dailyAt('1:30');
