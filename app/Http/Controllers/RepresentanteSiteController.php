@@ -574,7 +574,7 @@ class RepresentanteSiteController extends Controller
                             'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Não pode criar agendamento no momento. Por gentileza, procure o atendimento do Core-SP.',
                             'class' => 'alert-warning'
                         ]);
-                    $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user);
+                    $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user, $this->service);
                     if(!isset($erro))
                         $dados['salas'] = $this->service->getService('SalaReuniao')->salasAtivas();
                     break;
@@ -625,7 +625,7 @@ class RepresentanteSiteController extends Controller
                             'message' => '<i class="fas fa-exclamation-triangle"></i>&nbsp;Não pode criar agendamento no momento. Por gentileza, procure o atendimento do Core-SP.',
                             'class' => 'alert-warning'
                         ]);
-                    $dados = $this->service->getService('SalaReuniao')->site()->save($dados, $user);
+                    $dados = $this->service->getService('SalaReuniao')->site()->save($dados, $user, $this->service);
                     $erro = isset($dados['message']) ? $dados : $erro;
                     $msg = ['message' => '<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento criado com sucesso! Foi enviado um e-mail com os detalhes.', 
                     'class' => 'alert-success'];

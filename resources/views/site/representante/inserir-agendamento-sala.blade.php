@@ -257,6 +257,7 @@
             id="justificativa"
             maxlength="1000"
             required
+            autofocus
           >{{ old('justificativa') }}</textarea>
           @if($errors->has('justificativa'))
           <div class="invalid-feedback">

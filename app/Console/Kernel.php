@@ -147,26 +147,31 @@ class Kernel extends ConsoleKernel
          * =======================================================================================================
         */ 
         
-        // Suspensões com data finalizada serão excluídas como soft delete
         $schedule->call(function(){
+            // Suspensões com data finalizada serão excluídas como soft delete
             SuspensaoExcecao::where('data_final', '<', now()->format('Y-m-d'))
             ->delete();
-        })->daily();
 
-        // Atualizar situação das suspensoes
-        $schedule->call(function(){
+            // Atualizar situação das suspensoes se exceção válida
             SuspensaoExcecao::where('situacao', SuspensaoExcecao::SITUACAO_SUSPENSAO)
             ->where('data_inicial_excecao', '<=', now()->format('Y-m-d'))
             ->where('data_final_excecao', '>=', now()->format('Y-m-d'))
             ->update(['situacao' => SuspensaoExcecao::SITUACAO_EXCECAO]);
 
+            // Atualizar situação das suspensoes se exceção não mais válida
             SuspensaoExcecao::where('situacao', SuspensaoExcecao::SITUACAO_EXCECAO)
-            ->whereNull('data_inicial_excecao')
-            ->whereNull('data_final_excecao')
-            ->orWhere('data_inicial_excecao', '>', now()->format('Y-m-d'))
-            ->orWhere('data_final_excecao', '<', now()->format('Y-m-d'))
+            ->where('data_final_excecao', '<', now()->format('Y-m-d'))
             ->update(['situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO]);
-        })->dailyAt('1:00');
+
+            // Atualizar relacionamento caso o cpf / cnpj se cadastre no portal
+            $suspensos = SuspensaoExcecao::whereNotNull('cpf_cnpj')->get();
+            foreach($suspensos as $suspenso)
+            {
+                $rc = Representante::where('cpf_cnpj', $suspenso->cpf_cnpj)->first();
+                if(isset($rc))
+                    $suspenso->updateRelacaoByIdRep($rc->id);
+            }
+        })->daily();
 
         $schedule->call(function(){
             // Agendamentos não justificados ou status não atualizados após 2 dias
@@ -178,7 +183,7 @@ class Kernel extends ConsoleKernel
                 $texto = $agendado->updateRotina();
                 \Log::channel('interno')->info($texto);
             }
-        })->dailyAt('1:30');
+        })->dailyAt('0:30');
 
         // Agendamentos com anexo finalizados com 1 mês ou mais terão o anexo removido.
         $schedule->call(function(){

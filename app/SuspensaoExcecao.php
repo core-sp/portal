@@ -15,6 +15,7 @@ class SuspensaoExcecao extends Model
 
     const SITUACAO_SUSPENSAO = 'Suspenso';
     const SITUACAO_EXCECAO = 'Liberado Temporariamente';
+    const TOTAL_DIAS_EXCECAO = 14;
 
     public function representante()
     {
@@ -33,8 +34,9 @@ class SuspensaoExcecao extends Model
 
     public static function existeSuspensao($cpf_cnpj)
     {
+        $cpf_cnpj = apenasNumeros($cpf_cnpj);
+
     	return self::with('representante')
-        ->where('situacao', self::SITUACAO_SUSPENSAO)
         ->where('cpf_cnpj', $cpf_cnpj)
         ->orWhereHas('representante', function($query) use($cpf_cnpj) {
             $query->where('cpf_cnpj', $cpf_cnpj);
@@ -42,19 +44,29 @@ class SuspensaoExcecao extends Model
         ->first();
     }
 
+    public function getTotalDiasExcecao()
+    {
+    	return self::TOTAL_DIAS_EXCECAO;
+    }
+
     public function getCpfCnpj()
     {
     	return isset($this->representante) ? $this->representante->cpf_cnpj : formataCpfCnpj($this->cpf_cnpj);
     }
 
-    public function isExcecao()
+    public function getTextoHTMLSeCadastro()
+    {
+    	return isset($this->representante) ? '<br><small><em>Cadastrado no Portal</em></small>' : '';
+    }
+
+    public function possuiExcecao()
     {
     	return isset($this->data_inicial_excecao) && isset($this->data_final_excecao);
     }
 
     public function isLiberadoHoje()
     {
-    	return $this->isExcecao() && ((now()->format('Y-m-d') >= $this->data_inicial_excecao) && (now()->format('Y-m-d') <= $this->data_final_excecao));
+    	return $this->possuiExcecao() && (now()->format('Y-m-d') >= $this->data_inicial_excecao) && (now()->format('Y-m-d') <= $this->data_final_excecao);
     }
 
     public function isSuspenso()
@@ -77,7 +89,7 @@ class SuspensaoExcecao extends Model
 
     public function mostraPeriodoExcecao()
     {
-        if($this->isExcecao())
+        if($this->possuiExcecao())
     	    return onlyDate($this->data_inicial_excecao).' - '.onlyDate($this->data_final_excecao);
         return '-----';
     }
@@ -93,11 +105,11 @@ class SuspensaoExcecao extends Model
 
     public function mostraPeriodoExcecaoEmDias()
     {
-        if($this->isExcecao())
+        if($this->possuiExcecao())
         {
             $dataInicial = Carbon::parse($this->data_inicial_excecao);
-            $texto = Carbon::parse($this->data_final_excecao)->diffInDays($dataInicial);
-            return 'Liberado por ' . $texto . ' dias';
+            $texto = Carbon::parse($this->data_final_excecao)->diffInDays($dataInicial) + 1;
+            return $texto == 1 ? 'Liberado por 1 dia' : 'Liberado por ' . $texto . ' dias';
         }
         return '';
     }
@@ -143,5 +155,26 @@ class SuspensaoExcecao extends Model
     public function getDataFinal()
     {
         return isset($this->data_final) ? Carbon::parse($this->data_final)->format('d/m/Y') : 'Tempo Indeterminado';
+    }
+
+    public function getSituacaoUpdateExcecao($data_inicial, $data_final)
+    {
+        if(!isset($data_inicial) && !isset($data_final))
+            return self::SITUACAO_SUSPENSAO;
+
+        if(($data_inicial > now()->format('Y-m-d')) || ($data_final < now()->format('Y-m-d')))
+            return self::SITUACAO_SUSPENSAO;
+
+        return self::SITUACAO_EXCECAO;
+    }
+
+    public function updateRelacaoByIdRep($id)
+    {
+        if(!isset($this->representante))
+            $this->update([
+                'idrepresentante' => $id,
+                'cpf_cnpj' => null
+            ]);
+        return $this->fresh();
     }
 }

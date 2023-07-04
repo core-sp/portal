@@ -50,7 +50,7 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
             $acoes .= '<a href="' .route('sala.reuniao.suspensao.edit', [$resultado->id, 'excecao']). '" class="btn btn-sm btn-success">Editar Exceção</a>';
             $conteudo = [
                 $resultado->id,
-                $resultado->getCpfCnpj(),
+                $resultado->getCpfCnpj() . $resultado->getTextoHTMLSeCadastro(),
                 $resultado->getSituacaoHTML(),
                 $resultado->mostraPeriodo().'<br><small><em>'. $resultado->mostraPeriodoEmDias() .'</em></small>',
                 $resultado->mostraPeriodoExcecao().'<br><small><em>'. $resultado->mostraPeriodoExcecaoEmDias() .'</em></small>',
@@ -89,6 +89,11 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
 
     public function view($user, $id = null)
     {
+        if(!isset($id))
+            return [
+                'variaveis' => (object) $this->variaveis
+            ];
+
         $suspenso = SuspensaoExcecao::findOrFail($id);
 
         return [
@@ -100,20 +105,33 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
     public function save($user, $dados, $id = null)
     {
         $acao = isset($id) ? 'editou período' : 'criou';
+        $situacao = 'suspensão';
+        $dados['justificativa'] = '[Funcionário(a) '.$user->nome.'] - ' . $dados['justificativa'] . ' Data da justificativa: ' . formataData(now());
 
         if(isset($id))
         {
             $suspenso = SuspensaoExcecao::findOrFail($id);
             $dados['idusuario'] = $user->idusuario;
-            $dados['justificativa'] = '[Funcionário(a) '.$user->nome.'] - ' . $dados['justificativa'] . ' Data da justificativa: ' . formataData(now());
             $dados['justificativa'] = $suspenso->addJustificativa($dados['justificativa']);
 
             if(isset($dados['data_final']))
                 $dados['data_final'] = $dados['data_final'] == '00' ? null : $suspenso->addDiasDataFinal($dados['data_final']);
+            else{
+                $situacao = 'exceção';
+                $dados['situacao'] = $suspenso->getSituacaoUpdateExcecao($dados['data_inicial_excecao'], $dados['data_final_excecao']);
+            }
 
             $suspenso->update($dados);
+        }else{
+            $dados['justificativa'] = json_encode([$dados['justificativa']], JSON_FORCE_OBJECT);
+            $id = $user->suspensoes()->create($dados)->id;
         }
 
-        event(new CrudEvent('suspensão / exceção', $acao, $id));
+        event(new CrudEvent($situacao, $acao, $id));
+    }
+
+    public function verificaSuspenso($cpf_cnpj)
+    {
+        return SuspensaoExcecao::existeSuspensao(apenasNumeros($cpf_cnpj));
     }
 }

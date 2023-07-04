@@ -11,8 +11,18 @@ use Carbon\Carbon;
 
 class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
-    public function verificaPodeAgendar($user, $mes = null, $ano = null)
+    public function verificaPodeAgendar($user, $service, $mes = null, $ano = null)
     {
+        $suspenso = $service->getService('SalaReuniao')->suspensaoExcecao()->verificaSuspenso($user->cpf_cnpj);
+        if(isset($suspenso))
+        {
+            if(!$suspenso->updateRelacaoByIdRep($user->id)->isLiberadoHoje())
+                return [
+                    'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Está suspenso pelo período de ' . $suspenso->mostraPeriodo(),
+                    'class' => 'alert-danger'
+                ];
+        }
+
         if(!$user->podeAgendar($mes, $ano))
             return [
                 'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Já possui o limite de 4 agendamentos a finalizar no mês atual e/ou seguinte.',
@@ -20,7 +30,7 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
             ];
     }
 
-    public function save($dados, $user)
+    public function save($dados, $user, $service)
     {
         if(!Carbon::hasFormat($dados['dia'], 'd/m/Y'))
             return [
@@ -29,7 +39,7 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
             ];
         $dia = Carbon::createFromFormat('d/m/Y', $dados['dia']);
 
-        $resultado = $this->verificaPodeAgendar($user, $dia->month, $dia->year);
+        $resultado = $this->verificaPodeAgendar($user, $service, $dia->month, $dia->year);
         if(isset($resultado['message']))
             return $resultado;
 

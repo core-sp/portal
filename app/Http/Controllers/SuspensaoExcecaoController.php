@@ -48,8 +48,10 @@ class SuspensaoExcecaoController extends Controller
 
         try{
             $dados = $this->service->getService('SalaReuniao')->suspensaoExcecao()->view(auth()->user(), $id);
-            $dados['variaveis']->singular = $situacao;
-            $dados['variaveis']->singulariza = $situacao;
+            if($situacao == 'excecao'){
+                $dados['variaveis']->singular = 'exceção';
+                $dados['variaveis']->singulariza = 'a exceção';
+            }
             $dados['situacao'] = $situacao;
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
@@ -89,5 +91,23 @@ class SuspensaoExcecaoController extends Controller
         }
 
         return view('admin.crud.criar', $dados);
+    }
+
+    public function store(SuspensaoExcecaoRequest $request)
+    {
+        // $this->authorize('create', auth()->user());
+
+        try{
+            $validated = $request->validated();
+            $this->service->getService('SalaReuniao')->suspensaoExcecao()->save(auth()->user(), $validated);
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao criar a suspensão.");
+        }
+
+        return redirect(route('sala.reuniao.suspensao.lista'))->with([
+            'message' => '<i class="icon fa fa-check"></i>Suspensão cadastrada com sucesso!',
+            'class' => 'alert-success'
+        ]);
     }
 }
