@@ -594,6 +594,7 @@ class RepresentanteSiteController extends Controller
                     $dados['salas'] = $user->agendamentosAtivos();
                     $dados['participando'] = $this->service->getService('SalaReuniao')->site()->getAgendadosParticipante($user);
                     $view = 'agendamento-sala';
+                    $dados['situacao'] = $this->service->getService('SalaReuniao')->site()->verificaSuspensao($user, $this->service);
                     break;
             }
             $dados['acao'] = isset($acao) ? $acao : '';

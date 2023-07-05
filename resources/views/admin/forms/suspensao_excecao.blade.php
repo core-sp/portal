@@ -18,7 +18,7 @@
         @if($situacao == 'suspensao')
         <h5><strong>Período da suspensão a ser editado:</strong></h5>
         <p>
-            <i class="fas fa-info-circle text-primary"></i> <i>Caso a data final seja Tempo Indeterminado, será considerada a data inicial.</i>
+            <i class="fas fa-info-circle text-primary"></i> <i>Caso a data final seja Tempo Indeterminado, será considerada a data de hoje ({{ date('d/m/Y') }}).</i>
         </p>
                 
         <div class="form-row">

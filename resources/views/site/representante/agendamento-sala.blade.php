@@ -6,6 +6,10 @@
 <div class="d-block w-100">
     <p class="alert {{ Session::get('class') }}">{!! Session::get('message') !!}</p>
 </div>
+@elseif(isset($situacao))
+<div class="d-block w-100">
+    <p class="alert {{ $situacao['class'] }}">{!! $situacao['message'] !!}</p>
+</div>
 @endif
 
 <div class="representante-content w-100">
@@ -23,7 +27,7 @@
                 <a class="nav-link active" data-toggle="tab" href="#agendamento">Seus Agendamentos</a>
             </li>
             @endif
-            @if(auth()->guard('representante')->user()->tipoPessoa() != 'PJ')
+            @if((auth()->guard('representante')->user()->tipoPessoa() != 'PJ') && ($participando->isNotEmpty()))
             <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#participando">Agendamentos como participante</a>
             </li>
@@ -77,9 +81,8 @@
                 @endif
             </div>
 
-            @if(auth()->guard('representante')->user()->tipoPessoa() != 'PJ')
+            @if((auth()->guard('representante')->user()->tipoPessoa() != 'PJ') && ($participando->isNotEmpty()))
             <div class="tab-pane container fade" id="participando">
-                @if($participando->isNotEmpty())
                 <div class="list-group w-100 mt-2">
                     @foreach ($participando as $participa)
                     <div class="list-group-item light d-block bg-secondary">
@@ -99,7 +102,6 @@
                     <div class="linha-lg-mini mb-2"></div>
                     @endforeach
                 </div>
-                @endif
             </div>
             @endif
 

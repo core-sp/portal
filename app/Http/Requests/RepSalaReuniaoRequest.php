@@ -32,6 +32,7 @@ class RepSalaReuniaoRequest extends FormRequest
             'participantes_nome' => 'exclude_unless:tipo_sala,reuniao|required_if:tipo_sala,reuniao|array|size:'.$this->total_cpfs,
             'participantes_nome.*' => 'distinct|regex:/^\D*$/|min:5|max:191',
             'participante_vetado' => 'nullable|array|size:0',
+            'participante_suspenso' => 'nullable|array|size:0',
         ];
 
         $agendar = [
@@ -122,6 +123,12 @@ class RepSalaReuniaoRequest extends FormRequest
                 $this->merge(['dia' => '']);
             if(!empty($vetados))
                 $this->merge(['participante_vetado' => $vetados]);
+            if(empty($vetados))
+            {
+                $suspensos = $this->service->suspensaoExcecao()->participantesSuspensos($this->participantes_cpf);
+                if(isset($suspensos) && !empty($suspensos))
+                    $this->merge(['participante_suspenso' => $suspensos]);
+            }
         }
     }
 
@@ -134,6 +141,9 @@ class RepSalaReuniaoRequest extends FormRequest
     {
         $participantesVetados = isset($this->participante_vetado) ? 
         '<br><strong>' . implode('<br>', $this->participante_vetado) . '</strong>' : '';
+
+        $participantesSuspensos = isset($this->participante_suspenso) ? 
+        '<br><strong>' . implode('<br>', $this->participante_suspenso) . '</strong>' : '';
 
         return [
             'required' => 'O campo é obrigatório',
@@ -156,6 +166,7 @@ class RepSalaReuniaoRequest extends FormRequest
             'justificativa.min' => 'A justificativa deve ter :min caracteres ou mais',
             'participantes_cpf.*.not_in' => 'Representante logado já é um participante. Não pode ser inserido novamente.',
             'participante_vetado.size' => 'Os seguintes participantes já estão agendados neste mesmo dia e período:' . $participantesVetados,
+            'participante_suspenso.size' => 'Os seguintes participantes estão suspensos para novos agendamentos:' . $participantesSuspensos,
         ];
     }
 }

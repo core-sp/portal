@@ -66,6 +66,6 @@ class RepresentanteService implements RepresentanteServiceInterface {
     public function getRepresentanteByCpfCnpj($cpfCnpj)
     {
         $cpfCnpj = apenasNumeros($cpfCnpj);
-        return Representante::where('cpf_cnpj', $cpfCnpj)->first();
+        return Representante::where('cpf_cnpj', $cpfCnpj)->where('ativo', 1)->first();
     }
 }

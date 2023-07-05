@@ -10,5 +10,9 @@ interface SuspensaoExcecaoSubServiceInterface {
 
     public function save($user, $dados, $id = null);
 
+    public function buscar($busca, $user);
+
     public function verificaSuspenso($cpf_cnpj);
+
+    public function participantesSuspensos($cpfs);
 }

@@ -7,12 +7,12 @@
     <h4 class="pt-0 pb-0">Agendamento de Sala</h4>
     <div class="linha-lg-mini mb-3"></div>
 
-    @if($errors->has('participante_vetado') || $errors->has('participantes_cpf') || $errors->has('participantes_cpf.*') || $errors->has('participantes_nome') || $errors->has('participantes_nome.*'))
+    @if($errors->has('participante_vetado') || $errors->has('participante_suspenso') || $errors->has('participantes_cpf') || $errors->has('participantes_cpf.*') || $errors->has('participantes_nome') || $errors->has('participantes_nome.*'))
     <div class="d-block w-100">
       <p class="alert alert-danger">
         <i class="fas fa-times"></i>&nbsp;&nbsp;
-        @if($errors->has('participante_vetado'))
-        {!! $errors->first('participante_vetado') !!}
+        @if($errors->has('participante_vetado') || $errors->has('participante_suspenso'))
+        {!! $errors->has('participante_vetado') ? $errors->first('participante_vetado') : $errors->first('participante_suspenso') !!}
         @elseif($errors->has('participantes_cpf.*') || $errors->has('participantes_nome.*'))
         {{ $errors->has('participantes_cpf.*') ? $errors->first('participantes_cpf.*') : $errors->first('participantes_nome.*') }}
         @else

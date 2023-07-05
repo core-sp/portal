@@ -67,13 +67,13 @@ class SuspensaoExcecaoController extends Controller
 
         try{
             $validated = $request->validated();
-            $this->service->getService('SalaReuniao')->suspensaoExcecao()->save(auth()->user(), $validated, $id);
+            $erro = $this->service->getService('SalaReuniao')->suspensaoExcecao()->save(auth()->user(), $validated, $id);
         } catch (\Exception $e) {
             \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
             abort(500, "Erro ao atualizar a suspensão.");
         }
 
-        return redirect(route('sala.reuniao.suspensao.lista'))->with([
+        return redirect(route('sala.reuniao.suspensao.lista'))->with(isset($erro['message']) ? $erro : [
             'message' => '<i class="icon fa fa-check"></i>Suspensão com a ID: '.$id.' foi editada com sucesso!',
             'class' => 'alert-success'
         ]);
@@ -109,5 +109,26 @@ class SuspensaoExcecaoController extends Controller
             'message' => '<i class="icon fa fa-check"></i>Suspensão cadastrada com sucesso!',
             'class' => 'alert-success'
         ]);
+    }
+
+    public function busca(Request $request)
+    {
+        // $this->authorize('viewAny', auth()->user());
+
+        try{
+            if(strlen($request->q) == 0)
+                return redirect(route('sala.reuniao.suspensao.lista'))->with([
+                    'message' => '<i class="icon fa fa-exclamation-circle"></i> Deve digitar na busca um caracter pelo menos.',
+                    'class' => 'alert-warning'
+                ]);
+            $busca = $request->q;
+            $dados = $this->service->getService('SalaReuniao')->suspensaoExcecao()->buscar($busca, auth()->user());
+            $dados['busca'] = $busca;
+        } catch (\Exception $e) {
+            \Log::error('[Erro: '.$e->getMessage().'], [Controller: ' . request()->route()->getAction()['controller'] . '], [Código: '.$e->getCode().'], [Arquivo: '.$e->getFile().'], [Linha: '.$e->getLine().']');
+            abort(500, "Erro ao buscar o texto em suspensões.");
+        }
+
+        return view('admin.crud.home', $dados);
     }
 }

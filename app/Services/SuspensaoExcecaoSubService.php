@@ -72,9 +72,9 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
     public function listar($user)
     {
         $suspensos = SuspensaoExcecao::with(['representante'])
-        ->where('data_final', '>=', now()->format('Y-m-d'))
-        ->orWhereNull('data_final')
+        ->orderBy('situacao')
         ->orderBy('data_final')
+        ->orderBy('data_final_excecao')
         ->paginate(15);
 
         // if($user->cannot('create', $user))
@@ -106,21 +106,26 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
     {
         $acao = isset($id) ? 'editou período' : 'criou';
         $situacao = 'suspensão';
-        $dados['justificativa'] = '[Funcionário(a) '.$user->nome.'] - ' . $dados['justificativa'] . ' Data da justificativa: ' . formataData(now());
 
         if(isset($id))
         {
             $suspenso = SuspensaoExcecao::findOrFail($id);
             $dados['idusuario'] = $user->idusuario;
-            $dados['justificativa'] = $suspenso->addJustificativa($dados['justificativa']);
 
             if(isset($dados['data_final']))
                 $dados['data_final'] = $dados['data_final'] == '00' ? null : $suspenso->addDiasDataFinal($dados['data_final']);
             else{
                 $situacao = 'exceção';
+                if(($suspenso->data_inicial_excecao == $dados['data_inicial_excecao']) && ($suspenso->data_final_excecao == $dados['data_final_excecao']))
+                    return [
+                        'message' => '<i class="fas fa-info-circle"></i> Não houve alterações nas datas de exceção. Registro não foi alterado.',
+                        'class' => 'alert-info'
+                    ];
                 $dados['situacao'] = $suspenso->getSituacaoUpdateExcecao($dados['data_inicial_excecao'], $dados['data_final_excecao']);
             }
 
+            $dados['justificativa'] = '[Funcionário(a) '.$user->nome.'] | [Ação - '.$situacao.'] - ' . $dados['justificativa'] . ' Data da justificativa: ' . formataData(now());
+            $dados['justificativa'] = $suspenso->addJustificativa($dados['justificativa']);
             $suspenso->update($dados);
         }else{
             $dados['justificativa'] = json_encode([$dados['justificativa']], JSON_FORCE_OBJECT);
@@ -130,8 +135,46 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
         event(new CrudEvent($situacao, $acao, $id));
     }
 
+    public function buscar($busca, $user)
+    {
+        $possuiNumeros = strlen(apenasLetras($busca)) == 0;
+
+        $resultados = SuspensaoExcecao::with('representante')
+        ->when($possuiNumeros, function ($query) use ($busca){
+            return $query->whereHas('representante', function($q) use($busca){
+                $q->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
+            })
+            ->orWhere('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%')
+            ->orWhere('id', apenasNumeros($busca));
+        }, function ($query) use($busca) {
+            return $query->where('situacao', $busca);
+        })
+        ->paginate(10);
+
+        $this->variaveis['slug'] = $this->variaveis['busca'];
+
+        return [
+            'resultados' => $resultados,
+            'tabela' => $this->tabelaCompleta($resultados, $user), 
+            'variaveis' => (object) $this->variaveis
+        ];
+    }
+
     public function verificaSuspenso($cpf_cnpj)
     {
         return SuspensaoExcecao::existeSuspensao(apenasNumeros($cpf_cnpj));
+    }
+
+    public function participantesSuspensos($cpfs)
+    {
+        if(!is_array($cpfs) || empty($cpfs))
+            return null;
+
+        $suspensos = SuspensaoExcecao::participantesSuspensos($cpfs);
+
+        if(!empty($suspensos))
+            foreach($suspensos as $chave => $val)
+                $suspensos[$chave] = formataCpfCnpj($val);
+        return $suspensos;
     }
 }

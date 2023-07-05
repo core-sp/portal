@@ -11,17 +11,59 @@ use Carbon\Carbon;
 
 class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
-    public function verificaPodeAgendar($user, $service, $mes = null, $ano = null)
+    public function verificaSuspensao($user, $service, $acao = '')
     {
         $suspenso = $service->getService('SalaReuniao')->suspensaoExcecao()->verificaSuspenso($user->cpf_cnpj);
+        $retornoSuspensao = null;
+        $retornoExcecao = null;
+
         if(isset($suspenso))
         {
-            if(!$suspenso->updateRelacaoByIdRep($user->id)->isLiberadoHoje())
-                return [
-                    'message' => '<i class="fas fa-times"></i>&nbsp;&nbsp;Está suspenso pelo período de ' . $suspenso->mostraPeriodo(),
+            $liberado = $suspenso->updateRelacaoByIdRep($user->id)->isLiberadoHoje();
+            if(!$liberado)
+            {
+                $justificativa = $suspenso->getJustificativasDesc($suspenso->getJustificativasByAcao('suspensão'))[0];
+                $texto = '<i class="fas fa-ban"></i>&nbsp;&nbsp;Está suspenso pelo período de <b>' . $suspenso->mostraPeriodo().'</b>';
+                $texto .= '<br><br>Durante a suspensão não pode criar novos agendamentos e nem participar de novas reuniões.';
+                $texto .= '<br>Os agendamentos e participações já criados não são afetados.';
+                $texto .= '<br><b>Última justificativa de suspensão:</b> '.$suspenso->removeNomeAcaoJustificativa($justificativa, 'suspensão');
+                $retornoSuspensao = [
+                    'message' => $texto,
                     'class' => 'alert-danger'
                 ];
+            }
+
+            if($liberado)
+            {
+                $texto = '<i class="fas fa-exclamation-circle"></i>&nbsp;&nbsp;Está liberado temporariamente pelo período de ';
+                $retornoExcecao = [
+                    'message' => $texto . '<b>'.$suspenso->mostraPeriodoExcecao().'</b> para criar novos agendamentos e participar de novas reuniões.',
+                    'class' => 'alert-info'
+                ];
+            }
+                
+            switch ($acao) {
+                case 'suspensão':
+                    return $retornoSuspensao;
+                    break;
+                case 'exceção':
+                    return $retornoExcecao;
+                    break;
+                default:
+                    if(isset($retornoSuspensao['message']))
+                        return $retornoSuspensao;
+                    if(isset($retornoExcecao['message']))
+                        return $retornoExcecao;
+                    break;
+            }
         }
+    }
+
+    public function verificaPodeAgendar($user, $service, $mes = null, $ano = null)
+    {
+        $situacao = $this->verificaSuspensao($user, $service, 'suspensão');
+        if(isset($situacao['message']))
+            return $situacao;
 
         if(!$user->podeAgendar($mes, $ano))
             return [

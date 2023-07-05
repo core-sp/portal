@@ -4,6 +4,8 @@ namespace App\Contracts;
 
 interface SalaReuniaoSiteSubServiceInterface {
 
+    public function verificaSuspensao($user, $service, $acao = '');
+
     public function verificaPodeAgendar($user, $service, $mes = null, $ano = null);
     
     public function save($dados, $user, $service);

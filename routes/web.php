@@ -270,6 +270,7 @@ Route::middleware(['block_ip'])->group(function () {
         Route::put('/editar/{id}/{situacao}', 'SuspensaoExcecaoController@update')->where('situacao', 'suspensao|excecao')->name('sala.reuniao.suspensao.update');
         Route::get('/criar', 'SuspensaoExcecaoController@create')->name('sala.reuniao.suspensao.criar');
         Route::post('/criar', 'SuspensaoExcecaoController@store')->name('sala.reuniao.suspensao.store');
+        Route::get('/busca', 'SuspensaoExcecaoController@busca')->name('sala.reuniao.suspensao.busca');
       });
     });
 

@@ -44,6 +44,29 @@ class SuspensaoExcecao extends Model
         ->first();
     }
 
+    public static function participantesSuspensos($cpfs)
+    {
+        $final_suspensos = array();
+        foreach($cpfs as $chave => $cpf)
+            $cpfs[$chave] = apenasNumeros($cpf);
+
+    	$suspensos = self::with('representante')
+        ->whereIn('cpf_cnpj', $cpfs)
+        ->orWhereHas('representante', function($query) use($cpfs) {
+            $query->whereIn('cpf_cnpj', $cpfs);
+        })
+        ->get();
+
+        foreach($suspensos as $key => $value)
+        {
+            if(!$value->isLiberadoHoje())
+                isset($value->representante) ? array_push($final_suspensos, apenasNumeros($value->representante->cpf_cnpj)) : 
+                array_push($final_suspensos, $value->cpf_cnpj);
+        }
+
+        return $final_suspensos;
+    }
+
     public function getTotalDiasExcecao()
     {
     	return self::TOTAL_DIAS_EXCECAO;
@@ -119,9 +142,9 @@ class SuspensaoExcecao extends Model
         return isset($this->justificativa) ? json_decode($this->justificativa, true) : array();
     }
 
-    public function getJustificativasDesc()
+    public function getJustificativasDesc($justificativas = null)
     {
-        return array_reverse($this->getJustificativas());
+        return isset($justificativas) ? array_reverse($justificativas) : array_reverse($this->getJustificativas());
     }
 
     public function addJustificativa($texto)
@@ -145,11 +168,35 @@ class SuspensaoExcecao extends Model
         return array_unique($protocolos);
     }
 
+    public function getJustificativasByAcao($acao)
+    {
+        if(!in_array($acao, ['suspensão', 'exceção']))
+            return null;
+
+        $justificadas = array();
+        $justificativas = $this->getJustificativas();
+        foreach($justificativas as $justificativa)
+            strpos($justificativa, '[Ação - '.$acao.']') !== false ? array_push($justificadas, $justificativa) : null;
+
+        return $justificadas;
+    }
+
+    public function removeNomeAcaoJustificativa($justificativa, $acao)
+    {
+        if(!in_array($acao, ['suspensão', 'exceção']))
+            return null;
+
+        $comprimento = $acao == 'suspensão' ? 25 : 23;
+        $comprimento = strpos($justificativa, '|') + $comprimento;
+
+        return substr_replace($justificativa, '', 0, $comprimento);
+    }
+
     public function addDiasDataFinal($dias)
     {
         if(isset($this->data_final))
             return Carbon::parse($this->data_final)->addDays($dias)->format('Y-m-d');
-        return Carbon::parse($this->data_inicial)->addDays($dias)->format('Y-m-d');
+        return now()->addDays($dias)->format('Y-m-d');
     }
 
     public function getDataFinal()

@@ -204,10 +204,10 @@ class AgendamentoSala extends Model
 
         if(isset($user))
         {
-            $texto = '[Funcionário(a) '.$user->nome.'] - Após análise da justificativa enviada pelo representante, o agendamento com o protocolo '. $this->protocolo;
+            $texto = '[Funcionário(a) '.$user->nome.'] | [Ação - suspensão] - Após análise da justificativa enviada pelo representante, o agendamento com o protocolo '. $this->protocolo;
             $texto .= ' teve o status atualizado para ' . self::STATUS_NAO_COMPARECEU . ' devido a recusa. A justificativa do funcionário está no agendamento. Então, o CPF / CNPJ ';
         }else{
-            $texto = '[Rotina do Portal] - Após verificação dos agendamentos, o agendamento com o protocolo '. $this->protocolo;
+            $texto = '[Rotina do Portal] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $this->protocolo;
             $texto .= ' teve o status atualizado para ' . self::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ ';
         }
 
