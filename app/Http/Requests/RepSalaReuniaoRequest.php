@@ -92,7 +92,7 @@ class RepSalaReuniaoRequest extends FormRequest
 
         if($this->acao == 'editar'){
             $temp = $user->agendamentosSalas()->findOrFail($this->id);
-            $this->total_cpfs = $temp->sala->getParticipantesAgendar('reuniao');
+            $this->total_cpfs = $temp->sala->isAtivo('reuniao') ? $temp->sala->getParticipantesAgendar('reuniao') : count($temp->getParticipantes());
             $this->merge([
                 'tipo_sala' => $temp->tipo_sala,
                 'dia' => Carbon::parse($temp->dia)->format('d/m/Y'),

@@ -35,9 +35,9 @@ class SalaReuniaoSiteSubService implements SalaReuniaoSiteSubServiceInterface {
 
             if($liberado)
             {
-                $texto = '<i class="fas fa-exclamation-circle"></i>&nbsp;&nbsp;Está liberado temporariamente pelo período de ';
+                $texto = '<i class="fas fa-exclamation-circle"></i>&nbsp;&nbsp;Está liberado temporariamente pelo período de <b>'.$suspenso->mostraPeriodoExcecao().'</b>';
                 $retornoExcecao = [
-                    'message' => $texto . '<b>'.$suspenso->mostraPeriodoExcecao().'</b> para criar novos agendamentos e participar de novas reuniões.',
+                    'message' => $texto . ' o acesso para criar novos agendamentos e participar de novas reuniões, independentemente do dia do agendamento.',
                     'class' => 'alert-info'
                 ];
             }

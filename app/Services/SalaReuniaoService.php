@@ -82,7 +82,9 @@ class SalaReuniaoService implements SalaReuniaoServiceInterface {
 
     public function listar()
     {
-        $salas = SalaReuniao::with('regional')->get();
+        $salas = SalaReuniao::with('regional')
+        ->get()
+        ->sortBy('regional.regional');
 
         return [
             'tabela' => $this->tabelaCompleta($salas),

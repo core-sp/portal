@@ -360,10 +360,10 @@ class AgendamentoSalaTest extends TestCase
             'justificativa_admin' => 'fgfgffgffgfffggfgfg'
         ]);
 
-        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $log = explode(PHP_EOL, tailCustom(storage_path($this->pathLogInterno()), 2));
         $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
         $txt = $inicio . $user->nome . ' (usuário '.$user->idusuario.') atualizou status para '. AgendamentoSala::STATUS_NAO_COMPARECEU .' *agendamento da sala de reunião* (id: 1)';
-        $this->assertStringContainsString($txt, $log);
+        $this->assertStringContainsString($txt, $log[0]);
     }
 
     /** @test */
@@ -869,13 +869,27 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
-    public function view_button_agendar_sala()
+    public function cannot_view_button_agendar_sala_without_salas()
     {
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
 
         $this->get(route('representante.agendar.inserir.view'))
         ->assertOk()
+        ->assertSee('<p><i class="fas fa-info-circle text-primary"></i> <b><em>No momento não há salas disponíveis para novos agendamentos.</em></b></p>')
+        ->assertDontSee('<a href="'. route('representante.agendar.inserir.view', 'agendar') .'" class="btn btn-primary link-nostyle branco">Agendar sala</a>');
+    }
+
+    /** @test */
+    public function view_button_agendar_sala_with_salas()
+    {
+        factory('App\SalaReuniao')->create();
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertOk()
+        ->assertDontSee('<p><i class="fas fa-info-circle text-primary"></i> <b><em>No momento não há salas disponíveis para novos agendamentos.</em></b></p>')
         ->assertSee('<a href="'. route('representante.agendar.inserir.view', 'agendar') .'" class="btn btn-primary link-nostyle branco">Agendar sala</a>');
     }
 
@@ -933,7 +947,7 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
-    public function cannot_get_salas_enabled()
+    public function non_authenticated_cannot_get_salas_enabled()
     {
         $salas = factory('App\SalaReuniao', 3)->create();
         $ids = $salas->sortBy('regional.regional')->pluck('id')->all();
@@ -960,7 +974,7 @@ class AgendamentoSalaTest extends TestCase
     }
 
     /** @test */
-    public function cannot_get_total_and_itens_without_authentication()
+    public function non_authenticated_cannot_get_total_and_itens()
     {
         $agenda = factory('App\AgendamentoSala')->create();
 
@@ -1773,7 +1787,7 @@ class AgendamentoSalaTest extends TestCase
         ->assertSee('Sala: <strong>'.$agenda->getTipoSala().'</strong>')
         ->assertSee('&nbsp;&nbsp;|&nbsp;&nbsp;Dia: <strong>'.onlyDate($agenda->dia).'</strong>')
         ->assertSee('&nbsp;&nbsp;|&nbsp;&nbsp;Período: <strong>'.$agenda->getPeriodo().'</strong>')
-        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]).'" class="btn btn-danger btn-sm link-nostyle">Cancelar</a>');
+        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]).'" class="btn btn-danger btn-sm link-nostyle mt-2">Cancelar</a>');
     }
 
     /** @test */
@@ -1795,7 +1809,7 @@ class AgendamentoSalaTest extends TestCase
         ->assertSee('<p class="pb-0 branco"><i class="fas fa-users text-dark"></i> Participantes: ')
         ->assertSee('CPF: <strong>'.formataCpfCnpj($cpfs[0]) . '</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Nome: <strong>' .$nomes[0].'</strong>')
         ->assertSee('CPF: <strong>'.formataCpfCnpj($cpfs[1]) . '</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Nome: <strong>' .$nomes[1].'</strong>')
-        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]).'" class="btn btn-secondary btn-sm link-nostyle">Editar Participantes</a>');
+        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]).'" class="btn btn-secondary btn-sm link-nostyle mt-2">Editar Participantes</a>');
     }
 
     /** @test */
@@ -1968,7 +1982,7 @@ class AgendamentoSalaTest extends TestCase
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
 
         $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]).'" class="btn btn-danger btn-sm link-nostyle">Cancelar</a>');
+        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]).'" class="btn btn-danger btn-sm link-nostyle mt-2">Cancelar</a>');
 
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]))
         ->assertOk()
@@ -2049,7 +2063,7 @@ class AgendamentoSalaTest extends TestCase
         ]);
 
         $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]).'" class="btn btn-sm btn-dark link-nostyle">Justificar</a>');
+        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]).'" class="btn btn-sm btn-dark link-nostyle mt-2">Justificar</a>');
 
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]))
         ->assertOk()
@@ -2108,7 +2122,7 @@ class AgendamentoSalaTest extends TestCase
         ]);
 
         $this->get(route('representante.agendar.inserir.view'))
-        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]).'" class="btn btn-sm btn-dark link-nostyle">Justificar</a>');
+        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]).'" class="btn btn-sm btn-dark link-nostyle mt-2">Justificar</a>');
 
         $this->get(route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]))
         ->assertOk()
@@ -2267,7 +2281,193 @@ class AgendamentoSalaTest extends TestCase
         ->assertSee('<i class="fas fa-times"></i>&nbsp;&nbsp;Não é possível justificar o agendamento.');
     }
 
-    // Testes da rota via ajax que verifica dias e períodos ******************************************************
+    /** @test */
+    public function cannot_create_agendamento_without_sala_enabled()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->raw([
+            'sala_reuniao_id' => null
+        ]);
+        $agenda['dia'] = Carbon::parse($agenda['dia'])->format('d/m/Y');
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<p><i class="fas fa-info-circle text-primary"></i> <b><em>No momento não há salas disponíveis para novos agendamentos.</em></b></p>');
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'agendar']))
+        ->assertRedirect(route('representante.agendar.inserir.view'));
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-info-circle"></i> No momento não há salas disponíveis para novos agendamentos.');
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), $agenda)
+        ->assertSessionHasErrors([
+            'sala_reuniao_id'
+        ]);
+    }
+
+    /** @test */
+    public function can_to_edit_participantes_reuniao_without_sala_enabled()
+    {
+        Mail::fake();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $agenda->sala->update([
+            'participantes_reuniao' => 0,
+            'participantes_coworking' => 0
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<p><i class="fas fa-info-circle text-primary"></i> <b><em>No momento não há salas disponíveis para novos agendamentos.</em></b></p>');
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSeeText('Editar');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'editar',
+            'id' => $agenda->id
+        ]), [
+            'participantes_cpf' => ['56983238010'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
+        ])->assertStatus(302);
+
+        Mail::assertQueued(AgendamentoSalaMail::class);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Participantes foram alterados com sucesso! Foi enviado um e-mail com os detalhes.');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'reuniao',
+            'idrepresentante' => 1,
+            'participantes' => json_encode([
+                '56983238010' => 'NOME PARTICIPANTE UM'
+            ], JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function cannot_add_participante_when_to_edit_participantes_reuniao_without_sala_enabled()
+    {
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $agenda->sala->update([
+            'participantes_reuniao' => 0,
+            'participantes_coworking' => 0
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<p><i class="fas fa-info-circle text-primary"></i> <b><em>No momento não há salas disponíveis para novos agendamentos.</em></b></p>');
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSeeText('Editar');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'editar',
+            'id' => $agenda->id
+        ]), [
+            'participantes_cpf' => ['56983238010', '81921923008'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-info-circle"></i>&nbsp;&nbsp;Não houve alterações nos participantes.');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'editar',
+            'id' => $agenda->id
+        ]), [
+            'participantes_cpf' => ['81921923008', '56983238010'],
+            'participantes_nome' => ['NOME PARTICIPANTE DOIS', 'NOME PARTICIPANTE UM'],
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Participantes foram alterados com sucesso! Foi enviado um e-mail com os detalhes.');
+    }
+
+    /** @test */
+    public function can_to_cancel_without_sala_enabled()
+    {        
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->create();
+
+        $agenda->sala->update([
+            'participantes_reuniao' => 0,
+            'participantes_coworking' => 0
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<p><i class="fas fa-info-circle text-primary"></i> <b><em>No momento não há salas disponíveis para novos agendamentos.</em></b></p>');
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSee('<button type="submit" class="btn btn-danger">');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'cancelar',
+            'id' => $agenda->id
+        ]))->assertStatus(302);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento cancelado com sucesso!');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'status' => 'Cancelado'
+        ]);
+    }
+
+    /** @test */
+    public function can_to_justify_without_sala_enabled()
+    {
+        Mail::fake();
+
+        $representante = factory('App\Representante')->create();
+        $this->actingAs($representante, 'representante');
+        $agenda = factory('App\AgendamentoSala')->create([
+            'dia' => now()->subDays(1)->format('Y-m-d')
+        ]);
+        $agenda->sala->update([
+            'participantes_reuniao' => 0,
+            'participantes_coworking' => 0
+        ]);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<p><i class="fas fa-info-circle text-primary"></i> <b><em>No momento não há salas disponíveis para novos agendamentos.</em></b></p>');
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSeeText('Justificar');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'justificar', 'id' => $agenda->id
+        ]), [
+            'justificativa' => 'dfdfdfdfdfdfdfdfdfdfdfdfdf',
+            'anexo_sala' => '',
+        ])
+        ->assertStatus(302);
+
+        Mail::assertQueued(AgendamentoSalaMail::class);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento justificado com sucesso! Está em análise do atendente. Foi enviado um e-mail com a sua justificativa.');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'status' => 'Justificativa Enviada'
+        ]);
+    }
+
+    /** 
+     * =======================================================================================================
+     * Testes da rota via ajax que verifica dias e períodos comm e sem bloqueios
+     * =======================================================================================================
+     */
 
     /** @test */
     public function get_full_days()

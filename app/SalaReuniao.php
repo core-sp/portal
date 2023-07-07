@@ -204,7 +204,7 @@ class SalaReuniao extends Model
                 $temp = str_replace('_', '', $val);
                 $temp_k = array_search($temp, $all, true);
                 if($temp_k !== false)
-                    $all[$temp_k] = self::itensHTML()[$key] . $final[$temp_k];
+                    $all[$temp_k] = '<span class="text-nowrap">'.self::itensHTML()[$key] . $final[$temp_k].'</span>';
             }
         }elseif($tipo == 'coworking'){
             if(strlen($this->itens_coworking) < 5)
@@ -217,7 +217,7 @@ class SalaReuniao extends Model
                 $temp = str_replace('_', '', $val);
                 $temp_k = array_search($temp, $all, true);
                 if($temp_k !== false)
-                    $all[$temp_k] = self::itensHTML()[$key] . $final[$temp_k];
+                    $all[$temp_k] = '<span class="text-nowrap">'.self::itensHTML()[$key] . $final[$temp_k].'</span>';
             }
         }
         

@@ -17,10 +17,16 @@
         <h4 class="pt-1 pb-1">Agendamentos de Salas</h4>
         <div class="linha-lg-mini mb-2"></div>
         <p>Serviço de reserva de sala, tanto na sede quanto nas seccionais, para reunião e/ou coworking quando disponível, através do agendamento.</p>
+
+        @if($total > 0)
         <div class="d-block mt-2">
             <a href="{{ route('representante.agendar.inserir.view', 'agendar') }}" class="btn btn-primary link-nostyle branco">Agendar sala</a>
         </div>
+        @else
+        <p><i class="fas fa-info-circle text-primary"></i> <b><em>No momento não há salas disponíveis para novos agendamentos.</em></b></p>
+        @endif
 
+        @if($salas->isNotEmpty() || $participando->isNotEmpty())
         <ul class="nav nav-tabs mt-3">
             @if($salas->isNotEmpty())
             <li class="nav-item">
@@ -33,10 +39,11 @@
             </li>
             @endif
         </ul>
+        @endif
 
         <div class="tab-content">
+            @if($salas->isNotEmpty())
             <div class="tab-pane container active" id="agendamento">
-                @if($salas->isNotEmpty())
                 <div class="list-group w-100 mt-2">
                     @foreach ($salas as $item)
                     <div class="list-group-item light d-block bg-info">
@@ -57,14 +64,14 @@
                         </p>
                         @endif
                         @if($item->podeEditarParticipantes())
-                        <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $item->id]) }}" class="btn btn-secondary btn-sm link-nostyle">Editar Participantes</a>
+                        <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $item->id]) }}" class="btn btn-secondary btn-sm link-nostyle mt-2">Editar Participantes</a>
                         @endif
                         @if($item->podeCancelar())
-                        <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $item->id]) }}" class="btn btn-danger btn-sm link-nostyle">Cancelar</a>
+                        <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $item->id]) }}" class="btn btn-danger btn-sm link-nostyle mt-2">Cancelar</a>
                         @endif
                         @if($item->podeJustificar())
                         <p class="pb-0 branco">
-                            <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $item->id]) }}" class="btn btn-sm btn-dark link-nostyle">Justificar</a>
+                            <a href="{{ route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $item->id]) }}" class="btn btn-sm btn-dark link-nostyle mt-2">Justificar</a>
                             &nbsp;&nbsp;<i class="fas fa-exclamation-triangle text-warning"></i>&nbsp;&nbsp;Caso não tenha comparecido, deve justificar até {{ $item->getDataLimiteJustificar() }}
                         </p>
                         @endif
@@ -78,8 +85,8 @@
                     @endif
                     </div>
                 </div>
-                @endif
             </div>
+            @endif
 
             @if((auth()->guard('representante')->user()->tipoPessoa() != 'PJ') && ($participando->isNotEmpty()))
             <div class="tab-pane container fade" id="participando">

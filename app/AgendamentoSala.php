@@ -100,10 +100,10 @@ class AgendamentoSala extends Model
 
     public function getParticipantesComTotal()
     {
-        $total = $this->sala->participantes_reuniao - 1;
         $final = $this->getParticipantes();
+        $total = $this->sala->participantes_reuniao == 0 ? count($final) : $this->sala->participantes_reuniao - 1;
         $atual = $total - count($final);
-        if(($this->isReuniao()) && (count($final) < $this->sala->participantes_reuniao))
+        if((($this->isReuniao()) && (count($final) < $this->sala->participantes_reuniao)) || !$this->sala->isAtivo('reuniao'))
             for($i = 1; $i <= $atual; $i++)    
                 $final[$i] = '';
         return $final;
@@ -205,7 +205,8 @@ class AgendamentoSala extends Model
         if(isset($user))
         {
             $texto = '[Funcionário(a) '.$user->nome.'] | [Ação - suspensão] - Após análise da justificativa enviada pelo representante, o agendamento com o protocolo '. $this->protocolo;
-            $texto .= ' teve o status atualizado para ' . self::STATUS_NAO_COMPARECEU . ' devido a recusa. A justificativa do funcionário está no agendamento. Então, o CPF / CNPJ ';
+            $texto .= ' teve o status atualizado para ' . self::STATUS_NAO_COMPARECEU . ' devido a recusa.';
+            $texto .= ' A justificativa do funcionário foi enviada por e-mail para o representante e está no agendamento. Então, o CPF / CNPJ ';
         }else{
             $texto = '[Rotina do Portal] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $this->protocolo;
             $texto .= ' teve o status atualizado para ' . self::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ ';

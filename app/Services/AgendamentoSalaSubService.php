@@ -262,26 +262,29 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
     public function buscar($user, $busca)
     {
         $regional = $user->can('atendenteOrGerSeccionais', $user) ? $user->idregional : null;
+        $possuiNumeros = strlen(apenasLetras($busca)) == 0;
 
         $resultados = AgendamentoSala::with(['user', 'representante', 'sala'])
-            ->when($regional, function ($query) use ($regional, $busca) {
+            ->when($regional, function ($query) use ($regional, $busca, $possuiNumeros) {
                 return $query->where('sala_reuniao_id', $regional)
-                ->where(function($q) use ($busca) {
-                    $q->where('protocolo', 'LIKE', 'RC-AGE-'. str_replace('RC-AGE-', '', $busca).'%')
-                    ->orWhere('id', apenasNumeros($busca))
-                    ->when(apenasNumeros($busca) != '', function ($q1) use ($busca) {
-                        $q1->orWhereHas('representante', function ($q2) use ($busca){
+                ->where(function($q) use ($busca, $possuiNumeros) {
+                    $q->when($possuiNumeros, function ($q1) use ($busca) {
+                        $q1->whereHas('representante', function ($q2) use ($busca){
                             $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
-                        });
+                        })
+                        ->orWhere('id', apenasNumeros($busca));
+                    }, function ($q1) use($busca) {
+                        $q1->where('protocolo', 'LIKE', 'RC-AGE-'. str_replace('RC-AGE-', '', $busca).'%');
                     });
                 });
-            }, function ($query) use ($busca) {
-                return $query->where('protocolo', 'LIKE', 'RC-AGE-'. str_replace('RC-AGE-', '', $busca).'%')
-                ->orWhere('id', apenasNumeros($busca))
-                ->when(apenasNumeros($busca) != '', function ($q) use ($busca) {
-                    $q->orWhereHas('representante', function ($q1) use ($busca){
-                        $q1->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
-                    });
+            }, function ($query) use ($busca, $possuiNumeros) {
+                return $query->when($possuiNumeros, function ($q1) use ($busca) {
+                    $q1->whereHas('representante', function ($q2) use ($busca){
+                        $q2->where('cpf_cnpj', 'LIKE', '%'.apenasNumeros($busca).'%');
+                    })
+                    ->orWhere('id', apenasNumeros($busca));
+                }, function ($q1) use($busca) {
+                    $q1->where('protocolo', 'LIKE', 'RC-AGE-'. str_replace('RC-AGE-', '', $busca).'%');
                 });
             })
             ->paginate(25);

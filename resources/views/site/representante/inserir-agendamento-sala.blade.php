@@ -89,7 +89,7 @@
         <div class="col-sm mb-2-576">
           <label for="datepicker">Dia <span class="text-danger">*</span> 
             <span>
-              ( <i class="fa fa-square" style="color:red"></i> = sem período disponível, <i class="far fa-square"></i> = seu agendamento )
+              ( <i class="fa fa-square" style="color:red;"></i> = sem período disponível, <i class="far fa-square"></i> = seu agendamento )
             </span>
           </label>
           <div class="input-group">

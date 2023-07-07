@@ -4,6 +4,7 @@
         @method('PUT')
     @endif
     <div class="card-body">
+        <p><i class="fas fa-info-circle text-primary"></i> <em>Somente pode bloquear salas ativas, com participantes maior que zero.</em></p>
         <div class="form-row">
             <div class="col-3">
                 <label for="salaBloqueio">Sala de Reunião</label>
@@ -48,7 +49,7 @@
                 @endif
             </div>
             <div class="col-3">
-                <label for="dataFinalBloqueio">Data final</label>
+                <label for="dataFinalBloqueio">Data final <small><em>(para <b>Tempo Indeterminado</b>, deixe vazio)</em></small></label>
                 <input 
                     type="date" 
                     name="dataFinal" 

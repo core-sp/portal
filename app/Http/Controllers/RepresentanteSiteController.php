@@ -575,8 +575,12 @@ class RepresentanteSiteController extends Controller
                             'class' => 'alert-warning'
                         ]);
                     $erro = $this->service->getService('SalaReuniao')->site()->verificaPodeAgendar($user, $this->service);
-                    if(!isset($erro))
-                        $dados['salas'] = $this->service->getService('SalaReuniao')->salasAtivas();
+                    $dados['salas'] = !isset($erro) ? $this->service->getService('SalaReuniao')->salasAtivas() : collect();
+                    if($dados['salas']->count() == 0)
+                        $erro = isset($erro) ? $erro : [
+                            'message' => '<i class="fas fa-info-circle"></i> No momento não há salas disponíveis para novos agendamentos.',
+                            'class' => 'alert-info'
+                        ];
                     break;
                 case 'editar':
                     $dados = $this->service->getService('SalaReuniao')->site()->verificaPodeEditar($id, $user);
@@ -595,6 +599,7 @@ class RepresentanteSiteController extends Controller
                     $dados['participando'] = $this->service->getService('SalaReuniao')->site()->getAgendadosParticipante($user);
                     $view = 'agendamento-sala';
                     $dados['situacao'] = $this->service->getService('SalaReuniao')->site()->verificaSuspensao($user, $this->service);
+                    $dados['total'] = $this->service->getService('SalaReuniao')->salasAtivas()->count();
                     break;
             }
             $dados['acao'] = isset($acao) ? $acao : '';

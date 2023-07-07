@@ -64,7 +64,9 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
             'table',
             'table-hover'
         ];
-        $tabela = montaTabela($headers, $contents, $classes);
+
+        $legenda = '<p><i class="fas fa-info-circle text-primary"></i> O <b>período de exceção</b> é para liberar o acesso a criar novos agendamentos e participar de novas reuniões, independentemente do dia do agendamento.</p>';
+        $tabela = $legenda . montaTabela($headers, $contents, $classes);
         
         return $tabela;
     }
@@ -128,6 +130,7 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
             $dados['justificativa'] = $suspenso->addJustificativa($dados['justificativa']);
             $suspenso->update($dados);
         }else{
+            $dados['justificativa'] = '[Funcionário(a) '.$user->nome.'] | [Ação - '.$situacao.'] - ' . $dados['justificativa'] . ' Data da justificativa: ' . formataData(now());
             $dados['justificativa'] = json_encode([$dados['justificativa']], JSON_FORCE_OBJECT);
             $id = $user->suspensoes()->create($dados)->id;
         }

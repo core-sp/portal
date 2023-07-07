@@ -166,9 +166,60 @@ class SalaReuniaoTest extends TestCase
     }
 
     /** @test */
+    public function sala_can_be_edited_without_horarios_reuniao_manha_when_horarios_reuniao_tarde_full_and_participantes_reuniao_not_0()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->create();
+        $horarios_c = $sala->getHorariosManha('coworking');
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['manha_horarios_reuniao'] = [];
+        $dados['tarde_horarios_reuniao'] = ['14:00'];
+        $dados['manha_horarios_coworking'] = $horarios_c;
+        $dados['tarde_horarios_coworking'] = ['14:00', '15:00', '16:00'];
+        $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = $sala->getItens('coworking');
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
+        ->assertRedirect(route('sala.reuniao.index'));
+
+        $this->assertDatabaseHas('salas_reunioes', [
+            'horarios_reuniao' => json_encode(['manha' => array(), 'tarde' => ['14:00']], JSON_FORCE_OBJECT),
+        ]);
+    }
+
+    /** @test */
+    public function sala_can_be_edited_without_horarios_reuniao_tarde_when_horarios_reuniao_manha_full_and_participantes_reuniao_not_0()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->create();
+        $horarios_c = $sala->getHorariosManha('coworking');
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['manha_horarios_reuniao'] = ['10:00'];
+        $dados['tarde_horarios_reuniao'] = [];
+        $dados['manha_horarios_coworking'] = $horarios_c;
+        $dados['tarde_horarios_coworking'] = ['14:00', '15:00', '16:00'];
+        $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = $sala->getItens('coworking');
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
+        ->assertRedirect(route('sala.reuniao.index'));
+
+        $this->assertDatabaseHas('salas_reunioes', [
+            'horarios_reuniao' => json_encode(['manha' => ['10:00'], 'tarde' => array()], JSON_FORCE_OBJECT),
+        ]);
+    }
+
+    /** @test */
     public function sala_can_be_edited_without_itens_reuniao_when_participantes_reuniao_0()
     {
-        $this->withoutExceptionHandling();
         $this->signInAsAdmin();
         $sala = factory('App\SalaReuniao')->create();
         $horarios_c = $sala->getHorariosManha('coworking');
@@ -181,6 +232,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = $horarios_c;
         $dados['tarde_horarios_coworking'] = ['14:00', '15:00', '16:00'];
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertRedirect(route('sala.reuniao.index'));
@@ -219,6 +271,58 @@ class SalaReuniaoTest extends TestCase
     }
 
     /** @test */
+    public function sala_can_be_edited_without_horarios_coworking_manha_when_horarios_coworking_tarde_full_and_participantes_coworking_not_0()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->create();
+        $horarios_r = $sala->getHorariosManha('reuniao');
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['manha_horarios_reuniao'] = $horarios_r;
+        $dados['tarde_horarios_reuniao'] = ['14:00', '15:00', '16:00'];
+        $dados['manha_horarios_coworking'] = [];
+        $dados['tarde_horarios_coworking'] = ['14:00'];
+        $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = $sala->getItens('coworking');
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
+        ->assertRedirect(route('sala.reuniao.index'));
+
+        $this->assertDatabaseHas('salas_reunioes', [
+            'horarios_coworking' => json_encode(['manha' => array(), 'tarde' => ['14:00']], JSON_FORCE_OBJECT),
+        ]);
+    }
+
+    /** @test */
+    public function sala_can_be_edited_without_horarios_coworking_tarde_when_horarios_coworking_manha_full_and_participantes_coworking_not_0()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->create();
+        $horarios_r = $sala->getHorariosManha('reuniao');
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['manha_horarios_reuniao'] = $horarios_r;
+        $dados['tarde_horarios_reuniao'] = ['14:00', '15:00', '16:00'];
+        $dados['manha_horarios_coworking'] = ['10:00'];
+        $dados['tarde_horarios_coworking'] = [];
+        $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = $sala->getItens('coworking');
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
+        ->assertRedirect(route('sala.reuniao.index'));
+
+        $this->assertDatabaseHas('salas_reunioes', [
+            'horarios_coworking' => json_encode(['manha' => ['10:00'], 'tarde' => array()], JSON_FORCE_OBJECT),
+        ]);
+    }
+
+    /** @test */
     public function sala_can_be_edited_without_itens_coworking_when_participantes_coworking_0()
     {
         $this->signInAsAdmin();
@@ -233,6 +337,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = $horarios_r;
         $dados['tarde_horarios_reuniao'] = ['14:00', '15:00', '16:00'];
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertRedirect(route('sala.reuniao.index'));
@@ -241,6 +346,29 @@ class SalaReuniaoTest extends TestCase
             'participantes_coworking' => 0,
             'horarios_coworking' => json_encode(['manha' => array(), 'tarde' => array()], JSON_FORCE_OBJECT),
             'itens_coworking' => json_encode(array(), JSON_FORCE_OBJECT),
+        ]);
+    }
+
+    /** @test */
+    public function sala_can_be_edited_with_itens_with_underline_when_participantes_reuniao_0()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->states('desativa_coworking')->create();
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['participantes_reuniao'] = 0;
+        $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
+        $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
+        $dados['itens_reuniao'] = ['Água', 'Café', 'TV _ polegadas com entrada HDMI'];
+        $dados['itens_coworking'] = [];
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados);
+
+        $this->assertDatabaseHas('salas_reunioes', [
+            'itens_reuniao' => json_encode(array(), JSON_FORCE_OBJECT),
         ]);
     }
 
@@ -308,7 +436,7 @@ class SalaReuniaoTest extends TestCase
     }
 
     /** @test */
-    public function sala_cannot_be_edited_without_periodo_manha_when_participantes_reuniao_greater_than_0()
+    public function sala_cannot_be_edited_without_periodo_manha_and_without_periodo_tarde_when_participantes_reuniao_greater_than_0()
     {
         $this->signInAsAdmin();
         $sala = factory('App\SalaReuniao')->states('desativa_coworking')->create();
@@ -318,12 +446,14 @@ class SalaReuniaoTest extends TestCase
 
         $dados = $sala->toArray();
         $dados['manha_horarios_reuniao'] = null;
-        $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
+        $dados['tarde_horarios_reuniao'] = null;
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
-            'manha_horarios_reuniao'
+            'manha_horarios_reuniao',
+            'tarde_horarios_reuniao'
         ]);
     }
 
@@ -340,6 +470,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = '09:00,10:00';
         $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -360,6 +491,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = ['15:00', '16:00'];
         $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -380,30 +512,11 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = ['09:00', '10:00', '10:00'];
         $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
             'manha_horarios_reuniao.*'
-        ]);
-    }
-
-    /** @test */
-    public function sala_cannot_be_edited_without_periodo_tarde_when_participantes_reuniao_greater_than_0()
-    {
-        $this->signInAsAdmin();
-        $sala = factory('App\SalaReuniao')->states('desativa_coworking')->create();
-                
-        $this->get(route('sala.reuniao.index'))->assertOk();
-        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
-
-        $dados = $sala->toArray();
-        $dados['tarde_horarios_reuniao'] = null;
-        $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
-        $dados['itens_reuniao'] = $sala->getItens('reuniao');
-
-        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
-        ->assertSessionHasErrors([
-            'tarde_horarios_reuniao'
         ]);
     }
 
@@ -420,6 +533,7 @@ class SalaReuniaoTest extends TestCase
         $dados['tarde_horarios_reuniao'] = '09:00,10:00';
         $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -440,6 +554,7 @@ class SalaReuniaoTest extends TestCase
         $dados['tarde_horarios_reuniao'] = ['10:00', '11:00'];
         $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -460,6 +575,7 @@ class SalaReuniaoTest extends TestCase
         $dados['tarde_horarios_reuniao'] = ['14:00', '15:00', '14:00'];
         $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
         $dados['itens_reuniao'] = $sala->getItens('reuniao');
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -480,6 +596,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
         $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
         $dados['itens_reuniao'] = null;
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -500,6 +617,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
         $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
         $dados['itens_reuniao'] = 'tv de teste';
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -520,6 +638,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
         $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
         $dados['itens_reuniao'] = ['Agua', 'Café'];
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -540,6 +659,28 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
         $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
         $dados['itens_reuniao'] = ['Água', 'Café', 'Água'];
+        $dados['itens_coworking'] = [];
+
+        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
+        ->assertSessionHasErrors([
+            'itens_reuniao'
+        ]);
+    }
+
+    /** @test */
+    public function sala_cannot_be_edited_with_itens_with_underline_when_participantes_reuniao_greater_than_0()
+    {
+        $this->signInAsAdmin();
+        $sala = factory('App\SalaReuniao')->states('desativa_coworking')->create();
+                
+        $this->get(route('sala.reuniao.index'))->assertOk();
+        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
+
+        $dados = $sala->toArray();
+        $dados['manha_horarios_reuniao'] = $sala->getHorariosManha('reuniao');
+        $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
+        $dados['itens_reuniao'] = ['Água', 'Café', 'TV _ polegadas com entrada HDMI'];
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -561,6 +702,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -582,6 +724,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -590,7 +733,7 @@ class SalaReuniaoTest extends TestCase
     }
 
     /** @test */
-    public function sala_cannot_be_edited_without_periodo_manha_when_participantes_coworking_greater_than_0()
+    public function sala_cannot_be_edited_without_periodo_manha_and_periodo_tarde_when_participantes_coworking_greater_than_0()
     {
         $this->signInAsAdmin();
         $sala = factory('App\SalaReuniao')->states('desativa_reuniao')->create();
@@ -600,12 +743,14 @@ class SalaReuniaoTest extends TestCase
 
         $dados = $sala->toArray();
         $dados['manha_horarios_coworking'] = null;
-        $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
+        $dados['tarde_horarios_coworking'] = null;
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
-            'manha_horarios_coworking'
+            'manha_horarios_coworking',
+            'tarde_horarios_coworking'
         ]);
     }
 
@@ -622,6 +767,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = '09:00,10:00';
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -642,6 +788,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = ['15:00', '16:00'];
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -662,30 +809,11 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = ['09:00', '10:00', '10:00'];
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
             'manha_horarios_coworking.*'
-        ]);
-    }
-
-    /** @test */
-    public function sala_cannot_be_edited_without_periodo_tarde_when_participantes_coworking_greater_than_0()
-    {
-        $this->signInAsAdmin();
-        $sala = factory('App\SalaReuniao')->states('desativa_reuniao')->create();
-                
-        $this->get(route('sala.reuniao.index'))->assertOk();
-        $this->get(route('sala.reuniao.editar.view', $sala->id))->assertOk();
-
-        $dados = $sala->toArray();
-        $dados['tarde_horarios_coworking'] = null;
-        $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
-        $dados['itens_coworking'] = $sala->getItens('coworking');
-
-        $this->put(route('sala.reuniao.editar', $sala->id), $dados)
-        ->assertSessionHasErrors([
-            'tarde_horarios_coworking'
         ]);
     }
 
@@ -702,6 +830,7 @@ class SalaReuniaoTest extends TestCase
         $dados['tarde_horarios_coworking'] = '09:00,10:00';
         $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -722,6 +851,7 @@ class SalaReuniaoTest extends TestCase
         $dados['tarde_horarios_coworking'] = ['10:00', '11:00'];
         $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -742,6 +872,7 @@ class SalaReuniaoTest extends TestCase
         $dados['tarde_horarios_coworking'] = ['14:00', '15:00', '14:00'];
         $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
         $dados['itens_coworking'] = $sala->getItens('coworking');
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -762,6 +893,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = null;
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -782,6 +914,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = 'tv de teste';
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -802,6 +935,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = ['Agua', 'Café'];
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -822,6 +956,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = $sala->getHorariosManha('coworking');
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = ['Água', 'Café', 'Água'];
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados)
         ->assertSessionHasErrors([
@@ -856,6 +991,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = ['10:30', '11:00', '11:30'];
         $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
         $dados['itens_reuniao'] = ['Água', 'Café'];
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados);
 
@@ -887,6 +1023,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_reuniao'] = ['10:30', '11:00', '11:30'];
         $dados['tarde_horarios_reuniao'] = $sala->getHorariosTarde('reuniao');
         $dados['itens_reuniao'] = ['Água', 'Café'];
+        $dados['itens_coworking'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados);
 
@@ -920,6 +1057,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = ['10:30', '11:00', '11:30'];
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = ['Água', 'Café'];
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados);
 
@@ -951,6 +1089,7 @@ class SalaReuniaoTest extends TestCase
         $dados['manha_horarios_coworking'] = ['10:30', '11:00', '11:30'];
         $dados['tarde_horarios_coworking'] = $sala->getHorariosTarde('coworking');
         $dados['itens_coworking'] = ['Água', 'Café'];
+        $dados['itens_reuniao'] = [];
 
         $this->put(route('sala.reuniao.editar', $sala->id), $dados);
 

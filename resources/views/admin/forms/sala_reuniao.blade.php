@@ -3,6 +3,10 @@
     @if(isset($resultado))
         @method('PUT')
     @endif
+    @php
+        $manha = $resultado::horasManha();
+        $tarde = $resultado::horasTarde();
+    @endphp
     <div class="card-body">
         <h4>Regional - {{ $resultado->regional->regional }}</h4>
 
@@ -44,16 +48,13 @@
                         id="manha_horarios_reuniao" 
                         multiple
                     >
-                    @php
-                        $manha = $resultado::horasManha();
-                    @endphp
-                    @foreach($manha as $hora)
+                    @foreach($manha as $horaRM)
                         <option 
-                            value="{{ $hora }}" 
-                            {{ (!empty(old('manha_horarios_reuniao')) && is_array(old('manha_horarios_reuniao')) && in_array($hora, old('manha_horarios_reuniao'))) || in_array($hora, $resultado->getHorariosManha('reuniao')) ? 
+                            value="{{ $horaRM }}" 
+                            {{ (is_array(old('manha_horarios_reuniao')) && in_array($horaRM, old('manha_horarios_reuniao'))) || in_array($horaRM, $resultado->getHorariosManha('reuniao')) ? 
                                 'selected' : '' }}
                             >
-                            {{ $hora }}
+                            {{ $horaRM }}
                         </option>
                     @endforeach
                     </select>
@@ -77,16 +78,13 @@
                         id="tarde_horarios_reuniao" 
                         multiple
                     >
-                    @php
-                        $tarde = $resultado::horasTarde();
-                    @endphp
-                    @foreach($tarde as $hora)
+                    @foreach($tarde as $horaRT)
                         <option 
-                            value="{{ $hora }}" 
-                            {{ (!empty(old('tarde_horarios_reuniao')) && is_array(old('tarde_horarios_reuniao')) && in_array($hora, old('tarde_horarios_reuniao'))) || in_array($hora, $resultado->getHorariosTarde('reuniao')) ? 
+                            value="{{ $horaRT }}" 
+                            {{ (is_array(old('tarde_horarios_reuniao')) && in_array($horaRT, old('tarde_horarios_reuniao'))) || in_array($horaRT, $resultado->getHorariosTarde('reuniao')) ? 
                                 'selected' : '' }}
                             >
-                            {{ $hora }}
+                            {{ $horaRT }}
                         </option>
                     @endforeach
                     </select>
@@ -137,7 +135,7 @@
                     @foreach($itensR as $itemEdit)
                         <option 
                             value="{{ $itemEdit }}" 
-                            {{ (!empty(old('itens_reuniao')) && is_array(old('itens_reuniao')) && in_array($itemEdit, old('itens_reuniao'))) || in_array($itemEdit, $itensR) ? 
+                            {{ (is_array(old('itens_reuniao')) && in_array($itemEdit, old('itens_reuniao'))) || in_array($itemEdit, $itensR) ? 
                                 'selected' : '' }}
                             >
                             {{ $itemEdit }}
@@ -149,13 +147,14 @@
                         <br>
                         <em>** Dê um duplo clique no item para editar um valor</em>
                     </small>
-                    <button class="btn btn-sm btn-danger float-left mt-2 removeItem" type="button" id="btnRemoveReuniao"><i class="fas fa-angle-double-left"></i> Remover itens</button>
 
                     @if($errors->has('itens_reuniao') || $errors->has('itens_reuniao.*'))
                     <div class="invalid-feedback">
                         {{ $errors->has('itens_reuniao') ? $errors->first('itens_reuniao') : $errors->first('itens_reuniao.*') }}
                     </div>
                     @endif
+
+                    <button class="btn btn-sm btn-danger float-left mt-2 removeItem" type="button" id="btnRemoveReuniao"><i class="fas fa-angle-double-left"></i> Remover itens</button>
 
                 </div>
             </div>
@@ -201,8 +200,10 @@
                         id="manha_horarios_coworking" 
                         multiple
                     >
-                    @foreach($manha as $hora)
-                        <option value="{{ $hora }}" {{ (!empty(old('manha_horarios_coworking')) && is_array(old('manha_horarios_coworking')) && in_array($hora, old('manha_horarios_reuniao'))) || in_array($hora, $resultado->getHorariosManha('coworking')) ? 'selected' : '' }}>{{ $hora }}</option>
+                    @foreach($manha as $horaCM)
+                        <option value="{{ $horaCM }}" {{ (is_array(old('manha_horarios_coworking')) && in_array($horaCM, old('manha_horarios_coworking'))) || in_array($horaCM, $resultado->getHorariosManha('coworking')) ? 'selected' : '' }}>
+                            {{ $horaCM }}
+                        </option>
                     @endforeach
                     </select>
 
@@ -225,8 +226,10 @@
                         id="tarde_horarios_coworking" 
                         multiple
                     >
-                    @foreach($tarde as $hora)
-                        <option value="{{ $hora }}" {{ (!empty(old('tarde_horarios_coworking')) && is_array(old('tarde_horarios_coworking')) && in_array($hora, old('tarde_horarios_reuniao'))) || in_array($hora, $resultado->getHorariosTarde('coworking')) ? 'selected' : '' }}>{{ $hora }}</option>
+                    @foreach($tarde as $horaCT)
+                        <option value="{{ $horaCT }}" {{ (is_array(old('tarde_horarios_coworking')) && in_array($horaCT, old('tarde_horarios_coworking'))) || in_array($horaCT, $resultado->getHorariosTarde('coworking')) ? 'selected' : '' }}>
+                            {{ $horaCT }}
+                        </option>
                     @endforeach
                     </select>
 
@@ -277,7 +280,7 @@
                     @foreach($itensC as $itemCEdit)
                         <option 
                             value="{{ $itemCEdit }}" 
-                            {{ (!empty(old('itens_coworking')) && is_array(old('itens_coworking')) && in_array($itemCEdit, old('itens_coworking'))) || in_array($itemCEdit, $itensC) ? 
+                            {{ (is_array(old('itens_coworking')) && in_array($itemCEdit, old('itens_coworking'))) || in_array($itemCEdit, $itensC) ? 
                                 'selected' : '' }}
                             >
                             {{ $itemCEdit }}
@@ -289,13 +292,14 @@
                         <br>
                         <em>** Dê um duplo clique no item para editar um valor</em>
                     </small>
-                    <button class="btn btn-sm btn-danger float-left mt-2 removeItem" type="button" id="btnRemoveCoworking"><i class="fas fa-angle-double-left"></i> Remover itens</button>
 
                     @if($errors->has('itens_coworking') || $errors->has('itens_coworking.*'))
                     <div class="invalid-feedback">
                         {{ $errors->has('itens_coworking') ? $errors->first('itens_coworking') : $errors->first('itens_coworking.*') }}
                     </div>
                     @endif
+
+                    <button class="btn btn-sm btn-danger float-left mt-2 removeItem" type="button" id="btnRemoveCoworking"><i class="fas fa-angle-double-left"></i> Remover itens</button>
 
                 </div>
             </div>
