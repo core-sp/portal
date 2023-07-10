@@ -247,7 +247,7 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             if($status == AgendamentoSala::STATUS_NAO_COMPARECEU)
             {
                 $texto = $agendado->updateRotina($user);
-                \Log::channel('interno')->info($texto);
+                \Log::channel('interno')->info('[IP: ' . request()->ip() . '] - ' . $texto);
             }
 
             return null;
@@ -294,5 +294,33 @@ class AgendamentoSalaSubService implements AgendamentoSalaSubServiceInterface {
             'tabela' => $this->tabelaCompleta($resultados, $user), 
             'variaveis' => (object) $this->variaveis
         ];
+    }
+
+    public function executarRotina($removerAnexos = false)
+    {
+        if(!$removerAnexos)
+        {
+            $agendados = AgendamentoSala::whereNull('status')
+            ->whereDate('dia', '<=', now()->subDays(3)->toDateString())
+            ->get();
+    
+            foreach($agendados as $agendado)
+            {
+                $texto = $agendado->updateRotina();
+                \Log::channel('interno')->info($texto);
+            }
+        }else{
+            $agendados = AgendamentoSala::whereIn('status', [AgendamentoSala::STATUS_NAO_COMPARECEU, AgendamentoSala::STATUS_JUSTIFICADO])
+            ->whereNotNull('anexo')
+            ->whereDate('updated_at', '<=', now()->subMonth()->toDateString())
+            ->get();
+    
+            foreach($agendados as $agendado)
+            {
+                $removeu = Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendado->anexo);
+                $removeu ? \Log::channel('interno')->info('[Rotina do Portal] - Removido anexo do agendamento de sala com ID ' . $agendado->id.'.') : 
+                \Log::channel('interno')->info('[Rotina do Portal] - Não foi removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
+            }
+        }
     }
 }

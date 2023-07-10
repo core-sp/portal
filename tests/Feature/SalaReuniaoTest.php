@@ -1255,6 +1255,42 @@ class SalaReuniaoTest extends TestCase
     }
 
     /** @test */
+    public function cannot_create_bloqueio_with_data_inicial_invalid()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'dataFinal' => null,
+            'dataInicial' => now()->addDays(2)->format('d/m/Y'),
+            'horarios' => ['10:00'],
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'dataInicial',
+        ]);
+    }
+
+    /** @test */
+    public function cannot_create_bloqueio_with_data_final_invalid()
+    {
+        $user = $this->signInAsAdmin();
+
+        $bloqueio = factory('App\SalaReuniaoBloqueio')->raw([
+            'dataInicial' => now()->addDays(2)->format('Y-m-d'),
+            'dataFinal' => now()->addDays(2)->format('d/m/Y'),
+            'horarios' => ['10:00'],
+        ]);
+
+        $this->get(route('sala.reuniao.bloqueio.criar'))->assertOk(); 
+        $this->post(route('sala.reuniao.bloqueio.store'), $bloqueio)
+        ->assertSessionHasErrors([
+            'dataFinal',
+        ]);
+    }
+
+    /** @test */
     public function cannot_create_bloqueio_with_data_inicial_before_or_equal_today()
     {
         $user = $this->signInAsAdmin();

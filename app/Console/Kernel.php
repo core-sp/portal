@@ -16,9 +16,6 @@ use PDO;
 use PDOException;
 use App\SolicitaCedula;
 use App\Mail\InternoSolicitaCedulaMail;
-use App\AgendamentoSala;
-use Illuminate\Support\Facades\Storage;
-use App\SuspensaoExcecao;
 
 class Kernel extends ConsoleKernel
 {
@@ -149,55 +146,23 @@ class Kernel extends ConsoleKernel
         
         $schedule->call(function(){
             // Suspensões com data finalizada serão excluídas como soft delete
-            SuspensaoExcecao::where('data_final', '<', now()->format('Y-m-d'))
-            ->delete();
-
             // Atualizar situação das suspensoes se exceção válida
-            SuspensaoExcecao::where('situacao', SuspensaoExcecao::SITUACAO_SUSPENSAO)
-            ->where('data_inicial_excecao', '<=', now()->format('Y-m-d'))
-            ->where('data_final_excecao', '>=', now()->format('Y-m-d'))
-            ->update(['situacao' => SuspensaoExcecao::SITUACAO_EXCECAO]);
-
             // Atualizar situação das suspensoes se exceção não mais válida
-            SuspensaoExcecao::where('situacao', SuspensaoExcecao::SITUACAO_EXCECAO)
-            ->where('data_final_excecao', '<', now()->format('Y-m-d'))
-            ->update(['situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO]);
-
             // Atualizar relacionamento caso o cpf / cnpj se cadastre no portal
-            $suspensos = SuspensaoExcecao::whereNotNull('cpf_cnpj')->get();
-            foreach($suspensos as $suspenso)
-            {
-                $rc = Representante::where('cpf_cnpj', $suspenso->cpf_cnpj)->first();
-                if(isset($rc))
-                    $suspenso->updateRelacaoByIdRep($rc->id);
-            }
+            $service = resolve('App\Contracts\MediadorServiceInterface');
+            $service->getService('SalaReuniao')->suspensaoExcecao()->executarRotina($service);
         })->daily();
 
         $schedule->call(function(){
             // Agendamentos não justificados ou status não atualizados após 2 dias
-            $agendados = AgendamentoSala::whereNull('status')
-            ->whereDate('dia', '<=', now()->subDays(3)->toDateString())
-            ->get();
-
-            foreach($agendados as $agendado){
-                $texto = $agendado->updateRotina();
-                \Log::channel('interno')->info($texto);
-            }
+            $service = resolve('App\Contracts\MediadorServiceInterface');
+            $service->getService('SalaReuniao')->agendados()->executarRotina();
         })->dailyAt('0:30');
 
         // Agendamentos com anexo finalizados com 1 mês ou mais terão o anexo removido.
         $schedule->call(function(){
-            $agendados = AgendamentoSala::whereIn('status', [AgendamentoSala::STATUS_NAO_COMPARECEU, AgendamentoSala::STATUS_JUSTIFICADO])
-            ->whereNotNull('anexo')
-            ->whereDate('updated_at', '<=', now()->subMonth()->toDateString())
-            ->get();
-
-            foreach($agendados as $agendado)
-            {
-                $removeu = Storage::disk('local')->delete('representantes/agendamento_sala/'.$agendado->anexo);
-                $removeu ? \Log::channel('interno')->info('[Rotina do Portal] - Removido anexo do agendamento de sala com ID ' . $agendado->id.'.') : 
-                \Log::channel('interno')->info('[Rotina do Portal] - Não foi removido anexo do agendamento de sala com ID ' . $agendado->id.'.');
-            }
+            $service = resolve('App\Contracts\MediadorServiceInterface');
+            $service->getService('SalaReuniao')->agendados()->executarRotina(true);
         })->monthlyOn(1, '2:00');
     }
 

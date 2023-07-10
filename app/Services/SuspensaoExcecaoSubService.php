@@ -180,4 +180,31 @@ class SuspensaoExcecaoSubService implements SuspensaoExcecaoSubServiceInterface 
                 $suspensos[$chave] = formataCpfCnpj($val);
         return $suspensos;
     }
+
+    public function executarRotina($service)
+    {
+        // Suspensões com data finalizada serão excluídas como soft delete
+        SuspensaoExcecao::where('data_final', '<', now()->format('Y-m-d'))
+        ->delete();
+
+        // Atualizar situação das suspensoes se exceção válida
+        SuspensaoExcecao::where('situacao', SuspensaoExcecao::SITUACAO_SUSPENSAO)
+        ->where('data_inicial_excecao', '<=', now()->format('Y-m-d'))
+        ->where('data_final_excecao', '>=', now()->format('Y-m-d'))
+        ->update(['situacao' => SuspensaoExcecao::SITUACAO_EXCECAO]);
+
+        // Atualizar situação das suspensoes se exceção não mais válida
+        SuspensaoExcecao::where('situacao', SuspensaoExcecao::SITUACAO_EXCECAO)
+        ->where('data_final_excecao', '<', now()->format('Y-m-d'))
+        ->update(['situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO]);
+
+        // Atualizar relacionamento caso o cpf / cnpj se cadastre no portal
+        $suspensos = SuspensaoExcecao::whereNotNull('cpf_cnpj')->get();
+        foreach($suspensos as $suspenso)
+        {
+            $rc = $service->getService('Representante')->getRepresentanteByCpfCnpj($suspenso->cpf_cnpj);
+            if(isset($rc))
+                $suspenso->updateRelacaoByIdRep($rc->id);
+        }
+    }
 }

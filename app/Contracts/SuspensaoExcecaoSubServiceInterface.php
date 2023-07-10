@@ -15,4 +15,6 @@ interface SuspensaoExcecaoSubServiceInterface {
     public function verificaSuspenso($cpf_cnpj);
 
     public function participantesSuspensos($cpfs);
+
+    public function executarRotina($service);
 }

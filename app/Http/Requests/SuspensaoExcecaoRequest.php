@@ -77,31 +77,30 @@ class SuspensaoExcecaoRequest extends FormRequest
 
     public function rules()
     {
+        $justificativa = ['justificativa' => 'required|string|min:10|max:1000'];
+
         if(!isset($this->situacao))
-            return [
+            return array_merge([
                 'idrepresentante' => '',
                 'cpf_cnpj' => [
                     'required_if:idrepresentante,',
                     'nullable',
                     new CpfCnpj
                 ],
-                'data_inicial' => 'required|date|after_or_equal:today',
-                'data_final' => 'present|nullable|date'.$this->dataFinal,
-                'justificativa' => 'required|min:10|max:1000',
-            ];
+                'data_inicial' => 'required|date_format:Y-m-d|after_or_equal:today',
+                'data_final' => 'present|nullable|date_format:Y-m-d'.$this->dataFinal,
+            ], $justificativa);
 
         if($this->situacao == 'suspensao')
-            return [
+            return array_merge([
                 'data_final' => 'required|in:'.$this->dataFinalIn,
-                'justificativa' => 'required|min:10|max:1000',
-            ];
+            ], $justificativa);
         
         if($this->situacao == 'excecao')
-            return [
-                'data_inicial_excecao' => 'nullable|date'.$this->dataInicialExcecao,
-                'data_final_excecao' => 'required_unless:data_inicial_excecao,|nullable|date'.$this->dataFinalExcecao,
-                'justificativa' => 'required|min:10|max:1000',
-            ];
+            return array_merge([
+                'data_inicial_excecao' => 'required_unless:data_final_excecao,|nullable|date_format:Y-m-d'.$this->dataInicialExcecao,
+                'data_final_excecao' => 'required_unless:data_inicial_excecao,|nullable|date_format:Y-m-d'.$this->dataFinalExcecao,
+            ], $justificativa);
     }
 
     public function messages()
@@ -112,11 +111,11 @@ class SuspensaoExcecaoRequest extends FormRequest
             'min' => 'Deve ter pelo menos :min caracteres',
             'max' => 'Deve ter no máximo :max caracteres',
             'data_final_excecao.required' => 'O campo é obrigatório / período não aceito',
-            'date' => 'Data deve ser no formato válido',
+            'date_format' => 'Data deve ser no formato válido',
             'data_inicial_excecao.after_or_equal' => 'A data inicial da exceção deve ser maior ou igual a data inicial da suspensão e, no mínimo, igual a hoje',
             'data_final_excecao.after_or_equal' => 'A data final da exceção deve ser maior ou igual a data inicial da exceção',
             'data_final_excecao.before_or_equal' => 'A data final da exceção deve ser menor ou igual a data final da suspensão',
-            'required_unless' => 'O campo obrigatório caso data inicial da exceção esteja preenchido / período ultrapassou o limite de 15 dias incluindo a data inicial da exceção',
+            'required_unless' => 'O campo obrigatório caso data inicial ou final da exceção esteja preenchido / período ultrapassou o limite de 15 dias incluindo a data inicial da exceção',
             'data_inicial.after_or_equal' => 'A data inicial deve ser maior ou igual hoje',
             'data_final.after_or_equal' => 'A data final deve ser maior ou igual a data inicial + 30 dias, ou vazia para Tempo Indeterminado',
             'cpf_cnpj.required_if' => 'Campo obrigatório ou CPF / CNPJ já possui suspensão válida',

@@ -55,8 +55,8 @@ class AgendamentoBloqueioRequest extends FormRequest
                 'sala_reuniao_id' => 'required|in:'.$this->chaveRegional,
                 'horarios' => 'required|array|in:'.$this->chaveHorarios,
                 'horarios.*' => 'distinct',
-                'dataInicial' => 'required|date|after_or_equal:'.now()->addDay()->format('Y-m-d'),
-                'dataFinal' => 'nullable|date|after_or_equal:dataInicial',
+                'dataInicial' => 'required|date_format:Y-m-d|after_or_equal:'.now()->addDay()->format('Y-m-d'),
+                'dataFinal' => 'nullable|date_format:Y-m-d|after_or_equal:dataInicial',
             ];
 
         return [
@@ -74,6 +74,7 @@ class AgendamentoBloqueioRequest extends FormRequest
         return [
             'required' => 'O campo é obrigatório',
             'date' => 'Deve ser uma data válida',
+            'date_format' => 'Deve ser uma data num formato válido',
             'diatermino.after_or_equal' => 'Deve ser uma data igual ou maior que a data de início',
             'diainicio.after_or_equal' => 'Deve ser uma data igual ou maior que hoje',
             'exists' => 'Não existe esse valor',

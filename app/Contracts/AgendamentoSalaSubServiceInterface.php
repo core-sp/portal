@@ -11,4 +11,6 @@ interface AgendamentoSalaSubServiceInterface {
     public function update($user, $id, $acao, $justificativa = ['justificativa_admin' => null]);
 
     public function buscar($user, $busca);
+
+    public function executarRotina();
 }
