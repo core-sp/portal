@@ -10,6 +10,7 @@ use App\AgendamentoSala;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AgendamentoSalaMail;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class AgendamentoSalaTest extends TestCase
 {
@@ -2055,6 +2056,7 @@ class AgendamentoSalaTest extends TestCase
     public function can_to_justify()
     {
         Mail::fake();
+        Storage::fake('local');
 
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
@@ -2086,6 +2088,8 @@ class AgendamentoSalaTest extends TestCase
         $this->assertDatabaseHas('agendamentos_salas', [
             'status' => 'Justificativa Enviada'
         ]);
+
+        Storage::disk('local')->assertExists('representantes/agendamento_sala/'.$agenda->fresh()->anexo);
     }
 
     /** @test */
@@ -2210,6 +2214,8 @@ class AgendamentoSalaTest extends TestCase
     /** @test */
     public function cannot_to_justify_with_anexo_sala_invalid()
     {
+        Storage::fake('local');
+
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->create([
@@ -2234,6 +2240,8 @@ class AgendamentoSalaTest extends TestCase
     /** @test */
     public function cannot_to_justify_with_anexo_sala_greater_than_2MB()
     {
+        Storage::fake('local');
+
         $representante = factory('App\Representante')->create();
         $this->actingAs($representante, 'representante');
         $agenda = factory('App\AgendamentoSala')->states('reuniao')->create([
@@ -2934,4 +2942,105 @@ class AgendamentoSalaTest extends TestCase
             'tarde' => 'Tarde: '.implode(', ', $sala->getHorariosTarde('coworking')),
         ]);
     }
+
+    /* ROTINAS KERNEL */
+
+    private function create_agendamentos_rotina()
+    {
+        // atualizar status
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'dia' => now()->subDays(3)->format('Y-m-d')
+        ]);
+
+        // manter
+        $agendamento1 = factory('App\AgendamentoSala')->create([
+            'dia' => now()->format('Y-m-d'),
+            'idrepresentante' => factory('App\Representante')->create([
+                'cpf_cnpj' => '11122233344'
+            ])
+        ]);
+
+        // atualizar status
+        $agendamento2 = factory('App\AgendamentoSala')->create([
+            'dia' => now()->subDays(4)->format('Y-m-d'),
+            'idrepresentante' => factory('App\Representante')->create([
+                'cpf_cnpj' => '22233344455'
+            ])
+        ])->fresh();
+
+        // manter
+        $agendamento3 = factory('App\AgendamentoSala')->states('justificado')->create([
+            'idrepresentante' => factory('App\Representante')->create([
+                'cpf_cnpj' => '44455566677'
+            ])
+        ]);
+
+        // // manter
+        // $suspenso4 = factory('App\SuspensaoExcecao')->create([
+        //     'cpf_cnpj' => '22233366699',
+        //     'data_final' => null
+        // ])->fresh();
+
+        // // atualizar situação para liberado
+        // $suspenso5 = factory('App\SuspensaoExcecao')->create([
+        //     'cpf_cnpj' => '33366699990',
+        //     'data_inicial_excecao' => now()->format('Y-m-d'),
+        //     'data_final_excecao' => now()->format('Y-m-d'),
+        // ])->fresh();
+
+        // $representante1 = factory('App\Representante')->create([
+        //     'cpf_cnpj' => '73525258000185'
+        // ]);
+
+        // // atualizar relação
+        // $suspenso6 = factory('App\SuspensaoExcecao')->states('excecao')->create([
+        //     'cpf_cnpj' => '73525258000185',
+        // ])->fresh();
+
+        return [
+            $agendamento, $agendamento1, $agendamento2, $agendamento3, /*$suspenso4, $suspenso5, $suspenso6*/
+        ];
+    }
+
+    /** @test */
+    public function rotina_agendamentos_update_status_kernel()
+    {
+        $agendamentos = $this->create_agendamentos_rotina();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('SalaReuniao')->agendados()->executarRotina();
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'idrepresentante' => $agendamentos[0]->idrepresentante,
+            'id' => $agendamentos[0]->id,
+            'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
+        ]);
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'idrepresentante' => $agendamentos[1]->idrepresentante,
+            'id' => $agendamentos[1]->id,
+            'status' => $agendamentos[1]->status
+        ]);
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'idrepresentante' => $agendamentos[2]->idrepresentante,
+            'id' => $agendamentos[2]->id,
+            'status' => AgendamentoSala::STATUS_NAO_COMPARECEU
+        ]);
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'idrepresentante' => $agendamentos[3]->idrepresentante,
+            'id' => $agendamentos[3]->id,
+            'status' => $agendamentos[3]->status
+        ]);
+    }
+
+    // /** @test */
+    // public function rotina_agendamentos_remove_anexos_kernel()
+    // {
+    //     $agendamentos = $this->create_agendamentos_rotina();
+
+    //     $service = resolve('App\Contracts\MediadorServiceInterface');
+    //     $service->getService('SalaReuniao')->agendados()->executarRotina(true);
+    // }
 }

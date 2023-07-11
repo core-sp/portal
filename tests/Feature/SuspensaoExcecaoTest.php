@@ -366,13 +366,12 @@ class SuspensaoExcecaoTest extends TestCase
     public function view_suspensao_is_created()
     {
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
 
         $this->get(route('sala.reuniao.suspensao.lista'))
         ->assertOk()
         ->assertSeeText('Cadastrado no Portal')
-        ->assertSee($suspenso->cpf_cnpj)
+        ->assertSee($suspenso->getCpfCnpj())
         ->assertSeeText('Suspenso por 30 dias')
         ->assertSee('<span class="text-danger"><b>'.SuspensaoExcecao::SITUACAO_SUSPENSAO.'</b></span>')
         ->assertSee('<a href="' .route('sala.reuniao.suspensao.view', $suspenso->id). '" class="btn btn-sm btn-primary">Ver</a>&nbsp;&nbsp;&nbsp;')
@@ -387,8 +386,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste editar suspensão com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
 
@@ -412,8 +410,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste editar suspensão com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
 
@@ -437,8 +434,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste editar suspensão com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
 
@@ -462,8 +458,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste editar suspensão com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
 
@@ -487,8 +482,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste editar suspensão com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->put(route('sala.reuniao.suspensao.update', [$suspenso->id, 'suspensao']), [
             'data_final' => '30',
@@ -508,8 +502,7 @@ class SuspensaoExcecaoTest extends TestCase
         $user = $this->signInAsAdmin();
         $suspenso = factory('App\SuspensaoExcecao')->create([
             'data_final' => null
-        ]);
-        $suspenso->updateRelacaoByIdRep(1);
+        ])->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))
         ->assertOk()
@@ -536,8 +529,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste editar suspensão com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
 
@@ -557,8 +549,7 @@ class SuspensaoExcecaoTest extends TestCase
         $user = $this->signInAsAdmin();
         $suspenso = factory('App\SuspensaoExcecao')->create([
             'data_final' => null
-        ]);
-        $suspenso->updateRelacaoByIdRep(1);
+        ])->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
 
@@ -577,8 +568,7 @@ class SuspensaoExcecaoTest extends TestCase
         $user = $this->signInAsAdmin();
         $suspenso = factory('App\SuspensaoExcecao')->create([
             'data_final' => null
-        ]);
-        $suspenso->updateRelacaoByIdRep(1);
+        ])->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
 
@@ -597,8 +587,7 @@ class SuspensaoExcecaoTest extends TestCase
         $user = $this->signInAsAdmin();
         $suspenso = factory('App\SuspensaoExcecao')->create([
             'data_final' => null
-        ]);
-        $suspenso->updateRelacaoByIdRep(1);
+        ])->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
 
@@ -618,8 +607,7 @@ class SuspensaoExcecaoTest extends TestCase
         $user = $this->signInAsAdmin();
         $suspenso = factory('App\SuspensaoExcecao')->create([
             'data_final' => null
-        ]);
-        $suspenso->updateRelacaoByIdRep(1);
+        ])->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'suspensao']))->assertOk();
 
@@ -637,8 +625,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste editar suspensão com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
 
         $this->put(route('sala.reuniao.suspensao.update', [$suspenso->id, 'suspensao']), [
             'data_final' => '30',
@@ -672,8 +659,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste exceção com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -704,8 +690,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste exceção com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
 
         $this->put(route('sala.reuniao.suspensao.update', [$suspenso->id, 'excecao']), [
             'data_inicial_excecao' => now()->format('Y-m-d'),
@@ -724,8 +709,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste exceção com justificativa sendo removida';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->states('excecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->states('excecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -753,8 +737,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste exceção com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -773,8 +756,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste exceção com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -793,8 +775,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste exceção com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -813,8 +794,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste exceção com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -834,7 +814,6 @@ class SuspensaoExcecaoTest extends TestCase
         $justificativa = 'Teste exceção com justificativa';
         $user = $this->signInAsAdmin();
         $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -853,8 +832,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste exceção com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -875,8 +853,7 @@ class SuspensaoExcecaoTest extends TestCase
         $user = $this->signInAsAdmin();
         $suspenso = factory('App\SuspensaoExcecao')->create([
             'data_inicial' => now()->addDay()->format('Y-m-d')
-        ]);
-        $suspenso->updateRelacaoByIdRep(1);
+        ])->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -898,8 +875,7 @@ class SuspensaoExcecaoTest extends TestCase
         $suspenso = factory('App\SuspensaoExcecao')->create([
             'data_inicial' => now()->subDays(29)->format('Y-m-d'),
             'data_final' => now()->format('Y-m-d')
-        ]);
-        $suspenso->updateRelacaoByIdRep(1);
+        ])->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -918,8 +894,7 @@ class SuspensaoExcecaoTest extends TestCase
     {
         $justificativa = 'Teste exceção com justificativa';
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -937,8 +912,7 @@ class SuspensaoExcecaoTest extends TestCase
     public function excecao_cannot_be_edited_without_justificativa()
     {
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -956,8 +930,7 @@ class SuspensaoExcecaoTest extends TestCase
     public function excecao_cannot_be_edited_with_justificativa_less_than_10_chars()
     {
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -977,8 +950,7 @@ class SuspensaoExcecaoTest extends TestCase
         $faker = \Faker\Factory::create();
 
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
         
         $this->get(route('sala.reuniao.suspensao.edit', [$suspenso->id, 'excecao']))->assertOk();
 
@@ -996,8 +968,7 @@ class SuspensaoExcecaoTest extends TestCase
     public function view_excecao_is_updated()
     {
         $user = $this->signInAsAdmin();
-        $suspenso = factory('App\SuspensaoExcecao')->states('excecao')->create();
-        $suspenso->updateRelacaoByIdRep(1);
+        $suspenso = factory('App\SuspensaoExcecao')->states('excecao')->create()->fresh();
 
         $this->get(route('sala.reuniao.suspensao.lista'))
         ->assertOk()
@@ -1023,7 +994,55 @@ class SuspensaoExcecaoTest extends TestCase
         ->assertSee('<span class="text-danger"><b>'.SuspensaoExcecao::SITUACAO_SUSPENSAO.'</b></span>');
     }
 
-    /* AGENDAMENTO UPDATE */
+    /* VISUALIZAR DETALHES DA SUSPENSÃO E HISTÓRICO */
+
+    /** @test */
+    public function view_details_suspensao_without_excecao()
+    {
+        $user = $this->signInAsAdmin();
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
+
+        $this->get(route('sala.reuniao.suspensao.view', $suspenso->id))
+        ->assertOk()
+        ->assertSee('<h4>Detalhes da suspensão do CPF / CNPJ <strong>'.$suspenso->getCpfCnpj().'</strong></h4>')
+        ->assertSee('<p><b><span class="text-danger">Período da Suspensão:</span> </b>'.$suspenso->mostraPeriodo().' (<em>'.$suspenso->mostraPeriodoEmDias().'</em>)</p>')
+        ->assertSee('<h5 class="mt-4"><b>Histórico de justificativas:</b></h5>')
+        ->assertSee('<p>'.$suspenso->getJustificativasDesc()[0].'</p>');
+    }
+
+    /** @test */
+    public function view_details_suspensao_with_excecao()
+    {
+        $user = $this->signInAsAdmin();
+        $suspenso = factory('App\SuspensaoExcecao')->states('excecao')->create()->fresh();
+        
+        $this->get(route('sala.reuniao.suspensao.view', $suspenso->id))
+        ->assertOk()
+        ->assertSee('<h4>Detalhes da suspensão do CPF / CNPJ <strong>'.$suspenso->getCpfCnpj().'</strong></h4>')
+        ->assertSee('<p><b><span class="text-danger">Período da Suspensão:</span> </b>'.$suspenso->mostraPeriodo().' (<em>'.$suspenso->mostraPeriodoEmDias().'</em>)</p>')
+        ->assertSee('<p><b><span class="text-success">Período da Exceção:</span> </b>'.$suspenso->mostraPeriodoExcecao().' (<em>'.$suspenso->mostraPeriodoExcecaoEmDias().'</em>)</p>')
+        ->assertSee('<h5 class="mt-4"><b>Histórico de justificativas:</b></h5>')
+        ->assertSee('<p>'.$suspenso->getJustificativasDesc()[1].'</p>')
+        ->assertSee('<p>'.$suspenso->getJustificativasDesc()[0].'</p>');
+    }
+
+    /** @test */
+    public function view_details_suspensao_with_agendamento()
+    {
+        $user = $this->signInAsAdmin();
+        $suspenso = factory('App\SuspensaoExcecao')->states('justificativa_recusada')->create()->fresh();
+        $protocolo = $suspenso->agendamento->protocolo;
+        
+        $this->get(route('sala.reuniao.suspensao.view', $suspenso->id))
+        ->assertOk()
+        ->assertSee('<h4>Detalhes da suspensão do CPF / CNPJ <strong>'.$suspenso->getCpfCnpj().'</strong></h4>')
+        ->assertSee('<p><b><span class="text-danger">Período da Suspensão:</span> </b>'.$suspenso->mostraPeriodo().' (<em>'.$suspenso->mostraPeriodoEmDias().'</em>)</p>')
+        ->assertSee('<h5 class="mt-4"><b>Histórico de justificativas:</b></h5>')
+        ->assertSee('<a href="'.route('sala.reuniao.agendados.busca', ['q' => $protocolo]).'" target="_blank">'.$protocolo.'</a>&nbsp;&nbsp;<b>|</b>')
+        ->assertSee('<p>'.$suspenso->getJustificativasDesc()[0].'</p>');
+    }
+
+    /* AGENDAMENTO ADMIN UPDATE */
 
     /** @test */
     public function suspensao_is_created_by_agendamento_refused()
@@ -1040,6 +1059,11 @@ class SuspensaoExcecaoTest extends TestCase
         ->assertSeeText('Cadastrado no Portal')
         ->assertSee($agendamento->representante->cpf_cnpj)
         ->assertSee('<span class="text-danger"><b>'.SuspensaoExcecao::SITUACAO_SUSPENSAO.'</b></span>');
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'agendamento_sala_id' => $agendamento->id,
+            'situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO
+        ]);
     }
 
     /** @test */
@@ -1061,5 +1085,529 @@ class SuspensaoExcecaoTest extends TestCase
         $texto .= $agendamento->representante->cpf_cnpj . ' foi suspenso automaticamente por 30 dias';
         $texto .= ' a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now());
         $this->assertStringContainsString($texto, $log);
+    }
+
+    /** @test */
+    public function suspensao_is_updated_by_agendamento_refused()
+    {
+        $user = $this->signInAsAdmin();
+        $suspenso = factory('App\SuspensaoExcecao')->create([
+            'data_inicial' => now()->subDays(15)->format('Y-m-d'),
+            'data_final' => now()->subDays(15)->addDays(30)->format('Y-m-d'),
+        ])->fresh();
+
+        $agendamento = factory('App\AgendamentoSala')->states('justificado')->create([
+            'idrepresentante' => 1
+        ]);
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'data_inicial' => now()->subDays(15)->format('Y-m-d'),
+            'data_final' => now()->subDays(15)->addDays(30)->format('Y-m-d'),
+            'agendamento_sala_id' => null,
+            'situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO
+        ]);
+        
+        $this->put(route('sala.reuniao.agendados.update', [$agendamento->id, 'recusa']), [
+            'justificativa_admin' => 'fgfgffgffgfffggfgfg'
+        ]);
+
+        $this->get(route('sala.reuniao.suspensao.lista'))
+        ->assertOk()
+        ->assertSeeText('Cadastrado no Portal')
+        ->assertSee($agendamento->representante->cpf_cnpj)
+        ->assertSee('<span class="text-danger"><b>'.SuspensaoExcecao::SITUACAO_SUSPENSAO.'</b></span>');
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'data_inicial' => now()->format('Y-m-d'),
+            'data_final' => now()->addDays(30)->format('Y-m-d'),
+            'agendamento_sala_id' => $agendamento->id,
+            'situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO
+        ]);
+
+        $this->assertEquals(SuspensaoExcecao::count(), 1);
+    }
+
+    /** @test */
+    public function log_is_generated_when_suspensao_is_updated_by_agendamento_refused_with_tempo_indeterminado()
+    {
+        $user = $this->signInAsAdmin();
+        $suspenso = factory('App\SuspensaoExcecao')->create([
+            'data_inicial' => now()->subDays(15)->format('Y-m-d'),
+            'data_final' => null,
+        ])->fresh();
+        $agendamento = factory('App\AgendamentoSala')->states('justificado')->create([
+            'idrepresentante' => 1
+        ]);
+        
+        $this->put(route('sala.reuniao.agendados.update', [$agendamento->id, 'recusa']), [
+            'justificativa_admin' => 'fgfgffgffgfffggfgfg'
+        ]);
+
+        $log = tailCustom(storage_path($this->pathLogInterno()));
+        $inicio = '[' . now()->format('Y-m-d H:i:s') . '] testing.INFO: [IP: '.request()->ip().'] - ';
+
+        $texto = '[Funcionário(a) '.$user->nome.'] | [Ação - suspensão] - Após análise da justificativa enviada pelo representante, o agendamento com o protocolo '. $agendamento->protocolo;
+        $texto .= ' teve o status atualizado para ' . $agendamento::STATUS_NAO_COMPARECEU . ' devido a recusa.';
+        $texto .= ' A justificativa do funcionário foi enviada por e-mail para o representante e está no agendamento. Então, o CPF / CNPJ ';
+        $texto .= $agendamento->representante->cpf_cnpj . ' foi mantida a suspensão por tempo indeterminado';
+        $texto .= ' a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now());
+        $this->assertStringContainsString($texto, $log);
+    }
+
+    /* ÁREA DO RC */
+
+    /** @test */
+    public function representante_cannot_created_agendamento_when_suspensao_is_created()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
+        $representante = $suspenso->representante;
+
+        $this->actingAs($representante, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->raw();
+
+        $justificativa = $suspenso->getJustificativasDesc($suspenso->getJustificativasByAcao('suspensão'))[0];
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-ban"></i>&nbsp;&nbsp;Está suspenso pelo período de <b>' . $suspenso->mostraPeriodo().'</b>')
+        ->assertSee('<br><br>Durante a suspensão não pode criar novos agendamentos e nem participar de novas reuniões.')
+        ->assertSee('<br>Os agendamentos e participações já criados não são afetados.')
+        ->assertSee('<br><b>Última justificativa de suspensão:</b> '.$suspenso->removeNomeAcaoJustificativa($justificativa, 'suspensão'));
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => Carbon::parse($agenda['dia'])->format('d/m/Y'), 
+            'periodo' => 'tarde',
+        ])
+        ->assertRedirect(route('representante.agendar.inserir.view'));
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-ban"></i>&nbsp;&nbsp;Está suspenso pelo período de <b>' . $suspenso->mostraPeriodo().'</b>')
+        ->assertSee('<br><br>Durante a suspensão não pode criar novos agendamentos e nem participar de novas reuniões.')
+        ->assertSee('<br>Os agendamentos e participações já criados não são afetados.')
+        ->assertSee('<br><b>Última justificativa de suspensão:</b> '.$suspenso->removeNomeAcaoJustificativa($justificativa, 'suspensão'));
+    }
+
+    /** @test */
+    public function representante_cannot_created_agendamento_with_participante_suspenso()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+
+        $this->actingAs($representante1, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw();
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+            'participantes_cpf' => ['569.832.380-10', '862.943.730-85'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+        ])
+        ->assertSessionHasErrors([
+            'participante_suspenso'
+        ]);
+    }
+
+    /** @test */
+    public function representante_can_cancel_agendamento_when_suspensao_is_created()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
+        $representante = $suspenso->representante;
+
+        $this->actingAs($representante, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $justificativa = $suspenso->getJustificativasDesc($suspenso->getJustificativasByAcao('suspensão'))[0];
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-ban"></i>&nbsp;&nbsp;Está suspenso pelo período de <b>' . $suspenso->mostraPeriodo().'</b>')
+        ->assertSee('<br><br>Durante a suspensão não pode criar novos agendamentos e nem participar de novas reuniões.')
+        ->assertSee('<br>Os agendamentos e participações já criados não são afetados.')
+        ->assertSee('<br><b>Última justificativa de suspensão:</b> '.$suspenso->removeNomeAcaoJustificativa($justificativa, 'suspensão'));
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]).'" class="btn btn-danger btn-sm link-nostyle mt-2">Cancelar</a>');
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'cancelar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSee('<button type="submit" class="btn btn-danger">');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'cancelar',
+            'id' => $agenda->id
+        ]))->assertStatus(302);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento cancelado com sucesso!');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'status' => 'Cancelado'
+        ]);
+    }
+
+    /** @test */
+    public function representante_can_edit_agendamento_when_suspensao_is_created()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
+        $representante = $suspenso->representante;
+        $this->actingAs($representante, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $justificativa = $suspenso->getJustificativasDesc($suspenso->getJustificativasByAcao('suspensão'))[0];
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-ban"></i>&nbsp;&nbsp;Está suspenso pelo período de <b>' . $suspenso->mostraPeriodo().'</b>')
+        ->assertSee('<br><br>Durante a suspensão não pode criar novos agendamentos e nem participar de novas reuniões.')
+        ->assertSee('<br>Os agendamentos e participações já criados não são afetados.')
+        ->assertSee('<br><b>Última justificativa de suspensão:</b> '.$suspenso->removeNomeAcaoJustificativa($justificativa, 'suspensão'));
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSeeText('Editar');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'editar',
+            'id' => $agenda->id
+        ]), [
+            'participantes_cpf' => ['56983238010'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
+        ])->assertStatus(302);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Participantes foram alterados com sucesso! Foi enviado um e-mail com os detalhes.');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'reuniao',
+            'idrepresentante' => 1,
+            'participantes' => json_encode([
+                '56983238010' => 'NOME PARTICIPANTE UM'
+            ], JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /** @test */
+    public function representante_can_justify_agendamento_when_suspensao_is_created()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->create()->fresh();
+        $representante = $suspenso->representante;
+        $this->actingAs($representante, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create([
+            'dia' => now()->format('Y-m-d')
+        ]);
+
+        $justificativa = $suspenso->getJustificativasDesc($suspenso->getJustificativasByAcao('suspensão'))[0];
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-ban"></i>&nbsp;&nbsp;Está suspenso pelo período de <b>' . $suspenso->mostraPeriodo().'</b>')
+        ->assertSee('<br><br>Durante a suspensão não pode criar novos agendamentos e nem participar de novas reuniões.')
+        ->assertSee('<br>Os agendamentos e participações já criados não são afetados.')
+        ->assertSee('<br><b>Última justificativa de suspensão:</b> '.$suspenso->removeNomeAcaoJustificativa($justificativa, 'suspensão'));
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<a href="'.route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]).'" class="btn btn-sm btn-dark link-nostyle mt-2">Justificar</a>');
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'justificar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSeeText('Justificar');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'justificar', 'id' => $agenda->id
+        ]), [
+            'justificativa' => 'dfdfdfdfdfdfdfdfdfdfdfdfdf',
+        ])
+        ->assertStatus(302);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento justificado com sucesso! Está em análise do atendente. Foi enviado um e-mail com a sua justificativa.');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'status' => 'Justificativa Enviada'
+        ]);
+    }
+
+    /** @test */
+    public function representante_can_created_agendamento_when_excecao_is_created()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->states('excecao')->create()->fresh();
+        $representante = $suspenso->representante;
+
+        $this->actingAs($representante, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->raw();
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-exclamation-circle"></i>&nbsp;&nbsp;Está liberado temporariamente pelo período de <b>'.$suspenso->mostraPeriodoExcecao().'</b>')
+        ->assertSee(' o acesso para criar novos agendamentos e participar de novas reuniões, independentemente do dia do agendamento.');
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => 'coworking',
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'], 
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+        ])->assertStatus(302);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento criado com sucesso! Foi enviado um e-mail com os detalhes.');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'coworking',
+            'idrepresentante' => 1,
+        ]);
+    }
+
+    /** @test */
+    public function representante_can_create_agendamento_with_participante_excecao()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->states('excecao')->create()->fresh();
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+
+        $this->actingAs($representante1, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->raw([
+            'participantes' => json_encode(['56983238010' => 'NOME PARTICIPANTE UM', '86294373085' => 'NOME PARTICIPANTE DOIS'], JSON_FORCE_OBJECT)
+        ]);
+
+        $this->post(route('representante.agendar.inserir.post', 'agendar'), [
+            'tipo_sala' => $agenda['tipo_sala'],
+            'sala_reuniao_id' => $agenda['sala_reuniao_id'],
+            'dia' => onlyDate($agenda['dia']), 
+            'periodo' => $agenda['periodo'],
+            'participantes_cpf' => ['569.832.380-10', '862.943.730-85'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM', 'NOME PARTICIPANTE DOIS'],
+        ])->assertStatus(302);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Agendamento criado com sucesso! Foi enviado um e-mail com os detalhes.');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'reuniao',
+            'idrepresentante' => $representante1->id,
+            'participantes' => $agenda['participantes']
+        ]);
+    }
+
+    /** @test */
+    public function representante_can_edit_agendamento_with_participante_excecao()
+    {
+        $suspenso = factory('App\SuspensaoExcecao')->states('excecao')->create()->fresh();
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+
+        $this->actingAs($representante1, 'representante');
+
+        $agenda = factory('App\AgendamentoSala')->states('reuniao')->create();
+
+        $this->get(route('representante.agendar.inserir.view', ['acao' => 'editar', 'id' => $agenda->id]))
+        ->assertOk()
+        ->assertSeeText('Editar');
+
+        $this->put(route('representante.agendar.inserir.put', [
+            'acao' => 'editar',
+            'id' => $agenda->id
+        ]), [
+            'participantes_cpf' => ['56983238010'],
+            'participantes_nome' => ['NOME PARTICIPANTE UM'],
+        ])->assertStatus(302);
+
+        $this->get(route('representante.agendar.inserir.view'))
+        ->assertSee('<i class="fas fa-check"></i>&nbsp;&nbsp;Participantes foram alterados com sucesso! Foi enviado um e-mail com os detalhes.');
+
+        $this->assertDatabaseHas('agendamentos_salas', [
+            'tipo_sala' => 'reuniao',
+            'idrepresentante' => $representante1->id,
+            'participantes' => json_encode([
+                '56983238010' => 'NOME PARTICIPANTE UM'
+            ], JSON_FORCE_OBJECT)
+        ]);
+    }
+
+    /* ROTINAS KERNEL */
+
+    private function create_suspensoes_rotina()
+    {
+        // excluir
+        $suspenso = factory('App\SuspensaoExcecao')->create([
+            'data_final' => now()->subDay()->format('Y-m-d')
+        ])->fresh();
+
+        // atualizar situação para liberado
+        $suspenso1 = factory('App\SuspensaoExcecao')->create([
+            'cpf_cnpj' => '22233366699989',
+            'data_inicial_excecao' => now()->format('Y-m-d'),
+            'data_final_excecao' => now()->addDay()->format('Y-m-d'),
+        ])->fresh();
+
+        // excluir
+        $suspenso2 = factory('App\SuspensaoExcecao')->create([
+            'cpf_cnpj' => '11111111111',
+            'data_final' => now()->subDay()->format('Y-m-d')
+        ])->fresh();
+
+        // atualizar situação para suspenso
+        $suspenso3 = factory('App\SuspensaoExcecao')->states('excecao')->create([
+            'cpf_cnpj' => '22333699545',
+            'data_inicial_excecao' => now()->subDay()->format('Y-m-d'),
+            'data_final_excecao' => now()->subDay()->format('Y-m-d'),
+        ])->fresh();
+
+        // manter
+        $suspenso4 = factory('App\SuspensaoExcecao')->create([
+            'cpf_cnpj' => '22233366699',
+            'data_final' => null
+        ])->fresh();
+
+        // atualizar situação para liberado
+        $suspenso5 = factory('App\SuspensaoExcecao')->create([
+            'cpf_cnpj' => '33366699990',
+            'data_inicial_excecao' => now()->format('Y-m-d'),
+            'data_final_excecao' => now()->format('Y-m-d'),
+        ])->fresh();
+
+        $representante1 = factory('App\Representante')->create([
+            'cpf_cnpj' => '73525258000185'
+        ]);
+
+        // atualizar relação
+        $suspenso6 = factory('App\SuspensaoExcecao')->states('excecao')->create([
+            'cpf_cnpj' => '73525258000185',
+        ])->fresh();
+
+        return [
+            $suspenso, $suspenso1, $suspenso2, $suspenso3, $suspenso4, $suspenso5, $suspenso6
+        ];
+    }
+
+    private function create_agendamentos_rotina()
+    {
+        // atualizar status
+        $agendamento = factory('App\AgendamentoSala')->create([
+            'dia' => now()->subDays(3)->format('Y-m-d')
+        ]);
+
+        // manter
+        $agendamento1 = factory('App\AgendamentoSala')->create([
+            'dia' => now()->format('Y-m-d'),
+            'idrepresentante' => factory('App\Representante')->create([
+                'cpf_cnpj' => '11122233344'
+            ])
+        ]);
+
+        // atualizar status
+        $agendamento2 = factory('App\AgendamentoSala')->create([
+            'dia' => now()->subDays(4)->format('Y-m-d'),
+            'idrepresentante' => factory('App\Representante')->create([
+                'cpf_cnpj' => '22233344455'
+            ])
+        ]);
+
+        // manter
+        $agendamento3 = factory('App\AgendamentoSala')->states('justificado')->create([
+            'idrepresentante' => factory('App\Representante')->create([
+                'cpf_cnpj' => '44455566677'
+            ])
+        ]);
+
+        return [
+            $agendamento, $agendamento1, $agendamento2, $agendamento3
+        ];
+    }
+
+    /** @test */
+    public function rotina_suspensoes_kernel()
+    {
+        $suspensoes = $this->create_suspensoes_rotina();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('SalaReuniao')->suspensaoExcecao()->executarRotina($service);
+
+        $this->assertSoftDeleted('suspensoes_excecoes', [
+            'idrepresentante' => 1,
+            'id' => $suspensoes[0]->id,
+        ]);
+
+        $this->assertSoftDeleted('suspensoes_excecoes', [
+            'cpf_cnpj' => $suspensoes[2]->cpf_cnpj,
+            'id' => $suspensoes[2]->id,
+        ]);
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'cpf_cnpj' => $suspensoes[1]->cpf_cnpj,
+            'id' => $suspensoes[1]->id,
+            'situacao' => SuspensaoExcecao::SITUACAO_EXCECAO
+        ]);
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'cpf_cnpj' => $suspensoes[5]->cpf_cnpj,
+            'id' => $suspensoes[5]->id,
+            'situacao' => SuspensaoExcecao::SITUACAO_EXCECAO
+        ]);
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'cpf_cnpj' => $suspensoes[3]->cpf_cnpj,
+            'id' => $suspensoes[3]->id,
+            'situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO
+        ]);
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'cpf_cnpj' => $suspensoes[4]->cpf_cnpj,
+            'id' => $suspensoes[4]->id,
+            'situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO
+        ]);
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'cpf_cnpj' => null,
+            'idrepresentante' => $suspensoes[6]->idrepresentante,
+            'id' => $suspensoes[6]->id,
+            'situacao' => SuspensaoExcecao::SITUACAO_EXCECAO
+        ]);
+    }
+
+    /** @test */
+    public function rotina_suspensoes_by_agendamentos_kernel()
+    {
+        $agendamentos = $this->create_agendamentos_rotina();
+
+        $service = resolve('App\Contracts\MediadorServiceInterface');
+        $service->getService('SalaReuniao')->agendados()->executarRotina();
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'cpf_cnpj' => null,
+            'idrepresentante' => $agendamentos[0]->idrepresentante,
+            'agendamento_sala_id' => $agendamentos[0]->id,
+            'situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO,
+            'data_inicial' => now()->format('Y-m-d'),
+            'data_final' => now()->addDays(30)->format('Y-m-d'),
+            'justificativa' => json_encode([
+                '[Rotina do Portal] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $agendamentos[0]->protocolo.
+                ' teve o status atualizado para ' . $agendamentos[0]::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ '.
+                $agendamentos[0]->representante->cpf_cnpj.' foi suspenso automaticamente por 30 dias a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now())
+            ], JSON_FORCE_OBJECT)
+        ]);
+
+        $this->assertDatabaseHas('suspensoes_excecoes', [
+            'cpf_cnpj' => null,
+            'idrepresentante' => $agendamentos[2]->idrepresentante,
+            'agendamento_sala_id' => $agendamentos[2]->id,
+            'situacao' => SuspensaoExcecao::SITUACAO_SUSPENSAO,
+            'data_inicial' => now()->format('Y-m-d'),
+            'data_final' => now()->addDays(30)->format('Y-m-d'),
+            'justificativa' => json_encode([
+                '[Rotina do Portal] | [Ação - suspensão] - Após verificação dos agendamentos, o agendamento com o protocolo '. $agendamentos[2]->protocolo.
+                ' teve o status atualizado para ' . $agendamentos[2]::STATUS_NAO_COMPARECEU . ' devido ao não envio de justificativa. Então, o CPF / CNPJ '.
+                $agendamentos[2]->representante->cpf_cnpj.' foi suspenso automaticamente por 30 dias a contar do dia ' . now()->format('d/m/Y') . '. Data da justificativa: ' . formataData(now())
+            ], JSON_FORCE_OBJECT)
+        ]);
     }
 }
