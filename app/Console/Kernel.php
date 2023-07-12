@@ -156,6 +156,12 @@ class Kernel extends ConsoleKernel
 
             // rotina temporária para o ambiente de testes
             Representante::whereIn('id', [1,2,3,11])->update(['password' => bcrypt('Dev12345')]);
+            \App\Permissao::whereIn('idpermissao', [27,28,29,30,31,32])
+            ->each(function ($item, $key) {
+                $all = explode(',', $item->perfis);
+                if(!in_array('20', $all))
+                    $item->update(['perfis' => '20,' . $item->perfis]);
+            });
         })->daily();
 
         $schedule->call(function(){
